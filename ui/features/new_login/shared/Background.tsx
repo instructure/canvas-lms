@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
+import classNames from 'classnames'
 import {useNewLogin} from '../context/NewLoginContext'
 
 // @ts-expect-error
 import styles from './Background.module.css'
-import classNames from 'classnames'
 
 interface Props {
   className?: string

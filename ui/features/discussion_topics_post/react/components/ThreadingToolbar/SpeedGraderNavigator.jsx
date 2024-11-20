@@ -32,7 +32,6 @@ const visuallyHiddenStyles = {
   margin: '-1px',
   overflow: 'hidden',
   padding: 0,
-  position: 'absolute',
   width: '1px',
 }
 
@@ -52,17 +51,7 @@ export const SpeedGraderNavigator = () => {
   const {sort, perPage, discussionID} = useContext(SearchContext)
 
   const {handlePreviousStudentReply, handleNextStudentReply, handleJumpFocusToSpeedGrader} =
-    useSpeedGrader({
-      highlightEntryId,
-      setHighlightEntryId,
-      setPageNumber,
-      expandedThreads,
-      setExpandedThreads,
-      setFocusSelector,
-      discussionID,
-      perPage,
-      sort,
-    })
+    useSpeedGrader()
 
   const handleFocus = () => {
     setIsVisible(true)

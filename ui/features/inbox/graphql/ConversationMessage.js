@@ -29,10 +29,8 @@ export const ConversationMessage = {
       id
       createdAt
       body
-      attachmentsConnection {
-        nodes {
-          ...Attachment
-        }
+      attachments {
+        ...Attachment
       }
       author {
         ...User
@@ -54,9 +52,7 @@ export const ConversationMessage = {
     id: string,
     createdAt: string,
     body: string,
-    attachmentsConnection: shape({
-      nodes: arrayOf(Attachment.shape),
-    }),
+    attachments: arrayOf(Attachment.shape),
     author: User.shape,
     mediaComment: MediaComment.shape,
     recipients: arrayOf(User.shape),
@@ -67,10 +63,7 @@ export const ConversationMessage = {
     id = 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjk2',
     createdAt = '2021-02-01T12:28:57-07:00',
     body = 'this is the first reply message',
-    attachmentsConnection = {
-      nodes: [Attachment.mock()],
-      __typename: 'FileConnection',
-    },
+    attachments = [Attachment.mock()],
     author = User.mock(),
     mediaComment = MediaComment.mock(),
     recipients = [User.mock({_id: '8', pronouns: 'They/Them', name: 'Scotty Summers'})],
@@ -79,7 +72,7 @@ export const ConversationMessage = {
     id,
     createdAt,
     body,
-    attachmentsConnection,
+    attachments,
     author,
     mediaComment,
     recipients,

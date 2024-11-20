@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ApolloClient} from 'apollo-client'
-import {InMemoryCache} from 'apollo-cache-inmemory'
-import {HttpLink} from 'apollo-link-http'
+import {ApolloClient, HttpLink} from '@apollo/client'
+import {InMemoryCache} from '@apollo/client/cache'
 
 const cache = new InMemoryCache()
 

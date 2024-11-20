@@ -257,6 +257,7 @@ tr:
   access_token_3be22221: "Erişim Anahtarı"
   access_token_count_access_token_count_dfb5463c: "Erişim Anahtarı Sayısı: %{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Oluşturulan ya da Yeniden Oluşturulmuş Erişim Anahtarı"
+  access_token_details_495d989: "Token Erişim Ayrıntıları"
   access_token_is_valid_until_d2f048cf: "Erişim dizgesi şu tarihe kadar geçerli"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Erişim Anahtarları diğer uygulamaların sizin adınıza API iletişimi kurmalarına izin vermek için kullanılır. Kendi entegrasyonlarınız için erişim anahtarları üretip *Canvas Açık API'yi de kullanabilirsiniz.*"
   accessible_sidebar_menu_b30baf97: "Erişilebilir Kenar Çubuğu Menüsü"
@@ -2591,6 +2592,7 @@ tr:
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Bu olay için rezervasyonunuzu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Tüm ödevler için %{sisName}ile Senkronize etmeyi devre dışı bırakmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Bunu yapmak istediğinize emin misiniz? Bu işlem geri alınamaz ve not defterinde var olan notların üzerine yazılır."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Tekrardan token yaratmak istediğinize emin misiniz? Yapacağınız değişiklikle birçok şeyi değiştirmek durumunda kalabilirsiniz."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Bu notlandırma peryodunu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Bu aracı kaldırmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Bu kullanıcıyı silmek istediğinize emin misiniz?"
@@ -2628,6 +2630,7 @@ tr:
   assessment_title_7ab69b66: "değerlendirme başlığı"
   assessment_type_81a73b9c: "değerlendirme türü"
   assign_eedf72bb: Ata
+  assign_reviews_3fb2932a: "Ödev Değerlendirmeleri"
   assign_reviews_on_date_7e48ec50: "Şu Tarihte Gözden Geçirme Ata"
   assign_to_6b806cd9: "Şuna Ata"
   assign_to_95404a83: "Şuna Ata"
@@ -3605,6 +3608,8 @@ tr:
   author_215203d2: Yazar
   author_s_name_b35e905a: "Yazar Adı"
   authorize_e3f25bb4: Yetkilendir
+  authorize_google_drive_8ad056d5: "Google Drive'a İzin Ver"
+  authorize_google_drive_access_aefcf8d6: "Google Drive Erişimine İzin Ver"
   authorize_url_f28167a3: "URL'yi yetkilendir"
   auto_leader_7791c30a: auto_leader
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Uyumlu e-tablo dışa aktarmalarında alan ayırıcıları otomatik algıla"
@@ -3645,6 +3650,7 @@ tr:
   back_to_announcements_1036e43e: "Duyurulara Geri Dön"
   back_to_app_center_95420d83: "Uygulama Merkezine Geri Dön"
   back_to_assignment_1df86a69: "Ödeve Geri Dön"
+  back_to_login_e4b5f663: "Oturum Aç'a dön"
   back_to_ref_title_377ea1f0: "%{ref_title} Geri Dön"
   back_to_table_of_contents_d878b315: "İçerik Tablosuna Geri Dön"
   back_to_title_39e7a8f4: "%{title} e geri dön"
@@ -4866,11 +4872,13 @@ tr:
     submit: Gönder
   confirm_dialog_component: 
     ok: Tamam
+  confirm_email_address_9072dd3c: "Eposta Adresini Onayla"
   confirm_removal_a9bb889: "Kaldırma İşlemini Onayla"
   confirm_reservation_removal_e6350e7c: "Rezervasyon Silme Onayı"
   confirm_unenrollment_64333263: "Kaydın Silinmesini Onayla"
   confirmation_code_required_22984955: "Onay kodu (gerekli)"
   confirmation_failed_please_try_again_ae566d37: "Onaylama başarısız. Lütfen tekrar deneyin."
+  confirming_2df4b68f: Onaylanıyor...
   consumer_key_57d9fcf1: "Kullanıcı anahtarı"
   consumer_key_6f94ba11: "Kullanıcı Anahtarı"
   contact_a6e7f6da: İletişim
@@ -7317,6 +7325,7 @@ tr:
     saving: Kaydediliyor...
   different_course_b875770e: "farklı ders"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo, özellikle araştırma ve eğitim için tasarlanmış bir sosyal yer imi oluşturma aracıdır. Canvas'ın zengin içerik editörü sayesinde Canvas içinden yararlı bulduğunuz diğer kaynaklara bağlantı eklemek için Diigo etiketleriniz içinde arama yapabilirsiniz."
   direct_share_80afd4a7: "Doğrudan Paylaşım"
   disableWhileLoading: 
     loading: Yükleniyor...
@@ -8436,6 +8445,7 @@ tr:
   expand_or_collapse_undated_items_b901de09: "Tarihi belirlenmemiş öğeleri genişlet veya topla"
   expand_subdiscussion_cd226ed4: "Alt tartışmaları Göster"
   expanded_f4493860: Genişletilmiş
+  expires_7019786e: "Sona Erme"
   expires_at_6214b43f: "Şu tarihte sona erecek"
   export_course_content_f4774b74: "Ders İçeriğini Dışa Aktar"
   export_de71cd8e: "Dışa Aktar"
@@ -8895,10 +8905,12 @@ tr:
   general_locked_objects_6a9adafb: "Genel Kilitli Öğeler"
   generate_activity_for_user_2b0af749: "%{user} İçin Etkinlik Oluştur"
   generate_epub_80e89ea4: "ePub Oluştur"
+  generate_token_393ab5b4: "Token Üret"
   generated_f26ee56b: "Oluşturulan:"
   generating_5b5e20f8: "Oluşturuluyor:"
   generating_c2aabc02: Oluşturuluyor...
   generating_preview_45b53be0: "Oluşturma önizlemesi..."
+  generating_token_42c29663: "Token Üretiliyor..."
   germany_49_fc5b8179: "Almanya  (+49)"
   get_started_b9507525: Başlayın
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "*%{assignment.name}* sınavında tüm öğrencilere aynı not verilecektir. Bunun için bir not değeri girin ve ardından notlandırın : "
@@ -10627,6 +10639,7 @@ tr:
   last_modified_by_ca4bb5e1: "Son Düzenleme"
   last_name_303122f3: Soyad
   last_submission_activity_64ada9d0: "Son Gönderim Etkinliği"
+  last_used_17553fed: "Son Kullanma"
   last_user_access_title: "Son Kullanıcı Erişimi"
   late_2be42b88: Geç
   late_assignment_user_name_assignment_name_2df32e01: "Geç Gönderilen Ödev:  %{user_name}, %{assignment_name}"
@@ -13324,6 +13337,7 @@ tr:
   never_1ed1244d: asla
   never_df100b49: Asla
   new_13daf639: Yeni
+  new_access_token_e301d1fc: "Yeni Erişim Anahtarı"
   new_account_role_6e5c4964: "Yeni Hesap Rolü"
   new_activity_8b84847d: "Yeni Etkinlik"
   new_analytics_api_access_7eec1ead: "Yeni Analitikler API Erişimi"
@@ -13805,6 +13819,7 @@ tr:
   off_5385ef3f: Kapalı
   ok_c47544a2: Tamam
   ok_ff1b646a: Tamam
+  ok_thanks_6b1fc8ae: "Tamam, Teşekkürler"
   okay_1772bbeb: Tamam
   okay_got_it_d686d4e8: "Tamam, anlaşıldı"
   old_quiz_e8dafede: "Eski Kısa Sınav"
@@ -13830,6 +13845,7 @@ tr:
       
       Bir not manuel olarak yayınlandığında, otomatik olarak yeni bildirimler gönderir ve öğrenciler tarafından görülür.
       Yayınlanan notlar için gelecekteki not değişikliklerinin manuel olarak yayınlanmasına gerek yoktur.
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Google Drive ınızı görmemize yetki verdiğinizde ödevlerinizi doğrudan Google Drive'dan gönderebilecek ve sınıflarınızdaki arkadaşlarınızla belgeler oluşturup paylaşabieceksiniz."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Cevabınızı gönderdikten sonra değiştiremezsiniz. Bir önceki soruyu da göremezsiniz."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
   one_or_more_items_are_currently_being_imported_the_186fe069: "Şu anda bir veya daha fazla öğe içe aktarılıyor. Hazır olduklarında aşağıdaki dersin içinde görünecekler."
@@ -14865,6 +14881,8 @@ tr:
       regenerating_token_failed: "Yeniden Token Üretiminde Hata"
       registration_failed: "Kayıt işlemi başarısız. Kullanıcı adı ve şifrenizi kontrol edin ve tekrar deneyiniz."
     failed_resending: "İstek başarısız oldu. Tekrar deneyin."
+    labels: 
+      enable_login_for_email: "Bu eposta adresini kullanarak Canvas'a giriş yapmak istiyorum"
     links: 
       resend_confirmation: "Onayı Tekrar Yolla"
       resend_confirmation_failed: "İstek başarısız oldu. Tekrar deneyin."
@@ -15236,6 +15254,7 @@ tr:
     new: 
       payment_info: "Ödeme Bilgileri"
   purple_7678a9fc: Mor
+  purpose_5202a309: Amaç
   push_notification_a6532ff3: "Bilgilendirme Bildirimleri"
   qatar_974_7e9684ca: "Katar (+974)"
   qti_display: QTI
@@ -16699,6 +16718,8 @@ tr:
   range_name_90614433: "Aralık adı"
   ratings_2433172b: Oranlar
   rce_enhancements_5701e06: "RCE İyileştirmeleri"
+  re_send_confirmation_bcc66940: "Onayı Tekrar Yolla"
+  re_sending_379a8580: "Yeniden Gönderiliyor..."
   re_submit_assignment_b3e2bd28: "Ödevi Yeniden Gönder"
   re_upload_submissions_125e415d: "Gönderileri Yeniden Yükle"
   re_upload_submissions_form: 
@@ -16789,7 +16810,12 @@ tr:
   redirected_to_identity_provider_6c4e17d2: "Kimlik sağlayıcıya yönlendirildi"
   reference_code_3e8355dd: "Referans Kodu"
   refresh_8a04b019: Yenile
+  regenerate_token_7d4fb783: "Yeniden Token Üret"
+  regenerating_token_42e5c747: "Yeniden Token Üretiliyor"
+  register_communication_ae935328: "İletişim Kaydı"
   register_email_efc06d59: "E-Mail Kaydet"
+  register_skype_d5e2b3d3: "Skype'a Üye Ol"
+  register_sms_7f87e50d: "SMS Kaydet"
   register_tool_84de3186: "Kayıt Aracı"
   registration: 
     get_started: Başlarken
@@ -17150,8 +17176,10 @@ tr:
   save_changes_698abe77: "Değişiklikleri Kaydet"
   save_key_b4dede06: "Anahtarı Kaydet"
   save_learning_mastery_82889d8b: "Öğrenme Yeterliliğini Kaydet"
+  save_login_bba1272: "Oturumu Kaydet"
   save_publish_36440725: "Kaydet & Yayınla"
   save_settings_cafe79a5: "Ayarları Kaydet"
+  save_skype_name_4de35a9: "Skype İsmini Kaydet"
   save_theme_36c73e6a: "Temayı Kaydet"
   save_theme_f706116e: "Temayı Kaydet"
   saved_discussion_settings_successfully_ebd46a57: "Tartışma ayarları başarılı bir şekilde kaydedildi"
@@ -18399,6 +18427,8 @@ tr:
   skipped_file_filename_due_to_error_94f0194: "Hatadan dolayı %{filename} dosyası atlandı"
   skipping_unknown_file_type_cd1086ee: "Bilinmeyen dosya türü atlanıyor"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Skype Adı"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype ücretsiz çevrimiçi ses ve video görüşmelerine izin veren uygulamadır. Birçok öğrenci ücretsiz Skype hizmetini kullanarak, iletişimin kolay yolunu keşvetmiş durumda. Eğer kayıtlı Skype isminizi kaydeder ve görünür kılarsanız, diğer öğrencilerin sizleri aradıklarında ulaşmaları kolay olur."
   slack_notifications_3a0288e6: "Slack Bildirimleri"
   slideshow: 
     titles: 
@@ -19405,6 +19435,7 @@ tr:
   today_76e10f9c: Bugün
   toggle_course_card_color_overlays_b5b8137a: "Renklendirilmiş ders kartları görünümüne geç"
   toggle_editing_answer_text_as_html_9a93fe6: "Cevap metnini HTML olarak düzenlemeye geçiş yap"
+  token_9a020862: Token
   tolerance_value_9e96573c: "Tolerans değeri"
   tomorrow_9a6c9a00: Yarın
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Çok fazla oturum açma denemesi meydana geldi. Lütfen daha sonra tekrar deneyiniz veya sistem yönetici ile iletişime geçiniz."

@@ -59,6 +59,7 @@ gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_s
 gem "gepub", "~> 1.0"
 gem "graphql", "~> 2.3.0"
 gem "graphql-batch", "~> 0.5"
+gem "hashdiff", "~> 1.1", require: false
 gem "highline", "~> 3.0", require: false
 gem "httparty", "~> 0.21"
 gem "i18nliner", "~> 0.2.4"

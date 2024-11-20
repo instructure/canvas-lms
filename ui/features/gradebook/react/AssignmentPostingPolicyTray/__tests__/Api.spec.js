@@ -69,7 +69,7 @@ describe('AssignmentPostingPolicyTray Api', () => {
             variables: {assignmentId: BAD_RESPONSE_ASSIGNMENT_ID, postManually: true},
           },
           result: {
-            data: {},
+            data: {setAssignmentPostPolicy: {errors: [], postPolicy: null}},
           },
         },
       ])

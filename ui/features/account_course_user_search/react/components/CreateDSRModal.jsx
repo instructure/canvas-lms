@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {bool, func, shape, string, element, oneOf} from 'prop-types'
+import {func, shape, string, element} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import { IconCloudDownloadLine } from '@instructure/ui-icons'
+import {IconCloudDownloadLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -37,8 +37,6 @@ import unflatten from 'obj-unflatten'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
 const I18n = useI18nScope('account_course_user_search')
-
-const trim = (str = '') => str.trim()
 
 const initialState = {
   open: false,
@@ -62,27 +60,25 @@ export default class CreateDSRModal extends React.Component {
       email: string,
       time_zone: string,
     }),
-    customized_login_handle_name: string,
-    delegated_authentication: bool,
-    showSIS: bool,
     afterSave: func.isRequired,
-  }
-
-  static defaultProps = {
-    customized_login_handle_name: window.ENV.customized_login_handle_name,
-    delegated_authentication: window.ENV.delegated_authentication,
-    showSIS: window.ENV.SHOW_SIS_ID_IN_NEW_USER_FORM,
   }
 
   state = {...initialState}
 
   UNSAFE_componentWillMount() {
-      this.setState(update(this.state, {data: {
-        $set: {
-          request_name: ENV.ROOT_ACCOUNT_NAME.toString().replace(/\s+/g, '-') + '-' + (new Date).toISOString().split('T')[0],
-          request_output: "xlsx",
-        }
-      }}))
+    this.setState(
+      update(this.state, {
+        data: {
+          $set: {
+            request_name:
+              ENV.ROOT_ACCOUNT_NAME.toString().replace(/\s+/g, '-') +
+              '-' +
+              new Date().toISOString().split('T')[0],
+            request_output: 'xlsx',
+          },
+        },
+      })
+    )
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -109,7 +105,7 @@ export default class CreateDSRModal extends React.Component {
 
   onChange = (field, value) => {
     this.setState(prevState => {
-      let newState = update(prevState, {
+      const newState = update(prevState, {
         data: unflatten({[field]: {$set: value}}),
         errors: {$set: {}},
       })
@@ -138,10 +134,11 @@ export default class CreateDSRModal extends React.Component {
         this.setState({...initialState})
         if (this.props.afterSave) this.props.afterSave(response)
       },
-      ({response}) => {
+      () => {
         $.flashError('Something went wrong creating the DSR request.')
-        this.setState({errors: {
-          request_name: ["Invalid request name"]
+        this.setState({
+          errors: {
+            request_name: ['Invalid request name'],
           },
         })
       }
@@ -156,63 +153,68 @@ export default class CreateDSRModal extends React.Component {
         open={this.state.open}
         onDismiss={this.close}
         size="medium"
-        label={
-          I18n.t('Create DSR Request')
-        }
+        label={I18n.t('Create DSR Request')}
       >
         <Modal.Body>
           <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-                <TextInput
-                  key="request_name"
-                  renderLabel={<>
-                    {I18n.t('DSR Request Name')} <Text color="danger"> *</Text>
-                  </>}
-                  label={ I18n.t('DSR Request Name')}
-                  data-testid={ I18n.t('DSR Request Name') }
-                  value={get(this.state.data, "request_name")?.toString() ?? ''}
-                  onChange={e =>
-                    this.onChange("request_name", e.target.value)
-                  }
-                  isRequired={true}
-                  layout="inline"
-                  messages={(this.state.errors["request_name"] || [])
-                    .map(errMsg => ({type: 'error', text: errMsg}))
-                    .concat({type: 'hint', text: I18n.t('This is a a common tracking ID for DSR requests.')})
-                    .filter(Boolean)}
-                />
-                <View as="div" padding="0 0 0 medium">
-                  <RadioInputGroup
-                    name="request_output"
-                    description="Output Format"
-                    layout="columns"
-                    value={get(this.state.data, "request_output")?.toString() ?? ''}
-                    onChange={e =>
-                      this.onChange("request_output", e.target.value)
-                    }
-                  >
-                    <RadioInput value="xlsx" label="Excel" />
-                    {/* Enabled once we agree on a format for PDF */}
-                    {/* <RadioInput value="pdf" label="PDF" /> */}
-                  </RadioInputGroup>
-                </View>
+            <TextInput
+              key="request_name"
+              renderLabel={
+                <>
+                  {I18n.t('DSR Request Name')} <Text color="danger"> *</Text>
+                </>
+              }
+              label={I18n.t('DSR Request Name')}
+              data-testid={I18n.t('DSR Request Name')}
+              value={get(this.state.data, 'request_name')?.toString() ?? ''}
+              onChange={e => this.onChange('request_name', e.target.value)}
+              isRequired={true}
+              layout="inline"
+              messages={(this.state.errors.request_name || [])
+                .map(errMsg => ({type: 'error', text: errMsg}))
+                .concat({
+                  type: 'hint',
+                  text: I18n.t('This is a a common tracking ID for DSR requests.'),
+                })
+                .filter(Boolean)}
+            />
+            <View as="div" padding="0 0 0 medium">
+              <RadioInputGroup
+                name="request_output"
+                description="Output Format"
+                layout="columns"
+                value={get(this.state.data, 'request_output')?.toString() ?? ''}
+                onChange={e => this.onChange('request_output', e.target.value)}
+              >
+                <RadioInput value="xlsx" label="Excel" />
+                {/* Enabled once we agree on a format for PDF */}
+                {/* <RadioInput value="pdf" label="PDF" /> */}
+              </RadioInputGroup>
+            </View>
           </FormFieldGroup>
-          {this.state.latestRequest && (<View as="div" padding="small 0 0">
-            <hr />
-            <Text weight="bold">{I18n.t('Latest DSR: ')}</Text>
-            {this.state.latestRequest.progress_status === 'completed' ? (
-              <a href={this.state.latestRequest.download_url} target="_blank" rel="noopener noreferrer">
-                {this.state.latestRequest.request_name} <IconCloudDownloadLine title={I18n.t('Download')} />
-              </a>
-            ) : (<Text>
-                {I18n.t('In progress')}
-              </Text>
-            )}
-          </View>)}
+          {this.state.latestRequest && (
+            <View as="div" padding="small 0 0">
+              <hr />
+              <Text weight="bold">{I18n.t('Latest DSR: ')}</Text>
+              {this.state.latestRequest.progress_status === 'completed' ? (
+                <a
+                  href={this.state.latestRequest.download_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {this.state.latestRequest.request_name}{' '}
+                  <IconCloudDownloadLine title={I18n.t('Download')} />
+                </a>
+              ) : (
+                <Text>{I18n.t('In progress')}</Text>
+              )}
+            </View>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
           <Button type="submit" color="primary">
-            { I18n.t('Create') }
+            {I18n.t('Create')}
           </Button>
         </Modal.Footer>
       </Modal>

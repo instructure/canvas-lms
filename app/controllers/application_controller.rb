@@ -384,14 +384,12 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
-    usage_rights_discussion_topics
     granular_permissions_manage_users
     create_course_subaccount_picker
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
     lti_dynamic_registration
     lti_registrations_next
-    lti_multiple_assignment_deep_linking
     lti_overwrite_user_url_input_select_content_dialog
     buttons_and_icons_root_account
     extended_submission_state
@@ -439,21 +437,35 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  JS_ENV_ROOT_ACCOUNT_SETTINGS = %i[
-    calendar_contexts_limit
-    open_registration
-  ].freeze
-  JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH = Digest::SHA256.hexdigest(JS_ENV_ROOT_ACCOUNT_SETTINGS.sort.join(",")).freeze
+  def js_env_root_account_settings
+    default_settings = %i[calendar_contexts_limit open_registration]
+    if Account.site_admin.feature_enabled?(:inbox_settings)
+      inbox_settings = %i[
+        inbox_auto_response
+        inbox_signature_block
+        inbox_auto_response_for_students
+        inbox_signature_block_for_students
+      ]
+    end
+    settings = default_settings
+    settings += inbox_settings if inbox_settings
 
-  def cached_js_env_account_settings
+    settings.uniq.freeze
+  end
+
+  def cached_js_env_root_account_settings
+    js_env_settings = js_env_root_account_settings
+    js_env_settings_hash = Digest::SHA256.hexdigest(js_env_settings.sort.join(","))
+    account_settings_hash = Digest::SHA256.hexdigest(@domain_root_account[:settings].to_s)
+
     # can be invalidated by a settings change on the domain root account
-    # or updating the JS_ENV_ROOT_ACCOUNT_SETTINGS array
-    MultiCache.fetch(["js_env_account_settings",
-                      JS_ENV_ROOT_ACCOUNT_SETTINGS_HASH,
-                      @domain_root_account[:settings]].cache_key) do
+    # or an update to js_env_root_account_settings
+    MultiCache.fetch(["js_env_root_account_settings", js_env_settings_hash, account_settings_hash].cache_key) do
       results = {}
-      JS_ENV_ROOT_ACCOUNT_SETTINGS.each do |s|
-        results[s] = @domain_root_account&.setting_enabled?(s)
+      js_env_settings.each do |setting|
+        next unless @domain_root_account.settings.key?(setting.to_sym)
+
+        results[setting] = @domain_root_account.settings[setting.to_sym]
       end
       results
     end
@@ -2025,6 +2037,12 @@ class ApplicationController < ActionController::Base
       data = errors.to_hash
     when ActiveRecord::RecordNotFound
       data = { errors: [{ message: "The specified resource does not exist." }] }
+    when AuthenticationMethods::RevokedAccessTokenError
+      add_www_authenticate_header
+      data = { errors: [{ message: "Revoked access token." }] }
+    when AuthenticationMethods::ExpiredAccessTokenError
+      add_www_authenticate_header
+      data = { errors: [{ message: "Expired access token." }] }
     when AuthenticationMethods::AccessTokenError
       add_www_authenticate_header
       data = { errors: [{ message: "Invalid access token." }] }
@@ -3078,6 +3096,7 @@ class ApplicationController < ActionController::Base
              current_user_has_been_observer_in_this_course:,
              observed_student_ids: ObserverEnrollment.observed_student_ids(@context, @current_user),
              apply_assignment_group_weights: @context.apply_group_weights?,
+             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
            })
 
     conditional_release_js_env(includes: :active_rules)
@@ -3101,6 +3120,7 @@ class ApplicationController < ActionController::Base
                              }
                            end,
              DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
+             DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
            })
     js_env(active_grading_periods: GradingPeriod.json_for(@context, @current_user)) if @context.grading_periods?
   end

@@ -312,7 +312,7 @@ class AccountReportsController < ApplicationController
   end
 
   def valid_enrollment_term_id?(enrollment_term_id)
-    enrollment_term_id == "active_terms" || api_find_all(@account.root_account.enrollment_terms, enrollment_term_id.split(",")).exists?
+    enrollment_term_id == "active_terms" || api_find_all(@account.root_account.enrollment_terms, enrollment_term_id.to_s.split(",")).exists?
   end
 
   def type_scope

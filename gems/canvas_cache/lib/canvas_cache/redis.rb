@@ -64,6 +64,18 @@ module CanvasCache
       # rubocop:enable Style/ArgumentsForwarding
     end
 
+    module TaggedRingConfig
+      def initialize(*, ring: nil, **)
+        super(*, **)
+
+        @ring = ring
+      end
+
+      def ring
+        @ring
+      end
+    end
+
     module Distributed
       def initialize(addresses, options = {})
         options[:ring] ||= HashRing.new([], options[:replicas], options[:digest])
@@ -168,6 +180,7 @@ module CanvasCache
         ::Redis.prepend(Redis)
         ::Redis.prepend(IgnorePipelinedKey)
         ::RedisClient.prepend(Client)
+        ::RedisClient::Config.prepend(TaggedRingConfig)
         ::Redis::Cluster::Client.prepend(Cluster)
         ::RedisClient::Cluster.prepend(IgnorePipelinedKey)
         ::Redis::Client.prepend(Client)

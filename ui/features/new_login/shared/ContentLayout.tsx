@@ -35,7 +35,6 @@ const ContentLayout = ({className, children}: Props) => (
       as="div"
       className={classNames(className, styles.contentLayout__wrapper)}
       background="primary"
-      position="relative"
     >
       {children}
     </View>

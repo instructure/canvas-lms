@@ -19,6 +19,7 @@
 export interface AuthProvider {
   id: number
   auth_type: string
+  display_name: string
 }
 
 export interface LoginResponse {

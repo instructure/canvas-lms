@@ -30,7 +30,10 @@ const getContrastingButtonColor = (color1: string) => {
   return buttonColor
 }
 
-const isTransparent = (color: string) => {
+const isTransparent = (color?: string) => {
+  if (!color) {
+    return true
+  }
   const c = tinycolor(color)
   return c.isValid() && c.getAlpha() === 0
 }

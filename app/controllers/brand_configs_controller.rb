@@ -55,10 +55,29 @@ class BrandConfigsController < ApplicationController
     js_bundle :theme_editor
     brand_config = active_brand_config(ignore_parents: true) || BrandConfig.new
 
+    variable_schema = default_schema
+
+    # TODO: permanently remove unused theme variables
+    # once the `login_registration_ui_identity` feature is fully adopted and the
+    # new login UI becomes the default:
+    #   1. permanently update the theme editor UI to remove old/unused login
+    #      brand config variables
+    #   2. remove the `login_registration_ui_identity` feature flag check
+    #   3. remove `LoginBrandConfigFilter.filter`, as the filtering will no
+    #      longer be necessary
+    #   4. ensure that only the new login-related brand config variables are
+    #      returned in relevant API responses
+    #   5. update tests
+    # this is a general outline; there may be other areas that need cleanup, so
+    # review the code carefully when making these changes
+    if @domain_root_account.feature_enabled?(:login_registration_ui_identity)
+      variable_schema = Login::LoginBrandConfigFilter.filter(variable_schema)
+    end
+
     js_env brandConfig: brand_config.as_json(include_root: false),
            isDefaultConfig: session[:brand_config]&.[](:type) == :default,
            hasUnsavedChanges: session.key?(:brand_config),
-           variableSchema: default_schema,
+           variableSchema: variable_schema,
            allowGlobalIncludes: @account.allow_global_includes?,
            account_id: @account.id
     render html: "", layout: "layouts/bare"

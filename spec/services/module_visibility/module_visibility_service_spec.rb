@@ -31,7 +31,7 @@ describe "ModuleVisibility" do
   end
 
   def module_ids_visible_to_user(user)
-    ModuleVisibility::ModuleVisibilityService.modules_visible_to_student(course_id: @course.id, user_id: user.id).map(&:context_module_id)
+    ModuleVisibility::ModuleVisibilityService.modules_visible_to_students(course_ids: @course.id, user_ids: user.id).map(&:context_module_id)
   end
 
   context "module visibility" do

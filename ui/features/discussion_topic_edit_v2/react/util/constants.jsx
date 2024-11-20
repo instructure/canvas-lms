@@ -111,7 +111,6 @@ export const useShouldShowContent = (
 
   const shouldShowUsageRightsOption =
     ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_ATTACH &&
-    ENV?.FEATURES?.usage_rights_discussion_topics &&
     ENV?.USAGE_RIGHTS_REQUIRED &&
     ENV?.PERMISSIONS?.manage_files
 
@@ -129,12 +128,8 @@ export const useShouldShowContent = (
   const shouldShowPodcastFeedOption =
     ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !ENV.K5_HOMEROOM_COURSE
 
-  const shouldShowCheckpointsOptions = isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && !ENV.RESTRICT_QUANTITATIVE_DATA
-
-  const canCreateGradedDiscussion =
-    !isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_CREATE_ASSIGNMENT
-  const canEditDiscussionAssignment =
-    isEditing && ENV?.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_UPDATE_ASSIGNMENT
+  const shouldShowCheckpointsOptions =
+    isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && !ENV.RESTRICT_QUANTITATIVE_DATA
 
   const shouldShowAssignToForUngradedDiscussions =
     !isAnnouncement &&

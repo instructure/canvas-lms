@@ -28,6 +28,8 @@ CanvasRails::Application.routes.draw do
   post "/api/graphql", to: "graphql#execute"
   get "graphiql", to: "graphql#graphiql"
 
+  get "acceptable_use_policy", to: "accounts#acceptable_use_policy"
+
   resources :submissions, only: [] do
     resources :submission_comments, path: :comments, only: :index, defaults: { format: :pdf }
     resources :docviewer_audit_events, only: [:create], constraints: { format: :json }
@@ -315,7 +317,11 @@ CanvasRails::Application.routes.draw do
 
       get :rubric
       resource :rubric_association, path: :rubric do
-        resources :rubric_assessments, path: :assessments
+        resources :rubric_assessments, path: :assessments do
+          collection do
+            get :export
+          end
+        end
       end
 
       get :peer_reviews
@@ -1178,7 +1184,6 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :accounts) do
-      get "terms_of_service_custom_content", action: :terms_of_service_custom_content
       get "settings/environment", action: :environment
     end
 
@@ -1733,6 +1738,7 @@ CanvasRails::Application.routes.draw do
       delete "accounts/:account_id/users/:user_id", action: :remove_user
       put "accounts/:account_id/users/:user_id/restore", action: :restore_user
       get "accounts/:account_id/quiz_ip_filters", action: :quiz_ip_filters, as: "quiz_ip_filters"
+      get "acceptable_use_policy", action: :acceptable_use_policy
     end
 
     scope(controller: :sub_accounts) do

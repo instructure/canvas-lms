@@ -177,6 +177,7 @@ hy:
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "ընդունելի ձեւաչափեր․ hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Ընդունելի ձեւաչափեր․ svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Ընդունված. %{user}, %{role_type}, դասընթաց, %{course}"
+  access_token_details_495d989: "Հասանելիության token-ի տվյալներ"
   access_token_is_valid_until_d2f048cf: "Մուտքի token-ը ուժի մեջ է մինչև"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Մուտքի token-ները կարող են թույլ տալ այլ հավելվածներին Ձեր անունից կատարել API այցեր: Դուք կարող եք նաև գեներացնել մուտքի token-ները և *օգտագործել Canvas Open API-ն* Ձեր սեփական ինտեգրացիաների ստեղծման համար:"
   accordion_section_1_7888782d: "Accordion բաժին 1"
@@ -1950,6 +1951,7 @@ hy:
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս հաղորդակցության Ձեր օրինակը: Այս գործողությունը հնարավոր չէ չեղյալ համարել:"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Դուք իսկապե՞ս ցանկանում եք կատարել այս գործողությունը: Այն հնարավոր չէ չեղարկել եւ արդյունքում կջնջվեն գնահատականների մատյանում տեղ գտած գնահատականները:  "
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Դուք իսկապե՞ս ցանկանում եք ապաակտիվացնել այս օգտատիրոջը: Ապաակտիվացման դեպքում նա չի կարող մասնակցել դասընթացին:"
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Դուք իսկապե՞ս ցանկանում եք կրկին ստեղծել այս token-ը: Անհրաժեշտ կլինի թարմացնել token-ն օգտագործող ամեն ինչ:"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Դուք իսկապե՞ս ցանկանում եք ջնջել գնահատման այս ժամանակահատվածը:"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս գործիքը:"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "Դուք իսկապե՞ս ցանկանում եք հեռացնել այս օգտատիրոջ պրոֆիլի պատկերը:"
@@ -1971,6 +1973,7 @@ hy:
   assessment_title_7ab69b66: "Գիտելիքների գնահատման անվանում"
   assessment_type_81a73b9c: "Գիտելիքների գնահատման տեսակ"
   assign_eedf72bb: Հանձնարարել
+  assign_reviews_3fb2932a: "Հանձնարարել ունկնդիրներին ներկայացնել կարծիքներ միմյանց աշխատանքների վերաբերյալ"
   assign_reviews_on_date_7e48ec50: "Նշանակել կարծիքների ներկայացման ամսաթիվ"
   assign_to_c46e21: "Հանձնարարել "
   assignment: 
@@ -2821,6 +2824,8 @@ hy:
   authnresponse_from_idp_185037e9: "IdP-ից ստացված իսկության հաստատման պատասխան"
   author_215203d2: Հեղինակ
   authorize_e3f25bb4: Թույլատրել
+  authorize_google_drive_8ad056d5: "Թույլատրել Google Drive"
+  authorize_google_drive_access_aefcf8d6: "Թույլատրել Google Drive հասանելիությունը"
   automatically_assign_a_student_group_leader_29448649: "Ավտոմատ կերպով նշանակել ուսանողական խմբի ղեկավարին"
   available_8606e40c: Հասանելի
   available_after_unlock_at_b5682224: "Հասանելի է %{unlock_at}-ից հետո"
@@ -2846,6 +2851,7 @@ hy:
   back_to_announcements_1036e43e: "Վերադառնալ հայտարարություններին"
   back_to_app_center_95420d83: "Վերադառնալ App Center"
   back_to_assignment_1df86a69: "Վերադառնալ առաջադրանքին"
+  back_to_login_e4b5f663: Վերադառնալ
   back_to_ref_title_377ea1f0: "Վերադառնալ %{ref_title} ին"
   back_to_table_of_contents_d878b315: "Վերադառնալ բովանդակության ցանկին"
   back_to_title_39e7a8f4: "Վերադառնալ %{title}-ին"
@@ -3789,9 +3795,11 @@ hy:
     submit: Ուղարկել
   confirm_dialog_component: 
     ok: OK
+  confirm_email_address_9072dd3c: "Հաստատել էլեկտրոնային փոստի հասցեն"
   confirm_unenrollment_64333263: "Հաստատել գրանցման չեղյալացումը"
   confirmation_code_required_22984955: "Հաստատման ծածկագիր (պարտադիր է)"
   confirmation_failed_please_try_again_ae566d37: "Չհաջողվեց հաստատել: Փորձեք կրկին:"
+  confirming_2df4b68f: "Հաստատում է..."
   consumer_key_57d9fcf1: "Օգտատիրոջ բանալի"
   consumer_key_6f94ba11: "Օգտատիրոջ բանալի"
   content_exports: 
@@ -5913,6 +5921,7 @@ hy:
   different_course_b875770e: "այլ դասընթաց"
   differentiated_assignments_description: "Տարբերակված առաջադրանքները հանդիսանում են *բետա* ֆունկցիա, որը հնարավորություն է տալիս ընտրել, թե հանձնարարությունը որ բաժին(ներ)ին է առնչվում: Այն բաժին(ներ)ին, որոնց գծով հանձնարարություն չի տրված, չեն ներառվելու դասընթացի բովանդակության մեջ և ուսանողների վերջնական գնահատականը կհաշվարկվի առանց այդ միավորների:"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo-ն էջանշանների հետ աշխատելու գործիք է, որ նախատեսված է ուսումնասիրությունների և կրթության համար: Canvas-ի մուլտիմեդիա բովանդակության խմբագիրը ձեզ հնարավորություն կտա որոնելու ձեր Diigo պիտակները՝ հեշտորեն կապվելու Canvas-ի և ձեզ համար օգտակար այլ ռեսուրսների հետ:"
   disableWhileLoading: 
     loading: "Բեռնում է..."
   disable_a5c05db3: Անջատել
@@ -6856,6 +6865,7 @@ hy:
   expand_or_collapse_undated_items_b901de09: "Բացել կամ սեղմել չթվագրված տարրերը"
   expand_subdiscussion_cd226ed4: "Բացել ենթաքննարկումները"
   expanded_f4493860: "Բացված է"
+  expires_7019786e: "Ժամկետը լրանում է"
   export_de71cd8e: Արտահանում
   exporting_b1eab154: "Արտահանվում է"
   extensions_7250a0bb: Ընդլայնումներ
@@ -7228,11 +7238,13 @@ hy:
   gathering_files_933551d9: "Ֆայլերի հավաքագրում..."
   general_answer_comments_730136ba: "Պատասխանների ընդհանուր մեկնաբանություններ"
   generate_epub_80e89ea4: "Գեներացնել ePub-ը"
+  generate_token_393ab5b4: "Ստեղծել token"
   generated_f26ee56b: Գեներացված.
   generating_5b5e20f8: "Գեներացվում է."
   generating_c2aabc02: "Գեներացվում է..."
   generating_preview_45b53be0: "Կարծիքը գեներացվում է ..."
   generating_preview_ae83830: "Ստեղծվում է Նախնական Դիտում..."
+  generating_token_42c29663: "Token-ի գեներացում..."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Ստանալ հետևյալը ձեր Salesforce Connected App հավելվածից:"
   get_your_users_error_reports_posted_to_salesforce__76f57839: "Խնդրեք ձեր օգտատերերին սխալների մասին  հաշվետվությունները տեղադրել Salesforce Service Cloud-ում:"
   get_your_users_error_reports_posted_to_salesforce_dfb1a6c2: "Խնդրեք ձեր օգտատերերին սխալների մասին  հաշվետվությունները տեղադրել Salesforce-ում:"
@@ -8734,6 +8746,7 @@ hy:
   last_item_79583712: "Վերջին տարրը՝"
   last_login_54565109: "Վերջին մուտք"
   last_modified_by_ca4bb5e1: "Ում կողմից է փոփոխվել վերջին անգամ"
+  last_used_17553fed: "Վերջին անգամ օգտագործվել է"
   last_user_access_title: "Օգտատիրոջ վերջին մուտքը համակարգ"
   late_assignment_user_name_assignment_name_2df32e01: "Ուշացված հանձնարարություն՝ %{user_name}, %{assignment_name}"
   late_bd436902: ՈՒՇ
@@ -11250,6 +11263,7 @@ hy:
   near_mastery_f25174a4: "Մոտ է անցողիկ միավորին"
   never_1ed1244d: երբեք
   new_13daf639: Նոր
+  new_access_token_e301d1fc: "Հասանելիության նոր token"
   new_account_role_6e5c4964: "Հաշվի նոր դերը"
   new_assignment_for_course_name_f71dd337: "Նոր հանձնարարություն %{course_name} դասընթացի համար"
   new_conferences_a020a8a9: "Նոր կոնֆերանսներ"
@@ -11640,6 +11654,7 @@ hy:
   off_5385ef3f: "Անջատված է"
   ok_c47544a2: Ok
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: Շնորհակալություն
   okay_got_it_d686d4e8: OK
   oldgradebookgradebookKeyboardNav: 
     keyboard_assignment_desc: "Անցնել ընթացիկ հանձնարարության մանրամասների էջին"
@@ -11656,6 +11671,7 @@ hy:
   on_paper_46d0ba36: "Թղթային տարբերակով"
   on_paper_87119532: "Թղթի վրա"
   on_time_percent_eebffe38: "Ժամանակին՝ %{percent}"
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Ձեր Google Drive-ը տեսնելու թույլտվություն տալուց հետո Դուք կարող եք ուղարկել Ձեր հանձնարարությունները անմիջապես Google Drive-ից, ստեղծել և Ձեր դասընթացի անդամների հետ համատեղ օգտագործել փաստաթղթերը:  "
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Պատասխանը փոխելուց հետո դուք պետք է ընտրեք տարբերակ՝ նախքան հարցը թարմացնելը:"
   one_or_more_items_are_currently_being_imported_the_186fe069: "Մեկ կամ մի քանի տարրեր ներկայումս ներմուծվում են: Հասանելի լինելուն պես դրանք անմիջապես տեսանելի կլինեն այս դասընթացում: "
   one_per_line_format_name_value_79647700: "Մեկ տողին՝ մեկը: Ֆորմատ՝ անուն=մեծություն"
@@ -12518,6 +12534,8 @@ hy:
       regenerating_token_failed: "Չհաջողվեց token-ը կրկին ստեղծել"
       registration_failed: "Գրանցումը չհաջողվեց: Ստուգեք մուտքանունը և գաղտնաբառը և փորձեք կրկին:"
     failed_resending: "Հարցման սխալ: Փորձեք կրկին:"
+    labels: 
+      enable_login_for_email: "Ես ցանկանում եմ մուտք գործել Canvas համակարգ, օգտագործելով էլեկտրոնային փոստի այս հասցեն:"
     links: 
       resend_confirmation: "Կրկին ուղարկել հաստատումը"
       resend_confirmation_failed: "Հարցման սխալ: Փորձեք կրկին:"
@@ -12881,6 +12899,7 @@ hy:
     new: 
       payment_info: "Վճարման մասին տեղեկատվություն"
   purple_7678a9fc: Մանուշակագույն
+  purpose_5202a309: Նպատակ
   push_notification_a6532ff3: "Սեղմել ծանուցումը"
   qti_display: QTI
   qti_file_description: "QTI .zip ֆայլ"
@@ -14314,6 +14333,8 @@ hy:
   range_name_90614433: "Դիապազոնի անվանումը"
   ratings_2433172b: Վարկանիշեր
   re_activate_user_f7d77c9a: "Կրկին ակտիվացնել օգտատիրոջ կարգավիճակը"
+  re_send_confirmation_bcc66940: "Կրկին ուղարկել հաստատումը"
+  re_sending_379a8580: "Կրկին ուղարկվում է..."
   re_submit_assignment_b3e2bd28: "Հանձնարարությունը կրկին ուղարկել"
   re_upload_submissions_125e415d: "Կրկին բեռնել ուղարկված աշխատանքները"
   re_upload_submissions_form: 
@@ -14398,9 +14419,14 @@ hy:
   reference_code_is_required_c32c757f: "Պահանջվում է հղման կոդ"
   refresh_8a04b019: Թարմացնել
   regenerate_epub_395c8e56: "Կրկին գեներացնել ePub-ը"
+  regenerate_token_7d4fb783: " Կրկին գեներացնել token-ը"
+  regenerating_token_42e5c747: "Token-ը կրկին գեներացվում է..."
   region_47e29025: Տարածաշրջան.
   region_939f2a6c: Տարածաշրջան
+  register_communication_ae935328: "Գրանցել կապի տեսակը"
   register_email_efc06d59: "Էլեկտրոնային փոստի գրանցում"
+  register_skype_d5e2b3d3: "Գրանցում Skype-ում"
+  register_sms_7f87e50d: "SMS գրանցում"
   register_tool_84de3186: "Գրանցել գործիքը"
   registration: 
     get_started: Սկսենք
@@ -14735,7 +14761,9 @@ hy:
   sample_data_e4fd01ff: "Ընտրանքային տվյալներ"
   save_11a80ec3: Պահպանել
   save_key_b4dede06: "Պահպանել բանալին"
+  save_login_bba1272: "Պահպանել մուտքի տվյալները"
   save_settings_cafe79a5: "Պահպանել կարգաբերումները"
+  save_skype_name_4de35a9: "Պահպանել Skype անունը"
   saving_d55dd90e: "Պահպանվում է..."
   saving_recording_e111cb05: "Ձայնագրառումը պահպանվում է..."
   schedule_student_availability_332154a: "Սահմանել ունկնդիրների հասանելիության ժամանակացույց"
@@ -15925,6 +15953,8 @@ hy:
   skipped_file_filename_due_to_error_94f0194: "բաց է թողնված ֆայլը %{filename} սխալի պատճառով"
   skipping_unknown_file_type_cd1086ee: "Բացթողնել անհայտ տեսակի ֆայլ"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Skype անունը"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype առաջարկում է անվճար առցանց ձայնային և տեսաձայնային զանգեր: Շատ ունկնդիրներ օգտագործում են Skype որպես հաղորդակցության անվճար, հեշտ միջոց: Եթե գրանցեք ձեր անունը Skypy-ում և ակտիվացնեք տեսանելիությունը, ապա մյուս ունկնդիրները կարող են հեշտորեն գտնել ձեր կապի տվյալները և զանգել կամ ավելացնել ձեզ Skype-ի օգնությամբ: "
   slideshow: 
     titles: 
       back: Վերադառնալ
@@ -16863,6 +16893,7 @@ hy:
   toggle_dashcard_view_or_recent_activity_stream_1de257: "Փոխանջատել դիտման վահանակը վերջին ակտիվ հոսքի վրա"
   toggle_editing_answer_text_as_html_9a93fe6: "Ցուցադրել խմբագրված տեքստի պատասխանը HTML-ում"
   toggle_style_checkbox_1cce5eea: "Փոխանջատման-ոճի կոճակ"
+  token_9a020862: Token
   tolerance_value_9e96573c: "Թույլատրելի շեղումների մեծություն"
   tomorrow_9a6c9a00: Վաղը
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Մուտք գործելու չափազանց շատ անհաջող փորձեր կան: Խնդրում ենք փորձել ավելի ուշ կամ դիմել ձեր համակարգի ադմինիստրատորին:"

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import React from 'react'
 import {
   createBrowserRouter,
@@ -30,6 +30,7 @@ import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {NewLoginRoutes} from '../../features/new_login/routes/NewLoginRoutes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
+import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -60,6 +61,8 @@ const portalRouter = createBrowserRouter(
 
       {window.ENV.FEATURES.login_registration_ui_identity && NewLoginRoutes}
 
+      {AUPRoutes}
+
       {window.ENV.enhanced_rubrics_enabled && RubricRoutes}
 
       <Route path="*" element={<></>} />
@@ -72,14 +75,14 @@ export function loadReactRouter() {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const I18n = useI18nScope('main')
   if (mountNode) {
-    ReactDOM.render(
+    const root = ReactDOM.createRoot(mountNode)
+    root.render(
       <QueryProvider>
         <RouterProvider
           router={portalRouter}
           fallbackElement={<Spinner renderTitle={I18n.t('Loading page')} />}
         />
-      </QueryProvider>,
-      mountNode
+      </QueryProvider>
     )
   }
 }

@@ -1199,7 +1199,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # NOTE: only use for courses with differentiated assignments on
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students_in_courses(course_ids:, user_ids:).map(&:quiz_id)
+      visible_quiz_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(course_ids:, user_ids:).map(&:quiz_id)
       if visible_quiz_ids.any?
         where(id: visible_quiz_ids)
       else
@@ -1578,7 +1578,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def visible_students_with_da(context_students)
     if Account.site_admin.feature_enabled?(:selective_release_backend)
       user_ids = context_students.pluck(:id)
-      visible_user_ids = QuizVisibility::QuizVisibilityService.quiz_visible_to_students(quiz_id: id, user_ids:).map(&:user_id)
+      visible_user_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: id, user_ids:).map(&:user_id)
 
       quiz_students = if visible_user_ids.any?
                         context_students.where(id: visible_user_ids)

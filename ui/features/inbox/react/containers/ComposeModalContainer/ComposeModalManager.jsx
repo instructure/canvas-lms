@@ -89,17 +89,13 @@ const ComposeModalManager = props => {
   })
 
   const updateConversationsCache = (cache, result) => {
-    let legacyNode
-    try {
-      const queryResult = JSON.parse(
-        JSON.stringify(cache.readQuery(props.conversationsQueryOption))
-      )
-      legacyNode = queryResult.legacyNode
-    } catch (e) {
-      // readQuery throws an exception if the query isn't already in the cache
-      // If its not in the cache we don't want to do anything
+    const queryResult = JSON.parse(JSON.stringify(cache.readQuery(props.conversationsQueryOption)))
+
+    if (!queryResult) {
       return
     }
+
+    const legacyNode = queryResult.legacyNode
 
     if (props.isReply || props.isReplyAll || props.isForward) {
       const conversation = legacyNode.conversationsConnection.nodes.find(
@@ -138,6 +134,11 @@ const ComposeModalManager = props => {
           })
         )
       )
+
+      if (!replyQueryResult) {
+        return
+      }
+
       replyQueryResult.legacyNode.conversationMessagesConnection.nodes.unshift(
         result.data.addConversationMessage.conversationMessage
       )
@@ -164,7 +165,7 @@ const ComposeModalManager = props => {
       }
       const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
-      if (!!result.data?.addConversationMessage.conversationMessage)
+      if (result.data?.addConversationMessage.conversationMessage)
         data.legacyNode.conversationMessagesConnection.nodes = [
           result.data.addConversationMessage.conversationMessage,
           ...data.legacyNode.conversationMessagesConnection.nodes,
@@ -198,7 +199,13 @@ const ComposeModalManager = props => {
         sort: 'desc',
       },
     }
+
     const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
+
+    if (!data) {
+      return
+    }
+
     const submissionToUpdate = data.legacyNode.viewableSubmissionsConnection.nodes.find(
       c => c._id === props.conversation._id
     )
@@ -211,7 +218,7 @@ const ComposeModalManager = props => {
 
   const updateCache = (cache, result) => {
     if (result?.data?.addConversationMessage?.conversationMessage._id === '0') {
-      //if the user sends another delayed message right now, we will have 2 0 id message in our stack, which will cause duplication
+      // if the user sends another delayed message right now, we will have 2 0 id message in our stack, which will cause duplication
       result.data.addConversationMessage.conversationMessage.id = Date.now().toString()
     }
     const submissionFail = result?.data?.createSubmissionComment?.errors
@@ -311,7 +318,13 @@ const ComposeModalManager = props => {
   }
 
   const filteredCourses = () => {
-    const courses = coursesQuery?.data?.legacyNode
+    const legacyNode = coursesQuery?.data?.legacyNode
+
+    if (!legacyNode) {
+      return null
+    }
+
+    const courses = JSON.parse(JSON.stringify(legacyNode))
     if (courses) {
       courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.concluded)
       courses.favoriteGroupsConnection.nodes = courses?.favoriteGroupsConnection?.nodes.filter(

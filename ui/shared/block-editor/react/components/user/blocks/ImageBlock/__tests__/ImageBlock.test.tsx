@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 import {Editor, Frame} from '@craftjs/core'
 import {ImageBlock, type ImageBlockProps} from '..'
 
@@ -115,6 +116,25 @@ describe('ImageBlock', () => {
       })
       const img = container.querySelector('img')
       expect(img).toHaveStyle({objectFit: 'contain'})
+    })
+  })
+
+  describe('svg handling', () => {
+    beforeEach(() => {
+      fetchMock.get('some-image.svg', '<svg></svg>')
+    })
+
+    it('renders the svg inline', async () => {
+      const {container} = renderBlock({
+        src: 'some-image.svg',
+      })
+      const block = container.querySelector('.image-block') as HTMLElement
+      expect(block).toBeInTheDocument()
+      await waitFor(() => {
+        expect(block?.querySelector('img')).not.toBeInTheDocument()
+        expect(block.querySelector('svg')).toBeInTheDocument()
+      })
+      expect(block.querySelector('svg')?.outerHTML).toEqual('<svg></svg>')
     })
   })
 })

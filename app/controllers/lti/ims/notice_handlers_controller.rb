@@ -115,25 +115,31 @@ module Lti::IMS
     # @argument handler [Required, String]
     #   URL to receive the notice, or an empty string to unsubscribe
     #
-    # @returns NoticeCatalog
+    # @returns NoticeHandler
+    #
+    # @example_response
+    #   {
+    #       "handler": "",
+    #       "notice_type": "LtiHelloWorldNotice"
+    #   }
+    #
     def update
       notice_type = params.require(:notice_type)
       handler_url = params[:handler]
-      if handler_url.present?
-        Lti::PlatformNotificationService.subscribe_tool_for_notice(
-          tool:,
-          notice_type:,
-          handler_url:
-        )
-      elsif handler_url == ""
-        Lti::PlatformNotificationService.unsubscribe_tool_for_notice(
-          tool:,
-          notice_type:
-        )
-      else
-        raise ArgumentError, "handler must be a valid URL or an empty string"
-      end
-      index
+      handler_json =
+        if handler_url.present?
+          Lti::PlatformNotificationService.subscribe_tool_for_notice(
+            tool:,
+            notice_type:,
+            handler_url:
+          )
+        elsif handler_url == ""
+          Lti::PlatformNotificationService.unsubscribe_tool_for_notice(tool:, notice_type:)
+        else
+          raise ArgumentError, "handler must be a valid URL or an empty string"
+        end
+
+      render json: handler_json
     rescue ArgumentError => e
       logger.warn "Invalid PNS notice_handler subscription request: #{e.inspect}"
       render_error(e.message, :bad_request)

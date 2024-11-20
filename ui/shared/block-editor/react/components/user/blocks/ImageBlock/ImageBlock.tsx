@@ -51,6 +51,27 @@ const ImageBlock = ({
   // in preview mode, node.dom is null, so use a ref to the element
   const [blockRef, setBlockRef] = useState<HTMLDivElement | null>(null)
   const imgRef = useRef<HTMLImageElement | null>(null)
+
+  const [isSVG, setIsSVG] = useState(false)
+  const [svg, setSVG] = useState<string | null>(null)
+  const [svgLoading, setSvgLoading] = useState(false)
+
+  useEffect(() => {
+    if (!src) return
+    if (!src.toLowerCase().endsWith('.svg')) return
+
+    setIsSVG(true)
+    setSvgLoading(true)
+    fetch(src)
+      .then(response => response.text())
+      .then(text => {
+        setSVG(text)
+      })
+      .finally(() => {
+        setSvgLoading(false)
+      })
+  }, [src])
+
   const loadingStyle = {
     position: 'absolute',
     left: '10px',
@@ -111,18 +132,8 @@ const ImageBlock = ({
 
   const imgConstrain =
     (maintainAspectRatio ? 'cover' : constraint) || ImageBlock.craft.defaultProps.constraint
-  if (!src) {
-    return (
-      <div
-        role="treeitem"
-        aria-label={ImageBlock.craft.displayName}
-        tabIndex={-1}
-        className={clazz}
-        style={styl}
-        ref={el => el && connect(drag(el as HTMLDivElement))}
-      />
-    )
-  } else {
+
+  const renderImage = () => {
     return (
       <div
         role="treeitem"
@@ -149,6 +160,51 @@ const ImageBlock = ({
         />
       </div>
     )
+  }
+
+  const renderInlineSVG = () => {
+    return (
+      <div
+        role="treeitem"
+        aria-label={ImageBlock.craft.displayName}
+        tabIndex={-1}
+        className={clazz}
+        style={{...styl, position: 'relative'}}
+        ref={el => {
+          el && connect(drag(el as HTMLDivElement))
+          setBlockRef(el)
+        }}
+      >
+        {svgLoading ? (
+          <div style={loadingStyle}>
+            <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
+          </div>
+        ) : null}
+
+        <div
+          ref={imgRef}
+          dangerouslySetInnerHTML={{__html: svg || ''}}
+          style={{width: '100%', height: '100%', objectFit: imgConstrain, display: 'inline-block'}}
+        />
+      </div>
+    )
+  }
+
+  if (!src) {
+    return (
+      <div
+        role="treeitem"
+        aria-label={ImageBlock.craft.displayName}
+        tabIndex={-1}
+        className={clazz}
+        style={styl}
+        ref={el => el && connect(drag(el as HTMLDivElement))}
+      />
+    )
+  } else if (isSVG) {
+    return renderInlineSVG()
+  } else {
+    return renderImage()
   }
 }
 

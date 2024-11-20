@@ -211,6 +211,7 @@ he:
   access_report_80d28095: "דוח גישה"
   access_token_3be22221: "אסימון גישה"
   access_token_count_access_token_count_dfb5463c: "מונה אסימון גישה: %{access_token_count}"
+  access_token_details_495d989: "פרטי אסימון הגישה"
   access_token_is_valid_until_d2f048cf: "הרשאת אסימון הגישה בתוקף עד"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "ניתן להשתמש באסימוני גישה כדי לאפשר לאפליקציות אחרות לבצע קריאות API בעבורך. תוכל/י גם לייצר אסימוני גישה ו *להשתמש ב Canvas Open API* כדי לפתח אינטגרציות עצמיות."
   accordion_section_1_7888782d: "איזור נפתח 1"
@@ -2449,6 +2450,7 @@ he:
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "בטוחים שרוצים לבטל את הרשמתכם לאירוע זה?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "האם אתם בטוחים שרוצים למנוע את הסיכנכרוניזציה ל %{sisName} לכל המשימות האלו?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "בטוח/ה שרוצה לבצע פעולה זו? לא ניתן לשחזר זאת והפעולה תדרוס ציונים קיימים בספר הציונים."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "בטוח/ה שרוצה לייצר מחדש את האסימון? כל מי שמשתמש בו יצטרך להתעדכן"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "בטוח/ה שרוצה להסיר את תקופת ההערכה הזו?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "בטוח/ה שרוצה להסיר כלי זה?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "האם בטוחים שרוצים להסיר משתמש זה"
@@ -2489,6 +2491,7 @@ he:
   assessment_title_7ab69b66: "כותרת הערכה"
   assessment_type_81a73b9c: "סוג הערכה"
   assign_eedf72bb: הקצאה
+  assign_reviews_3fb2932a: "הקצאת סקירות עמיתים"
   assign_reviews_on_date_7e48ec50: "הקצאת סקירות עמיתים לתאריך"
   assign_to_c46e21: "הקצאה ל-"
   assignment: 
@@ -3413,6 +3416,8 @@ he:
   author_215203d2: מחבר/ת
   author_s_name_b35e905a: "שם המחבר"
   authorize_e3f25bb4: הרשאה
+  authorize_google_drive_8ad056d5: "הרשאת גוגל דרייב"
+  authorize_google_drive_access_aefcf8d6: "הרשאת גישה לגוגל דרייב"
   auto_leader_7791c30a: auto_leader
   automatically_apply_deduction_to_late_submissions_2b68166e: "הפעלה אוטומטית של קנס על הגשות מאוחרות"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "מתן ציון אוטומטי להגשות חסרות"
@@ -3448,6 +3453,7 @@ he:
   back_to_announcements_1036e43e: "חזרה להכרזות"
   back_to_app_center_95420d83: "חזרה אל מרכז האפליקציות"
   back_to_assignment_1df86a69: "חזרה למשימה"
+  back_to_login_e4b5f663: "חזרה לדף ההתחברות "
   back_to_ref_title_377ea1f0: "חזרה אל %{ref_title}"
   back_to_table_of_contents_d878b315: "חזרה לתכן הענינים"
   back_to_title_39e7a8f4: "חזרה אל %{title}"
@@ -4641,11 +4647,13 @@ he:
     submit: שליחה
   confirm_dialog_component: 
     ok: OK
+  confirm_email_address_9072dd3c: "אישור כתובת דוא\"ל"
   confirm_removal_a9bb889: "אישור הסרה"
   confirm_reservation_removal_e6350e7c: "אישור הסרת רישום"
   confirm_unenrollment_64333263: "אישור הסרת הרשמה"
   confirmation_code_required_22984955: "קוד אישור (נדרש)"
   confirmation_failed_please_try_again_ae566d37: "אישור נכשל. יש לנסות שוב."
+  confirming_2df4b68f: "מאשר... "
   consumer_key_57d9fcf1: "מפתח מערכת הלקוח"
   consumer_key_6f94ba11: "מפתח מערכת הלקוח"
   contact_a6e7f6da: התקשרות
@@ -5462,6 +5470,7 @@ he:
   copy_to_folder_32ecc3c3: "העתקה לתיקיה"
   copying_628a9607: מעתיק...
   copyright_holder_66ee111: "בעלים של זכויות יוצרים:"
+  correct_7df6d875: נכון!
   correct_answer: "זו היתה התשובה הנכונה"
   correct_answer_5a6a57d1: "תשובה נכונה"
   correct_answer_comments_34ca671f: "תיקון הערות תשובה"
@@ -7049,6 +7058,7 @@ he:
     saving: שומר...
   different_course_b875770e: "קורס שונה"
   diigo_993c4646: דייגו
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "דייגו הנו כלי סימניות חברתי שעוצב במיוחד למטרות מחקר והוראה. עורך התוכן העשיר של קנבס יאפשר לך לחפש את תגי דייגו שלך כדי לקשר בקלות מתוך קנבס אל מקורות שימצאו מועילים,"
   disableWhileLoading: 
     loading: "בטעינה... "
   disable_a5c05db3: השבתה
@@ -8178,6 +8188,7 @@ he:
   expand_tutorial_tray_22630c49: "הרחבת איזור המדריך"
   expanded_f4493860: הורחב
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
+  expires_7019786e: "פג תוקף "
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "ייצוא בוחן קיים לפורמט הבחנים גירסה 2"
   export_course_content_f4774b74: "ייצוא תוכן קורס"
   export_de71cd8e: ייצוא
@@ -8643,10 +8654,12 @@ he:
   generate_epub_80e89ea4: "צור/י ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "הפקת דוח ניתוח פריטים %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "הפקת דוח ניתוח תלמידים %{statusLabel}"
+  generate_token_393ab5b4: "יצירת אסימון "
   generated_f26ee56b: "נוצר:"
   generating_5b5e20f8: "מייצר:"
   generating_c2aabc02: "מייצר:"
   generating_preview_45b53be0: "מכין תצוגה מקדימה..."
+  generating_token_42c29663: "מייצר אסימון..."
   germany_49_fc5b8179: "גרמניה (+49)"
   germany_b02d91c9: גרמניה
   get_started_b9507525: "ניתן להתחיל"
@@ -10264,6 +10277,7 @@ he:
       הקלדת והפצת הערכות עבור התלמידים. הצגת ההערכות כציונים
       אחוזים או כלא הושלמו, עברו, נכשלו, או בסולם GPA והערכה מילולית
       ההערכה של משימות קבוצתיות ממתינה
+  insert_593145ef: הוספה
   insert_equella_links_49a8dacd: "הוספת קישורי Equella "
   insert_here_ccdb022e: "הוספה כאן"
   insert_math_equation_57c6e767: "הוספת משוואה מתימטית"
@@ -10549,6 +10563,7 @@ he:
   last_name_303122f3: "שם משפחה"
   last_post_display_last_reply_at_b9896355: "הפרסום האחרון %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "העדכון האחרון שנשלח: %{last_export_at}"
+  last_used_17553fed: "תאריך שימוש אחרון "
   last_used_f9457313: "שומש לאחרונה:"
   last_user_access_title: "כניסת משתמש אחרונה"
   late_2be42b88: איחור
@@ -11064,6 +11079,7 @@ he:
   mastery_paths_cc4096c2: "מסלולי התמחות"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "ציון ההתמחות משקף את הציון הגבוה ביותר של המשימה המוערכת או הבוחן"
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "ניקוד התמחות משקף את הערכת המשימה או הבוחן המאוחר ביותר"
+  matching_63f5af40: התאמה
   matching_left_side_900f860b: "התאמה לצד שמאל"
   matching_right_side_920e71b2: "התאמה לצד ימין"
   mathquill: 
@@ -13145,6 +13161,7 @@ he:
   multi_factor_authentication_configured_865b1bde: "הזדהות רב מימדית קונפגה"
   multiple_ba5220cd: מרובים
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "חשבונות קנבס מרובים משויכים לאיזור ה Clever %{district_id}"
+  multiple_choice_9f931ee6: "בחירה מרובה"
   multiple_dates_e3a122f7: "תאריכים מרובים"
   multiple_due_dates_283dd861: "תאריכי יעד מרובים"
   multiple_due_dates_6b0d75c6: "תאריכי יעד מרובים"
@@ -13238,6 +13255,7 @@ he:
   never_1ed1244d: "אף פעם "
   never_df100b49: "אף פעם"
   new_13daf639: חדש
+  new_access_token_e301d1fc: "אסימון גישה חדש "
   new_account_role_6e5c4964: "תפקיד חדש בחשבון"
   new_activity_8b84847d: "פעילות חדשה"
   new_annotations_66932016: "ביאורים חדשים"
@@ -13726,6 +13744,7 @@ he:
   off_5385ef3f: מושבת
   ok_c47544a2: OK
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: "בסדר, תודה"
   okay_1772bbeb: בסדר
   okay_got_it_d686d4e8: "בסדר, הבנתי"
   oldest_newest_4de86803: "ישן ביותר - חדש ביותר"
@@ -13747,6 +13766,7 @@ he:
   on_time_17ca5ad9: בזמן
   on_time_percent_eebffe38: "בזמן: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "היה ותכונה זו תשופעל, לא ניתן יהיה יותר לכבותה. יש לוודא שאכן אתם מוכנים לשפעל את תיקיית ההגשות לפני שממשיכים בתהליך."
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "ברגע שנקבל הרשאה לראות את תוכן גוגל דרייב שלך ניתן יהיה להגיש משימות ישירות מגוגל דוקס, ולייצר ולשתף מסמכים עם חברים בכתותיך."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "ברגע ששינית תשובה יש לבחור באפשרות לפני שמעדכנים את השאלה."
   one_or_more_items_are_currently_being_imported_the_186fe069: "פריט אחד או יותר מיובאים ברגעים אלה. הם יוצגו בקורס שבהמשך מיד כשהם זמינים"
   one_per_line_format_name_value_79647700: "אחד לשורה. הפורמט: שם=ערך"
@@ -14782,6 +14802,8 @@ he:
       regenerating_token_failed: "יצירה מחדש של אסימון נכשלה"
       registration_failed: "הרשמה נכשלה. יש לבדוק את שם המשתמש והסיסמה, ולנסות שנית"
     failed_resending: "הבקשה נכשלה. יש לנסות שוב"
+    labels: 
+      enable_login_for_email: "ברצוני להתחבר לקנבס עם הדוא\"ל הזה"
     links: 
       resend_confirmation: "שליחה מחדש של האישור"
       resend_confirmation_failed: "הבקשה נכשלה. יש לנסות שוב"
@@ -15138,6 +15160,7 @@ he:
     new: 
       payment_info: "מידע על תשלומים"
   purple_7678a9fc: סגול
+  purpose_5202a309: "מטרה "
   push_notification_a6532ff3: "דחיפת תזכורת"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "ש: מה הופך שחור, לבן, שחור, לבן? ת: דב פנדה מתגלגל במורד הגבעה"
   qatar_974_7e9684ca: "קטר (+974)"
@@ -16621,6 +16644,8 @@ he:
   ratio_responded_correctly_6d890107: "%{ratio}% הגיבו נכונה"
   re_activate_user_f7d77c9a: "החזרת משתמש למצב פעיל"
   re_reported_b9671073: "דווח מחדש"
+  re_send_confirmation_bcc66940: "שליחה מחדש של האישור "
+  re_sending_379a8580: "שולח שוב..."
   re_submit_assignment_b3e2bd28: "הגשה מחדש של משימה"
   re_upload_submissions_125e415d: "העלאה מחדש של הגשות"
   re_upload_submissions_form: 
@@ -16715,9 +16740,14 @@ he:
   reference_code_is_required_c32c757f: "קוד הפניה נדרש"
   refresh_8a04b019: רענן
   regenerate_epub_395c8e56: "יצירה מחדש של ePub"
+  regenerate_token_7d4fb783: "מייצר אסימון מחדש "
+  regenerating_token_42e5c747: "מייצר אסימון מחדש..."
   region_47e29025: "אזור:"
   region_939f2a6c: אזור
+  register_communication_ae935328: "רישום תקשורת"
   register_email_efc06d59: "רישום כתובת דוא\"ל"
+  register_skype_d5e2b3d3: "רישום סקייפ"
+  register_sms_7f87e50d: "רישום מערכת המסרונים"
   register_tool_84de3186: "רישום כלי"
   registration: 
     get_started: "ניתן להתחיל"
@@ -17100,8 +17130,10 @@ he:
   save_grading_period_daaaddea: "שמירת תקופת הערכה"
   save_grading_period_set_e029fa88: "שמירת אוגדן תקופות הערכה"
   save_key_b4dede06: "שמירת מפתח"
+  save_login_bba1272: "שמירת לוג-אין"
   save_publish_36440725: "שמירה ופרסום"
   save_settings_cafe79a5: "שמירת הגדרות"
+  save_skype_name_4de35a9: "שמירת שם סקייפ"
   save_theme_f706116e: "שמירת ערכת נושא"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "שמירת %{type} שלך כדי להתחיל להגדיר את התוכן המותנה."
   saving_associations_989bd4da: "שמירת פריטים נלווים"
@@ -18445,6 +18477,8 @@ he:
   skipped_file_filename_due_to_error_94f0194: "דילוג על קובץ %{filename} כתוצאה משגיאה"
   skipping_unknown_file_type_cd1086ee: "דילוג על סוג קובץ לא ידוע"
   skype_18850ba7: סקייפ
+  skype_name_9eb890df: "שם סקייפ"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "סקייפ מציעה שיחות קוליות ווידאו מקוונות. תלמידים רבים משתמשים בסקייפ חינם, כדרך פשוטה לתקשר. אם תרשום את שם הסקייפ שלך ותאפשר ניראות, תלמידים אחרים יוכלו בקלות למצוא אותך ולתקשר או להוסיפך בסקייפ."
   slideshow: 
     titles: 
       back: חזרה
@@ -19654,6 +19688,7 @@ he:
   today_76e10f9c: היום
   toggle_editing_answer_text_as_html_9a93fe6: "שינוי מצב עריכת תוכן תשובה ל HTML"
   toggle_select_course_name_310fdee4: "שינוי מצב בחירת קורס %{name}"
+  token_9a020862: אסימון
   tolerance_value_9e96573c: "ערך שולי הטעות"
   tomorrow_9a6c9a00: מחר
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "יותר מדי נסיונות כושלים להתחבר. נא לנסות מאוחר יותר או להקתשר למנהל המערכת שלך"
@@ -19692,6 +19727,7 @@ he:
     folder_tree_instructions: "יש להשתמש בחיצי מעלה מטה כדי לנווט בעץ. לחיצת חץ ימיני כדי להרחיב ענף נבחר בעץ וחץ שמאלי כדי לכווץ ענף נבחר בעץ."
   trophy: 
     star_display_name: "הוספת כוכבית"
+  true_false_823761a9: "נכון/לא נכון"
   truncated_56b1a661: מקוצץ
   try_again_6ca44338: "יש לנסות שוב"
   turned_in_submission_date_e9180b8b: "הוגש בתאריך: %{submission_date}"

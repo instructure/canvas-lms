@@ -123,6 +123,7 @@ export const ContentMigrationsForm = ({
   const onResetForm = useCallback(() => {
     setChosenMigrator(null)
     setIsSubmitting(false)
+    setFileUploadProgress(0)
   }, [])
 
   const handleFileProgress = useCallback(
@@ -138,6 +139,7 @@ export const ContentMigrationsForm = ({
         return
       }
       setIsSubmitting(true)
+      setFileUploadProgress(0)
       delete formData.errored
       const requestBody: RequestBody = {
         course_id: courseId,

@@ -729,6 +729,24 @@ describe "API Authentication", type: :request do
       expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
     end
 
+    it "errors if the access token is revoked" do
+      @token.update_attribute(:workflow_state, "deleted")
+      get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      assert_status(401)
+      expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
+      json = JSON.parse(response.body)
+      expect(json["errors"].first["message"]).to eq "Revoked access token."
+    end
+
+    it "errors if the access token is permanently expired" do
+      @token.update_attribute(:permanent_expires_at, 1.hour.ago)
+      get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
+      assert_status(401)
+      expect(response["WWW-Authenticate"]).to eq %(Bearer realm="canvas-lms")
+      json = JSON.parse(response.body)
+      expect(json["errors"].first["message"]).to eq "Expired access token."
+    end
+
     it "errors if the developer key is inactive" do
       @token.developer_key.deactivate!
       get "/api/v1/courses", headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }

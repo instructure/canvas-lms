@@ -153,6 +153,7 @@ ko:
         common_core_guid: "공통 핵심 GUID (선택 사항)"
         partner_id: "파트너 ID"
         partner_key: "파트너 키"
+  access_token_details_495d989: "액세스 토큰 세부 정보"
   account: 
     ask_canvas_network: "Canvas Network 커뮤니티에 묻기"
     default_account_name: "기본 계정"
@@ -1612,6 +1613,7 @@ ko:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "이 평가 구성표를 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_rubric_f1c9eaa2: "이 루브릭을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "이 메시지의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "이 토큰을 다시 생성하시겠습니까? 이 토큰을 사용하는 것도 업데이트해야 합니다."
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "이 도구를 제거하시겠습니까?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "이 사용자의 프로필 사진을 제거하시겠습니까?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "이 프로필 사진을 신고하시겠습니까?"
@@ -1622,6 +1624,7 @@ ko:
     default_imported_title: "가져온 질문"
     default_title: "이름 없음 - %{course}"
     default_unfiled_title: "내용 없는 문제"
+  assign_reviews_3fb2932a: "검토 할당"
   assignment: 
     assignment_group_must_have_group: "이 과제에 대한 과제 그룹을 선택하시기 바랍니다."
     at_least_one_file_type: "적어도 하나의 허용되는 파일 유형을 지정하십시오."
@@ -2387,6 +2390,7 @@ ko:
   average_score_15cd7c3c: "평균 점수"
   back_to_app_center_95420d83: "앱 센터로 돌아가기"
   back_to_assignment_1df86a69: "과제로 돌아가기"
+  back_to_login_e4b5f663: "로그인으로 돌아가기"
   bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
   bb_name: "Blackboard 변환기"
@@ -3252,7 +3256,9 @@ ko:
     submit: 제출
   confirm_dialog_component: 
     ok: 확인
+  confirm_email_address_9072dd3c: "이메일 주소 확인"
   confirm_unenrollment_64333263: "등록 취소 확인"
+  confirming_2df4b68f: "확인 중..."
   consumer_key_6f94ba11: "소비자 키"
   contact_a6e7f6da: 연락처
   content_exports: 
@@ -5046,6 +5052,7 @@ ko:
     save_settings: "설정 저장"
     saving: "저장 중..."
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo는 연구와 교육에 특화된 소셜 북마크 도구입니다. Canvas의 서식있는 내용 편집기에서는 Canvas에서 유용한 리소스로 쉽게 연결할 수 있도록 Diigo 태그를 검색할 수 있습니다."
   disableWhileLoading: 
     loading: "로드하는 중..."
   disable_a5c05db3: "사용 안 함"
@@ -5794,6 +5801,7 @@ ko:
   example_84698b7d: 예
   exceeds_expectations_5910fc3a: "기대를 초과함"
   expand_all_bb64d2ea: "모두 확장"
+  expires_7019786e: 만료일
   extensions_7250a0bb: 확장
   external_apps_f5490181: "외부 앱"
   external_content: 
@@ -6077,6 +6085,8 @@ ko:
   full_article_9296bb6f: "전체 기사"
   gathering_files_933551d9: "파일 수집 중..."
   general_answer_comments_730136ba: "일반 답변 의견"
+  generate_token_393ab5b4: "토큰 생성"
+  generating_token_42c29663: "토큰 생성 중..."
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "아래에 평점 값을 입력해서 모든 학생에게 *%{assignment.name}*에 대한 동일한 평점을 주십시오:"
   global_announcements_a78912c8: "전체 공지"
   global_message_icons: 
@@ -7288,6 +7298,7 @@ ko:
   language_6b3e2c7c: 언어
   last_error_a3832668: "마지막 오류"
   last_modified_by_ca4bb5e1: "마지막 수정한 사람"
+  last_used_17553fed: "최종 사용일"
   late_assignment_user_name_assignment_name_2df32e01: "지연된 과제: %{user_name}, %{assignment_name}"
   late_bd436902: 지연
   latest_f604a75: 최신
@@ -9505,6 +9516,7 @@ ko:
   navigation_ee9af92d: 탐색
   never_1ed1244d: "한 적 없음"
   new_13daf639: "새 항목"
+  new_access_token_e301d1fc: "새 액세스 토큰"
   new_discussion_dae4fae3: "새 토론"
   new_file_135ae520: "[ 새 파일 ]"
   new_group_8d6ad781: "새 그룹"
@@ -9827,6 +9839,7 @@ ko:
   off_5385ef3f: 끄기
   ok_c47544a2: 확인
   ok_ff1b646a: 확인
+  ok_thanks_6b1fc8ae: 감사합니다.
   oldgradebookgradebookKeyboardNav: 
     keyboard_assignment_desc: "현재 과제의 세부 정보 페이지로 이동"
     keyboard_close_menu: "현재 활성인 과제 메뉴 닫기"
@@ -10446,6 +10459,8 @@ ko:
       regenerating_token_failed: "토큰 다시 생성 실패"
       registration_failed: "등록에 실패했습니다. 사용자 이름과 암호를 확인하고 다시 시도하시기 바랍니다."
     failed_resending: "요청이 실패했습니다. 다시 시도하시기 바랍니다."
+    labels: 
+      enable_login_for_email: "이 이메일 주소로 Canvas에 로그인하겠습니다."
     links: 
       resend_confirmation: "확인 다시 전송"
       resend_confirmation_failed: "요청이 실패했습니다. 다시 시도하시기 바랍니다."
@@ -10753,6 +10768,7 @@ ko:
   purchases: 
     new: 
       payment_info: "지불 정보"
+  purpose_5202a309: 목적
   push_notification_a6532ff3: "푸시 알림"
   qti_display: QTI
   qti_file_description: "QTI .zip 파일"
@@ -11909,6 +11925,8 @@ ko:
     ? "true"
     : 맞음
   ratings_2433172b: 등급
+  re_send_confirmation_bcc66940: "확인 다시 전송"
+  re_sending_379a8580: "다시 보내는 중..."
   re_upload_submissions_form: 
     buttons: 
       upload: "파일 업로드"
@@ -11955,7 +11973,12 @@ ko:
   record_upload_media_comment_4d01b943: "미디어 설명 녹음/녹화/업로드"
   recording_98da6bda: 녹음/녹화
   refresh_8a04b019: "새로 고침"
+  regenerate_token_7d4fb783: "토큰 다시 생성"
+  regenerating_token_42e5c747: "토큰 다시 생성 중..."
+  register_communication_ae935328: "통신 등록"
   register_email_efc06d59: "이메일 등록"
+  register_skype_d5e2b3d3: "Skype 등록"
+  register_sms_7f87e50d: "SMS 등록"
   registration: 
     get_started: 시작하기
     incomplete_registration_warning: 
@@ -12224,7 +12247,9 @@ ko:
   running_totals_d6f45b6b: "누적 합계"
   save_11a80ec3: 저장
   save_key_b4dede06: "키 저장"
+  save_login_bba1272: "로그인 저장"
   save_settings_cafe79a5: "설정 저장"
+  save_skype_name_4de35a9: "Skype 이름 저장"
   saving_d55dd90e: "저장 중..."
   scheduler_65b5ac91: "일정 관리"
   scheduling_5a3327e7: 일정
@@ -13184,6 +13209,8 @@ ko:
   size_b30e1077: 크기
   size_size_a77bd760: "크기: %{size}"
   skype_18850ba7: Skype
+  skype_name_9eb890df: "Skype 이름"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype는 무료 온라인 음성 및 화상 통화를 제공합니다. 많은 학생이 Skype를 손쉬운 의사소통 방법으로 사용하고 있습니다. Skype 이름을 등록하고 표시하도록 설정하면 다른 학생이 연락처를 쉽게 찾아 Skype에 추가하거나 통화할 수 있습니다."
   slideshow: 
     titles: 
       back: 뒤로
@@ -13884,6 +13911,7 @@ ko:
   to_c4c44f4b: "다음 요일로"
   to_f0e90538: "수신:"
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
+  token_9a020862: 토큰
   tomorrow_9a6c9a00: 내일
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "로그인을 너무 많이 실패했습니다. 다시 시도하시거나 시스템 관리자에게 문의하십시오."
   tooltips: 

@@ -307,13 +307,29 @@ class DiscussionRow extends Component {
       moment.utc(b.assignment_override?.lock_at).diff(moment.utc(a.assignment_override?.lock_at))
     )
 
-    const availabilityBegin =
-      this.props.discussion.delayed_post_at || (assignment && assignment.unlock_at)
+    const ungradedUnlockAt = this.props.discussion.ungraded_discussion_overrides?.sort((a, b) =>
+      moment
+        .utc(b.assignment_override?.unlock_at)
+        .diff(moment.utc(a.assignment_override?.unlock_at))
+    )
 
-    const availabilityEnd =
-      this.props.discussion.lock_at ||
-      (assignment && assignment.lock_at) ||
-      ungradedLockAt?.[0]?.assignment_override.lock_at
+    let availabilityBegin, availabilityEnd
+
+    if (assignment) {
+      availabilityBegin = assignment.unlock_at
+    } else if (ungradedUnlockAt?.length > 0) {
+      availabilityBegin = ungradedUnlockAt?.[0]?.assignment_override.unlock_at
+    } else {
+      availabilityBegin = this.props.discussion.delayed_post_at
+    }
+
+    if (assignment) {
+      availabilityEnd = assignment.lock_at
+    } else if (ungradedLockAt?.length > 0) {
+      availabilityEnd = ungradedLockAt?.[0]?.assignment_override.lock_at
+    } else {
+      availabilityEnd = this.props.discussion.lock_at
+    }
 
     if (
       availabilityBegin &&

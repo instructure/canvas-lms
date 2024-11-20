@@ -20,9 +20,9 @@ import React, {useEffect} from 'react'
 import {
   useMutation as baseUseMutation,
   useQuery as baseUseQuery,
-  useInfiniteQuery as baseUseInfiniteQuery,
   hashQueryKey,
   QueryClient,
+  useInfiniteQuery,
 } from '@tanstack/react-query'
 import type {
   UseQueryOptions,
@@ -34,10 +34,17 @@ import type {
 import {PersistQueryClientProvider} from '@tanstack/react-query-persist-client'
 import {createSyncStoragePersister} from '@tanstack/query-sync-storage-persister'
 import wasPageReloaded from '@canvas/util/wasPageReloaded'
+import {v4} from 'uuid'
 import {useBroadcastWhenFetched, useReception} from './utils'
 
 const CACHE_KEY = 'QUERY_CACHE'
 const CHANNEL_KEY = 'QUERY_CHANNEL'
+
+if (wasPageReloaded || localStorage.cacheBuster === undefined) {
+  localStorage.cacheBuster = v4()
+}
+
+const cacheBuster: string = String(localStorage.cacheBuster)
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,6 +79,7 @@ export function QueryProvider({children}: {children: React.ReactNode}) {
             return query.state.status === 'success'
           },
         },
+        buster: cacheBuster,
       }}
     >
       {children}
@@ -136,44 +144,6 @@ export function useQuery<
     channel: broadcastChannel,
     enabled: Boolean(options.meta?.broadcast),
   })
-
-  return queryResult
-}
-
-export function useInfiniteQuery<
-  TQueryFnData = unknown,
-  TError = unknown,
-  TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
->(options: UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryFnData, TQueryKey>) {
-  const ensureFetch = options.meta?.fetchAtLeastOnce || wasPageReloaded
-  const hashedKey = hashQueryKey(options.queryKey || [])
-  const wasAlreadyFetched = queriesFetched.has(hashedKey)
-
-  const refetchOnMount =
-    process.env.NODE_ENV !== 'test' && ensureFetch && !wasAlreadyFetched
-      ? 'always'
-      : Boolean(options.meta?.refetchOnMount) ?? false
-
-  const mergedOptions: UseInfiniteQueryOptions<
-    TQueryFnData,
-    TError,
-    TData,
-    TQueryFnData,
-    TQueryKey
-  > = {
-    ...options,
-    refetchOnMount,
-  }
-  const queryResult = baseUseInfiniteQuery<TQueryFnData, TError, TData, TQueryKey>(mergedOptions)
-
-  if (
-    queryResult.isFetchedAfterMount &&
-    queryResult.fetchStatus === 'idle' &&
-    queryResult.isSuccess
-  ) {
-    setTimeout(() => queriesFetched.add(hashedKey), 0)
-  }
 
   return queryResult
 }

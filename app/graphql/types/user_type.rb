@@ -108,6 +108,7 @@ module Types
     def sis_id
       domain_root_account = context[:domain_root_account]
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
+         context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
         Loaders::AssociationLoader.for(User, :pseudonyms)
                                   .load(object)
@@ -127,6 +128,7 @@ module Types
     def integration_id
       domain_root_account = context[:domain_root_account]
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
+         context[:course]&.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
          object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
         Loaders::AssociationLoader.for(User, :pseudonyms)
                                   .load(object)
@@ -292,7 +294,8 @@ module Types
           context:,
           synthetic_contexts: true,
           messageable_only: true,
-          base_url: self.context[:request].base_url
+          base_url: self.context[:request].base_url,
+          include_concluded: false
         )
 
         contexts_collection = collections.select { |c| c[0] == "contexts" }

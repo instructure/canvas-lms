@@ -333,6 +333,7 @@ hu:
   access_token_3be22221: "Hozzáférési token"
   access_token_count_access_token_count_dfb5463c: "Elérési token száma:%{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Hozzáférési token létrehozva vagy újragenerálva"
+  access_token_details_495d989: "Hozzáférési token részletei"
   access_token_manage_a626f071: "Hozzáférési Token – kezelés"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "A hozzáférési token arra használható, hogy egyes alkalmazások API hívásokat kezdeményezhessenek az Ön nevében. Önnek lehetősége van hozzáférési token generálására és *Canvas Open API* használatára a saját integrációs megoldások fejlesztése során."
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "Bármely iOS vagy Android mobileszközzel elérheti kurzusait és csoportjait, és további információkat találhat a Súgó menüben."
@@ -3386,6 +3387,7 @@ hu:
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Biztos benne, hogy véglegesen eltávolítja a felhasználót az ÖSSZES fiókból?"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Biztosan közzé szeretné tenni a feladat érdemjegyeit a tanulóknak?"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Biztosan folytatja? A végrehajtott módosítások nem kerülnek mentésre."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Biztos benne, hogy újragenerálja ezt a tokent? Mindent frissíteni kell, ami használja ezt a tokent. "
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Biztosan eltávolítja ezt az elemet?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Biztos benne, hogy el szeretné távolítani ezt az eszközt?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Biztos benne, hogy szeretné törölni ezt a felhasználót?"
@@ -3452,6 +3454,7 @@ hu:
   assign_graded_checkpoints_2a7e9694: "Osztályozott ellenőrző pontok kijelölése"
   assign_manually_1785dcfc: "Manuális hozzárendelés"
   assign_module_to_individuals_or_sections_bd638c03: "Modul hozzárendelése egyénekhez vagy szekciókhoz."
+  assign_reviews_3fb2932a: "Értékelések hozzárendelése"
   assign_reviews_on_date_7e48ec50: "Értékelés hozzárendelése dátumhoz"
   assign_temporary_enrollments_bdaaa58a: "Ideiglenes beiratkozások hozzárendelése"
   assign_temporary_enrollments_to_count_users_5da4f30d: 
@@ -4424,6 +4427,8 @@ hu:
   author_s_name_b35e905a: "Szerző neve"
   author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: Engedélyezés
+  authorize_google_drive_8ad056d5: "Google Drive engedélyezése"
+  authorize_google_drive_access_aefcf8d6: "Google Drive-fiókhoz való hozzáférés engedélyezése"
   authorize_url_f28167a3: "Hitelesített URL"
   auto_leader_7791c30a: auto_leader
   auto_provision_new_quizzes_if_flagged_root_account_a19fbf5b: "Új kvízek automatikus biztosítása a megjelölt gyökérfiókokon."
@@ -4488,6 +4493,7 @@ hu:
   back_to_app_center_95420d83: "Vissza az Alkalmazásközpontba"
   back_to_assignment_1df86a69: "Vissza a feladathoz"
   back_to_attempt_attempt_ffb22bb8: "Vissza a próbálkozáshoz %{attempt}"
+  back_to_login_e4b5f663: "Vissza a bejelentkezéshez"
   back_to_production_fed09f33: "Vissza a gyártáshoz"
   back_to_ref_title_377ea1f0: "Vissza ide:  %{ref_title}"
   back_to_subject_80a1eb: "Vissza a tárgyhoz"
@@ -6199,6 +6205,7 @@ hu:
   confirm_delete_a5239715: "törlés jóváhagyása"
   confirm_deletion_b2efe7d4: "Törlés jóváhagyása"
   confirm_edit_outcome_a9746c99: "Erősítse meg az eredmény szerkesztését"
+  confirm_email_address_9072dd3c: "E-mail cím megerősítése"
   confirm_mastery_calculation_19ad19f9: "Erősítse meg a Jártassági számítást"
   confirm_mastery_scale_9a779252: "Erősítse meg a Jártassági szintet"
   confirm_qr_code_display_49664fa3: "Erősítse meg a QR-kód megjelenítését"
@@ -6213,6 +6220,7 @@ hu:
   confirm_unfavorite_course_fa01966d: "Erősítse meg a kurzus kedveltekből való eltávolítását"
   confirmation_code_required_22984955: "Megerősítő kód (kötelező)"
   confirmation_failed_please_try_again_ae566d37: "A megerősítés sikertelen. Kérjük, próbálja újra!"
+  confirming_2df4b68f: Jóváhagyás...
   confused_panda_questioning_what_to_do_next_42941484: "Zavart Panda azt kérdezi, mit tegyen ezután"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Fontolja meg több beküldési típus kiválasztását, hogy megfeleljen azoknak a hallgatóknak, akik esetleg nem tudnak megjegyzéseket létrehozni."
   consortium_parent_keys_803547b: "Konzorcium szülői kulcsok"
@@ -8985,6 +8993,7 @@ hu:
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Nem találta, amit keres? Próbálkozzon!"
   different_course_b875770e: "másik kurzus"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "A Diigo egy közösségi könyvjelzőeszköz kifejezetten kutatási és oktatási célra. A Canvas vizuális szövegszerkesztője segítségével keresést indíthat a Diigo címkéi között, hogy Canvasról más hasznos külső forrásra hivatkozhasson."
   direct_share_80afd4a7: "Közvetlen megosztás"
   disableWhileLoading: 
     loading: Betöltés...
@@ -10564,6 +10573,7 @@ hu:
   excused_5877183c: Felmentve!
   excused_cf8792eb: Felmentve
   exit_d0c7b013: Kilépés
+  exit_fullscreen_b7eb0aa4: "Lépjen ki a teljes képernyőről"
   expand_2f2fadbd: Kinyit
   expand_all_8329940a: "Minden kinyitása"
   expand_all_bb64d2ea: "Kinyit mindent"
@@ -10584,6 +10594,7 @@ hu:
   expanded_f4493860: Kinyitva
   expected_array_of_objects_b09ead01: "Objektumok várt tömbje"
   expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "A %{filter} paraméternek a következők egyike lehet:%{visible}, %{hidden}"
+  expires_7019786e: Lejár
   expires_at_6214b43f: "Lejár:"
   explanation_of_statuses_90a26d07: "Az állapotok magyarázata:"
   explicit_latex_typesetting_c1c569c9: "Explicit LaTeX tipizálás"
@@ -11182,6 +11193,7 @@ hu:
   full_name_83cf5453: "Teljes név"
   full_name_is_required_8efbdc84: "A teljes név megadása kötelező"
   full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Teljes: a tanulók nevei és profilképei el lesznek rejtve"
+  fullscreen_873bf53f: "Teljes képernyő"
   fun_quiz_47ab0b0: "Szórakoztató kvíz"
   future_5416ea92: Jövő
   future_jobs_cf2964a1: "Jövőbeli jobok"
@@ -11197,12 +11209,14 @@ hu:
   generate_epub_80e89ea4: "ePub generálása"
   generate_item_analysis_report_statuslabel_16e02c8: "Elemanalízis-jelentés generálása %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Hallgatói elemzési jelentés generálása %{statusLabel}"
+  generate_token_393ab5b4: "Token generálása"
   generated_f26ee56b: "Generálva: "
   generating_5b5e20f8: "Generálás: "
   generating_c2aabc02: Generálás...
   generating_pairing_code_251b7fc8: "Párosítási kód generálása..."
   generating_pairing_code_d480ccf4: "Párosítási kód generálása"
   generating_preview_45b53be0: "Előnézet generálása... "
+  generating_token_42c29663: "Token generálása... "
   german_3ec99bbb: Német
   germany_49_fc5b8179: "Németország (+49)"
   get_help_on_how_to_use_and_configure_conferences_i_e90d9ed5: "Kérjen segítséget a konferenciák Canvasban történő használatához és konfigurálásához."
@@ -13476,6 +13490,7 @@ hu:
   last_sync_5aac1ff1: "Utolsó szinkronizálás:"
   last_synced_datetime_1c3e0295: "Utoljára szinkronizálva:%{datetime}"
   last_synced_right_now_f6c2ab00: "Utoljára szinkronizálva:épp az imént"
+  last_used_17553fed: "Utoljára használt"
   last_used_f9457313: "Utoljára használt:"
   last_user_access_title: "Utolsó felhasználói hozzáférés"
   last_viewed_cfbbbc3a: "utoljára megtekintett"
@@ -16654,6 +16669,7 @@ hu:
   never_df100b49: Soha
   never_should_have_made_it_here_ab72bdab: "Soha nem lett volna szabad idekerülnie"
   new_13daf639: Új
+  new_access_token_e301d1fc: "Új hozzáférési jegyzék"
   new_account_role_6e5c4964: "Új fiókszerep"
   new_activity_8b84847d: "Új aktivitás"
   new_activity_for_title_c5cc74: "Új tevékenység ennél: %{title}"
@@ -17449,6 +17465,7 @@ hu:
   oid_cannot_be_used_with_multiple_tenants_22425636: "\"oid\" nem használható több bérlővel együtt"
   ok_c47544a2: OK
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: "Rendben, köszönöm"
   okay_1772bbeb: Rendben
   old_policy_39e4f77: "Régi Irányelv"
   oldest_first_ab166f62: "Legöregebb első"
@@ -17495,6 +17512,7 @@ hu:
       Ha egy osztályzatot manuálisan küldenek be, automatikusan új értesítések lesznek küldve,
                                     és láthatóvá válik a hallgatók számára.
   once_enabled_this_option_is_visible_in_gradebook_f_3bbe5849: "Ha engedélyezve van, ez az opció látható az oktatók számára az osztálynaplóban."
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Amint engedélyezi, hogy lássuk az Ön Google Drive-ját, be tudja adni a beadandóit közvetlenül Google Drive-on keresztül, valamint készíthet és megoszthat dokumentumokat a csoporttársaival."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Ha egyszer elküldött egy választ, akkor később nem fogja tudni módosítani. Nem fogja tudni megnézni az előző kérdést."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: " A hibakeresés megkezdése után a következő bejelentkezési kísérletre vonatkozó összes\n\
       \x20                             információ összegyűjtésre kerül. "
@@ -18957,6 +18975,8 @@ hu:
       regenerating_token_failed: "Token generálása sikertelen "
       registration_failed: "A regisztráció sikertelen. Ellenőrizze a felhasználónevet és próbálja meg újra."
     failed_resending: "Nem sikerült teljesíteni a kérést. Próbálja újra."
+    labels: 
+      enable_login_for_email: "Be kívánok lépni a Canvasba ezzel az e-mail címmel"
     links: 
       resend_confirmation: "Megerősítés újraküldése"
       resend_confirmation_failed: "Nem sikerült teljesíteni a kérést. Próbálja újra."
@@ -19329,6 +19349,7 @@ hu:
   publishing_progress_is_progress_percent_complete_20482e3e: "A publikálás %{progress} százalékban befejeződött"
   pumpkin_904428d5: Sütőtök
   purple_7678a9fc: Lila
+  purpose_5202a309: Cél
   push_notification_a6532ff3: "Értesítő kiküldése"
   qatar_974_7e9684ca: "Katar (+974)"
   qr_code_display_was_canceled_96234bf2: "A QR-kód megjelenítése visszavonásra került"
@@ -20659,7 +20680,9 @@ hu:
   rce_icon_maker_2114f87: "RCE Icon Készítő"
   re_activate_user_f7d77c9a: "Felhasználó újbóli aktiválása"
   re_reported_b9671073: Újrajelentett
+  re_send_confirmation_bcc66940: "Megerősítés újraküldése"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Közvetlen értesítés újraküldése a felhasználóknak, amikor a hirdetmény megkezdődik                        "
+  re_sending_379a8580: Újraküldés...
   re_submission_user_name_assignment_title_621a1cb3: "Újraküldés: %{user_name}, %{assignment_title}"
   re_submit_assignment_b3e2bd28: "Feladat újbóli beadása"
   re_upload_submissions_125e415d: "Beküldések újra feltöltése"
@@ -20795,12 +20818,17 @@ hu:
   regenerate_3e4679f8: Újragenerálás
   regenerate_epub_395c8e56: "ePub újragenerálása"
   regenerate_summary_f189e9d: "Összegzés újragenerálása"
+  regenerate_token_7d4fb783: "Token újragenerálása"
   regenerating_themes_462e6cd9: "Megújuló témák..."
+  regenerating_token_42e5c747: "Token újragenerálása..."
   region_47e29025: "Terület:"
   region_939f2a6c: Terület
   register_app_a8aaabdf: "Alkalmazás regisztrálása"
+  register_communication_ae935328: "Kommunikáció regisztrálása"
   register_email_efc06d59: "E-mail regisztrációja"
+  register_skype_d5e2b3d3: "Skype regisztrálása"
   register_slack_email_1f6d7e6d: "Slack Email Regisztráció"
+  register_sms_7f87e50d: "SMS regisztrálása"
   register_tool_84de3186: "Eszköz regisztrálása"
   registration: 
     get_started: "Vágjon bele!"
@@ -21464,12 +21492,14 @@ hu:
   save_grading_period_set_e029fa88: "Osztályzási időszak mentése"
   save_key_b4dede06: "Kulcs mentése"
   save_learning_mastery_82889d8b: "Tanulási jártasság mentése"
+  save_login_bba1272: "Bejelentkezési adatok mentése"
   save_mastery_calculation_84fbeb0f: "Jártassági számítás mentése"
   save_mastery_scale_2b4dc13a: "Jártassági számítás mentése"
   save_name_796fa6a2: "\"%{name} mentése\""
   save_publish_36440725: "Mentés és publikálás"
   save_rubric_1e4f6a44: "Értékelőtábla mentése"
   save_settings_cafe79a5: "Beállítások mentése"
+  save_skype_name_4de35a9: "Skype-név mentése"
   save_successful_b2f64da4: "Mentés sikeres."
   save_theme_36c73e6a: "Téma mentése"
   save_theme_f706116e: "Téma mentése"
@@ -23084,6 +23114,8 @@ hu:
   skipped_file_filename_due_to_error_94f0194: "%{filename} fájlhiba miatt kihagyva"
   skipping_unknown_file_type_cd1086ee: "Ismeretlen fájltípus kihagyása"
   skype_18850ba7: Skype
+  skype_name_9eb890df: Skype-azonosító
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "A Skype ingyen hang- és videóhívásokat kínál. Számos hallgató használja a Skype-ot, mint a kommunikáció ingyenes és egyszerű módját. Ha regisztrálja a Skype-nevét, és engedélyezi a láthatóságot, akkor a hallgatók könnyedén megtalálhatják, és hívhatják, vagy hozzáadhatják a kapcsolatlistájukhoz. "
   slack_api_key_92f0c667: "Laza API kulcs"
   slack_email_9204e2ea: "Slack e-mail"
   slack_notifications_3a0288e6: "Slack értesítések"
@@ -25681,6 +25713,7 @@ hu:
   toggle_tooltip_2447b4fa: "ToolTip átkapcsolása"
   toggle_tooltip_d3b7cb86: "Toggle tooltip"
   toggling_placement_ee1ab8b5: "Elhelyezés átkapcsolása"
+  token_9a020862: Token
   tolerance_value_9e96573c: Tűrésérték
   tomorrow_9a6c9a00: Holnap
   tomorrow_at_date_63a0d0d9: "Holnap ekkor: %{date}"

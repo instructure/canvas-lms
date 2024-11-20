@@ -2,19 +2,17 @@
   "name": "Knowledge Check",
   "description": "Add a quiz question from an Item Bank so your students can checck their comprehension of the material.",
   "template_type": "section",
-  "template_category": "type",
+  "template_category": "global",
   "node_tree": {
     "rootNodeId": "uurLTPnBr1",
     "nodes": {
       "uurLTPnBr1": {
         "type": {
-          "resolvedName": "QuizSection"
+          "resolvedName": "KnowledgeCheckSection"
         },
         "isCanvas": false,
-        "props": {
-          "questionId": "1"
-        },
-        "displayName": "Quiz Question",
+        "props": {},
+        "displayName": "Knowledge Check",
         "custom": {
           "isSection": true,
           "displayName": "Knowledge Check"

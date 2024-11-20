@@ -22,9 +22,6 @@ import {Flex} from '@instructure/ui-flex'
 import {FooterLinks, InstructureLogo} from './index'
 import {View} from '@instructure/ui-view'
 
-// @ts-expect-error
-import styles from './Footer.module.css'
-
 interface Props {
   className?: string
 }
@@ -32,12 +29,10 @@ interface Props {
 const Footer = ({className}: Props) => {
   return (
     <View as="footer" className={classNames(className)}>
-      <Flex as="div" direction="column" gap="large">
+      <Flex direction="column" gap="large">
         <FooterLinks />
 
-        <View as="div" className={styles.footer__logo}>
-          <InstructureLogo />
-        </View>
+        <InstructureLogo />
       </Flex>
     </View>
   )

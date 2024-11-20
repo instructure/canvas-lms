@@ -23,11 +23,7 @@ $highlight-blue: #00b5fe;
 
 .page_header_container {
   @include page_header_container;
-  align-items: flex-start;
-  flex-direction:  column;
-  @include breakpoint(ICEDesktop) {
-    flex-direction: row;
-  }
+
   .collab-page_header {
     @include page_header;
   }

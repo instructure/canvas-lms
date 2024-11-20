@@ -51,16 +51,18 @@ export const settings = (items: string[] | Badges[] | Product[]): Settings => {
 
 export const calculateArrowDisableIndex = (
   items: string[] | Badges[] | Product[],
-  windowSize: number
+  isDesktop: boolean,
+  isTablet: boolean,
+  isMobile: boolean
 ): {type: number} => {
   const total = items.length
-  if (windowSize <= 360 && total === 2) {
+  if (isMobile && total === 2) {
     return {type: total - 1}
-  } else if (windowSize <= 360) {
+  } else if (isMobile) {
     return {type: total - 1}
-  } else if (windowSize <= 760 && windowSize > 360) {
+  } else if (isTablet) {
     return {type: total - 2}
-  } else if (windowSize >= 760 && total === 2) {
+  } else if (isDesktop && total === 2) {
     return {type: total - 2}
   } else {
     return {type: total - 3}

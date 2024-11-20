@@ -323,9 +323,31 @@ module Interfaces::SubmissionInterface
       end
   end
 
+  field :custom_grade_status_id, ID, null: true
+
   field :custom_grade_status, String, null: true
   def custom_grade_status
-    submission.custom_grade_status&.name.to_s
+    load_association(:custom_grade_status).then do |status|
+      status&.name.to_s
+    end
+  end
+
+  field :status, String, null: false
+  def status
+    Promise.all([load_association(:assignment), load_association(:custom_grade_status)]).then do
+      Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
+        object.status
+      end
+    end
+  end
+
+  field :status_tag, Types::SubmissionStatusTagType, null: false
+  def status_tag
+    load_association(:assignment).then do
+      Loaders::AssociationLoader.for(Assignment, :external_tool_tag).load(object.assignment).then do
+        object.status_tag
+      end
+    end
   end
 
   field :media_object, Types::MediaObjectType, null: true

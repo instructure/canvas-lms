@@ -166,6 +166,12 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
         $.flashError(I18n.t('Selected content is not an LTI link.'))
         return
       }
+
+      if (event.data.reloadpage) {
+        window.location.reload()
+        return
+      }
+
       const tool: LtiLaunchDefinition = $(
         '#context_external_tools_select .tools .tool.selected'
       ).data('tool')
@@ -905,7 +911,7 @@ $(document).ready(function () {
 
     $('#select_context_content_dialog .module_item_option').hide()
     if ($(this).val() === 'attachment') {
-      // eslint-disable-next-line react/no-render-return-value
+      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
       fileSelectBox = ReactDOM.render(
         React.createFactory(FileSelectBox)({
           contextString: ENV.context_asset_string,
@@ -1099,6 +1105,7 @@ function renderFileUploadForm() {
     // toggle from current uploads to the choose files button
     $('#module_attachment_upload_form').show()
     $('#module_attachment_upload_progress').hide()
+    // eslint-disable-next-line no-restricted-properties
     upload_form = ReactDOM.render(
       <UploadForm {...folderProps} />,
       $('#module_attachment_upload_form')[0]
@@ -1107,6 +1114,7 @@ function renderFileUploadForm() {
 }
 
 function renderCurrentUploads() {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CurrentUploads onUploadChange={handleUploadOnChange} />,
     $('#module_attachment_upload_progress')[0]

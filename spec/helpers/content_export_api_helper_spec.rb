@@ -22,7 +22,8 @@ RSpec.describe ContentExportApiHelper, type: :helper do
   let(:context) { double("Context", content_exports:, quizzes:) }
   let(:content_exports) { double("ContentExports", build: export) }
   let(:quizzes) { double("Quizzes", exists?: true) }
-  let(:export) { ContentExport.build }
+  let(:course) { Course.build }
+  let(:export) { ContentExport.build(course:) }
   let(:current_user) { User.build }
   let(:params) { ActionController::Parameters.new({ export_type: "zip", select: { assignments: [1] } }) }
 
@@ -186,6 +187,11 @@ RSpec.describe ContentExportApiHelper, type: :helper do
         it "sets selected_content to the processed params" do
           expect(subject.selected_content).to eq(processed_params)
         end
+
+        it "calls content export's #prepare_new_quizzes_export with selected assignments" do
+          expect(export).to receive(:prepare_new_quizzes_export).with([1])
+          subject
+        end
       end
 
       context "when full" do
@@ -195,6 +201,11 @@ RSpec.describe ContentExportApiHelper, type: :helper do
 
         it "sets selected_content to all_attachments if select is not present" do
           expect(subject.selected_content.deep_symbolize_keys).to eq({ everything: true })
+        end
+
+        it "calls content export's #prepare_new_quizzes_export with nil" do
+          expect(export).to receive(:prepare_new_quizzes_export).with(nil)
+          subject
         end
       end
 

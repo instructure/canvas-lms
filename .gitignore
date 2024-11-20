@@ -90,6 +90,9 @@ docker-compose/api-gateway.override.yml
 # generated scopes markdown
 /doc/api/api_token_scopes.md
 
+# generated live events docs
+/doc/api/data_services/md/dynamic/*.md
+
 # js coverage stuff
 .nyc_output
 coverage-jest

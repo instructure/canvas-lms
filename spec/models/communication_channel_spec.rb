@@ -635,6 +635,7 @@ describe CommunicationChannel do
           set_root_account_ids
           after_save_flag_old_microsoft_sync_user_mappings
           consider_building_notification_policies
+          initialize_synced_with_identity
         ]
         expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end

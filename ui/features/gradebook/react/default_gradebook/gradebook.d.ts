@@ -159,6 +159,7 @@ export type GradebookOptions = {
   publish_to_sis_url: string
   re_upload_submissions_url: string
   reorder_custom_columns_url: string
+  rubric_assessment_imports_exports_enabled: boolean
   save_view_ungraded_as_zero_to_server: boolean
   sections: Section[]
   setting_update_url: string

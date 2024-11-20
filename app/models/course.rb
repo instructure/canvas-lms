@@ -543,6 +543,22 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def get_assignment_ids_from_modules(modules)
+    return unless modules
+
+    context_module_tags.not_deleted
+                       .assignments_for_modules(modules)
+                       .pluck(:content_id)
+  end
+
+  def get_assignment_ids_from_module_items(module_items)
+    return unless module_items
+
+    context_module_tags.not_deleted
+                       .assignments_for_module_items(module_items)
+                       .pluck(:content_id)
+  end
+
   def verify_unique_ids
     infer_root_account unless root_account_id
 

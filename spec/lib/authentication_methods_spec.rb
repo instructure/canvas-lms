@@ -362,6 +362,20 @@ describe AuthenticationMethods do
         expect(controller.instance_variable_get(:@access_token).last_used_at).to be_truthy
       end
 
+      it "raises RevokedAccessTokenError if the access token is revoked" do
+        token = AccessToken.create!(user: @user, workflow_state: "deleted")
+        controller = setup_with_token(token)
+
+        expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::RevokedAccessTokenError)
+      end
+
+      it "raises ExpiredAccessTokenError if the access token is expired" do
+        token = AccessToken.create!(user: @user, permanent_expires_at: 1.day.ago)
+        controller = setup_with_token(token)
+
+        expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::ExpiredAccessTokenError)
+      end
+
       it "raises AccessTokenError if current_user and current_pseudonym are not set" do
         allow(SisPseudonym).to receive(:for).and_return(nil)
         token = AccessToken.create!(user: @user)

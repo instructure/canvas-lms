@@ -18,7 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import useWindowWidth from '../useWindowWidth'
+
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import {PreviousArrow, NextArrow} from './Arrows'
 import {settings, calculateArrowDisableIndex} from './utils'
 import Slider from 'react-slick'
@@ -42,15 +43,22 @@ type ProductCarouselProps = {
 function ProductCarousel(props: ProductCarouselProps) {
   const {products, companyName} = props
   const slider = React.useRef<Slider>(null)
-  const windowSize = useWindowWidth()
   const updatedSettings = settings(products)
-  const updatedArrowDisableIndex = calculateArrowDisableIndex(products, windowSize)
+  const {isDesktop, isTablet, isMobile} = useBreakpoints()
+  const updatedArrowDisableIndex = calculateArrowDisableIndex(
+    products,
+    isDesktop,
+    isTablet,
+    isMobile
+  )
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
 
   const renderProducts = () => {
     return products?.map((associatedProducts, i) => (
-      <ProductCard key={`${i + 1}`} product={associatedProducts} />
+      <Flex key={`${i + 1}`} margin="0 small 0 0">
+        <ProductCard key={`${i + 1}`} product={associatedProducts} />
+      </Flex>
     ))
   }
 
@@ -74,12 +82,12 @@ function ProductCarousel(props: ProductCarouselProps) {
         )}
       </Flex>
       <Flex>
-        <Flex.Item>
+        <Flex.Item shouldGrow={true}>
           <Slider
             ref={slider}
             {...updatedSettings}
             {...props.customSettings}
-            beforeChange={(currentSlide: number, nextSlide: number) =>
+            beforeChange={(_currentSlide: number, nextSlide: number) =>
               setCurrentSlideNumber(nextSlide)
             }
           >

@@ -75,7 +75,67 @@ describe AuthenticationProvider::OpenIDConnect do
       response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
       expect(CanvasHttp).to receive(:get).and_yield(response)
       subject.valid?
-      expect(subject.issuer).to eq "me"
+      expect(subject.issuer).to eql "me"
+      expect(subject.discovery_url).to eql "https://somewhere/.well-known/openid-configuration"
+    end
+
+    it "ignores a (newly) blank issuer" do
+      subject.issuer_will_change!
+      expect(CanvasHttp).not_to receive(:get)
+      subject.valid?
+      expect(subject.issuer).to be_nil
+      expect(subject.discovery_url).to be_nil
+    end
+
+    it "doesn't try to download if nothing changed" do
+      subject.discovery_url = "https://somewhere/.well-known/openid-configuration"
+      allow(subject).to receive_messages(discovery_url_changed?: false, issuer_changed?: false)
+      expect(CanvasHttp).not_to receive(:get)
+      subject.valid?
+    end
+
+    it "infers the discovery URL from the issuer" do
+      subject.issuer = "https://somewhere"
+      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      expect(CanvasHttp).to receive(:get).with("https://somewhere/.well-known/openid-configuration").and_yield(response)
+      subject.valid?
+      expect(subject.issuer).to eql "me"
+      expect(subject.discovery_url).to eql "https://somewhere/.well-known/openid-configuration"
+    end
+
+    it "infers the discovery URL from a multi-tenant issuer" do
+      subject.issuer = "https://somewhere/multitenant/"
+      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      expect(CanvasHttp).to receive(:get).with("https://somewhere/multitenant/.well-known/openid-configuration").and_yield(response)
+      subject.valid?
+      expect(subject.issuer).to eql "me"
+      expect(subject.discovery_url).to eql "https://somewhere/multitenant/.well-known/openid-configuration"
+    end
+
+    it "does not infer a discovery URL when the provider doesn't support discovery" do
+      subject.issuer = "https://somewhere"
+      response = instance_double("Net::HTTPOK", value: 404, body: "NOT FOUND")
+      expect(CanvasHttp).to receive(:get).with("https://somewhere/.well-known/openid-configuration").and_yield(response)
+      subject.valid?
+      expect(subject.issuer).to eql "https://somewhere"
+      expect(subject.discovery_url).to be_nil
+    end
+
+    it "does not infer a discovery URL when it's invalid" do
+      subject.issuer = "not_a_url"
+      subject.valid?
+      expect(subject.issuer).to eql "not_a_url"
+      expect(subject.discovery_url).to be_nil
+    end
+
+    it "does not modify an explicit discovery URL with a non-matching issuer" do
+      subject.issuer = "https://somewhere"
+      subject.discovery_url = "https://somewhere/openid-configuration"
+      response = instance_double("Net::HTTPOK", value: 200, body: { issuer: "me" }.to_json)
+      expect(CanvasHttp).to receive(:get).with("https://somewhere/openid-configuration").and_yield(response)
+      subject.valid?
+      expect(subject.issuer).to eql "me"
+      expect(subject.discovery_url).to eql "https://somewhere/openid-configuration"
     end
   end
 

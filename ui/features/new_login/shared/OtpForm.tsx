@@ -24,6 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
+import {Text} from '@instructure/ui-text'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNewLogin} from '../context/NewLoginContext'
@@ -171,75 +172,63 @@ const OtpForm = ({className}: Props) => {
 
   const otpFormContent = (
     <Flex className={classNames(className)} direction="column" gap="large">
-      <Flex.Item overflowY="visible">
-        <Heading level="h2" as="h1">
-          {I18n.t('Multi-Factor Authentication')}
-        </Heading>
+      <Heading level="h2" as="h1">
+        {I18n.t('Multi-Factor Authentication')}
+      </Heading>
 
-        {otpCommunicationChannelId ? (
-          <p>{I18n.t('Please enter the verification code sent to your mobile phone number.')}</p>
-        ) : (
-          <p>{I18n.t('Please enter the verification code shown by your authenticator app.')}</p>
-        )}
-      </Flex.Item>
+      {otpCommunicationChannelId ? (
+        <Text>
+          {I18n.t('Please enter the verification code sent to your mobile phone number.')}
+        </Text>
+      ) : (
+        <Text>{I18n.t('Please enter the verification code shown by your authenticator app.')}</Text>
+      )}
 
-      <Flex.Item overflowY="visible">
-        <form onSubmit={handleOtpSubmit}>
-          <Flex direction="column" gap="large">
-            <Flex.Item overflowY="visible">
-              <Flex direction="column" gap="small">
-                <Flex.Item overflowY="visible">
-                  <TextInput
-                    id="otpCode"
-                    renderLabel={I18n.t('Verification Code')}
-                    type="text"
-                    value={verificationCode}
-                    onChange={(_event, value) => {
-                      setVerificationCode(value)
-                    }}
-                    autoComplete="one-time-code"
-                  />
-                </Flex.Item>
+      <form onSubmit={handleOtpSubmit}>
+        <Flex direction="column" gap="large">
+          <Flex direction="column" gap="small">
+            <TextInput
+              id="otpCode"
+              renderLabel={I18n.t('Verification Code')}
+              type="text"
+              value={verificationCode}
+              onChange={(_event, value) => {
+                setVerificationCode(value)
+              }}
+              autoComplete="one-time-code"
+            />
 
-                <Flex.Item overflowY="visible">
-                  <Checkbox
-                    label={I18n.t('Stay signed in')}
-                    checked={rememberMe}
-                    onChange={() => setRememberMe(!rememberMe)}
-                    inline={true}
-                  />
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
-
-            <Flex.Item overflowY="visible">
-              <Flex direction="column" gap="small">
-                <Flex.Item overflowY="visible">
-                  <Button
-                    type="submit"
-                    color="primary"
-                    display="block"
-                    disabled={isUiActionPending || !verificationCode.trim()}
-                  >
-                    {I18n.t('Verify')}
-                  </Button>
-                </Flex.Item>
-
-                <Flex.Item overflowY="visible">
-                  <Button
-                    color="secondary"
-                    onClick={handleCancelOtp}
-                    display="block"
-                    disabled={isUiActionPending}
-                  >
-                    {I18n.t('Cancel')}
-                  </Button>
-                </Flex.Item>
-              </Flex>
+            <Flex.Item overflowY="visible" overflowX="visible">
+              <Checkbox
+                label={I18n.t('Stay signed in')}
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
+                inline={true}
+              />
             </Flex.Item>
           </Flex>
-        </form>
-      </Flex.Item>
+
+          <Flex direction="column" gap="small">
+            <Button
+              type="submit"
+              color="primary"
+              display="block"
+              disabled={isUiActionPending || !verificationCode.trim()}
+            >
+              {I18n.t('Verify')}
+            </Button>
+
+            <Button
+              color="secondary"
+              onClick={handleCancelOtp}
+              display="block"
+              disabled={isUiActionPending}
+            >
+              {I18n.t('Cancel')}
+            </Button>
+          </Flex>
+        </Flex>
+      </form>
     </Flex>
   )
 

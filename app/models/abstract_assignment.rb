@@ -2159,7 +2159,7 @@ class AbstractAssignment < ActiveRecord::Base
     grade_group_students = !(grade_group_students_individually || opts[:excused])
 
     if has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
-      sub_assignment_tag = opts.delete(:sub_assignment_tag)
+      sub_assignment_tag = opts[:sub_assignment_tag]
       checkpoint_assignment = find_checkpoint(sub_assignment_tag)
       if sub_assignment_tag.blank? || checkpoint_assignment.nil?
         raise ::Assignment::GradeError, "Must provide a valid sub assignment tag when grading checkpointed discussions"
@@ -3128,7 +3128,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students_in_courses(user_ids:, course_ids:).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:).map(&:assignment_id)
 
       if visible_assignment_ids.any?
         where(id: visible_assignment_ids)
@@ -3149,7 +3149,7 @@ class AbstractAssignment < ActiveRecord::Base
     elsif Account.site_admin.feature_enabled?(:selective_release_backend)
       user_ids = Array.wrap(user_ids)
       course_ids = Array.wrap(course_ids_that_have_da_enabled)
-      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_to_students_in_course(user_ids:, course_ids:, assignment_ids: ids).map(&:assignment_id)
+      visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids: ids).map(&:assignment_id)
       where(
         "(assignments.context_id NOT IN (?) AND assignments.workflow_state <> 'deleted') OR assignments.id IN (?)",
         course_ids,
@@ -4098,7 +4098,7 @@ class AbstractAssignment < ActiveRecord::Base
 
   def a2_enabled?
     return false unless course.feature_enabled?(:assignments_2_student)
-    return false if quiz? || discussion_topic? || wiki_page?
+    return false if quiz? || discussion_topic? || wiki_page? || quiz_lti?
     return false if peer_reviews? && !course.feature_enabled?(:peer_reviews_for_a2)
     return false if external_tool? && !Account.site_admin.feature_enabled?(:external_tools_for_a2)
 

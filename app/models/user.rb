@@ -347,7 +347,7 @@ class User < ActiveRecord::Base
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignment_visible_in_course(assignment_id:, course_id:).map(&:user_id)
+      visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id).map(&:user_id)
       if visible_user_id.any?
         where(id: visible_user_id)
       else
@@ -362,7 +362,7 @@ class User < ActiveRecord::Base
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_quiz_in_course_with_da, lambda { |quiz_id, course_id|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_user_ids = QuizVisibility::QuizVisibilityService.quiz_visible_in_course(quiz_id:, course_id:).map(&:user_id)
+      visible_user_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: quiz_id, course_ids: course_id).map(&:user_id)
       where(id: visible_user_ids)
     else
       joins(:quiz_student_visibilities)
@@ -617,8 +617,9 @@ class User < ActiveRecord::Base
     self.root_account_ids = refreshed_root_account_ids.to_a.sort
     if root_account_ids_changed?
       save!
-      # Update each communication channel associated with the user
+      # Update communication channel and feature flag records associated with the user
       communication_channels.update_all(root_account_ids:)
+      feature_flags.update_all(root_account_ids:)
     end
   end
 
@@ -1319,18 +1320,18 @@ class User < ActiveRecord::Base
     return account.grants_right?(user, sought_right) if fake_student? # doesn't have account association
 
     # Intentionally include deleted pseudonyms when checking deleted users (important for diagnosing deleted users)
-    accounts_to_search = if associated_accounts.empty?
-                           if merged_into_user
-                             # Early return from inside if to ensure we handle chains of merges correctly
-                             return merged_into_user.check_accounts_right?(user, sought_right)
-                           elsif Account.where(id: pseudonyms.pluck(:account_id)).any?
-                             Account.where(id: pseudonyms.pluck(:account_id))
-                           else
-                             associated_accounts
-                           end
-                         else
-                           associated_accounts
-                         end
+    accounts_to_search =
+      if associated_accounts.empty?
+        if merged_into_user && active_merged_into_user
+          return active_merged_into_user.check_accounts_right?(user, sought_right)
+        elsif Account.joins(:pseudonyms).where(pseudonyms: { user_id: id }).exists?
+          Account.joins(:pseudonyms).where(pseudonyms: { user_id: id })
+        else
+          associated_accounts
+        end
+      else
+        associated_accounts
+      end
 
     common_shards = associated_shards & user.associated_shards
     search_method = lambda do |shard|
@@ -1348,6 +1349,22 @@ class User < ActiveRecord::Base
     return true if (associated_shards - common_shards).any?(&search_method)
 
     false
+  end
+
+  def active_merged_into_user
+    merged_into_users.find { |u| u.associated_accounts.present? }
+  end
+
+  def merged_into_users
+    chain = []
+    next_in_chain = merged_into_user
+
+    while next_in_chain && chain.exclude?(next_in_chain) && chain.length < 20
+      chain << next_in_chain
+      next_in_chain = next_in_chain.merged_into_user
+    end
+
+    chain
   end
 
   set_policy do
@@ -3343,6 +3360,10 @@ class User < ActiveRecord::Base
   def all_active_pseudonyms(reload = false)
     @all_active_pseudonyms = nil if reload
     @all_active_pseudonyms ||= pseudonyms.shard(self).active.to_a
+  end
+
+  def pseudonyms_visible_to(_user)
+    all_active_pseudonyms
   end
 
   def preferred_gradebook_version

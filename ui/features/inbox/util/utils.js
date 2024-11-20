@@ -116,6 +116,7 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
         inboxMessage.body = message?.comment
         inboxMessage.htmlBody = message?.htmlComment
         inboxMessage.attachmentsConnection = null
+        inboxMessage.attachments = null
         inboxMessage.mediaComment = null
         contextName = message?.course?.contextName
         canReply = canReply && message?.canReply
@@ -129,6 +130,7 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
         inboxMessage.body = message?.body
         inboxMessage.htmlBody = message?.htmlComment
         inboxMessage.attachmentsConnection = message?.attachmentsConnection
+        inboxMessage.attachments = message?.attachments
         inboxMessage.mediaComment = message?.mediaComment
         contextName = data?.contextName
         canReply = data?.canReply

@@ -18,16 +18,19 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('lti_registrations')
 
 function Disclaimer() {
   return (
-    <Text color="secondary">
-      {I18n.t(
-        'Apps offered in the Canvas Apps library are not reviewed or otherwise vetted by Instructure. We encourage you to review the AI, privacy, and security practices of each provider before connecting to your Canvas LMS account.'
-      )}
-    </Text>
+    <View as="div">
+      <Text color="secondary">
+        {I18n.t(
+          'Apps offered in the Canvas Apps library are not reviewed or otherwise vetted by Instructure. We encourage you to review the AI, privacy, and security practices of each provider before connecting to your Canvas LMS account.'
+        )}
+      </Text>
+    </View>
   )
 }
 

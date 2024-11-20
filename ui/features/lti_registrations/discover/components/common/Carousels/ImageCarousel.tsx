@@ -17,6 +17,7 @@
  */
 
 import React, {useState} from 'react'
+import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import Slider from 'react-slick'
 import type {Settings} from 'react-slick'
 import 'slick-carousel/slick/slick.css'
@@ -24,7 +25,6 @@ import 'slick-carousel/slick/slick.css'
 import {Flex} from '@instructure/ui-flex'
 
 import {PreviousArrow, NextArrow} from './Arrows'
-import useWindowWidth from '../useWindowWidth'
 import {settings, calculateArrowDisableIndex} from './utils'
 
 type ImageCarouselProps = {
@@ -35,9 +35,14 @@ type ImageCarouselProps = {
 function ImageCarousel(props: ImageCarouselProps) {
   const {screenshots} = props
   const slider = React.useRef<Slider>(null)
-  const windowSize = useWindowWidth()
   const updatedSettings = settings(screenshots)
-  const updatedArrowDisableIndex = calculateArrowDisableIndex(screenshots, windowSize)
+  const {isDesktop, isTablet, isMobile} = useBreakpoints()
+  const updatedArrowDisableIndex = calculateArrowDisableIndex(
+    screenshots,
+    isDesktop,
+    isTablet,
+    isMobile
+  )
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)
 
@@ -56,12 +61,12 @@ function ImageCarousel(props: ImageCarouselProps) {
       {screenshots.length > 1 && (
         <PreviousArrow currentSlideNumber={currentSlideNumber} slider={slider} />
       )}
-      <Flex.Item>
+      <Flex.Item shouldShrink={true}>
         <Slider
           ref={slider}
           {...updatedSettings}
           {...props.customSettings}
-          beforeChange={(currentSlide: number, nextSlide: number) =>
+          beforeChange={(_currentSlide: number, nextSlide: number) =>
             setCurrentSlideNumber(nextSlide)
           }
         >

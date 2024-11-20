@@ -355,6 +355,7 @@ nn:
   access_token_3be22221: Tilgangstoken
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Tilgangstoken er laga eller regenerert."
+  access_token_details_495d989: "Detaljar for tilgangstoken"
   access_token_is_valid_until_d2f048cf: "Tilgangstoken er gyldig til"
   access_token_manage_a626f071: "Tilgangstoken - administrer"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "Tilgangstoken kan gi andre applikasjonar lov til å gjere API-kall på dine vegne. Du kan óg generere tilgangstoken og *bruke Canvas sine opne API-ar* til å sette opp eigne integrasjonar. "
@@ -3750,6 +3751,7 @@ nn:
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane? "
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Er du sikker på at du vil halde fram? Endringar du har gjort vil ikkje bli lagra."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Er du sikker på at du vil publisere denne kommentaren?"
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "Er du sikker på at du vil generere dette teiknet på nytt? Alt som brukar dette teiknet må oppdaterast."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne karaktersetjingsperioden?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Er du sikker på at du vil fjerne dette elementet? "
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne verktøyet?"
@@ -3822,6 +3824,7 @@ nn:
   assign_graded_checkpoints_2a7e9694: "Tildel vurderte sjekkpunkt"
   assign_manually_1785dcfc: "Tildel manuelt"
   assign_module_to_individuals_or_sections_bd638c03: "Tildel modul til enkeltpersonar eller seksjonar."
+  assign_reviews_3fb2932a: "Gi vurderingar"
   assign_reviews_on_date_7e48ec50: "Tilordne gjennomgangar etter dato"
   assign_temporary_enrollments_bdaaa58a: "Tildel midlertidige påmeldingar"
   assign_temporary_enrollments_to_count_users_5da4f30d: 
@@ -4873,6 +4876,8 @@ nn:
   author_s_name_b35e905a: "Forfattaren sitt namn"
   author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: Autoriser
+  authorize_google_drive_8ad056d5: "Godkjenn Google Drive"
+  authorize_google_drive_access_aefcf8d6: "Autoriser Google Drive-tilgang"
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: "Vis undertekstar automatisk"
@@ -4942,6 +4947,7 @@ nn:
   back_to_app_center_95420d83: "Tilbake til appsenteret"
   back_to_assignment_1df86a69: "Tilbake til oppgåve"
   back_to_attempt_attempt_ffb22bb8: "Tilbake til forsøk %{attempt}"
+  back_to_login_e4b5f663: "Tilbake til pålogging"
   back_to_production_fed09f33: "Tilbake til produksjon"
   back_to_ref_title_377ea1f0: "Tilbake til %{ref_title}"
   back_to_subject_80a1eb: "Tilbake til emne"
@@ -6742,6 +6748,7 @@ nn:
   confirm_dialog_component: 
     ok: OK
   confirm_edit_outcome_a9746c99: "Stadfest redigering av læringsmål"
+  confirm_email_address_9072dd3c: "Stadfest e-postadresse"
   confirm_mastery_calculation_19ad19f9: "Bekreft ekspertiseberekning"
   confirm_mastery_scale_9a779252: "Stadfest meistringskala"
   confirm_qr_code_display_49664fa3: "Bekreft QR-kode visning"
@@ -6756,6 +6763,7 @@ nn:
   confirm_unfavorite_course_fa01966d: "Bekreft fjerning av favoritt-merke"
   confirmation_code_required_22984955: "Kode for stadfesting (obligatorisk)"
   confirmation_failed_please_try_again_ae566d37: "Stadfesting mislukkast. Prøv på nytt seinare."
+  confirming_2df4b68f: Stadfestar...
   confused_panda_questioning_what_to_do_next_42941484: "Forvirra Panda funderar på kva han skal gjere no"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Vurder å velje fleire innleveringstypar for å tilpasse innleveringen for studentar som kanskje ikkje får til å lage merknader"
   consumer_key_57d9fcf1: Forbrukarnøkkel
@@ -9740,6 +9748,7 @@ nn:
       i Canvas Data tenesteverktøyet
   differentiated_modules_5e2377d7: "Differensierte modular"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo er eit sosialt bokmerkings-verktøy som er utforma spesielt for forsking og utdanning. Redigeringsprogrammet i Canvas gjer at du kan søke etter Diigo-taggar og enkelt legge til lenker frå Canvas til ressursar som er nyttige for deg."
   direct_share_80afd4a7: "Direct Share"
   disableWhileLoading: 
     loading: Lastar...
@@ -11328,6 +11337,7 @@ nn:
   excused_5877183c: "Fritak er innvilga."
   excused_cf8792eb: "Fritak er innvilga"
   exit_d0c7b013: "Gå ut og lukk"
+  exit_fullscreen_b7eb0aa4: "Avslutt fullskjerm"
   expand_2f2fadbd: Vis
   expand_all_8329940a: "Utvid alle"
   expand_all_bb64d2ea: "Vis alle"
@@ -11349,6 +11359,7 @@ nn:
   expanded_f4493860: Viser
   expected_array_of_objects_b09ead01: "Forventa tabell med objekt"
   experimental_graphql_api_75c5eb8f: "EXPERIMENTAL GraphQL API."
+  expires_7019786e: "Går ut"
   expires_at_6214b43f: "Går ut den"
   explanation_of_statuses_90a26d07: "Forklaring på statusar:"
   explicit_latex_typesetting_c1c569c9: "Eksplisitt LaTeX-typesetting"
@@ -11929,6 +11940,7 @@ nn:
   full_name_83cf5453: "Fullstendig namn"
   full_name_is_required_8efbdc84: "Fullstendig namn er obligatorisk"
   full_student_names_and_profile_pictures_will_be_hi_ddfba94e: "Full: namn og profilbilete på student vil være skjult"
+  fullscreen_873bf53f: "Full skjerm"
   fun_quiz_47ab0b0: "Underhaldande quiz"
   future_5416ea92: Framtidig
   future_jobs_cf2964a1: "Framtidige jobbar"
@@ -11944,12 +11956,14 @@ nn:
   generate_epub_80e89ea4: "Generer EPUB"
   generate_item_analysis_report_statuslabel_16e02c8: "Generer elementanalyserapport %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "Generer studentanalyserapport %{statusLabel}"
+  generate_token_393ab5b4: "Generer teikn"
   generated_f26ee56b: "Generert:"
   generating_5b5e20f8: "Genererer:"
   generating_c2aabc02: Genererer...
   generating_pairing_code_251b7fc8: "Genererer paringskode..."
   generating_pairing_code_d480ccf4: "Genererer paringskode"
   generating_preview_45b53be0: "Genererer førehandsvising..."
+  generating_token_42c29663: "Genererer teikn..."
   german_3ec99bbb: Tysk
   germany_49_fc5b8179: "Tyskland (+49)"
   germany_b02d91c9: Tyskland
@@ -14714,6 +14728,7 @@ nn:
   last_synced_datetime_1c3e0295: "Sist synkronisert: %{datetime}"
   last_synced_right_now_f6c2ab00: "Sist synkronisert: No"
   last_updated_timestamp_1822e508: "Sist oppdatert %{timestamp}"
+  last_used_17553fed: "Sist brukt"
   last_used_f9457313: "Sist brukt:"
   last_user_access_title: "Siste brukartilgang"
   last_viewed_cfbbbc3a: "Sist vist"
@@ -17964,6 +17979,7 @@ nn:
   never_df100b49: Aldri
   never_should_have_made_it_here_ab72bdab: "Skulle aldri kome hit"
   new_13daf639: Ny
+  new_access_token_e301d1fc: "Nytt tilgangstoken"
   new_account_role_6e5c4964: "Ny kontorolle"
   new_activity_8b84847d: "Ny aktivitet"
   new_activity_for_title_c5cc74: "Ny aktivitet for%{title}"
@@ -18778,6 +18794,7 @@ nn:
   offline_score_8d7b4779: "Fråkopla Resultat:"
   ok_c47544a2: OK
   ok_ff1b646a: OK
+  ok_thanks_6b1fc8ae: Takk
   okay_1772bbeb: OK
   old_policy_39e4f77: "Gamle retningslinjar"
   old_quiz_e8dafede: "Gammal quiz"
@@ -18820,6 +18837,7 @@ nn:
       Framtidige resultatendringar for vurderingar som allereie er posta, treng ikkje å postast manuelt.
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "Med ein gong ei vurdering er posta manuelt sendast det automatisk eit varsel og den er synleg for studentane."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Når denne funksjonen er slått på, kan den ikkje slåast av igjen. Ver sikker på at du er klar for å aktivere innleveringsmappa før du går vidare. "
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "Når du har gitt tilgang til Google Drive, kan du levere inn oppgåvene direkte frå Google Drive og opprette og dele dokument med medlemmar i seksjonane."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har levert eit svar, kan du ikkje endre på det seinare. Du kan ikkje lenger sjå førre spørsmål."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Når du byrjar å feilsøke blir all informasjon om neste SAML-påloggingsforsøk samla inn. Klikk på \"Oppdater\" for å sjå om det er samla inn fleire data, eller klikk på \"Stopp feilsøking\" for å fjerne innsamla data og stoppe gjeldande feilsøkingsforsøk."
   one_or_more_content_items_sent_by_this_external_ap_76a5ba2a: "Eitt eller fleire innhaldselement sende av denne eksterne appen vart ikkje behandla på riktig måte. Desse har ikkje vorte lagra av Canvas, og årsakene til feilen er oppført nedanfor."
@@ -20316,6 +20334,8 @@ nn:
       regenerating_token_failed: "Ny generering av teikn mislukkast"
       registration_failed: "Registrering mislukkast. Kontroller brukarnamn og passord før du prøver på nytt."
     failed_resending: "Førespurnad mislukkast Prøv på nytt seinare."
+    labels: 
+      enable_login_for_email: "Eg vil logge på Canvas med denne e-postadressa"
     links: 
       resend_confirmation: "Send stadfesting på nytt"
       resend_confirmation_failed: "Førespurnad mislukkast Prøv på nytt seinare."
@@ -20733,6 +20753,7 @@ nn:
     new: 
       payment_info: Betalingsinformasjon
   purple_7678a9fc: Lilla
+  purpose_5202a309: Formål
   push_notification_a6532ff3: Push-varsel
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Sp: Kva er svart, kvit, svart, kvit? Sv: Ein panda som rullar ned ei skråning."
   qatar_974_7e9684ca: "Qatar (+974)"
@@ -22084,7 +22105,9 @@ nn:
   rce_s_new_and_improved_equation_editor_dialog_380653be: "Rik teksteditor sin nye og forbetra likningseditor"
   re_activate_user_f7d77c9a: "Aktiver brukar på nytt"
   re_reported_b9671073: "Rapportert på nytt"
+  re_send_confirmation_bcc66940: "Send stadfesting på nytt"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Send varsel på nytt direkte til brukar når kunngjeringa startar"
+  re_sending_379a8580: "Sender på nytt..."
   re_submission_user_name_assignment_title_621a1cb3: "Ny innlevering: %{user_name},%{assignment_title}"
   re_submit_assignment_b3e2bd28: "Lever oppgåve på nytt"
   re_upload_submissions_125e415d: "Last tilbake kommenterte filer"
@@ -22224,12 +22247,17 @@ nn:
   regenerate_3e4679f8: Regenerer
   regenerate_epub_395c8e56: "Regenerer EPUB"
   regenerate_summary_f189e9d: "Regenerer oppsummering"
+  regenerate_token_7d4fb783: "Generer teiknet på nytt"
   regenerating_themes_462e6cd9: "Genererer tema på nytt . . ."
+  regenerating_token_42e5c747: "Genererer teiknet på nytt..."
   region_47e29025: "Område:"
   region_939f2a6c: Område
   register_app_a8aaabdf: "Registrer app"
+  register_communication_ae935328: "Registrer kommunikasjon"
   register_email_efc06d59: "Registrer e-post"
+  register_skype_d5e2b3d3: "Registrer Skype"
   register_slack_email_1f6d7e6d: "Registrer Slack-epost"
+  register_sms_7f87e50d: "Registrer SMS"
   register_tool_84de3186: "Registrer verktøyet"
   registration: 
     get_started: "Kom i gang"
@@ -22919,12 +22947,14 @@ nn:
   save_key_b4dede06: "Lagre nøkkel"
   save_label_6ed4a68e: "Lagre etiketten"
   save_learning_mastery_82889d8b: "Lagre meistringsbasert læring"
+  save_login_bba1272: "Lagre pålogging"
   save_mastery_calculation_84fbeb0f: "Lagre ekspertiseberekning"
   save_mastery_scale_2b4dc13a: "Lagre ekspertisenivå"
   save_name_796fa6a2: "Lagre \"%{name}\""
   save_publish_36440725: "Lagre og publiser"
   save_rubric_1e4f6a44: "Lagre vurderingsskjema"
   save_settings_cafe79a5: "Lagre innstillingar"
+  save_skype_name_4de35a9: "Lagre Skype-namn"
   save_successful_b2f64da4: Lagra
   save_theme_36c73e6a: "Lagre tema"
   save_theme_f706116e: "Lagre tema"
@@ -24725,6 +24755,8 @@ nn:
   skipped_file_filename_due_to_error_94f0194: "Hoppa over fila %{filename} på grunn av feil"
   skipping_unknown_file_type_cd1086ee: "Hoppar over ukjent filtype"
   skype_18850ba7: Skype
+  skype_name_9eb890df: Skype-namn
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "Skype tilbyr gratis nettbaserte tale- og videosamtalar. Mange studentar brukar Skype som ein gratis og enkel måte å kommunisere på. Dersom du registrerer Skype-namnet og aktiverer synlegheit, kan andre studentar enkelt finne deg og kontakte deg på Skype."
   slack_1130ad43: Slack
   slack_api_key_92f0c667: Slack-API-nøkkel
   slack_email_9204e2ea: Slack-epost
@@ -27449,6 +27481,7 @@ nn:
   toggle_tooltip_2447b4fa: "Vis/skjul tips"
   toggle_tooltip_d3b7cb86: "Vis/skjul tips"
   toggling_placement_ee1ab8b5: "Bytte plassering"
+  token_9a020862: Token
   tolerance_value_9e96573c: Toleranseverdi
   tomorrow_9a6c9a00: "I morgon"
   tomorrow_at_date_63a0d0d9: "I morgon på %{date}"

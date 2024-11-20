@@ -16,9 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+InstUI breakpoint values:
+(found in node_modules/@instructure/ui-theme-tokens/src/canvas/breakpoints.ts)
+
+- xxSmall: 8em      (128px)
+- xSmall: 16em      (256px)
+- small: 30em       (480px)
+- medium: 48em      (768px)
+- tablet: 48em      (768px)  // Shares value with medium
+- large: 62em       (992px)
+- desktop: 64em     (1024px)
+- xLarge: 75em      (1200px)
+*/
 
 .contentLayout {
-    @media (min-width: 48rem) and (max-width: 80rem) { /* 768px – 1280px */
+    @media (min-width: 48rem) and (max-width: 74.9375rem) { /* 768px – 1199px */
         padding: 5rem 0 8rem; /* 80px 128px */
     }
 }
@@ -34,7 +47,7 @@
         width: 35.75rem; /* 572px */
     }
 
-    @media (min-width: 80rem) { /* 1280px */
+    @media (min-width: 75rem) { /* 1200px */
         height: 100%;
         margin: unset;
         padding: 5rem; /* 80px */
@@ -50,7 +63,7 @@
     top: 0;
     z-index: -1;
 
-    @media (min-width: 80rem) { /* 1280px */
+    @media (min-width: 75rem) { /* 1200px */
         left: 45rem; /* 720px */
     }
 }

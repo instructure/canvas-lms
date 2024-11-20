@@ -214,16 +214,13 @@ export const DiscussionTopicContainer = ({
     const discussionOrAnnouncement = isAnnouncement
       ? I18n.t('Announcements')
       : I18n.t('Discussions')
-    const discussionOrAnnouncementUrl= isAnnouncement ? 'announcements' : 'discussion_topics'
-    const oldCrumbs = getCrumbs()
-    const newCrumbs = [
-      ...oldCrumbs,
-      ...[
-        {name: discussionOrAnnouncement, url: oldCrumbs[0].url + '/' + discussionOrAnnouncementUrl},
-        {name: props.discussionTopic.title || '', url: ''},
-      ],
-    ]
-    setCrumbs(newCrumbs)
+    const discussionOrAnnouncementUrl = isAnnouncement ? 'announcements' : 'discussion_topics'
+    const crumbs = getCrumbs()
+    const baseUrl = `${crumbs[0].url}/${discussionOrAnnouncementUrl}`
+
+    crumbs.push({name: discussionOrAnnouncement, url: baseUrl})
+    crumbs.push({name: props.discussionTopic.title || '', url: ''})
+    setCrumbs(crumbs)
   }
 
   return (
@@ -302,8 +299,8 @@ export const DiscussionTopicContainer = ({
                     borderRadius={responsiveProps?.border?.radius}
                     borderStyle="solid"
                     borderColor="primary"
-                    padding="small"
-                    margin="0 0 small 0"
+                    padding={matches.includes('mobile') ? "small 0 medium 0" : "small"}
+                    margin={matches.includes('mobile') ? "0 0 medium 0" : "0 0 small 0"}
                   >
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />
@@ -339,7 +336,7 @@ export const DiscussionTopicContainer = ({
                             )
                           )}
                         </Flex.Item>
-                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY='hidden'>
+                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY='visible'>
                           <DiscussionEntryContainer
                             isTopic={true}
                             postUtilities={
@@ -539,12 +536,13 @@ export const DiscussionTopicContainer = ({
                       borderRadius={responsiveProps?.border?.radius}
                       borderStyle="solid"
                       borderColor="primary"
-                      padding="small"
+                      padding={matches.includes('mobile') ? "0" : "small"}
                       margin="0 0 small 0"
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
                         <DiscussionSummary
                           onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
+                          isMobile={matches.includes('mobile') ? true : false}
                         />
                       </Flex>
                     </View>

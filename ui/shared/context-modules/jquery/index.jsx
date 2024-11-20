@@ -312,10 +312,14 @@ window.modules = (function () {
               } else if (info.has_many_overrides != null) {
                 data.due_date_display = I18n.t('Multiple Due Dates')
               } else if (info.vdd_tooltip != null) {
-                info.vdd_tooltip.link_href = $context_module_item.find('a.title').attr('href')
-                $context_module_item
-                  .find('.due_date_display')
-                  .html(vddTooltipView(info.vdd_tooltip))
+                if (info.vdd_tooltip.due_dates.length === 1) {
+                  data.due_date_display = dateString(info.vdd_tooltip.due_dates[0].due_at)
+                } else {
+                  info.vdd_tooltip.link_href = $context_module_item.find('a.title').attr('href')
+                  $context_module_item
+                    .find('.due_date_display')
+                    .html(vddTooltipView(info.vdd_tooltip))
+                }
               } else {
                 $context_module_item.find('.due_date_display').remove()
               }

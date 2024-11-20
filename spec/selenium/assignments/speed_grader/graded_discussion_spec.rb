@@ -224,5 +224,32 @@ describe "Screenreader Gradebook grading" do
         end
       end
     end
+
+    it "pagination works" do
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@entry.id}"
+      in_frame("speedgrader_iframe") do
+        in_frame("discussion_preview_iframe") do
+          expect(f("div[data-testid='isHighlighted']").text).to include(@student2.name)
+          # page 1 is selected
+          expect(f("body").text).to include("reply to topic j2")
+          expect(f("body").text).to_not include("reply to topic i0")
+
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:tab).perform
+          driver.action.send_keys(:enter).perform
+          wait_for_ajaximations
+          wait_for(method: nil, timeout: 0.5) { fj("[data-cid='BaseButton PaginationButton']:contains('2')").click }
+          wait_for_ajaximations
+
+          wait_for(method: nil, timeout: 0.5) { fj("[data-cid='BaseButton PaginationButton']:contains('2')").click }
+          wait_for_ajaximations
+          # page 2 is selected
+          expect(f("body").text).to include("reply to topic i0")
+          expect(f("body").text).to_not include("reply to topic j2")
+        end
+      end
+    end
   end
 end

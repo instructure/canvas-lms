@@ -154,7 +154,10 @@ class Quizzes::QuizzesController < ApplicationController
         SIS_INTEGRATION_SETTINGS_ENABLED: sis_integration_settings_enabled,
         NEW_QUIZZES_SELECTED: quiz_engine_selection,
         SHOW_SPEED_GRADER_LINK: @current_user.present? && context.allows_speed_grader? && context.grants_any_right?(@current_user, :manage_grades, :view_all_grades),
+        VALID_DATE_RANGE: CourseDateRange.new(@context),
+        HAS_GRADING_PERIODS: @context.grading_periods?,
       }
+      set_section_list_js_env
       if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read)
         hash[:COURSE_ID] = @context.id.to_s
       end
@@ -260,9 +263,12 @@ class Quizzes::QuizzesController < ApplicationController
         QUIZ: quiz_json(@quiz, @context, @current_user, session),
         QUIZ_DETAILS_URL: course_quiz_managed_quiz_data_url(@context.id, @quiz.id),
         QUIZZES_URL: course_quizzes_url(@context),
-        MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
+        MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size,
+        VALID_DATE_RANGE: CourseDateRange.new(@context),
+        HAS_GRADING_PERIODS: @context.grading_periods?,
+        DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
       }
-
+      set_section_list_js_env
       append_sis_data(hash)
       js_env(hash)
       conditional_release_js_env(@quiz.assignment, includes: [:rule])
@@ -336,7 +342,6 @@ class Quizzes::QuizzesController < ApplicationController
       regrade_options = @quiz.current_quiz_question_regrades.to_h do |qqr|
         [qqr.quiz_question_id, qqr.regrade_option]
       end
-      sections = @context.course_sections.active
 
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
       max_name_length = AssignmentUtil.assignment_max_name_length(@context)
@@ -349,15 +354,6 @@ class Quizzes::QuizzesController < ApplicationController
                                                         include_names: true),
         DUE_DATE_REQUIRED_FOR_ACCOUNT: AssignmentUtil.due_date_required_for_account?(@context),
         QUIZ: quiz_json(@quiz, @context, @current_user, session),
-        SECTION_LIST: sections.map do |section|
-          {
-            id: section.id,
-            name: section.name,
-            start_at: section.start_at,
-            end_at: section.end_at,
-            override_course_and_term_dates: section.restrict_enrollments_to_section_dates
-          }
-        end,
         QUIZZES_URL: course_quizzes_url(@context),
         QUIZ_IP_FILTERS_URL: api_v1_course_quiz_ip_filters_url(@context, @quiz),
         CONTEXT_ACTION_SOURCE: :quizzes,
@@ -370,6 +366,8 @@ class Quizzes::QuizzesController < ApplicationController
         MAX_NAME_LENGTH: max_name_length,
         IS_MODULE_ITEM: @quiz.is_module_item?
       }
+
+      set_section_list_js_env
 
       if @context.grading_periods?
         hash[:active_grading_periods] = GradingPeriod.json_for(@context, @current_user)
@@ -1173,5 +1171,17 @@ class Quizzes::QuizzesController < ApplicationController
       selection
     end
     selection
+  end
+
+  def set_section_list_js_env
+    js_env SECTION_LIST: @context.course_sections.active.map { |section|
+      {
+        id: section.id,
+        name: section.name,
+        start_at: section.start_at,
+        end_at: section.end_at,
+        override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+      }
+    }
   end
 end

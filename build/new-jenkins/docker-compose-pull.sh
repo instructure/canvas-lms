@@ -3,7 +3,7 @@
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 # Pull all docker images that are used for rspec / selenium in advance of
-# running docker-compose up for protection against flakey network requests.
+# running docker compose up for protection against flakey network requests.
 # Always pull all images, even if the rspec job does not use them, so that
 # the image cache is completely fulfilled and subsequent builds don't need
 # to load them. This helps our build times to remain more consistent.

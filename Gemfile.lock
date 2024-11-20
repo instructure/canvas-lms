@@ -659,7 +659,7 @@ GEM
       json-jwt (~> 1.13)
     inst_llm (0.2.4)
       aws-sdk-bedrockruntime (~> 1.5)
-    inst_statsd (3.0.5)
+    inst_statsd (3.0.6)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
@@ -1277,6 +1277,7 @@ DEPENDENCIES
   graphql (~> 2.3.0)
   graphql-batch (~> 0.5)
   guardrail (~> 3.0)
+  hashdiff (~> 1.1)
   headless (= 2.3.1)
   highline (~> 3.0)
   html_text_helper!

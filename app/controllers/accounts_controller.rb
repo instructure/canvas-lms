@@ -518,7 +518,7 @@ class AccountsController < ApplicationController
   #   { "calendar_contexts_limit": true, "open_registration": false, ...}
   #
   def environment
-    render json: cached_js_env_account_settings
+    render json: cached_js_env_root_account_settings
   end
 
   # @API Permissions
@@ -1372,9 +1372,15 @@ class AccountsController < ApplicationController
     end
   end
 
-  def terms_of_service_custom_content
+  def acceptable_use_policy
     TermsOfService.ensure_terms_for_account(@domain_root_account)
-    render plain: @domain_root_account.terms_of_service.terms_of_service_content&.content
+    # disable navigation_header JavaScript bundle to prevent console errors
+    # caused by missing DOM elements in this bare layout
+    @headers = false
+    respond_to do |format|
+      format.html { render html: "", layout: "bare" }
+      format.json { render json: { content: @domain_root_account.terms_of_service.terms_of_service_content&.content }, status: :ok }
+    end
   end
 
   def settings

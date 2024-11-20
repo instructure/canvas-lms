@@ -47,8 +47,8 @@ export function DiscussionAvailabilityContainer({...props}) {
       : [{userCount: props.totalUserCount, name: I18n.t('All Sections'), id: '1'}]
   } else if (props.groupSet.currentGroup) {
     availabilities = [props.groupSet.currentGroup]
-  } else if (props.groupSet?.groupsConnection?.nodes) {
-    availabilities = props.groupSet.groupsConnection.nodes
+  } else if (props.groupSet?.groups) {
+    availabilities = props.groupSet.groups
   } else {
     availabilities = [{userCount: props.totalUserCount, name: props.groupSet.name, id: '1'}]
   }

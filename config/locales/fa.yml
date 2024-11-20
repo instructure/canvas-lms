@@ -259,6 +259,7 @@ fa:
       تعداد نشانه دسترسی: 
       %{access_token_count}
   access_token_created_or_regenerated_4ce9ed1f: "توکن دسترسی ایجاد یا بازسازی شد"
+  access_token_details_495d989: "اطلاعات نشانه دسترسی"
   access_token_is_valid_until_d2f048cf: "نشانه دسترسی معتبر است تا"
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: "نشانه های دسترسی را می توان برای اجازه دادن به برنامه های دیگر برای برقراری تماس های API از جانب شما استفاده کرد. همچنین می توانید نشانه های دسترسی را ایجاد کنید و از *API باز کانواس* برای ایجاد یکپارچه سازی های خود استفاده کنید."
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: "با استفاده از هر دستگاه تلفن همراه iOS یا Android به درس‌ها و گروه‌های خود دسترسی پیدا کنید و اطلاعات بیشتری را در منوی راهنما بیابید."
@@ -3193,6 +3194,7 @@ fa:
   are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "آیا مطمئن هستید که می خواهید کاربر را برای همیشه از همه حساب ها حذف کنید"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "آیا مطمئن هستید که می خواهید نمرات این تکلیف را برای دانشجویان ارسال کنید؟"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "آیا مطمئن هستید که می خواهید ادامه دهید؟ تغییراتی که ایجاد کرده اید ذخیره نمی شوند."
+  are_you_sure_you_want_to_regenerate_this_token_any_7f2a7fe5: "مطمئنید که می خواهید این نشانه دوباره ایجاد شود؟ هرچیزی که از این نشانه استفاده می کند باید بهنگام سازی شود."
   are_you_sure_you_want_to_remove_this_item_7887ce31: "آیا مطمئن هستید که می خواهید این مورد را حذف کنید؟"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "مطمئنید که می خواهید این ابزار حذف شود؟"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "مطمئنید که می خواهید این کاربر حذف شود؟"
@@ -3245,6 +3247,7 @@ fa:
   assessment_type_81a73b9c: "نوع ارزیابی"
   asset_string_ddeaf719: "دارایی رشته"
   assign_eedf72bb: "اختصاص دادن"
+  assign_reviews_3fb2932a: "تخصیص بازبینی ها"
   assign_reviews_on_date_7e48ec50: "تخصیص بازبینی ها بر اساس تاریخ"
   assign_to_6b806cd9: "اختصاص دادن به:"
   assign_to_95404a83: "اختصاص دادن به"
@@ -4298,6 +4301,8 @@ fa:
   author_s_name_b35e905a: "نام نویسنده"
   author_sis_id_b59b62af: "شناسه نویسنده"
   authorize_e3f25bb4: "اجازه دادن"
+  authorize_google_drive_8ad056d5: "دادن اجازه دسترسی به Google Drive"
+  authorize_google_drive_access_aefcf8d6: "دادن اجازه دسترسی به Google Drive"
   authorize_url_f28167a3: "  URLرا مجاز کنید"
   auto_leader_7791c30a: auto_leader
   auto_show_closed_captions_e4cd7aff: " نمایش خودکار شرح‌های بسته"
@@ -4355,6 +4360,7 @@ fa:
   back_to_app_center_95420d83: "بازگشت به مرکز برنامه"
   back_to_assignment_1df86a69: "بازگشت به تکلیف"
   back_to_attempt_attempt_ffb22bb8: " بازگشت به تلاش %{attempt}"
+  back_to_login_e4b5f663: "Back to login"
   back_to_production_fed09f33: "بازگشت به تولید"
   back_to_ref_title_377ea1f0: "بازگشت به %{ref_title}"
   back_to_subject_80a1eb: "بازگشت به موضوع"
@@ -5985,6 +5991,7 @@ fa:
   confirm_dialog_component: 
     ok: تأیید
   confirm_edit_outcome_a9746c99: "ویرایش نتیجه را تأیید کنید"
+  confirm_email_address_9072dd3c: "تأیید نشانی پست الکترونیکی"
   confirm_mastery_calculation_19ad19f9: "محاسبه تسلط را تأیید کنید"
   confirm_mastery_scale_9a779252: "تایید مقیاس تسلط"
   confirm_qr_code_display_49664fa3: "نمایش کد QR را تأیید کنید"
@@ -5997,6 +6004,7 @@ fa:
   confirm_unfavorite_course_fa01966d: "دوره نامطلوب را تأیید کنید"
   confirmation_code_required_22984955: "رمز تأیید (لازم)"
   confirmation_failed_please_try_again_ae566d37: "تأیید انجام نشد. لطفا دوباره تلاش کنید."
+  confirming_2df4b68f: "درحال تأیید..."
   confused_panda_questioning_what_to_do_next_42941484: "پاندای سردرگم می‌پرسد که بعداً چه کاری انجام دهد"
   consider_selecting_multiple_submission_types_to_ac_f7e624d5: "انتخاب چندین نوع ارسال را در نظر بگیرید چون که ممکن است دانشجویانی قادر به ایجاد حاشیه نویسی نباشند."
   consumer_key_57d9fcf1: "کلید مصرف کننده"
@@ -6882,6 +6890,7 @@ fa:
   copying_628a9607: "در حال کپی کردن.."
   copyright_and_license_information_must_be_provided_5feffaf: "اطلاعات حق نشر و مجوز باید قبل از انتشار اطلاعات برای  فایل‌ها ارائه شود."
   copyright_holder_66ee111: "دارنده حق نشر:"
+  correct_7df6d875: "درست است!"
   correct_answer: "جواب درست بود."
   correct_answer_5a6a57d1: "پاسخ درست"
   correct_answer_comments_34ca671f: "نظرهای مربوط به پاسخ درست"
@@ -8782,6 +8791,7 @@ fa:
     saving: "در حال ذخیره سازی..."
   different_course_b875770e: "درس دیگر"
   diigo_993c4646: Diigo
+  diigo_is_a_social_bookmarking_tool_tailored_specif_1bff1643: "Diigo یک ابزار نشانه گذار اجتماعی است که به طور خاص برای تحقیق و آموزش طراحی شده است. ویرایشگر محتوای غنی کانواس به شما اجازه می دهد برچسب های Diigo خود را جستجو کنید تا به راحتی از داخل کانواس به منابع دیگری که مفید تشخیص می دهید پیوند دهید."
   direct_share_80afd4a7: "اشتراک مستقیم"
   disableWhileLoading: 
     loading: "در حال بارگذاری..."
@@ -10212,6 +10222,7 @@ fa:
   expand_tutorial_tray_22630c49: "گسترش سینی خودآموز"
   expanded_f4493860: "باز شده"
   experimental_graphql_api_75c5eb8f: "رابط برنامه نویسی برنامه GraphQL آزمایشی"
+  expires_7019786e: "منقضی می شود در"
   expires_at_6214b43f: "منقضی می‌شود در"
   explanation_of_statuses_90a26d07: "توضیح وضعیت ها:"
   export_an_existing_quiz_to_new_quizzes_2_format_8fd08a23: "صدور یک آزمون موجود به فرمت جدید Quizzes 2"
@@ -10869,12 +10880,14 @@ fa:
   generate_epub_80e89ea4: "ایجاد ePub"
   generate_item_analysis_report_statuslabel_16e02c8: "ایجاد گزارش تحلیل مورد %{statusLabel}"
   generate_student_analysis_report_statuslabel_aecdc4dc: "ایجاد گزارش تحلیل دانشجو %{statusLabel}"
+  generate_token_393ab5b4: "ایجاد نشانه"
   generated_f26ee56b: "ایجاد شد:"
   generating_5b5e20f8: "در حال ایجاد:"
   generating_c2aabc02: "در حال ایجاد..."
   generating_pairing_code_251b7fc8: "ایجاد کردن رمز جفتی  ..."
   generating_pairing_code_d480ccf4: "ایجاد کردن رمز جفتی "
   generating_preview_45b53be0: "در حال ایجاد پیش نمایش..."
+  generating_token_42c29663: "در حال ایجاد نشانه"
   german_3ec99bbb: آلمانی
   germany_49_fc5b8179: "آلمان (+49)"
   get_started_b9507525: "شروع به کار"
@@ -12776,6 +12789,7 @@ fa:
   inner_box_border_d0524b03: "مرز کادر داخلی"
   input_and_distribute_grades_for_students_display_g_9a2e46a0: "نمرات را برای دانشجویان وارد و توزیع کنید. نمرات را به صورت امتیاز، درصد، کامل یا ناقص، قبول یا مردود، مقیاس معدل و نمره به حروف نمایش دهید. تکالیف را برای وزن‌دار کردن نمرات گروه بندی کنید."
   input_event_title_1d4c8b10: "عنوان رویداد ورودی"
+  insert_593145ef: درج
   insert_above_row_de82d138: "درج در بالا %{row}"
   insert_below_row_55ed6f34: "درج در پایین%{row}"
   insert_equella_links_49a8dacd: "Insert Equella Links"
@@ -13154,6 +13168,7 @@ fa:
   last_synced_datetime_1c3e0295: "آخرین همگام شده: %{datetime}"
   last_synced_right_now_f6c2ab00: "آخرین همگام شده: اکنون"
   last_updated_timestamp_1822e508: "آخرین به روزرسانی %{timestamp}"
+  last_used_17553fed: "آخرین استفاده"
   last_used_f9457313: "آخرین استفاده:"
   last_user_access_title: "آخرین دسترسی کاربر"
   last_viewed_cfbbbc3a: "آخرین مشاهده"
@@ -13812,6 +13827,7 @@ fa:
   mastery_points_f1672cc: "امتیازهای تسلط "
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "نمره تسلط بالاترین نمره یک تکلیف یا آزمون نمره گذاری شده را نشان می دهد."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "نمره تسلط جدیدترین تکلیف یا آزمون نمره گذاری شده را نشان می دهد."
+  matching_63f5af40: تطبیقی
   matching_left_side_900f860b: "در حال انطباق سمت چپ"
   matching_right_side_920e71b2: "در حال انطباق سمت راست"
   mathquill: 
@@ -16154,6 +16170,7 @@ fa:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "چند مورد به عنوان \"زمینه فعلی\" علامت‌گذاری شده است، زیرا مقادیر یکسان تحت چند نام ذخیره شده‌اند، یعنی هر یک با آنچه در حال حاضر اعمال شده یکسان هستند"
   multiple_ba5220cd: "چند مورد"
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "چند حساب کانواس با Clever District %{district_id} در ارتباط است"
+  multiple_choice_9f931ee6: "چند گزینه ای"
   multiple_dates_e3a122f7: "چند تاریخ"
   multiple_dropdowns_read_surrounding_text_f61274b3: "دارای چند منوی بازشونده، متن‌های اطراف را بخوانید"
   multiple_due_dates_283dd861: "چند تاریخ مهلت"
@@ -16289,6 +16306,7 @@ fa:
   never_1ed1244d: هرگز
   never_df100b49: هرگز
   new_13daf639: جدید
+  new_access_token_e301d1fc: "نشانه دسترسی جدید"
   new_account_role_6e5c4964: "نقش حساب جدید"
   new_analytics_f6147886: "تحلیل جدید"
   new_annotations_66932016: "یادآوری های جدید"
@@ -16950,6 +16968,7 @@ fa:
   offline_score_8d7b4779: "امتیاز آفلاین:"
   ok_c47544a2: تأیید
   ok_ff1b646a: تأیید
+  ok_thanks_6b1fc8ae: "باشه، سپاسگزارم"
   okay_1772bbeb: "صحیح است"
   old_policy_39e4f77: "سیاست قبلی"
   old_quiz_e8dafede: "امتحان قبلی"
@@ -16980,6 +16999,7 @@ fa:
       تغییرات نمرات آتی برای نمرات ارسال شده نیازی به ارسال دستی ندارند.
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "هنگامی که نمره ای به صورت دستی ارسال می شود ، به طور خودکار اطلاعیه‌های جدید ارسال می کند و برای دانشجویان قابل مشاهده است."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "وقتی این ویژگی فعال شود، نمی توانید آن را دوباره غیر فعال کنید.  قبل از ادامه مطمئن شوید که برای فعالسازی پوشه موردهای ارسالی آماده هستید."
+  once_you_authorize_us_to_see_your_google_drive_you_9c4b2261: "وقتی به ما اجازه می دهید که Google Drive تان را مشاهده کنیم، قادر خواهید بود تکلیف های خود را به طور مستقیم از Google Docs ارسال کنید و اسناد را ایجاد کنید و با همکلاسی های خود به اشتراک بگذارید."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "هنگامی که یک پاسخ ارسال کنید، نمی توانید آن را تغییر دهید. نمی‌توانید پرسش قبلی را مشاهده کنید."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "وقتی اشکال زدایی را شروع کردید، تمام اطلاعات مربوط به تلاش بعدی برای ورود به سیستم جمع آوری می‌شود. \"تازه کردن\" را کلیک کنید تا ببینید آیا داده‌های بیشتری جمع آوری شده است یا  اینکه برای پاک کردن اطلاعات جمع آوری شده و توقف تلاش برای رفع اشکال فعلی  \"متوقف کردن اشکال زدایی\" را کلیک کنید."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
@@ -18239,6 +18259,8 @@ fa:
       regenerating_token_failed: "ایجاد دوباره ی نشانه انجام نشد"
       registration_failed: "ثبت نام انجام نشد. نام کاربری و رمز عبور را بررسی کنید و دوباره تلاش کنید."
     failed_resending: "درخواست انجام نشد. لطفا دوباره سعی کنید."
+    labels: 
+      enable_login_for_email: "می خواهم با استفاده از این نشانی پست الکترونیکی وارد کانواس شوم"
     links: 
       resend_confirmation: "ارسال دوباره تأییدیه"
       resend_confirmation_failed: "درخواست انجام نشد. دوباره تلاش کنید."
@@ -18643,6 +18665,7 @@ fa:
     new: 
       payment_info: "اطلاعات پرداخت"
   purple_7678a9fc: ارغوانی
+  purpose_5202a309: هدف
   push_notification_a6532ff3: "وارد کردن اطلاعیه"
   q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "پرسش: چه چیزی سیاه، سفید، سیاه، سفید می شود؟ جواب: یک پاندا به که به پایین تپه غلت می‌خورد."
   qatar_974_7e9684ca: "قطر (+974)"
@@ -20151,6 +20174,8 @@ fa:
   rce_enhancements_5701e06: "ارتقای RCE"
   re_activate_user_f7d77c9a: "فعال سازی دوباره کاربر"
   re_reported_b9671073: "دوباره گزارش شده"
+  re_send_confirmation_bcc66940: "ارسال دوباره تأییدیه"
+  re_sending_379a8580: "در حال ارسال دوباره..."
   re_submission_user_name_assignment_title_621a1cb3: "ارسال مجدد: %{user_name}, %{assignment_title}"
   re_submit_assignment_b3e2bd28: "ارسال دوباره تکلیف"
   re_upload_submissions_125e415d: "بارگذاری دوباره موردهای ارسالی"
@@ -20264,10 +20289,15 @@ fa:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "صرف نظر از فعال یا غیرفعال بودن این مجوز، کاربران همچنان قادر به مدیریت رویدادها در تقویم شخصی خود خواهند بود."
   regenerate_3e4679f8: بازتولید
   regenerate_epub_395c8e56: "ایجاد دوباره ePub"
+  regenerate_token_7d4fb783: "ایجاد دوباره نشانه"
+  regenerating_token_42e5c747: "در حال ایجاد دوباره نشانه..."
   region_47e29025: "ناحیه:"
   region_939f2a6c: ناحیه
+  register_communication_ae935328: "ثبت ارتباط"
   register_email_efc06d59: "ثبت پست الکترونیکی"
+  register_skype_d5e2b3d3: "ثبت اسکایپ"
   register_slack_email_1f6d7e6d: "ثبت پست الکترونیکی ضعیف"
+  register_sms_7f87e50d: "ثبت پیامک"
   register_tool_84de3186: "ثبت ابزار"
   registration: 
     get_started: "شروع به کار"
@@ -20799,8 +20829,10 @@ fa:
   save_key_b4dede06: "ذخیره سازی کلید"
   save_label_6ed4a68e: "ذخیره برچسب"
   save_learning_mastery_82889d8b: "تسلط یادگیری را دخیره کنید"
+  save_login_bba1272: "ذخیره سازی ورود"
   save_publish_36440725: "ذخیره سازی و انتشار"
   save_settings_cafe79a5: "ذخیره سازی تنظیمات"
+  save_skype_name_4de35a9: "ذخیره سازی نام اسکایپ"
   save_successful_b2f64da4: "با موفقیت ذخیره شد."
   save_theme_36c73e6a: "ذخیره سازی زمینه"
   save_theme_f706116e: "ذخیره سازی زمینه"
@@ -22414,6 +22446,8 @@ fa:
   skipped_file_filename_due_to_error_94f0194: "به دلیل بروز خطا، از فایل %{filename} صرفنظر شد"
   skipping_unknown_file_type_cd1086ee: "صرفنظر از نوع فایل ناشناس"
   skype_18850ba7: اسکایپ
+  skype_name_9eb890df: "نام اسکایپ"
+  skype_offers_free_online_voice_and_video_calls_lot_35295baa: "اسکایپ تماس صوتی و تصویری رایگان ارائه می دهد .خیلی از دانشجویان از اسکایپ به عنوان یک روش آسان و مجانی برای برقراری ارتباط استفاده می کنند .اگر نام اسکایپ خود را ثبت کنید و قابلیت مشاهده را فعال کنید، دانشجویان دیگر به راحتی می توانند اطلاعات تماس شما را بیابند و با استفاده از اسکایپ با شما تماس بگیرند یا اینکه شما را در اسکایپ اضافه کنند."
   slack_1130ad43: ضعیف
   slack_api_key_92f0c667: "کلید Api ضعیف"
   slack_email_9204e2ea: " پست الکترونیکی ضعیف"
@@ -24381,6 +24415,7 @@ fa:
   toggle_tooltip_2447b4fa: "تغییر ابزار راهنما "
   toggle_tooltip_d3b7cb86: "تغییر ابزار راهنما"
   toggling_placement_ee1ab8b5: "تغییر مکان"
+  token_9a020862: نشانه
   tolerance_value_9e96573c: "میزان تحمل"
   tomorrow_9a6c9a00: فردا
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "تعداد تلاش های ناموفق برای ورود زیاد است. لطفا بعدا دوباره تلاش کنید، یا با مدیر سیستم خود تماس بگیرید."
@@ -24438,6 +24473,7 @@ fa:
   trinidad_and_tobago_1_fc2d8d1c: "ترینیداد و توباگو (+1)"
   trophy: 
     star_display_name: "ستاره دار کردن"
+  true_false_823761a9: درست/غلط
   truncated_56b1a661: "کوتاه شده"
   trusted_account_669ba397: "حساب تایید شده"
   trusted_account_url_e6200e41: "لینک حساب تاییدشده"

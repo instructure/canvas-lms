@@ -53,6 +53,10 @@ class SecurityController < ApplicationController
     )
   end
 
+  def self.notice_types_supported
+    Lti::PlatformNotificationService::NOTICE_TYPES
+  end
+
   # @API Show all available JWKs used by Canvas for signing.
   #
   # @returns JWKs
@@ -130,13 +134,15 @@ class SecurityController < ApplicationController
   end
 
   def lti_platform_configuration(account)
+    notice_types_supported = SecurityController.notice_types_supported if account.feature_enabled?(:platform_notification_service)
     {
       product_family_code: "canvas",
       version: canvas_ims_product_version,
       messages_supported: SecurityController.messages_supported,
+      notice_types_supported:,
       variables: Lti::VariableExpander.expansion_keys,
       "https://canvas.instructure.com/lti/account_name": account.name,
       "https://canvas.instructure.com/lti/account_lti_guid": account.lti_guid
-    }.with_indifferent_access
+    }.with_indifferent_access.compact
   end
 end

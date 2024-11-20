@@ -1171,9 +1171,12 @@ describe "Accounts API", type: :request do
   end
 
   describe "environment" do
-    it "lists cached_js_env_account_settings" do
-      expect_any_instance_of(ApplicationController).to receive(:cached_js_env_account_settings)
-        .and_return({ calendar_contexts_limit: true })
+    before_once do
+      Account.default.settings[:calendar_contexts_limit] = true
+      Account.default.save!
+    end
+
+    it "lists cached_js_env_root_account_settings" do
       json = api_call(:get,
                       "/api/v1/settings/environment",
                       { controller: "accounts", action: "environment", format: "json" },
@@ -1184,9 +1187,10 @@ describe "Accounts API", type: :request do
     end
 
     it "requires user session" do
-      request_path = "https://www.example.com/api/v1/settings/environment"
-      __send__(:get, request_path, params: { controller: "accounts", action: "environment", format: "json" })
-      expect(response).to have_http_status(:unauthorized)
+      __send__(:get,
+               "/api/v1/settings/environment",
+               params: { controller: "accounts", action: "environment", format: "json" })
+      assert_status(401)
     end
   end
 

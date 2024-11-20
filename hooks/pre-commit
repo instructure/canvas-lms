@@ -31,7 +31,7 @@ if [ $(pwd -P) = $CANVAS ]; then
     fi
   else
     echo 'Trying to run lint:staged inside Docker. If you want things quicker yarn install locally.'
-    docker-compose exec -T web yarn run lint:staged ||
+    docker compose exec -T web yarn run lint:staged ||
       echo "You should run yarn locally or check to make sure docker is running."
   fi
 

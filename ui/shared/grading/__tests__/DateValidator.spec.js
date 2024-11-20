@@ -384,6 +384,12 @@ describe('section dates', () => {
           end_at: null,
           override_course_and_term_dates: null,
         },
+        {
+          id: 678,
+          start_at: '2020-03-01T00:00:00Z',
+          end_at: '2020-08-01T00:00:00Z',
+          override_course_and_term_dates: false,
+        },
       ],
     })
   })
@@ -491,5 +497,26 @@ describe('section dates', () => {
     })
     const validator = makeIndividualValidator()
     expect(isValid(validator, data)).toBe(false)
+  })
+
+  test('allows a lock date after the course end date if it is before the section end date', () => {
+    const data = generateData({
+      lock_at: '2020-07-01T00:00:00Z',
+      student_ids: null,
+      course_section_id: 678,
+    })
+    const validator = makeIndividualValidator({termEnd: '2020-06-01T00:00:00Z'})
+    expect(isValid(validator, data)).toBe(true)
+  })
+
+  test('allows an unlock date before the course start date if it is after the section start date', () => {
+    const data = generateData({
+      unlock_at: '2020-05-01T00:00:00Z',
+      due_at: '2020-06-01T00:00:00Z',
+      student_ids: null,
+      course_section_id: 678,
+    })
+    const validator = makeIndividualValidator({termStart: '2020-07-01T00:00:00Z'})
+    expect(isValid(validator, data)).toBe(true)
   })
 })

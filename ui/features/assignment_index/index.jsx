@@ -151,8 +151,5 @@ ready(() => {
     })
 
   alertIfDeepLinkingCreatedModule()
-
-  if (ENV.FEATURES?.lti_multiple_assignment_deep_linking) {
-    addDeepLinkingListener(handleAssignmentIndexDeepLinking)
-  }
+  addDeepLinkingListener(handleAssignmentIndexDeepLinking)
 })

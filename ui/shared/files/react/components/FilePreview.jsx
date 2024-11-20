@@ -230,6 +230,7 @@ export default class FilePreview extends React.PureComponent {
         'ef-file-preview-frame-html': html,
         'attachment-html-iframe': html,
       })
+      const sandbox = html ? 'allow-same-origin' : 'allow-scripts allow-same-origin'
 
       return (
         <iframe
@@ -237,6 +238,7 @@ export default class FilePreview extends React.PureComponent {
           title={I18n.t('File Preview')}
           src={this.state.displayedItem.get('preview_url')}
           className={iFrameClasses}
+          sandbox={sandbox}
         />
       )
     } else {

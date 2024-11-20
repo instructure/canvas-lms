@@ -101,3 +101,19 @@ export type RubricOutcome = {
   displayName: string
   title: string
 }
+
+export type RubricImport = {
+  attachment: {
+    id: string
+    filename: string
+    size: number
+  }
+  id: string
+  createdAt: string
+  errorCount: number
+  errorData: {
+    message: string
+  }[]
+  progress: number
+  workflowState: string
+}

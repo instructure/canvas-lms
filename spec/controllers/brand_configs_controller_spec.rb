@@ -18,7 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require_relative "../feature_flag_helper"
+
 describe BrandConfigsController do
+  include FeatureFlagHelper
+
   before :once do
     @account = Account.default
     @bc = BrandConfig.create(variables: { "ic-brand-primary" => "#321" })
@@ -93,6 +97,28 @@ describe BrandConfigsController do
 
       primary = vars.detect { |v| v["variable_name"] == "ic-brand-primary" }
       expect(primary["default"]).to eq "#321"
+    end
+
+    context "when the login_registration_ui_identity feature flag is enabled/disabled" do
+      let_once(:admin) { account_admin_user(account: @account) }
+
+      before do
+        user_session(admin)
+      end
+
+      it "applies the login brand config filter when the feature flag is enabled" do
+        mock_feature_flag(:login_registration_ui_identity, true, [@account])
+        expect(Login::LoginBrandConfigFilter).to receive(:filter).with(instance_of(Array)).and_call_original
+        get "new", params: { brand_config: @bc, account_id: @account.id }
+        assert_status(200)
+      end
+
+      it "does not apply the login brand config filter when the feature flag is disabled" do
+        mock_feature_flag(:login_registration_ui_identity, false, [@account])
+        expect(Login::LoginBrandConfigFilter).not_to receive(:filter)
+        get "new", params: { brand_config: @bc, account_id: @account.id }
+        assert_status(200)
+      end
     end
   end
 

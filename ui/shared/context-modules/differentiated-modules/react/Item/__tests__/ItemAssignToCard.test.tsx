@@ -110,6 +110,7 @@ describe('ItemAssignToCard', () => {
   })
 
   it('renders checkpoints fields and not Due Date', () => {
+    window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
     const {getByLabelText, getAllByLabelText} = renderComponent({
       isCheckpointed: true,
     })
@@ -133,6 +134,7 @@ describe('ItemAssignToCard', () => {
 
     it('renders the Reply to Topic Due Date 1st from the top', () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
+      window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
       const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
         due_at: undefined,
         isCheckpointed: true,
@@ -145,6 +147,7 @@ describe('ItemAssignToCard', () => {
 
     it('renders the Required Replies Due Date 2nd from the top', () => {
       window.ENV.DEFAULT_DUE_TIME = '08:00:00'
+      window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
       const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
         due_at: undefined,
         isCheckpointed: true,
@@ -157,6 +160,7 @@ describe('ItemAssignToCard', () => {
 
     describe('isCheckpointed is true', () => {
       it('renders the Available From 3rd from the top', () => {
+        window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
         const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
           due_at: undefined,
           isCheckpointed: true,
@@ -168,6 +172,7 @@ describe('ItemAssignToCard', () => {
       })
 
       it('renders the Available Until 4th from the top', () => {
+        window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
         const {getByLabelText, getByRole, getAllByLabelText} = renderComponent({
           due_at: undefined,
           isCheckpointed: true,
@@ -622,6 +627,14 @@ describe('ItemAssignToCard', () => {
     })
 
     describe('isCheckpointed is true', () => {
+      beforeEach(() => {
+        window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = true
+      })
+
+      afterEach(() => {
+        window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
+      })
+
       it('labels the clear buttons on cards with no pills', () => {
         renderComponent({isCheckpointed: true})
         const labels = [

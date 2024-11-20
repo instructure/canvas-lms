@@ -1,0 +1,23 @@
+<ul class="login_details_list">
+  <li class='login_details'>
+    <span class="login_details_label"><%= before_label('last_request', 'Last request') %></span>
+    <span class="login_details_value"><%= datetime_string(pseudonym.last_request_at) || t('never', "never") %></span>
+  </li>
+  <li class='login_details' style="display: none;">
+    <span class="login_details_label"><%= before_label('current_login', 'Current login') %></span>
+    <span class="login_details_value"><%= datetime_string(pseudonym.current_login_at) || t('never', "never") %></span>
+  </li>
+  <li class='login_details' style="display: none;">
+    <span class="login_details_label"><%= before_label('current_ip', 'Current login IP') %></span>
+    <span class="login_details_value"><%= pseudonym.current_login_ip || t('none', "none") %></span>
+  </li>
+  <li class='login_details' style="display: none;">
+    <span class="login_details_label"><%= before_label('last_login', 'Last login') %></span>
+    <span class="login_details_value"><%= datetime_string(pseudonym.last_login_at) || t('never', "never") %></span>
+  </li>
+  <li class='login_details' style="display: none;">
+    <span class="login_details_label"><%= before_label('last_ip', 'Last login IP') %></span>
+    <span class="login_details_value"><%= pseudonym.last_login_ip || t('none', "none") %></span>
+  </li>
+</ul>
+<a href="#" class="login_details_link"><%= t('more', 'more...') %></a>

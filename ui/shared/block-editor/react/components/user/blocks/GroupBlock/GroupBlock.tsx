@@ -21,7 +21,7 @@ import {Element, useEditor, useNode, type Node} from '@craftjs/core'
 
 import {NoSections} from '../../common'
 import {Container} from '../Container/Container'
-import {useClassNames, isNthChild} from '../../../../utils'
+import {useClassNames, isNthChild, getContrastingColor} from '../../../../utils'
 import {type GroupBlockProps, defaultAlignment} from './types'
 import {GroupBlockToolbar} from './GroupBlockToolbar'
 import {BlockResizer} from '../../../editor/BlockResizer'
@@ -86,6 +86,9 @@ export const GroupBlock = (props: GroupBlockProps) => {
   }
   if (background) {
     styl.backgroundColor = background
+    styl.color = getContrastingColor(background)
+  } else {
+    styl.backgroundColor = 'transparent'
   }
   if (roundedCorners) {
     styl.borderRadius = '8px'

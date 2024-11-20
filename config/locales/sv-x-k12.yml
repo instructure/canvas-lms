@@ -1528,7 +1528,7 @@ sv-x-k12:
         allow_invitation_previews: "Förhandsvisningar av inbjudan"
         allow_name_pronunciation_edit_for_admins: Admin
         allow_name_pronunciation_edit_for_students: Elev
-        allow_name_pronunciation_edit_for_teachers: Lärare
+        allow_name_pronunciation_edit_for_teachers: "Kursadministratör (inkluderar lärare, lärarassistenter och designers)"
         allow_sending_scores_in_emails: "Elever kan välja att ta emot resultat som e-post aviseringar"
         author_email_in_notifications: "Visa avsändarens e-postadress för användaraviseringar"
         can_add_pronouns: "Aktivera personliga pronomen"
@@ -2513,11 +2513,16 @@ sv-x-k12:
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Notiser måste konfigureras för institutionen. Notiser är en sällan använd funktion som designats för att skicka en notis till elever, lärare eller administratörer vid vissa tillfällen (t.ex. ingen interaktion mellan elev och lärare under 7 dagar). De kontrolleras varje dag och aviseringar skickas till eleven och/eller läraren tills problemet som utlöste aviseringen har åtgärdats."
   align_horizontally_fce4bc3f: "Justera horisontellt"
   align_outcomes_to_this_page_7d055196: "Koppla lärandemål till den här sidan"
+  align_to_bottom_2d84ba5b: "Justera nedåt"
   align_to_center_e42b23db: "Justera till mitten"
   align_to_end_ef6b2fba: "Justera till slutet"
+  align_to_middle_3a5bd230: "Justera mitten"
   align_to_start_3b1d5678: "Justera till början"
+  align_to_top_f14e03c1: "Justera uppåt"
   align_vertically_584173b7: "Justera vertikalt"
   aligned_questions_125fd2ce: "Justerade frågor"
+  alignment_f475ed5: Samarbetsvillighet
+  alignment_options_6d5762d1: Justeringsalternativ
   alignments_de5f20d8: Justeringar
   all_4321c3a1: Alla
   all_account_types_e83c1516: "Ala kontotyper"
@@ -2952,6 +2957,7 @@ sv-x-k12:
   allows_user_to_create_course_pages_allows_user_to__2b7e4d48: "Gör att användare kan skapa kurssidor. Gör att användare kan redigera Blueprint-låsinställningar för enskilda sidor i en Blueprint-huvudkurs."
   allows_user_to_create_course_pages_ec9c6647: "Gör att användare kan skapa kurssidor."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Gör det möjligt för användaren att skapa utvecklarnycklar för konton."
+  allows_user_to_create_dsr_exports_dd1fef69: "Tillåter att användare skapar DSR-exporter."
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: "Gör det möjligt för användaren att skapa, redigera och ta bort kontogrupper."
   allows_user_to_create_edit_and_delete_course_group_36097d72: "Gör det möjligt för användaren att skapa, redigera och ta bort kursgrupper. Gör det möjligt för användaren att skapa, redigera och ta bort grupper som skapats av elever."
   allows_user_to_create_edit_and_delete_course_group_40367907: "Tillåter användare att skapa, redigera och ta bort kursgrupper."
@@ -3004,6 +3010,7 @@ sv-x-k12:
       Gör det möjligt för användaren att hantera inställningar för kursmallar i Kursinställningar.
       Gör det möjligt för användaren att lägga till associerade kurser.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Gör det möjligt för användaren att särskilja uppgifter för enskilda elever."
+  allows_user_to_download_completed_dsr_exports_3d335d00: "Tillåter att användare laddar ner slutförda DSR-exporter."
   allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Tillåter användaren att duplicera uppgifter i en kurs."
   allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Tillåter användaren att duplicera quiz i en kurs."
   allows_user_to_edit_a_list_of_assignment_blackout__9c734bf0: "Tillåter användare att redigera en lista över blackout-datum för uppgifter."
@@ -3522,6 +3529,7 @@ sv-x-k12:
   an_error_occurred_while_loading_course_outcomes_320ccc44: "Ett fel inträffade vid inläsning av kursens lärandemål."
   an_error_occurred_while_loading_course_outcomes_er_accefe77: "Ett fel inträffade vid inläsning av kursens lärandemål: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Ett fel uppstod vid inläsningen av kurser"
+  an_error_occurred_while_loading_files_usage_data_a8f7575d: "Ett fel uppstod vid inläsning av användningsdata för filer"
   an_error_occurred_while_loading_late_policies_c415f676: "Ett fel uppstod vid inläsningen av policyer för sena inlämningar"
   an_error_occurred_while_loading_outcome_alignments_5442d2d7: "Ett fel inträffade vid inläsning av justeringar för lärandemål."
   an_error_occurred_while_loading_selected_group_8b80d3d5: "Ett fel inträffade vid inläsning av den valda gruppen."
@@ -5179,6 +5187,7 @@ sv-x-k12:
   back_to_subject_80a1eb: "Tillbaka till ämnet"
   back_to_table_of_contents_d878b315: "Tillbaka till tabell över innehåll"
   back_to_title_39e7a8f4: "Tillbaka till %{title}"
+  background_1bc88842: Bakgrund
   background_color_b92b52ac: Bakgrundsfärg
   background_image_1a401e1a: Bakgrundsbild
   badges_e40b8880: Märken
@@ -5364,6 +5373,7 @@ sv-x-k12:
   bookmarking_for_enrollments_index_api_840be156: "API för bokmärkning av registreringsindex"
   bookmarks_5b5b81c9: Bokmärken
   boone_assignment_submission_87d53fc0: Boone-uppgiftsinlämning
+  border_5b08b06d: Gräns
   boston_students_access_report_bd285b2e: "Åtkomstrapport för Boston-elever"
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "Både Diskussioner – skapa och Diskussioner – moderera gör att användare kan skapa en diskussion på sidan Diskussioner. Om den här behörigheten aktiveras, behövs inte Diskussioner – skapa För att se diskussioner i en kurs måste Diskussioner – visa aktiveras. För att svara på en diskussion måste även Diskussioner – publicera vara aktiverat. För att redigera uppgiftsinformation för en diskussion måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverat."
   both_discussions_create_and_discussions_moderate_a_41c29c37: "Både Diskussioner – skapa och Diskussioner – moderera gör att användare kan skapa en diskussion på sidan Diskussioner. Om den här behörigheten aktiveras, behövs inte Diskussioner – skapa För att se diskussioner i en kurs måste Diskussioner – visa aktiveras. För att svara på en diskussion måste även Diskussioner – publicera vara aktiverat. För att redigera uppgiftsinformation för en diskussion måste även Uppgifter och Quiz – lägg till/redigera/ta bort vara aktiverat."
@@ -5397,6 +5407,7 @@ sv-x-k12:
   bring_your_content_into_your_course_c0f3df7e: "Ta med ditt innehåll till din kurs"
   broken_file_link_found_in_your_course_7cc24395: "En bruten fillänk hittades i din kurs"
   brown_a82c3d0d: Brun
+  browse_courses_c8af1754: "Bläddra bland kurser"
   browse_e78c4413: bläddra
   browse_your_computer_9a735a4: "sök från datorn"
   browse_your_computer_for_a_course_image_d7db2376: "Sök på datorn efter en kursbild"
@@ -5470,6 +5481,7 @@ sv-x-k12:
       user_name: Användarnamn
       user_name_description: "Användarnamnet som läraren/designer har använt för att ansluta till kursen för raden. Detta måste matcha ett av användarnamnen i Blackboard-inloggningsuppgifterna ovan."
     only_one_bulk_migration: "Endast en bulkmigrering kan köras åt gången."
+  bulk_download_rubrics_2c12b96a: "Ladda ned matriser i bulk"
   bulk_edit_bc023ac5: Massredigering
   bulk_migration: 
     buttons: 
@@ -5543,6 +5555,7 @@ sv-x-k12:
   by_name_54daec42: "av %{name}"
   by_selecting_make_all_discussions_threaded_you_wil_cf286418: "Genom att välja \"Gör alla diskussioner trådade (\"Make All Discussions Threaded) uppdaterar du alla icke-trådade diskussioner i kursen till trådade. Denna åtgärd avmarkerar alternativet \"Tillåt inte trådade svar\" (Dissallow Threaded Replies) vilket aktiverar trådade svar för alla diskussioner."
   by_url_a163275e: "Efter URL"
+  bzzzzt_try_again_1eee9e8: "Hoppla, försök igen."
   c4e_analytics_66e0fc46: C4E-analyser
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "Cachen har rensats"
@@ -5908,6 +5921,7 @@ sv-x-k12:
     ics_description_user: "Kalenderhändelser för användaren %{user_name}"
     ics_title: "%{course_or_group_name} Kalender (Canvas)"
     invalid_date_or_time: "Ogiltigt datum eller tid för %{attr}"
+  calendar_events_api_pagination_enhancements_9107cb6b: "Pagineringsförbättringar i AIP för kalenderhändelser"
   calendar_feed_url_b7b91e7b: "URL för kalenderflöde"
   calendar_frequency_picker: 
     annually: "Årligen den %{date} %{month}"
@@ -6210,6 +6224,7 @@ sv-x-k12:
   canvas_introduction_video_2d81f3ad: "Canvas introduktionsvideo"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas är inte konfigurerad för att ta emot inloggningar från %{issuer}."
   canvas_lms_6ce68514: "Canvas LMS"
+  canvas_lms_logo_bd752156: "Canvas LMS-logotyp"
   canvas_login_failure_message_4c922f2f: "Meddelande om misslyckad Canvas-inloggning"
   canvas_login_instructure_271b8d00: "Canvas-inloggning | Instructure"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Canvas multi-faktor autentiserings säkerhetskopierings koder"
@@ -6357,12 +6372,14 @@ sv-x-k12:
   chcp_student_activity_report_5611dd39: "Aktivitetsrapport för CHCP-elev"
   check_back_later_c4234dbc: "Kom tillbaka senare"
   check_back_later_to_view_feedback_b937200a: "Kom tillbaka senare för att visa återkoppling."
+  check_f9bb054a: Kontrollera
   check_permissions_when_masquerading_as_course_admi_ded7106c: "Kontrollera behörigheter vid agerande som kursadministratör"
   check_services_to_enable_8877c451: "Kontrollera tjänsterna för att aktivera"
   check_this_box_to_add_posts_with_specific_phrase_i_d473aeeb: "Markera den här rutan för att lägga till inlägg med specifik fras i titeln med hjälp av textrutan nedan"
   check_to_add_a_user_for_loginid_6cd25597: "Markera för att lägga till en användare för %{loginid}"
   check_to_select_all_98e484f1: "Markera för att välja alla"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Markera för att hoppa över att lägga till en användare för %{loginid}"
+  check_your_knowledge_9f655098: "Kontrollera din kunskap"
   check_your_spelling_or_try_fewer_letters_70769a90: "Kontrollera din stavning eller försök med färre bokstäver."
   checkbox_examples_dc790142: "Exempel på kryssrutor"
   checked_883b93fd: kontrollerad
@@ -6420,6 +6437,7 @@ sv-x-k12:
   choose_home_page_80cef4ee: "Välj startsida"
   choose_image_242f727e: "Välj bild"
   choose_image_e5ee5d7a: "Välj bild"
+  choose_one_140f313f: "Välj en"
   choose_one_2c4277df: "Välj en"
   choose_one_submission_type_cf4eda5b: "Välj en inlämningstyp"
   choose_student_1513fcd1: "-- Välj elev --"
@@ -6737,8 +6755,10 @@ sv-x-k12:
   color_a363e1b0: Färg
   color_color_for_mastery_level_position_35079de: "Färgen %{color} för måluppfyllelsenivån %{position}"
   color_color_for_proficiency_rating_position_273414eb: "Färg %{color} för kompetensbedömning %{position}"
+  color_contrast_ratio_687782f0: Färgkontrastförhållande
   color_option_colorlabel_hex_code_hexcode_ba314ad3: "Färgalternativ %{colorLabel}, hexkod: %{hexcode}"
   color_overlay_fb5ecce7: Färgöverlägg
+  color_popup_af39810f: Färg-popup
   columbia_college_chicago_custom_canvas_usage_repor_b6e2ee88: "Anpassningsbar Canvas-användningsrapport för Columbia College – Chicago"
   column_e1ae5c64: Kolumn
   column_style_427bdfc7: Kolumnstil
@@ -7373,7 +7393,10 @@ sv-x-k12:
       import_blueprint_settings: 
         checkbox_label: "Importera inställningar för Blueprint-kurs"
       import_quizzes_next_view: 
+        convert_to_nq_help_text: "Befintliga frågebanker och klassiska quiz importeras som frågebanksobjekt och New Quizzes.%{p_p}För mer information kontakta din systemadministratör eller gå till"
+        convert_to_nq_help_title: "Konvertera quiz"
         import_new_quizzes: "Importera befintliga quiz som *New Quizzes*"
+        import_new_quizzes_all: "Konvertera quiz till *New Quizzes*"
         import_new_quizzes_help_text: "New Quizzes är den Canvas-bedömningsmotorn.%{p_p}Kontakta din systemadministratör om du vill veta mer eller besök"
         import_quizzesNext_help_label: "Importera bedömning som New Quizzes-hjälpikon"
         import_quizzesNext_help_text: "Quizzes.Next är den nya bedömningsmotorn för Canvas.%{p_p}För att få veta mer kontakta din systemadministratör eller gå till"
@@ -7958,6 +7981,7 @@ sv-x-k12:
   copyright_and_license_information_must_be_provided_5feffaf: "Copyright- och licensinformation måste tillhandahållas för filer innan de publiceras."
   copyright_holder_386cc8b8: Upphovsrättsinnehavare
   copyright_holder_66ee111: "Upphovsrättsinnehavare:"
+  correct_7df6d875: Korrekt!
   correct_answer: "Det var rätt svar."
   correct_answer_5a6a57d1: "Korrekt svar"
   correct_answer_comments_34ca671f: "Korrekt svar kommentarer"
@@ -7991,6 +8015,7 @@ sv-x-k12:
   couldn_t_load_folder_options_cdf418f3: "Det gick inte att läsa in mappalternativ"
   couldn_t_load_migrators_a399c113: "Det gick inte att läsa in migrerare."
   couldn_t_load_previous_content_migrations_a0ef5d7a: "Det gick inte att läsa in tidigare innehållsmigreringar"
+  couldn_t_load_quiz_items_97302a: "Det gick inte att läsa in quizobjekt"
   couldn_t_save_account_calendar_visibilities_343459d1: "Det gick inte att spara kontokalendern synlighet"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Det gick inte att spåra tilldelning av grupper till elever, men det pågår fortfarande. Kontrollera resultatet manuellt senare.+ (%{errorMessage})"
   couldn_t_update_content_migrations_68777765: "Det gick inte att uppgradera innehållsmigreringar"
@@ -10611,6 +10636,8 @@ sv-x-k12:
   display_name_6c2cfc58: "Visa namn:"
   display_name_b80c243e: "Visa namn"
   display_student_filter_options_ab034cfa: "Visa filteralternativ för elever"
+  display_templates_as_grid_931314b9: "Visa mallar som rutnät"
+  display_templates_as_rows_b7b8392f: "Visa mallar som rader"
   display_to_students_e1301f99: "Visa för elever"
   display_totals_for_all_grading_periods_option_4a72586: "Visa totalsumma för alternativet Alla bedömningsperioder"
   display_updated_at_d5b25d7b: "%{display_updated_at}"
@@ -10628,10 +10655,12 @@ sv-x-k12:
       Visar konfetti för användare som lämnar in en uppgift före
       inlämningsdatumet.
   distance_a377c748: Avstånd
+  distribute_3148a03a: Distribuera
   district_id_6f408184: "Distrikt ID"
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Dela in i lika långa tider på %{num_minutes} minuter. *Gå*"
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: "Dela in i lika långa tider (värdet är i minuter)"
   divide_into_equal_time_slots_in_minutes_234312fa: "Dela in i lika långa tider (i minuter"
+  divider_fe08b810: Avdelare
   division_cutoff_cutoff_value_e938bc9d: "Divisionsgräns %{cutoff_value}"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ta inte hänsyn till denna uppgift i slutbedömningen"
   do_not_display_in_gradebook_or_the_student_s_grade_3de05e1c: "Visa inte i bedömningsboken eller elevens bedömningssida"
@@ -11131,7 +11160,9 @@ sv-x-k12:
   enable_individual_learning_paths_for_students_base_5236d3bb: "Aktivera individuella lärandevägar för elever baserat på uppgift"
   enable_irish_language_support_in_canvas_fe7abaf8: "Aktivera stöd för iriska i Canvas"
   enable_labels_on_the_new_inbox_page_485ce65a: "Aktivera etiketter på den nya Inkorgssidan"
+  enable_migrating_all_question_banks_to_new_quizzes_63d26a55: "Aktivera migrering av alla frågebanker till New Quizzes under import/kopiering av kurs"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Aktivera migrering av frågebanker till New Quizzes under import/kopiering av kurs"
+  enable_migrating_question_banks_to_new_quizzes_dur_5bdd629e: "Aktivera migrering av frågebanker till New Quizzes under import/kopiering av kurs"
   enable_moderated_grading_bacd20d8: "Aktivera modererad bedömning."
   enable_new_item_notifications_c8fc525a: "Aktivera aviseringar för nytt objekt"
   enable_new_quizzes_to_refresh_service_jwts_used_by_af54fd97: "Aktivera New Quizzes för att uppdatera Service JWT:er som används av innehållsredigeraren."
@@ -12144,6 +12175,7 @@ sv-x-k12:
   faculty_journal_has_been_deprecated_70c65772: "Fakultetsjournalen har fasats ut!"
   faculty_journal_manage_entries_efc09599: "Lärarjournal – hantera poster"
   faculty_journal_will_be_discontinued_on_deprecatio_d5d1e8b3: "Fakultetsjournalen kommer att försvinna %{deprecationDate}."
+  fail_544e5dde: MISSLYCKADES
   fail_62dbb06a: underkänd
   failed_276786d: Misslyckades
   failed_307449e1: "Misslyckades:"
@@ -12214,6 +12246,7 @@ sv-x-k12:
   failed_to_fetch_content_for_import_a042cc27: "Det gick inte att hämta innehåll för import."
   failed_to_fetch_latest_forbidden_words_4d2a7dd6: "Det gick inte att hämta de senaste förbjudna orden."
   failed_to_fetch_migration_issues_data_a896da98: "Det gick inte att hämta data om migreringsproblem."
+  failed_to_fetch_quizzes_6a469b90: "Det gick inte att hämta quiz"
   failed_to_fetch_temporary_enrollment_data_9422003: "Det gick inte att hämta data om tillfällig registrering"
   failed_to_gather_and_compress_files_7fab00aa: "Det gick inte att samla in och komprimera filerna."
   failed_to_get_new_activity_17e7ec7c: "Det gick inte att hämta ny aktivitet"
@@ -12463,6 +12496,7 @@ sv-x-k12:
   files_2c1c604: filer
   files_a11y_rewrite_6ea6ccfd: "Files a11y Rewrite"
   files_and_folder_contents_only_available_to_studen_944f9166: "Filer och mappars innehåll är endast tillgängliga för elever med länk. Inte synliga i elevfiler."
+  files_and_folders_8a89d16b: "Filer och mappar"
   files_c300e900: Filer
   files_drag_and_drop_enhancements_da55de57: "Förbättrade funktioner för dra och släpp filer"
   files_index_menu_c6961f14: "Indexmeny för filer"
@@ -12653,6 +12687,7 @@ sv-x-k12:
               svarsanalyser.
   for_title_69d92b3a: "för %{title}"
   forbidden_words_list_deleted_successfully_b9a0c5a4: "Listan med förbjudna ord raderades."
+  foreground_3acfb942: Förgrund
   forgot_password_7232790f: "Har du glömt lösenordet?"
   forgot_password_9098c30d: "Glömt lösenord"
   forgot_password_f0c3fbac: "Glömt lösenordet?"
@@ -12732,6 +12767,7 @@ sv-x-k12:
   generate_summary_6d3d3b14: "Generera sammanfattning"
   generated_f26ee56b: "Genererat:"
   generated_icon_d004f211: "Generera ikon"
+  generated_summary_63857c79: "Genererad sammanfattning"
   generating_5b5e20f8: "Genererar:"
   generating_c2aabc02: "Genererar ..."
   generating_pairing_code_251b7fc8: "Genererar kopplingskod ..."
@@ -13467,6 +13503,7 @@ sv-x-k12:
   graph_of_student_page_views_by_category_7cb49887: "Diagram över elevers sidvisningar efter kategori"
   graph_of_the_distribution_of_grades_in_the_departm_30445777: "Diagram över bedömningsdistribution på avdelningen"
   graph_showing_the_fraction_of_on_time_submissions__735e47db: "Diagram över varje uppgifts del av inlämningar som gjorts i tid"
+  graphics_text_bc9568bc: Bildtext
   graphql_api_af4deb45: "GraphQL API"
   graphql_mutation_activity_5a47678b: GraphQL-mutationsaktivitet
   graphql_mutation_log_25acc923: GraphQL-mutationslogg
@@ -13548,6 +13585,7 @@ sv-x-k12:
   group_is_not_available_at_this_time_d99f0eab: "Gruppen är inte tillgänglig just nu"
   group_leader_selection_method_438f933a: "Urvalsmetod för gruppledare"
   group_leader_user_name_6f24bebb: "gruppledare %{user_name}"
+  group_leaders_can_manage_members_and_edit_the_grou_ea94c329: "Gruppledare kan hantera medlemmar och redigera gruppnamnet men inte gruppens storlek."
   group_limit_87ae4421: group_limit
   group_limit_size_is_invalid_fc673cd2: "Begränsningsstorleken för grupp är ogiltig"
   group_members_ae5489ed: gruppmedlemmar
@@ -14002,6 +14040,7 @@ sv-x-k12:
   hidden_available_with_a_link_65ef2bda: "Dold. Tillgänglig via länk"
   hidden_b1a6a352: (dold)
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Dold, filerna inuti kommer vara tillgängliga via länkar."
+  hiddenchildrencount_more_726a470: "%{hiddenChildrenCount} Mer"
   hiddenchildrencount_more_actions_3739c11d: "%{hiddenChildrenCount} fler åtgärder"
   hide_account_navigation_menu_ccdf9480: "Dölj konto-navigeringsmeny"
   hide_admin_navigation_menu_5cab9c9e: "Dölj administrations-navigeringsmeny"
@@ -14402,6 +14441,7 @@ sv-x-k12:
       begärande klienten istället för att omdirigera till sig själva
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Om alternativet är aktiverat visas alternativet matriser utan poäng."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Om det är aktiverat, kommer förälderns registreringsformulär att kräva en elevparningskod istället för barnets användarnamn och lösenord."
+  if_enabled_the_selective_release_feature_will_use__33b4f6ec: "Om aktiverad använder funktionen för selektiv version cache-minnet för att spara resultaten för tunga frågor för att förbättra prestandan."
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Om aktiverad visar webbplatsadministratörens gränssnitt för utvecklarnycklar endast
       webbplatsadministratörens utvecklingsnycklar. Observera att detta endast påverkar
@@ -14672,6 +14712,7 @@ sv-x-k12:
   import_override_scores_in_gradebook_80d51a72: "Importera åsidosatta resultat i bedömningsöversikten"
   import_queue_1fe82fe4: "Importera kö"
   import_rubric_aa83d957: "Importera matris"
+  import_rubric_assessments_to_cf75d794: "Importera matrisbedömningar till "
   import_rubrics_135270f0: "Importera matriser"
   import_rubrics_tray_c4cbaa72: "Facket Importera matriser"
   import_sis_data_428cc803: "Importera SIS-data"
@@ -14728,6 +14769,7 @@ sv-x-k12:
   improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "Förbättrat stöd för att ta New Quizzes inifrån Moduler."
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Förbättrade visuella påminnelser som uppmuntrar lärare att publicera kurser"
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Förbättringar i användarupplevelsen i översikten för lärandemål."
+  improves_api_pagination_handling_for_assignment_ev_45e4b2dc: "Förbättrar API-pagineringen för uppgiftshändelser i användarens kalender."
   in_a_few_seconds_538ddff3: "om några sekunder"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "I %{asset_link}, klickar elever på %{bad_link} som pekar på en sida som inte finns i din kurs."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link}, klickar elever på %{bad_link} som pekar på innehåll i en annan kurs."
@@ -14741,6 +14783,7 @@ sv-x-k12:
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Genomgång av produkten med hållpunkter för lärare"
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Genomgång av produkten med hållpunkter föradministratörer, lärare och elever"
   in_progress_13b9e26f: pågår
+  in_progress_646a8aef: Pågår
   in_progress_9d1ce8b9: Pågår
   in_progress_c095d059: Pågår
   in_some_accounts_with_a_large_number_of_content_mi_917a205b: |-
@@ -14875,7 +14918,12 @@ sv-x-k12:
   input_event_location_39b0fbf3: "Plats för indatahändelse …"
   input_event_title_1d4c8b10: "Titel för indatahändelse"
   input_event_title_b2445e30: "Titel för indatahändelse …"
+  input_field_for_alpha_678265fd: "Inmatningsfält för alfa"
+  input_field_for_blue_561e020a: "Inmatningsfält för blått"
+  input_field_for_green_67f8b2b6: "Inmatningsfält för grönt"
+  input_field_for_red_86a84615: "Inmatningsfält för rött"
   input_is_not_a_valid_number_5c1b572e: "%{INPUT} är inte ett giltigt nummer."
+  insert_593145ef: Infoga
   insert_a_grade_change_record_when_the_periodic_mis_424139e5: "Infoga en bedömningsändringspost när det periodiska jobbet MissingPolicyApplicator körs på en inlämning."
   insert_above_row_de82d138: "infoga ovan %{row}"
   insert_below_row_55ed6f34: "infoga nedan %{row}"
@@ -15122,6 +15170,7 @@ sv-x-k12:
   invalid_hexcode_9124519f: "Ogiltig hexadecimal kod"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ogiltig hexadecimal kod. Ange en giltig hexadecimal kod här för att använda en anpassad färg."
   invalid_hexcode_provided_522ba223: "Ogiltig hexadecimal kod tillhandahölls"
+  invalid_json_7d2eebce: "Ogiltig JSON"
   invalid_jwk_f8d46234: "Ogiltig JWK"
   invalid_jwt_audience_audience_961899c6: "Ogiltig JWT-målgrupp %{audience}"
   invalid_label_name_it_already_exists_e9a4712: "Ogiltigt etikettnamn Det finns redan."
@@ -15421,6 +15470,7 @@ sv-x-k12:
   keyboard_shortcuts_ed1844bd: Kortkommandon
   kind_7f0a88c4: Sort
   know_your_users_5c1323be: "Få överblick över dina deltagare"
+  knowledge_check_4aade5c5: Kunskapskontroll
   korean_da812d9: Koreanska
   label_3c9a991: "%{label}:"
   label_9fe386a0: "%{label}"
@@ -15444,6 +15494,7 @@ sv-x-k12:
   large_9c5e80e7: Stor
   large_balsamiq_font_5fe45fae: "Stort Balsamiq-teckensitt"
   large_course_db3d58b: "Stor kurs:"
+  large_text_e7ba08cd: "Stor text"
   last_7_days_bd411f1f: "Senaste 7 dagarna"
   last_activity_a983e541: "Senaste aktivitet"
   last_ae273283: senaste
@@ -15514,6 +15565,7 @@ sv-x-k12:
   late_submission_deduction_percent_52516a62: "Avdrag för sena inlämningar i procent"
   late_submittedat_2a07ea28: "Sen %{submittedAt}"
   latest_assessment_a85280ef: "Senaste bedömning"
+  latest_dsr_a0141d99: "Senaste DSR: "
   latest_f604a75: Senaste
   latest_outcome_import_context_is_not_self_300d5795: "latest_outcome_import kontext är inte ensamt"
   latest_score_905aa87b: "Senaste resultat"
@@ -16096,6 +16148,7 @@ sv-x-k12:
   login_label_1dea0f9d: Inloggningsetikett
   login_link_color_a887a109: "Färg på inloggningslänk"
   login_logo_5eecf564: Inloggningslogotyp
+  login_page_navigation_a6fe5436: "Navigering för inloggningssida"
   login_screen_83518c07: Inloggningsskärm
   login_with_auth_type_a0aaa52a: "Logga in med *%{auth_type}*"
   login_with_provider_3fd3998e: "Logga in med %{provider}"
@@ -16373,6 +16426,7 @@ sv-x-k12:
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet för måluppfyllelse reflekterar den uppgift eller det quiz som bedömts senast."
   match_aspect_ratio_529c9bd1: "Matcha bildförhållande"
   matched_jobs_jobs_with_tags_tags_1d1fddb6: "Matchade %{jobs} jobb med %{tags} taggar"
+  matching_63f5af40: Matchning
   matching_left_side_900f860b: "Matchar vänster sida"
   matching_right_side_920e71b2: "Matchar höger sida"
   math_ede93050: Matematik
@@ -18440,6 +18494,7 @@ sv-x-k12:
   moderator_49b9f2e1: Moderator
   moderator_sortorder_18063692: "Moderator %{sortOrder}"
   modern_cf6cb815: Modern
+  modernized_speedgrader_platform_11a5acae: "Moderniserad SpeedGrader-plattform"
   modified_by_c1584b3c: "Ändrad av"
   modified_by_user_e6c8ade3: "ändrad av: %{user}"
   modify_permissions_for_account_rubrics_6c3aee59: "Ändra behörigheter för kontomatriser"
@@ -18633,6 +18688,7 @@ sv-x-k12:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: "Flera är markerade som \"Aktuellt tema\" eftersom samma värden har sparats under flera namn, dvs. de är alla samma som det som för närvarande tillämpas"
   multiple_ba5220cd: Flera
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "Flera Canvas-konton är kopplade till Clever District %{district_id}"
+  multiple_choice_9f931ee6: "Flera val"
   multiple_dates_e3a122f7: "Flera datum"
   multiple_dropdowns_read_surrounding_text_f61274b3: "Flera rullgardinsmenyer, läs omgivande text"
   multiple_due_dates_283dd861: "Flera inlämningsdatum"
@@ -18942,6 +18998,7 @@ sv-x-k12:
   new_quizzes_submission_history_d81b477b: "Inlämningshistorik för New Quizzes"
   new_quizzes_support_for_modules_7b81eee9: "Stöd för New Quizzes i Moduler"
   new_quizzes_third_party_importing_1e1b696d: "Import av paket från tredje part till New Quizzes"
+  new_quizzes_unattached_bank_migrations_17d731d1: "Ej bifogade bankmigreringar för New Quizzes"
   new_rating_canceled_eed3c4ff: "Ny ranking avbruten"
   new_rating_created_54125331: "Ny bedömning skapades"
   new_release_note_37ec0ea7: "Ny versionsinformation"
@@ -18964,6 +19021,7 @@ sv-x-k12:
   new_user_s_name_909b6267: "Nytt användarnamn"
   new_user_tutorial_cdd3a446: "Handledning för nya användare"
   new_video_conference_17817456: "Ny videokonferens"
+  new_way_to_create_deeeff5e: "Nytt sätt att skapa"
   new_zealand_64_f126cf2e: "Nya Zeeland (+64)"
   newest_first_87672763: "Nyaste först"
   newest_oldest_d768cf1a: "Nyast - äldst"
@@ -19107,6 +19165,9 @@ sv-x-k12:
   no_placements_enabled_f705f28: "Inga placeringar har aktiverats"
   no_points_possible_368669d: "Inga möjliga poäng"
   no_points_possible_72db3a55: "Inga möjliga poäng"
+  no_question_has_been_selected_a347f75d: "Ingen fråga har valts"
+  no_questions_found_ab6f5992: "Inget svar hittades."
+  no_quizzes_found_c80c537a: "Inga quiz hittades."
   no_recent_announcements_abf950d5: "Inga nya meddelanden"
   no_redirect_uris_specified_7b47f4a4: "Inga omdirigerings-URL:er har angetts"
   no_restrictions_79a892d2: "Inga begränsningar"
@@ -19168,6 +19229,7 @@ sv-x-k12:
   none_3b5e34d2: Inga
   none_9b6c9bec: inga
   none_anonymized_e1ff7c45: "Inga (anonymiserade)"
+  normal_text_7b03da48: "Normal text"
   northeast_community_college_course_syllabus_report_8124f969: "Kursöversiktsrapport för Northeast Community College"
   norway_47_bc598662: "Norge (+47)"
   norwegian_53f391ec: Norska
@@ -19903,6 +19965,7 @@ sv-x-k12:
   organize_course_content_11de8958: "Strukturera kursinnehåll"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "Organisera epub enligt innehållstyp (förinställt är enligt modul)."
   organize_your_course_content_c3c7ed03: "Organisera ditt kursinnehåll"
+  orientation_1808cda7: Orientering
   original_job_id_d81afbb3: "Ursprungligt jobb-ID"
   originality_report_5d461681: Originalitetsrapport
   originality_reports_1e36b935: Urkundsrapporter
@@ -20193,6 +20256,7 @@ sv-x-k12:
   page_menu_2f8bee0: Sidmeny
   page_name_21defa75: Sidnamn
   page_name_is_required_d8c2736e: "Sidnamn krävs"
+  page_navigation_434d4aad: Sidnavigering
   page_not_found_2b0d05f5: "Sidan hittades inte"
   page_page_59070cd8: "Sida %{page}"
   page_pagenum_20dbfeb8: "Sida %{pageNum}"
@@ -20302,6 +20366,7 @@ sv-x-k12:
   participants_must_respond_to_the_topic_before_view_27a0395a: "Deltagare måste svara på ämnet innan de kan visa andras svar"
   participation_af2598: Deltagande
   participations_1823832d: Deltaganden
+  pass_1c19a2b3: GODKÄND
   pass_2a8c4f07: godkänd
   pass_fail_3d9461b0: Godkänd/underkänd
   pass_fail_grade_options_f9b06a58: "Alternativ för godkänt/icke godkänt"
@@ -20389,6 +20454,7 @@ sv-x-k12:
   percentages_and_points_can_t_be_edited_because_it__fa156ee5: "Det går inte att redigera procentandelar och poäng eftersom det används som standardbedömningsschema."
   percentdone_percent_edd66f1b: "%{percentDone} procent"
   percentused_of_bytesavailable_used_a859a40d: "%{percentUsed} av %{bytesAvailable} använda"
+  percentused_of_quota_used_c68c828e: "%{percentUsed} av %{quota} använda"
   perform_dsr_exports_for_users_2fca6bf7: "Utför DSR-exporter för användare"
   perform_full_validation_of_openid_connect_id_token_2105eec7: "Genomför en full validering av ID-tokens för OpenID Connect"
   performance_ac5f9e70: Prestation
@@ -20483,7 +20549,9 @@ sv-x-k12:
   personal_pronouns_7d271f52: "Personliga pronomen"
   peru_51_d3d38d1f: "Peru (+51)"
   philippines_63_a4f62138: "Filippinerna (+63)"
+  pick_a_color_557abfb0: "Välj en färg"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "välj en destination, vi skickar felen till dig"
+  pick_a_matching_answer_c551f6a0: "Välj ett svar som matchar"
   pick_a_name_to_save_this_theme_as_9773cb1a: "Välj ett namn som du vill spara det här temat som"
   pick_an_emoji_942adfc4: "Välj en emoji …"
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "välj en slutpunkt, vi lägger upp felrapporterna där"
@@ -20501,6 +20569,7 @@ sv-x-k12:
   place_section_before_5b45714e: "Placera ”%{section}” före:"
   place_title_2c183274: "Placera \"%{title}\""
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Platshållare för webhookåtkomst i Canvas-katalogen."
+  placement_6b523587: Placering
   placement_active_click_to_deactivate_47f8cf45: "Placering aktiv, klicka för att avaktivera"
   placement_icon_1f87372: "%{placement}-ikon"
   placement_inactive_click_to_activate_f7fe8c30: "Placering inaktiv, klicka för att aktivera"
@@ -20539,6 +20608,7 @@ sv-x-k12:
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Ge Canvas åtkomst till din mikrofon och webbkamera."
   please_check_back_soon_37d45200: "Återkom snart."
   please_check_your_email_if_your_sms_code_does_not__732060c1: "Kontrollera din e-post om du har fått SMS-koden än."
+  please_choose_an_editor_569f139e: "Välj en redigerare"
   please_click_below_to_launch_the_tool_and_select_a_f66e14d: "Klicka nedan för att starta verktyget och välja en resurs."
   please_confirm_you_want_to_move_forward_with_these_69a3ed38: "Bekräfta att du vill genomföra de här ändringarna."
   please_contact_your_lms_administrator_for_more_det_635afd97: "Kontakta din LMS-administratör för ytterligare information."
@@ -21258,6 +21328,7 @@ sv-x-k12:
   previous_snapshots_d8cd4820: "Föregående ögonblicksbilder"
   previous_student_46275eae: "Föregående elev"
   previous_student_899a6732: "Föregående elev"
+  previously_chosen_colors_f1338315: "Tidigare valda färger"
   primary_brand_color_db79b428: "Primär varumärkesfärg"
   primary_button_3a98f4bc: "Primär knapp"
   primary_button_text_1f55d27b: "Primär knapptext"
@@ -21861,6 +21932,7 @@ sv-x-k12:
   questions_a955145c: Frågor
   queued_d0e45c4b: "I kö"
   queued_jobs_9a7a923e: "Köade jobb"
+  quick_look_9bd1a50d: Snabbtitt
   quickly_share_course_content_and_templates_with_te_1cf3dc6f: "Dela snabbt kursinnehåll och mallar med lärare"
   quickly_share_course_content_and_templates_with_te_c70a5eeb: "Snabbt delar kursinnehåll och mallar med lärare"
   quiz: 
@@ -23140,6 +23212,7 @@ sv-x-k12:
   reactivate_user_e058db8b: "Omaktivera användare"
   reactivation_will_allow_all_logins_for_name_to_log_455df70: "Omaktivering gör det möjligt att tillåta alla inloggningar för %{name} för att logga in och återfå åtkomst till tidigare godkända API-integrationer."
   read_7cabda44: läs
+  read_about_key_features_and_discover_what_you_can__9a8e4c27: "Läs om viktiga funktioner och upptäck vad du kan skapa i blockredigeraren."
   read_comments_3fcc7590: "Läs kommentarer"
   read_context_membership_data_cf406033: "Läs kontextmedlemsdata"
   read_dc99757a: Läs
@@ -23316,6 +23389,7 @@ sv-x-k12:
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Läs in sidan igen eller navigera till en ny sida för att ändringen ska träda i kraft."
   remediation_feccc1fd: Lösning
   remember_course_navigation_collapsed_state_60fe6c95: "Kom ihåg stängt tillstånd för kursnavigering"
+  remember_my_choice_d74e8f60: "Kom ihåg mitt val"
   remember_my_choice_for_this_course_5a3b7206: "Kom ihåg mitt val för den här kursen"
   remember_whether_module_links_load_in_new_tab_91fccb4f: "Kom ihåg om modullänkar ska läsas in i ny flik"
   remember_your_settings_page_tab_a081121d: "Kom ihåg din flik för inställningar"
@@ -23604,6 +23678,7 @@ sv-x-k12:
   reset_available_from_102b946: "Återställ tillgänglig från"
   reset_available_until_db5b42d6: "Återställ tillgänglig till"
   reset_courses_fe29ddf9: "Återställ kurser"
+  reset_default_alignment_6ce6df18: "Återställ justering till standard"
   reset_lti_provision_6d8e287f: "Återställ LTI-etablering"
   reset_multi_factor_authentication_2b63a558: "Återställ multifaktorautentisering"
   reset_name_6a0aa0f: "Återställ ”%{name}”\""
@@ -23714,6 +23789,7 @@ sv-x-k12:
   rich_text_editor_a0491c6e: Innehållsredigeraren
   rich_text_f1b4274a: "Formaterad text"
   right_sidebar_logo_5483dc0a: "Logotyp i höger sidofält"
+  rights_9d9d0a19: Rättigheter
   rocketship_on_launchpad_4011ea8c: "rymdraket på avskjutningsramp"
   role: 
     duplicate_role: "En roll med det här namnet finns redan"
@@ -23889,6 +23965,8 @@ sv-x-k12:
     filter_multiple_users_found: "%{userCount} användare hittades."
     filter_no_users_found: "Inga matchande användare hittades."
     filter_one_user_found: "1 användare hittades."
+  rounded_2fc05c1: Rundad
+  rouned_corners_e6ae98c0: "Rundade kanter"
   row_fc0944a7: Rad
   row_row_message_e369e49e: "Rad %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
@@ -23908,6 +23986,7 @@ sv-x-k12:
   rubric_assessment_5f0e8a83: Matrisbedömning
   rubric_assessment_tray_df17d20b: Matrisbedömningspanel
   rubric_assessment_view_mode_1038db: "Visningsläge för matrisbedömning"
+  rubric_assessments_imports_and_exports_e0eaaef: "Import och export av matrisbedömningar"
   rubric_association: 
     no_details: "Inga detaljer"
   rubric_button_display_4e4a26fe: "Knappvisning för matris"
@@ -24301,6 +24380,9 @@ sv-x-k12:
   search_people_4782671a: "Sök efter personer"
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Sök efter personer. När du börjar skriva i det här fältet filtreras listan automatiskt till att bara inkludera de namn som matchar din inmatning."
   search_permissions_915bbd09: "Sök behörigheter"
+  search_questions_836a821a: "Sök efter frågor"
+  search_questions_e3356d9f: "Sök efter frågor..."
+  search_quizzes_8998b6d6: "Sök quiz"
   search_results_4d5af4eb: Sökresultat
   search_results_for_62243f02: "sökresultat för"
   search_rubrics_422e0f1a: "Sök efter matriser"
@@ -24476,7 +24558,9 @@ sv-x-k12:
   select_a_outcome_to_view_additional_information_61a282f: "Välj ett lärandemål för att se ytterligare information"
   select_a_predefined_color_c77ab2f5: "Välj en fördefinierad färg."
   select_a_provisional_grade_7106e3d5: "Välj en provisorisk omdöme"
+  select_a_question_a6d8bece: "Välj en fråga"
   select_a_question_bank_f346e5a0: "Välj en frågebank"
+  select_a_quiz_db052310: "Välj ett quiz"
   select_a_role_287e53e8: "Välj en roll"
   select_a_section_37ac1694: "Välj en sektion"
   select_a_student_adfcc348: "Välj en elev"
@@ -24500,6 +24584,7 @@ sv-x-k12:
   select_an_assignment_optional_b58f7819: "Välj en uppgift (valfritt)"
   select_an_assignment_to_view_additional_informatio_de1370e1: "Välj en uppgift att visa ytterligare information för här."
   select_an_edit_operation_ec1467d: "Välj en redigeringsåtgärd"
+  select_an_editor_e860f69: "Välj en redigerare"
   select_an_icon_49906766: "Välj en ikon"
   select_an_icon_e9a2c858: "Välj en ikon"
   select_an_outcome_37fb2096: "Välj ett lärandemål"
@@ -24589,6 +24674,7 @@ sv-x-k12:
   select_prerequisite_module_57894963: "Välj förutsättningsmodul"
   select_prerequite_module_e9042bb0: "Välj förutsättningsmodul"
   select_question_bank_508e5c08: "Välj frågebank"
+  select_quiz_f91522af: "Välj quiz"
   select_requirement_count_e0948936: "Välj kravantal"
   select_requirement_type_bf9a39d9: "Välj kravtyp"
   select_role_aa5cfd69: "Välj roll"
@@ -24673,6 +24759,7 @@ sv-x-k12:
   selective_release_optimized_visibility_services_fi_526eca8b: "Selektiv frigörning – optimerade synlighetstjänster – fem frågor"
   selective_release_optimized_visibility_services_on_33c4304b: "Selektiv frigörning – optimerade synlighetstjänster – en fråga"
   selective_release_optimized_visibility_services_th_9fd12ca0: "Selektiv frigörning – optimerade synlighetstjänster – tre frågor"
+  selective_release_query_caching_fc32c65e: "Selektiv version – frågelagring i cache-minnet"
   selective_release_ui_api_changes_a60b681a: "Selektiv publicering – ändringar i gränssnitt och API"
   self_enrollments: 
     already_enrolled: 
@@ -26017,6 +26104,7 @@ sv-x-k12:
   spring_grading_period_current_score_7083cf0d: "Nuvarande resultat för vårens bedömningsperiod"
   spring_grading_period_final_score_386d92f7: "Slutresultat för vårens bedömningsperiod"
   spring_grading_period_id_61aec82c: "Vårens bedömningsperiods-ID"
+  square_511eb3b3: Kvadrat
   sr_gradebook: 
     all_grading_periods: "Alla bedömningsperioder"
     all_sections: "Alla sektioner"
@@ -26899,6 +26987,7 @@ sv-x-k12:
   template_account_is_not_a_template_account_d80200ae: "Mallkontot är inte ett mallkonto"
   template_account_not_found_7144542c: "Mallkontot hittades inte"
   template_name_fba74b9c: "Namn på mall"
+  template_quick_look_734f92bc: "Mall: Snabbtitt"
   templates_4ca13d07: Mallar
   temporarily_enroll_a_user_into_a_course_this_tempo_990488f8: "Registrera en användare tillfälligt för en kurs. Den här tillfälliga registreringen paras samman med en annan registrering i kursen."
   temporarily_enroll_name_8acb66ce: "Registrera %{name} tillfälligt"
@@ -27055,6 +27144,7 @@ sv-x-k12:
   that_user_account_has_been_deleted_please_contact__350e0e0: "Användarkontot har raderats.  Kontakta din systemadministratör om du vill aktivera kontot igen."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "Användarens förmåga att ta emot meddelanden från Slack"
   the_about_section_is_a_great_place_to_introduce_yo_7cccaca0: "Sektionen Om är en bra plats för att presentera dig själv i kursen. "
+  the_acceptable_use_policy_is_currently_unavailable_a41c129f: "Policyn för godkänd användning är för närvarande inte tillgänglig. Kom tillbaka senare eller kontakta supporten om du behöver ytterligare hjälp."
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "Den rapporterande användarens konto-ID."
   the_account_uuid_of_the_account_to_which_the_repor_dd3fcd79: "Konto-UUID:et för kontot som den rapporterande användaren tillhör"
   the_account_wide_sync_settings_were_changed_while__90c48497: "Synkroniseringsinställningarna för hela kontot ändrades under synkroniseringen. Försök synkronisera igen."
@@ -27732,6 +27822,7 @@ sv-x-k12:
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Med den här funktionen kan lärare enkelt kopiera enskilda objekt från en kurs till en annan, och dela enskilda innehållsobjekt med andra användare så att de kan importera dessa objekt till sina kurser."
   this_feature_allows_users_to_create_and_search_for_15991ac8: "Med den här funktionen kan användare skapa och söka efter matriser medan de använder Förbättrade matriser på uppgiftssidan."
   this_feature_allows_users_to_import_and_export_rub_340b5d30: "Med den här funktionen kan användarna importera och exportera matriser från CSV- och XML-filer."
+  this_feature_allows_users_to_import_and_export_rub_43a99d67: "Med den här funktionen kan användarna importera och exportera matrisbedömningar i ett CSV-format. Den här funktionen är beroende av funktionen Förbättrade matriser."
   this_feature_allows_users_to_import_and_export_rub_b8cb0344: "Med den här funktionen kan användarna importera och exportera matriser från CSV- och XML-filer från Förbättrade matriser."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Den här funktionen kan inte inaktiveras eftersom det finns minst ett underkonto eller en kurs med den här funktionen aktiverad."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Den här funktionen kan inte aktiveras när autodetektering av fältseparatorer har aktiverats"
@@ -27789,6 +27880,7 @@ sv-x-k12:
                                   Innan du aktiverar det för en institution ska du försäkra dig om att du till fullo förstår
                                   funktionen och dess påverkan på användare.
   this_feature_provides_a_new_analytics_hub_platform_749d5f1a: "Den här funktionen tillhandahåller en ny Analytics Hub-plattformsupplevelse."
+  this_feature_provides_a_new_speedgrader_platform_e_b739c571: "Den här funktionen tillhandahåller en ny SpeedGrader-plattformsupplevelse med fokus på förbättrade prestanda i stora kurser."
   this_feature_provides_a_new_speedgrader_platform_e_e7d740bd: "Den här funktionen tillhandahåller en ny SpeedGrader-plattformsupplevelse."
   this_feature_provides_the_ability_to_capture_media_918c06c6: "Den här funktion möjliggör inspelning av mediefiler i SpeedGrader med hjälp av Studio-skärminspelning."
   this_feature_provides_visual_and_functional_enhanc_e5e57a21: "Den här funktionen tillhandahåller visuella och funktionella förbättringar för matriser i Canvas."
@@ -28013,6 +28105,7 @@ sv-x-k12:
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denna exempelsida inkluderar vanliga UI element i Canvas för att hjälpa dig skapa ditt eget varumärke. När du börjar ändra färgvärden och bilder i den vänstra menyn, får du se knappen *Förhandsgranska dina ändringar*. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Denna exempelsida inkluderar vanliga UI element i Canvas för att hjälpa dig skapa ditt eget varumärke. När du börjar göra ändringar i färgvärden och bilder visas knappen *Förhandsgranska dina ändringar*. Klicka på den för att uppdatera sidan och se hur dina ändringar ser ut."
   this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Den här sektionstakt kommer att tas bort och takten återställs till standardtakt."
+  this_setting_is_locked_on_the_account_level_d875b894: "Den här inställningen är låst på kontonivå"
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Den här inställningen påverkar endast din vy av elevbedömningar och visar bedömningar som om alla uppgifter som inte bedömts fått resultatet noll. Inställningen innebär endast en visuell ändring och påverkar inte bedömningar för elever eller andra användare av den här bedömningsöversikten. Om den här inställningen aktiveras fyller inte Canvas i nollor i bedömningsöversikten för elevinlämningar i individuella uppgifter. Endast uppgiftsgrupperna och Total-kolumnerna kommer automatiskt att räkna med noll-resultat i det totala procentvärdet för varje elev."
   this_setting_only_impacts_courses_it_will_include__1b2169a: "Den är inställningen påverkar bara kurser. Den inkluderar sis_batch_id och sis_batch_user_id"
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Den här inställningen ändrar väsentligen Canvas-upplevelsen för elever och lärare."
@@ -29091,6 +29184,7 @@ sv-x-k12:
     trophy_display_name: Trofé
   trophy_case_7a098a85: Troféskåp
   trophy_case_da3b25bb: Troféskåp
+  true_false_823761a9: Sant/Falskt
   truncated_56b1a661: Trunkerat
   trusted_account_669ba397: "Betrott konto"
   trusted_account_url_e6200e41: "Betrodd konto-URL"
@@ -29101,6 +29195,8 @@ sv-x-k12:
   try_disabling_the_unread_filter_b8d9d77: "Prova att inaktivera filtret \"Olästa\"."
   try_entering_your_institution_s_complete_name_2013abab: "Försök ange din institutions fullständiga namn."
   try_out_canvas_for_free_e2265d30: "Prova Canvas gratis!"
+  try_the_block_editor_ee65a02f: "Prova blockredigeraren"
+  try_the_new_block_editor_179e588: "Prova den nya blockredigeraren"
   ttml_tracks_are_not_allowed_because_they_are_susce_d40b654a: "TTML-spårningar är inte tillåtna eftersom de är mottagliga för XSS-attacker."
   tue_bb10b386: Tis
   tuesday_698a01b: Tisdag
@@ -29202,6 +29298,7 @@ sv-x-k12:
   unable_to_load_messages_2b158fd0: "Det gick inte att läsa in meddelandena. "
   unable_to_load_messages_49a2942b: "Det gick inte att läsa in meddelandena."
   unable_to_load_results_4e15a097: "Det gick inte att läsa in resultaten"
+  unable_to_load_the_acceptable_use_policy_please_tr_bc8fa18b: "Det gick inte att läsa in policyn för godkänd användning. Försök igen eller kontakta supporten om problemet kvarstår."
   unable_to_load_this_control_543a8271: "Det gick inte att läsa in den här kontrollen"
   unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
       Det gick inte att hitta den valda SFTP-nyckeln.
@@ -29276,6 +29373,7 @@ sv-x-k12:
   unenrolled_users_e7632d24: "Icke-registrerade användare"
   unexpected_error_while_performing_export_1e6b4207: "Ett oväntat fel inträffade under exporten"
   unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Oväntat svar från Microsoft-API: mottog statuskoden %{status_code}"
+  unexpected_response_format_e9c1df2e: "Oväntat svarsformat"
   unexpected_response_from_microsoft_api_got_status__86f7a95e: "Oväntat svar från Microsoft API: tog emot statuskod för %{status_code}"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Oväntat svar från Microsoft API. Det är sannolikt en defekt. Kontakta support."
   unexpected_value_12f2d401: "Oväntat värde"
@@ -29419,6 +29517,7 @@ sv-x-k12:
   unsupported_authentication_type_b07ad82d: "Autentiseringtyp som inte stöds"
   unsupported_bymonthday_only_a_single_day_is_permit_76e60fc9: "BYMONTHDAY stöds inte, bara en enkel dag tillåts."
   unsupported_package: "Innehållspaket som inte stöds"
+  unsupported_question_type_58aedb6: "Frågetypen stöds inte"
   unsyncable_4bf11ee6: "Går inte att synkronisera"
   unsyncable_message_95faa75d: "Går inte att synkronisera: %{message}"
   unsynced_changes_4ddaec76: "Osynkroniserade ändringar"
@@ -29633,6 +29732,7 @@ sv-x-k12:
   use_the_new_interface_for_managing_permissions_907e8e8f: "Använd det nya gränssnittet för att hantera tillstånd"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Använd det nya quiz LTI-verktyget istället för vanliga canvas quizzes"
   use_the_new_scheduler_1273b832: "Använd den nya schemabokaren"
+  use_the_rce_873ca281: "Använd innehållsredigeraren"
   use_this_grading_scheme_52aa4ecf: "Använd det här bedömningsschemat"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Använd denna lista för att ta bort tilldelade elever. Lägg till nya elever med kombirutan efter listan."
   use_this_panel_to_resolve_duplicate_results_or_peo_856d1c96: "Använd den här panelen för att lösa problem med duplicerade resultat eller personer som inte hittas med din sökning."
@@ -29964,6 +30064,16 @@ sv-x-k12:
         all_users: "Alla användare"
         choose_term: "Välj termin"
         search_results: "Sökresultat för ”%{search_term}\""
+    last_login: 
+      labels: 
+        current_ip: "Nuvarande inloggnings-IP"
+        current_login: "Nuvarande inloggning"
+        last_ip: "Senaste inloggnings-IP"
+        last_login: "Senaste inloggning"
+        last_request: "Senaste begäran"
+      more: fler ...
+      never: aldrig
+      none: inga
     linkedin_added: "LinkedIn har lagts till!"
     linkedin_fail: "LinkedIn verifiering misslyckades. Försök igen"
     logins: 
@@ -30360,6 +30470,7 @@ sv-x-k12:
   we_re_sending_your_message_d586da: "Vi skickar ditt meddelande ..."
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Vi ber om ursäkt, ett inloggningsfel har uppstått, kontrollera ditt barns inloggningsuppgifter och försök igen."
   we_suggest_using_firefox_to_test_lti_1_3_tools_wit_f51737e2: "Vi föreslår att du använder Firefox för att testa LTI 1.3-verktyg med Canvas HTTP-version."
+  we_ve_introduced_a_new_editor_to_give_you_more_fle_1fedb3b9: "Vi har introducerat en ny redigerare som ger dig större flexibilitet och kraft när du skapar innehåll. Välj den redigeraren som bäst passar ditt arbetsflöde."
   we_ve_let_your_instructor_know_to_review_this_link_f8d56088: "Vi har informerat din lärare om att granska den här länken så fort som möjligt."
   we_ve_received_several_incorrect_username_or_passw_c62ccb92: "Vi har tagit emot flera felaktiga inmatningar av användarnamn eller lösenord. För att skydda ditt konto har vi låst det. Kontakta din systemadministratör."
   we_ve_run_into_a_problem_while_updating_all_discus_52ac7d70: "Vi har stött på ett problem under uppdateringen av alla diskussioner. Försök igen eller kontakta oss för att få hjälp med den här frågan."
@@ -30590,6 +30701,7 @@ sv-x-k12:
   when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: "Vid agerande som kursadministratörsroller (lärare/lärarassistent/designer) kommer Canvas att se till att den agerande användaren har samma (eller högre) behörigheter som målanvändaren."
   when_on_1edtech_platform_notfication_service_used__4800aa8f: "Om denna funktion är aktiverad, aktiveras 1Edtech Platform-aviseringstjänsten (används för att prenumerera på verktygsaviseringar, lista befintliga aviseringshandtag, avisera prenumererade verktyg med mera.)."
   when_on_1edtech_platform_notfication_services_used_6347510c: "Om denna funktion är aktiverad,  aktiveras 1Edtech Platform-aviseringstjänsterna (används för att prenumerera på verktygsaviseringar, lista befintliga aviseringshandtag, avisera prenumererade verktyg med mera.)."
+  when_on_1edtech_platform_notification_service_used_43761290: "Om denna funktion är aktiverad aktiveras, 1Edtech Platform-aviseringstjänsten (används för att prenumerera på verktygsaviseringar, lista befintliga aviseringshandtag, avisera prenumererade verktyg med mera)."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Det här är sidan man ser när man besöker din kurs.  Du kan välja om den ska visa ett aktivitetsflöde, listan över kursmoduler, en kursöversikt eller en anpassad sida som du skapar själv.  Det förinställda läget är att visa kursens aktivitetsflöde."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       När personer besöker dina kurser, är detta den första sidan de kommer att se.
@@ -30719,6 +30831,9 @@ sv-x-k12:
       buttons: 
         new_page: Sida
         new_page_label: "Lägg till en sida"
+        new_rce_page: "Sida i innehållsredigeraren"
+        try_the_block_editor: "Prova blockredigeraren"
+        use_the_rce: "Använd innehållsredigeraren"
       headers: 
         creation_date: "Skapad den"
         last_edit: "Senaste redigering"
@@ -30921,6 +31036,9 @@ sv-x-k12:
   you_are_not_the_selected_moderator_for_this_assign_e57b483f: "Du är inte den valda moderatorn för denna uppgift"
   you_are_now_able_to_submit_your_peer_review_4ae84901: "Nu kan du lämna in din kamratrespons"
   you_are_observing_observeduser_afd2f245: "Du observerar %{observedUser}"
+  you_are_on_a_color_palette_to_navigate_on_the_pale_b3feaa53: "Du är på en färgpalett. För att navigera upp, till vänster/höger eller ned, använd knapparna W, A, S och D."
+  you_are_on_a_color_slider_to_navigate_the_slider_l_10afbbbc: "Du är på ett färgreglage. För att navigera upp, till vänster/höger eller ned, använd knapparna A och D."
+  you_are_on_an_alpha_slider_to_navigate_the_slider__260e908a: "Du är på ett alfareglage. För att navigera upp, till vänster/höger eller ned, använd knapparna A och D."
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "Du är redo att synkronisera 1 uppgift."
     other: "Du är redo att synkronisera %{count} uppgifter."

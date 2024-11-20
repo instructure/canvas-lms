@@ -1,0 +1,193 @@
+{
+  "name": "Navigation Section",
+  "description": "Course navigation with four buttons",
+  "workflow_state": "active",
+  "node_tree": {
+    "rootNodeId": "yue4mpUChN",
+    "nodes": {
+      "yue4mpUChN": {
+        "type": {
+          "resolvedName": "ColumnsSection"
+        },
+        "isCanvas": false,
+        "props": {
+          "columns": 1,
+          "background": "#1D4C59FF"
+        },
+        "displayName": "Columns",
+        "custom": {
+          "isSection": true,
+          "displayName": "Navigation Section"
+        },
+        "parent": "ROOT",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "columns__inner": "_LWmxgLGU8"
+        }
+      },
+      "_LWmxgLGU8": {
+        "type": {
+          "resolvedName": "ColumnsSectionInner"
+        },
+        "isCanvas": true,
+        "props": {},
+        "displayName": "Columns Inner",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "yue4mpUChN",
+        "hidden": false,
+        "nodes": [
+          "13kQFSc-L3"
+        ],
+        "linkedNodes": {}
+      },
+      "13kQFSc-L3": {
+        "type": {
+          "resolvedName": "GroupBlock"
+        },
+        "isCanvas": true,
+        "props": {
+          "layout": "row",
+          "alignment": "distribute",
+          "verticalAlignment": "start",
+          "roundedCorners": false,
+          "resizable": false,
+          "isColumn": true,
+          "id": "columns-pEdeFvz6_0-1",
+          "background": "#00000000"
+        },
+        "displayName": "Group",
+        "custom": {
+          "isResizable": false,
+          "isBlock": true,
+          "isExpanded": false,
+          "displayName": "Column"
+        },
+        "parent": "_LWmxgLGU8",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {
+          "group__inner": "Ef7hf8YVK5"
+        }
+      },
+      "Ef7hf8YVK5": {
+        "type": {
+          "resolvedName": "NoSections"
+        },
+        "isCanvas": true,
+        "props": {
+          "className": "group-block__inner",
+          "placeholderText": "Drop a block to add it here"
+        },
+        "displayName": "NoSections",
+        "custom": {
+          "noToolbar": true
+        },
+        "parent": "13kQFSc-L3",
+        "hidden": false,
+        "nodes": [
+          "lDKe-fJfGy",
+          "JwS1ab5Ylg",
+          "CV9ftqN8l9",
+          "u3ntJFci_x"
+        ],
+        "linkedNodes": {}
+      },
+      "lDKe-fJfGy": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Announcements",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary-inverse",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "Ef7hf8YVK5",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "JwS1ab5Ylg": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Modules",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary-inverse",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "Ef7hf8YVK5",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "CV9ftqN8l9": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Resources",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary-inverse",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "Ef7hf8YVK5",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      },
+      "u3ntJFci_x": {
+        "type": {
+          "resolvedName": "ButtonBlock"
+        },
+        "isCanvas": false,
+        "props": {
+          "text": "Support",
+          "href": "",
+          "size": "medium",
+          "variant": "condensed",
+          "color": "primary-inverse",
+          "iconName": ""
+        },
+        "displayName": "Button",
+        "custom": {
+          "isBlock": true
+        },
+        "parent": "Ef7hf8YVK5",
+        "hidden": false,
+        "nodes": [],
+        "linkedNodes": {}
+      }
+    }
+  },
+  "template_type": "section",
+  "template_category": "global",
+  "thumbnail": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARAAAAAPCAYAAAAs/ZDvAAAAAXNSR0IArs4c6QAABQ5JREFUeF7tm3lQlGUcx78LqJByxSEoiCRnwHCIAgljKASEpE1Ykmam4ZRaA2YEOioMFYpJDNqMSBYgI4qSqKxyhBxxLUcg54KAyzHLKSAEcu4279N0/FHNLO68ivs8/+37Psfv93l+z/f3e9/d5bgfCBLzBZ2gjRKgBCgBSQiYrdQHR3+Tn1iSQbQvJUAJUAJ/EqACQmOBEqAE5kyACsic0dGBlAAlQAWExgAlQAnMmQCrAmLx0ko0CjogEonmbLAkA5UWLcTjySlJhjxTfdVVlDE5NY3xiQkwL6yaO7ogEv39ykpNeQmmppn7k8Tuba+54nJW7jPlw1yMMVmhBxuTVUgv5BHfZbEZ6C6FnakRrucVSeT+AgUFTM/MSDTmSTqzKiBpp8KQmluIu+VVcLG1Ql5lNWxNjaGjoY749Cx8uNmLAHO0NENpHR9isRjONpZofNABkVgMBwszZPMqscnFEal3f4HbGju0Cbuhpa6Gkpp6+HlsQCI3G672NugbHELgu744dfEKHC3NkZSRg7HH8ysYbU2NELLLD2+HhIMXfxYu/oHY+bob0gtLsVhREd7ODrhVyIOwbwBer6zFO+7r8enp7+Dj4oQEbhb2bvFG7HUua4L9JIH4z7G73/Ak8ZD85WFEXUrFiyrKaHjQjnXWFriZX4wdXm6IS7uNFTraMFymi5GxMTCsWjqFkJeXw8DwCAx0tVFWz4e7w2oSE/Ot3Twdjre+CIOetiYE3b141c4aCgry5HNGSQWcrMzBq+dDU1UVpgZ6yOJVwn2tHezNTcAt4qGgqpYVl1kTECYImAzpu8EFx2ITiPOxIQGQk+Pg4u2foa2uhpScAlyLOEoUNOz7JBIMwv6HiDsciJHxcewKjURebBSySitQeK+OCMvB7b7QUFWBlroqSmobUd3UgvaeXny9bw86e/sQfPYCIvbvwecx51lVZmnsHnMoFi1cQIKnkn8fTEWVUVKOayeOE18+iz4HTTVVtHQJkXA8iGRrXU0NEkwVDU3kUEUmXsF8+5qNERBGBD8+EY1zwQEQDgxiaHQUvLpGvOflhq0h4Qh+fxvqWgXwcLRHR08fvk1OxQ6vjUjgZiMzJgKNgk50DzxEa5cQV3MKpLEdrM6xVEMd0YH7cCkzB9yiMkQFfAQFeXkinEzCzau8h+SvjoAv6CDXlmtrkgr1Ax9PnEy4zJqtrAkIA+BQTCxsTYxguEwHafnFiDtykGRHRkB6B4fg4bSGwDE10IdA2IMfb2Wis7cfPxw7RA5HVVMLEQvmHiNAXX0DOLB1MxjYDW3t5HGluKaelPUnP9mL5o5OlNQ2YLGSIslO5Q1NrIGVxkKMADABst7OGmMTE6TSeNPVGcu1NP8KmAs37hBh3mBvg/6hR6QiYw5UdXMrbIxXISUnH8Ojv0nDHNbm2O3jiXjuHxUIh8PBr/z76B8axjprSxIDsyIRqptb4L/Fm1Qhd4rL8E3SVaREHCV9GW4Vjc1EQJysXsb+yDOs2S6thRJCgzAzM4szKTfgbGMBY309WBkZEkFkzsVqM2MseUGJPOoxSfZ8Gpfs+3bPjRgYfoSfcgulZcr/zsOagLDhDQf412z7X9fZsImNNZ53/9hgOB/WCPXfidC4RCIeNS1tmJ6ZfepmP1cC8tRpUgMoARkjQAVExjacuksJSJMAFRBp0qRzUQIyRoAKiIxtOHWXEpAmAQ79N640cdK5KAHZIcD8uPF3ksEOR5yOo+cAAAAASUVORK5CYII=",
+  "id": "6c61322d-3ca3-4856-bbfb-7a271d729b8b",
+  "global_id": "6c61322d-3ca3-4856-bbfb-7a271d729b8b"
+}

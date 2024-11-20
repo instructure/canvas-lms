@@ -16,69 +16,82 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React from 'react'
+import {Img} from '@instructure/ui-img'
+import {Responsive} from '@instructure/ui-responsive'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
-import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
-import classNames from 'classnames'
+import {useNewLogin} from '../context/NewLoginContext'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+// @ts-expect-error
+import CanvasLmsLogoIcon from '../assets/images/canvas-logo-small.svg'
+// @ts-expect-error
+import CanvasLmsLogo from '../assets/images/canvas-logo.svg'
 
 const I18n = useI18nScope('new_login')
 
-interface Props {
-  className?: string
-}
-
-const AppNavBar = ({className}: Props) => {
-  const [state, setState] = useState({
-    isSmallViewportMenuOpen: false,
-  })
-
-  const orgName = <Text>{I18n.t('Canvas')}</Text>
+const AppNavBar = () => {
+  const {enableCourseCatalog} = useNewLogin()
 
   return (
-    <TopNavBar
-      className={classNames(className)}
-      breakpoint="650"
-      inverseColor={true}
-      mediaQueryMatch="element"
-    >
+    <TopNavBar breakpoint={10} inverseColor={true}>
       {() => {
         return (
           <TopNavBar.Layout
-            navLabel="Example navigation bar"
+            navLabel={I18n.t('Login page navigation')}
             smallViewportConfig={{
-              dropdownMenuToggleButtonLabel: 'Toggle Menu',
-              dropdownMenuLabel: 'Main Menu',
-              onDropdownMenuToggle: isMenuOpen => {
-                setState({...state, isSmallViewportMenuOpen: isMenuOpen})
-              },
-              alternativeTitle: 'Overview',
+              dropdownMenuToggleButtonLabel: I18n.t('Menu'),
             }}
             renderBrand={
               <TopNavBar.Brand
-                screenReaderLabel="Name of organization"
+                screenReaderLabel={I18n.t('Canvas LMS')}
                 renderIcon={
-                  <View as="div" margin="small">
-                    {orgName}
-                  </View>
+                  <Responsive
+                    match="media"
+                    query={{
+                      small: {minWidth: '48rem'},
+                    }}
+                  >
+                    {(_props, matches) => {
+                      if (matches?.includes('small')) {
+                        return (
+                          <Img
+                            src={CanvasLmsLogo}
+                            alt={I18n.t('Canvas LMS Logo')}
+                            width="8rem"
+                            height="2.375rem"
+                            constrain="contain"
+                          />
+                        )
+                      } else {
+                        return (
+                          <Img
+                            src={CanvasLmsLogoIcon}
+                            alt={I18n.t('Canvas LMS Logo')}
+                            width="2.375rem"
+                            height="2.375rem"
+                            constrain="contain"
+                          />
+                        )
+                      }
+                    }}
+                  </Responsive>
                 }
               />
             }
-            renderMenuItems={
-              <TopNavBar.MenuItems
-                listLabel="Page navigation"
-                renderHiddenItemsMenuTriggerLabel={hiddenChildrenCount =>
-                  `${hiddenChildrenCount} More`
-                }
-              >
-                <TopNavBar.Item id="link1" href="#">
-                  Link
-                </TopNavBar.Item>
-                <TopNavBar.Item id="link2" href="#">
-                  Link
-                </TopNavBar.Item>
-              </TopNavBar.MenuItems>
+            renderActionItems={
+              enableCourseCatalog ? (
+                <TopNavBar.ActionItems
+                  listLabel={I18n.t('Page navigation')}
+                  renderHiddenItemsMenuTriggerLabel={hiddenChildrenCount =>
+                    I18n.t('%{hiddenChildrenCount} More', {hiddenChildrenCount})
+                  }
+                >
+                  <TopNavBar.Item id="browseCourses" href="/search/all_courses">
+                    {I18n.t('Browse courses')}
+                  </TopNavBar.Item>
+                </TopNavBar.ActionItems>
+              ) : undefined
             }
           />
         )

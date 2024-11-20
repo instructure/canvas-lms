@@ -18,9 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Lti::OverlayVersion < ActiveRecord::Base
+  extend RootAccountResolver
   belongs_to :account, inverse_of: :lti_overlay_versions, optional: false
   belongs_to :lti_overlay, class_name: "Lti::Overlay", inverse_of: :lti_overlay_versions, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :lti_overlay_versions, optional: false
 
+  # @see Hashdiff.diff for the format of the diff
   validates :diff, presence: true
+
+  resolves_root_account through: :account
 end

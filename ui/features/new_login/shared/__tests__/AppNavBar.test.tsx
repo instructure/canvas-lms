@@ -17,15 +17,18 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
 import {AppNavBar} from '../index'
 import {MemoryRouter} from 'react-router-dom'
+import {NewLoginProvider} from '../../context/NewLoginContext'
+import {render} from '@testing-library/react'
 
 describe('AppNavBar', () => {
   it('mounts without crashing', () => {
     render(
       <MemoryRouter>
-        <AppNavBar />
+        <NewLoginProvider>
+          <AppNavBar />
+        </NewLoginProvider>
       </MemoryRouter>
     )
   })

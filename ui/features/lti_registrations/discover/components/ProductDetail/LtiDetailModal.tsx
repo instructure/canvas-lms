@@ -44,9 +44,9 @@ const LtiDetailModal = (props: LtiDetailModalProps) => {
     return renderPerLtiType?.placements.map((placement, i) => {
       const backgroundColor = i % 2 !== 0 ? '#F5F5F5' : '#FFFFFF'
       return (
-        <div style={{backgroundColor}}>
-          <List.Item>{placement}</List.Item>
-        </div>
+        <List.Item margin="0">
+          <div style={{backgroundColor}}>{placement}</div>
+        </List.Item>
       )
     })
   }
@@ -55,9 +55,9 @@ const LtiDetailModal = (props: LtiDetailModalProps) => {
     return renderPerLtiType?.services.map((service, i) => {
       const backgroundColor = i % 2 !== 0 ? '#F5F5F5' : '#FFFFFF'
       return (
-        <div style={{backgroundColor}}>
-          <List.Item>{service}</List.Item>
-        </div>
+        <List.Item margin="0">
+          <div style={{backgroundColor}}>{service}</div>
+        </List.Item>
       )
     })
   }

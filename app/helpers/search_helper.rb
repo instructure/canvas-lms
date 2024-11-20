@@ -171,7 +171,8 @@ module SearchHelper
                         exclude_ids: exclude_contexts,
                         search_all_contexts: options[:search_all_contexts],
                         types: types[:context],
-                        base_url: options[:base_url]
+                        base_url: options[:base_url],
+                        include_concluded: options[:include_concluded]
                       )]
     end
 
@@ -181,7 +182,8 @@ module SearchHelper
                         search: options[:search],
                         exclude_ids: exclude_users,
                         context: options[:context],
-                        weak_checks: options[:skip_visibility_checks]
+                        weak_checks: options[:skip_visibility_checks],
+                        include_concluded: options[:include_concluded]
                       )]
     end
 
@@ -217,7 +219,7 @@ module SearchHelper
           if terms.present? || options[:search_all_contexts] # search all groups and sections (and users)
             result = sections + groups
           else # otherwise we show synthetic contexts
-            result = synthetic_contexts_for(course, context_name, options[:base_url])
+            result = synthetic_contexts_for(course, context_name, options)
             found_custom_sections = sections.any? { |s| s[:id] != course[:default_section_id] }
             result << { id: "#{context_name}_sections", name: I18n.t(:course_sections, "Course Sections"), item_count: sections.size, type: :context } if found_custom_sections
             result << { id: "#{context_name}_groups", name: I18n.t(:student_groups, "Student Groups"), item_count: groups.size, type: :context } unless groups.empty?
@@ -234,7 +236,7 @@ module SearchHelper
         if terms.present? # we'll just search the users
           result = []
         else
-          return synthetic_contexts_for(course_for_section(section), context_name, options[:base_url])
+          return synthetic_contexts_for(course_for_section(section), context_name, options)
         end
       end
     end
@@ -341,12 +343,13 @@ def course_for_group(group)
   course_for_section(group)
 end
 
-def synthetic_contexts_for(course, context, base_url)
+def synthetic_contexts_for(course, context, options)
   # context is a string identifying a subset of the course
   @skip_users = true
   # TODO: move the aggregation entirely into the DB. we only select a little
   # bit of data per user, but this still isn't ideal
-  users = @current_user.address_book.known_in_context(context)
+  base_url = options[:base_url]
+  users = @current_user.address_book.known_in_context(context, options)
   enrollment_counts = { all: users.size }
   users.each do |user|
     common_courses = @current_user.address_book.common_courses(user)

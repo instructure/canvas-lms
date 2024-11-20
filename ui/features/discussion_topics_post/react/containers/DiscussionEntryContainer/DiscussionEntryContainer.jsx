@@ -103,7 +103,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
       <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
         <Flex direction={props.isTopic ? direction : 'row'}>
           {hasAuthor && (
-            <Flex.Item shouldGrow={true} shouldShrink={true} padding={authorInfoPadding}>
+            <Flex.Item overflowY="visible" shouldGrow={true} shouldShrink={true} padding={authorInfoPadding}>
               <AuthorInfo
                 author={props.author}
                 threadParent={props.threadParent}
@@ -118,9 +118,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
                 lastReplyAtDisplay={props.lastReplyAtDisplay}
                 isTopic={props.isTopic}
                 isTopicAuthor={props.isTopicAuthor}
-                discussionEntryVersions={
-                  props.discussionEntry?.discussionEntryVersionsConnection?.nodes || []
-                }
+                discussionEntryVersions={props.discussionEntry?.discussionEntryVersions || []}
                 reportTypeCounts={props.discussionEntry?.reportTypeCounts}
                 threadMode={threadMode}
                 toggleUnread={props.toggleUnread}
@@ -133,8 +131,9 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
           <Flex.Item
             align={postUtilitiesAlign}
             margin={hasAuthor ? postUtilitiesMargin : '0'}
-            overflowX="hidden"
-            overflowY="hidden"
+            overflowX="visible"
+            overflowY="visible"
+            padding="xxx-small 0 0 0"
             shouldGrow={!hasAuthor}
           >
             {props.postUtilities}

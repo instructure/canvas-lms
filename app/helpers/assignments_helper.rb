@@ -66,12 +66,22 @@ module AssignmentsHelper
 
   def due_at(assignment, user)
     if assignment.multiple_due_dates_apply_to?(user)
-      multiple_due_dates
+      overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
+      overrides = assignment.merge_overrides_by_date(overrides)
+      if overrides.length > 1
+        multiple_due_dates
+      else
+        single_due_at(assignment, user)
+      end
     else
-      assignment = assignment.overridden_for(user)
-      due_date = assignment.due_at || assignment.applied_overrides.filter_map(&:due_at).first
-      due_date ? datetime_string(due_date) : I18n.t("No Due Date")
+      single_due_at(assignment, user)
     end
+  end
+
+  def single_due_at(assignment, user)
+    assignment = assignment.overridden_for(user)
+    due_date = assignment.due_at || assignment.applied_overrides.filter_map(&:due_at).first
+    due_date ? datetime_string(due_date) : I18n.t("No Due Date")
   end
 
   def assignment_publishing_enabled?(assignment, user)

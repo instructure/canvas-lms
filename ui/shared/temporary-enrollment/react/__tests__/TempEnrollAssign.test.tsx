@@ -141,7 +141,7 @@ function formatDateToLocalString(utcDateStr: string) {
 }
 
 describe('TempEnrollAssign', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     // @ts-expect-error
     window.ENV = {
       ACCOUNT_ID: '1',
@@ -248,8 +248,11 @@ describe('TempEnrollAssign', () => {
       window.ENV = {...window.ENV, TIMEZONE: 'America/Denver'}
 
       const {findAllByLabelText, findAllByText} = render(<TempEnrollAssign {...props} />)
-      const startTime = (await findAllByLabelText('Time'))[0]
+      const startDate = (await findAllByLabelText('Begins On'))[0]
+      fireEvent.input(startDate, {target: {value: 'Oct 31 2024'}})
+      fireEvent.blur(startDate)
 
+      const startTime = (await findAllByLabelText('Time'))[0]
       fireEvent.input(startTime, {target: {value: '9:00 AM'}})
       fireEvent.blur(startTime)
 
@@ -258,13 +261,6 @@ describe('TempEnrollAssign', () => {
 
       expect(localTime.textContent).toContain('9:00 AM')
       expect(accTime.textContent).toContain('11:00 PM')
-
-      // @ts-expect-error
-      window.ENV = {
-        ACCOUNT_ID: '1',
-        CONTEXT_TIMEZONE: 'Asia/Brunei',
-        context_asset_string: 'account_1',
-      }
     })
 
     it('show error when date field is blank', async () => {

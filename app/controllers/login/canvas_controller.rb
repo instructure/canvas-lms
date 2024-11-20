@@ -201,7 +201,8 @@ class Login::CanvasController < ApplicationController
     @auth_providers = auth_providers_with_buttons.map do |provider|
       {
         id: provider.id,
-        auth_type: provider.auth_type
+        auth_type: provider.auth_type,
+        display_name: provider.class.display_name
       }
     end
     render "login/canvas/new_login", layout: "bare", status: status || :ok

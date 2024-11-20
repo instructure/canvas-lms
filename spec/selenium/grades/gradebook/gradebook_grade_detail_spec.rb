@@ -538,6 +538,44 @@ describe "Grade Detail Tray:" do
         expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "None")
         expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Excused")
       end
+
+      it "persists data when clicking the speedgraded link", :ignore_js_errors do
+        discussion_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "late discussion")
+        due_at = 1.week.ago
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic:,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: }],
+          points_possible: 20
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic:,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: }],
+          points_possible: 10,
+          replies_required: 1
+        )
+
+        entry = discussion_topic.discussion_entries.create!(user: @students[0])
+        sub_entry = discussion_topic.discussion_entries.build
+        sub_entry.parent_id = entry.id
+        sub_entry.user_id = @students[0].id
+        sub_entry.save!
+
+        late_assignment = Assignment.last
+        user_session(@teacher)
+        Gradebook.visit(@course)
+        Gradebook::Cells.open_tray(@students[0], late_assignment)
+        reply_to_topic_input = Gradebook::GradeDetailTray.grade_inputs[0]
+        required_replies_input = Gradebook::GradeDetailTray.grade_inputs[1]
+        Gradebook::GradeDetailTray.edit_grade_for_input(reply_to_topic_input, 10)
+        Gradebook::GradeDetailTray.edit_grade_for_input(required_replies_input, 10)
+        Gradebook::GradeDetailTray.speedgrader_link.click
+        expect(f("[data-testid='reply_to_topic-checkpoint-status-select']")).to have_attribute("value", "Late")
+        expect(f("[data-testid='reply_to_entry-checkpoint-status-select']")).to have_attribute("value", "Late")
+      end
     end
   end
 end
