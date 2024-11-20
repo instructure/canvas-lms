@@ -279,8 +279,11 @@ module SpeedGrader
         end
       end
 
+      discussion_checkpoints_enabled = assignment.root_account.feature_enabled?(:discussion_checkpoints)
+
       res[:submissions] =
         submissions.map do |sub|
+          sub.workflow_state = "pending_review" if sub.checkpoints_needs_grading? && discussion_checkpoints_enabled
           submission_methods = %i[
             submission_history
             late

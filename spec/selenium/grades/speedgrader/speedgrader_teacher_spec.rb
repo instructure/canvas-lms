@@ -339,6 +339,23 @@ describe "SpeedGrader" do
       expect(f("#section-menu .ui-menu")).to include_text(@section0.name)
       expect(f("#section-menu .ui-menu")).to include_text(@section1.name)
     end
+
+    describe "discussion_checkpoints" do
+      it "displays not_graded if SubAssignment needs_grading" do
+        course_with_teacher_logged_in
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @student = student_in_course(course: @course, active_all: true).user
+        @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+        @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
+
+        @topic.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+        @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@topic.assignment.id}"
+        expect(f("#students_selectmenu-button")).to have_class("not_graded")
+        expect(ff("#students_selectmenu option")).to have_size 1
+      end
+    end
   end
 
   it "includes the student view student for grading", priority: "1" do
