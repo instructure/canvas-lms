@@ -35,6 +35,9 @@ export type ProductResponse = {
   tools: Array<Product>
   meta: Meta
 }
+export type OrganizationProductResponse = ProductResponse & {
+  description: string
+}
 
 export const fetchProducts = async (params: DiscoverParams): Promise<ProductResponse> => {
   const {page, search} = params
@@ -112,7 +115,7 @@ export const fetchCustomFilters = async (salesforceId: number): Promise<Organiza
 export const fetchProductsByOrganization = async (
   params: DiscoverParams,
   organizationSalesforceId: string
-): Promise<ProductResponse> => {
+): Promise<OrganizationProductResponse> => {
   const {page, search} = params
   const {tags, companies, audience, versions} = params.filters
 
@@ -161,5 +164,6 @@ async function fetchResponse(method: string, url: string, errorText: string): Pr
   if (!response.ok) {
     throw new Error(errorText)
   }
-  return response.json()
+  const products: OrganizationProductResponse = await response.json()
+  return products
 }
