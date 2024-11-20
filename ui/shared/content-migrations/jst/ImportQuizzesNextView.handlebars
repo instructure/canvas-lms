@@ -11,7 +11,7 @@
     <i class="icon-question"></i>
   </a>
 
-  <div id="import_quizzesNext_helpDialog" data-read-on-open="true" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none" 
+  <div id="import_quizzesNext_helpDialog" data-read-on-open="true" data-turn-into-dialog='{"width":600,"modal":true}' style="display:none"
     title={{#if unattachedBankMigrationsEnabled}}
       "{{#t "convert_to_nq_help_title"}}Convert Quizzes{{/t}}"
     {{else}}
@@ -19,9 +19,10 @@
     {{/if}}
   >
     {{#if unattachedBankMigrationsEnabled}}
-      {{#t "convert_to_nq_help_text"}}Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.<p></p>To learn more, please contact your system administrator or visit{{/t}} <a href="{{#t "#community.instructor_guide_link" }}{{/t}}">Canvas Instructor Guide</a>.
+      {{#t "convert_to_nq_help_text"}}Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.<p></p>To learn more, please contact your system administrator or visit{{/t}}
     {{else}}
-      {{#t "import_new_quizzes_help_text"}}New Quizzes is the new assessment engine for Canvas.<p></p>To learn more, please contact your system administrator or visit{{/t}} <a href="{{#t "#community.instructor_guide" }}{{/t}}">Canvas Instructor Guide</a>.
+      {{#t "import_new_quizzes_help_text"}}New Quizzes is the new assessment engine for Canvas.<p></p>To learn more, please contact your system administrator or visit{{/t}}
     {{/if}}
+     <a href="{{#t "#community.instructor_guide" }}{{/t}}">Canvas Instructor Guide</a>.
   </div>
 </label>
