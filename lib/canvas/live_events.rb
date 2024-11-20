@@ -434,6 +434,7 @@ module Canvas::LiveEvents
   end
 
   def self.get_user_data(user)
+    pseudo = SisPseudonym.for(user, nil, type: :implicit, require_sis: false)
     {
       user_id: user.global_id,
       uuid: user.uuid,
@@ -442,8 +443,8 @@ module Canvas::LiveEvents
       workflow_state: user.workflow_state,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      user_login: user.primary_pseudonym&.unique_id,
-      user_sis_id: user.primary_pseudonym&.sis_user_id
+      user_login: pseudo&.unique_id,
+      user_sis_id: pseudo&.sis_user_id
     }
   end
 

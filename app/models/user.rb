@@ -1019,16 +1019,6 @@ class User < ActiveRecord::Base
                          User.last_name_first(self.name, likely_already_surname_first: false)
   end
 
-  def primary_pseudonym
-    pseudonyms.active.first
-  end
-
-  def primary_pseudonym=(p)
-    p = Pseudonym.find(p)
-    p.move_to_top
-    reload
-  end
-
   def email_channel
     # It's already ordered, so find the first one, if there's one.
     if communication_channels.loaded?
@@ -1286,10 +1276,6 @@ class User < ActiveRecord::Base
 
   def students
     [self]
-  end
-
-  def latest_pseudonym
-    Pseudonym.order(:created_at).where(user_id: id).active.last
   end
 
   def used_feature(feature)

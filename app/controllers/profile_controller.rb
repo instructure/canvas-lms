@@ -220,15 +220,8 @@ class ProfileController < ApplicationController
       @user = @current_user
       @user.dismiss_bouncing_channel_message!
     end
-    @user_data = profile_data(@user.profile, @current_user, session, [])
     @channels = @user.communication_channels.unretired
-    @email_channels = @channels.select { |c| c.path_type == "email" }
-    @sms_channels = @channels.select { |c| c.path_type == "sms" }
-    @other_channels = @channels.reject { |c| c.path_type == "email" }
-    @default_email_channel = @email_channels.first
-    @default_pseudonym = @user.primary_pseudonym
     @pseudonyms = @user.pseudonyms.active_only
-    @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
     @context = @user.profile
     set_active_tab "profile_settings"
     register_cc_tabs = ["email"]
@@ -240,6 +233,12 @@ class ProfileController < ApplicationController
     js_env({ enable_gravatar: @domain_root_account&.enable_gravatar?, register_cc_tabs:, is_default_account:, is_eligible_for_token_regeneration:, google_drive_oauth_url: })
     respond_to do |format|
       format.html do
+        @user_data = profile_data(@user.profile, @current_user, session, [])
+        @password_pseudonyms = @pseudonyms.reject(&:managed_password?)
+        @email_channels = @channels.select { |c| c.path_type == "email" }
+        @sms_channels = @channels.select { |c| c.path_type == "sms" }
+        @other_channels = @channels.reject { |c| c.path_type == "email" }
+        @default_email_channel = @email_channels.first
         @user.reload
         show_tutorial_ff_to_user = @domain_root_account&.feature_enabled?(:new_user_tutorial) &&
                                    @user.participating_instructor_course_ids.any?
