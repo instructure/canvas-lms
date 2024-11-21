@@ -209,7 +209,7 @@ describe Login::CasController do
       account.unknown_user_url = unknown_user_url
       account.save!
       get "new", params: { ticket: "ST-abcd" }
-      expect(response).to redirect_to(unknown_user_url)
+      expect(response).to redirect_to(/^#{unknown_user_url}\?message=Canvas/)
       expect(session[:cas_session]).to be_nil
     end
 

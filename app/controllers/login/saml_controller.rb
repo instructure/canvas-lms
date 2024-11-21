@@ -188,13 +188,11 @@ class Login::SamlController < ApplicationController
       pseudonym.infer_auth_provider(aac)
       successful_login(user, pseudonym)
     else
-      unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-      message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
+      message = "Received SAML login request for unknown user: #{unique_id}"
       logger.warn message
       aac.debug_set(:canvas_login_fail_message, message) if debugging
-      flash[:delegated_message] = t("Canvas doesn't have an account for user: %{user}",
-                                    user: unique_id)
-      redirect_to unknown_user_url
+      redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}",
+                                     user: unique_id))
     end
   end
 

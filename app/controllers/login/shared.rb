@@ -29,6 +29,17 @@ module Login::Shared
                               :oauth2_nonce)
   end
 
+  def redirect_to_unknown_user_url(message)
+    unknown_user_url = @domain_root_account.unknown_user_url.presence
+    if unknown_user_url
+      unknown_user_url += (URI.parse(unknown_user_url).query ? "&" : "?")
+      unknown_user_url << "message=#{URI::DEFAULT_PARSER.escape(message)}"
+    else
+      flash[:delegated_message] = message
+    end
+    redirect_to unknown_user_url || login_url
+  end
+
   def successful_login(user, pseudonym, otp_passed = false)
     reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, "login")

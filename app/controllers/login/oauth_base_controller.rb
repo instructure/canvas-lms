@@ -64,12 +64,11 @@ class Login::OAuthBaseController < ApplicationController
 
     unique_id = unique_ids.is_a?(Hash) ? unique_ids[@aac.login_attribute] : unique_ids
     if unique_id.nil?
-      unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login with no unique_id"
-      flash[:delegated_message] =
+      return redirect_to_unknown_user_url(
         t("Authentication with %{provider} was successful, but no unique ID for logging in to Canvas was provided.",
           provider: @aac.class.display_name)
-      return redirect_to unknown_user_url
+      )
     end
 
     pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids, @aac)
@@ -93,10 +92,8 @@ class Login::OAuthBaseController < ApplicationController
 
       successful_login(user, pseudonym)
     else
-      unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-      logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}, redirecting to: #{unknown_user_url}."
-      flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", user: unique_id
-      redirect_to unknown_user_url
+      logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}"
+      redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: unique_id))
     end
   end
 end

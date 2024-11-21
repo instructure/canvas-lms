@@ -64,10 +64,8 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         unique_id = @aac.unique_id(token)
         provider_attributes = @aac.provider_attributes(token)
       rescue OAuthValidationError => e
-        unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-        flash[:delegated_message] = e.message
         @aac.debug_set(:validation_error, e.message) if debugging
-        return redirect_to unknown_user_url
+        return redirect_to_unknown_user_url(e.message)
       rescue => e
         @aac.debug_set(:claims_response, e) if debugging
         raise
