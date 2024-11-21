@@ -482,7 +482,7 @@
                 <% end%>
                 <td class="due">
                   <% if sub_assignment_presenter.has_no_group_weight?  %>
-                    <%= datetime_string(sub_assignment.due_at, :due_date) rescue "" %>
+                    <%= datetime_string(sa_submission.cached_due_date, :due_date) rescue "" %>
                   <% end %>
                 </td>
                 <td class="submitted">
