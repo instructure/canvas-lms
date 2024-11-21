@@ -430,6 +430,9 @@ export default class WikiPageView extends Backbone.View {
       tool.url = `${tool.base_url}&pages[]=${this.model.get('page_id')}`
     })
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
+    json.IS = {
+      HORIZON_COURSE: ENV?.horizon_course,
+    }
     return json
   }
 }

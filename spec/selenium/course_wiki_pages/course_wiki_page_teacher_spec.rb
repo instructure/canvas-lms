@@ -64,5 +64,13 @@ describe "course wiki pages" do
     context "With granular permission on" do
       it_behaves_like "course_pages_granular_permissions"
     end
+
+    it "does not show the 'Use as First page' button in Horizon courses" do
+      @course.root_account.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+      visit_course_wiki_index_page(@course.id)
+      f("tbody .al-trigger").click
+      expect(element_exists?(".use-as-front-page-menu-item")).to be_falsey
+    end
   end
 end

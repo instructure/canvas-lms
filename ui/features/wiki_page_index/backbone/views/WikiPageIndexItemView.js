@@ -103,6 +103,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     json.block_editor = !!ENV.FEATURES?.BLOCK_EDITOR
     json.page_is_block = this.model.get('editor') === 'block_editor'
     json.page_type_label = json.page_is_block ? I18n.t('block page') : I18n.t('classic page')
+    json.is_horizon_course = ENV?.horizon_course
     return json
   }
 

@@ -143,6 +143,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       DELETE: !!this.PAGE_RIGHTS.delete,
       EDIT_TITLE: !!this.PAGE_RIGHTS.update || json.new_record,
       EDIT_ROLES: !!this.WIKI_RIGHTS.update,
+      SELECT_ROLES: !ENV?.horizon_course,
     }
     json.SHOW = {COURSE_ROLES: json.contextName === 'courses'}
 
