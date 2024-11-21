@@ -237,13 +237,9 @@ module Lti::IMS
     #   }
     def create
       report_grade_progress_metric
-      ags_scores_multiple_files = @domain_root_account.feature_enabled?(:ags_scores_multiple_files)
-      return old_create unless ags_scores_multiple_files
 
       json = {}
-      preflights_and_attachments = compute_preflights_and_attachments(
-        ags_scores_multiple_files:
-      )
+      preflights_and_attachments = compute_preflights_and_attachments
       attachments = preflights_and_attachments.pluck(:attachment)
       json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
 
@@ -270,31 +266,6 @@ module Lti::IMS
     end
 
     private
-
-    def old_create
-      submit_homework if new_submission? && !has_content_items? && activity_started?
-      update_or_create_result
-      json = { resultUrl: result_url }
-
-      preflights_and_attachments = compute_preflights_and_attachments
-      json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
-
-      if has_content_items?
-        begin
-          upload_submission_files(preflights_and_attachments.pluck(:preflight_json))
-        rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
-          return render_error("failed to communicate with file service", :gateway_timeout)
-        rescue CanvasHttp::InvalidResponseCodeError => e
-          err_message = "uploading to file service failed with #{e.code}: #{e.body}"
-          return render_error(err_message, :bad_request) if e.code == 400
-
-          # 5xx and other unexpected errors
-          return render_error(err_message, :internal_server_error)
-        end
-      end
-
-      render json:, content_type: MIME_TYPE
-    end
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = [:scoreGiven, :scoreMaximum, :comment, :submittedAt, submission: %i[submittedAt]].freeze
@@ -483,12 +454,10 @@ module Lti::IMS
       end
     end
 
-    def compute_preflights_and_attachments(ags_scores_multiple_files: false)
+    def compute_preflights_and_attachments
       # We defer submitting the assignment if the file error improvements flag is not on
       #   When this feature flag is turned on, we will never submit the assignment,
       #   and always precreate the attachment here
-      precreate_attachment = ags_scores_multiple_files
-      submit_assignment = !ags_scores_multiple_files
       file_content_items.map do |item|
         # Pt 1 of the file upload process, which for non-InstFS (ie local or open source) is all that's needed.
         # This upload will always be URL-only, so unless InstFS is enabled a job will be created to pull the
@@ -499,8 +468,8 @@ module Lti::IMS
           check_quota: false, # we don't check quota when uploading a file for assignment submission
           folder: user.submissions_folder(context), # organize attachment into the course submissions folder
           assignment: line_item.assignment,
-          submit_assignment:,
-          precreate_attachment:,
+          submit_assignment: false,
+          precreate_attachment: true,
           return_json: true,
           override_logged_in_user: true,
           override_current_user_with: user,
@@ -511,10 +480,10 @@ module Lti::IMS
           }
         )
         # if we precreate the attachment, it gets returned with the json
-        preflight_json = precreate_attachment ? preflight[:json] : preflight
-        attachment = precreate_attachment ? preflight[:attachment] : nil
+        preflight_json = preflight[:json]
+        attachment = preflight[:attachment]
 
-        if submitted_at && ags_scores_multiple_files
+        if submitted_at
           # the file upload process uses the Progress#created_at for the homework submission time
           Progress.find(preflight_json[:progress][:id]).update!(created_at: submitted_at)
         end

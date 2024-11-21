@@ -1,15 +1,14 @@
 ---
-ags_scores_multiple_files:
+ags_improved_course_concluded_response_codes:
   state: hidden
-  display_name: Allow multiple file AGS submissions to count as only one submission
+  display_name: Better LTI AGS Response Codes for Concluded Courses
   description: |-
-    This feature makes it so that when multiple files are submitted together by
-    a third party tool via the Assignments and Grade Service API they will be
-    grouped as one submission, rather than creating multiple separate submissions.
+    If enabled, the AGS API will return a more helpful response code whenever an LTI
+    tool attempts to access or modify data in a course that has already concluded.
+    Rather than returning a generic 404 Not Found, the API will instead return a 422
+    along with a helpful message indicating that the tool cannot access concluded
+    courses.
   applies_to: RootAccount
-  environments:
-    development:
-      state: on
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin

@@ -535,7 +535,7 @@ module Lti::IMS
             end
             let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: false, submitted_at: }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, submitted_at: }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
             end
             let(:expected_progress_url) do
               "http://canonical.host/api/lti/courses/#{context_id}/progress/"
@@ -563,6 +563,10 @@ module Lti::IMS
                 end
 
                 context "when over attempt limit" do
+                  let(:params_overrides) do
+                    super().merge(Lti::Result::AGS_EXT_SUBMISSION => { new_submission: false })
+                  end
+
                   it "succeeds" do
                     result.submission.update!(attempt: 4)
                     send_request
@@ -625,58 +629,41 @@ module Lti::IMS
                 expect(Attachment.last.content_type).to eq "text/plain"
               end
 
-              context "with FF on" do
-                let(:params_overrides) do
-                  super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: true, submitted_at: })
-                end
-
-                before do
-                  Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
-                end
-
-                it "sets submitted_at correctly" do
-                  send_request
-                  expect(result.submission.reload.submitted_at).to eq submitted_at
-                end
-
-                context "and multiple file content items" do
-                  let(:params_overrides) do
-                    super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
-                                                                         {
-                                                                           type: "file",
-                                                                           url: "https://getsamplefiles.com/download/txt/sample-1.txt",
-                                                                           title: "sample1.txt"
-                                                                         },
-                                                                         {
-                                                                           type: "file",
-                                                                           url: "https://getsamplefiles.com/download/txt/sample-2.txt",
-                                                                           title: "sample2.txt"
-                                                                         },
-                                                                       ],
-                                                                       new_submission: true })
-                  end
-
-                  it "handles multiple attachments" do
-                    send_request
-                    expect(result.submission.reload.attachments.length).to eq 2
-                  end
-
-                  it "only creates one attempt" do
-                    attempt_count = result.submission.attempt || 0
-                    send_request
-                    expect(result.submission.reload.attempt).to eq(attempt_count + 1)
-                  end
-                end
+              let(:params_overrides) do
+                super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items:, new_submission: true, submitted_at: })
               end
 
-              context "with FF off" do
-                before do
-                  Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
+              it "sets submitted_at correctly" do
+                send_request
+                expect(result.submission.reload.submitted_at).to eq submitted_at
+              end
+
+              context "and multiple file content items" do
+                let(:params_overrides) do
+                  super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
+                                                                       {
+                                                                         type: "file",
+                                                                         url: "https://getsamplefiles.com/download/txt/sample-1.txt",
+                                                                         title: "sample1.txt"
+                                                                       },
+                                                                       {
+                                                                         type: "file",
+                                                                         url: "https://getsamplefiles.com/download/txt/sample-2.txt",
+                                                                         title: "sample2.txt"
+                                                                       },
+                                                                     ],
+                                                                     new_submission: true })
                 end
 
-                it "ignores submitted_at" do
+                it "handles multiple attachments" do
                   send_request
-                  expect(result.submission.reload.submitted_at).not_to eq submitted_at
+                  expect(result.submission.reload.attachments.length).to eq 2
+                end
+
+                it "only creates one attempt" do
+                  attempt_count = result.submission.attempt || 0
+                  send_request
+                  expect(result.submission.reload.attempt).to eq(attempt_count + 1)
                 end
               end
 
@@ -721,7 +708,6 @@ module Lti::IMS
                 )
               end
 
-              # it_behaves_like 'creates a new submission'
               # See spec/integration/scores_spec.rb
               # for Instfs, we have to mock a request to the files capture API
               # that doesn't work well in a controller spec for this controller
@@ -734,11 +720,7 @@ module Lti::IMS
                 expect(progress_url).to include expected_progress_url
               end
 
-              shared_examples_for "no updates are made with FF on" do
-                before do
-                  Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
-                end
-
+              shared_examples_for "no updates are made" do
                 it "does not update submission" do
                   score = result.submission.score
                   send_request
@@ -759,40 +741,13 @@ module Lti::IMS
                 end
               end
 
-              shared_examples_for "updates are made with FF off" do
-                before do
-                  Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
-                end
-
-                it "updates submission" do
-                  result
-                  send_request
-                  expect(result.submission.reload.score).to eq 10
-                end
-
-                it "updates result" do
-                  result
-                  send_request
-                  expect(result.reload.result_score).to eq 10
-                end
-
-                # since the file upload process submits the assignment when content items are present
-                it "does not submit assignment" do
-                  submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
-                  attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
-                  send_request
-                  expect(result.submission.reload.attempt).to eq attempt
-                end
-              end
-
               shared_examples_for "a 400" do
                 it "returns bad request" do
                   send_request
                   expect(response).to be_bad_request
                 end
 
-                it_behaves_like "no updates are made with FF on"
-                it_behaves_like "updates are made with FF off"
+                it_behaves_like "no updates are made"
               end
 
               shared_examples_for "a 500" do
@@ -801,8 +756,7 @@ module Lti::IMS
                   expect(response).to be_server_error
                 end
 
-                it_behaves_like "no updates are made with FF on"
-                it_behaves_like "updates are made with FF off"
+                it_behaves_like "no updates are made"
               end
 
               context "when InstFS is unreachable" do
@@ -834,63 +788,31 @@ module Lti::IMS
               end
 
               context "when file upload url times out" do
-                context "and FF is on" do
+                context "and InstFS responds with a 502" do
                   before do
-                    Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
+                    allow(CanvasHttp).to receive(:post).and_return(
+                      double(class: Net::HTTPBadRequest, code: 502, body: {})
+                    )
                   end
 
-                  context "and InstFS responds with a 502" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 502, body: {})
-                      )
-                    end
-
-                    it "returns 504 and specific error message" do
-                      send_request
-                      expect(response).to have_http_status :gateway_timeout
-                      expect(response.body).to include("file url timed out")
-                    end
-                  end
-
-                  context "and InstFS responds with a 400" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
-                      )
-                    end
-
-                    it "returns 504 and specific error message" do
-                      send_request
-                      expect(response).to have_http_status :gateway_timeout
-                      expect(response.body).to include("file url timed out")
-                    end
+                  it "returns 504 and specific error message" do
+                    send_request
+                    expect(response).to have_http_status :gateway_timeout
+                    expect(response.body).to include("file url timed out")
                   end
                 end
 
-                context "and FF is off" do
+                context "and InstFS responds with a 400" do
                   before do
-                    Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
+                    allow(CanvasHttp).to receive(:post).and_return(
+                      double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                    )
                   end
 
-                  context "and InstFS responds with a 502" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 502, body: {})
-                      )
-                    end
-
-                    it_behaves_like "a 500"
-                  end
-
-                  context "and InstFS responds with a 400" do
-                    before do
-                      allow(CanvasHttp).to receive(:post).and_return(
-                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
-                      )
-                    end
-
-                    it_behaves_like "a 400"
+                  it "returns 504 and specific error message" do
+                    send_request
+                    expect(response).to have_http_status :gateway_timeout
+                    expect(response.body).to include("file url timed out")
                   end
                 end
               end
@@ -1219,7 +1141,7 @@ module Lti::IMS
         it_behaves_like "a successful scores request"
       end
 
-      context "when activityProdress is set to Initialized" do
+      context "when activityProgress is set to Initialized" do
         let(:params_overrides) { super().merge(activityProgress: "Initialized") }
 
         shared_examples_for "an unsubmitted submission" do
@@ -1231,14 +1153,6 @@ module Lti::IMS
         end
 
         it_behaves_like "an unsubmitted submission"
-
-        context "ags_scores_multiple_files FF is on" do
-          before do
-            Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
-          end
-
-          it_behaves_like "an unsubmitted submission"
-        end
       end
 
       context "when user_id is a fake student in course" do
