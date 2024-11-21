@@ -236,6 +236,11 @@ describe AuthenticationProvider::OpenIDConnect do
         expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
       end
 
+      it "validates a multi-valued audience" do
+        id_token = Canvas::Security.create_jwt(base_payload.merge(aud: ["def", "abc"]), nil, subject.client_secret)
+        expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
+      end
+
       def self.bad_token_spec(description, payload)
         it "validates #{description}" do
           id_token = Canvas::Security.create_jwt(payload, nil, subject.client_secret)
