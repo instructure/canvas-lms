@@ -65,14 +65,14 @@ module CanvasCache
     end
 
     module TaggedRingConfig
-      def initialize(*, ring: nil, **)
-        super(*, **)
+      def initialize(*, **kwargs)
+        @ring_tag = kwargs.delete(:_ring_tag)
 
-        @ring = ring
+        super
       end
 
-      def ring
-        @ring
+      def ring_tag
+        @ring_tag
       end
     end
 
