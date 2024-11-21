@@ -85,6 +85,7 @@ explicit_latex_typesetting:
 
 file_verifiers_for_quiz_links:
   state: allowed_on
+  shadow: true
   display_name: Use file verifier authentication for New Quiz file links
   description: |-
     Links to Canvas files created in New Quizzes will always add file verifiers to allow authentication
