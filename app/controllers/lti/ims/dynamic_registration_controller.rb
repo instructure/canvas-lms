@@ -116,7 +116,9 @@ module Lti
           registration.update!(registration_overlay:)
 
           # also update the DK scopes
-          registration.developer_key.update!(scopes: registration.scopes - registration_overlay["disabledScopes"])
+          if registration_overlay["disabledScopes"].present?
+            registration.developer_key.update!(scopes: registration.scopes - registration_overlay["disabledScopes"])
+          end
 
           data = Schemas::Lti::IMS::RegistrationOverlay.to_lti_overlay(registration_overlay)
 
@@ -126,7 +128,7 @@ module Lti
                                  account: account_context,
                                  data:)
           else
-            overlay.update!(data:)
+            overlay.update!(data:, updated_by: @current_user)
           end
           registration.update_external_tools!
         end

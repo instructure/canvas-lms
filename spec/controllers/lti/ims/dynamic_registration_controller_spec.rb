@@ -539,6 +539,17 @@ describe Lti::IMS::DynamicRegistrationController do
       expect(registration.reload.developer_key.scopes).not_to include("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")
     end
 
+    it "doesn't error if no disabledScopes are included in the request" do
+      user_session(user)
+      put :update_registration_overlay,
+          params: { account_id: Account.default.id,
+                    registration_id: registration.id },
+          body: overlay.except(:disabledScopes).to_json
+      expect(response).to be_successful
+
+      expect(registration.reload.registration_overlay).to eq(overlay.except(:disabledScopes).deep_stringify_keys)
+    end
+
     it "returns a 422 if the request body does not meet the schema" do
       user_session(user)
       put :update_registration_overlay,
@@ -604,15 +615,42 @@ describe Lti::IMS::DynamicRegistrationController do
 
         expect(response).to be_successful
         expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
-        expect(lti_overlay.reload.data).to eq({
-                                                "disabled_placements" => ["course_navigation"],
-                                                "disabled_scopes" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
-                                                "placements" => {
-                                                  "account_navigation" => {
-                                                    "icon_url" => "https://example.com/icon.jpg"
-                                                  }
-                                                }
-                                              })
+        expect(lti_overlay.reload.updated_by).to eq(user)
+        expect(lti_overlay.data).to eq({
+                                         "disabled_placements" => ["course_navigation"],
+                                         "disabled_scopes" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+                                         "placements" => {
+                                           "account_navigation" => {
+                                             "icon_url" => "https://example.com/icon.jpg"
+                                           }
+                                         }
+                                       })
+      end
+
+      # This is rare but does happen, particularly for overlays that were
+      # backfilled from IMS registrations
+      context "the overlay doesn't have a user associated with it" do
+        before do
+          lti_overlay.update_column(:updated_by_id, nil)
+        end
+
+        it "updates the registration and Lti::Overlay model" do
+          user_session(user)
+          put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.to_json
+
+          expect(response).to be_successful
+          expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
+          expect(lti_overlay.reload.updated_by).to eq(user)
+          expect(lti_overlay.data).to eq({
+                                           "disabled_placements" => ["course_navigation"],
+                                           "disabled_scopes" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+                                           "placements" => {
+                                             "account_navigation" => {
+                                               "icon_url" => "https://example.com/icon.jpg"
+                                             }
+                                           }
+                                         })
+        end
       end
     end
   end
