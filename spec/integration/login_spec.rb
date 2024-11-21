@@ -120,7 +120,7 @@ describe "login" do
       redirect_until(cas_redirect_url)
 
       get "/login/cas", params: { ticket: "ST-abcd" }
-      expect(response).to redirect_to(redirect_url)
+      expect(response).to redirect_to(%r{^http://google.com/\?message=})
     end
 
     it "logins case insensitively" do

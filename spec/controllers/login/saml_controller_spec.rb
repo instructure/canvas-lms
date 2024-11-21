@@ -284,7 +284,7 @@ describe Login::SamlController do
     account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, params: { SAMLResponse: "foo" }
-    expect(response).to redirect_to(unknown_user_url)
+    expect(response).to redirect_to(/^#{unknown_user_url}\?message=Canvas/)
     expect(session[:saml_unique_id]).to be_nil
   end
 

@@ -91,10 +91,8 @@ class Login::CasController < ApplicationController
         pseudonym.infer_auth_provider(aac)
         successful_login(user, pseudonym)
       else
-        unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-        logger.warn "Received CAS login for unknown user: #{st.user}, redirecting to: #{unknown_user_url}."
-        flash[:delegated_message] = t "Canvas doesn't have an account for user: %{user}", user: st.user
-        redirect_to unknown_user_url
+        logger.warn "Received CAS login for unknown user: #{st.user}"
+        redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: st.user))
       end
     else
       if debugging
