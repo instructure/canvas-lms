@@ -204,6 +204,7 @@ export type Assignment = Readonly<{
   intra_group_peer_reviews: boolean
   is_quiz_assignment: boolean
   lock_at: null | string
+  has_rubric: null | boolean
   locked_for_user: boolean
   lti_context_id: string
   max_name_length: number

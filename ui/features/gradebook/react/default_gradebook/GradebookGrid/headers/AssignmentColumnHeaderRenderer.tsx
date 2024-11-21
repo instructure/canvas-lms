@@ -123,6 +123,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       postManually: assignment.post_manually,
       published: assignment.published,
       submissionTypes: assignment.submission_types,
+      hasRubric: assignment.has_rubric,
     },
 
     curveGradesAction: gradebook.getCurveGradesAction(assignmentId),

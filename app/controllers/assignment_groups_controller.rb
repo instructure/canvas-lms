@@ -321,7 +321,8 @@ class AssignmentGroupsController < ApplicationController
 
   def assignment_includes
     includes = [:context, :external_tool_tag, { quiz: :context }]
-    includes += [:rubric, :rubric_association] unless assignment_excludes.include?("rubric")
+    includes += [:rubric_association] if !assignment_excludes.include?("rubric") || include_params.include?("has_rubric")
+    includes += [:rubric] unless assignment_excludes.include?("rubric")
     includes << :discussion_topic if include_params.include?("discussion_topic")
     includes << :assignment_overrides if include_overrides?
     includes

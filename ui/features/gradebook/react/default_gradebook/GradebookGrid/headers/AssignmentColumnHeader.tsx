@@ -478,12 +478,12 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           </MenuItem>
         )}
 
-        {this.props.rubricAssessmentImportsExportsEnabled && (
+        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
           <MenuItem onSelect={() => this.selectBulkRubricExport()}>
             {I18n.t('Bulk Download Rubrics')}
           </MenuItem>
         )}
-        {this.props.rubricAssessmentImportsExportsEnabled && (
+        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
           <MenuItem
             onSelect={() => {
               const {toggleRubricAssessmentImportTray} = useStore.getState()
