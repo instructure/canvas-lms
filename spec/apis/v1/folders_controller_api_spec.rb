@@ -139,9 +139,17 @@ describe "Folders API", type: :request do
     end
 
     it "has url to list file and folder listings" do
+      Account.site_admin.disable_feature! :files_a11y_rewrite
       json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(action: "show"), {})
       expect(json["files_url"].ends_with?("/api/v1/folders/#{@root.id}/files")).to be true
       expect(json["folders_url"].ends_with?("/api/v1/folders/#{@root.id}/folders")).to be true
+      expect(json["all_url"]).to be_nil
+    end
+
+    it "has url to list file and folder listings with files_a11y_rewrite" do
+      Account.site_admin.enable_feature! :files_a11y_rewrite
+      json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(action: "show"), {})
+      expect(json["all_url"].ends_with?("/api/v1/folders/#{@root.id}/all")).to be true
     end
 
     it "returns forbidden error if requestor is not permitted to view folder" do

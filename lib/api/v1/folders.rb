@@ -39,6 +39,7 @@ module Api::V1::Folders
         json["restricted_by_master_course"] = true
       end
       json["locked"] = !!folder.locked
+      json["all_url"] = api_v1_list_folders_and_files_url(folder) if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
       json["folders_url"] = api_v1_list_folders_url(folder)
       json["files_url"] = api_v1_list_files_url(folder)
       json["files_count"] = can_view_hidden_files ? folder.attachments.not_deleted.count : folder.attachments.active.count
