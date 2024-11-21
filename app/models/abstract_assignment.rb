@@ -374,12 +374,24 @@ class AbstractAssignment < ActiveRecord::Base
       # we have to save result here because we have to set it as a parent_assignment
       result.save!
       sub_assignments.each do |sub_assignment|
-        new_sa = sub_assignment.duplicate({
-                                            duplicate_wiki_page: false,
-                                            duplicate_discussion_topic: false,
-                                          })
-        new_sa.parent_assignment = result
-        new_sa.save!
+        new_sub_assignment = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: result.discussion_topic,
+          checkpoint_label: sub_assignment.sub_assignment_tag,
+          points_possible: sub_assignment.points_possible,
+          dates: if sub_assignment.due_at.nil?
+                   []
+                 else
+                   [{
+                     type: "everyone",
+                     due_at: sub_assignment.due_at,
+                     lock_at: sub_assignment.lock_at,
+                     unlock_at: sub_assignment.unlock_at
+                   }]
+                 end,
+          replies_required: result.discussion_topic.reply_to_entry_required_count || nil
+        )
+        new_sub_assignment.duplicate_of = sub_assignment
+        new_sub_assignment.save!
       end
     end
 

@@ -221,6 +221,64 @@ describe "discussions index" do
       expect(DiscussionsIndex.discussion(discussion1_title + " Copy")).to be_displayed
     end
 
+    it "duplicates a checkpointed discussion properly" do
+      Account.site_admin.enable_feature! :discussion_checkpoints
+      checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed topic")
+      checkpointed_discussion.assignment.lock_at = 3.days.from_now
+      checkpointed_discussion.assignment.unlock_at = 3.days.ago
+      checkpointed_discussion.assignment.save!
+
+      rtt = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          { type: "everyone", due_at: 2.days.from_now },
+          { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }
+        ],
+        points_possible: 6
+      )
+      rte = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: checkpointed_discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          { type: "everyone", due_at: 3.days.from_now },
+          { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: 10.days.from_now }
+        ],
+        points_possible: 7,
+        replies_required: 2
+      )
+
+      login_and_visit_course(@teacher, @course)
+      DiscussionsIndex.click_duplicate_menu_option(checkpointed_discussion.title)
+
+      dup_discussion = DiscussionTopic.last
+      expect(DiscussionsIndex.discussion(checkpointed_discussion.title)).to be_displayed
+      expect(DiscussionsIndex.discussion(checkpointed_discussion.title + " Copy")).to be_displayed
+      expect(checkpointed_discussion.reload.workflow_state).to eq "active"
+      expect(checkpointed_discussion).not_to eq dup_discussion
+      expect(dup_discussion.title).to eq checkpointed_discussion.title + " Copy"
+      expect(dup_discussion.workflow_state).to eq "unpublished"
+      expect(dup_discussion.reply_to_entry_required_count).to eq checkpointed_discussion.reply_to_entry_required_count
+      expect(dup_discussion.assignment.title).to eq checkpointed_discussion.assignment.title + " Copy"
+      expect(dup_discussion.assignment.workflow_state).to eq "unpublished"
+
+      dup_rtt = dup_discussion.reply_to_topic_checkpoint
+      expect(dup_rtt.title).to eq checkpointed_discussion.title + " Copy"
+      expect(dup_rtt.points_possible).to eq rtt.points_possible
+      expect(dup_rtt.due_at).to eq rtt.due_at
+      expect(dup_rtt.lock_at).to eq rtt.lock_at
+      expect(dup_rtt.unlock_at).to eq rtt.unlock_at
+      expect(dup_rtt.assignment_overrides).to be_empty
+
+      dup_rte = dup_discussion.reply_to_entry_checkpoint
+      expect(dup_rte.title).to eq checkpointed_discussion.title + " Copy"
+      expect(dup_rte.points_possible).to eq rte.points_possible
+      expect(dup_rte.due_at).to eq rte.due_at
+      expect(dup_rte.lock_at).to eq rte.lock_at
+      expect(dup_rte.unlock_at).to eq rte.unlock_at
+      expect(dup_rte.assignment_overrides).to be_empty
+    end
+
     it "pill on announcement displays correct number of unread replies", priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
