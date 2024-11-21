@@ -368,7 +368,7 @@ class AuthenticationProvider
             raise OAuthValidationError, "Missing claim#{"s" if missing_claims.length > 1} #{missing_claims.join(", ")}"
           end
 
-          unless id_token["aud"] == client_id
+          unless Array(id_token["aud"]).include?(client_id)
             raise OAuthValidationError, "Invalid JWT audience: #{id_token["aud"].inspect}"
           end
 
