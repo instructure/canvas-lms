@@ -840,6 +840,12 @@ CanvasRails::Application.routes.draw do
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
   get "login/canvas/forgot-password", to: "login/canvas#new"
   post "login/canvas" => "login/canvas#create"
+  scope "login/canvas/register", as: "register" do
+    get "/", to: "login/canvas#new", as: :landing
+    get "/student", to: "login/canvas#new", as: :student
+    get "/parent", to: "login/canvas#new", as: :parent
+    get "/teacher", to: "login/canvas#new", as: :teacher
+  end
 
   get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
   post "login/email_verify" => "login/email_verify#verify", :as => :login_email_verify

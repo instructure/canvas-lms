@@ -16,6 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './api'
-export * from './data'
-export * from './register'
+import React from 'react'
+import RegistrationRoutesMiddleware from '../RegistrationRoutesMiddleware'
+import {MemoryRouter} from 'react-router-dom'
+import {render} from '@testing-library/react'
+
+jest.mock('../../context/NewLoginContext', () => ({
+  useNewLogin: jest.fn(() => ({
+    selfRegistrationType: 'all',
+  })),
+}))
+
+describe('RegistrationRoutesMiddleware', () => {
+  it('mounts without crashing', () => {
+    render(
+      <MemoryRouter initialEntries={['/login/canvas/register/landing']}>
+        <RegistrationRoutesMiddleware />
+      </MemoryRouter>
+    )
+  })
+})

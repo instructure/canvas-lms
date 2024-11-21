@@ -578,6 +578,12 @@ class Account < ActiveRecord::Base
     canvas_authentication_provider.try(:enable_captcha)
   end
 
+  def recaptcha_key
+    return nil unless root_account? && self_registration_captcha?
+
+    DynamicSettings.find(tree: "private")["recaptcha_client_key", failsafe: nil]
+  end
+
   def self_registration_allowed_for?(type)
     return false unless self_registration?
     return false if self_registration_type != "all" && type != self_registration_type

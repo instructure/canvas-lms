@@ -99,13 +99,7 @@ const SSOButtons = () => {
                 transform: 'translateY(-50%)',
               }}
             >
-              <Img
-                src={iconSrc}
-                alt={displayName}
-                width="1.125rem"
-                height="1.125rem"
-                display="block"
-              />
+              <Img display="block" height="1.125rem" src={iconSrc} width="1.125rem" />
             </View>
           )}
           {I18n.t('Log in with %{displayName}', {displayName})}

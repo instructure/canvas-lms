@@ -35,22 +35,20 @@ const InstructureLogo = () => {
   }
 
   return (
-    <View as="div" textAlign="center">
-      <Link
-        href="https://instructure.com"
-        target="_blank"
-        aria-label={I18n.t('By Instructure')}
-        onClick={handleClick}
-      >
-        <Img
-          width="7.9375rem"
-          height="1.125rem"
-          constrain="contain"
-          src={require('../assets/images/instructure-logo.svg')}
-          alt=""
-        />
-      </Link>
-    </View>
+    <Link
+      aria-label={I18n.t('By Instructure')}
+      href="https://instructure.com"
+      onClick={handleClick}
+      target="_blank"
+    >
+      <Img
+        constrain="contain"
+        display="block"
+        height="1.125rem"
+        src={require('../assets/images/instructure.svg')}
+        width="7.9375rem"
+      />
+    </Link>
   )
 }
 

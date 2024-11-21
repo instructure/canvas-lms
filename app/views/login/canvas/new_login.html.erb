@@ -1,19 +1,19 @@
 <%
-  # Copyright (C) 2024 - present Instructure, Inc.
-  #
-  # This file is part of Canvas.
-  #
-  # Canvas is free software: you can redistribute it and/or modify it under
-  # the terms of the GNU Affero General Public License as published by the Free
-  # Software Foundation, version 3 of the License.
-  #
-  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-  # details.
-  #
-  # You should have received a copy of the GNU Affero General Public License along
-  # with this program. If not, see <http://www.gnu.org/licenses/>.
+     # Copyright (C) 2024 - present Instructure, Inc.
+     #
+     # This file is part of Canvas.
+     #
+     # Canvas is free software: you can redistribute it and/or modify it under
+     # the terms of the GNU Affero General Public License as published by the Free
+     # Software Foundation, version 3 of the License.
+     #
+     # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+     # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+     # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+     # details.
+     #
+     # You should have received a copy of the GNU Affero General Public License along
+     # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
 <%
@@ -40,6 +40,28 @@
 
      # theme editor preview mode boolean
      is_preview_mode = params[:previewing_from_themeeditor].to_s.downcase == "true"
+
+     # self-registration (none, all, observer)
+     allowed_self_registration_type = @domain_root_account.self_registration_type if %w[all observer].include?(@domain_root_account.self_registration_type)
+
+     # captcha
+     recaptcha_key = @domain_root_account.recaptcha_key
+
+     # free for teacher custom registration url
+     fft_registration_url = @domain_root_account.settings[:fft_registration_url]
+
+     # terms required
+     terms_required = @domain_root_account.terms_required?
+
+     # terms and privacy policy URLs
+     tou_url = terms_of_use_url
+     pp_url = privacy_policy_url
+
+     # require email
+     require_email = @domain_root_account.require_email_for_registration?
+
+     # json-encoded object of password policy rules
+     password_policy_data = @domain_root_account&.password_policy.to_json
 %>
 
 <div id="new_login_data"
@@ -51,4 +73,12 @@
      <%= "data-body-bg-color='#{body_bg_color}'".html_safe if body_bg_color.present? %>
      <%= "data-body-bg-image='#{body_bg_image}'".html_safe if body_bg_image.present? %>
      <%= "data-is-preview-mode='true'".html_safe if is_preview_mode %>
+     <%= "data-self-registration-type='#{allowed_self_registration_type}'".html_safe if allowed_self_registration_type.present? %>
+     <%= "data-recaptcha-key='#{recaptcha_key}'".html_safe if recaptcha_key.present? %>
+     <%= "data-fft-registration-url='#{fft_registration_url}'".html_safe if fft_registration_url.present? %>
+     <%= "data-terms-required='true'".html_safe if terms_required %>
+     <%= "data-terms-of-use-url='#{tou_url}'".html_safe if tou_url.present? %>
+     <%= "data-privacy-policy-url='#{pp_url}'".html_safe if pp_url.present? %>
+     <%= "data-require-email='true'".html_safe if require_email %>
+     <%= "data-password-policy=#{raw password_policy_data}" if password_policy_data.present? %>
 ></div>

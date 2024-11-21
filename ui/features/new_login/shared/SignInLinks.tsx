@@ -20,6 +20,7 @@ import React from 'react'
 import type {ViewOwnProps} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
+import {ROUTES} from './constants'
 import {useMatch, useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -28,14 +29,12 @@ const I18n = useI18nScope('new_login')
 
 const SignInLinks = () => {
   const navigate = useNavigate()
-  const isSignIn = useMatch('/login/canvas')
-  const isForgotPassword = useMatch('/login/canvas/forgot-password')
-
   const {isPreviewMode, isUiActionPending} = useNewLogin()
+  const isSignIn = useMatch(ROUTES.SIGN_IN)
+  const isForgotPassword = useMatch(ROUTES.FORGOT_PASSWORD)
 
   const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
-
     if (!(isPreviewMode || isUiActionPending)) {
       navigate(path)
     }
@@ -45,20 +44,13 @@ const SignInLinks = () => {
     <Flex direction="column" gap="small">
       {isSignIn && (
         <Flex.Item overflowX="visible" overflowY="visible">
-          <Link
-            href="/login/canvas/forgot-password"
-            onClick={handleNavigate('/login/canvas/forgot-password')}
-          >
-            {I18n.t('Forgot password?')}
-          </Link>
+          <Link onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}>{I18n.t('Forgot password?')}</Link>
         </Flex.Item>
       )}
 
       {isForgotPassword && (
         <Flex.Item overflowX="visible" overflowY="visible">
-          <Link href="/login/canvas" onClick={handleNavigate('/login/canvas')}>
-            {I18n.t('Sign in')}
-          </Link>
+          <Link onClick={handleNavigate(ROUTES.SIGN_IN)}>{I18n.t('Sign in')}</Link>
         </Flex.Item>
       )}
     </Flex>

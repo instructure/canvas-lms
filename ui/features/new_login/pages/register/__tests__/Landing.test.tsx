@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import Landing from '../Landing'
 import React from 'react'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginProvider} from '../../../context/NewLoginContext'
 import {render} from '@testing-library/react'
-import {ContentLayout} from '..'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 
-describe('ContentLayout', () => {
+describe('Landing', () => {
   it('mounts without crashing', () => {
     render(
-      <NewLoginProvider>
-        <ContentLayout>Test content</ContentLayout>
-      </NewLoginProvider>
+      <MemoryRouter>
+        <NewLoginProvider>
+          <Landing />
+        </NewLoginProvider>
+      </MemoryRouter>
     )
   })
 })

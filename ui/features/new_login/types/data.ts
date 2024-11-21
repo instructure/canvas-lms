@@ -16,6 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './api'
-export * from './data'
-export * from './register'
+export interface AuthProvider {
+  id: number
+  auth_type: string
+  display_name: string
+}
+
+export enum SelfRegistrationType {
+  ALL = 'all',
+  OBSERVER = 'observer',
+}
