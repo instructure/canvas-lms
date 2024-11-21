@@ -87,7 +87,7 @@ describe "admin_tools" do
     expect(cols[3].text).to eq event_type
 
     fj("#courseLoggingSearchResults table tbody tr:last td:last a").click
-    expect(fj(".ui-dialog dl dd:first").text).to eq event.id
+    expect(f("[data-testid='event-id'").text).to eq event.id
   end
 
   before do
@@ -528,10 +528,9 @@ describe "admin_tools" do
       @event = Auditors::Course.record_created(@course, @teacher, course.changes)
 
       show_event_details("Created")
-      cols = ffj(".ui-dialog table:first tbody tr:first td")
-      expect(cols.size).to eq 2
-      expect(cols[0].text).to eq "Name"
-      expect(cols[1].text).to eq @course.name
+      first_row = fj("[aria-label='Event Details'] tbody tr:first")
+      expect(first_row.find_element(:css, "th").text).to eq "Name"
+      expect(first_row.find_element(:css, "td").text).to eq @course.name
     end
 
     it "shows updated event details" do
@@ -540,15 +539,14 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       show_event_details("Updated", old_name)
-      items = ffj(".ui-dialog dl > dd")
-      expect(items[4].text).to eq "Manual"
-      expect(items[5].text).to eq "Updated"
+      expect(f('[data-testid="event-source"]').text).to eq "Manual"
+      expect(f('[data-testid="event-type"]').text).to eq "Updated"
 
-      cols = ffj(".ui-dialog table:first tbody tr:first td")
-      expect(cols.size).to eq 3
-      expect(cols[0].text).to eq "Name"
-      expect(cols[1].text).to eq old_name
-      expect(cols[2].text).to eq @course.name
+      first_row_header = fj("[aria-label='Event Details'] tbody tr:first th")
+      first_row_data = ffj("[aria-label='Event Details'] tbody tr:first td")
+      expect(first_row_header.text).to eq "Name"
+      expect(first_row_data[0].text).to eq old_name
+      expect(first_row_data[1].text).to eq @course.name
     end
 
     it "shows sis batch id if source is sis" do
@@ -559,9 +557,8 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes, source: :sis, sis_batch:)
 
       show_event_details("Updated", old_name)
-      items = ffj(".ui-dialog dl > dd")
-      expect(items[4].text).to eq "SIS"
-      expect(items[5].text).to eq sis_batch.id.to_s
+      expect(f('[data-testid="event-source"]').text).to eq "SIS"
+      expect(f('[data-testid="event-sis-batch"]').text).to eq sis_batch.id.to_s
     end
 
     it "shows concluded event details" do
@@ -594,7 +591,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied To", @course.name, @to_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @copied_course.name
+      expect(f('[data-testid="event-copied-to"]').text).to eq @copied_course.name
     end
 
     it "shows copied_from event details" do
@@ -602,7 +599,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
       show_event_details("Copied From", @copied_course.name, @from_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @course.name
+      expect(f('[data-testid="event-copied-from"]').text).to eq @course.name
     end
 
     it "shows reset_to event details" do
@@ -610,7 +607,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset To", @course.name, @to_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @reset_course.name
+      expect(f('[data-testid="event-reset-to"]').text).to eq @reset_course.name
     end
 
     it "shows reset_from event details" do
@@ -618,7 +615,7 @@ describe "admin_tools" do
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
       show_event_details("Reset From", @reset_course.name, @from_event)
-      expect(fj(".ui-dialog dl dd:last").text).to eq @course.name
+      expect(f('[data-testid="event-reset-from"]').text).to eq @course.name
     end
   end
 

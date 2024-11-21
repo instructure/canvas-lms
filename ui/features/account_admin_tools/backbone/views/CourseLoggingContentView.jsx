@@ -15,6 +15,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
@@ -25,9 +27,8 @@ import CourseLoggingItemView from './CourseLoggingItemView'
 import CourseLoggingCollection from '../collections/CourseLoggingCollection'
 import template from '../../jst/courseLoggingContent.handlebars'
 import courseLoggingResultsTemplate from '../../jst/courseLoggingResults.handlebars'
-import detailsTemplate from '../../jst/courseLoggingDetails.handlebars'
-import 'jqueryui/dialog'
 import {extend} from '@canvas/backbone/utils'
+import CourseActivityDetails from '../../react/CourseActivityDetails'
 
 extend(CourseLoggingContentView, Backbone.View)
 
@@ -66,7 +67,6 @@ Object.assign(CourseLoggingContentView.prototype, {
   els: {'#courseLoggingForm': '$form'},
 
   template,
-  detailsTemplate,
 
   events: {
     'submit #courseLoggingForm': 'onSubmit',
@@ -100,16 +100,10 @@ Object.assign(CourseLoggingContentView.prototype, {
       return
     }
 
-    this.dialog = $('<div class="use-css-transitions-for-show-hide" style="padding:0;"/>')
-    this.dialog.html(this.detailsTemplate(model.present()))
-    const config = {
-      title: 'Event Details',
-      width: 600,
-      resizable: true,
-      modal: true,
-      zIndex: 1000,
-    }
-    return this.dialog.dialog(config)
+    const mountPoint = document.getElementById('course_activity_details_mount_point')
+    const root = createRoot(mountPoint)
+
+    root.render(<CourseActivityDetails {...model.present()} onClose={() => root.unmount()} />)
   },
 
   updateCollection(json) {
