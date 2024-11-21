@@ -139,6 +139,7 @@ function DiscussionTopicForm({
   const isUnpublishedAnnouncement =
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const published = currentDiscussionTopic?.published ?? false
+  const shouldMasteryPathsBeVisible = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
 
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
@@ -176,6 +177,16 @@ function DiscussionTopicForm({
   const [postToValidationMessages, setPostToValidationMessages] = useState([])
 
   const [rceContent, setRceContent] = useState(currentDiscussionTopic?.message || '')
+
+  const isRceContentChanged = () => {
+    const originalContent = new DOMParser().parseFromString(
+      currentDiscussionTopic?.message || '',
+      'text/html'
+    ).body.innerHTML
+    const newContent = new DOMParser().parseFromString(rceContent, 'text/html').body.innerHTML
+
+    return originalContent !== newContent
+  }
 
   let sectionsDefault = []
   if (
@@ -429,6 +440,13 @@ function DiscussionTopicForm({
     )
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
 
+  useEffect(() => {
+    if (isCheckpoints) {
+      setIsGroupDiscussion(false)
+      setGroupCategoryId(null)
+    }
+  }, [isCheckpoints])
+
   addToStudentToDoDateRef?.setAttribute('data-testid', 'add-to-student-to-do-date')
   addToStudentToDoTimeRef?.setAttribute('data-testid', 'add-to-student-to-do-time')
 
@@ -456,16 +474,23 @@ function DiscussionTopicForm({
     discussionAnonymousState,
     isEditing,
     isStudent,
-    published
+    published,
+    isCheckpoints
   )
 
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
 
   const createSubmitPayload = shouldPublish => {
+    let message = currentDiscussionTopic?.message
+
+    if (isRceContentChanged()) {
+      message = rceContent
+    }
+
     const payload = {
       // Static payload properties
       title,
-      message: rceContent,
+      message,
       podcastEnabled: enablePodcastFeed,
       discussionType: isThreaded ? 'threaded' : 'not_threaded',
       podcastHasStudentPosts: includeRepliesInFeed,
@@ -815,15 +840,22 @@ function DiscussionTopicForm({
     shouldShowAssignToForUngradedDiscussions,
   ])
 
-  return (
-    <>
+  const renderDiscussionTopicFormViewSelector = () => {
+    return (
       <DiscussionTopicFormViewSelector
         selectedView={selectedView}
         setSelectedView={setSelectedView}
         breakpoints={breakpoints}
-        shouldMasteryPathsBeVisible={ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement}
+        shouldMasteryPathsBeVisible={shouldMasteryPathsBeVisible}
         shouldMasteryPathsBeEnabled={isGraded}
       />
+    )
+  }
+
+  return (
+    <>
+      {((shouldMasteryPathsBeVisible && instUINavEnabled()) || !instUINavEnabled()) &&
+        renderDiscussionTopicFormViewSelector()}
       <View
         margin={breakpoints.mobileOnly ? 'mediumSmall 0 0 0' : '0'}
         display={selectedView === Views.Details ? 'block' : 'none'}
@@ -968,7 +1000,7 @@ function DiscussionTopicForm({
               />
             )}
 
-            {!isGroupContext && !isAnnouncement && (
+            {!isGroupContext && (
               <Checkbox
                 data-testid="require-initial-post-checkbox"
                 label={I18n.t(
@@ -978,6 +1010,7 @@ function DiscussionTopicForm({
                 inline={true}
                 checked={requireInitialPost}
                 onChange={() => setRequireInitialPost(!requireInitialPost)}
+                disabled={isAnnouncement && locked}
               />
             )}
 

@@ -188,7 +188,6 @@ describe "Common Cartridge exporting" do
       expect(doc.at_css("learningOutcomeGroup[identifier=#{mig_id(@log2)}]")).not_to be_nil
       expect(doc.at_css("learningOutcomeGroup[identifier=#{mig_id(@log3)}]")).to be_nil
       expect(doc.at_css("learningOutcome[identifier=#{mig_id(@lo)}]")).not_to be_nil
-      expect(doc.at_css("learningOutcome[identifier=#{mig_id(@lo2)}]")).to be_nil
       expect(ccc_schema.validate(doc)).to be_empty
 
       doc = Nokogiri::XML.parse(@zip_file.read("course_settings/assignment_groups.xml"))

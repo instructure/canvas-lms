@@ -169,8 +169,9 @@ class Group < ActiveRecord::Base
 
   def allow_self_signup?(user)
     group_category &&
-      (group_category.unrestricted_self_signup? ||
-        (group_category.restricted_self_signup? && has_common_section_with_user?(user)))
+      (!group_category.past_self_signup_end_at? &&
+        (group_category.unrestricted_self_signup? ||
+          (group_category.restricted_self_signup? && has_common_section_with_user?(user))))
   end
 
   def full?
@@ -586,57 +587,14 @@ class Group < ActiveRecord::Base
       given { |user, session| grants_right?(user, session, :participate_as_student) && context.allow_student_organized_groups }
       can :create
 
-      #################### Begin legacy permission block #########################
-
       given do |user, session|
-        !context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-          context.grants_right?(user, session, :manage_groups)
-      end
-      can %i[
-        create
-        create_collaborations
-        delete
-        manage
-        manage_admin_users
-        allow_course_admin_actions
-        manage_calendar
-        manage_content
-        manage_course_content_add
-        manage_course_content_edit
-        manage_course_content_delete
-        manage_files_add
-        manage_files_edit
-        manage_files_delete
-        manage_students
-        manage_wiki_create
-        manage_wiki_delete
-        manage_wiki_update
-        moderate_forum
-        post_to_forum
-        create_forum
-        read
-        read_forum
-        read_announcements
-        read_roster
-        send_messages
-        send_messages_all
-        update
-        view_unpublished_items
-        read_files
-      ]
-
-      ##################### End legacy permission block ##########################
-
-      given do |user, session|
-        context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-          context.grants_right?(user, session, :manage_groups_add)
+        context.grants_right?(user, session, :manage_groups_add)
       end
       can %i[read read_files create]
 
       # permissions to update a group and manage actions within the context of a group
       given do |user, session|
-        context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-          context.grants_right?(user, session, :manage_groups_manage)
+        context.grants_right?(user, session, :manage_groups_manage)
       end
       can %i[
         read
@@ -670,8 +628,7 @@ class Group < ActiveRecord::Base
       ]
 
       given do |user, session|
-        context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
-          context.grants_right?(user, session, :manage_groups_delete)
+        context.grants_right?(user, session, :manage_groups_delete)
       end
       can %i[read read_files delete]
 

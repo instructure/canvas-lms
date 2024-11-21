@@ -34,7 +34,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import QuantitativeDataOptions from './react/components/QuantitativeDataOptions'
 import CourseDefaultDueTime from './react/components/CourseDefaultDueTime'
-import {CourseApps} from './react/components/CourseApps'
 
 const I18n = useI18nScope('course_settings')
 
@@ -44,6 +43,7 @@ const CourseAvailabilityOptions = React.lazy(() =>
   import('./react/components/CourseAvailabilityOptions')
 )
 const Integrations = React.lazy(() => import('@canvas/integrations/react/courses/Integrations'))
+const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
 
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const Error = () => (
@@ -121,11 +121,13 @@ ready(() => {
   if (availabilityOptionsContainer) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <CourseAvailabilityOptions
-          canManage={ENV.PERMISSIONS.edit_course_availability}
-          viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
-          viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
-        />
+        <ErrorBoundary errorComponent={<Error />}>
+          <CourseAvailabilityOptions
+            canManage={ENV.PERMISSIONS.edit_course_availability}
+            viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
+            viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
+          />
+        </ErrorBoundary>
       </Suspense>,
       availabilityOptionsContainer
     )
@@ -167,7 +169,9 @@ ready(() => {
   if (integrationsContainer) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <Integrations />
+        <ErrorBoundary errorComponent={<Error />}>
+          <Integrations />
+        </ErrorBoundary>
       </Suspense>,
       integrationsContainer
     )
@@ -177,7 +181,9 @@ ready(() => {
   if (appsMountpoint) {
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
-        <CourseApps />
+        <ErrorBoundary errorComponent={<Error />}>
+          <CourseApps />
+        </ErrorBoundary>
       </Suspense>,
       appsMountpoint
     )

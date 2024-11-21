@@ -237,7 +237,7 @@
   min-width: 2rem;
   &.page-block {
     background-color: transparent;
-    padding: 8px;
+    padding: 0px;
     min-height: 10rem;
     margin: 3px;
   }
@@ -441,6 +441,27 @@
   align-items: center;
 }
 
+.rce-text-block {
+  width: 100%;
+  height: auto;
+  overflow: auto;
+  min-height: 1.2rem;
+  line-height: 1.2rem;
+  text-wrap: balance;
+  p:first-child {
+    margin-top: 0;
+  }
+  p:last-child {
+    margin-bottom: 0;
+  }
+  &::before {
+    /* I'm baffled by why the ::before placeholder isn't centered for this block and needs this */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2.4rem;
+  }
+}
 
 .text-block {
   min-width: 10rem;
@@ -460,6 +481,10 @@
   p:last-child {
     margin-bottom: 0;
   }
+}
+
+.tabs-block {
+  width: 100%
 }
 
 .heading-block {
@@ -571,7 +596,7 @@
 
 }
 
-.image-block {
+.image-block, .media-block {
   max-width: calc(100% - 4px);
   max-height: calc(100% - 4px);
   overflow: hidden;

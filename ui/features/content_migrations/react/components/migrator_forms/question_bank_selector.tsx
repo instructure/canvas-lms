@@ -22,6 +22,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import type {QuestionBankSettings} from '../types'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -31,11 +32,6 @@ type QuestionBank = {
     id: number
     title: string
   }
-}
-
-export type QuestionBankSettings = {
-  question_bank_id?: string | number
-  question_bank_name?: string
 }
 
 type QuestionBankSelectorProps = {

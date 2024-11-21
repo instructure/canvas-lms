@@ -134,6 +134,7 @@ describe "Rubric form page" do
     RubricsIndex.create_rubric_button.click
     RubricsForm.rubric_title_input.send_keys("Rubric 4")
     RubricsForm.cancel_rubric_button.click
+    RubricsForm.warning_exit_rubric_button.click
 
     expect(RubricsIndex.saved_rubrics_panel).not_to include_text("Rubric 4")
   end
@@ -296,6 +297,7 @@ describe "Rubric form page" do
     RubricsIndex.edit_rubric_button.click
     RubricsForm.add_criterion_button.click
     RubricsForm.cancel_criterion_button.click
+    RubricsForm.warning_exit_rubric_button.click
     RubricsForm.save_rubric_button.click
 
     expect(RubricsIndex.rubric_criterion_count(0)).to include_text("2")

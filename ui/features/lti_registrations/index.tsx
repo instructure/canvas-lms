@@ -21,9 +21,9 @@ import {createRoot} from 'react-dom/client'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
-import {DiscoverRoute} from './discover/components'
+import {DiscoverRoute} from './discover'
 import {ManageRoutes} from './manage'
-import ProductDetail from './discover/components/ProductDetail/ProductDetail'
+import ProductDetail from '../../shared/lti-apps/components/ProductDetail/ProductDetail'
 import {ZAccountId} from './manage/model/AccountId'
 import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
 import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
@@ -45,12 +45,8 @@ import {
 } from './manage/api/registrations'
 import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
-
-const getBasename = () => {
-  const path = window.location.pathname
-  const parts = path.split('/')
-  return parts.slice(0, parts.indexOf('apps') + 1).join('/')
-}
+import {openDynamicRegistrationWizard} from './manage/registration_wizard/RegistrationWizardModalState'
+import {getBasename} from '@canvas/lti-apps/utils/basename'
 
 const queryClient = new QueryClient()
 
@@ -67,12 +63,12 @@ const router = createBrowserRouter(
     },
     {
       path: 'product_detail/:id',
-      element: <ProductDetail />,
+      element: <ProductDetail onConfigure={openDynamicRegistrationWizard} />,
     },
   ],
 
   {
-    basename: getBasename(),
+    basename: getBasename('apps'),
   }
 )
 

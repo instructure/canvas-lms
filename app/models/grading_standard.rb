@@ -74,6 +74,7 @@ class GradingStandard < ActiveRecord::Base
 
   scope :active, -> { where("grading_standards.workflow_state = 'active'") }
   scope :archived, -> { where("grading_standards.workflow_state = 'archived'") }
+  scope :non_deleted, -> { where.not(workflow_state: "deleted") }
   scope :sorted, -> { order(Arel.sql("usage_count >= 3 DESC")).order(nulls(:last, best_unicode_collation_key("title"))) }
   scope :for_context, lambda { |context|
     context_codes = [context.asset_string]
@@ -104,25 +105,35 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def self.for_assignment(assignment, include_archived: false)
-    standards = include_archived ? GradingStandard.for_context(assignment.context) : GradingStandard.active.for_context(assignment.context)
-    standards = GradingStandard.where(id: standards)
-    course_scheme = assignment.context.grading_standard
-    standards = standards.union(GradingStandard.where(id: course_scheme)) if course_scheme&.archived?
-    if assignment.grading_standard&.archived?
-      standards = standards.union(GradingStandard.where(id: assignment.grading_standard))
+    standards = include_archived ? GradingStandard.non_deleted : GradingStandard.active
+    standards = standards.for_context(assignment.context)
+
+    ids = standards.pluck(:id)
+
+    context_grading_standard = assignment.context.grading_standard
+    if context_grading_standard&.archived?
+      ids << context_grading_standard.id
     end
-    standards
+
+    if assignment.grading_standard&.archived?
+      ids << assignment.grading_standard_id
+    end
+
+    GradingStandard.where(id: ids)
   end
 
   def self.for_course(course, include_archived: false)
-    standards = include_archived ? GradingStandard.for_context(course) : GradingStandard.active.for_context(course)
-    standards = GradingStandard.where(id: standards)
-    standards = standards.union(GradingStandard.where(id: course.grading_standard)) if course.grading_standard&.archived?
-    standards
+    standards = include_archived ? GradingStandard.non_deleted : GradingStandard.active
+    standards = standards.for_context(course)
+
+    return standards unless course.grading_standard&.archived?
+
+    ids = standards.pluck(:id) + [course.grading_standard_id]
+    GradingStandard.where(id: ids)
   end
 
   def self.for_account(account, include_parent_accounts: true)
-    scope = GradingStandard.active.union(GradingStandard.archived)
+    scope = GradingStandard.non_deleted
     return scope.for_context(account) if include_parent_accounts
 
     scope.where(context_type: Account.to_s, context_id: account.id)

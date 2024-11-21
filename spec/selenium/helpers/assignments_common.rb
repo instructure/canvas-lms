@@ -23,6 +23,16 @@ require_relative "groups_common"
 module AssignmentsCommon
   include GroupsCommon
 
+  def clear_input_field(input_el)
+    input_el.click
+    driver.action
+          .key_down(:control)
+          .send_keys("a")
+          .send_keys(:delete)
+          .key_up(:control)
+          .perform
+  end
+
   def build_assignment_with_type(type, opts = {})
     if opts[:assignment_group_id]
       assignment_group_id = opts[:assignment_group_id]
@@ -32,26 +42,37 @@ module AssignmentsCommon
     end
 
     f("#assignment_group_#{assignment_group_id} .add_assignment").click
-    click_option(f("#ag_#{assignment_group_id}_assignment_type"), type)
+    click_option(f("[data-testid='assignment-type-select']"), type)
 
     if opts[:name]
-      f("#ag_#{assignment_group_id}_assignment_name").clear
-      f("#ag_#{assignment_group_id}_assignment_name").send_keys opts[:name]
+      name_input = f("[data-testid='assignment-name-input']")
+      clear_input_field(name_input)
+      name_input.send_keys opts[:name]
     end
     if opts[:points]
-      f("#ag_#{assignment_group_id}_assignment_points").clear
-      f("#ag_#{assignment_group_id}_assignment_points").send_keys opts[:points]
+      points_input = f("[data-testid='points-input']")
+      clear_input_field(points_input)
+      f("[data-testid='points-input']").send_keys opts[:points]
     end
     if opts[:due_at]
-      f("#ag_#{assignment_group_id}_assignment_due_at").clear
-      f("#ag_#{assignment_group_id}_assignment_due_at").send_keys opts[:due_at]
+      date_input = f("#Selectable_1")
+      clear_input_field(date_input)
+      date_input.send_keys opts[:due_at]
+      driver.action.send_keys(:enter).perform
+
+      if opts[:due_time]
+        time_input = f("#Select_1")
+        clear_input_field(time_input)
+        time_input.send_keys opts[:due_time]
+        driver.action.send_keys(:enter).perform
+      end
     end
     if opts[:submit]
-      fj(".create_assignment:visible").click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
     end
     if opts[:more_options]
-      fj(".more_options:visible").click
+      f("[data-testid='more-options-button']").click
       wait_for_ajaximations
     end
   end
@@ -61,23 +82,34 @@ module AssignmentsCommon
     f("#assignment_#{assignment_id} .edit_assignment").click
 
     if opts[:name]
-      f("#assign_#{assignment_id}_assignment_name").clear
-      f("#assign_#{assignment_id}_assignment_name").send_keys opts[:name]
+      name_input = f("[data-testid='assignment-name-input']")
+      clear_input_field(name_input)
+      name_input.send_keys opts[:name]
     end
     if opts[:points]
-      f("#assign_#{assignment_id}_assignment_points").clear
-      f("#assign_#{assignment_id}_assignment_points").send_keys opts[:points]
+      points_input = f("[data-testid='points-input']")
+      clear_input_field(points_input)
+      f("[data-testid='points-input']").send_keys opts[:points]
     end
     if opts[:due_at]
-      f("#assign_#{assignment_id}_assignment_due_at").clear
-      f("#assign_#{assignment_id}_assignment_due_at").send_keys opts[:due_at]
+      date_input = f("#Selectable_1")
+      clear_input_field(date_input)
+      date_input.send_keys opts[:due_at]
+      driver.action.send_keys(:enter).perform
+
+      if opts[:due_time]
+        time_input = f("#Select_1")
+        clear_input_field(time_input)
+        time_input.send_keys opts[:due_time]
+        driver.action.send_keys(:enter).perform
+      end
     end
     if opts[:submit]
-      fj(".create_assignment:visible").click
+      f("[data-testid='save-button']").click
       wait_for_ajaximations
     end
     if opts[:more_options]
-      fj(".more_options:visible").click
+      f("[data-testid='more-options-button']").click
       wait_for_ajaximations
     end
   end

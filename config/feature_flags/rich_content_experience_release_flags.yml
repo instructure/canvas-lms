@@ -61,6 +61,20 @@ consolidated_media_player:
     development:
       state: allowed_on
 
+docviewer_enable_iwork_files:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Docviewer Apple iWork file support"
+  description: "Allows Canvas to send iWork files to docviewer."
+  visible_on: docviewer_enable_iwork_visible_on_hook
+
+enhanced_docviewer_url_security:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Enhanced DocViewer URL Security
+  description: |-
+    DocViewer will be launched more securely (using a JWT with a JTI claim to prevent token reuse)
+
 explicit_latex_typesetting:
   state: hidden
   display_name: Explicit LaTeX Typesetting
@@ -135,6 +149,18 @@ rce_linked_file_urls:
     New Quizzes (and eventually others) need a way to create file links that work more independently
     of Canvas. This API allows creation of link locations so that we can track files linked in the rich
     content of other tools and grant access to them from those locations.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
+rce_transform_iframe_sandbox_attributes:
+  state: hidden
+  display_name: Transform RCE iframe Sandbox Attributes
+  description: |-
+    Transforms iframe sandbox attributes to limit sandbox attributes inside user content.
   applies_to: SiteAdmin
   environments:
     ci:

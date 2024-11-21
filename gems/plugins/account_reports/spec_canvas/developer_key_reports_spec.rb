@@ -159,4 +159,32 @@ describe AccountReports::DeveloperKeyReports do
       end
     end
   end
+
+  context "one of the keys has an overlay that adds an additional placement" do
+    let(:user) { user_model }
+    let(:overlay) do
+      Lti::Overlay.create!(registration: second_key.lti_registration,
+                           account:,
+                           updated_by: user,
+                           data: {
+                             "placements" => {
+                               "module_index_menu_modal" => {
+                                 "message_type" => "LtiResourceLinkRequest",
+                                 "icon_url" => "https://www.example.com/icon.png",
+                               }
+                             }
+                           })
+    end
+
+    let(:expected_result) do
+      super().tap do |er|
+        er[1][5] = %w[course_navigation module_index_menu_modal].to_s
+      end
+    end
+
+    it "adds the additional placement" do
+      overlay
+      expect(subject).to eq(expected_result)
+    end
+  end
 end

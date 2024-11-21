@@ -27,6 +27,7 @@ module LtiAdvantage::Messages
       target_link_uri
     ].freeze
 
+    # Remove deployment_id when removing the lti_deployment_id_in_login_request FF
     OPTIONAL_PARAMETERS = %i[
       lti_message_hint
       canvas_region
@@ -34,6 +35,7 @@ module LtiAdvantage::Messages
       client_id
       lti_storage_target
       deployment_id
+      lti_deployment_id
     ].freeze
 
     attr_accessor(*(REQUIRED_PARAMETERS + OPTIONAL_PARAMETERS))

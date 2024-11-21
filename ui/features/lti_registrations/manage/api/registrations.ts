@@ -26,7 +26,7 @@ import {
 } from '../../common/lib/apiResult/ApiResult'
 import {ZPaginatedList, type PaginatedList} from './PaginatedList'
 import {type LtiRegistrationId} from '../model/LtiRegistrationId'
-import type {AccountId} from '../model/AccountId'
+import {ZAccountId, type AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import * as z from 'zod'
 import {
@@ -34,6 +34,8 @@ import {
   type InternalLtiConfiguration,
 } from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
+import type DeveloperKey from 'features/developer_keys_v2/react/DeveloperKey'
+import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 
 export type AppsSortProperty =
   | 'name'
@@ -184,5 +186,30 @@ export const updateRegistration: UpdateRegistration = (
       setTimeout(() => {
         resolve(new Response('{}', {status: 200}))
       }, Math.random() * 2000)
+    })
+  )
+
+export const fetchRegistrationByClientId = (accountId: AccountId, clientId: DeveloperKeyId) =>
+  parseFetchResult(ZLtiRegistration)(
+    fetch(`/api/v1/accounts/${accountId}/lti_registration_by_client_id/${clientId}`, {
+      ...defaultFetchOptions(),
+    })
+  )
+
+export const bindGlobalLtiRegistration = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId
+) =>
+  parseFetchResult(z.unknown())(
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
+      ...defaultFetchOptions(),
+      method: 'POST',
+      headers: {
+        ...defaultFetchOptions().headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workflow_state: 'on',
+      }),
     })
   )

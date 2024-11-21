@@ -1993,21 +1993,38 @@ module Lti
             context "for teacher" do
               before do
                 course.enroll_user(user, "TeacherEnrollment")
-                course.enroll_user(User.create!, "StudentEnrollment")
-                course.enroll_user(User.create!, "StudentEnrollment")
               end
 
-              it "is expanded" do
-                subm1, subm2 = assignment.submissions.to_a
-                subm1.update! cached_due_date: right_now
-                subm2.update! cached_due_date: right_now - 1.day
-                expect(assignment.due_at).to be_nil
-                expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+              context "with enrollments" do
+                before do
+                  course.enroll_user(User.create!, "StudentEnrollment")
+                  course.enroll_user(User.create!, "StudentEnrollment")
+                end
+
+                it "is expanded" do
+                  subm1, subm2 = assignment.submissions.to_a
+                  subm1.update! cached_due_date: right_now
+                  subm2.update! cached_due_date: right_now - 1.day
+                  expect(assignment.due_at).to be_nil
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+
+                it "handles a nil due_at" do
+                  assignment.update!(due_at: nil)
+                  expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+                end
               end
 
-              it "handles a nil due_at" do
-                assignment.update!(due_at: nil)
-                expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+              context "without enrollments" do
+                it "is expanded if there is due date set" do
+                  assignment.update!(due_at: right_now)
+                  expect(expand!("$Canvas.assignment.dueAt.iso8601")).to eq right_now.utc.iso8601
+                end
+
+                it "handles a nil due_at" do
+                  assignment.update!(due_at: nil)
+                  expect_unexpanded! "$Canvas.assignment.dueAt.iso8601"
+                end
               end
             end
           end
@@ -2344,6 +2361,15 @@ module Lti
         it "has substitution for ToolConsumerProfile.url" do
           expander = VariableExpander.new(root_account, account, controller, current_user: user, tool: ToolProxy.new)
           expect(expand!("$ToolConsumerProfile.url", expander:)).to eq "url"
+        end
+
+        it "has substitution for $com.instructure.user.lti_1_1_id.history" do
+          course.save!
+          user.lti_context_id = "current_context_id"
+          UserPastLtiId.create!(user:, context: account, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user:, context: course, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
+          UserPastLtiId.create!(user: User.new, context: account, user_lti_id: "old_lti_id2", user_lti_context_id: "", user_uuid: "old_uuid2")
+          expect(expand!("$com.instructure.user.lti_1_1_id.history")).to eq "old_context_id,current_context_id"
         end
       end
 

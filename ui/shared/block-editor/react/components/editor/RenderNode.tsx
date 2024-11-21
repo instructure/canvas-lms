@@ -93,8 +93,9 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     }
   }, [mountPoint])
 
-  // the next 2 useEffects implemnt click once to select the block
   useEffect(() => {
+    // if the user clicked on a block's inner component, (e.g. it has no toolbar)
+    // walk up the node tree to find one and select that
     if (selected && node.data.custom?.noToolbar) {
       const upnode = findUpNode(node, query)
       if (upnode && upnode.id !== node.id) {

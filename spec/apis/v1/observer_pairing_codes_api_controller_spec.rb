@@ -39,7 +39,7 @@ describe ObserverPairingCodesApiController, type: :request do
       ap.self_registration = "none"
       ap.save!
       api_call_as_user(@student, :post, @path, @params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "students can create pairing codes for themselves" do
@@ -55,13 +55,13 @@ describe ObserverPairingCodesApiController, type: :request do
       params = @params.merge(user_id: user.to_param)
       path = "/api/v1/users/#{user.id}/observer_pairing_codes"
       api_call_as_user(user, :post, path, params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "teacher cannot generate code by default" do
       teacher = teacher_in_course(course: @course, active_all: true).user
       json = api_call_as_user(teacher, :post, @path, @params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
       expect(json["code"]).to be_nil
     end
 
@@ -86,7 +86,7 @@ describe ObserverPairingCodesApiController, type: :request do
       path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
       params = @params.merge(user_id: @student.to_param)
       api_call_as_user(@teacher, :post, path, params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "admin can generate code" do
@@ -98,7 +98,7 @@ describe ObserverPairingCodesApiController, type: :request do
 
     it "errors if current_user isnt the student or a teacher/admin" do
       api_call_as_user(user_model, :post, @path, @params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     describe "sub_accounts" do
@@ -128,7 +128,7 @@ describe ObserverPairingCodesApiController, type: :request do
                    action: "create",
                    format: "json" }
         api_call_as_user(@sub_admin, :post, path, params)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
   end

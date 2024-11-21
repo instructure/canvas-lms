@@ -6,6 +6,8 @@ x-environment: &BASE-ENV
   ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
   POSTGRES_PASSWORD: sekret
   RAILS_ENV: development
+  CANVAS_DEV_DOMAIN: canvas-web.$INST_DOMAIN
+  CANVAS_PROD_DOMAIN: canvas-web.$INST_DOMAIN
 
 x-base-service: &BASE-SERVICE
   build:
@@ -42,8 +44,6 @@ services:
     <<: *BASE-SERVICE
     environment:
       <<: *BASE-ENV
-      CANVAS_DEV_DOMAIN: canvas-web.$INST_DOMAIN
-      CANVAS_PROD_DOMAIN: canvas-web.$INST_DOMAIN
       HTTPS_METHOD: noredirect
       # TODO: remove and replace instances with CANVAS_DEV_DOMAIN
       VIRTUAL_HOST: .canvas-web.$INST_DOMAIN

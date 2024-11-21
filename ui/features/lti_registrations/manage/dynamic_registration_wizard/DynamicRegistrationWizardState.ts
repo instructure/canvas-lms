@@ -25,7 +25,7 @@ import type {LtiImsRegistration} from '../model/lti_ims_registration/LtiImsRegis
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {
   createRegistrationOverlayStore,
-  RegistrationOverlayState,
+  type RegistrationOverlayState,
   type RegistrationOverlayStore,
 } from '../registration_wizard/registration_settings/RegistrationOverlayState'
 import type {DynamicRegistrationWizardService} from './DynamicRegistrationWizardService'
@@ -37,8 +37,8 @@ import {
 } from '../../common/lib/apiResult/ApiResult'
 import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import type {UnifiedToolId} from '../model/UnifiedToolId'
-import {LtiPlacement} from '../model/LtiPlacement'
-import {LtiPlacementOverlay} from '../model/PlacementOverlay'
+import type {LtiPlacement} from '../model/LtiPlacement'
+import type {LtiPlacementOverlay} from '../model/PlacementOverlay'
 
 /**
  * Steps are:

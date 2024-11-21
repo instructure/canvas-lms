@@ -23,6 +23,7 @@ describe('Course Settings Helpers', () => {
     expect(Helpers.isValidImageType('image/jpeg')).toBe(true) // accepts jpeg
     expect(Helpers.isValidImageType('image/gif')).toBe(true) // accepts gif
     expect(Helpers.isValidImageType('image/png')).toBe(true) // accepts png
+    expect(Helpers.isValidImageType('image/svg+xml')).toBe(true) // accepts svg
     expect(Helpers.isValidImageType('image/tiff')).toBe(false) // denies tiff
   })
 

@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type NodeTreeNodes} from '../types'
+
 // We don't want the expanded state to be saved with the block data
-export const closeExpandedBlocks = (query: any) => {
+export const closeExpandedBlocks = (query: any): NodeTreeNodes => {
   const nodes = JSON.parse(query.serialize())
   Object.keys(nodes).forEach(k => {
     const node = nodes[k]
     delete node.custom?.isExpanded
   })
-  return JSON.stringify(nodes)
+  return nodes
 }
 
 // NOTE: this is not being used, but it is a good example

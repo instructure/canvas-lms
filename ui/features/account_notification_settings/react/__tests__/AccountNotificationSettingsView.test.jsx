@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {render, screen, within} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'

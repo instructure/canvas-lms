@@ -26,7 +26,6 @@ import {View} from '@instructure/ui-view'
 import {Tag} from '@instructure/ui-tag'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import TruncateWithTooltip from '../common/TruncateWithTooltip'
-import {ZAccountId} from '../../models/AccountId'
 
 type ProductCardProps = {
   product: Product
@@ -34,7 +33,9 @@ type ProductCardProps = {
 
 const ProductCard = (props: ProductCardProps) => {
   const {product} = props
-  const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
+  const productUrl = `${window.location.origin}${window.location.pathname}/product_detail/${
+    product.global_product_id
+  }${window.location.pathname.endsWith('configurations') ? '#tab-apps' : ''}`
 
   return (
     <Flex.Item>
@@ -48,7 +49,7 @@ const ProductCard = (props: ProductCardProps) => {
         borderWidth="small"
         padding="mediumSmall"
         onClick={() => {
-          window.location.href = `/accounts/${accountId}/apps/product_detail/${product.global_product_id}`
+          window.location.href = productUrl
         }}
         cursor="pointer"
       >
@@ -67,7 +68,7 @@ const ProductCard = (props: ProductCardProps) => {
                   <Link
                     isWithinText={false}
                     themeOverride={{fontWeight: 700, color: 'black'}}
-                    href={`/accounts/${accountId}/apps/product_detail/${product.global_product_id}`}
+                    href={productUrl}
                   >
                     {product?.name}
                   </Link>

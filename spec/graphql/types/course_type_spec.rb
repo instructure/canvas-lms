@@ -777,41 +777,49 @@ describe Types::CourseType do
       end
 
       it "returns nil for other users's initial totalActivityTime if current user does not have appropriate permissions" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { totalActivityTime } }",
-            current_user: @student1
-          )
-        ).to eq [nil, 0, nil, nil, nil, nil]
+        expected_total_activity_time = [nil, 0, nil, nil, nil, nil]
+
+        result_total_activity_time = course_type.resolve(
+          "enrollmentsConnection { nodes { totalActivityTime } }",
+          current_user: @student1
+        )
+
+        expect(result_total_activity_time).to match_array(expected_total_activity_time)
       end
 
       it "returns the sisRole of each user" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { sisRole } }",
-            current_user: @teacher
-          )
-        ).to eq %w[teacher student teacher student student student]
+        expected_sis_roles = %w[teacher student teacher student student student]
+
+        result_sis_roles = course_type.resolve(
+          "enrollmentsConnection { nodes { sisRole } }",
+          current_user: @teacher
+        )
+
+        expect(result_sis_roles).to match_array(expected_sis_roles)
       end
 
       it "returns an htmlUrl for each enrollment" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { htmlUrl } }",
-            current_user: @teacher,
-            request: ActionDispatch::TestRequest.create
-          )
-        ).to eq([@teacher, @student1, other_teacher, @student2, @inactive_user, @concluded_user]
-          .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" })
+        expected_urls = [@teacher, @student1, other_teacher, @student2, @inactive_user, @concluded_user]
+                        .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" }
+
+        result_urls = course_type.resolve(
+          "enrollmentsConnection { nodes { htmlUrl } }",
+          current_user: @teacher,
+          request: ActionDispatch::TestRequest.create
+        )
+
+        expect(result_urls).to match_array(expected_urls)
       end
 
       it "returns canBeRemoved boolean value for each enrollment" do
-        expect(
-          course_type.resolve(
-            "enrollmentsConnection { nodes { canBeRemoved } }",
-            current_user: @teacher
-          )
-        ).to eq [false, true, true, true, true, true]
+        expected_can_be_removed = [false, true, true, true, true, true]
+
+        result_can_be_removed = course_type.resolve(
+          "enrollmentsConnection { nodes { canBeRemoved } }",
+          current_user: @teacher
+        )
+
+        expect(result_can_be_removed).to match_array(expected_can_be_removed)
       end
 
       describe "filtering" do
@@ -884,17 +892,98 @@ describe Types::CourseType do
     end
   end
 
-  describe "GroupSetsConnection" do
+  describe "groupSetsConnection" do
     before(:once) do
+      @teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
       @project_groups = course.group_categories.create! name: "Project Groups"
       @student_groups = GroupCategory.student_organized_for(course)
+      @non_collaborative_groups = course.group_categories.create! name: "NC Groups", non_collaborative: true
     end
 
-    it "returns project groups" do
+    it "returns project group sets (not student_organized, not non_collaborative) when not asked for" do
       expect(
         course_type.resolve("groupSetsConnection { edges { node { _id } } }",
                             current_user: @teacher)
       ).to eq [@project_groups.id.to_s]
+    end
+
+    it "includes non_collaborative group sets when asked for by someone with permissions" do
+      @course.account.enable_feature!(:differentiation_tags)
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: true
+        )
+      end
+
+      expect(
+        course_type.resolve("groupSetsConnection(includeNonCollaborative: true) { edges { node { _id } } }",
+                            current_user: @teacher)
+      ).to match_array [@project_groups.id.to_s, @non_collaborative_groups.id.to_s]
+    end
+
+    it "does not include non_collaborative group sets when asked for by someone without permissions" do
+      @course.account.enable_feature!(:differentiation_tags)
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: false
+        )
+      end
+      expect(
+        course_type.resolve("groupSetsConnection { edges { node { _id } } }",
+                            current_user: @teacher)
+      ).to eq [@project_groups.id.to_s]
+    end
+  end
+
+  describe "groupSets" do
+    before(:once) do
+      @teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
+      @project_groups = course.group_categories.create! name: "Project Groups"
+      @student_groups = GroupCategory.student_organized_for(course)
+      @non_collaborative_groups = course.group_categories.create! name: "NC Groups", non_collaborative: true
+    end
+
+    it "returns project group sets (not student_organized, not non_collaborative) when not asked for" do
+      expect(
+        course_type.resolve("groupSets { _id}",
+                            current_user: @teacher)
+      ).to eq [@project_groups.id.to_s]
+    end
+
+    it "includes non_collaborative group sets when asked for by someone with permissions" do
+      @course.account.enable_feature!(:differentiation_tags)
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: true
+        )
+      end
+
+      expect(
+        course_type.resolve("groupSets(includeNonCollaborative: true) { _id }",
+                            current_user: @teacher)
+      ).to match_array [@project_groups.id.to_s, @non_collaborative_groups.id.to_s]
+    end
+
+    it "excludes non_collaborative group sets when asked for by someone without permissions" do
+      @course.account.enable_feature!(:differentiation_tags)
+      RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: @teacher_role,
+          enabled: false
+        )
+      end
+
+      expect(
+        course_type.resolve("groupSets(includeNonCollaborative: true) { _id }",
+                            current_user: @teacher)
+      ).to match_array [@project_groups.id.to_s]
     end
   end
 
@@ -1057,6 +1146,68 @@ describe Types::CourseType do
       expect(cur_resolver.resolve("activityStream { summary { count } } ")).to match_array [1, 1]
       expect(cur_resolver.resolve("activityStream { summary { unreadCount } } ")).to match_array [1, 1]
       expect(cur_resolver.resolve("activityStream { summary { notificationCategory } } ")).to match_array [nil, nil]
+    end
+  end
+
+  describe "moderators" do
+    def execute_query(pagination_options: {}, user: @teacher)
+      options_string = pagination_options.empty? ? "" : "(#{pagination_options.map { |key, value| "#{key}: #{value.inspect}" }.join(", ")})"
+      CanvasSchema.execute(<<~GQL, context: { current_user: user }).dig("data", "course")
+        query {
+          course(id: #{course.id}) {
+            availableModerators#{options_string} {
+              edges {
+                node {
+                  _id
+                  name
+                }
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+            availableModeratorsCount
+          }
+        }
+      GQL
+    end
+
+    before(:once) do
+      @ta = User.create!
+      course.enroll_ta(@ta, enrollment_state: :active)
+    end
+
+    context "when user has permissions to manage assignments" do
+      it "returns availableModerators and availableModeratorsCount" do
+        result = execute_query
+
+        expect(result["availableModerators"]["edges"]).to match_array [
+          { "node" => { "_id" => @teacher.id.to_s, "name" => @teacher.name } },
+          { "node" => { "_id" => @ta.id.to_s, "name" => @ta.name } },
+        ]
+
+        expect(result["availableModeratorsCount"]).to eq 2
+      end
+
+      it "paginate available moderators" do
+        result = execute_query(pagination_options: { first: 1 })
+        expect(result["availableModerators"]["edges"].length).to eq 1
+        expect(result["availableModerators"]["pageInfo"]["hasNextPage"]).to be true
+
+        end_cursor = result["availableModerators"]["pageInfo"]["endCursor"]
+        result = execute_query(pagination_options: { first: 1, after: end_cursor })
+        expect(result["availableModerators"]["edges"].length).to eq 1
+        expect(result["availableModerators"]["pageInfo"]["hasNextPage"]).to be false
+      end
+    end
+
+    context "when user does not have permissions to manage assignments" do
+      it "returns nil" do
+        result = execute_query(user: @student)
+        expect(result["availableModerators"]).to be_nil
+        expect(result["availableModeratorsCount"]).to be_nil
+      end
     end
   end
 end

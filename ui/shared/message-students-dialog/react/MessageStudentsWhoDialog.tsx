@@ -954,6 +954,7 @@ const MessageStudentsWhoDialog = ({
                 </Flex.Item>
                 <Flex.Item margin="0 0 0 x-small">
                   <Button
+                    id="send-message-button" // EVAL-4242
                     data-testid="send-message-button"
                     interaction={isFormDataValid ? 'enabled' : 'disabled'}
                     color="primary"

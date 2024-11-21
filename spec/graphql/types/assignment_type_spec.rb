@@ -1128,4 +1128,162 @@ describe Types::AssignmentType do
       end
     end
   end
+
+  describe "assignmentTargetConnection" do
+    before(:once) do
+      @overridden_assignment = course.assignments.create!(title: "assignment with overrides",
+                                                          workflow_state: "published",
+                                                          due_at: 5.weeks.from_now)
+
+      @override1 = assignment_override_model(assignment: @overridden_assignment,
+                                             title: "First override",
+                                             due_at: 2.weeks.from_now,
+                                             unlock_at: 1.week.from_now,
+                                             lock_at: 3.weeks.from_now)
+      @override1.assignment_override_students.build(user: student)
+      @override1.save!
+
+      @override2 = assignment_override_model(assignment: @overridden_assignment,
+                                             title: "Second override",
+                                             due_at: 3.weeks.from_now,
+                                             unlock_at: 2.weeks.from_now,
+                                             lock_at: 4.weeks.from_now)
+
+      @override2.assignment_override_students.build(user: student2)
+      @override2.save!
+    end
+
+    let_once(:student2) { student_in_course(course:, active_all: true).user }
+    let(:overridden_assignment_type) { GraphQLTypeTester.new(@overridden_assignment, current_user: teacher) }
+    let(:student_overridden_assignment_type) { GraphQLTypeTester.new(@overridden_assignment, current_user: student) }
+
+    def create_context_module_and_override_adhoc(context: @course, assignment: @overridden_assignment, name: "Module 1", student: student2)
+      context_module = context.context_modules.create!(name:)
+      assignment.context_module_tags.create! context_module:, context:, tag_type: "context_module"
+      module_override = context_module.assignment_overrides.create! title: "1 Student"
+      override_student = module_override.assignment_override_students.build
+      override_student.user = student
+      override_student.save!
+      module_override
+    end
+
+    def format_timestamps(timestamp)
+      timestamp.map { |t| t&.strftime("%Y-%m-%dT%H:%M:%SZ") } # rubocop:disable Specs/NoStrftime
+    end
+
+    def sorted_results(field, sort_by, direction = "ascending")
+      overridden_assignment_type.resolve(
+        "assignmentTargetConnection (orderBy: { field: #{sort_by}, direction: #{direction} }) { edges { node { #{field} } } }"
+      )
+    end
+
+    def paginated_results(field, first = 1)
+      overridden_assignment_type.resolve(
+        "assignmentTargetConnection (first: #{first}) { edges { node { #{field} } } }"
+      )
+    end
+
+    def paginated_results_next_page(first = 1)
+      overridden_assignment_type.resolve(
+        "assignmentTargetConnection (first: #{first}) { pageInfo { hasNextPage } }"
+      )
+    end
+
+    def expect_error(result, message)
+      errors = result["errors"] || result.dig("data", "assignmentTargetConnection", "errors")
+      expect(errors).not_to be_nil
+      expect(errors[0]["message"]).to match(message)
+    end
+
+    context "when user has permissions to manage assignments" do
+      it "returns assignment overrides for the assignment" do
+        expect(overridden_assignment_type.resolve(
+                 "assignmentTargetConnection { edges { node { title } } }"
+               )).to match_array([@override1.title, @override2.title])
+      end
+
+      it "returns module overrides for the assignment" do
+        module_override = create_context_module_and_override_adhoc
+        expect(overridden_assignment_type.resolve(
+                 "assignmentTargetConnection { edges { node { title } } }"
+               )).to match_array([@override1.title, @override2.title, module_override.title])
+      end
+
+      it "returns only active overrides for the assignment" do
+        @override2.assignment_override_students.first.delete
+        @override2.delete
+        expect(overridden_assignment_type.resolve(
+                 "assignmentTargetConnection { edges { node { title } } }"
+               )).to match_array([@override1.title])
+      end
+
+      context "sorting" do
+        it "sorts by title in ascending order" do
+          expect(sorted_results("title", "title")).to eq([@override1.title, @override2.title])
+        end
+
+        it "sorts by title in descending order" do
+          expect(sorted_results("title", "title", "descending")).to eq([@override2.title, @override1.title])
+        end
+
+        it "sorts by due_at in ascending order" do
+          expect(sorted_results("dueAt", "due_at")).to eq(format_timestamps([@override1.due_at, @override2.due_at]))
+        end
+
+        it "sorts by due_at in descending order" do
+          expect(sorted_results("dueAt", "due_at", "descending")).to eq(format_timestamps([@override2.due_at, @override1.due_at]))
+        end
+
+        it "sorts by unlock_at in ascending order" do
+          expect(sorted_results("unlockAt", "unlock_at")).to eq(format_timestamps([@override1.unlock_at, @override2.unlock_at]))
+        end
+
+        it "sorts by unlock_at in descending order" do
+          expect(sorted_results("unlockAt", "unlock_at", "descending")).to eq(format_timestamps([@override2.unlock_at, @override1.unlock_at]))
+        end
+
+        it "sorts by lock_at in ascending order" do
+          expect(sorted_results("lockAt", "lock_at")).to eq(format_timestamps([@override1.lock_at, @override2.lock_at]))
+        end
+
+        it "sorts by lock_at in descending order" do
+          expect(sorted_results("lockAt", "lock_at", "descending")).to eq(format_timestamps([@override2.lock_at, @override1.lock_at]))
+        end
+
+        it "orders NULL values at the end if descending order" do
+          expect(sorted_results("lockAt", "lock_at", "descending")).to eq(format_timestamps([@override2.lock_at, @override1.lock_at]))
+          @override2.lock_at = nil
+          @override2.save!
+          expect(sorted_results("lockAt", "lock_at", "descending")).to eq(format_timestamps([@override1.lock_at, @override2.lock_at]))
+        end
+
+        context "argument validation" do
+          it "raises graphql error if sort field is invalid" do
+            expect { sorted_results("title", "invalid_sort_field") }.to raise_error(GraphQLTypeTester::Error)
+          end
+
+          it "raises graphql error if sort direction is invalid" do
+            expect { sorted_results("title", "title", "invalid_sort_direction") }.to raise_error(GraphQLTypeTester::Error)
+          end
+        end
+      end
+
+      context "pagination" do
+        it "paginates results" do
+          expect(paginated_results("title", 1).length).to eq 1
+          expect(paginated_results_next_page(1)).to be true
+          expect(paginated_results("title", 2).length).to eq 2
+          expect(paginated_results_next_page(2)).to be false
+        end
+      end
+    end
+
+    context "when user does not have permissions to manage assignments" do
+      it "returns nil" do
+        expect(student_overridden_assignment_type.resolve(
+                 "assignmentTargetConnection { edges { node { title } } }"
+               )).to be_nil
+      end
+    end
+  end
 end

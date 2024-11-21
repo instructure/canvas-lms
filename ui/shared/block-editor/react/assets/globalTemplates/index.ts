@@ -21,6 +21,7 @@
 //
 
 import {type BlockTemplate} from '../../types'
+import {transformTemplate} from '../../utils'
 
 import blank from './blank.json'
 import knowledgeCheck from './knowledgeCheck.json'
@@ -45,10 +46,15 @@ export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
     herosectionwithnavigation as unknown as BlockTemplate,
     cardssection as unknown as BlockTemplate,
     navigationsection as unknown as BlockTemplate,
-  ])
+  ]).then(
+    // @ts-expect-error
+    (t: BlockTemplate) => t.map(transformTemplate)
+  )
 }
 
 export const getGlobalPageTemplates = (): Promise<BlockTemplate[]> => {
-  // @ts-expect-error
-  return Promise.resolve([blankPage, homepageyellow, homepageblue, homepageelementary])
+  return Promise.resolve([blankPage, homepageyellow, homepageblue, homepageelementary]).then(
+    // @ts-expect-error
+    (t: BlockTemplate) => t.map(transformTemplate)
+  )
 }

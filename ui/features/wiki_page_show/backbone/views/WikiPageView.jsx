@@ -33,12 +33,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/modules/jquery/prerequisites_lookup'
-import '../../jquery/content_locks'
+import lockExplanation from '@canvas/content-locks/jquery/lock_reason'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
-import doFetchApi from "@canvas/do-fetch-api-effect";
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('pages')
 
@@ -98,7 +98,7 @@ export default class WikiPageView extends Backbone.View {
 
     if (this.model.get('locked_for_user')) {
       const lock_info = this.model.get('lock_info')
-      $('.lock_explanation').html(htmlEscape(INST.lockExplanation(lock_info, 'page')))
+      $('.lock_explanation').html(htmlEscape(lockExplanation(lock_info, 'page')))
       if (lock_info.context_module && lock_info.context_module.id) {
         const prerequisites_lookup = `${ENV.MODULES_PATH}/${
           lock_info.context_module.id
@@ -200,7 +200,7 @@ export default class WikiPageView extends Backbone.View {
           window.location.href = `${window.location.href.split('?')[0]}/edit?editor=${editor}`
         })
       } else if (window.ENV.text_editor_preference === 'block_editor') {
-        e.preventDefault();
+        e.preventDefault()
         await doFetchApi({
           path: `/courses/${this.course_id}/pages/${this.model.get('url')}/create_block_editor`,
           method: 'PUT',

@@ -35,7 +35,7 @@ describe GroupPermissionHelper do
     end
 
     it "passes the correct rights for collaborative group add action" do
-      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_add])
+      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups_add])
       check_group_authorization(context:, current_user: @teacher, action_category: :add, non_collaborative: false)
     end
 
@@ -45,7 +45,7 @@ describe GroupPermissionHelper do
     end
 
     it "passes the correct rights for collaborative group manage action" do
-      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_manage])
+      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups_manage])
       check_group_authorization(context:, current_user: @teacher, action_category: :manage, non_collaborative: false)
     end
 
@@ -55,7 +55,7 @@ describe GroupPermissionHelper do
     end
 
     it "passes the correct rights for collaborative group delete action" do
-      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_delete])
+      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups_delete])
       check_group_authorization(context:, current_user: @teacher, action_category: :delete, non_collaborative: false)
     end
 
@@ -65,7 +65,7 @@ describe GroupPermissionHelper do
     end
 
     it "passes the correct rights for collaborative group view action" do
-      expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
+      expect(self).to receive(:authorized_action).with(context, @teacher, RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
       check_group_authorization(context:, current_user: @teacher, action_category: :view, non_collaborative: false)
     end
 
@@ -79,43 +79,23 @@ describe GroupPermissionHelper do
         Account.default.disable_feature!(:differentiation_tags)
       end
 
-      it "doesn't check non_collaborative view permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [])
-        check_group_authorization(context:, current_user: @teacher, action_category: :view, non_collaborative: true)
-      end
-
-      it "doesn't check non_collaborative add permission" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [])
-        check_group_authorization(context:, current_user: @teacher, action_category: :add, non_collaborative: true)
-      end
-
-      it "doesn't check non_collaborative manage permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [])
-        check_group_authorization(context:, current_user: @teacher, action_category: :manage, non_collaborative: true)
-      end
-
-      it "checks non_collaborative delete permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_tags_delete])
-        check_group_authorization(context:, current_user: @teacher, action_category: :delete, non_collaborative: true)
-      end
-
       it "checks collaborative group add permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_add])
+        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups_add])
         check_group_authorization(context:, current_user: @teacher, action_category: :add, non_collaborative: false)
       end
 
       it "checks collaborative group manage permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_manage])
+        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups_manage])
         check_group_authorization(context:, current_user: @teacher, action_category: :manage, non_collaborative: false)
       end
 
       it "checks collaborative group delete permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_delete])
+        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups_delete])
         check_group_authorization(context:, current_user: @teacher, action_category: :delete, non_collaborative: false)
       end
 
       it "checks collaborative group view permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
+        expect(self).to receive(:authorized_action).with(context, @teacher, RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
         check_group_authorization(context:, current_user: @teacher, action_category: :view, non_collaborative: false)
       end
     end
@@ -123,10 +103,10 @@ describe GroupPermissionHelper do
 
   describe "#determine_rights_for_type" do
     it "returns collaborative group rights when non_collaborative is false" do
-      expect(determine_rights_for_type(:add, false)).to eq([:manage_groups, :manage_groups_add])
-      expect(determine_rights_for_type(:manage, false)).to eq([:manage_groups, :manage_groups_manage])
-      expect(determine_rights_for_type(:delete, false)).to eq([:manage_groups, :manage_groups_delete])
-      expect(determine_rights_for_type(:view, false)).to eq([:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
+      expect(determine_rights_for_type(:add, false)).to eq([:manage_groups_add])
+      expect(determine_rights_for_type(:manage, false)).to eq([:manage_groups_manage])
+      expect(determine_rights_for_type(:delete, false)).to eq([:manage_groups_delete])
+      expect(determine_rights_for_type(:view, false)).to eq(RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
     end
 
     it "returns non_collaborative group rights when non_collaborative is true" do
@@ -137,10 +117,10 @@ describe GroupPermissionHelper do
     end
 
     it "handles nil non_collaborative value by treating it as false" do
-      expect(determine_rights_for_type(:add, nil)).to eq([:manage_groups, :manage_groups_add])
-      expect(determine_rights_for_type(:manage, nil)).to eq([:manage_groups, :manage_groups_manage])
-      expect(determine_rights_for_type(:delete, nil)).to eq([:manage_groups, :manage_groups_delete])
-      expect(determine_rights_for_type(:view, nil)).to eq([:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS])
+      expect(determine_rights_for_type(:add, nil)).to eq([:manage_groups_add])
+      expect(determine_rights_for_type(:manage, nil)).to eq([:manage_groups_manage])
+      expect(determine_rights_for_type(:delete, nil)).to eq([:manage_groups_delete])
+      expect(determine_rights_for_type(:view, nil)).to eq(RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
     end
 
     it "raises an error for unsupported action_category" do

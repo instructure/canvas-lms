@@ -97,7 +97,7 @@ describe "assignment groups" do
     f("#assignment_group_#{ag.id} .add_assignment").click
 
     wait_for_ajaximations
-    fj(".more_options:visible").click
+    f("[data-testid='more-options-button']").click
     wait_for_ajaximations
 
     expect(get_value("#assignment_group_id")).to eq ag.id.to_s
@@ -111,12 +111,9 @@ describe "assignment groups" do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
-    f("#assignment_group_#{ag2.id} .add_assignment").click
-    wait_for_ajaximations
+    build_assignment_with_type("Assignment", assignment_group_id: ag2.id, name: "Do this", points: "13")
 
-    replace_content(f("#ag_#{ag2.id}_assignment_name"), "Do this")
-    replace_content(f("#ag_#{ag2.id}_assignment_points"), "13")
-    expect_new_page_load { fj(".more_options:visible").click }
+    expect_new_page_load { f("[data-testid='more-options-button']").click }
 
     expect(get_value("#assignment_name")).to eq "Do this"
     expect(get_value("#assignment_points_possible")).to eq "13"
@@ -199,12 +196,8 @@ describe "assignment groups" do
     wait_for_ajaximations
     ag = @course.assignment_groups.first
 
-    f("#assignment_group_#{ag.id} .add_assignment").click
-    wait_for_animations
+    build_assignment_with_type("Assignment", assignment_group_id: ag.id, name: "Disappear", submit: true)
 
-    replace_content(f("#ag_#{ag.id}_assignment_name"), "Disappear")
-    fj(".create_assignment:visible").click
-    wait_for_ajaximations
     refresh_page
     expect(fj("#assignment_group_#{ag.id} .assignment:eq(1) .ig-title").text).to match "Disappear"
 
@@ -252,7 +245,7 @@ describe "assignment groups" do
 
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
-    drag_with_js("#assignment_group_#{ags[1].id} .sortable-handle", 0, 100)
+    drag_with_js("#assignment_group_#{ags[1].id} .sortable-handle", 0, 200)
     wait_for_ajaximations
 
     ags.each(&:reload)
@@ -274,16 +267,16 @@ describe "assignment groups" do
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
 
-        # Finds and click the Add Assignment button on an assignment group.
-        f("#assignment_group_#{assignment_group.id} .add_assignment").click
-        wait_for_ajaximations
-
-        # Enter in values for Name, Due, and Points, then clicks save.
-        replace_content(f("#ag_#{assignment_group.id}_assignment_name"), assignment_name)
-        replace_content(f("#ag_#{assignment_group.id}_assignment_due_at"), current_time)
-        replace_content(f("#ag_#{assignment_group.id}_assignment_points"), assignment_points)
-        fj(".create_assignment:visible").click
-        wait_for_ajaximations
+        # Create Assignment
+        build_assignment_with_type(
+          "Assignment",
+          assignment_group_id: assignment_group.id,
+          name: "Do this",
+          due_at: current_time,
+          due_time: "4:15 AM",
+          points: "13",
+          submit: true
+        )
       end
     end
 
@@ -319,16 +312,10 @@ describe "assignment groups" do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
-    f("#assignment_group_#{ag.id} .add_assignment").click
-    wait_for_ajaximations
-
-    replace_content(f("#ag_#{ag.id}_assignment_name"), "Do this")
-    replace_content(f("#ag_#{ag.id}_assignment_points"), "13")
-    fj(".create_assignment:visible").click
-    wait_for_ajaximations
+    build_assignment_with_type("Assignment", assignment_group_id: ag.id, name: "Do this", points: "13", submit: true)
 
     f("#assignment_group_#{ag.id} .add_assignment").click
-    expect(f("#ag_#{ag.id}_assignment_name")).to be_displayed
+    expect(f("[data-testid='assignment-name-input']")).to be_displayed
   end
 
   it "adds group weights correctly", priority: "2" do

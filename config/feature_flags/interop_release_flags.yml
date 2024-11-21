@@ -20,16 +20,6 @@ ags_scores_multiple_files:
   environments:
     development:
       state: on
-api_auth_error_updates:
-  state: hidden
-  display_name: Updates to JSON API auth error HTTP code and JSON status field
-  description: |-
-    If enabled, an "unauthorized" response from the JSON API will return a 403
-    (Forbidden) instead of a 401 code, to be more in line with HTTP standards.
-    Also, when the API returns a unauthenticated or unauthorized JSON error,
-    the "status" field will not be localized; it will always be given in
-    English.
-  applies_to: SiteAdmin
 assignment_edit_placement_not_on_announcements:
   state: hidden
   applies_to: SiteAdmin
@@ -40,6 +30,18 @@ assignment_submission_type_card:
   applies_to: SiteAdmin
   display_name: Allow submission type resource card to be shown in the assignment edit page
   description: When enabled, the new submission type resource card will be shown in the assignment edit page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_deployment_id_in_login_request:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Send lti_deployment_id in the LTI login request
+  description: |-
+    When enabled the lti_deployment_id will be sent in the LTI 1.3 login request.
+    When disabled both deployment_id and lti_deployment_id will be sent.
   environments:
     development:
       state: allowed_on
@@ -301,6 +303,22 @@ lti_resource_links_api:
       state: allowed_on
     ci:
       state: allowed_on
+lti_report_multiple_schema_validation_errors:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Return multiple json schema validation errors at once (not just the first one).
+  description: |-
+    INTEROP-8899. This is a low risk change, because tools should not depend on error messages coming from json schema validator.
+  environments:
+    ci:
+      state: allowed_on
+    test:
+      state: allowed_on
+    development:
+      state: allowed_on
+    production:
+      state: allowed_on
 lti_toggle_placements:
   state: hidden
   applies_to: RootAccount
@@ -354,6 +372,19 @@ platform_notification_service:
   description: >-
     When on, 1Edtech Platform Notification service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
     be enabled.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+remove_unwanted_lti_validation_claims:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Do not include validation_context and errors claims in LTI Launches
+  description: |-
+    If enabled, the unwanted LTI validation claims like validation_context and errors will not be included in every LTI launch.
   environments:
     development:
       state: allowed_on

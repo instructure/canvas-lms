@@ -17,39 +17,27 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import type {AuthProvider} from '../types'
-import type {ViewOwnProps} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
-import {Grid, GridCol, GridRow} from '@instructure/ui-grid'
+import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
+import {Responsive} from '@instructure/ui-responsive'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-// @ts-expect-error
 import iconApple from '../assets/images/apple.svg'
-// @ts-expect-error
 import iconClasslink from '../assets/images/classlink.svg'
-// @ts-expect-error
 import iconClever from '../assets/images/clever.svg'
-// @ts-expect-error
 import iconFacebook from '../assets/images/facebook.svg'
-// @ts-expect-error
 import iconGithub from '../assets/images/github.svg'
-// @ts-expect-error
 import iconGoogle from '../assets/images/google.svg'
-// @ts-expect-error
 import iconLinkedin from '../assets/images/linkedin.svg'
-// @ts-expect-error
 import iconMicrosoft from '../assets/images/microsoft.svg'
-// @ts-expect-error
 import iconX from '../assets/images/x.svg'
 
 const I18n = useI18nScope('new_login')
-
-interface Props {
-  className?: string
-}
 
 const providerIcons: Record<string, string> = {
   apple: iconApple,
@@ -63,7 +51,7 @@ const providerIcons: Record<string, string> = {
   twitter: iconX,
 }
 
-const SSOButtons = ({className}: Props) => {
+const SSOButtons = () => {
   const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
 
   if (!authProviders || authProviders.length === 0) {
@@ -88,32 +76,67 @@ const SSOButtons = ({className}: Props) => {
     const iconSrc = providerIcons[authType]
 
     return (
-      <GridCol key={provider.id} width={{small: 12, large: 6}}>
+      <Flex.Item
+        key={provider.id}
+        overflowX="visible"
+        overflowY="visible"
+        shouldGrow={true}
+        size={`calc(50% - ${canvas.spacing.small})`}
+      >
         <Button
           href={link}
           display="block"
           disabled={isUiActionPending}
-          renderIcon={() => (
-            <Img
-              src={iconSrc}
-              alt={displayName}
-              width="1.125rem"
-              height="1.125rem"
-              display="block"
-            />
-          )}
           onClick={handleClick}
+          width="100%"
         >
-          {I18n.t('Sign in with %{displayName}', {displayName})}
+          {iconSrc && (
+            <View
+              position="absolute"
+              insetInlineStart="0.625rem"
+              insetBlockStart="50%"
+              style={{
+                transform: 'translateY(-50%)',
+              }}
+            >
+              <Img
+                src={iconSrc}
+                alt={displayName}
+                width="1.125rem"
+                height="1.125rem"
+                display="block"
+              />
+            </View>
+          )}
+          {I18n.t('Log in with %{displayName}', {displayName})}
         </Button>
-      </GridCol>
+      </Flex.Item>
     )
   }
 
   return (
-    <Grid startAt="x-large" colSpacing="small" rowSpacing="small" className={classNames(className)}>
-      <GridRow hAlign="space-around">{authProviders.map(renderProviderButton)}</GridRow>
-    </Grid>
+    <Responsive
+      match="media"
+      query={{
+        desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
+      }}
+    >
+      {(_props, matches) => {
+        const isDesktopOrLarger = matches?.includes('desktop')
+
+        return (
+          <Flex
+            direction={isDesktopOrLarger ? 'row' : 'column'}
+            wrap={isDesktopOrLarger ? 'wrap' : 'no-wrap'}
+            gap="small"
+            justifyItems={isDesktopOrLarger ? 'start' : 'center'}
+            alignItems="stretch"
+          >
+            {authProviders.map(renderProviderButton)}
+          </Flex>
+        )
+      }}
+    </Responsive>
   )
 }
 

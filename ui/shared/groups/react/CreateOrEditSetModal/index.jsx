@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useReducer} from 'react'
+import React, {useEffect, useRef, useReducer, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
@@ -123,6 +123,7 @@ export const CreateOrEditSetModal = ({
   const [st, dispatch] = useReducer(reducer, INITIAL_STATE)
   const topElement = useRef(null)
   const creationJSON = useRef(undefined)
+  const [selfSignupEndDate, setSelfSignupEndDate] = useState(null)
   const areErrors = Object.keys(st.errors).length > 0
   const apiCall = mockApi || doFetchApi
   const isApiActive = st.apiState !== API_STATE.inactive
@@ -135,6 +136,7 @@ export const CreateOrEditSetModal = ({
       name: st.name,
       group_limit: st.groupLimit,
       enable_self_signup: st.selfSignup ? '1' : '0',
+      self_signup_end_at: selfSignupEndDate,
       enable_auto_leader: st.enableAutoLeader ? '1' : '0',
       create_group_count: st.createGroupCount,
     }
@@ -317,7 +319,12 @@ export const CreateOrEditSetModal = ({
                   {allowSelfSignup && (
                     <>
                       <Divider />
-                      <SelfSignup onChange={to => dispatch({ev: 'selfsignup-change', to})} {...props} />
+                      <SelfSignup
+                        onChange={to => dispatch({ev: 'selfsignup-change', to})}
+                        selfSignupEndDateEnabled={ENV.self_signup_deadline_enabled}
+                        endDateOnChange={(value) => setSelfSignupEndDate(value)}
+                        {...props}
+                      />
                       <Divider />
                       <GroupStructure
                         errormsg={st.errors.structure}

@@ -96,27 +96,30 @@ describe "jquery ui" do
     expect(active.tag_name).to eq "select"
   end
 
-  context "calendar widget" do
-    it "lets you replace content by selecting and typing instead of appending" do
-      get "/courses/#{@course.id}/assignments"
+  # We need to find alternate test case for calendar since the
+  # calender widget has been replaced with InstUI in the assignments modal
 
-      f(".add_assignment").click
-      wait_for_ajaximations
-      f(".ui-datepicker-trigger").click
-      wait_for_ajaximations
-      f(".ui-datepicker-time-hour").send_keys("12")
-      f(".ui-datepicker-time-minute").send_keys("00")
-      f(".ui-datepicker-ok").click
-      wait_for_ajaximations
+  # context "calendar widget" do
+  #   it "lets you replace content by selecting and typing instead of appending" do
+  #     get "/courses/#{@course.id}/assignments"
 
-      f(".ui-datepicker-trigger").click
-      wait_for_ajaximations
+  #     f(".add_assignment").click
+  #     wait_for_ajaximations
+  #     f(".ui-datepicker-trigger").click
+  #     wait_for_ajaximations
+  #     f(".ui-datepicker-time-hour").send_keys("12")
+  #     f(".ui-datepicker-time-minute").send_keys("00")
+  #     f(".ui-datepicker-ok").click
+  #     wait_for_ajaximations
 
-      driver.execute_script("$('#ui-datepicker-time-hour').select();")
-      f("#ui-datepicker-time-hour").send_keys("5")
-      expect(f("#ui-datepicker-time-hour")).to have_attribute("value", "5")
-    end
-  end
+  #     f(".ui-datepicker-trigger").click
+  #     wait_for_ajaximations
+
+  #     driver.execute_script("$('#ui-datepicker-time-hour').select();")
+  #     f("#ui-datepicker-time-hour").send_keys("5")
+  #     expect(f("#ui-datepicker-time-hour")).to have_attribute("value", "5")
+  #   end
+  # end
 
   context "dialog titles" do
     # jquery ui doesn't escape dialog titles by default (even when inferred from

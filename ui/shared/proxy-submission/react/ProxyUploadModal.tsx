@@ -39,7 +39,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-// @ts-expect-error
 import UploadFileSVG from '../../../features/assignments_show_student/images/UploadFile.svg'
 
 const I18n = useI18nScope('conversations_2')
@@ -539,6 +538,7 @@ const ProxyUploadModal = ({
             Close
           </Button>
           <Button
+            id="proxySubmit" // EVAL-4244
             data-testid="proxySubmit"
             color="primary"
             type="submit"

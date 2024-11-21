@@ -16,19 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {lazy, Suspense} from 'react'
-import {Route} from 'react-router-dom'
+import React, {lazy} from 'react'
 import {LoginLayout} from '../layouts'
-import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import {NewLoginProvider} from '../context/NewLoginContext'
-
-const I18n = useI18nScope('new_login')
+import {Route} from 'react-router-dom'
 
 const SignIn = lazy(() => import('../pages/SignIn'))
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
-
-const Fallback = () => <Spinner renderTitle={I18n.t('Loading page')} />
 
 export const NewLoginRoutes = (
   <Route
@@ -39,22 +33,8 @@ export const NewLoginRoutes = (
       </NewLoginProvider>
     }
   >
-    <Route
-      index={true}
-      element={
-        <Suspense fallback={<Fallback />}>
-          <SignIn />
-        </Suspense>
-      }
-    />
-    <Route
-      path="forgot-password"
-      element={
-        <Suspense fallback={<Fallback />}>
-          <ForgotPassword />
-        </Suspense>
-      }
-    />
+    <Route index={true} element={<SignIn />} />
+    <Route path="forgot-password" element={<ForgotPassword />} />
     <Route path="*" element={<SignIn />} />
   </Route>
 )

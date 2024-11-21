@@ -129,7 +129,7 @@ describe AssignmentsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "returns the ids and names of users in the same group as the student" do
@@ -240,7 +240,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    it "returns unauthorized for users who cannot :read the course" do
+    it "returns forbidden for users who cannot :read the course" do
       # unpublished course with invited student
       course_with_student
       expect(@course.grants_right?(@student, :read)).to be_falsey
@@ -255,7 +255,7 @@ describe AssignmentsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     context "when the 'new_quizzes' query param is set" do
@@ -439,7 +439,7 @@ describe AssignmentsApiController, type: :request do
                         },
                         {},
                         {},
-                        expected_status: 401)
+                        expected_status: 403)
         expect(json["status"]).to eq "unauthorized"
       end
 
@@ -1797,7 +1797,7 @@ describe AssignmentsApiController, type: :request do
                  user_id: @student.id.to_s },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "returns data for for teacher who can read target student data" do
@@ -1834,7 +1834,7 @@ describe AssignmentsApiController, type: :request do
                          user_id: student.id.to_s },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
   end
 
@@ -1860,7 +1860,7 @@ describe AssignmentsApiController, type: :request do
                          assignment_id: assignment.id.to_s },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "duplicates if teacher" do
@@ -2237,7 +2237,7 @@ describe AssignmentsApiController, type: :request do
           },
           {},
           {},
-          { expected_status: 401 }
+          { expected_status: 403 }
         )
       end
 
@@ -2442,7 +2442,7 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.post_to_sis).to be true
     end
 
-    it "returns unauthorized for users who do not have permission" do
+    it "returns forbidden for users who do not have permission" do
       student_in_course(active_all: true)
       @group = @course.assignment_groups.create!({ name: "some group" })
       @group_category = @course.group_categories.create!(name: "foo")
@@ -2458,7 +2458,7 @@ describe AssignmentsApiController, type: :request do
                },
                create_assignment_json(@group, @group_category),
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "allows authenticated users to create assignments" do
@@ -3833,7 +3833,7 @@ describe AssignmentsApiController, type: :request do
 
       it "returns unauthorized if attempting to change points possible" do
         api_update_assignment_call(@course, @assignment, { points_possible: 12 })
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "succeeds if grading_type is provided but it matches current grading_type" do
@@ -3843,7 +3843,7 @@ describe AssignmentsApiController, type: :request do
 
       it "returns unauthorized if attempting to change grading_type" do
         api_update_assignment_call(@course, @assignment, { grading_type: "percent" })
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "succeeds if grading_standard_id is provided but it matches current grading_standard_id" do
@@ -3858,11 +3858,11 @@ describe AssignmentsApiController, type: :request do
         expect(response).to be_successful
       end
 
-      it "returns unauthorized if attempting to change grading_standard_id" do
+      it "returns forbidden if attempting to change grading_standard_id" do
         grading_standard = grading_standard_for(@course)
         @assignment.update!(grading_standard:)
         api_update_assignment_call(@course, @assignment, { grading_standard_id: nil })
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "succeeds if not provided attributes that trigger a regrade" do
@@ -3871,7 +3871,7 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
-    it "returns unauthorized for users who do not have permission" do
+    it "returns forbidden for users who do not have permission" do
       course_with_student(active_all: true)
       @assignment = @course.assignments.create!({
                                                   name: "some assignment",
@@ -3880,7 +3880,7 @@ describe AssignmentsApiController, type: :request do
 
       api_update_assignment_call(@course, @assignment, { points_possible: 10 })
 
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "allows user with grading rights to update assignment grading type" do
@@ -5945,7 +5945,7 @@ describe AssignmentsApiController, type: :request do
                  },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
         expect(@assignment.reload).not_to be_deleted
       end
     end
@@ -6495,7 +6495,7 @@ describe AssignmentsApiController, type: :request do
                      })
 
         # should be authorization error
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "shows an unpublished assignment to teachers" do
@@ -6603,7 +6603,7 @@ describe AssignmentsApiController, type: :request do
                      id: @assignment1.id.to_s },
                    {},
                    {},
-                   { expected_status: 401 })
+                   { expected_status: 403 })
         end
 
         it "does not include assignment_visibility data when requested" do
@@ -7402,7 +7402,7 @@ describe AssignmentsApiController, type: :request do
 
     it "requires manage_assignments rights" do
       student_in_course(active_all: true)
-      api_bulk_update(@course, [], expected_status: 401)
+      api_bulk_update(@course, [], expected_status: 403)
     end
 
     it "expects an array of assignments" do
@@ -7680,7 +7680,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "disallows editing moderated assignments if you're not the moderator" do
-        api_bulk_update(@course, [{ "id" => @a0.id, "all_dates" => [] }], expected_status: 401)
+        api_bulk_update(@course, [{ "id" => @a0.id, "all_dates" => [] }], expected_status: 403)
         api_bulk_update(@course, [{ "id" => @a1.id, "all_dates" => [] }])
       end
 

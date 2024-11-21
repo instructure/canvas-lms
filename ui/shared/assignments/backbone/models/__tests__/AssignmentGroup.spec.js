@@ -75,8 +75,13 @@ describe('AssignmentGroup', () => {
     expect(ag.countRules()).toBe(0)
   })
 
-  test('#syncedWithSisCategory returns true if integration_data contains mapping', () => {
+  test('#syncedWithSisCategory returns true if integration_data contains sistemic mapping', () => {
     const ag = new AssignmentGroup({integration_data: {sistemic: {categoryMapping: {abc: {}}}}})
+    expect(ag.syncedWithSisCategory()).toBe(true)
+  })
+
+  test('#syncedWithSisCategory returns true if integration_data contains syncedWithSisCategory flag', () => {
+    const ag = new AssignmentGroup({integration_data: {syncedWithSisCategory: true}})
     expect(ag.syncedWithSisCategory()).toBe(true)
   })
 

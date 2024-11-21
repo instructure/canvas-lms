@@ -139,7 +139,11 @@ describe SplitUsers do
         UserMerge.from(restored_user).into(source_user)
         UserMerge.from(user3).into(source_user)
         UserMergeData.find_by(user_id: source_user).update(workflow_state: "failed")
-        expect_any_instance_of(SplitUsers).to receive(:split_users).once
+
+        double = double(SplitUsers)
+        allow(SplitUsers).to receive(:new).and_return(double)
+        expect(double).to receive(:split_users).once
+
         SplitUsers.split_db_users(source_user)
       end
 

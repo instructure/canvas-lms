@@ -23,6 +23,7 @@ require_relative "../../support/boolean_translator"
 module GroupCategories
   MockGroupCategory = Struct.new(:name,
                                  :self_signup,
+                                 :self_signup_end_at,
                                  :auto_leader,
                                  :group_limit,
                                  :create_group_count,
@@ -78,7 +79,8 @@ module GroupCategories
       end
 
       describe "when context is a course" do
-        let(:context) { Course.new }
+        let(:account) { Account.new }
+        let(:context) { Course.new(account:) }
 
         it "populates group count" do
           policy.populate_with({ enable_self_signup: "1", create_group_count: 2 }, populate_options)

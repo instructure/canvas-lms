@@ -320,7 +320,7 @@ describe DiscussionTopicsController, type: :request do
                { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
                { title: "hai", message: "test message" },
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "makes a basic topic" do
@@ -478,7 +478,7 @@ describe DiscussionTopicsController, type: :request do
                { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
                { title: "pwn3d ur grade", message: "lol", assignment: { points_possible: 1000, due_at: 1.week.ago.as_json } },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "does not create an assignment on a discussion topic when set_assignment is false" do
@@ -1146,7 +1146,7 @@ describe DiscussionTopicsController, type: :request do
                            },
                            {},
                            {},
-                           { expected_status: 401 })
+                           { expected_status: 403 })
         end
 
         it "student not in section should not be able to see section specific announcements" do
@@ -1351,7 +1351,7 @@ describe DiscussionTopicsController, type: :request do
                            topic_id: @topic.id.to_s },
                          {},
                          {},
-                         expected_status: 401)
+                         expected_status: 403)
       end
 
       it "returns group_topic_children for group discussions" do
@@ -1503,7 +1503,7 @@ describe DiscussionTopicsController, type: :request do
                  { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
                  { title: "hai", message: "test message" },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
 
       it "updates the entry" do
@@ -1684,7 +1684,7 @@ describe DiscussionTopicsController, type: :request do
                  { controller: "discussion_topics", action: "update", format: "json", group_id: group.to_param, topic_id: gtopic.to_param },
                  { message: "new message" },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
 
         api_call(:put,
                  "/api/v1/groups/#{group.id}/discussion_topics/#{gtopic.id}",
@@ -1865,7 +1865,7 @@ describe DiscussionTopicsController, type: :request do
                  { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
                  { assignment: { points_possible: 100 } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
 
         expect(@assignment.reload.points_possible).to eq 50
       end
@@ -2044,7 +2044,7 @@ describe DiscussionTopicsController, type: :request do
                  { controller: "discussion_topics", action: "destroy", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
                  {},
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
         expect(@topic.reload).not_to be_deleted
       end
 
@@ -2072,7 +2072,7 @@ describe DiscussionTopicsController, type: :request do
       expect(JSON.parse(response.body).to_s).not_to include(topic.assignment.title.to_s)
 
       calls = %i[get_show get_entries get_replies add_entry add_reply]
-      calls.each { |call| expect(send(call, topic).to_s).to eq "401" }
+      calls.each { |call| expect(send(call, topic).to_s).to eq "403" }
     end
 
     def get_index(course)
@@ -2558,7 +2558,7 @@ describe DiscussionTopicsController, type: :request do
           topic_id: @topic.id.to_s },
         { message: @message },
         {},
-        expected_status: 401
+        expected_status: 403
       )
     end
 
@@ -2575,7 +2575,7 @@ describe DiscussionTopicsController, type: :request do
           topic_id: @announcement.id.to_s },
         { message: @message },
         {},
-        expected_status: 401
+        expected_status: 403
       )
     end
 
@@ -3134,14 +3134,14 @@ describe DiscussionTopicsController, type: :request do
       @entry = create_entry(@topic, message: "<p>top-level entry</p>")
     end
 
-    it "401s if the user can't update" do
+    it "403s if the user can't update" do
       student_in_course(course: @course, user: user_with_pseudonym)
       api_call(:put,
                "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
                { controller: "discussion_entries", action: "update", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, id: @entry.id.to_s },
                { message: "haxor" },
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@entry.reload.message).to eq "<p>top-level entry</p>"
     end
 
@@ -3196,14 +3196,14 @@ describe DiscussionTopicsController, type: :request do
       @entry = create_entry(@topic, message: "top-level entry")
     end
 
-    it "401s if the user can't delete" do
+    it "403s if the user can't delete" do
       student_in_course(course: @course, user: user_with_pseudonym)
       api_call(:delete,
                "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
                { controller: "discussion_entries", action: "destroy", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, id: @entry.id.to_s },
                {},
                {},
-               expected_status: 401)
+               expected_status: 403)
       expect(@entry.reload).not_to be_deleted
     end
 
@@ -4087,7 +4087,7 @@ describe DiscussionTopicsController, type: :request do
                  topic_id: @group_topic.to_param },
                {},
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "cannot duplicate announcements" do
@@ -4177,7 +4177,7 @@ describe DiscussionTopicsController, type: :request do
                  topic_id: @group_topic.to_param },
                {},
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "duplicate work if admin" do
@@ -4405,11 +4405,11 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "does not show student comments to other students not in the course" do
-        check_access(announcements_view_api.call(@student, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(@student, @course.id, @announcement.id, 403))
       end
 
       it "does not show student comments to other teachers not in the course" do
-        check_access(announcements_view_api.call(@teacher, @course.id, @announcement.id, 401))
+        check_access(announcements_view_api.call(@teacher, @course.id, @announcement.id, 403))
       end
     end
   end

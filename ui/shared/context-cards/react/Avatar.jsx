@@ -54,6 +54,7 @@ class Avatar extends React.Component {
           {canMasquerade && (
             <Text size="x-small" weight="bold" as="div">
               <a
+                id="act-as-user" // EVAL-4241
                 href={`/courses/${courseId}?become_user_id=${user._id}`}
                 aria-label={I18n.t('Act as %{name}', {name: user.short_name})}
               >

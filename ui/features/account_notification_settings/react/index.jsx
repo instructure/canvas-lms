@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import React from 'react'
 import AccountNotificationSettingsView from './AccountNotificationSettingsView'
 

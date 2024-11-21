@@ -44,6 +44,7 @@ module Api::V1::Group
 
     hash = api_json(group, user, session, API_GROUP_JSON_OPTS, permissions_to_include)
     hash.merge!(context_data(group))
+    hash["context_name"] = group.context.name
     image = group.avatar_attachment
     hash["avatar_url"] = image && thumbnail_image_url(image)
     hash["role"] = group.group_category.role if group.group_category

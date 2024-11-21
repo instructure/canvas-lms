@@ -92,7 +92,7 @@ describe WebZipExportsController do
                                 format: "json"
                               })
 
-      expect(response).to eq 401
+      expect(response).to eq 403
     end
   end
 end

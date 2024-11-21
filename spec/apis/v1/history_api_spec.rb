@@ -157,7 +157,7 @@ describe HistoryController, type: :request do
                          { controller: "history", action: "index", format: "json", user_id: @student.to_param },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
         UserObservationLink.create_or_restore(observer:, student: @student, root_account: Account.default)
         api_call_as_user(observer,
                          :get,
@@ -187,7 +187,7 @@ describe HistoryController, type: :request do
                          { controller: "history", action: "index", format: "json", user_id: @student.to_param },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
     end
 

@@ -17,20 +17,15 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {useNewLogin} from '../context/NewLoginContext'
 
-interface Props {
-  className?: string
-}
-
-const LoginLogo = ({className}: Props) => {
-  const {loginLogoUrl: src, loginLogoAlt: alt} = useNewLogin()
+const LoginLogo = () => {
+  const {loginLogoUrl: src, loginLogoText: alt} = useNewLogin()
 
   if (!src) return null
 
@@ -38,33 +33,31 @@ const LoginLogo = ({className}: Props) => {
     <Responsive
       match="media"
       query={{
-        tablet: {minWidth: '48rem'},
-        desktop: {minWidth: '75rem'},
+        tablet: {minWidth: canvas.breakpoints.tablet}, // 768px
+        desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
       }}
     >
       {(_props, matches) => {
-        const largerScreen = matches?.includes('desktop')
+        const isDesktop = matches?.includes('desktop')
+        const isTablet = matches?.includes('tablet')
+        const width = isDesktop ? '18.75rem' : isTablet ? '23.25rem' : '11.25rem' // 300px, 372px, 180px
+        const height = isDesktop ? '7.5rem' : '5rem' // 120px, 80px
+
         return (
           <Flex
             direction="column"
-            height={largerScreen ? '7.5rem' : '5rem'}
-            gap="small"
+            height={height}
+            gap="x-small"
             alignItems="center"
             justifyItems="center"
-            className={classNames(className)}
           >
-            <Flex.Item
-              style={{maxWidth: largerScreen ? '18.75rem' : '11.25rem'}}
-              shouldShrink={true}
-            >
+            <Flex.Item width={width} shouldShrink={true} shouldGrow={true}>
               <Img width="100%" height="100%" constrain="contain" src={src} alt={alt} />
             </Flex.Item>
 
             {alt && (
               <Flex.Item textAlign="center">
-                <Text size="x-small">
-                  <TruncateText>{alt}</TruncateText>
-                </Text>
+                <Text size="x-small">{alt}</Text>
               </Flex.Item>
             )}
           </Flex>

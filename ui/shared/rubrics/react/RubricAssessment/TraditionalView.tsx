@@ -298,7 +298,12 @@ const CriterionRow = ({
                 <Flex.Item margin={rubricSavedComments.length > 0 ? 'medium 0 0 0' : '0 0 0 0'}>
                   <Text weight="bold">{I18n.t('Comment')}</Text>
                 </Flex.Item>
-                <Flex.Item margin="x-small 0 0 0" shouldGrow={true}>
+                <Flex.Item
+                  margin="x-small 0 0 0"
+                  shouldGrow={true}
+                  overflowX="hidden"
+                  overflowY="hidden"
+                >
                   {isPreviewMode ? (
                     <View as="div" margin="0 0 0 0" height="48px">
                       <Text>{commentText}</Text>

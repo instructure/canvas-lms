@@ -586,13 +586,11 @@ describe "student planner" do
     end
 
     it "allows account admins with content management rights to add todo dates" do
-      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
       @wiki = @course.wiki_pages.create!(title: "Default Time Wiki Page")
-      admin = account_admin_user_with_role_changes(role_changes: { manage_courses: false })
+      admin = account_admin_user
       user_session(admin)
 
-      expect(@course.grants_right?(admin, :manage)).to be false # sanity check
       expect(@course.grants_right?(admin, :manage_content)).to be true
 
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
@@ -605,13 +603,11 @@ describe "student planner" do
     end
 
     it "allows account admins with content management rights to add todo dates (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
       @wiki = @course.wiki_pages.create!(title: "Default Time Wiki Page")
       admin = account_admin_user
       user_session(admin)
 
-      expect(@course.grants_right?(admin, :manage)).to be true
       expect(@course.grants_right?(admin, :manage_course_content_edit)).to be true
 
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")

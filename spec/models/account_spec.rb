@@ -752,17 +752,6 @@ describe Account do
     end
   end
 
-  # TODO: deprecated; need to look into removing this setting
-  it "allows no_enrollments_can_create_courses correctly" do
-    a = Account.default
-    a.disable_feature!(:granular_permissions_manage_courses)
-    a.settings = { no_enrollments_can_create_courses: true }
-    a.save!
-
-    user_factory
-    expect(a.manually_created_courses_account.grants_right?(@user, :create_courses)).to be_truthy
-  end
-
   it "does not allow create_courses even to admins on site admin and children" do
     a = Account.site_admin
     a.settings = { no_enrollments_can_create_courses: true }
@@ -778,20 +767,6 @@ describe Account do
     a = Account.default
     a.settings = { no_enrollments_can_create_courses: true }
     a.save!
-
-    manual = a.manually_created_courses_account
-    course = manual.courses.create!
-    user = course.student_view_student
-
-    expect(a.grants_right?(user, :create_courses)).to be false
-    expect(manual.grants_right?(user, :create_courses)).to be false
-  end
-
-  it "does not allow create courses for student view students (granular permissions)" do
-    a = Account.default
-    a.settings = { no_enrollments_can_create_courses: true }
-    a.save!
-    a.enable_feature!(:granular_permissions_manage_courses)
 
     manual = a.manually_created_courses_account
     course = manual.courses.create!
@@ -2295,19 +2270,6 @@ describe Account do
     let(:account) { account_model }
 
     it "returns expected roles with the given permission" do
-      account.disable_feature!(:granular_permissions_manage_courses)
-      role = account.roles.create name: "AssistantGrader"
-      role.base_role_type = "TaEnrollment"
-      role.workflow_state = "active"
-      role.save!
-      create_role_override("change_course_state", role, account)
-      expect(
-        account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
-      ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
-    end
-
-    it "returns expected roles with the given permission (granular permissions)" do
-      account.enable_feature!(:granular_permissions_manage_courses)
       role = account.roles.create name: "TeacherAdmin"
       role.base_role_type = "TeacherEnrollment"
       role.workflow_state = "active"
@@ -2725,97 +2687,106 @@ describe Account do
   end
 
   describe "available ip filters" do
-    let!(:account1) { Account.create!(name: "Account 1") }
-    let!(:account2) { account1.sub_accounts.create!(name: "Account 2") }
-    let!(:account3) { account2.sub_accounts.create!(name: "Account 3") }
-    let!(:account4) { account3.sub_accounts.create!(name: "Account 4") }
+    before do
+      @account1 = Account.create!(name: "Account 1")
+      @course1 = @account1.courses.create!(name: "Test Course 1")
+
+      @account2 = Account.create!(name: "Account 2", consortium_parent_account: @account1)
+      @course2 = @account2.courses.create!(name: "Test Course 2")
+
+      @account3 = @account2.sub_accounts.create!(name: "Account 3")
+      @course3 = @account3.courses.create!(name: "Test Course 3")
+
+      @account4 = @account3.sub_accounts.create!(name: "Account 4")
+      @course4 = @account4.courses.create!(name: "Test Course 4")
+    end
 
     context "when filters exist in the account chain" do
       before do
-        account1.settings[:ip_filters] = {
+        @account1.settings[:ip_filters] = {
           "filter1" => "192.168.1.0",
           "filter2" => "10.0.0.0"
         }
-        account1.save!
+        @account1.save!
 
-        account3.settings[:ip_filters] = {
+        @account3.settings[:ip_filters] = {
           "filter3" => "172.16.0.0"
         }
-        account3.save!
+        @account3.save!
       end
 
       it "gets all the filters up the chain" do
         expected_filters = [
-          { name: "filter1", account: account1.name, filter: "192.168.1.0" },
-          { name: "filter2", account: account1.name, filter: "10.0.0.0" },
-          { name: "filter3", account: account3.name, filter: "172.16.0.0" }
+          { name: "filter1", account: @account1.name, filter: "192.168.1.0" },
+          { name: "filter2", account: @account1.name, filter: "10.0.0.0" },
+          { name: "filter3", account: @account3.name, filter: "172.16.0.0" }
         ]
 
-        expect(account4.available_ip_filters).to match_array(expected_filters)
+        expect(Account.default.available_ip_filters(@course4.uuid)).to match_array(expected_filters)
       end
     end
 
     context "when no filters exist in the account chain" do
       it "returns an empty array" do
-        expect(account4.available_ip_filters).to be_empty
+        expect(Account.default.available_ip_filters(@course4.uuid)).to be_empty
       end
     end
 
     context "when settings is nil" do
       before do
-        allow(account1).to receive(:settings).and_return(nil)
+        allow(@account1).to receive(:settings).and_return(nil)
       end
 
       it "handles nil settings gracefully" do
-        expect { account4.available_ip_filters }.not_to raise_error
-        expect(account4.available_ip_filters).to be_empty
+        expect { Account.default.available_ip_filters(@course4.uuid) }.not_to raise_error
+        expect(Account.default.available_ip_filters(@course4.uuid)).to be_empty
       end
     end
 
     context "when ip_filters is nil" do
       before do
-        account1.settings[:ip_filters] = nil
-        account1.save!
+        @account1.settings[:ip_filters] = nil
+        @account1.save!
       end
 
       it "handles nil ip_filters gracefully" do
-        expect { account4.available_ip_filters }.not_to raise_error
-        expect(account4.available_ip_filters).to be_empty
+        expect { Account.default.available_ip_filters(@course4.uuid) }.not_to raise_error
+        expect(Account.default.available_ip_filters(@course4.uuid)).to be_empty
       end
     end
 
     context "when there are duplicate filter names in different accounts" do
       before do
-        account1.settings[:ip_filters] = { "common_filter" => "192.168.1.0" }
-        account1.save!
-        account3.settings[:ip_filters] = { "common_filter" => "10.0.0.0" }
-        account3.save!
+        @account1.settings[:ip_filters] = { "common_filter" => "192.168.1.0" }
+        @account1.save!
+        @account3.settings[:ip_filters] = { "common_filter" => "10.0.0.0" }
+        @account3.save!
       end
 
       it "includes both filters" do
         expected_filters = [
-          { name: "common_filter", account: account1.name, filter: "192.168.1.0" },
-          { name: "common_filter", account: account3.name, filter: "10.0.0.0" }
+          { name: "common_filter", account: @account1.name, filter: "192.168.1.0" },
+          { name: "common_filter", account: @account3.name, filter: "10.0.0.0" }
         ]
-        expect(account4.available_ip_filters).to match_array(expected_filters)
+        expect(Account.default.available_ip_filters(@course4.uuid)).to match_array(expected_filters)
       end
     end
 
     context "when accessing filters from different levels" do
       before do
-        account1.settings[:ip_filters] = { "filter1" => "192.168.1.0" }
-        account1.save!
-        account2.settings[:ip_filters] = { "filter2" => "172.16.0.0" }
-        account2.save!
-        account3.settings[:ip_filters] = { "filter3" => "10.0.0.0" }
-        account3.save!
+        @account1.settings[:ip_filters] = { "filter1" => "192.168.1.0" }
+        @account1.save!
+        @account2.settings[:ip_filters] = { "filter2" => "172.16.0.0" }
+        @account2.save!
+        @account3.settings[:ip_filters] = { "filter3" => "10.0.0.0" }
+        @account3.save!
       end
 
       it "returns correct filters for each account level" do
-        expect(account4.reload.available_ip_filters.size).to eq(3)
-        expect(account3.reload.available_ip_filters.size).to eq(3)
-        expect(account2.reload.available_ip_filters.size).to eq(2)
-        expect(account1.reload.available_ip_filters.size).to eq(1)
+        expect(Account.default.available_ip_filters(@course4.uuid).size).to eq(3)
+        expect(Account.default.available_ip_filters(@course3.uuid).size).to eq(3)
+        expect(Account.default.available_ip_filters(@course2.uuid).size).to eq(2)
+        expect(Account.default.available_ip_filters(@course1.uuid).size).to eq(1)
       end
     end
   end

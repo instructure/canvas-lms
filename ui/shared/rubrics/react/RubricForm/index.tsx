@@ -39,6 +39,7 @@ import {NewCriteriaRow} from './NewCriteriaRow'
 import {fetchRubric, saveRubric, type SaveRubricResponse} from './queries/RubricFormQueries'
 import type {RubricFormProps} from './types/RubricForm'
 import {CriterionModal} from './CriterionModal'
+import {WarningModal} from './WarningModal'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
 import {OutcomeCriterionModal} from './OutcomeCriterionModal'
@@ -121,6 +122,7 @@ export const RubricForm = ({
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false)
   const [savedRubricResponse, setSavedRubricResponse] = useState<SaveRubricResponse>()
+  const [showWarningModal, setShowWarningModal] = useState(false)
   const criteriaRef = useRef(rubricForm.criteria)
 
   const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
@@ -261,6 +263,17 @@ export const RubricForm = ({
 
   const handleAddOutcome = () => {
     setOutcomeDialogOpen(true)
+  }
+
+  const handleCancelButton = () => {
+    if (
+      rubricForm.criteria.length === defaultRubricForm.criteria.length &&
+      rubricForm.title === defaultRubricForm.title
+    ) {
+      onCancel()
+    } else {
+      setShowWarningModal(true)
+    }
   }
 
   useEffect(() => {
@@ -550,7 +563,7 @@ export const RubricForm = ({
         >
           <Flex justifyItems="end">
             <Flex.Item margin="0 medium 0 0">
-              <Button onClick={onCancel} data-testid="cancel-rubric-save-button">
+              <Button onClick={handleCancelButton} data-testid="cancel-rubric-save-button">
                 {I18n.t('Cancel')}
               </Button>
 
@@ -597,6 +610,11 @@ export const RubricForm = ({
         </View>
       </div>
 
+      <WarningModal
+        isOpen={showWarningModal}
+        onDismiss={() => setShowWarningModal(false)}
+        onCancel={onCancel}
+      />
       <CriterionModal
         criterion={selectedCriterion}
         criterionUseRangeEnabled={criterionUseRangeEnabled}

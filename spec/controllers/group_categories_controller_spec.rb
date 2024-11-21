@@ -61,8 +61,7 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "requires teacher default enabled :manage_groups_add (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "requires teacher default enabled :manage_groups_add" do
       user_session(@teacher)
       post "create", params: { course_id: @course.id, category: { name: "My Category" } }
       expect(response).to be_successful
@@ -124,8 +123,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "is not authorized without :manage_groups_add enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "is not authorized without :manage_groups_add enabled" do
       @course.root_account.role_overrides.create!(
         permission: "manage_groups_add",
         role: teacher_role,
@@ -177,12 +175,15 @@ describe GroupCategoriesController do
     end
 
     it "respects enable_self_signup" do
+      @course.account.enable_feature!(:self_signup_deadline)
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, category: { name: "Study Groups", enable_self_signup: "1" } }
+      end_date = Time.now.utc
+      post "create", params: { course_id: @course.id, category: { name: "Study Groups", enable_self_signup: "1", self_signup_end_at: end_date } }
       expect(response).to be_successful
       expect(assigns[:group_category]).not_to be_nil
       expect(assigns[:group_category]).to be_self_signup
       expect(assigns[:group_category]).to be_unrestricted_self_signup
+      expect(assigns[:group_category].self_signup_end_at).to be_within(1.second).of(end_date)
     end
 
     it "uses create_group_count when self-signup" do
@@ -256,15 +257,6 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "updates category" do
-      user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1" } }
-      expect(response).to be_successful
-      expect(assigns[:group_category]).to eql(@group_category)
-      expect(assigns[:group_category].name).to eql("Different Category")
-      expect(assigns[:group_category]).to be_self_signup
-    end
-
     it "allows teachers to update both types of group categories by default" do
       Account.default.enable_feature!(:differentiation_tags)
 
@@ -315,18 +307,19 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "updates category (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "updates category" do
+      @course.account.enable_feature!(:self_signup_deadline)
       user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1" } }
+      end_date = Time.now.utc
+      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1", self_signup_end_at: end_date } }
       expect(response).to be_successful
       expect(assigns[:group_category]).to eql(@group_category)
       expect(assigns[:group_category].name).to eql("Different Category")
       expect(assigns[:group_category]).to be_self_signup
+      expect(assigns[:group_category].self_signup_end_at).to be_within(1.second).of(end_date)
     end
 
-    it "does not update category if :manage_groups_manage is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not update category if :manage_groups_manage is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_manage",
         role: teacher_role,
@@ -382,6 +375,26 @@ describe GroupCategoriesController do
       user_session(@teacher)
       put "update", params: { course_id: @course.id, id: @group_category.id, category: { enable_self_signup: "1", restrict_self_signup: "1" } }
       expect(response).not_to be_successful
+    end
+
+    it "clears self_signup_end_at if self_signup is disabled" do
+      @course.account.enable_feature!(:self_signup_deadline)
+      user_session(@teacher)
+      end_date = Time.now.utc
+      @group_category.self_signup_end_at = end_date
+      @group_category.save!
+      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "0", self_signup_end_at: end_date } }
+      expect(response).to be_successful
+      expect(assigns[:group_category].self_signup_end_at).to be_nil
+    end
+
+    it "does not set self_signup_end_at if self_signup_deadline FF is disabled" do
+      user_session(@teacher)
+      end_date = Time.now.utc
+      put "update", params: { course_id: @course.id, id: @group_category.id, category: { name: "Different Category", enable_self_signup: "1", self_signup_end_at: end_date } }
+      expect(response).to be_successful
+      expect(assigns[:group_category]).to be_self_signup
+      expect(assigns[:group_category].self_signup_end_at).to be_nil
     end
   end
 
@@ -453,24 +466,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "deletes the category and groups (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      category1 = @course.group_categories.create(name: "Study Groups")
-      category2 = @course.group_categories.create(name: "Other Groups")
-      @course.groups.create(name: "some group", group_category: category1)
-      @course.groups.create(name: "another group", group_category: category2)
-      delete "destroy", params: { course_id: @course.id, id: category1.id }
-      expect(response).to be_successful
-      @course.reload
-      expect(@course.all_group_categories.length).to be(4)
-      expect(@course.group_categories.length).to be(3)
-      expect(@course.groups.length).to be(2)
-      expect(@course.groups.active.length).to be(1)
-    end
-
-    it "does not delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not delete the category/groups if :manage_groups_delete is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_delete",
         role: teacher_role,
@@ -640,7 +636,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "renders progress_json" do
+    it "initiates import" do
       user_session(@teacher)
       post "import", params: {
         course_id: @course.id,
@@ -654,23 +650,7 @@ describe GroupCategoriesController do
       expect(json["completion"]).to eq 0
     end
 
-    it "initiates import (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
-      user_session(@teacher)
-      post "import", params: {
-        course_id: @course.id,
-        group_category_id: @category.id,
-        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
-      }
-      expect(response).to be_successful
-      json = JSON.parse(response.body) # rubocop:disable Rails/ResponseParsedBody
-      expect(json["context_type"]).to eq "GroupCategory"
-      expect(json["tag"]).to eq "course_group_import"
-      expect(json["completion"]).to eq 0
-    end
-
-    it "does not initiate import if :manage_groups_add is not enabled (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_groups)
+    it "does not initiate import if :manage_groups_add is not enabled" do
       @course.account.role_overrides.create!(
         permission: "manage_groups_add",
         role: teacher_role,
@@ -715,6 +695,42 @@ describe GroupCategoriesController do
   end
 
   describe "GET index" do
+    it "returns only collaborative group categories when differentiation tag FF is off" do
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 1
+      expect(json.pluck("name")).to include("Collaborative Groups")
+    end
+
+    it "returns an empty array when no data exists" do
+      course_with_teacher(active_all: true)
+
+      user_session(@teacher)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      json = response.parsed_body
+
+      expect(response).to be_successful
+      expect(json.count).to eq 0
+    end
+
+    it "returns unauthorized when user has no permissions" do
+      user_session(@student)
+
+      get "index", params: { course_id: @course.id }, format: :json
+      assert_forbidden
+    end
+  end
+
+  context "Differentiation Tags" do
+    before do
+      Account.default.enable_feature!(:differentiation_tags)
+    end
+
     it "returns both collaborative and non-collaborative group categories when user has both group and tag management permissions" do
       user_session(@teacher)
 
@@ -762,65 +778,56 @@ describe GroupCategoriesController do
       expect(json[0]["name"]).to eq "Non-Collaborative Groups"
     end
 
-    it "returns unauthorized when user has no permissions" do
-      user_session(@student)
+    context "with differentiation tags disabled with existing hidden groups" do
+      before do
+        Account.default.disable_feature!(:differentiation_tags)
+      end
 
-      get "index", params: { course_id: @course.id }, format: :json
-      assert_unauthorized
-    end
-  end
+      it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
+        @course.account.role_overrides.create!({
+                                                 role: teacher_role,
+                                                 permission: :manage_tags_add,
+                                                 enabled: true
+                                               })
+        user_session(@teacher)
 
-  context "Differentiation Tags disabled with existing non_collaborative group_sets" do
-    before do
-      Account.default.disable_feature!(:differentiation_tags)
-    end
+        post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
 
-    it "prevents teachers from creating non_collaborative groups if differentiation_tags is disabled" do
-      Account.default.disable_feature!(:differentiation_tags)
-      @course.account.role_overrides.create!({
-                                               role: teacher_role,
-                                               permission: :manage_tags_add,
-                                               enabled: true
-                                             })
-      user_session(@teacher)
+        expect(response).to be_unauthorized
+      end
 
-      post "create", params: { course_id: @course.id, category: { name: "Hidden GC", non_collaborative: true } }
-
-      expect(response).to be_unauthorized
-    end
-
-    it "does not allow viewing non-collaborative group category" do
-      user_session(@teacher)
-      get "users", params: {
-        course_id: @course.id,
-        group_category_id: @non_collaborative_category.id
-      }
-      assert_unauthorized
-    end
-
-    it "does not allow adding non-collaborative group category" do
-      user_session(@teacher)
-      post "create", params: {
-        course_id: @course.id,
-        category: {
-          name: "New Non-Collaborative Group",
-          non_collaborative: "1"
+      it "does not allow viewing non-collaborative group category" do
+        user_session(@teacher)
+        get "users", params: {
+          course_id: @course.id,
+          group_category_id: @non_collaborative_category.id
         }
-      }
-      assert_unauthorized
-    end
+        assert_unauthorized
+      end
 
-    it "does not allow updating non-collaborative group category" do
-      user_session(@teacher)
-      put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
-      assert_unauthorized
-    end
+      it "does not allow adding non-collaborative group category" do
+        user_session(@teacher)
+        post "create", params: {
+          course_id: @course.id,
+          category: {
+            name: "New Non-Collaborative Group",
+            non_collaborative: "1"
+          }
+        }
+        assert_unauthorized
+      end
 
-    # Users are still able to delete non-collaborative group categories if the flag is off
-    it "allows deleting non-collaborative group category" do
-      user_session(@teacher)
-      delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
-      expect(response).to be_successful
+      it "does not allow updating non-collaborative group category" do
+        user_session(@teacher)
+        put "update", params: { course_id: @course.id, id: @non_collaborative_category.id, category: { name: "Updated Non-Collaborative Group" } }
+        assert_unauthorized
+      end
+
+      it "does not allow deleting non-collaborative group category" do
+        user_session(@teacher)
+        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_category.id }
+        assert_unauthorized
+      end
     end
   end
 end

@@ -147,7 +147,7 @@ ready(() => {
           },
           emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
           mediaSettings: window.INST.kalturaSettings,
-          lang: window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE,
+          lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
           currentUserIsAdmin: ENV.current_user_is_admin ?? false,
           themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
           useHighContrast: window.ENV.use_high_contrast ?? false,

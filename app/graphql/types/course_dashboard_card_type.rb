@@ -170,7 +170,7 @@ module Types
 
     field :can_change_course_publish_state, Boolean, null: true
     def can_change_course_publish_state
-      course.grants_any_right?(current_user, :change_course_state, :manage_courses_publish)
+      course.grants_right?(current_user, :manage_courses_publish)
     end
 
     field :default_view, String, null: true

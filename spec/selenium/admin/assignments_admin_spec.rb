@@ -70,18 +70,7 @@ describe "assignments" do
       assignment_model(course: @course, submission_types: "online_upload", title: "Assignment 1")
     end
 
-    it "does not kersplode on the index without the `manage_courses` permission" do
-      @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-      account_admin_user_with_role_changes(role_changes: { manage_courses: false })
-      user_session(@user)
-
-      get "/courses/#{@course.id}/assignments"
-      wait_for_ajaximations
-      expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
-    end
-
-    it "does not kersplode on the index without the `manage_courses_admin` permission (granular permissions)" do
-      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+    it "does not kersplode on the index without the `manage_courses_admin` permission" do
       account_admin_user_with_role_changes(role_changes: { manage_courses_admin: false })
       user_session(@user)
 

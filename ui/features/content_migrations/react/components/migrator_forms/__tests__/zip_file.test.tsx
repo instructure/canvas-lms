@@ -107,7 +107,7 @@ describe('ZipFileImporter', () => {
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
     await userEvent.upload(input, file)
-    expect(screen.getByText('No file chosen')).toBeInTheDocument()
+    expect(screen.queryByText('my_file.zip')).not.toBeInTheDocument()
   })
 
   it('renders alert when large file is chosen', async () => {
@@ -117,7 +117,7 @@ describe('ZipFileImporter', () => {
     Object.defineProperty(file, 'size', {value: 1024 + 1})
     const input = screen.getByTestId('migrationFileUpload')
     await userEvent.upload(input, file)
-    expect(showFlashError).toHaveBeenCalledWith('Your migration can not exceed 1.0 KB')
+    expect(screen.getByText('Your migration can not exceed 1.0 KB')).toBeInTheDocument()
   })
 
   it('calls onSubmit', async () => {
@@ -172,6 +172,18 @@ describe('ZipFileImporter', () => {
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
       expect(screen.queryByText('Search folders')).not.toBeInTheDocument()
       expect(screen.queryByText('course files')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('submit error', () => {
+    describe('file input error', () => {
+      const expectedFileMissingError = 'You must select a file to import content from'
+
+      it('renders the file missing error', async () => {
+        renderComponent()
+        await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+        expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
+      })
     })
   })
 })

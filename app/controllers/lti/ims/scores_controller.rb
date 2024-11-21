@@ -76,6 +76,7 @@ module Lti::IMS
       :verify_line_item_in_context,
       :verify_user_in_context,
       :verify_required_params,
+      :verify_assignment_published,
       :verify_valid_timestamp,
       :verify_valid_score_maximum,
       :verify_valid_score_given,
@@ -403,6 +404,12 @@ module Lti::IMS
       return if submission.attempts_left.nil? || submission.attempts_left > 0
 
       render_error("The maximum number of allowed attempts has been reached for this submission", :unprocessable_entity)
+    end
+
+    def verify_assignment_published
+      return if line_item.assignment.published?
+
+      render_error("This assignment is still unpublished", :unprocessable_entity)
     end
 
     def prioritize_non_tool_grade?

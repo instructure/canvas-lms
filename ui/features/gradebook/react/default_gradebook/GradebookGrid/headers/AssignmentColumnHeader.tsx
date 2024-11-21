@@ -257,6 +257,11 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     }
   }
 
+  selectBulkRubricExport() {
+    const {toggleRubricAssessmentExportModal} = useStore.getState()
+    toggleRubricAssessmentExportModal(true, this.props.allStudents.length, this.props.assignment)
+  }
+
   activeStudentDetails() {
     const activeStudents = this.props
       .getCurrentlyShownStudents()
@@ -403,6 +408,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
         {this.props.postGradesAction.enabledForUser && (
           <MenuItem
+            id="post-grades"
             disabled={!this.props.postGradesAction.hasGradesOrCommentsToPost}
             onSelect={this.postGrades}
           >
@@ -458,13 +464,15 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         {this.props.postGradesAction.enabledForUser && <MenuSeparator />}
 
         {this.props.postGradesAction.enabledForUser && (
-          <MenuItem onSelect={this.showGradePostingPolicy}>
+          <MenuItem id="save-grade-posting-policy" onSelect={this.showGradePostingPolicy}>
             {I18n.t('Grade Posting Policy')}
           </MenuItem>
         )}
 
         {this.props.rubricAssessmentImportsExportsEnabled && (
-          <MenuItem onSelect={() => {}}>{I18n.t('Bulk Download Rubrics')}</MenuItem>
+          <MenuItem onSelect={() => this.selectBulkRubricExport()}>
+            {I18n.t('Bulk Download Rubrics')}
+          </MenuItem>
         )}
         {this.props.rubricAssessmentImportsExportsEnabled && (
           <MenuItem

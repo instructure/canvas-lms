@@ -25,7 +25,8 @@ import {ResourceCard} from './user/blocks/ResourceCard'
 import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
 import {ImageBlock} from './user/blocks/ImageBlock'
-import {RCEBlock} from './user/blocks/RCEBlock'
+import {MediaBlock} from './user/blocks/MediaBlock'
+import {RCETextBlock} from './user/blocks/RCETextBlock/RCETextBlock'
 import {GroupBlock} from './user/blocks/GroupBlock'
 import {DividerBlock} from './user/blocks/DividerBlock'
 
@@ -39,7 +40,7 @@ import {FooterSection} from './user/sections/FooterSection'
 import {KnowledgeCheckSection} from './user/sections/KnowledgeCheckSection'
 import {AnnouncementSection} from './user/sections/AnnouncementSection'
 import {BlankSection} from './user/sections/BlankSection'
-import {TabsBlock, TabBlock, TabContent} from './user/blocks/TabsBlock'
+import {TabsBlock} from './user/blocks/TabsBlock'
 
 import {NoSections} from './user/common'
 
@@ -52,8 +53,9 @@ const blocks = {
   ResourceCard,
   IconBlock,
   ImageBlock,
-  RCEBlock,
+  MediaBlock,
   KnowledgeCheckSection,
+  RCETextBlock,
   AnnouncementSection,
   ResourcesSection,
   ResourcesSectionInner,
@@ -70,8 +72,6 @@ const blocks = {
   FooterSection,
   BlankSection,
   TabsBlock,
-  TabBlock,
-  TabContent,
   DividerBlock,
 }
 

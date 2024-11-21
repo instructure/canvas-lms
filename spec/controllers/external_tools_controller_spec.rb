@@ -161,9 +161,31 @@ describe ExternalToolsController do
             canvas_region
             canvas_environment
             client_id
-            deployment_id
+            lti_deployment_id
             lti_storage_target
           ]
+        end
+
+        context "with lti_deployment_id_in_login_request FF off" do
+          before do
+            @course.root_account.disable_feature!(:lti_deployment_id_in_login_request)
+          end
+
+          it "creates a login message that includes deployment_id" do
+            subject
+            expect(assigns[:lti_launch].params.keys).to match_array %w[
+              iss
+              login_hint
+              target_link_uri
+              lti_message_hint
+              canvas_region
+              canvas_environment
+              client_id
+              deployment_id
+              lti_deployment_id
+              lti_storage_target
+            ]
+          end
         end
 
         it 'sets the "login_hint" to the current user lti id' do
@@ -777,7 +799,7 @@ describe ExternalToolsController do
           expect(lti_launch.params["accept_media_types"]).to eq "application/pdf,image/jpeg"
         end
 
-        it "sends the ext_content_file_extensions paramter for restriced file types" do
+        it "sends the ext_content_file_extensions parameter for restricted file types" do
           user_session(@teacher)
           assignment = @course.assignments.new(name: "an assignment")
           assignment.allowed_extensions += ["pdf", "jpeg"]
@@ -1698,7 +1720,7 @@ describe ExternalToolsController do
         adhoc_override.save!
       end
 
-      it "generates a student launch with overriden params" do
+      it "generates a student launch with overridden params" do
         expect(assignment.due_at).to eq due_at
 
         user_session(@student)
@@ -1709,7 +1731,7 @@ describe ExternalToolsController do
         ).to eq due_at_diff
       end
 
-      it "generates an admin/teacher launch with overriden params" do
+      it "generates an admin/teacher launch with overridden params" do
         expect(assignment.due_at).to eq due_at
 
         user_session(@user)
@@ -1751,7 +1773,7 @@ describe ExternalToolsController do
         end
       end
 
-      context "when launching as a student but the assigment is unpublished" do
+      context "when launching as a student but the assignment is unpublished" do
         it "returns a 401" do
           user_session(@student)
           assignment.update! workflow_state: "unpublished"
@@ -2211,7 +2233,7 @@ describe ExternalToolsController do
     it "does not create tool if user lacks create_tool_manually" do
       user_session(@student)
       post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com", consumer_key: "key", shared_secret: "secret" } }, format: "json"
-      assert_status(401)
+      assert_forbidden
     end
 
     it "creates tool if user is granted create_tool_manually" do
@@ -2468,7 +2490,7 @@ describe ExternalToolsController do
     end
 
     context "navigation tabs caching" do
-      it "does not clear the navigation tabs cache for non navigtaion tools" do
+      it "does not clear the navigation tabs cache for non navigation tools" do
         enable_cache do
           user_session(@teacher)
           nav_cache = Lti::NavigationCache.new(@course.root_account)

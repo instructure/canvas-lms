@@ -376,11 +376,13 @@ class ApplicationController < ActionController::Base
     assignment_edit_placement_not_on_announcements
     instui_header
     rce_find_replace
+    rce_transform_iframe_sandbox_attributes
     courses_popout_sisid
     dashboard_graphql_integration
     discussion_checkpoints
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
+    horizon_course_setting
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours

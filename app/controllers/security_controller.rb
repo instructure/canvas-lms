@@ -54,21 +54,26 @@ class SecurityController < ApplicationController
   end
 
   def self.notice_types_supported
-    Lti::PlatformNotificationService::NOTICE_TYPES
+    Lti::Pns::NoticeTypes::ALL
+  end
+
+  def self.key_storages_by_path
+    {
+      "/internal/services/jwks" => CanvasSecurity::ServicesJwt::KeyStorage,
+      "/login/oauth2/jwks" => Canvas::OAuth::KeyStorage,
+      "/api/lti/security/jwks" => Lti::KeyStorage
+    }
   end
 
   # @API Show all available JWKs used by Canvas for signing.
   #
   # @returns JWKs
   def jwks
-    key_storage = case request.path
-                  when "/internal/services/jwks"
-                    CanvasSecurity::ServicesJwt::KeyStorage
-                  when "/login/oauth2/jwks"
-                    Canvas::OAuth::KeyStorage
-                  when "/api/lti/security/jwks"
-                    Lti::KeyStorage
-                  end
+    key_storage = self.class.key_storages_by_path[request.path]
+    unless key_storage
+      return render json: { message: "page not found" }, status: :not_found
+    end
+
     public_keyset = key_storage.public_keyset
 
     if params.include?(:rotation_check)

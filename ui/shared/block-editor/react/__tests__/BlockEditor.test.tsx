@@ -18,11 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import {
-  getByText as domGetByText,
-  getAllByText as domGetAllByText,
-  getByLabelText as domGetByLabelText,
-} from '@testing-library/dom'
+import {getByText as domGetByText} from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import BlockEditor, {type BlockEditorProps} from '../BlockEditor'
@@ -43,7 +39,6 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
       container={container}
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       content={{version: '0.2', blocks: blank_page}}
-      onCancel={() => {}}
       {...props}
     />,
     {container}
@@ -108,7 +103,6 @@ describe('BlockEditor', () => {
       const previewModal = screen.getByLabelText('Preview')
       expect(previewModal).toHaveAttribute('role', 'dialog')
 
-      expect(domGetAllByText(previewModal, 'View Size')).toHaveLength(2)
       expect(domGetByText(previewModal, 'this is text.', {exact: true})).toBeInTheDocument()
 
       const closeButton = domGetByText(previewModal, 'Close', {exact: true}).closest(
@@ -119,38 +113,6 @@ describe('BlockEditor', () => {
       await waitFor(() => {
         expect(screen.queryByLabelText('Preview')).not.toBeInTheDocument()
       })
-    })
-
-    it('adjusts the view size', async () => {
-      // rebnder a page with a blank section containing a text block
-      const {getByText} = renderEditor({
-        content: {id: '1', version: '0.2', blocks: blank_section_with_text},
-      })
-      await user.click(getByText('Preview').closest('button') as HTMLButtonElement)
-
-      const previewModal = screen.getByLabelText('Preview')
-      expect(previewModal).toHaveAttribute('role', 'dialog')
-
-      expect(domGetByLabelText(previewModal, 'Desktop')).toBeChecked()
-
-      const view = document.querySelector('.block-editor-view') as HTMLElement
-
-      expect(view).toHaveClass('desktop')
-      expect(view).toHaveStyle({width: '1026px'})
-
-      const tablet = domGetByLabelText(previewModal, 'Tablet')
-      expect(tablet).not.toBeChecked()
-      await user.click(tablet)
-      expect(tablet).toBeChecked()
-      expect(view).toHaveClass('tablet')
-      expect(view).toHaveStyle({width: '768px'})
-
-      const mobile = domGetByLabelText(previewModal, 'Mobile')
-      expect(mobile).not.toBeChecked()
-      await user.click(mobile)
-      expect(mobile).toBeChecked()
-      expect(view).toHaveClass('mobile')
-      expect(view).toHaveStyle({width: '320px'})
     })
   })
 

@@ -57,7 +57,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
                        quiz_id: @quiz.id.to_s },
                      { quiz_extensions: quiz_extension_params },
                      { "Accept" => "application/vnd.api+json" })
-        assert_status(403)
+        assert_forbidden
       end
     end
 

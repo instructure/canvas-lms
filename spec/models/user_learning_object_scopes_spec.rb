@@ -1068,6 +1068,18 @@ describe UserLearningObjectScopes do
           @group_topic.save!
           expect(@student.discussion_topics_needing_viewing(**opts).sort_by(&:id)).to eq [@topic, @group_topic, @a]
         end
+
+        it "does not show for locked announcements" do
+          @a.lock_at = 1.day.ago
+          @a.save!
+          a2 = announcement_model(context: @course)
+          a2.lock_at = nil
+          a2.save!
+          a3 = announcement_model(context: @course)
+          a3.lock_at = 1.day.from_now
+          a3.save!
+          expect(@student.discussion_topics_needing_viewing(**opts)).to eq [a2, a3]
+        end
       end
 
       context "include_concluded" do

@@ -78,7 +78,8 @@ module Factories
 
   def lti_ims_registration_model(**params)
     params = LTI_IMS_REGISTRATION_BASE_ATTRS.merge(params)
-    params[:developer_key] ||= developer_key_model(public_jwk_url: LTI_IMS_REGISTRATION_BASE_ATTRS[:jwks_uri], account: params.delete(:account) || account_model)
+    params[:developer_key] ||= developer_key_model(public_jwk_url: LTI_IMS_REGISTRATION_BASE_ATTRS[:jwks_uri], account: params.delete(:account) || account_model, is_lti_key: true)
+    params[:lti_registration] ||= params[:developer_key].lti_registration
     @ims_registration = Lti::IMS::Registration.create!(params)
   end
 end

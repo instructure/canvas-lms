@@ -41,8 +41,7 @@ ready(() => {
         published={published}
         isPublishing={false}
         disabled={false}
-      />,
-      el
+      />
     )
   })
 })

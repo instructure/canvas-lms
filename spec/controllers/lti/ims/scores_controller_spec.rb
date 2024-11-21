@@ -167,7 +167,7 @@ module Lti::IMS
               expect(rslt.submission).to be_nil
             end
 
-            context do
+            context "with PendingManual" do
               let(:params_overrides) { super().merge(gradingProgress: "PendingManual") }
 
               it "does not create submission with PendingManual" do
@@ -1409,6 +1409,28 @@ module Lti::IMS
           end
 
           it_behaves_like "an unprocessable entity"
+        end
+
+        context "when assignment is unpublished" do
+          before { assignment.update!(workflow_state: "unpublished") }
+
+          let(:params_overrides) do
+            super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
+                            {
+                              type: "file",
+                              url: "https://getsamplefiles.com/download/txt/sample-1.txt",
+                              title: "sample1.txt"
+                            }
+                          ] })
+          end
+
+          it "does not modify the submission" do
+            result
+            send_request
+            expect(assignment.find_or_create_submission(user).workflow_state).to eq "unsubmitted"
+            expect(response).to have_http_status :unprocessable_entity
+            expect(response.body).to include "This assignment is still unpublished"
+          end
         end
       end
     end

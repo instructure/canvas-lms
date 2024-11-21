@@ -93,17 +93,7 @@ const renderComponent = (props: Partial<BlocksPanelProps> = {}) => {
   return render(<BlocksPanel {...defaultProps} {...props} />)
 }
 
-const blockList = [
-  'Button',
-  'Text',
-  'RCE',
-  'Icon',
-  'Heading',
-  'Resource Card',
-  'Image',
-  'Group',
-  'Tabs',
-]
+const blockList = ['Button', 'Text', 'Icon', 'Image', 'Group', 'Tabs', 'Divider']
 
 describe('Toolbox', () => {
   afterEach(() => {

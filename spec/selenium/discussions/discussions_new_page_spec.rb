@@ -1085,6 +1085,13 @@ describe "discussions" do
           expect(rule_assignment.id).to eq(dt.assignment.id)
           expect(rule_first_assignment.id).to eq(@assignment_for_mp.id)
         end
+
+        it "Use tab style filter element in normal view and dropdown in mobile view" do
+          get "/courses/#{course.id}/discussion_topics/new"
+          expect(f("div[role='tab']").text).to eq "Details"
+          resize_screen_to_mobile_width
+          expect(f("input[data-testid='view-select']").attribute("title")).to eq "Details"
+        end
       end
 
       context "when instui_nav feature flag on" do
@@ -1098,13 +1105,6 @@ describe "discussions" do
         it "create discussion header title rendered correctly" do
           get "/courses/#{course.id}/discussion_topics/new"
           expect(fj("h1:contains('#{page_header_title_discussion}')").text).to eq page_header_title_discussion
-        end
-
-        it "Use tab style filter element in normal view and dropdown in mobile view" do
-          get "/courses/#{course.id}/discussion_topics/new"
-          expect(f("div[role='tab']").text).to eq "Details"
-          resize_screen_to_mobile_width
-          expect(f("input[data-testid='view-select']").attribute("title")).to eq "Details"
         end
 
         it "After Save and publish need to see a publish pill in edit page" do
@@ -1140,6 +1140,7 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
         # Expect certain field to be present
         expect(f("body")).to contain_jqcss "input[value='enable-participants-commenting']"
+        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
         expect(f("body")).to contain_jqcss "input[value='enable-podcast-feed']"
         expect(f("body")).to contain_jqcss "input[value='allow-liking']"
         expect(f("body")).to contain_jqcss "div[data-testid='non-graded-date-options']"
@@ -2484,6 +2485,19 @@ describe "discussions" do
             expect(sub_assignment1.points_possible).to eq 5
             expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
             expect(sub_assignment2.points_possible).to eq 7
+          end
+
+          it "disallows setting the group discussion checkbox" do
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_truthy
+
+            force_click_native('input[type=checkbox][value="graded"]')
+            wait_for_ajaximations
+
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_falsey
           end
         end
       end

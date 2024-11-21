@@ -407,26 +407,16 @@ module AuthenticationMethods
   def render_json_unauthorized
     add_www_authenticate_header if api_request? && !@current_user
 
-    if Account.site_admin.feature_enabled?(:api_auth_error_updates)
-      if @current_user
-        code = :forbidden
-        status = "unauthorized"
-        message = I18n.t("lib.auth.not_authorized", "user not authorized to perform that action")
-      else
-        code = :unauthorized
-        status = "unauthenticated"
-        message = I18n.t("lib.auth.authentication_required", "user authorization required")
-      end
+    if @current_user
+      code = :forbidden
+      status = "unauthorized"
+      message = I18n.t("lib.auth.not_authorized", "user not authorized to perform that action")
     else
       code = :unauthorized
-      if @current_user
-        status = I18n.t("lib.auth.status_unauthorized", "unauthorized")
-        message = I18n.t("lib.auth.not_authorized", "user not authorized to perform that action")
-      else
-        status = I18n.t("lib.auth.status_unauthenticated", "unauthenticated")
-        message = I18n.t("lib.auth.authentication_required", "user authorization required")
-      end
+      status = "unauthenticated"
+      message = I18n.t("lib.auth.authentication_required", "user authorization required")
     end
+
     render status: code, json: { status:, errors: [{ message: }] }
   end
 

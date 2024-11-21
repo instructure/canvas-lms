@@ -40,7 +40,7 @@ describe UsageRightsController, type: :request do
                          { controller: "usage_rights", action: "licenses", course_id: @course.to_param, format: "json" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "lists licenses" do
@@ -60,7 +60,7 @@ describe UsageRightsController, type: :request do
                          { controller: "usage_rights", action: "set_usage_rights", course_id: @course.to_param, format: "json" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "publishes on save when usage_rights & publish have been set" do
@@ -208,7 +208,7 @@ describe UsageRightsController, type: :request do
                          { controller: "usage_rights", action: "remove_usage_rights", course_id: @course.to_param, format: "json" },
                          {},
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
 
       it "removes usage rights" do

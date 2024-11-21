@@ -54,7 +54,7 @@ describe "CSP Settings API", type: :request do
 
     it "is unauthorized" do
       course_with_student(active_all: true, course: @course)
-      get_csp_settings(@course, 401)
+      get_csp_settings(@course, 403)
     end
 
     describe "course-level settings" do

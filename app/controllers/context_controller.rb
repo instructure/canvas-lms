@@ -344,7 +344,7 @@ class ContextController < ApplicationController
       end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
 
       @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
-      if @context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
+      if @context.grants_right?(@current_user, :manage_groups_delete)
         @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
       end
       @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.created_at }.reverse
@@ -360,7 +360,7 @@ class ContextController < ApplicationController
       scope = @context.wiki if type == "wiki_page"
       type = "all_discussion_topic" if type == "discussion_topic"
       type = "all_group_category" if type == "group_category"
-      if %w[all_group_category group].include?(type) && !@context.grants_any_right?(@current_user, :manage_groups, :manage_groups_delete)
+      if %w[all_group_category group].include?(type) && !@context.grants_right?(@current_user, :manage_groups_delete)
         return render_unauthorized_action
       end
 

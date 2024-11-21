@@ -241,11 +241,11 @@ describe UserObserveesController, type: :request do
 
     it "does not allow admins from an external account" do
       add_linked_observer(external_student, external_parent, root_account: external_account)
-      observers_call(user_id: external_student.id, domain_root_account: external_account, expected_status: 401)
+      observers_call(user_id: external_student.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
-      observers_call(api_user: disallowed_admin, expected_status: 401)
+      observers_call(api_user: disallowed_admin, expected_status: 403)
     end
 
     it "only returns linked root accounts the admin has rights for" do
@@ -299,11 +299,11 @@ describe UserObserveesController, type: :request do
 
     it "does not allow admins from an external account" do
       add_linked_observer(external_student, external_parent, root_account: external_account)
-      index_call(user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
+      index_call(user_id: external_parent.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
-      index_call(api_user: disallowed_admin, expected_status: 401)
+      index_call(api_user: disallowed_admin, expected_status: 403)
     end
 
     it "returns avatar if avatar service enabled on account" do
@@ -413,7 +413,7 @@ describe UserObserveesController, type: :request do
         unique_id: external_student_pseudonym.unique_id,
         password: external_student_pseudonym.password,
       }
-      create_call({ observee: }, user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
+      create_call({ observee: }, user_id: external_parent.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
@@ -421,7 +421,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      create_call({ observee: }, api_user: disallowed_admin, expected_status: 401)
+      create_call({ observee: }, api_user: disallowed_admin, expected_status: 403)
 
       expect(parent.reload.linked_students).to eq []
     end
@@ -431,7 +431,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      create_call({ observee: }, api_user: student, expected_status: 401)
+      create_call({ observee: }, api_user: student, expected_status: 403)
 
       expect(student.reload.linked_students).to eq []
     end
@@ -472,12 +472,12 @@ describe UserObserveesController, type: :request do
 
     it "does not allow admins from an external account" do
       add_linked_observer(external_student, external_parent, root_account: external_account)
-      show_call(user_id: external_parent.id, observee_id: external_student.id, domain_root_account: external_account, expected_status: 401)
+      show_call(user_id: external_parent.id, observee_id: external_student.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
       add_linked_observer(student, parent)
-      show_call(api_user: disallowed_admin, expected_status: 401)
+      show_call(api_user: disallowed_admin, expected_status: 403)
     end
   end
 
@@ -509,12 +509,12 @@ describe UserObserveesController, type: :request do
 
     it "does not allow admins from an external account" do
       add_linked_observer(external_student, external_parent, root_account: external_account)
-      show_observer_call(user_id: external_student.id, observer_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
+      show_observer_call(user_id: external_student.id, observer_id: external_parent.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
       add_linked_observer(student, parent)
-      show_observer_call(api_user: disallowed_admin, expected_status: 401)
+      show_observer_call(api_user: disallowed_admin, expected_status: 403)
     end
   end
 
@@ -551,15 +551,15 @@ describe UserObserveesController, type: :request do
     end
 
     it "does not allow admins from an external account" do
-      update_call(user_id: external_parent.id, observee_id: external_student.id, domain_root_account: external_account, expected_status: 401)
+      update_call(user_id: external_parent.id, observee_id: external_student.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow self managed users" do
-      update_call(api_user: parent, expected_status: 401)
+      update_call(api_user: parent, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
-      update_call(api_user: disallowed_admin, expected_status: 401)
+      update_call(api_user: disallowed_admin, expected_status: 403)
     end
 
     context "multiple root accounts" do
@@ -627,12 +627,12 @@ describe UserObserveesController, type: :request do
     end
 
     it "does not allow admins from an external account" do
-      delete_call(user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
+      delete_call(user_id: external_parent.id, domain_root_account: external_account, expected_status: 403)
     end
 
     it "does not allow unauthorized admins" do
       add_linked_observer(student, parent)
-      delete_call(api_user: disallowed_admin, expected_status: 401)
+      delete_call(api_user: disallowed_admin, expected_status: 403)
       expect(parent.reload.linked_students).to eq [student]
     end
 

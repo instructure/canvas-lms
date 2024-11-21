@@ -51,6 +51,7 @@ const COURSE_RUBRICS_QUERY = gql`
             longDescription
             description
             ignoreForScoring
+            learningOutcomeId
           }
           hasRubricAssociations
           hidePoints
@@ -84,6 +85,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
             longDescription
             description
             ignoreForScoring
+            learningOutcomeId
           }
           hasRubricAssociations
           hidePoints

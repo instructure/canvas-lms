@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useState} from 'react'
 import type {BlockTemplate} from '../../types'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -37,26 +37,59 @@ export default function QuickLook({
   close: () => void
   customize: () => void
 }) {
+  const [quickLookWrapperRef, setQuickLookWrapperRef] = useState<HTMLDivElement | null>(null)
+  const [quickLookRef, setQuickLookRef] = useState<HTMLDivElement | null>(null)
+
+  const handleModalOpen = useCallback(() => {
+    if (quickLookWrapperRef && quickLookRef) {
+      requestAnimationFrame(() => {
+        const {width, height} = quickLookRef.getBoundingClientRect()
+        quickLookWrapperRef.style.height = `${height}px`
+        quickLookWrapperRef.style.width = `${width}px`
+      })
+    }
+  }, [quickLookRef, quickLookWrapperRef])
+
   if (!template) {
     return null
   }
 
   return (
-    <Modal label={I18n.t('Template: Quick Look')} open={true} size="medium">
+    <Modal label={I18n.t('Template: Quick Look')} open={true} size="auto" onOpen={handleModalOpen}>
       <Modal.Header>
         <CloseButton placement="end" offset="small" onClick={close} screenReaderLabel="Close" />
         <Heading level="h3">{I18n.t('Template: Quick Look')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <View as="div" margin="small" padding="small" borderWidth="small" borderRadius="large">
-          {template.node_tree && (
-            <BlockEditorView
-              content={{
-                version: LATEST_BLOCK_DATA_VERSION,
-                blocks: JSON.stringify(template.node_tree.nodes),
+        <View
+          as="div"
+          position="relative"
+          padding="small"
+          borderWidth="small"
+          borderRadius="large"
+          width="743px" /* 1024 * 0.7 - 26 (margin+padding) */
+        >
+          <div ref={setQuickLookWrapperRef} style={{height: '100%'}}>
+            <div
+              ref={setQuickLookRef}
+              style={{
+                position: 'relative',
+                width: '1024px',
+                height: 'auto',
+                transform: 'scale(0.7)',
+                transformOrigin: 'top left',
               }}
-            />
-          )}
+            >
+              {template.node_tree && (
+                <BlockEditorView
+                  content={{
+                    version: LATEST_BLOCK_DATA_VERSION,
+                    blocks: template.node_tree.nodes,
+                  }}
+                />
+              )}
+            </div>
+          </div>
         </View>
       </Modal.Body>
       <Modal.Footer>

@@ -64,7 +64,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jira_ref_parser (1.0.1)
-    json (2.8.1)
+    json (2.7.2)
     language_server-protocol (3.17.0.3)
     loofah (2.22.0)
       crass (~> 1.0.2)

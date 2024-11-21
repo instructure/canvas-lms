@@ -320,6 +320,10 @@ class MediaObjectsController < ApplicationController
     js_env media_object: media_api_json if media_api_json
     js_env attachment: !!@attachment
     js_env attachment_id: @attachment.id if Account.site_admin.feature_enabled?(:media_links_use_attachment_id) && @attachment
+    consolidated_media_player_enabled = @attachment&.context&.account&.feature_enabled?(:consolidated_media_player) || (@attachment.nil? && @media_object&.context&.account&.feature_enabled?(:consolidated_media_player))
+    # this flag is also injected through the normal js_env for the RCE
+    # but it needs to be added separately here for the iframe because of subaccount weirdness
+    js_env[:FEATURES][:consolidated_media_player_iframe] = true if consolidated_media_player_enabled && js_env[:FEATURES]
     js_bundle :media_player_iframe_content
     css_bundle :media_player
     render html: "<div id='player_container'>#{I18n.t("Loading...")}</div>".html_safe,

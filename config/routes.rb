@@ -320,6 +320,7 @@ CanvasRails::Application.routes.draw do
         resources :rubric_assessments, path: :assessments do
           collection do
             get :export
+            post :import
           end
         end
       end
@@ -1925,6 +1926,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
+      get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
       post "accounts/:account_id/lti_registrations/:id/bind", action: :bind
     end
@@ -2319,6 +2321,7 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/products_categories", action: :index_by_category
       get  "#{prefix}/products/:id", action: :show
       get  "#{prefix}/filters", action: :filters
+      get  "#{prefix}/organizations/:organization_salesforce_id/products", action: :index_by_organization
     end
 
     scope(controller: :feature_flags) do

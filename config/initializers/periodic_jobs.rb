@@ -309,6 +309,10 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(MissingPolicyApplicator, :apply_missing_deductions)
   end
 
+  Delayed::Periodic.cron "ConcludedGradingStandardSetter.preserve_grading_standard_inheritance", "*/5 * * * *", priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(ConcludedGradingStandardSetter, :preserve_grading_standard_inheritance)
+  end
+
   Delayed::Periodic.cron "Assignment.clean_up_duplicating_assignments", "*/15 * * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Assignment, :clean_up_duplicating_assignments)
   end

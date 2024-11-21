@@ -18,7 +18,7 @@
 
 import {contrast} from '@instructure/ui-color-utils'
 import {white, black} from './constants'
-import tinycolor from 'tinycolor2'
+import {getContrastStatus, isTransparent} from '@instructure/canvas-rce'
 
 const getContrastingColor = (color1: string) => {
   const color2 = contrast(color1, white) > contrast(color1, black) ? white : black
@@ -30,12 +30,21 @@ const getContrastingButtonColor = (color1: string) => {
   return buttonColor
 }
 
-const isTransparent = (color?: string) => {
-  if (!color) {
-    return true
+const getEffectiveBackgroundColor = (elem: HTMLElement) => {
+  let bgcolor = window.getComputedStyle(elem).backgroundColor
+  while (isTransparent(bgcolor) && elem.parentElement) {
+    elem = elem.parentElement
+    bgcolor = window.getComputedStyle(elem).backgroundColor
   }
-  const c = tinycolor(color)
-  return c.isValid() && c.getAlpha() === 0
+  return bgcolor
 }
 
-export {getContrastingColor, getContrastingButtonColor, isTransparent, white, black}
+export {
+  getContrastingColor,
+  getContrastingButtonColor,
+  getContrastStatus,
+  isTransparent,
+  getEffectiveBackgroundColor,
+  white,
+  black,
+}

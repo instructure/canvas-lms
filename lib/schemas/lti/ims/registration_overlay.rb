@@ -76,6 +76,42 @@ module Schemas::Lti::IMS
       }
     }.freeze
 
+    def self.to_lti_overlay(reg_overlay)
+      return {} unless reg_overlay
+
+      reg_overlay = reg_overlay.with_indifferent_access
+
+      {
+        title: reg_overlay[:title],
+        description: reg_overlay[:description],
+        disabled_scopes: reg_overlay[:disabledScopes],
+        disabled_placements: reg_overlay[:disabledPlacements],
+        privacy_level: reg_overlay[:privacy_level],
+        placements: reg_overlay[:placements].to_h do |placement|
+          launch_height = placement[:launch_height] || reg_overlay[:launch_height]
+          launch_width = placement[:launch_width] || reg_overlay[:launch_width]
+
+          # There's technically the possibility for loss of info here, as the
+          # overlay could have a string value for launch_height/launch_width, but
+          # the Lti::Overlay only supports numbers. However, all strings should
+          # just be stringified numbers, as we don't support % or other units.
+          launch_height = launch_height.to_i unless launch_height.nil?
+          launch_width = launch_width.to_i unless launch_width.nil?
+
+          [
+            placement[:type].to_sym,
+            {
+              text: placement[:label],
+              icon_url: placement[:icon_url] || reg_overlay[:icon_url],
+              launch_height:,
+              launch_width:,
+              default: placement[:default],
+            }.compact
+          ]
+        end
+      }.compact.with_indifferent_access
+    end
+
     private
 
     def schema

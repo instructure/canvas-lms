@@ -124,11 +124,10 @@ class GroupCategoriesController < ApplicationController
     scoped_categories = @context.group_categories.preload(:root_account, :progresses)
     respond_to do |format|
       format.json do
-        if authorized_action(@context, @current_user, [:manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS])
+        if authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS + RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
           can_view_groups = @context.grants_any_right?(
             @current_user,
             session,
-            :manage_groups,
             *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
           )
 
@@ -151,7 +150,7 @@ class GroupCategoriesController < ApplicationController
           includes = ["progress_url"]
           includes.concat(params[:includes]) if params[:includes]
 
-          render json: paginated_categories.map { |c| group_category_json(c, @current_user, session, include: includes) } if paginated_categories.present?
+          render json: paginated_categories.map { |c| group_category_json(c, @current_user, session, include: includes) }
         end
       end
     end

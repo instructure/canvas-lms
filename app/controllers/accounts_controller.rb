@@ -365,7 +365,7 @@ class AccountsController < ApplicationController
     @accounts = @current_user ? @current_user.adminable_accounts : []
     @all_accounts = Set.new
     @accounts.each do |a|
-      if a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+      if a.grants_any_right?(@current_user, session, :manage_courses_admin, :create_courses)
         @all_accounts << a
         @all_accounts.merge Account.active.sub_accounts_recursive(a.id)
       end
@@ -383,7 +383,7 @@ class AccountsController < ApplicationController
     return render json: [] unless @current_user
 
     accounts = @current_user.adminable_accounts || []
-    accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :manage_courses_add) }
+    accounts = accounts.select { |a| a.grants_any_right?(@current_user, session, :manage_courses_admin, :manage_courses_add) }
     sub_accounts = []
     # Load and handle ids from now on to avoid excessive memory usage
     accounts.each { |a| sub_accounts.concat Account.active.sub_account_ids_recursive(a.id) }
@@ -395,7 +395,7 @@ class AccountsController < ApplicationController
 
       next unless a.root_account.students_can_create_courses_anywhere? ||
                   @current_user.active_k5_enrollments?(root_account: a.root_account) ||
-                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+                  a.grants_any_right?(@current_user, session, :manage_courses_admin, :create_courses)
 
       accounts << a.id
     end
@@ -405,7 +405,7 @@ class AccountsController < ApplicationController
 
       next unless a.root_account.teachers_can_create_courses_anywhere? ||
                   @current_user.active_k5_enrollments?(root_account: a.root_account) ||
-                  a.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin, :create_courses)
+                  a.grants_any_right?(@current_user, session, :manage_courses_admin, :create_courses)
 
       accounts << a.id
     end
@@ -927,7 +927,7 @@ class AccountsController < ApplicationController
 
   def quiz_ip_filters
     if authorized_action(@account, @current_user, :read)
-      available_filters = @account.available_ip_filters(params[:search_term]) || []
+      available_filters = @account.available_ip_filters(params[:course_uuid], params[:search_term]) || []
 
       paginated_set = Api.paginate(available_filters, self, api_v1_quiz_ip_filters_url)
       renderable = quiz_ip_filters_json(paginated_set, @context, @current_user, session)
@@ -942,7 +942,7 @@ class AccountsController < ApplicationController
       includes = Array(params[:includes]) || []
       unauthorized = false
 
-      if params[:account].key?(:sis_account_id)
+      if params[:account]&.key?(:sis_account_id)
         sis_id = params[:account].delete(:sis_account_id)
         if @account.root_account.grants_right?(@current_user, session, :manage_sis) && !@account.root_account?
           @account.sis_source_id = sis_id.presence
@@ -956,7 +956,26 @@ class AccountsController < ApplicationController
         end
       end
 
-      if params[:account][:services] && authorized_action(@account, @current_user, :manage_account_settings)
+      if params[:account]&.key?(:parent_account_id)
+        if !@account.root_account? && @account.parent_account&.grants_right?(@current_user, session, :manage_account_settings)
+          new_parent_account = api_find(@account.root_account.all_accounts.active, params[:account][:parent_account_id])
+          if new_parent_account.grants_right?(@current_user, session, :manage_account_settings)
+            @account.parent_account = new_parent_account
+          else
+            @account.errors.add(:unauthorized, t("You are not authorized to manage the destination parent account."))
+            unauthorized = true
+          end
+        else
+          if @account.root_account?
+            @account.errors.add(:unauthorized, t("You cannot move a root account."))
+          else
+            @account.errors.add(:unauthorized, t("You are not authorized to manage the source parent account."))
+          end
+          unauthorized = true
+        end
+      end
+
+      if params[:account]&.key?(:services) && authorized_action(@account, @current_user, :manage_account_settings)
         params[:account][:services].slice(*Account.services_exposed_to_ui_hash(nil, @current_user, @account).keys).each do |key, value|
           @account.set_service_availability(key, value_to_boolean(value))
         end
@@ -1068,6 +1087,13 @@ class AccountsController < ApplicationController
   #   Empty means to inherit the setting from parent account, 0 means to not
   #   use a template even if a parent account has one set. The course must be
   #   marked as a template.
+  #
+  # @argument account[parent_account_id] [Integer|String]
+  #   The ID of a parent account to move the account to. The new parent account
+  #   must be in the same root account as the original. The hierarchy of
+  #   sub-accounts will be preserved in the new parent account. The caller must
+  #   be an administrator in both the original parent account and the new parent
+  #   account.
   #
   # @argument account[settings][restrict_student_past_view][value] [Boolean]
   #   Restrict students from viewing courses after end date
@@ -1562,7 +1588,7 @@ class AccountsController < ApplicationController
     user = api_find(User, params[:user_id])
     raise ActiveRecord::RecordNotFound if user.try(:frd_deleted?)
 
-    pseudonym = user && @account.pseudonyms.where(user_id: user).order(deleted_at: :desc).first!
+    pseudonym = user.pseudonym_for_restoration_in(@account)
 
     is_permissible =
       pseudonym.account.grants_right?(@current_user, :manage_user_logins) &&
@@ -1736,7 +1762,7 @@ class AccountsController < ApplicationController
       can_read_course_list:,
       can_read_roster:,
       can_create_dsr:,
-      can_create_courses: @account.grants_any_right?(@current_user, session, :manage_courses, :create_courses),
+      can_create_courses: @account.grants_right?(@current_user, session, :create_courses),
       can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
       analytics: @account.service_enabled?(:analytics),
       can_read_sis: @account.grants_right?(@current_user, session, :read_sis),
@@ -1747,7 +1773,6 @@ class AccountsController < ApplicationController
         @account.grants_any_right?(
           @current_user,
           session,
-          :manage_groups,
           *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
         ),
       can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))

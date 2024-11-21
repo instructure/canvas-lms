@@ -24,12 +24,12 @@
 
   can_manage = can_do(@context, @current_user, :manage)
 
-  can_manage_courses = can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
+  can_manage_courses = can_do(@context.account, @current_user, :manage_courses_admin)
   can_rename_course = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_renaming_by_teachers])
   can_change_course_availability = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_availability_editing_by_teachers])
   can_manage_master_courses = can_manage_courses && can_do(@context.account, @current_user, :manage_master_courses)
   has_multiple_sections = @context.course_sections.active.count > 1
-  show_publish_controls = can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?)
+  show_publish_controls = can_do(@context, @current_user, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?)
 
   is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
   blueprint_subscription = @context.master_course_subscriptions.active.first
@@ -248,7 +248,7 @@
           <% if can_manage %>
             <% account_chain = @context.account.account_chain.reverse %>
             <% account_chain.each do |account| %>
-              <% if can_do(account, @current_user, :manage_courses, :manage_courses_admin) %>
+              <% if can_do(account, @current_user, :manage_courses_admin) %>
                 <% if account.root_account? && account.all_accounts.active.count > Setting.get('course_settings_sub_account_dropdown_limit', '500').to_i %>
                   <a href="<%= context_url(account, :context_sub_accounts_url, :format => :json, :include_self => "1") %>" id="course_account_id_url" style="display: none;">&nbsp;</a>
                   <input type="hidden" name="course[account_id]" id="course_account_id" value="<%= @context.account_id %>"/>
@@ -314,7 +314,7 @@
       <div class="form-row">
         <div class="form-label"><%= f.blabel :enrollment_term_id, :en => "Term" %></div>
         <div>
-          <% if can_manage && can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin) %>
+          <% if can_manage && can_do(@context.account, @current_user, :manage_courses_admin) %>
             <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
               <% @context.root_account.enrollment_terms.active.sort_by{|t| t.start_at || CanvasSort::First}.each do |term| %>
                 <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
@@ -698,6 +698,12 @@
                   </span>
                 </div>
               <% end %>
+              <% if @context.account.feature_enabled?(:horizon_course_setting) %>
+                <div class="checkbox-flex-container">
+                  <%= f.check_box :horizon_course, :disabled => !can_manage_courses %>
+                  <%= f.label :horizon_course, :en => 'Horizon course' %><br />
+                </div>
+              <% end %>
               <%= f.select :default_wiki_editing_roles, [
                 [t('#course.wiki_permissions.only_teachers', "Only Teachers"), "teachers"],
                 [t('#course.wiki_permissions.teachers_students', "Teacher and Students"), "teachers,students"],
@@ -721,7 +727,7 @@
         <footer class="sticky-footer">
           <div>
             <% if Setting.get('cross_root_account_course_moves', 'false') == 'true' &&
-              Account.site_admin.grants_any_right?(@current_user, :manage_courses, :manage_courses_admin) && Account.root_accounts.count > 1 %>
+              Account.site_admin.grants_any_right?(@current_user, :manage_courses_admin) && Account.root_accounts.count > 1 %>
                 <a href="#" class="move_course_link btn"><i class="icon-arrow-right"></i> <%= t('links.move_course', %{Move To Another Account}) %></a>
             <% end %>
               <span class="course_form">
@@ -1001,7 +1007,7 @@
   <% end %>
 </div><!-- end course details tab -->
 
-<% if Account.site_admin.grants_any_right?(@current_user, :manage_courses, :manage_courses_admin) %>
+<% if Account.site_admin.grants_any_right?(@current_user, :manage_courses_admin) %>
   <div id="move_course_dialog" style="display: none;">
     <h2><%= t('headings.move_course', %{Move the course to another root account}) %></h2>
     <%= t('deatils.move_course', %{Select a new root account for this course.  After you move the course you'll want to specify a new department for the course as well.}) %>

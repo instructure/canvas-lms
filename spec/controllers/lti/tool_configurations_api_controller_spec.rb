@@ -77,7 +77,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
     context "when the user is not an admin" do
       before { user_session(student) }
 
-      it { is_expected.to be_unauthorized }
+      it { is_expected.to be_forbidden }
     end
 
     unless skip_404
@@ -557,6 +557,67 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it "renders the tool configuration" do
         subject
         expect(config_from_response).to eq tool_configuration
+      end
+    end
+
+    context "when the tool configuration is an Lti::IMS::Registration" do
+      let(:ims_registration) do
+        lti_ims_registration_model(
+          redirect_uris: ["http://example.com"],
+          initiate_login_uri: "http://example.com/login",
+          client_name: "Example Tool",
+          jwks_uri: "http://example.com/jwks",
+          logo_uri: "http://example.com/logo.png",
+          client_uri: "http://example.com/",
+          tos_uri: "http://example.com/tos",
+          policy_uri: "http://example.com/policy",
+          lti_tool_configuration: {
+            domain: "example.com",
+            messages: [],
+            claims: [
+              "name",
+              "email"
+            ]
+          },
+          scopes: [],
+          developer_key:,
+          lti_registration: developer_key.lti_registration,
+          registration_overlay: {
+            "privacy_level" => "anonymous"
+          }
+        )
+      end
+
+      before do
+        ims_registration
+      end
+
+      it "returns the registration with its overlay applied" do
+        subject
+        expect(json_parse.with_indifferent_access
+          .dig(:tool_configuration, :settings, :extensions)[0][:privacy_level])
+          .to eq "anonymous"
+      end
+
+      context "when the overlay is stored on an Lti::Overlay" do
+        let(:overlay) do
+          Lti::Overlay.create!(updated_by: account_admin_user,
+                               registration: developer_key.lti_registration,
+                               account:,
+                               data: { privacy_level: "anonymous" })
+        end
+
+        before do
+          overlay
+          tool_configuration.update!(registration_overlay: nil)
+        end
+
+        it "still returns the registration with its overlay applied" do
+          subject
+          expect(json_parse.with_indifferent_access
+            .dig(:tool_configuration, :settings, :extensions)[0][:privacy_level])
+            .to eq "anonymous"
+        end
       end
     end
   end

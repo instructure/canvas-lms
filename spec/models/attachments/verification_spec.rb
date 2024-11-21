@@ -120,7 +120,6 @@ describe Attachments::Verification do
       expect(v2.valid_verifier_for_permission?("token", :read)).to be(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to be(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_success").twice
-      expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
     it "follows custom permissions" do

@@ -18,7 +18,6 @@
 
 import {enhanceUserContent} from '../enhance_user_content'
 import {Mathml} from '../mathml'
-import formatMessage from '../../format-message'
 import * as instructureHelper from '../instructure_helper'
 
 jest.useFakeTimers()
@@ -555,6 +554,77 @@ describe('enhanceUserContent()', () => {
           expect(imgTag.src).toEqual('http://localhost/courses/1/files/1')
           expect(imgTag.hasAttribute('href')).toBe(false)
         })
+      })
+    })
+  })
+
+  describe('iframes with sandbox attribute', () => {
+    describe('when the rce_transform_iframe_sandbox_attributes feature flag is on', () => {
+      const acceptableSandboxAttributes = [
+        'allow-forms',
+        'allow-pointer-lock',
+        'allow-popups',
+        'allow-same-origin',
+        'allow-top-navigation',
+        'allow-modals',
+        'allow-orientation-lock',
+        'allow-popups-to-escape-sandbox',
+        'allow-presentation',
+        'allow-top-navigation-by-user-activation',
+      ]
+
+      beforeEach(() => {
+        subject(`
+          <iframe id="iframe1" src="https://example.com"></iframe>
+          <iframe id="iframe2" sandbox="allow-scripts allow-same-origin" src="https://example.com"></iframe>
+          <iframe id="iframe3" sandbox="allow-scripts" src="https://example.com"></iframe>
+        `)
+      })
+
+      it('adds sandbox attribute with all acceptable attributes if not present', () => {
+        const iframe = document.getElementById('iframe1')
+        // Call the function that enhances user content
+        enhanceUserContent(document, {rce_transform_iframe_sandbox_attributes: true})
+        expect(iframe.getAttribute('sandbox')).toBe(acceptableSandboxAttributes.join(' '))
+      })
+
+      it('removes disallowed attributes and keeps acceptable ones', () => {
+        // Call the function that enhances user content
+        enhanceUserContent(document, {rce_transform_iframe_sandbox_attributes: true})
+        const iframe = document.getElementById('iframe2')
+        expect(iframe.getAttribute('sandbox')).toBe('allow-same-origin')
+      })
+
+      it('adds all acceptable attributes if removing disallowed ones leaves it empty', () => {
+        const iframe = document.getElementById('iframe3')
+        // Call the function that enhances user content
+        enhanceUserContent(document, {rce_transform_iframe_sandbox_attributes: true})
+        expect(iframe.getAttribute('sandbox')).toBe(acceptableSandboxAttributes.join(' '))
+      })
+    })
+
+    describe('when the rce_transform_iframe_sandbox_attributes feature flag is false', () => {
+      beforeEach(() => {
+        subject(`
+          <iframe id="iframe1" sandbox="allow-scripts allow-forms allow-same-origin" src="https://example.com"></iframe>
+          <iframe id="iframe2" sandbox="allow-scripts allow-same-origin" src="https://example.com"></iframe>
+          <iframe id="iframe3" sandbox="allow-scripts" src="https://example.com"></iframe>
+        `)
+      })
+
+      it('only removes the sandbox attribute if it has the options [allow-scripts allow-forms allow-same-origin]', () => {
+        const iframe = document.getElementById('iframe1')
+        // Call the function that enhances user content
+        enhanceUserContent(document, {rce_transform_iframe_sandbox_attributes: false})
+        expect(iframe.getAttribute('sandbox')).toBe(null)
+
+        const iframe2 = document.getElementById('iframe2')
+        enhanceUserContent(document, {rce_transform_iframe_sandbox_attributes: false})
+        expect(iframe2.getAttribute('sandbox')).toBe('allow-scripts allow-same-origin')
+
+        const iframe3 = document.getElementById('iframe3')
+        enhanceUserContent(document, {rce_transform_iframe_sandbox_attributes: false})
+        expect(iframe3.getAttribute('sandbox')).toBe('allow-scripts')
       })
     })
   })

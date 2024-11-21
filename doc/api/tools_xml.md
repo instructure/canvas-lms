@@ -533,7 +533,7 @@ matching, and to only return URLs matching that domain.
 External tools can support different LTI environments for different canvas environments.
 
 NOTE: This setting is only supported by LTI 1.1 tools. LTI 1.3 tools should redirect to the
-desired domain/launch URL as described in the <a href="file.lti_dev_key_config.html#login-redirect">LTI 1.3 configuration guide</a>.
+desired domain/launch URL as described in the <a href="file.lti_launch_overview.html#login-redirect">LTI 1.3 launch overview</a>.
 
 * __domain__: All url domains in this tool's configuration will be replaced with this domain
 * __launch_url__: the blti:launch\_url property that should be used for all canvas test environments.

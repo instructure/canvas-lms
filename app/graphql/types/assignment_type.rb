@@ -121,6 +121,19 @@ module Types
       end
     end
 
+    class AssignmentRubricAssessmentType < ApplicationObjectType
+      description "RubricAssessments on an Assignment"
+
+      field :assessments_count,
+            Int,
+            "The count of RubricAssessments on an Assignment.",
+            null: true
+
+      def assessments_count
+        Loaders::AssignmentRubricAssessmentsCountLoader.load(object)
+      end
+    end
+
     class AssignmentScoreStatisticType < ApplicationObjectType
       graphql_name "AssignmentScoreStatistic"
       description "Statistics for an Assignment"
@@ -219,6 +232,11 @@ module Types
 
     field :moderated_grading, AssignmentModeratedGrading, null: true
     def moderated_grading
+      assignment
+    end
+
+    field :rubric_assessment, AssignmentRubricAssessmentType, null: true
+    def rubric_assessment
       assignment
     end
 
@@ -589,6 +607,28 @@ module Types
             submissions.graded.count
           end
         end
+      end
+    end
+
+    field :assignment_target_connection, AssignmentOverrideType.connection_type, null: true do
+      argument :order_by, AssignmentTargetSortOrderInputType, required: false
+    end
+    def assignment_target_connection(order_by: nil)
+      load_association(:context).then do |context|
+        return unless context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
+        scope = assignment.all_assignment_overrides.active
+
+        if order_by.present?
+          field = order_by[:field]
+          direction = (order_by[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
+
+          raise "Sort by field '#{field}' is not supported" unless %w[title due_at lock_at unlock_at].include?(field)
+
+          scope = scope.order(Arel.sql("assignment_overrides.#{field} #{direction}"))
+        end
+
+        scope
       end
     end
   end

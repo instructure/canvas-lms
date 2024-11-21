@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import classNames from 'classnames'
 import {InlineList} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
@@ -26,11 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('new_login')
 
-interface Props {
-  className?: string
-}
-
-const FooterLinks = ({className}: Props) => {
+const FooterLinks = () => {
   const {isUiActionPending, isPreviewMode} = useNewLogin()
 
   const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
@@ -40,11 +35,11 @@ const FooterLinks = ({className}: Props) => {
   }
 
   return (
-    <View as="div" className={classNames(className)} textAlign="center">
+    <View as="div" textAlign="center">
       <InlineList delimiter="pipe" size="small">
         <InlineList.Item>
           <Link href="https://community.canvaslms.com/" target="_blank" onClick={handleClick}>
-            Help
+            {I18n.t('Help')}
           </Link>
         </InlineList.Item>
 

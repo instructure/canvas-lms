@@ -2093,6 +2093,22 @@ module Lti
                          @root_account.feature_enabled?(:send_usage_metrics)
                        }
 
+    # Returns a comma-separated list of historical `lti_context_id` of a user in chronological order including the current id.
+    # The `lti_context_id` of a user is the same that is sent as `user_id` in 1.1 launches.
+    # This variable helps tools handle the merged user's history.
+    #
+    # @example
+    #   ```
+    #   123,456,789
+    #   ```
+    register_expansion "com.instructure.user.lti_1_1_id.history",
+                       [],
+                       lambda {
+                         past_ids = @current_user.past_lti_ids.pluck(:user_lti_context_id).uniq.compact_blank
+                         (past_ids + [@current_user.lti_context_id]).join(",")
+                       },
+                       USER_GUARD
+
     private
 
     def unique_submission_dates
@@ -2114,7 +2130,7 @@ module Lti
       context = @assignment.context
       # We return the latest of all due dates for the assignment if the user is a course admin.
       if course_admin?(context)
-        @assignment.submissions.maximum(:cached_due_date)
+        @assignment.submissions.maximum(:cached_due_date) || @assignment.due_at
       else
         @assignment.due_at
       end

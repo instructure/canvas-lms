@@ -132,6 +132,11 @@ over 10% different, the entire import file will be applied instead of diffing
 against a previous batch and this batch will not be used for diffing any future
 batches. The change_threshold can be set to any integer between 1 and 100.
 
+If five consecutive SIS batches with the same diffing data set identifier 
+exceed the change threshold, future imports will fail. You will be required
+to perform a remaster using the `diffing_remaster_data_set=true` option
+to resume imports with that data set identifier.
+
 change_threshold also impacts batch mode.
 
 Stickiness

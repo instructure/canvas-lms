@@ -2528,9 +2528,10 @@ class Account < ActiveRecord::Base
     settings[:banned_email_domains] || []
   end
 
-  def available_ip_filters(search_term = nil)
+  def available_ip_filters(course_uuid, search_term = nil)
     filters = []
-    accounts = account_chain.uniq
+    current_account = Course.find_by(uuid: course_uuid)&.account || self
+    accounts = current_account.account_chain(include_federated_parent: true).uniq
     search_term = search_term.downcase if search_term.present?
 
     accounts.each do |account|
@@ -2545,6 +2546,7 @@ class Account < ActiveRecord::Base
         }
       end
     end
-    filters
+
+    filters.sort_by { |filter| filter[:name] }
   end
 end

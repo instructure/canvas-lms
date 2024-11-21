@@ -25,7 +25,10 @@ import {
 } from '../RegistrationWizardModalState'
 import {apiError, genericError, success} from '../../../common/lib/apiResult/ApiResult'
 import {mockJsonUrlWizardService} from './helpers'
-import {mockDynamicRegistrationWizardService} from '../../dynamic_registration_wizard/__tests__/helpers'
+import {
+  mockDynamicRegistrationWizardService,
+  mockLti1p3RegistrationWizardService,
+} from '../../dynamic_registration_wizard/__tests__/helpers'
 import userEvent from '@testing-library/user-event'
 import {ZUnifiedToolId} from '../../model/UnifiedToolId'
 import {mockInternalConfiguration} from '../../lti_1p3_registration_form/__tests__/helpers'
@@ -63,6 +66,7 @@ describe('RegistrationWizardModal', () => {
     dynamicRegistrationWizardService: mockDynamicRegistrationWizardService({
       fetchRegistrationToken,
     }),
+    lti1p3RegistrationWizardService: mockLti1p3RegistrationWizardService({}),
   }
 
   describe('When opened normally', () => {

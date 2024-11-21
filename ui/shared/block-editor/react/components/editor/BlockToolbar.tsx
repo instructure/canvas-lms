@@ -199,9 +199,16 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
   const handleDeleteNode = useCallback(
     (e: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
       e.stopPropagation()
+      // when we delete a block, select its parent.
+      // TODO: we should select the previous sibling or parent if no prev. sib.
+      // but I have to refactor the functions in KBNavigator before doing that
+      const parentId = query.node(node.id).get().data.parent
       actions.delete(node.id)
+      requestAnimationFrame(() => {
+        actions.selectNode(parentId || 'ROOT')
+      })
     },
-    [actions, node.id]
+    [actions, node.id, query]
   )
 
   const handleSave = useCallback(

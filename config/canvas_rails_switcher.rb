@@ -40,39 +40,41 @@ unless defined?($canvas_rails)
     source = file_path
   else
     begin
-      # have to do the consul communication without any gems, because
-      # we're in the context of loading the gemfile
-      require "base64"
-      require "json"
-      require "net/http"
-      require "yaml"
+      consul_yml = File.expand_path("consul.yml", __dir__)
+      if File.exist?(consul_yml)
+        # have to do the consul communication without any gems, because
+        # we're in the context of loading the gemfile
+        require "bundler/vendored_net_http"
+        require "yaml"
 
-      environment = YAML.safe_load_file(File.expand_path("consul.yml", __dir__)).dig(ENV["RAILS_ENV"] || "development", "environment")
+        environment = YAML.safe_load_file(consul_yml).dig(ENV["RAILS_ENV"] || "development", "environment")
 
-      keys = ($canvas_clusters || []).map do |canvas_cluster| # rubocop:disable Style/GlobalVars
-        "private/canvas/#{environment}/#{canvas_cluster}/rails_version"
-      end
+        keys.push(
+          ["private/canvas", environment, "rails_version"].compact.join("/"),
+          ["private/canvas", "rails_version"].compact.join("/"),
+          ["global/private/canvas", environment, "rails_version"].compact.join("/"),
+          ["global/private/canvas", "rails_version"].compact.join("/")
+        )
+        keys.uniq!
 
-      keys.push(
-        ["private/canvas", environment, "rails_version"].compact.join("/"),
-        ["private/canvas", "rails_version"].compact.join("/"),
-        ["global/private/canvas", environment, "rails_version"].compact.join("/"),
-        ["global/private/canvas", "rails_version"].compact.join("/")
-      )
-      keys.uniq!
-
-      result = nil
-      Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
-        keys.each do |key|
-          result = http.request_get("/v1/kv/#{key}?stale")
-          result = nil unless result.is_a?(Net::HTTPSuccess)
-          if result
-            source = "the Consul key #{key}"
-            break
+        result = nil
+        Gem::Net::HTTP.start("localhost", 8500, connect_timeout: 1, read_timeout: 1) do |http|
+          keys.each do |key|
+            result = http.request_get("/v1/kv/#{key}?stale&raw")
+            result = nil unless result.is_a?(Net::HTTPSuccess)
+            if result
+              source = "the Consul key #{key}"
+              break
+            end
           end
         end
       end
-      $canvas_rails = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : SUPPORTED_RAILS_VERSIONS.first
+
+      $canvas_rails = if result
+                        result.body
+                      else
+                        SUPPORTED_RAILS_VERSIONS.first
+                      end
     rescue
       $canvas_rails = SUPPORTED_RAILS_VERSIONS.first
     end

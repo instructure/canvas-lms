@@ -104,6 +104,7 @@ module Lti
           let(:settings) do
             s = super()
             s.delete("target_link_uri")
+            s["public_jwk"]["alg"] = "WRONG"
             s
           end
 
@@ -111,7 +112,13 @@ module Lti
 
           it "contains a message about a missing target_link_uri" do
             tool_configuration.valid?
-            expect(tool_configuration.errors[:configuration].first.message).to include("target_link_uri,")
+            error_msgs = tool_configuration.errors[:configuration].map(&:message)
+            expect(error_msgs).to include(a_string_including("target_link_uri"))
+          end
+
+          it "contains a multiple error messages" do
+            tool_configuration.valid?
+            expect(tool_configuration.errors.size).to eq 2
           end
         end
 
@@ -414,7 +421,7 @@ module Lti
 
       shared_examples_for "a new context external tool" do
         context 'when "disabled_placements" is set' do
-          before { tool_configuration.disabled_placements = ["course_navigation"] }
+          before { tool_configuration.update!(disabled_placements: ["course_navigation"]) }
 
           it "does not set the disabled placements" do
             expect(subject.settings.keys).not_to include "course_navigation"
@@ -1007,8 +1014,8 @@ module Lti
       end
     end
 
-    describe "#importable_configuration" do
-      subject { tool_configuration.importable_configuration }
+    describe "#deployment_configuration" do
+      subject { tool_configuration.developer_key.lti_registration.deployment_configuration }
 
       context "with settings hash" do
         let(:tool_configuration) { untransformed_tool_configuration }
@@ -1026,7 +1033,7 @@ module Lti
         end
 
         context "when model is transformed" do
-          let(:old_configuration) { tool_configuration.importable_configuration }
+          let(:old_configuration) { developer_key.lti_registration.deployment_configuration }
 
           before do
             tool_configuration.settings["oidc_initiation_urls"] = { "us-east-1" => "http://example.com" }
@@ -1233,7 +1240,7 @@ module Lti
       end
 
       it "clears out new columns" do
-        columns = tool_configuration.internal_configuration.except(:privacy_level).keys
+        columns = tool_configuration.internal_lti_configuration.except(:privacy_level).keys
         subject
         columns.each do |column|
           expect(tool_configuration[column]).to be_blank
@@ -1265,7 +1272,7 @@ module Lti
       let(:tool_configuration) { untransformed_tool_configuration }
 
       it "remains equivalent after multiple transforms" do
-        settings = tool_configuration.settings.merge("oidc_initiation_urls" => {}, "public_jwk_url" => nil)
+        settings = tool_configuration.settings.merge("public_jwk_url" => nil)
         tool_configuration.transform!
         new_settings = tool_configuration.settings
         expect(new_settings).to eq settings

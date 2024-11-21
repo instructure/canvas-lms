@@ -34,10 +34,13 @@ function renderEditor(props = {}) {
 
   return render(
     <BlockEditor
+      course_id="1"
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
       container={container}
-      content={{version: LATEST_BLOCK_DATA_VERSION, blocks: blank_section_with_button_and_heading}}
-      onCancel={() => {}}
+      content={{
+        version: LATEST_BLOCK_DATA_VERSION,
+        blocks: JSON.parse(blank_section_with_button_and_heading),
+      }}
       {...props}
     />,
     {container}
@@ -163,7 +166,7 @@ describe('BlockEditor', () => {
     ) as HTMLButtonElement
     await user.click(deleteButton)
     await waitFor(() => {
-      expect(getBlockToolbar()).not.toBeInTheDocument()
+      expect(getBlockToolbar().textContent).toContain('Blank Section')
       expect(getButton()).not.toBeInTheDocument()
     })
     expect(getHeading()).toBeInTheDocument()

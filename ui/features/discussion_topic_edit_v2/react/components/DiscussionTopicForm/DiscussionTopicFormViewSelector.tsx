@@ -19,7 +19,6 @@
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tabs} from '@instructure/ui-tabs'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {ViewOwnProps} from '@instructure/ui-view'
@@ -82,26 +81,24 @@ export const DiscussionTopicFormViewSelector = ({
               setSelectedView(value as number)
             }
           }}
-          renderLabel={<ScreenReaderContent>{I18n.t('Select View')}</ScreenReaderContent>}
+          renderLabel={I18n.t('View')}
           data-testid="view-select"
         >
-          <SimpleSelect.Group renderLabel={I18n.t('View')} key="view-group">
-            <SimpleSelect.Option id="details" key={Views.Details} value={Views.Details}>
-              {I18n.t('Details')}
+          <SimpleSelect.Option id="details" key={Views.Details} value={Views.Details}>
+            {I18n.t('Details')}
+          </SimpleSelect.Option>
+          {shouldMasteryPathsBeVisible ? (
+            <SimpleSelect.Option
+              id="mastery-paths"
+              key={Views.MasteryPaths}
+              value={Views.MasteryPaths}
+              isDisabled={!shouldMasteryPathsBeEnabled}
+            >
+              {I18n.t('Mastery Paths')}
             </SimpleSelect.Option>
-            {shouldMasteryPathsBeVisible ? (
-              <SimpleSelect.Option
-                id="mastery-paths"
-                key={Views.MasteryPaths}
-                value={Views.MasteryPaths}
-                isDisabled={!shouldMasteryPathsBeEnabled}
-              >
-                {I18n.t('Mastery Paths')}
-              </SimpleSelect.Option>
-            ) : (
-              <></>
-            )}
-          </SimpleSelect.Group>
+          ) : (
+            <></>
+          )}
         </SimpleSelect>
       </Flex.Item>
     )

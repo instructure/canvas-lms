@@ -353,7 +353,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
     context "whom has not started the quiz" do
       describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
-        it "is unauthorized" do
+        it "is forbidden" do
           raw_api_call(:get,
                        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                        controller: "quizzes/quiz_questions",
@@ -361,12 +361,12 @@ describe Quizzes::QuizQuestionsController, type: :request do
                        format: "json",
                        course_id: @course.id.to_s,
                        quiz_id: @quiz.id.to_s)
-          assert_status(401)
+          assert_forbidden
         end
       end
 
       describe "GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)" do
-        it "is unauthorized" do
+        it "is forbidden" do
           @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
           raw_api_call(:get,
@@ -377,7 +377,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
                        course_id: @course.id.to_s,
                        quiz_id: @quiz.id.to_s,
                        id: @question.id)
-          assert_status(401)
+          assert_forbidden
         end
       end
     end
@@ -388,7 +388,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       describe "GET /courses/:course_id/quizzes/:quiz_id/questions (index)" do
-        it "is unauthorized" do
+        it "is forbidden" do
           raw_api_call(:get,
                        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                        controller: "quizzes/quiz_questions",
@@ -396,7 +396,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
                        format: "json",
                        course_id: @course.id.to_s,
                        quiz_id: @quiz.id.to_s)
-          assert_status(401)
+          assert_forbidden
         end
 
         it "is authorized with quiz_submission_id & attempt" do
@@ -415,7 +415,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       describe "GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)" do
-        it "is unauthorized" do
+        it "is forbidden" do
           @question = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
 
           raw_api_call(:get,
@@ -426,7 +426,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
                        course_id: @course.id.to_s,
                        quiz_id: @quiz.id.to_s,
                        id: @question.id)
-          assert_status(401)
+          assert_forbidden
         end
       end
     end

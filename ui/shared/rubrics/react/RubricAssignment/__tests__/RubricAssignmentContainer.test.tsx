@@ -67,6 +67,9 @@ describe('RubricAssignmentContainer Tests', () => {
         courseId="1"
         contextAssetString="course_1"
         canManageRubrics={true}
+        canUpdateSelfAssessment={true}
+        rubricSelfAssessmentEnabled={false}
+        rubricSelfAssessmentFFEnabled={true}
         {...props}
       />
     )
@@ -82,6 +85,7 @@ describe('RubricAssignmentContainer Tests', () => {
     it('should not render the create when manage_rubrics permissions is false', () => {
       const {getByTestId, queryByTestId} = renderComponent({canManageRubrics: false})
       expect(queryByTestId('create-assignment-rubric-button')).toBeNull()
+      expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
       expect(getByTestId('find-assignment-rubric-button')).toHaveTextContent('Find Rubric')
     })
 
@@ -118,11 +122,15 @@ describe('RubricAssignmentContainer Tests', () => {
   })
 
   describe('associated rubric', () => {
-    it('will render the rubric title, edit, preview, and remove buttons when rubric is attached to assignment', () => {
-      const {getByTestId} = renderComponent({
+    const getAssociatedComponent = () => {
+      return renderComponent({
         assignmentRubric: RUBRIC,
         assignmentRubricAssociation: RUBRIC_ASSOCIATION,
       })
+    }
+
+    it('will render the rubric title, edit, preview, and remove buttons when rubric is attached to assignment', () => {
+      const {getByTestId} = getAssociatedComponent()
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('remove-assignment-rubric-button')).toBeInTheDocument()
@@ -204,6 +212,41 @@ describe('RubricAssignmentContainer Tests', () => {
       getByTestId('edit-assignment-rubric-button').click()
       getByTestId('copy-edit-confirm-btn').click()
       expect(queryByTestId('rubric-assignment-create-modal')).toBeInTheDocument()
+    })
+
+    describe('self assessment settings', () => {
+      it('does not render self assessment settings when rubricSelfAssessmentFFEnabled is false', () => {
+        const {queryByTestId} = renderComponent({
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+          rubricSelfAssessmentFFEnabled: false,
+        })
+        expect(queryByTestId('rubric-self-assessment-checkbox')).toBeNull()
+      })
+
+      it('self assessment settings should be enabled when rubricSelfAssessmentEnabled is true', () => {
+        const {getByTestId} = getAssociatedComponent()
+        expect(getByTestId('rubric-self-assessment-checkbox')).toBeEnabled()
+        expect(getByTestId('rubric-self-assessment-checkbox')).not.toBeChecked()
+      })
+
+      it('self assessment settings should be disabled when rubricSelfAssessmentEnabled is false', () => {
+        const {getByTestId} = renderComponent({
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+          canUpdateSelfAssessment: false,
+        })
+        expect(getByTestId('rubric-self-assessment-checkbox')).not.toBeEnabled()
+      })
+
+      it('self assessment should be checked when rubricSelfAssessmentEnabled is true', () => {
+        const {getByTestId} = renderComponent({
+          assignmentRubric: RUBRIC,
+          assignmentRubricAssociation: RUBRIC_ASSOCIATION,
+          rubricSelfAssessmentEnabled: true,
+        })
+        expect(getByTestId('rubric-self-assessment-checkbox')).toBeChecked()
+      })
     })
   })
 

@@ -24,6 +24,7 @@ import {isAccessible} from '@canvas/test-utils/jestAssertions'
 
 let view = null
 let groupCategory = null
+let $fixtures
 
 const equal = (value, expected) => expect(value).toEqual(expected)
 
@@ -31,12 +32,17 @@ const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
 
+const selfSignupEndDateContainer = document.createElement('div')
+selfSignupEndDateContainer.setAttribute('id', 'self_signup_end_at_picker')
+document.body.appendChild(selfSignupEndDateContainer)
+
 describe('GroupCategoryEditView', () => {
   beforeEach(() => {
     fakeENV.setup({allow_self_signup: true})
     groupCategory = new GroupCategory()
     view = new GroupCategoryEditView({model: groupCategory})
     view.render()
+    $fixtures = $('#fixtures')
     view.$el.appendTo($('#fixtures'))
   })
 
@@ -47,7 +53,7 @@ describe('GroupCategoryEditView', () => {
   })
 
   test('it should be accessible', done => {
-    isAccessible(view, done, {a11yReport: true})
+    isAccessible($fixtures, done, {a11yReport: true})
   })
 
   test('auto leadership is unset without model state', () => {

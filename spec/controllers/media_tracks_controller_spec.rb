@@ -488,7 +488,7 @@ describe MediaTracksController do
             },
             body: JSON.generate([{ locale: "en", content: "new en" }, { locale: "es", content: "new es" }, { locale: "br" }]),
             format: :json
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "updates tracks" do

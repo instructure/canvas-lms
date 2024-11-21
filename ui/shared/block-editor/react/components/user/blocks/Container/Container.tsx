@@ -15,51 +15,70 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {
+  forwardRef,
+  type ForwardRefExoticComponent,
+  type RefAttributes,
+  type CSSProperties,
+} from 'react'
 import {useNode, type Node} from '@craftjs/core'
 import {type ContainerProps} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor')
 
-export const Container = ({
-  id,
-  className,
-  background,
-  style,
-  onKeyDown,
-  children,
-  ...rest
-}: ContainerProps) => {
-  const {
-    connectors: {connect, drag},
-    node,
-  } = useNode((n: Node) => {
-    return {
-      node: n,
-    }
-  })
-  return (
-    <div
-      role="treeitem"
-      aria-label={node.data.displayName}
-      aria-selected={node.events.selected}
-      aria-expanded={!!node.data.custom?.isExpanded}
-      id={id || `container-${node.id}`}
-      className={`container-block ${className}`}
-      data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
-      ref={el => el && connect(drag(el))}
-      style={{
-        background: background || Container.craft.defaultProps.background,
-        ...style,
-      }}
-      tabIndex={-1}
-      onKeyDown={onKeyDown}
-    >
-      {children}
-    </div>
-  )
+type ContainerCraft = {
+  displayName: string
+  defaultProps: {
+    className: string
+    background: string
+    style: CSSProperties
+  }
 }
+
+interface ForwardRefContainerComponent
+  extends ForwardRefExoticComponent<ContainerProps & RefAttributes<HTMLElement>> {
+  craft: ContainerCraft
+}
+const Container = forwardRef<HTMLElement, ContainerProps>(
+  (
+    {id, className, background, style, onKeyDown, children, ...rest}: ContainerProps,
+    ref: React.Ref<HTMLElement | null>
+  ) => {
+    const {
+      connectors: {connect, drag},
+      node,
+    } = useNode((n: Node) => {
+      return {
+        node: n,
+      }
+    })
+    return (
+      <div
+        role="treeitem"
+        aria-label={node.data.displayName}
+        aria-selected={node.events.selected}
+        aria-expanded={!!node.data.custom?.isExpanded}
+        id={id || `container-${node.id}`}
+        className={`container-block ${className}`}
+        data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
+        ref={el => {
+          if (el) connect(drag(el))
+          if (typeof ref === 'function') ref(el)
+          else if (ref) (ref as React.MutableRefObject<HTMLElement | null>).current = el
+        }}
+        style={{
+          backgroundColor: background || Container.craft.defaultProps.background,
+          ...style,
+        }}
+        tabIndex={-1}
+        onKeyDown={onKeyDown}
+      >
+        {children}
+      </div>
+    )
+  }
+) as ForwardRefContainerComponent
 
 Container.craft = {
   displayName: I18n.t('Container'),
@@ -69,3 +88,5 @@ Container.craft = {
     style: {},
   },
 }
+
+export {Container}

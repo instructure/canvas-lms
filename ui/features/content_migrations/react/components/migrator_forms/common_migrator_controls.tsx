@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useMemo, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
@@ -43,6 +43,10 @@ type CommonMigratorControlsProps = {
   fileUploadProgress: number | null
   isSubmitting: boolean
   setIsQuestionBankDisabled?: (isDisabled: boolean) => void
+  oldStartDate?: string
+  oldEndDate?: string
+  newStartDate?: string
+  newEndDate?: string
 }
 
 const generateNewQuizzesLabel = () => (
@@ -105,27 +109,44 @@ export const CommonMigratorControls = ({
   onCancel,
   isSubmitting,
   setIsQuestionBankDisabled,
+  oldStartDate,
+  oldEndDate,
+  newStartDate,
+  newEndDate,
 }: CommonMigratorControlsProps) => {
-  const [selectiveImport, setSelectiveImport] = useState<null | boolean>(null)
+  const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
   const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
   const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
-  const [dateAdjustments, setDateAdjustments] = useState<DateAdjustmentConfig>({
+  const [dateAdjustmentConfig, setDateAdjustmentConfig] = useState<DateAdjustmentConfig>({
     adjust_dates: {
       enabled: false,
       operation: 'shift_dates',
     },
     date_shift_options: {
       substitutions: {},
-      old_start_date: false,
-      new_start_date: false,
-      old_end_date: false,
-      new_end_date: false,
+      old_start_date: oldStartDate || false,
+      new_start_date: newStartDate || false,
+      old_end_date: oldEndDate || false,
+      new_end_date: newEndDate || false,
       day_substitutions: [],
     },
   })
   const [contentError, setContentError] = useState<boolean>(false)
+
+  useEffect(() => {
+    setDateAdjustmentConfig(prevState => ({
+      ...prevState,
+      date_shift_options: {
+        ...prevState.date_shift_options,
+        old_start_date: oldStartDate || false,
+        new_start_date: newStartDate || false,
+        old_end_date: oldEndDate || false,
+        new_end_date: newEndDate || false,
+      },
+    }))
+  }, [oldStartDate, newStartDate, oldEndDate, newEndDate])
 
   const onCanImportAsNewQuizzesChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,9 +163,9 @@ export const CommonMigratorControls = ({
     data.errored = canSelectContent && selectiveImport === null // So the parent form can guard submit and show it's own errors
     canSelectContent && (data.selective_import = selectiveImport)
     canImportBPSettings && (data.settings.import_blueprint_settings = importBPSettings)
-    if (canAdjustDates && dateAdjustments) {
-      dateAdjustments.adjust_dates && (data.adjust_dates = dateAdjustments.adjust_dates)
-      remapSubstitutions(data, dateAdjustments)
+    if (canAdjustDates && dateAdjustmentConfig) {
+      dateAdjustmentConfig.adjust_dates && (data.adjust_dates = dateAdjustmentConfig.adjust_dates)
+      remapSubstitutions(data, dateAdjustmentConfig)
     }
     canImportAsNewQuizzes && (data.settings.import_quizzes_next = importAsNewQuizzes)
     canOverwriteAssessmentContent && (data.settings.overwrite_quizzes = overwriteAssessmentContent)
@@ -155,7 +176,7 @@ export const CommonMigratorControls = ({
     canImportBPSettings,
     importBPSettings,
     canAdjustDates,
-    dateAdjustments,
+    dateAdjustmentConfig,
     canImportAsNewQuizzes,
     importAsNewQuizzes,
     canOverwriteAssessmentContent,
@@ -199,9 +220,9 @@ export const CommonMigratorControls = ({
             label={I18n.t('Adjust events and due dates')}
             onChange={({target}) => {
               setShowAdjustDates(target.checked)
-              const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+              const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
               tmp.adjust_dates.enabled = target.checked ? 1 : 0
-              setDateAdjustments(tmp)
+              setDateAdjustmentConfig(tmp)
             }}
           />,
         ]
@@ -232,6 +253,7 @@ export const CommonMigratorControls = ({
             name={I18n.t('Selective import')}
             layout="stacked"
             description={I18n.t('Content')}
+            defaultValue="non_selective"
           >
             <RadioInput
               name="selective_import"
@@ -291,8 +313,8 @@ export const CommonMigratorControls = ({
           </CheckboxGroup>
           {showAdjustDates ? (
             <DateAdjustments
-              dateAdjustments={dateAdjustments}
-              setDateAdjustments={setDateAdjustments}
+              dateAdjustmentConfig={dateAdjustmentConfig}
+              setDateAdjustments={setDateAdjustmentConfig}
               disabled={isSubmitting}
             />
           ) : null}

@@ -2,6 +2,7 @@
   "name": "Hero Section, two columns",
   "description": "Hero section with image, text, and button",
   "workflow_state": "active",
+  "editor_version": "0.3",
   "node_tree": {
     "rootNodeId": "yue4mpUChN",
     "nodes": {

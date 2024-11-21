@@ -192,7 +192,7 @@ DueDateOverrideView.prototype.gradingPeriods = GradingPeriodsAPI.deserializePeri
 DueDateOverrideView.prototype.hasGradingPeriods = !!ENV.HAS_GRADING_PERIODS
 
 DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
-  if (!data) {
+  if (!data || (this.options && this.options.inPacedCourse && this.options.isModuleItem)) {
     return errors
   }
   if (ENV.FEATURES?.selective_release_ui_api) {

@@ -219,6 +219,7 @@ class User < ActiveRecord::Base
            dependent: :destroy
   has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
   has_many :block_editor_templates, class_name: "BlockEditorTemplate", as: :context, inverse_of: :context
+  has_many :asset_user_accesses
 
   has_one :profile, class_name: "UserProfile"
 
@@ -509,6 +510,7 @@ class User < ActiveRecord::Base
   validates :name, presence: { if: :require_presence_of_name }
   validates_locale :locale, :browser_locale, allow_nil: true
   validates :terms_of_use, acceptance: { if: :require_acceptance_of_terms, allow_nil: false }
+  validates :instructure_identity_id, uniqueness: true, allow_nil: true
   validates_each :self_enrollment_code do |record, attr, value|
     next unless record.require_self_enrollment_code
 
@@ -1161,10 +1163,14 @@ class User < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    remove_from_root_account(:all)
-    self.workflow_state = "deleted"
-    self.deleted_at = Time.now.utc
-    if save
+    was_saved = User.transaction do
+      remove_from_root_account(:all)
+      self.workflow_state = "deleted"
+      self.deleted_at = Time.now.utc
+      save
+    end
+
+    if was_saved
       eportfolios.active.in_batches.destroy_all
       gradebook_filters.in_batches.destroy_all
       true
@@ -2079,7 +2085,7 @@ class User < ActiveRecord::Base
   def alternate_account_for_course_creation
     Rails.cache.fetch_with_batched_keys("alternate_account_for_course_creation", batch_object: self, batched_keys: :account_users) do
       account_users.active.detect do |au|
-        break au.account if au.root_account_id == account.id && au.account.grants_any_right?(self, :manage_courses, :manage_courses_add)
+        break au.account if au.root_account_id == account.id && au.account.grants_right?(self, :manage_courses_add)
       end
     end
   end
@@ -3114,7 +3120,7 @@ class User < ActiveRecord::Base
   end
 
   def fake_student?
-    preferences[:fake_student] && !!enrollments.where(type: "StudentViewEnrollment").first
+    !!preferences[:fake_student] && enrollments.where(type: "StudentViewEnrollment").exists?
   end
 
   def private?
@@ -3527,7 +3533,7 @@ class User < ActiveRecord::Base
 
   def create_courses_right(account)
     return :admin if account.cached_account_users_for(self).any? do |au|
-                       au.permission_check(account, :manage_courses).success? || au.permission_check(account, :manage_courses_add).success?
+                       au.permission_check(account, :manage_courses_add).success?
                      end
     return nil if fake_student? || account.root_account.site_admin?
 
@@ -3616,5 +3622,9 @@ class User < ActiveRecord::Base
   def student_in_limited_access_account?
     accounts = Account.where(id: student_enrollments.active.joins(:course).select("#{Course.quoted_table_name}.account_id"))
     accounts.any?(&:limited_access_for_students?)
+  end
+
+  def pseudonym_for_restoration_in(account)
+    account.pseudonyms.where(user_id: self).order(deleted_at: :desc).first!
   end
 end

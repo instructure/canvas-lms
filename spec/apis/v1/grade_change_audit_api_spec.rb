@@ -401,13 +401,13 @@ describe "GradeChangeAudit API", type: :request do
         api_call_as_user(@viewing_user, :get, path, params, {}, {}, expected_status: 404)
       end
 
-      it "returns a 401 when teacher" do
-        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 401)
+      it "returns a 403 when teacher" do
+        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 403)
       end
 
-      it "returns a 401 when not a teacher nor admin" do
+      it "returns a 403 when not a teacher nor admin" do
         user = user_model
-        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 401)
+        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 403)
       end
     end
 
@@ -428,13 +428,13 @@ describe "GradeChangeAudit API", type: :request do
         api_call_as_user(@viewing_user, :get, path, params, {}, {}, expected_status: 404)
       end
 
-      it "returns a 401 when teacher" do
-        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 401)
+      it "returns a 403 when teacher" do
+        api_call_as_user(@teacher, :get, path, params, {}, {}, expected_status: 403)
       end
 
-      it "returns a 401 when not teacher nor admin" do
+      it "returns a 403 when not teacher nor admin" do
         user = user_model
-        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 401)
+        api_call_as_user(user, :get, path, params, {}, {}, expected_status: 403)
       end
     end
   end
@@ -443,12 +443,12 @@ describe "GradeChangeAudit API", type: :request do
     it "does not authorize the endpoints with no permissions" do
       @user, @viewing_user = @user, user_model
 
-      fetch_for_context(@course, expected_status: 401)
-      fetch_for_context(@assignment, expected_status: 401)
-      fetch_for_context(@student, expected_status: 401, type: "student")
-      fetch_for_context(@teacher, expected_status: 401, type: "grader")
+      fetch_for_context(@course, expected_status: 403)
+      fetch_for_context(@assignment, expected_status: 403)
+      fetch_for_context(@student, expected_status: 403, type: "student")
+      fetch_for_context(@teacher, expected_status: 403, type: "grader")
       test_course_and_contexts do |contexts|
-        fetch_for_course_and_other_contexts(contexts, expected_status: 401)
+        fetch_for_course_and_other_contexts(contexts, expected_status: 403)
       end
     end
 
@@ -466,12 +466,12 @@ describe "GradeChangeAudit API", type: :request do
                                         :view_all_grades.to_s,
                                         override: false)
 
-      fetch_for_context(@course, expected_status: 401)
-      fetch_for_context(@assignment, expected_status: 401)
-      fetch_for_context(@student, expected_status: 401, type: "student")
-      fetch_for_context(@teacher, expected_status: 401, type: "grader")
+      fetch_for_context(@course, expected_status: 403)
+      fetch_for_context(@assignment, expected_status: 403)
+      fetch_for_context(@student, expected_status: 403, type: "student")
+      fetch_for_context(@teacher, expected_status: 403, type: "grader")
       test_course_and_contexts do |contexts|
-        fetch_for_course_and_other_contexts(contexts, expected_status: 401)
+        fetch_for_course_and_other_contexts(contexts, expected_status: 403)
       end
     end
 
@@ -480,26 +480,26 @@ describe "GradeChangeAudit API", type: :request do
       allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
       @viewing_user = user_with_pseudonym(account: new_root_account)
 
-      fetch_for_context(@course, expected_status: 401)
-      fetch_for_context(@assignment, expected_status: 401)
-      fetch_for_context(@student, expected_status: 401, type: "student")
-      fetch_for_context(@teacher, expected_status: 401, type: "grader")
+      fetch_for_context(@course, expected_status: 403)
+      fetch_for_context(@assignment, expected_status: 403)
+      fetch_for_context(@student, expected_status: 403, type: "student")
+      fetch_for_context(@teacher, expected_status: 403, type: "grader")
       test_course_and_contexts do |contexts|
-        fetch_for_course_and_other_contexts(contexts, expected_status: 401)
+        fetch_for_course_and_other_contexts(contexts, expected_status: 403)
       end
     end
 
     context "for teachers" do
-      it "returns a 401 on for_assignment" do
-        fetch_for_context(@assignment, expected_status: 401, user: @teacher)
+      it "returns a 403 on for_assignment" do
+        fetch_for_context(@assignment, expected_status: 403, user: @teacher)
       end
 
-      it "returns a 401 on for_student" do
-        fetch_for_context(@student, expected_status: 401, type: "student", user: @teacher)
+      it "returns a 403 on for_student" do
+        fetch_for_context(@student, expected_status: 403, type: "student", user: @teacher)
       end
 
-      it "returns a 401 on for_grader" do
-        fetch_for_context(@teacher, expected_status: 401, type: "grader", user: @teacher)
+      it "returns a 403 on for_grader" do
+        fetch_for_context(@teacher, expected_status: 403, type: "grader", user: @teacher)
       end
 
       it "returns a 200 on for_course" do
@@ -517,17 +517,17 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "returns a 401 on for_course when not teacher in that course" do
+      it "returns a 403 on for_course when not teacher in that course" do
         other_teacher = User.create!
         Course.create!.enroll_teacher(other_teacher).accept!
-        fetch_for_context(@course, expected_status: 401, user: other_teacher)
+        fetch_for_context(@course, expected_status: 403, user: other_teacher)
       end
 
-      it "returns a 401 on for_course_and_other_parameters when not teacher in that course" do
+      it "returns a 403 on for_course_and_other_parameters when not teacher in that course" do
         other_teacher = User.create!
         Course.create!.enroll_teacher(other_teacher).accept!
         test_course_and_contexts do |context|
-          fetch_for_course_and_other_contexts(context, expected_status: 401, user: other_teacher)
+          fetch_for_course_and_other_contexts(context, expected_status: 403, user: other_teacher)
         end
       end
     end

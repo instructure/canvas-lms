@@ -25,9 +25,13 @@ module Factories
     params[:account] ||= account_model
     params[:name] ||= "Test Registration"
     include_binding = params.delete(:bound)
+    overlay_data = params.delete(:overlay)
     @lti_registration = Lti::Registration.create!(params)
     if include_binding
       lti_registration_account_binding_model(registration: @lti_registration, account: @lti_registration.account, workflow_state: :on)
+    end
+    if overlay_data.present?
+      lti_overlay_model(registration: @lti_registration, account: @lti_registration.account, data: overlay_data, updated_by: @lti_registration.created_by)
     end
     @lti_registration
   end

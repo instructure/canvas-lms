@@ -181,7 +181,7 @@ describe "selective_release module item assign to tray" do
       expect(assign_to_in_tray("Remove Everyone")[0]).to be_displayed
     end
 
-    it "shows points possible only when present" do
+    it "shows points possible only when present", :ignore_js_errors do
       @assignment1.update!(points_possible: 10)
       @assignment2.update!(points_possible: nil)
       go_to_modules
@@ -755,7 +755,7 @@ describe "selective_release module item assign to tray" do
     end
   end
 
-  context "item assign to tray saves" do
+  context "item assign to tray saves", :ignore_js_errors do
     before(:once) do
       @course.enable_feature! :quizzes_next
       @course.context_external_tools.create!(
@@ -784,7 +784,7 @@ describe "selective_release module item assign to tray" do
     it_behaves_like "module item assign to tray", :course_homepage
   end
 
-  context "item assign to tray saves for canvas for elementary" do
+  context "item assign to tray saves for canvas for elementary", :ignore_js_errors do
     before(:once) do
       teacher_setup
       @subject_course.enable_feature! :quizzes_next

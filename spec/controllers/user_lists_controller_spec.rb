@@ -91,7 +91,7 @@ describe UserListsController do
       user_session(@user)
 
       post "create", params: { account_id: @account.id, user_list: "list", v2: true, search_type: "unique_id" }, format: "json"
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
   end
 end

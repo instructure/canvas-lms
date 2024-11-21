@@ -1165,14 +1165,14 @@ describe MediaObjectsController do
         media_object2 = @course.media_objects.create! media_id: "0_deadbeef", user_entered_title: "blah.flv"
 
         get "iframe_media_player", params: { attachment_id: media_object2.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "does not allow access if InstFS doesn't return metadata for the tenant auth" do
         stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 404, body: { error: "weird" }.to_json)
 
         get "iframe_media_player", params: { attachment_id: @media_object.attachment_id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
   end

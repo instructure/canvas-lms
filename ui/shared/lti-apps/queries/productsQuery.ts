@@ -37,20 +37,23 @@ export type ProductResponse = {
 }
 
 export const fetchProducts = async (params: DiscoverParams): Promise<ProductResponse> => {
+  const {page, search} = params
+  const {tags, companies, audience, versions} = params.filters
+
   const apiParams = {
-    page: params.page,
+    page,
     per_page: 21,
     q: {
-      ...(params.search && {search_terms_cont: params.search}),
-      ...(params.filters.tags && {display_group_id_eq: params.filters.tags[0]?.id}),
-      ...(params.filters.companies && {
-        company_id_in: params.filters.companies.map((company: FilterItem) => company.id),
+      ...(search && {search_terms_cont: search}),
+      ...(tags && {display_group_id_eq: tags[0]?.id}),
+      ...(companies && {
+        company_id_in: companies.map((company: FilterItem) => company.id),
       }),
-      ...(params.filters.audience && {
-        audience_id_in: params.filters.audience.map((audience: FilterItem) => audience.id),
+      ...(audience && {
+        audience_id_in: audience.map((audience: FilterItem) => audience.id),
       }),
-      ...(params.filters.versions && {
-        version_id_in: params.filters.versions.map((version: FilterItem) => version.id),
+      ...(versions && {
+        version_id_in: versions.map((version: FilterItem) => version.id),
       }),
     },
   }
@@ -139,4 +142,51 @@ export const fetchLtiFilters = async (): Promise<LtiFilters> => {
   const filters = await response.json()
 
   return filters || {}
+}
+
+export const fetchProductsByOrganization = async (
+  params: DiscoverParams,
+  organizationSalesforceId: string
+): Promise<ProductResponse> => {
+  const {page, search} = params
+  const {tags, companies, audience, versions} = params.filters
+
+  const apiParams = {
+    page,
+    per_page: 21,
+    q: {
+      ...(search && {search_terms_cont: search}),
+      ...(tags && {display_group_id_eq: tags[0]?.id}),
+      ...(companies && {
+        company_id_in: companies.map(company => company.id),
+      }),
+      ...(audience && {
+        audience_id_in: audience.map(audience => audience.id),
+      }),
+      ...(versions && {
+        version_id_in: versions.map(version => version.id),
+      }),
+    },
+  }
+
+  const url = `/api/v1/accounts/${accountId}/learn_platform/organizations/${organizationSalesforceId}/products?${stringify(
+    apiParams,
+    {
+      arrayFormat: 'brackets',
+    }
+  )}`
+
+  const response = await fetch(url, {
+    method: 'get',
+    headers: {
+      'X-CSRF-Token': getCookie('_csrf_token'),
+      'content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch products by organization`)
+  }
+  const products: ProductResponse = await response.json()
+  return products
 }

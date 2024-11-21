@@ -95,15 +95,6 @@ Rails.application.config.to_prepare do
         available_to: %w[AccountAdmin AccountMembership],
         account_allows: ->(a) { a.settings[:catalog_enabled] }
       },
-      # deprecated; legacy role override
-      manage_courses: {
-        label: -> { I18n.t("Manage ( add / edit / delete ) ") },
-        label_v2: -> { I18n.t("Courses - add / edit / delete") },
-        available_to: %w[AccountAdmin AccountMembership],
-        true_for: ["AccountAdmin"],
-        account_only: true,
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
-      },
       manage_courses_admin: {
         label: -> { I18n.t("Manage account level course actions") },
         label_v2: -> { I18n.t("Courses - manage / update") },
@@ -111,8 +102,7 @@ Rails.application.config.to_prepare do
         group_label: -> { I18n.t("Manage Courses") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: ["AccountAdmin"],
-        account_only: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+        account_only: true
       },
       manage_courses_add: {
         label: -> { I18n.t("Add courses") },
@@ -121,8 +111,7 @@ Rails.application.config.to_prepare do
         group_label: -> { I18n.t("Manage Courses") },
         available_to: %w[AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
-        account_only: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+        account_only: true
       },
       manage_courses_publish: {
         label: -> { I18n.t("Publish courses") },
@@ -136,8 +125,7 @@ Rails.application.config.to_prepare do
           TaEnrollment
           DesignerEnrollment
         ],
-        true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+        true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
       },
       manage_courses_conclude: {
         label: -> { I18n.t("Conclude courses") },
@@ -151,8 +139,7 @@ Rails.application.config.to_prepare do
           TaEnrollment
           DesignerEnrollment
         ],
-        true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+        true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
       },
       manage_courses_reset: {
         label: -> { I18n.t("Reset courses") },
@@ -165,8 +152,7 @@ Rails.application.config.to_prepare do
           TeacherEnrollment
           DesignerEnrollment
         ],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+        true_for: %w[AccountAdmin]
       },
       manage_courses_delete: {
         label: -> { I18n.t("Delete courses") },
@@ -179,8 +165,7 @@ Rails.application.config.to_prepare do
           TeacherEnrollment
           DesignerEnrollment
         ],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
+        true_for: %w[AccountAdmin]
       },
       manage_data_services: {
         label: -> { I18n.t("permissions.manage_data_services", "Manage data services") },
@@ -429,20 +414,6 @@ Rails.application.config.to_prepare do
           "AccountMembership"
         ],
         true_for: ["AccountAdmin"]
-      },
-      # deprecated
-      change_course_state: {
-        label: -> { I18n.t("permissions.change_course_state", "Change course state") },
-        label_v2: -> { I18n.t("Course State - manage") },
-        true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-        available_to: %w[
-          AccountAdmin
-          AccountMembership
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-        ],
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_courses) }
       },
       create_collaborations: {
         label: -> { I18n.t("permissions.create_collaborations", "Create student collaborations") },
@@ -1129,21 +1100,6 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ]
       },
-      # lagacy role override
-      manage_groups: {
-        label: -> { I18n.t("Manage (create / edit / delete) groups") },
-        label_v2: -> { I18n.t("Groups - add / edit / delete") },
-        available_to: %w[
-          TaEnrollment
-          DesignerEnrollment
-          TeacherEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
-      },
       manage_groups_add: {
         label: -> { I18n.t("Add groups") },
         label_v2: -> { I18n.t("Groups - add") },
@@ -1157,8 +1113,7 @@ Rails.application.config.to_prepare do
           AccountMembership
         ],
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+        acts_as_access_token_scope: true
       },
       manage_groups_manage: {
         label: -> { I18n.t("Manage groups") },
@@ -1173,8 +1128,7 @@ Rails.application.config.to_prepare do
           AccountMembership
         ],
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+        acts_as_access_token_scope: true
       },
       manage_groups_delete: {
         label: -> { I18n.t("Delete groups") },
@@ -1189,8 +1143,7 @@ Rails.application.config.to_prepare do
           AccountMembership
         ],
         true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
-        acts_as_access_token_scope: true,
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_groups) }
+        acts_as_access_token_scope: true
       },
       manage_tags_add: {
         label: -> { I18n.t("Add Differentiated Tags") },
@@ -1206,6 +1159,7 @@ Rails.application.config.to_prepare do
         ],
         true_for: %w[TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true,
+        account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
       },
       manage_tags_manage: {
         label: -> { I18n.t("Manage Differentiated Tags") },
@@ -1221,6 +1175,7 @@ Rails.application.config.to_prepare do
         ],
         true_for: %w[TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true,
+        account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
       },
       manage_tags_delete: {
         label: -> { I18n.t("Delete Differentiated Tags") },
@@ -1236,6 +1191,7 @@ Rails.application.config.to_prepare do
         ],
         true_for: %w[TeacherEnrollment AccountAdmin],
         acts_as_access_token_scope: true,
+        account_allows: ->(a) { a.feature_allowed?(:differentiation_tags) }
       },
       manage_interaction_alerts: {
         label: -> { I18n.t("permissions.manage_interaction_alerts", "Manage alerts") },
