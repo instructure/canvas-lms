@@ -4843,4 +4843,63 @@ describe User do
       expect(@user.student_in_limited_access_account?).to be false
     end
   end
+
+  describe "group and differentiation_tag associations" do
+    before :once do
+      @student1 = course_with_student(active_all: true).user
+      @student2 = course_with_student(active_all: true, course: @course).user
+
+      # Create non-collaborative category and groups
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
+      @non_collab_group1 = @course.groups.create!(name: "Non-Collab Group 1", group_category: @non_collaborative_category)
+      @non_collab_group2 = @course.groups.create!(name: "Non-Collab Group 2", group_category: @non_collaborative_category)
+      @non_collab_membership1 = @non_collab_group1.add_user(@student1)
+      @non_collab_membership1.destroy
+      @non_collab_membership2 = @non_collab_group2.add_user(@student1)
+
+      # Create collaborative category and groups
+      @collaborative_category = @course.group_categories.create!(name: "Collaborative Groups")
+      @collab_group1 = @course.groups.create!(name: "Collab Group 1", group_category: @collaborative_category)
+      @collab_group2 = @course.groups.create!(name: "Collab Group 2", group_category: @collaborative_category)
+      @collab_membership1 = @collab_group1.add_user(@student1)
+      @collab_membership1.destroy
+      @collab_membership2 = @collab_group2.add_user(@student1)
+    end
+
+    describe "group" do
+      it "only includes memberships from collaborative groups regardless of state" do
+        expect(@student1.group_memberships.pluck(:id)).to contain_exactly(@collab_membership1.id, @collab_membership2.id)
+      end
+
+      it "only includes active memberships from collaborative groups" do
+        expect(@student1.current_group_memberships.pluck(:id)).to contain_exactly(@collab_membership2.id)
+      end
+
+      it "only includes collaborative groups with non-deleted memberships" do
+        expect(@student1.groups.pluck(:id)).to contain_exactly(@collab_group2.id)
+      end
+
+      it "only includes collaborative groups with active memberships" do
+        expect(@student1.current_groups.pluck(:id)).to contain_exactly(@collab_group2.id)
+      end
+    end
+
+    describe "differentiation_tag" do
+      it "only includes memberships from non-collaborative groups regardless of state" do
+        expect(@student1.differentiation_tag_memberships.pluck(:id)).to contain_exactly(@non_collab_membership1.id, @non_collab_membership2.id)
+      end
+
+      it "only includes active memberships from non-collaborative groups" do
+        expect(@student1.current_differentiation_tag_memberships.pluck(:id)).to contain_exactly(@non_collab_membership2.id)
+      end
+
+      it "only includes non-collaborative groups with non-deleted memberships" do
+        expect(@student1.differentiation_tags.pluck(:id)).to contain_exactly(@non_collab_group2.id)
+      end
+
+      it "only includes non-collaborative groups with active memberships" do
+        expect(@student1.current_differentiation_tags.pluck(:id)).to contain_exactly(@non_collab_group2.id)
+      end
+    end
+  end
 end
