@@ -26,6 +26,7 @@ class Score < ActiveRecord::Base
   belongs_to :assignment_group, optional: true
   belongs_to :custom_grade_status, inverse_of: :scores
   has_one :course, through: :enrollment
+  has_one :score_metadata
 
   validates :enrollment, presence: true
   validates :current_score,
@@ -53,6 +54,21 @@ class Score < ActiveRecord::Base
         enrollment.user.grants_right?(user, :read_as_parent)
     end
     can :read
+  end
+
+  def destroy
+    score_metadata.destroy if score_metadata.present?
+    super
+  end
+
+  def destroy_permanently!
+    ScoreMetadata.where(score: self).delete_all
+    super
+  end
+
+  def undestroy
+    score_metadata.undestroy if score_metadata.present?
+    super
   end
 
   def current_grade

@@ -28,6 +28,7 @@ class GradeCalculator
       ignore_muted: true,
       update_all_grading_period_scores: true,
       update_course_score: true,
+      only_update_course_gp_metadata: false,
       only_update_points: false,
       use_what_if_scores: false,
       include_discussion_checkpoints: false
@@ -75,6 +76,7 @@ class GradeCalculator
     @enrollments = opts[:enrollments]
     @periods = opts[:periods]
     @submissions = opts[:submissions]
+    @only_update_course_gp_metadata = opts[:only_update_course_gp_metadata]
     @only_update_points = opts[:only_update_points]
     @use_what_if_scores = opts[:use_what_if_scores]
     @include_discussion_checkpoints = opts[:include_discussion_checkpoints]
@@ -358,6 +360,7 @@ class GradeCalculator
       effective_due_dates:,
       enrollments:,
       submissions:,
+      only_update_course_gp_metadata: @only_update_course_gp_metadata,
       only_update_points: @only_update_points
     )
     GradeCalculator.new(@user_ids, @course, **opts).compute_and_save_scores
@@ -426,6 +429,23 @@ class GradeCalculator
     end
   end
 
+  def group_dropped_rows
+    enrollments_by_user.keys.map do |user_id|
+      current = @current_groups[user_id].pluck(:global_id, :dropped).to_h
+      final = @final_groups[user_id].pluck(:global_id, :dropped).to_h
+      @groups.map do |group|
+        agid = group.global_id
+        hsh = {
+          current: { dropped: current[agid] },
+          final: { dropped: final[agid] }
+        }
+        enrollments_by_user[user_id].map do |enrollment|
+          "(#{enrollment.id}, #{group.id}, '#{hsh.to_json}')"
+        end
+      end
+    end.flatten
+  end
+
   def updated_at
     @updated_at ||= Score.connection.quote(Time.now.utc)
   end
@@ -466,9 +486,11 @@ class GradeCalculator
     Score.transaction do
       @course.shard.activate do
         save_course_and_grading_period_scores
+        save_course_and_grading_period_metadata
         score_rows = group_score_rows
         if @grading_period.nil? && score_rows.any?
-          save_assignment_group_scores(score_rows)
+          dropped_rows = group_dropped_rows
+          save_assignment_group_scores(score_rows, dropped_rows)
         end
       end
     end
@@ -492,6 +514,8 @@ class GradeCalculator
   end
 
   def save_course_and_grading_period_scores
+    return if @only_update_course_gp_metadata
+
     # Depending on whether we're updating course scores or grading period
     # scores, we need to check our inserted values against different uniqueness
     # constraints
@@ -557,6 +581,47 @@ class GradeCalculator
     raise Delayed::RetriableError, "Deadlock in upserting course or grading period scores"
   end
 
+  def save_course_and_grading_period_metadata
+    # We only save score metadata for posted grades. This means, if we're
+    # calculating unposted grades (which means @ignore_muted is false),
+    # we don't want to update the score metadata. TODO: start storing the
+    # score metadata for unposted grades.
+    return unless @ignore_muted
+
+    table = ScoreMetadata.quoted_table_name
+    ScoreMetadata.connection.execute(<<~SQL.squish)
+      INSERT INTO #{table}
+        (score_id, calculation_details, created_at, updated_at)
+        SELECT
+          scores.id AS score_id,
+          CASE enrollments.user_id
+            #{@dropped_updates.map do |user_id, dropped|
+              "WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)"
+            end.join(" ")}
+            ELSE NULL
+          END AS calculation_details,
+          #{updated_at} AS created_at,
+          #{updated_at} AS updated_at
+        FROM #{Score.quoted_table_name} scores
+        INNER JOIN #{Enrollment.quoted_table_name} enrollments ON
+          enrollments.id = scores.enrollment_id
+        LEFT OUTER JOIN #{ScoreMetadata.quoted_table_name} metadata ON
+          metadata.score_id = scores.id
+        WHERE
+          scores.enrollment_id IN (#{joined_enrollment_ids}) AND
+          scores.assignment_group_id IS NULL AND
+          #{@grading_period ? "scores.grading_period_id = #{@grading_period.id}" : "scores.course_score IS TRUE"}
+        ORDER BY enrollment_id
+      ON CONFLICT (score_id)
+      DO UPDATE SET
+        calculation_details = excluded.calculation_details,
+        updated_at = excluded.updated_at
+      WHERE
+        #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
+        #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+    SQL
+  end
+
   def assignment_group_columns_to_insert_or_update
     @assignment_group_columns_to_insert_or_update ||= begin
       column_list = {
@@ -591,7 +656,7 @@ class GradeCalculator
     end
   end
 
-  def save_assignment_group_scores(score_values)
+  def save_assignment_group_scores(score_values, dropped_values)
     table = Score.quoted_table_name
 
     update_columns, update_conditions = assignment_group_columns_to_insert_or_update[:update_columns]
@@ -640,6 +705,38 @@ class GradeCalculator
           OR #{table}.root_account_id IS DISTINCT FROM excluded.root_account_id
           OR #{table}.workflow_state IS DISTINCT FROM COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
       SQL
+    end
+
+    # We only save score metadata for posted grades. This means, if we're
+    # calculating unposted grades (which means @ignore_muted is false),
+    # we don't want to update the score metadata. TODO: start storing the
+    # score metadata for unposted grades.
+    if @ignore_muted
+      table = ScoreMetadata.quoted_table_name
+      Score.connection.with_max_update_limit(dropped_values.length) do
+        ScoreMetadata.connection.execute(<<~SQL.squish)
+          INSERT INTO #{table}
+            (score_id, calculation_details, created_at, updated_at)
+            SELECT
+              scores.id AS score_id,
+              CAST(val.calculation_details as json) AS calculation_details,
+              #{updated_at} AS created_at,
+              #{updated_at} AS updated_at
+            FROM (VALUES #{dropped_values.join(",")}) val
+              (enrollment_id, assignment_group_id, calculation_details)
+            LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
+              scores.enrollment_id = val.enrollment_id AND
+              scores.assignment_group_id = val.assignment_group_id
+            ORDER BY score_id
+          ON CONFLICT (score_id)
+          DO UPDATE SET
+            calculation_details = excluded.calculation_details,
+            updated_at = excluded.updated_at
+          WHERE
+          #{table}.calculation_details #>>'{current,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{current,dropped}' OR
+          #{table}.calculation_details #>>'{final,dropped}' IS DISTINCT FROM excluded.calculation_details #>>'{final,dropped}'
+        SQL
+      end
     end
   rescue ActiveRecord::Deadlocked => e
     Canvas::Errors.capture_exception(:grade_calculator, e, :warn)
