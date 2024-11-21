@@ -968,5 +968,105 @@ describe "gradebooks/grade_summary" do
       expect(response).to have_tag("tr#sub_assignment_#{@reply_to_topic.id}")
       expect(response).to have_tag("tr#sub_assignment_#{@reply_to_entry.id}")
     end
+
+    it "renders correct due dates after adding an ADHOC override" do
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+
+      everyone_reply_to_topic_due_at = "2022-01-25T20:10:00Z"
+      points_possible_reply_to_topic = 5
+
+      everyone_reply_to_entry_due_at = "2022-01-26T21:10:00Z"
+      points_possible_reply_to_entry = 10
+      replies_required = 2
+
+      # Adding an everyone card
+      reply_to_topic = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_topic_due_at,
+          },
+        ],
+        points_possible: points_possible_reply_to_topic
+      )
+
+      reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_entry_due_at,
+          },
+        ],
+        points_possible: points_possible_reply_to_entry,
+        replies_required:
+      )
+
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+      rendered_html = render "gradebooks/grade_summary"
+
+      doc = Nokogiri::HTML5.fragment rendered_html
+      topic_due_date = doc.at_css("tr#sub_assignment_#{reply_to_topic.id} .due").text.strip
+      entry_due_date = doc.at_css("tr#sub_assignment_#{reply_to_entry.id} .due").text.strip
+
+      expect(topic_due_date).to eq("Jan 25, 2022 by 8:10pm")
+      expect(entry_due_date).to eq("Jan 26, 2022 by 9:10pm")
+
+      adhoc_reply_to_topic_due_at = "2021-02-25T3:30:00Z"
+      adhoc_reply_to_entry_due_at = "2021-02-26T4:30:00Z"
+
+      # Adding an ADHOC card
+      Checkpoints::DiscussionCheckpointUpdaterService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_topic_due_at,
+          },
+          {
+            type: "override",
+            set_type: "ADHOC",
+            due_at: adhoc_reply_to_topic_due_at,
+            student_ids: [@student.id]
+          },
+        ],
+        points_possible: points_possible_reply_to_topic
+      )
+
+      Checkpoints::DiscussionCheckpointUpdaterService.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [
+          {
+            type: "everyone",
+            due_at: everyone_reply_to_entry_due_at,
+          },
+          {
+            type: "override",
+            set_type: "ADHOC",
+            due_at: adhoc_reply_to_entry_due_at,
+            student_ids: [@student.id.to_s]
+          },
+        ],
+        points_possible: points_possible_reply_to_entry,
+        replies_required:
+      )
+
+      # re-rendering gradebooks/grade_summary
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+      rendered_html = render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment rendered_html
+
+      topic_due_date_updated = doc.at_css("tr#sub_assignment_#{reply_to_topic.id} .due").text.strip
+      entry_due_date_updated = doc.at_css("tr#sub_assignment_#{reply_to_entry.id} .due").text.strip
+
+      expect(topic_due_date_updated).to eq("Feb 25, 2021 by 3:30am")
+      expect(entry_due_date_updated).to eq("Feb 26, 2021 by 4:30am")
+    end
   end
 end
