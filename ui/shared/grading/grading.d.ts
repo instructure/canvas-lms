@@ -185,6 +185,7 @@ export type CamelizedAssignment = {
   pointsPossible: number
   postManually: boolean
   published: boolean
+  hasRubric: boolean | null
   submissionTypes: string[]
   checkpoints?: {
     tag: string
