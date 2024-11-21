@@ -96,6 +96,7 @@ export default class DateGroup extends Backbone.Model {
       pending: this.pending(),
       open: this.open(),
       closed: this.closed(),
+      setType: this.get('set_type'),
     }
   }
 }
