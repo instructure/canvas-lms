@@ -58,6 +58,9 @@ module AssignmentOverrideApplicator
                                .applied_overrides.select { |o| o.set_type == "CourseSection" }
                                .map(&:set_id)
       course_section_ids = context.active_course_sections.map(&:id)
+      course_override_due_at = result_learning_object
+                               .applied_overrides.find { |o| o.set_type == "Course" }
+                               &.due_at
 
       if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz)
         result_learning_object.due_at =
@@ -68,7 +71,7 @@ module AssignmentOverrideApplicator
             result_learning_object.due_at
           else
             potential_due_dates = [
-              result_learning_object.without_overrides.due_at,
+              course_override_due_at || result_learning_object.without_overrides.due_at,
               result_learning_object.due_at
             ]
             if potential_due_dates.include?(nil)
