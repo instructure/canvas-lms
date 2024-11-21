@@ -1045,7 +1045,7 @@ describe Types::UserType do
       @student.favorites.create!(context: hidden_group)
       allow(hidden_group).to receive(:grants_any_right?).and_return(true)
 
-      result = type.resolve("favoriteGroupsConnection { nodes { _id } }")
+      result = type.resolve("favoriteGroupsConnection(includeNonCollaborative: true) { nodes { _id } }")
       expect(result).to match_array([favorite_group.id.to_s, hidden_group.id.to_s])
     end
 
