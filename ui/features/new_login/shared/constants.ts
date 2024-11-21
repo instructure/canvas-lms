@@ -17,3 +17,12 @@
  */
 
 export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export const ROUTES = {
+  FORGOT_PASSWORD: '/login/canvas/forgot-password',
+  REGISTER: '/login/canvas/register',
+  REGISTER_PARENT: '/login/canvas/register/parent',
+  REGISTER_STUDENT: '/login/canvas/register/student',
+  REGISTER_TEACHER: '/login/canvas/register/teacher',
+  SIGN_IN: '/login/canvas',
+}

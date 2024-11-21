@@ -16,4 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './LoginLayout'
+import React from 'react'
+import {ActionPrompt} from '..'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginProvider} from '../../context/NewLoginContext'
+import {render} from '@testing-library/react'
+
+describe('ActionPrompt', () => {
+  it('mounts without crashing', () => {
+    render(
+      <MemoryRouter>
+        <NewLoginProvider>
+          <ActionPrompt variant="signIn" />
+        </NewLoginProvider>
+      </MemoryRouter>
+    )
+  })
+})

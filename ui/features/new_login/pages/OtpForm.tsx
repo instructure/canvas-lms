@@ -20,10 +20,11 @@ import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {Loading, RememberMeCheckbox} from '.'
+import {Loading, RememberMeCheckbox} from '../shared'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../services'
+import {createErrorMessage} from '../shared/helpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -189,7 +190,7 @@ const OtpForm = () => {
               value={verificationCode}
               onChange={handleVerificationCodeChange}
               onBlur={handleVerificationCodeBlur}
-              messages={verificationCodeError ? [{type: 'error', text: verificationCodeError}] : []}
+              messages={createErrorMessage(verificationCodeError)}
               autoComplete="one-time-code"
               inputRef={inputElement => {
                 otpInputRef.current = inputElement as HTMLInputElement | undefined

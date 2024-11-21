@@ -17,12 +17,15 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
+import OtpForm from './OtpForm'
+import {ActionPrompt, RememberMeCheckbox, SignInLinks, SSOButtons} from '../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {OtpForm, RememberMeCheckbox, SignInLinks, SSOButtons} from '../shared'
+import {SelfRegistrationType} from '../types'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
+import {createErrorMessage} from '../shared/helpers'
 import {performSignIn} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNewLogin} from '../context/NewLoginContext'
@@ -40,6 +43,7 @@ const SignIn = () => {
     loginHandleName,
     authProviders,
     isPreviewMode,
+    selfRegistrationType,
   } = useNewLogin()
 
   const [username, setUsername] = useState('')
@@ -48,8 +52,8 @@ const SignIn = () => {
   const [passwordError, setPasswordError] = useState('')
   const isRedirectingRef = useRef(false)
 
-  const usernameInputRef = useRef<HTMLInputElement | undefined>(undefined)
-  const passwordInputRef = useRef<HTMLInputElement | undefined>(undefined)
+  const usernameInputRef = useRef<HTMLInputElement | null>(null)
+  const passwordInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     setUsername('')
@@ -58,28 +62,23 @@ const SignIn = () => {
     setPasswordError('')
   }, [otpRequired])
 
-  useEffect(() => {
-    if (usernameError) {
-      usernameInputRef.current?.focus()
-    } else if (passwordError) {
-      passwordInputRef.current?.focus()
-    }
-  }, [usernameError, passwordError])
-
   const validateForm = (): boolean => {
     setUsernameError('')
     setPasswordError('')
 
-    let formIsValid = true
     if (username.trim() === '') {
       setUsernameError(I18n.t('Please enter your %{loginHandleName}', {loginHandleName}))
-      formIsValid = false
+      usernameInputRef.current?.focus()
+      return false
     }
-    if (password.trim() === '' && formIsValid) {
+
+    if (password.trim() === '') {
       setPasswordError(I18n.t('Please enter your password'))
-      formIsValid = false
+      passwordInputRef.current?.focus()
+      return false
     }
-    return formIsValid
+
+    return true
   }
 
   const handleFailedLogin = () => {
@@ -141,9 +140,21 @@ const SignIn = () => {
 
   return (
     <Flex direction="column" gap="large">
-      <Heading as="h1" level="h2">
-        {I18n.t('Welcome to Canvas')}
-      </Heading>
+      <Flex direction="column" gap="small">
+        <Heading as="h1" level="h2">
+          {I18n.t('Welcome to Canvas')}
+        </Heading>
+
+        {selfRegistrationType && (
+          <ActionPrompt
+            variant={
+              selfRegistrationType === SelfRegistrationType.ALL
+                ? 'createAccount'
+                : 'createParentAccount'
+            }
+          />
+        )}
+      </Flex>
 
       {authProviders && authProviders.length > 0 && (
         <Flex direction="column" gap="large">
@@ -156,30 +167,26 @@ const SignIn = () => {
         <Flex direction="column" gap="large">
           <Flex direction="column" gap="mediumSmall">
             <TextInput
-              id="username"
-              inputRef={inputElement => {
-                usernameInputRef.current = inputElement as HTMLInputElement | undefined
-              }}
-              renderLabel={loginHandleName}
-              value={username}
-              onChange={handleUsernameChange}
               autoComplete="username"
               disabled={isUiActionPending}
-              messages={usernameError ? [{type: 'error', text: usernameError}] : []}
+              id="username"
+              inputRef={inputElement => (usernameInputRef.current = inputElement)}
+              messages={createErrorMessage(usernameError)}
+              onChange={handleUsernameChange}
+              renderLabel={loginHandleName}
+              value={username}
             />
 
             <TextInput
+              autoComplete="current-password"
+              disabled={isUiActionPending}
               id="password"
-              inputRef={inputElement => {
-                passwordInputRef.current = inputElement as HTMLInputElement | undefined
-              }}
+              inputRef={inputElement => (passwordInputRef.current = inputElement)}
+              messages={createErrorMessage(passwordError)}
+              onChange={handlePasswordChange}
               renderLabel={I18n.t('Password')}
               type="password"
               value={password}
-              onChange={handlePasswordChange}
-              autoComplete="current-password"
-              disabled={isUiActionPending}
-              messages={passwordError ? [{type: 'error', text: passwordError}] : []}
             />
 
             <Flex.Item overflowY="visible" overflowX="visible">

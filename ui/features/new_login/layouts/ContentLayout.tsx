@@ -18,10 +18,11 @@
 
 import React, {Suspense} from 'react'
 import classNames from 'classnames'
-import {Background, Loading} from '.'
+import {Background, Loading} from '../shared'
 import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
 import {canvas} from '@instructure/ui-theme-tokens'
+import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 // @ts-expect-error
@@ -39,10 +40,16 @@ interface Props {
 }
 
 const ContentLayout = ({children}: Props) => {
+  const {isDataLoading} = useNewLogin()
+
   // <Responsive> renders as a <div> with display="block", so we set its height to 100% to fill the
   // available space within its parent, which is a flex item
   const setResponsiveRef = (el: HTMLDivElement | null) => {
     if (el) el.style.height = '100%'
+  }
+
+  const renderLoading = () => {
+    return <Loading title={I18n.t('Loading page …')} />
   }
 
   return (
@@ -72,9 +79,13 @@ const ContentLayout = ({children}: Props) => {
               position="relative"
               stacking="above"
             >
-              <Suspense fallback={<Loading title={I18n.t('Loading page …')} />}>
-                {children}
-              </Suspense>
+              {isDataLoading ? (
+                // show a loading spinner during data fetching
+                renderLoading()
+              ) : (
+                // suspense fallback for lazy-loaded components
+                <Suspense fallback={renderLoading()}>{children}</Suspense>
+              )}
             </View>
 
             <Background

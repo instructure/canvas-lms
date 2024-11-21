@@ -16,6 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './api'
-export * from './data'
-export * from './register'
+import React from 'react'
+import Teacher from '../Teacher'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginProvider} from '../../../context/NewLoginContext'
+import {render} from '@testing-library/react'
+
+describe('Teacher', () => {
+  it('mounts without crashing', () => {
+    render(
+      <MemoryRouter>
+        <NewLoginProvider>
+          <Teacher />
+        </NewLoginProvider>
+      </MemoryRouter>
+    )
+  })
+})

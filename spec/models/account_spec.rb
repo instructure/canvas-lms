@@ -2900,4 +2900,46 @@ describe Account do
       expect(@submission_sub_sub.reload.versions.first.model.grade).to eq "A"
     end
   end
+
+  describe "#recaptcha_key" do
+    let(:root_account) { Account.create! }
+
+    before do
+      allow(root_account).to receive_messages(root_account?: true, self_registration_captcha?: true)
+    end
+
+    it "returns the recaptcha_client_key when root_account? and self_registration_captcha? are true" do
+      allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
+        instance_double("DynamicSettingsResult", :[] => "test_key")
+      )
+      expect(root_account.recaptcha_key).to eq("test_key")
+    end
+
+    it "returns nil if not a root account" do
+      allow(root_account).to receive(:root_account?).and_return(false)
+      expect(root_account.recaptcha_key).to be_nil
+    end
+
+    it "returns nil if self_registration_captcha? is false" do
+      allow(root_account).to receive(:self_registration_captcha?).and_return(false)
+      expect(root_account.recaptcha_key).to be_nil
+    end
+
+    it "returns nil if recaptcha_client_key is not present in DynamicSettings" do
+      allow(DynamicSettings).to receive(:find).with(tree: "private").and_return(
+        instance_double("DynamicSettingsResult", :[] => nil)
+      )
+      expect(root_account.recaptcha_key).to be_nil
+    end
+
+    it "returns nil if not a root account even if self_registration_captcha? is true" do
+      allow(root_account).to receive_messages(root_account?: false, self_registration_captcha?: true)
+      expect(root_account.recaptcha_key).to be_nil
+    end
+
+    it "returns nil if both root_account? and self_registration_captcha? are false" do
+      allow(root_account).to receive_messages(root_account?: false, self_registration_captcha?: false)
+      expect(root_account.recaptcha_key).to be_nil
+    end
+  end
 end

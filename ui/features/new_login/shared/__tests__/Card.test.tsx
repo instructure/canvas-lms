@@ -16,24 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export interface AuthProvider {
-  id: number
-  auth_type: string
-  display_name: string
-}
+import React from 'react'
+import {Card} from '..'
+import {render} from '@testing-library/react'
 
-export interface LoginResponse {
-  location?: string
-  otp_required?: boolean
-  pseudonym?: object
-}
-
-export interface OtpInitiationResponse {
-  otp_sent?: boolean
-  otp_configuring?: boolean
-  otp_communication_channel_id?: string
-}
-
-export interface OtpVerifyResponse {
-  location?: string
-}
+describe('Card', () => {
+  it('mounts without crashing', () => {
+    const mockOnClick = jest.fn()
+    render(<Card href="#" icon="/path/to/mock-icon.svg" onClick={mockOnClick} text="Test Card" />)
+  })
+})

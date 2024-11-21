@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {OtpForm} from '..'
+import OtpForm from '../OtpForm'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginProvider} from '../../context/NewLoginContext'
+import {render} from '@testing-library/react'
 
 describe('OtpForm', () => {
   it('mounts without crashing', () => {

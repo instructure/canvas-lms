@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {useNewLogin} from '../context/NewLoginContext'
 
 const LoginLogo = () => {
-  const {loginLogoUrl: src, loginLogoText: alt} = useNewLogin()
+  const {loginLogoUrl: src, loginLogoText: text} = useNewLogin()
 
   if (!src) return null
 
@@ -52,12 +52,12 @@ const LoginLogo = () => {
             justifyItems="center"
           >
             <Flex.Item width={width} shouldShrink={true} shouldGrow={true}>
-              <Img width="100%" height="100%" constrain="contain" src={src} alt={alt} />
+              <Img constrain="contain" display="block" height="100%" src={src} width="100%" />
             </Flex.Item>
 
-            {alt && (
+            {text && (
               <Flex.Item textAlign="center">
-                <Text size="x-small">{alt}</Text>
+                <Text size="x-small">{text}</Text>
               </Flex.Item>
             )}
           </Flex>
