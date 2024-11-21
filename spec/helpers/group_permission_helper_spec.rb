@@ -79,26 +79,6 @@ describe GroupPermissionHelper do
         Account.default.disable_feature!(:differentiation_tags)
       end
 
-      it "doesn't check non_collaborative view permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [])
-        check_group_authorization(context:, current_user: @teacher, action_category: :view, non_collaborative: true)
-      end
-
-      it "doesn't check non_collaborative add permission" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [])
-        check_group_authorization(context:, current_user: @teacher, action_category: :add, non_collaborative: true)
-      end
-
-      it "doesn't check non_collaborative manage permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [])
-        check_group_authorization(context:, current_user: @teacher, action_category: :manage, non_collaborative: true)
-      end
-
-      it "checks non_collaborative delete permissions" do
-        expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_tags_delete])
-        check_group_authorization(context:, current_user: @teacher, action_category: :delete, non_collaborative: true)
-      end
-
       it "checks collaborative group add permissions" do
         expect(self).to receive(:authorized_action).with(context, @teacher, [:manage_groups, :manage_groups_add])
         check_group_authorization(context:, current_user: @teacher, action_category: :add, non_collaborative: false)

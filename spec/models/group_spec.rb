@@ -1024,6 +1024,7 @@ describe Group do
     context "permissions" do
       before do
         @group = Group.create!(context: @course, group_category: @non_collaborative_category, name: "Test Group", non_collaborative: true)
+        @course.account.enable_feature!(:differentiation_tags)
         allow(@course).to receive(:grants_any_right?).with(@teacher, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
       end
 
