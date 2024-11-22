@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CommonMigratorControls from '../common_migrator_controls'
 
@@ -34,6 +34,7 @@ describe('CommonMigratorControls', () => {
     window.ENV.QUIZZES_NEXT_ENABLED = true
     window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
     window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
+    window.ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS = false
   })
 
   afterEach(() => jest.clearAllMocks())
@@ -296,6 +297,57 @@ describe('CommonMigratorControls', () => {
       it('not fills the new end date', () => {
         expectDateField('Select new end date', newEndDateExpectedDate)
       })
+    })
+  })
+
+  describe('New Quizzes Label', () => {
+    const testNewQuizzesLabel = async (
+      featureFlag: boolean,
+      labelText: string,
+      headerText: string,
+      bodyText: string
+    ) => {
+      window.ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS = featureFlag
+      renderComponent({canImportAsNewQuizzes: true})
+
+      expect(screen.getByText(labelText)).toBeInTheDocument()
+
+      const infoButton = screen
+        .getByText('Import assessment as New Quizzes Help Icon')
+        .closest('button')
+
+      if (!infoButton) {
+        throw new Error('New Quizzes Help button not found')
+      }
+
+      await userEvent.click(infoButton)
+
+      within(screen.getByLabelText('Import assessment as New Quizzes Help Modal')).getByText(
+        headerText
+      )
+      expect(screen.getByText(bodyText)).toBeInTheDocument()
+      expect(
+        screen.getByText('To learn more, please contact your system administrator or visit')
+      ).toBeInTheDocument()
+      expect(screen.getByText('Canvas Instructor Guide')).toBeInTheDocument()
+    }
+
+    it('renders convert new quizzes text when feature flag is enabled', async () => {
+      await testNewQuizzesLabel(
+        true,
+        'Convert content to New Quizzes',
+        'Convert Quizzes',
+        'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.'
+      )
+    })
+
+    it('renders import new quizzes text when feature flag is disabled', async () => {
+      await testNewQuizzesLabel(
+        false,
+        'Import existing quizzes as New Quizzes',
+        'New Quizzes',
+        'New Quizzes is the new assessment engine for Canvas.'
+      )
     })
   })
 })
