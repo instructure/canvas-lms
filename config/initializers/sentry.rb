@@ -48,22 +48,13 @@ if settings.present?
         event
       end
     end
+
     config.traces_sampler = lambda do |sampling_context|
       rack_env = sampling_context[:env]
       return 1 if rack_env && rack_env.try(:[], 'QUERY_STRING')&.include?('sentry')
-
-      parent_sampled = sampling_context[:parent_sampled]
-
-      return parent_sampled unless parent_sampled.nil?
-
       transaction_context = sampling_context[:transaction_context]
-
-      transaction_name = transaction_context[:name]
-      return 0.00001 if %w[/cloud_event/handle Sidekiq/CloudEventJob].include?(transaction_name)
-
-      return 0.001 if transaction_name.include?('/cable')
-
-      0.001
+      return 0.001 if transaction_context[:name].match?(/grade_passback$/)
+      0.0
     end
   end
 
