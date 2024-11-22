@@ -264,7 +264,7 @@ export const CommonMigratorControls = ({
   return (
     <>
       {canSelectContent && (
-        <View as="div" margin="medium none none none">
+        <View as="div" margin="medium none none none" width="100%" maxWidth="28.75rem">
           <RadioInputGroup
             name={I18n.t('Selective import')}
             layout="stacked"

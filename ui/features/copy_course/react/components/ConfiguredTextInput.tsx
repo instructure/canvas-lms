@@ -16,11 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {CopyCourseForm} from './components/CopyCourseForm'
+import React, {type ChangeEvent} from 'react'
+import {TextInput} from '@instructure/ui-text-input'
 
-export const App = () => {
-  return <CopyCourseForm />
+export const ConfiguredTextInput = ({
+  label,
+  inputValue,
+  onChange,
+}: {
+  label: string
+  inputValue: string
+  onChange: (value: string) => void
+}) => {
+  const handleInput = (_: ChangeEvent<HTMLInputElement>, value: string) => {
+    onChange(value)
+  }
+
+  return <TextInput renderLabel={label} value={inputValue} onChange={handleInput} />
 }
-
-export default App

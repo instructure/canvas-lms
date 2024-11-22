@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import {CopyCourseForm} from './components/CopyCourseForm'
+import {Text} from '@instructure/ui-text'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-export const App = () => {
-  return <CopyCourseForm />
+const I18n = useI18nScope('content_copy_redesign')
+
+export const CreateCourseLabel = () => {
+  return <Text>{I18n.t('Create course')}</Text>
 }
-
-export default App
