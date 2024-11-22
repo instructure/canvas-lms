@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {DateTimeInput} from '@instructure/ui-date-time-input'
+import type {RefObject} from 'react'
 import type {Control, FieldErrors} from 'react-hook-form'
 
 export const getFormErrorMessage = <T extends {}>(errors: FieldErrors<T>, fieldName: keyof T) => {
@@ -26,4 +28,8 @@ export const getFormErrorMessage = <T extends {}>(errors: FieldErrors<T>, fieldN
 
 export const focusFiled = <T extends {}>(control: Control<T, any>, fieldName: keyof T) => {
   control._fields[fieldName]?._f.ref.focus?.()
+}
+
+export const isDateTimeInputInvalid = (ref: RefObject<DateTimeInput>) => {
+  return ref.current?.state?.message?.type === 'error'
 }

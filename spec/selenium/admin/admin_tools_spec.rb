@@ -117,7 +117,8 @@ describe "admin_tools" do
         load_admin_tools_page
         click_view_notifications_tab
         perform_user_search("#commMessagesSearchForm", @student.id)
-        f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+        dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+        dialog.find_element(:css, "button[type='submit']").click
         wait_for_ajaximations
         expect(f("#commMessagesSearchResults .message-body").text).to include("this is my message")
       end
@@ -130,7 +131,8 @@ describe "admin_tools" do
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
           expect(f("#commMessagesSearchResults .message-body").text).to include("foo bar")
         end
@@ -140,8 +142,11 @@ describe "admin_tools" do
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
-          set_value f(".userDateRangeSearchModal .dateEndSearchField"), 2.months.ago
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          to_date = dialog.find_element(:css, "[data-testid='to-date']")
+          set_value(to_date, 2.months.ago.to_date)
+          to_date.send_keys(:tab)
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
           expect(f("#commMessagesSearchResults .alert").text).to include("No messages found")
           expect(f("#content")).not_to contain_css("#commMessagesSearchResults .message-body")
@@ -153,21 +158,24 @@ describe "admin_tools" do
           click_view_notifications_tab
           # Search with no dates
           perform_user_search("#commMessagesSearchForm", @student.id)
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
           expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from the beginning to now.")
           # Search with begin date and end date - should show time actually being used
           perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f(".userDateRangeSearchModal .dateStartSearchField"), "Mar 3, 2001")
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "Mar 9, 2001")
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001")
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
           expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
-          replace_and_proceed(f(".userDateRangeSearchModal .dateStartSearchField"), "Mar 3, 2001 1:05p")
-          replace_and_proceed(f(".userDateRangeSearchModal .dateEndSearchField"), "Mar 9, 2001 3p")
-          f(".userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='from-date']"), "Mar 3, 2001 1:05p", { press_return: true, tab_out: false })
+          replace_and_proceed(dialog.find_element(:css, "[data-testid='to-date']"), "Mar 9, 2001 3:00p", { press_return: true, tab_out: false })
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
           expect(f("#commMessagesSearchOverview").text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
@@ -209,12 +217,14 @@ describe "admin_tools" do
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
           # Search with invalid dates
-          set_value f(".userDateRangeSearchModal .dateStartSearchField"), "couch"
-          set_value f(".userDateRangeSearchModal .dateEndSearchField"), "pillow"
-          f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+          dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+          from_date = dialog.find_element(:css, "[data-testid='from-date']")
+          to_date = dialog.find_element(:css, "[data-testid='to-date']")
+          set_value from_date, "couch"
+          set_value to_date, "pillow"
+          dialog.find_element(:css, "button[type='submit']").click
           wait_for_ajaximations
-          assert_error_box("[name='messages_start_time']")
-          assert_error_box("[name='messages_end_time']")
+          ff('[class$="formFieldMessage"').each { |el| expect(el.text).to eq "Invalid date and time." }
         end
 
         it "hides tab if account setting disabled" do
@@ -358,7 +368,8 @@ describe "admin_tools" do
 
     it "shows log history" do
       perform_user_search("#authLoggingSearchForm", @student.id)
-      f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+      dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+      dialog.find_element(:css, "button[type='submit']").click
       wait_for_ajaximations
       expect(ff("#authLoggingSearchResults table tbody tr").length).to eq 2
       cols = ffj("#authLoggingSearchResults table tbody tr:first td")
@@ -368,7 +379,8 @@ describe "admin_tools" do
 
     it "searches by user name" do
       perform_user_search("#authLoggingSearchForm", "testuser")
-      f(".userDateRangeSearchModal .userDateRangeSearchBtn").click
+      dialog = f("[aria-label='Generate Activity for #{@student.name}'")
+      dialog.find_element(:css, "button[type='submit']").click
       wait_for_ajaximations
       expect(ff("#authLoggingSearchResults table tbody tr").length).to eq 2
     end

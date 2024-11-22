@@ -15,15 +15,16 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/userDateRangeSearchForm.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import '@canvas/jquery/jquery.ajaxJSON'
-import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
-import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import UserDateRangeSearch from '../../react/UserDateRangeSearch'
 
 const I18n = useI18nScope('user_date_range_search')
 
@@ -44,10 +45,6 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
       '.userIdField': '$userIdField',
       '.hiddenDateStart': '$hiddenDateStart',
       '.hiddenDateEnd': '$hiddenDateEnd',
-      '.dateStartSearchField': '$dateStartSearchField',
-      '.dateEndSearchField': '$dateEndSearchField',
-      '.search-controls': '$searchControls',
-      '.search-people-status': '$searchPeopleStatus',
     }
 
     this.optionProperty('formName')
@@ -60,13 +57,6 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
   initialize(options) {
     this.model = new Backbone.Model()
     return super.initialize(options)
-  }
-
-  // Setup the date inputs for javascript use.
-  afterRender() {
-    renderDatetimeField(this.$dateStartSearchField)
-    renderDatetimeField(this.$dateEndSearchField)
-    return this.$searchControls.hide()
   }
 
   attach() {
@@ -100,95 +90,42 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
     return (this.lastRequest = this.inputFilterView.collection.fetch())
   }
 
-  selectUser(e) {
+  selectUser(user) {
     this.usersView.$el.find('tr').each(function () {
       $(this).removeClass('selected')
     })
-    if (e) {
-      this.model.set(e.attributes)
-      const id = e.get('id')
+
+    if (user) {
+      this.model.set(user.attributes)
+      const id = user.get('id')
       this.$userIdField.val(id)
       const self = this
-      return this.$searchControls.show().dialog({
-        title: I18n.t('Generate Activity for %{user}', {user: e.get('name')}),
-        resizable: false,
-        height: 'auto',
-        width: 400,
-        modal: true,
-        zIndex: 1000,
-        dialogClass: 'userDateRangeSearchModal',
-        close() {
-          return self.$el.find(`.roster_user_name[data-user-id=${id}]`).focus()
-        },
-        buttons: [
-          {
-            text: I18n.t('Cancel'),
-            click() {
-              $(this).dialog('close')
-            },
-          },
-          {
-            text: I18n.t('Find'),
-            class: 'btn btn-primary userDateRangeSearchBtn',
-            id: `${self.formName}-find-button`,
-            click() {
-              const errors = self.datesValidation()
-              if (Object.keys(errors).length !== 0) {
-                self.showErrors(errors, true)
-                return
-              }
+      const userName = user.get('name')
+      const mountPoint = document.getElementById('generate_activity_for_user_mount_point')
+      const root = createRoot(mountPoint)
 
-              self.$hiddenDateStart.val(self.$dateStartSearchField.val())
-              self.$hiddenDateEnd.val(self.$dateEndSearchField.val())
-              self.$el.submit()
-              $(this).dialog('close')
-            },
-          },
-        ],
-      })
+      const closeModal = () => {
+        root.unmount()
+
+        self.$el.find(`.roster_user_name[data-user-id=${id}]`).focus()
+      }
+
+      root.render(
+        <UserDateRangeSearch
+          userName={userName}
+          onSubmit={({from, to}) => {
+            self.$hiddenDateStart.val(from)
+            self.$hiddenDateEnd.val(to)
+            self.$el.submit()
+
+            closeModal()
+          }}
+          onClose={() => closeModal()}
+        />
+      )
     } else {
       return this.$userIdField.val('')
     }
-  }
-
-  dateIsValid(dateField) {
-    if (dateField.val() === '') {
-      return true
-    }
-    const date = dateField.data('unfudged-date')
-    return date instanceof Date && !Number.isNaN(Number(date.valueOf()))
-  }
-
-  datesValidation() {
-    const errors = {}
-    const startDateField = this.$dateStartSearchField
-    const endDateField = this.$dateEndSearchField
-    const startDate = startDateField.data('unfudged-date')
-    const endDate = endDateField.data('unfudged-date')
-
-    if (startDate && endDate && startDate > endDate) {
-      errors[`${this.formName}_end_time`] = [
-        {
-          message: I18n.t('To Date cannot come before From Date'),
-        },
-      ]
-    } else {
-      if (!this.dateIsValid(startDateField)) {
-        errors[`${this.formName}_start_time`] = [
-          {
-            message: I18n.t('Not a valid date'),
-          },
-        ]
-      }
-      if (!this.dateIsValid(endDateField)) {
-        errors[`${this.formName}_end_time`] = [
-          {
-            message: I18n.t('Not a valid date'),
-          },
-        ]
-      }
-    }
-    return errors
   }
 
   submit(event) {
@@ -197,19 +134,15 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
   }
 
   updateCollection() {
-    // Update the params (which fetches the collection)
     const json = this.$el.toJSON()
     delete json.search_term
 
     if (!json.start_time) {
       json.start_time = ''
-    } else {
-      json.start_time = new Date(this.$dateStartSearchField.data('unfudged-date')).toISOString()
     }
+
     if (!json.end_time) {
       json.end_time = ''
-    } else {
-      json.end_time = new Date(this.$dateEndSearchField.data('unfudged-date')).toISOString()
     }
 
     return this.collection.setParams(json)
