@@ -376,7 +376,6 @@ class ApplicationController < ActionController::Base
     assignment_edit_placement_not_on_announcements
     instui_header
     rce_find_replace
-    rce_transform_iframe_sandbox_attributes
     courses_popout_sisid
     dashboard_graphql_integration
     discussion_checkpoints
