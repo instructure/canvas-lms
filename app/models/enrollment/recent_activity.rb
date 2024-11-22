@@ -52,12 +52,9 @@ class Enrollment
     end
 
     def update_with(options)
-      active_scope = all_enrollments_scope
-                       .where.not(:activity_state => 'deleted')
-
-      result = active_scope.update_all(options)
-
-      active_scope.ids.each do |id|
+      result = all_enrollments_scope.update_all(options)
+      
+      all_enrollments_scope.ids.each do |id|
         enr = Enrollment.find_by(id: id)
         enr.publish_as_v2 if enr
       end
