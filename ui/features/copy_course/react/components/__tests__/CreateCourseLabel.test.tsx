@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {CopyCourseForm} from './components/CopyCourseForm'
+import {render} from '@testing-library/react'
+import {CreateCourseLabel} from '../CreateCourseLabel'
 
-export const App = () => {
-  return <CopyCourseForm />
-}
-
-export default App
+test('renders ImportLabel with correct text', () => {
+  const {getByText} = render(<CreateCourseLabel />)
+  expect(getByText('Create course')).toBeInTheDocument()
+})
