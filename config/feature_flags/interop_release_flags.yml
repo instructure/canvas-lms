@@ -414,13 +414,6 @@ require_permission_for_app_center_token:
       state: allowed_on
     ci:
       state: allowed_on
-resource_link_uuid_in_custom_substitution:
-  state: hidden
-  display_name: Use a Resource link's resource_link_uuid in the $ResourceLink.id substitution parameter
-  description: |-
-    Changes the $ResourceLink.id substitution parameter's behavior
-    to include the resource_link_uuid, instead of the resource_id for the line item
-  applies_to: RootAccount
 top_navigation_placement:
   state: hidden
   applies_to: RootAccount
