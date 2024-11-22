@@ -13969,8 +13969,10 @@ ko:
   unsubscribed_c93564a2: "구독 해제함"
   unsupported_package: "지원하지 않는 내용 묶음"
   until_date_949017c4: "%{date} 까지"
+  update_details_6abfed16: "세부 정보 업데이트"
   update_module_b984c2e5: "모듈 업데이트"
   update_settings_9b422d0f: "설정 업데이트"
+  updating_user_details_b8520b3e: "사용자 세부 정보 업데이트 중..."
   upload_8b403d05: 업로드
   upload_a_picture_9f5f6e3c: "사진 업로드"
   upload_button: 
@@ -14593,6 +14595,7 @@ ko:
   yesterday_c6bd6abf: 어제
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "권한이 없거나 한 곳 이상의 장소에서 사용하고 있으므로 이 루브릭을 편집할 수 없습니다. 변경한 내용은 기존 루브릭을 바탕으로 한 새 루브릭이 됩니다. 계속 진행하시겠습니까?"
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "이 사용자의 정보를 업데이트할 수 있지만 사용자가 원래대로 바꿀 수 있습니다."
   you_created_an_announcement_in_course_c49e3d70: "%{course}에 공지를 생성했습니다"
   you_currently_have_no_pinned_discussions_6f0078b8: "고정한 토론이 없음"
   you_must_allow_at_least_one_group_to_attend_68531eab: "적어도 하나 이상의 참가할 그룹을 허용해야 합니다."
