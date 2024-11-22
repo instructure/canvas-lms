@@ -426,6 +426,69 @@ describe GradeCalculator do
           group_ids = @assignments.map(&:assignment_group_id).uniq
           GradeCalculator.new(user_ids, @course.id).compute_and_save_scores
           expect(Score.where(assignment_group_id: group_ids).count).to eq @course.enrollments.count * group_ids.length
+          expect(ScoreMetadata.where(score_id: Score.where(assignment_group_id: group_ids)).count).to eq 2
+        end
+
+        it "saves dropped submission to group score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.find_by(user_id: @user.id, course_id: @course.id)
+          score = enrollment.find_score(assignment_group: @group)
+          expect(score.score_metadata.calculation_details).to eq({
+                                                                   "current" => { "dropped" => [find_submission(@overridden_middle)] },
+                                                                   "final" => { "dropped" => [find_submission(@overridden_middle)] }
+                                                                 })
+        end
+
+        it "does not include muted assignments in the dropped submission list in group score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          @overridden_middle.mute!
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(assignment_group: @group)
+          expect(score.score_metadata.calculation_details).to eq({
+                                                                   "current" => { "dropped" => [] },
+                                                                   "final" => { "dropped" => [] }
+                                                                 })
+        end
+
+        it "saves dropped submissions to course score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(course_score: true)
+          expect(score.score_metadata.calculation_details).to eq({
+                                                                   "current" => { "dropped" => [find_submission(@overridden_middle)] },
+                                                                   "final" => { "dropped" => [find_submission(@overridden_middle)] }
+                                                                 })
+        end
+
+        it "does not include muted assignments in the dropped submission list in course score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          @overridden_middle.mute!
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(course_score: true)
+          expect(score.score_metadata.calculation_details).to eq({
+                                                                   "current" => { "dropped" => [] },
+                                                                   "final" => { "dropped" => [] }
+                                                                 })
+        end
+
+        it "updates existing course score metadata" do
+          @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
+          GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
+          enrollment = Enrollment.where(user_id: @user.id, course_id: @course.id).first
+          score = enrollment.find_score(course_score: true)
+          metadata = score.score_metadata
+
+          @group.update_attribute(:rules, "drop_highest:1")
+          expect { GradeCalculator.new(@user.id, @course.id).compute_and_save_scores }.not_to change { ScoreMetadata.count }
+          metadata.reload
+          expect(metadata.calculation_details).to eq({
+                                                       "current" => { "dropped" => [find_submission(@overridden_highest)] },
+                                                       "final" => { "dropped" => [find_submission(@overridden_highest)] }
+                                                     })
         end
       end
     end
