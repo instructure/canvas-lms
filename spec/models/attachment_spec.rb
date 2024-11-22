@@ -3214,6 +3214,14 @@ describe Attachment do
         expect(MemoryLimit).to receive(:apply).with(4.gigabytes).and_call_original
         @attachment.update_word_count
       end
+
+      it "applies a time limit" do
+        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
+        Setting.set("attachment_calculate_words_time_limit", "0.001")
+        expect(PDF::Reader).to receive(:new) { sleep 1 } # rubocop:disable Lint/NoSleep
+        expect(Canvas::Errors).to receive(:capture_exception).with(:word_count, an_instance_of(Timeout::Error), :info)
+        @attachment.calculate_words
+      end
     end
   end
 
