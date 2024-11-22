@@ -75,7 +75,7 @@ module Lti::IMS
   #     }
   #
   class NoticeHandlersController < ApplicationController
-    include ::Lti::IMS::Concerns::LtiServices
+    include Concerns::AdvantageServices
     include Api::V1::DeveloperKey
 
     before_action :require_feature_enabled
@@ -161,6 +161,10 @@ module Lti::IMS
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_PNS_SCOPE)
+    end
+
+    def context
+      tool.context
     end
 
     def tool
