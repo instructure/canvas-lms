@@ -17001,6 +17001,7 @@ hy:
   unused_courses_title: "Չօգտագործված դասընթացներ"
   up_c553575d: Վերև
   update_4d8ee62: Թարմացնել
+  update_details_6abfed16: "Թարմացնել Տվյալները"
   update_grade_b47eb3ff: "Թարմացնել գնահատականը"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
@@ -17008,6 +17009,7 @@ hy:
   update_your_notification_settings_ed9564f3: "Թարմացնել ծանուցման ձեր կարգաբերումները"
   updated_group_group_name_727b1d98: "%{group_name} թարմացված խումբ"
   updating_6edbab78: "Թարմացվում է"
+  updating_user_details_b8520b3e: "Օգտատիրոջ տվյալների թարմացում..."
   upload_8b403d05: Բեռնել
   upload_a_css_file_ec22214b: "Բեռնել CSS ֆայլ..."
   upload_a_js_file_c89d795: "Բեռնել JS ֆայլ..."
@@ -17770,6 +17772,7 @@ hy:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Դուք չեք կարող ջնջել ենթահաշիվ, որը դասընթացներ ունի իր մեջ:"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Դուք չեք կարող խմբագրել այս ռուբրիկը, որովհետև  թույլտվություն չունեք, կամ այն օգտագործվում է մեկից ավելի տեղերում: Ձեր կատարած ցանկացած փոփոխություն կհանգեցնի հին ռուբրիկի վրա հիմնված նոր ռուբրիկի: Ցանկանո՞ւմ եք շարունակել: "
   you_can_try_to_log_in_again_2b23ef0f: "Դուք կարող եք փորձել *կրկին մուտք գործել:*"
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "Դուք կարող եք թարմացնել օգտատիրոջ վերաբերյալ որոշ տեղեկություններ, բայց նա կարող է դրանք նորից հին տեղեկություններով փոխարինել:"
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Դուք կարող եք օգտագործել 16x16, 32x32, 48x48 ico ֆայլերը"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Դուք չեք կարող խմբագրել թեմաներն այս ենթահաշվում:"
   you_cannot_remove_this_enrollment_c87be1cb: "Դուք չեք կարող ջնջել այս գրանցումը:"
