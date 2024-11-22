@@ -51,34 +51,46 @@ type CommonMigratorControlsProps = {
   newEndDate: string | null
 }
 
-const generateNewQuizzesLabel = () => (
-  <>
-    <Text>
-      {I18n.t('Import existing quizzes as ')}
-      <Text weight="bold">{I18n.t('New Quizzes')}</Text>
-    </Text>
-    <span style={{position: 'absolute', marginTop: '-0.55em'}}>
-      <InfoButton
-        heading={I18n.t('New Quizzes')}
-        body={
-          <>
-            <Text>{I18n.t('New Quizzes is the new assessment engine for Canvas.')}</Text>
-            <br />
-            <Text>
-              {I18n.t('To learn more, please contact your system administrator or visit ')}
-            </Text>
-            <Link href={I18n.t('#community.instructor_guide')}>
-              {I18n.t('Canvas Instructor Guide')}
-            </Link>
-            <Text>.</Text>
-          </>
-        }
-        buttonLabel={I18n.t('Import assessment as New Quizzes Help Icon')}
-        modalLabel={I18n.t('Import assessment as New Quizzes Help Modal')}
-      />
-    </span>
-  </>
-)
+const generateNewQuizzesLabel = () => {
+  const isConvertQuizzes = ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS
+
+  const labelText = isConvertQuizzes
+    ? I18n.t('Convert content to New Quizzes')
+    : I18n.t('Import existing quizzes as New Quizzes')
+  const headingText = isConvertQuizzes ? I18n.t('Convert Quizzes') : I18n.t('New Quizzes')
+  const bodyText = isConvertQuizzes
+    ? I18n.t(
+        'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.'
+      )
+    : I18n.t('New Quizzes is the new assessment engine for Canvas.')
+  const helpText = I18n.t('To learn more, please contact your system administrator or visit ')
+  const guideLink = I18n.t('#community.instructor_guide')
+  const guideText = I18n.t('Canvas Instructor Guide')
+  const buttonLabel = I18n.t('Import assessment as New Quizzes Help Icon')
+  const modalLabel = I18n.t('Import assessment as New Quizzes Help Modal')
+
+  return (
+    <>
+      <Text>{labelText}</Text>
+      <span style={{position: 'absolute', marginTop: '-0.55em'}}>
+        <InfoButton
+          heading={headingText}
+          body={
+            <>
+              <Text>{bodyText}</Text>
+              <br />
+              <Text>{helpText}</Text>
+              <Link href={guideLink}>{guideText}</Link>
+              <Text>.</Text>
+            </>
+          }
+          buttonLabel={buttonLabel}
+          modalLabel={modalLabel}
+        />
+      </span>
+    </>
+  )
+}
 
 const generateOverwriteLabel = () => (
   <>
