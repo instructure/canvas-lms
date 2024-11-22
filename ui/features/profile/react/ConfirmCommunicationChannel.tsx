@@ -28,7 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {zodResolver} from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import {Controller, useForm} from 'react-hook-form'
+import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 
 const I18n = useI18nScope('profile')
@@ -41,6 +41,8 @@ const validationSchema = z.object({
     .min(1, I18n.t('Code is required.'))
     .length(4, I18n.t('Code must be four characters.')),
 })
+
+type FormValues = z.infer<typeof validationSchema>
 
 interface ConfirmChannelResponse {
   communication_channel: {id: string; pseudonym_id: string}
@@ -74,7 +76,7 @@ const ConfirmCommunicationChannel = ({
   const title = I18n.t('Confirm Communication Channel')
   const buttonText = isSubmitting ? I18n.t('Confirming...') : I18n.t('Confirm')
 
-  const handleFormSubmit = async ({code}: typeof defaultValues) => {
+  const handleFormSubmit: SubmitHandler<FormValues> = async ({code}) => {
     try {
       const {json} = await doFetchApi<ConfirmChannelResponse>({
         path: `/register/${code}`,
