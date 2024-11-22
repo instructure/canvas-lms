@@ -26115,6 +26115,7 @@ hu:
   updating_discussion_failed_aadb2d35: "A Fórum frissítése sikertelen"
   updating_publication_date_62cc1622: "A közzététel dátumának frissítése"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "A katalógus URL-jének frissítése azonnali hatállyal elérhetetlenné teszi a régi URL-t a felhasználók számára! Ha egy meglévő fizetési processzor van beállítva, a változtatásokhoz egy katalógusmérnök segítségére lesz szükség."
+  updating_user_details_b8520b3e: "Felhasználó részleteinek frissítése..."
   upload_8b403d05: Feltöltés
   upload_a_file_228b8cf9: "Fájl feltöltése"
   upload_a_list_of_forbidden_words_terms_in_addition_e9ac69d3: "Töltse fel a tiltott szavak/kifejezések listáját az alapértelmezett listán kívül. A fájl szövegfájl (.txt) legyen, soronként egyetlen szóval vagy kifejezéssel."
@@ -27411,7 +27412,7 @@ hu:
   you_can_t_edit_this_rubric_either_because_you_don__ab22f243: " Ezt az értékelőtáblát nem szerkesztheti, mert vagy nincs engedélye, vagy mert több helyen is használják. "
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Ön nem szerkesztheti ezt az értékelőtáblát, mert nincs engedélye vagy már használatban van. Minden módosítás egy új értékelőtáblába lesz átvezetve, ami az eredeti alapján készül el. Mindenképpen folytatja?"
   you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "Nem küldhet be feladatot, ha az még nincs közzétéve."
-  you_can_update_some_of_this_user_s_information_but_8e99a045: "Ön frissítheti az itt látható felhasználó egyes adatait, de a felhasználó visszaváltoztathatja azokat, ha kívánja. "
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "Ön frissítheti az itt látható felhasználó egyes adatait, de a felhasználó visszaváltoztathatja ezeket, ha kívánja. "
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Ön egy 16x16, 32x32, 48x48 méretű ikonfájlt alkalmazhat."
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: "Az elbocsátott hirdetményeket a Fiók menüpontban és a Globális hirdetmények menüpontot választja."
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: " A Mi lenne, ha pontszámok alapján megtekintheti az osztályzatokat, hogy tudja, hogyan befolyásolják az osztályzatokat a következő vagy újra benyújtott feladatok. "
