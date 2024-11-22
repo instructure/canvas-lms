@@ -78,71 +78,6 @@ class GradingSchemesJsonController < ApplicationController
     end
   end
 
-  def regrade_affected_assignments(assignments, grading_standard)
-    regrade_affected_submissions(assignments, grading_standard)
-    regrade_affected_submission_versions(assignments, grading_standard)
-  end
-
-  def regrade_affected_submissions(assignments, grading_standard)
-    submissions_with_grades = Submission.where.not(grade: nil).where(assignment_id: assignments.select(:id))
-    submissions_with_grades.preload(assignment: [:grading_standard, { context: :grading_standard }]).find_in_batches(batch_size: 1000) do |submissions_batch|
-      batched_updates = submissions_batch.each_with_object([]) do |submission, acc|
-        next if submission.assignment.points_possible.zero?
-
-        score = BigDecimal(submission.score.to_s.presence || "0.0") / BigDecimal(submission.assignment.points_possible.to_s)
-        new_grade = grading_standard.score_to_grade((score * 100).to_f)
-        grade_has_changed = new_grade != submission.grade || new_grade != submission.published_grade
-        if grade_has_changed
-          acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => Time.now)
-        end
-      end
-
-      Submission.upsert_all(
-        batched_updates,
-        unique_by: :id,
-        update_only: %i[grade published_grade updated_at],
-        record_timestamps: false,
-        returning: false
-      )
-    end
-  end
-
-  def regrade_affected_submission_versions(assignments, grading_standard)
-    current_versions_for_submissions = Version
-                                       .where(versionable: Submission.where(assignment: assignments))
-                                       .order(versionable_id: :asc, number: :desc)
-                                       .distinct_on(:versionable_id) # we only want the _most recent_ version associated with each submission
-    ActiveRecord::Base.transaction do
-      current_versions_for_submissions.preload(versionable: { assignment: [:grading_standard, { context: :grading_standard }] }).find_each do |version|
-        model = version.model
-        next unless model.grade.present? && version.versionable.assignment.points_possible.positive?
-
-        score = BigDecimal(model.score.to_s.presence || "0.0") / BigDecimal(model.assignment.points_possible.to_s)
-        new_grade = grading_standard.score_to_grade((score * 100).to_f)
-        grade_has_changed = new_grade != model.grade || new_grade != model.published_grade
-        next unless grade_has_changed
-
-        model.grade = new_grade
-        model.published_grade = new_grade
-        yaml = model.attributes.to_yaml
-        # We can't use the same upsert_all approach that we used in regrade_affected_submissions
-        # because the versions table is partitioned.
-        version.update_columns(yaml:)
-      end
-    end
-  end
-
-  def recompute_assignments_using_account_default(account, grading_standard)
-    account.courses.where(grading_standard_id: nil).where.not(workflow_state: "completed").where.not(workflow_state: "deleted").find_each do |course|
-      affected_assignments = course.assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil)
-      delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: ["recalc_account_default", Shard.current.database_server.id], singleton: "recalc_account_default:#{course.global_id}").regrade_affected_assignments(affected_assignments, grading_standard)
-    end
-
-    account.sub_accounts.where(grading_standard: nil).find_each do |sub_account|
-      recompute_assignments_using_account_default(sub_account, grading_standard)
-    end
-  end
-
   def update_account_default_grading_scheme
     return unless Account.site_admin.feature_enabled?(:default_account_grading_scheme)
     return unless @context.is_a?(Account)
@@ -163,7 +98,7 @@ class GradingSchemesJsonController < ApplicationController
 
     respond_to do |format|
       if @context.save
-        recompute_assignments_using_account_default(@context, @context.grading_standard || GradingStandard.default_instance)
+        @context.recompute_assignments_using_account_default(grading_standard || GradingStandard.default_instance)
         format.json { render json: response }
       else
         format.json { render json: @context.errors, status: :bad_request }

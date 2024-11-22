@@ -615,10 +615,10 @@ describe GradingSchemesJsonController, type: :request do
         assignment_not_inheriting = course_not_inheriting_from_root.assignments.create!(title: "hello", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
         assignment_sub = course_inheriting_from_sub.assignments.create!(title: "hi2", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
         assignment_sub_sub = course_inheriting_from_sub_sub.assignments.create!(title: "hi3", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
-        @submission_root = assignment_root.grade_student(student1, score: 6, grader: admin).first
-        @submission_not_inheriting = assignment_not_inheriting.grade_student(student2, score: 6, grader: admin).first
-        @submission_sub = assignment_sub.grade_student(student3, score: 6, grader: admin).first
-        @submission_sub_sub = assignment_sub_sub.grade_student(student4, score: 6, grader: admin).first
+        @submission_root = assignment_root.grade_student(student1, score: 7, grader: admin).first
+        @submission_not_inheriting = assignment_not_inheriting.grade_student(student2, score: 7, grader: admin).first
+        @submission_sub = assignment_sub.grade_student(student3, score: 7, grader: admin).first
+        @submission_sub_sub = assignment_sub_sub.grade_student(student4, score: 7, grader: admin).first
       end
 
       it "updates submission grades in account inheriting courses/assignments and all sub account courses/assignments" do
@@ -631,6 +631,18 @@ describe GradingSchemesJsonController, type: :request do
         expect(@submission_not_inheriting.reload.grade).to eq "F"
         expect(@submission_sub.reload.grade).to eq "A"
         expect(@submission_sub_sub.reload.grade).to eq "A"
+      end
+
+      it "updates submission grades in account inheriting courses/assignments and all sub account courses/assignments when default is set to canvas default (null)" do
+        put "/accounts/#{@root_account.id}/grading_schemes/account_default",
+            params: { id: nil },
+            as: :json
+
+        expect(response).to have_http_status(:ok)
+        expect(@submission_root.reload.grade).to eq "C-"
+        expect(@submission_not_inheriting.reload.grade).to eq "F"
+        expect(@submission_sub.reload.grade).to eq "C-"
+        expect(@submission_sub_sub.reload.grade).to eq "C-"
       end
 
       it "updates the most recent submission version in all inheriting account and sub account courses" do
