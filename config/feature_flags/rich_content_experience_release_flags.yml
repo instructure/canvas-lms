@@ -157,18 +157,6 @@ rce_linked_file_urls:
     development:
       state: allowed_on
 
-rce_transform_iframe_sandbox_attributes:
-  state: hidden
-  display_name: Transform RCE iframe Sandbox Attributes
-  description: |-
-    Transforms iframe sandbox attributes to limit sandbox attributes inside user content.
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
-
 rce_transform_loaded_content:
   state: hidden
   display_name: Transform RCE Content on Load
