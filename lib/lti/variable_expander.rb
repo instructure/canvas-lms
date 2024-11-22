@@ -173,11 +173,7 @@ module Lti
 
     def resource_link_id
       @resource_link_id ||= if @assignment&.submission_types == "external_tool" && @assignment&.line_items.present?
-                              if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
-                                @assignment.line_items.first&.resource_link&.resource_link_uuid
-                              else
-                                @assignment.line_items.first&.resource_id
-                              end
+                              @assignment.line_items.first&.resource_link&.resource_link_uuid
                             elsif @resource_link
                               @resource_link.resource_link_uuid
                             elsif @content_tag&.associated_asset.present?
@@ -188,27 +184,12 @@ module Lti
                             end
     end
 
-    # This method should be removed when resource_link_uuid_in_custom_substitution is turned on for all
-    def resource_link_id_is_present
-      @resource_link_id_is_present ||=
-        if @assignment&.submission_types == "external_tool"
-          if @root_account&.feature_enabled?(:resource_link_uuid_in_custom_substitution)
-            resource_link_id.present?
-          else
-            @assignment&.line_items.present?
-          end
-        else
-          resource_link_id.present?
-        end
-    end
-
     # LTI - Custom parameter substitution: ResourceLink.id
     # Returns the LTI value for the resource_link.id property
     # Returns "$ResourceLink.id" otherwise
     register_expansion "ResourceLink.id",
                        [],
                        -> { resource_link_id },
-                       -> { resource_link_id_is_present },
                        default_name: "resourcelink_id"
 
     # LTI - Custom parameter substitution: ResourceLink.description

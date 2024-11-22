@@ -1717,15 +1717,7 @@ module Lti
             )
           end
 
-          context "when the resource_link_uuid_in_custom_substitution feature flag is on" do
-            before :once do
-              Account.site_admin.enable_feature!(:resource_link_uuid_in_custom_substitution)
-            end
-
-            it_expands("$ResourceLink.id") { resource_link_uuid }
-          end
-
-          it_expands "$ResourceLink.id", "abc"
+          it_expands("$ResourceLink.id") { resource_link_uuid }
           it_expands "$ResourceLink.description", "This is a super fun activity"
           it_expands "$ResourceLink.title", "Activity XYZ"
           it_expands("$ResourceLink.available.startDateTime") { right_now.iso8601(3) }
