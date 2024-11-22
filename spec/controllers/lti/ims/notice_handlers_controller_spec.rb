@@ -127,5 +127,19 @@ describe Lti::IMS::NoticeHandlersController do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    describe "with devkey turned off" do
+      let(:handler_object) { { notice_type:, handler: handler_url } }
+      let(:body_overrides) { handler_object.to_json }
+
+      before do
+        developer_key.account_binding_for(Account.default).update!(workflow_state: "off")
+      end
+
+      it "it throws 401" do
+        send_request
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
   end
 end
