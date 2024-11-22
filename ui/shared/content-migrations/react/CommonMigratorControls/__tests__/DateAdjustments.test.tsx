@@ -18,9 +18,19 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import DateAdjustments from '../DateAdjustments'
+import DateAdjustments, {localisedDateMessages} from '../DateAdjustments'
 import type {DateAdjustmentConfig, DateShifts} from '../types'
 import userEvent from '@testing-library/user-event'
+import moment from 'moment-timezone'
+import tzInTest from '@instructure/moment-utils/specHelpers'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
+import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+// @ts-ignore
+import tz from 'timezone'
+// @ts-ignore
+import chicago from 'timezone/America/Chicago'
+// @ts-ignore
+import detroit from 'timezone/America/Detroit'
 
 const dateAdjustments: DateAdjustmentConfig = {
   adjust_dates: {
@@ -166,5 +176,50 @@ describe('DateAdjustment', () => {
     expect(remove_sub_button).toBeInTheDocument()
     await userEvent.click(remove_sub_button)
     expect(setDateAdjustments).toHaveBeenCalledWith(dateAdjustments)
+  })
+
+  describe('localisedDateMessages', () => {
+    describe('when date parameter is missing', () => {
+      it('returns an empty array', () => {
+        expect(localisedDateMessages()).toStrictEqual([])
+      })
+    })
+
+    describe('when the two timezones are the same', () => {
+      it('returns an empty array', () => {
+        ENV.CONTEXT_TIMEZONE = 'America/New_York'
+        ENV.TIMEZONE = 'America/New_York'
+
+        expect(localisedDateMessages('2024-08-08T08:00:00+00:00')).toStrictEqual([])
+      })
+    })
+
+    it('returns the correct localised date messages', () => {
+      moment.tz.setDefault('America/Denver')
+
+      tzInTest.configureAndRestoreLater({
+        tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
+        tzData: {
+          'America/Chicago': chicago,
+          'America/Detroit': detroit,
+        },
+        formats: getI18nFormats(),
+      })
+      ENV.CONTEXT_TIMEZONE = 'America/Detroit'
+      ENV.TIMEZONE = 'America/Chicago'
+
+      render(
+        <CanvasDateInput
+          selectedDate="2024-11-08T08:00:00+00:00"
+          onSelectedDateChange={() => {}}
+          formatDate={jest.fn(date => date.toISOString())}
+          interaction="enabled"
+          messages={localisedDateMessages('2024-11-08T08:00:00+00:00')}
+        />
+      )
+
+      expect(screen.queryByText('Local: Nov 8 at 2am')).toBeInTheDocument()
+      expect(screen.queryByText('Course: Nov 8 at 3am')).toBeInTheDocument()
+    })
   })
 })
