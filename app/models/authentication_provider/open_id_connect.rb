@@ -84,6 +84,7 @@ class AuthenticationProvider
           header: -> { t("Header") },
           claims: -> { t("Claims") },
           userinfo: -> { t("Userinfo") },
+          validation_error: -> { t("Validation error") }
         }]
       end
 
@@ -242,11 +243,11 @@ class AuthenticationProvider
     def validate_signature(token)
       tries ||= 1
       if token.alg&.to_sym == :none
-        return "Token is not signed"
+        return t("Token is not signed")
       elsif token.send(:hmac?)
         token.verify!(client_secret)
       elsif (jwks = self.jwks).nil?
-        return "No JWKS available to validate signature"
+        return t("No JWKS available to validate signature")
       else
         token.verify!(jwks)
       end
@@ -365,28 +366,29 @@ class AuthenticationProvider
 
         if self.class.always_validate? || account.feature_enabled?(:oidc_full_token_validation)
           unless (missing_claims = %w[aud iss iat exp nonce] - id_token.keys).empty?
-            raise OAuthValidationError, "Missing claim#{"s" if missing_claims.length > 1} #{missing_claims.join(", ")}"
+            raise OAuthValidationError, t({ one: "Missing claim %{claims}", other: "Missing claims %{claims}" },
+                                          count: missing_claims.length,
+                                          claims: missing_claims.join(", "))
           end
 
-          unless id_token["aud"] == client_id
-            raise OAuthValidationError, "Invalid JWT audience: #{id_token["aud"].inspect}"
+          unless Array(id_token["aud"]).include?(client_id)
+            raise OAuthValidationError, t("Invalid JWT audience: %{audience}", audience: id_token["aud"].inspect)
           end
 
           if self.class.validate_issuer?
             if issuer.blank?
-              raise OAuthValidationError, "No issuer configured for OpenID Connect provider"
+              raise OAuthValidationError, t("No issuer configured for OpenID Connect provider")
             end
             unless issuer === id_token["iss"] # rubocop:disable Style/CaseEquality may be a string or a RegEx
-              raise OAuthValidationError, "Invalid JWT issuer: #{id_token["iss"]}"
+              raise OAuthValidationError, t("Invalid JWT issuer: %{issuer}", issuer: id_token["iss"])
             end
           end
           unless id_token["nonce"] == token.options[:nonce]
-            raise OAuthValidationError, "Invalid nonce claim in ID Token"
+            raise OAuthValidationError, t("Invalid nonce claim in ID Token")
           end
 
           if (signature_error = validate_signature(id_token))
-            debug_set(:signature_error, signature_error) if instance_debugging
-            raise OAuthValidationError, "Invalid signature: #{signature_error}"
+            raise OAuthValidationError, t("Invalid signature: %{signature_error}", signature_error:)
           end
         elsif id_token != {}
           missing_claims_persisted = settings["missing_claims"] ||= []
