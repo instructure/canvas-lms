@@ -189,19 +189,21 @@ class ScoringRange extends React.Component {
           <div className="cr-scoring-range__bound cr-scoring-range__upper-bound">
             {this.renderUpperBound()}
           </div>
-          <button
-            type="button"
-            className="cr-scoring-range__add-assignment-button"
-            aria-label={I18n.t('Add Items to Score Range')}
-            onClick={this.handleAddItems}
-          >
-            +
-          </button>
+          <div className="cr-scoring-range__center">
+            <button
+              type="button"
+              className="cr-scoring-range__add-assignment-button"
+              aria-label={I18n.t('Add Items to Score Range')}
+              onClick={this.handleAddItems}
+            >
+              +
+            </button>
+            <div className="cr-scoring-range__assignments">{this.renderAssignmentSets()}</div>
+          </div>
           <div className="cr-scoring-range__bound cr-scoring-range__lower-bound">
             {this.renderLowerBound()}
           </div>
         </div>
-        <div className="cr-scoring-range__assignments">{this.renderAssignmentSets()}</div>
       </div>
     )
   }

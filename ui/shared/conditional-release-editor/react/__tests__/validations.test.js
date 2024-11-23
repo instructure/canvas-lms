@@ -82,7 +82,15 @@ describe('validateScores', () => {
       List(['1.0', '1.0', '1.0', '1.0', '1.0', '2.0', '1.0']),
       defaultScoringInfo()
     )
-    expect(errors.toJS()).toEqual([null, null, null, null, null, 'number is too large', null])
+    expect(errors.toJS()).toEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
+      'Please enter a smaller number',
+      null,
+    ])
   })
 
   it('allows scores with close bounds', () => {
@@ -141,13 +149,13 @@ describe('validateScores', () => {
   })
 
   it('requires the input to be within bounds', () => {
-    expectAllInvalid(/too/, '1.1', '1.105', '-1')
-    expectAllInvalidLetters(/too/, '1.1', '1.105', '-1')
+    expectAllInvalid(/Please enter a .* number/, '1.1', '1.105', '-1')
+    expectAllInvalidLetters(/Please enter a .* number/, '1.1', '1.105', '-1')
   })
 
   it('requires the input to not be blank', () => {
-    expectAllInvalid(/empty/, null, '')
-    expectAllInvalidLetters(/empty/, null, '')
+    expectAllInvalid(/Please enter a score/, null, '')
+    expectAllInvalidLetters(/Please enter a score/, null, '')
   })
 
   it('requires scores be in order', () => {

@@ -33,26 +33,26 @@ const isNumeric = n => {
 }
 
 const checkBlank = s => {
-  return s === null || s === '' || s.length === 0 ? I18n.t('must not be empty') : null
+  return s === null || s === '' || s.length === 0 ? I18n.t('Please enter a score') : null
 }
 
 const checkNumeric = s => {
-  return isNumeric(s) ? null : I18n.t('must be a number')
+  return isNumeric(s) ? null : I18n.t('Please enter a number')
 }
 
 const checkBounds = (minScore, maxScore, score) => {
   score = numberHelper.parse(score)
   if (score > maxScore) {
-    return I18n.t('number is too large')
+    return I18n.t('Please enter a smaller number')
   } else if (score < minScore) {
-    return I18n.t('number is too small')
+    return I18n.t('Please enter a larger number')
   } else {
     return null
   }
 }
 
 const checkInGradingScheme = (gradingScheme, score) => {
-  return isNumeric(score) ? null : I18n.t('must provide valid letter grade')
+  return isNumeric(score) ? null : I18n.t('Please provide a valid letter grade')
 }
 
 const checkScoreOrder = (scores, previousErrors) => {
@@ -66,13 +66,13 @@ const checkScoreOrder = (scores, previousErrors) => {
       !previousErrors.get(index - 1) &&
       score > numberHelper.parse(scores.get(index - 1))
     ) {
-      return I18n.t('these scores are out of order')
+      return I18n.t('Please adjust score order')
     } else if (
       index + 1 < scores.size &&
       !previousErrors.get(index + 1) &&
       score < numberHelper.parse(scores.get(index + 1))
     ) {
-      return I18n.t('these scores are out of order')
+      return I18n.t('Please adjust score order')
     } else {
       return null
     }
