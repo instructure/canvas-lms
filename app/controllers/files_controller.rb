@@ -425,7 +425,7 @@ class FilesController < ApplicationController
                                 else
                                   []
                                 end
-
+        root_folder_id = Folder.root_folders(context)&.first&.id if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
         {
           asset_string: context.asset_string,
           name: (context == @current_user) ? t("my_files", "My Files") : context.name,
@@ -436,7 +436,8 @@ class FilesController < ApplicationController
             manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
           },
           file_menu_tools:,
-          file_index_menu_tools:
+          file_index_menu_tools:,
+          root_folder_id:
         }
       end
 

@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {useQuery} from '@tanstack/react-query'
 
 import {type File, type Folder} from '../../../interfaces/File'
 import SubTableContent from './SubTableContent'
@@ -31,6 +32,7 @@ import ActionMenuButton from './ActionMenuButton'
 import NameLink from './NameLink'
 import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('files_v2')
 
@@ -39,6 +41,16 @@ interface ColumnHeader {
   title: string
   textAlign: 'start' | 'center' | 'end'
   width?: string
+}
+
+const fetchFilesAndFolders = async (folderId: string) => {
+  const includeParams = ['user', 'usage_rights', 'enhanced_preview_url', 'context_asset_string']
+  const url = `/api/v1/folders/${folderId}/all?include[]=${includeParams.join('&include[]=')}`
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error('Failed to fetch files and folders')
+  }
+  return response.json()
 }
 
 const columnHeaders: ColumnHeader[] = [
@@ -82,19 +94,20 @@ const columnRenderers: {
 
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
-  isLoading: boolean
   userCanEditFilesForContext: boolean
-  rows?: (File | Folder)[]
+  folderId: string
 }
 
-const FileFolderTable = ({
-  size,
-  isLoading,
-  userCanEditFilesForContext,
-  rows = [],
-}: FileFolderTableProps) => {
+const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolderTableProps) => {
   const isStacked = size !== 'large'
+  const {data, error, isLoading} = useQuery<(File | Folder)[], unknown>(['files'], () =>
+    fetchFilesAndFolders(folderId)
+  )
+  if (error) {
+    showFlashError(I18n.t('Failed to fetch files and folders'))
+  }
 
+  const rows = data ?? []
   return (
     <>
       <Table

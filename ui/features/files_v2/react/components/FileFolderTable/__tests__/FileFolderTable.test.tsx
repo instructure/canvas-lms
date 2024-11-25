@@ -19,64 +19,82 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import FileFolderTable from '..'
-import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../data/FakeData'
 import {BrowserRouter} from 'react-router-dom'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {QueryClient} from '@tanstack/react-query'
+import fetchMock from 'fetch-mock'
+import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../data/FakeData'
 
 const defaultProps = {
   size: 'large' as 'large' | 'small' | 'medium',
-  isLoading: false,
-  rows: [],
   userCanEditFilesForContext: true,
+  folderId: '1',
 }
+
 const renderComponent = (props = {}) => {
+  const queryClient = new QueryClient()
+
   return render(
     <BrowserRouter>
-      <FileFolderTable {...defaultProps} {...props} />
+      <MockedQueryClientProvider client={queryClient}>
+        <FileFolderTable {...defaultProps} {...props} />
+      </MockedQueryClientProvider>
     </BrowserRouter>
   )
 }
 
 describe('FileFolderTable', () => {
-  it('renders filedrop when no results and not loading', () => {
+  beforeEach(() => {
+    fetchMock.get(/.*\/folders/, FAKE_FOLDERS_AND_FILES)
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+  })
+
+  it('renders filedrop when no results and not loading', async () => {
+    fetchMock.get(/.*\/folders/, [], {overwriteRoutes: true})
     renderComponent()
 
-    expect(screen.getByText('Drag a file here, or')).toBeInTheDocument()
+    expect(await screen.findByText('Drag a file here, or')).toBeInTheDocument()
   })
 
   it('renders spinner and no filedrop when loading', () => {
-    renderComponent({isLoading: true})
+    fetchMock.get(/.*\/folders/, FAKE_FOLDERS_AND_FILES, {overwriteRoutes: true, delay: 5000})
+    renderComponent()
 
     expect(screen.getByText('Loading data')).toBeInTheDocument()
     expect(screen.queryByText('Drag a file here, or')).not.toBeInTheDocument()
   })
 
-  it('renders stacked when not large', () => {
-    renderComponent({size: 'medium', rows: FAKE_FOLDERS_AND_FILES})
+  it('renders stacked when not large', async () => {
+    renderComponent({size: 'medium'})
 
-    expect(screen.getAllByText('Name:')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
+    expect(await screen.findAllByText('Name:')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
   })
 
-  it('renders file/folder rows when results', () => {
-    renderComponent({rows: FAKE_FOLDERS_AND_FILES})
+  it('renders file/folder rows when results', async () => {
+    renderComponent()
 
-    expect(screen.getAllByTestId('table-row')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
+    expect(await screen.findAllByTestId('table-row')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
     expect(screen.getByText(FAKE_FOLDERS_AND_FILES[0].name)).toBeInTheDocument()
   })
 
   describe('FileFolderTable - modifiedBy column', () => {
-    it('renders link with user profile of file rows when modified by user', () => {
-      const { display_name, html_url } = FAKE_FILES[0].user || {}
+    it('renders link with user profile of file rows when modified by user', async () => {
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true})
+      const {display_name, html_url} = FAKE_FILES[0].user || {}
 
       expect(display_name).toBeDefined()
-      renderComponent({ rows: [FAKE_FILES[0]] })
-
-      const userLink = screen.getByText(display_name!)
+      renderComponent()
+      const userLink = await screen.findByText(display_name!)
       expect(userLink).toBeInTheDocument()
       expect(userLink.closest('a')).toHaveAttribute('href', html_url!)
     })
 
     it('does not render link when folder', () => {
-      renderComponent({ rows: [FAKE_FOLDERS[0]] })
+      fetchMock.get(/.*\/folders/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
+      renderComponent()
 
       const userLinks = screen.queryAllByText((_, element) => {
         if (!element) return false
