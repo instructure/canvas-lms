@@ -92,6 +92,7 @@
     "@instructure/ui-buttons": "8.56.4",
     "@instructure/ui-checkbox": "8.56.4",
     "@instructure/ui-source-code-editor": "8.56.4",
+    "@instructure/ui-color-picker": "8.56.4",
     "@instructure/ui-color-utils": "8.56.4",
     "@instructure/ui-file-drop": "8.56.4",
     "@instructure/ui-flex": "8.56.4",
@@ -131,6 +132,7 @@
     "@instructure/ui-view": "8.56.4",
     "@instructure/uid": "8.56.4",
     "@sheerun/mutationobserver-shim": "^0.3.2",
+    "@types/tinycolor2": "^1.4.6",
     "@tinymce/tinymce-react": "~3.8.4",
     "aphrodite": "^2",
     "axios": "^0.21.1",
@@ -160,6 +162,7 @@
     "redux-batch-middleware": "^0.2.0",
     "redux-thunk": "^3.1.0",
     "text-field-edit": "^3.2.0",
+    "tinycolor2": "^1.6.0",
     "tinymce": "^5",
     "uri-js": "^4.2.2",
     "wcag-element-contrast": "^1.0.1"
