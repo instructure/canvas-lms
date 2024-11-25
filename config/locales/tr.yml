@@ -209,6 +209,8 @@ tr:
   a_role_name_is_required_47efd33: "Rol adı gereklidir."
   a_save_is_in_progress_63a2887d: "Kaydetme işlemi devam ediyor"
   a_section_is_required_64103992: "Bir bölüm gerekli"
+  a_setting_with_the_name_name_already_exists_3bf5f9b8: " \"%{name}\" adıyla bir ayar zaten var."
+  a_single_certificate_file_e7f347f1: "Tek bir sertifika dosyası"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Yeni bir ÖBS entegrasyonu yapılandırılmamış ve yeni ÖBS Entegrasyonunu Etkinleştirme ayarları etkin değil."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Notlandırma şemasının adını, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
@@ -18874,6 +18876,7 @@ tr:
   submit_ticket_5515ffd: "Yardım İsteği Gönder"
   submitted_318fad53: Gönderildi
   submitted_at_4d5ea3aa: "Gönderildi:"
+  submitted_b37e2ff0: gönderildi
   submitted_d5ba370a: "Gönderilen:"
   submitted_datetime_fa2e9287: "Gönderildi: %{dateTime}"
   submitted_files_82dd3009: "Gönderilen Dosyalar"
