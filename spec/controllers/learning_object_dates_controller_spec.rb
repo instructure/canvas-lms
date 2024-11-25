@@ -719,6 +719,67 @@ describe LearningObjectDatesController do
         expect(json_parse).to include({ "blueprint_date_locks" => ["availability_dates"] })
       end
     end
+
+    context "checkpointed discussions in a context module with overrides" do
+      before do
+        @course.root_account.enable_feature! :discussion_checkpoints
+        course_with_student(course: @course)
+
+        @checkpoint_due_at = "2022-05-05T12:00:00Z"
+
+        discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        context_module = @course.context_modules.create!(name: "module")
+        override = context_module.assignment_overrides.create!(set_type: "ADHOC")
+        override.assignment_override_students.create!(user: @student)
+        context_module.content_tags.create!(content: @discussion, context: @course, tag_type: "context_module")
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "override",
+              due_at: @checkpoint_due_at,
+              unlock_at: nil,
+              lock_at: nil,
+              set_type: "Course"
+            },
+          ],
+          points_possible: 5
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "override",
+              due_at: @checkpoint_due_at,
+              unlock_at: nil,
+              lock_at: nil,
+              set_type: "Course"
+            },
+          ],
+          points_possible: 15,
+          replies_required: 3
+        )
+
+        @discussion = discussion.reload
+
+        @default_params = {
+          course_id: @course.id,
+          discussion_topic_id: @discussion.id
+        }
+      end
+
+      it "returns course override dates as checkpoint due_at dates" do
+        get :show, params: { course_id: @course.id, assignment_id: @discussion.assignment.id }
+
+        expect(response).to be_successful
+        expect(json_parse["checkpoints"].first["due_at"]).to eq(@checkpoint_due_at)
+        expect(json_parse["checkpoints"].second["due_at"]).to eq(@checkpoint_due_at)
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -1279,6 +1340,210 @@ describe LearningObjectDatesController do
         expect(reply_to_entry_checkpoint.unlock_at).to be_nil
         expect(reply_to_entry_checkpoint.lock_at).to be_nil
         expect(reply_to_entry_checkpoint.only_visible_to_overrides).to be false
+      end
+
+      it "updates checkpoint due_at dates with course override dates when in a module with overrides" do
+        course_with_student(course: @course)
+        context_module = @course.context_modules.create!(name: "module")
+        override = context_module.assignment_overrides.create!(set_type: "ADHOC")
+        override.assignment_override_students.create!(user: @student)
+        context_module.content_tags.create!(content: @discussion, context: @course, tag_type: "context_module")
+
+        put :update, params: {
+          **@default_params,
+          only_visible_to_overrides: true,
+          assignment_overrides: [
+            due_at: nil,
+            reply_to_topic_due_at: @reply_to_topic_due_at,
+            required_replies_due_at: @reply_to_entry_due_at,
+            unlock_at: @unlock_at,
+            lock_at: @lock_at,
+            course_id: "everyone",
+            unassign_item: false
+          ]
+        }
+
+        expect(response).to be_successful
+        expect(@discussion.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).due_at).to be_within(1.second).of(@reply_to_topic_due_at)
+        expect(@discussion.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).due_at).to be_within(1.second).of(@reply_to_entry_due_at)
+      end
+    end
+
+    context "checkpointed discussions in a context module" do
+      before do
+        @course.root_account.enable_feature! :discussion_checkpoints
+        course_with_student(course: @course)
+        @context_module = @course.context_modules.create!(name: "module")
+
+        @reply_to_topic_due_at = 7.days.from_now
+        @reply_to_entry_due_at = 14.days.from_now
+        @unlock_at = 5.days.from_now
+        @lock_at = 16.days.from_now
+
+        discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        @context_module.content_tags.create!(content: discussion, context: @course, tag_type: "context_module")
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            {
+              type: "override",
+              due_at: @checkpoint_due_at,
+              unlock_at: nil,
+              lock_at: nil,
+              set_type: "Course"
+            },
+          ],
+          points_possible: 5
+        )
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            {
+              type: "override",
+              due_at: @checkpoint_due_at,
+              unlock_at: nil,
+              lock_at: nil,
+              set_type: "Course"
+            },
+          ],
+          points_possible: 15,
+          replies_required: 3
+        )
+
+        @discussion = discussion.reload
+
+        @default_params = {
+          course_id: @course.id,
+          discussion_topic_id: @discussion.id
+        }
+      end
+
+      context "with student overrides" do
+        before do
+          @module_override = @context_module.assignment_overrides.create!(set_type: "ADHOC")
+          @module_override.assignment_override_students.create!(user: @student)
+        end
+
+        it "handles delete course override" do
+          override = @discussion.assignment.assignment_overrides.first
+
+          put :update, params: {
+            **@default_params,
+            only_visible_to_overrides: true,
+            assignment_overrides: [{
+              due_at: nil,
+              id: @module_override.id,
+              lock_at: nil,
+              reply_to_topic_due_at: nil,
+              required_replies_due_at: nil,
+              student_ids: [@student.id.to_s],
+              unassign_item: false,
+              unlock_at: nil,
+            }]
+          }
+
+          expect(response).to be_successful
+          expect(override.reload).to be_deleted
+        end
+
+        it "handles unassigning module override" do
+          assignment = @discussion.assignment
+          override = @discussion.assignment.assignment_overrides.first
+
+          put :update, params: {
+            **@default_params,
+            only_visible_to_overrides: true,
+            assignment_overrides: [{
+              course_id: "everyone",
+              due_at: nil,
+              id: override.id,
+              lock_at: assignment.lock_at,
+              reply_to_topic_due_at: assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).due_at,
+              required_replies_due_at: assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).due_at,
+              unassign_item: false,
+              unlock_at: assignment.unlock_at
+            },
+                                   {
+                                     due_at: nil,
+                                     lock_at: nil,
+                                     reply_to_topic_due_at: nil,
+                                     required_replies_due_at: nil,
+                                     student_ids: [@student.id.to_s],
+                                     unassign_item: true,
+                                     unlock_at: nil,
+                                   }]
+          }
+
+          new_override = @discussion.assignment.assignment_overrides.last
+          expect(response).to be_successful
+          expect(new_override.unassign_item).to be(true)
+        end
+      end
+
+      context "with section overrides" do
+        before do
+          @section1 = @course.course_sections.create!
+          @module_override = @context_module.assignment_overrides.create!(set_type: "Section", set: @section1)
+        end
+
+        it "handles delete course override" do
+          override = @discussion.assignment.assignment_overrides.first
+
+          put :update, params: {
+            **@default_params,
+            only_visible_to_overrides: true,
+            assignment_overrides: [{
+              due_at: nil,
+              id: @module_override.id,
+              lock_at: nil,
+              reply_to_topic_due_at: nil,
+              required_replies_due_at: nil,
+              course_section_id: @section1.id.to_s,
+              unassign_item: false,
+              unlock_at: nil,
+            }]
+          }
+
+          expect(response).to be_successful
+          expect(override.reload).to be_deleted
+        end
+
+        it "handles unassigning module override" do
+          assignment = @discussion.assignment
+          override = @discussion.assignment.assignment_overrides.first
+
+          put :update, params: {
+            **@default_params,
+            only_visible_to_overrides: true,
+            assignment_overrides: [{
+              course_id: "everyone",
+              due_at: nil,
+              id: override.id,
+              lock_at: assignment.lock_at,
+              reply_to_topic_due_at: assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC).due_at,
+              required_replies_due_at: assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY).due_at,
+              unassign_item: false,
+              unlock_at: assignment.unlock_at
+            },
+                                   {
+                                     due_at: nil,
+                                     lock_at: nil,
+                                     reply_to_topic_due_at: nil,
+                                     required_replies_due_at: nil,
+                                     course_section_id: @section1.id.to_s,
+                                     unassign_item: true,
+                                     unlock_at: nil,
+                                   }]
+          }
+
+          new_override = @discussion.assignment.assignment_overrides.last
+          expect(response).to be_successful
+          expect(new_override.unassign_item).to be(true)
+        end
       end
     end
 

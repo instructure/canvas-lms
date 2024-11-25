@@ -282,8 +282,8 @@ class LearningObjectDatesController < ApplicationController
     params[:assignment_overrides]&.each do |override|
       base_override = { type: "override" }
 
-      [:unlock_at, :lock_at].each do |date_field|
-        base_override[date_field] = override[date_field] if override.key?(date_field)
+      %i[unlock_at lock_at unassign_item].each do |override_field|
+        base_override[override_field] = override[override_field] if override.key?(override_field)
       end
 
       # If student_ids, course_section_id, or group_id is provided, then we want to provide the correct set_type and set ids
@@ -296,6 +296,8 @@ class LearningObjectDatesController < ApplicationController
       elsif override[:group_id]
         base_override[:set_type] = "Group"
         base_override[:set_id] = override[:group_id]
+      elsif override[:course_id]
+        base_override[:set_type] = "Course"
       end
 
       # each checkpoint has the same base_override attributes

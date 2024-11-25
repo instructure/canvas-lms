@@ -41,7 +41,8 @@ class Checkpoints::AdhocOverrideCreatorService < Checkpoints::AdhocOverrideCommo
       set_type: AssignmentOverride::SET_TYPE_ADHOC,
       dont_touch_assignment: true,
       title: get_title(student_ids:),
-      parent_override:
+      parent_override:,
+      unassign_item: @override.fetch(:unassign_item, false)
     )
     apply_overridden_dates(override, @override, shell_override:)
     override
