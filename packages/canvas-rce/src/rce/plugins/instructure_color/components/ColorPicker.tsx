@@ -28,12 +28,9 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
-import {isTransparent, getContrastStatus} from './colorUtils'
+import {isTransparent, getContrastStatus, getDefaultColors} from './colorUtils'
 
-// this will hold colors the user picks during this session
-const previouslyChosenColors: string[] = []
-
-type ColorTab = 'foreground' | 'background' | 'border'
+export type ColorTab = 'foreground' | 'background' | 'border'
 
 export type ColorSpec = {
   bgcolor?: string
@@ -46,13 +43,20 @@ export type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K>}> = Partial<T> & U[key
 
 export type TabSpec = AtLeastOne<Record<ColorTab, string | undefined>>
 
+export type ColorsInUse = {
+  foreground: string[]
+  background: string[]
+  border: string[]
+}
+
 export type ColorPickerProps = {
   tabs: TabSpec
+  colorsInUse?: ColorsInUse
   onCancel: () => void
   onSave: (newcolors: ColorSpec) => void
 }
 
-const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
+const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) => {
   const [currFgColor, setCurrFgColor] = useState<string | undefined>(tabs.foreground)
   const [currBgColor, setCurrBgColor] = useState<string | undefined>(
     isTransparent(tabs.background) ? undefined : tabs.background
@@ -63,27 +67,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
   )
   const [customBackground, setCustomBackground] = useState<boolean>(!isTransparent(tabs.background))
   const [customBorder, setCustomBorder] = useState<boolean>(!isTransparent(tabs.border))
-  const [defaultColors] = useState(() => {
-    const fontcolor =
-      window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--ic-brand-font-color-dark') || '#000000'
-    return [fontcolor, '#FFFFFF']
-  })
-
-  const updatePreviousColors = useCallback(
-    (color: string) => {
-      if (previouslyChosenColors.includes(color)) return
-      if (defaultColors.includes(color)) return
-      if (color === `${defaultColors[0]}FF`) return
-      if (isTransparent(color)) return
-
-      previouslyChosenColors.unshift(color)
-      if (previouslyChosenColors.length > 8) previouslyChosenColors.pop()
-    },
-    [defaultColors]
-  )
-
+  const [defaultColors] = useState(getDefaultColors())
   const handleFgColorChange = useCallback((newColor: string) => {
     setCurrFgColor(newColor)
   }, [])
@@ -135,13 +119,11 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
     if (customBackground && currBgColor) {
       const c = tinycolor(currBgColor).toHexString()
       newcolors.bgcolor = c
-      updatePreviousColors(c)
     }
 
     if (currFgColor) {
       const c = tinycolor(currFgColor).toHexString()
       newcolors.fgcolor = c
-      updatePreviousColors(c)
     }
     if (currBorderColor) {
       newcolors.bordercolor =
@@ -149,19 +131,14 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
       if (newcolors.bordercolor) {
         const c = tinycolor(newcolors.bordercolor).toHexString()
         newcolors.bordercolor = c
-        updatePreviousColors(c)
       }
     }
     onSave(newcolors)
-  }, [
-    currBgColor,
-    currBorderColor,
-    currFgColor,
-    customBackground,
-    customBorder,
-    onSave,
-    updatePreviousColors,
-  ])
+  }, [currBgColor, currBorderColor, currFgColor, customBackground, customBorder, onSave])
+
+  const getColorPresets = (variant: ColorTab) => {
+    return [...defaultColors, ...(colorsInUse?.[variant] || [])]
+  }
 
   const renderColorMixer = (variant: ColorTab, enabled: boolean) => {
     let value = currBgColor
@@ -215,7 +192,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
         data-testid="color-preset"
         disabled={!enabled}
         label={formatMessage('Previously chosen colors')}
-        colors={[...defaultColors, ...previouslyChosenColors]}
+        colors={getColorPresets(variant)}
         selected={currColor}
         onSelect={onSelectColor}
       />

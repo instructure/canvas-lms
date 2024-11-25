@@ -16,9 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {type SerializedNode} from '@craftjs/core'
+import tinycolor from 'tinycolor2'
 import {contrast} from '@instructure/ui-color-utils'
 import {white, black} from './constants'
-import {getContrastStatus, isTransparent} from '@instructure/canvas-rce'
+import {
+  getContrastStatus,
+  isTransparent,
+  getDefaultColors,
+  type ColorsInUse,
+  type ColorTab,
+} from '@instructure/canvas-rce'
 
 const getContrastingColor = (color1: string) => {
   const color2 = contrast(color1, white) > contrast(color1, black) ? white : black
@@ -39,12 +47,63 @@ const getEffectiveBackgroundColor = (elem: HTMLElement) => {
   return bgcolor
 }
 
+const sortByBrightness = (a: string, b: string) => {
+  const brightnessA = tinycolor(a).getBrightness()
+  const brightnessB = tinycolor(b).getBrightness()
+  return brightnessA - brightnessB
+}
+
+const getColorsInUse = (query: any) => {
+  const defaultColors = getDefaultColors()
+
+  const colors: ColorsInUse = {
+    foreground: [],
+    background: [],
+    border: [],
+  }
+
+  Object.values(query.getSerializedNodes()).forEach((value: any) => {
+    const n = value as SerializedNode
+    if (n.props.color && n.props.color[0] === '#' && !isTransparent(n.props.color)) {
+      const c = tinycolor(n.props.color).toHexString().toLowerCase()
+      if (!(defaultColors.includes(c) || colors.foreground.includes(c))) {
+        colors.foreground.push(c)
+      }
+    }
+
+    if (n.props.background && n.props.background[0] === '#' && !isTransparent(n.props.background)) {
+      const c = tinycolor(n.props.background).toHexString().toLowerCase()
+      if (!(defaultColors.includes(c) || colors.background.includes(c))) {
+        colors.background.push(c)
+      }
+    }
+
+    if (
+      n.props.borderColor &&
+      n.props.borderColor[0] === '#' &&
+      !isTransparent(n.props.borderColor)
+    ) {
+      const c = tinycolor(n.props.borderColor).toHexString().toLowerCase()
+      if (!(defaultColors.includes(c) || colors.border.includes(c))) {
+        colors.border.push(c)
+      }
+    }
+  })
+  colors.foreground.sort(sortByBrightness)
+  colors.background.sort(sortByBrightness)
+  colors.border.sort(sortByBrightness)
+  return colors
+}
+
 export {
   getContrastingColor,
   getContrastingButtonColor,
   getContrastStatus,
   isTransparent,
   getEffectiveBackgroundColor,
+  getColorsInUse,
+  getDefaultColors,
   white,
   black,
+  type ColorsInUse,
 }
