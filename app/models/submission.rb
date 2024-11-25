@@ -3157,6 +3157,17 @@ class Submission < ActiveRecord::Base
     false
   end
 
+  # For large body text, this can be SLOW. Call this method in a delayed job.
+  def calc_body_word_count
+    return 0 if body.nil?
+
+    tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
+    segments = body.split(%r{<br\s*/?>})
+    segments.sum do |segment|
+      ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
+    end
+  end
+
   private
 
   def checkpoint_changes?
@@ -3179,17 +3190,6 @@ class Submission < ActiveRecord::Base
 
   def get_word_count_from_body?
     !body.nil? && submission_type != "online_quiz"
-  end
-
-  # For large body text, this can be SLOW. Call this method in a delayed job.
-  def calc_body_word_count
-    return 0 if body.nil?
-
-    tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
-    segments = body.split(%r{<br\s*/?>})
-    segments.sum do |segment|
-      ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
-    end
   end
 
   def update_body_word_count_later
