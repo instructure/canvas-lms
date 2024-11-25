@@ -118,7 +118,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   def everyone_date
     # If there are no dates for everyone, return a hash with nil values.
     # This is important because the due_at, unlock_at, and lock_at fields, if not present, will not be updated accordingly.
-    dates_by_type("everyone").first || { due_at: nil, unlock_at: nil, lock_at: nil }
+    dates_by_set_type("Course").first || dates_by_type("everyone").first || { due_at: nil, unlock_at: nil, lock_at: nil }
   end
 
   def override_dates
@@ -129,6 +129,15 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     @dates.select do |date|
       date_type = date.fetch(:type) { raise Checkpoints::DateTypeRequiredError, "each date must have a type specified ('everyone' or 'override')" }
       date_type == type
+    end
+  end
+
+  def dates_by_set_type(type)
+    @dates.select do |date|
+      next unless date[:type] == "override" && date[:set_type]
+
+      set_type = date.fetch(:set_type)
+      set_type == type
     end
   end
 
