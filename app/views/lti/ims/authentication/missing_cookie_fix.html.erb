@@ -1,33 +1,38 @@
 <%
-# Copyright (C) 2024 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+  # Copyright (C) 2024 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Missing Cookie Fix</title>
-  </head>
-  <body>
-    <form id="oidc_form" action="<%= url %>" method="GET">
-      <% oidc_params.each do |key, value| %>
-      <input type="hidden" name="<%= key %>" value="<%= value %>">
-      <% end %>
-    </form>
-    <script type="text/javascript">
-      document.getElementById('oidc_form').submit();
-    </script>
-</html>
+<% provide :page_title, t('Retrying Login') %>
+
+<p><%= t("You're probably using Safari with 'Prevent cross-site tracking' enabled. This may cause your login information to not be properly sent with the LTI launch. Let's try to fix this.") %></p>
+
+<form id="retry_login" action="<%= lti_1_3_authorization_url %>" method="get">
+  <input type="hidden" name="retried" id="retried" value="true" />
+  <input type="hidden" name="client_id" value="<%= @oidc_params[:client_id] %>" />
+  <input type="hidden" name="login_hint" value="<%= @oidc_params[:login_hint] %>" />
+  <input type="hidden" name="lti_message_hint" value="<%= @oidc_params[:lti_message_hint] %>" />
+  <input type="hidden" name="nonce" value="<%= @oidc_params[:nonce] %>" />
+  <input type="hidden" name="prompt" value="<%= @oidc_params[:prompt] %>" />
+  <input type="hidden" name="redirect_uri" value="<%= @oidc_params[:redirect_uri] %>" />
+  <input type="hidden" name="response_mode" value="<%= @oidc_params[:response_mode] %>" />
+  <input type="hidden" name="response_type" value="<%= @oidc_params[:response_type] %>" />
+  <input type="hidden" name="scope" value="<%= @oidc_params[:scope] %>" />
+  <input type="hidden" name="state" value="<%= @oidc_params[:state] %>" />
+</form>
+
+<script type="text/javascript">
+  document.getElementById('retry_login').submit();
+</script>

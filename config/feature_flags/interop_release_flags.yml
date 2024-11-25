@@ -200,6 +200,21 @@ lti_migration_info:
       state: allowed_on
     ci:
       state: allowed_on
+lti_oidc_missing_cookie_retry:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Retry LTI OIDC launches that fail due to missing cookies
+  description: |-
+    If enabled, Canvas will retry LTI OIDC launches that fail due to missing cookies.
+    Safari tracking protection sometimes blocks cookies from being set to authorize the endpoint.
+    To fix this, we resubmit the request with a form.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_overwrite_user_url_input_select_content_dialog:
   state: on
   applies_to: RootAccount
