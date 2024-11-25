@@ -19,6 +19,7 @@ import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo'
 import React, {useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
+import * as z from 'zod'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
@@ -28,39 +29,88 @@ import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Grid} from '@instructure/ui-grid'
+import {useForm, type SubmitHandler, Controller} from 'react-hook-form'
+import {zodResolver} from '@hookform/resolvers/zod'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+
+type User = {name: string}
+
+type LogEntry = {
+  assetString: string
+  mutationId: string
+  mutationName: string
+  timestamp: string
+  user: User
+  realUser: User
+  params: object
+}
+
+type PageInfo = {
+  endCursor?: string
+  hasNextPage: boolean
+}
+
+type QueryData = {
+  auditLogs?: {
+    __typename: string
+    mutationLogs: {
+      __typename: string
+      nodes: Array<LogEntry>
+      pageInfo: PageInfo
+    }
+  }
+}
 
 const I18n = useI18nScope('mutationActivity')
 
-function formatDate(date) {
-  return tz.format(date, 'date.formats.medium_with_weekday')
+function formatDate(date: Date) {
+  return tz.format(date, 'date.formats.medium_with_weekday') ?? ''
 }
 
-const AuditLogForm = ({onSubmit}) => {
-  const [assetString, setAssetString] = useState('')
-  const [startDate, setStartDate] = useState(null)
-  const [endDate, setEndDate] = useState(null)
-  const makeDateHandler = setter => value => {
-    if (value) setter(value)
-  }
-  const formDisabled = assetString.length === 0
+const defaultValues = {
+  assetString: '',
+  startDate: undefined,
+  endDate: undefined,
+}
 
-  const submit = e => {
-    e.preventDefault()
-    if (formDisabled) return
+const validationSchema = z.object({
+  assetString: z.string().min(1, I18n.t('Asset String is required.')),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
+})
+
+type FormValues = z.infer<typeof validationSchema>
+
+interface AuditLogFormProps {
+  onSubmit: (data: FormValues) => void
+}
+
+const AuditLogForm = ({onSubmit}: AuditLogFormProps) => {
+  const {
+    control,
+    formState: {errors},
+    handleSubmit,
+  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+
+  const submit: SubmitHandler<FormValues> = ({assetString, startDate, endDate}) => {
     onSubmit({assetString, startDate, endDate})
   }
 
   return (
     <View background="secondary" as="div" padding="medium" borderWidth="small">
-      <form onSubmit={submit} style={{margin: 0}}>
-        <TextInput
-          renderLabel={I18n.t('Asset String')}
-          placeholder="course_123"
-          value={assetString}
-          onChange={e => {
-            setAssetString(e.target.value)
-          }}
-          isRequired={true}
+      <form onSubmit={handleSubmit(submit)} style={{margin: 0}} noValidate={true}>
+        <Controller
+          name="assetString"
+          control={control}
+          render={({field}) => (
+            <TextInput
+              {...field}
+              renderLabel={I18n.t('Asset String')}
+              placeholder="course_123"
+              isRequired={true}
+              messages={getFormErrorMessage(errors, 'assetString')}
+            />
+          )}
         />
 
         <div style={{marginTop: '1.5em'}} />
@@ -68,27 +118,55 @@ const AuditLogForm = ({onSubmit}) => {
         <Grid>
           <Grid.Row>
             <Grid.Col>
-              <CanvasDateInput
-                renderLabel={I18n.t('Start Date')}
-                onSelectedDateChange={makeDateHandler(setStartDate)}
-                formatDate={formatDate}
-                selectedDate={startDate}
-                placement="top center"
-                withRunningValue={true}
+              <Controller
+                name="startDate"
+                control={control}
+                render={({field: {ref, ...restField}}) => (
+                  <CanvasDateInput
+                    {...restField}
+                    renderLabel={I18n.t('Start Date')}
+                    onSelectedDateChange={startDate => {
+                      if (!startDate) {
+                        return
+                      }
+
+                      restField.onChange(startDate)
+                    }}
+                    formatDate={formatDate}
+                    selectedDate={restField.value}
+                    placement="top center"
+                    withRunningValue={true}
+                    interaction={undefined}
+                  />
+                )}
               />
             </Grid.Col>
             <Grid.Col>
-              <CanvasDateInput
-                renderLabel={I18n.t('End Date')}
-                onSelectedDateChange={makeDateHandler(setEndDate)}
-                formatDate={formatDate}
-                selectedDate={endDate}
-                placement="top center"
-                withRunningValue={true}
+              <Controller
+                name="endDate"
+                control={control}
+                render={({field: {ref, ...restField}}) => (
+                  <CanvasDateInput
+                    {...restField}
+                    renderLabel={I18n.t('End Date')}
+                    onSelectedDateChange={endDate => {
+                      if (!endDate) {
+                        return
+                      }
+
+                      restField.onChange(endDate)
+                    }}
+                    formatDate={formatDate}
+                    selectedDate={restField.value}
+                    placement="top center"
+                    withRunningValue={true}
+                    interaction={undefined}
+                  />
+                )}
               />
             </Grid.Col>
-            <Grid.Col vAlign="middle">
-              <Button color="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
+            <Grid.Col vAlign="bottom">
+              <Button color="primary" type="submit">
                 {I18n.t('Find')}
               </Button>
             </Grid.Col>
@@ -99,7 +177,12 @@ const AuditLogForm = ({onSubmit}) => {
   )
 }
 
-const User = ({user, realUser}) =>
+interface UserCellDataProps {
+  user: User
+  realUser: User
+}
+
+const UserCellData = ({user, realUser}: UserCellDataProps) =>
   realUser
     ? I18n.t('%{user1} masquerading as %{user2}', {user1: realUser.name, user2: user.name})
     : user.name
@@ -143,7 +226,13 @@ const MUTATION_LOG_QUERY = gql`
     }
   }
 `
-const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
+
+interface LoadMoreButtonProps {
+  pageInfo: PageInfo
+  onClick: () => void
+}
+
+const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}: LoadMoreButtonProps) => (
   <Table.Row>
     <Table.Cell colSpan={4}>
       {hasNextPage ? (
@@ -156,7 +245,11 @@ const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
 )
 LoadMoreButton.displayName = 'Row'
 
-const LogEntry = ({logEntry}) => {
+interface LogEntryRowProps {
+  logEntry: LogEntry
+}
+
+const LogEntryRow = ({logEntry}: LogEntryRowProps) => {
   const [showingParams, setShowingParams] = useState(false)
 
   return (
@@ -165,7 +258,7 @@ const LogEntry = ({logEntry}) => {
         <Table.Cell>{logEntry.timestamp}</Table.Cell>
         <Table.Cell>{logEntry.mutationName}</Table.Cell>
         <Table.Cell>
-          <User user={logEntry.user} realUser={logEntry.realUser} />
+          <UserCellData user={logEntry.user} realUser={logEntry.realUser} />
         </Table.Cell>
         <Table.Cell>
           <Link as="button" isWithinText={false} onClick={() => setShowingParams(!showingParams)}>
@@ -183,13 +276,17 @@ const LogEntry = ({logEntry}) => {
     </>
   )
 }
-LogEntry.displayName = 'Row'
+LogEntryRow.displayName = 'Row'
 
-const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
+interface AuditLogResultsProps extends FormValues {
+  pageSize: number
+}
+
+const AuditLogResults = ({assetString, startDate, endDate, pageSize}: AuditLogResultsProps) => {
   if (!assetString) return null
 
   return (
-    <Query
+    <Query<QueryData>
       query={MUTATION_LOG_QUERY}
       variables={{assetString, startDate, endDate, first: pageSize}}
     >
@@ -201,9 +298,9 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
           return <Spinner renderTitle={I18n.t('Loading')} />
         }
 
-        const {nodes: logEntries, pageInfo} = data.auditLogs.mutationLogs
+        const {nodes: logEntries, pageInfo} = data.auditLogs?.mutationLogs ?? {}
 
-        if (logEntries.length) {
+        if (logEntries?.length && pageInfo) {
           return (
             <Table caption={I18n.t('mutations on %{search}', {search: assetString})}>
               <Table.Head>
@@ -216,10 +313,10 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
               </Table.Head>
               <Table.Body>
                 {logEntries.map(logEntry => (
-                  <LogEntry key={logEntry.mutationId} logEntry={logEntry} />
+                  <LogEntryRow key={logEntry.mutationId} logEntry={logEntry} />
                 ))}
                 <LoadMoreButton
-                  pageInfo={data.auditLogs.mutationLogs.pageInfo}
+                  pageInfo={pageInfo}
                   onClick={() => {
                     return fetchMore({
                       variables: {
@@ -229,7 +326,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
                         first: pageSize,
                         after: pageInfo.endCursor,
                       },
-                      updateQuery: (prevData, {fetchMoreResult: newData}) => {
+                      updateQuery: (prevData: Required<QueryData>, {fetchMoreResult: newData}) => {
                         return {
                           auditLogs: {
                             __typename: prevData.auditLogs.__typename,
@@ -237,9 +334,11 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
                               __typename: prevData.auditLogs.mutationLogs.__typename,
                               nodes: [
                                 ...prevData.auditLogs.mutationLogs.nodes,
-                                ...newData.auditLogs.mutationLogs.nodes,
+                                ...(newData?.auditLogs?.mutationLogs?.nodes ?? []),
                               ],
-                              pageInfo: newData.auditLogs.mutationLogs.pageInfo,
+                              pageInfo: newData?.auditLogs?.mutationLogs.pageInfo ?? {
+                                hasNextPage: false,
+                              },
                             },
                           },
                         }
@@ -259,10 +358,10 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
 }
 
 const AuditLogApp = () => {
-  const [auditParams, setAuditParams] = useState({
-    assetString: null,
-    startDate: null,
-    endDate: null,
+  const [auditParams, setAuditParams] = useState<FormValues>({
+    assetString: '',
+    startDate: undefined,
+    endDate: undefined,
   })
 
   return (
