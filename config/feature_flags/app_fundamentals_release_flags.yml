@@ -81,4 +81,4 @@ migrate_assignment_group_categories:
   state: hidden
   applies_to: Course
   display_name: Preserve Group Set During Assignment Copy
-  description: Include group categories when copying group assignments in course copies or blueprint syncs
+  description: When copying a group assignment to another course, a group set set with the same name is created in the destination course if no matching group set exists
