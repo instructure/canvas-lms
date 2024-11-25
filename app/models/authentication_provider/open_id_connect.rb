@@ -141,7 +141,6 @@ class AuthenticationProvider
 
     def user_logout_redirect(controller, _current_user)
       return super unless end_session_endpoint.present?
-      return end_session_endpoint unless account.feature_enabled?(:oidc_rp_initiated_logout_params)
 
       uri = URI.parse(end_session_endpoint)
       params = post_logout_redirect_params(controller)
