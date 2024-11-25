@@ -16360,6 +16360,7 @@ hy:
       agree_to_pledge: "Այս հանձնարարությունն ուղարկելուց առաջ դուք պետք է ընդունեք հանձնարարությունն ուղարկելու պայմանները:"
   submit_media_file_f334c1ba: "Ուղարկել մեդի ֆայլ"
   submitted_318fad53: "Ներկայացված է "
+  submitted_b37e2ff0: "ուղարկված է"
   submitted_d5ba370a: "Ուղարկված է՝"
   submitted_datetime_fa2e9287: "Ուղարկված է՝ %{dateTime}"
   submitting_types_7c5a7096: "Ուղարկվում է. %{types}"
