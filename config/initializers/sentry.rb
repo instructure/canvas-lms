@@ -29,7 +29,6 @@ if settings.present?
   Sentry.init do |config|
     config.dsn = settings[:dsn]
     config.breadcrumbs_logger = [:sentry_logger, :http_logger]
-    config.traces_sample_rate = 0
     config.capture_exception_frame_locals = true
     config.transport.ssl_verification = false
     config.release = Canvas.revision
@@ -48,6 +47,14 @@ if settings.present?
       else
         event
       end
+    end
+
+    config.traces_sampler = lambda do |sampling_context|
+      rack_env = sampling_context[:env]
+      return 1 if rack_env && rack_env.try(:[], 'QUERY_STRING')&.include?('sentry')
+      transaction_context = sampling_context[:transaction_context]
+      return 0.001 if transaction_context[:name].match?(/grade_passback$/)
+      0.0
     end
   end
 
