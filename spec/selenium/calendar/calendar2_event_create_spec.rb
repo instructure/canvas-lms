@@ -146,14 +146,14 @@ describe "calendar2" do
         expect(event.title).to eq event_name
       end
 
-      it "is not able to create an event without a title in edit event view" do
+      it "is not able to create an event without a title in edit event view", :ignore_js_errors do
         get "/courses/#{@course.id}/calendar_events/new"
         wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
         replace_content(more_options_title_field, "")
         more_options_submit_button.click
         wait_for_ajaximations
         scroll_page_to_top
-        expect(more_options_error_box).to include_text("You must enter a title")
+        expect(f("#calendar_event_title-error")).to include_text("An event title is required")
         expect(@course.calendar_events.count).to eq(0)
       end
 

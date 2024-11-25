@@ -100,4 +100,26 @@
   .form-actions .btn {
     margin-bottom: 5px;
   }
+
+  .error-text {
+    color: $ic-bg-light-danger-text;
+  }
+
+  input[type="text"].error {
+    border: 1px solid $crimson;
+    margin-bottom: 0;
+  }
+
+  .error-message {
+    display: flex;
+    gap: 0.3em;
+    font-size: 0.875rem;
+    color: $ic-bg-light-danger-text;
+    margin-top: 0.25em;
+    margin-bottom: $baseLineHeight * 0.5;
+
+    i {
+      margin-top: 0.175em;
+    }
+  }
 }

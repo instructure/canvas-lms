@@ -544,9 +544,14 @@ export default class EditCalendarEventView extends Backbone.View {
     // location_name, start_at, title
     const errors = []
     if (title.length === 0) {
+      EditCalendarEventView.showError({
+        id: 'calendar_event_title',
+        selector: '#calendar_event_title',
+        message: I18n.t('errors.title_required', 'An event title is required'),
+      })
       errors.push({
-        field: $('#calendar_event_title'),
-        text: I18n.t('errors.title_required', 'You must enter a title'),
+        hidden: true,
+        selector: '#calendar_event_title',
       })
     }
     if (!start_at) {
@@ -558,12 +563,16 @@ export default class EditCalendarEventView extends Backbone.View {
     if (errors.length) {
       let offset
       errors.forEach(err => {
-        const errorBox = err.field.errorBox(err.text)
-        offset ||= errorBox.offset()
+        if (!err.hidden) {
+          const errorBox = err.field.errorBox(err.text)
+          offset ||= errorBox.offset()
+        }
       })
       if (offset) {
         // Scrolls to the the uppermost field, in this page title field could be it.
         $('html,body').scrollTo({top: offset.top, left: 0})
+      } else {
+        EditCalendarEventView.focusAndScrollTo(errors[0].selector)
       }
       return false
     }
@@ -683,6 +692,62 @@ export default class EditCalendarEventView extends Backbone.View {
 
   cancel() {
     RichContentEditor.closeRCE(this.$('textarea'))
+  }
+
+  static showError({id, selector, message}) {
+    if (selector && message) {
+      EditCalendarEventView.clearError(selector)
+
+      // Updates the input with red border
+      $(selector).addClass('error')
+
+      // Adds the error message with accessible attributes
+      const errorId = `${id || 'input'}-error`
+
+      const errorContainer = $('<span>', {class: 'error-message', tabindex: -1})
+      const icon = $('<i>', {class: 'icon-warning icon-Solid', tabindex: -1, 'aria-hidden': true})
+      const text = $('<span>', {
+        id: errorId,
+        role: 'alert',
+        'aria-live': 'polite',
+        tabindex: -1,
+        text: message,
+      })
+
+      errorContainer.append(icon, text)
+
+      $(selector).after(errorContainer)
+
+      // Associates the message to the input via aria-describedby
+      $(selector).attr('aria-describedby', errorId)
+
+      // Listens changes from the input and clear error when changes
+      $(selector).on('input.clearError', function () {
+        EditCalendarEventView.clearError(selector)
+      })
+    }
+  }
+
+  static clearError(selector) {
+    if (selector) {
+      // Removes the input red border
+      $(selector).removeClass('error')
+
+      // Removes the error message element
+      $(selector).next('.error-message').remove()
+
+      // Removes the error message attributes from the input
+      $(selector).removeAttr('aria-describedby')
+
+      // Removes the specific event listener
+      $(selector).off('input.clearError')
+    }
+  }
+
+  static focusAndScrollTo(selector) {
+    if (selector) {
+      $(selector)[0].scrollIntoView({behavior: 'smooth'})
+    }
   }
 }
 
