@@ -1601,7 +1601,8 @@ Rails.application.config.to_prepare do
         label: -> { I18n.t("permission.read_sis", "Read SIS data") },
         label_v2: -> { I18n.t("SIS Data - read") },
         true_for: %w[AccountAdmin TeacherEnrollment],
-        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment StudentEnrollment]
+        available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment StudentEnrollment],
+        applies_to_concluded: %w[TeacherEnrollment TaEnrollment]
       },
       select_final_grade: {
         label: -> { I18n.t("Grades - select final grade for moderation") },
@@ -1700,7 +1701,8 @@ Rails.application.config.to_prepare do
         label: -> { I18n.t("View login ids for users") },
         label_v2: -> { I18n.t("Users - view login IDs") },
         available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
-        true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment]
+        true_for: %w[AccountAdmin TeacherEnrollment TaEnrollment],
+        applies_to_concluded: %w[TeacherEnrollment TaEnrollment]
       },
       view_admin_analytics: {
         label: -> { I18n.t("Admin Analytics - view and export data") },
