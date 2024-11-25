@@ -25571,6 +25571,7 @@ nn:
   submitted_318fad53: Innlevert
   submitted_718f5cbc: "Levert:"
   submitted_at_4d5ea3aa: Levert
+  submitted_b37e2ff0: levert
   submitted_by_name_dab6d5e1: "Levert av: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Levert av %{proxy}den %{date}"
   submitted_by_submitter_1dcd07a1: "Levert av %{submitter}"
