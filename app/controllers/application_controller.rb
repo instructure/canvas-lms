@@ -1655,7 +1655,10 @@ class ApplicationController < ActionController::Base
           if pseudonym && pseudonym != @current_pseudonym
             return_to = session.delete(:return_to)
             reset_session_saving_keys(:oauth2)
-            PseudonymSession.create!(pseudonym)
+            pseudonym_session = PseudonymSession.new(pseudonym)
+            # this doesn't count as a real login
+            pseudonym_session.non_explicit_session = true
+            pseudonym_session.save!
             session[:used_remember_me_token] = true if token.used_remember_me_token
           end
           if pseudonym && token.current_user_id
