@@ -219,7 +219,6 @@ module AdheresToPolicy
     #
     # Returns the rights status pertaining the user and session provided.
     def check_right?(user, session, sought_right)
-      Rails.logger.info("User #{user.id} checking right #{sought_right}")
       return false unless sought_right
 
       if Thread.current[:primary_permission_under_evaluation].nil?
@@ -253,15 +252,12 @@ module AdheresToPolicy
           # Loop through all the conditions until we find the first one that
           # grants us the sought_right.
           conditions.any? do |condition|
-            Rails.logger.info("User #{user.id} checking condition #{condition.given}, #{condition.rights}, #{condition.parent}")
-
             condition_applies = false
             elapsed_time = Benchmark.realtime do
               condition_applies = condition.applies?(self, user, session)
             end
 
             if condition_applies
-              Rails.logger.info("User #{user.id} has access to #{sought_right} via condition #{condition.given}, #{condition.rights}, #{condition.parent}")
               # Since the condition is true we can loop through all the rights
               # that belong to it and cache them.  This will short circut the above
               # Rails.cache.fetch for future checks that we won't have to do again.
@@ -287,7 +283,7 @@ module AdheresToPolicy
         end
       end
       CanvasStatsd::Statsd.instance&.increment("adheres_to_policy.#{sought_right_cookie}.#{how_it_got_it}")
-      Rails.logger.info("User #{user.id} has #{value ? 'access' : 'no access'} to #{sought_right} in #{self.class.name} (#{how_it_got_it})")
+
       value
     ensure
       Thread.current[:primary_permission_under_evaluation] = was_primary_permission
