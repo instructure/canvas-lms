@@ -26,12 +26,15 @@ import {Mathml} from './enhance-user-content/mathml'
 
 export {
   getContrastStatus,
+  getDefaultColors,
   isTransparent,
 } from './rce/plugins/instructure_color/components/colorUtils'
 export {
   ColorPicker,
+  type ColorTab,
   type ColorSpec,
   type TabSpec,
+  type ColorsInUse,
 } from './rce/plugins/instructure_color/components/ColorPicker'
 
 export * from './enhance-user-content/index'

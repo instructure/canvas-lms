@@ -17,10 +17,12 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
+import {useEditor} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
 import {ColorPicker, type ColorSpec, type TabSpec} from '@instructure/canvas-rce'
+import {getColorsInUse, type ColorsInUse} from '../../../utils'
 
 import {useScope} from '@canvas/i18n'
 
@@ -32,25 +34,19 @@ type ToolbarColorProps = {
 }
 
 const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
+  const {query} = useEditor()
   const [isShowingContent, setIsShowingContent] = useState(false)
   const [recreateKey, setRecreateKey] = useState(0)
-
-  useEffect(() => {
-    if (!isShowingContent) {
-      setRecreateKey(Date.now())
-    }
-  }, [isShowingContent])
+  const [colorsInUse, setColorsInUse] = useState<ColorsInUse>(getColorsInUse(query))
 
   const handleShowContent = useCallback(() => {
+    setColorsInUse(getColorsInUse(query))
     setIsShowingContent(true)
-  }, [])
-
-  const handleHideContent = useCallback(() => {
-    setIsShowingContent(false)
-  }, [])
+  }, [query])
 
   const handleCancel = useCallback(() => {
     setIsShowingContent(false)
+    setRecreateKey(Date.now())
   }, [])
 
   const handleSubmit = useCallback(
@@ -76,14 +72,19 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
       }
       isShowingContent={isShowingContent}
       onShowContent={handleShowContent}
-      onHideContent={handleHideContent}
+      onHideContent={handleCancel}
       on="click"
       screenReaderLabel={I18n.t('Color popup')}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
     >
-      <ColorPicker tabs={tabs} onCancel={handleCancel} onSave={handleSubmit} />
+      <ColorPicker
+        tabs={tabs}
+        colorsInUse={colorsInUse}
+        onCancel={handleCancel}
+        onSave={handleSubmit}
+      />
     </Popover>
   )
 }
