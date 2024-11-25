@@ -18,10 +18,18 @@
 
 import splitAssetString from '@canvas/util/splitAssetString'
 
+interface Permissions {
+  manage_files_add?: boolean
+  manage_files_edit?: boolean
+  manage_files_boolean?: boolean
+  [key: string]: boolean | undefined
+}
 interface FileContext {
   asset_string: string
   contextType?: string
   contextId?: string
+  root_folder_id: string
+  permissions: Permissions
 }
 
 declare const ENV: {
@@ -32,7 +40,7 @@ const fileContexts: FileContext[] = ENV.FILES_CONTEXTS || []
 
 const buildContextsDictionary = (contexts: FileContext[]) => {
   return contexts.reduce((dict: Record<string, FileContext>, context) => {
-    const [contextType, contextId] = splitAssetString(context.asset_string)
+    const [contextType, contextId] = splitAssetString(context.asset_string) ?? ['', '']
     context.contextType = contextType
     context.contextId = contextId
     dict[context.asset_string] = context
@@ -47,6 +55,19 @@ const filesEnv = {
   contextType: fileContexts[0]?.contextType,
   contextId: fileContexts[0]?.contextId,
   baseUrl: '',
+  contextFor,
+  userHasPermission,
+}
+
+function contextFor(folder: {contextType: string; contextId: string}) {
+  const assetString = `${folder && folder.contextType}s_${folder && folder.contextId}`.toLowerCase()
+  return filesEnv.contextsDictionary && filesEnv.contextsDictionary[assetString]
+}
+
+function userHasPermission(folder: {contextType: string; contextId: string}, action: string) {
+  return (
+    contextFor(folder) && contextFor(folder).permissions && contextFor(folder).permissions[action]
+  )
 }
 
 filesEnv.baseUrl = filesEnv.showingAllContexts
