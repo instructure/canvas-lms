@@ -55,7 +55,10 @@ module Lti
 
       transform_settings
       self.redirect_uris = developer_key.redirect_uris.presence || [target_link_uri]
-      save!(validate: false)
+
+      ToolConfiguration.suspend_callbacks(:update_external_tools!, :update_unified_tool_id) do
+        save!(validate: false)
+      end
     end
 
     def untransform!
@@ -73,7 +76,9 @@ module Lti
       end
 
       @transformed = false
-      save!(validate: false)
+      ToolConfiguration.suspend_callbacks(:update_external_tools!, :update_unified_tool_id) do
+        save!(validate: false)
+      end
     end
 
     def transformed?
