@@ -22,7 +22,7 @@ class Checkpoints::AdhocOverrideCreatorService < Checkpoints::AdhocOverrideCommo
     desired_student_ids = @override.fetch(:student_ids) { raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" }
     raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" if desired_student_ids.blank?
 
-    student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id)
+    student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id).uniq
     parent_override = existing_parent_override(student_ids:) || build_override(assignment: @checkpoint.parent_assignment, student_ids:, shell_override: true)
     build_override_students(override: parent_override, student_ids:)
     parent_override.save! if parent_override.changed? || parent_override.changed_student_ids.any?
