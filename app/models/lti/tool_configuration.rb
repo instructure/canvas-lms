@@ -28,7 +28,6 @@ module Lti
     before_validation :normalize_configuration
     before_validation :transform_updated_settings
     before_save :update_privacy_level_from_extensions
-    before_save :update_lti_registration
     before_save :set_redirect_uris
 
     after_update :update_external_tools!, if: :configuration_changed?
@@ -129,6 +128,7 @@ module Lti
         internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
         create!(
           developer_key: dk,
+          lti_registration: dk.lti_registration,
           disabled_placements: tool_configuration_params[:disabled_placements],
           privacy_level: tool_configuration_params[:privacy_level] || internal_config[:privacy_level],
           title: internal_config[:title],
@@ -268,11 +268,6 @@ module Lti
 
     def update_external_tools!
       developer_key.update_external_tools!
-    end
-
-    def update_lti_registration
-      self.lti_registration_id = developer_key&.lti_registration_id if developer_key
-      true
     end
 
     def set_redirect_uris
