@@ -221,7 +221,7 @@ class ProfileController < ApplicationController
       @user.dismiss_bouncing_channel_message!
     end
     @channels = @user.communication_channels.unretired
-    @pseudonyms = @user.pseudonyms.active_only
+    @pseudonyms = @user.pseudonyms_visible_to(@current_user).select(&:active?)
     @context = @user.profile
     set_active_tab "profile_settings"
     register_cc_tabs = ["email"]
