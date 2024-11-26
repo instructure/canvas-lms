@@ -141,6 +141,17 @@
                  <% end %>
               <% end %>
             <% end %>
+            <% if !@account.site_admin? && @account.feature_enabled?(:differentiation_tags) && @account.feature_enabled?(:assign_to_differentiation_tags) %>
+              <tr id="differentiation_tags">
+                <td><%= f.blabel :differentiation_tags, t("Differentiation Tags") %></td>
+                <td>
+                  <p>
+                    <%= f.check_box :allow_assign_to_differentiation_tags, :checked => @account.allow_assign_to_differentiation_tags?  %>
+                    <%= f.label :allow_assign_to_differentiation_tags, t("When selected, Differentiation Tags will allow instructors to categorize and tailor content for specific groups of students, making it easier to customize learning experiences."), :style => "display: inline;" %>
+                  </p>
+                </td>
+              </tr>
+            <% end %>
             <% if @account.primary_settings_root_account? %>
               <tr>
                 <td><%= f.blabel :default_time_zone, :en => "Default Time Zone" %></td>

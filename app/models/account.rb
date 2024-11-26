@@ -429,6 +429,7 @@ class Account < ActiveRecord::Base
                                                                         common_passwords_folder_id]
 
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
+  add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)

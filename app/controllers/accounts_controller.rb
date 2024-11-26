@@ -1999,6 +1999,7 @@ class AccountsController < ApplicationController
                                    :admins_can_view_notifications,
                                    :allow_name_pronunciation_edit_for_admins,
                                    :allow_additional_email_at_registration,
+                                   :allow_assign_to_differentiation_tags,
                                    :allow_invitation_previews,
                                    :allow_sending_scores_in_emails,
                                    :author_email_in_notifications,
