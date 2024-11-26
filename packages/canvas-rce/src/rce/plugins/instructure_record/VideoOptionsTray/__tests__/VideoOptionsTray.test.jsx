@@ -151,7 +151,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
       renderComponent()
       // I don't know why, but getByText does not find the string,
       // though I can prove it's there
-      expect(/Must be at least 320/.test(tray.$element.textContent)).toBeTruthy()
+      expect(/Pixels must be at least 320/.test(tray.messageText())).toBeTruthy()
     })
   })
 
