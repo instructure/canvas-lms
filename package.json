@@ -358,7 +358,7 @@
     "msw": "^2.0.12",
     "nyc": "^13",
     "patch-package": "^8.0.0",
-    "postinstall-postinstall": "^2.1.0",
+    "postinstall-postinstall": "https://github.com/instructure/postinstall-postinstall#1732ae8ba054fa7a3335b4a1ecd019f78ca68b10",
     "prettier": "^2.8.8",
     "qunitjs": "^1.23.0",
     "react-moment-proptypes": "^1.4.0",
