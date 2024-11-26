@@ -416,6 +416,71 @@ describe AccountsController do
       expect(@account.settings[:show_sections_in_course_tray]).to be true
     end
 
+    describe "allow_assign_to_differentiation_tags" do
+      it "allows for setting to be updated on an account" do
+        account_with_admin_logged_in
+        post(
+          :update,
+          params: {
+            id: @account.id,
+            account: {
+              settings: {
+                allow_assign_to_differentiation_tags: false
+              }
+            }
+          }
+        )
+        @account.reload
+        expect(@account.settings[:allow_assign_to_differentiation_tags]).to be false
+
+        post(
+          :update,
+          params: {
+            id: @account.id,
+            account: {
+              settings: {
+                allow_assign_to_differentiation_tags: true
+              }
+            }
+          }
+        )
+        @account.reload
+        expect(@account.settings[:allow_assign_to_differentiation_tags]).to be true
+      end
+
+      it "allows for setting to be updated on a sub-account" do
+        account_with_admin_logged_in
+        sub_account = @account.sub_accounts.create!
+        post(
+          :update,
+          params: {
+            id: sub_account.id,
+            account: {
+              settings: {
+                allow_assign_to_differentiation_tags: false
+              }
+            }
+          }
+        )
+        sub_account.reload
+        expect(sub_account.settings[:allow_assign_to_differentiation_tags]).to be false
+
+        post(
+          :update,
+          params: {
+            id: sub_account.id,
+            account: {
+              settings: {
+                allow_assign_to_differentiation_tags: true
+              }
+            }
+          }
+        )
+        sub_account.reload
+        expect(sub_account.settings[:allow_assign_to_differentiation_tags]).to be true
+      end
+    end
+
     it "allows admins to set the sis_source_id on sub accounts" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
