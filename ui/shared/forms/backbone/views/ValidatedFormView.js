@@ -75,7 +75,7 @@ ValidatedFormView.prototype.saveOpts = {
 ValidatedFormView.prototype.disableWhileLoadingOpts = {}
 
 // Sets the model data from the form and saves it. Called when the form
-// submits, or can be called programatically.
+// submits, or can be called programmatically.
 // set @saveOpts in your view to to pass opts to Backbone.sync (like multipart: true if you have
 // a file attachment).  if you want the form not to be re-enabled after save success (because you
 // are navigating to a new page, set dontRenableAfterSaveSuccess to true on your view)
@@ -298,7 +298,7 @@ ValidatedFormView.prototype.parseErrorResponse = function (response) {
   } else {
     try {
       return JSON.parse(response.responseText).errors
-    } catch (error1) {
+    } catch (_error1) {
       return {}
     }
   }
