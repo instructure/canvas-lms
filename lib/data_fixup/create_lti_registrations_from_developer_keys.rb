@@ -21,27 +21,24 @@ module DataFixup
   module CreateLtiRegistrationsFromDeveloperKeys
     def self.run
       DeveloperKey.where(is_lti_key: true, lti_registration: nil).preload(:tool_configuration, :ims_registration).find_each do |developer_key|
-        registration_values = {
-          admin_nickname: developer_key.name,
-          account_id: developer_key.account_id.presence || Account.site_admin.global_id,
-          internal_service: developer_key.internal_service,
-          name: developer_key.tool_configuration.configuration["title"],
-          developer_key:,
-          ims_registration: developer_key.ims_registration, # can be nil
-          skip_lti_sync: true,
-        }
+        lti_registration = ::Lti::Registration.create!(
+          {
+            admin_nickname: developer_key.name,
+            account_id: developer_key.account_id.presence || Account.site_admin.global_id,
+            internal_service: developer_key.internal_service,
+            name: developer_key.tool_configuration.configuration["title"],
+            manual_configuration: developer_key.referenced_tool_configuration,
+            ims_registration: developer_key.ims_registration, # can be nil
+            skip_lti_sync: true,
+          }
+        )
 
-        begin
-          registration = ::Lti::Registration.create!(registration_values)
-
-          developer_key.lti_registration = registration if registration
-          developer_key.save!
-        rescue => e
-          Sentry.with_scope do |scope|
-            scope.set_tags(developer_key_id: developer_key.global_id)
-            scope.set_context("exception", { name: e.class.name, message: e.message })
-            Sentry.capture_message("DataFixup#create_lti_registrations_from_developer_keys", level: :warning)
-          end
+        developer_key.update!(lti_registration:, skip_lti_sync: true)
+      rescue => e
+        Sentry.with_scope do |scope|
+          scope.set_tags(developer_key_id: developer_key.global_id)
+          scope.set_context("exception", { name: e.class.name, message: e.message })
+          Sentry.capture_message("DataFixup#create_lti_registrations_from_developer_keys", level: :warning)
         end
       end
     end
