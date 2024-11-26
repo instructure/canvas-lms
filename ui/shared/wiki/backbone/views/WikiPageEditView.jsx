@@ -349,7 +349,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       errors.title = [
         {
           type: 'required',
-          message: I18n.t('errors.require_title', 'You must enter a title'),
+          message: I18n.t('A page title is required'),
         },
       ]
     }
