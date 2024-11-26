@@ -46,20 +46,15 @@
             <p><%= t('sections.body1', <<-DETAILS,
               Sections are listed along the left side of the window
               (%{showme1}). Each section can have multiple pages inside of it.
-              To organize or add sections, click the "%{manage_sections}" link
-              (%{showme2}).
+              To organize or edit a section, click the %{manage_sections}.
               DETAILS
               :showme1 => show_me('sections_list_hover'),
-              :manage_sections => manage_sections_link_text,
-              :showme2 => show_me('organize_sections_hover')) %></p>
-
+              :manage_sections => '<i class="icon-more"></i>'.html_safe) %></p>
             <p><%= t('sections.body2', <<-DETAILS,
-              You can rename any section by clicking on the %{edit_icon} icon
-              that appears, rearrange sections by clicking and dragging them,
-              or delete sections by clicking the %{delete_icon} icon.
+              You can rename any section by clicking "Rename", rearrange sections by clicking "Move To...",
+              or delete sections by clicking "Delete" in the popup menu.
               DETAILS
-              :edit_icon => '<i class="icon-edit"></i>'.html_safe,
-              :delete_icon => '<i class="icon-end"></i>'.html_safe) %></p>
+              ) %></p>
           </div>
         </div>
       </li>

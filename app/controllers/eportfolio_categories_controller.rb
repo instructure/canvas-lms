@@ -17,14 +17,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 class EportfolioCategoriesController < ApplicationController
+  include Api::V1::Eportfolio
   include EportfolioPage
   before_action :rce_js_env
   before_action :get_eportfolio
-
   def index
-    redirect_to eportfolio_url(@portfolio)
+    if authorized_action(@portfolio, @current_user, :read)
+      @categories = @portfolio.eportfolio_categories
+      respond_to do |format|
+        format.html { redirect_to eportfolio_url(@portfolio) }
+        format.json { render json: @categories.map { |c| eportfolio_category_json(c, @current_user, session) } }
+      end
+    end
   end
 
   def create
@@ -63,11 +68,16 @@ class EportfolioCategoriesController < ApplicationController
       session[:permissions_key] = SecureRandom.uuid
     end
     if authorized_action(@portfolio, @current_user, :read)
+      browser_env = rce_js_env
+      browser_env[:eportfolio_id] = @portfolio.id
       if params[:id]
         @category = @portfolio.eportfolio_categories.find(params[:id])
       elsif params[:category_name]
         @category = @portfolio.eportfolio_categories.where(slug: params[:category_name]).first!
       end
+      browser_env[:category_id] = @category.id
+      browser_env[:owner_view] = @portfolio.user == @current_user && params[:view] != "preview"
+      js_env(browser_env)
       @page = @category.eportfolio_entries.first
       if @portfolio.grants_right?(@current_user, session, :update)
         @page ||= @portfolio.eportfolio_entries.create(
@@ -80,8 +90,10 @@ class EportfolioCategoriesController < ApplicationController
       raise ActiveRecord::RecordNotFound unless @page
 
       eportfolio_page_attributes
-
-      render "eportfolios/show", stream: can_stream_template?
+      respond_to do |format|
+        format.html { render "eportfolios/show", stream: can_stream_template? }
+        format.json { render json: eportfolio_category_json(@category, @current_user, session) }
+      end
     end
   rescue ActiveRecord::RecordNotFound
     flash[:notice] = t("errors.missing_page", "Couldn't find that page")

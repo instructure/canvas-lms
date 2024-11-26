@@ -28,7 +28,10 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {QueryProvider} from '@canvas/query'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import SectionList from '../react/SectionList'
+import ReactDOM from 'react-dom/client'
 import userSettings from '@canvas/user-settings'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import MoveToDialog from '../react/MoveToDialog'
@@ -49,6 +52,7 @@ import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('eportfolio')
 
@@ -112,14 +116,9 @@ function _saveList(parent, prefix, anchor) {
   })
 }
 
-function saveSectionList() {
-  _saveList('#section_list', 'section_', '.reorder_sections_url')
-}
-
 function savePageList() {
   _saveList('#page_list', 'page_', '.reorder_pages_url')
 }
-
 function showMoveDialog(source, destinations, triggerElement, dialogLabel, onMove) {
   const appElement = document.querySelector('#application')
   let modalRoot = document.querySelector('#eportfolios_move_to_modal_root')
@@ -127,8 +126,8 @@ function showMoveDialog(source, destinations, triggerElement, dialogLabel, onMov
     $('#application').append('<div id="eportfolios_move_to_modal_root"></div>')
     modalRoot = document.querySelector('#eportfolios_move_to_modal_root')
   }
-   
-  ReactDOM.render(
+  const root = ReactDOM.createRoot(modalRoot)
+  root.render(
     <MoveToDialog
       source={source}
       destinations={destinations}
@@ -141,8 +140,7 @@ function showMoveDialog(source, destinations, triggerElement, dialogLabel, onMov
         })
       }}
       onMove={onMove}
-    />,
-    modalRoot
+    />
   )
 }
 
@@ -226,7 +224,6 @@ function saveObject($obj, type) {
         name_message = I18n.t('errors.section_name_too_long', 'Section name is too long')
       }
       if ($obj.hasClass('unsaved')) {
-         
         alert(name_message)
         $obj.remove()
       } else {
@@ -267,18 +264,38 @@ function countObjects(type) {
   }
 }
 
+function renderSectionList(portfolio, isOwner) {
+  const sectionListContainer = document.getElementById('section_list_mount')
+  if (sectionListContainer) {
+    const root = ReactDOM.createRoot(sectionListContainer)
+    root.render(
+      <QueryProvider>
+        <SectionList portfolio={portfolio} isOwner={isOwner} />
+      </QueryProvider>
+    )
+  }
+}
+
 $(document).ready(function () {
-  $('.portfolio_settings_link').click(event => {
-    event.preventDefault()
-    $('#edit_eportfolio_form')
-      .dialog({
-        width: 'auto',
-        title: I18n.t('eportfolio_settings', 'ePortfolio Settings'),
-        modal: true,
-        zIndex: 1000,
-      })
-      .fixDialogButtons()
-  })
+  const fetchPortfolio = async () => {
+    const {json} = await doFetchApi({
+      path: `/eportfolios/${ENV.eportfolio_id}`,
+    })
+    return json
+  }
+  fetchPortfolio()
+    .then(portfolio => {
+      const isOwner = ENV.owner_view
+      renderSectionList(portfolio, isOwner)
+    })
+    .catch(() => {
+      console.log('Failed to load section list')
+      const sectionListContainer = document.getElementById('section_list_mount')
+      if (sectionListContainer) {
+        const root = ReactDOM.createRoot(sectionListContainer)
+        root.render(<Alert variant="error">{I18n.t('Failed to load section list')}</Alert>)
+      }
+    })
   // Add ePortfolio related
   $('.add_eportfolio_link').click(function (event) {
     event.preventDefault()
@@ -298,21 +315,6 @@ $(document).ready(function () {
       return false
     }
   })
-  // Edit ePortfolio related
-  $('#edit_eportfolio_form .cancel_button').click(() => {
-    $('#edit_eportfolio_form').dialog('close')
-  })
-  $('#edit_eportfolio_form').formSubmit(
-    $.extend(ePortfolioValidations, {
-      beforeSubmit(_data) {
-        $(this).loadingImage()
-      },
-      success(_data) {
-        $(this).loadingImage('remove')
-        $(this).dialog('close')
-      },
-    })
-  )
   $('.edit_content_link').click(function (event) {
     event.preventDefault()
     $('.edit_content_link_holder').hide()
@@ -1028,165 +1030,6 @@ $(document).ready(function () {
     }, 500)
   }
 
-  countObjects('section')
-  $(document).bind('section_deleted', (event, data) => {
-    const category = data.eportfolio_category
-    $('#section_' + category.id).remove()
-    $('#structure_category_' + category.id).remove()
-    countObjects('section')
-  })
-  $(document).bind('section_added section_updated', (event, data) => {
-    const category = data.eportfolio_category
-    let $section = $('#section_' + category.id)
-    if ($section.length === 0) {
-      $section = $('#section_blank').clone(true).removeAttr('id')
-      $('#section_list').append($section.css('display', ''))
-    }
-    $section.removeClass('unsaved')
-    $section.find('.settings-label').text(I18n.t('Settings for %{title}', {title: category.name}))
-    $section.fillTemplateData({
-      data: category,
-      id: 'section_' + category.id,
-      hrefValues: ['id', 'slug'],
-    })
-    let $category = $('#structure_category_' + category.id)
-    if ($category.length === 0) {
-      $category = $('#structure_category_blank').clone(true).removeAttr('id')
-      $('#eportfolio_structure').append($category)
-    }
-    $category.fillTemplateData({
-      id: 'structure_category_' + category.id,
-      data: category,
-    })
-    let $category_select = $('#category_select_' + category.id)
-    if ($category_select.length === 0) {
-      $category_select = $('#category_select_blank').clone(true).removeAttr('id')
-      $('#category_select').append($category_select.show())
-    }
-    $category_select
-      .attr('id', 'category_select_' + category.id)
-      .val(category.id)
-      .text(category.name)
-    countObjects('section')
-  })
-  $('.manage_sections_link,#section_list_manage .done_editing_button').click(event => {
-    event.preventDefault()
-    if ($('#section_list').hasClass('editing')) {
-      $('#section_list').sortable('destroy')
-      $('#section_list_manage').removeClass('editing')
-      $('#section_list').removeClass('editing')
-      const manage_sections = I18n.t('buttons.manage_sections', 'Manage Sections')
-      $('.arrange_sections_link').text(manage_sections).val(manage_sections)
-      $('.add_section').hide()
-      $('#section_list .name').attr('title', '')
-    } else {
-      $('#section_list_manage').addClass('editing')
-      $('#section_list').sortable({
-        axis: 'y',
-        helper: 'clone',
-        stop(_event, ui) {
-          ui.item.addClass('just_dropped')
-        },
-        update: saveSectionList,
-      })
-      $('#section_list').addClass('editing').sortable('enable')
-      const done_editing = I18n.t('buttons.done_editing', 'Done Editing')
-      $('.arrange_sections_link').text(done_editing).val(done_editing)
-      $('.add_section').show()
-      $('#section_list .name').attr(
-        'title',
-        I18n.t('titles.section_list', 'Drag to Arrange, Click to Edit')
-      )
-    }
-  })
-  $('.add_section_link').click(event => {
-    event.preventDefault()
-    const $section = $('#section_blank').clone(true).attr('id', 'section_new')
-    $('#section_list').append($section.show())
-    editObject($section, 'section')
-  })
-  $('.remove_section_link').click(function (event) {
-    event.preventDefault()
-
-    hideEditObject('section')
-    $(this)
-      .parents('li')
-      .confirmDelete({
-        message: I18n.t('confirm_delete_section', 'Delete this section and all its pages?'),
-        url: $(this).parents('li').find('.rename_section_url').attr('href'),
-        success(data) {
-          $(this).fadeOut(function () {
-            $(this).remove()
-            $(document).triggerHandler('section_deleted', data)
-            countObjects('section')
-          })
-        },
-      })
-  })
-  $('.move_section_link').click(event => {
-    event.preventDefault()
-
-    const section = $(event.target).closest('.section')
-    const source = {
-      id: section.attr('id'),
-      label: section.find('.name').text(),
-    }
-    const otherSections = $('#section_list .section').not(section).not('#section_blank').toArray()
-    const destinations = otherSections.map(otherSection => ({
-      id: $(otherSection).attr('id'),
-      label: $(otherSection).find('.name').text(),
-    }))
-    const dialogLabel = I18n.t('Move Section')
-
-    const triggerElement = section.find('.section_settings_menu .al-trigger')
-
-    const onMove = function (before) {
-      if (before !== '') {
-        $(section).insertBefore(document.getElementById(before))
-      } else {
-        $(section).insertAfter($('#section_list .section:last'))
-      }
-      $('#section_list').sortable('refreshPositions')
-      saveSectionList()
-    }
-    showMoveDialog(source, destinations, triggerElement, dialogLabel, onMove)
-  })
-  $('#section_list').on('click', '.edit_section_link', function (event) {
-    if ($(this).parents('li').hasClass('unsaved')) {
-      event.preventDefault()
-    }
-    if ($(this).parents('#section_list').hasClass('editing')) {
-      event.preventDefault()
-      const $li = $(this).parents('li')
-      if ($li.hasClass('just_dropped')) {
-        $li.removeClass('just_dropped')
-        return
-      }
-      editObject($li, 'section')
-    }
-  })
-  $('#section_name')
-    .keydown(function (event) {
-      if (event.keyCode === 27) {
-        // esc
-        hideEditObject('section')
-      } else if (event.keyCode === 13) {
-        // enter
-        $(this).parents('li').find('.name').text($(this).val())
-        const result = saveObject($(this).parents('li'), 'section')
-        if (result) {
-          hideEditObject('section')
-        }
-      }
-    })
-    .blur(function () {
-      let result = true
-      const $section = $(this).parents('li.section')
-      result = saveObject($section, 'section')
-      if (result) {
-        hideEditObject('section')
-      }
-    })
   $('.download_eportfolio_link').click(function (event) {
     $(this).slideUp()
     event.preventDefault()
