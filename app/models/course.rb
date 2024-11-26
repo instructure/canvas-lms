@@ -3305,6 +3305,12 @@ class Course < ActiveRecord::Base
     course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
   end
 
+  def self.horizon_course_nav_tabs
+    tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+    tabs.find { |tab| tab[:id] == TAB_SYLLABUS }[:label] = t("Overview")
+    tabs
+  end
+
   def self.elementary_course_nav_tabs
     tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
     tabs.find { |tab| tab[:id] == TAB_SYLLABUS }[:label] = t("Important Info")
@@ -3342,6 +3348,8 @@ class Course < ActiveRecord::Base
                      Course.course_subject_tabs
                    elsif elementary_subject_course?
                      Course.elementary_course_nav_tabs
+                   elsif horizon_course?
+                     Course.horizon_course_nav_tabs
                    else
                      Course.default_tabs
                    end
