@@ -268,7 +268,6 @@ export type RootAccountFeatureId =
   | 'buttons_and_icons_root_account'
   | 'create_course_subaccount_picker'
   | 'extended_submission_state'
-  | 'granular_permissions_manage_users'
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'

@@ -3045,20 +3045,12 @@ class User < ActiveRecord::Base
     return false if %w[StudentEnrollment ObserverEnrollment].include?(type) && MasterCourses::MasterTemplate.is_master_course?(course)
     return false if course.template?
 
-    if course.root_account.feature_enabled?(:granular_permissions_manage_users)
-      return true if type == "TeacherEnrollment" && course.grants_right?(self, session, :add_teacher_to_course)
-      return true if type == "TaEnrollment" && course.grants_right?(self, session, :add_ta_to_course)
-      return true if type == "DesignerEnrollment" && course.grants_right?(self, session, :add_designer_to_course)
-      return true if type == "StudentEnrollment" && course.grants_right?(self, session, :add_student_to_course)
-      return true if type == "ObserverEnrollment" && course.grants_right?(self, session, :add_observer_to_course)
-    else
-      if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
-        return true
-      end
-      if %w[StudentEnrollment ObserverEnrollment].include?(type) && course.grants_right?(self, session, :manage_students)
-        return true
-      end
-    end
+    return true if type == "TeacherEnrollment" && course.grants_right?(self, session, :add_teacher_to_course)
+    return true if type == "TaEnrollment" && course.grants_right?(self, session, :add_ta_to_course)
+    return true if type == "DesignerEnrollment" && course.grants_right?(self, session, :add_designer_to_course)
+    return true if type == "StudentEnrollment" && course.grants_right?(self, session, :add_student_to_course)
+    return true if type == "ObserverEnrollment" && course.grants_right?(self, session, :add_observer_to_course)
+
     false
   end
 

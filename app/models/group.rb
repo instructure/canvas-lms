@@ -569,7 +569,6 @@ class Group < ActiveRecord::Base
       given { |user| user && has_moderator?(user) }
       can :delete and
         can :manage and
-        can :manage_admin_users and
         can :allow_course_admin_actions and
         can :manage_students and
         can :moderate_forum and
@@ -601,7 +600,6 @@ class Group < ActiveRecord::Base
         update
         create_collaborations
         manage
-        manage_admin_users
         allow_course_admin_actions
         manage_calendar
         manage_content
@@ -715,7 +713,6 @@ class Group < ActiveRecord::Base
       given { |user, session| user && context&.grants_right?(user, session, :manage_tags_manage) }
       can :update,
           :manage,
-          :manage_admin_users,
           :allow_course_admin_actions,
           :manage_students
 

@@ -161,29 +161,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section).to eq @section
       end
 
-      it "is forbidden for users without manage_students permission (non-granular)" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_users)
-        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
-        api_call :post,
-                 @path,
-                 @path_options,
-                 {
-                   enrollment: {
-                     user_id: @unenrolled_user.id,
-                     type: "StudentEnrollment",
-                     enrollment_state: "active",
-                     course_section_id: @section.id,
-                     limit_privileges_to_course_section: true,
-                     start_at: nil,
-                     end_at: nil
-                   }
-                 },
-                 {},
-                 { expected_status: 403 }
-      end
-
-      it "is forbidden for users without add_student_to_course permission (granular)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      it "is forbidden for users without add_student_to_course permission" do
         @course.account.role_overrides.create!(role: admin_role, enabled: true, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
         api_call :post,

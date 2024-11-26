@@ -32,12 +32,16 @@ QUnit.module('RosterUserViewSpec', {
   setup() {
     window.ENV = window.ENV || {}
     existingENV = window.ENV
-    window.ENV.FEATURES = {
-      granular_permissions_manage_users: false,
-    }
     window.ENV.permissions = {
       can_allow_course_admin_actions: true,
       manage_students: true,
+      active_granular_enrollment_permissions: [
+        'TeacherEnrollment',
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'StudentEnrollment',
+        'ObserverEnrollment',
+      ],
     }
     window.ENV.course = {id: 1}
 

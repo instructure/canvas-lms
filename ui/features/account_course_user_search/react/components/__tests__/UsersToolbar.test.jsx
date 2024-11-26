@@ -35,7 +35,6 @@ describe('UsersToolbar', () => {
     old_env = window.ENV
     window.ENV = {
       PERMISSIONS: {can_edit_users: true},
-      FEATURES: {granular_permissions_manage_users: true},
     }
   })
 

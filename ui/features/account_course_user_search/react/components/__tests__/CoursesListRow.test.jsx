@@ -72,11 +72,11 @@ it('filters addable roles by blueprint and permissions', () => {
       can_create_enrollments={true}
       concluded={false}
       roles={[
-        {id: '1', base_role_name: 'TeacherEnrollment', manageable_by_user: true},
-        {id: '2', base_role_name: 'TaEnrollment', manageable_by_user: true},
-        {id: '3', base_role_name: 'StudentEnrollment', manageable_by_user: true},
-        {id: '4', base_role_name: 'ObserverEnrollment', manageable_by_user: true},
-        {id: '5', base_role_name: 'DesignerEnrollment', manageable_by_user: false},
+        {id: '1', base_role_name: 'TeacherEnrollment', addable_by_user: true},
+        {id: '2', base_role_name: 'TaEnrollment', addable_by_user: true},
+        {id: '3', base_role_name: 'StudentEnrollment', addable_by_user: true},
+        {id: '4', base_role_name: 'ObserverEnrollment', addable_by_user: true},
+        {id: '5', base_role_name: 'DesignerEnrollment', addable_by_user: false},
       ]}
     />
   )

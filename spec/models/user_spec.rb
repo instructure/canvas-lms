@@ -4393,7 +4393,6 @@ describe User do
   describe "#can_create_enrollment_for?" do
     before(:once) do
       course_with_ta
-      @course.root_account.enable_feature!(:granular_permissions_manage_users)
     end
 
     it "checks permissions" do

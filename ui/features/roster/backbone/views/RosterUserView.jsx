@@ -93,11 +93,9 @@ export default class RosterUserView extends Backbone.View {
     json.canRemoveUsers = every(this.model.get('enrollments'), e => e.can_be_removed)
     json.canResendInvitation =
       !json.isInactive &&
-      (ENV.FEATURES.granular_permissions_manage_users
-        ? some(this.model.get('enrollments'), en =>
-            ENV.permissions.active_granular_enrollment_permissions.includes(en.type)
-          )
-        : true)
+      some(this.model.get('enrollments'), en =>
+        ENV.permissions.active_granular_enrollment_permissions.includes(en.type)
+      )
 
     if (json.canRemoveUsers && !ENV.course.concluded) {
       json.canEditRoles = !some(
@@ -111,8 +109,8 @@ export default class RosterUserView extends Backbone.View {
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
 
-    const candoAdminActions =
-      ENV.permissions.can_allow_course_admin_actions || ENV.permissions.manage_admin_users
+    const candoAdminActions = ENV.permissions.can_allow_course_admin_actions
+
     json.canManage = some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )

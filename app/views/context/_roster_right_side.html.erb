@@ -33,7 +33,7 @@
 
       <% if can_do(@context,
                    @current_user,
-                   @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users,
+                   :allow_course_admin_actions,
                    :manage_students,
                    :read_prior_roster
                   ) %>
