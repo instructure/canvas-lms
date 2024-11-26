@@ -2779,7 +2779,6 @@ describe Course do
       end
 
       it "shows people tab with granular permissions if hidden" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @course.tab_configuration = [{
           id: Course::TAB_PEOPLE,
           label: "People",
@@ -3085,7 +3084,6 @@ describe Course do
       end
 
       it "hides people tab with granular permissions if hidden" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @course.tab_configuration = [{
           id: Course::TAB_PEOPLE,
           label: "People",

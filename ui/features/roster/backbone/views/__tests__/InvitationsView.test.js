@@ -29,9 +29,6 @@ const strictEqual = (x, y) => expect(x).toEqual(y)
 describe('InvitationsView', () => {
   beforeEach(() => {
     ENV = {
-      FEATURES: {
-        granular_permissions_manage_users: true,
-      },
       permissions: {
         active_granular_enrollment_permissions: ['StudentEnrollment'],
       },

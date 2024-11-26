@@ -1685,13 +1685,7 @@ class AccountsController < ApplicationController
   end
 
   def avatars
-    is_authorized = if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
-                      authorized_action(@account, @current_user, :allow_course_admin_actions)
-                    else
-                      authorized_action(@account, @current_user, :manage_admin_users)
-                    end
-
-    if is_authorized
+    if authorized_action(@account, @current_user, :allow_course_admin_actions)
       @users = @account.all_users
       @avatar_counts = {
         all: format_avatar_count(@users.with_avatar_state("any").count),
@@ -1775,8 +1769,15 @@ class AccountsController < ApplicationController
           session,
           *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS
         ),
-      can_create_enrollments: @account.grants_any_right?(@current_user, session, *add_enrollment_permissions(@account))
+      can_create_enrollments: @account.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_COURSE_ENROLLMENT_PERMISSIONS),
+      can_allow_course_admin_actions: @account.grants_right?(@current_user, session, :allow_course_admin_actions),
+      can_add_ta: @account.grants_right?(@current_user, session, :add_ta_to_course),
+      can_add_student: @account.grants_right?(@current_user, session, :add_student_to_course),
+      can_add_teacher: @account.grants_right?(@current_user, session, :add_teacher_to_course),
+      can_add_designer: @account.grants_right?(@current_user, session, :add_designer_to_course),
+      can_add_observer: @account.grants_right?(@current_user, session, :add_observer_to_course)
     }
+
     if @account.root_account.feature_enabled?(:temporary_enrollments)
       js_permissions[:can_add_temporary_enrollments] =
         @account.grants_right?(@current_user, session, :temporary_enrollments_add)
@@ -1787,16 +1788,7 @@ class AccountsController < ApplicationController
       js_permissions[:can_view_temporary_enrollments] =
         @account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
     end
-    if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
-      js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
-      js_permissions[:can_add_ta] = @account.grants_right?(@current_user, session, :add_ta_to_course)
-      js_permissions[:can_add_student] = @account.grants_right?(@current_user, session, :add_student_to_course)
-      js_permissions[:can_add_teacher] = @account.grants_right?(@current_user, session, :add_teacher_to_course)
-      js_permissions[:can_add_designer] = @account.grants_right?(@current_user, session, :add_designer_to_course)
-      js_permissions[:can_add_observer] = @account.grants_right?(@current_user, session, :add_observer_to_course)
-    else
-      js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
-    end
+
     js_env({
              ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
              ROOT_ACCOUNT_ID: @account.root_account.id,
@@ -2187,22 +2179,5 @@ class AccountsController < ApplicationController
       CUSTOM_HELP_LINKS: @account.help_links || [],
       DEFAULT_HELP_LINKS: @account.help_links_builder.instantiate_links(@account.help_links_builder.default_links)
     }
-  end
-
-  def add_enrollment_permissions(context)
-    if context.root_account.feature_enabled?(:granular_permissions_manage_users)
-      %i[
-        add_teacher_to_course
-        add_ta_to_course
-        add_designer_to_course
-        add_student_to_course
-        add_observer_to_course
-      ]
-    else
-      [
-        :manage_students,
-        :manage_admin_users
-      ]
-    end
   end
 end

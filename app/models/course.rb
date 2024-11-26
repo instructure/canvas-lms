@@ -3087,12 +3087,6 @@ class Course < ActiveRecord::Base
                                       visibilities = section_visibilities_for(user),
                                       require_message_permission: false,
                                       check_full: true)
-    manage_perm = if root_account.feature_enabled? :granular_permissions_manage_users
-                    :allow_course_admin_actions
-                  else
-                    :manage_admin_users
-                  end
-
     return :restricted if require_message_permission && !grants_right?(user, :send_messages)
 
     has_read_roster = grants_right?(user, :read_roster) unless require_message_permission
@@ -3106,7 +3100,7 @@ class Course < ActiveRecord::Base
                                     :view_all_grades,
                                     :manage_grades,
                                     :manage_students,
-                                    manage_perm)
+                                    :allow_course_admin_actions)
     end
 
     # e.g. observer, can only see admins in the course
@@ -3528,14 +3522,10 @@ class Course < ActiveRecord::Base
           TAB_SYLLABUS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
           TAB_QUIZZES => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
           TAB_GRADES => [:view_all_grades, :manage_grades],
-          TAB_PEOPLE => [:manage_students, :manage_admin_users],
           TAB_FILES => RoleOverride::GRANULAR_FILE_PERMISSIONS,
-          TAB_DISCUSSIONS => [:moderate_forum]
+          TAB_DISCUSSIONS => [:moderate_forum],
+          TAB_PEOPLE => RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
         }
-
-        if root_account.feature_enabled?(:granular_permissions_manage_users)
-          additional_checks[TAB_PEOPLE] = RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
-        end
 
         tabs.reject! do |t|
           # tab shouldn't be shown to non-admins

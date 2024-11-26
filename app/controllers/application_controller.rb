@@ -386,7 +386,6 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
-    granular_permissions_manage_users
     create_course_subaccount_picker
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal

@@ -31,7 +31,7 @@ describe GroupsController do
   describe "GET context_index" do
     context "student context cards" do
       it "is always enabled for teachers" do
-        %w[manage_students manage_admin_users].each do |perm|
+        %w[manage_students allow_course_admin_actions].each do |perm|
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end
         user_session(@teacher)

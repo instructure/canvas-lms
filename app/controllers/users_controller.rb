@@ -1418,16 +1418,12 @@ class UsersController < ApplicationController
             js_permissions[:can_delete_temporary_enrollments] = @context_account.grants_right?(@current_user, session, :temporary_enrollments_delete)
             js_permissions[:can_view_temporary_enrollments] =
               @context_account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
-            if @context_account.root_account.feature_enabled?(:granular_permissions_manage_users)
-              js_permissions[:can_allow_course_admin_actions] = @context_account.grants_right?(@current_user, session, :allow_course_admin_actions)
-              js_permissions[:can_add_ta] = @context_account.grants_right?(@current_user, session, :add_ta_to_course)
-              js_permissions[:can_add_student] = @context_account.grants_right?(@current_user, session, :add_student_to_course)
-              js_permissions[:can_add_teacher] = @context_account.grants_right?(@current_user, session, :add_teacher_to_course)
-              js_permissions[:can_add_designer] = @context_account.grants_right?(@current_user, session, :add_designer_to_course)
-              js_permissions[:can_add_observer] = @context_account.grants_right?(@current_user, session, :add_observer_to_course)
-            else
-              js_permissions[:can_manage_admin_users] = @context_account.grants_right?(@current_user, session, :manage_admin_users)
-            end
+            js_permissions[:can_allow_course_admin_actions] = @context_account.grants_right?(@current_user, session, :allow_course_admin_actions)
+            js_permissions[:can_add_ta] = @context_account.grants_right?(@current_user, session, :add_ta_to_course)
+            js_permissions[:can_add_student] = @context_account.grants_right?(@current_user, session, :add_student_to_course)
+            js_permissions[:can_add_teacher] = @context_account.grants_right?(@current_user, session, :add_teacher_to_course)
+            js_permissions[:can_add_designer] = @context_account.grants_right?(@current_user, session, :add_designer_to_course)
+            js_permissions[:can_add_observer] = @context_account.grants_right?(@current_user, session, :add_observer_to_course)
           end
 
           timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
@@ -2762,12 +2758,7 @@ class UsersController < ApplicationController
 
     # returns the original list in :invited_users (with ids) if successfully added, or in :errored_users if not
     get_context
-    manage_perm = if @context.root_account.feature_enabled? :granular_permissions_manage_users
-                    :allow_course_admin_actions
-                  else
-                    :manage_admin_users
-                  end
-    return unless authorized_action(@context, @current_user, [:manage_students, manage_perm])
+    return unless authorized_action(@context, @current_user, %i[manage_students allow_course_admin_actions])
 
     root_account = context.root_account
     unless root_account.open_registration? || root_account.grants_right?(@current_user, session, :manage_user_logins)

@@ -131,7 +131,6 @@ export const SITE_ADMIN_ENV = {
     read_sis: true,
     read_reports: true,
     can_allow_admin_actions: true,
-    manage_admin_users: true,
     manage_students: true,
   },
 }

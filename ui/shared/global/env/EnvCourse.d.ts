@@ -117,7 +117,6 @@ export interface EnvCourseSettings {
     edit_course_availability: boolean
 
     can_allow_course_admin_actions: boolean
-    manage_admin_users: boolean
 
     add_tool_manually: boolean
     edit_tool_manually: boolean

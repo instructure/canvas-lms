@@ -931,7 +931,7 @@ class Enrollment < ActiveRecord::Base
     can_remove = [StudentEnrollment].include?(self.class) &&
                  context.grants_right?(user, session, :manage_students) &&
                  context.id == (context.is_a?(Course) ? course_id : course_section_id)
-    can_remove || context.grants_right?(user, session, manage_admin_users_perm)
+    can_remove || context.grants_right?(user, session, :allow_course_admin_actions)
   end
 
   # Determine if a user has permissions to delete this enrollment.
@@ -944,14 +944,8 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     return context.grants_right?(user, session, :use_student_view) if fake_student?
 
-    if root_account.feature_enabled? :granular_permissions_manage_users
-      can_remove = can_delete_via_granular(user, session, context)
-      can_remove &&= user_id != user.id || context.account.grants_right?(user, session, :allow_course_admin_actions)
-    else
-      can_remove = context.grants_right?(user, session, :manage_admin_users) && !student?
-      can_remove ||= [StudentEnrollment, ObserverEnrollment].include?(self.class) && context.grants_right?(user, session, :manage_students)
-      can_remove &&= user_id != user.id || context.account.grants_right?(user, session, :manage_admin_users)
-    end
+    can_remove = can_delete_via_granular(user, session, context)
+    can_remove &&= user_id != user.id || context.account.grants_right?(user, session, :allow_course_admin_actions)
     can_remove && context.id == (context.is_a?(Course) ? course_id : course_section_id)
   end
 
@@ -1298,7 +1292,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| course.grants_any_right?(user, session, :manage_students, manage_admin_users_perm, :read_roster) }
+    given { |user, session| course.grants_any_right?(user, session, :manage_students, :allow_course_admin_actions, :read_roster) }
     can :read
 
     given { |user| self.user == user }
@@ -1585,10 +1579,6 @@ class Enrollment < ActiveRecord::Base
       user_id: user,
       type: Array.wrap(types)
     ).where.not(id:).where.not(workflow_state: :deleted)
-  end
-
-  def manage_admin_users_perm
-    root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users
   end
 
   def can_delete_via_granular(user, session, context)

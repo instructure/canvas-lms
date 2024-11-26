@@ -77,10 +77,7 @@ const roleSelectView = new RoleSelectView({
 const resendInvitationsView = new ResendInvitationsView({
   model: course,
   resendInvitationsUrl: ENV.resend_invitations_url,
-  canResend:
-    ENV.permissions.manage_students ||
-    ENV.permissions.manage_admin_users ||
-    ENV.permissions.can_allow_course_admin_actions,
+  canResend: ENV.permissions.manage_students || ENV.permissions.can_allow_course_admin_actions,
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}

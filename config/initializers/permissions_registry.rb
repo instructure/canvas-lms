@@ -577,22 +577,6 @@ Rails.application.config.to_prepare do
         ],
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
       },
-      manage_admin_users: {
-        label: -> { I18n.t("permissions.manage_admin_users", "Add/remove other teachers, course designers or TAs to the course") },
-        label_v2: -> { I18n.t("Users - add / remove teachers, course designers, or TAs in courses") },
-        available_to: %w[
-          TaEnrollment
-          DesignerEnrollment
-          TeacherEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: [
-          "TeacherEnrollment",
-          "AccountAdmin"
-        ],
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_users) }
-      },
       allow_course_admin_actions: {
         label: -> { I18n.t("Allow administrative actions in courses") },
         label_v2: -> { I18n.t("Users - allow administrative actions in courses") },
@@ -606,8 +590,7 @@ Rails.application.config.to_prepare do
         true_for: [
           "TeacherEnrollment",
           "AccountAdmin"
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        ]
       },
       add_teacher_to_course: {
         label: -> { I18n.t("Add Teachers to courses") },
@@ -624,8 +607,7 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ],
         group: "manage_course_teacher_enrollments",
-        group_label: -> { I18n.t("Users - Teachers") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Teachers") }
       },
       remove_teacher_from_course: {
         label: -> { I18n.t("Remove Teachers from courses") },
@@ -642,8 +624,7 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ],
         group: "manage_course_teacher_enrollments",
-        group_label: -> { I18n.t("Users - Teachers") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Teachers") }
       },
       add_ta_to_course: {
         label: -> { I18n.t("Add TAs to courses") },
@@ -660,8 +641,7 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ],
         group: "manage_course_ta_enrollments",
-        group_label: -> { I18n.t("Users - TAs") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - TAs") }
       },
       remove_ta_from_course: {
         label: -> { I18n.t("Remove TAs from courses") },
@@ -678,8 +658,7 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ],
         group: "manage_course_ta_enrollments",
-        group_label: -> { I18n.t("Users - TAs") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - TAs") }
       },
       add_observer_to_course: {
         label: -> { I18n.t("Add Observers to courses") },
@@ -698,8 +677,7 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ],
         group: "manage_course_observer_enrollments",
-        group_label: -> { I18n.t("Users - Observers") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Observers") }
       },
       remove_observer_from_course: {
         label: -> { I18n.t("Remove Observers from courses") },
@@ -718,8 +696,7 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ],
         group: "manage_course_observer_enrollments",
-        group_label: -> { I18n.t("Users - Observers") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Observers") }
       },
       add_designer_to_course: {
         label: -> { I18n.t("Add Designers to courses") },
@@ -736,8 +713,7 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ],
         group: "manage_course_designer_enrollments",
-        group_label: -> { I18n.t("Users - Designers") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Designers") }
       },
       remove_designer_from_course: {
         label: -> { I18n.t("Remove Designers from courses") },
@@ -754,8 +730,7 @@ Rails.application.config.to_prepare do
           "AccountAdmin"
         ],
         group: "manage_course_designer_enrollments",
-        group_label: -> { I18n.t("Users - Designers") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Designers") }
       },
       manage_assignments: {
         label: -> { I18n.t("permissions.manage_assignments", "Manage (add / edit / delete) assignments and quizzes") },
@@ -1286,20 +1261,8 @@ Rails.application.config.to_prepare do
         true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
       },
       manage_students: {
-        label: lambda do
-          if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
-            I18n.t("Manage students for the course")
-          else
-            I18n.t("permissions.manage_students", "Add/remove students for the course")
-          end
-        end,
-        label_v2: lambda do
-                    if Account.site_admin.feature_enabled?(:granular_permissions_manage_users)
-                      I18n.t("Users - manage students in courses")
-                    else
-                      I18n.t("Users - add / remove students in courses")
-                    end
-                  end,
+        label: -> { I18n.t("Manage students for the course") },
+        label_v2: -> { I18n.t("Users - manage students in courses") },
         available_to: %w[
           TaEnrollment
           DesignerEnrollment
@@ -1331,8 +1294,7 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ],
         group: "manage_course_student_enrollments",
-        group_label: -> { I18n.t("Users - Students") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Students") }
       },
       remove_student_from_course: {
         label: -> { I18n.t("Remove Students from courses") },
@@ -1351,8 +1313,7 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ],
         group: "manage_course_student_enrollments",
-        group_label: -> { I18n.t("Users - Students") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+        group_label: -> { I18n.t("Users - Students") }
       },
       temporary_enrollments_add: {
         label: -> { I18n.t("permissions.temporary_enrollments_add", "Add temporary enrollments") },

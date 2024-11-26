@@ -81,7 +81,7 @@ interface Props {
     can_add_observer: boolean
     can_add_designer: boolean
     can_read_sis: boolean
-    can_manage_admin_users: boolean
+    can_allow_course_admin_actions: boolean
     can_add_temporary_enrollments: boolean
     can_edit_temporary_enrollments: boolean
     can_delete_temporary_enrollments: boolean
