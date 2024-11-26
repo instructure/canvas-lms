@@ -508,12 +508,6 @@ describe CoursesController, type: :request do
       @user.pseudonym.update_attribute(:sis_user_id, "user1")
     end
 
-    before do
-      @course_dates_stubbed = true
-      allow_any_instance_of(Course).to(receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
-      allow_any_instance_of(Course).to(receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
-    end
-
     describe "observer viewing a course" do
       before :once do
         @observer_enrollment = course_with_observer(active_all: true)
@@ -1179,10 +1173,6 @@ describe CoursesController, type: :request do
           @resource_params = { controller: "courses", action: "create", format: "json", account_id: @account.id.to_s }
         end
 
-        before do
-          @course_dates_stubbed = false
-        end
-
         it "creates a new course" do
           term = @account.enrollment_terms.create
           post_params = {
@@ -1589,10 +1579,6 @@ describe CoursesController, type: :request do
                           "time_zone" => "Pacific/Honolulu"
                         },
                         "offer" => true }
-      end
-
-      before do
-        @course_dates_stubbed = false
       end
 
       context "an account admin" do
