@@ -3052,6 +3052,19 @@ describe Course do
           end
         end
       end
+
+      describe "with horizon_course account setting on" do
+        before :once do
+          Account.default.enable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: true)
+          @course.save!
+        end
+
+        it "renames the syllabus tab to overview" do
+          syllabus_tab = @course.tabs_available(@user).find { |t| t[:id] == Course::TAB_SYLLABUS }
+          expect(syllabus_tab[:label]).to eq("Overview")
+        end
+      end
     end
 
     context "students" do
