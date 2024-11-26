@@ -500,6 +500,12 @@ RSpec.describe Lti::Registration do
     let(:account) { account_model }
     let(:registrations) { [] }
 
+    def expect_preloaded_bindings(registrations)
+      registrations.each do |registration|
+        expect(registration.send(:preloaded_account_binding)).to be_present
+      end
+    end
+
     context "when account is nil" do
       let(:account) { nil }
 
@@ -516,7 +522,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads bindings for nearest root account" do
         subject
-        expect(registrations).to all(have_attributes(account_binding: be_present))
+        expect_preloaded_bindings(registrations)
       end
     end
 
@@ -530,7 +536,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads account_binding on registrations" do
         subject
-        expect(registrations).to all(have_attributes(account_binding: be_present))
+        expect_preloaded_bindings(registrations)
       end
     end
 
@@ -544,7 +550,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads bindings from site admin registrations" do
         subject
-        expect(registrations).to all(have_attributes(account_binding: be_present))
+        expect_preloaded_bindings(registrations)
       end
 
       context "with sharding" do
@@ -556,7 +562,7 @@ RSpec.describe Lti::Registration do
 
         it "preloads bindings from site admin registrations" do
           @shard2.activate { subject }
-          expect(registrations).to all(have_attributes(account_binding: be_present))
+          expect_preloaded_bindings(registrations)
         end
       end
     end
@@ -579,13 +585,13 @@ RSpec.describe Lti::Registration do
 
       it "associates bindings with registrations" do
         subject
-        expect(registrations.first.account_binding).to eq(account_bindings.first)
+        expect(registrations.first.send(:preloaded_account_binding)).to eq(account_bindings.first)
       end
     end
 
     it "associates bindings with registrations" do
       subject
-      expect(registrations.first.account_binding).to eq(account_bindings.first)
+      expect(registrations.first.send(:preloaded_account_binding)).to eq(account_bindings.first)
     end
   end
 
@@ -595,6 +601,12 @@ RSpec.describe Lti::Registration do
     let(:account) { account_model }
     let(:registrations) { [] }
     let(:overlay) { { title: "Test" } }
+
+    def expect_preloaded_overlays(registrations)
+      registrations.each do |registration|
+        expect(registration.send(:preloaded_overlay)).to be_present
+      end
+    end
 
     context "when account is nil" do
       let(:account) { nil }
@@ -612,7 +624,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads overlays for nearest root account" do
         subject
-        expect(registrations).to all(have_attributes(overlay: be_present))
+        expect_preloaded_overlays(registrations)
       end
     end
 
@@ -626,7 +638,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads overlays on registrations" do
         subject
-        expect(registrations).to all(have_attributes(overlay: be_present))
+        expect_preloaded_overlays(registrations)
       end
     end
 
@@ -640,7 +652,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads overlays from site admin registrations" do
         subject
-        expect(registrations).to all(have_attributes(overlay: be_present))
+        expect_preloaded_overlays(registrations)
       end
 
       context "with sharding" do
@@ -652,7 +664,7 @@ RSpec.describe Lti::Registration do
 
         it "preloads overlays from site admin registrations" do
           @shard2.activate { subject }
-          expect(registrations).to all(have_attributes(overlay: be_present))
+          expect_preloaded_overlays(registrations)
         end
       end
     end
@@ -675,13 +687,13 @@ RSpec.describe Lti::Registration do
 
       it "associates overlays with registrations" do
         subject
-        expect(registrations.first.overlay).to eq(overlays.first)
+        expect(registrations.first.send(:preloaded_overlay)).to eq(overlays.first)
       end
     end
 
     it "associates overlays with registrations" do
       subject
-      expect(registrations.first.overlay).to eq(overlays.first)
+      expect(registrations.first.send(:preloaded_overlay)).to eq(overlays.first)
     end
   end
 
