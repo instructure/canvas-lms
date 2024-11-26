@@ -165,6 +165,16 @@ describe AuthenticationProvider::OpenIDConnect do
       expect(subject.unique_id(token)).to eq "myid"
     end
 
+    it "does not request more attributes if unnecessary, even if userinfo_endpoint is present" do
+      subject.userinfo_endpoint = "moar"
+      subject.login_attribute = "in_id_token"
+      payload = { sub: "1", in_id_token: "myid" }
+      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
+      token = double(options: {}, params: { "id_token" => id_token })
+      expect(token).not_to receive(:get)
+      expect(subject.unique_id(token)).to eq "myid"
+    end
+
     it "ignores userinfo that doesn't match" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "not_in_id_token"

@@ -84,7 +84,6 @@ describe AuthenticationProvider::Google do
     ap.hosted_domain = "*"
     expect(CanvasSecurity).to receive(:decode_jwt).once.and_return(id_token("hd" => "instructure.com", "sub" => "123"))
     token = double("token", params: { "id_token" => "dummy" }, options: {})
-    expect(token).to receive(:get).and_return(double(parsed: {}))
 
     expect(ap.unique_id(token)).to eq "123"
   end
