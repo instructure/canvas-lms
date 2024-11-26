@@ -1173,10 +1173,10 @@ module Lti
     describe "#transform!" do
       subject { tool_configuration.transform! }
 
-      let(:tool_configuration) { untransformed_tool_configuration }
+      let(:tool_configuration) { untransformed_tool_configuration.tap(&:save!) }
 
       before do
-        allow(tool_configuration).to receive(:transform_settings).and_return(true)
+        allow(tool_configuration).to receive(:transform_settings).and_call_original
       end
 
       it "transforms the model" do
@@ -1187,6 +1187,12 @@ module Lti
       it "sets redirect_uris" do
         subject
         expect(tool_configuration.redirect_uris).to eq developer_key.redirect_uris
+      end
+
+      it "does not run callbacks" do
+        allow(tool_configuration).to receive(:update_external_tools!).and_return(true)
+        subject
+        expect(tool_configuration).not_to have_received(:update_external_tools!)
       end
 
       context "with invalid model" do
@@ -1249,6 +1255,12 @@ module Lti
 
       it "leaves existing columns" do
         expect { subject }.not_to change { tool_configuration[:privacy_level] }
+      end
+
+      it "does not run callbacks" do
+        allow(tool_configuration).to receive(:update_unified_tool_id).and_return(true)
+        subject
+        expect(tool_configuration).not_to have_received(:update_unified_tool_id)
       end
 
       context "with invalid model" do
