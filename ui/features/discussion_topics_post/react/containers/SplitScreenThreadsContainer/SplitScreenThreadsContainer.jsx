@@ -68,7 +68,7 @@ export const SplitScreenThreadsContainer = props => {
     // update each root discussionEntry in cache
     result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.forEach(discussionEntry => {
       const discussionEntryOptions = {
-        id: btoa('DiscussionEntry-' + discussionEntry._id),
+        id: `DiscussionEntry:${btoa('DiscussionEntry-' + discussionEntry._id)}`,
         fragment: DiscussionEntry.fragment,
         fragmentName: 'DiscussionEntry',
       }
@@ -104,9 +104,9 @@ export const SplitScreenThreadsContainer = props => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = extractedSubentryNodes.filter(
+        const entries = JSON.parse(JSON.stringify(extractedSubentryNodes.filter(
           entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
-        )
+        )))
 
         entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())

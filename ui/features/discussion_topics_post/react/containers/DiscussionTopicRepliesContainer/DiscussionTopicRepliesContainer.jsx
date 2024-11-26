@@ -51,7 +51,7 @@ export const DiscussionTopicRepliesContainer = props => {
     // update each root discussionEntry in cache
     result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.forEach(discussionEntry => {
       const discussionEntryOptions = {
-        id: btoa('DiscussionEntry-' + discussionEntry._id),
+        id: `DiscussionEntry:${btoa('DiscussionEntry-' + discussionEntry._id)}`,
         fragment: DiscussionEntry.fragment,
         fragmentName: 'DiscussionEntry',
       }
@@ -86,15 +86,21 @@ export const DiscussionTopicRepliesContainer = props => {
     if (discussionEntriesToUpdate.size > 0 && !searchTerm) {
       const interval = setInterval(() => {
         const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
+        const entries = JSON.parse(JSON.stringify(props.discussionTopic.discussionEntriesConnection.nodes.filter(
           entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
-        )
+        )))
         entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())
         updateDiscussionEntriesReadState({
           variables: {
             discussionEntryIds: entryIds,
             read: true,
+          },
+          optimisticResponse: {
+            updateDiscussionEntriesReadState: {
+              discussionEntries: entries,
+              __typename: 'UpdateDiscussionEntriesReadStatePayload',
+            },
           },
         })
       }, AUTO_MARK_AS_READ_DELAY)

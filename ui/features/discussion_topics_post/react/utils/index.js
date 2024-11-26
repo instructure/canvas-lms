@@ -56,7 +56,7 @@ export const updateDiscussionTopicEntryCounts = (
   entryCountChange
 ) => {
   const options = {
-    id: discussionTopicGraphQLId,
+    id: `Discussion:${discussionTopicGraphQLId}`,
     fragment: Discussion.fragment,
     fragmentName: 'Discussion',
   }
@@ -80,7 +80,7 @@ export const updateDiscussionTopicEntryCounts = (
 
 export const updateDiscussionEntryRootEntryCounts = (cache, discussionEntry, unreadCountChange) => {
   const discussionEntryOptions = {
-    id: btoa('DiscussionEntry-' + discussionEntry.rootEntryId),
+    id: `DiscussionEntry:${btoa('DiscussionEntry-' + discussionEntry.rootEntryId)}`,
     fragment: DiscussionEntry.fragment,
     fragmentName: 'DiscussionEntry',
   }
@@ -99,7 +99,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     // Creates an object containing the data that needs to be updated
     // Writes that new data to the cache using the id of the object
     const discussionEntryOptions = {
-      id: btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId),
+      id: `DiscussionEntry:${btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId)}`,
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry',
     }
@@ -124,7 +124,7 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     // The writeQuery creates a subentry query shape using the data from the new discussion entry
     // Using that query object it tries to find the cached subentry query for that reply and add the new reply to the cache
     const parentEntryOptions = {
-      id: btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId),
+      id: `DiscussionEntry:${btoa('DiscussionEntry-' + newDiscussionEntry.rootEntryId)}`,
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry',
     }
@@ -214,7 +214,7 @@ export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
   // Otherwise, it already happens correctly in the root entry level.
   if (newDiscussionEntry.parentId !== newDiscussionEntry.rootEntryId) {
     const discussionEntryOptions = {
-      id: btoa('DiscussionEntry-' + newDiscussionEntry.parentId),
+      id: `DiscussionEntry:${btoa('DiscussionEntry-' + newDiscussionEntry.parentId)}`,
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry',
     }
@@ -340,6 +340,7 @@ export const getOptimisticResponse = ({
               __typename: 'AnonymousUser',
             }
           : null,
+        editedAt: null,
         editor: null,
         lastReply: null,
         permissions: {
