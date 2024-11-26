@@ -20,9 +20,7 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
 $(document).ready(() => {
-  $('.sections_list_hover').on('mouseover focus', () =>
-    $('#section_list .section:first').indicate()
-  )
+  $('.sections_list_hover').on('mouseover focus', () => $('#section_list').indicate())
 
   $('.pages_list_hover').on('mouseover focus', () => $('#section_pages').indicate())
 

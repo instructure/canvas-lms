@@ -38,20 +38,6 @@ describe "eportfolios/show" do
     expect(response).not_to be_nil
   end
 
-  it "does not link the user name if @owner_url is not set" do
-    render "eportfolios/show"
-    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).to be_nil
-    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
-  end
-
-  it "links the user name if @owner_url is set" do
-    owner_url = assign(:owner_url, user_url(@portfolio.user, host: "test.host"))
-    render "eportfolios/show"
-    expect(view.content_for(:left_side)[owner_url]).not_to be_nil
-    expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
-    expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
-  end
-
   it "shows the share link explicitly" do
     assign(:owner_view, true)
     render "eportfolios/show"

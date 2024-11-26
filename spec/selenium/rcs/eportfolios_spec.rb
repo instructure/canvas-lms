@@ -117,12 +117,17 @@ describe "eportfolios" do
 
     it "adds a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
       add_eportfolio_section("test section name")
+      wait_for_ajax_requests
       expect(sections.last).to include_text("test section name")
     end
 
     it "deletes a section", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
 
       # add a section
       add_eportfolio_section("section #1")
@@ -130,13 +135,13 @@ describe "eportfolios" do
       # delete section using the settings menu
       section = sections.last
       delete_eportfolio_section(section)
+      wait_for_ajax_requests
 
       # The last remaining section should not include the "Delete" action.
-      organize_sections
       expect(sections.length).to eq 1
       last_section = sections.last
-      last_section.find_element(:css, ".section_settings_menu").click
-      expect(last_section).not_to contain_jqcss(".remove_section_link:visible")
+      last_section.find("button").click
+      expect(f("ul[role='menu']")).not_to include_text("Delete")
     end
 
     it "reorders a section", :ignore_js_errors, priority: "1" do
@@ -157,11 +162,11 @@ describe "eportfolios" do
 
     it "edits ePortfolio settings", priority: "2" do
       get "/eportfolios/#{@eportfolio.id}"
-      f("#section_list_manage .portfolio_settings_link").click
-      replace_content f("#edit_eportfolio_form #eportfolio_name"), "new ePortfolio name1"
-      f("#edit_eportfolio_form #eportfolio_public").click
-      submit_dialog_form("#edit_eportfolio_form")
       wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+      f("button[data-testid='portfolio-settings']").click
+      replace_content f("[data-testid='portfolio-name-field']"), "new ePortfolio name1"
+      fj("button:contains('Save')").click
       @eportfolio.reload
       expect(@eportfolio.name).to include("new ePortfolio name1")
     end

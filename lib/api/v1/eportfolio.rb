@@ -32,4 +32,11 @@ module Api::V1::Eportfolio
   def eportfolio_entry_json(entry, current_user, session)
     api_json(entry, current_user, session, only: ENTRY_ATTRIBUTES)
   end
+
+  def eportfolio_category_json(category, current_user, session)
+    category_url = category.slug.presence && eportfolio_named_category_path(category.eportfolio, category.slug)
+    api_json(category, current_user, session, only: ENTRY_ATTRIBUTES).tap do |hash|
+      hash["category_url"] = category_url
+    end
+  end
 end
