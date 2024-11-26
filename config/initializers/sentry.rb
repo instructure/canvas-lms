@@ -54,7 +54,7 @@ if settings.present?
       return 1 if rack_env && rack_env.try(:[], 'QUERY_STRING')&.include?('sentry')
       transaction_context = sampling_context[:transaction_context]
       return 0.001 if transaction_context[:name].match?(/grade_passback$/)
-      0.0
+      0.0001
     end
   end
 
