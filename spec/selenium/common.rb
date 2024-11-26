@@ -246,7 +246,7 @@ shared_context "in-process server selenium tests" do
 
       # Crystalball is going to get a few JS errors when using istanbul-instrumenter
       if javascript_errors.present? && ENV["CRYSTALBALL_MAP"] != "1"
-        raise javascript_errors.map(&:message).join("\n\n")
+        raise javascript_errors.map(&:message).join("\n\n").gsub('\\n', "\n")
       end
     end
   end
