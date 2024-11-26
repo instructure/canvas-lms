@@ -1,0 +1,52 @@
+{
+  "name": "account_created",
+  "definition": "The event is emitted anytime an account is created by an end user or API request.",
+  "trigger": "Triggered anytime a new account is created.",
+  "schema": {
+    "name": "The name of the account.",
+    "account_id": "The Canvas id of the account.",
+    "root_account_id": "The id of the Canvas root account the created account belongs to.",
+    "parent_account_id": "The id of the Canvas parent account of the created account.",
+    "external_status": "The external status of the account.",
+    "workflow_state": "The workflow state of the account.",
+    "default_time_zone": "The default time zone of the account.",
+    "default_locale": "The default locale of the account."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.example.instructure.com",
+          "user_login": "example@example.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000001",
+          "time_zone": "America/Chicago",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "sample.instructure.com",
+          "http_method": "POST",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://sample.instructure.com/accounts",
+          "referrer": "https://sample.instructure.com/accounts/",
+          "producer": "canvas",
+          "event_name": "account_created",
+          "event_time": "2024-11-01T18:42:07.091Z"
+        },
+        "body": {
+          "name": "Account Name",
+          "account_id": 3,
+          "root_account_id": 1,
+          "parent_account_id": 2,
+          "external_status": "paid",
+          "workflow_state": "active",
+          "default_time_zone": "America/Chicago",
+          "default_locale": "en"
+        }
+      }
+    }
+  ]
+}

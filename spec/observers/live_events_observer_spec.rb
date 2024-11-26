@@ -352,6 +352,23 @@ describe LiveEventsObserver do
     end
   end
 
+  describe "account" do
+    before do
+      @account = Account.default
+    end
+
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:account_created).once
+      account_model
+    end
+
+    it "posts update events" do
+      account = account_model
+      expect(Canvas::LiveEvents).to receive(:account_updated).with(account)
+      account.update_attribute(:name, "New Account")
+    end
+  end
+
   describe "account_notification" do
     it "posts create events" do
       expect(Canvas::LiveEvents).to receive(:account_notification_created).once
