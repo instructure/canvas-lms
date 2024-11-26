@@ -142,8 +142,10 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   end
 
   def compute_due_dates_and_create_submissions(checkpoint)
-    assignments = [checkpoint, checkpoint.parent_assignment]
-    AbstractAssignment.clear_cache_keys(assignments, :availability)
+    parent_assignment = checkpoint.parent_assignment
+    assignments = [checkpoint, parent_assignment]
+    Assignment.clear_cache_keys(parent_assignment, :availability)
+    SubAssignment.clear_cache_keys(checkpoint, :availability)
     SubmissionLifecycleManager.recompute_course(checkpoint.course, assignments:, update_grades: true, create_sub_assignment_submissions: false)
   end
 end
