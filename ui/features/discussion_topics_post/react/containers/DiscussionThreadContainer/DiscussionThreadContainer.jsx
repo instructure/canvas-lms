@@ -352,8 +352,9 @@ export const DiscussionThreadContainer = props => {
     discussionEntry => {
       props.markAsRead(discussionEntry._id)
       // manually update this entry's read state, then updateLoadedSubentry
-      discussionEntry.entryParticipant.read = !discussionEntry.entryParticipant?.read
-      updateLoadedSubentry(discussionEntry)
+      const data = JSON.parse(JSON.stringify(discussionEntry))
+      data.entryParticipant.read = !data.entryParticipant?.read
+      updateLoadedSubentry(data)
     },
     [props, updateLoadedSubentry]
   )
