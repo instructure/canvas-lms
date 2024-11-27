@@ -1168,6 +1168,12 @@ module Lti
         expect(tool_configuration.placements).not_to be_blank
         expect(tool_configuration.placements).to eq settings.dig("extensions", 0, "settings", "placements")
       end
+
+      it "ignores fields not in the schema" do
+        tool_configuration.settings["selection_width"] = 1200
+        expect { subject }.not_to raise_error
+        expect(tool_configuration.settings).not_to include("selection_width")
+      end
     end
 
     describe "#transform!" do
