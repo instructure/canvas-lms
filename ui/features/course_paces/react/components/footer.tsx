@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -28,6 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
+// @ts-expect-error
 import {ResponsiveSizes, StoreState} from '../types'
 import {
   getAnyActiveRequests,

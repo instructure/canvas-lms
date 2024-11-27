@@ -25,6 +25,7 @@ const queryClient = new QueryClient()
 
 describe('SideNav', () => {
   beforeEach(() => {
+    // @ts-expect-error
     window.ENV.current_user = {
       id: '',
       avatar_image_url: 'testSrc',
@@ -33,6 +34,7 @@ describe('SideNav', () => {
       html_url: '',
       pronouns: '',
     }
+    // @ts-expect-error
     window.ENV.SETTINGS = {
       collapse_global_nav: false,
     }
@@ -99,6 +101,7 @@ describe('SideNav', () => {
     })
 
     afterEach(() => {
+      // @ts-expect-error
       window.ENV.active_brand_config = null
     })
 

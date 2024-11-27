@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -24,16 +23,17 @@ import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TextInput} from '@instructure/ui-text-input'
-import CanvasDateInput, {
-  CanvasDateInputMessageType,
-} from '@canvas/datetime/react/components/DateInput'
+import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {coursePaceTimezone} from '../api/backend_serializer'
 
 import {BlackoutDate} from '../types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+type CanvasDateInputMessageType = unknown
+
 const I18n = useI18nScope('course_paces_app')
 
+// @ts-expect-error
 const dateTimeFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
   month: 'numeric',
   day: 'numeric',
@@ -187,7 +187,9 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
         render={(_props, matches) => {
           let addBtnMarginTop = '0'
           if (
+            // @ts-expect-error
             !matches.includes('smallest') &&
+            // @ts-expect-error
             (matches.includes('smaller') || matches.includes('large'))
           ) {
             addBtnMarginTop = 'calc(1.75rem + 2px)'
@@ -197,6 +199,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
               <Flex alignItems="start" justifyItems="start" wrap="wrap">
                 <Flex.Item margin="0 small small 0">
                   <TextInput
+                    // @ts-expect-error
                     inputRef={el => (this.titleInputRef = el)}
                     renderLabel="Event Title"
                     placeholder="e.g., Winter Break"
@@ -204,6 +207,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                     value={this.state.eventTitle}
                     onChange={this.onChangeEventTitle}
                     onBlur={this.validateTitle}
+                    // @ts-expect-error
                     messages={this.state.titleMessages}
                   />
                 </Flex.Item>
@@ -219,6 +223,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         onBlur={this.onBlurDate}
                         selectedDate={this.state.startDate}
                         width="140px"
+                        // @ts-expect-error
                         messages={this.state.startMessages}
                         withRunningValue={true}
                       />
@@ -232,6 +237,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         onSelectedDateChange={this.onChangeEndDate}
                         onBlur={this.onBlurDate}
                         width="140px"
+                        // @ts-expect-error
                         messages={this.state.endMessages}
                         withRunningValue={true}
                       />

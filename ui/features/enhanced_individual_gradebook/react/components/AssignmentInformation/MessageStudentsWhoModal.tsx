@@ -55,6 +55,7 @@ export default function MessageStudentsWhoModal({
 }: MessageStudentsWhoModalProps) {
   const {userId} = gradebookOptions
 
+  // @ts-expect-error
   const messageWhoAssignment: CamelizedAssignment = {
     ...assignment,
     muted: false,

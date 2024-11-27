@@ -203,11 +203,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
       >
         {children}
         {description && (
-          <Text
-            size="x-small"
-            as="div"
-            color={isHighlighted ? 'secondary-inverse' : 'secondary'}
-          >
+          <Text size="x-small" as="div" color={isHighlighted ? 'secondary-inverse' : 'secondary'}>
             {description}
           </Text>
         )}
@@ -298,7 +294,9 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
         selectedOptionId: id,
         inputValue: text,
         isShowingOptions: false,
-        announcement: I18n.t('%{option} selected. List collapsed.', {option: this.getOptionTextForScreenReaderById(id)}),
+        announcement: I18n.t('%{option} selected. List collapsed.', {
+          option: this.getOptionTextForScreenReaderById(id),
+        }),
       })
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {
@@ -338,6 +336,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
       } else if (matchComponentTypes(o, [CanvasSelectGroup])) {
         const groupOptions = castArray<
           ReactElement | ReactElement[] | (ReactElement | ReactElement[])[]
+          // @ts-expect-error
         >(o.props.children)
         for (let j = 0; j < groupOptions.length; ++j) {
           const o2 = groupOptions[j]

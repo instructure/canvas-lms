@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -39,6 +38,7 @@ export default class GradeOverride {
     return this._attr.schemeKey
   }
 
+  // @ts-expect-error
   equals(gradeOverride) {
     return (
       this.percentage === gradeOverride.percentage && this.schemeKey === gradeOverride.schemeKey

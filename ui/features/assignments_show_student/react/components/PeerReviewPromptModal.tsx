@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -23,7 +22,6 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-// @ts-ignore
 import successSVG from '../../images/Success.svg'
 
 import type {ViewProps} from '@instructure/ui-view'

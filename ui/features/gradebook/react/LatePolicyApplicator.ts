@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -24,6 +23,7 @@ import type {Submission} from '../../../api.d'
 const equivalentToNull = [undefined, null, '', 0]
 const intervalTypes = ['day', 'hour']
 
+// @ts-expect-error
 function equivalent(a, b) {
   return a === b || (equivalentToNull.includes(a) && equivalentToNull.includes(b))
 }
@@ -36,6 +36,7 @@ function isPositive(val: number | null) {
   return (val || 0) > 0
 }
 
+// @ts-expect-error
 function getEnteredScore(score, pointsDeducted) {
   if (score == null) {
     return score
@@ -44,6 +45,7 @@ function getEnteredScore(score, pointsDeducted) {
   return score + (pointsDeducted || 0)
 }
 
+// @ts-expect-error
 function changeSubmission(submission, score, grade, pointsDeducted, assignment, gradingScheme) {
   const changed = !(
     equivalent(score, submission.score) &&
@@ -63,6 +65,7 @@ function changeSubmission(submission, score, grade, pointsDeducted, assignment, 
   return changed
 }
 
+// @ts-expect-error
 function submissionIntervalsLate(submission, intervalType) {
   if (!submission.late) {
     return 0
@@ -78,6 +81,7 @@ function submissionIntervalsLate(submission, intervalType) {
   return Math.ceil(intervalType === 'day' ? daysLate : hoursLate)
 }
 
+// @ts-expect-error
 function latePenalty(submission: Submission, assignment, latePolicy) {
   const {
     lateSubmissionDeduction,
@@ -104,6 +108,7 @@ function latePenalty(submission: Submission, assignment, latePolicy) {
   return (Math.min(latePercentDeduct, maximumDeduct) * assignment.points_possible) / 100
 }
 
+// @ts-expect-error
 function missingScore(submission, assignment, latePolicy) {
   const {missingSubmissionDeductionEnabled, missingSubmissionDeduction} = latePolicy
 
@@ -114,6 +119,7 @@ function missingScore(submission, assignment, latePolicy) {
   return ((100 - missingSubmissionDeduction) * assignment.points_possible) / 100
 }
 
+// @ts-expect-error
 function processLateSubmission(submission, assignment, gradingScheme, latePolicy) {
   const pointsDeducted = round(latePenalty(submission, assignment, latePolicy), 2)
   const score =
@@ -123,6 +129,7 @@ function processLateSubmission(submission, assignment, gradingScheme, latePolicy
   return changeSubmission(submission, score, grade, pointsDeducted, assignment, gradingScheme)
 }
 
+// @ts-expect-error
 function processMissingSubmission(submission, assignment, gradingScheme, latePolicy) {
   const score = missingScore(submission, assignment, latePolicy)
   const grade = ScoreToGradeHelper.scoreToGrade(score, assignment, gradingScheme)
@@ -131,6 +138,7 @@ function processMissingSubmission(submission, assignment, gradingScheme, latePol
 }
 
 const LatePolicyApplicator = {
+  // @ts-expect-error
   processSubmission(submission, assignment, gradingScheme, latePolicy) {
     if (assignment.grading_type === 'pass_fail' || !isPositive(assignment.points_possible)) {
       return false

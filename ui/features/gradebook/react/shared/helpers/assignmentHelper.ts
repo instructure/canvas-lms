@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -31,10 +30,14 @@ const assignmentHelper = {
     if (!aDateIsNull && bDateIsNull) {
       return -1
     }
+    // @ts-expect-error
     aDate = +aDate
+    // @ts-expect-error
     bDate = +bDate
     if (aDate === bDate) {
+      // @ts-expect-error
       const aName = a.name.toLowerCase() || ''
+      // @ts-expect-error
       const bName = b.name.toLowerCase() || ''
       if (aName === bName) {
         return 0
@@ -44,6 +47,7 @@ const assignmentHelper = {
     return aDate - bDate
   },
 
+  // @ts-expect-error
   getComparator(arrangeBy) {
     if (arrangeBy === 'due_date') {
       return this.compareByDueDate.bind(this)
@@ -53,6 +57,7 @@ const assignmentHelper = {
     }
   },
 
+  // @ts-expect-error
   compareByAssignmentGroup(a, b) {
     const diffOfAssignmentGroupPosition = a.assignment_group_position - b.assignment_group_position
     if (diffOfAssignmentGroupPosition === 0) {
@@ -65,6 +70,7 @@ const assignmentHelper = {
     return diffOfAssignmentGroupPosition
   },
 
+  // @ts-expect-error
   gradeByGroup(assignment) {
     return !!assignment.group_category_id && !assignment.grade_group_students_individually
   },

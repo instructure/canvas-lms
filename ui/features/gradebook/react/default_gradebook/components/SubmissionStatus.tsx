@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -56,6 +55,7 @@ export default class SubmissionStatus extends React.Component {
   }
 
   getStatusPills() {
+    // @ts-expect-error
     const {assignment, submission} = this.props
     const statusPillComponents = []
 
@@ -105,6 +105,7 @@ export default class SubmissionStatus extends React.Component {
       display: 'flex',
     }
 
+    // @ts-expect-error
     if (this.props.isConcluded) {
       const concludedEnrollmentStatusMessage = I18n.t(
         "This student's enrollment has been concluded"
@@ -126,6 +127,7 @@ export default class SubmissionStatus extends React.Component {
       )
     }
 
+    // @ts-expect-error
     if (this.props.isNotCountedForScore) {
       const isNotCountedForScoreMessage = I18n.t('Not calculated in final grade')
 
@@ -140,6 +142,7 @@ export default class SubmissionStatus extends React.Component {
   }
 
   gradingPeriodStatusMessage() {
+    // @ts-expect-error
     const {isInOtherGradingPeriod, isInClosedGradingPeriod, isInNoGradingPeriod} = this.props
     let message
 

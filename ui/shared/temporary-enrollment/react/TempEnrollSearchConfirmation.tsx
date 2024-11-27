@@ -42,6 +42,7 @@ interface Props {
 export function TempEnrollSearchConfirmation(props: Props) {
   const [userDetails, setUserDetails] = useState<User[]>([])
   const [loading, setLoading] = useState<boolean>(false)
+  // @ts-expect-error
   const [selectedDupes, setSelectedDupes] = useState<Record<string, DuplicateUser | null>>([])
 
   useEffect(() => {
@@ -51,8 +52,10 @@ export function TempEnrollSearchConfirmation(props: Props) {
         const promises: Promise<User>[] = []
         users.forEach(user => {
           if (user.id == null) {
+            // @ts-expect-error
             promises.push(fetchUserDetails(user))
           } else {
+            // @ts-expect-error
             promises.push(user)
           }
         })

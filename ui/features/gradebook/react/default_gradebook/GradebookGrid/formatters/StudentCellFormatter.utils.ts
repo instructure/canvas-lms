@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -37,6 +36,7 @@ export function getSecondaryDisplayInfo(
     integration_id?: string
   },
   secondaryInfo: string,
+  // @ts-expect-error
   options
 ) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
@@ -98,6 +98,7 @@ export function getOptions(gradebook: Gradebook) {
   }
 }
 
+// @ts-expect-error
 // xsslint safeString.property enrollmentLabel secondaryInfo studentId courseId url displayName
 export function renderCell(options) {
   let enrollmentStatus = ''

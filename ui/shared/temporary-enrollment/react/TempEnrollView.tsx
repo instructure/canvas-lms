@@ -143,6 +143,7 @@ export function TempEnrollView(props: Props) {
   })
 
   const {mutate} = useMutation({
+    // @ts-expect-error
     mutationFn: async (enrollments: Enrollment[]) => handleConfirmAndDeleteEnrollment(enrollments),
     mutationKey: ['delete-enrollments'],
     onSuccess: () => queryClient.refetchQueries({queryKey: ['enrollments'], type: 'active'}),
@@ -169,6 +170,7 @@ export function TempEnrollView(props: Props) {
 
   const handleDeleteClick = (enrollments: Enrollment[]) => {
     if (canDelete) {
+      // @ts-expect-error
       mutate(enrollments)
     } else {
       // eslint-disable-next-line no-console
@@ -268,6 +270,7 @@ export function TempEnrollView(props: Props) {
   }
 
   if (error) {
+    // @ts-expect-error
     const errorMsg = error.message
     // eslint-disable-next-line no-console
     console.error(`Failed to fetch enrollments for user ${props.user.id}:`, errorMsg)
@@ -304,6 +307,7 @@ export function TempEnrollView(props: Props) {
                     onClick={handleAddNewClick}
                     aria-label={I18n.t('Create temporary enrollment')}
                     {...analyticProps('Create')}
+                    // @ts-expect-error
                     renderIcon={IconPlusLine}
                   >
                     {I18n.t('Recipient')}

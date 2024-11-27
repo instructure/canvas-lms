@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,6 +19,7 @@
 import htmlEscape from '@instructure/html-escape'
 
 export default class CustomColumnCellFormatter {
+  // @ts-expect-error
   render(_row, _cell, content /* value */, _columnDef, _dataContext) {
     return content == null ? '' : htmlEscape(content)
   }

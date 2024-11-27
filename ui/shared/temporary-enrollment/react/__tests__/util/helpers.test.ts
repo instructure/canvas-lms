@@ -137,8 +137,8 @@ describe('helpers.ts', () => {
       })
 
       it('returns only local time if the context timezone is null', () => {
-        // @ts-expect-error
         window.ENV = {
+          // @ts-expect-error
           CONTEXT_TIMEZONE: null,
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',

@@ -61,7 +61,8 @@ const handleBreadCrumbSetter = (
 ) => {
   const existingCrumbs: Crumb[] = getCrumbs()
   const allCrumbs = currentPageName
-    ? [...existingCrumbs, {name: currentPageName, url: ''}] : existingCrumbs
+    ? [...existingCrumbs, {name: currentPageName, url: ''}]
+    : existingCrumbs
   setCrumbs(allCrumbs)
 }
 
@@ -103,6 +104,7 @@ const addTutorialActionItem = () => {
 const tutorialEnabled = () => {
   // @ts-ignore
   const env = window.ENV
+  // @ts-expect-error
   const new_user_tutorial_on_off = env?.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT?.is_enabled
   return env?.NEW_USER_TUTORIALS?.is_enabled && new_user_tutorial_on_off
 }

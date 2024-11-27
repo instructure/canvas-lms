@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -26,6 +25,7 @@ export default function select(obj: Object, props: Array<string | [string, strin
     // allows aliasing selected props by passing an array like [old_prop, new_prop]
     // for examle select(assignment, ['points', ['assignment_name', 'name']]) will copy `assignment_name` into `name`
     const [src, dest] = Array.isArray(prop) ? prop : [prop, prop]
+    // @ts-expect-error
     return Object.assign(propSet, {[dest]: obj[src]})
   }, {})
 }

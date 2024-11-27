@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -36,7 +35,7 @@ import BlueprintLock from './blueprint_lock'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getBlueprintLocked, getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
 import {getCoursePace, isNewPace} from '../../reducers/course_paces'
-import {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
+import type {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
 import {paceContextsActions} from '../../actions/pace_contexts'
 import {generateModalLauncherId} from '../../utils/utils'
@@ -106,6 +105,7 @@ export const Header = (props: HeaderProps) => {
   }, [])
 
   if (window.ENV.FEATURES.course_paces_redesign) {
+    // @ts-expect-error
     const getDurationLabel = planDays => {
       if (!planDays) return false
       let weeks
@@ -152,6 +152,7 @@ export const Header = (props: HeaderProps) => {
                   <span className="course-paces-metrics-heading">
                     <Table
                       elementRef={e => {
+                        // @ts-expect-error
                         metricsTableRef.current = e
                       }}
                       caption={I18n.t('Metrics')}
@@ -197,6 +198,7 @@ export const Header = (props: HeaderProps) => {
                                   aria-label={durationTooltipText}
                                   margin="none none none xx-small"
                                 >
+                                  {/* @ts-expect-error */}
                                   <IconInfoLine as="div" size="x-small" />
                                 </View>
                               </Tooltip>
@@ -251,6 +253,7 @@ export const Header = (props: HeaderProps) => {
               </Flex>
             </Flex.Item>
             <Flex.Item
+              // @ts-expect-error
               fontSize="0.875rem"
               textAlign="center"
               margin={props.responsiveSize !== 'small' ? '0' : 'small 0 0'}
@@ -263,6 +266,7 @@ export const Header = (props: HeaderProps) => {
                 isWithinText={false}
                 data-testid="go-to-default-pace"
                 onClick={() => {
+                  // @ts-expect-error
                   props.setSelectedPaceContext('Course', window.ENV.COURSE_ID)
                   props.setDefaultPaceContextAsSelected()
                 }}
@@ -291,6 +295,7 @@ export const Header = (props: HeaderProps) => {
             hasShadow={false}
             margin="0 0 medium"
           >
+            {/* @ts-expect-error */}
             {NEW_PACE_ALERT_MESSAGES[props.context_type]}
           </Alert>
         )}
@@ -300,6 +305,7 @@ export const Header = (props: HeaderProps) => {
           </Flex.Item>
           <Flex.Item margin="0 0 small" shouldGrow={true}>
             <Settings isBlueprintLocked={props.blueprintLocked} margin="0 0 0 small" />
+            {/* @ts-expect-error */}
             <BlueprintLock newPace={props.newPace} />
           </Flex.Item>
           <Flex.Item textAlign="end" margin="0 0 small small">
@@ -333,4 +339,5 @@ export default connect(mapStateToProps, {
   setSelectedPaceContext: actions.setSelectedPaceContext,
   setDefaultPaceContextAsSelected: paceContextsActions.setDefaultPaceContextAsSelected,
   fetchDefaultPaceContext: paceContextsActions.fetchDefaultPaceContext,
+  // @ts-expect-error
 })(Header)

@@ -128,6 +128,7 @@ const ZipFileImporter = ({
           nextLink ||
           `/api/v1/courses/${window.ENV.COURSE_ID}/folders?sort_by=position&per_page=100`,
       })
+        // @ts-expect-error
         .then((response: FetchFoldersResponse) => {
           const {json, link} = response
           const folderData = accumulatedResults.concat(json || [])

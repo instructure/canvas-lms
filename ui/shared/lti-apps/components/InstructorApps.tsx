@@ -48,6 +48,7 @@ export const InstructorApps = () => {
     isLoading,
   } = useQuery({
     queryKey: ['lti_product_info', queryParams],
+    // @ts-expect-error
     queryFn: () => fetchProductsByOrganization(queryParams, ENV.DOMAIN_ROOT_ACCOUNT_SFID),
     initialData: {
       tools: [] as Product[],
@@ -63,6 +64,7 @@ export const InstructorApps = () => {
 
   const {data: customFilterData} = useQuery({
     queryKey: ['custom_filters'],
+    // @ts-expect-error
     queryFn: () => fetchCustomFilters(window.ENV.DOMAIN_ROOT_ACCOUNT_SFID),
   })
 

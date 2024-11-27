@@ -54,14 +54,18 @@ function combineAssignmentGroupGrades(
 
     let finalGrade = bigSum(relevantGroupGrades.map(weightedPercent))
     if (fullWeight === 0) {
+      // @ts-expect-error
       finalGrade = null
     } else if (fullWeight < 100) {
+      // @ts-expect-error
       finalGrade = toNumber(weightedPercent({score: finalGrade, possible: fullWeight, weight: 100}))
     }
 
     const submissionCount = sumBy(relevantGroupGrades, 'submission_count')
     const possible = submissionCount > 0 || includeUngraded ? 100 : 0
+    // @ts-expect-error
     let score = finalGrade && round(finalGrade, 2)
+    // @ts-expect-error
     score = Number.isNaN(Number(score)) ? null : score
 
     return {score, possible}

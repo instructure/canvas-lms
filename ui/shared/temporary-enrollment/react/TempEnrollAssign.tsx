@@ -312,6 +312,7 @@ export function TempEnrollAssign(props: Props) {
             ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {account_id: ENV.ACCOUNT_ID}),
           },
         })
+        // @ts-expect-error
         setEnrollmentsByCourse(json)
       } catch (error: any) {
         showFlashError(
@@ -465,11 +466,13 @@ export function TempEnrollAssign(props: Props) {
     let success: boolean = false
     try {
       setErrorMsg('')
+      // @ts-expect-error
       const pairingPromises = []
       enrollmentProps.forEach(() => {
         pairingPromises.push(createTemporaryEnrollmentPairing(ENV.ACCOUNT_ID, stateChoice))
       })
       const temporaryEnrollmentPairings: TemporaryEnrollmentPairing[] = await Promise.all(
+        // @ts-expect-error
         pairingPromises
       )
 
@@ -566,6 +569,7 @@ export function TempEnrollAssign(props: Props) {
           <Flex.Item overflowY="visible">
             <Button
               onClick={handleGoBack}
+              // @ts-expect-error
               renderIcon={IconArrowOpenStartLine}
               {...analyticProps('Back')}
             >

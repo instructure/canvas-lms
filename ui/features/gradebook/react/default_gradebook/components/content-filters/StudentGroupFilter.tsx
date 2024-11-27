@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -29,7 +28,9 @@ const I18n = useI18nScope(
   'gradebook_default_gradebook_components_content_filters_student_group_filter'
 )
 
+// @ts-expect-error
 function normalizeStudentGroupSets(studentGroupSets) {
+  // @ts-expect-error
   return studentGroupSets.map(category => ({
     children: [...category.groups].sort(natcompare.byKey('name')),
     id: category.id,
@@ -37,6 +38,7 @@ function normalizeStudentGroupSets(studentGroupSets) {
   }))
 }
 
+// @ts-expect-error
 export default function StudentGroupFilter(props) {
   const {studentGroupSets, selectedStudentGroupId, ...filterProps} = props
 

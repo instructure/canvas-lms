@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createAction, ActionsUnion} from '../shared/types'
+import {createAction, type ActionsUnion} from '../shared/types'
 import * as Api from '../api/pace_contexts_api'
-import {
+import type {
   APIPaceContextTypes,
   OrderType,
   PaceContext,
@@ -28,8 +27,8 @@ import {
   SortableColumn,
   StoreState,
 } from '../types'
-import {ThunkAction} from 'redux-thunk'
-import {Action} from 'redux'
+import type {ThunkAction} from 'redux-thunk'
+import type {Action} from 'redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {CONTEXT_TYPE_MAP} from '../utils/utils'
 import {coursePaceActions} from './course_paces'
@@ -43,6 +42,7 @@ export interface FetchContextsActionParams {
   sortBy?: SortableColumn
   orderType?: OrderType
   contextIds?: string[]
+  // @ts-expect-error
   afterFetch?: (contexts) => void
 }
 

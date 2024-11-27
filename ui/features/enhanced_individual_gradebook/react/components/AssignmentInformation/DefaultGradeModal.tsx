@@ -73,7 +73,9 @@ export default function DefaultGradeModal({
 
   const isCheckpointed = assignmentHasCheckpoints(assignment)
 
+  // @ts-expect-error
   const getCheckpointSubmissions = submissions => {
+    // @ts-expect-error
     return submissions.flatMap(submission => submission.subAssignmentSubmissions)
   }
 

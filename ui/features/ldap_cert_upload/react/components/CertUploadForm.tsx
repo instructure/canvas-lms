@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEventHandler, useEffect, useState} from 'react'
+import React, {type MouseEventHandler, useEffect, useState} from 'react'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -96,6 +95,7 @@ export const CertUploadForm = ({inputField}: CertUploadFormProps) => {
     <div>
       <FileDrop
         accept={ACCEPTED_TYPES.join(',')}
+        // @ts-expect-error
         onDropAccepted={([file]) => {
           parseCertificate(file)
             .then(setCert)
@@ -136,6 +136,7 @@ export const CertUploadForm = ({inputField}: CertUploadFormProps) => {
                   }}
                 />
                 <br />
+                {/* @ts-expect-error */}
                 <Button renderIcon={IconTrashLine} onClick={handleCertCleared} size="small">
                   {I18n.t('Remove certificate')}
                 </Button>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -22,6 +21,7 @@ import React from 'react'
 
 const I18n = useI18nScope('modules')
 
+// @ts-expect-error
 export default function PostGradesDialogSummaryPage(props) {
   return (
     <div className="post-summary text-center">

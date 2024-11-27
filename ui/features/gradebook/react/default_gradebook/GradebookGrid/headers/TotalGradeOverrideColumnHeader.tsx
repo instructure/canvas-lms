@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -42,6 +41,7 @@ export default class TotalGradeOverrideColumnHeader extends PureComponent {
    * This is a required part of the Column Header API for preempting keydown
    * event handlers when the column header employs behavior for keydown events.
    */
+  // @ts-expect-error
   handleKeyDown(_event) {}
 
   render() {

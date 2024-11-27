@@ -43,12 +43,14 @@ const getViewOptionsButton = async () => {
 describe('PasswordComplexityConfiguration Component', () => {
   beforeAll(() => {
     if (!window.ENV) {
+      // @ts-expect-error
       window.ENV = {}
     }
     window.ENV.DOMAIN_ROOT_ACCOUNT_ID = '1'
   })
 
   afterAll(() => {
+    // @ts-expect-error
     delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
   })
 

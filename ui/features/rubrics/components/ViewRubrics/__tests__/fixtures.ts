@@ -55,6 +55,7 @@ export const RUBRICS_DATA: Rubric[] = [
     ratingOrder: 'ascending',
     freeFormCriterionComments: false,
     buttonDisplay: 'points',
+    // @ts-expect-error
     locations: [],
     workflowState: 'active',
   },
@@ -116,6 +117,7 @@ export const RUBRICS_DATA: Rubric[] = [
     ratingOrder: 'ascending',
     freeFormCriterionComments: false,
     buttonDisplay: 'points',
+    // @ts-expect-error
     locations: [],
     workflowState: 'archived',
   },
@@ -200,6 +202,7 @@ export const RUBRICS_DATA: Rubric[] = [
     ratingOrder: 'ascending',
     freeFormCriterionComments: false,
     buttonDisplay: 'points',
+    // @ts-expect-error
     locations: [],
     workflowState: 'active',
   },

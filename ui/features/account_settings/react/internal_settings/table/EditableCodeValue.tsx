@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -18,10 +17,11 @@
  */
 
 import {InPlaceEdit} from '@instructure/ui-editable'
-import React, {ChangeEvent, LegacyRef, ReactNode, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
+import type {ChangeEvent, LegacyRef, ReactNode} from 'react'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ButtonProps, IconButton} from '@instructure/ui-buttons'
+import {type ButtonProps, IconButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('internal-settings')
@@ -59,6 +59,7 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
     if (readOnly) return null
 
     return (
+      // @ts-expect-error
       <IconButton
         size="small"
         screenReaderLabel={
@@ -90,6 +91,7 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
     onBlur: () => void
     editorRef: LegacyRef<HTMLInputElement>
   }) => (
+    // @ts-expect-error
     <Text
       as="input"
       name={(props.name ? `${props.name} ` : '') + 'value'}
@@ -107,9 +109,11 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
       <InPlaceEdit
         renderViewer={renderView}
         renderEditor={renderEdit}
+        // @ts-expect-error
         renderEditButton={renderEditButton}
         readOnly={props.readonly}
         mode={mode}
+        // @ts-expect-error
         onChangeMode={setMode}
         value={editorValue}
         inline={false}

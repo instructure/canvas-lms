@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEvent, useState, useRef, useEffect} from 'react'
+import React, {type MouseEvent, useState, useRef, useEffect} from 'react'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Popover} from '@instructure/ui-popover'
 import {Button} from '@instructure/ui-buttons'
@@ -38,6 +37,7 @@ type Props = {
   onOpenTray: () => void
   dataMap: FilterDrilldownData
   filterItems: FilterDrilldownData
+  // @ts-expect-error
   changeAnnouncement: (filterAnnouncement) => void
   applyFiltersButtonRef: React.RefObject<HTMLButtonElement>
   multiselectGradebookFiltersEnabled?: boolean
@@ -101,7 +101,7 @@ const FilterDropdown = ({
     }
   }, [isRoot])
 
-  const setItemId = id => {
+  const setItemId = (id: string) => {
     setTempItemId(id)
 
     if (menuRef.current) {
@@ -109,6 +109,7 @@ const FilterDropdown = ({
     }
   }
 
+  // @ts-expect-error
   const handleTabbingOut = event => {
     // Drilldown should close when Tab is pressed
     if (isOpen && event?.keyCode === 9) {
@@ -123,6 +124,7 @@ const FilterDropdown = ({
       as="div"
       data-testid="back-button"
       onClick={() => {
+        // @ts-expect-error
         setItemId(currentObj.parentId)
       }}
     >
@@ -140,8 +142,10 @@ const FilterDropdown = ({
       <Popover
         renderTrigger={
           <Button
+            // @ts-expect-error
             elementRef={ref => (applyFiltersButtonRef.current = ref)}
             data-testid="apply-filters-button"
+            // @ts-expect-error
             renderIcon={IconFilterLine}
           >
             {I18n.t('Apply Filters')}
@@ -171,6 +175,7 @@ const FilterDropdown = ({
             {items.length > 0 && (
               <Menu.Group
                 label={I18n.t('Saved Filter Presets')}
+                // @ts-expect-error
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
                   items[updated[0]].onToggle?.()
                 }}
@@ -179,6 +184,7 @@ const FilterDropdown = ({
                 {items.map(a => {
                   return (
                     <Menu.Item key={a.id} as="div" data-testid={`${a.name}-enable-preset`}>
+                      {/* @ts-expect-error */}
                       <TruncateWithTooltip position="middle">{a.name}</TruncateWithTooltip>
                     </Menu.Item>
                   )
@@ -253,6 +259,7 @@ const FilterDropdown = ({
 
             {sortedItemGroups.length > 0 &&
               sortedItemGroups.map((itemGroup: any) => {
+                // @ts-expect-error
                 const selectedIndices2 = itemGroup.items.reduce((acc, current, index) => {
                   if (current.isSelected) {
                     return acc.concat(index)
@@ -271,6 +278,7 @@ const FilterDropdown = ({
                         return
                       }
 
+                      // @ts-expect-error
                       itemGroup.items[updated[0]].onToggle()
                     }}
                   >
@@ -306,6 +314,7 @@ const FilterDropdown = ({
                 allowMultiple={multiselectGradebookFiltersEnabled}
                 label={currentObj.name}
                 selected={selectedIndices}
+                // @ts-expect-error
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
                   if (multiselectGradebookFiltersEnabled) {
                     return

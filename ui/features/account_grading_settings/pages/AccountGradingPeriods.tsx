@@ -27,6 +27,7 @@ export function Component() {
   }
   const accountId = pathMatch.params.accountId
   const rootAccountId = ENV.DOMAIN_ROOT_ACCOUNT_ID
+  // @ts-expect-error
   const isRootAccount = ENV.IS_ROOT_ACCOUNT
 
   // Note: these env vars are required downstream in api callers used by the grading periods management page,

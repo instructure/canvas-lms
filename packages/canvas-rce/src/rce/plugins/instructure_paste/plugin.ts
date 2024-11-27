@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -51,6 +50,7 @@ const config = {
 // (We don't seem to have a way to grab an existing store)
 // So the configureStore and getSession logic gets repeated here for the
 // automatic file upload when pasting or dropping a file on the RCE
+// @ts-expect-error
 function initStore(initProps) {
   if (config.store === null) {
     config.store = configureStore(initProps)
@@ -61,6 +61,7 @@ function initStore(initProps) {
         .then(() => {
           config.session = config.store.getState().session
         })
+        // @ts-expect-error
         .catch(_err => {
           // eslint-disable-next-line no-console
           console.error('The Paste plugin failed to get canvas session data.')
@@ -170,6 +171,7 @@ tinymce.PluginManager.add(
       // Specifically implementing due to this bug in Firefox: https://bugzilla.mozilla.org/show_bug.cgi?id=1699743
       // However, there could be other issues that cause this condition so it's a nice safety net regardless
       if (isPaste && files.some(file => file.size === 0)) {
+        // @ts-expect-error
         showFlashAlert({
           message: formatMessage(
             'One or more files failed to paste. Please try uploading or dragging and dropping files.'

@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import EditUserDetails, {EditUserDetailsProps, UserDetails} from '../EditUserDetails'
+import EditUserDetails, {type EditUserDetailsProps, type UserDetails} from '../EditUserDetails'
 import {computeShortAndSortableNamesFromName} from '@canvas/user-sortable-name/react'
 
 describe('EditUserDetails', () => {

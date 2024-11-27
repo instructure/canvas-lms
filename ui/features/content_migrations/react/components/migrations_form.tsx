@@ -139,7 +139,9 @@ export const ContentMigrationsForm = ({
         path: `/api/v1/courses/${courseId}/content_migrations`,
         body: requestBody,
       })
+      // @ts-expect-error
       if (preAttachmentFile && json.pre_attachment) {
+        // @ts-expect-error
         const attachment = await completeUpload(json.pre_attachment, preAttachmentFile, {
           ignoreResult: true,
           onProgress: (response: any) => {
@@ -147,6 +149,7 @@ export const ContentMigrationsForm = ({
           },
         })
         const jsonWithAttachment: ContentMigrationItem = {
+          // @ts-expect-error
           ...json,
           attachment,
         }
@@ -165,6 +168,7 @@ export const ContentMigrationsForm = ({
     doFetchApi({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`,
     })
+      // @ts-expect-error
       .then((response: {json: Migrator[]}) => {
         // TODO: webct_scraper is not supported anymore, this should be removed from backend too.
         const filteredMigrators = response.json.filter((m: Migrator) => m.type !== 'webct_scraper')

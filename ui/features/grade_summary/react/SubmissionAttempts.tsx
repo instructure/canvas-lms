@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -25,10 +24,11 @@ import {IconDiscussionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import canvas from '@instructure/ui-themes'
-import {Attachment, SubmissionComment, MediaSource, MediaTrack} from '../../../api.d'
+import type {Attachment, SubmissionComment, MediaSource, MediaTrack} from '../../../api.d'
 import useStore from './stores'
 import {Badge} from '@instructure/ui-badge'
 import {Link} from '@instructure/ui-link'
+// @ts-expect-error
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
@@ -96,7 +96,9 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
   return (
     <>
       {comments.map((comment, i) => {
+        // @ts-expect-error
         let mediaTracks: MediaTrack[] = null
+        // @ts-expect-error
         let mediaSources: MediaSource[] = null
         const mediaObject = comment.media_object
         if (mediaObject) {
@@ -105,6 +107,7 @@ function SubmissionAttemptComments({comments}: SubmissionAttemptProps) {
             mediaSource.src = mediaSource.url
             return mediaSource
           })
+          // @ts-expect-error
           mediaTracks = mediaObject.media_tracks.map(track => {
             return {
               id: track.id,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -21,6 +20,7 @@ const hasProp = {}.hasOwnProperty
 
 export const extend = function (child: Function, parent: Function) {
   for (const key in parent) {
+    // @ts-expect-error
     if (hasProp.call(parent, key)) child[key] = parent[key]
   }
   function ctor() {
@@ -28,6 +28,7 @@ export const extend = function (child: Function, parent: Function) {
     this.constructor = child
   }
   ctor.prototype = parent.prototype
+  // @ts-expect-error
   // eslint-disable-next-line new-cap
   child.prototype = new ctor()
   // @ts-expect-error

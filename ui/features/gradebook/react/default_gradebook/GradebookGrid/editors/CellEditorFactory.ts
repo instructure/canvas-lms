@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -26,7 +25,9 @@ const editorsByColumnType = {
 }
 
 export default class CellEditorFactory {
+  // @ts-expect-error
   getEditor(column) {
+    // @ts-expect-error
     return editorsByColumnType[column.type]
   }
 }

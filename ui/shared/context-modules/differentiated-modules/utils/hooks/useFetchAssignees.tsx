@@ -57,7 +57,6 @@ const useFetchAssignees = ({
   const [hasErrors, setHasErrors] = useState(false)
   const groupCategoryRef = useRef<string | null>(null)
 
-  // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
   const shouldFetch = !ENV?.IN_PACED_COURSE
 
   const params: Record<string, string | number> = useMemo(() => {

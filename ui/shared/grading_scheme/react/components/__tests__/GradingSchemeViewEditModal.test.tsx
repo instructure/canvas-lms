@@ -29,10 +29,12 @@ jest.mock('@canvas/do-fetch-api-effect')
 
 describe('Grading Schemes View Edit Tests', () => {
   beforeEach(() => {
+    // @ts-expect-error
     doFetchApi.mockClear()
   })
 
   afterEach(() => {
+    // @ts-expect-error
     doFetchApi.mockClear()
   })
 
@@ -52,7 +54,9 @@ describe('Grading Schemes View Edit Tests', () => {
   }
 
   it('should render selected grading scheme', async () => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[0]})
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
     const {getByTestId} = renderGradingSchemesManagement()
 
@@ -62,7 +66,9 @@ describe('Grading Schemes View Edit Tests', () => {
   })
 
   it('should not disable course grading scheme buttons', async () => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[0]})
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
     const {getByTestId} = renderGradingSchemesManagement()
 
@@ -72,7 +78,9 @@ describe('Grading Schemes View Edit Tests', () => {
   })
 
   it('should disable Account grading scheme buttons when contextType is Course', async () => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[1]})
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
     const {getByTestId} = renderGradingSchemesManagement()
 
@@ -82,7 +90,9 @@ describe('Grading Schemes View Edit Tests', () => {
   })
 
   it('should not disable Account grading scheme buttons when contextType is Account', async () => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes[1]})
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
     const {getByTestId} = renderGradingSchemesManagement({contextType: 'Account'})
 

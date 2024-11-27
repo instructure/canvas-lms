@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import {Button, ButtonProps} from '@instructure/ui-buttons'
+import {Button, type ButtonProps} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -94,6 +93,7 @@ export default function Layout(props: LayoutProps) {
     </View>
   )
 
+  // @ts-expect-error
   const handlePostPolicyChanged = event => {
     props.onPostPolicyChanged({postManually: event.target.value === MANUAL_POST})
   }

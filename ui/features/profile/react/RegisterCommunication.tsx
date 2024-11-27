@@ -17,8 +17,10 @@
  */
 
 import React, {useState} from 'react'
+// @ts-expect-error
 import {useForm, Controller} from 'react-hook-form'
 import * as z from 'zod'
+// @ts-expect-error
 import {zodResolver} from '@hookform/resolvers/zod'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
@@ -117,6 +119,7 @@ const RegisterCommunication = ({
         selectedTab === Tab.EMAIL ? values.enableEmailLogin : undefined
       )
     } catch {
+      // @ts-expect-error
       focusFiled(control, selectedTab)
     }
   }
@@ -156,11 +159,13 @@ const RegisterCommunication = ({
                 <Controller
                   name="email"
                   control={control}
+                  // @ts-expect-error
                   render={({field}) => (
                     <TextInput
                       {...field}
                       width="200px"
                       renderLabel={I18n.t('Email Address')}
+                      // @ts-expect-error
                       messages={getFormErrorMessage(errors, Tab.EMAIL)}
                     />
                   )}
@@ -169,6 +174,7 @@ const RegisterCommunication = ({
                   <Controller
                     name="enableEmailLogin"
                     control={control}
+                    // @ts-expect-error
                     render={({field}) => (
                       <Checkbox
                         {...field}
@@ -194,11 +200,13 @@ const RegisterCommunication = ({
                 <Controller
                   name="sms"
                   control={control}
+                  // @ts-expect-error
                   render={({field}) => (
                     <TextInput
                       {...field}
                       width="200px"
                       renderLabel={I18n.t('Mobile Number')}
+                      // @ts-expect-error
                       messages={getFormErrorMessage(errors, Tab.SMS)}
                       onChange={event => {
                         event.target.value = event.target.value.replace(/\D/g, '')
@@ -226,11 +234,13 @@ const RegisterCommunication = ({
                 <Controller
                   name="slack"
                   control={control}
+                  // @ts-expect-error
                   render={({field}) => (
                     <TextInput
                       {...field}
                       width="200px"
                       renderLabel={I18n.t('Slack Email')}
+                      // @ts-expect-error
                       messages={getFormErrorMessage(errors, Tab.SLACK)}
                       data-testid="slack-email"
                     />

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -19,6 +18,7 @@
 
 import {isArray, each, clone} from 'lodash'
 
+// @ts-expect-error
 function flattenObjects(array, key, backward, output) {
   if (!isArray(array)) {
     array = [array]

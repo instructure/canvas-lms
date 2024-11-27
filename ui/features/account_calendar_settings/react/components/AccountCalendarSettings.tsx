@@ -178,6 +178,7 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
       method: 'PUT',
       body: accountCalendarChanges,
     })
+      // @ts-expect-error
       .then((response: UpdateAccountDataResponse) => {
         const json = response.json
         setVisibilityChanges([])

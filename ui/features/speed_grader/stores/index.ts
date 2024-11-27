@@ -19,6 +19,7 @@
 import create from 'zustand'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {RubricAssessmentSelect} from '@canvas/rubrics/react/types/rubric'
+// @ts-expect-error
 import type {RubricAssessmentUnderscore} from '../react/RubricAssessmentTrayWrapper/utils'
 
 type SpeedGraderStore = {

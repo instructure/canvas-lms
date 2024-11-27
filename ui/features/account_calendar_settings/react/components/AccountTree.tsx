@@ -84,6 +84,7 @@ export const AccountTree = ({
           ...(nextLink == null && {per_page: 100}),
         },
       })
+        // @ts-expect-error
         .then((response: FetchAccountDataResponse) => {
           const {json, link} = response
           const accountData = accumulatedResults.concat(json || [])

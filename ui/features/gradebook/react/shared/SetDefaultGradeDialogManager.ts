@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -70,6 +69,7 @@ class SetDefaultGradeDialogManager {
     }
   }
 
+  // @ts-expect-error
   async showDialog(cb) {
     if (this.isAdmin || !this.assignment.inClosedGradingPeriod) {
       const SetDefaultGradeDialog = await AsyncComponents.loadSetDefaultGradeDialog()

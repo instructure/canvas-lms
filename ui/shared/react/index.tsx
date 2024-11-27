@@ -48,7 +48,6 @@ function getTheme(highContrast: boolean, brandVariables: BrandVariables) {
       duration: string
     }
   } = {}
-  // @ts-expect-error
   if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
     transitionOverride = {
       transitions: {
@@ -82,8 +81,7 @@ export function render(
   const highContrast =
     typeof options.highContrast === 'boolean'
       ? options.highContrast
-      : // @ts-expect-error
-        Boolean(ENV.use_high_contrast)
+      : Boolean(ENV.use_high_contrast)
 
   // @ts-expect-error
   const brandVariables = options.brandVariables || window.CANVAS_ACTIVE_BRAND_VARIABLES || EMPTY_OBJ

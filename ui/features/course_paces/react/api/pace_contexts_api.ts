@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PaceContextsApiResponse} from '../types'
+import type {PaceContextsApiResponse} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {FetchContextsActionParams} from '../actions/pace_contexts'
+import type {FetchContextsActionParams} from '../actions/pace_contexts'
 
 export interface FetchContextsAPIParams extends FetchContextsActionParams {
   courseId: string
@@ -53,6 +52,7 @@ export const getPaceContexts = ({
   if (contextIds) {
     apiParams.contexts = JSON.stringify(contextIds)
   }
+  // @ts-expect-error
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/pace_contexts`,
     params: apiParams,
@@ -62,5 +62,6 @@ export const getPaceContexts = ({
 export const getDefaultPaceContext = (courseId: string) => {
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/pace_contexts?type=course`,
+    // @ts-expect-error
   }).then(({json}) => json?.pace_contexts?.[0])
 }

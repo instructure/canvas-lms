@@ -34,15 +34,18 @@ interface TranslationControlsProps {
 }
 
 const TranslationControls = (props: TranslationControlsProps) => {
+  // @ts-expect-error
   const languages = useRef(ENV?.inbox_translation_languages ?? [])
   const [language, setLanguage] = useState('English')
   const [includeTranslation, setIncludeTranslation] = useState(false)
   const {
     setMessagePosition,
     messagePosition,
+    // @ts-expect-error
     translationTargetLanguage,
     setTranslationTargetLanguage,
     translateBody,
+    // @ts-expect-error
     translateBodyWith,
     body,
     setBody,
@@ -61,6 +64,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
     return messagePosition !== null && body.includes(translationSeparator)
   }, [messagePosition, body])
 
+  // @ts-expect-error
   const handleSelect = (e, {id, value}) => {
     setLanguage(value)
     setTranslationTargetLanguage(id)
@@ -79,6 +83,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
   /**
    * Handle placing translated message in primary or secondary position
    * */
+  // @ts-expect-error
   const handleChange = isPrimary => {
     // If not already translated, translate the body.
     setMessagePosition(isPrimary ? 'primary' : 'secondary')
@@ -87,6 +92,7 @@ const TranslationControls = (props: TranslationControlsProps) => {
       return
     }
 
+    // @ts-expect-error
     setBody(prevBody => {
       let newBody = prevBody
       // Strip the signature
@@ -109,11 +115,13 @@ const TranslationControls = (props: TranslationControlsProps) => {
     })
   }
 
+  // @ts-expect-error
   const handleIncludeTranslation = shouldInclude => setIncludeTranslation(shouldInclude)
 
   useEffect(() => {
     if (!includeTranslation && translated) {
       setMessagePosition(null)
+      // @ts-expect-error
       setBody(prevBody => {
         if (props.inboxSettingsFeature && props.signature !== '') {
           prevBody = stripSignature(prevBody)
@@ -157,9 +165,11 @@ const TranslationControls = (props: TranslationControlsProps) => {
             <SimpleSelect
               renderLabel={I18n.t('Select Translation Language')}
               value={language}
+              // @ts-expect-error
               onChange={handleSelect}
               width="360px"
             >
+              {/* @ts-expect-error */}
               {languages.current.map(({id, name}) => {
                 return (
                   <SimpleSelect.Option key={id} id={id} value={name}>

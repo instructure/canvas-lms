@@ -149,6 +149,7 @@ export const fetchProductsByOrganization = async (
     url,
     'Failed to fetch products by organization'
   )
+  // @ts-expect-error
   return products
 }
 

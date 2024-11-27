@@ -40,6 +40,7 @@ export const DiscussionSummaryGenerateButton: React.FC<
       <Button
         display={props.isMobile ? 'block' : 'inline-block'}
         onClick={props.onClick}
+        // @ts-expect-error
         renderIcon={IconSyllabusLine}
         data-testid="summary-generate-button"
         disabled={!props.isEnabled}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -79,10 +78,12 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
     const results: number[] = []
     for (j = 0, len1 = ref2.length; j < len1; j++) {
       item = ref2[j]
+      // @ts-expect-error
       results.push(parseInt(stateMap[item.state || 'no'], 10))
     }
     return results
   })()
+  // @ts-expect-error
   data.state = stateList[max(states)]
   return data
 }

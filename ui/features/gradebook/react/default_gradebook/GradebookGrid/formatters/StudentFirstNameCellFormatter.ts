@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -34,6 +33,7 @@ export default class StudentFirstNameCellFormatter {
     }
   }
 
+  // @ts-expect-error
   render = (_row, _cell, _value, _columnDef, student /* dataContext */) => {
     if (student.isPlaceholder) {
       return ''

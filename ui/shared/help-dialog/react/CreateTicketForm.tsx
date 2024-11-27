@@ -49,6 +49,7 @@ function CreateTicketForm({onSubmit, onCancel}: Props) {
           $.flashMessage(I18n.t('Ticket successfully submitted.'))
           onSubmit()
         },
+        // @ts-expect-error
         error: response => {
           formRef.current?.formErrors(JSON.parse(response.responseText))
           focus()

@@ -92,6 +92,7 @@ export const generateDateDetailsPayload = (
     payload.only_visible_to_overrides = true
   }
 
+  // @ts-expect-error
   payload.assignment_overrides = overrideCards
     .map(card => {
       const isUpdatedModuleOverride = card.contextModuleId !== undefined && card.isEdited
@@ -172,6 +173,7 @@ export const generateDateDetailsPayload = (
   const masteryPathsCard = cards.find(card => card.selectedAssigneeIds.includes('mastery_paths'))
   if (masteryPathsCard !== undefined) {
     const isAlreadyMasteryPath = masteryPathsCard.defaultOptions?.[0]?.includes('Mastery Paths')
+    // @ts-expect-error
     payload.assignment_overrides.push({
       id: isAlreadyMasteryPath ? masteryPathsCard.overrideId : undefined,
       title: 'Mastery Paths',

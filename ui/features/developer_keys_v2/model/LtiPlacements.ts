@@ -125,6 +125,7 @@ export const LtiPlacements = {
 } as const
 
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>
+  // @ts-expect-error
   ({
     account_navigation: I18n.t('Account Navigation'),
     assignment_edit: I18n.t('Assignment Edit'),

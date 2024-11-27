@@ -24,8 +24,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('SpeedGraderDiscussionsNavigation')
 
 export const SpeedGraderDiscussionsNavigation = () => {
+  // @ts-expect-error
   function sendPostMessage(message) {
     const iframe = document.getElementById('speedgrader_iframe')
+    // @ts-expect-error
     const iframeDoc = iframe.contentDocument || iframe.contentWindow.document
     const discussion_iframe = iframeDoc?.getElementById('discussion_preview_iframe')
     const contentWindow = discussion_iframe?.contentWindow

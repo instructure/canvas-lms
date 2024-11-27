@@ -79,6 +79,7 @@ export const RegistrationOverlayForm = (props: {
         </Flex.Item>
         <Flex.Item>
           <Button
+            // @ts-expect-error
             renderIcon={IconResetLine}
             margin="0 0 0 small"
             onClick={() => {

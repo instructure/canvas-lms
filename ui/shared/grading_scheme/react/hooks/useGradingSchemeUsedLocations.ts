@@ -60,8 +60,10 @@ export const useGradingSchemeUsedLocations = (): {
 
         setGradingSchemeUsedLocationsStatus(ApiCallStatus.COMPLETED)
         return {
+          // @ts-expect-error
           usedLocations: result.json || [],
           isLastPage: result.link?.next === undefined,
+          // @ts-expect-error
           nextPage: result.link?.next?.url,
         }
       } catch (err) {

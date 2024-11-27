@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -21,9 +20,11 @@ import '@canvas/message-students-dialog/jquery/message_students'
 import messageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 
 const MessageStudentsWhoDialog = {
+  // @ts-expect-error
   show({assignment, students}, onClose) {
     const settings = messageStudentsWhoHelper.settings(assignment, students)
     settings.onClose = onClose
+    // @ts-expect-error
     window.messageStudents(settings)
   },
 }

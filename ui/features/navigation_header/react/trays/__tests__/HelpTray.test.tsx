@@ -70,6 +70,7 @@ describe('HelpTray', () => {
     if (originalWindowEnv) {
       Object.defineProperty(window, 'ENV', originalWindowEnv)
     } else {
+      // @ts-expect-error
       delete window.ENV
     }
     queryClient.removeQueries()

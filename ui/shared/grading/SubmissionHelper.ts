@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -25,12 +24,14 @@ import type {
   CamelizedSubmissionWithOriginalityReport,
 } from './grading.d'
 
+// @ts-expect-error
 export function isGraded(submission) {
   // TODO: remove when we no longer camelize data in Gradebook
   const workflow_state = submission.workflow_state || submission.workflowState
   return (submission.score != null && workflow_state === 'graded') || submission.excused
 }
 
+// @ts-expect-error
 export function isPostable(submission) {
   // TODO: remove when we no longer camelize data in Gradebook
   const posted_at = submission.posted_at || submission.postedAt
@@ -38,6 +39,7 @@ export function isPostable(submission) {
   return !posted_at && (isGraded(submission) || !!has_postable_comments || !!submission.sticker)
 }
 
+// @ts-expect-error
 export function isHideable(submission) {
   // TODO: remove when we no longer camelize data in Gradebook
   const posted_at = submission.posted_at || submission.postedAt
@@ -56,6 +58,7 @@ export function isHideable(submission) {
 //   - "error" reports (reports that had a problem running)
 //   - "pending" reports (reports still being processed)
 //   - scored reports, with higher scores (indicating more likely plagiarism) first
+// @ts-expect-error
 export function extractSimilarityInfo(submission) {
   const sub = camelizeProperties(submission) as CamelizedSubmissionWithOriginalityReport
   let plagiarismData
@@ -84,6 +87,7 @@ export function extractSimilarityInfo(submission) {
   return {type, entries}
 }
 
+// @ts-expect-error
 function getSimilarityEntries(submission, plagiarismData) {
   const entries: SimilarityEntry[] = []
 
@@ -91,6 +95,7 @@ function getSimilarityEntries(submission, plagiarismData) {
     // A submission with attachments may have a plagiarism report for each
     // attachment. Also, an attachment's data might also be found in an
     // "attachment" object nested inside the actual attachment object we got.
+    // @ts-expect-error
     submission.attachments.forEach(attachment => {
       const id = attachment.attachment?.id || attachment.id
       const idKey = `attachment_${id}`

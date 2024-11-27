@@ -141,7 +141,6 @@ const MigrationFileInput = ({
               screenReaderLabel={I18n.t('Loading completion')}
               valueNow={fileUploadProgress || 0}
               valueMax={100}
-              // @ts-ignore
               shouldAnimate={true}
             />
             <span>{fileUploadProgress}%</span>

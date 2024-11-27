@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -35,8 +34,10 @@ const componentOverrides = {
 
 const I18n = useI18nScope('pill')
 const ellipsis = () => I18n.t('…')
+// @ts-expect-error
 const truncate = text => (text.length > 14 ? text.slice(0, 13) + ellipsis() : text)
 
+// @ts-expect-error
 function renderText(text, truncatedText, textColor) {
   const isTruncated = text.length > truncatedText.length
   if (isTruncated) {
@@ -64,6 +65,7 @@ function renderIcon(selected: boolean) {
   }
 }
 
+// @ts-expect-error
 const Pill = ({studentId, observerId = null, text, onClick, selected = false}) => {
   const textColor = selected ? 'primary' : 'secondary'
   const truncatedText = truncate(text)
