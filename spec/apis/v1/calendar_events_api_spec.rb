@@ -5259,6 +5259,114 @@ describe CalendarEventsApiController, type: :request do
         expect(response.body).to include("assignment description")
       end
     end
+
+    context "discussion with checkpoints" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        due_date_reply_to_topic = 1.day.from_now
+        due_date_reply_to_entry = 3.days.from_now
+        @topic_title = "Discussion with Checkpoints"
+        @required_replies = 2
+        @reply_to_topic, @reply_to_entry, @topic = graded_discussion_topic_with_checkpoints(
+          title: @topic_title,
+          context: @course,
+          due_date_reply_to_topic:,
+          due_date_reply_to_entry:,
+          reply_to_entry_required_count: @required_replies
+        )
+        everyone_override = { type: "everyone", due_at: nil }
+        student_override = { type: "override", set_type: "ADHOC", student_ids: [@student.id], due_at: nil }
+        reply_to_topic_override_due_date = 5.days.from_now
+        reply_to_entry_override_due_date = 10.days.from_now
+        Checkpoints::DiscussionCheckpointUpdaterService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [
+            everyone_override.merge({ due_at: due_date_reply_to_topic }),
+            student_override.merge({ due_at: reply_to_topic_override_due_date })
+          ]
+        )
+        @reply_to_topic_override = AssignmentOverride.last
+        Checkpoints::DiscussionCheckpointUpdaterService.call(
+          discussion_topic: @topic,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [
+            everyone_override.merge({ due_at: due_date_reply_to_entry }),
+            student_override.merge({ due_at: reply_to_entry_override_due_date })
+          ],
+          replies_required: @required_replies
+        )
+        @reply_to_entry_override = AssignmentOverride.last
+        common_events = [
+          "calendar-event-#{@event.id}",
+          "assignment-override-#{@override.id}",
+          "assignment-override-#{@reply_to_topic_override.id}",
+          "assignment-override-#{@reply_to_entry_override.id}",
+        ]
+        @student_events = common_events + [
+          "calendar-event-#{@appointment.id}"
+        ]
+        @teacher_events = common_events + [
+          "calendar-event-#{@appointment_event.id}",
+          "calendar-event-#{@appointment_event2.id}",
+          "sub-assignment-#{@reply_to_topic.id}",
+          "sub-assignment-#{@reply_to_entry.id}"
+        ]
+      end
+
+      def find_due_date(response, date)
+        response.body.match(/DTSTART:\s*#{date.utc.iso8601.gsub(/[-:]/, "").gsub(/\d\dZ$/, "00Z")}/)
+      end
+
+      def find_events(response)
+        response.body.scan(/UID:\s*event-([^\n]*)/).flatten.map(&:strip)
+      end
+
+      it "includes discussion checkpoints in calendar feed for the teacher" do
+        raw_api_call(:get, "/feeds/calendars/#{@teacher.feed_code}.ics", {
+                       controller: "calendar_events_api", action: "public_feed", format: "ics", feed_code: @teacher.feed_code
+                     })
+        expect(response).to be_successful
+        expect(find_events(response)).to match_array @teacher_events
+      end
+
+      it "includes discussion checkpoints in calendar feed for the student" do
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {
+                       controller: "calendar_events_api", action: "public_feed", format: "ics", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(find_events(response)).to match_array @student_events
+      end
+
+      it "includes correct overriden due dates for the student" do
+        raw_api_call(:get, "/feeds/calendars/#{@student.feed_code}.ics", {
+                       controller: "calendar_events_api", action: "public_feed", format: "ics", feed_code: @student.feed_code
+                     })
+        expect(response).to be_successful
+        expect(find_due_date(response, @override.due_at)).not_to be_nil
+        expect(find_due_date(response, @reply_to_topic_override.due_at)).not_to be_nil
+        expect(find_due_date(response, @reply_to_entry_override.due_at)).not_to be_nil
+      end
+
+      it "includes correct discussion checkpoint titles" do
+        raw_api_call(:get, "/feeds/calendars/#{@teacher.feed_code}.ics", {
+                       controller: "calendar_events_api", action: "public_feed", format: "ics", feed_code: @teacher.feed_code
+                     })
+        expect(response).to be_successful
+        expect(response.body.match(/SUMMARY:#{@topic_title} Reply to Topic/)).not_to be_nil
+        expect(response.body.match(/SUMMARY:#{@topic_title} Reply to Topic \(1 student\)/)).not_to be_nil
+        expect(response.body.match(/SUMMARY:#{@topic_title} Required Replies \(#{@required_replies}\)/)).not_to be_nil
+        expect(response.body.match(/SUMMARY:#{@topic_title} Required Replies \(#{@required_replies}\) \(1 student\)/)).not_to be_nil
+      end
+
+      it "does not include the parent assignment" do
+        raw_api_call(:get, "/feeds/calendars/#{@teacher.feed_code}.ics", {
+                       controller: "calendar_events_api", action: "public_feed", format: "ics", feed_code: @teacher.feed_code
+                     })
+        expect(response).to be_successful
+        expect(find_events(response)).not_to include("assignment-#{@topic.assignment.id}")
+      end
+    end
   end
 
   context "save_selected_contexts" do

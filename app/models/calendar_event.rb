@@ -762,7 +762,7 @@ class CalendarEvent < ActiveRecord::Base
         event.dtend = nil
       end
 
-      event.summary = @event.title
+      event.summary = @event.is_a?(SubAssignment) ? @event.title_with_required_replies : @event.title
 
       if @event.description && include_description
         html = api_user_content(@event.description, @event.context, nil, preloaded_attachments)
@@ -805,9 +805,15 @@ class CalendarEvent < ActiveRecord::Base
         url_context = url_context.account
       end
 
+      tag_name_and_id = if @event.is_a?(SubAssignment)
+                          "assignment_#{@event.parent_assignment_id}"
+                        else
+                          "#{tag_name}_#{@event.id}"
+                        end
+
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
-      event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
+      event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name_and_id}"
       event.uid =         "event-#{tag_name.tr("_", "-")}-#{@event.id}"
       event.sequence =    0
 
@@ -815,9 +821,10 @@ class CalendarEvent < ActiveRecord::Base
         @event.applied_overrides.try(:each) do |override|
           next unless override.due_at_overridden
 
+          title = @event.is_a?(SubAssignment) ? @event.title_with_required_replies : @event.title
           tag_name = override.class.name.underscore
           event.uid       = "event-#{tag_name.tr("_", "-")}-#{override.id}"
-          event.summary   = "#{@event.title} (#{override.title})"
+          event.summary   = "#{title} (#{override.title})"
           # TODO: event.url
         end
       end

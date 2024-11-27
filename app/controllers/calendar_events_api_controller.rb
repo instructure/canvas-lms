@@ -1214,6 +1214,16 @@ class CalendarEventsApiController < ApplicationController
       GuardRail.activate(:secondary) do
         @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
+
+        if discussion_checkpoints_enabled?
+          sub_assignments = assignment_scope(@current_user, sub_assignment: true).paginate(per_page: 1000, max: 1000)
+
+          if sub_assignments.present?
+            sub_assignments_and_overrides = apply_assignment_overrides(sub_assignments, @current_user, sub_assignment: true)
+            @events.concat sub_assignments_and_overrides
+          end
+        end
+
         @events.concat calendar_event_scope(@current_user, &:events_without_child_events).paginate(per_page: 1000, max: 1000)
 
         # Add in any appointment groups this user can manage and someone has reserved
@@ -1259,6 +1269,20 @@ class CalendarEventsApiController < ApplicationController
       GuardRail.activate(:secondary) do
         @contexts.each do |context|
           @assignments = context.assignments.active.to_a if context.respond_to?(:assignments)
+
+          if discussion_checkpoints_enabled? && @assignments.present?
+            # replace parent assignments with their sub_assignments
+            parent_assignment_ids = @assignments.extract!(&:has_sub_assignments?).map(&:id)
+
+            if parent_assignment_ids.present?
+              sub_assignments = SubAssignment
+                                .active
+                                .where(parent_assignment_id: parent_assignment_ids)
+                                .to_a
+              @events.concat sub_assignments
+            end
+          end
+
           # no overrides to apply without a current user
           @events.concat context.calendar_events.active.to_a
           @events.concat @assignments || []
