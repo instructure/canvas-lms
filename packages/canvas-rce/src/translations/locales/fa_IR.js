@@ -67,6 +67,7 @@ const locale = {
   },
   "close_d634289d": { "message": "بستن" },
   "collaborations_5c56c15f": { "message": "همکاری ها" },
+  "color_a363e1b0": { "message": "رنگ" },
   "computer_1d7dfa6f": { "message": "کامپیوتر" },
   "content_1440204b": { "message": "محتوا" },
   "content_type_2cf90d95": { "message": "نوع محتوا" },

@@ -180,6 +180,7 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Összecsukás az elrejtéshez { types }"
   },
+  "color_a363e1b0": { "message": "Szín" },
   "color_picker_6b359edf": { "message": "Színválasztó" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Színválasztó ({ colorName } kiválasztva)"
