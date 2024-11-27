@@ -538,4 +538,25 @@ describe "assignments show page assign to" do
       end
     end
   end
+
+  context "teacher/observer permissions" do
+    before :once do
+      @teacher = teacher_in_course(active_all: true).user
+      @course.enroll_user(@teacher, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student1 })
+      @course.enroll_user(@teacher, "ObserverEnrollment", { allow_multiple_enrollments: true, associated_user_id: @student2 })
+    end
+
+    before do
+      @assignment1.due_at = 1.week.from_now
+      @assignment1.save!
+      @assignment1.assignment_overrides.create!(set_type: "ADHOC")
+      @assignment1.assignment_overrides.first.assignment_override_students.create!(user: @student)
+      user_session(@teacher)
+    end
+
+    it "shows assignment page for teachers when they are also observers in the course" do
+      get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+      expect(element_exists?(AssignmentPage.assign_to_button_selector)).to be_truthy
+    end
+  end
 end
