@@ -71,6 +71,7 @@ const locale = {
   },
   "close_d634289d": { "message": "Закрити" },
   "collaborations_5c56c15f": { "message": "Сумісна робота" },
+  "color_a363e1b0": { "message": "Колір" },
   "computer_1d7dfa6f": { "message": "Комп''ютер" },
   "content_1440204b": { "message": "Вміст" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {

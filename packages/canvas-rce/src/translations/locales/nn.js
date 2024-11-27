@@ -169,6 +169,7 @@ const locale = {
   "clubs_suit_c1ffedff": { "message": "Kløver (Korttype)" },
   "collaborations_5c56c15f": { "message": "Samarbeid" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Skjul og lukk { types }" },
+  "color_a363e1b0": { "message": "Farge" },
   "color_picker_6b359edf": { "message": "Fargeveljar" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Fargeveljar ({ colorName } vald)"

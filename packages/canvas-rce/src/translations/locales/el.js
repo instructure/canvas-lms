@@ -53,6 +53,7 @@ const locale = {
   },
   "close_d634289d": { "message": "Κλείσιμο" },
   "collaborations_5c56c15f": { "message": "Συνεργασίες" },
+  "color_a363e1b0": { "message": "Χρώμα" },
   "content_1440204b": { "message": "Περιεχόμενο" },
   "content_type_2cf90d95": { "message": "Τύπος Περιεχομένου" },
   "copy_9748f9f": { "message": "Αντιγραφή" },
