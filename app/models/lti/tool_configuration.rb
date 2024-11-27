@@ -87,7 +87,7 @@ module Lti
     def transform_settings
       internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(self[:settings]).except(:vendor_extensions)
 
-      allowed_keys = internal_config.keys & internal_lti_configuration.keys
+      allowed_keys = internal_config.keys & Schemas::InternalLtiConfiguration.allowed_base_properties
       allowed_keys.each do |key|
         self[key] = internal_config[key]
       end
