@@ -1,6 +1,7 @@
 {
   "name": "Content Page 2",
   "description": "Columns with text",
+  "tags": ["generalcontent"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",

@@ -1,6 +1,7 @@
 {
   "name": "Instructor Information",
   "description": "",
+  "tags": ["resource"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",

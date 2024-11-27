@@ -1,6 +1,7 @@
 {
   "name": "Course Home - Elementary",
   "description": "Home page with images, navigation, teacher's note, and footer",
+  "tags": ["home"],
   "workflow_state": "active",
   "editor_version": "0.3",
   "node_tree": {

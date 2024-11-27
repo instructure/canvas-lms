@@ -1,6 +1,7 @@
 {
   "name": "Module Overview 1",
   "description": "",
+  "tags": ["moduleoverview"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",

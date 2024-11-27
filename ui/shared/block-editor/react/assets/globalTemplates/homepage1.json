@@ -1,6 +1,7 @@
 {
   "name": "Home Page 1",
   "description": "",
+  "tags": ["home"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
