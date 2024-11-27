@@ -9911,7 +9911,6 @@ en-GB:
       tab_hidden_if_disabled_k5: "Tab disabled, won't appear in subject navigation"
       tabs: 
         alerts: Alerts
-        apps: "Apps (New)"
         details: "Course details"
         feature_options: "Feature Options"
         feature_previews: "Feature Previews"
