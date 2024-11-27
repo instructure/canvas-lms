@@ -33,6 +33,7 @@ const UNPUBLISHED = 'unpublished'
 
 export const CourseListItemContent = ({course}: {course: Course}) => {
   const sectionNames = (course.sections || []).map(section => section.name)
+  // @ts-expect-error
   const showSections = ENV.SETTINGS?.show_sections_in_course_tray
   const sectionDetails =
     showSections && sectionNames.length > 0 ? sectionNames.sort().join(', ') : null

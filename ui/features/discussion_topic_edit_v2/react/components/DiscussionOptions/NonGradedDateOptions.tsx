@@ -78,6 +78,7 @@ export const NonGradedDateOptions = ({
         value={availableFrom}
         onChange={(_event, newAvailableFrom = '') => {
           if (newAvailableFrom === '') {
+            // @ts-expect-error
             newAvailableFrom = null
           }
           validateAvailability(
@@ -86,6 +87,7 @@ export const NonGradedDateOptions = ({
             isGraded,
             setAvailabilityValidationMessages
           )
+          // @ts-expect-error
           setAvailableFrom(newAvailableFrom)
         }}
         datePlaceholder={I18n.t('Select Date')}
@@ -121,6 +123,7 @@ export const NonGradedDateOptions = ({
         value={availableUntil}
         onChange={(_event, newAvailableUntil = '') => {
           if (newAvailableUntil === '') {
+            // @ts-expect-error
             newAvailableUntil = null
           }
           validateAvailability(
@@ -129,6 +132,7 @@ export const NonGradedDateOptions = ({
             isGraded,
             setAvailabilityValidationMessages
           )
+          // @ts-expect-error
           setAvailableUntil(newAvailableUntil)
         }}
         datePlaceholder={I18n.t('Select Date')}

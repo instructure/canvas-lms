@@ -371,6 +371,7 @@ function parseModuleItemData(element: Element, isRequirement: boolean) {
     activeRequirementNode = Array.from(element.querySelectorAll('.requirement_type')).filter(
       node => window.getComputedStyle(node).display !== 'none'
     )[0]
+    // @ts-expect-error
     data.type = requirementTypeMap[activeRequirementNode.classList[1] as Requirement['type']]
   }
 
@@ -379,10 +380,13 @@ function parseModuleItemData(element: Element, isRequirement: boolean) {
     data.resource === 'quiz' ||
     data.resource === 'discussion'
   ) {
+    // @ts-expect-error
     data.graded = element.querySelector('.graded')?.textContent === '1'
     const pointsPossibleString = element.querySelector('.points_possible_display')?.textContent
+    // @ts-expect-error
     data.pointsPossible = pointsPossibleString ? pointsPossibleString.split(/\s/)[0] : null
     if (isRequirement) {
+      // @ts-expect-error
       data.minimumScore = activeRequirementNode.querySelector('.min_score')?.textContent || '0'
     }
   }

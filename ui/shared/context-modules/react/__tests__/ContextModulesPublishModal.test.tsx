@@ -41,10 +41,12 @@ const defaultProps = {
 }
 
 beforeAll(() => {
+  // @ts-expect-error
   doFetchApi.mockResolvedValue({response: {ok: true}, json: {completed: []}})
 })
 
 beforeEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 

@@ -43,6 +43,7 @@ export const PlacementsConfirmationWrapper = ({
         p => !overlayState.registration.disabledPlacements?.includes(p)
       )}
       courseNavigationDefaultHidden={
+        // @ts-expect-error
         overlayState.registration.placements?.find(p => p.type === 'course_navigation')?.default ===
           'disabled' ?? false
       }

@@ -169,6 +169,7 @@ describe('AddImageModal', () => {
       screen.getByRole('textbox', {name: /file url/i}),
       'http://example.com/image.jpg'
     )
+    // @ts-expect-error
     await user.click(screen.getByText('Submit').closest('button'))
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', '')
@@ -191,6 +192,7 @@ describe('AddImageModal', () => {
       {target: {value: 'Some alt text'}}
     )
 
+    // @ts-expect-error
     await user.click(screen.getByText('Submit').closest('button'))
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith('http://example.com/image.jpg', 'Some alt text')

@@ -65,6 +65,7 @@ $('#forgot_password_form').formSubmit({
     // Focus on the close button of the alert we just put up, per a11y
     $('#flash_message_holder button.close_link').focus()
   },
+  // @ts-expect-error
   error(_data) {
     $(this).loadingImage('remove')
   },

@@ -31,6 +31,7 @@ ready(async () => {
     return
   }
 
+  // @ts-expect-error
   const graphqlModuleItemsNodes = await getAssignments(ENV.course_id.toString())
 
   if (!graphqlModuleItemsNodes || graphqlModuleItemsNodes.length === 0) return

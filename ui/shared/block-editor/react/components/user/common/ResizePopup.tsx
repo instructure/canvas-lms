@@ -26,7 +26,8 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {IconResize} from '../../../assets/internal-icons'
 import {getAspectRatio} from '../../../utils'
-import {ImageSizeVariant} from '../blocks/ImageBlock/types'
+// @ts-expect-error
+import type {ImageSizeVariant} from '../blocks/ImageBlock/types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 

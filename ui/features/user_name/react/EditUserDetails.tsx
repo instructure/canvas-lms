@@ -24,9 +24,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import * as z from 'zod'
-// @ts-expect-error
 import {Controller, useForm} from 'react-hook-form'
-// @ts-expect-error
 import {zodResolver} from '@hookform/resolvers/zod'
 import {TextInput} from '@instructure/ui-text-input'
 import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
@@ -137,7 +135,6 @@ const EditUserDetails = ({
           <Controller
             name="name"
             control={control}
-            // @ts-expect-error
             render={({field}) => (
               <TextInput
                 {...field}
@@ -162,7 +159,6 @@ const EditUserDetails = ({
           <Controller
             name="short_name"
             control={control}
-            // @ts-expect-error
             render={({field}) => (
               <TextInput
                 {...field}
@@ -174,7 +170,6 @@ const EditUserDetails = ({
           <Controller
             name="sortable_name"
             control={control}
-            // @ts-expect-error
             render={({field}) => (
               <TextInput
                 {...field}
@@ -188,7 +183,6 @@ const EditUserDetails = ({
               <Controller
                 name="time_zone"
                 control={control}
-                // @ts-expect-error
                 render={({field}) => (
                   <SimpleSelect
                     {...field}
@@ -207,7 +201,6 @@ const EditUserDetails = ({
               <Controller
                 name="email"
                 control={control}
-                // @ts-expect-error
                 render={({field}) => (
                   <TextInput
                     {...field}

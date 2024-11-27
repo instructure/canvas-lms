@@ -99,9 +99,11 @@ export default function DisplayLayoutButtons({
     </svg>`
 
   const selectGrid = () => {
+    // @ts-expect-error
     setDisplayType('grid')
   }
   const selectRows = () => {
+    // @ts-expect-error
     setDisplayType('rows')
   }
 

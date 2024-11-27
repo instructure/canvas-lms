@@ -82,6 +82,7 @@ const fetchAssignment = async (
     path,
   })
 
+  // @ts-expect-error
   return json || null
 }
 
@@ -97,6 +98,7 @@ const fetchSubmission = async (
     path,
   })
 
+  // @ts-expect-error
   return json || null
 }
 
@@ -202,6 +204,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
 
   const [shouldAnnounceCurrentGradeChange, setShouldAnnounceCurrentGradeChange] = useState(false)
   const {setOnSuccess} = useContext(AlertManagerContext)
+  // @ts-expect-error
   const [lastSubmission, setLastSubmission] = useState<SubAssignmentSubmission>(null)
 
   const {data: assignment, isLoading: isLoadingAssignment} = useQuery({
@@ -234,6 +237,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
 
     const score = Number(lastSubmission.grade)
     const {points_possible: pointsPossible} = getAssignmentWithPropsFromCheckpoints(
+      // @ts-expect-error
       assignment,
       lastSubmission
     )
@@ -339,6 +343,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
       })}
       <Flex margin="none none small" gap="small" alignItems="start">
         <Flex.Item>
+          {/* @ts-expect-error */}
           <AssessmentGradeInput
             assignment={assignment}
             showAlert={() => {}}

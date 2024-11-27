@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {SyntheticEvent, useState} from 'react'
+import React, {type SyntheticEvent, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -27,7 +27,7 @@ import {useQuery} from '@canvas/query'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import {useScope} from '@canvas/i18n'
 
-import {ResponseSection, fetchSections} from './api'
+import {type ResponseSection, fetchSections} from './api'
 
 const I18n = useScope('roster_section_input')
 

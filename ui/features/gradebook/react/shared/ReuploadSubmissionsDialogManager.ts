@@ -18,7 +18,6 @@
 
 import type JQuery from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
-// @ts-expect-error
 import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submissions_form.handlebars'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'

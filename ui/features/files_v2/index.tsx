@@ -24,7 +24,6 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {createRoot} from 'react-dom/client'
 
 // TODO fix ENV typing
-// @ts-expect-error
 const contextAssetString = window.ENV.context_asset_string
 const router = createBrowserRouter(
   [

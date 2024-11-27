@@ -26,14 +26,13 @@ import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {coursePaceTimezone} from '../api/backend_serializer'
 
-import {BlackoutDate} from '../types'
+import type {BlackoutDate} from '../types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 type CanvasDateInputMessageType = unknown
 
 const I18n = useI18nScope('course_paces_app')
 
-// @ts-expect-error
 const dateTimeFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
   month: 'numeric',
   day: 'numeric',
@@ -41,6 +40,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
   timeZone: coursePaceTimezone,
 })
 
+// @ts-expect-error
 function formatDate(date): string {
   return dateTimeFormatter.format(date)
 }

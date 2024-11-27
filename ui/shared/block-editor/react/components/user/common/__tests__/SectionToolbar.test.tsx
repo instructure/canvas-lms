@@ -22,7 +22,7 @@ import {render} from '@testing-library/react'
 import {useNode} from '@craftjs/core'
 import {SectionToolbar} from '../SectionToolbar'
 
-let props: Record<string, any>
+const props: Record<string, any> = {} // Initialize props
 
 const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
   callback(props)
