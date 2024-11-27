@@ -299,6 +299,35 @@ describe CalendarEvent do
         ics = @event.to_ics
         expect(ics).to include("SUMMARY:#{@event.title} [#{@course.course_code}]")
       end
+
+      context "discussion with checkpoints" do
+        before :once do
+          course_model
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+          @required_replies = 2
+          @reply_to_topic, @reply_to_entry, @topic = graded_discussion_topic_with_checkpoints(
+            context: @course,
+            reply_to_entry_required_count: @required_replies
+          )
+        end
+
+        def url_for_checkpoint(checkpoint)
+          asset_string = checkpoint.context.asset_string
+          start_at = checkpoint.due_at
+          tag_name_id = "assignment_#{checkpoint.parent_assignment_id}"
+          "https://localhost/calendar?include_contexts=#{asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name_id}"
+        end
+
+        it "generates correct titles for discussion checkpoints" do
+          expect(@reply_to_topic.to_ics).to include("SUMMARY:#{@topic.title} Reply to Topic")
+          expect(@reply_to_entry.to_ics).to include("SUMMARY:#{@topic.title} Required Replies (#{@required_replies})")
+        end
+
+        it "generates correct urls for discussion checkpoints" do
+          expect(@reply_to_topic.to_ics.match(/URI([\s\S]*?)END/)).not_to be_nil
+          expect(@reply_to_entry.to_ics.match(/URI([\s\S]*?)END/)).not_to be_nil
+        end
+      end
     end
   end
 

@@ -140,7 +140,8 @@ module Factories
     topic_opts = {}
     topic_opts.merge!(opts)
     topic_opts[:title] = opts[:title] || "graded discussion with checkpoints"
-    topic_opts.reject! { |k| [:due_date_reply_to_topic, :due_date_reply_to_entry].include?(k) }
+    # options below are not valid for the discussion_topic_model
+    topic_opts.reject! { |k| %i[due_date_reply_to_topic due_date_reply_to_entry points_possible_reply_to_topic points_possible_reply_to_entry].include?(k) }
     @topic = discussion_topic_model(topic_opts)
     @assignment = @topic.context.assignments.build(submission_types: "discussion_topic", title: @topic.title)
     @assignment.infer_times
