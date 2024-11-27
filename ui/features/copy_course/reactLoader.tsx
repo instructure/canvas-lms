@@ -17,13 +17,39 @@
  */
 
 import React from 'react'
+// @ts-ignore
 import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
-import App from './react/app'
+import App from './react/App'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+
+declare const ENV: GlobalEnv & {
+  TIME_ZONE?: string
+}
 
 ready(() => {
   const root = document.getElementById('instui_course_copy')
   if (root) {
-    ReactDOM.createRoot(root).render(<App />)
+    const courseId: string = ENV.current_context?.id || ''
+    const accountId: string = ENV.DOMAIN_ROOT_ACCOUNT_ID
+    const canImportAsNewQuizzes: boolean = ENV.NEW_QUIZZES_MIGRATION || false
+    const timeZone: string | undefined = ENV.TIME_ZONE
+
+    if (!courseId) {
+      throw Error('Course id is not provided!')
+    }
+
+    if (!accountId) {
+      throw Error('Account id is not provided!')
+    }
+
+    ReactDOM.createRoot(root).render(
+      <App
+        courseId={courseId}
+        accountId={accountId}
+        timeZone={timeZone}
+        canImportAsNewQuizzes={canImportAsNewQuizzes}
+      />
+    )
   }
 })

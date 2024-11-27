@@ -23,23 +23,25 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const formatDate = (date: Date) => {
-  return datetimeString(date, {timezone: ENV.TIMEZONE})
-}
-
 export const ConfiguredDateInput = ({
   selectedDate,
   placeholder,
   renderScreenReaderLabelText,
   renderLabelText,
   onSelectedDateChange,
+  timeZone,
 }: {
-  selectedDate?: string
+  selectedDate?: string | null
   placeholder?: string
   renderScreenReaderLabelText: string
   renderLabelText: string
   onSelectedDateChange: (d: Date | null) => void
+  timeZone?: string
 }) => {
+  const formatDate = (date: Date) => {
+    return datetimeString(date, {timezone: timeZone})
+  }
+
   return (
     <>
       <Text weight="bold">{renderLabelText}</Text>
