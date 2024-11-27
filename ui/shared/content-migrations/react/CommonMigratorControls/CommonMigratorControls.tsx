@@ -80,7 +80,9 @@ const generateNewQuizzesLabel = () => {
               <Text>{bodyText}</Text>
               <br />
               <Text>{helpText}</Text>
-              <Link href={guideLink}>{guideText}</Link>
+              <Link href={guideLink} target="_blank" rel="noopener noreferrer">
+                {guideText}
+              </Link>
               <Text>.</Text>
             </>
           }
