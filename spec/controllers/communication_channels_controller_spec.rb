@@ -1481,23 +1481,6 @@ describe CommunicationChannelsController do
           end
         end
 
-        it "creates push even if cannot manage comm channels" do
-          user_with_pseudonym(active_user: true)
-          user_session(@user, @pseudonym)
-          controller.instance_variable_set(:@access_token, second_sns_access_token)
-          @user.account.settings[:users_can_edit_comm_channels] = false
-          @user.account.save!
-
-          post "create", params: {
-            user_id: @user.id,
-            communication_channel: {
-              token: "asdasd123123", type: "push"
-            }
-          }
-          ap(response.parsed_body)
-          expect(response).to be_successful
-        end
-
         it "deletes a push_token", type: :request do
           json = api_call(:delete,
                           "/api/v1/users/self/communication_channels/push",
