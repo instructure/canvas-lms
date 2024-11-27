@@ -46,6 +46,7 @@ import {
   getCoursePaceItemPosition,
   isStudentPace,
   getCoursePaceItemChanges,
+  getSelectedDaysToSkip,
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
@@ -73,6 +74,7 @@ interface StoreProps {
   readonly coursePace: CoursePace
   readonly blueprintLocked: boolean | undefined
   readonly excludeWeekends: boolean
+  readonly selectedDaysToSkip: string[]
   readonly coursePaceItemPosition: number
   readonly blackoutDates: BlackoutDate[]
   readonly isSyncing: boolean
@@ -120,6 +122,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       nextState.duration !== this.state.duration ||
       nextState.hovering !== this.state.hovering ||
       nextProps.coursePace.exclude_weekends !== this.props.coursePace.exclude_weekends ||
+      nextProps.coursePace.selected_days_to_skip !== this.props.coursePace.selected_days_to_skip ||
       nextProps.coursePace.context_type !== this.props.coursePace.context_type ||
       (nextProps.coursePace.context_type === this.props.coursePace.context_type &&
         nextProps.coursePace.context_id !== this.props.coursePace.context_id) ||
@@ -146,6 +149,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       this.props.dueDate,
       newDueDate,
       this.props.excludeWeekends,
+      this.props.selectedDaysToSkip,
       this.props.blackoutDates,
       false
     )
@@ -378,6 +382,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
   return {
     coursePace,
     excludeWeekends: getExcludeWeekends(state),
+    selectedDaysToSkip: getSelectedDaysToSkip(state),
     blueprintLocked: getBlueprintLocked(state),
     coursePaceItemPosition: getCoursePaceItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),

@@ -206,6 +206,10 @@ module CoursePacesPageObject
     "//span[@data-testid = 'skip-weekends-toggle']"
   end
 
+  def skip_selected_days_xpath_selector
+    "[data-testid= 'skip-selected-days']"
+  end
+
   def skip_weekends_checkbox_selector
     "[data-testid='skip-weekends-toggle']"
   end
@@ -540,6 +544,10 @@ module CoursePacesPageObject
     fxpath(skip_weekends_checkbox_xpath_selector)
   end
 
+  def show_skip_selected_days
+    f(skip_selected_days_xpath_selector)
+  end
+
   def student_course_pace(student_name)
     fj(student_course_pace_selector(student_name))
   end
@@ -742,6 +750,10 @@ module CoursePacesPageObject
 
   def click_weekends_checkbox
     skip_weekends_checkbox.click
+  end
+
+  def click_show_skip_selected_days
+    show_skip_selected_days.click
   end
 
   #------------------------- Redesign Elements -----------------------

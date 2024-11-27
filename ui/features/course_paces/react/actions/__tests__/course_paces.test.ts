@@ -243,7 +243,7 @@ describe('Course paces actions', () => {
       expect(fetchMock.called(COMPRESS_API, 'POST')).toBe(true)
     }
 
-    it('Updates pace and manages loading state. course_paces_skip_selected_days = false', async () => {
+    it('Updates pace and manages loading state.course_paces_skip_selected_days = false', async () => {
       await testCompressDates(false, PRIMARY_PACE, {
         blackout_dates: [
           {
@@ -273,7 +273,7 @@ describe('Course paces actions', () => {
       })
     })
 
-    it('Updates pace and manages loading state. course_paces_skip_selected_days = true', async () => {
+    it('Updates pace and manages loading state.course_paces_skip_selected_days = true', async () => {
       await testCompressDates(true, PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED, {
         blackout_dates: [
           {

@@ -21,24 +21,23 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconSettingsLine} from '@instructure/ui-icons'
 import {uid} from '@instructure/uid'
 import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
-import type {CoursePace, ResponsiveSizes, StoreState} from '../../../types'
+import type {CoursePace, StoreState, ResponsiveSizes} from '../../../types'
 import type {BlackoutDate} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
-import {getCoursePace, getExcludeWeekends} from '../../../reducers/course_paces'
+import {getCoursePace} from '../../../reducers/course_paces'
 import {coursePaceActions} from '../../../actions/course_paces'
 import {actions as uiActions} from '../../../actions/ui'
 import {actions as blackoutDateActions} from '../../../shared/actions/blackout_dates'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
-import {getResponsiveSize, getSyncing} from '../../../reducers/ui'
+import {getSyncing, getResponsiveSize} from '../../../reducers/ui'
 import type {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
+import SettingsMenu from './SettingsMenu'
 
 import type {ButtonProps} from '@instructure/ui-buttons'
 
@@ -50,7 +49,6 @@ const I18n = useI18nScope('course_paces_settings')
 const {Item: MenuItem} = Menu as any
 interface StoreProps {
   readonly blackoutDates: BlackoutDate[]
-  readonly excludeWeekends: boolean
   readonly coursePace: CoursePace
   readonly isSyncing: boolean
   readonly responsiveSize: ResponsiveSizes
@@ -58,6 +56,7 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly toggleExcludeWeekends: typeof coursePaceActions.toggleExcludeWeekends
+  readonly toggleSelectedDaysToSkip: typeof coursePaceActions.toggleSelectedDaysToSkip
   readonly updateBlackoutDates: typeof blackoutDateActions.updateBlackoutDates
 }
 
@@ -118,27 +117,6 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     return error
   }
 
-  menuButton = () => {
-    if (window.ENV.FEATURES.course_paces_redesign && this.props.responsiveSize !== 'small') {
-      return (
-        <Button
-          data-testid="course-pace-settings"
-          margin={this.props.margin}
-          // @ts-expect-error
-          renderIcon={IconSettingsLine}
-        >
-          {I18n.t('Settings')}
-        </Button>
-      )
-    } else {
-      return (
-        <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
-          <IconSettingsLine />
-        </IconButton>
-      )
-    }
-  }
-
   renderManageBlackoutDates = () => {
     if (
       !window.ENV.FEATURES.course_paces_redesign ||
@@ -189,30 +167,24 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
             onSave={this.handleSaveBlackoutDates}
             onCancel={this.closeBlackoutDatesModal}
           />
-          <Menu
-            trigger={this.menuButton()}
-            placement={this.menuPlacement()}
-            show={this.state.showSettingsPopover}
-            onToggle={newState =>
+
+          <SettingsMenu
+            isSyncing={this.props.isSyncing}
+            responsiveSize={this.props.responsiveSize}
+            margin={this.props.margin}
+            menuPlacement={this.menuPlacement}
+            coursePace={this.props.coursePace}
+            showSettingsPopover={this.state.showSettingsPopover}
+            showBlackoutDatesModal={this.showBlackoutDatesModal}
+            toggleShowSettingsPopover={newState =>
               this.setState({
                 showSettingsPopover: newState,
               })
             }
-            disabled={this.props.isBlueprintLocked}
-            shouldHideOnSelect={false}
-            withArrow={false}
-          >
-            <MenuItem
-              type="checkbox"
-              selected={this.props.excludeWeekends}
-              onSelect={this.props.toggleExcludeWeekends}
-              disabled={this.props.isSyncing}
-              data-testid="skip-weekends-toggle"
-            >
-              {I18n.t('Skip Weekends')}
-            </MenuItem>
-            {this.renderManageBlackoutDates()}
-          </Menu>
+            isBlueprintLocked={this.props.isBlueprintLocked}
+            toggleExcludeWeekends={this.props.toggleExcludeWeekends}
+            toggleSelectedDaysToSkip={this.props.toggleSelectedDaysToSkip}
+          />
         </Tooltip>
       </div>
     )
@@ -221,20 +193,20 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    responsiveSize: getResponsiveSize(state),
     blackoutDates: getBlackoutDates(state),
     // @ts-expect-error
     course: getCourse(state),
     courseId: getCourse(state).id,
-    excludeWeekends: getExcludeWeekends(state),
     coursePace: getCoursePace(state),
     isSyncing: getSyncing(state),
+    responsiveSize: getResponsiveSize(state),
   }
 }
 
 export default connect(mapStateToProps, {
+  toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends,
+  toggleSelectedDaysToSkip: coursePaceActions.toggleSelectedDaysToSkip,
   loadLatestPaceByContext: coursePaceActions.loadLatestPaceByContext,
   showLoadingOverlay: uiActions.showLoadingOverlay,
-  toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends,
   updateBlackoutDates: blackoutDateActions.updateBlackoutDates,
 })(Settings)
