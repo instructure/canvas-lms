@@ -52,6 +52,7 @@ const nameToSection = (name: string) => {
     case 'About':
       return <AboutSection />
     case 'Knowledge Check':
+      // @ts-expect-error
       return <KnowledgeCheckSection />
     case 'Announcement':
       return <AnnouncementSection />

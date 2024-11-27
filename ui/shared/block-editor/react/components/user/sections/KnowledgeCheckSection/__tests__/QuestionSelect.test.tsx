@@ -36,6 +36,7 @@ describe('QuestionSelect', () => {
   })
 
   it('calls onSelect when a QuestionToggle is clicked', async () => {
+    // @ts-expect-error
     render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
     const toggle = screen.getByText(testQuestions[0].entry.title)
     fireEvent.click(toggle)
@@ -43,6 +44,7 @@ describe('QuestionSelect', () => {
   })
 
   it('renders the correct question titles', () => {
+    // @ts-expect-error
     render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
     testQuestions.forEach(question => {
       expect(screen.getByText(question.entry.title)).toBeInTheDocument()
@@ -50,6 +52,7 @@ describe('QuestionSelect', () => {
   })
 
   it('filters questions based on search input', () => {
+    // @ts-expect-error
     render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
     const input = screen.getByPlaceholderText('Search questions...')
     fireEvent.change(input, {target: {value: 'test'}})

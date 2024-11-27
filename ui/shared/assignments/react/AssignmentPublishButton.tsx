@@ -147,6 +147,7 @@ const AssignmentPublishButton = ({
       }
       withArrow={false}
       trigger={
+        // @ts-expect-error
         <Button
           elementRef={buttonRefCallback}
           renderIcon={assignmentPublished ? IconPublishSolid : IconNoLine}

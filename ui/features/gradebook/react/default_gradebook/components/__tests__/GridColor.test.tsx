@@ -112,10 +112,15 @@ describe('GridColor', () => {
     expect(rules.includes(defaultColors.green)).toBe(true)
     expect(rules.includes(defaultColors.orange)).toBe(true)
     expect(rules.includes(defaultColors.yellow)).toBe(true)
+    // @ts-expect-error
     expect(rules.includes(darken(defaultColors.blue, 5))).toBe(true)
+    // @ts-expect-error
     expect(rules.includes(darken(defaultColors.salmon, 5))).toBe(true)
+    // @ts-expect-error
     expect(rules.includes(darken(defaultColors.green, 5))).toBe(true)
+    // @ts-expect-error
     expect(rules.includes(darken(defaultColors.orange, 5))).toBe(true)
+    // @ts-expect-error
     expect(rules.includes(darken(defaultColors.yellow, 5))).toBe(true)
   })
 

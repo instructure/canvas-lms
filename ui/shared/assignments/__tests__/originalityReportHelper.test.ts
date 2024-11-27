@@ -68,6 +68,7 @@ describe('originalityReportSubmissionKey', () => {
         id: 1,
       },
     })
+    // @ts-expect-error
     expect(originalityReportSubmissionKey(gqlSubmission)).toEqual(
       'submission_1_2011-10-05T14:48:00Z'
     )
@@ -226,6 +227,7 @@ describe('getOriginalityData', () => {
         submissionType: 'online_text_entry',
       },
     })
+    // @ts-expect-error
     expect(getOriginalityData(gqlSubmission, 0)).toEqual({
       score: 99,
       state: 'acceptable',

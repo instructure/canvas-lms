@@ -17,6 +17,7 @@
  */
 
 import {Container} from './Container'
+// @ts-expect-error
 import {type ContainerProps, type ContainerLayout} from './types'
 
 export {Container, type ContainerProps, type ContainerLayout}

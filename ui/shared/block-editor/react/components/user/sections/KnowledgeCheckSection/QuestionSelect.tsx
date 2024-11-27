@@ -90,6 +90,7 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
 
       {filteredQuestions.map(question => (
         <View as="div" margin="x-small" key={question.id}>
+          {/* @ts-expect-error */}
           <QuestionToggle question={question} onSelect={onSelect} />
         </View>
       ))}

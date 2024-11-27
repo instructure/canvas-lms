@@ -75,6 +75,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
           }
         }
       } else if (kbnav) {
+        // @ts-expect-error
         kbnav.key(e, actions, query, selectedNodeId)
       }
     },

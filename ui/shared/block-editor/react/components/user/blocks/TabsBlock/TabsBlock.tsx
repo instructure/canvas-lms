@@ -85,6 +85,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   )
 
   const handleTabTitleChange = useCallback(
+    // @ts-expect-error
     e => {
       setProp((props: TabsBlockProps) => {
         if (!props.tabs) return
@@ -103,6 +104,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         e.preventDefault()
         e.stopPropagation()
         setEditable(false)
+        // @ts-expect-error
         document.getElementById(`tab-${tabs[activeTabIndex].id}`)?.focus()
       } else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.stopPropagation()

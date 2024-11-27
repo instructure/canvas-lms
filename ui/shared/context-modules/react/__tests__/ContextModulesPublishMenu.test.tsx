@@ -41,11 +41,13 @@ const defaultProps = {
 
 describe('ContextModulesPublishMenu', () => {
   beforeEach(() => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({response: {ok: true}, json: [], link: null})
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    // @ts-expect-error
     doFetchApi.mockReset()
     document.body.innerHTML = ''
   })
@@ -64,6 +66,7 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('renders a spinner when publish is in-flight', () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           id: 1234,
@@ -78,6 +81,7 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('updates all the modules when ready', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           id: 1234,
@@ -93,6 +97,7 @@ describe('ContextModulesPublishMenu', () => {
 
     describe('progress', () => {
       it('renders a screenreader message with progress starts', async () => {
+        // @ts-expect-error
         doFetchApi.mockResolvedValueOnce({
           json: {
             id: '17',
@@ -110,6 +115,7 @@ describe('ContextModulesPublishMenu', () => {
       })
 
       it('renders a screenreader message with progress updates', async () => {
+        // @ts-expect-error
         doFetchApi.mockResolvedValueOnce({
           json: {
             id: '17',
@@ -127,6 +133,7 @@ describe('ContextModulesPublishMenu', () => {
       })
 
       it('renders a screenreader message when progress completes', async () => {
+        // @ts-expect-error
         doFetchApi.mockResolvedValueOnce({
           json: {
             id: '17',
@@ -146,6 +153,7 @@ describe('ContextModulesPublishMenu', () => {
       })
 
       it('renders message when publishing was canceled', async () => {
+        // @ts-expect-error
         doFetchApi.mockResolvedValueOnce({
           json: {
             id: '17',
@@ -247,6 +255,7 @@ describe('ContextModulesPublishMenu', () => {
 
   describe('error handling', () => {
     it('shows alert on successful publish', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           progress: {
@@ -256,6 +265,7 @@ describe('ContextModulesPublishMenu', () => {
           },
         },
       })
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           id: '3533',
@@ -263,6 +273,7 @@ describe('ContextModulesPublishMenu', () => {
           url: '/api/v1/progress/3533',
         },
       })
+      // @ts-expect-error
       doFetchApi.mockResolvedValue({response: {ok: true}, json: [], link: null})
 
       const {getByRole, getByText, getAllByText} = render(
@@ -279,6 +290,7 @@ describe('ContextModulesPublishMenu', () => {
 
     it('shows alert on failed publish', async () => {
       const whoops = new Error('whoops')
+      // @ts-expect-error
       doFetchApi.mockRejectedValueOnce(whoops)
 
       const {getByRole, getByText, getAllByText} = render(
@@ -296,6 +308,7 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('shows alert on failed poll for progress', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           progress: {
@@ -305,6 +318,7 @@ describe('ContextModulesPublishMenu', () => {
           },
         },
       })
+      // @ts-expect-error
       doFetchApi.mockRejectedValueOnce(new Error('whoops'))
 
       const {getByRole, getByText, getAllByText} = render(
@@ -326,6 +340,7 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('shows alert when failing to update results', async () => {
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           progress: {
@@ -335,6 +350,7 @@ describe('ContextModulesPublishMenu', () => {
           },
         },
       })
+      // @ts-expect-error
       doFetchApi.mockResolvedValueOnce({
         json: {
           id: '3533',
@@ -342,6 +358,7 @@ describe('ContextModulesPublishMenu', () => {
           url: '/api/v1/progress/3533',
         },
       })
+      // @ts-expect-error
       doFetchApi.mockRejectedValue(new Error('whoops'))
 
       const {getByRole, getByText, getAllByText} = render(

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import CourseActivityDetails, {CourseActivityDetailsProps} from '../CourseActivityDetails'
+import CourseActivityDetails, {type CourseActivityDetailsProps} from '../CourseActivityDetails'
 import {dateString, timeString} from '@canvas/datetime/date-functions'
 
 describe('CourseActivityDetails', () => {

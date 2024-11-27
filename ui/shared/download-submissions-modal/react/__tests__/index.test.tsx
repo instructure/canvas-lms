@@ -32,10 +32,12 @@ const setUp = (propOverrides = {}) => {
     breakpoints: {},
     ...propOverrides,
   }
+  // @ts-expect-error
   return render(<DownloadSubmissionModal {...props} />)
 }
 
 beforeEach(() => {
+  // @ts-expect-error
   doFetchApi.mockResolvedValue({
     json: {
       attachment: {
@@ -46,6 +48,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
@@ -72,10 +75,12 @@ describe('DownloadSubmissionModal', () => {
 
   describe('error while downloading', () => {
     beforeEach(() => {
+      // @ts-expect-error
       doFetchApi.mockRejectedValue(new Error('error'))
     })
 
     afterEach(() => {
+      // @ts-expect-error
       doFetchApi.mockClear()
     })
 

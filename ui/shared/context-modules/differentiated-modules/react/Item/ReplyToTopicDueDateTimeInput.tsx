@@ -49,11 +49,13 @@ export function ReplyToTopicDueDateTimeInput({
   const key = 'reply_to_topic_due_at'
   const handleClear = useCallback(() => setReplyToTopicDueDate(null), [setReplyToTopicDueDate])
   const dateInputRef = useCallback(
+    // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
   const timeInputRef = useCallback(
+    // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []

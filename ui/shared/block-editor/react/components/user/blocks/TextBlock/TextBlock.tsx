@@ -47,6 +47,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
   const [editable, setEditable] = useState(true)
 
   const handleChange = useCallback(
+    // @ts-expect-error
     e => {
       let html = e.target.value
       if (!isAParagraph(html)) {

@@ -26,10 +26,8 @@ import {raw} from '@instructure/html-escape'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-// @ts-expect-error
 import {zodResolver} from '@hookform/resolvers/zod'
 import * as z from 'zod'
-// @ts-expect-error
 import {Controller, useForm} from 'react-hook-form'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 
@@ -127,7 +125,6 @@ const ConfirmCommunicationChannel = ({
           <Controller
             name="code"
             control={control}
-            // @ts-expect-error
             render={({field}) => (
               <TextInput
                 {...field}

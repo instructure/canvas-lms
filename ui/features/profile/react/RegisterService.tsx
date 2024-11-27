@@ -24,11 +24,9 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-// @ts-expect-error
 import {Controller, useForm, type Control} from 'react-hook-form'
 import * as z from 'zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
-// @ts-expect-error
 import {zodResolver} from '@hookform/resolvers/zod'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -74,7 +72,6 @@ export const serviceConfigByName: Record<
       <Controller
         name="username"
         control={control}
-        // @ts-expect-error
         render={({field, formState: {errors}}) => (
           <TextInput
             {...field}
@@ -126,7 +123,6 @@ export const serviceConfigByName: Record<
         <Controller
           name="username"
           control={control}
-          // @ts-expect-error
           render={({field, formState: {errors}}) => (
             <TextInput
               {...field}
@@ -138,7 +134,6 @@ export const serviceConfigByName: Record<
         <Controller
           name="password"
           control={control}
-          // @ts-expect-error
           render={({field, formState: {errors}}) => (
             <TextInput
               {...field}

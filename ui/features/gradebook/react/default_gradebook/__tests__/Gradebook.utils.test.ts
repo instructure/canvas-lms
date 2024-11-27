@@ -698,7 +698,6 @@ describe('filterStudentBySectionFn', () => {
 
     it('filteredStudents include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is true', () => {
       modifiedStudents.push(modifiedStudent2)
-      // @ts-expect-error
       ENV.GRADEBOOK_OPTIONS = {multiselect_gradebook_filters_enabled: true}
       const appliedFilters: Filter[] = [
         {
@@ -722,7 +721,6 @@ describe('filterStudentBySectionFn', () => {
 
     it('filteredStudents does not include all students when appliedFilters includes multiple sections when multiselect_gradebook_filters_enabled is false', () => {
       modifiedStudents.push(modifiedStudent2)
-      // @ts-expect-error
       ENV.GRADEBOOK_OPTIONS = {multiselect_gradebook_filters_enabled: false}
       const appliedFilters: Filter[] = [
         {
@@ -746,7 +744,6 @@ describe('filterStudentBySectionFn', () => {
   })
 
   describe('filter start and end date pill display', () => {
-    // @ts-expect-error
     ENV.TIMEZONE = 'Asia/Tokyo'
 
     const startFilter: Filter = {
@@ -776,7 +773,6 @@ describe('filterStudentBySectionFn', () => {
 })
 
 describe('formatGradingPeriodTitleForDisplay', () => {
-  // @ts-expect-error
   ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: true}
   const gp: CamelizedGradingPeriod = {
     id: '1',
@@ -801,7 +797,6 @@ describe('formatGradingPeriodTitleForDisplay', () => {
 
   // TODO: remove "with the feature flag" from the test description when the feature flag is removed
   it('returns the grading period title with the start, end, and close dates with the feature flag', () => {
-    // @ts-expect-error
     ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: true}
     const result = formatGradingPeriodTitleForDisplay(gp)
     expect(result).toEqual('GP1: 1/1/21 - 1/31/21 | 2/1/21')
@@ -809,7 +804,6 @@ describe('formatGradingPeriodTitleForDisplay', () => {
 
   // TODO: remove this test when we remove the feature flag
   it('returns only the grading period title without the feature flag', () => {
-    // @ts-expect-error
     ENV.GRADEBOOK_OPTIONS = {grading_periods_filter_dates_enabled: false}
     const result = formatGradingPeriodTitleForDisplay(gp)
     expect(result).toEqual('GP1')

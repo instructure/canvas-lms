@@ -50,6 +50,7 @@ const TabsBlockToolbar = () => {
   }, [setProp, tabs])
 
   const handleSelectVariant = useCallback(
+    // @ts-expect-error
     (e, value) => {
       setProp((prps: TabsBlockProps) => {
         prps.variant = value
