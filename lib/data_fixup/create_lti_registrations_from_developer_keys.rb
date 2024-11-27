@@ -21,19 +21,26 @@ module DataFixup
   module CreateLtiRegistrationsFromDeveloperKeys
     def self.run
       DeveloperKey.where(is_lti_key: true, lti_registration: nil).preload(:tool_configuration, :ims_registration).find_each do |developer_key|
+        next if (developer_key.account_id || 0) > Shard::IDS_PER_SHARD
+
         lti_registration = ::Lti::Registration.create!(
           {
             admin_nickname: developer_key.name,
             account_id: developer_key.account_id.presence || Account.site_admin.global_id,
             internal_service: developer_key.internal_service,
             name: developer_key.tool_configuration.configuration["title"],
-            manual_configuration: developer_key.referenced_tool_configuration,
             ims_registration: developer_key.ims_registration, # can be nil
             skip_lti_sync: true,
           }
         )
 
-        developer_key.update!(lti_registration:, skip_lti_sync: true)
+        # including these models in the create params above causes these problems:
+        # 1. DeveloperKey has an after_update that will try to update the Lti::Registration,
+        # which is not necessary.
+        # 2. any DeveloperKeys or ToolConfigurations with invalid data (which absolutely exist
+        # in production) won't save the association with the registration if Rails handles the save.
+        developer_key.update_column(:lti_registration_id, lti_registration.id)
+        developer_key.referenced_tool_configuration.update_column(:lti_registration_id, lti_registration.id)
       rescue => e
         Sentry.with_scope do |scope|
           scope.set_tags(developer_key_id: developer_key.global_id)
