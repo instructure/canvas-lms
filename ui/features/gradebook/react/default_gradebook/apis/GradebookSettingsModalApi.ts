@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from '@canvas/axios'
 import {camelizeProperties, underscoreProperties} from '@canvas/convert-case'
-import type {LatePolicyCamelized, LatePolicy} from '../gradebook.d'
+import type {LatePolicyCamelized, LatePolicy, CourseSettingsType} from '../gradebook.d'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const DEFAULT_LATE_POLICY_DATA: LatePolicyCamelized = {
   lateSubmissionDeductionEnabled: false,
@@ -43,40 +43,42 @@ function underscoreLatePolicyData(latePolicyData: Partial<LatePolicyCamelized>) 
 }
 
 export function fetchLatePolicy(courseId: string) {
-  const url = `/api/v1/courses/${courseId}/late_policy`
-  return axios
-    .get<{
-      late_policy: LatePolicy
-    }>(url)
-    .then(response => ({data: camelizeLatePolicyResponseData(response.data)}))
+  return doFetchApi<{late_policy: LatePolicy}>({
+    path: `/api/v1/courses/${courseId}/late_policy`,
+    method: 'GET',
+  })
+    .then(response => {
+      if (response.json === undefined) {
+        throw new Error('Response JSON is undefined')
+      }
+
+      return {data: camelizeLatePolicyResponseData(response.json)}
+    })
     .catch(error => {
       // if we get a 404 then we know the course does not
       // currently have a late policy set up
       if (error.response?.status === 404) {
-        // eslint-disable-next-line promise/no-return-wrap
-        return Promise.resolve({data: {latePolicy: DEFAULT_LATE_POLICY_DATA}})
-      } else {
-        // eslint-disable-next-line promise/no-return-wrap
-        return Promise.reject(error)
+        return {data: {latePolicy: DEFAULT_LATE_POLICY_DATA}}
       }
+
+      throw error
     })
 }
 
 export function createLatePolicy(courseId: string, latePolicyData: Partial<LatePolicyCamelized>) {
-  const url = `/api/v1/courses/${courseId}/late_policy`
-  const late_policy = underscoreLatePolicyData(latePolicyData)
-  const data = {late_policy}
-  return axios
-    .post<{
-      late_policy: LatePolicy
-    }>(url, data)
-    .then(response => ({data: camelizeLatePolicyResponseData(response.data)}))
+  return doFetchApi({
+    path: `/api/v1/courses/${courseId}/late_policy`,
+    method: 'POST',
+    body: {late_policy: underscoreLatePolicyData(latePolicyData)},
+  })
 }
 
 export function updateLatePolicy(courseId: string, latePolicyData: Partial<LatePolicyCamelized>) {
-  const url = `/api/v1/courses/${courseId}/late_policy`
-  const data = {late_policy: underscoreLatePolicyData(latePolicyData)}
-  return axios.patch(url, data)
+  return doFetchApi({
+    path: `/api/v1/courses/${courseId}/late_policy`,
+    method: 'PATCH',
+    body: {late_policy: underscoreLatePolicyData(latePolicyData)},
+  })
 }
 
 export function updateCourseSettings(
@@ -85,8 +87,15 @@ export function updateCourseSettings(
     allowFinalGradeOverride: boolean
   }
 ) {
-  const url = `/api/v1/courses/${courseId}/settings`
-  return axios.put(url, underscoreProperties(settings)).then(response => ({
-    data: camelizeProperties<{allowFinalGradeOverride: boolean}>(response.data),
-  }))
+  return doFetchApi<CourseSettingsType>({
+    path: `/api/v1/courses/${courseId}/settings`,
+    method: 'PUT',
+    body: underscoreProperties(settings),
+  }).then(response => {
+    if (response.json === undefined) {
+      throw new Error('Response JSON is undefined')
+    }
+
+    return {data: camelizeProperties<{allowFinalGradeOverride: boolean}>(response.json)}
+  })
 }

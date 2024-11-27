@@ -361,6 +361,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                   <Grid.Col width="auto">
                     <NumberInput
                       allowStringValue={true}
+                      data-testid="missing-submission-grade"
                       id="missing-submission-grade"
                       // @ts-expect-error
                       locale={this.props.locale}
