@@ -21,6 +21,8 @@ import {Portal} from '@instructure/ui-portal'
 import TopNav, {type ITopNavProps} from './TopNav'
 import {QueryProvider} from '@canvas/query'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
+import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const getMountPoint = (): HTMLElement | null => document.getElementById('react-instui-topnav')
 
@@ -41,7 +43,8 @@ const TopNavPortal: React.FC<ITopNavProps> = props => {
 export const initializeTopNavPortal = (props?: ITopNavProps): void => {
   const mountPoint = getMountPoint()
   if (mountPoint) {
-    ReactDOM.render(<TopNavPortal {...props} />, mountPoint)
+    const root = createRoot(mountPoint)
+    root.render(<TopNavPortal {...props} />)
   }
 }
 

@@ -145,6 +145,17 @@ const withDefaults = (Component: React.FC<ITopNavProps>) => {
 }
 
 const TopNavPortalWithDefaults = withDefaults(TopNavPortal)
+
+export const addCrumbs = (newCrumbs: Crumb[], oldCrumbs?: Crumb[]): Crumb[] => {
+  // @ts-ignore
+  const crumbs: Crumb[] = oldCrumbs || window.ENV.breadcrumbs || []
+  newCrumbs.forEach(crumb => {
+    if (!crumbs.some(c => c.name === crumb.name)) {
+      crumbs.push(crumb)
+    }
+  })
+  return crumbs
+}
 export const initializeTopNavPortalWithDefaults = (props?: WithProps): void => {
   const mountPoint = getMountPoint()
   if (mountPoint) {
