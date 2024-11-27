@@ -1,6 +1,7 @@
 {
   "name": "Content Page",
   "description": "Content page with video",
+  "tags": ["generalcontent"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",

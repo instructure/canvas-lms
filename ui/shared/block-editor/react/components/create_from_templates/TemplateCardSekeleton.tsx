@@ -38,15 +38,18 @@ export default function TemplateCardSkeleton({
 }) {
   return (
     <View
+      data-testid="template-card-skeleton"
       as="div"
-      className={`block-template-preview-card ${template.id === 'blank_page' ? 'blank-card' : ''}`}
+      className={`block-template-preview-card ${inLayout} ${
+        template.id === 'blank_page' ? 'blank-card' : ''
+      }`}
       display="flex"
       position="relative"
-      height={inLayout === 'grid' ? '241px' : '40vh'}
       shadow="above"
       tabIndex={0}
       style={{backgroundImage: template?.thumbnail && `url(${template.thumbnail})`}}
-      width={inLayout === 'grid' ? '341px' : 'calc(50% - 2.25rem)'}
+      aria-label={I18n.t('%{name} template', {name: template.name})}
+      aria-describedby={template.description ? `${template.id}-description` : undefined}
     >
       {template.id === 'blank_page' && <div className="curl" />}
       <Flex alignItems="center" height="100%" justifyItems="center" width="100%">
@@ -65,6 +68,11 @@ export default function TemplateCardSkeleton({
           </Button>
         )}
       </Flex>
+      {template.description && (
+        <div id={`${template.id}-description`} style={{position: 'absolute', left: '-9999px'}}>
+          {template.description}
+        </div>
+      )}
     </View>
   )
 }

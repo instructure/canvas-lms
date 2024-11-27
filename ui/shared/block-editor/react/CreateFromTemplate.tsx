@@ -16,22 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
-import {Button} from '@instructure/ui-buttons'
+import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {BlockTemplate, TemplateNodeTree} from './types'
-import {IconArrowStartLine} from '@instructure/ui-icons'
+import {IconArrowStartLine, IconSearchLine, IconXLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
+import {Pill} from '@instructure/ui-pill'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {TextInput} from '@instructure/ui-text-input'
+import {View} from '@instructure/ui-view'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {getGlobalPageTemplates} from '@canvas/block-editor/react/assets/globalTemplates'
-import TemplateCardSkeleton from './components/create_from_templates/TemplateCardSekelton'
+import TemplateCardSkeleton from './components/create_from_templates/TemplateCardSekeleton'
 import QuickLook from './components/create_from_templates/QuickLook'
-import DisplayLayoutButtons from '@canvas/block-editor/react/components/create_from_templates/DisplayLayoutButtons'
+import DisplayLayoutButtons, {
+  type DisplayType,
+} from './components/create_from_templates/DisplayLayoutButtons'
+import {TagSelect, AvailableTags} from './components/create_from_templates/TagSelect'
 
 const I18n = useI18nScope('block-editor')
 
@@ -40,7 +47,7 @@ declare const ENV: GlobalEnv & {WIKI_PAGE: object}
 export default function CreateFromTemplate(props: {course_id: string}) {
   const {actions} = useEditor()
   const [isOpen, setIsOpen] = useState<boolean>(!ENV.WIKI_PAGE)
-  const [displayType, setDisplayType] = useState<'grid' | 'rows'>('grid')
+  const [displayType, setDisplayType] = useState<DisplayType>('grid')
   const [quickLookTemplate, setQuickLookTemplate] = useState<BlockTemplate | undefined>(undefined)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
   const [blankPageTemplate, setBlankPageTemplate] = useState<BlockTemplate>(() => {
@@ -49,6 +56,10 @@ export default function CreateFromTemplate(props: {course_id: string}) {
   const close = () => {
     setIsOpen(false)
   }
+  const [searchString, setSearchString] = useState<string>('')
+  const [selectedTags, setSelectedTags] = useState<string[]>(Object.keys(AvailableTags))
+  const [foundTemplateIds, setFoundTemplateIds] = useState<string[]>([])
+  const [interaction, setInteraction] = useState<'enabled' | 'disabled'>('disabled')
 
   const loadTemplateOnRoot = (node_tree: TemplateNodeTree) => {
     actions.deserialize(JSON.stringify(node_tree.nodes))
@@ -62,12 +73,83 @@ export default function CreateFromTemplate(props: {course_id: string}) {
           const blankPage = templates.splice(idx, 1)[0]
           setBlankPageTemplate(blankPage)
           setBlockTemplates(templates)
+          setFoundTemplateIds(templates.map(template => template.id))
+          setInteraction('enabled')
         })
         .catch((err: Error) => {
           showFlashError(I18n.t('Cannot get block custom templates'))(err)
         })
     }
   }, [isOpen])
+
+  const filterTemplates = useCallback(
+    (search: string, tags: string[]) => {
+      const lcval = search.toLowerCase()
+      const searchIds = new Set(
+        blockTemplates
+          .filter(
+            template =>
+              lcval.length < 3 ||
+              template.name.toLowerCase().includes(lcval) ||
+              template.description?.toLowerCase().includes(lcval)
+          )
+          .map(template => template.id)
+      )
+      const tagIds = new Set(
+        blockTemplates
+          .filter(template => {
+            return tags.some(tag => {
+              return template.tags?.includes(tag)
+            })
+          })
+          .map(template => template.id)
+      )
+      const foundIds =
+        typeof Set.prototype.intersection === 'function'
+          ? Array.from(searchIds.intersection(tagIds))
+          : [...searchIds].filter(x => tagIds.has(x))
+
+      setFoundTemplateIds(foundIds)
+    },
+    [blockTemplates]
+  )
+
+  useEffect(() => {
+    filterTemplates(searchString, selectedTags)
+  }, [filterTemplates, searchString, selectedTags])
+
+  const handleSearchChange = useCallback(
+    (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
+      setSearchString(value)
+    },
+    []
+  )
+
+  const handleClearAllFilters = useCallback(() => {
+    setSelectedTags(Object.keys(AvailableTags))
+  }, [])
+
+  const handleTagsChange = useCallback((tags: string[]) => {
+    setSelectedTags(tags)
+  }, [])
+
+  const handleRemovePill = useCallback(
+    (tag: string) => {
+      setSelectedTags(selectedTags.filter(t => t !== tag))
+    },
+    [selectedTags]
+  )
+
+  const renderClearSearch = () => {
+    return (
+      <CondensedButton
+        renderIcon={<IconXLine title={I18n.t('Clear search string')} />}
+        onClick={() => {
+          setSearchString('')
+        }}
+      />
+    )
+  }
 
   return (
     <Modal
@@ -106,7 +188,45 @@ export default function CreateFromTemplate(props: {course_id: string}) {
             {I18n.t('Back to Pages')}
           </Button>
         </div>
-        {/* @ts-expect-error */}
+        <Flex as="div" margin="large 0" gap="small">
+          <Flex.Item shouldGrow={true}>
+            <TextInput
+              data-testid="template-search"
+              renderBeforeInput={<IconSearchLine />}
+              renderAfterInput={renderClearSearch()}
+              renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}
+              interaction={interaction}
+              placeholder="Search"
+              value={searchString}
+              onChange={handleSearchChange}
+            />
+          </Flex.Item>
+          <TagSelect
+            onChange={handleTagsChange}
+            selectedTags={selectedTags}
+            interaction={interaction}
+          />
+        </Flex>
+        <Flex margin="large 0" justifyItems="space-between" gap="small">
+          <Flex>
+            <CondensedButton onClick={handleClearAllFilters} interaction={interaction}>
+              {I18n.t('Clear All Filters')}
+            </CondensedButton>
+            <View as="div" margin="0 0 0 small">
+              {selectedTags.sort().map(tag => (
+                <CondensedButton
+                  onClick={() => handleRemovePill(tag)}
+                  key={tag}
+                  interaction={interaction}
+                >
+                  <Pill key={tag} margin="0 x-small 0 0" renderIcon={<IconXLine />}>
+                    {AvailableTags[tag]}
+                  </Pill>
+                </CondensedButton>
+              ))}
+            </View>
+          </Flex>
+        </Flex>
         <DisplayLayoutButtons displayType={displayType} setDisplayType={setDisplayType} />
       </Modal.Header>
       <Modal.Body>
@@ -121,24 +241,28 @@ export default function CreateFromTemplate(props: {course_id: string}) {
               close()
             }}
           />
-          {blockTemplates.map(blockTemplate => {
-            return (
-              <TemplateCardSkeleton
-                inLayout={displayType}
-                key={blockTemplate.id}
-                template={blockTemplate}
-                createAction={() => {
-                  if (blockTemplate.node_tree) {
-                    loadTemplateOnRoot(blockTemplate.node_tree)
-                  }
-                  close()
-                }}
-                quickLookAction={() => {
-                  setQuickLookTemplate(blockTemplate)
-                }}
-              />
+          {blockTemplates
+            .filter(
+              template => foundTemplateIds.length > 0 && foundTemplateIds.includes(template.id)
             )
-          })}
+            .map(blockTemplate => {
+              return (
+                <TemplateCardSkeleton
+                  inLayout={displayType}
+                  key={blockTemplate.id}
+                  template={blockTemplate}
+                  createAction={() => {
+                    if (blockTemplate.node_tree) {
+                      loadTemplateOnRoot(blockTemplate.node_tree)
+                    }
+                    close()
+                  }}
+                  quickLookAction={() => {
+                    setQuickLookTemplate(blockTemplate)
+                  }}
+                />
+              )
+            })}
         </Flex>
         <QuickLook
           template={quickLookTemplate}

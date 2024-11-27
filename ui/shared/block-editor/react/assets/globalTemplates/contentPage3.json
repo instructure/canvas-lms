@@ -1,6 +1,7 @@
 {
   "name": "Content Page 3",
   "description": "Text + Image Columns",
+  "tags": ["generalcontent"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",

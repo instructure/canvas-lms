@@ -1,6 +1,7 @@
 {
   "name": "Home Page - Elementary 2",
   "description": "",
+  "tags": ["home"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
