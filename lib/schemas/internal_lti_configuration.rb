@@ -104,6 +104,10 @@ module Schemas
       }.freeze
     end
 
+    def self.allowed_base_properties
+      schema[:properties].keys
+    end
+
     def self.base_properties
       {
         title: { type: "string", description: "Overridable by 'text' in settings and placements" },
