@@ -30,6 +30,7 @@ end
   provide :head, include_common_stylesheets
   set_badge_counts_for(@context, @current_user) if @set_badge_counts
   js_env notices: flash_notices()
+  student_view_text = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
 -%>
 <%= render :partial => "layouts/head" %>
 <%-
@@ -152,8 +153,8 @@ end
               <div id="immersive_reader_mount_point"></div>
             <% end %>
             <% if show_student_view_button? %>
-              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => t("View as Student") do %>
-                <i class="icon-student-view"></i> <%= t('View as Student') %>
+              <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn btn-top-nav", :id => "easy_student_view", :method => :post, :"aria-label" => student_view_text do %>
+                <i class="icon-student-view"></i> <%= student_view_text %>
               <% end %>
             <% end %>
             <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
