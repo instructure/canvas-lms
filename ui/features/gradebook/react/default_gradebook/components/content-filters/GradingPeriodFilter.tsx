@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -28,13 +27,16 @@ const I18n = useI18nScope(
   'gradebook_default_gradebook_components_content_filters_grading_period_filter'
 )
 
+// @ts-expect-error
 function normalizeGradingPeriods(gradingPeriods) {
+  // @ts-expect-error
   return gradingPeriods.map(gradingPeriod => ({
     id: gradingPeriod.id,
     name: formatGradingPeriodTitleForDisplay(gradingPeriod),
   }))
 }
 
+// @ts-expect-error
 export default function GradingPeriodFilter(props) {
   const {disabled, onSelect, gradingPeriods, selectedGradingPeriodId, ...filterProps} = props
 

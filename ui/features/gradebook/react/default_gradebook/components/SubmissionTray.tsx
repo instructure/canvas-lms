@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -47,12 +46,13 @@ import SubmissionTrayRadioInputGroup, {
 import ProxyUploadModal from '@canvas/proxy-submission/react/ProxyUploadModal'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type {
+  // @ts-expect-error
   GradingStandard,
   LatePolicyCamelized,
   PendingGradeInfo,
   SerializedComment,
 } from '../gradebook.d'
-import {
+import type {
   CamelizedAssignment,
   CamelizedSubmission,
   GradeEntryMode,
@@ -185,6 +185,7 @@ export default class SubmissionTray extends React.Component<
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   state = {
     proxyUploadModalOpen: false,
     checkpointStates: DEFAULT_CHECKPOINT_STATES,
@@ -194,6 +195,7 @@ export default class SubmissionTray extends React.Component<
     this.initializeCheckpointStates()
   }
 
+  // @ts-expect-error
   componentDidUpdate(prevProps) {
     if (prevProps.submission !== this.props.submission) {
       this.initializeCheckpointStates()
@@ -203,7 +205,9 @@ export default class SubmissionTray extends React.Component<
   initializeCheckpointStates = () => {
     const {submission, latePolicy} = this.props
 
+    // @ts-expect-error
     if (submission.hasSubAssignmentSubmissions && submission.subAssignmentSubmissions.length > 0) {
+      // @ts-expect-error
       const checkpointStates = submission.subAssignmentSubmissions.map(subSubmission => {
         let status = NONE
         let timeLate = '0'
@@ -215,6 +219,7 @@ export default class SubmissionTray extends React.Component<
         } else if (subSubmission.late) {
           status = LATE
           timeLate =
+            // @ts-expect-error
             latePolicy.lateSubmissionInterval === 'hour'
               ? (secondsLate / 3600).toString()
               : (secondsLate / (24 * 3600)).toString()
@@ -234,6 +239,7 @@ export default class SubmissionTray extends React.Component<
 
       this.setState({checkpointStates})
     } else {
+      // @ts-expect-error
       this.setState({checkpointStates: DEFAULT_CHECKPOINT_STATES})
     }
   }
@@ -268,6 +274,7 @@ export default class SubmissionTray extends React.Component<
     ))
   }
 
+  // @ts-expect-error
   renderSubmissionComments(_props) {
     // TODO: Remove _props? It is not used.
     const {anonymizeStudents, moderatedGrading, muted} = this.props.assignment
@@ -301,6 +308,7 @@ export default class SubmissionTray extends React.Component<
     )
   }
 
+  // @ts-expect-error
   renderSpeedGraderLink(speedGraderProps) {
     const buttonProps: {
       disabled?: boolean
@@ -336,6 +344,7 @@ export default class SubmissionTray extends React.Component<
           </Alert>
         )}
         <View as="div" textAlign="center">
+          {/* @ts-expect-error */}
           <Button {...buttonProps} renderIcon={IconSpeedGraderLine}>
             {I18n.t('SpeedGrader')}
           </Button>
@@ -352,6 +361,7 @@ export default class SubmissionTray extends React.Component<
         <View as="div" textAlign="center">
           <Button
             id="submit-for-student-button" // EVAL-4243
+            // @ts-expect-error
             variant="link"
             onClick={this.toggleUploadModal}
             aria-label={I18n.t('Submit for Student %{name}', {name: this.props.student.name})}
@@ -423,8 +433,10 @@ export default class SubmissionTray extends React.Component<
         open={this.state.proxyUploadModalOpen}
         onClose={this.closeUploadModal}
         assignment={this.props.assignment}
+        // @ts-expect-error
         student={this.props.student}
         submission={this.props.submission}
+        // @ts-expect-error
         reloadSubmission={this.props.reloadSubmission}
       />
     )
@@ -469,6 +481,7 @@ export default class SubmissionTray extends React.Component<
       }
     }
 
+    // @ts-expect-error
     const updateCheckpointStates = (subAssignmentTag, field, value) => {
       this.setState(prevState => {
         return {
@@ -486,6 +499,7 @@ export default class SubmissionTray extends React.Component<
         }
 
         const secondsLate =
+          // @ts-expect-error
           this.props.latePolicy.lateSubmissionInterval === 'hour'
             ? timeLate * 3600
             : timeLate * 24 * 3600
@@ -501,28 +515,36 @@ export default class SubmissionTray extends React.Component<
           data.latePolicyStatus = value
         }
 
+        // @ts-expect-error
         this.props.updateSubmission(data)
       } else if (field === 'secondsLate') {
         const data: PendingUpdateData = {subAssignmentTag, secondsLateOverride: value}
 
+        // @ts-expect-error
         this.props.updateSubmission(data)
       } else if (field === 'customGradeStatusId') {
         const data: PendingUpdateData = {subAssignmentTag, customGradeStatusId: value}
 
+        // @ts-expect-error
         this.props.updateSubmission(data)
       }
     }
 
+    // @ts-expect-error
     const checkLatePolicyStatus = (submission, gradeInfo) => {
+      // @ts-expect-error
       const {status, secondsLate} = this.state.checkpointStates.find(
         e => e.label === gradeInfo.subAssignmentTag
       )
+      // @ts-expect-error
       const subAssignmentFromProps = this.props.submission.subAssignmentSubmissions.find(
+        // @ts-expect-error
         e => e.sub_assignment_tag === gradeInfo.subAssignmentTag
       )
       if (status !== subAssignmentFromProps.late_policy_status) {
         const data: PendingUpdateData = {
           subAssignmentTag: gradeInfo.subAssignmentTag,
+          // @ts-expect-error
           postedGrade: gradeInfo.grade,
         }
         if (status === EXCUSED) {
@@ -533,6 +555,7 @@ export default class SubmissionTray extends React.Component<
         }
         if (secondsLate !== 0) data.secondsLateOverride = secondsLate
 
+        // @ts-expect-error
         this.props.updateSubmission(data)
       } else {
         this.props.onGradeSubmission(submission, gradeInfo)
@@ -540,15 +563,21 @@ export default class SubmissionTray extends React.Component<
     }
 
     const renderInputsForCheckpoints = (
+      // @ts-expect-error
       hasCheckpoints,
+      // @ts-expect-error
       props,
+      // @ts-expect-error
       subAssignmentTag,
+      // @ts-expect-error
       submission,
+      // @ts-expect-error
       header
     ) => {
       return (
         <InputsForCheckpoints
           hasCheckpoints={hasCheckpoints}
+          // @ts-expect-error
           checkpointStates={this.state.checkpointStates}
           subAssignmentTag={subAssignmentTag}
           assignment={props.assignment}
@@ -570,12 +599,14 @@ export default class SubmissionTray extends React.Component<
       )
     }
 
+    // @ts-expect-error
     const getSubAssignmentSubmission = (hasCheckpoints, submission, subAssignmentTag) => {
       if (!hasCheckpoints) {
         return null
       }
 
       const subAssignmentSubmission = submission.subAssignmentSubmissions.find(
+        // @ts-expect-error
         sub => sub.sub_assignment_tag === subAssignmentTag
       )
 
@@ -591,6 +622,7 @@ export default class SubmissionTray extends React.Component<
     }
 
     const hasCheckpoints =
+      // @ts-expect-error
       this.props.assignment.hasSubAssignments && this.props.assignment.checkpoints.length > 0
     const replyToTopicSubmission = getSubAssignmentSubmission(
       hasCheckpoints,
@@ -622,6 +654,7 @@ export default class SubmissionTray extends React.Component<
     return (
       <ApolloProvider client={createClient()}>
         <Tray
+          // @ts-expect-error
           contentRef={this.props.contentRef}
           label={I18n.t('Submission tray')}
           open={this.props.isOpen}
@@ -637,7 +670,9 @@ export default class SubmissionTray extends React.Component<
           />
           <div className="SubmissionTray__Container">
             <div id="SubmissionTray__Content" style={{display: 'flex', flexDirection: 'column'}}>
+              {/* @ts-expect-error */}
               <View as="div" padding={carouselContainerStyleOverride}>
+                {/* @ts-expect-error */}
                 {avatarUrl && renderAvatar(name, avatarUrl)}
 
                 <Carousel
@@ -651,6 +686,7 @@ export default class SubmissionTray extends React.Component<
                   rightArrowDescription={I18n.t('Next student')}
                 >
                   <InstUISettingsProvider
+                    // @ts-expect-error
                     theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   >
                     <Link href={this.props.student.gradesUrl} isWithinText={false}>
@@ -672,6 +708,7 @@ export default class SubmissionTray extends React.Component<
                   rightArrowDescription={I18n.t('Next assignment')}
                 >
                   <InstUISettingsProvider
+                    // @ts-expect-error
                     theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   >
                     <Link href={this.props.assignment.htmlUrl} isWithinText={false}>
@@ -724,6 +761,7 @@ export default class SubmissionTray extends React.Component<
                   alignItems="start"
                   justifyItems="space-between"
                 >
+                  {/* @ts-expect-error */}
                   <Flex.Item flex="2" shouldShrink={true}>
                     <GradeInput
                       assignment={this.props.assignment}
@@ -731,9 +769,13 @@ export default class SubmissionTray extends React.Component<
                       enterGradesAs={this.props.enterGradesAs}
                       gradingScheme={this.props.gradingScheme}
                       pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
+                      // @ts-expect-error
                       pendingGradeInfo={this.props.pendingGradeInfo}
+                      // @ts-expect-error
                       onSubmissionUpdate={this.props.onGradeSubmission}
+                      // @ts-expect-error
                       scalingFactor={this.props.scalingFactor}
+                      // @ts-expect-error
                       submission={this.props.submission}
                       submissionUpdating={this.props.submissionUpdating}
                       header={hasCheckpoints ? I18n.t('Current Total') : undefined}
@@ -741,10 +783,12 @@ export default class SubmissionTray extends React.Component<
                   </Flex.Item>
 
                   {showSticker && (
+                    // @ts-expect-error
                     <Flex.Item flex="1" margin="xx-small none none none">
                       <SubmissionSticker
                         confetti={false}
                         size="small"
+                        // @ts-expect-error
                         submission={{...this.props.submission, courseId: this.props.courseId}}
                         onStickerChange={sticker =>
                           this.props.onStickerChange(this.props.submission, sticker)
@@ -759,9 +803,11 @@ export default class SubmissionTray extends React.Component<
                     <LatePolicyGrade
                       assignment={this.props.assignment}
                       enterGradesAs={this.props.enterGradesAs}
+                      // @ts-expect-error
                       gradingScheme={this.props.gradingScheme}
                       pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
                       scalingFactor={this.props.scalingFactor}
+                      // @ts-expect-error
                       submission={this.props.submission}
                     />
                   </View>
@@ -781,9 +827,11 @@ export default class SubmissionTray extends React.Component<
                         customGradeStatusesEnabled={this.props.customGradeStatusesEnabled}
                         disabled={this.props.gradingDisabled}
                         locale={this.props.locale}
+                        // @ts-expect-error
                         latePolicy={this.props.latePolicy}
                         submission={this.props.submission}
                         submissionUpdating={this.props.submissionUpdating}
+                        // @ts-expect-error
                         updateSubmission={this.props.updateSubmission}
                       />
                     </View>

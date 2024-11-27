@@ -38,7 +38,6 @@ import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import GenericErrorPage from '@canvas/generic-error-page'
 import ErrorBoundary from '@canvas/error-boundary'
-// @ts-ignore
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import type {ActionMenuProps} from './components/ActionMenu'
 import type {SubmissionTrayProps} from './components/SubmissionTray'
@@ -113,7 +112,6 @@ import type {
   GridDisplaySettings,
   GridLocation,
   FilterColumnsOptions,
-  RowFilterKey,
 } from './grid.d'
 import type GradebookGridType from './GradebookGrid/index'
 import type {StatusColors} from './constants/colors'
@@ -122,7 +120,6 @@ import type TotalGradeColumnHeader from './GradebookGrid/headers/TotalGradeColum
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 import {QueryProvider} from '@canvas/query'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-// @ts-expect-error
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -1014,6 +1011,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   saveColumnOrder = () => {
     if (!isInvalidSort(this.props.modules, this.gradebookColumnOrderSettings)) {
       const url = this.options.gradebook_column_order_settings_url
+      // @ts-expect-error
       $.ajaxJSON(url, 'POST', {
         column_order: getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings),
       })
@@ -2465,6 +2463,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       UserSettings.contextSet('warned_about_totals_display', true)
     }
     this.options.show_total_grade_as_points = !this.options.show_total_grade_as_points
+    // @ts-expect-error
     $.ajaxJSON(this.options.setting_update_url, 'PUT', {
       show_total_grade_as_points: this.options.show_total_grade_as_points,
     })
@@ -2908,6 +2907,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       url = this.options.custom_column_datum_url
         .replace(/:id/, col_id?.[1] || '')
         .replace(/:user_id/, item.id)
+      // @ts-expect-error
       return $.ajaxJSON(url, 'PUT', {
         'column_data[content]': item[column.field],
       })
@@ -2921,6 +2921,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Persisted Gradebook Settings
   saveColumnWidthPreference = (id: string, newWidth: number) => {
     const url = this.options.gradebook_column_size_settings_url
+    // @ts-expect-error
     return $.ajaxJSON(url, 'POST', {
       column_id: id,
       column_size: newWidth,
@@ -2991,6 +2992,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return GradebookApi.saveUserSettings(this.options.context_id, gradebook_settings)
     } else {
       return new Promise((resolve, reject) => {
+        // @ts-expect-error
         $.ajaxJSON(
           this.options.settings_update_url,
           'PUT',
@@ -3075,12 +3077,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   missingSort = (columnId: string) => {
-    // @ts-ignore
+    // @ts-expect-error
     this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].missing))
   }
 
   lateSort = (columnId: string) => {
-    // @ts-ignore
+    // @ts-expect-error
     this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].late))
   }
 
@@ -4629,6 +4631,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   changeSticker = (submission: {assignmentId: string; userId: string}, sticker: string | null) => {
     const savedSubmission = this.getSubmission(submission.userId, submission.assignmentId)
     if (savedSubmission) {
+      // @ts-expect-error
       savedSubmission.sticker = sticker
     }
   }

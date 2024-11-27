@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -81,6 +80,7 @@ export const FlaggableNumberInput = ({
           renderTip={I18n.t('You cannot edit a locked pace')}
           on={showTooltipOn}
         >
+          {/* @ts-expect-error */}
           <NumberInput
             renderLabel={label}
             interaction={interaction}

@@ -197,9 +197,11 @@ const ItemAssignToTrayContent = ({
           params: {per_page: 100},
         }
         while (url && pageCount < MAX_PAGES) {
+          // @ts-expect-error
           // eslint-disable-next-line no-await-in-loop
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
+          // @ts-expect-error
           url = response.link?.next?.url || null
           args = {
             path: url,
@@ -210,12 +212,14 @@ const ItemAssignToTrayContent = ({
         const combinedResponse = allResponses.reduce(
           (acc, response) => ({
             blueprint_date_locks: [
+              // @ts-expect-error
               ...(acc.blueprint_date_locks || []),
               ...(response.blueprint_date_locks || []),
             ],
           }),
           {}
         )
+        // @ts-expect-error
         setBlueprintDateLocks(combinedResponse.blueprint_date_locks)
       } catch {
         showFlashError()()
@@ -314,9 +318,11 @@ const ItemAssignToTrayContent = ({
           params: {per_page: 100},
         }
         while (url && pageCount < MAX_PAGES) {
+          // @ts-expect-error
           // eslint-disable-next-line no-await-in-loop
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
+          // @ts-expect-error
           url = response.link?.next?.url || null
           args = {
             path: url,
@@ -327,8 +333,10 @@ const ItemAssignToTrayContent = ({
         const combinedResponse = allResponses.reduce(
           (acc, response) => ({
             ...response,
+            // @ts-expect-error
             overrides: [...(acc.overrides || []), ...(response.overrides || [])],
             blueprint_date_locks: [
+              // @ts-expect-error
               ...(acc.blueprint_date_locks || []),
               ...(response.blueprint_date_locks || []),
             ],
@@ -337,14 +345,20 @@ const ItemAssignToTrayContent = ({
         )
 
         const dateDetailsApiResponse = combinedResponse
+        // @ts-expect-error
         const overrides = dateDetailsApiResponse.overrides
         const overriddenTargets = getOverriddenAssignees(overrides)
+        // @ts-expect-error
         delete dateDetailsApiResponse.overrides
+        // @ts-expect-error
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         if (
+          // @ts-expect-error
           dateDetailsApiResponse.checkpoints &&
+          // @ts-expect-error
           Array.isArray(dateDetailsApiResponse.checkpoints)
         ) {
+          // @ts-expect-error
           dateDetailsApiResponse.checkpoints.forEach((checkpoint: any) => {
             if (checkpoint.tag === REPLY_TO_ENTRY) {
               baseDates.required_replies_due_at = checkpoint.due_at
@@ -354,9 +368,12 @@ const ItemAssignToTrayContent = ({
           })
         }
 
+        // @ts-expect-error
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
         const allModuleAssignees: string[] = []
+        // @ts-expect-error
         const hasModuleOverride = overrides?.some(override => override.context_module_id)
+        // @ts-expect-error
         const hasCourseOverride = overrides?.some(override => override.course_id)
 
         const cards: ItemAssignToCardSpec[] = []
@@ -376,11 +393,13 @@ const ItemAssignToTrayContent = ({
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
             selectedAssigneeIds: selectedOption,
+            // @ts-expect-error
             overrideId: dateDetailsApiResponse.id,
           })
           selectedOptionIds.push(...selectedOption)
         }
         if (overrides?.length) {
+          // @ts-expect-error
           overrides.forEach(override => {
             // if an override is unassigned, we don't need to show a card for it
             if (override.unassign_item) {
@@ -392,6 +411,7 @@ const ItemAssignToTrayContent = ({
                 allModuleAssignees.push(`section-${override.course_section_id}`)
               }
               if (override.student_ids) {
+                // @ts-expect-error
                 allModuleAssignees.push(...override.student_ids.map(id => `student-${id}`))
               }
             }
@@ -399,11 +419,13 @@ const ItemAssignToTrayContent = ({
             let filteredStudents = override.student_ids
             if (override.context_module_id && override.student_ids) {
               filteredStudents = filteredStudents?.filter(
+                // @ts-expect-error
                 id => !overriddenTargets?.students?.includes(id)
               )
               removeCard = override.student_ids?.length > 0 && filteredStudents?.length === 0
             }
             const studentOverrides =
+              // @ts-expect-error
               filteredStudents?.map(studentId => `student-${studentId}`) ?? []
             const defaultOptions = studentOverrides
             if (override.noop_id) {
@@ -452,8 +474,10 @@ const ItemAssignToTrayContent = ({
         }
         setModuleAssignees(allModuleAssignees)
         setHasModuleOverrides(hasModuleOverride || false)
+        // @ts-expect-error
         setGroupCategoryId(dateDetailsApiResponse.group_category_id)
         setOverridesFetched(true)
+        // @ts-expect-error
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         disabledOptionIdsRef.current = selectedOptionIds
         setInitialCards(cards)
@@ -679,6 +703,7 @@ const ItemAssignToTrayContent = ({
         onClick={handleAddCard}
         data-testid="add-card"
         margin="small 0 0 0"
+        // @ts-expect-error
         renderIcon={IconAddLine}
         interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
         elementRef={firstButton ? undefined : el => (addCardButtonRef.current = el)}
@@ -717,6 +742,7 @@ const ItemAssignToTrayContent = ({
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpenRef={isOpenRef}
+            // @ts-expect-error
             disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}

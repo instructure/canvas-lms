@@ -76,6 +76,7 @@ export function isElementOfStyle(property: string, value: string, elem: Element 
   let currentElem: Element | null = elem
   while (currentElem) {
     const computedStyle = window.getComputedStyle(currentElem)
+    // @ts-expect-error
     if (computedStyle[property] === value) {
       return true
     }

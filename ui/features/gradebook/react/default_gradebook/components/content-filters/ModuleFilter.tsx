@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -25,6 +24,7 @@ import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter
 
 const I18n = useI18nScope('gradebook_default_gradebook_components_content_filters_module_filter')
 
+// @ts-expect-error
 export default function ModuleFilter(props) {
   const {modules, selectedModuleId, ...filterProps} = props
 

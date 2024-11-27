@@ -43,6 +43,7 @@ export default ({
               <Button
                 id="new_quiz_lti"
                 data-testid="new_quiz_button"
+                // @ts-expect-error
                 renderIcon={IconAddSolid}
                 href={newAssignmentUrl + '?quiz_lti'}
               >
@@ -51,6 +52,7 @@ export default ({
             )}
             <Button
               data-testid="new_group_button"
+              // @ts-expect-error
               renderIcon={IconAddSolid}
               onClick={e => {
                 const hiddenInput = $('[data-view=addGroup]')
@@ -61,6 +63,7 @@ export default ({
             </Button>
             <Button
               data-testid="new_assignment_button"
+              // @ts-expect-error
               renderIcon={IconAddSolid}
               color="primary"
               href={newAssignmentUrl}

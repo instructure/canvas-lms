@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -37,7 +36,7 @@ import {View} from '@instructure/ui-view'
 
 import AssignmentRow from './assignment_row'
 import BlackoutDateRow from './blackout_date_row'
-import {ModuleWithDueDates, ResponsiveSizes} from '../../types'
+import type {ModuleWithDueDates, ResponsiveSizes} from '../../types'
 
 const I18n = useI18nScope('course_paces_module')
 
@@ -116,9 +115,11 @@ export const Module = (props: ComponentProps) => {
           aria-labelledby="due-date-column-title"
           alignItems="center"
           justifyItems="center"
+          // @ts-expect-error
           padding={headerPadding}
         >
           {props.compression > 0 && (
+            // @ts-expect-error
             <Tooltip renderTip={compressionTipText} placement="top" on={tipEvents}>
               <IconButton
                 withBorder={false}
@@ -133,6 +134,7 @@ export const Module = (props: ComponentProps) => {
           <View id="due-date-column-title" as="span">
             {I18n.t('Due Date')}
           </View>
+          {/* @ts-expect-error */}
           <Tooltip renderTip={timezoneTipText} placement="top" on={tipEvents}>
             <IconButton
               withBorder={false}
@@ -148,12 +150,14 @@ export const Module = (props: ComponentProps) => {
     )
   }
 
+  // @ts-expect-error
   const renderAssignmentRow = item => {
     // Scoping the key this way keeps a single reference on the table, regardless of whether the pace exists or not
     const key = `assignment-row-${item.module_item_id}`
     return (
       <AssignmentRow
         key={key}
+        // @ts-expect-error
         actuallyExpanded={actuallyExpanded}
         datesVisible={datesVisible}
         coursePaceItem={item}
@@ -163,6 +167,7 @@ export const Module = (props: ComponentProps) => {
     )
   }
 
+  // @ts-expect-error
   const renderBlackoutDateRow = item => {
     const key = `blackoutdate-${props.module.moduleKey}-${item.id || item.temp_id}`
     return <BlackoutDateRow key={key} blackoutDate={item} isStacked={isTableStacked} />
@@ -205,6 +210,7 @@ export const Module = (props: ComponentProps) => {
               <Table.Head>
                 <Table.Row>
                   <Table.ColHeader id={`module-${props.module.id}-assignments`} width="100%">
+                    {/* @ts-expect-error */}
                     <View as="div" padding={headerPadding}>
                       {I18n.t('Item')}
                     </View>
@@ -218,11 +224,13 @@ export const Module = (props: ComponentProps) => {
                       aria-labelledby="days-column-title"
                       alignItems="center"
                       justifyItems="center"
+                      // @ts-expect-error
                       padding={headerPadding}
                     >
                       <View id="days-column-title" as="span">
                         {I18n.t('Days')}
                       </View>
+                      {/* @ts-expect-error */}
                       <Tooltip renderTip={daysTipText} placement="top" on={tipEvents}>
                         <IconButton
                           withBorder={false}
@@ -241,6 +249,7 @@ export const Module = (props: ComponentProps) => {
                     id={`module-${props.module.id}-status`}
                     textAlign="center"
                   >
+                    {/* @ts-expect-error */}
                     <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
                       {I18n.t('Status')}
                     </Flex>

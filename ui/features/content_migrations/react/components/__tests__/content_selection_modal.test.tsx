@@ -60,6 +60,7 @@ describe('ContentSelectionModal', () => {
   })
 
   describe('modal', () => {
+    // @ts-expect-error
     beforeEach(() => doFetchApi.mockImplementation(() => Promise.resolve({json: selectiveData})))
 
     it('opens on click', async () => {
@@ -131,6 +132,7 @@ describe('ContentSelectionModal', () => {
     })
 
     it('shows alert if fetch fails', async () => {
+      // @ts-expect-error
       doFetchApi.mockImplementation(() => Promise.reject())
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})
@@ -141,6 +143,7 @@ describe('ContentSelectionModal', () => {
     })
 
     it('shows spinner when loading', async () => {
+      // @ts-expect-error
       doFetchApi.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 5000)))
       renderComponent()
       const button = screen.getByRole('button', {name: 'Select content'})

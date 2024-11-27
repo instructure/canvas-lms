@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -25,36 +24,43 @@ import StatusColorListItem from './StatusColorListItem'
 const colorPickerButtons = {}
 const colorPickerContents = {}
 
+// @ts-expect-error
 export default function StatusColorPanel({colors: initialColors, onColorsUpdated}) {
   const [colors, setColors] = useState({...initialColors})
   const [openPopover, setOpenPopover] = useState(null)
   const lastSelectedStatusRef = useRef<string>()
 
+  // @ts-expect-error
   const bindColorPickerButton = status => button => {
+    // @ts-expect-error
     colorPickerButtons[status] = button
   }
 
+  // @ts-expect-error
   const bindColorPickerContent = status => content => {
+    // @ts-expect-error
     colorPickerContents[status] = content
   }
-
+  // @ts-expect-error
   const updateStatusColors = status => color => {
     const newColors = {...colors, [status]: color}
     setColors(newColors)
     setOpenPopover(null)
     onColorsUpdated(newColors)
   }
-
+  // @ts-expect-error
   const handleOnToggle = status => toggle => {
     setOpenPopover(toggle ? status : null)
   }
 
+  // @ts-expect-error
   const handleColorPickerAfterClose = _status => () => {
     setOpenPopover(null)
   }
 
   useEffect(() => {
     if (openPopover == null) {
+      // @ts-expect-error
       colorPickerButtons[lastSelectedStatusRef.current || '']?.focus()
     } else {
       lastSelectedStatusRef.current = openPopover

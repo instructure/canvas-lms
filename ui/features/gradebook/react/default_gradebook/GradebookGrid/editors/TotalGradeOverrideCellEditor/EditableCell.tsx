@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -58,17 +57,22 @@ export default class EditableCell extends CellEditorComponent {
   }
 
   componentDidMount() {
+    // @ts-expect-error
     if (!this.props.gradeIsUpdating) {
+      // @ts-expect-error
       this.gradeInput.focus()
     }
   }
 
+  // @ts-expect-error
   componentDidUpdate(prevProps) {
+    // @ts-expect-error
     const gradeFinishedUpdating = prevProps.gradeIsUpdating && !this.props.gradeIsUpdating
 
     if (gradeFinishedUpdating) {
       // the cell was reactivated while the grade was updating
       // set the focus on the input by default
+      // @ts-expect-error
       this.gradeInput.focus()
     }
   }
@@ -77,6 +81,7 @@ export default class EditableCell extends CellEditorComponent {
    * ReactCellEditor Interface Method (required)
    */
   applyValue() {
+    // @ts-expect-error
     this.props.onGradeUpdate(this.gradeInput.gradeInfo)
   }
 
@@ -84,20 +89,26 @@ export default class EditableCell extends CellEditorComponent {
    * ReactCellEditor Interface Method (required)
    */
   focus() {
+    // @ts-expect-error
     this.gradeInput.focus()
   }
 
   /*
    * ReactCellEditor Interface Method (required)
    */
+  // @ts-expect-error
   handleKeyDown(event) {
+    // @ts-expect-error
     const inputHandled = this.gradeInput.handleKeyDown(event)
     if (inputHandled != null) {
       return inputHandled
     }
 
+    // @ts-expect-error
     const indicatorHasFocus = this.invalidGradeIndicator === document.activeElement
+    // @ts-expect-error
     const inputHasFocus = this.contentContainer.contains(document.activeElement)
+    // @ts-expect-error
     const hasPreviousElement = inputHasFocus && this.invalidGradeIndicator
 
     // Tab
@@ -116,19 +127,23 @@ export default class EditableCell extends CellEditorComponent {
    * ReactCellEditor Interface Method (required)
    */
   isValueChanged() {
+    // @ts-expect-error
     return this.gradeInput.hasGradeChanged()
   }
 
   render() {
+    // @ts-expect-error
     const gradeIsInvalid = this.props.pendingGradeInfo && !this.props.pendingGradeInfo.valid
 
     return (
       <InstUISettingsProvider theme={themeOverrides}>
+        {/* @ts-expect-error */}
         <div className={`Grid__GradeCell ${this.props.gradeEntry.enterGradesAs}`}>
           <div className="Grid__GradeCell__StartContainer">
             {gradeIsInvalid && (
               <InvalidGradeIndicator
                 elementRef={ref => {
+                  // @ts-expect-error
                   this.invalidGradeIndicator = ref
                 }}
               />
@@ -138,27 +153,35 @@ export default class EditableCell extends CellEditorComponent {
           <div
             className="Grid__GradeCell__Content"
             ref={ref => {
+              // @ts-expect-error
               this.contentContainer = ref
             }}
           >
             <GradeInput
+              // @ts-expect-error
               disabled={this.props.gradeIsUpdating || this.props.disabledByCustomStatus}
+              // @ts-expect-error
               gradeEntry={this.props.gradeEntry}
+              // @ts-expect-error
               gradeInfo={this.props.gradeInfo}
+              // @ts-expect-error
               pendingGradeInfo={this.props.pendingGradeInfo}
               ref={ref => {
+                // @ts-expect-error
                 this.gradeInput = ref
               }}
             />
           </div>
 
           <View as="div" className="Grid__GradeCell__EndContainer">
+            {/* @ts-expect-error */}
             {this.props.customGradeStatusesEnabled && (
               <View as="div" className="Grid__GradeCell__Options">
                 <IconButton
                   onClick={() => {
                     const {toggleFinalGradeOverrideTray} = useStore.getState()
                     toggleFinalGradeOverrideTray()
+                    // @ts-expect-error
                     this.props.onTrayOpen()
                   }}
                   size="small"

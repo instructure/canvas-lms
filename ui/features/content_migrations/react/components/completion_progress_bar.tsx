@@ -47,7 +47,6 @@ export const CompletionProgressBar = ({
           screenReaderLabel={I18n.t('Loading completion')}
           valueNow={completion}
           valueMax={100}
-          // @ts-ignore
           shouldAnimate={true}
         />
       )

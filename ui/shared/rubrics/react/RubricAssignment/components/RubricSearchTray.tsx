@@ -174,7 +174,9 @@ const RubricContextSelect = ({
   const {data: rubricContexts = [], isLoading} = useQuery({
     queryKey: ['fetchGradingRubricContexts', courseId],
     queryFn: getGradingRubricContexts,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
     onSuccess: successResponse => {
       setSelectedContext(successResponse[0]?.context_code)
     },
@@ -238,7 +240,9 @@ const RubricsForContext = ({
     queryKey: ['fetchGradingRubricsForContext', courseId, selectedContext],
     queryFn: getGradingRubricsForContext,
     staleTime: 0,
-    fetchAtLeastOnce: true,
+    meta: {
+      fetchAtLeastOnce: true,
+    },
   })
 
   if (isRubricsLoading) {
@@ -338,6 +342,7 @@ const RubricSearchFooter = ({disabled, onSubmit, onCancel}: RubricSearchFooterPr
         <Flex.Item>
           <Button
             color="primary"
+            // @ts-expect-error
             renderIcon={IconAddLine}
             onClick={() => onSubmit()}
             data-testid="save-rubric-assessment-button"

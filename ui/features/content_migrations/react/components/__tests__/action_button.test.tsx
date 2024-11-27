@@ -67,6 +67,7 @@ describe('ActionButton', () => {
 
   describe('modal', () => {
     beforeEach(() =>
+      // @ts-expect-error
       doFetchApi.mockReturnValue(Promise.resolve({json: generateMigrationIssues(1)}))
     )
 
@@ -103,6 +104,7 @@ describe('ActionButton', () => {
         const page1 = issues.slice(0, 10)
         const page2 = issues.slice(10, 15)
         doFetchApi
+          // @ts-expect-error
           .mockReturnValueOnce(Promise.resolve({json: page1}))
           .mockReturnValueOnce(Promise.resolve({json: page2}))
       })
@@ -147,8 +149,10 @@ describe('ActionButton', () => {
       })
 
       it('shows alert if fetch fails', async () => {
+        // @ts-expect-error
         doFetchApi.mockReset()
         doFetchApi
+          // @ts-expect-error
           .mockReturnValueOnce(Promise.resolve({json: generateMigrationIssues(10)}))
           .mockImplementationOnce(() => Promise.reject())
         renderComponent({migration_issues_count: 15})
@@ -162,6 +166,7 @@ describe('ActionButton', () => {
 
       it.skip('shows spinner when loading more issues', async () => {
         doFetchApi
+          // @ts-expect-error
           .mockReturnValueOnce(Promise.resolve({json: generateMigrationIssues(10)}))
           .mockReturnValueOnce(new Promise(resolve => setTimeout(resolve, 5000)))
         renderComponent({migration_issues_count: 15})
@@ -172,6 +177,7 @@ describe('ActionButton', () => {
     })
 
     it('shows alert if fetch fails', async () => {
+      // @ts-expect-error
       doFetchApi.mockImplementation(() => Promise.reject())
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
@@ -180,6 +186,7 @@ describe('ActionButton', () => {
     })
 
     it('shows spinner when loading', async () => {
+      // @ts-expect-error
       doFetchApi.mockReturnValue(new Promise(resolve => setTimeout(resolve, 5000)))
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'View Issues'}))

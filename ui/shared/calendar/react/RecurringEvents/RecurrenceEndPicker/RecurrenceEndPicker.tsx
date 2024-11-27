@@ -256,6 +256,7 @@ export default function RecurrenceEndPicker({
   }
 
   const fireOnChange = useCallback(
+    // @ts-expect-error
     (newMode, newUntil, newCount): void => {
       if (newMode === 'ON') {
         if (newUntil === undefined) return
@@ -284,6 +285,7 @@ export default function RecurrenceEndPicker({
   )
 
   const handleCountChange = useCallback(
+    // @ts-expect-error
     (_event, value: string | number): void => {
       const cnt = typeof value === 'string' ? parseFloat(value) : value
       setCountNumber(cnt)

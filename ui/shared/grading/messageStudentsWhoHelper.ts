@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -37,6 +36,7 @@ type MessageStudentParams = {
   attachment_ids?: string[]
 }
 
+// @ts-expect-error
 export function hasSubmitted(submission) {
   if (submission.excused) {
     return true
@@ -47,6 +47,7 @@ export function hasSubmitted(submission) {
   return !!(submission.submittedAt || submission.submitted_at)
 }
 
+// @ts-expect-error
 export function hasGraded(submission) {
   if (submission.excused) {
     return true
@@ -55,6 +56,7 @@ export function hasGraded(submission) {
   return MessageStudentsWhoHelper.exists(submission.score)
 }
 
+// @ts-expect-error
 export function hasSubmission(assignment) {
   const submissionTypes = getSubmissionTypes(assignment)
   if (submissionTypes.length === 0) return false
@@ -65,15 +67,18 @@ export function hasSubmission(assignment) {
   )
 }
 
+// @ts-expect-error
 function getSubmissionTypes(assignment) {
   return assignment.submissionTypes || assignment.submission_types
 }
 
+// @ts-expect-error
 function getCourseId(assignment) {
   return assignment.courseId || assignment.course_id
 }
 
 const MessageStudentsWhoHelper = {
+  // @ts-expect-error
   settings(assignment, students) {
     const settings: {
       title: string
@@ -129,6 +134,7 @@ const MessageStudentsWhoHelper = {
     return axios.post('/api/v1/conversations', params)
   },
 
+  // @ts-expect-error
   options(assignment) {
     const options = this.allOptions()
     const noSubmissions = !this.hasSubmission(assignment)
@@ -140,35 +146,43 @@ const MessageStudentsWhoHelper = {
     return [
       {
         text: I18n.t("Haven't submitted yet"),
+        // @ts-expect-error
         subjectFn: assignment =>
           I18n.t('No submission for %{assignment}', {assignment: assignment.name}),
+        // @ts-expect-error
         criteriaFn: student => !hasSubmitted(student),
       },
       {
         text: I18n.t("Haven't been graded"),
+        // @ts-expect-error
         subjectFn: assignment =>
           I18n.t('No grade for %{assignment}', {assignment: assignment.name}),
+        // @ts-expect-error
         criteriaFn: student => !hasGraded(student),
       },
       {
         text: I18n.t('Scored less than'),
         cutoff: true,
+        // @ts-expect-error
         subjectFn: (assignment, cutoff: number) =>
           I18n.t('Scored less than %{cutoff} on %{assignment}', {
             assignment: assignment.name,
             cutoff: I18n.n(cutoff),
           }),
+        // @ts-expect-error
         criteriaFn: (student, cutoff) =>
           this.scoreWithCutoff(student, cutoff) && student.score < cutoff,
       },
       {
         text: I18n.t('Scored more than'),
         cutoff: true,
+        // @ts-expect-error
         subjectFn: (assignment, cutoff: number) =>
           I18n.t('Scored more than %{cutoff} on %{assignment}', {
             assignment: assignment.name,
             cutoff: I18n.n(cutoff),
           }),
+        // @ts-expect-error
         criteriaFn: (student, cutoff) =>
           this.scoreWithCutoff(student, cutoff) && student.score > cutoff,
       },
@@ -176,19 +190,24 @@ const MessageStudentsWhoHelper = {
   },
 
   // implement this so it can be stubbed in tests
+  // @ts-expect-error
   hasSubmission(assignment) {
     return hasSubmission(assignment)
   },
 
+  // @ts-expect-error
   exists(value) {
     return value != null
   },
 
+  // @ts-expect-error
   scoreWithCutoff(student, cutoff) {
     return this.exists(student.score) && student.score !== '' && this.exists(cutoff)
   },
 
+  // @ts-expect-error
   callbackFn(selected, cutoff, students) {
+    // @ts-expect-error
     const criteriaFn = this.findOptionByText(selected).criteriaFn
     const studentsMatchingCriteria = filter(students, student =>
       criteriaFn(student.user_data, cutoff)
@@ -196,13 +215,17 @@ const MessageStudentsWhoHelper = {
     return map(studentsMatchingCriteria, student => student.user_data.id)
   },
 
+  // @ts-expect-error
   findOptionByText(text) {
     return find(this.allOptions(), option => option.text === text)
   },
 
+  // @ts-expect-error
   generateSubjectCallbackFn(assignment) {
+    // @ts-expect-error
     return (selected, cutoff) => {
       const cutoffString = cutoff || ''
+      // @ts-expect-error
       const subjectFn = this.findOptionByText(selected).subjectFn
       return subjectFn(assignment, cutoffString)
     }

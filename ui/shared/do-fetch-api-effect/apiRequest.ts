@@ -43,12 +43,12 @@ export type ApiRequest = {
  * additional functionality or benefits. Please use `doFetchApi` directly.
  */
 export async function executeApiRequest<T>(request: ApiRequest): Promise<ApiResponse<T>> {
-  // @ts-expect-error
   const {json, response, link} = await doFetchApi(request)
 
   return {
     data: json as T,
     status: (response as Response).status,
+    // @ts-expect-error
     link,
   }
 }

@@ -265,6 +265,7 @@ export function TempEnrollSearch(props: Props) {
             height="9em"
             value={search}
             placeholder={exampleText}
+            // @ts-expect-error
             onChange={handleSearchChange}
           />
         </Flex.Item>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -23,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {PaceContextTypes} from '../../types'
+import type {PaceContextTypes} from '../../types'
 
 const I18n = useI18nScope('unpublished_warning_modal')
 
@@ -46,6 +45,7 @@ const WARNING_MODAL_BODY_TEXT = {
   ),
 }
 
+// @ts-expect-error
 const UnpublishedWarningModal = ({open, onCancel, onConfirm, contextType}) => {
   return (
     <Modal
@@ -57,6 +57,7 @@ const UnpublishedWarningModal = ({open, onCancel, onConfirm, contextType}) => {
     >
       <Modal.Body>
         <View>
+          {/* @ts-expect-error */}
           <Text>{WARNING_MODAL_BODY_TEXT[contextType]}</Text>
         </View>
       </Modal.Body>

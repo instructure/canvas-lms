@@ -165,6 +165,7 @@ const ModalBodyWrapper = ({
         <Lti1p3RegistrationWizard
           accountId={accountId}
           service={lti1p3RegistrationWizardService}
+          // @ts-expect-error
           internalConfiguration={{
             title: state.manualAppName.trim(),
             target_link_uri: '',

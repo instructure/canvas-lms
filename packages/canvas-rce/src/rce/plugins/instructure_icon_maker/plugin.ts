@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -95,7 +94,7 @@ tinymce.PluginManager.add('instructure_icon_maker', function (ed) {
         }))
       ),
     onSetup(api) {
-      function handleNodeChange(_e) {
+      function handleNodeChange(_e: unknown) {
         api.setDisabled(!isOKToLink(ed.selection.getContent()))
       }
 
@@ -108,6 +107,7 @@ tinymce.PluginManager.add('instructure_icon_maker', function (ed) {
   })
 
   // Register context toolbar for editing existing icon maker icons
+  // @ts-expect-error
   registerEditToolbar(ed, api => {
     if (!api.isDisabled()) {
       handleOptionSelected(ed, 'instructure_edit_icon_maker')

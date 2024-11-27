@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -33,8 +32,8 @@ import {View} from '@instructure/ui-view'
 
 import UnpublishedWarningModal from './unpublished_warning_modal'
 
-import {StoreState, Enrollment, Section, PaceContextTypes, ResponsiveSizes} from '../../types'
-import {Course} from '../../shared/types'
+import type {StoreState, Enrollment, Section, PaceContextTypes, ResponsiveSizes} from '../../types'
+import type {Course} from '../../shared/types'
 import {getUnappliedChangesExist} from '../../reducers/course_paces'
 import {getSortedEnrollments} from '../../reducers/enrollments'
 import {getSortedSections} from '../../reducers/sections'
@@ -107,6 +106,7 @@ export const PacePicker = ({
     }
   }
 
+  // @ts-expect-error
   const handleSelect = (_, value: string | string[]) => {
     const option = Array.isArray(value) ? value[0] : value
     if (unappliedChangesExist) {
@@ -159,6 +159,7 @@ export const PacePicker = ({
       data-testid="course-pace-picker"
       interaction="readonly"
       role="button"
+      // @ts-expect-error
       onKeyDown={handleKeyDown}
       width={PICKER_WIDTH}
     />
@@ -181,6 +182,7 @@ export const PacePicker = ({
         trigger={trigger}
         show={open}
         onToggle={setOpen}
+        // @ts-expect-error
         onSelect={handleSelect}
       >
         {renderOption(createContextKey('Course', course.id), I18n.t('Course'))}
@@ -226,4 +228,5 @@ const mapStateToProps = (state: StoreState) => ({
 
 export default connect(mapStateToProps, {
   setSelectedPaceContext: actions.setSelectedPaceContext,
+  // @ts-expect-error
 })(PacePicker)

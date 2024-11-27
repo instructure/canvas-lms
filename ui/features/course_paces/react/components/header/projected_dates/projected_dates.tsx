@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -27,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {coursePaceActions as actions} from '../../../actions/course_paces'
-import {StoreState, CoursePace, OptionalDate, PaceDuration} from '../../../types'
+import type {StoreState, CoursePace, OptionalDate, PaceDuration} from '../../../types'
 import {
   getCoursePace,
   getCoursePaceItems,
@@ -106,6 +105,7 @@ export const ProjectedDates = ({
 
   const hasAtLeastOneDate = () => !!(startDateValue || endDateValue)
 
+  // @ts-expect-error
   const renderDate = (label, dateValue, helpText, testid) => {
     return (
       <div data-testid={testid} style={{display: 'inline-block', lineHeight: '1.125rem'}}>

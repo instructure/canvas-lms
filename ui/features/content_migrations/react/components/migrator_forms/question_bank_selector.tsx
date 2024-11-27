@@ -53,6 +53,7 @@ const QuestionBankSelector = ({
   const questionBanks = ENV.QUESTION_BANKS || []
 
   const handleChange = useCallback(
+    // @ts-expect-error
     (_, {value}) => {
       setShowQuestionInput(value === 'new_question_bank')
       if (!value) {
@@ -78,6 +79,7 @@ const QuestionBankSelector = ({
           data-testid="questionBankSelect"
           renderLabel={I18n.t('Default Question bank')}
           assistiveText={I18n.t('Select a question bank')}
+          // @ts-expect-error
           onChange={handleChange}
           disabled={disable}
           value={questionBankSettings?.question_bank_id || ''}

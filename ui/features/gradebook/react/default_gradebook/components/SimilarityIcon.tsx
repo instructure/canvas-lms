@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -27,6 +26,7 @@ import {
   IconWarningLine,
 } from '@instructure/ui-icons'
 
+// @ts-expect-error
 export default function SimilarityIcon({similarityScore, status}) {
   if (status === 'scored' && similarityScore != null) {
     if (similarityScore <= 20) {

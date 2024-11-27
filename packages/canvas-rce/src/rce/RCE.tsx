@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -315,6 +313,7 @@ const defaultProps = {
   onInit: () => undefined,
 }
 
+// @ts-expect-error
 RCE.defaultProps = defaultProps
 
 export default RCE

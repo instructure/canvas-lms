@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -75,6 +74,7 @@ class RailsFlashNotificationsHelper {
     return this.holder != null
   }
 
+  // @ts-expect-error
   createNode(type, content, timeout, cssOptions = {}, classes = '') {
     if (this.holderReady()) {
       const node = this.generateNodeHTML(type, content)
@@ -91,6 +91,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
+  // @ts-expect-error
   generateNodeHTML(type, content) {
     const icon = this.getIconType(type)
     const escapedType = htmlEscape(type)
@@ -112,6 +113,7 @@ class RailsFlashNotificationsHelper {
     `.trim()
   }
 
+  // @ts-expect-error
   getIconType(type) {
     if (type === 'success') {
       return 'check'
@@ -137,6 +139,7 @@ class RailsFlashNotificationsHelper {
     return this.screenreader_holder != null
   }
 
+  // @ts-expect-error
   createScreenreaderNode(content, closable = true) {
     if (this.screenreaderHolderReady()) {
       updateAriaLive.call(this, {polite: false})
@@ -178,6 +181,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
+  // @ts-expect-error
   createScreenreaderNodeExclusive(content, polite = false) {
     if (this.screenreaderHolderReady()) {
       updateAriaLive.call(this, {polite})
@@ -187,6 +191,7 @@ class RailsFlashNotificationsHelper {
     }
   }
 
+  // @ts-expect-error
   generateScreenreaderNodeHTML(content, closable) {
     let closeContent
     if (closable) {
@@ -198,9 +203,8 @@ class RailsFlashNotificationsHelper {
     return `<span>${this.escapeContent(content)}${htmlEscape(closeContent)}</span>`
   }
 
-  /*
-xsslint safeString.method escapeContent
-*/
+  // @ts-expect-error
+  // xsslint safeString.method escapeContent
   escapeContent(content) {
     if (content.hasOwnProperty('html')) {
       return content.html

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,50 +19,63 @@
 import GridHelper from './GridHelper'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
+// @ts-expect-error
 function isLeftArrow(event) {
   return event.which === 37
 }
 
+// @ts-expect-error
 function isRightArrow(event) {
   return event.which === 39
 }
 
 // RTL aware methods that "flip" left and right so arrows do the right thing in RTL
+// @ts-expect-error
 const isNextArrow = event => (isRTL(event.target) ? isLeftArrow : isRightArrow)(event)
+// @ts-expect-error
 const isPrevArrow = event => (isRTL(event.target) ? isRightArrow : isLeftArrow)(event)
 
+// @ts-expect-error
 function isUpArrow(event) {
   return event.which === 38
 }
 
+// @ts-expect-error
 function isDownArrow(event) {
   return event.which === 40
 }
 
+// @ts-expect-error
 function isTab(event) {
   return event.which === 9 && !event.shiftKey
 }
 
+// @ts-expect-error
 function isShiftTab(event) {
   return event.which === 9 && event.shiftKey
 }
 
+// @ts-expect-error
 function skipSlickGridDefaults(event) {
   ;(event.originalEvent || event).skipSlickGridDefaults = true
 }
 
+// @ts-expect-error
 function isFirstRow(location, _grid) {
   return location.row === 0
 }
 
+// @ts-expect-error
 function isLastRow(location, grid) {
   return location.row === grid.getData().length - 1
 }
 
+// @ts-expect-error
 function isFirstCellInRow(location, _grid) {
   return location.cell === 0
 }
 
+// @ts-expect-error
 function isLastCellInRow(location, grid) {
   return location.cell === grid.getColumns().length - 1
 }
@@ -75,6 +87,7 @@ export default class Navigation {
 
   helper: GridHelper
 
+  // @ts-expect-error
   constructor(grid, gridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport
@@ -92,11 +105,13 @@ export default class Navigation {
     })
   }
 
+  // @ts-expect-error
   handleClick = event => {
     const {region, ...location} = this.getEventLocation(event)
     this.gridSupport.state.setActiveLocation(region, location)
   }
 
+  // @ts-expect-error
   handleKeyDown = (sourceEvent, obj = {}) => {
     const event = sourceEvent.originalEvent || sourceEvent
     const location = this.getEventLocation(event, obj)
@@ -119,6 +134,7 @@ export default class Navigation {
     this.helper.syncScrollPositions()
   }
 
+  // @ts-expect-error
   handleHeaderKeyDown(event, location) {
     if (isTab(event)) {
       // Tab out of the grid: Activate the "after grid" region.
@@ -174,6 +190,7 @@ export default class Navigation {
     skipSlickGridDefaults(event)
   }
 
+  // @ts-expect-error
   handleBodyKeyDown(event, location) {
     if (isShiftTab(event)) {
       // Shift+Tab out of the grid: Activate the "before grid" region.
@@ -271,6 +288,7 @@ export default class Navigation {
     // All other keys are either handled by SlickGrid or altogether ignored.
   }
 
+  // @ts-expect-error
   handleBeforeGridKeyDown(event, _location) {
     if (isTab(event)) {
       // Tab into the header: Activate the first cell.
@@ -285,6 +303,7 @@ export default class Navigation {
     skipSlickGridDefaults(event)
   }
 
+  // @ts-expect-error
   handleAfterGridKeyDown(event, _location) {
     if (isShiftTab(event)) {
       // Shift+Tab back into the body: Activate the first cell.
@@ -307,6 +326,7 @@ export default class Navigation {
     skipSlickGridDefaults(event)
   }
 
+  // @ts-expect-error
   trigger(handlerName, event) {
     const gridEvent = this.gridSupport.events[handlerName]
     if (gridEvent) {
@@ -320,6 +340,7 @@ export default class Navigation {
     return undefined
   }
 
+  // @ts-expect-error
   getEventLocation(event, obj: {row?: number; cell?: number} = {}) {
     const columns = this.grid.getColumns()
 
@@ -327,6 +348,7 @@ export default class Navigation {
       return {region: 'body', row: obj.row, cell: obj.cell, columnId: columns[obj.cell].id}
     }
 
+    // @ts-expect-error
     const index = columns.findIndex(column => {
       const $headerNode = this.helper.getColumnHeaderNode(column.id)
       return $headerNode === event.target || $headerNode?.contains(event.target)

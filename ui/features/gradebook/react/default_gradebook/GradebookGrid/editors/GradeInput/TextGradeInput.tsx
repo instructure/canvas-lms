@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -41,6 +40,7 @@ export default class TextGradeInput extends PureComponent {
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -55,6 +55,7 @@ export default class TextGradeInput extends PureComponent {
     }
   }
 
+  // @ts-expect-error
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.textInput !== document.activeElement) {
       const nextInfo = nextProps.pendingGradeInfo || nextProps.gradeInfo
@@ -67,6 +68,7 @@ export default class TextGradeInput extends PureComponent {
   }
 
   get gradeInfo() {
+    // @ts-expect-error
     return this.state.gradeInfo
   }
 
@@ -79,13 +81,16 @@ export default class TextGradeInput extends PureComponent {
     return undefined
   }
 
+  // @ts-expect-error
   handleTextChange(event) {
     let {value} = event.target
+    // @ts-expect-error
     if (this.props.gradeEntry.restrictToTwoDigitsAfterSeparator) {
       value = finalGradeOverrideUtils.restrictToTwoDigitsAfterSeparator(value)
     }
 
     this.setState({
+      // @ts-expect-error
       gradeInfo: this.props.gradeEntry.parseValue(value, true),
       inputValue: value,
     })
@@ -94,15 +99,20 @@ export default class TextGradeInput extends PureComponent {
   render() {
     return (
       <TextInput
+        // @ts-expect-error
         disabled={this.props.disabled}
         inputRef={ref => {
+          // @ts-expect-error
           this.textInput = ref
         }}
+        // @ts-expect-error
         renderLabel={this.props.label}
+        // @ts-expect-error
         messages={this.props.messages}
         onChange={this.handleTextChange}
         size="small"
         textAlign="center"
+        // @ts-expect-error
         value={this.state.inputValue}
       />
     )

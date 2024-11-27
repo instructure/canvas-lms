@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -62,11 +61,13 @@ class GradebookExportManager {
 
   static DEFAULT_CANCEL_BASE_URL = '/api/v1/progress'
 
+  // @ts-expect-error
   static exportCompleted(workflowState) {
     return workflowState === 'completed'
   }
 
   // Returns false if the workflowState is 'failed' or an unknown state
+  // @ts-expect-error
   static exportFailed(workflowState) {
     if (workflowState === 'failed') return true
 
@@ -74,8 +75,11 @@ class GradebookExportManager {
   }
 
   constructor(
+    // @ts-expect-error
     exportingUrl,
+    // @ts-expect-error
     currentUserId,
+    // @ts-expect-error
     existingExport,
     pollingInterval = GradebookExportManager.DEFAULT_POLLING_INTERVAL,
     updateExportState?: (name?: string, val?: number) => void
@@ -141,6 +145,7 @@ class GradebookExportManager {
     this.export = undefined
   }
 
+  // @ts-expect-error
   monitorExport(resolve, reject) {
     if (!this.monitoringUrl()) {
       this.export = undefined
@@ -193,8 +198,10 @@ class GradebookExportManager {
 
   startExport(
     gradingPeriodId: string | null,
+    // @ts-expect-error
     getAssignmentOrder,
     showStudentFirstLastName = false,
+    // @ts-expect-error
     getStudentOrder,
     currentView = false
   ) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -38,6 +37,7 @@ const assignmentUtils = {
     please_ignore: boolean
     original_error: boolean
   } {
+    // @ts-expect-error
     const a: PartialAssignment = pick(assignment, [
       'id',
       'name',
@@ -77,6 +77,7 @@ const assignmentUtils = {
     return assignments.some(fn)
   },
 
+  // @ts-expect-error
   noDueDateForEveryoneElseOverride(a) {
     const has_overrides = a.overrides?.length > 0
     if (has_overrides && a.overrides.length !== a.sectionCount && !a.due_at) {
@@ -250,6 +251,7 @@ const assignmentUtils = {
     return false
   },
 
+  // @ts-expect-error
   suitableToPost(assignment) {
     return assignment.published && assignment.post_to_sis
   },

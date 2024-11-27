@@ -63,10 +63,13 @@ export const RubricCreateModal = ({
             rubric={rubric}
             rubricAssociation={rubricAssociation}
             courseId={ENV.COURSE_ID}
+            // @ts-expect-error
             assignmentId={ENV.ASSIGNMENT_ID}
             onCancel={onDismiss}
             onSaveRubric={onSaveRubric}
+            // @ts-expect-error
             canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+            // @ts-expect-error
             criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
             hideHeader={true}
             rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}

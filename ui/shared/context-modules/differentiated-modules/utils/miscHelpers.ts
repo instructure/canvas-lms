@@ -18,7 +18,7 @@
 
 import * as tz from '@instructure/moment-utils'
 import type {SettingsPanelState} from '../react/settingsReducer'
-import type {ModuleItem, Requirement, DiscussionRequirement} from '../react/types'
+import type {Requirement} from '../react/types'
 
 export function calculatePanelHeight(withinTabs: boolean): string {
   let headerHeight = 79.5

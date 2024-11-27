@@ -71,6 +71,7 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
     <>
       <RatingButton
         action="like"
+        // @ts-expect-error
         isActive={props.liked}
         isEnabled={props.isEnabled}
         onClick={props.onLikeClick}
@@ -79,6 +80,7 @@ export const DiscussionSummaryRatings: React.FC<DiscussionSummaryRatingsProps> =
       />
       <RatingButton
         action="dislike"
+        // @ts-expect-error
         isActive={props.disliked}
         isEnabled={props.isEnabled}
         onClick={props.onDislikeClick}

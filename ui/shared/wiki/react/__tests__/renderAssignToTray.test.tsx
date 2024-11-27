@@ -55,6 +55,7 @@ export const STUDENTS_DATA = [
   },
 ]
 
+// @ts-expect-error
 window.ENV = {
   COURSE_ID: '1',
 }
@@ -110,6 +111,7 @@ describe('renderAssignToTray', () => {
 
 describe('renderAssignToTray embedded', () => {
   beforeAll(() => {
+    // @ts-expect-error
     window.ENV = {
       COURSE_ID: '1',
       FEATURES: {

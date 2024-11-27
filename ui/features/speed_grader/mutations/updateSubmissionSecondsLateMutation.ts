@@ -46,7 +46,6 @@ export const updateSubmissionSecondsLate = ({
   return doFetchApi({
     path: url,
     method,
-    // @ts-ignore JSON.stringify will not be parsed correctly
     body: data,
   })
 }

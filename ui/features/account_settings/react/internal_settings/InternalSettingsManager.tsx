@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -21,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {useMutation} from '@apollo/react-hooks'
 import React, {useContext, useEffect, useState} from 'react'
-import {
+import type {
   CreateInternalSettingData,
   CreateInternalSettingVariables,
   DeleteInternalSettingData,
@@ -177,6 +176,7 @@ export const InternalSettingsManager = (props: {internalSettings: InternalSettin
           <Dialog
             open={!!pendingDeleteId}
             shouldContainFocus={true}
+            // @ts-expect-error
             defaultFocusElement={() => {}}
             shouldReturnFocus={true}
             onDismiss={cancelDeleteInternalSetting}

@@ -22,6 +22,7 @@ import {LtiScopes} from '@canvas/lti/model/LtiScope'
 export const mockInternalConfiguration = (
   overrides?: Partial<InternalLtiConfiguration>
 ): InternalLtiConfiguration => {
+  // @ts-expect-error
   return {
     title: 'title',
     description: 'description',

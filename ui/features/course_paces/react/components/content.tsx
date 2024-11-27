@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -227,4 +226,5 @@ export default connect(mapStateToProps, {
   setSelectedContext: paceContextsActions.setSelectedContext,
   setSelectedModalContext: uiActions.setSelectedPaceContext,
   syncPublishingPaces: paceContextsActions.syncPublishingPaces,
+  // @ts-expect-error
 })(PaceContent)

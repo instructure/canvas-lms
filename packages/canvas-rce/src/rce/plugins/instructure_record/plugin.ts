@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -33,6 +32,7 @@ const COURSE_PLUGIN_KEY = 'course_media'
 const USER_PLUGIN_KEY = 'user_media'
 const GROUP_PLUGIN_KEY = 'group_media'
 
+// @ts-expect-error
 function getMenuItems(ed) {
   const contextType = ed.settings.canvas_rce_user_context.type
   const items: Array<{text: string; value: string}> = []
@@ -61,6 +61,7 @@ function getMenuItems(ed) {
   return items
 }
 
+// @ts-expect-error
 function doMenuItem(ed, value) {
   switch (value) {
     case 'instructure_upload_media':
@@ -120,6 +121,7 @@ tinymce.PluginManager.add('instructure_record', function (ed) {
         }))
       ),
     onSetup(api) {
+      // @ts-expect-error
       function handleNodeChange(_e) {
         api.setDisabled(!isOKToLink(ed.selection.getContent()))
       }

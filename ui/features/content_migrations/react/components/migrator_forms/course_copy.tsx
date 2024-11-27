@@ -128,6 +128,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
       <View as="div" margin="medium none none none" width="100%" maxWidth="22.5rem">
         <CanvasSelect
           id="course-copy-select-course"
+          // @ts-expect-error
           inputValue={selectedCourse ? selectedCourse.label : searchParam}
           interaction={isSubmitting ? 'disabled' : 'enabled'}
           onInputChange={getCourseOptions}

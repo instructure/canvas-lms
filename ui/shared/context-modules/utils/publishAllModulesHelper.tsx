@@ -75,6 +75,7 @@ export function monitorProgress(
       doFetchApi({
         path: `/api/v1/progress/${progressId}`,
       })
+        // @ts-expect-error
         .then((result: CanvasProgressAPIResult) => {
           progress = result.json
           if (!['completed', 'failed'].includes(progress.workflow_state)) {
@@ -103,6 +104,7 @@ export function cancelBatchUpdate(
     method: 'POST',
     body: {message: 'canceled'},
   })
+    // @ts-expect-error
     .then((_result: CanvasProgressAPIResult) => {
       onCancelComplete()
     })
@@ -115,6 +117,7 @@ export function fetchAllItemPublishedStates(courseId: string | number, nextLink?
   return doFetchApi({
     path: nextLink || `/api/v1/courses/${courseId}/modules?include[]=items`,
     method: 'GET',
+    // @ts-expect-error
   }).then((response: DoFetchModuleWithItemsResponse) => {
     const {json, link} = response
     json.forEach((module: any) => {

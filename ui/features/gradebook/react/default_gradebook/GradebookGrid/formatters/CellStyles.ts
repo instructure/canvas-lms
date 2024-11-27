@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -17,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// @ts-expect-error
 export function classNamesForAssignmentCell(assignment, submissionData) {
   const classNames: string[] = []
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -48,6 +47,7 @@ declare global {
 // Simple dropdown list.  Takes the list of attributes specified in "options" and displays them
 // in a menu anchored to the selected element.
 $.fn.dropdownList = Object.assign(
+  // @ts-expect-error
   function (this: typeof $.fn, options) {
     if (this.length) {
       let $div = $('#instructure_dropdown_list')

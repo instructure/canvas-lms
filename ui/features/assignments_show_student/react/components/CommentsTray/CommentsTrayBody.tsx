@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,11 +19,9 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import CommentContent from './CommentContent'
 import CommentTextArea from './CommentTextArea'
 import ErrorBoundary from '@canvas/error-boundary'
-// @ts-ignore
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
-// @ts-ignore
 import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -51,6 +48,7 @@ import {
 const I18n = useI18nScope('assignments_2')
 const COMPLETED_WORKFLOW_STATE = 'completed'
 
+// @ts-expect-error
 export default function CommentsTrayBody(props) {
   const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)
   const [peerReviewModalOpen, setPeerReviewModalOpen] = useState(false)
@@ -73,7 +71,7 @@ export default function CommentsTrayBody(props) {
     setIsFetchingMoreComments(true)
     await fetchMore({
       variables: {
-        // @ts-ignore
+        // @ts-expect-error
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
         ...queryVariables,
       },
@@ -93,6 +91,7 @@ export default function CommentsTrayBody(props) {
   }
 
   const handlePeerReviewPromptModal = () => {
+    // @ts-expect-error
     const matchingAssessment = assignedAssessments.find(x => x.assetId === props.submission._id)
     if (!matchingAssessment) return
 

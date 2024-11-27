@@ -106,6 +106,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
             {I18n.t('Back to Pages')}
           </Button>
         </div>
+        {/* @ts-expect-error */}
         <DisplayLayoutButtons displayType={displayType} setDisplayType={setDisplayType} />
       </Modal.Header>
       <Modal.Body>

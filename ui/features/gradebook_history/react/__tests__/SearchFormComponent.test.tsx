@@ -55,7 +55,6 @@ liveRegion.setAttribute('role', 'alert')
 document.body.appendChild(liveRegion)
 
 const mountComponent = (props = {}) =>
-  // @ts-expect-error
   shallow(<SearchFormComponent {...defaultProps()} {...props} />)
 
 describe('SearchForm', () => {

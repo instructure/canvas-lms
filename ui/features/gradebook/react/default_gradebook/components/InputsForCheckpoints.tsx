@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -34,10 +33,13 @@ import {
   NONE,
   REPLY_TO_TOPIC,
 } from './SubmissionTray'
+// @ts-expect-error
 import type {GradingStandard, PendingGradeInfo} from '../gradebook.d'
 import {
+  // @ts-expect-error
   CamelizedAssignment,
   type GradeEntryMode,
+  // @ts-expect-error
   GradeResult,
   type SubmissionData,
 } from '@canvas/grading/grading.d'
@@ -81,7 +83,9 @@ export const InputsForCheckpoints = (props: Props) => {
   const isStatusLate = checkpointStatus === LATE
 
   useEffect(() => {
+    // @ts-expect-error
     setLocalTimeLate(checkpointState?.timeLate)
+    // @ts-expect-error
   }, [checkpointState.timeLate])
 
   const getSubAssignment = (
@@ -151,6 +155,7 @@ export const InputsForCheckpoints = (props: Props) => {
             value={checkpointStatus}
             onChange={(_e, {value}) => {
               props.updateCheckpointStates(props.subAssignmentTag, 'timeLate', '0')
+              // @ts-expect-error
               if (standardStatuses.includes(value)) {
                 props.updateCheckpointStates(
                   props.subAssignmentTag,
@@ -158,6 +163,7 @@ export const InputsForCheckpoints = (props: Props) => {
                   value?.toString() || NONE
                 )
               } else {
+                // @ts-expect-error
                 props.updateCheckpointStates(props.subAssignmentTag, 'customGradeStatusId', value)
               }
             }}

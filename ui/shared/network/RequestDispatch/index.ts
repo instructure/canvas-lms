@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -65,11 +64,13 @@ export default class RequestDispatch {
     return this.requests.find(request => !request.active)
   }
 
+  // @ts-expect-error
   addRequest(request) {
     this.requests.push(request)
     this.fillQueue()
   }
 
+  // @ts-expect-error
   clearRequest(request) {
     this.requests = this.requests.filter(r => r !== request)
     this.fillQueue()
@@ -85,7 +86,9 @@ export default class RequestDispatch {
 
   getDepaginated<T>(
     url: string,
+    // @ts-expect-error
     params,
+    // @ts-expect-error
     pageCallback: (data?) => void = () => {},
     pagesEnqueuedCallback = (_deferreds: ReturnType<typeof deferPromise>[]) => {}
   ): Promise<T> {
@@ -131,6 +134,7 @@ export default class RequestDispatch {
     return request.deferred.promise
   }
 
+  // @ts-expect-error
   getJSON<T>(url: string, params?): Promise<T> {
     const request = {
       deferred: deferPromise<T>(),
@@ -146,6 +150,7 @@ export default class RequestDispatch {
        */
       request.active = true
 
+      // @ts-expect-error
       $.ajaxJSON(url, 'GET', params)
         .then(request.deferred.resolve)
         .fail(request.deferred.reject)
@@ -162,12 +167,15 @@ export default class RequestDispatch {
 
   // PRIVILEGED
 
+  // @ts-expect-error
   _getJSON(url, params) {
     return new Promise((resolve, reject) => {
+      // @ts-expect-error
       $.ajaxJSON(
         url,
         'GET',
         params,
+        // @ts-expect-error
         (data, xhr) => {
           resolve({data, xhr})
         },

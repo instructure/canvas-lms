@@ -865,6 +865,7 @@ $(document).ready(function () {
             fileSelectBox?.setDirty()
             renderCurrentUploads()
           } else if (typeof url !== 'undefined') {
+            // @ts-expect-error
             $.ajaxJSON(
               url,
               'POST',
@@ -942,6 +943,7 @@ $(document).ready(function () {
         $select.find('.message').text('Loading...')
         const url = $('#select_context_content_dialog .external_tools_url').attr('href')
         if (typeof url !== 'undefined') {
+          // @ts-expect-error
           $.ajaxJSON(
             url,
             'GET',

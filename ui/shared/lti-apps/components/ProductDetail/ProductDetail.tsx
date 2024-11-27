@@ -142,7 +142,7 @@ const ProductDetail = (props: ProductDetailProps) => {
 
                 props.onConfigure!(
                   dynamicRegistrationInformation.url,
-                  // @ts-ignore
+                  // @ts-expect-error
                   dynamicRegistrationInformation.unified_tool_id,
                   () => {
                     // redirect to apps page

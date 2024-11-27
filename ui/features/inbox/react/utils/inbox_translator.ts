@@ -73,6 +73,7 @@ export async function translateText(args: TranslateArgs, text: string): Promise<
       },
     },
   })
+  // @ts-expect-error
   return result.json.translated_text
 }
 
@@ -90,6 +91,7 @@ export async function translateInboxMessage(
     },
   })
 
+  // @ts-expect-error
   callback(result.json)
 }
 
@@ -113,6 +115,7 @@ export function handleTranslatedModalBody(
   bodySetter: React.SetStateAction<string>,
   newBody?: string
 ) {
+  // @ts-expect-error
   bodySetter(prevBody => {
     let message
     if (typeof newBody !== 'undefined') {

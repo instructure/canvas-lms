@@ -20,6 +20,7 @@ import React from 'react'
 import TeacherCreateEditView from './TeacherCreateEditView'
 
 const TeacherCreateQuery = ({courseId}: {courseId: string}) => {
+  // @ts-expect-error
   return <TeacherCreateEditView edit={false} assignment={{course: {lid: courseId}}} />
 }
 

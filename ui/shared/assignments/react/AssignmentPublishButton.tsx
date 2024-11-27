@@ -101,6 +101,7 @@ const AssignmentPublishButton = ({
       .catch(() => handleUpdatePublishFailure(isPublishing))
   }
   const getButtonLabel = (): React.ReactFragment => {
+    // @ts-expect-error
     return (
       <>
         {assignmentPublished ? I18n.t('Published') : I18n.t('Unpublished')}

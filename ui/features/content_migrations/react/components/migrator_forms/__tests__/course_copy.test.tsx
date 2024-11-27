@@ -38,6 +38,7 @@ describe('CourseCopyImporter', () => {
       id: '0',
     }
     window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
+    // @ts-expect-error
     doFetchApi.mockReturnValue(
       Promise.resolve({
         json: [

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -23,6 +22,7 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import classnames from 'classnames'
 import TimeLateInput from '@canvas/grading/TimeLateInput'
 
+// @ts-expect-error
 function styles({color, showNumberInput}) {
   return {
     backgroundColor: color,
@@ -55,6 +55,7 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
     color: 'transparent',
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -63,6 +64,7 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
     })
   }
 
+  // @ts-expect-error
   handleRadioInputChange = event => {
     this.props.onChange(event)
   }
@@ -86,10 +88,12 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
         <TimeLateInput
           key={(this.props.submission.id || 'none').toString()}
           disabled={this.props.disabled}
+          // @ts-expect-error
           lateSubmissionInterval={this.props.latePolicy.lateSubmissionInterval}
           locale={this.props.locale}
           secondsLate={this.props.submission.secondsLate}
           renderLabelBefore={false}
+          // @ts-expect-error
           onSecondsLateUpdated={this.props.updateSubmission}
           width="5rem"
           visible={showNumberInput}

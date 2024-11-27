@@ -188,6 +188,7 @@ const AssigneeSelector = ({
         setInputRef={inputRef}
         listRef={e => (listElementRef.current = e)}
         customOnRequestShowOptions={handleShowOptions}
+        // @ts-expect-error
         onFocus={handleFocus}
         customRenderBeforeInput={tags =>
           tags?.map((tag: ReactElement) => (

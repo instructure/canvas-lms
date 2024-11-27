@@ -18,7 +18,7 @@
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import {ActionDropDown, ActionObject} from '../ActionDropDown'
+import {ActionDropDown, type ActionObject} from '../ActionDropDown'
 import {IconTrashLine, IconLockLine} from '@instructure/ui-icons'
 
 describe('ActionDropDown', () => {

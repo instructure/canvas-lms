@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -76,6 +75,7 @@ class ScoreToUngradedManager {
     }
   }
 
+  // @ts-expect-error
   monitorProcess(resolve, reject) {
     if (!this.monitoringUrl()) {
       this.process = undefined

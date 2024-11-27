@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -56,6 +55,7 @@ type State = {
 }
 
 export default class AssignmentPostingPolicyTray extends PureComponent<Props, State> {
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -74,6 +74,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
     this.setState({open: false})
   }
 
+  // @ts-expect-error
   show(context) {
     this.setState({
       ...context,
@@ -83,6 +84,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
     })
   }
 
+  // @ts-expect-error
   handlePostPolicyChanged({postManually}) {
     this.setState({selectedPostManually: postManually})
   }
@@ -98,6 +100,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
 
     this.setState({requestInProgress: true})
     setAssignmentPostPolicy({assignmentId, postManually: selectedPostManually})
+      // @ts-expect-error
       .then(response => {
         const message = I18n.t('Success! The post policy for %{name} has been updated.', {name})
         const {postManually} = response
@@ -106,6 +109,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent<Props, St
         this.state.onAssignmentPostPolicyUpdated?.({assignmentId, postManually})
         this.handleDismiss()
       })
+      // @ts-expect-error
       .catch(_error => {
         const message = I18n.t('An error occurred while saving the assignment post policy')
         showFlashAlert({message, type: 'error', err: null})

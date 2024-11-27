@@ -30,9 +30,7 @@ const helper = {
     }
 
     let num = helper._parseNumber(input.toString(), {
-      // @ts-expect-error
       thousands: I18n.lookup('number.format.delimiter'),
-      // @ts-expect-error
       decimal: I18n.lookup('number.format.separator'),
     })
 

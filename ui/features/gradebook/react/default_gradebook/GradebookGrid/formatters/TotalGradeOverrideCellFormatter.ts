@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -23,6 +22,7 @@ import type Gradebook from '../../Gradebook'
 import useStore from '../../stores'
 import {gradeOverrideCustomStatus} from '../../FinalGradeOverrides/FinalGradeOverride.utils'
 
+// @ts-expect-error
 function renderStartContainer(gradeInfo) {
   let content = ''
   if (!gradeInfo.valid) {
@@ -32,6 +32,7 @@ function renderStartContainer(gradeInfo) {
   return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
 }
 
+// @ts-expect-error
 function render(formattedGrade, gradeInfo, studentId, selectedGradingPeriodId) {
   const escapedGrade = lodashEscape(formattedGrade)
 
@@ -95,6 +96,7 @@ export default class TotalGradeOverrideCellFormatter {
     this.render = this.render.bind(this)
   }
 
+  // @ts-expect-error
   render(_row, _cell, _value, _columnDef, student /* dataContext */) {
     const gradeInfo = this.options.getGradeInfoForUser(student.id)
     const formattedGrade = this.options.formatGradeInfo(gradeInfo)
