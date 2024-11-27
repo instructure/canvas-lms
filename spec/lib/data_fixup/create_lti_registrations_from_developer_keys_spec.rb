@@ -59,6 +59,13 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
         .to eq(second_account_key.internal_service)
     end
 
+    it "links tool configuration to registration" do
+      described_class.run
+      second_account_key.reload
+      expect(second_account_key.lti_registration.manual_configuration)
+        .to eq(second_account_key.referenced_tool_configuration)
+    end
+
     context "and with a developer key that already has a registration" do
       # registration will be created for this key automatically
       before { dev_key_model_1_3(account: first_account) }
