@@ -16,11 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {CopyCourseForm} from './components/CopyCourseForm'
-
-export const App = () => {
-  return <CopyCourseForm />
-}
-
-export default App
+export type Term = Readonly<{
+  name: string
+  id: string
+}>

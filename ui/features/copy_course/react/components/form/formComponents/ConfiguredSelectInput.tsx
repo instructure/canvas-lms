@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('content_copy_redesign')
 
-type Option = {id: string; label: string}
+type Option = {id: string; name: string}
 
 export const ConfiguredSelectInput = ({
   label,
@@ -45,7 +45,7 @@ export const ConfiguredSelectInput = ({
   }
 
   const getOptionLabelById = (queryId: string | null) => {
-    return queryId ? getOptionById(queryId)?.label || '' : ''
+    return queryId ? getOptionById(queryId)?.name || '' : ''
   }
 
   const handleShowOptions = () => {
@@ -97,7 +97,7 @@ export const ConfiguredSelectInput = ({
             isHighlighted={option.id === highlightedOptionId}
             isSelected={option.id === selectedOptionId}
           >
-            {option.label}
+            {option.name}
           </Select.Option>
         )
       })}

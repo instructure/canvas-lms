@@ -611,9 +611,15 @@ export type Account = Readonly<{
 }>
 
 // '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname',
+// '/api/v1/courses/:id',
 export type Course = Readonly<{
   id: string
   name: string
+  course_code?: string
+  start_at?: string
+  end_at?: string
+  time_zone: string
+  blueprint: boolean
   workflow_state: string
   enrollment_term_id: number
   term: {
@@ -622,6 +628,15 @@ export type Course = Readonly<{
   homeroom_course: boolean
   sis_course_id: string | null
   sections: [
+    {
+      id: string
+      name: string
+    }
+  ]
+}>
+
+export type EnrollmentTerms = Readonly<{
+  enrollment_terms: [
     {
       id: string
       name: string

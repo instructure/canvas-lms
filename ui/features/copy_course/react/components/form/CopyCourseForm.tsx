@@ -22,23 +22,35 @@ import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {CommonMigratorControls, parseDateToISOString} from '@canvas/content-migrations'
-import {CreateCourseLabel} from './CreateCourseLabel'
-import {ConfiguredDateInput} from './ConfiguredDateInput'
-import {ConfiguredTextInput} from './ConfiguredTextInput'
-import {ConfiguredSelectInput} from './ConfiguredSelectInput'
+import {CreateCourseLabel} from './formComponents/CreateCourseLabel'
+import {ConfiguredDateInput} from './formComponents/ConfiguredDateInput'
+import {ConfiguredTextInput} from './formComponents/ConfiguredTextInput'
+import {ConfiguredSelectInput} from './formComponents/ConfiguredSelectInput'
+import type {Course} from '../../../../../api'
+import type {Term} from '../../types'
 
 const I18n = useI18nScope('content_copy_redesign')
 
-type Term = {id: string; label: string}
+const dateOrNull = (dateString: string | undefined) => (dateString ? new Date(dateString) : null)
 
-export const CopyCourseForm = () => {
+export const CopyCourseForm = ({
+  course,
+  terms,
+  timeZone,
+  canImportAsNewQuizzes,
+}: {
+  course: Course
+  terms: Term[]
+  timeZone?: string
+  canImportAsNewQuizzes: boolean
+}) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const [isBpCourse, setIsBpCourse] = useState<boolean>(false)
-  const [courseName, setCourseName] = useState<string>('')
-  const [courseCode, setCourseCode] = useState<string>('')
-  const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(null)
-  const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(null)
-  const [terms, setTerms] = useState<Term[]>([])
+  const [courseName, setCourseName] = useState<string>(course.name)
+  const [courseCode, setCourseCode] = useState<string>(course?.course_code || '')
+  const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(
+    dateOrNull(course?.start_at)
+  )
+  const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(dateOrNull(course?.end_at))
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(null)
 
   const handleSubmit = () => {
@@ -46,7 +58,7 @@ export const CopyCourseForm = () => {
   }
 
   const handleCancel = () => {
-    window.history.back()
+    window.location.href = `/courses/${course.id}/settings`
   }
 
   const handleTextInputChange = (value: string, setter: Dispatch<string>) => {
@@ -63,13 +75,12 @@ export const CopyCourseForm = () => {
     term && setSelectedTerm(term)
   }
 
-  const parsedEnvOldStartDate = parseDateToISOString(ENV.OLD_START_DATE)
-  const parsedEnvOldEndDate = parseDateToISOString(ENV.OLD_END_DATE)
-  const isoNewCourseStartDate = newCourseStartDate?.toISOString()
-  const isoNewCourseEndDate = newCourseEndDate?.toISOString()
+  const isoNewCourseStartDate = parseDateToISOString(newCourseStartDate)
+  const isoNewCourseEndDate = parseDateToISOString(newCourseEndDate)
+  const canImportBpSettings = course.blueprint || false
 
   return (
-    <View as="div" margin="small none xx-large none">
+    <View as="div">
       <Heading level="h1" margin="0 0 small">
         {I18n.t('Copy course')}
       </Heading>
@@ -96,6 +107,7 @@ export const CopyCourseForm = () => {
             placeholder={I18n.t('Select a date (optional)')}
             renderLabelText={I18n.t('Start date')}
             renderScreenReaderLabelText={I18n.t('Select a new beginning date')}
+            timeZone={timeZone}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -105,12 +117,13 @@ export const CopyCourseForm = () => {
             placeholder={I18n.t('Select a date (optional)')}
             renderLabelText={I18n.t('End date')}
             renderScreenReaderLabelText={I18n.t('Select a new end date')}
+            timeZone={timeZone}
           />
         </View>
         <View as="div" margin="medium none none none">
           <ConfiguredSelectInput
             label={I18n.t('Term')}
-            defaultInputValue={terms[0]?.label}
+            defaultInputValue={terms[0]?.name}
             options={terms}
             onSelect={selectedId => handleSelectTerm(selectedId)}
           />
@@ -119,12 +132,12 @@ export const CopyCourseForm = () => {
       <CommonMigratorControls
         canAdjustDates={true}
         canSelectContent={true}
-        canImportBPSettings={isBpCourse}
-        canImportAsNewQuizzes={ENV.NEW_QUIZZES_MIGRATION}
-        newStartDate={parsedEnvOldStartDate}
-        newEndDate={parsedEnvOldEndDate}
-        oldStartDate={parsedEnvOldStartDate}
-        oldEndDate={parsedEnvOldEndDate}
+        canImportBPSettings={canImportBpSettings}
+        canImportAsNewQuizzes={canImportAsNewQuizzes}
+        newStartDate={isoNewCourseStartDate}
+        newEndDate={isoNewCourseEndDate}
+        oldStartDate={isoNewCourseStartDate}
+        oldEndDate={isoNewCourseEndDate}
         fileUploadProgress={null}
         isSubmitting={isSubmitting}
         onCancel={handleCancel}

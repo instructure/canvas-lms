@@ -22,9 +22,9 @@ import {ConfiguredSelectInput} from '../ConfiguredSelectInput'
 
 describe('ConfiguredSelectInput', () => {
   const options = [
-    {id: '1', label: 'Option 1'},
-    {id: '2', label: 'Option 2'},
-    {id: '3', label: 'Option 3'},
+    {id: '1', name: 'Option 1'},
+    {id: '2', name: 'Option 2'},
+    {id: '3', name: 'Option 3'},
   ]
 
   const label = 'Test Label'
@@ -53,22 +53,22 @@ describe('ConfiguredSelectInput', () => {
     renderConfiguredSelectInput()
     fireEvent.click(screen.getByLabelText('Test Label'))
     options.forEach(option => {
-      expect(screen.getByText(option.label)).toBeInTheDocument()
+      expect(screen.getByText(option.name)).toBeInTheDocument()
     })
   })
 
   it('selects an option when clicked', () => {
     renderConfiguredSelectInput()
     fireEvent.click(screen.getByLabelText(label))
-    fireEvent.click(screen.getByText(options[1].label))
-    expect(screen.getByDisplayValue(options[1].label)).toBeInTheDocument()
+    fireEvent.click(screen.getByText(options[1].name))
+    expect(screen.getByDisplayValue(options[1].name)).toBeInTheDocument()
   })
 
   it('calls the onSelect mock on selection', () => {
     const onSelect = jest.fn()
     renderConfiguredSelectInput({onSelect})
     fireEvent.click(screen.getByLabelText(label))
-    fireEvent.click(screen.getByText(options[1].label))
+    fireEvent.click(screen.getByText(options[1].name))
     expect(onSelect).toHaveBeenCalledWith(options[1].id)
   })
 })
