@@ -80,6 +80,14 @@ const RCETextBlockToolbar = () => {
       >
         <Menu.Item
           type="checkbox"
+          value="auto"
+          selected={props.sizeVariant === 'auto'}
+          onSelect={handleChangeSzVariant}
+        >
+          <Text size="small">{I18n.t('Auto')}</Text>
+        </Menu.Item>
+        <Menu.Item
+          type="checkbox"
           value="pixel"
           selected={props.sizeVariant === 'pixel'}
           onSelect={handleChangeSzVariant}
