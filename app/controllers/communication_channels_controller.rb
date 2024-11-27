@@ -154,9 +154,7 @@ class CommunicationChannelsController < ApplicationController
   def create
     @user = api_request? ? api_find(User, params[:user_id]) : @current_user
 
-    if !has_api_permissions? && params[:communication_channel][:type] != CommunicationChannel::TYPE_PUSH
-      return render_unauthorized_action
-    end
+    return render_unauthorized_action unless has_api_permissions?
 
     # We are doing the check here because it takes a lot of queries to get from
     # the CC model to the domain_root_account, and 99% of the time that will end
