@@ -332,6 +332,7 @@ type GradebookState = {
   isGridLoaded: boolean
   modules: Module[]
   sections: Section[]
+  settingsTrayOpen: boolean
   isStatusesModalOpen: boolean
   exportState?: {
     completion?: number
@@ -501,6 +502,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       isGridLoaded: this.props.isGridLoaded,
       modules: [],
       sections: this.options.sections.length > 1 ? this.options.sections : [],
+      settingsTrayOpen: false,
       isStatusesModalOpen: false,
       exportState: undefined,
       exportManager: undefined,
@@ -2191,14 +2193,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       gradedLateSubmissionsExist: this.options.graded_late_submissions_exist,
       locale: this.props.locale,
       gradebookIsEditable: this.options.gradebook_is_editable,
-      onClose: () => {
-        return this.gradebookSettingsModalButton.current?.focus()
+      onRequestClose: () => {
+        this.setState({settingsTrayOpen: false}, this.renderGradebookSettingsModal)
       },
+      onAfterClose: () => this.gradebookSettingsModalButton.current?.focus(),
       onCourseSettingsUpdated: (settings: {allowFinalGradeOverride: boolean}) =>
         this.courseSettings.handleUpdated(settings, this.props.fetchFinalGradeOverrides),
       onLatePolicyUpdate: this.onLatePolicyUpdate,
+      open: this.state.settingsTrayOpen,
       postPolicies: this.postPolicies,
-      ref: this.gradebookSettingsModal,
     }
 
     if (this.options.enhanced_gradebook_filters) {
@@ -5236,7 +5239,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             ref={this.gradebookSettingsModalButton}
             data-testid="gradebook-settings-button"
             color="secondary"
-            onClick={() => this.gradebookSettingsModal?.current?.open()}
+            onClick={() =>
+              this.setState({settingsTrayOpen: true}, this.renderGradebookSettingsModal)
+            }
             screenReaderLabel={I18n.t('Gradebook Settings')}
           />
         </Portal>

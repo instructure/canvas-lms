@@ -135,6 +135,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
           <RadioInput
             name="postPolicy"
             id="GradePostingPolicyTabPanel__PostAutomatically"
+            data-testid="GradePostingPolicyTabPanel__PostAutomatically"
             label={automaticallyPostLabel}
             value={AUTOMATIC_POST}
             disabled={!this.props.gradebookIsEditable}
@@ -143,6 +144,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
           <RadioInput
             name="postPolicy"
             id="GradePostingPolicyTabPanel__PostManually"
+            data-testid="GradePostingPolicyTabPanel__PostManually"
             label={manuallyPostLabel}
             value={MANUAL_POST}
             disabled={!this.props.gradebookIsEditable}
