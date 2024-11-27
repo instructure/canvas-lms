@@ -72,6 +72,8 @@ const getModuleItems = (modules: Module[]) =>
 // calculations.
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, deepEqual)
 
+export const getSelectedDaysToSkip = (state: StoreState): string[] =>
+  state.coursePace.selected_days_to_skip
 export const getExcludeWeekends = (state: StoreState): boolean => state.coursePace.exclude_weekends
 export const getCoursePace = (state: StoreState): CoursePacesState => state.coursePace
 export const getCoursePaceModules = (state: StoreState) => state.coursePace.modules
@@ -119,13 +121,25 @@ export const getPaceName = (state: StoreState): string => {
 
 export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
+  getSelectedDaysToSkip,
   getOriginalPace,
   getOriginalBlackoutDates,
   getBlackoutDates,
-  (excludeWeekends, originalPace, originalBlackoutDates, blackoutDates) => {
+  (excludeWeekends, selectedDaysToSkip, originalPace, originalBlackoutDates, blackoutDates) => {
     const changes: Change[] = []
 
-    if (excludeWeekends !== originalPace.exclude_weekends)
+    if (window.ENV.FEATURES.course_paces_skip_selected_days) {
+      if (
+        selectedDaysToSkip.length !== originalPace.selected_days_to_skip.length ||
+        !deepEqual(selectedDaysToSkip, originalPace.selected_days_to_skip)
+      ) {
+        changes.push({
+          id: 'selected_days_to_skip',
+          oldValue: originalPace.selected_days_to_skip,
+          newValue: selectedDaysToSkip,
+        })
+      }
+    } else if (excludeWeekends !== originalPace.exclude_weekends)
       changes.push({
         id: 'exclude_weekends',
         oldValue: originalPace.exclude_weekends,
@@ -263,12 +277,14 @@ export const getStartDate = createDeepEqualSelector(
 export const getDueDates = createDeepEqualSelector(
   getCoursePaceItems,
   getExcludeWeekends,
+  getSelectedDaysToSkip,
   getBlackoutDates,
   getStartDate,
   getPaceCompressedDates,
   (
     items: CoursePaceItem[],
     excludeWeekends: boolean,
+    selectedDaysToSkip,
     blackoutDates: BlackoutDate[],
     startDate?: string,
     compressedDueDates?: CoursePaceItemDueDates
@@ -276,22 +292,36 @@ export const getDueDates = createDeepEqualSelector(
     if (compressedDueDates) {
       return compressedDueDates
     }
-    return PaceDueDatesCalculator.getDueDates(items, excludeWeekends, blackoutDates, startDate)
+    return PaceDueDatesCalculator.getDueDates(
+      items,
+      excludeWeekends,
+      selectedDaysToSkip,
+      blackoutDates,
+      startDate
+    )
   }
 )
 
 export const getUncompressedDueDates = createDeepEqualSelector(
   getCoursePaceItems,
   getExcludeWeekends,
+  getSelectedDaysToSkip,
   getBlackoutDates,
   getStartDate,
   (
     items: CoursePaceItem[],
     excludeWeekends: boolean,
+    selectedDaysToSkip: string[],
     blackoutDates: BlackoutDate[],
     startDate?: string
   ): CoursePaceItemDueDates => {
-    return PaceDueDatesCalculator.getDueDates(items, excludeWeekends, blackoutDates, startDate)
+    return PaceDueDatesCalculator.getDueDates(
+      items,
+      excludeWeekends,
+      selectedDaysToSkip,
+      blackoutDates,
+      startDate
+    )
   }
 )
 
@@ -578,6 +608,11 @@ export default (
         return {...state, exclude_weekends: false}
       } else {
         return {...state, exclude_weekends: true}
+      }
+    case CoursePaceConstants.TOGGLE_SELECTED_DAYS_TO_SKIP:
+      return {
+        ...state,
+        selected_days_to_skip: action.payload,
       }
     case CoursePaceConstants.RESET_PACE:
       return {

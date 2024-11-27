@@ -102,6 +102,7 @@ export interface CoursePace {
   readonly workflow_state: WorkflowStates
   readonly modules: Module[]
   readonly exclude_weekends: boolean
+  readonly selected_days_to_skip: string[]
   readonly course: Course
   readonly course_id: string
   readonly course_section_id?: string

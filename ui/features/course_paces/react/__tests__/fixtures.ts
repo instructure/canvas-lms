@@ -177,6 +177,7 @@ export const PRIMARY_PACE: CoursePace = {
   end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: true,
+  selected_days_to_skip: [],
   modules: [PACE_MODULE_1, PACE_MODULE_2],
   // @ts-expect-error
   course: undefined,

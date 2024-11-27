@@ -49,6 +49,8 @@ export enum Constants {
   SET_START_DATE = 'COURSE_PACE/SET_START_DATE',
   PUBLISH_PACE = 'COURSE_PACE/PUBLISH_PACE',
   TOGGLE_EXCLUDE_WEEKENDS = 'COURSE_PACE/TOGGLE_EXCLUDE_WEEKENDS',
+  TOGGLE_SELECTED_DAYS_TO_SKIP = 'COURSE_PACE/TOGGLE_SELECTED_DAYS_TO_SKIP',
+  TOGGLE_SELECT_WEEKENDS_TO_SKIP = 'COURSE_PACE/TOGGLE_SELECT_WEEKENDS_TO_SKIP',
   SAVE_COURSE_PACE = 'COURSE_PACE/SAVE',
   COURSE_PACE_SAVED = 'COURSE_PACE/SAVED',
   PACE_CREATED = 'COURSE_PACE/PACE_CREATED',
@@ -70,6 +72,8 @@ const regularActions = {
   uncompressDates: () => createAction(Constants.UNCOMPRESS_DATES),
   paceCreated: (pace: CoursePace) => createAction(Constants.PACE_CREATED, pace),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
+  toggleSelectedDaysToSkip: (selectedDay: string[]) =>
+    createAction(Constants.TOGGLE_SELECTED_DAYS_TO_SKIP, selectedDay),
   resetPace: (originalPace: CoursePace) => createAction(Constants.RESET_PACE, originalPace),
   setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
   coursePaceSaved: (coursePace: CoursePace) =>
