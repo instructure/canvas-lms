@@ -53,15 +53,12 @@ export const PeerReviewOptions = ({
 
   return (
     <View as="div">
-      <Text as="h3" weight="bold">
-        {I18n.t('Peer Reviews')}
-      </Text>
       <View as="div" margin="small 0">
         <RadioInputGroup
           onChange={(_event, value) => setPeerReviewAssignment(value)}
           name="peer_review_radio_group"
           value={peerReviewAssignment}
-          description={<ScreenReaderContent>{I18n.t('Peer review options')}</ScreenReaderContent>}
+          description={I18n.t('Peer Reviews')}
         >
           {peerReviewOptions.map(option => (
             <RadioInput
