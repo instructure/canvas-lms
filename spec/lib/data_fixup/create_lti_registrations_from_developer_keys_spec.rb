@@ -76,6 +76,31 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
       end
     end
 
+    context "with invalid developer key" do
+      before do
+        second_account_key.scopes += ["invalid_scope"]
+        second_account_key.save!(validate: false)
+      end
+
+      it "still associates the registration with the key" do
+        described_class.run
+        expect(second_account_key.reload.lti_registration).to be_present
+      end
+    end
+
+    context "with invalid tool configuration" do
+      before do
+        second_account_key.tool_configuration.privacy_level = "invalid"
+        second_account_key.tool_configuration.save!(validate: false)
+      end
+
+      it "still associates the registration to the tool configuration" do
+        described_class.run
+        expect(second_account_key.reload.lti_registration.manual_configuration).to be_present
+        expect(second_account_key.tool_configuration.lti_registration).to be_present
+      end
+    end
+
     context "and with an API key existing" do
       before { dev_key_model(account: first_account) }
 
