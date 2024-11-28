@@ -6991,6 +6991,8 @@ hu:
   conversations_send_messages_to_entire_class_3f414741: "Beszélgetések - üzenetek küldése egész osztálynak"
   conversations_send_messages_to_individual_course_m_733620b: "Beszélgetések - üzenetek küldése egyedi kurzusrésztvevőknek"
   cookie_notice_fe4f182e: Cookie-közlemény
+  copied_from_2094bec4: "Innen másolva: "
+  copied_to_b437eff8: "Ide másolva: "
   copy_9748f9f: Másolás
   copy_announcement_title_9d23ddde: "Hirdetmény másolása %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Másolja a %{name} feladatot egy másik kurzusba"
@@ -10465,6 +10467,7 @@ hu:
   event_creation_failed_71b75bea: "Az esemény létrehozása nem sikerült"
   event_date_c9459fe3: "Esemény dátuma"
   event_date_f05219e7: "Esemény dátuma: "
+  event_details_e646df52: "Esemény részletei"
   event_end_time_ef830e66: "Esemény vége"
   event_fe9ba3fe: Esemény
   event_start_time_441b491f: "Esemény kezdete"
@@ -21115,11 +21118,13 @@ hu:
   reset_available_from_102b946: "Elréhető ettől dátum törlése"
   reset_available_until_db5b42d6: "Elréhető eddig dátum törlése"
   reset_courses_fe29ddf9: "Kurzusok visszaállítása"
+  reset_from_322d819a: "Visszaállítás innen"
   reset_multi_factor_authentication_2b63a558: "A többlépcsős hitelesítés alaphelyzetbe hozása"
   reset_name_6a0aa0f: "\"%{name}\" visszaállítása"
   reset_quiz_engine_choice_323a40e6: "A kvízmotor választásának visszaállítása"
   reset_this_contact_method_s_bounce_count_3845ecf4: "A kapcsolatfelvételi mód visszapattanás-számlálójának alaphelyzetbe állítása"
   reset_this_email_address_s_bounce_count_d81d8fd9: "E-mail cím visszapattanás-számlálójának alaphelyzetbe állítása"
+  reset_to_ee9265ef: "Visszaállítás ide"
   reset_to_original_score_4d815afd: "Visszaállítás az eredeti pontszámra"
   reset_what_if_score_98fa18dd: "A mi lenne, ha pontszám visszaállítása"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "a forrás-URL és a forráskezelő tartományának meg kell egyeznie"
@@ -23029,6 +23034,7 @@ hu:
       unrecorgnized_type: "Ismeretlen import típus"
     instructure_csv: "Instructure formázott CSV vagy CSV-k zip-pel tömörítve"
     upload_filename: "sis_feltöltés_%{id}.zip"
+  sis_batch_d0050e20: "SIS kötegelt feldolgozás"
   sis_batch_id_8b755858: sis_batch_id
   sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "SIS adat"
@@ -25476,6 +25482,7 @@ hu:
                 engedélyezni kell.
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: " A szekciók keresztlistázásához engedélyezni kell a Kurzusszekciók - szerkesztés opciót.\n\
       \x20                       "
+  to_date_7c45ee77: "Eddig a dátumig"
   to_date_cannot_come_before_from_date_3eeb2633: "A Dátumig nem lehet a Dátumtól dátum előtt"
   to_delete_groups_groups_delete_must_also_be_enable_5157ff6e: "A csoportok törléséhez a Csoportok - törlés funkciót is engedélyezni kell."
   to_differentiate_assignments_to_individual_student_69373d88: |-

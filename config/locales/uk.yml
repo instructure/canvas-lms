@@ -5009,6 +5009,8 @@ uk:
     unarchive: Розархівувати
     unstar: "Зняти помітку зіркою"
   conversations_69a8dc26: Бесіди
+  copied_from_2094bec4: "Скопійовано з"
+  copied_to_b437eff8: "Копіюється в"
   copy_9748f9f: Копіювати
   copy_to_folder_32ecc3c3: "Копіювати до каталогу"
   copying_628a9607: Копіювання...
@@ -7467,6 +7469,7 @@ uk:
     wrong_file_extension: "Обраний файл з розширенням \"%{extension}\" недозволений для подання"
   event_date_c9459fe3: "Дата події"
   event_date_f05219e7: "Дата події:"
+  event_details_e646df52: "Деталі події"
   event_end_time_ef830e66: "Час завершення події"
   event_fe9ba3fe: Подія
   event_start_time_441b491f: "Час початку події"
@@ -7822,6 +7825,7 @@ uk:
     one: "Знайдено одне  посилання, що не відповідає на запити"
     other: "Знайдено %{count}  посилань, що не відповідають на запити"
   france_33_90b595d7: "Франція (+33)"
+  from_date_27317230: "Дата від "
   from_date_must_be_before_to_date_79f00046: "Дата 'від' має бути раніше за дату 'До'"
   from_fdd4956d: Від
   from_from_to_to_e31f6422: "Від %{from} до %{to}"
@@ -15166,9 +15170,11 @@ uk:
   reserved_by_you_cd03b62d: "Зарезервовано вами"
   reserved_f247b60b: Зарезервовано
   reset_95a81614: Скинути
+  reset_from_322d819a: "Скидання з"
   reset_multi_factor_authentication_2b63a558: "Прибрати багатофакторну аутентифікацію"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Скинути лічильник відмов звернення"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Скинути лічильник відмов електронної адреси"
+  reset_to_ee9265ef: "Скидання для"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "Url ресурс повинен відповідати домену обробників ресурсу"
   respondus_lockdown_browser_support_413352eb: "Служба допомоги браузера Respondus LockDown"
   respondus_soap_endpoint: 
@@ -16538,6 +16544,7 @@ uk:
       unrecorgnized_type: "Невизначений тип імпорту"
     instructure_csv: " CSV, відформатований інфраструктурою або zip-архів із файлів CSV"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "Група SIS"
   sis_export_title: "SIS експорт"
   sis_friendly_name_52b5683d: "SIS сумісне ім'я"
   sis_grade_export_settings_45a9f709: "Налаштування експорту SIS оцінок"
@@ -17822,6 +17829,7 @@ uk:
       а також отримати ідентифікатор клієнта та секретний ключ клієнта.
       
       Якщо провайдер може налаштовувати правильні зворотні виклики або перенаправлення URI, використовуйте %{callback_url}.
+  to_date_7c45ee77: "Дата завершення"
   to_date_can_t_come_before_from_date_cf9e18aa: "\"Кінцева дата\" не може бути раніша за \"Початкова дата\""
   to_do_1d554f36: Зробити
   to_do_5526f10a: "Зробити:"
