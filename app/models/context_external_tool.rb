@@ -28,6 +28,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :lti_resource_links, class_name: "Lti::ResourceLink"
   has_many :progresses, as: :context, inverse_of: :context
   has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
+  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :developer_key
