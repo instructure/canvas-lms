@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import FileFolderTable from '..'
-import {FAKE_FOLDERS_AND_FILES} from '../../../../data/FakeData'
+import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../data/FakeData'
 import {BrowserRouter} from 'react-router-dom'
 
 const defaultProps = {
@@ -61,5 +61,28 @@ describe('FileFolderTable', () => {
 
     expect(screen.getAllByTestId('table-row')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
     expect(screen.getByText(FAKE_FOLDERS_AND_FILES[0].name)).toBeInTheDocument()
+  })
+
+  describe('FileFolderTable - modifiedBy column', () => {
+    it('renders link with user profile of file rows when modified by user', () => {
+      const { display_name, html_url } = FAKE_FILES[0].user || {}
+
+      expect(display_name).toBeDefined()
+      renderComponent({ rows: [FAKE_FILES[0]] })
+
+      const userLink = screen.getByText(display_name!)
+      expect(userLink).toBeInTheDocument()
+      expect(userLink.closest('a')).toHaveAttribute('href', html_url!)
+    })
+
+    it('does not render link when folder', () => {
+      renderComponent({ rows: [FAKE_FOLDERS[0]] })
+
+      const userLinks = screen.queryAllByText((_, element) => {
+        if (!element) return false
+        return !!element.closest('a')?.getAttribute('href')?.includes('/users/')
+      })
+      expect(userLinks.length).toBe(0)
+    })
   })
 })

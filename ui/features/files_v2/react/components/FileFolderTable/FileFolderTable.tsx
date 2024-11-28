@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
@@ -61,7 +62,15 @@ const columnRenderers: {
   name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
   created: row => <FriendlyDatetime dateTime={row.created_at} />,
   lastModified: row => <FriendlyDatetime dateTime={row.updated_at} />,
-  modifiedBy: row => ('user' in row ? <TruncateText>{row.user.display_name}</TruncateText> : null),
+  modifiedBy: row =>
+    'user' in row ? (
+      <Link
+        isWithinText={false}
+        href={row.user.html_url}
+      >
+        <TruncateText>{row.user.display_name}</TruncateText>
+      </Link>
+    ) : null,
   size: row =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
   rights: _row => <RightsIconButton />,
