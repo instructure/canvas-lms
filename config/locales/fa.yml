@@ -6877,6 +6877,8 @@ fa:
   conversations_69a8dc26: گفتگوها
   conversations_send_messages_to_entire_class_3f414741: "گفتگوها - ارسال پیام برای کل کلاس"
   conversations_send_messages_to_individual_course_m_733620b: "گفتگوها - ارسال پیام‌ها برای اعضای انفرادی درس"
+  copied_from_2094bec4: "کپی شده از"
+  copied_to_b437eff8: "کپی شده در"
   copy_9748f9f: "کپی کردن"
   copy_assignment_name_to_another_course_b62d0a54: "کپی تکلیف %{name} به درس دیگر"
   copy_operation_started_successfully_b2f236a1: "عملیات کپی با موفقیت شروع شد"
@@ -10168,6 +10170,7 @@ fa:
   event_creation_failed_71b75bea: "ایجاد رویداد ناموفق بود"
   event_date_c9459fe3: "تاریخ رویداد"
   event_date_f05219e7: "تاریخ رویداد"
+  event_details_e646df52: "اطلاعات رویداد"
   event_end_time_ef830e66: "زمان پایان رویداد"
   event_fe9ba3fe: رویداد
   event_start_time_441b491f: "زمان شروع رویداد"
@@ -10855,6 +10858,7 @@ fa:
   friendly_description_for_parent_student_display_e608ecf3: "توضیحات دوستانه (برای نمایش والدین / دانشجو)"
   friendly_name_601153fb: "نام دوستانه"
   friendly_panda_3a0df50e: "پاندای دوستانه"
+  from_date_27317230: "از تاریخ"
   from_date_must_be_before_to_date_79f00046: "«ازتاریخ» باید قبل از «تا تاریخ» بیاید"
   from_fdd4956d: از
   from_from_to_to_e31f6422: "از %{from} به %{to}"
@@ -20497,10 +20501,12 @@ fa:
   reserved_f247b60b: "رزرو شده"
   reset_95a81614: بازنشانی
   reset_courses_fe29ddf9: "بازنشانی دوره ها"
+  reset_from_322d819a: "باز نشانی شده از"
   reset_multi_factor_authentication_2b63a558: "بازنشانی اعتبارسنجی چند عاملی"
   reset_quiz_engine_choice_323a40e6: "بازنشانی انتخاب موتور آزمون"
   reset_this_contact_method_s_bounce_count_3845ecf4: "بازنشانی تعداد بازگشت این روش تماس"
   reset_this_email_address_s_bounce_count_d81d8fd9: "بازنشانی تعداد بازگشت این نشانی پست الکترونیکی"
+  reset_to_ee9265ef: "بازنشانی شده در"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "نشانی اینترنتی منبع باید با حوزه ی مدیریت منابع منطبق باشد"
   resources_ccefab27: منابع
   respondus_lockdown_browser_support_413352eb: "پشتیبانی مرورگر Respondus LockDown"
@@ -22350,6 +22356,7 @@ fa:
       unrecorgnized_type: "نوع ورود ناشناخته است"
     instructure_csv: "Instructure فایل CSV یا فایل فشرده CSVها را فرمت کرد"
     upload_filename: "بارگذاری_سامانه اطلاعات دانشجو_%{id}.zip"
+  sis_batch_d0050e20: "فایل دسته ای سامانه اطلاعات دانشجو"
   sis_data_eee75d5b: "داده های سامانه اطلاعات دانشجو"
   sis_data_import_8bb623ce: "داده های سامانه اطلاعات دانشجو - وارد کردن"
   sis_data_manage_328a4799: "داده های سامانه اطلاعات دانشجو - مدیریت"
@@ -24254,6 +24261,7 @@ fa:
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "برای فهرست بندی متقابل یک بخش ، بخش‌های درس - افزودن / ویرایش / حذف نیز باید فعال شوند. برای ویرایش شناسه سامانه اطلاعات دانشجو درس،  مدیریت - داده های سامانه اطلاعات دانشجو نیز باید فعال باشد. برای اینکه یک کاربر در سطح حساب بتواند درسی را حذف کند، مدیریت _ وضعیت درس نیز باید فعال باشد."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "برای فهرست بندی متقابل یک بخش ، بخش‌های درس - افزودن / ویرایش / حذف نیز باید فعال شوند. برای ویرایش شناسه سامانه اطلاعات دانشجو درس،  مدیریت - داده های سامانه اطلاعات دانشجو نیز باید فعال باشد. برای اینکه یک کاربر در سطح حساب بتواند درسی را حذف کند، مدیریت _ وضعیت درس نیز باید فعال باشد."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "برای فهرست بندی متقابل بخش‌ها ، درس - افزودن / ویرایش / حذف نیز باید فعال باشد."
+  to_date_7c45ee77: "تا تاریخ"
   to_date_can_t_come_before_from_date_cf9e18aa: "\"تا تاریخ\" نمی‌تواند قبل از \"از تاریخ\" باشد"
   to_date_cannot_come_before_from_date_3eeb2633: "تاریخ تا نمی تواند قبل از تاریخ از باشد."
   to_differentiate_assignments_to_individual_student_6cc40fde: "برای تمایز تکالیف به تک تک دانشجویان، لیست نمایش کاربران - نیز باید فعال باشد"
