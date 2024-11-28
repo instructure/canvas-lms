@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, fireEvent} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import {ConfiguredSelectInput} from '../ConfiguredSelectInput'
 
 describe('ConfiguredSelectInput', () => {
@@ -43,32 +43,37 @@ describe('ConfiguredSelectInput', () => {
   }
 
   it('renders with the correct label and default option', () => {
-    renderConfiguredSelectInput()
-    expect(screen.getByLabelText(label)).toBeInTheDocument()
-    expect(screen.getByText(assistiveText)).toBeInTheDocument()
-    expect(screen.getByDisplayValue(defaultInputValue)).toBeInTheDocument()
+    const {getByLabelText, getByText, getByDisplayValue} = renderConfiguredSelectInput()
+    expect(getByLabelText(label)).toBeInTheDocument()
+    expect(getByText(assistiveText)).toBeInTheDocument()
+    expect(getByDisplayValue(defaultInputValue)).toBeInTheDocument()
   })
 
   it('shows options when clicked', () => {
-    renderConfiguredSelectInput()
-    fireEvent.click(screen.getByLabelText('Test Label'))
+    const {getByLabelText, getByText} = renderConfiguredSelectInput()
+    fireEvent.click(getByLabelText('Test Label'))
     options.forEach(option => {
-      expect(screen.getByText(option.name)).toBeInTheDocument()
+      expect(getByText(option.name)).toBeInTheDocument()
     })
   })
 
   it('selects an option when clicked', () => {
-    renderConfiguredSelectInput()
-    fireEvent.click(screen.getByLabelText(label))
-    fireEvent.click(screen.getByText(options[1].name))
-    expect(screen.getByDisplayValue(options[1].name)).toBeInTheDocument()
+    const {getByLabelText, getByText, getByDisplayValue} = renderConfiguredSelectInput()
+    fireEvent.click(getByLabelText(label))
+    fireEvent.click(getByText(options[1].name))
+    expect(getByDisplayValue(options[1].name)).toBeInTheDocument()
   })
 
   it('calls the onSelect mock on selection', () => {
     const onSelect = jest.fn()
-    renderConfiguredSelectInput({onSelect})
-    fireEvent.click(screen.getByLabelText(label))
-    fireEvent.click(screen.getByText(options[1].name))
+    const {getByLabelText, getByText} = renderConfiguredSelectInput({onSelect})
+    fireEvent.click(getByLabelText(label))
+    fireEvent.click(getByText(options[1].name))
     expect(onSelect).toHaveBeenCalledWith(options[1].id)
+  })
+
+  it('renders with disabled', () => {
+    const {getByDisplayValue} = renderConfiguredSelectInput({disabled: true})
+    expect(getByDisplayValue(defaultInputValue)).toBeDisabled()
   })
 })

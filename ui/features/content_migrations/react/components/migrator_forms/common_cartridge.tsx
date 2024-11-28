@@ -27,6 +27,7 @@ import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
 import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
 
 type CommonCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -80,6 +81,7 @@ const CommonCartridgeImporter = ({
         newStartDate={parseDateToISOString(ENV.OLD_START_DATE)}
         newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
         SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
       />
     </>
   )

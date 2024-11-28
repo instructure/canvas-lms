@@ -23,6 +23,7 @@ import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
 import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
 
 type QTIZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -73,6 +74,7 @@ const QTIZipImporter = ({
         onCancel={onCancel}
         setIsQuestionBankDisabled={setIsQuestionBankDisabled}
         SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
       />
     </>
   )

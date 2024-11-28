@@ -16,31 +16,45 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {ConfiguredTextInput} from '../ConfiguredTextInput'
 
 describe('ConfiguredTextInput', () => {
+  const label = 'Test Label'
+  const inputValue = 'Test Value'
+
   it('renders with the correct label and value', () => {
-    const label = 'Test Label'
-    const inputValue = 'Test Value'
+    const {getByLabelText, getByDisplayValue} = render(
+      <ConfiguredTextInput label={label} inputValue={inputValue} onChange={() => {}} />
+    )
 
-    render(<ConfiguredTextInput label={label} inputValue={inputValue} onChange={() => {}} />)
-
-    expect(screen.getByLabelText(label)).toBeInTheDocument()
-    expect(screen.getByDisplayValue(inputValue)).toBeInTheDocument()
+    expect(getByLabelText(label)).toBeInTheDocument()
+    expect(getByDisplayValue(inputValue)).toBeInTheDocument()
   })
 
   it('calls onChange when input value changes', () => {
-    const label = 'Test Label'
-    const inputValue = 'Test Value'
     const expectedValue = 'New Value'
     const handleChange = jest.fn()
 
-    render(<ConfiguredTextInput label={label} inputValue={inputValue} onChange={handleChange} />)
+    const {getByLabelText} = render(
+      <ConfiguredTextInput label={label} inputValue={inputValue} onChange={handleChange} />
+    )
 
-    const input = screen.getByLabelText(label)
+    const input = getByLabelText(label)
     fireEvent.change(input, {target: {value: expectedValue}})
 
     expect(handleChange).toHaveBeenCalledWith(expectedValue)
+  })
+
+  it('renders with disabled', () => {
+    const {getByDisplayValue} = render(
+      <ConfiguredTextInput
+        label={label}
+        inputValue={inputValue}
+        onChange={() => {}}
+        disabled={true}
+      />
+    )
+    expect(getByDisplayValue(inputValue)).toBeDisabled()
   })
 })
