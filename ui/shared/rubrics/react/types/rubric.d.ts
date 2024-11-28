@@ -74,6 +74,7 @@ export type RubricAssessment = {
 export type RubricAssessmentData = {
   id: string
   points?: number
+  pointsPossible?: number
   criterionId: string
   learningOutcomeId?: string
   comments: string

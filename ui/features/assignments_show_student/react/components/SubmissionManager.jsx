@@ -946,6 +946,7 @@ const SubmissionManager = ({
     title: assignment.rubric?.title,
     ratingOrder: assignment.rubric?.ratingOrder,
     freeFormCriterionComments: assignment.rubric?.free_form_criterion_comments,
+    pointsPossible: assignment.rubric?.points_possible,
     criteria: (assignment.rubric?.criteria || []).map(criterion => {
       return {
         ...criterion,
@@ -998,6 +999,7 @@ const SubmissionManager = ({
         hidePoints={rubricData?.assignment?.rubricAssociation?.hide_points}
         isOpen={isSelfAssessmentOpen}
         isPreviewMode={!!selfAssessment}
+        isSelfAssessment={shouldRenderSelfAssessment()}
         isPeerReview={false}
         onDismiss={() => setIsSelfAssessmentOpen(false)}
         rubricAssessmentData={rubricAssessmentData}
