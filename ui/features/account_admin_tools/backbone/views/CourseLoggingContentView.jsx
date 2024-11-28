@@ -20,8 +20,6 @@ import {createRoot} from 'react-dom/client'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
-import DateRangeSearchView from './DateRangeSearchView'
-import AutocompleteView from './AutocompleteView'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import CourseLoggingItemView from './CourseLoggingItemView'
 import CourseLoggingCollection from '../collections/CourseLoggingCollection'
@@ -29,6 +27,7 @@ import template from '../../jst/courseLoggingContent.handlebars'
 import courseLoggingResultsTemplate from '../../jst/courseLoggingResults.handlebars'
 import {extend} from '@canvas/backbone/utils'
 import CourseActivityDetails from '../../react/CourseActivityDetails'
+import CourseActivityForm from '../../react/CourseActivityForm'
 
 extend(CourseLoggingContentView, Backbone.View)
 
@@ -38,18 +37,6 @@ export default function CourseLoggingContentView(options) {
   this.options = options
   this.collection = new CourseLoggingCollection()
   Backbone.View.apply(this, arguments)
-  this.dateRangeSearch = new DateRangeSearchView({
-    name: 'courseLogging',
-  })
-  this.courseSearch = new AutocompleteView({
-    collection: new Backbone.Collection(null, {resourceName: 'courses'}),
-    labelProperty: $.proxy(this.autoCompleteItemLabel, this),
-    fieldName: 'course_id',
-    placeholder: 'Course ID',
-    sourceParameters: {
-      'state[]': 'all',
-    },
-  })
   this.resultsView = new PaginatedCollectionView({
     template: courseLoggingResultsTemplate,
     itemView: CourseLoggingItemView,
@@ -58,27 +45,26 @@ export default function CourseLoggingContentView(options) {
 }
 CourseLoggingContentView.mixin(ValidatedMixin)
 CourseLoggingContentView.child('resultsView', '#courseLoggingSearchResults')
-CourseLoggingContentView.child('dateRangeSearch', '#courseDateRangeSearch')
-CourseLoggingContentView.child('courseSearch', '#courseCourseSearch')
 
 Object.assign(CourseLoggingContentView.prototype, {
-  fieldSelectors: {course_id: '#course_id-autocompleteField'},
-
-  els: {'#courseLoggingForm': '$form'},
-
   template,
 
   events: {
-    'submit #courseLoggingForm': 'onSubmit',
     'click #courseLoggingSearchResults .courseLoggingDetails > a': 'showDetails',
   },
 
-  onSubmit(event) {
-    event.preventDefault()
-    const json = this.$form.toJSON()
-    if (this.validate(json)) {
-      return this.updateCollection(json)
-    }
+  afterRender() {
+    const mountPoint = document.getElementById('course_activity_form_mount_point')
+    const root = createRoot(mountPoint)
+
+    root.render(
+      <CourseActivityForm
+        accountId={ENV.ACCOUNT_ID}
+        onSubmit={data => {
+          this.updateCollection(data)
+        }}
+      />
+    )
   },
 
   showDetails(event) {
@@ -107,9 +93,6 @@ Object.assign(CourseLoggingContentView.prototype, {
   },
 
   updateCollection(json) {
-    // Update the params (which fetches the collection)
-    if (!json) json = this.$form.toJSON()
-
     const params = {
       id: null,
       type: null,
@@ -123,25 +106,6 @@ Object.assign(CourseLoggingContentView.prototype, {
     if (json.course_id) params.id = json.course_id
 
     return this.collection.setParams(params)
-  },
-
-  validate(json) {
-    if (!json) json = this.$form.toJSON()
-    delete json.course_submit
-    const errors = this.dateRangeSearch.validate(json) || {}
-
-    if (!json.course_id) json.course_id = this.$el.find('#course_id-autocompleteField').val()
-    if (!json.course_id) {
-      errors.course_submit = [
-        {
-          type: 'required',
-          message: 'A valid Course is required to search events.',
-        },
-      ]
-    }
-
-    this.showErrors(errors)
-    return $.isEmptyObject(errors)
   },
 
   attach() {
@@ -169,11 +133,5 @@ Object.assign(CourseLoggingContentView.prototype, {
       ]
       if (!$.isEmptyObject(errors)) return this.showErrors(errors)
     }
-  },
-
-  autoCompleteItemLabel(model) {
-    const name = model.get('name')
-    const code = model.get('course_code')
-    return `${model.id} - ${name} - ${code}`
   },
 })
