@@ -730,4 +730,12 @@ describe('RubricAssessmentTray Tests', () => {
       expect(queryAllByTestId('modern-view-out-of-points')).toHaveLength(2)
     })
   })
+
+  describe('selfAssessment test', () => {
+    it('should display self assessment instructions and score', () => {
+      const {getByTestId} = renderComponent({isSelfAssessment: true})
+      expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-instructor-score')).toBeInTheDocument()
+    })
+  })
 })

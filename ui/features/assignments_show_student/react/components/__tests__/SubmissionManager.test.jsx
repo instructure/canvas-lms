@@ -2149,8 +2149,9 @@ describe('SubmissionManager', () => {
 
       expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
       expect(getByTestId('rubric-assessment-horizontal-display')).toBeInTheDocument()
-      expect(getByTestId('rubric-rating-button-1')).not.toBeDisabled()
-      expect(getByTestId('rubric-rating-button-0')).not.toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-rating-button-1')).not.toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-rating-button-0')).not.toBeDisabled()
     })
 
     it('renders the rubric assessment tray in preview mode when the user has already self assessed', async () => {
@@ -2171,10 +2172,10 @@ describe('SubmissionManager', () => {
 
       expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
       expect(getByTestId('rubric-assessment-horizontal-display')).toBeInTheDocument()
-
-      expect(getByTestId('rubric-rating-button-1')).toBeDisabled()
-      expect(getByTestId('rubric-rating-button-selected')).toBeInTheDocument()
-      expect(getByTestId('rubric-rating-button-0')).toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-rating-button-1')).toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-rating-button-selected')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-rating-button-0')).toBeDisabled()
     })
   })
 })

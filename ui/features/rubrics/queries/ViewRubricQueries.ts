@@ -161,7 +161,10 @@ type CourseRubricQueryResponse = {
 }
 
 type RubricPreviewQueryResponse = {
-  rubric: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments'>
+  rubric: Pick<
+    Rubric,
+    'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+  >
 }
 
 type AccountRubricQueryResponse = {

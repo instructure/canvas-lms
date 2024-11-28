@@ -25,11 +25,13 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {possibleString, possibleStringRange} from '../Points'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
+import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton';
 
 const {shamrock} = colors
 
 type VerticalButtonDisplayProps = {
   isPreviewMode: boolean
+  isSelfAssessment: boolean
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingId?: string
@@ -38,6 +40,7 @@ type VerticalButtonDisplayProps = {
 }
 export const VerticalButtonDisplay = ({
   isPreviewMode,
+  isSelfAssessment,
   ratings,
   ratingOrder,
   selectedRatingId,
@@ -72,13 +75,22 @@ export const VerticalButtonDisplay = ({
                 data-testid={`rating-button-${rating.id}-${index}`}
                 aria-label={buttonAriaLabel}
               >
-                <RatingButton
-                  buttonDisplay={buttonDisplay}
-                  isPreviewMode={isPreviewMode}
-                  isSelected={isSelected}
-                  selectedArrowDirection="right"
-                  onClick={() => onSelectRating(rating)}
-                />
+                {isSelfAssessment ? (
+                  <SelfAssessmentRatingButton
+                    buttonDisplay={buttonDisplay}
+                    isPreviewMode={isPreviewMode}
+                    isSelected={isSelected}
+                    onClick={() => onSelectRating(rating)}
+                  />
+                ) : (
+                  <RatingButton
+                    buttonDisplay={buttonDisplay}
+                    isPreviewMode={isPreviewMode}
+                    isSelected={isSelected}
+                    selectedArrowDirection="right"
+                    onClick={() => onSelectRating(rating)}
+                  />
+                )}
               </Flex.Item>
               <Flex.Item
                 margin={isSelected ? '0' : '0 0 x-small x-small'}

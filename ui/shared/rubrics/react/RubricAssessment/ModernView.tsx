@@ -41,13 +41,14 @@ import {OutcomeTag} from './OutcomeTag'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
-type ModernViewModes = 'horizontal' | 'vertical'
+export type ModernViewModes = 'horizontal' | 'vertical'
 
 type ModernViewProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview: boolean
+  isSelfAssessment: boolean
   isFreeFormCriterionComments: boolean
   ratingOrder: string
   rubricAssessmentData: RubricAssessmentData[]
@@ -60,6 +61,7 @@ export const ModernView = ({
   hidePoints,
   isPreviewMode,
   isPeerReview,
+  isSelfAssessment,
   isFreeFormCriterionComments,
   ratingOrder,
   rubricAssessmentData,
@@ -81,6 +83,7 @@ export const ModernView = ({
             displayHr={index < criteria.length - 1}
             hidePoints={hidePoints}
             isPreviewMode={isPreviewMode}
+            isSelfAssessment={isSelfAssessment}
             isPeerReview={isPeerReview}
             ratingOrder={ratingOrder}
             criterionUseRange={criterion.criterionUseRange}
@@ -102,6 +105,7 @@ type CriterionRowProps = {
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview: boolean
+  isSelfAssessment: boolean
   isFreeFormCriterionComments: boolean
   ratingOrder: string
   criterionUseRange: boolean
@@ -116,6 +120,7 @@ export const CriterionRow = ({
   hidePoints,
   isPreviewMode,
   isPeerReview,
+  isSelfAssessment,
   isFreeFormCriterionComments,
   ratingOrder,
   criterionUseRange,
@@ -183,6 +188,7 @@ export const CriterionRow = ({
       return (
         <HorizontalButtonDisplay
           isPreviewMode={isPreviewMode}
+          isSelfAssessment={isSelfAssessment}
           ratings={ratings}
           ratingOrder={ratingOrder}
           selectedRatingId={selectedRatingId}
@@ -195,6 +201,7 @@ export const CriterionRow = ({
     return (
       <VerticalButtonDisplay
         isPreviewMode={isPreviewMode}
+        isSelfAssessment={isSelfAssessment}
         ratings={ratings}
         ratingOrder={ratingOrder}
         selectedRatingId={selectedRatingId}

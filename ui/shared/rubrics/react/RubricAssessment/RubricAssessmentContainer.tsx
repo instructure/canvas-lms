@@ -30,10 +30,12 @@ import type {
   RubricRating,
   UpdateAssessmentData,
 } from '../types/rubric'
-import {ModernView} from './ModernView'
+import {ModernView, type ModernViewModes} from './ModernView'
 import {TraditionalView} from './TraditionalView'
 import {InstructorScore} from './InstructorScore'
 import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
+import {SelfAssessmentInstructorScore} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructorScore'
+import {SelfAssessmentInstructions} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructions'
 
 const I18n = useI18nScope('rubrics-assessment-tray')
 
@@ -44,10 +46,12 @@ type RubricAssessmentContainerProps = {
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview: boolean
+  isSelfAssessment?: boolean
   isFreeFormCriterionComments: boolean
   isStandaloneContainer?: boolean
   ratingOrder: string
   rubricTitle: string
+  pointsPossible?: number
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
   viewModeOverride?: ViewMode
@@ -60,7 +64,9 @@ export const RubricAssessmentContainer = ({
   hidePoints,
   isPreviewMode,
   isPeerReview,
+  isSelfAssessment = false,
   isFreeFormCriterionComments,
+  pointsPossible,
   isStandaloneContainer = false,
   ratingOrder,
   rubricTitle,
@@ -97,7 +103,7 @@ export const RubricAssessmentContainer = ({
   }, [rubricAssessmentData, criteria])
 
   const renderViewContainer = () => {
-    if (isTraditionalView) {
+    if (isTraditionalView && !isSelfAssessment) {
       return (
         <TraditionalView
           criteria={criteria}
@@ -120,10 +126,11 @@ export const RubricAssessmentContainer = ({
         hidePoints={hidePoints}
         isPreviewMode={isPreviewMode}
         isPeerReview={isPeerReview}
+        isSelfAssessment={isSelfAssessment}
         ratingOrder={ratingOrder}
         rubricSavedComments={rubricSavedComments}
         rubricAssessmentData={rubricAssessmentDraftData}
-        selectedViewMode={viewMode}
+        selectedViewMode={viewMode as ModernViewModes}
         onUpdateAssessmentData={onUpdateAssessmentData}
         isFreeFormCriterionComments={isFreeFormCriterionComments}
       />
@@ -201,6 +208,8 @@ export const RubricAssessmentContainer = ({
             isFreeFormCriterionComments={isFreeFormCriterionComments}
             isPreviewMode={isPreviewMode}
             isPeerReview={isPeerReview}
+            pointsPossible={pointsPossible}
+            isSelfAssessment={isSelfAssessment}
             isStandaloneContainer={isStandaloneContainer}
             isTraditionalView={isTraditionalView}
             onDismiss={onDismiss}
@@ -276,9 +285,11 @@ const ViewModeSelect = ({
 type AssessmentHeaderProps = {
   hidePoints: boolean
   instructorPoints: number
+  pointsPossible?: number
   isFreeFormCriterionComments: boolean
   isPreviewMode: boolean
   isPeerReview: boolean
+  isSelfAssessment: boolean
   isStandaloneContainer: boolean
   isTraditionalView: boolean
   onDismiss: () => void
@@ -292,6 +303,8 @@ const AssessmentHeader = ({
   isFreeFormCriterionComments,
   isPreviewMode,
   isPeerReview,
+  isSelfAssessment,
+  pointsPossible,
   isStandaloneContainer,
   isTraditionalView,
   onDismiss,
@@ -299,6 +312,8 @@ const AssessmentHeader = ({
   rubricHeader,
   selectedViewMode,
 }: AssessmentHeaderProps) => {
+  const showTraditionalView = () => isTraditionalView && !isSelfAssessment
+
   return (
     <View
       as="div"
@@ -326,14 +341,16 @@ const AssessmentHeader = ({
 
       <View as="hr" margin="x-small 0 small" aria-hidden={true} />
       <Flex wrap="wrap" gap="medium 0">
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <ViewModeSelect
-            isFreeFormCriterionComments={isFreeFormCriterionComments}
-            selectedViewMode={selectedViewMode}
-            onViewModeChange={onViewModeChange}
-          />
-        </Flex.Item>
-        {isTraditionalView && (
+        {!isSelfAssessment && (
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
+            <ViewModeSelect
+              isFreeFormCriterionComments={isFreeFormCriterionComments}
+              selectedViewMode={selectedViewMode}
+              onViewModeChange={onViewModeChange}
+            />
+          </Flex.Item>
+        )}
+        {showTraditionalView() && (
           <>
             {!hidePoints && (
               <Flex.Item>
@@ -349,17 +366,26 @@ const AssessmentHeader = ({
           </>
         )}
       </Flex>
-
-      {!isTraditionalView && (
+      {isSelfAssessment && <SelfAssessmentInstructions />}
+      {!showTraditionalView() && (
         <>
           {!hidePoints && (
-            <View as="div" margin="medium 0 0">
-              <InstructorScore
-                isPeerReview={isPeerReview}
-                instructorPoints={instructorPoints}
-                isPreviewMode={isPreviewMode}
-              />
-            </View>
+            <>
+              {isSelfAssessment ? (
+                <SelfAssessmentInstructorScore
+                  instructorPoints={instructorPoints}
+                  pointsPossible={pointsPossible}
+                />
+              ) : (
+                <View as="div" margin="medium 0 0">
+                  <InstructorScore
+                    isPeerReview={isPeerReview}
+                    instructorPoints={instructorPoints}
+                    isPreviewMode={isPreviewMode}
+                  />
+                </View>
+              )}
+            </>
           )}
 
           <View as="hr" margin="medium 0 medium 0" aria-hidden={true} />
