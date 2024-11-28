@@ -4350,6 +4350,8 @@ el:
     unarchive: Απο-αρχειοθέτηση
     unstar: "Αφαίρεση αστερίσκου"
   conversations_69a8dc26: Συνομιλίες
+  copied_from_2094bec4: "Αντιγράφτηκε απο"
+  copied_to_b437eff8: "Αντιγράφτηκε στο"
   copy_9748f9f: Αντιγραφή
   copy_to_folder_32ecc3c3: "Αντιγραφή σε Φάκελο"
   copying_628a9607: Αντιγραφή...
@@ -6341,6 +6343,7 @@ el:
     wrong_file_extension: "Το αρχείο με επέκταση «%{extension}» που επιλέξατε δεν είναι εξουσιοδοτημένο για υποβολή"
   event_date_c9459fe3: "Ημερομηνία Γεγονότος"
   event_date_f05219e7: "Ημερομηνία Γεγονότος:"
+  event_details_e646df52: "Λεπτομέρειες συμβάντος"
   event_end_time_ef830e66: "Ώρα Τερματισμού του Γεγονότος"
   event_start_time_441b491f: "Ώρα Έναρξης του Γεγονότος"
   event_title_7f1051a6: "Τίτλος Γεγονότος"
@@ -6605,6 +6608,7 @@ el:
   form_border_f61f12dc: "Δημιουργία Πλαισίου"
   forward_d143f64: Προώθηση
   france_33_90b595d7: "Γαλλία (+33)"
+  from_date_27317230: "Απο την ημερ/νία"
   from_fdd4956d: Από
   from_from_to_to_e31f6422: "Από %{from} μέχρι %{to}"
   from_gravatar_58372d5a: "Από Gravatar"
@@ -12991,9 +12995,11 @@ el:
   reserved_by_d563e7d2: "Έχει γίνει κράτηση απο:"
   reserved_f247b60b: "Έχει γίνει κράτηση"
   reset_95a81614: Επαναφορά
+  reset_from_322d819a: "Επαναφορά Απο"
   reset_multi_factor_authentication_2b63a558: "Επαναφορά Ελέγχου Ταυτότητας Πολλών Παραγόντων"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Επαναφορά του αριθμού επιστροφών αυτού του τρόπου επικοινωνίας"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Επαναφορά του αριθμού επιστροφών αυτής της ηλεκτρονικής διεύθυνσης"
+  reset_to_ee9265ef: "Επαναφορά Μέχρι"
   respondus_lockdown_browser_support_413352eb: "Υποστήριξη Respondus LockDown Browser"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -14149,6 +14155,7 @@ el:
       unrecorgnized_type: "Μη αναγνωρισμένος τύπος εισαγωγής"
     instructure_csv: "Αρχείο CSV ή αρχείο zip που περιέχει περισσότερα CSV που δημιουργήθηκε από την Instructure"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "SIS Batch"
   sis_export_title: "Εξαγωγή SIS"
   sis_grade_export_settings_45a9f709: "Ρυθμίσεις Εξαγωγής Βαθμών από το SIS"
   sis_id_4495a887: "SIS ID"
@@ -15097,6 +15104,7 @@ el:
       <mrk mid="4696" mtype="seg">Για τη ρύθμιση παρόχου OpenID Connect, θα χρειαστείτε τα url εξουσιοδότησης και token, καθώς και ένα ID Πελάτη και ένα Μυστικό Πελάτη.</mrk>
       
       <mrk mid="4697" mtype="seg">Αν ο πάροχος μπορεί να δημιουργήσει έγκυρα URL επανάκλησης ή ανακατεύθυνσης, χρησιμοποιήστε το %{callback_url}.</mrk>
+  to_date_7c45ee77: "Μέχρι την ημερ/νία"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Για να συνδέσετε τον παρατηρητή του μαθήματος *%{name}* με κάποιον σπουδαστή, ξεκινήστε να πληκτρολογείτε το όνομα του σπουδαστή παρακάτω για να τον βρείτε και μετά πατήστε Ενημέρωση."
   to_minscore_43e5452e: "σε %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Για να καρφιτσώσετε μια συζήτηση στο επάνω μέρος της σελίδας, σύρετε τη συζήτηση εδώ ή επιλέξτε Καρφίτσωμα από το μενού ρυθμίσεων της συζήτησης."
