@@ -23,9 +23,10 @@ import {white, black} from './constants'
 import {
   getContrastStatus,
   isTransparent,
+  // @ts-expect-error
   getDefaultColors,
+  // @ts-expect-error
   type ColorsInUse,
-  type ColorTab,
 } from '@instructure/canvas-rce'
 
 const getContrastingColor = (color1: string) => {

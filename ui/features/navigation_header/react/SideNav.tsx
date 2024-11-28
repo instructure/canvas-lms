@@ -86,7 +86,6 @@ interface ISideNav {
 }
 
 const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
-  // @ts-expect-error
   const [collapseSideNav, setCollapseSideNav] = useState(window.ENV.SETTINGS.collapse_global_nav)
   const [state, dispatch] = useReducer(sideNavReducer, initialState)
   const {isTrayOpen, activeTray, selectedNavItem, previousSelectedNavItem} = state
@@ -132,9 +131,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
 
   let logoUrl = null
   const queryClient = useQueryClient()
-  // @ts-expect-error
   const isK5User = window.ENV.K5_USER
-  // @ts-expect-error
   const helpIcon = window.ENV.help_link_icon
 
   const getHelpIcon = (): JSX.Element => {
