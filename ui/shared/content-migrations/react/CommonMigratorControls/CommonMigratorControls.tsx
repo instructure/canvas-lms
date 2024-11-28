@@ -342,8 +342,8 @@ export const CommonMigratorControls = ({
       )}
 
       <View as="div" margin="medium none none none">
-        <Button disabled={isSubmitting} onClick={onCancel}>
-          {I18n.t('Cancel')}
+        <Button disabled={isSubmitting} onClick={onCancel} data-testid="clear-migration-button">
+          {I18n.t('Clear')}
         </Button>
         <Button
           disabled={isSubmitting}

@@ -236,6 +236,46 @@ describe('ContentMigrationForm', () => {
     expect(screen.queryByTestId('submitMigration')).not.toBeInTheDocument()
   })
 
+  describe('migration type', () => {
+    const selectMigrator = async (migratorName: string) => {
+      await userEvent.click(screen.getByText(migratorName))
+    }
+
+    const openSelectMigratorDropdown = async () => {
+      await userEvent.click(await screen.findByTestId('select-content-type-dropdown'))
+    }
+
+    const renderAndOpenDropdown = async () => {
+      renderComponent()
+      await openSelectMigratorDropdown()
+    }
+
+    it('shows select one after initial load', async () => {
+      await renderAndOpenDropdown()
+
+      expect(screen.queryByText('Select one')).toBeInTheDocument()
+    })
+
+    it('does not show select one after selecting migrator', async () => {
+      await renderAndOpenDropdown()
+
+      await selectMigrator('Copy a Canvas Course')
+      await openSelectMigratorDropdown()
+
+      expect(screen.queryByText('Select one')).not.toBeInTheDocument()
+    })
+
+    it('shows select one after clicking clear', async () => {
+      await renderAndOpenDropdown()
+
+      await selectMigrator('Copy a Canvas Course')
+      await userEvent.click(await screen.findByTestId('clear-migration-button'))
+      await openSelectMigratorDropdown()
+
+      expect(screen.queryByText('Select one')).toBeInTheDocument()
+    })
+  })
+
   describe('workflow_state setting', () => {
     afterEach(() => {
       setMigrationsMock.mockReset()
