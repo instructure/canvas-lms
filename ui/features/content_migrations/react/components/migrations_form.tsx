@@ -206,10 +206,13 @@ export const ContentMigrationsForm = ({
             onChange={(_e: any, {value}: any) =>
               setChosenMigrator(value !== 'empty' ? value : null)
             }
+            data-testid="select-content-type-dropdown"
           >
-            <SimpleSelect.Option key="empty-option" id="empty" value="empty">
-              {I18n.t('Select one')}
-            </SimpleSelect.Option>
+            {!chosenMigrator && (
+              <SimpleSelect.Option key="empty-option" id="empty" value="empty">
+                {I18n.t('Select one')}
+              </SimpleSelect.Option>
+            )}
             {migrators.map((o: Migrator) => (
               <SimpleSelect.Option key={o.type} id={o.type} value={o.type}>
                 {o.name}

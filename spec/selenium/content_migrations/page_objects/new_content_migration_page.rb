@@ -43,6 +43,10 @@ class NewContentMigrationPage
       f('[data-testid="submitMigration"]')
     end
 
+    def clear_button
+      f('[data-testid="clear-migration-button"]')
+    end
+
     def selective_import_dropdown
       ff("input[name=selective_import]")
     end

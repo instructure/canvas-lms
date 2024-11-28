@@ -152,7 +152,7 @@ describe('CommonMigratorControls', () => {
 
   it('calls onCancel', async () => {
     renderComponent()
-    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Clear'}))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -161,7 +161,7 @@ describe('CommonMigratorControls', () => {
     expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeInTheDocument()
     expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
     expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
-    expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+    expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
     expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
   })
 

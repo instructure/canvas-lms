@@ -172,11 +172,11 @@ export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
     expect(screen.getByText('Uploading File')).toBeInTheDocument()
   })
 
-  it('disable Add and Cancel buttons while uploading', async () => {
+  it('disable Add and Clear buttons while uploading', async () => {
     renderComponent({isSubmitting: true})
     await waitFor(() => {
       expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
-      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
     })
   })

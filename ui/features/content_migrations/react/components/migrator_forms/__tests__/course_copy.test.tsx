@@ -114,7 +114,7 @@ describe('CourseCopyImporter', () => {
 
   it('calls onCancel', async () => {
     renderComponent()
-    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Clear'}))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -146,7 +146,7 @@ describe('CourseCopyImporter', () => {
   it('disable inputs while uploading', async () => {
     renderComponent({isSubmitting: true})
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
       expect(screen.getByRole('combobox', {name: 'Search for a course *'})).toBeDisabled()
       expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
