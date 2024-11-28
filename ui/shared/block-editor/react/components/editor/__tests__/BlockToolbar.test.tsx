@@ -144,6 +144,7 @@ describe('BlockToolbar', () => {
     downNode = {
       id: 'upnode',
     }
+    // @ts-expect-error
     blockOwnToolbar = dummyBlockToolbar
     nodeCustomData = {
       noToolbar: customNoToolbar,

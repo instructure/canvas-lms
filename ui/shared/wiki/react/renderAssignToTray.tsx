@@ -24,7 +24,7 @@ import {IconEditLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import ReactDOM from 'react-dom'
-import {
+import type {
   DateDetailsPayload,
   ItemAssignToCardSpec,
 } from '@canvas/context-modules/differentiated-modules/react/Item/types'
@@ -61,6 +61,7 @@ const AssignToOption = (props: Props) => {
   useEffect(() => {
     if (props.pageId === undefined) {
       const defaultCard = generateDefaultCard()
+      // @ts-expect-error
       setCheckPoint([defaultCard])
       setDisabledOptionIds(defaultCard.selectedAssigneeIds)
     }
@@ -171,6 +172,7 @@ const AssignToOption = (props: Props) => {
         open={open}
         onClose={handleClose}
         onDismiss={handleDismiss}
+        // @ts-expect-error
         courseId={ENV.COURSE_ID}
         itemName={itemName}
         itemType="page"
@@ -180,6 +182,7 @@ const AssignToOption = (props: Props) => {
         locale={ENV.LOCALE || 'en'}
         timezone={ENV.TIMEZONE || 'UTC'}
         removeDueDateInput={true}
+        // @ts-expect-error
         onSave={handleSave}
         defaultCards={checkPoint}
         defaultDisabledOptionIds={disabledOptionIds}
@@ -192,6 +195,7 @@ const AssignToOption = (props: Props) => {
     <>
       <ItemAssignToManager
         data-testid="manage-assign-to"
+        // @ts-expect-error
         courseId={ENV.COURSE_ID}
         itemName={itemName}
         itemType="page"
@@ -205,6 +209,7 @@ const AssignToOption = (props: Props) => {
         defaultDisabledOptionIds={disabledOptionIds}
         onInitialStateSet={setCheckPoint}
         isTray={false}
+        // @ts-expect-error
         onChange={onChange}
       />
     </>
@@ -219,6 +224,7 @@ const AssignToOption = (props: Props) => {
 
 export const renderAssignToTray = (el: HTMLElement, props: Props) => {
   if (el) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<AssignToOption {...props} />, el)
   }
   return <AssignToOption {...props} />

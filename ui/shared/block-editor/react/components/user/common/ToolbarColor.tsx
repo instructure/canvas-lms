@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useEditor} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
@@ -81,6 +81,7 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
     >
       <ColorPicker
         tabs={tabs}
+        // @ts-expect-error
         colorsInUse={colorsInUse}
         onCancel={handleCancel}
         onSave={handleSubmit}
