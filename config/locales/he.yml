@@ -5468,6 +5468,8 @@ he:
     unstar: "הסרת כוכבית"
     unstar_conversation: "הסר/י את הכוכבית מהשיחה"
   conversations_69a8dc26: שיחות
+  copied_from_2094bec4: "הועתק מ-"
+  copied_to_b437eff8: "הועתק אל"
   copy_9748f9f: העתקה
   copy_to_folder_32ecc3c3: "העתקה לתיקיה"
   copying_628a9607: מעתיק...
@@ -8150,6 +8152,7 @@ he:
     wrong_file_extension: "הקובץ שבחרת עם הסיומת \"%{extension}\", אינו מורשה להגשה"
   event_date_c9459fe3: "תאריך אירוע"
   event_date_f05219e7: "תאריך אירוע:"
+  event_details_e646df52: "פרטי אירוע"
   event_end_time_ef830e66: "זמן סיום אירוע"
   event_fe9ba3fe: אירוע
   event_start_time_441b491f: "זמן תחילת אירוע"
@@ -8636,6 +8639,7 @@ he:
     other: "נמצאו %{count} קישורים שאינם מגיבים"
     two: "נמצאו %{count} קישורים שאינם מגיבים"
   france_33_90b595d7: צרפת(+33)
+  from_date_27317230: מתאריך
   from_date_must_be_before_to_date_79f00046: "תאריך תחילה צריך להיות קודם לתאריך סיום"
   from_fdd4956d: מ-
   from_from_to_to_e31f6422: "מ %{from} עד %{to}"
@@ -16876,9 +16880,11 @@ he:
   reserved_by_you_cd03b62d: "הוזמן על ידך"
   reserved_f247b60b: שמור
   reset_95a81614: "חזרה למצב ברירת מחדל"
+  reset_from_322d819a: "חזרה למצב ברירות מחדל מ-"
   reset_multi_factor_authentication_2b63a558: "איפוס הזדהות רב שלבית"
   reset_this_contact_method_s_bounce_count_3845ecf4: "איפוס מונה תעופות של סוג התקשרות זה "
   reset_this_email_address_s_bounce_count_d81d8fd9: "איפוס מונה תעופות של כתובת דוא\"ל זו"
+  reset_to_ee9265ef: "חזרה למצב ברירות מחדל עד"
   respondus_lockdown_browser_support_413352eb: "עזרה לגבי דפדפן Respondus LockDown"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -18401,6 +18407,7 @@ he:
       unrecorgnized_type: "סוג ייבוא לא מוכר"
     instructure_csv: "פורמט CSV או קבצי זיפ של CSVs של Instructure "
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "אוגדן SIS  "
   sis_export_title: "ייצוא ממערכת המידע הבית ספרית"
   sis_friendly_name_52b5683d: "שם ידידותי של המערכת הבית ספרית"
   sis_grade_export_settings_45a9f709: "הגדרות ייצוא הערכות של המערכת הבית ספרית"
@@ -19676,6 +19683,7 @@ he:
       ולקבל מזהה Client ומילה סודית שלו
       
       אם הספק יכול לקנפג קריאה חוזרת תקינה או לנתב URIים, אפשר להשתמש ב  %{callback_url}.
+  to_date_7c45ee77: "עד תאריך"
   to_do_1d554f36: "מטלות לביצוע"
   to_do_items_loading_d1cdfcd5: "משימות לביצוע נטענות"
   to_f0e90538: "עבור:"
