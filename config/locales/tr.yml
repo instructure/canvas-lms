@@ -5731,6 +5731,8 @@ tr:
     unstar_conversation: "Tartışmadan yıldızı kaldır"
   conversations_69a8dc26: Mesajlaşmalar
   conversations_send_messages_to_individual_course_m_733620b: "Mesajlar - ders üyelerine bireysel mesaj gönder"
+  copied_from_2094bec4: "Şuradan Kopyalandı"
+  copied_to_b437eff8: "Şuraya Kopyalandı"
   copy_9748f9f: Kopyala
   copy_operation_started_successfully_b2f236a1: "Kopyalama işlemi abşarılı bir şekilde başladı"
   copy_page_to_another_course_405cc07c: "Sayfayı başka derse kopyala"
@@ -8411,6 +8413,7 @@ tr:
     wrong_file_extension: "Seçmiş olduğunuz \"%{extension}\" uzantılı dosyanın gönderilmesine onay verilmemiş."
   event_date_c9459fe3: "Olay Tarihi"
   event_date_f05219e7: "Olay Tarihi:"
+  event_details_e646df52: "Olay Ayrıntıları"
   event_end_time_ef830e66: "Olay Bitiş Zamanı"
   event_fe9ba3fe: Olay
   event_start_time_441b491f: "Olay Başlama Zamanı"
@@ -8891,6 +8894,7 @@ tr:
     one: "Kırık 1 bağlantı bulundu"
     other: "%{count} kırık bağlantı bulundu"
   france_33_90b595d7: "Fransa (+33)"
+  from_date_27317230: "Kimden Tarihi"
   from_fdd4956d: Kimden
   from_from_to_to_e31f6422: "%{from}'dan %{to}'a"
   from_gravatar_58372d5a: "Gravatar'dan al"
@@ -16918,7 +16922,9 @@ tr:
   reregister_9ab95a57: "Tekrar kayıt ol"
   reserved_f247b60b: "Rezerve edildi"
   reset_95a81614: Sıfırla
+  reset_from_322d819a: "Şuradan Ayarla"
   reset_multi_factor_authentication_2b63a558: "Çoklu Kimlik Doğrulama'yı Sıfırla"
+  reset_to_ee9265ef: "Şuraya Ayarla"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -18350,6 +18356,7 @@ tr:
       unrecorgnized_type: "Bilinmeyen içeri aktarma türü"
     instructure_csv: "Instructure CSV veya CSV uzantılarının bulunduğu zip dosya formatında olmalıdır"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "ÖBS Toplu İş"
   sis_data_eee75d5b: "SIS verisi"
   sis_data_import_8bb623ce: "ÖBS Verisi - içeri aktar"
   sis_data_manage_328a4799: "ÖBS verisi - yönet"
@@ -19428,6 +19435,7 @@ tr:
   to_c4c44f4b: ile
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "sis_account_id değiştirmek için kullanıcının manage_sis izni olmalı"
   to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Bir tartışmayı yorumlara kapatmak için buraya sürükleyin veya tartışma ayarları menüsünden Yorumları Kapat'ı seçin."
+  to_date_7c45ee77: "Kime Tarihi"
   to_do_1d554f36: Yapılacaklar
   to_do_date_2cb4bf7b: "Yapılacak Tarihi:"
   to_do_list_dashboard_d741f64e: "Yapılacaklar Listesi Paneli"
