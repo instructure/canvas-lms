@@ -152,6 +152,7 @@ class AbstractAssignment < ActiveRecord::Base
            inverse_of: :context,
            class_name: "Lti::ResourceLink",
            dependent: :destroy
+  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor", dependent: :destroy, inverse_of: :assignment
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
@@ -1538,6 +1539,7 @@ class AbstractAssignment < ActiveRecord::Base
     # Assignment owns deletion of Lti::LineItem, Lti::ResourceLink
     # destroy_all removes associations, so avoid that
     lti_resource_links.find_each(&:destroy)
+    lti_asset_processors.find_each(&:destroy)
 
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all
