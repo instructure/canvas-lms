@@ -287,7 +287,7 @@ export const DiscussionTopicContainer = ({
 
       render={(responsiveProps, matches) => (
         <>
-          <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} />
+          <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} useStudentView={true}/>
           <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
