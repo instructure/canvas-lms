@@ -17,10 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {CreateCourseLabel} from '../CreateCourseLabel'
+import {Text} from '@instructure/ui-text'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-test('renders CreateCourseLabel with correct text', () => {
-  const {getByText} = render(<CreateCourseLabel />)
-  expect(getByText('Create course')).toBeInTheDocument()
-})
+const I18n = useI18nScope('content_migrations_redesign')
+
+export const ImportInProgressLabel = () => {
+  return <Text>{I18n.t('Adding...')}</Text>
+}

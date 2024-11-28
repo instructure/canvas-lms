@@ -33,10 +33,12 @@ const renderComponent = (overrideProps?: any) =>
       onCancel={onCancel}
       {...overrideProps}
       SubmitLabel={TextLabel}
+      SubmittingLabel={TextSubmittingLabel}
     />
   )
 
 const TextLabel = () => <Text>Add to Import Queue</Text>
+const TextSubmittingLabel = () => <Text>Submitting test</Text>
 
 describe('CommonMigratorControls', () => {
   afterEach(() => jest.clearAllMocks())
@@ -162,7 +164,7 @@ describe('CommonMigratorControls', () => {
     expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
     expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
     expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
-    expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
+    expect(screen.getByRole('button', {name: /Submitting test/})).toBeDisabled()
   })
 
   it('disable "events and due" dates optional fields while uploading', async () => {
@@ -187,6 +189,7 @@ describe('CommonMigratorControls', () => {
         isSubmitting={true}
         fileUploadProgress={10}
         SubmitLabel={TextLabel}
+        SubmittingLabel={TextSubmittingLabel}
       />
     )
     expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
@@ -221,6 +224,7 @@ describe('CommonMigratorControls', () => {
         isSubmitting={true}
         fileUploadProgress={10}
         SubmitLabel={TextLabel}
+        SubmittingLabel={TextSubmittingLabel}
       />
     )
     expect(getByRole('checkbox', {name: 'Import Blueprint Course settings'})).toBeDisabled()

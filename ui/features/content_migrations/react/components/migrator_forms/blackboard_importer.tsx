@@ -25,6 +25,7 @@ import MigrationFileInput from './file_input'
 import {parseDateToISOString} from '../utils'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
 import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
 
 type BlackboardImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -74,6 +75,7 @@ const BlackboardImporter = ({
         newStartDate={parseDateToISOString(ENV.OLD_START_DATE)}
         newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
         SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
       />
     </>
   )

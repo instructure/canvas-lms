@@ -21,11 +21,11 @@ import {fireEvent, render} from '@testing-library/react'
 import {ConfiguredDateInput} from '../ConfiguredDateInput'
 
 describe('ConfiguredDateInput', () => {
-  it('renders correctly with initial date', () => {
-    const placeholder = 'Select a date (optional)'
-    const renderLabelText = 'Start date'
-    const renderScreenReaderLabelText = 'Select a new beginning date'
+  const placeholder = 'Select a date (optional)'
+  const renderLabelText = 'Start date'
+  const renderScreenReaderLabelText = 'Select a new beginning date'
 
+  it('renders correctly with initial date', () => {
     const {getByPlaceholderText, getByText} = render(
       <ConfiguredDateInput
         selectedDate="2024-01-01T00:00:00.000Z"
@@ -44,10 +44,6 @@ describe('ConfiguredDateInput', () => {
 
   it('calls onSelectedDateChange when a date is selected', () => {
     const handleDateChange = jest.fn()
-    const placeholder = 'Select a date (optional)'
-    const renderLabelText = 'Start date'
-    const renderScreenReaderLabelText = 'Select a new beginning date'
-
     const {getByPlaceholderText, getByText} = render(
       <ConfiguredDateInput
         selectedDate="2024-01-05T00:00:00.000Z"
@@ -66,5 +62,19 @@ describe('ConfiguredDateInput', () => {
     }
     fireEvent.click(jan15Button)
     expect(handleDateChange).toHaveBeenCalledWith(new Date('2024-01-15'), 'pick')
+  })
+
+  it('renders with disabled', () => {
+    const {getByDisplayValue} = render(
+      <ConfiguredDateInput
+        selectedDate="2024-01-01T00:00:00.000Z"
+        onSelectedDateChange={() => {}}
+        placeholder={placeholder}
+        renderLabelText={renderLabelText}
+        renderScreenReaderLabelText={renderScreenReaderLabelText}
+        disabled={true}
+      />
+    )
+    expect(getByDisplayValue('Jan 1 at 12am')).toBeDisabled()
   })
 })

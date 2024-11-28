@@ -33,6 +33,7 @@ import type {onSubmitMigrationFormCallback} from '../types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {parseDateToISOString} from '../utils'
 import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -210,6 +211,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         onSubmit={handleSubmit}
         onCancel={onCancel}
         SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
       />
     </>
   )

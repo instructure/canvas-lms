@@ -23,14 +23,18 @@ export const ConfiguredTextInput = ({
   label,
   inputValue,
   onChange,
+  disabled = false,
 }: {
   label: string
   inputValue: string
   onChange: (value: string) => void
+  disabled?: boolean
 }) => {
   const handleInput = (_: ChangeEvent<HTMLInputElement>, value: string) => {
     onChange(value)
   }
 
-  return <TextInput renderLabel={label} value={inputValue} onChange={handleInput} />
+  return (
+    <TextInput renderLabel={label} value={inputValue} onChange={handleInput} disabled={disabled} />
+  )
 }

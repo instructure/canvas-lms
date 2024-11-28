@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {CreateCourseLabel} from '../CreateCourseLabel'
+import {CreateCourseInProgressLabel} from '../CreateCourseInProgressLabel'
 
-test('renders CreateCourseLabel with correct text', () => {
-  const {getByText} = render(<CreateCourseLabel />)
-  expect(getByText('Create course')).toBeInTheDocument()
+test('renders CreateCourseInProgressLabel with correct text', () => {
+  const {getByText} = render(<CreateCourseInProgressLabel />)
+  expect(getByText('Creating...')).toBeInTheDocument()
 })

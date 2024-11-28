@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
 import {CopyCourseForm} from '../CopyCourseForm'
 import type {Course} from '../../../../../../api'
 
@@ -58,7 +58,19 @@ describe('CourseCopyForm', () => {
     expect(getByRole('button', {name: 'Create course'})).toBeInTheDocument()
   })
 
-  describe('intial values', () => {
+  it('renders all the fields as disabled on submit', () => {
+    const {getByRole, getByDisplayValue} = render(
+      <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
+    )
+    fireEvent.click(getByRole('button', {name: 'Create course'}))
+    expect(getByDisplayValue(courseName)).toBeDisabled()
+    expect(getByDisplayValue(courseCode)).toBeDisabled()
+    expect(getByDisplayValue('Jan 1 at 12am')).toBeDisabled()
+    expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
+    expect(getByRole('button', {name: /Creating/})).toBeDisabled()
+  })
+
+  describe('initial values', () => {
     it('renders the course name', () => {
       const {getByDisplayValue} = render(
         <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />

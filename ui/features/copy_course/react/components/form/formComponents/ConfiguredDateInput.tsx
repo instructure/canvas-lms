@@ -30,6 +30,7 @@ export const ConfiguredDateInput = ({
   renderLabelText,
   onSelectedDateChange,
   timeZone,
+  disabled = false,
 }: {
   selectedDate?: string | null
   placeholder?: string
@@ -37,6 +38,7 @@ export const ConfiguredDateInput = ({
   renderLabelText: string
   onSelectedDateChange: (d: Date | null) => void
   timeZone?: string
+  disabled?: boolean
 }) => {
   const formatDate = (date: Date) => {
     return datetimeString(date, {timezone: timeZone})
@@ -52,7 +54,7 @@ export const ConfiguredDateInput = ({
           formatDate={formatDate}
           placeholder={placeholder}
           renderLabel={<ScreenReaderContent>{renderScreenReaderLabelText}</ScreenReaderContent>}
-          interaction="enabled"
+          interaction={disabled ? 'disabled' : 'enabled'}
           width="100%"
         />
       </Flex>

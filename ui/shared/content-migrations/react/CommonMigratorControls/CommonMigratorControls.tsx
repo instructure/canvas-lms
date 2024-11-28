@@ -49,6 +49,7 @@ type CommonMigratorControlsProps = {
   newStartDate?: string | null
   newEndDate?: string | null
   SubmitLabel: ComponentType
+  SubmittingLabel: ComponentType
 }
 
 const generateNewQuizzesLabel = () => {
@@ -130,6 +131,7 @@ export const CommonMigratorControls = ({
   newStartDate,
   newEndDate,
   SubmitLabel,
+  SubmittingLabel,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -354,8 +356,8 @@ export const CommonMigratorControls = ({
         >
           {isSubmitting ? (
             <>
-              <Spinner size="x-small" renderTitle={I18n.t('Adding')} /> &nbsp;
-              {I18n.t('Adding...')}
+              <Spinner size="x-small" renderTitle={<SubmittingLabel />} /> &nbsp;
+              <SubmittingLabel />
             </>
           ) : (
             <SubmitLabel />

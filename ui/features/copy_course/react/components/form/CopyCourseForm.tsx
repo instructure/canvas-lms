@@ -28,6 +28,7 @@ import {ConfiguredTextInput} from './formComponents/ConfiguredTextInput'
 import {ConfiguredSelectInput} from './formComponents/ConfiguredSelectInput'
 import type {Course} from '../../../../../api'
 import type {Term} from '../../types'
+import {CreateCourseInProgressLabel} from './formComponents/CreateCourseInProgressLabel'
 
 const I18n = useI18nScope('content_copy_redesign')
 
@@ -91,6 +92,7 @@ export const CopyCourseForm = ({
             label={I18n.t('Name')}
             inputValue={courseName}
             onChange={value => handleTextInputChange(value, setCourseName)}
+            disabled={isSubmitting}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -98,6 +100,7 @@ export const CopyCourseForm = ({
             label={I18n.t('Course code')}
             inputValue={courseCode}
             onChange={value => handleTextInputChange(value, setCourseCode)}
+            disabled={isSubmitting}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -108,6 +111,7 @@ export const CopyCourseForm = ({
             renderLabelText={I18n.t('Start date')}
             renderScreenReaderLabelText={I18n.t('Select a new beginning date')}
             timeZone={timeZone}
+            disabled={isSubmitting}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -118,6 +122,7 @@ export const CopyCourseForm = ({
             renderLabelText={I18n.t('End date')}
             renderScreenReaderLabelText={I18n.t('Select a new end date')}
             timeZone={timeZone}
+            disabled={isSubmitting}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -126,6 +131,7 @@ export const CopyCourseForm = ({
             defaultInputValue={terms[0]?.name}
             options={terms}
             onSelect={selectedId => handleSelectTerm(selectedId)}
+            disabled={isSubmitting}
           />
         </View>
       </View>
@@ -143,6 +149,7 @@ export const CopyCourseForm = ({
         onCancel={handleCancel}
         onSubmit={handleSubmit}
         SubmitLabel={CreateCourseLabel}
+        SubmittingLabel={CreateCourseInProgressLabel}
       />
     </View>
   )

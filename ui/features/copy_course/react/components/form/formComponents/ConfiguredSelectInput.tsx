@@ -29,11 +29,13 @@ export const ConfiguredSelectInput = ({
   defaultInputValue = '',
   options,
   onSelect,
+  disabled = false,
 }: {
   label: string
   defaultInputValue?: string
   options: Array<Option>
   onSelect: (selectedId: string | null) => void
+  disabled?: boolean
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultInputValue)
   const [isShowingOptions, setIsShowingOptions] = useState<boolean>(false)
@@ -88,6 +90,7 @@ export const ConfiguredSelectInput = ({
       onRequestHideOptions={handleHideOptions}
       onRequestHighlightOption={handleHighlightOption}
       onRequestSelectOption={handleSelectOption}
+      disabled={disabled}
     >
       {options.map(option => {
         return (
