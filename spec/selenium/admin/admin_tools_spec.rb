@@ -46,6 +46,14 @@ describe "admin_tools" do
     autocomplete_value
   end
 
+  def perform_autocomplete_search_react(input, search_term, row_index_to_select = 0)
+    input.send_keys(search_term)
+    wait_for_ajaximations
+    selected_option = fj("[role='listbox'] [role='option']:nth(#{row_index_to_select})")
+    selected_option.click
+    selected_option
+  end
+
   def setup_users
     # Setup a student (@student)
     course_with_student(active_all: true, account: @account, user: user_with_pseudonym(name: "Student TestUser"))
@@ -79,8 +87,9 @@ describe "admin_tools" do
     search_term ||= @course.name
     event ||= @event
 
-    perform_autocomplete_search("#course_id-autocompleteField", search_term)
-    f("#loggingCourse button[name=course_submit]").click
+    form = f('[aria-label="Course Activity Form"]')
+    perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), search_term)
+    form.find("button[aria-label='Find']").click
     wait_for_ajaximations
 
     cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
@@ -487,8 +496,9 @@ describe "admin_tools" do
       end
       @course.save
 
-      perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      f("#loggingCourse button[name=course_submit]").click
+      form = f('[aria-label="Course Activity Form"]')
+      perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
 
       expect(ff("#courseLoggingSearchResults table tbody tr").length).to eq @events.length
@@ -505,16 +515,18 @@ describe "admin_tools" do
       @course.name = "Course Updated"
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
-      set_value f("#course_id-autocompleteField"), @course.id
-      f("#loggingCourse button[name=course_submit]").click
+      form = f('[aria-label="Course Activity Form"]')
+      perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), @course.id)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
       expect(cols.size).to eq 6
     end
 
     it "fails gracefully with invalid ids" do
-      set_value f("#course_id-autocompleteField"), "notarealid"
-      f("#loggingCourse button[name=course_submit]").click
+      form = f('[aria-label="Course Activity Form"]')
+      perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), "notarealid")
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(f("#courseLoggingSearchResults ").text).to eq "No items found"
     end
@@ -523,10 +535,11 @@ describe "admin_tools" do
       @event = Auditors::Course.record_concluded(@course, @teacher)
       @course.destroy
 
-      autocomplete_value = perform_autocomplete_search("#course_id-autocompleteField", @course.name)
-      expect(autocomplete_value).not_to be_nil
+      form = f('[aria-label="Course Activity Form"]')
+      selection_option = perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
+      expect(selection_option).not_to be_nil
 
-      f("#loggingCourse button[name=course_submit]").click
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
 
       cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
