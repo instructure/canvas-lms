@@ -5794,6 +5794,7 @@ ko:
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
     unsaved_changes: "저장하지 않은 변경 사항이 있습니다."
     wrong_file_extension: "선택한 파일의 확장자 \"%{extension}\"는 제출이 허용되지 않습니다."
+  event_details_e646df52: "행사 세부 정보"
   event_title_7f1051a6: "행사 제목"
   everyone_854554dd: 모두
   everyone_else_6c6dc7b6: "나머지 모든 사람"
@@ -6078,6 +6079,7 @@ ko:
   for_title_69d92b3a: "%{title}"
   forgot_password_9098c30d: "암호 잊음"
   forward_d143f64: 전달
+  from_date_27317230: "시작 날짜"
   from_fdd4956d: 시작
   from_from_to_to_e31f6422: "%{from}부터 %{to}까지"
   from_gravatar_58372d5a: "Gravatar 사용"
@@ -13910,6 +13912,7 @@ ko:
     view_in_separate_window: "별도 창에 보기"
   to_51406be9: "받는 사람"
   to_c4c44f4b: "다음 요일로"
+  to_date_7c45ee77: "끝 날짜"
   to_f0e90538: "수신:"
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
   token_9a020862: 토큰
