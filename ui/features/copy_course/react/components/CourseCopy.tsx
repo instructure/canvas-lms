@@ -18,17 +18,30 @@
 
 import React from 'react'
 import {CopyCourseForm} from './form/CopyCourseForm'
-import {useQuery} from '@canvas/query'
+import {useQuery, useMutation} from '@canvas/query'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {coursesQuery} from '../queries/courseQuery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {termsQuery} from '../queries/termsQuery'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import type {CopyCourseFormSubmitData} from '../types'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {copyCourseMutation} from '../mutations/copyCourseMutation'
 // @ts-ignore
 import ErrorShip from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page/react'
 
 const I18n = useI18nScope('content_copy_redesign')
+
+export const onSuccessCallback = (newCourseId: string) => {
+  window.location.href = `/courses/${newCourseId}/content_migrations`
+}
+
+export const onErrorCallback = () => {
+  showFlashError(
+    I18n.t('Something went wrong during copy course operation. Reload the page and try again')
+  )()
+}
 
 export const CourseCopy = ({
   courseId,
@@ -52,6 +65,21 @@ export const CourseCopy = ({
     queryFn: termsQuery,
     meta: {fetchAtLeastOnce: true},
   })
+
+  const mutation = useMutation({
+    mutationKey: ['copy_course', 'create_course_and_migration', accountId],
+    mutationFn: copyCourseMutation,
+    onSuccess: onSuccessCallback,
+    onError: onErrorCallback,
+  })
+
+  const handleCancel = () => {
+    window.location.href = `/courses/${courseId}/settings`
+  }
+
+  const handleSubmit = (formData: CopyCourseFormSubmitData) => {
+    mutation.mutate({accountId, formData, courseId})
+  }
 
   if (courseQueryResult.isLoading || termsQueryResult.isLoading) {
     return (
@@ -85,6 +113,9 @@ export const CourseCopy = ({
       course={courseQueryResult.data}
       terms={termsQueryResult.data}
       timeZone={timeZone}
+      isSubmitting={mutation.isLoading || mutation.isSuccess}
+      onCancel={handleCancel}
+      onSubmit={handleSubmit}
     />
   )
 }

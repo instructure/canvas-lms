@@ -22,6 +22,8 @@ import {Text} from '@instructure/ui-text'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ErrorFormMessage} from '@canvas/content-migrations'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 export const ConfiguredDateInput = ({
   selectedDate,
@@ -31,6 +33,7 @@ export const ConfiguredDateInput = ({
   onSelectedDateChange,
   timeZone,
   disabled = false,
+  errorMessage,
 }: {
   selectedDate?: string | null
   placeholder?: string
@@ -39,9 +42,19 @@ export const ConfiguredDateInput = ({
   onSelectedDateChange: (d: Date | null) => void
   timeZone?: string
   disabled?: boolean
+  errorMessage?: string
 }) => {
   const formatDate = (date: Date) => {
     return datetimeString(date, {timezone: timeZone})
+  }
+
+  const generateErrorMessage = (message: string): FormMessage[] => {
+    return [
+      {
+        text: <ErrorFormMessage>{message}</ErrorFormMessage>,
+        type: 'error',
+      },
+    ]
   }
 
   return (
@@ -56,6 +69,7 @@ export const ConfiguredDateInput = ({
           renderLabel={<ScreenReaderContent>{renderScreenReaderLabelText}</ScreenReaderContent>}
           interaction={disabled ? 'disabled' : 'enabled'}
           width="100%"
+          messages={errorMessage ? generateErrorMessage(errorMessage) : []}
         />
       </Flex>
     </>

@@ -22,6 +22,7 @@ import {
   type DateShifts,
   type DateShiftsCommon,
   type DateAdjustmentConfig,
+  type MigrationCreateRequestBody,
 } from '@canvas/content-migrations'
 
 export type ContentMigrationItemSettings = {
@@ -69,12 +70,6 @@ export type ContentMigrationItem = {
   created_at: string
 }
 
-export type DateShiftsRequestBody = DateShiftsCommon & {
-  remove_dates?: boolean
-  shift_dates?: boolean
-  day_substitutions: Record<string, string>
-}
-
 export type submitMigrationFormData = {
   errored?: boolean
   adjust_dates: AdjustDates
@@ -86,19 +81,6 @@ export type submitMigrationFormData = {
     name: string
     size: number
     no_redirect: boolean
-  }
-}
-
-export type MigrationCreateRequestBody = {
-  course_id: string
-  migration_type: string
-  date_shift_options: DateShiftsRequestBody
-  selective_import: boolean
-  settings: {[key: string]: any}
-  pre_attachment?: {
-    name: string
-    no_redirect: boolean
-    size: number
   }
 }
 
@@ -125,4 +107,11 @@ export type QuestionBankSettings = {
   question_bank_name?: string
 }
 
-export type {AdjustDates, DaySub, DateShifts, DateShiftsCommon, DateAdjustmentConfig}
+export type {
+  AdjustDates,
+  DaySub,
+  DateShifts,
+  DateShiftsCommon,
+  DateAdjustmentConfig,
+  MigrationCreateRequestBody,
+}

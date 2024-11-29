@@ -29,7 +29,7 @@ describe('ConfiguredSelectInput', () => {
 
   const label = 'Test Label'
   const assistiveText = 'Use arrow keys to navigate options.'
-  const defaultInputValue = 'default'
+  const defaultInputValue = 'Option 1'
 
   const defaultProps = {
     label,

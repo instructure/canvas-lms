@@ -23,7 +23,7 @@ import type {
   DaySub,
   MigrationCreateRequestBody,
   submitMigrationFormData,
-} from '../components/types'
+} from '../types'
 
 const convertDaySubstitutions = (dateShiftOptions: DateShifts): Record<string, string> => {
   const treated_subs: {[key: string]: string} = {}

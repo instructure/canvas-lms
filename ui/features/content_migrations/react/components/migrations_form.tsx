@@ -40,7 +40,7 @@ import type {
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
 import QTIZipImporter from './migrator_forms/qti_zip'
-import {convertFormDataToMigrationCreateRequest} from '../converter/form_data_converter'
+import {convertFormDataToMigrationCreateRequest} from '@canvas/content-migrations'
 import D2LImporter from './migrator_forms/d2l_importer'
 import AngelImporter from './migrator_forms/angel_importer'
 import BlackboardImporter from './migrator_forms/blackboard_importer'

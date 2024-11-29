@@ -61,3 +61,22 @@ export type onSubmitMigrationFormCallback = (
   formData: submitMigrationFormData,
   preAttachmentFile?: File
 ) => void
+
+export type DateShiftsRequestBody = DateShiftsCommon & {
+  remove_dates?: boolean
+  shift_dates?: boolean
+  day_substitutions: Record<string, string>
+}
+
+export type MigrationCreateRequestBody = {
+  course_id: string
+  migration_type: string
+  date_shift_options: DateShiftsRequestBody
+  selective_import: boolean
+  settings: Record<string, any>
+  pre_attachment?: {
+    name: string
+    no_redirect: boolean
+    size: number
+  }
+}
