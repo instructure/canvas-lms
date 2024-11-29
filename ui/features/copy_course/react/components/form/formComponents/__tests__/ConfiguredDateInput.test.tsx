@@ -77,4 +77,20 @@ describe('ConfiguredDateInput', () => {
     )
     expect(getByDisplayValue('Jan 1 at 12am')).toBeDisabled()
   })
+
+  it('renders error message', () => {
+    const errorMessage = 'This is an error message'
+
+    const {getByText} = render(
+      <ConfiguredDateInput
+        selectedDate="2024-01-01T00:00:00.000Z"
+        onSelectedDateChange={() => {}}
+        placeholder={placeholder}
+        renderLabelText={renderLabelText}
+        renderScreenReaderLabelText={renderScreenReaderLabelText}
+        errorMessage={errorMessage}
+      />
+    )
+    expect(getByText(errorMessage)).toBeInTheDocument()
+  })
 })

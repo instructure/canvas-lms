@@ -635,11 +635,18 @@ export type Course = Readonly<{
   ]
 }>
 
+export type ContentMigration = Readonly<{
+  id: string
+  migration_type: string
+}>
+
 export type EnrollmentTerms = Readonly<{
   enrollment_terms: [
     {
       id: string
       name: string
+      end_at: string
+      start_at: string
     }
   ]
 }>

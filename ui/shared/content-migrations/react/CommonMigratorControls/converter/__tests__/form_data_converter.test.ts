@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {submitMigrationFormData} from '../../components/types'
+import type {submitMigrationFormData} from '../../types'
 import {convertFormDataToMigrationCreateRequest} from '../form_data_converter'
 
 describe('convertFormDataToMigrationCreateRequest', () => {

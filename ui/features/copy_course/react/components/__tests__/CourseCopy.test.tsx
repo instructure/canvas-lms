@@ -17,13 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {useQuery} from '@canvas/query'
+import {fireEvent, render} from '@testing-library/react'
+import {useQuery, useMutation} from '@canvas/query'
 import CourseCopy from '../CourseCopy'
 
 jest.mock('@canvas/query')
-
-const mockUseQuery = useQuery as jest.Mock
 
 describe('CourseCopy', () => {
   const defaultProps = {
@@ -31,6 +29,16 @@ describe('CourseCopy', () => {
     accountId: '1',
     canImportAsNewQuizzes: true,
   }
+
+  const courseData = {id: '1', name: 'Test Course'}
+  const termsData = [{id: '1', name: 'Test Term'}]
+
+  const mockUseQuery = useQuery as jest.Mock
+  const mockUseMutation = useMutation as jest.Mock
+
+  afterEach(() => {
+    mockUseMutation.mockReset()
+  })
 
   it('renders loading state', () => {
     mockUseQuery.mockReturnValue({isLoading: true})
@@ -41,11 +49,9 @@ describe('CourseCopy', () => {
   })
 
   it('renders success state', () => {
-    const courseData = {id: '1', name: 'Test Course'}
-    const termsData = [{id: '1', name: 'Test Term'}]
-
     mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: courseData})
     mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: termsData})
+    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
 
@@ -89,6 +95,56 @@ describe('CourseCopy', () => {
       const {getByText} = render(<CourseCopy {...defaultProps} />)
 
       expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
+    })
+  })
+
+  it('handleCancel redirects to the course settings page', () => {
+    // @ts-ignore
+    delete window.location
+    window.location = {href: ''} as Location
+    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: courseData})
+    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: termsData})
+    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
+
+    const {getByRole} = render(<CourseCopy {...defaultProps} />)
+
+    fireEvent.click(getByRole('button', {name: 'Clear'}))
+    expect(window.location.href).toBe(`/courses/${defaultProps.courseId}/settings`)
+  })
+
+  it('handleSubmit calls mutate', () => {
+    const mockMutate = jest.fn()
+    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: courseData})
+    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: termsData})
+    mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false, mutate: mockMutate})
+
+    const {getByRole} = render(<CourseCopy {...defaultProps} />)
+
+    fireEvent.click(getByRole('button', {name: 'Create course'}))
+
+    expect(mockMutate).toHaveBeenCalledWith({
+      accountId: defaultProps.accountId,
+      courseId: defaultProps.courseId,
+      formData: {
+        courseName: courseData.name,
+        courseCode: '',
+        newCourseStartDate: null,
+        newCourseEndDate: null,
+        selectedTerm: termsData[0],
+        adjust_dates: {enabled: false, operation: 'shift_dates'},
+        date_shift_options: {
+          old_start_date: '',
+          new_start_date: '',
+          old_end_date: '',
+          new_end_date: '',
+          day_substitutions: [],
+        },
+        selective_import: false,
+        settings: {
+          import_quizzes_next: false,
+        },
+        errored: false,
+      },
     })
   })
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import {CopyCourseForm} from '../CopyCourseForm'
 import type {Course} from '../../../../../../api'
 
@@ -42,10 +42,26 @@ describe('CourseCopyForm', () => {
     end_at: endAt,
   }
 
+  const terms = [
+    {id: '1', name: 'Option 1'},
+    {id: '2', name: 'Option 2'},
+    {id: '3', name: 'Option 3'},
+  ]
+
+  const defaultProps = {
+    course,
+    terms,
+    isSubmitting: false,
+    onSubmit: jest.fn(),
+    onCancel: jest.fn(),
+    canImportAsNewQuizzes: true,
+  }
+
+  const renderCopyCourseForm = (props = {}) =>
+    render(<CopyCourseForm {...defaultProps} {...props} />)
+
   it('renders the component with all the form fields', () => {
-    const {getByText, getByRole} = render(
-      <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
-    )
+    const {getByText, getByRole} = renderCopyCourseForm()
 
     expect(getByText('Name')).toBeInTheDocument()
     expect(getByText('Course code')).toBeInTheDocument()
@@ -58,11 +74,57 @@ describe('CourseCopyForm', () => {
     expect(getByRole('button', {name: 'Create course'})).toBeInTheDocument()
   })
 
-  it('renders all the fields as disabled on submit', () => {
-    const {getByRole, getByDisplayValue} = render(
-      <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
-    )
+  it('calls onSubmit with the correct arguments when the form is submitted', () => {
+    const onSubmit = jest.fn()
+    const {getByRole, getByLabelText, getByText} = renderCopyCourseForm({onSubmit})
+
+    fireEvent.click(getByLabelText('Term'))
+    fireEvent.click(getByText('Option 1'))
+    fireEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
     fireEvent.click(getByRole('button', {name: 'Create course'}))
+
+    expect(onSubmit).toHaveBeenCalledWith({
+      courseName: course.name,
+      courseCode: course.course_code,
+      newCourseStartDate: new Date(startAt),
+      newCourseEndDate: new Date(endAt),
+      selectedTerm: {id: '1', name: 'Option 1'},
+      settings: {import_quizzes_next: false},
+      selective_import: false,
+      adjust_dates: {enabled: 1, operation: 'shift_dates'},
+      errored: false,
+      date_shift_options: {
+        old_start_date: new Date(startAt).toISOString(),
+        new_start_date: new Date(startAt).toISOString(),
+        old_end_date: new Date(endAt).toISOString(),
+        new_end_date: new Date(endAt).toISOString(),
+        day_substitutions: [],
+      },
+    })
+  })
+
+  it('should not call onSubmit on date validation error', () => {
+    const onSubmit = jest.fn()
+    const courseWithWrongDates = {
+      ...course,
+      start_at: endAt,
+      end_at: startAt,
+    }
+    const {getByText, getByRole} = renderCopyCourseForm({
+      onSubmit,
+      course: courseWithWrongDates,
+    })
+
+    fireEvent.click(getByRole('button', {name: 'Create course'}))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(getByText('Start date must be before end date')).toBeInTheDocument()
+    expect(getByText('End date must be after start date')).toBeInTheDocument()
+  })
+
+  it('renders all the fields as disabled on submit', () => {
+    const {getByRole, getByDisplayValue} = renderCopyCourseForm({isSubmitting: true})
+
     expect(getByDisplayValue(courseName)).toBeDisabled()
     expect(getByDisplayValue(courseCode)).toBeDisabled()
     expect(getByDisplayValue('Jan 1 at 12am')).toBeDisabled()
@@ -72,46 +134,32 @@ describe('CourseCopyForm', () => {
 
   describe('initial values', () => {
     it('renders the course name', () => {
-      const {getByDisplayValue} = render(
-        <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
-      )
+      const {getByDisplayValue} = renderCopyCourseForm()
 
       expect(getByDisplayValue(courseName)).toBeInTheDocument()
     })
 
     it('renders the course code', () => {
-      const {getByDisplayValue} = render(
-        <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
-      )
+      const {getByDisplayValue} = renderCopyCourseForm()
 
       expect(getByDisplayValue(courseCode)).toBeInTheDocument()
     })
 
     it('renders the start date', () => {
-      const {getByDisplayValue} = render(
-        <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
-      )
+      const {getByDisplayValue} = renderCopyCourseForm()
 
       expect(getByDisplayValue('Jan 1 at 12am')).toBeInTheDocument()
     })
 
     it('renders the end date', () => {
-      const {getByDisplayValue} = render(
-        <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={[]} />
-      )
+      const {getByDisplayValue} = renderCopyCourseForm()
 
       expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
     })
 
     it('renders the terms', () => {
-      const terms = [
-        {id: '1', name: 'Option 1'},
-        {id: '2', name: 'Option 2'},
-        {id: '3', name: 'Option 3'},
-      ]
-      const {getByText, getByLabelText} = render(
-        <CopyCourseForm canImportAsNewQuizzes={true} course={course} terms={terms} />
-      )
+      const {getByText, getByLabelText} = renderCopyCourseForm()
+
       fireEvent.click(getByLabelText('Term'))
       terms.forEach(option => {
         expect(getByText(option.name)).toBeInTheDocument()
