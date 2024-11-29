@@ -3365,6 +3365,9 @@ class Course < ActiveRecord::Base
                           })
     end
 
+    # Remove Home tab for Horizon courses
+    default_tabs.delete_at(0) if horizon_course?
+
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
