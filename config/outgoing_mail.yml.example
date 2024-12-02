@@ -17,13 +17,13 @@ test:
   delivery_method: "test"
 
 production:
-  address: "smtp.example.com"
-  port: "25"
-  user_name: "user"
-  password: "password"
+  address: "smtp.gmail.com"
+  port: "587"
+  user_name: ""
+  password: ""
   authentication: "plain" # plain, login, or cram_md5
-  domain: "example.com"
-  outgoing_address: "canvas@example.com"
+  domain: "gmail.com"
+  outgoing_address: ""
   default_name: "Instructure Canvas"
 
 # If receiving mail from multiple inboxes (see incoming_mail.yml.example),

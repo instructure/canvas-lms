@@ -21,17 +21,18 @@ services:
     links:
       - postgres
       - redis
+    volumes:
+      - ./:/usr/src/canvas:cached
+      - ./volumes/nginx:/etc/nginx/conf.d
     environment:
       POSTGRES_PASSWORD: sekret
-    command: bundle exec script/delayed_job run
-
   postgres:
     build: ./docker-compose/postgres
     environment:
       POSTGRES_PASSWORD: sekret
     command: postgres -c stats_temp_directory=/tmp
     volumes:
-      - ./volumes/postgres/14:/home
+      - ./volumes/postgres/14:/var/lib/postgresql/data
     # 永続化したらバグった。なぜ。web側の永続化が問題な可能性もある。切り分け前。
 
   redis:

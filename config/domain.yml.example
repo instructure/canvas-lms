@@ -9,8 +9,8 @@ development:
   # ssl: true
 
 production:
-  domain: "canvas-local.com"
+  domain: "stg-canvas.zuudev.com"
   # whether this instance of canvas is served over ssl (https) or not
   # defaults to true for production, false for test/development
-  ssl: false
+  ssl: true
   # files_domain: "canvasfiles.example.com"

@@ -1,7 +1,7 @@
 production: &default
   # replace this with a random string of at least 20 characters
   encryption_key: 123456789123456789123456789
-  lti_iss: 'http://canvas-local.com'
+  lti_iss: 'https://stg-canvas.zuudev.com'
 
 development:
   <<: *default
