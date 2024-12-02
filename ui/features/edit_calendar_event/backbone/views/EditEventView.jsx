@@ -352,9 +352,11 @@ export default class EditCalendarEventView extends Backbone.View {
     renderDatetimeField(this.$('.date_field'), {
       dateOnly: true,
       datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))},
+      newSuggestionDesign: true,
     })
     renderDatetimeField($('.time_field'), {
       timeOnly: true,
+      newSuggestionDesign: true,
     })
     this.$('.date_start_end_row').each((_unused, row) => {
       const date = $('.start_date', row).first()
@@ -559,9 +561,14 @@ export default class EditCalendarEventView extends Backbone.View {
       })
     }
     if (!start_at) {
+      EditCalendarEventView.showError({
+        id: 'calendar_event_date',
+        selector: '#calendar_event_date',
+        message: I18n.t('errors.start_date_required', 'You must enter a date'),
+      })
       errors.push({
-        field: $('#calendar_event_date'),
-        text: I18n.t('errors.start_date_required', 'You must enter a date'),
+        hidden: true,
+        selector: '#calendar_event_date',
       })
     }
     if (errors.length) {
@@ -720,7 +727,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
       errorContainer.append(icon, text)
 
-      $(selector).after(errorContainer)
+      $(selector).parent().append(errorContainer)
 
       // Associates the message to the input via aria-describedby
       $(selector).attr('aria-describedby', errorId)
@@ -738,7 +745,7 @@ export default class EditCalendarEventView extends Backbone.View {
       $(selector).removeClass('error')
 
       // Removes the error message element
-      $(selector).next('.error-message').remove()
+      $(selector).parent().children('.error-message').remove()
 
       // Removes the error message attributes from the input
       $(selector).removeAttr('aria-describedby')

@@ -122,4 +122,25 @@
       margin-top: 0.175em;
     }
   }
+
+  .datetime_suggest {
+    width: 6rem;
+    padding-left: 0;
+  }
+  .date_field_responsive .datetime_suggest {
+    width: 8rem;
+  }
+  @media (max-width: 767px) {
+    .date_field_responsive {
+      display: block;
+      width: 100%;
+    }
+    .date_field_responsive input.date_field {
+      width: 11.2rem !important;
+    }
+
+    .date_field_responsive .datetime_suggest {
+      width: 12rem;
+    }
+  }
 }

@@ -166,7 +166,7 @@ describe "calendar2" do
         more_options_submit_button.click
         wait_for_ajaximations
 
-        expect(more_options_error_box).to include_text("You must enter a date")
+        expect(f("#calendar_event_date-error")).to include_text("You must enter a date")
         expect(@course.calendar_events.count).to eq(0)
       end
 
