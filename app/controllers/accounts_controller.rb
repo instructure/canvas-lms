@@ -515,7 +515,7 @@ class AccountsController < ApplicationController
   #
   # @example_response
   #
-  #   { "calendar_contexts_limit": true, "open_registration": false, ...}
+  #   { "calendar_contexts_limit": 10, "open_registration": false, ...}
   #
   def environment
     render json: cached_js_env_root_account_settings
