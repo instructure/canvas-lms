@@ -151,7 +151,7 @@
 </thead>
 <tbody>
   <% if rubric && rubric.criteria %>
-    <% learning_outcome_ids = rubric.learning_outcome_ids_from_results %>
+    <% learning_outcome_ids = edit_view ? rubric.learning_outcome_ids_from_results : [] %>
     <% rubric.criteria_object.each do |criterion| %>
       <% rating = assessment.ratings.find{|r| r[:criterion_id] == criterion.id} rescue nil %>
       <% friendly_description = outcome_friendly_descriptions.detect {|x| x["learning_outcome_id"] == criterion[:learning_outcome_id]}.description rescue '' %>
