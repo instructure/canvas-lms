@@ -2261,6 +2261,7 @@ describe UsersController do
 
     context "rendering page views" do
       before do
+        allow(controller).to receive(:page_view_path).and_return("users/page_views/page_views")
         allow(PageView).to receive(:page_views_enabled?).and_return(true)
         course_with_teacher(active_all: 1)
       end
