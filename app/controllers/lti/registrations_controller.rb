@@ -349,7 +349,7 @@
 # @model Lti::ToolConfiguration
 #     {
 #       "id": "Lti::ToolConfiguration",
-#       "description": "A Registration's Canvas-specific tool configuration. Any Lti::Overlays returned are already applied to the configuration.",
+#       "description": "A Registration's Canvas-specific tool configuration.",
 #       "properties": {
 #         "title": {
 #           "description": "The display name of the tool",
@@ -928,7 +928,8 @@ class Lti::RegistrationsController < ApplicationController
   #   Array of additional data to include. Always includes [account_binding].
   #
   #   "account_binding":: the registration's binding to the given account
-  #   "configuration":: the registration's Canvas-style tool configuration
+  #   "configuration":: the registration's Canvas-style tool configuration, without any overlays applied.
+  #   "overlaid_configuration":: the registration's Canvas-style tool configuration, with all overlays applied.
   #   "overlay":: the registration's admin-defined configuration overlay
   #
   # @returns {"total": "integer", data: [Lti::Registration] }
@@ -1101,7 +1102,8 @@ class Lti::RegistrationsController < ApplicationController
   #   Array of additional data to include. Always includes [account_binding configuration].
   #
   #   "account_binding":: the registration's binding to the given account
-  #   "configuration":: the registration's Canvas-style tool configuration
+  #   "configuration":: the registration's Canvas-style tool configuration, without any overlays applied.
+  #   "overlaid_configuration":: the registration's Canvas-style tool configuration, with all overlays applied.
   #   "overlay":: the registration's admin-defined configuration overlay
   #   "overlay_versions":: the registration's overlay's edit history
   #

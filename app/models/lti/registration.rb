@@ -216,11 +216,10 @@ class Lti::Registration < ActiveRecord::Base
   # Returns a Hash conforming to the InternalLtiConfiguration schema. If a context is specified, the
   # overlay for said context, if one exists, will be applied to the configuration.
   # @param [Account | Course | nil] context The context for which to generate the configuration.
+  # @param [Boolean] include_overlay Whether or not to apply the overlay to the configuration.
   # @return [Hash] A Hash conforming to the InternalLtiConfiguration schema.
   # TODO: this will eventually need to account for 1.1 registrations
-  def internal_lti_configuration(context: nil)
-    overlay = overlay_for(context)&.data
-
+  def internal_lti_configuration(context: nil, include_overlay: true)
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
@@ -229,6 +228,9 @@ class Lti::Registration < ActiveRecord::Base
                       developer_key&.tool_configuration&.internal_lti_configuration ||
                       {}
 
+    return internal_config unless include_overlay
+
+    overlay = overlay_for(context)&.data
     # TODO: Remove this clause once we have backfilled all Lti::IMS::Registration overlays into the
     # actual Lti::Overlay table.
     if ims_registration.present? && overlay.blank?
