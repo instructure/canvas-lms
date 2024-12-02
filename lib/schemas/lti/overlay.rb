@@ -35,7 +35,6 @@ module Schemas::Lti
     SCHEMA = {
       type: "object",
       properties: {
-
         title: { type: "string" },
         description: { type: "string" },
         custom_fields: { type: "object" },

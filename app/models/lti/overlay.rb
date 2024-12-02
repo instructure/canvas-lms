@@ -142,7 +142,7 @@ class Lti::Overlay < ActiveRecord::Base
       placement.merge!(placement_overlay)
     end
 
-    # disabled_placements takes precendence over placements, in case there's any overlap.
+    # disabled_placements takes precedence over placements, in case there's any overlap.
     disabled_placements&.each do |placement|
       placement = internal_config[:placements].find { |p| p[:placement] == placement }
       placement[:enabled] = false if placement.present?
