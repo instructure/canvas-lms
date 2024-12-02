@@ -5888,6 +5888,7 @@ uk:
       та Контрольні питання. Групам завдань можна призначати вагові коефіцієнти.
   create_content_for_your_course_500a7032: "Створити вміст для свого курсу"
   create_course_9a69b32c: "Створити курс"
+  create_course_9dc5b61a: "Створити курс"
   create_criterion_6df4d4ad: "Створити критерій"
   create_discussion_topics_8330d52b: "Створити теми для обговорення"
   create_educational_resources_8219326e: "Створити навчальні ресурси"
@@ -12745,6 +12746,7 @@ uk:
   please_enter_a_name_for_this_link_318f01a4: "Будь ласка, введіть назву для цього посилання."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Будь ласка. введіть пошукові терміни з трьома і більше символами"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Будь ласка, введіть правильний URL. Протокол потрібен (e.g. http://, https://, ftp://, tel:, mailto:)."
+  please_enter_the_details_for_the_new_course_dc705b8c: "Будь ласка, введіть деталі для нового курсу."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Будь ласка, введіть код підтвердження, показаний вашим токеном."
   please_enter_your_label_name_7745272d: "Будь ласка, введіть ваше %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Будь ласка, введіть ваш %{label_name} і пароль:"

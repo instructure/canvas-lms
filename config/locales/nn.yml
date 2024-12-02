@@ -8914,6 +8914,7 @@ nn:
       eller Quizar. Oppgåvegrupper kan vektast.
   create_content_for_your_course_500a7032: "Opprett emneinnhald"
   create_course_9a69b32c: "Opprett emne"
+  create_course_9dc5b61a: "Opprett emne"
   create_course_pace_3dff129: "Lag ein framdriftsplan for emne"
   create_criterion_6df4d4ad: "Opprett kriterium"
   create_delete_edit_157bb1a3: "opprett / slett / rediger"
@@ -19577,6 +19578,7 @@ nn:
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Skriv inn ein gyldig URL (til dømes https://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://)."
+  please_enter_the_details_for_the_new_course_dc705b8c: "Sett inn detaljane for det nye emnet."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Oppgi godkjenningskoden vist av token."
   please_enter_your_label_name_7745272d: "Oppgi %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Oppgi %{label_name} og passord:"
