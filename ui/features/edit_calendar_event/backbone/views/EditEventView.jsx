@@ -56,6 +56,8 @@ RichContentEditor.preloadRemoteModule()
 // #
 // View for editing a calendar event on it's own page
 export default class EditCalendarEventView extends Backbone.View {
+  static recurringEventLimit = 200
+
   initialize() {
     this.render = this.render.bind(this)
     this.toggleDuplicateOptions = this.toggleDuplicateOptions.bind(this)
@@ -544,7 +546,7 @@ export default class EditCalendarEventView extends Backbone.View {
     return this.saveEvent(eventData)
   }
 
-  validateFormData({title, start_at}) {
+  validateFormData({title, start_at, duplicate}) {
     // Form data:
     // blackout_date, description, end_at, important_dates, location_address,
     // location_name, start_at, title
@@ -552,42 +554,68 @@ export default class EditCalendarEventView extends Backbone.View {
     if (title.length === 0) {
       EditCalendarEventView.showError({
         id: 'calendar_event_title',
-        selector: '#calendar_event_title',
+        fieldSelector: '#calendar_event_title',
         message: I18n.t('errors.title_required', 'An event title is required'),
       })
-      errors.push({
-        hidden: true,
-        selector: '#calendar_event_title',
-      })
+      errors.push('#calendar_event_title')
     }
+
     if (!start_at) {
       EditCalendarEventView.showError({
         id: 'calendar_event_date',
-        selector: '#calendar_event_date',
+        fieldSelector: '#calendar_event_date',
         message: I18n.t('errors.start_date_required', 'You must enter a date'),
       })
-      errors.push({
-        hidden: true,
-        selector: '#calendar_event_date',
-      })
+      errors.push('#calendar_event_date')
     }
+
+    if (duplicate) {
+      EditCalendarEventView.validateDuplicatesForm(duplicate, errors)
+    }
+
     if (errors.length) {
-      let offset
-      errors.forEach(err => {
-        if (!err.hidden) {
-          const errorBox = err.field.errorBox(err.text)
-          offset ||= errorBox.offset()
-        }
-      })
-      if (offset) {
-        // Scrolls to the the uppermost field, in this page title field could be it.
-        $('html,body').scrollTo({top: offset.top, left: 0})
-      } else {
-        EditCalendarEventView.focusAndScrollTo(errors[0].selector)
-      }
+      EditCalendarEventView.focusAndScrollTo(errors[0])
       return false
     }
     return true
+  }
+
+  static validateDuplicatesForm(duplicate, errors) {
+    const {interval, count} = duplicate
+
+    // Validate duplicate interval field
+    if (Number.isNaN(Number(interval)) || Number(interval) <= 0) {
+      EditCalendarEventView.showError({
+        id: 'duplicate_interval',
+        fieldSelector: '#duplicate_interval',
+        containerSelector: 'label[for="duplicate_interval"]',
+        message: I18n.t('errors.greater_or_equal', 'Please enter a value greater or equal to 1'),
+      })
+      errors.push('#duplicate_interval')
+    }
+
+    // Validate duplicate count field
+    if (Number.isNaN(Number(count)) || Number(count) <= 0) {
+      EditCalendarEventView.showError({
+        id: 'duplicate_count',
+        fieldSelector: '#duplicate_count',
+        containerSelector: 'label[for="duplicate_count"]',
+        message: I18n.t('errors.greater_or_equal', 'Please enter a value greater or equal to 1'),
+      })
+      errors.push('#duplicate_count')
+    } else if (Number(count) > EditCalendarEventView.recurringEventLimit) {
+      EditCalendarEventView.showError({
+        id: 'duplicate_count',
+        fieldSelector: '#duplicate_count',
+        containerSelector: 'label[for="duplicate_count"]',
+        message: I18n.t(
+          'errors.less_or_equal',
+          'Please enter a value less than or equal to %{recurringEventLimit}',
+          {recurringEventLimit: EditCalendarEventView.recurringEventLimit}
+        ),
+      })
+      errors.push('#duplicate_count')
+    }
   }
 
   async saveEvent(eventData) {
@@ -621,7 +649,6 @@ export default class EditCalendarEventView extends Backbone.View {
 
   toJSON() {
     const result = super.toJSON(...arguments)
-    result.recurringEventLimit = 200
     result.k5_context = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE || ENV.K5_ACCOUNT
     result.should_show_blackout_dates = this.shouldShowBlackoutDatesCheckbox()
     result.disableSectionDates =
@@ -705,12 +732,12 @@ export default class EditCalendarEventView extends Backbone.View {
     RichContentEditor.closeRCE(this.$('textarea'))
   }
 
-  static showError({id, selector, message}) {
-    if (selector && message) {
-      EditCalendarEventView.clearError(selector)
+  static showError({id, fieldSelector, containerSelector, message}) {
+    if (fieldSelector && message) {
+      EditCalendarEventView.clearError({fieldSelector, containerSelector})
 
       // Updates the input with red border
-      $(selector).addClass('error')
+      $(fieldSelector).addClass('error')
 
       // Adds the error message with accessible attributes
       const errorId = `${id || 'input'}-error`
@@ -727,31 +754,36 @@ export default class EditCalendarEventView extends Backbone.View {
 
       errorContainer.append(icon, text)
 
-      $(selector).parent().append(errorContainer)
+      $(containerSelector || fieldSelector)
+        .parent()
+        .append(errorContainer)
 
       // Associates the message to the input via aria-describedby
-      $(selector).attr('aria-describedby', errorId)
+      $(fieldSelector).attr('aria-describedby', errorId)
 
       // Listens changes from the input and clear error when changes
-      $(selector).on('input.clearError', function () {
-        EditCalendarEventView.clearError(selector)
+      $(fieldSelector).on('input.clearError', function () {
+        EditCalendarEventView.clearError({fieldSelector, containerSelector})
       })
     }
   }
 
-  static clearError(selector) {
-    if (selector) {
+  static clearError({fieldSelector, containerSelector}) {
+    if (fieldSelector) {
       // Removes the input red border
-      $(selector).removeClass('error')
+      $(fieldSelector).removeClass('error')
 
       // Removes the error message element
-      $(selector).parent().children('.error-message').remove()
+      $(containerSelector || fieldSelector)
+        .parent()
+        .children('.error-message')
+        .remove()
 
       // Removes the error message attributes from the input
-      $(selector).removeAttr('aria-describedby')
+      $(fieldSelector).removeAttr('aria-describedby')
 
       // Removes the specific event listener
-      $(selector).off('input.clearError')
+      $(fieldSelector).off('input.clearError')
     }
   }
 
