@@ -1017,7 +1017,7 @@ RSpec.describe Lti::RegistrationsController do
     context "with an invalid overlay" do
       let(:params) do
         super().tap do |p|
-          p[:overlay] = { "scopes" => ["invalid"] }
+          p[:overlay] = { "disabled_scopes" => ["invalid"] }
         end
       end
 

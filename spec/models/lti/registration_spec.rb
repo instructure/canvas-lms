@@ -174,7 +174,6 @@ RSpec.describe Lti::Registration do
       context "when an Lti::Overlay is present" do
         let(:data) do
           {
-            scopes: [TokenScopes::LTI_AGS_LINE_ITEM_SCOPE],
             title: "A Better Title",
             privacy_level: "anonymous",
             placements: {
@@ -205,7 +204,6 @@ RSpec.describe Lti::Registration do
 
           expect(subject["privacy_level"]).to eq("anonymous")
           expect(subject["title"]).to eq("A Better Title")
-          expect(subject["scopes"]).to eq([TokenScopes::LTI_AGS_LINE_ITEM_SCOPE])
           global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
           module_config = subject["placements"].find { |p| p["placement"] == "module_index_menu_modal" }
 

@@ -129,11 +129,8 @@ class Lti::Overlay < ActiveRecord::Base
     internal_config[:launch_settings].merge!(overlay.slice(*Schemas::Lti::Overlay::LAUNCH_SETTINGS_KEYS))
 
     disabled_scopes = overlay[:disabled_scopes]
-    added_scopes = overlay[:scopes]&.difference(disabled_scopes) if disabled_scopes.present?
-    added_scopes ||= overlay[:scopes]
     disabled_placements = overlay[:disabled_placements]
 
-    internal_config[:scopes] = internal_config[:scopes].union(added_scopes) if added_scopes.present?
     # disabled_scopes takes precedence over scopes, in case there's any overlap.
     internal_config[:scopes].reject! { |scope| disabled_scopes&.include?(scope) }
     internal_config[:scopes].uniq!
@@ -162,7 +159,7 @@ class Lti::Overlay < ActiveRecord::Base
 
     internal_config[:placements] += additional_placements if additional_placements.present?
 
-    internal_config
+    internal_config.compact
   end
 
   private

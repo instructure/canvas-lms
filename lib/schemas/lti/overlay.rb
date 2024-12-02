@@ -43,11 +43,7 @@ module Schemas::Lti
         oidc_initiation_url: { type: "string" },
         domain: { type: "string" },
         privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
-        redirect_uris: { type: "array", items: { type: "string" } },
-        public_jwk: { type: "object" },
-        public_jwk_url: { type: "string" },
         disabled_scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
-        scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
         disabled_placements: { type: "array", items: { type: "string", enum: ::Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) } },
         placements: {
           type: "object",
