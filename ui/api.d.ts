@@ -697,6 +697,8 @@ export type Checkpoint = {
   overrides: CheckpointOverride[]
   points_possible: number
   tag: string
+  unlock_at: string | null
+  lock_at: string | null
 }
 
 export type CheckpointOverride = {
@@ -708,4 +710,6 @@ export type CheckpointOverride = {
   student_ids: string[]
   title: string
   unassign_item: boolean
+  unlock_at: string | null
+  lock_at: string | null
 }
