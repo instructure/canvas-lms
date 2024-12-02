@@ -804,28 +804,6 @@
 #           "example": "https://mytool.com/1_3/login",
 #           "type": "string"
 #         },
-#         "public_jwk": {
-#           "description": "1.3 specific. The tool's public JWK in JSON format. Discouraged in favor of a url hosting a JWK set.",
-#           "example": { "e": "AQAB", "etc": "etc" },
-#           "type": "object"
-#         },
-#         "public_jwk_url": {
-#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
-#           "example": "https://mytool.com/1_3/jwks",
-#           "type": "string"
-#         },
-#         "scopes": {
-#           "description": "1.3 specific. List of LTI scopes requested by the tool",
-#           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
-#           "type": "array",
-#           "items": { "type": "string" }
-#         },
-#         "redirect_uris": {
-#           "description": "1.3 specific. List of possible launch URLs for after the Canvas authorize redirect step",
-#           "example": ["https://mytool.com/launch", "https://mytool.com/1_3/launch"],
-#           "type": "array",
-#           "items": { "type": "string" }
-#         },
 #         "disabled_scopes": {
 #           "description": "1.3 specific. List of LTI scopes that the tool has requested but an admin has disabled",
 #           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
