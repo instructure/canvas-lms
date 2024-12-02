@@ -123,6 +123,10 @@ module Lti
       }
     end
 
+    before do
+      root_account.disable_feature!(:refactor_custom_variables)
+    end
+
     def self.it_expands(expansion, val = nil, &blk)
       it "expands #{expansion}" do
         val ||= blk
@@ -582,7 +586,6 @@ module Lti
           # truthy setting
           Account.default.settings[:restrict_quantitative_data] = { value: true, locked: true }
           Account.default.save!
-
           course.save!
           managed_pseudonym(user, account: root_account, username: "login_id", sis_user_id: "sis id!")
           login = managed_pseudonym(user, account: root_account, username: "login_id2", sis_user_id: "sis id2!")
@@ -2379,6 +2382,69 @@ module Lti
           UserPastLtiId.create!(user:, context: course, user_lti_id: "old_lti_id", user_lti_context_id: "old_context_id", user_uuid: "old_uuid")
           UserPastLtiId.create!(user: User.new, context: account, user_lti_id: "old_lti_id2", user_lti_context_id: "", user_uuid: "old_uuid2")
           expect(expand!("$com.instructure.user.lti_1_1_id.history")).to eq "old_context_id,current_context_id"
+        end
+      end
+
+      context "refactor_custom_variables FF is on" do
+        before do
+          root_account.enable_feature!(:refactor_custom_variables)
+        end
+
+        it "has substitution for $Canvas.api.domain" do
+          allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+          expect(expand!("$Canvas.api.domain")).to eq "localhost"
+        end
+
+        context "context is a course with an assignment" do
+          let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool:, collaboration:) }
+
+          it "has substitution for $Canvas.api.collaborationMembers.url" do
+            allow(collaboration).to receive(:id).and_return(1)
+            allow(tool.context).to receive(:environment_specific_domain).and_return("localhost")
+            allow(Rails.application.routes.url_helpers).to receive(:api_v1_collaboration_members_url)
+              .and_return("https://www.example.com/api/v1/collaborations/1/members")
+            expect(expand!("$Canvas.api.collaborationMembers.url")).to \
+              eq "https://www.example.com/api/v1/collaborations/1/members"
+          end
+
+          it "has substitution for $ToolProxyBinding.memberships.url even if the controller is unset" do
+            course.save!
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            expect(expand!("$ToolProxyBinding.memberships.url")).to eq \
+              "http://localhost/api/lti/courses/#{course.id}/membership_service"
+          end
+
+          it "has substitution for $Canvas.externalTool.url even if the controller is unset" do
+            course.save!
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool")
+            expander = VariableExpander.new(root_account, course, controller, current_user: user, tool:)
+            expander.instance_variable_set(:@controller, nil)
+            expander.instance_variable_set(:@request, nil)
+            expect(expand!("$Canvas.externalTool.url", expander:)).to eq "http://localhost/api/v1/courses/#{course.id}/external_tools/#{tool.id}"
+          end
+
+          it "has substitution for $Canvas.xapi.url even if no controller" do
+            course.save!
+            allow(Lti::AnalyticsService).to receive(:create_token).and_return("--token--")
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            variable_expander.instance_variable_set(:@current_user, user)
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            expect(expand!("$Canvas.xapi.url")).to eq "http://localhost/api/lti/v1/xapi/--token--"
+          end
+
+          it "has substitution for $Caliper.url even if no controller" do
+            course.save!
+            allow(Lti::AnalyticsService).to receive(:create_token).and_return("--token--")
+            variable_expander.instance_variable_set(:@controller, nil)
+            variable_expander.instance_variable_set(:@request, nil)
+            variable_expander.instance_variable_set(:@current_user, user)
+            allow(root_account).to receive(:environment_specific_domain).and_return("localhost")
+            expect(expand!("$Caliper.url")).to eq "http://localhost/api/lti/v1/caliper/--token--"
+          end
         end
       end
 

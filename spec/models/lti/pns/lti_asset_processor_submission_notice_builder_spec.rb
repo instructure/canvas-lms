@@ -119,6 +119,7 @@ RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model 
             }],
             scope: ["https://purl.imsglobal.org/spec/lti-ap/scope/asset.readonly"]
           },
+          "https://purl.imsglobal.org/spec/lti/claim/custom" => {},
           "https://purl.imsglobal.org/spec/lti/claim/context" => {
             "id" => Account.default.lti_context_id,
             "title" => Account.default.name,
