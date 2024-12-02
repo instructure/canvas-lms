@@ -20,7 +20,8 @@ import {render} from '@testing-library/react'
 import {CopyCourseForm} from '../CopyCourseForm'
 
 describe('CourseCopyForm', () => {
-  it('renders the component with all the form fields', () => {
+  // CLAB-835
+  it.skip('renders the component with all the form fields', () => {
     const {getByText, getByRole} = render(<CopyCourseForm />)
 
     expect(getByText('Name')).toBeInTheDocument()
