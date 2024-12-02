@@ -131,11 +131,12 @@ module ConversationsHelper
     result
   end
 
-  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user, session: nil)
+  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user, session: nil, group_conversation: false)
     if defined?(params)
       recipients ||= params[:recipients]
       context_code ||= params[:context_code]
       conversation_id ||= params[:from_conversation_id]
+      group_conversation = params[:group_conversation]
     end
 
     return unless recipients
@@ -170,7 +171,15 @@ module ConversationsHelper
       known.concat(unknown_users.map { |id| MessageableUser.find(id) })
     end
 
-    contexts.each { |c| known.concat(current_user.address_book.known_in_context(c, include_concluded: false)) }
+    contexts.each do |ctxt|
+      context_type, context_id = ctxt.match(MessageableUser::Calculator::CONTEXT_RECIPIENT).captures
+      if context_type == "group"
+        group = Group.find(context_id)
+        raise InsufficientPermissionsForDifferentiationTagsError if group&.non_collaborative? && !group.context.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+        raise GroupConversationForDifferentiationTagsNotAllowedError if group&.non_collaborative? && group_conversation
+      end
+      known.concat(current_user.address_book.known_in_context(ctxt, include_concluded: false))
+    end
     @recipients = known.uniq(&:id)
     @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
     @recipients
@@ -456,4 +465,8 @@ module ConversationsHelper
   class InvalidMessageForConversationError < StandardError; end
 
   class InvalidMessageParticipantError < StandardError; end
+
+  class GroupConversationForDifferentiationTagsNotAllowedError < StandardError; end
+
+  class InsufficientPermissionsForDifferentiationTagsError < StandardError; end
 end
