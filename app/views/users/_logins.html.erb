@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% extension_exclusions = %i[crypted_password password_salt persistence_token single_access_token single_access_token perishable_token reset_password_token].freeze %>
+
 <% if can_do(@user, @current_user, :manage, :manage_user_details) %>
   <% css_bundle :user_logins %>
   <% js_bundle :user_logins %>
@@ -98,6 +100,7 @@
         </tr>
       <% end %>
     </table>
+    <div class='inst-extension-login-information' data-extension-details="<%= pseudonyms&.to_json(except: extension_exclusions) %>"></div>
   </fieldset>
   <%= form_for :pseudonym, :url => user_pseudonyms_url(@user.id),
                :html => {:id => 'edit_pseudonym_form', :class => 'form-dialog form-horizontal',
