@@ -187,10 +187,10 @@
       {{#t "repeat"}}Duplicate{{/t}}
     </label>
 
-    <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <div class="duplicate_event_row duplicate_fields spacer-top" style="display: none">
       <label for="duplicate_interval">
         <div class="duplicate_label">{{#t}}Every{{/t}}</div>
-        <input value="1" disabled="true" type="number" id="duplicate_interval" name="duplicate_interval" min="1" />
+        <input value="1" disabled="true" type="number" id="duplicate_interval" name="duplicate_interval" />
         <select id="duplicate_frequency" name="duplicate_frequency">
           <option value="daily">{{#t}}Day(s){{/t}}</option>
           <option value="weekly" selected>{{#t}}Week(s){{/t}}</option>
@@ -199,10 +199,10 @@
       </label>
     </div>
 
-    <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <div class="duplicate_event_row duplicate_fields spacer-top" style="display: none">
       <label for="duplicate_count">
         <div class="duplicate_label" >{{#t}}For{{/t}}</div>
-        <input value="1" disabled="true" type="number" id="duplicate_count" name="duplicate_count" min="1" max="{{recurringEventLimit}}" />
+        <input value="1" disabled="true" type="number" id="duplicate_count" name="duplicate_count" />
         <span class="occurences_div">{{#t}}additional occurrence(s){{/t}}</span>
       </label>
     </div>

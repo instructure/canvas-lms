@@ -105,7 +105,8 @@
     color: $ic-bg-light-danger-text;
   }
 
-  input[type="text"].error {
+  input[type="text"].error,
+  input[type="number"].error {
     border: 1px solid $crimson;
     margin-bottom: 0;
   }
@@ -142,5 +143,20 @@
     .date_field_responsive .datetime_suggest {
       width: 12rem;
     }
+  }
+  .duplicate_event_row {
+    select {
+      margin-bottom: 0;
+    }
+
+    .error-message {
+      margin-top: 11px;
+      margin-left: 3.5rem;
+      margin-bottom: 0;
+    }
+  }
+
+  .spacer-top {
+    margin-top: 11px;
   }
 }

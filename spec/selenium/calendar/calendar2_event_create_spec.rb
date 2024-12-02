@@ -157,6 +157,84 @@ describe "calendar2" do
         expect(@course.calendar_events.count).to eq(0)
       end
 
+      context "duplicate" do
+        it "is not able to create an event with zero duplicate interval in edit event view", :ignore_js_errors do
+          get "/courses/#{@course.id}/calendar_events/new"
+          wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
+          replace_content(more_options_title_field, "My title")
+
+          # Enables section dates
+          use_section_dates_checkbox.click
+          wait_for_ajaximations
+          replace_content(f("#section_#{@course.default_section.id}_start_date"), "Apr 15, 1997")
+
+          # Enables duplicates
+          scroll_into_view(duplicate_event_checkbox)
+          duplicate_event_checkbox.click
+          wait_for_ajaximations
+
+          # Sets duplicates interval
+          scroll_into_view(duplicate_interval_input)
+          replace_content(duplicate_interval_input, "0")
+
+          more_options_submit_button.click
+          wait_for_ajaximations
+
+          expect(f("#duplicate_interval-error")).to include_text("Please enter a value greater or equal to 1")
+          expect(@course.calendar_events.count).to eq(0)
+        end
+
+        it "is not able to create an event with zero duplicate count in edit event view", :ignore_js_errors do
+          get "/courses/#{@course.id}/calendar_events/new"
+          wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
+          replace_content(more_options_title_field, "My title")
+
+          # Enables section dates
+          use_section_dates_checkbox.click
+          wait_for_ajaximations
+          replace_content(f("#section_#{@course.default_section.id}_start_date"), "Apr 15, 1997")
+
+          # Enables duplicates
+          scroll_into_view(duplicate_event_checkbox)
+          duplicate_event_checkbox.click
+          wait_for_ajaximations
+
+          # Sets duplicates count
+          scroll_into_view(duplicate_count_input)
+          replace_content(duplicate_count_input, "0")
+
+          more_options_submit_button.click
+          wait_for_ajaximations
+          expect(f("#duplicate_count-error")).to include_text("Please enter a value greater or equal to 1")
+          expect(@course.calendar_events.count).to eq(0)
+        end
+
+        it "is not able to create an event with 200+ duplicate count in edit event view", :ignore_js_errors do
+          get "/courses/#{@course.id}/calendar_events/new"
+          wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
+          replace_content(more_options_title_field, "My title")
+
+          # Enables section dates
+          use_section_dates_checkbox.click
+          wait_for_ajaximations
+          replace_content(f("#section_#{@course.default_section.id}_start_date"), "Apr 15, 1997")
+
+          # Enables duplicates
+          scroll_into_view(duplicate_event_checkbox)
+          duplicate_event_checkbox.click
+          wait_for_ajaximations
+
+          # Sets duplicates count
+          scroll_into_view(duplicate_count_input)
+          replace_content(duplicate_count_input, "300")
+
+          more_options_submit_button.click
+          wait_for_ajaximations
+          expect(f("#duplicate_count-error")).to include_text("Please enter a value less than or equal to 200")
+          expect(@course.calendar_events.count).to eq(0)
+        end
+      end
+
       it "is not able to create an event without a date in edit event view" do
         get "/courses/#{@course.id}/calendar_events/new"
         wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
