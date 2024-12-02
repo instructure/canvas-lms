@@ -37,7 +37,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
 
       begin
         token = @aac.get_token(params[:code], oauth2_login_callback_url)
-      rescue Oauth2::Error => e
+      rescue OAuth2::Error => e
         return render_json_unauthorized
       end
 
