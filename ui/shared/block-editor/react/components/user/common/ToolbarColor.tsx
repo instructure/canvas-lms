@@ -81,7 +81,7 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
     >
       <ColorPicker
         tabs={tabs}
-        // @ts-expect-error
+        // @ts-ignore
         colorsInUse={colorsInUse}
         onCancel={handleCancel}
         onSave={handleSubmit}

@@ -23,9 +23,9 @@ import {white, black} from './constants'
 import {
   getContrastStatus,
   isTransparent,
-  // @ts-expect-error
+  // @ts-ignore
   getDefaultColors,
-  // @ts-expect-error
+  // @ts-ignore
   type ColorsInUse,
 } from '@instructure/canvas-rce'
 

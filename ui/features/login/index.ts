@@ -33,9 +33,11 @@ $('#coenrollment_link').click(function (event) {
   const template = $(this).data('template')
   const path = $(this).data('path')
   loadSignupDialog
+    // @ts-ignore
     .then(signupDialog => {
       signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
     })
+    // @ts-ignore
     .catch(error => {
       throw new Error('Failed to load signup dialog', error)
     })

@@ -25,6 +25,7 @@ export type EnvCourse = EnvCourseCommon & Partial<EnvCourseCommon>
  */
 export interface EnvCourseCommon {
   COURSE: Course
+  course?: Course
 
   /**
    * From CoursesController#index

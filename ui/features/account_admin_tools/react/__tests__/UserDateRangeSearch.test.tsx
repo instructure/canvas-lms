@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import UserDateRangeSearch, {UserDateRangeSearchProps} from '../UserDateRangeSearch'
+import UserDateRangeSearch, {type UserDateRangeSearchProps} from '../UserDateRangeSearch'
 
 describe('UserDateRangeSearch', () => {
   const props: UserDateRangeSearchProps = {

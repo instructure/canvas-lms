@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['bundle', 'code', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['bundle', 'gergichLinters', 'jsLinters', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -40,13 +40,13 @@ def nodeRequirementsTemplate() {
 
 def tearDownNode() {
   { ->
-    container('code') {
+    container('gergichLinters') {
       sh './build/new-jenkins/linters/run-gergich-publish.sh'
     }
   }
 }
 
-def codeStage(stages) {
+def gergichLintersStage(stages) {
   { ->
     def codeEnvVars = [
       "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
@@ -54,9 +54,24 @@ def codeStage(stages) {
     ]
 
     callableWithDelegate(queueTestStage())(stages,
-      name: 'code',
+      name: 'gergichLinters',
       envVars: codeEnvVars,
       command: './build/new-jenkins/linters/run-gergich-linters.sh'
+    )
+  }
+}
+
+def jsLintersStage(stages) {
+  { ->
+    def codeEnvVars = [
+      "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
+      "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
+    ]
+
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'jsLinters',
+      envVars: codeEnvVars,
+      command: './build/new-jenkins/linters/run-js-linters.sh'
     )
   }
 }

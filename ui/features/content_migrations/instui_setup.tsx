@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
 import App from './react/app'
+// @ts-ignore
 import extensions from '@canvas/bundles/extensions'
 
 ready(() => {
@@ -32,7 +33,7 @@ ready(() => {
     root.render(<App />)
   }
 
-  // @ts-expect-error
+  // @ts-ignore
   const loadExtension = extensions['ui/features/content_migrations/instui_setup.tsx']?.()
   if (loadExtension) {
     loadExtension
