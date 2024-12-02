@@ -437,6 +437,7 @@ export default class RoleTray extends Component {
           name="edit_name_box"
           value={this.state.editRoleLabelInput}
           messages={this.state.editRoleLabelErrorMessages}
+          isRequired={true}
           onBlur={this.updateRole}
           onChange={this.onChangeRoleLabel}
         />
