@@ -4668,6 +4668,7 @@ ko:
       invalid_link: "사용한 등록 링크가 더 이상 유효하지 않은 것으로 보입니다. 과목 강사에게 문의하여 올바르게 등록되었는지 확인하시기 바랍니다."
   courses_43204aae: 과목
   create_course_9a69b32c: "과목 만들기"
+  create_course_9dc5b61a: "과목 만들기"
   create_discussion_topics_8330d52b: "토론 주제 만들기"
   create_group_set_7fe1cd53: "그룹 집합 만들기"
   create_module_item: 
@@ -10133,6 +10134,7 @@ ko:
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
     statistics: 통계
+  please_enter_the_details_for_the_new_course_dc705b8c: "새 과목에 대한 세부 정보를 입력하시기 바랍니다."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
   plugins: 
     academic_benchmark_importer: 
