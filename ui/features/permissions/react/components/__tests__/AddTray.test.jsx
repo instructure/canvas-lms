@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
+import {fireEvent, render, screen} from '@testing-library/react'
 
 import AddTray, {mapStateToProps} from '../AddTray'
 import {ENABLED_FOR_ALL, ENABLED_FOR_NONE} from '@canvas/permissions/react/propTypes'
@@ -207,31 +208,32 @@ it('onChangeRoleName changes role name properly', () => {
   expect(tree.state().selectedRoleName).toEqual('Awesome_aaron')
 })
 
-it('displays an error if attempting to save with an empty role name', () => {
+it('displays an error if attempting to save with an empty role name', async () => {
   const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  let errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(0)
-  inst.handleSaveButton()
-  errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(1)
+  render(<AddTray {...props} />)
+  const save = screen.getByText('Save')
+
+  fireEvent.click(save)
+
+  const errorText = await screen.findByText('A role name is required')
+  expect(errorText).toBeInTheDocument()
 })
 
-it('clears the empty role name error when text is entered', () => {
+it('clears the empty role name error when text is entered', async () => {
   const props = defaultProps()
-  const tree = shallow(<AddTray {...props} />)
-  const inst = tree.instance()
-  inst.handleSaveButton()
-  let errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(1)
-  inst.onChangeRoleName({
-    target: {
-      value: 'Custom Student Role',
-    },
-  })
-  errors = tree.state().roleNameErrors
-  expect(errors).toHaveLength(0)
+  render(<AddTray {...props} />)
+  const save = screen.getByText('Save')
+  const roleNameInput = screen.getByLabelText('Role Name')
+
+  fireEvent.click(save)
+
+  let errorText = await screen.findByText('A role name is required')
+  expect(errorText).toBeInTheDocument()
+
+  fireEvent.input(roleNameInput, {target: {value: 'Custom Student Role'}})
+
+  errorText = screen.queryByText('A role name is required')
+  expect(errorText).not.toBeInTheDocument()
 })
 
 it('does not pass in the account admin base role in mapStateToProps', () => {
