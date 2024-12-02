@@ -622,6 +622,15 @@ RSpec.describe Lti::RegistrationsController do
       expect(response_json).to have_key(:configuration)
     end
 
+    context "with 'overlaid_configuration' in include[] parameter" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlaid_configuration" }
+
+      it "includes the overlaid configuration" do
+        subject
+        expect(response_json).to have_key(:overlaid_configuration)
+      end
+    end
+
     context "with 'overlay' in include[] parameter" do
       subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlay" }
 

@@ -64,7 +64,7 @@ RSpec.describe Lti::Registration do
     end
   end
 
-  describe "#configuration" do
+  describe "#internal_lti_configuration" do
     subject { registration.internal_lti_configuration(context: account) }
 
     let(:registration) { lti_registration_model(account:) }
@@ -215,6 +215,17 @@ RSpec.describe Lti::Registration do
                                            "icon_url" => "https://example.com/icon.png",
                                            "title" => "A Better Title",
                                            "message_type" => "LtiDeepLinkingRequest")
+        end
+
+        context "with include_overlay: false" do
+          subject { registration.internal_lti_configuration(context: account, include_overlay: false) }
+
+          it "does not overlay fields on top of configuration" do
+            overlay
+
+            expect(subject["privacy_level"]).not_to eq("anonymous")
+            expect(subject["title"]).not_to eq("A Better Title")
+          end
         end
       end
     end
