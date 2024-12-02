@@ -185,4 +185,4 @@ production:
           https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
           https?:\/\/.*\/conferences\/\d+\/join
       rich-content-service:
-        app-host: "http://canvas-lms-canvasrceapi-1:3000"
+        app-host: "https://stg-canvas-rce-api.zuudev.com:443"
