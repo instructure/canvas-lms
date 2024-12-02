@@ -428,6 +428,47 @@ RSpec.describe Mutations::CreateConversation do
     expect(c.tags.sort).to eql [@course1.asset_string, @course2.asset_string, @course3.asset_string, @group1.asset_string, @group3.asset_string].sort
   end
 
+  context "non_collaborative groups" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:differentiation_tags)
+      ncc = @course.group_categories.create!(name: "non-collaborative category", non_collaborative: true)
+      @ncg = @course.groups.create!(name: "non-collaborative group", group_category: ncc)
+      @ncg.add_user(@student, "accepted")
+    end
+
+    it "allows sending to non-collaborative groups as long as groupConversation is set to false" do
+      result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: false, context_code: @course.asset_string }, @teacher)
+      expect(result.dig("data", "createConversation", "errors")).to be_nil
+      expect(result.dig("data", "createConversation", "conversations").count).to eq 1
+    end
+
+    it "returns a validation error when sending to non-collaborative groups with groupConversation set to true" do
+      result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: true, context_code: @course.asset_string }, @teacher)
+      expect(result.dig("data", "createConversation", "conversations")).to be_nil
+      expect(result.dig("data", "createConversation", "errors", 0, "message")).to eq "Group conversation for differentiation tags not allowed"
+    end
+
+    it "returns a validation error when sending to a non-collaborative group as someone without GRANULAR_MANAGE_TAGS permission" do
+      %i[manage_tags_add manage_tags_manage manage_tags_delete].each do |permission|
+        @course.account.role_overrides.create!(
+          permission:,
+          role: teacher_role,
+          enabled: false
+        )
+      end
+      result = run_mutation({ recipients: ["group_#{@ncg.id}"], body: "test", group_conversation: false, context_code: @course.asset_string }, @teacher)
+      expect(result.dig("data", "createConversation", "conversations")).to be_nil
+      expect(result.dig("data", "createConversation", "errors", 0, "message")).to eq "Insufficient permissions for differentiation tags"
+    end
+
+    it "runs successfully even when recipients include a discussion_topic" do
+      dt = @course.discussion_topics.create!(title: "discussion topic")
+      result = run_mutation({ recipients: ["discussion_topic_#{dt.id}", "group_#{@ncg.id}"], body: "test", group_conversation: false, context_code: @course.asset_string }, @teacher)
+      expect(result.dig("data", "createConversation", "errors")).to be_nil
+      expect(result.dig("data", "createConversation", "conversations").count).to eq 2
+    end
+  end
+
   context "group conversations" do
     before(:once) do
       @old_count = Conversation.count
