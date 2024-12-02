@@ -257,13 +257,13 @@ module PostgreSQLAdapterExtensions
     super
   end
 
-  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, **options)
+  def create_table(table_name, id: :primary_key, primary_key: nil, force: nil, if_not_exists: nil, **options)
     super
 
-    add_guard_excessive_updates(table_name)
+    add_guard_excessive_updates(table_name, force: if_not_exists)
   end
 
-  def add_guard_excessive_updates(table_name)
+  def add_guard_excessive_updates(table_name, force: false)
     # Don't try to install this on rails-internal tables; they need to be created for
     # internal_metadata to exist and this guard isn't really useful there either
     return if [ActiveRecord::Base.internal_metadata_table_name, ActiveRecord::Base.schema_migrations_table_name].include?(table_name)
@@ -274,7 +274,7 @@ module PostgreSQLAdapterExtensions
       trigger_name = "guard_excessive_#{operation.downcase}s"
 
       execute(<<~SQL.squish)
-        CREATE TRIGGER #{trigger_name}
+        CREATE #{"OR REPLACE " if force}TRIGGER #{trigger_name}
           AFTER #{operation}
           ON #{quote_table_name(table_name)}
           REFERENCING OLD TABLE AS oldtbl
