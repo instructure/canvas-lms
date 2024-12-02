@@ -23,6 +23,7 @@ class CanvasSecurity::ServicesJwt
   class InvalidRefresh < RuntimeError; end
 
   REFRESH_WINDOW = 6.hours
+  DEFAULT_AUDIENCE = "Instructure"
 
   attr_reader :token_string, :is_wrapped
 
@@ -99,7 +100,7 @@ class CanvasSecurity::ServicesJwt
     CanvasSecurity.base64_encode(crypted_token)
   end
 
-  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false, encrypt: true)
+  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false, encrypt: true, audience: nil)
     if domain.blank? || user.nil?
       raise ArgumentError, "Must have a domain and a user to build a JWT"
     end
@@ -117,6 +118,9 @@ class CanvasSecurity::ServicesJwt
     if context
       payload[:context_type] = context.class.name
       payload[:context_id] = context.id.to_s
+    end
+    if audience
+      payload[:aud] = audience
     end
     generate(payload, symmetric:, encrypt:)
   end
@@ -156,7 +160,7 @@ class CanvasSecurity::ServicesJwt
     timestamp = Time.zone.now.to_i
     payload_data.reverse_merge(
       iss: CanvasSecurity.services_issuer,
-      aud: ["Instructure"],
+      aud: [DEFAULT_AUDIENCE],
       exp: timestamp + 3600,  # token is good for 1 hour
       nbf: timestamp - 30,    # don't accept the token in the past
       iat: timestamp,         # tell when the token was issued
