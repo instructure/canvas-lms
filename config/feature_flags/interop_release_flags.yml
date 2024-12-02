@@ -360,6 +360,22 @@ platform_notification_service:
       state: allowed_on
     ci:
       state: allowed_on
+refactor_custom_variables:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Refactor custom variables to make substitution controllerless.
+  description: |-
+    Some of the custom variables used a controller instance for substitution.
+    That is not available in background jobs, so in PNS notices and content migration.
+    This feature flag will refactor the custom variables to make most if the variable substitutions controllerless.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 remove_submission_type_selection_from_dev_keys_edit_page:
   state: hidden
   shadow: true
