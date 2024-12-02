@@ -3738,17 +3738,19 @@ describe "Submissions API", type: :request do
       end
 
       it "supports marking checkpoints as missing" do
-        api_call(
+        json = api_call(
           *api_call_args,
           submission: { late_policy_status: "missing" },
           sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
         )
         expect(response).to be_successful
         expect(reply_to_topic_submission.late_policy_status).to eq "missing"
+        expect(json["late_policy_status"]).to eq "missing"
+        expect(json["all_submissions"][0]["late_policy_status"]).to eq "missing"
       end
 
       it "supports marking checkpoints as late and updating the seconds_late_override" do
-        api_call(
+        json = api_call(
           *api_call_args,
           submission: { late_policy_status: "late", seconds_late_override: 100 },
           sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
@@ -3756,6 +3758,8 @@ describe "Submissions API", type: :request do
         expect(response).to be_successful
         expect(reply_to_topic_submission.late_policy_status).to eq "late"
         expect(reply_to_topic_submission.seconds_late_override).to eq 100
+        expect(json["late_policy_status"]).to eq "late"
+        expect(json["all_submissions"][0]["late_policy_status"]).to eq "late"
       end
 
       it "raises an error if no sub assignment tag is provided" do
