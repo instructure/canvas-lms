@@ -1091,7 +1091,15 @@ class Lti::RegistrationsController < ApplicationController
       return render_configuration_errors(errors)
     end
 
-    render json: { configuration: Schemas::InternalLtiConfiguration.from_lti_configuration(config) }
+    configuration = Schemas::InternalLtiConfiguration.from_lti_configuration(config)
+
+    # The internal configuration conversion method doesn't include redirect_uris,
+    # as doing so might cause the actual redirect_uris on existing tool configurations
+    # to be overwritten. We need to include them here so that the UI can display
+    # them properly.
+    configuration[:redirect_uris] = [configuration[:target_link_uri]] unless configuration.key?(:redirect_uris)
+
+    render json: { configuration: }
   end
 
   # @API Show an LTI Registration
@@ -1136,6 +1144,7 @@ class Lti::RegistrationsController < ApplicationController
   # @argument vendor [String] The vendor of the tool
   # @argument configuration [Required, Lti::ToolConfiguration | Lti::LegacyConfiguration] The LTI 1.3 configuration for the tool
   # @argument overlay [Lti::Overlay] The overlay configuration for the tool. Overrides values in the base configuration.
+  # @argument unified_tool_id [String] The unique identifier for the tool, used for analytics. If not provided, one will be generated.
   # @argument workflow_state [String, "on" | "off" | "allow"]
   #   The desired state for this registration/account binding. "allow" is only valid for Site Admin registrations.
   #   Defaults to "off".
@@ -1207,13 +1216,15 @@ class Lti::RegistrationsController < ApplicationController
         visible: !@context.site_admin?,
         scopes:,
         lti_registration: registration,
-        workflow_state: "active"
+        workflow_state: "active",
+        is_lti_key: true
       )
 
       Lti::ToolConfiguration.create!(
         developer_key: dk,
         lti_registration: registration,
         settings: {},
+        unified_tool_id: params[:unified_tool_id],
         **configuration_params
       )
 

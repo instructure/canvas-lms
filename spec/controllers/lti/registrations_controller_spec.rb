@@ -1314,7 +1314,12 @@ RSpec.describe Lti::RegistrationsController do
 
       it "transforms the configuration" do
         subject
-        expect(response_json["configuration"]).to eq internal_configuration.with_indifferent_access.except(:redirect_uris)
+        expect(response_json["configuration"]).to eq internal_configuration.with_indifferent_access
+      end
+
+      it "adds a default redirect_uris to ensure the configuration is valid" do
+        subject
+        expect(response_json["configuration"]["redirect_uris"]).to eq internal_configuration[:redirect_uris]
       end
     end
 
@@ -1392,7 +1397,7 @@ RSpec.describe Lti::RegistrationsController do
 
           it "transforms the configuration" do
             subject
-            expect(response_json["configuration"]).to eq internal_configuration.with_indifferent_access.except(:redirect_uris)
+            expect(response_json["configuration"]).to eq internal_configuration.with_indifferent_access
           end
         end
       end
@@ -1472,6 +1477,12 @@ RSpec.describe Lti::RegistrationsController do
         .to eq(internal_configuration.merge({ "public_jwk_url" => nil }).with_indifferent_access)
     end
 
+    it "defaults to a nil unified_tool_id" do
+      expect(subject).to be_successful
+
+      expect(Lti::ToolConfiguration.last.unified_tool_id).to be_nil
+    end
+
     it "returns the created registration" do
       subject
       expect(response).to be_successful
@@ -1488,6 +1499,20 @@ RSpec.describe Lti::RegistrationsController do
       expect(Lti::RegistrationAccountBinding.last.registration).to eq(Lti::Registration.last)
       expect(Lti::RegistrationAccountBinding.last.account).to eq(account)
       expect(Lti::RegistrationAccountBinding.last.workflow_state).to eq("off")
+    end
+
+    context "setting the unified_tool_id" do
+      let(:params) do
+        super().tap do |p|
+          p[:unified_tool_id] = "test_unified_tool_id"
+        end
+      end
+
+      it "creates a new LTI registration with the unified_tool_id" do
+        expect(subject).to be_successful
+
+        expect(Lti::ToolConfiguration.last.unified_tool_id).to eq(params[:unified_tool_id])
+      end
     end
 
     context "attempting to update disallowed fields" do

@@ -104,7 +104,8 @@ export const createLti1p3RegistrationWizardState = ({
         accountId,
         internalConfig,
         overlay,
-        unifiedToolId
+        unifiedToolId,
+        get().state.overlayStore.getState().state.naming.nickname
       )
 
       if (isSuccessful(result)) {
@@ -120,16 +121,13 @@ export const createLti1p3RegistrationWizardState = ({
         set(state => ({
           state: {
             ...state.state,
-            state: {
-              ...state.state,
-              _step: 'Error',
-              errorMessage: formatApiResultError(result),
-            },
+            _step: 'Error',
+            errorMessage: formatApiResultError(result),
           },
         }))
       }
     },
-    update: async (onSuccessfulUpdate, accountId, registrationId, unifiedToolId) => {
+    update: async (onSuccessfulUpdate, accountId, registrationId) => {
       set(state => ({state: {...state.state, _step: 'Updating'}}))
 
       const overlay = convertToLtiConfigurationOverlay(
@@ -142,7 +140,7 @@ export const createLti1p3RegistrationWizardState = ({
         registrationId,
         internalConfig,
         overlay,
-        unifiedToolId
+        get().state.overlayStore.getState().state.naming.nickname
       )
 
       if (isSuccessful(result)) {
