@@ -1449,14 +1449,6 @@ class Account < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        grants_right?(user, :lti_add_edit)
-    end
-    can :create_tool_manually
-    ##################### End legacy permission block ##########################
-
     RoleOverride.permissions.each_key do |permission|
       given do |user|
         results = cached_account_users_for(user).map do |au|

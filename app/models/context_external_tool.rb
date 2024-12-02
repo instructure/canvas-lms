@@ -130,23 +130,13 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        context.grants_right?(user, session, :lti_add_edit)
-    end
-    can :read and can :update and can :delete and can :update_manually
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        context.grants_right?(user, session, :manage_lti_edit)
+      context.grants_right?(user, session, :manage_lti_edit)
     end
     can :read and can :update and can :update_manually
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        context.grants_right?(user, session, :manage_lti_delete)
+      context.grants_right?(user, session, :manage_lti_delete)
     end
     can :read and can :delete
   end

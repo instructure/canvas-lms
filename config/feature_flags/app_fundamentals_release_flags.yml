@@ -10,11 +10,6 @@ granular_permissions_manage_course_content:
   applies_to: RootAccount
   display_name: Granular permissions for managing course content
   description: Add granularity to permissions around managing all other course content
-granular_permissions_manage_lti:
-  state: allowed_on
-  applies_to: RootAccount
-  display_name: Granular permissions for managing LTI tools in Account or Course contexts
-  description: Add granularity to permissions around managing LTI tools in Account or Course contexts
 course_templates:
   state: hidden
   applies_to: RootAccount

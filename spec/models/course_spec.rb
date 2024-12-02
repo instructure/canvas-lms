@@ -1031,31 +1031,9 @@ describe Course do
         expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
       end
 
-      it "grants create_tool_manually to the proper individuals" do
+      it "grants manage_lti_* to the proper individuals" do
         course_with_teacher(active_all: true)
-        @course.root_account.disable_feature!(:granular_permissions_manage_lti)
-        @teacher = user_factory(active_all: true)
-        @course.enroll_teacher(@teacher).accept!
 
-        @ta = user_factory(active_all: true)
-        @course.enroll_ta(@ta).accept!
-
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-
-        @student = user_factory(active_all: true)
-        @course.enroll_student(@student).accept!
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :create_tool_manually)).to be_truthy
-        expect(@course.grants_right?(@ta, :create_tool_manually)).to be_truthy
-        expect(@course.grants_right?(@designer, :create_tool_manually)).to be_truthy
-        expect(@course.grants_right?(@student, :create_tool_manually)).to be_falsey
-      end
-
-      it "grants manage_lti_* to the proper individuals (granular permissions)" do
-        course_with_teacher(active_all: true)
-        @course.root_account.enable_feature!(:granular_permissions_manage_lti)
         @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 

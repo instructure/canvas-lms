@@ -38,7 +38,6 @@ const createElement = data => (
   <ReregisterExternalToolButton
     tool={data.tool}
     canAdd={true}
-    canAddEdit={true}
     returnFocus={() => {}}
   />
 )

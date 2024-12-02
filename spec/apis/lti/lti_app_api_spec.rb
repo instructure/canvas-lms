@@ -51,9 +51,9 @@ module Lti
         expect(json.detect { |j| j["definition_type"] == @external_tool.class.name && j["definition_id"] == @external_tool.id }).to be_nil
       end
 
-      it "works for a teacher even without lti_add_edit permissions" do
+      it "works for a teacher even without manage_lti_add permissions" do
         course_with_teacher(active_all: true, user: user_with_pseudonym, account:)
-        account.role_overrides.create!(permission: "lti_add_edit", enabled: false, role: teacher_role)
+        account.role_overrides.create!(permission: "manage_lti_add", enabled: false, role: teacher_role)
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/lti_apps/launch_definitions",
                         { controller: "lti/lti_apps", action: "launch_definitions", format: "json", course_id: @course.id.to_s })

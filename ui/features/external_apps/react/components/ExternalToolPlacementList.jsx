@@ -192,8 +192,7 @@ export default class ExternalToolPlacementList extends React.Component {
     const is_1_1_tool = tool.version === '1.1'
     const isFlagEnabled = ENV.FEATURES.lti_toggle_placements
     const canUpdateTool =
-      ENV.PERMISSIONS &&
-      (ENV.PERMISSIONS.create_tool_manually || ENV.PERMISSIONS.edit_tool_manually)
+      ENV.PERMISSIONS && ENV.PERMISSIONS.edit_tool_manually
     const isEditableContext =
       ENV.CONTEXT_BASE_URL &&
       tool.context &&

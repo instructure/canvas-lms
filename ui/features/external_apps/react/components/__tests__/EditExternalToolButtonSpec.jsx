@@ -42,7 +42,6 @@ test('allows editing of tools', () => {
   const tool = {name: 'test tool'}
   const component = renderComponent({
     tool,
-    canAddEdit: true,
   })
   const disabledMessage = 'This action has been disabled by your admin.'
   const form = JSON.stringify(component.form())
@@ -62,7 +61,6 @@ test('opens modal with expected tool state', () => {
   }
   const component = renderComponent({
     tool,
-    canAddEdit: true,
   })
   component.setContextExternalToolState(data)
   ok(component.state.tool.description, 'New tool description')
@@ -83,7 +81,6 @@ test('sets new state from state store response', () => {
   }
   const component = renderComponent({
     tool,
-    canAddEdit: true,
   })
   component.saveChanges(configurationType, data)
   ok(component.state.tool.name, 'New Name')

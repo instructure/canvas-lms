@@ -601,7 +601,6 @@ describe Account do
     full_access = RoleOverride.permissions.keys +
                   limited_access - disabled_by_default - conditional_access +
                   [:create_courses]
-    full_access << :create_tool_manually unless root_account.feature_enabled?(:granular_permissions_manage_lti)
 
     full_root_access = full_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :site_admin }.map(&:first)
     full_sub_access = full_root_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :root }.map(&:first)
