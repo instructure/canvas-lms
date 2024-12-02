@@ -40,7 +40,15 @@ const textAreaProps = {
   placeholder: I18n.t('Add a Comment'),
 }
 
-export default function CommentArea({getTextAreaRef, courseId, userId, useRCELite, handleCommentChange, currentText, readOnly}) {
+export default function CommentArea({
+  getTextAreaRef,
+  courseId,
+  userId,
+  useRCELite,
+  handleCommentChange,
+  currentText,
+  readOnly,
+}) {
   const [comment, setComment] = useState('')
   const textAreaRef = useRef()
   const [suggestionsRef, setSuggestionsRef] = useState(null)
@@ -79,7 +87,7 @@ export default function CommentArea({getTextAreaRef, courseId, userId, useRCELit
       {showCommentLibrary && (
         <CommentLibrary
           setFocusToTextArea={setFocusToTextArea}
-          setComment={(content) => handleContentChange(content, useRCELite)}
+          setComment={content => handleContentChange(content, useRCELite)}
           courseId={courseId}
           userId={userId}
           commentAreaText={stripHtmlTags(comment)}
@@ -95,7 +103,7 @@ export default function CommentArea({getTextAreaRef, courseId, userId, useRCELit
             height={300}
             textareaId="comment_rce_textarea"
             variant="lite"
-            onContentChange={(content) => handleContentChange(content, false)}
+            onContentChange={content => handleContentChange(content, false)}
             readOnly={readOnly}
           />
         ) : (

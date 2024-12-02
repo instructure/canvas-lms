@@ -393,7 +393,7 @@ test('does not allow submission_type_selection tools (selectedTool set) with req
     submission_type: 'external_tool',
     external_tool_tag_attributes: {
       content_type: 'context_external_tool',
-      title: "shouldn't look at this"
+      title: "shouldn't look at this",
     },
   }
   const errors = view._validateExternalTool(data, [])
@@ -475,7 +475,7 @@ const lastSubmissionTypeContainerProps = function () {
   return calls[calls.length - 1].args[1]
 }
 
-const makeResourceLinkContentItem = function(overrides={}) {
+const makeResourceLinkContentItem = function (overrides = {}) {
   return {
     type: 'ltiResourceLink',
     custom: {},
@@ -492,7 +492,7 @@ test("when a submission_type_selection sends back title and preserveExistingAssi
   view.$submissionType.trigger('change')
   view.$('#assignment_name').val('Test Assignment')
   const contentItem = makeResourceLinkContentItem({
-    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': true
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': true,
   })
   view.handleContentItem(contentItem)
 

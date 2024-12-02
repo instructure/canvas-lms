@@ -75,7 +75,6 @@ export default class EditSectionsView extends DialogBaseView {
     )
   }
 
-
   update(e) {
     let url
     e.preventDefault()

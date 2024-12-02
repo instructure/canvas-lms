@@ -103,8 +103,12 @@ export default class ScoreInput extends React.Component {
     return !!this.props.error
   }
 
-  errorMessage(){
-    return <span data-testid={'cr-score-input-error'} style={{whiteSpace: 'nowrap'}}>{this.props.error}</span>
+  errorMessage() {
+    return (
+      <span data-testid="cr-score-input-error" style={{whiteSpace: 'nowrap'}}>
+        {this.props.error}
+      </span>
+    )
   }
 
   errorMessageId() {
@@ -141,18 +145,18 @@ export default class ScoreInput extends React.Component {
             {srLabel}
           </label>
         </ScreenReaderContent>
-          <TextInput
-            className="cr-input cr-percent-input__input"
-            id={this.shortid}
-            type="text"
-            value={this.value()}
-            title={this.props.label}
-            onChange={this.changed}
-            onFocus={this.focused}
-            onBlur={this.blurred}
-            messages={this.hasError() ? [{text: this.errorMessage(), type: "error"}] : null}
-            {...optionalProps}
-          />
+        <TextInput
+          className="cr-input cr-percent-input__input"
+          id={this.shortid}
+          type="text"
+          value={this.value()}
+          title={this.props.label}
+          onChange={this.changed}
+          onFocus={this.focused}
+          onBlur={this.blurred}
+          messages={this.hasError() ? [{text: this.errorMessage(), type: 'error'}] : null}
+          {...optionalProps}
+        />
       </div>
     )
   }

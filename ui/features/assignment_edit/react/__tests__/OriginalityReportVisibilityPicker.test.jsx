@@ -23,7 +23,7 @@ import OriginalityReportVisibilityPicker from '../OriginalityReportVisibilityPic
 describe('OriginalityReportVisibilityPicker', () => {
   test('it renders', () => {
     const wrapper = shallow(
-      <OriginalityReportVisibilityPicker isEnabled selectedOption="immediate" />
+      <OriginalityReportVisibilityPicker isEnabled={true} selectedOption="immediate" />
     )
     expect(wrapper.exists()).toBe(true)
   })
@@ -32,7 +32,7 @@ describe('OriginalityReportVisibilityPicker', () => {
   options.forEach(option => {
     test(`it renders "${option}" option`, () => {
       const wrapper = shallow(
-        <OriginalityReportVisibilityPicker isEnabled selectedOption="immediate" />
+        <OriginalityReportVisibilityPicker isEnabled={true} selectedOption="immediate" />
       )
       expect(wrapper.find(`option[value='${option}']`).exists()).toBe(true)
     })
@@ -40,7 +40,7 @@ describe('OriginalityReportVisibilityPicker', () => {
 
   test('it selects the "selectedOption"', () => {
     const wrapper = shallow(
-      <OriginalityReportVisibilityPicker isEnabled selectedOption="after_due_date" />
+      <OriginalityReportVisibilityPicker isEnabled={true} selectedOption="after_due_date" />
     )
     expect(wrapper.find('#report_visibility_picker_select').prop('value')).toBe('after_due_date')
   })

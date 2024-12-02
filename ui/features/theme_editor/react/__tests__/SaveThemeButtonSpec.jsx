@@ -101,7 +101,7 @@ test('disabling button', () => {
 })
 
 test('disabling button: disabled if userNeedsToPreviewFirst', () => {
-  const wrapper = shallow(<SaveThemeButton {...props} userNeedsToPreviewFirst />)
+  const wrapper = shallow(<SaveThemeButton {...props} userNeedsToPreviewFirst={true} />)
   ok(wrapper.find('.Button--primary').first().prop('disabled'))
   wrapper.unmount()
 })

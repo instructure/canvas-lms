@@ -646,7 +646,9 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
       height: data['item[iframe][height]'],
     },
     lineItem: tryJsonParse(data['item[line_item]']),
-    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': tryJsonParse(data['item[preserveExistingAssignmentName]']),
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': tryJsonParse(
+      data['item[preserveExistingAssignmentName]']
+    ),
   }
   this.handleContentItem(contentItem)
 }
@@ -675,8 +677,9 @@ EditView.prototype.handleContentItem = function (item) {
     }
   }
 
-  const newAssignmentName = (lineItem && 'label' in lineItem) ? lineItem.label : item.title
-  const replaceAssignmentName = !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
+  const newAssignmentName = lineItem && 'label' in lineItem ? lineItem.label : item.title
+  const replaceAssignmentName =
+    !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
   if (newAssignmentName && (replaceAssignmentName || this.$name.val() === '')) {
     this.$name.val(newAssignmentName)
   }
@@ -691,14 +694,11 @@ EditView.prototype.handleContentItem = function (item) {
 }
 
 EditView.prototype.setDefaultSubmissionTypeSelectionContentType = function () {
-  return this.$externalToolsContentType.val(
-    DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
-  )
+  return this.$externalToolsContentType.val(DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE)
 }
 
 EditView.prototype.submissionTypeSelectionHasResource = function () {
-  return this.$externalToolsContentType.val() !==
-    DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
+  return this.$externalToolsContentType.val() !== DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
 }
 
 // used when loading an existing assignment with a resource link. otherwise
@@ -1079,10 +1079,9 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
 }
 
 EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
-   const resource=
-    this.submissionTypeSelectionHasResource() ?
-    {title: this.$externalToolsTitle.val() } :
-    undefined;
+  const resource = this.submissionTypeSelectionHasResource()
+    ? {title: this.$externalToolsTitle.val()}
+    : undefined
 
   const props = {
     tool: this.selectedTool,

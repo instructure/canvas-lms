@@ -325,7 +325,7 @@ export default AssignmentListItemView = (function () {
       if (checkpoints && checkpoints.length && !this.canManage()) {
         try {
           const checkpointsElem =
-          this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
+            this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
           const mountPoint = checkpointsElem[0]
 
           ReactDOM.render(
@@ -340,8 +340,10 @@ export default AssignmentListItemView = (function () {
           console.error(errorMessage, error)
           captureException(new Error(errorMessage), error)
         }
-      } else if(checkpoints && checkpoints.length && this.canManage()) {
-        const checkpointsElem = this.$el.find(`#assignment_teacher_checkpoint_info_${this.model.id}`)
+      } else if (checkpoints && checkpoints.length && this.canManage()) {
+        const checkpointsElem = this.$el.find(
+          `#assignment_teacher_checkpoint_info_${this.model.id}`
+        )
         const mountPoint = checkpointsElem[0]
         if (mountPoint) {
           try {
@@ -474,10 +476,10 @@ export default AssignmentListItemView = (function () {
             tool.base_url +
             `&discussion_topics[]=${__guard__(this.model.get('discussion_topic'), x => x.id)}`)
         })
-        data.item_assignment_type = "discussion_topic"
+        data.item_assignment_type = 'discussion_topic'
       } else {
         const isNewQuizzes = this.model.isQuizLTIAssignment()
-        const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
+        const isShareToCommons = tool => tool.canvas_icon_class === 'icon-commons'
         const tools = ENV.assignment_menu_tools || []
 
         if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
@@ -604,12 +606,7 @@ export default AssignmentListItemView = (function () {
         // Rerender the list item
         this.render()
       }
-      root.render(
-        <CreateAssignmentViewAdapter
-          assignment={this.model}
-          closeHandler={onClose}
-        />
-      )
+      root.render(<CreateAssignmentViewAdapter assignment={this.model} closeHandler={onClose} />)
     }
 
     renderItemAssignToTray(open, returnFocusTo, itemProps) {

@@ -41,7 +41,7 @@ describe('CreateDSRModal', () => {
       </CreateDSRModal>
     )
 
-  it('uses the user\'s name in the default report name', () => {
+  it("uses the user's name in the default report name", () => {
     axios.get.mockResolvedValueOnce({status: 204, data: {}})
 
     const {getByTitle, getByTestId} = renderComponent()

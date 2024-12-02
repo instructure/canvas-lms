@@ -255,10 +255,12 @@ export function setup() {
         document.getElementById('emoji-quick-picker-container')
       )
     }
-    const comments = document.getElementsByClassName("comment_content")
-    Array.from(comments).forEach((comment) => {
+    const comments = document.getElementsByClassName('comment_content')
+    Array.from(comments).forEach(comment => {
       const content = comment.dataset.content
-      const formattedComment = containsHtmlTags(content) ? sanitizeHtml(content) : formatMessage(content)
+      const formattedComment = containsHtmlTags(content)
+        ? sanitizeHtml(content)
+        : formatMessage(content)
       comment.innerHTML = formattedComment
     })
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')

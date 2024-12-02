@@ -37,7 +37,7 @@ import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankI
 import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
 import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
 import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
-import { reassignAssignment } from './mutations/reassignAssignmentMutation'
+import {reassignAssignment} from './mutations/reassignAssignmentMutation'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'

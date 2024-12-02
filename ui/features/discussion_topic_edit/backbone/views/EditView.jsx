@@ -402,11 +402,7 @@ EditView.prototype.render = function () {
 }
 
 EditView.prototype.shouldRenderUsageRights = function () {
-  return (
-    ENV.USAGE_RIGHTS_REQUIRED &&
-    ENV.PERMISSIONS.manage_files &&
-    this.permissions.CAN_ATTACH
-  )
+  return ENV.USAGE_RIGHTS_REQUIRED && ENV.PERMISSIONS.manage_files && this.permissions.CAN_ATTACH
 }
 
 EditView.prototype.afterRender = function () {

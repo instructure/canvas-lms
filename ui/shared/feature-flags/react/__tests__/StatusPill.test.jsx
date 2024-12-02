@@ -17,9 +17,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from "react"
-import {render} from "@testing-library/react"
-import StatusPill from "@canvas/feature-flags/react/StatusPill"
+import React from 'react'
+import {render} from '@testing-library/react'
+import StatusPill from '@canvas/feature-flags/react/StatusPill'
 
 import sampleData from './sampleData.json'
 
@@ -37,8 +37,8 @@ it('includes tooltips for hidden pills', () => {
   expect(
     getByText(
       'This feature option is only visible to users with Site Admin access.' +
-      ' End users will not see it until enabled by a Site Admin user. Before enabling for an institution,' +
-      ' please be sure you fully understand the functionality and possible impacts to users.'
+        ' End users will not see it until enabled by a Site Admin user. Before enabling for an institution,' +
+        ' please be sure you fully understand the functionality and possible impacts to users.'
     )
   ).toBeInTheDocument()
 })
@@ -48,7 +48,7 @@ it('Includes tooltips for shadow features', () => {
   expect(
     getByText(
       'This feature option is only visible to users with Site Admin access. It is similar to "Hidden",' +
-      ' but end users will not see it even if enabled by a Site Admin user.'
+        ' but end users will not see it even if enabled by a Site Admin user.'
     )
   ).toBeInTheDocument()
 })

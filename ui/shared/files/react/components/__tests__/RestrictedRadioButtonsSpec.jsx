@@ -23,7 +23,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import RestrictedRadioButtons from '../RestrictedRadioButtons'
 import Folder from '../../../backbone/models/Folder'
-import { mergeTimeAndDate } from '@instructure/moment-utils'
+import {mergeTimeAndDate} from '@instructure/moment-utils'
 
 QUnit.module('RestrictedRadioButtons', {
   setup() {
@@ -185,7 +185,7 @@ test('returns the correct object to restrict an item based on dates in the absen
   $(this.restrictedRadioButtons.lock_at).data('unfudged-date', endDate)
   const expectedObject = {
     hidden: false,
-    unlock_at:  $(this.restrictedRadioButtons.unlock_at).data('unfudged-date'),
+    unlock_at: $(this.restrictedRadioButtons.unlock_at).data('unfudged-date'),
     lock_at: $(this.restrictedRadioButtons.lock_at).data('unfudged-date'),
     locked: false,
   }

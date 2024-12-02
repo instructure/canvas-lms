@@ -28,7 +28,7 @@ const equal = (x, y) => expect(x).toEqual(y)
 
 describe('UsageRightsSelectBox', () => {
   test('shows alert message if nothing is chosen and component is setup for a message', () => {
-    const wrapper = shallow(<UsageRightsSelectBox showMessage />)
+    const wrapper = shallow(<UsageRightsSelectBox showMessage={true} />)
     ok(
       wrapper
         .find('.alert')

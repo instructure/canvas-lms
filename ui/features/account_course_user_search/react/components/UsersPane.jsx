@@ -170,7 +170,9 @@ export default class UsersPane extends React.Component {
             handleSubmitEditUserForm={this.handleSubmitEditUserForm}
             permissions={this.state.userList.permissions}
             sortColumnHeaderRef={this.handleSetSortColumnHeaderRef}
-            includeDeletedUsers={this.props.store.getState().userList.searchFilter.include_deleted_users}
+            includeDeletedUsers={
+              this.props.store.getState().userList.searchFilter.include_deleted_users
+            }
           />
         )}
 

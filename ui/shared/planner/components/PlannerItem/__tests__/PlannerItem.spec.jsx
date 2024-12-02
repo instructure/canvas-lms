@@ -664,10 +664,12 @@ it('does not render html tags in feedback', () => {
       comment: '<p>Death will not be the end of your suffering.</p>',
       is_media: false,
     },
-    deregisterAnimatable: jest.fn()
+    deregisterAnimatable: jest.fn(),
   })
   const {getByTestId} = render(<PlannerItem {...props} />)
-  expect(getByTestId('feedback-comment').textContent).toBe('Death will not be the end of your suffering.')
+  expect(getByTestId('feedback-comment').textContent).toBe(
+    'Death will not be the end of your suffering.'
+  )
 })
 
 it('renders the location if available', () => {

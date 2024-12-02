@@ -17,55 +17,55 @@
  */
 
 import React from 'react'
-import { render, cleanup, fireEvent } from '@testing-library/react'
+import {render, cleanup, fireEvent} from '@testing-library/react'
 import BreadcrumbCollapsedContainer from '../BreadcrumbCollapsedContainer'
 import Folder from '@canvas/files/backbone/models/Folder'
 import stubRouterContext from '../../../../../shared/test-utils/stubRouterContext'
 
 describe('BreadcrumbsCollapsedContainer', () => {
-  let Component;
+  let Component
 
   beforeEach(() => {
-    const folder = new Folder({ name: 'Test Folder', urlPath: 'test_url', url: 'stupid' });
-    folder.url = () => 'stupid';
+    const folder = new Folder({name: 'Test Folder', urlPath: 'test_url', url: 'stupid'})
+    folder.url = () => 'stupid'
 
-    const props = { foldersToContain: [folder] };
-    Component = stubRouterContext(BreadcrumbCollapsedContainer, props);
-  });
+    const props = {foldersToContain: [folder]}
+    Component = stubRouterContext(BreadcrumbCollapsedContainer, props)
+  })
 
-  afterEach(cleanup);
+  afterEach(cleanup)
 
   it('opens breadcrumbs on mouse enter', () => {
-    const { getByText } = render(<Component />);
-    const ellipsis = getByText('…').closest('li');
-    fireEvent.mouseEnter(ellipsis);
-    expect(ellipsis.querySelector('.open')).toBeTruthy();
-  });
+    const {getByText} = render(<Component />)
+    const ellipsis = getByText('…').closest('li')
+    fireEvent.mouseEnter(ellipsis)
+    expect(ellipsis.querySelector('.open')).toBeTruthy()
+  })
 
   it('opens breadcrumbs on focus', () => {
-    const { getByText } = render(<Component />);
-    const ellipsis = getByText('…').closest('li');
-    fireEvent.focus(ellipsis);
-    expect(ellipsis.querySelector('.open')).toBeTruthy();
-  });
+    const {getByText} = render(<Component />)
+    const ellipsis = getByText('…').closest('li')
+    fireEvent.focus(ellipsis)
+    expect(ellipsis.querySelector('.open')).toBeTruthy()
+  })
 
   it('closes breadcrumbs on mouse leave', () => {
-    jest.useFakeTimers();
-    const { getByText } = render(<Component />);
-    const ellipsis = getByText('…').closest('li');
-    fireEvent.mouseLeave(ellipsis);
-    jest.advanceTimersByTime(200);
-    expect(ellipsis.querySelector('.closed')).toBeTruthy();
-    jest.useRealTimers();
-  });
+    jest.useFakeTimers()
+    const {getByText} = render(<Component />)
+    const ellipsis = getByText('…').closest('li')
+    fireEvent.mouseLeave(ellipsis)
+    jest.advanceTimersByTime(200)
+    expect(ellipsis.querySelector('.closed')).toBeTruthy()
+    jest.useRealTimers()
+  })
 
   it('closes breadcrumbs on blur', () => {
-    jest.useFakeTimers();
-    const { getByText } = render(<Component />);
-    const ellipsis = getByText('…').closest('li');
-    fireEvent.blur(ellipsis);
-    jest.advanceTimersByTime(200);
-    expect(ellipsis.querySelector('.closed')).toBeTruthy();
-    jest.useRealTimers();
-  });
-});
+    jest.useFakeTimers()
+    const {getByText} = render(<Component />)
+    const ellipsis = getByText('…').closest('li')
+    fireEvent.blur(ellipsis)
+    jest.advanceTimersByTime(200)
+    expect(ellipsis.querySelector('.closed')).toBeTruthy()
+    jest.useRealTimers()
+  })
+})

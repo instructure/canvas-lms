@@ -334,7 +334,9 @@ const Timestamps = props => {
         return null
       }
 
-      return I18n.t('Posted %{delayedPostAt}', {delayedPostAt: DateHelper.formatDatetimeForDiscussions(props.delayedPostAt)})
+      return I18n.t('Posted %{delayedPostAt}', {
+        delayedPostAt: DateHelper.formatDatetimeForDiscussions(props.delayedPostAt),
+      })
     }
   }, [
     isTeacher,

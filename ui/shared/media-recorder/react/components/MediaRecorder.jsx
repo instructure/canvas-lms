@@ -164,8 +164,8 @@ export default class CanvasMediaRecorder extends React.Component {
     }
   }
 
-  handleStopShareClick = (status) => {
-    if (status === "PREVIEWSAVE") {
+  handleStopShareClick = status => {
+    if (status === 'PREVIEWSAVE') {
       this.showModal()
       this.removeIndicatorBar()
     }

@@ -85,11 +85,11 @@ PaginatedCollectionView.prototype.initialize = function () {
   PaginatedCollectionView.__super__.initialize.apply(this, arguments)
   // the drawer is not always loaded when PaginatedCollectionView is initalized
   // such as when the page is cached
-  window.addEventListener( "load", () => {
+  window.addEventListener('load', () => {
     if (document.getElementById('drawer-layout-content')) {
       this.resetScrollContainer(document.getElementById('drawer-layout-content'))
     }
-  });
+  })
   return this.initScrollContainer()
 }
 
@@ -173,8 +173,7 @@ PaginatedCollectionView.prototype.checkScroll = function () {
     const fetchPromise = this.collection.fetch({
       page: 'next',
     })
-    if(this.collection.lastRequests)
-      this.collection.lastRequests.push(fetchPromise)
+    if (this.collection.lastRequests) this.collection.lastRequests.push(fetchPromise)
     return fetchPromise
   } else {
     return this.hideLoadingIndicator()

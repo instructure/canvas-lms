@@ -57,7 +57,7 @@ describe('CreateOrEditSetModal', () => {
           media: query,
           onchange: null,
           addListener: jest.fn(),
-          removeListener: jest.fn()
+          removeListener: jest.fn(),
         }
       })
     })
@@ -87,7 +87,7 @@ describe('CreateOrEditSetModal', () => {
           media: query,
           onchange: null,
           addListener: jest.fn(),
-          removeListener: jest.fn()
+          removeListener: jest.fn(),
         }
       })
     })

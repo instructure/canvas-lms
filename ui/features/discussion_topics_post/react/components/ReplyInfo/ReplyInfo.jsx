@@ -80,16 +80,18 @@ export const ReplyInfo = props => {
         },
       }}
       render={responsiveProps => (
-        <AccessibleContent alt={
-          props.showHide ?
-          I18n.t('Hide %{details}', {details: responsiveProps.screenReaderLabel}) :
-          responsiveProps.screenReaderLabel
-        }>
-          <div data-testid="replies-counter">{
-            props.showHide ?
-            I18n.t(`Hide %{details}`, {details: responsiveProps.displayText}) :
-            responsiveProps.displayText
-        }</div>
+        <AccessibleContent
+          alt={
+            props.showHide
+              ? I18n.t('Hide %{details}', {details: responsiveProps.screenReaderLabel})
+              : responsiveProps.screenReaderLabel
+          }
+        >
+          <div data-testid="replies-counter">
+            {props.showHide
+              ? I18n.t(`Hide %{details}`, {details: responsiveProps.displayText})
+              : responsiveProps.displayText}
+          </div>
         </AccessibleContent>
       )}
     />

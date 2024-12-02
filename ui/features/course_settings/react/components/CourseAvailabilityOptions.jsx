@@ -107,11 +107,13 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
   }
 
   const endDateErrors = (startDate, endDate) => {
-    if(endDate < startDate){
-      return [{
-        type: 'error',
-        text: I18n.t('The end date can not occur before the start date.')
-      }]
+    if (endDate < startDate) {
+      return [
+        {
+          type: 'error',
+          text: I18n.t('The end date can not occur before the start date.'),
+        },
+      ]
     }
     return []
   }

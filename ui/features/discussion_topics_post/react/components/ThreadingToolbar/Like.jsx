@@ -73,7 +73,7 @@ export function Like({...props}) {
             interaction={props.interaction}
           >
             <PresentationContent>
-              <Text weight="bold" data-testid="like-count" size='medium'>
+              <Text weight="bold" data-testid="like-count" size="medium">
                 {icon()}
                 {props.likeCount > 0 && <View margin="0 0 0 xx-small">{props.likeCount}</View>}
                 {!responsiveProps.isMobile &&

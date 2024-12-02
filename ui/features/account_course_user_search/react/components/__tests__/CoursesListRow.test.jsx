@@ -146,22 +146,16 @@ it('shows the teacher count when needed', () => {
 })
 
 it('shows published icon and tooltip for published course', () => {
-  const { queryAllByText} = renderRow(
-    <CoursesListRow {...props} />
-  )
+  const {queryAllByText} = renderRow(<CoursesListRow {...props} />)
   expect(queryAllByText('Published').length).toBeGreaterThan(0)
 })
 
 it('shows unpublished icon and tooltip for unpublished course', () => {
-  const { queryAllByText} = renderRow(
-    <CoursesListRow {...props} workflow_state={"unpublished"} />
-  )
+  const {queryAllByText} = renderRow(<CoursesListRow {...props} workflow_state="unpublished" />)
   expect(queryAllByText('Unpublished').length).toBeGreaterThan(0)
 })
 
 it('shows completed icon and tooltip for concluded course', () => {
-  const { queryAllByText} = renderRow(
-    <CoursesListRow {...props} workflow_state={"completed"} />
-  )
+  const {queryAllByText} = renderRow(<CoursesListRow {...props} workflow_state="completed" />)
   expect(queryAllByText('Concluded').length).toBeGreaterThan(0)
 })

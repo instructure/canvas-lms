@@ -31,8 +31,8 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
   const minNameLength = ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT || 1
 
   // Different Assignment Types
-  const ONLINE_QUIZ = "online_quiz"
-  const DISCUSSION_TOPIC = "discussion_topic"
+  const ONLINE_QUIZ = 'online_quiz'
+  const DISCUSSION_TOPIC = 'discussion_topic'
 
   const moreOptionsHandler = (data, isNewAssignment) => {
     const assignmentModel = assignment || generateNewAssignment(assignmentGroup)
@@ -57,13 +57,13 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     }
   }
 
-  const saveHandler = async (data) => {
+  const saveHandler = async data => {
     const assignmentModel = assignment || generateNewAssignment(assignmentGroup)
 
     let mappedData = {
       submission_type: [data.type],
       name: data.name,
-      due_at: (data.dueAt !== '') ? data.dueAt : null,
+      due_at: data.dueAt !== '' ? data.dueAt : null,
       points_possible: data.points,
       post_to_sis: data.syncToSIS,
     }
@@ -71,7 +71,7 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     if (data.publish) {
       mappedData = {
         published: true,
-        ...mappedData
+        ...mappedData,
       }
     }
 
@@ -140,7 +140,7 @@ const courseUrl = () => {
   return ENV.current_context.url
 }
 
-const redirectTo = (url) => {
+const redirectTo = url => {
   window.location.href = url
 }
 
@@ -149,7 +149,7 @@ const launchQuizEdit = async (url, data) => {
   redirectTo(response.data.url)
 }
 
-const generateNewAssignment = (assignmentGroup) => {
+const generateNewAssignment = assignmentGroup => {
   const assignment = new Assignment()
   if (assignmentGroup) {
     assignment.assignmentGroupId(assignmentGroup.id)
@@ -169,7 +169,7 @@ const launchAssignmentEdit = (assignment, assignmentGroup, data, isNewAssignment
   } else {
     url = assignment.htmlEditUrl()
   }
-  redirectTo(url + "?" + encodeQueryString(data))
+  redirectTo(url + '?' + encodeQueryString(data))
 }
 
 const launchDiscussionTopicEdit = (assignment, assignmentGroup, data, isNewAssignment) => {
@@ -184,7 +184,7 @@ const launchDiscussionTopicEdit = (assignment, assignmentGroup, data, isNewAssig
     redirectTo(url + encodeQueryString(data))
   } else {
     url = assignment.htmlEditUrl()
-    redirectTo(url + "?" + encodeQueryString(data))
+    redirectTo(url + '?' + encodeQueryString(data))
   }
 }
 
@@ -194,20 +194,20 @@ const addFrozenField = (frozenFields, field) => {
   }
 }
 
-const getFrozenFields = (assignment) => {
+const getFrozenFields = assignment => {
   const assignmentJSON = assignment.toView()
-  let fields = []
+  const fields = []
 
   // Check if assignment is a child of blueprint course
   if (assignmentJSON.is_master_course_child_content) {
     const restrictions = assignmentJSON.master_course_restrictions
-    Object.keys(restrictions).forEach((r) => {
-      switch(r) {
-        case "content":
+    Object.keys(restrictions).forEach(r => {
+      switch (r) {
+        case 'content':
           if (restrictions[r]) addFrozenField(fields, 'name')
-        case "points":
+        case 'points':
           if (restrictions[r]) addFrozenField(fields, 'points')
-        case "due_dates":
+        case 'due_dates':
           if (restrictions[r]) addFrozenField(fields, 'due_at')
       }
     })

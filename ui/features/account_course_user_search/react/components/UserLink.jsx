@@ -21,7 +21,14 @@ import {Avatar} from '@instructure/ui-avatar'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
-export default function UserLink({size, avatar_url, name, pronouns, avatarName, ...propsToPassOnToLink}) {
+export default function UserLink({
+  size,
+  avatar_url,
+  name,
+  pronouns,
+  avatarName,
+  ...propsToPassOnToLink
+}) {
   return (
     <Link
       themeOverride={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}

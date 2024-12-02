@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import GradingPeriodTemplate from '../gradingPeriodTemplate';
+import React from 'react'
+import {createRoot} from 'react-dom/client'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import GradingPeriodTemplate from '../gradingPeriodTemplate'
 
 const defaultProps = {
   title: 'Spring',
@@ -39,43 +39,45 @@ const defaultProps = {
   onDeleteGradingPeriod: jest.fn(),
   onDateChange: jest.fn(),
   onTitleChange: jest.fn(),
-};
+}
 
 function renderComponent(props = {}) {
-  return render(<GradingPeriodTemplate {...{ ...defaultProps, ...props }} />);
+  return render(<GradingPeriodTemplate {...{...defaultProps, ...props}} />)
 }
 
 describe('custom prop validation for editable periods', () => {
-  let consoleErrorSpy;
+  let consoleErrorSpy
   function render(props = {}) {
-    const root = createRoot(document.createElement('div'));
-    const component = <GradingPeriodTemplate {...{ ...defaultProps, ...props }} />;
-    root.render(component);
+    const root = createRoot(document.createElement('div'))
+    const component = <GradingPeriodTemplate {...{...defaultProps, ...props}} />
+    root.render(component)
   }
 
   beforeEach(() => {
-    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation((error) => {console.log(error);});
-  });
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(error => {
+      console.log(error)
+    })
+  })
 
   afterEach(() => {
-    consoleErrorSpy.mockRestore();
-  });
+    consoleErrorSpy.mockRestore()
+  })
 
   it('does not warn of invalid props if all required props are present and of the correct type', () => {
-    render();
-    expect(consoleErrorSpy).not.toHaveBeenCalled();
-  });
+    render()
+    expect(consoleErrorSpy).not.toHaveBeenCalled()
+  })
 
   it('warns if required props are missing', () => {
-    render({ disabled: null });
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
-  });
+    render({disabled: null})
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(2)
+  })
 
   it('warns if required props are of the wrong type', () => {
-    render({ onDeleteGradingPeriod: 'invalid-type' });
-    expect(consoleErrorSpy).toHaveBeenCalledTimes(1);
-  });
-});
+    render({onDeleteGradingPeriod: 'invalid-type'})
+    expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
+  })
+})
 
 describe('GradingPeriod with read-only permissions', () => {
   const readOnlyProps = {
@@ -83,125 +85,124 @@ describe('GradingPeriod with read-only permissions', () => {
       update: false,
       delete: false,
     },
-  };
+  }
 
   it('isNewGradingPeriod returns false if the id does not contain "new"', () => {
-    const { container } = renderComponent(readOnlyProps);
-    const gradingPeriodInstance = container.querySelector('.grading-period');
-    expect(gradingPeriodInstance.id.includes('new')).toBe(false);
-  });
+    const {container} = renderComponent(readOnlyProps)
+    const gradingPeriodInstance = container.querySelector('.grading-period')
+    expect(gradingPeriodInstance.id.includes('new')).toBe(false)
+  })
 
   it('isNewGradingPeriod returns true if the id contains "new"', () => {
-    const { container } = renderComponent({ ...readOnlyProps, id: 'new1' });
-    const gradingPeriodInstance = container.querySelector('.grading-period');
-    expect(gradingPeriodInstance.id.includes('new')).toBe(true);
-  });
+    const {container} = renderComponent({...readOnlyProps, id: 'new1'})
+    const gradingPeriodInstance = container.querySelector('.grading-period')
+    expect(gradingPeriodInstance.id.includes('new')).toBe(true)
+  })
 
   it('does not render a delete button', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.queryByRole('button', {name: /delete/i})).not.toBeInTheDocument()
+  })
 
   it('renders attributes as read-only', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.getByText('Spring')).toBeInTheDocument();
-    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument();
-    expect(screen.getByText('May 31, 2015')).toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.getByText('Spring')).toBeInTheDocument()
+    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument()
+    expect(screen.getByText('May 31, 2015')).toBeInTheDocument()
+  })
 
   it('displays the correct attributes', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.getByText('Spring')).toBeInTheDocument();
-    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument();
-    expect(screen.getByText('May 31, 2015')).toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.getByText('Spring')).toBeInTheDocument()
+    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument()
+    expect(screen.getByText('May 31, 2015')).toBeInTheDocument()
+  })
 
   it('displays the assigned close date', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.getByText('Jun 7, 2015')).toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.getByText('Jun 7, 2015')).toBeInTheDocument()
+  })
 
   it('uses the end date when close date is not defined', () => {
-    renderComponent({ ...readOnlyProps, closeDate: defaultProps.endDate });
-    expect(screen.getAllByText('May 31, 2015')).toHaveLength(2);
-  });
+    renderComponent({...readOnlyProps, closeDate: defaultProps.endDate})
+    expect(screen.getAllByText('May 31, 2015')).toHaveLength(2)
+  })
 
   it('displays weight only when weighted is true', () => {
-    renderComponent({ ...readOnlyProps, weighted: true });
-    expect(screen.getByText('50%')).toBeInTheDocument();
-  });
-});
+    renderComponent({...readOnlyProps, weighted: true})
+    expect(screen.getByText('50%')).toBeInTheDocument()
+  })
+})
 
 describe("GradingPeriod with 'readOnly' set to true", () => {
-  const readOnlyProps = { readOnly: true };
+  const readOnlyProps = {readOnly: true}
 
   it('isNewGradingPeriod returns false if the id does not contain "new"', () => {
-    const { container } = renderComponent(readOnlyProps);
-    const gradingPeriodInstance = container.querySelector('.grading-period');
-    expect(gradingPeriodInstance.id.includes('new')).toBe(false);
-  });
+    const {container} = renderComponent(readOnlyProps)
+    const gradingPeriodInstance = container.querySelector('.grading-period')
+    expect(gradingPeriodInstance.id.includes('new')).toBe(false)
+  })
 
   it('isNewGradingPeriod returns true if the id contains "new"', () => {
-    const { container } = renderComponent({ ...readOnlyProps, id: 'new1' });
-    const gradingPeriodInstance = container.querySelector('.grading-period');
-    expect(gradingPeriodInstance.id.includes('new')).toBe(true);
-  });
+    const {container} = renderComponent({...readOnlyProps, id: 'new1'})
+    const gradingPeriodInstance = container.querySelector('.grading-period')
+    expect(gradingPeriodInstance.id.includes('new')).toBe(true)
+  })
 
   it('does not render a delete button', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.queryByRole('button', {name: /delete/i})).not.toBeInTheDocument()
+  })
 
   it('renders attributes as read-only', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.getByText('Spring')).toBeInTheDocument();
-    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument();
-    expect(screen.getByText('May 31, 2015')).toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.getByText('Spring')).toBeInTheDocument()
+    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument()
+    expect(screen.getByText('May 31, 2015')).toBeInTheDocument()
+  })
 
   it('displays the correct attributes', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.getByText('Spring')).toBeInTheDocument();
-    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument();
-    expect(screen.getByText('May 31, 2015')).toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.getByText('Spring')).toBeInTheDocument()
+    expect(screen.getByText('Mar 1, 2015')).toBeInTheDocument()
+    expect(screen.getByText('May 31, 2015')).toBeInTheDocument()
+  })
 
   it('displays the assigned close date', () => {
-    renderComponent(readOnlyProps);
-    expect(screen.getByText('Jun 7, 2015')).toBeInTheDocument();
-  });
+    renderComponent(readOnlyProps)
+    expect(screen.getByText('Jun 7, 2015')).toBeInTheDocument()
+  })
 
   it('uses the end date when close date is not defined', () => {
-    renderComponent({ ...readOnlyProps, closeDate: defaultProps.endDate });
-    expect(screen.getAllByText('May 31, 2015')).toHaveLength(2);
-  });
-});
+    renderComponent({...readOnlyProps, closeDate: defaultProps.endDate})
+    expect(screen.getAllByText('May 31, 2015')).toHaveLength(2)
+  })
+})
 
 describe('editable GradingPeriod', () => {
   it('renders a delete button', () => {
-    renderComponent();
-    expect(screen.getByText(/delete grading period/i)).toBeInTheDocument();
-  });
+    renderComponent()
+    expect(screen.getByText(/delete grading period/i)).toBeInTheDocument()
+  })
 
   it('renders with input fields', () => {
-    renderComponent();
-    expect(screen.getByDisplayValue('Spring')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Mar 1, 2015')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('May 31, 2015')).toBeInTheDocument();
-  });
+    renderComponent()
+    expect(screen.getByDisplayValue('Spring')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Mar 1, 2015')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('May 31, 2015')).toBeInTheDocument()
+  })
 
   it('displays the correct attributes', () => {
-    renderComponent();
-    expect(screen.getByDisplayValue('Spring')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Mar 1, 2015')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('May 31, 2015')).toBeInTheDocument();
-  });
+    renderComponent()
+    expect(screen.getByDisplayValue('Spring')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Mar 1, 2015')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('May 31, 2015')).toBeInTheDocument()
+  })
 
   it("ignores clicks on 'delete grading period' when disabled", () => {
-    const deleteSpy = jest.fn();
-    renderComponent({ onDeleteGradingPeriod: deleteSpy, disabled: true });
-    userEvent.click(screen.getByText(/delete grading period/i));
-    expect(deleteSpy).not.toHaveBeenCalled();
-  });
-});
-
+    const deleteSpy = jest.fn()
+    renderComponent({onDeleteGradingPeriod: deleteSpy, disabled: true})
+    userEvent.click(screen.getByText(/delete grading period/i))
+    expect(deleteSpy).not.toHaveBeenCalled()
+  })
+})

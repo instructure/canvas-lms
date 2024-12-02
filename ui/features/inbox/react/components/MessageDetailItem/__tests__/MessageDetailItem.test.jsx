@@ -157,7 +157,7 @@ describe('MessageDetailItem', () => {
         ],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'Text\nOn a new line',
-        htmlBody: 'Text\nOn a new line'
+        htmlBody: 'Text\nOn a new line',
       },
       contextName: 'Fake Course 1',
     }
@@ -301,14 +301,13 @@ describe('MessageDetailItem', () => {
         const {queryByText} = setup()
         expect(queryByText('he/him')).not.toBeInTheDocument()
       })
-
     })
     describe('can_add_pronouns enabled', () => {
       beforeEach(() => {
         ENV = {
           SETTINGS: {
-            can_add_pronouns: true
-          }
+            can_add_pronouns: true,
+          },
         }
       })
 

@@ -54,7 +54,8 @@ export default function RubricTab(props) {
   const [rubricTrayOpen, setRubricTrayOpen] = useState(true)
   const displayedAssessment = useStore(state => state.displayedAssessment)
 
-  const rubricAssessments = props.assessments?.filter(x => x.assessment_type !== 'self_assessment') ?? []
+  const rubricAssessments =
+    props.assessments?.filter(x => x.assessment_type !== 'self_assessment') ?? []
 
   const findAssessmentById = id => {
     return rubricAssessments.find(assessment => assessment._id === id)

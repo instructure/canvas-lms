@@ -149,19 +149,15 @@ export default class CreateDSRModal extends React.Component {
     switch (this.state.latestRequest.progress_status) {
       case 'completed':
         return (
-          <a
-            href={this.state.latestRequest.download_url}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={this.state.latestRequest.download_url} target="_blank" rel="noopener noreferrer">
             {this.state.latestRequest.request_name}{' '}
             <IconCloudDownloadLine title={I18n.t('Download')} />
           </a>
-        );
+        )
       case 'failed':
-        return <Text>{I18n.t('Failed')}</Text>;
+        return <Text>{I18n.t('Failed')}</Text>
       default:
-        return <Text>{I18n.t('In progress')}</Text>;
+        return <Text>{I18n.t('In progress')}</Text>
     }
   }
 
@@ -181,7 +177,7 @@ export default class CreateDSRModal extends React.Component {
               <TextInput
                 key="request_name"
                 renderLabel={
-                  <div style={{textAlign: "left"}}>
+                  <div style={{textAlign: 'left'}}>
                     {I18n.t('DSR Request Name')} <Text color="danger"> *</Text>
                   </div>
                 }

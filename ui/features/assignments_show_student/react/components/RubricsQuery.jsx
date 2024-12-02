@@ -44,15 +44,18 @@ export default function RubricsQuery(props) {
     onCompleted: data => {
       const allAssessments = data.submission?.rubricAssessmentsConnection?.nodes ?? []
 
-      const {parsedAssessments, selfAssessment} = allAssessments.reduce((prev, curr) => {
-        if (curr.assessment_type === 'self_assessment') {
-          return {...prev, selfAssessment: transformRubricAssessmentData(curr)}
-        }
+      const {parsedAssessments, selfAssessment} = allAssessments.reduce(
+        (prev, curr) => {
+          if (curr.assessment_type === 'self_assessment') {
+            return {...prev, selfAssessment: transformRubricAssessmentData(curr)}
+          }
 
-        const parsedAssessment = transformRubricAssessmentData(curr)
+          const parsedAssessment = transformRubricAssessmentData(curr)
 
-        return {...prev, parsedAssessments: [...prev.parsedAssessments, parsedAssessment]}
-      }, { parsedAssessments: [], selfAssessment: null })
+          return {...prev, parsedAssessments: [...prev.parsedAssessments, parsedAssessment]}
+        },
+        {parsedAssessments: [], selfAssessment: null}
+      )
 
       const parsedRubric = transformRubricData(data.assignment.rubric)
 

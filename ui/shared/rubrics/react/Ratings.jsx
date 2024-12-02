@@ -88,7 +88,7 @@ export const Rating = props => {
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={assessing ? 0 : null}
     >
-      {hidePoints || ENV['restrict_quantitative_data'] ? null : ratingPoints()}
+      {hidePoints || ENV.restrict_quantitative_data ? null : ratingPoints()}
       <div className="rating-description">
         <Text size="small" lineHeight="condensed" weight="bold">
           {description}

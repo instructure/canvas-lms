@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Layout from '../Layout'
 
@@ -25,23 +25,16 @@ describe('AssignmentPostingPolicyTray Layout', () => {
   let container
   let context
 
-
   function getCancelButton() {
-    return [...container.querySelectorAll('button')].find(
-      button => button.textContent === 'Cancel'
-    )
+    return [...container.querySelectorAll('button')].find(button => button.textContent === 'Cancel')
   }
 
   function getSaveButton() {
-    return [...container.querySelectorAll('button')].find(
-      button => button.textContent === 'Save'
-    )
+    return [...container.querySelectorAll('button')].find(button => button.textContent === 'Save')
   }
 
   function getLabel(text) {
-    return [...container.querySelectorAll('label')].find(label =>
-      label.textContent.includes(text)
-    )
+    return [...container.querySelectorAll('label')].find(label => label.textContent.includes(text))
   }
 
   function getInputByLabel(label) {
@@ -73,7 +66,7 @@ describe('AssignmentPostingPolicyTray Layout', () => {
       originalPostManually: true,
       selectedPostManually: false,
     }
-    const { container: renderedContainer } = render(<Layout {...context} />)
+    const {container: renderedContainer} = render(<Layout {...context} />)
     container = renderedContainer
   })
 
@@ -92,7 +85,7 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   it('the "Cancel" button is disabled when allowCanceling is false', () => {
     context.allowCanceling = false
-    const { container: newContainer } = render(<Layout {...context} />)
+    const {container: newContainer} = render(<Layout {...context} />)
     container = newContainer
     expect(getCancelButton().disabled).toBe(true)
   })
@@ -108,7 +101,7 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   it('the "Save" button is disabled when allowSaving is false', () => {
     context.allowSaving = false
-    const { container: newContainer } = render(<Layout {...context} />)
+    const {container: newContainer} = render(<Layout {...context} />)
     container = newContainer
     expect(getSaveButton().disabled).toBe(true)
   })
@@ -126,7 +119,7 @@ describe('AssignmentPostingPolicyTray Layout', () => {
   describe('when allowAutomaticPosting is false', () => {
     beforeEach(() => {
       context.allowAutomaticPosting = false
-      const { container: newContainer } = render(<Layout {...context} />)
+      const {container: newContainer} = render(<Layout {...context} />)
       container = newContainer
     })
 
@@ -142,7 +135,7 @@ describe('AssignmentPostingPolicyTray Layout', () => {
   describe('when selectedPostManually is true', () => {
     beforeEach(() => {
       context.selectedPostManually = true
-      const { container: newContainer } = render(<Layout {...context} />)
+      const {container: newContainer} = render(<Layout {...context} />)
       container = newContainer
     })
 
@@ -172,12 +165,12 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   it('clicking the "Manually" input passes postManually: true to onPostPolicyChanged', async () => {
     await userEvent.click(getManuallyPostInput())
-    expect(context.onPostPolicyChanged).toHaveBeenCalledWith({ postManually: true })
+    expect(context.onPostPolicyChanged).toHaveBeenCalledWith({postManually: true})
   })
 
   it('clicking the "Automatically" input calls onPostPolicyChanged', async () => {
     context.selectedPostManually = true
-    const { container: newContainer } = render(<Layout {...context} />)
+    const {container: newContainer} = render(<Layout {...context} />)
     container = newContainer
     await userEvent.click(getAutomaticallyPostInput())
     expect(context.onPostPolicyChanged).toHaveBeenCalledTimes(1)
@@ -185,9 +178,9 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   it('clicking the "Automatically" input passes postManually: false to onPostPolicyChanged', async () => {
     context.selectedPostManually = true
-    const { container: newContainer } = render(<Layout {...context} />)
+    const {container: newContainer} = render(<Layout {...context} />)
     container = newContainer
     await userEvent.click(getAutomaticallyPostInput())
-    expect(context.onPostPolicyChanged).toHaveBeenCalledWith({ postManually: false })
+    expect(context.onPostPolicyChanged).toHaveBeenCalledWith({postManually: false})
   })
 })

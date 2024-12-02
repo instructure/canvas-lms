@@ -80,7 +80,11 @@ export default function CommentRow(props) {
           color={props.comment._id === 'pending' ? 'secondary' : null}
           wrap="break-word"
           data-testid="commentContent"
-          dangerouslySetInnerHTML={{__html: containsHtmlTags(htmlComment) ? sanitizeHtml(htmlComment) : formatMessage(htmlComment)}}
+          dangerouslySetInnerHTML={{
+            __html: containsHtmlTags(htmlComment)
+              ? sanitizeHtml(htmlComment)
+              : formatMessage(htmlComment),
+          }}
         />
         {props.comment.attachments.map(attachment => (
           <Link

@@ -46,7 +46,12 @@ const HelpText = () => (
   </div>
 )
 
-export const SelfSignup = ({onChange, selfSignupEndDateEnabled = false, endDateOnChange, direction}) => {
+export const SelfSignup = ({
+  onChange,
+  selfSignupEndDateEnabled = false,
+  endDateOnChange,
+  direction,
+}) => {
   const {selfSignup, bySection} = useContext(GroupContext)
 
   function handleChange(key, val) {
@@ -55,7 +60,7 @@ export const SelfSignup = ({onChange, selfSignupEndDateEnabled = false, endDateO
     onChange(result)
   }
 
-  const handleEndDateUpdate = (value) => {
+  const handleEndDateUpdate = value => {
     endDateOnChange(value)
   }
 

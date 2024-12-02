@@ -304,36 +304,35 @@ describe('SplitScreenParent', () => {
   })
 
   describe('rating', () => {
-    it('should react on liked', async() => {
+    it('should react on liked', async () => {
       const onToggleRating = jest.fn()
       const {queryByTestId} = setup(
         defaultProps({
-            overrides: {onToggleRating}
+          overrides: {onToggleRating},
         })
       )
       const likeButton = await queryByTestId('not-liked-icon')
-      expect(likeButton).toBeInTheDocument();
+      expect(likeButton).toBeInTheDocument()
       fireEvent.click(likeButton)
       expect(onToggleRating).toHaveBeenCalled()
     })
 
-    it('should react on not_liked', async() => {
+    it('should react on not_liked', async () => {
       const onToggleRating = jest.fn()
       const {queryByTestId} = setup(
-        defaultProps(
-          {
-            discussionEntryOverrides: {
-              entryParticipant: {
-                rating: true,
-              },
-            }, overrides: {onToggleRating}
-          })
+        defaultProps({
+          discussionEntryOverrides: {
+            entryParticipant: {
+              rating: true,
+            },
+          },
+          overrides: {onToggleRating},
+        })
       )
       const likeButton = await queryByTestId('liked-icon')
-      expect(likeButton).toBeInTheDocument();
+      expect(likeButton).toBeInTheDocument()
       fireEvent.click(likeButton)
       expect(onToggleRating).toHaveBeenCalled()
     })
-
   })
 })

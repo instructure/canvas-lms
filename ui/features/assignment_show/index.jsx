@@ -41,7 +41,10 @@ import ready from '@instructure/ready'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {captureException} from '@sentry/browser'
 import {RubricAssignmentContainer} from '@canvas/rubrics/react/RubricAssignment'
-import {mapRubricUnderscoredKeysToCamelCase, mapRubricAssociationUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
+import {
+  mapRubricUnderscoredKeysToCamelCase,
+  mapRubricAssociationUnderscoredKeysToCamelCase,
+} from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
@@ -50,10 +53,12 @@ if (!('INST' in window)) window.INST = {}
 const I18n = useI18nScope('assignment')
 
 ready(() => {
-  const comments = document.getElementsByClassName("comment_content")
-  Array.from(comments).forEach((comment) => {
+  const comments = document.getElementsByClassName('comment_content')
+  Array.from(comments).forEach(comment => {
     const content = comment.dataset.content
-    const formattedComment = containsHtmlTags(content) ? sanitizeHtml(content) : formatMessage(content)
+    const formattedComment = containsHtmlTags(content)
+      ? sanitizeHtml(content)
+      : formatMessage(content)
     comment.innerHTML = formattedComment
   })
 
@@ -311,9 +316,14 @@ $(() => {
     const envRubric = ENV.assigned_rubric
     const envRubricAssociation = ENV.rubric_association
     const assignmentRubric = envRubric
-      ? {...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric), can_update: ENV.assigned_rubric?.can_update} 
+      ? {
+          ...mapRubricUnderscoredKeysToCamelCase(ENV.assigned_rubric),
+          can_update: ENV.assigned_rubric?.can_update,
+        }
       : undefined
-    const assignmentRubricAssociation = envRubricAssociation ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association) : undefined
+    const assignmentRubricAssociation = envRubricAssociation
+      ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
+      : undefined
     ReactDOM.render(
       <RubricAssignmentContainer
         accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}

@@ -115,8 +115,6 @@ const ConferencesRouter = Backbone.Router.extend({
     })
 
     $('.new-conference-btn').on('click', () => this.create())
-
-
   },
 
   index() {
