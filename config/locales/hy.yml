@@ -5447,6 +5447,7 @@ hy:
   create_132b3be1: Ստեղծել
   create_assignment_68532ceb: "Ստեղծել հանձնարարություն"
   create_course_9a69b32c: "Ստեղծել դասընթաց"
+  create_course_9dc5b61a: "Ստեղծել դասընթաց"
   create_discussion_982f915e: "Ստեղծել քննարկում"
   create_discussion_topics_8330d52b: "Ստեղծել քննարկման թեմաներ"
   create_group_set_7fe1cd53: "Ստեղծել խմբերի շարք"
@@ -12050,6 +12051,7 @@ hy:
     video: Վիդեո
   please_add_at_least_one_non_blank_answer_213c2c8e: "Ավելացրեք առնվազն մեկ լրացված պատասխան"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Խնդրում ենք ավելացնել առնվազն մեկ լրացված պատասխան յուրաքանչյուր փոփոխականի համար:"
+  please_enter_the_details_for_the_new_course_dc705b8c: "Մուտքագրեք նոր դասընթացի մանրամասները:"
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Մուտքագրեք ձեր token-ում ցույց տրված հաստատման կոդը"
   please_enter_your_label_name_7745272d: "Մուտքագրեք ձեր  %{label_name}՝"
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
