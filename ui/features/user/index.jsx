@@ -53,16 +53,18 @@ ready(() => {
   }
 
   if (modifyPermissions.canView !== undefined) {
-    const temp_enrollments_container = document.getElementById('manage-temp-enrollments-mount-point')
+    const temp_enrollments_container = document.getElementById(
+      'manage-temp-enrollments-mount-point'
+    )
 
     if (temp_enrollments_container) {
       ReactDOM.render(
         <ManageTempEnrollButton
-         user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
-         modifyPermissions={modifyPermissions}
-         roles={roles}
-         rolePermissions={rolePermissions}
-         can_read_sis={permissions.can_read_sis}
+          user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
+          modifyPermissions={modifyPermissions}
+          roles={roles}
+          rolePermissions={rolePermissions}
+          can_read_sis={permissions.can_read_sis}
         />,
         temp_enrollments_container
       )

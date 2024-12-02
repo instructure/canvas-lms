@@ -26,7 +26,7 @@ const conversationContextDefaultValues = {
   setMessageOpenEvent: () => {},
   isSubmissionCommentsType: false,
   setIsSubmissionCommentsType: () => {},
-  translationTargetLanguage: 'en'
+  translationTargetLanguage: 'en',
 }
 export const ConversationContext = React.createContext(conversationContextDefaultValues)
 

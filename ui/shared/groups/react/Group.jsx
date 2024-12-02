@@ -90,11 +90,13 @@ class Group extends React.Component {
         <i className="icon-user" aria-hidden="true" />
       </span>
     ) : null
-    const selfSignupClosed = this.props.group.group_category.self_signup_end_at ? Date.parse(this.props.group.group_category.self_signup_end_at) < Date.now() : false
+    const selfSignupClosed = this.props.group.group_category.self_signup_end_at
+      ? Date.parse(this.props.group.group_category.self_signup_end_at) < Date.now()
+      : false
     const canSelfSignup =
       (this.props.group.join_level === 'parent_context_auto_join' ||
-      this.props.group.group_category.self_signup === 'enabled' ||
-      this.props.group.group_category.self_signup === 'restricted') &&
+        this.props.group.group_category.self_signup === 'enabled' ||
+        this.props.group.group_category.self_signup === 'restricted') &&
       !selfSignupClosed
     const isFull =
       this.props.group.max_membership != null &&

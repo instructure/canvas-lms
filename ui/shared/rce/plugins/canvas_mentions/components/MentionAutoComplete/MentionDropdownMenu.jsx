@@ -64,7 +64,7 @@ const MentionDropdownMenu = ({
     return mentionOptions.map(user => {
       return (
         <MentionDropdownOption
-          name={user.shortName || user.name} 
+          name={user.shortName || user.name}
           onSelect={() => {
             onSelect({
               ...user,

@@ -21,7 +21,7 @@ import {render, cleanup, screen} from '@testing-library/react'
 import SimilarityScore from '../SimilarityScore'
 
 describe('SimilarityScore', () => {
-  let defaultProps = {
+  const defaultProps = {
     hasAdditionalData: false,
     reportUrl: '/my_superlative_report',
     similarityScore: 60,

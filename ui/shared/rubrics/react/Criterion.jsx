@@ -164,7 +164,7 @@ export default class Criterion extends React.Component {
     const pointsPossible = criterion.points
     const pointsElement = () =>
       !hidePoints &&
-      !ENV['restrict_quantitative_data'] &&
+      !ENV.restrict_quantitative_data &&
       !ignoreForScoring && (
         <Points
           key="points"
@@ -257,7 +257,7 @@ export default class Criterion extends React.Component {
           {!(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null}
         </Table.RowHeader>
         <Table.Cell>{ratings}</Table.Cell>
-        {(!ENV['restrict_quantitative_data'] && hasPointsColumn) && (
+        {!ENV.restrict_quantitative_data && hasPointsColumn && (
           <Table.Cell data-testid="criterion-points">
             {pointsElement()}
             {assessing && !freeForm && !editingComments ? commentButton : null}

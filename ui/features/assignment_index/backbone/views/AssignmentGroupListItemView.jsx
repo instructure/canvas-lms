@@ -110,7 +110,7 @@ AssignmentGroupListItemView.prototype.events = {
   'click .move_contents': 'onMoveContents',
   'click .move_group': 'onMoveGroup',
   'click .ag-header-controls .menu_tool_link': 'openExternalTool',
-  'click .add_assignment': 'addItem'
+  'click .add_assignment': 'addItem',
 }
 
 AssignmentGroupListItemView.prototype.messages = shimGetterShorthand(
@@ -282,7 +282,8 @@ AssignmentGroupListItemView.prototype.toJSON = function () {
     hasFrozenAssignments:
       this.model.hasFrozenAssignments != null && this.model.hasFrozenAssignments(),
     hasSisSourceId: this.model.hasSisSourceId != null && this.model.hasSisSourceId(),
-    syncedWithSisCategory: this.model.syncedWithSisCategory != null && this.model.syncedWithSisCategory(),
+    syncedWithSisCategory:
+      this.model.syncedWithSisCategory != null && this.model.syncedWithSisCategory(),
     postToSISName: ENV.SIS_NAME,
     assignmentGroupMenuPlacements: this.assignment_group_menu_tools,
     ENV,
@@ -641,12 +642,7 @@ AssignmentGroupListItemView.prototype.renderCreateEditAssignmentModal = function
     // re-render the group view
     this.render()
   }
-  root.render(
-    <CreateAssignmentViewAdapter
-      assignmentGroup={this.model}
-      closeHandler={onClose}
-    />
-  )
+  root.render(<CreateAssignmentViewAdapter assignmentGroup={this.model} closeHandler={onClose} />)
 }
 
 AssignmentGroupListItemView.prototype.addItem = function () {

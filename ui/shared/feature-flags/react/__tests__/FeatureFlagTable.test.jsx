@@ -66,9 +66,7 @@ describe('feature_flags::FeatureFlagTable', () => {
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature8`
     fetchMock.putOnce(route, sampleData.siteAdminOnFeature.feature_flag)
 
-    const {getByText, getAllByTestId} = render(
-      <FeatureFlagTable rows={rows} title={title} />
-    )
+    const {getByText, getAllByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
     const row = getAllByTestId('ff-table-row')[5] // siteAdminOffFeature
     expect(row).toHaveTextContent('Hidden')
 

@@ -350,10 +350,7 @@ export default class DiscussionsIndex extends Component {
   render() {
     return (
       <>
-        <TopNavPortalWithDefaults
-          currentPageName={I18n.t('Discussions')}
-          useStudentView={true}
-        />
+        <TopNavPortalWithDefaults currentPageName={I18n.t('Discussions')} useStudentView={true} />
         <div className="discussions-v2__wrapper">
           <ScreenReaderContent>
             <Heading level="h1">{I18n.t('Discussions')}</Heading>

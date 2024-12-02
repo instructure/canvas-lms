@@ -24,7 +24,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
 import Folder from '@canvas/files/backbone/models/Folder'
-import { mergeTimeAndDate } from '@instructure/moment-utils'
+import {mergeTimeAndDate} from '@instructure/moment-utils'
 
 QUnit.module('RestrictedDialogForm Multiple Selected Items', {
   setup() {

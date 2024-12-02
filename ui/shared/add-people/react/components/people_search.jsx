@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconUserSolid} from '@instructure/ui-icons'
 import {courseParamsShape, inputParamsShape} from './shapes'
 import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
-import { Flex } from '@instructure/ui-flex'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('PeopleSearch')
 
@@ -183,7 +183,12 @@ class PeopleSearch extends React.Component {
           />
         </fieldset>
         <fieldset className="peoplesearch__selections">
-          <Flex wrap="wrap" gap="large" justifyItems="center" data-testid="people-search-role-section-container">
+          <Flex
+            wrap="wrap"
+            gap="large"
+            justifyItems="center"
+            data-testid="people-search-role-section-container"
+          >
             <Flex.Item>
               <CanvasSelect
                 label={I18n.t('Role')}

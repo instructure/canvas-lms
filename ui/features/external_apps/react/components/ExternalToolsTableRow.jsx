@@ -262,7 +262,6 @@ export default class ExternalToolsTableRow extends React.Component {
     const {tool} = this.props
     const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
-
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
         <td className="e-tool-table-data center-text">{this.locked()}</td>
@@ -271,24 +270,21 @@ export default class ExternalToolsTableRow extends React.Component {
           className={`${this.nameClassNames()} e-tool-table-data`}
           title={tool.name}
         >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {tool.name} {this.disabledFlag()}
-           {(ENV.FEATURES.lti_migration_info && tool.migration_running) ? (
-
-              <ExternalToolMigrationInfo 
-              tool={tool}
-              canAddEdit={this.props.canAddEdit}/>
-                
-              ) : null}
-        </div>
-         
+          <div style={{display: 'flex', alignItems: 'center'}}>
+            {tool.name} {this.disabledFlag()}
+            {ENV.FEATURES.lti_migration_info && tool.migration_running ? (
+              <ExternalToolMigrationInfo tool={tool} canAddEdit={this.props.canAddEdit} />
+            ) : null}
+          </div>
         </td>
         {this.props.showLTIFavoriteToggles && show_top_nav_toggles && (
           <td>
             {canBeTopNavFavorite(tool) ? (
               <Checkbox
                 variant="toggle"
-                label={<ScreenReaderContent>{I18n.t('Top Navigation Favorite')}</ScreenReaderContent>}
+                label={
+                  <ScreenReaderContent>{I18n.t('Top Navigation Favorite')}</ScreenReaderContent>
+                }
                 value={tool.app_id}
                 onChange={this.handleFavoriteChange('top_nav')}
                 checked={tool.is_top_nav_favorite}
@@ -308,7 +304,11 @@ export default class ExternalToolsTableRow extends React.Component {
                 value={tool.app_id}
                 onChange={this.handleFavoriteChange('rce')}
                 checked={tool.is_rce_favorite}
-                disabled={!tool.is_rce_favorite && this.props.rceFavoriteCount >= MAX_FAVS && !INST.editorButtons?.find(b => b.id === tool.app_id)?.on_by_default}
+                disabled={
+                  !tool.is_rce_favorite &&
+                  this.props.rceFavoriteCount >= MAX_FAVS &&
+                  !INST.editorButtons?.find(b => b.id === tool.app_id)?.on_by_default
+                }
               />
             ) : (
               I18n.t('NA')

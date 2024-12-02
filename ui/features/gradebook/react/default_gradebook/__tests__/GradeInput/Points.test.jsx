@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { render, cleanup } from '@testing-library/react'
+import {render, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import GradeInput from '../../components/GradeInput'
 import '@testing-library/jest-dom/extend-expect'
@@ -128,10 +128,10 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
 
   describe('when the input receives a new value', () => {
     beforeEach(async () => {
-      const { getByDisplayValue } = renderComponent()
+      const {getByDisplayValue} = renderComponent()
       const input = getByDisplayValue('7.8')
       userEvent.clear(input)
-      await userEvent.type(input, '9.8', { delay: 1 })
+      await userEvent.type(input, '9.8', {delay: 1})
     })
 
     it('updates the input to the given value', () => {
@@ -146,7 +146,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
 
   describe('when the input blurs after receiving a new value', () => {
     beforeEach(async () => {
-      const { getByDisplayValue } = renderComponent()
+      const {getByDisplayValue} = renderComponent()
       const input = getByDisplayValue('7.8')
       userEvent.clear(input)
       await userEvent.type(input, '9.8')
@@ -171,7 +171,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       let gradeInfo
 
       beforeEach(async () => {
-        const { getByDisplayValue } = renderComponent()
+        const {getByDisplayValue} = renderComponent()
         const input = getByDisplayValue('7.8')
         userEvent.clear(input)
         await userEvent.type(input, '8.9')
@@ -196,7 +196,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       let gradeInfo
 
       beforeEach(async () => {
-        const { getByDisplayValue } = renderComponent()
+        const {getByDisplayValue} = renderComponent()
         const input = getByDisplayValue('7.8')
         userEvent.clear(input)
         await userEvent.type(input, '89%')
@@ -221,7 +221,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       let gradeInfo
 
       beforeEach(async () => {
-        const { getByDisplayValue } = renderComponent()
+        const {getByDisplayValue} = renderComponent()
         const input = getByDisplayValue('7.8')
         userEvent.clear(input)
         await userEvent.type(input, 'B')
@@ -246,7 +246,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       let gradeInfo
 
       beforeEach(async () => {
-        const { getByDisplayValue } = renderComponent()
+        const {getByDisplayValue} = renderComponent()
         const input = getByDisplayValue('7.8')
         userEvent.clear(input)
         await userEvent.type(input, 'EX')
@@ -271,7 +271,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       let gradeInfo
 
       beforeEach(async () => {
-        const { getByDisplayValue } = renderComponent()
+        const {getByDisplayValue} = renderComponent()
         const input = getByDisplayValue('7.8')
         userEvent.clear(input)
         await userEvent.type(input, 'unknown')
@@ -299,7 +299,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
 
   describe('when the input blurs without having received a new value', () => {
     beforeEach(async () => {
-      const { getByDisplayValue } = renderComponent()
+      const {getByDisplayValue} = renderComponent()
       const input = getByDisplayValue('7.8')
       userEvent.clear(input)
       await userEvent.type(input, '9.8') // change the input value
@@ -315,25 +315,25 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
 
   describe('when the submission grade is updating', () => {
     beforeEach(async () => {
-      props.submission = { ...props.submission, enteredGrade: null, enteredScore: null }
+      props.submission = {...props.submission, enteredGrade: null, enteredScore: null}
       props.submissionUpdating = true
-      props.pendingGradeInfo = { grade: '9.8', valid: true, excused: false }
+      props.pendingGradeInfo = {grade: '9.8', valid: true, excused: false}
     })
 
     it('updates the text input with the value of the pending grade', () => {
-      const { getAllByDisplayValue } = renderComponent()
+      const {getAllByDisplayValue} = renderComponent()
       const inputs = getAllByDisplayValue('9.8')
       expect(inputs.length).toBeGreaterThan(0)
     })
 
     it('sets the text input to "Excused" when the submission is being excused', () => {
-      props.pendingGradeInfo = { grade: null, valid: false, excused: true }
-      const { getByDisplayValue } = renderComponent()
+      props.pendingGradeInfo = {grade: null, valid: false, excused: true}
+      const {getByDisplayValue} = renderComponent()
       expect(getByDisplayValue('Excused')).toBeInTheDocument()
     })
 
     it('sets the input to "read only"', () => {
-      const { getAllByDisplayValue } = renderComponent()
+      const {getAllByDisplayValue} = renderComponent()
       const inputs = getAllByDisplayValue('9.8')
       inputs.forEach(input => {
         expect(input).toHaveAttribute('readOnly')
@@ -343,18 +343,18 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
     describe('when the submission grade finishes updating', () => {
       beforeEach(async () => {
         renderComponent()
-        props.submission = { ...props.submission, enteredGrade: '9.8', enteredScore: 9.8 }
+        props.submission = {...props.submission, enteredGrade: '9.8', enteredScore: 9.8}
         props.submissionUpdating = false
         renderComponent()
       })
       it('updates the input value with the updated grade', () => {
-        const { getAllByDisplayValue } = renderComponent()
+        const {getAllByDisplayValue} = renderComponent()
         const inputs = getAllByDisplayValue('9.8')
         expect(inputs.length).toBeGreaterThan(0)
       })
 
       it('enables the input', () => {
-        const { getAllByDisplayValue } = renderComponent()
+        const {getAllByDisplayValue} = renderComponent()
         const inputs = getAllByDisplayValue('9.8')
         inputs.forEach(input => {
           expect(input).not.toBeDisabled()
@@ -366,18 +366,18 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
   describe('when the submission is otherwise being updated', () => {
     it('does not update the input value when the submission begins updating', () => {
       renderComponent()
-      props.submission = { ...props.submission, enteredGrade: '9.8', enteredScore: 9.8 }
+      props.submission = {...props.submission, enteredGrade: '9.8', enteredScore: 9.8}
       props.submissionUpdating = true
-      const { queryByDisplayValue } = renderComponent()
+      const {queryByDisplayValue} = renderComponent()
       expect(queryByDisplayValue('7.8')).toBeInTheDocument()
     })
 
     it('updates the input value when the submission finishes updating', () => {
       props.submissionUpdating = true
       renderComponent()
-      props.submission = { ...props.submission, enteredGrade: '9.8', enteredScore: 9.8 }
+      props.submission = {...props.submission, enteredGrade: '9.8', enteredScore: 9.8}
       props.submissionUpdating = false
-      const { queryByDisplayValue } = renderComponent()
+      const {queryByDisplayValue} = renderComponent()
       expect(queryByDisplayValue('9.8')).toBeInTheDocument()
     })
   })

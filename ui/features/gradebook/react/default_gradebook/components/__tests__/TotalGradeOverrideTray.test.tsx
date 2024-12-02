@@ -46,7 +46,11 @@ describe('TotalGradeOverrideTray Tests', () => {
       ...props,
     }
 
-    return render(<MockedProvider><TotalGradeOverrideTray {...trayProps} /></MockedProvider>)
+    return render(
+      <MockedProvider>
+        <TotalGradeOverrideTray {...trayProps} />
+      </MockedProvider>
+    )
   }
 
   beforeEach(() => {

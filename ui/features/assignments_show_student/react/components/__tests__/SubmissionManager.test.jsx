@@ -2058,7 +2058,7 @@ describe('SubmissionManager', () => {
       const props = await mockAssignmentAndSubmission({
         Submission: {
           ...(isSubmitted ? SubmissionMocks.submitted : SubmissionMocks.missing),
-        }
+        },
       })
       props.assignment.rubric = {
         title: 'test rubric',
@@ -2082,9 +2082,9 @@ describe('SubmissionManager', () => {
                 longDescription: 'Rating 2 long description',
                 points: 0,
                 criterionId: '2',
-              }
-            ]
-          }
+              },
+            ],
+          },
         ],
       }
       props.assignment.rubricSelfAssessmentEnabled = true
@@ -2149,11 +2149,13 @@ describe('SubmissionManager', () => {
     it('renders the rubric assessment tray in preview mode when the user has already self assessed', async () => {
       store.setState({
         selfAssessment: {
-          data: [{
-            points: 10,
-            criterion_id: '1',
-            id: 'rating_1_id',
-          }]
+          data: [
+            {
+              points: 10,
+              criterion_id: '1',
+              id: 'rating_1_id',
+            },
+          ],
         },
       })
       const {getByTestId} = await renderComponent()

@@ -77,16 +77,24 @@ export const SpeedGraderNavigator = () => {
   return (
     <div
       ref={containerRef}
-      id={'speedgrader-navigator'}
+      id="speedgrader-navigator"
       style={isVisible ? {} : visuallyHiddenStyles}
       aria-hidden={!isVisible}
       onFocus={handleFocus}
       onBlur={handleBlur}
     >
       <Flex as="nav" justifyItems="start">
-        {renderButton(handlePreviousStudentReply, "previous-in-speedgrader", I18n.t('Previous in SpeedGrader'))}
-        {renderButton(handleNextStudentReply, "next-in-speedgrader", I18n.t('Next in SpeedGrader'))}
-        {renderButton(handleJumpFocusToSpeedGrader, "jump-to-speedgrader-navigation", I18n.t('Jump to SpeedGrader Navigation'))}
+        {renderButton(
+          handlePreviousStudentReply,
+          'previous-in-speedgrader',
+          I18n.t('Previous in SpeedGrader')
+        )}
+        {renderButton(handleNextStudentReply, 'next-in-speedgrader', I18n.t('Next in SpeedGrader'))}
+        {renderButton(
+          handleJumpFocusToSpeedGrader,
+          'jump-to-speedgrader-navigation',
+          I18n.t('Jump to SpeedGrader Navigation')
+        )}
       </Flex>
     </div>
   )

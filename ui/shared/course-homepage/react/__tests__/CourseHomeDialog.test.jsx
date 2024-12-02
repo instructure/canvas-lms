@@ -102,7 +102,7 @@ describe('CourseHomeDialog', () => {
 
   test('save button disabled when publishing if modules selected', () => {
     store.setState({selectedDefaultView: 'modules'})
-    let dialog = shallow(<CourseHomeDialog {...getDefaultProps()} isPublishing />)
+    let dialog = shallow(<CourseHomeDialog {...getDefaultProps()} isPublishing={true} />)
     ok(submitButton(dialog).props().disabled, 'submit disabled when modules selected')
 
     store.setState({selectedDefaultView: 'feed'})

@@ -235,9 +235,7 @@ export default class CoursesListRow extends React.Component {
 
     return (
       <Table.Row>
-        <Table.RowHeader textAlign="center">
-          {this.renderCourseStatusIcon()}
-        </Table.RowHeader>
+        <Table.RowHeader textAlign="center">{this.renderCourseStatusIcon()}</Table.RowHeader>
         <Table.Cell>
           <a href={url}>
             <span style={{paddingRight: '0.5em'}}>{name}</span>

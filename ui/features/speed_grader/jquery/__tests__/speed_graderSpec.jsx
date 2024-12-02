@@ -3894,7 +3894,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('RCE Lite is not used when rce_lite_enabled_speedgrader_comments FF is disabled', async () => {
-        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: false }
+        ENV.FEATURES = {rce_lite_enabled_speedgrader_comments: false}
         ENV.can_comment_on_submission = true
         SpeedGrader.setup()
         await awhile()
@@ -3904,7 +3904,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('RCE Lite is used when rce_lite_enabled_speedgrader_comments FF is enabled', async () => {
-        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: true }
+        ENV.FEATURES = {rce_lite_enabled_speedgrader_comments: true}
         ENV.can_comment_on_submission = true
         SpeedGrader.setup()
         await awhile()
@@ -4186,7 +4186,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('renderComment displays the edit button only for draft comments when rce_lite_enabled_speedgrader_comments FF is enabled', () => {
-        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: true }
+        ENV.FEATURES = {rce_lite_enabled_speedgrader_comments: true}
         commentToRender.publishable = true
         const renderedComment = SpeedGrader.EG.renderComment(
           commentToRender,
@@ -4204,10 +4204,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           author_id: 1,
           author_name: 'an author',
         }
-        const renderedComment = SpeedGrader.EG.renderComment(
-          comment,
-          commentRenderingOptions
-        )
+        const renderedComment = SpeedGrader.EG.renderComment(comment, commentRenderingOptions)
         const commentText = renderedComment.find('span.comment').html()
         equal(commentText, 'a comment<br>\nwith<br>\nparagraphs')
       })

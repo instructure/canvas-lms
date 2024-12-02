@@ -53,7 +53,7 @@ describe('DiscussionsSettings', () => {
         },
         saveSettings() {},
         toggleModalOpen() {},
-        applicationElement: () => document.getElementById('fixtures')
+        applicationElement: () => document.getElementById('fixtures'),
       },
       props
     )

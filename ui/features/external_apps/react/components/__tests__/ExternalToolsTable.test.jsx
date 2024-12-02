@@ -20,13 +20,19 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {ExternalToolsTable, countFavorites} from '../ExternalToolsTable'
 
-function renderTable(canAdd = true, canEdit = true, canDelete = true, canAddEdit = true, FEATURES = {}) {
+function renderTable(
+  canAdd = true,
+  canEdit = true,
+  canDelete = true,
+  canAddEdit = true,
+  FEATURES = {}
+) {
   window.ENV = {
     context_asset_string: 'account_1',
     ACCOUNT: {
       site_admin: false,
     },
-    FEATURES: FEATURES,
+    FEATURES,
   }
 
   const setFocusAbove = jest.fn()
@@ -64,7 +70,9 @@ describe('ExternalToolsTable', () => {
     })
 
     it('does not show if admin does not have permission', () => {
-      const {queryByText} = renderTable(false, false, false, false, {top_navigation_placement: true})
+      const {queryByText} = renderTable(false, false, false, false, {
+        top_navigation_placement: true,
+      })
       expect(queryByText('Name')).toBeInTheDocument()
       expect(queryByText('Pin to Top Navigation')).not.toBeInTheDocument()
     })
@@ -78,7 +86,7 @@ describe('ExternalToolsTable', () => {
 
   describe('calculateFavorites', () => {
     window.INST = {
-      editorButtons: []
+      editorButtons: [],
     }
     it('returns 0 if externalTools array is empty', () => {
       const externalTools = []
@@ -87,16 +95,29 @@ describe('ExternalToolsTable', () => {
     })
 
     it('returns 3 if externalTools contains 3 favorites and some not favorites', () => {
-      const externalTools = [{is_rce_favorite: true}, {is_rce_favorite: true}, {is_rce_favorite: true}, {is_rce_favorite: false}]
+      const externalTools = [
+        {is_rce_favorite: true},
+        {is_rce_favorite: true},
+        {is_rce_favorite: true},
+        {is_rce_favorite: false},
+      ]
       const rceFavCount = countFavorites(externalTools)
       expect(rceFavCount).toEqual(3)
     })
 
     it('returns 2 if externalTools contains 3 favorites but one of them is on_by_default', () => {
       window.INST = {
-        editorButtons: [{id: 2, on_by_default: true}, {id: 42, on_by_default: true}]
+        editorButtons: [
+          {id: 2, on_by_default: true},
+          {id: 42, on_by_default: true},
+        ],
       }
-      const externalTools = [{app_id: 1, is_rce_favorite: true}, {app_id: 2, is_rce_favorite: true}, {app_id: 3, is_rce_favorite: true}, {app_id: 4, is_rce_favorite: false}]
+      const externalTools = [
+        {app_id: 1, is_rce_favorite: true},
+        {app_id: 2, is_rce_favorite: true},
+        {app_id: 3, is_rce_favorite: true},
+        {app_id: 4, is_rce_favorite: false},
+      ]
       const rceFavCount = countFavorites(externalTools)
       expect(rceFavCount).toEqual(2)
     })

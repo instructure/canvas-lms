@@ -98,7 +98,9 @@ export function AttachmentDisplay(props) {
         attachmentInformation['attachment[content_type]'] = fileToUpload.type
         attachmentInformation['attachment[size]'] = fileToUpload.size
         // attach_discussion_file is checked against the user quota, but submissions are not
-        attachmentInformation['attachment[intent]'] = props.checkContextQuota ? 'attach_discussion_file' : 'submit'
+        attachmentInformation['attachment[intent]'] = props.checkContextQuota
+          ? 'attach_discussion_file'
+          : 'submit'
         attachmentInformation['attachment[context_code]'] = `${context}` // used to find the correct course folder
         attachmentInformation['attachment[asset_string]'] = `${assetString}` // required for downloads to go to submission folder; Doesn't Apply to Topic attachments, but Legacy Topic Attachments don't apply to user quota.
       }

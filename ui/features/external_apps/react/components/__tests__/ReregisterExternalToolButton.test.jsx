@@ -35,7 +35,12 @@ const ok = value => expect(value).toBeTruthy()
 let tools
 
 const createElement = data => (
-  <ReregisterExternalToolButton tool={data.tool} canAdd canAddEdit returnFocus={() => {}} />
+  <ReregisterExternalToolButton
+    tool={data.tool}
+    canAdd={true}
+    canAddEdit={true}
+    returnFocus={() => {}}
+  />
 )
 
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)

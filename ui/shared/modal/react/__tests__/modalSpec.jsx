@@ -60,7 +60,7 @@ test('can create a custom content class', function () {
 
 test('can create a custom overlay class name', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen overlayClassName="custom_overlay_class_name" title="Hello">
+    <Modal isOpen={true} overlayClassName="custom_overlay_class_name" title="Hello">
       Inner content
     </Modal>
   )
@@ -73,7 +73,7 @@ test('can create a custom overlay class name', function () {
 
 test('renders ModalContent inside of modal', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen overlayClassName="custom_overlay_class_name" title="Hello">
+    <Modal isOpen={true} overlayClassName="custom_overlay_class_name" title="Hello">
       <ModalContent className="childContent">word</ModalContent>
     </Modal>
   )
@@ -86,7 +86,7 @@ test('renders ModalContent inside of modal', function () {
 
 test('renders ModalButtons inside of modal', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen overlayClassName="custom_overlay_class_name" title="Hello">
+    <Modal isOpen={true} overlayClassName="custom_overlay_class_name" title="Hello">
       <ModalButtons className="buttonContent">buttons here</ModalButtons>
     </Modal>
   )
@@ -101,7 +101,7 @@ test('closes the modal with the X function when the X is pressed', function () {
   let functionCalled = false
   const mockFunction = () => (functionCalled = true)
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen onRequestClose={function () {}} title="Hello" closeWithX={mockFunction}>
+    <Modal isOpen={true} onRequestClose={function () {}} title="Hello" closeWithX={mockFunction}>
       <ModalButtons className="buttonContent">buttons here</ModalButtons>
     </Modal>
   )
@@ -128,7 +128,7 @@ test('Sets the iframe allowances', function () {
   const spy = sinon.spy()
   this.component = TestUtils.renderIntoDocument(
     <Modal
-      isOpen
+      isOpen={true}
       onRequestClose={function () {}}
       title="Hello"
       closeWithX={function () {}}
@@ -152,7 +152,7 @@ test('closeModal() set modal open state to false and calls onRequestClose', func
   let calledOnRequestClose = false
   const oRC = () => (calledOnRequestClose = true)
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen onRequestClose={oRC} title="Hello">
+    <Modal isOpen={true} onRequestClose={oRC} title="Hello">
       <ModalButtons className="buttonContent">buttons here</ModalButtons>
     </Modal>
   )
@@ -163,7 +163,7 @@ test('closeModal() set modal open state to false and calls onRequestClose', func
 
 test("doesn't default to attaching to body", function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen className="custom_class_name" title="Hello">
+    <Modal isOpen={true} className="custom_class_name" title="Hello">
       Inner content
     </Modal>
   )
@@ -172,7 +172,7 @@ test("doesn't default to attaching to body", function () {
 
 test('defaults to attaching to #application', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal isOpen className="custom_class_name" title="Hello">
+    <Modal isOpen={true} className="custom_class_name" title="Hello">
       Inner content
     </Modal>
   )
@@ -181,7 +181,12 @@ test('defaults to attaching to #application', function () {
 
 test('removes aria-hidden from #application when closed', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal onRequestClose={function () {}} isOpen className="custom_class_name" title="Hello">
+    <Modal
+      onRequestClose={function () {}}
+      isOpen={true}
+      className="custom_class_name"
+      title="Hello"
+    >
       Inner content
     </Modal>
   )
@@ -191,7 +196,7 @@ test('removes aria-hidden from #application when closed', function () {
 
 test('appElement sets react modals app element', function () {
   this.component = TestUtils.renderIntoDocument(
-    <Modal appElement={$('#fixtures')[0]} isOpen className="custom_class_name" title="Hello">
+    <Modal appElement={$('#fixtures')[0]} isOpen={true} className="custom_class_name" title="Hello">
       Inner content
     </Modal>
   )
@@ -203,7 +208,7 @@ test('removes aria-hidden from custom setElement property when closed', function
     <Modal
       onRequestClose={function () {}}
       appElement={$('#fixtures')[0]}
-      isOpen
+      isOpen={true}
       className="custom_class_name"
       title="Hello"
     >

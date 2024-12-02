@@ -445,7 +445,6 @@ $(document).ready(function () {
   })
   $course_form.formSubmit({
     beforeSubmit(data) {
-
       // If Restrict Quantitative Data is checked, then the course must have a default grading scheme selected
       const rqdEnabled =
         $course_form.find('#course_restrict_quantitative_data')?.prop('value') === 'true'
@@ -454,19 +453,25 @@ $(document).ready(function () {
         .prop('checked')
 
       const errorMessages = []
-      if ((rqdEnabled && !hasCourseDefaultGradingScheme)) {
+      if (rqdEnabled && !hasCourseDefaultGradingScheme) {
         errorMessages.push(
-          I18n.t('If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.')
+          I18n.t(
+            'If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.'
+          )
         )
       }
 
-      if (data["course[start_at]"].length > 0 && data["course[conclude_at]"].length > 0 && data["course[conclude_at]"] < data["course[start_at]"]) {
+      if (
+        data['course[start_at]'].length > 0 &&
+        data['course[conclude_at]'].length > 0 &&
+        data['course[conclude_at]'] < data['course[start_at]']
+      ) {
         errorMessages.push(
           I18n.t('The course end date can not occur before the course start date.')
         )
       }
 
-      if(errorMessages.length > 0) {
+      if (errorMessages.length > 0) {
         renderFlashError(errorMessages.join(' '))
         return false
       }
@@ -553,7 +558,7 @@ $(document).ready(function () {
     )
   })
 
-  const renderFlashError = (errorMessage) => {
+  const renderFlashError = errorMessage => {
     $.flashError(errorMessage)
   }
 

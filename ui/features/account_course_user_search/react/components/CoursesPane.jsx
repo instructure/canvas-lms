@@ -170,7 +170,7 @@ class CoursesPane extends React.Component {
       courses = this.state.previousCourses
     }
     const accountId = TermsStore.getAccountId()
-    const terms = TermsStore.get({ subaccount_id: accountId })
+    const terms = TermsStore.get({subaccount_id: accountId})
     let filteredTerms = []
     if (terms.data) {
       filteredTerms = terms.data.filter(term => term.used_in_subaccount)
