@@ -101,7 +101,7 @@ export default class ReregisterExternalToolButton extends React.Component {
   }
 
   render() {
-    if ((this.props.canAdd || this.props.canAddEdit) && this.props.tool.reregistration_url) {
+    if (this.props.canAdd && this.props.tool.reregistration_url) {
       return (
         <li role="presentation" className="ReregisterExternalToolButton">
           {this.getButton()}

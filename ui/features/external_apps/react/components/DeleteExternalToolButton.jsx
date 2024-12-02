@@ -29,8 +29,7 @@ export default class DeleteExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.shape({name: PropTypes.string}).isRequired,
     returnFocus: PropTypes.func.isRequired,
-    canDelete: PropTypes.bool.isRequired,
-    canAddEdit: PropTypes.bool.isRequired,
+    canDelete: PropTypes.bool.isRequired
   }
 
   state = {
@@ -68,7 +67,7 @@ export default class DeleteExternalToolButton extends React.Component {
   }
 
   render() {
-    if (this.props.canDelete || this.props.canAddEdit) {
+    if (this.props.canDelete) {
       return (
         <li role="presentation" className="DeleteExternalToolButton">
           {/* TODO: use InstUI button */}

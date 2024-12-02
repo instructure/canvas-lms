@@ -297,7 +297,6 @@ describe AccountsController do
           manage_lti_add: false,
           manage_lti_edit: false,
           manage_lti_delete: false,
-          lti_add_edit: false,
         }
       end
 

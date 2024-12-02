@@ -1577,16 +1577,12 @@ class CoursesController < ApplicationController
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
         manage: @context.grants_right?(@current_user, session, :manage),
         edit_course_availability: @context.grants_right?(@current_user, session, :edit_course_availability),
-        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions),
+        add_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_add),
+        edit_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_edit),
+        delete_tool_manually: @context.grants_right?(@current_user, session, :manage_lti_delete)
       }
 
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_lti)
-        js_permissions[:add_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_add)
-        js_permissions[:edit_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_edit)
-        js_permissions[:delete_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_delete)
-      else
-        js_permissions[:create_tool_manually] = @context.grants_right?(@current_user, session, :create_tool_manually)
-      end
       js_env({
                COURSE_ID: @context.id,
                USERS_URL: "/api/v1/courses/#{@context.id}/users",

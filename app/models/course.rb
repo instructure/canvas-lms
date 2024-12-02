@@ -1889,14 +1889,6 @@ class Course < ActiveRecord::Base
     can :read, :read_grades, :read_outcomes, :read_as_member
 
     # Admin
-    #################### Begin legacy permission block #########################
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        grants_right?(user, :lti_add_edit)
-    end
-    can :create_tool_manually
-    ##################### End legacy permission block ##########################
-
     given { |user| account_membership_allows(user) }
     can :read_as_admin and can :view_unpublished_items
 

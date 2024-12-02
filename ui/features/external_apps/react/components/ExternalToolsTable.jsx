@@ -39,7 +39,6 @@ export class ExternalToolsTable extends React.Component {
     canAdd: PropTypes.bool,
     canEdit: PropTypes.bool,
     canDelete: PropTypes.bool,
-    canAddEdit: PropTypes.bool,
     setFocusAbove: PropTypes.func.isRequired,
   }
 
@@ -110,7 +109,6 @@ export class ExternalToolsTable extends React.Component {
         canAdd={this.props.canAdd}
         canEdit={this.props.canEdit}
         canDelete={this.props.canDelete}
-        canAddEdit={this.props.canAddEdit}
         setFocusAbove={this.setFocusAbove(t)}
         rceFavoriteCount={rceFavCount}
         topNavFavoriteCount={topNavFavCount}
@@ -125,7 +123,7 @@ export class ExternalToolsTable extends React.Component {
     const show_lti_favorite_toggles =
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
-      (this.props.canAdd || this.props.canEdit || this.props.canDelete || this.props.canAddEdit)
+      (this.props.canAdd || this.props.canEdit || this.props.canDelete)
     const show_top_nav_toggles = !!ENV.FEATURES?.top_navigation_placement
 
     return (
