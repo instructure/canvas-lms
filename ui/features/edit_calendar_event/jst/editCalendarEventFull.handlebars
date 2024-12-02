@@ -36,7 +36,7 @@
       {{#each course_sections}}
       <label class="row_header" for="section_{{id}}_start_date">{{name}}</label>
       <div class="date_start_end_row">
-        <div class="date_field_container"
+        <div class="date_field_container date_field_responsive"
              {{#unless this.permissions.manage_calendar}}
                 data-tooltip
                 title="{{#t}}You don't have permission to edit this section.{{/t}}"
@@ -91,7 +91,7 @@
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">
-    <div class="date_field_container">
+    <div class="date_field_container date_field_responsive">
       <label class='screenreader-only' id='calendar_event_date_accessible_label'>
         {{#t}}Event Date{{/t}}
         {{datepickerScreenreaderPrompt 'date'}}

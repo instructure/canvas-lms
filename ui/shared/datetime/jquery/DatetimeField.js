@@ -143,6 +143,7 @@ export default class DatetimeField {
     let $wrapper
     this.$field = $field
     this.$field.data({instance: this})
+    this.$options = options
 
     this.processTimeOptions(options)
     if (this.showDate) $wrapper = this.addDatePicker(options)
@@ -414,11 +415,52 @@ export default class DatetimeField {
       }
       this.$contextSuggest.text(contextText).show()
     }
+
+    if (this.$options.newSuggestionDesign) return this.newSuggestion(show, localText)
+    this.defaultSuggestion(show, localText)
+  }
+
+  defaultSuggestion(show, localText) {
     this.$suggest.toggleClass('invalid_datetime', this.invalid()).text(localText)
     if (show || this.$contextSuggest || this.invalid()) {
       this.$suggest.show()
       return
     }
+    this.$suggest.hide()
+    if (this.$contextSuggest) this.$contextSuggest.hide()
+    this.screenreaderAlert = ''
+  }
+
+  newSuggestion(show, localText) {
+    this.$suggest.toggleClass('invalid_datetime', this.invalid())
+
+    if ((show || this.$contextSuggest || this.invalid()) && localText.length > 0) {
+      const errorContainer = document.createElement('span')
+      errorContainer.className = 'error-message'
+      errorContainer.setAttribute('tabindex', '-1')
+
+      const icon = document.createElement('i')
+      icon.className = 'icon-warning icon-Solid'
+      icon.setAttribute('tabindex', '-1')
+      icon.setAttribute('aria-hidden', 'true')
+
+      const text = document.createElement('span')
+      text.setAttribute('role', 'alert')
+      text.setAttribute('aria-live', 'polite')
+      text.setAttribute('tabindex', '-1')
+      text.textContent = localText // Safely set text content to avoid XSS
+
+      errorContainer.appendChild(icon)
+      errorContainer.appendChild(text)
+
+      this.$suggest[0].innerHTML = ''
+      this.$suggest[0].appendChild(errorContainer)
+
+      this.$field.addClass('error')
+      this.$suggest.show()
+      return
+    }
+    this.$field.removeClass('error')
     this.$suggest.hide()
     if (this.$contextSuggest) this.$contextSuggest.hide()
     this.screenreaderAlert = ''
@@ -469,6 +511,10 @@ export default class DatetimeField {
 
   get parseError() {
     if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
+    if (this.$options.newSuggestionDesign) {
+      if (this.$options.dateOnly) return I18n.t('Not a valid date format')
+      if (this.$options.timeOnly) return I18n.t('Not a valid time format')
+    }
     return I18n.t('errors.not_a_date', "That's not a date!")
   }
 }
