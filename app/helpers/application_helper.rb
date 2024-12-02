@@ -1067,7 +1067,9 @@ module ApplicationHelper
                     script-src-elem 'self' 'unsafe-inline' #{allow_list_domains};\
                     font-src 'self' data: #{allow_list_domains};\
                     connect-src 'self' #{allow_list_domains};\
-                    worker-src 'self' blob: #{allow_list_domains};"
+                    worker-src 'self' blob: #{allow_list_domains};\
+                    manifest-src 'self' #{allow_list_domains};\
+                    media-src 'self' #{allow_list_domains};"
 
       directives.squish + csp_report_uri
     else
