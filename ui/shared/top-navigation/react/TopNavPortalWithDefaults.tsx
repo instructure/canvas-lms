@@ -67,7 +67,7 @@ const handleBreadCrumbSetter = (
 }
 
 const addStudentViewActionItem = (courseId?: number) => {
-  // @ts-ignore
+  // @ts-expect-error
   const cId: number =
     courseId || window.ENV?.course?.id || window.ENV?.COURSE_ID || window.ENV?.course_id
   if (!cId) {

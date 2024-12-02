@@ -611,7 +611,8 @@ pipeline {
                       def nestedStages = [:]
 
                       callableWithDelegate(lintersStage.bundleStage(nestedStages, buildConfig))()
-                      callableWithDelegate(lintersStage.codeStage(nestedStages))()
+                      callableWithDelegate(lintersStage.gergichLintersStage(nestedStages))()
+                      callableWithDelegate(lintersStage.jsLintersStage(nestedStages))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 
