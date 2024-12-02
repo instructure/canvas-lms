@@ -20,7 +20,10 @@
   <ul class="participant_list"></ul>
   <div class="clear"></div>
   <div>
-    <label for="body">{{#t "message_label"}}Message:{{/t}}</label><br />
+    <label for="body" class="required">
+      {{#t "message_label"}}Message{{/t}}
+      <span class="error-text" aria-hidden="true">*</span>
+    </label><br />
     <textarea class="ic-Input" id="body" name="body"></textarea>
   </div>
   <div class="error"></div>

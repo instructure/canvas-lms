@@ -120,13 +120,60 @@ export default class MessageParticipantsDialog {
     })
   }
 
+  showErrorMessage = (selector, message) => {
+    if (selector.hasClass('error')) return
+
+    const errorId = 'error-message'
+    const errorContainer = document.createElement('span')
+    errorContainer.className = 'error-message'
+    errorContainer.setAttribute('tabindex', '-1')
+
+    const icon = document.createElement('i')
+    icon.className = 'icon-warning icon-Solid'
+    icon.setAttribute('tabindex', '-1')
+    icon.setAttribute('aria-hidden', 'true')
+
+    const text = document.createElement('span')
+    text.setAttribute('id', errorId)
+    text.setAttribute('role', 'alert')
+    text.setAttribute('aria-live', 'polite')
+    text.setAttribute('tabindex', '-1')
+    text.textContent = message // Safely set text content to avoid XSS
+
+    errorContainer.appendChild(icon)
+    errorContainer.appendChild(text)
+
+    $('div.error')[0].innerHTML = ''
+    $('div.error')[0].appendChild(errorContainer)
+
+    selector.attr('aria-invalid', true)
+    selector.attr('aria-describedby', errorId)
+    selector.addClass('error')
+
+    selector[0].scrollIntoView({behavior: 'smooth'})
+    selector.focus()
+
+    selector.on('input.clearError', function () {
+      errorContainer.remove()
+      selector.off('input.clearError')
+      selector.attr('aria-invalid', false)
+      selector.removeAttr('aria-describedby')
+      selector.removeClass('error')
+    })
+  }
+
   sendMessage = jsEvent => {
     jsEvent.preventDefault()
 
     if (this.loading) return
 
     const data = this.$form.getFormData()
-    if (!data['recipients[]'] || !data.body) return
+    if (!data['recipients[]']) return
+
+    if (!data.body) {
+      this.showErrorMessage($('textarea#body'), I18n.t('Message is required'))
+      return
+    }
 
     // Setting bulk_message will always send individual messages regardless of group_conversation setting.
     // We're still setting group_conversation because that is required when there's more than 100 recipients.
