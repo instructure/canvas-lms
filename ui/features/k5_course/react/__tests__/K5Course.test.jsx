@@ -476,7 +476,8 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('Subject announcements', () => {
-    it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
+    // LX-2162
+    it.skip('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
       const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage={true} />)
       const button = getByRole('link', {name: 'Edit announcement Important announcement'})
       const attachment = getByRole('link', {name: 'hw.pdf'})

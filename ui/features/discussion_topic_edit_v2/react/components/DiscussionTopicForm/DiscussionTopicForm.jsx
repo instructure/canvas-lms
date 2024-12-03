@@ -986,32 +986,35 @@ function DiscussionTopicForm({
               />
             )}
 
-            {!isStudent && (
-              <Checkbox
-                data-testid="disallow_threaded_replies"
-                label={I18n.t('Disallow threaded replies')}
-                value="disallow-threaded-replies"
-                inline={true}
-                checked={!isThreaded}
-                onChange={() => {
-                  setIsThreaded(!isThreaded)
-                }}
-                disabled={isCheckpoints || ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies}
-              />
+            {!isStudent && (!isAnnouncement || (isAnnouncement && !locked)) && (
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
+                <Checkbox
+                  data-testid="disallow_threaded_replies"
+                  label={I18n.t('Disallow threaded replies')}
+                  value="disallow-threaded-replies"
+                  inline={true}
+                  checked={!isThreaded}
+                  onChange={() => {
+                    setIsThreaded(!isThreaded)
+                  }}
+                  disabled={isCheckpoints || ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies}
+                />
+              </View>
             )}
 
-            {!isGroupContext && (
-              <Checkbox
-                data-testid="require-initial-post-checkbox"
-                label={I18n.t(
-                  'Participants must respond to the topic before viewing other replies'
-                )}
-                value="must-respond-before-viewing-replies"
-                inline={true}
-                checked={requireInitialPost}
-                onChange={() => setRequireInitialPost(!requireInitialPost)}
-                disabled={isAnnouncement && locked}
-              />
+            {((!isGroupContext && !isAnnouncement) || (isAnnouncement && !locked)) && (
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
+                <Checkbox
+                  data-testid="require-initial-post-checkbox"
+                  label={I18n.t(
+                    'Participants must respond to the topic before viewing other replies'
+                  )}
+                  value="must-respond-before-viewing-replies"
+                  inline={true}
+                  checked={requireInitialPost}
+                  onChange={() => setRequireInitialPost(!requireInitialPost)}
+                />
+              </View>
             )}
 
             {shouldShowPodcastFeedOption && (
