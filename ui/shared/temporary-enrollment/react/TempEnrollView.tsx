@@ -143,7 +143,6 @@ export function TempEnrollView(props: Props) {
   })
 
   const {mutate} = useMutation({
-    // @ts-expect-error
     mutationFn: async (enrollments: Enrollment[]) => handleConfirmAndDeleteEnrollment(enrollments),
     mutationKey: ['delete-enrollments'],
     onSuccess: () => queryClient.refetchQueries({queryKey: ['enrollments'], type: 'active'}),
@@ -170,7 +169,6 @@ export function TempEnrollView(props: Props) {
 
   const handleDeleteClick = (enrollments: Enrollment[]) => {
     if (canDelete) {
-      // @ts-expect-error
       mutate(enrollments)
     } else {
       // eslint-disable-next-line no-console
