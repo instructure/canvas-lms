@@ -39,12 +39,7 @@ class PageView
 
       params = "start_time=#{start_time.utc.iso8601(PRECISION)}"
       params << "&end_time=#{end_time.utc.iso8601(PRECISION)}"
-      root_account_uuids = user.shard.activate do
-        user.root_account_ids.map do |id|
-          Account.find_cached(id).uuid
-        end
-      end
-      params << "&root_account_uuids=#{root_account_uuids.join(",")}"
+      params << "&#{cached_root_account_uuids_for(user:)}"
       params << "&last_page_view_id=#{last_page_view_id}" if last_page_view_id
       params << "&limit=#{limit}" if limit
       response = CanvasHttp.get(
@@ -92,6 +87,17 @@ class PageView
       end
     end
 
+    private
+
+    def cached_root_account_uuids_for(user:)
+      root_account_uuids = user.shard.activate do
+        user.root_account_ids.map do |id|
+          Account.find_cached(id).uuid
+        end
+      end
+      "root_account_uuids=#{root_account_uuids.join(",")}"
+    end
+
     class Bookmarker
       def initialize(client)
         @client = client
@@ -105,5 +111,6 @@ class PageView
         bookmark.is_a?(Array) && bookmark.size == 2
       end
     end
+    private_constant :Bookmarker
   end
 end
