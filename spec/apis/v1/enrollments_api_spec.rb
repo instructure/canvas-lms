@@ -2735,6 +2735,27 @@ describe EnrollmentsApiController, type: :request do
           expect(enrollment_ids.sort).to eq(@cs_course.enrollments.map(&:id).sort)
           expect(json.length).to eq 2
         end
+
+        it "deals with an orphaned shadow user" do
+          @shard1.activate do
+            account = Account.create!
+            @course.root_account.trust_links.create!(managing_account: account)
+            user = user_with_pseudonym(account:, name: "Homsar", sis_user_id: "homsar")
+            course_with_student(user:, course: @course, active_all: true)
+
+            @orphan_id = user.global_id
+            [CommunicationChannel, Pseudonym, UserAccountAssociation, UserShardAssociation].freeze.each do |model|
+              model.shard(@shard1).where(user_id: @orphan_id).delete_all
+            end
+            user.destroy_permanently!
+          end
+
+          account_admin_user
+          json = api_call(:get, @path, @params, { include: ["user"] })
+          json = json.find { |row| row["user_id"] == @orphan_id }
+          expect(json["sis_user_id"]).to be_nil
+          expect(json).not_to have_key("user")
+        end
       end
 
       context "when scoped by a user" do
