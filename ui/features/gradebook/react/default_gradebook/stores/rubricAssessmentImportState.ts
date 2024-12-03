@@ -28,7 +28,7 @@ export type RubricAssessmentImportState = {
     isOpen: boolean
     assignment?: ImportAssignment
   }
-  toggleRubricAssessmentImportTray: (isOpen?: boolean) => void
+  toggleRubricAssessmentImportTray: (isOpen?: boolean, assignment?: ImportAssignment) => void
 }
 
 export default (

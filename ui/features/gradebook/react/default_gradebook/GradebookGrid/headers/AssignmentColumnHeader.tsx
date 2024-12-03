@@ -487,7 +487,6 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           <MenuItem
             onSelect={() => {
               const {toggleRubricAssessmentImportTray} = useStore.getState()
-              // @ts-expect-error
               toggleRubricAssessmentImportTray(true, this.props.assignment)
             }}
           >
