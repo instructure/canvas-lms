@@ -1068,5 +1068,28 @@ describe "gradebooks/grade_summary" do
       expect(topic_due_date_updated).to eq("Feb 25, 2021 by 3:30am")
       expect(entry_due_date_updated).to eq("Feb 26, 2021 by 4:30am")
     end
+
+    it "renders Reply To Topic first" do
+      view_context(@course, @student)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+      rendered_html = render "gradebooks/grade_summary"
+      doc = Nokogiri::HTML5.fragment rendered_html
+
+      rows_in_tbody = doc.css("tbody tr")
+      topic_row = doc.at_css("tr#sub_assignment_#{@reply_to_topic.id}")
+      entry_row = doc.at_css("tr#sub_assignment_#{@reply_to_entry.id}")
+
+      expect(topic_row).not_to be_nil
+      expect(entry_row).not_to be_nil
+
+      topic_index = rows_in_tbody.index(topic_row)
+      entry_index = rows_in_tbody.index(entry_row)
+
+      expect(topic_index).not_to be_nil
+      expect(entry_index).not_to be_nil
+
+      expect(topic_index).to be < entry_index
+    end
   end
 end
