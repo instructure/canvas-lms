@@ -468,7 +468,7 @@
             <td></td>
           </tr>
           <% if assignment.has_sub_assignments? %>
-            <% assignment.sub_assignments.map{ |sa| sa.overridden_for(@current_user) }.each do |sub_assignment| %>
+            <% assignment.sub_assignments.map{ |sa| sa.overridden_for(@current_user) }.sort_by{ |sa| sa.sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC ? 0 : 1 }.each do |sub_assignment| %>
               <%
                 sa_submission = @presenter.submissions.detect{ |s| s.assignment_id == sub_assignment.id }
                 sub_assignment_presenter = GradeSummaryAssignmentPresenter.new(@presenter, @current_user, sub_assignment, sa_submission)
