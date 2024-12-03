@@ -588,7 +588,7 @@ const ItemAssignToTrayContent = ({
 
       const parsedDeletedCard = deletedAssignees.map(id => {
         const card = allOptions.find(a => a.id === id)
-        const data = card?.id?.split('-')
+        const data = !card && isLoadingAssignees ? id?.split('-') : card?.id?.split('-')
         const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
 
         if (id === everyoneOption.id) {
@@ -613,6 +613,7 @@ const ItemAssignToTrayContent = ({
       disabledOptionIdsRef,
       everyoneOption.id,
       hasModuleOverrides,
+      isLoadingAssignees,
       onAssigneesChange,
     ]
   )
