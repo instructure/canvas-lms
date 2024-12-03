@@ -17,7 +17,7 @@
  */
 
 import React, {useRef, useState} from 'react'
-import {ActionPrompt, EMAIL_REGEX, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
+import {ActionPrompt, EMAIL_REGEX, ReCaptcha, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -49,6 +49,7 @@ const Teacher = () => {
   const [nameError, setNameError] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [termsError, setTermsError] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const nameInputRef = useRef<HTMLInputElement | null>(null)
@@ -79,6 +80,14 @@ const Teacher = () => {
       setTermsError('')
     }
 
+    if (recaptchaKey && !captchaToken) {
+      showFlashAlert({
+        message: I18n.t('Please complete the reCAPTCHA verification.'),
+        type: 'error',
+      })
+      return false
+    }
+
     return true
   }
 
@@ -90,12 +99,18 @@ const Teacher = () => {
     setIsUiActionPending(true)
 
     try {
-      const response = await createTeacherAccount(name, email, termsAccepted)
+      const response = await createTeacherAccount({
+        name,
+        email,
+        termsAccepted,
+        captchaToken: captchaToken ?? undefined,
+      })
+
       if (response.status === 200) {
         handleRegistrationRedirect(response.data)
       } else {
         showFlashAlert({
-          message: 'Something went wrong. Please try again later.',
+          message: I18n.t('Something went wrong. Please try again later.'),
           type: 'error',
         })
       }
@@ -188,7 +203,11 @@ const Teacher = () => {
             </Flex.Item>
           )}
 
-          {recaptchaKey && <Text>(TODO reCAPTCHA if enabled {recaptchaKey})</Text>}
+          {recaptchaKey && (
+            <Flex justifyItems="center" alignItems="center">
+              <ReCaptcha siteKey={recaptchaKey} onVerify={token => setCaptchaToken(token)} />
+            </Flex>
+          )}
 
           <Flex direction="row" gap="small">
             <Button

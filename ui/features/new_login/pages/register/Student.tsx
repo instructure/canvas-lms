@@ -17,7 +17,7 @@
  */
 
 import React, {useRef, useState} from 'react'
-import {ActionPrompt, EMAIL_REGEX, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
+import {ActionPrompt, EMAIL_REGEX, ReCaptcha, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -64,6 +64,7 @@ const Student = () => {
   const [passwordError, setPasswordError] = useState('')
   const [termsError, setTermsError] = useState('')
   const [usernameError, setUsernameError] = useState('')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
@@ -137,6 +138,14 @@ const Student = () => {
       setTermsError('')
     }
 
+    if (recaptchaKey && !captchaToken) {
+      showFlashAlert({
+        message: I18n.t('Please complete the reCAPTCHA verification.'),
+        type: 'error',
+      })
+      return false
+    }
+
     return true
   }
 
@@ -156,13 +165,14 @@ const Student = () => {
         joinCode,
         email: requireEmail ? email : undefined,
         termsAccepted,
+        captchaToken: captchaToken ?? undefined,
       })
 
       if (response.status === 200) {
         handleRegistrationRedirect(response.data)
       } else {
         showFlashAlert({
-          message: 'Something went wrong. Please try again later.',
+          message: I18n.t('Something went wrong. Please try again later.'),
           type: 'error',
         })
       }
@@ -365,7 +375,11 @@ const Student = () => {
             </Flex.Item>
           )}
 
-          {recaptchaKey && <Text>(TODO reCAPTCHA if enabled {recaptchaKey})</Text>}
+          {recaptchaKey && (
+            <Flex justifyItems="center" alignItems="center">
+              <ReCaptcha siteKey={recaptchaKey} onVerify={token => setCaptchaToken(token)} />
+            </Flex>
+          )}
 
           <Flex direction="row" gap="small">
             <Button
