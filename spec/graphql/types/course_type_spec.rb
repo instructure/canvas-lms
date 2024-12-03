@@ -576,6 +576,74 @@ describe Types::CourseType do
           GQL
         ).to eq [@student2a1_submission.id.to_s]
       end
+
+      describe "due_between" do
+        it "accepts a full range" do
+          @student2a1_submission.assignment.update(due_at: 3.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    start: "#{1.week.ago.iso8601}",
+                    end: "#{1.day.ago.iso8601}"
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to include @student2a1_submission.id.to_s
+        end
+
+        it "does not include submissions out of the range" do
+          @student2a1_submission.assignment.update(due_at: 8.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    start: "#{1.week.ago.iso8601}",
+                    end: "#{1.day.ago.iso8601}"
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to_not include @student2a1_submission.id.to_s
+        end
+
+        it "accepts a start-open range" do
+          @student2a1_submission.assignment.update(due_at: 3.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    end: "#{1.day.ago.iso8601}"
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to include @student2a1_submission.id.to_s
+        end
+
+        it "accepts a end-open range" do
+          @student2a1_submission.assignment.update(due_at: 3.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    start: "#{1.week.ago.iso8601}",
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to include @student2a1_submission.id.to_s
+        end
+      end
     end
   end
 

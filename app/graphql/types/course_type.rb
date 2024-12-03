@@ -339,6 +339,9 @@ module Types
       if filter[:updated_since]
         submissions = submissions.where("submissions.updated_at > ?", filter[:updated_since])
       end
+      if (due_between = filter[:due_between])
+        submissions = submissions.where(cached_due_date: (due_between[:start])..(due_between[:end]))
+      end
 
       (order_by || []).each do |order|
         direction = (order[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"

@@ -18,23 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  class SubmissionFilterInputType < Types::BaseInputObject
-    graphql_name "SubmissionFilterInput"
+class Types::DateTimeRangeType < Types::BaseInputObject
+  description "a range of datetimes"
 
-    argument :states,
-             [SubmissionStateType],
-             required: false,
-             default_value: DEFAULT_SUBMISSION_STATES
-
-    argument :section_ids,
-             [ID],
-             required: false,
-             prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
-
-    argument :due_between, DateTimeRangeType, required: false
-    argument :graded_since, DateTimeType, required: false
-    argument :submitted_since, DateTimeType, required: false
-    argument :updated_since, DateTimeType, required: false
-  end
+  argument :end, Types::DateTimeType, required: false
+  argument :start, Types::DateTimeType, required: false
 end
