@@ -612,7 +612,9 @@ pipeline {
 
                       callableWithDelegate(lintersStage.bundleStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.gergichLintersStage(nestedStages))()
-                      callableWithDelegate(lintersStage.jsLintersStage(nestedStages))()
+                      callableWithDelegate(lintersStage.miscJsChecksStage(nestedStages))()
+                      callableWithDelegate(lintersStage.eslintStage(nestedStages))()
+                      callableWithDelegate(lintersStage.typescriptStage(nestedStages))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 

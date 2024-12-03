@@ -5,8 +5,8 @@ export NODE_OPTIONS="--max-old-space-size=8192"
 
 exit_status=0
 
-echo "Running TypeScript type checking..."
-node_modules/.bin/tsc -p tsconfig.json --noEmit || { echo "TypeScript check failed"; exit_status=1; }
+echo "Generating plugin bundles..."
+node ui-build/webpack/generatePluginBundles.js
 
 echo "Running dependency cruiser..."
 # reintroduce later; wasn't failing builds earlier

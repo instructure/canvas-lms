@@ -52,10 +52,8 @@ if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'package
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
-node ui-build/webpack/generatePluginBundles.js
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
-[ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
 ruby script/lint_commit_message
 
 bin/rails css:styleguide doc:api
