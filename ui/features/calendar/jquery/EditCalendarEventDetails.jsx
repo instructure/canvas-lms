@@ -29,6 +29,7 @@ export default class EditCalendarEventDetails {
     }
 
     if (formHolder) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <CalendarEventDetailsForm
           event={event}

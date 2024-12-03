@@ -24,6 +24,7 @@ import {createClient} from '@canvas/apollo'
 
 export default function renderAssignmentsApp(env, elt) {
   const client = createClient()
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ApolloProvider client={client}>
       <TeacherQuery

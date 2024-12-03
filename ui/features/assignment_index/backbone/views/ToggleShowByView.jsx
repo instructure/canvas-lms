@@ -149,6 +149,7 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   renderToggle() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>

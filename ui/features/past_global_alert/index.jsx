@@ -22,5 +22,6 @@ import ReactDOM from 'react-dom'
 import PastGlobalAlert from './react/PastGlobalAlert'
 
 $(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<PastGlobalAlert />, $('<div/>').appendTo('#announcementWrapper')[0])
 })

@@ -22,5 +22,6 @@ import ReactDOM from 'react-dom'
 import PastGlobalAnnouncements from './react/PastGlobalAnnouncements'
 
 $(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<PastGlobalAnnouncements />, $('<div/>').appendTo('#content')[0])
 })

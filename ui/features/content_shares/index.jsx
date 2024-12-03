@@ -29,6 +29,7 @@ const I18n = useI18nScope('content_share')
 
 ready(() => {
   const container = document.getElementById('content')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ErrorBoundary
       errorComponent={

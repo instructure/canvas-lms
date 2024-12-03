@@ -115,6 +115,7 @@ ready(() => {
 
   const aria_label = !media_object.title ? undefined : media_object.title
   if (window.ENV.FEATURES?.consolidated_media_player_iframe) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <StudioMediaPlayer
         media_id={media_id}
@@ -128,6 +129,7 @@ ready(() => {
       document.getElementById('player_container')
     )
   } else {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CanvasMediaPlayer
         media_id={media_id}

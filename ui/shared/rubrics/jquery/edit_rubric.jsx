@@ -70,6 +70,7 @@ const rubricEditing = {
     $('#add_criterion_container').remove()
     $rubric.find('#add_criterion_holder').append($('<span/>').attr('id', 'add_criterion_container'))
     setTimeout(() => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <RubricAddCriterionPopover
           rubric={$rubric}
@@ -1630,6 +1631,7 @@ if (
 ) {
   $('h1').hide()
   const contextId = ENV.context_asset_string.split('_')[1]
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <RubricManagement accountId={contextId} />,
     document.getElementById('rubric_management')

@@ -200,6 +200,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
   createSwitchViews() {
     const component = <SwitchEditorControl textarea={this.textArea} />
     const $container = $("<div class='switch-views'></div>")
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(component, $container[0])
     return $container
   },

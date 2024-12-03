@@ -95,6 +95,7 @@ export default class AddPeopleApp {
 
   render(isOpen) {
     const ConnectedApp = this.ConnectedApp
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Provider store={this.store}>
         <ConnectedApp isOpen={isOpen} onClose={this.closer} theme={this.theme} />

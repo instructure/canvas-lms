@@ -68,6 +68,7 @@ export default class RosterView extends Backbone.View {
   }
 
   afterRender() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <TextInput
         onChange={e => {

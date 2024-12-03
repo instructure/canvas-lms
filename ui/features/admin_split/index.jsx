@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom'
 import AdminSplit from './react/index'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <AdminSplit
       user={ENV.ADMIN_SPLIT_USER}

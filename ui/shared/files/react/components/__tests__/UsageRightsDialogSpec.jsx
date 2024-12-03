@@ -55,6 +55,7 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     component = ReactDOM.render(<UsageRightsDialog {...props} />, $container)
   }
 

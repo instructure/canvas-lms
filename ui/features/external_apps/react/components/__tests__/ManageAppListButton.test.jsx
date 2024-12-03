@@ -31,6 +31,7 @@ document.body.appendChild(wrapper)
 Modal.setAppElement(wrapper)
 const onUpdateAccessToken = function () {}
 const createElement = () => <ManageAppListButton onUpdateAccessToken={onUpdateAccessToken} />
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = () => ReactDOM.render(createElement(), wrapper)
 
 describe('ExternalApps.ManageAppListButton', () => {

@@ -218,6 +218,7 @@ QUnit.module(
     }
 
     function mountComponent(componentProps = props) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(<LatePoliciesTabPanel {...componentProps} />, $container)
     }
 

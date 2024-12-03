@@ -188,6 +188,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
+      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
       return ReactDOM.render(
         <DueDateCalendarPicker
           dateType="todo_date"

@@ -22,5 +22,6 @@ import ready from '@instructure/ready'
 import {CoursePeopleApp} from './react/index'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<CoursePeopleApp />, document.getElementById('content'))
 })

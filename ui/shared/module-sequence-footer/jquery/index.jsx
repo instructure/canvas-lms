@@ -96,6 +96,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
         const label = `Previous Module Item${
           this.msfInstance.previous.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
         }`
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <Tooltip
             aria-label={label}
@@ -119,6 +120,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
         const label = `Next Module Item${
           this.msfInstance.next.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
         }`
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <Tooltip
             aria-label={label}

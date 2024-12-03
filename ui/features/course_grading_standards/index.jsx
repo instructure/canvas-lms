@@ -22,6 +22,7 @@ import CourseTabContainer from './react/CourseTabContainer'
 import ready from '@instructure/ready'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CourseTabContainer hasGradingPeriods={ENV.HAS_GRADING_PERIODS} />,
     document.getElementById('react_grading_tabs')

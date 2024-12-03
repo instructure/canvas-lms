@@ -311,6 +311,7 @@ export default class RosterUserView extends Backbone.View {
   }
 
   afterRender() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <a href={`users/${this.model.id}`}>
         <Avatar

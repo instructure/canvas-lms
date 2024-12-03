@@ -27,6 +27,7 @@ ready(() => {
 
     const inputField = id && (document.querySelector(`#internal_ca_${id}`) as HTMLInputElement)
 
+    // eslint-disable-next-line no-restricted-properties
     if (inputField) ReactDOM.render(<CertUploadForm inputField={inputField} />, certUploadContainer)
   })
 })

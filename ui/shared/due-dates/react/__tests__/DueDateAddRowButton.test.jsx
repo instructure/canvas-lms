@@ -27,6 +27,7 @@ describe('DueDateAddRowButton with true display prop', () => {
   beforeEach(() => {
     const props = {display: true}
     const DueDateAddRowButtonElement = <DueDateAddRowButton {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     DueDateAddRowButtonInstance = ReactDOM.render(
       DueDateAddRowButtonElement,
       $('<div>').appendTo('body')[0]
@@ -51,6 +52,7 @@ describe('DueDateAddRowButton with false display prop', () => {
   beforeEach(() => {
     const props = {display: false}
     const DueDateAddRowButtonElement = <DueDateAddRowButton {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     DueDateAddRowButtonInstance = ReactDOM.render(
       DueDateAddRowButtonElement,
       $('<div>').appendTo('body')[0]

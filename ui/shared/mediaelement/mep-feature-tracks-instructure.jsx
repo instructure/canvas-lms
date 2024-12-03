@@ -573,6 +573,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         const tooltip_container = $li
           .append('<span class="track-tip-container"></span>')
           .find('.track-tip-container')
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(<InheritedCaptionTooltip />, tooltip_container[0])
       }
 

@@ -50,6 +50,7 @@ export default class ReactCellEditor {
      * `createElement()` is required for subclasses to implement.
      */
     const element = this.createElement(props)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(element, this.container)
   }
 

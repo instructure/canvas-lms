@@ -41,6 +41,7 @@ it('renders normally', () => {
     dueAt: 'some time',
     description: 'an assignment',
   }
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <AssignmentToggleDetails description={assignment.description} />,
     document.getElementById('fixtures')
@@ -55,6 +56,7 @@ it('renders normally an assignment with no content', () => {
     pointsPossible: 42,
     dueAt: 'some time',
   }
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <AssignmentToggleDetails description={assignment.description} />,
     document.getElementById('fixtures')

@@ -31,6 +31,7 @@ class IndexView extends PaginatedCollectionView {
   // needed to render the react component at the top of the page
   // in the right lifecycle method of backbone
   afterRender() {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(
       <ProgressionModuleHeader bridge={this.collection} />,
       document.getElementById('progression-module-header-root')

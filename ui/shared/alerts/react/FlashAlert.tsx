@@ -247,6 +247,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
   }
 
   function renderAlert(parent: Element) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FlashAlert
         message={message}

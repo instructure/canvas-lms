@@ -101,5 +101,6 @@ export default class CriterionInfo extends React.Component {
 }
 
 export const addCriterionInfoButton = element => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<CriterionInfo />, element)
 }

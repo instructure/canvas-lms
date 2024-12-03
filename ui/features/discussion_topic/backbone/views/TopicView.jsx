@@ -269,6 +269,7 @@ export default class TopicView extends Backbone.View {
 
   openSendTo(event, open = true) {
     if (event) event.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -285,6 +286,7 @@ export default class TopicView extends Backbone.View {
 
   openCopyTo(event, open = true) {
     if (event) event.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}

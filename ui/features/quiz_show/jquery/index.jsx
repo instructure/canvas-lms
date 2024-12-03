@@ -179,6 +179,7 @@ $(document).ready(function () {
 
   function openSendTo(event, open = true) {
     if (event) event.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -197,6 +198,7 @@ $(document).ready(function () {
 
   function openCopyTo(event, open = true) {
     if (event) event.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -270,6 +272,7 @@ $(document).ready(function () {
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ItemAssignToManager
         open={open}

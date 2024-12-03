@@ -39,6 +39,7 @@ QUnit.module('PublishCloud', {
       model: this.model,
       userCanEditFilesForContext: true,
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
   teardown() {
@@ -56,6 +57,7 @@ test('clicking a published cloud opens restricted dialog', async function () {
   sandbox.stub(ReactDOM, 'render')
   Simulate.click(this.publishCloud.refs.publishCloud)
   await wait(10)
+  // eslint-disable-next-line no-restricted-properties
   ok(ReactDOM.render.calledOnce, 'renders a component inside the dialog')
 })
 
@@ -75,6 +77,7 @@ QUnit.module('PublishCloud Student View', {
       model: this.model,
       userCanEditFilesForContext: false,
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
   teardown() {
@@ -99,6 +102,7 @@ QUnit.module('PublishCloud#togglePublishedState', {
       }),
       userCanEditFilesForContext: true,
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   },
   teardown() {
@@ -143,6 +147,7 @@ test('sets published initial state based on params model hidden property', funct
     model,
     userCanEditFilesForContext: true,
   }
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   equal(this.publishCloud.state.published, !model.get('locked'), 'not locked is published')
   equal(this.publishCloud.state.restricted, false, 'restricted should be false')
@@ -158,6 +163,7 @@ test('restricted is true when lock_at/unlock_at is set', function () {
     id: 42,
   })
   const props = {model}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   equal(this.publishCloud.state.restricted, true, 'restricted is true when lock_at/ulock_at is set')
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.publishCloud).parentNode)
@@ -174,6 +180,7 @@ test('returns object that can be used to set state', function () {
     id: 42,
   })
   const props = {model}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   this.publishCloud = ReactDOM.render(<PublishCloud {...props} />, $('#fixtures')[0])
   const newModel = new FilesystemObject({
     locked: false,

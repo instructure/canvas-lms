@@ -198,7 +198,7 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
         : undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(React.createElement(GradingSchemesSelector, props), mountPoint)
 }
 

@@ -43,6 +43,7 @@ QUnit.module('SpeedGraderPostGradesMenu', hooks => {
       ...customProps,
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<SpeedGraderPostGradesMenu {...props} />, $container)
     getMenuTrigger().click()
   }

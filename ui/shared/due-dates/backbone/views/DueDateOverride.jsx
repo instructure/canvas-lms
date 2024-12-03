@@ -76,6 +76,7 @@ DueDateOverrideView.prototype.render = function () {
     return
   }
   if (this.options && this.options.inPacedCourse && this.options.isModuleItem) {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(
       React.createElement(CoursePacingNotice, {
         courseId: this.options.courseId,
@@ -164,7 +165,7 @@ DueDateOverrideView.prototype.render = function () {
         defaultDueTime: ENV.DEFAULT_DUE_TIME,
       })
 
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(assignToSection, div, () => {
     // Run this function until the focus is performed after all re-renders
     // Needs to be wrapped in a setTimeout since there are some internal

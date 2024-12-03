@@ -46,6 +46,7 @@ ready(() => {
   const roles = Array.prototype.slice.call(ENV.COURSE_ROLES)
 
   if (pairing_container) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
       pairing_container
@@ -58,6 +59,7 @@ ready(() => {
     )
 
     if (temp_enrollments_container) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <ManageTempEnrollButton
           user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}

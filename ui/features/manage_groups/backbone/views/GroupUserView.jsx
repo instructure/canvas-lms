@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-/* eslint-disable no-void */
-
 import {View} from '@canvas/backbone'
 import template from '../../jst/groupUser.handlebars'
 import {GroupUserMenu} from '../../react/GroupUserMenu'
@@ -74,6 +72,7 @@ export default class GroupUserView extends View {
         `group_${groupId}_user_${userId}_menu_selector`
       )
       if (this.canEditGroupAssignment && groupUserMenuSelector) {
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <GroupUserMenu
             userId={userId}

@@ -41,6 +41,7 @@ ready(() => {
   Array.prototype.forEach.call(rubricElements, rubricElement => {
     const rubric = findRubric(rubricElement.dataset.rubricId)
     const assessment = findRubricAssessment(rubricElement.dataset.rubricAssessmentId)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Rubric
         rubric={rubric}

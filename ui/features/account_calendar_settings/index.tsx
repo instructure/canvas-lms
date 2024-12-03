@@ -29,6 +29,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 declare const ENV: GlobalEnv & EnvAccountsAdminTools
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <AccountCalendarSettings accountId={parseInt(ENV.ACCOUNT_ID, 10)} />,
     document.getElementById('account-calendar-settings-container')

@@ -203,6 +203,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
 function setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange) {
   ReactDOM.unmountComponentAtNode($(`#manage-accounts-btn`)[0])
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <AccountCalendarsModal
       getSelectedOtherCalendars={getSelectedOtherCalendars}
@@ -345,6 +346,7 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     // ensures previously picked color clears
     ReactDOM.unmountComponentAtNode($(`#calendars_color_picker_holder`)[0])
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ColorPicker
         isOpen={true}

@@ -38,6 +38,7 @@ QUnit.module('SimilarityIndicator', moduleHooks => {
   }
 
   function mountComponent(similarityInfo) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SimilarityIndicator elementRef={elementRef} similarityInfo={similarityInfo} />,
       $container

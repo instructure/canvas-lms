@@ -76,6 +76,7 @@ function renderModuleSequenceFooter() {
   if (ENV.speed_grader_url) {
     const $container = document.getElementById('speed_grader_link_container')
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ModuleSequenceFooter
         courseId={ENV.COURSE_ID}

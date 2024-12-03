@@ -151,6 +151,7 @@ class Editor extends React.Component {
 
 const attach = function (element, type, env) {
   const editor = <Editor env={env} type={type} />
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(editor, element)
 }
 

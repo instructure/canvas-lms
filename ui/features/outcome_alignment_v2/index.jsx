@@ -26,6 +26,7 @@ ready(() => {
   $('li.alignment').each((_, li) => {
     const $div = $(li).find('div.links')[0]
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <OutcomeAlignmentDeleteLink
         has_rubric_association={$(li).data('has-rubric-association')}

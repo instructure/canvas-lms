@@ -199,6 +199,7 @@ MigrationConverterView.prototype.afterRender = function () {
     margin: '0 0 medium 0',
   })
   if (this.$overwriteWarning[0]) {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(alert, this.$overwriteWarning[0])
   }
 }

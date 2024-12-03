@@ -76,6 +76,7 @@ ready(() => {
     const selectedTab = tabState.tabs[tabState.selected]
     updateDocumentTitleBreadcrumbAndActiveTab(selectedTab, () => setBreadCrumb)
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<App {...props} />, content)
   })
 

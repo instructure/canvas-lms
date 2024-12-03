@@ -24,6 +24,7 @@ import Store from '../../lib/ExternalAppsStore'
 const wrapper = document.getElementById('fixtures')
 const prevEnvironment = ENV
 const createElement = (data = {}) => <EditExternalToolButton {...data} returnFocus={() => {}} />
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = (data = {}) => ReactDOM.render(createElement(data), wrapper)
 
 QUnit.module('ExternalApps.EditExternalToolButton', {

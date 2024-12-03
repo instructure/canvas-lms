@@ -35,6 +35,7 @@ export default function createPermissionsIndex(root, data = {}) {
   }
 
   function render() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <>
         <TopNavPortal />

@@ -58,6 +58,7 @@ ready(() => {
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <div
         style={{
@@ -83,6 +84,7 @@ ready(() => {
 
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GenericErrorPage
         imageUrl={errorShipUrl}
@@ -168,6 +170,7 @@ ready(() => {
       // eslint-disable-next-line no-console
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <GenericErrorPage
           imageUrl={errorShipUrl}

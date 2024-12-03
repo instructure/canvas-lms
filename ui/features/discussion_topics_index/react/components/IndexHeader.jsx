@@ -158,6 +158,7 @@ export default class IndexHeader extends Component {
         window.location.reload()
       }
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

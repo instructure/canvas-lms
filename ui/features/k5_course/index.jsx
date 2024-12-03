@@ -27,6 +27,7 @@ useK5Theme()
 ready(() => {
   const courseContainer = document.getElementById('course-dashboard-container')
   if (courseContainer) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <K5Course
         canManage={ENV.PERMISSIONS.manage}

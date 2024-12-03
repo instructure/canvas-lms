@@ -112,6 +112,7 @@ class IndexSpecContainer extends React.Component {
   }
 }
 
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const prepDocument = () => ReactDOM.render(<IndexSpecContainer />, testNode)
 
 const testRender = expectedToRender => {

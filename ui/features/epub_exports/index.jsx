@@ -24,6 +24,7 @@ import ready from '@instructure/ready'
 
 ready(() => {
   $('.course-epub-exports-app').each((_i, element) => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<EpubExportsApp />, element)
   })
 })

@@ -56,6 +56,7 @@ QUnit.module('EditGradingPeriodSetForm', {
       onCancel: () => {},
     }
     const element = React.createElement(GradingPeriodSetForm, _.defaults(opts, defaults))
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(element, wrapper)
   },
 

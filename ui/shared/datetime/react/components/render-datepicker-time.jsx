@@ -100,6 +100,7 @@ function renderDatepickerTime($input) {
 
   const containingDiv = document.createElement('div')
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <div className="ui-datepicker-time ui-corner-bottom">
       {label}{' '}

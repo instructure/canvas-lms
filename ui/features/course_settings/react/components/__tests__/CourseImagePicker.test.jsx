@@ -39,6 +39,7 @@ function renderComponent(props = {}) {
     courseId: 0,
     ...props,
   })
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(element, wrapper)
   return courseImagePicker
 }

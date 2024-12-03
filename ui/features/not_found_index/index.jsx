@@ -24,6 +24,7 @@ import NotFoundArtwork from './react/NotFoundArtwork'
 
 export const renderNotFoundApp = domElementId => {
   const AppRootElement = document.getElementById(domElementId)
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<NotFoundArtwork />, AppRootElement)
 }
 

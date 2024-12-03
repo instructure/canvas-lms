@@ -278,6 +278,7 @@ describe('OutcomesImporter', () => {
     showOutcomesImporterIfInProgress(props, userId)
 
     moxios.wait(() => {
+      // eslint-disable-next-line no-restricted-properties
       expect(ReactDOM.render).toHaveBeenCalled()
       done()
     })
@@ -293,6 +294,7 @@ describe('OutcomesImporter', () => {
     showOutcomesImporterIfInProgress(props, userId)
 
     moxios.wait(() => {
+      // eslint-disable-next-line no-restricted-properties
       expect(ReactDOM.render).not.toHaveBeenCalled()
       done()
     })

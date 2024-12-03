@@ -38,6 +38,7 @@ QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
       },
       ...props,
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<GradePostingPolicyTabPanel {...componentProps} />, $container)
     return $container.children[0]
   }

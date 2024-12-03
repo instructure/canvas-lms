@@ -79,6 +79,7 @@ function renderComponent() {
     changeSelectedEnrollmentTerm: sinon.spy(),
   }
   const element = React.createElement(Dropdown, props)
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(element, wrapper)
 }
 
