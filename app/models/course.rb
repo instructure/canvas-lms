@@ -170,6 +170,8 @@ class Course < ActiveRecord::Base
   has_many :all_differentiation_tag_categories, -> { non_collaborative }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :differentiation_tags, -> { non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :active_differentiation_tags, -> { active.non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  # regardless of non_collaborative state, all active groups are included
+  has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
   has_many :assignment_groups, -> { order("assignment_groups.position", AssignmentGroup.best_unicode_collation_key("assignment_groups.name")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order("assignments.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
