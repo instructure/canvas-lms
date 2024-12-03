@@ -263,7 +263,10 @@ AuthorInfoBase.propTypes = {
 }
 
 const Timestamps = props => {
-  const isTeacher = ENV?.current_user_roles && ENV?.current_user_roles.includes('teacher')
+  const isTeacher =
+    ENV?.current_user_roles &&
+    ENV?.current_user_roles.includes('teacher') &&
+    !ENV?.current_user_is_student
   const editText = useMemo(() => {
     if (!props.editedTimingDisplay) {
       return null
