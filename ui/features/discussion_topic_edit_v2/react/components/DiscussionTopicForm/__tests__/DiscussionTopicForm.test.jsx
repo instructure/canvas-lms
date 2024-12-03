@@ -137,8 +137,6 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
-    expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
-    expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
     expect(document.queryByTestId('non-graded-date-options')).toBeTruthy()
@@ -153,6 +151,22 @@ describe('DiscussionTopicForm', () => {
 
     // hides mastery paths
     expect(document.queryByText('Mastery Paths')).toBeFalsy()
+  })
+
+  it('renders comment related fields when participants commenting is enabled in an announcement', () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = false
+
+    const {queryByTestId, queryByLabelText} = setup()
+
+    const allowCommentsCheckbox = queryByLabelText('Allow Participants to Comment')
+    allowCommentsCheckbox.click()
+    expect(allowCommentsCheckbox).toBeChecked()
+    expect(queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
+    expect(queryByTestId('require-initial-post-checkbox')).toBeInTheDocument()
   })
 
   it('renders reset buttons for availability dates when creating/editing an announcement', () => {
@@ -546,16 +560,14 @@ describe('DiscussionTopicForm', () => {
       expect(checkbox.checked).toBe(false)
     })
 
-    it('disallow threaded replies checkbox is disabled in announcements if "Allow participants to comment" is disabled', () => {
+    it('disallow threaded replies checkbox is not present in announcements if "Allow participants to comment" is disabled', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
       window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
 
-      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
+      const {queryByTestId} = setup()
 
-      const checkbox = getByTestId('disallow_threaded_replies')
-      expect(checkbox.disabled).toBe(true)
-      expect(checkbox.checked).toBe(false)
+      expect(queryByTestId('disallow_threaded_replies')).not.toBeInTheDocument()
     })
 
     it('disallow threaded replies checkbox is enabled in dicussions if "Allow participants to comment" is disabled', () => {

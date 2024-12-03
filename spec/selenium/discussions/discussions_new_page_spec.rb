@@ -1140,7 +1140,6 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
         # Expect certain field to be present
         expect(f("body")).to contain_jqcss "input[value='enable-participants-commenting']"
-        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
         expect(f("body")).to contain_jqcss "input[value='enable-podcast-feed']"
         expect(f("body")).to contain_jqcss "input[value='allow-liking']"
         expect(f("body")).to contain_jqcss "div[data-testid='non-graded-date-options']"
@@ -1150,6 +1149,15 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[value='graded']"
         expect(f("body")).not_to contain_jqcss "input[value='group-discussion']"
         expect(f("body")).not_to contain_jqcss "input[value='add-to-student-to-do']"
+      end
+
+      it "displays comment related fields when participants commenting is enabled" do
+        user_session(teacher)
+        get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
+
+        force_click_native("input[value='enable-participants-commenting']")
+        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
+        expect(f("body")).to contain_jqcss "input[value='disallow-threaded-replies']"
       end
     end
 

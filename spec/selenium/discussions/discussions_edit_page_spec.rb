@@ -1216,9 +1216,17 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@announcement_no_options.id}/edit"
 
           expect(f("input[value='enable-participants-commenting']").selected?).to be_falsey
-          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
           expect(f("input[value='allow-liking']").selected?).to be_falsey
           expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
+        end
+
+        it "displays comment related fields when participants commenting is enabled" do
+          user_session(teacher)
+          get "/courses/#{course.id}/discussion_topics/#{@announcement_no_options.id}/edit"
+
+          force_click_native("input[value='enable-participants-commenting']")
+          expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
+          expect(f("body")).to contain_jqcss "input[value='disallow-threaded-replies']"
         end
       end
 
