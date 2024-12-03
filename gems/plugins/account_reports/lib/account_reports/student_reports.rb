@@ -99,9 +99,8 @@ module AccountReports
                  AND e.root_account_id = courses.root_account_id
                  AND e.type = 'StudentEnrollment'
                INNER JOIN #{CourseSection.quoted_table_name} cs ON cs.id = e.course_section_id
-               INNER JOIN #{Pseudonym.quoted_table_name} p ON e.user_id = p.user_id
+               INNER JOIN #{ordered_pseudonyms(Pseudonym.active)} p ON e.user_id = p.user_id
                  AND courses.root_account_id = p.account_id
-                 AND p.workflow_state <> 'deleted'
                INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id")
                             .where("NOT EXISTS (SELECT s.user_id
                            FROM #{Submission.quoted_table_name} s
@@ -170,9 +169,8 @@ module AccountReports
                  AND c.workflow_state = 'available'
                INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = enrollments.course_section_id
                  AND s.workflow_state = 'active'
-               INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = enrollments.user_id
+               INNER JOIN #{ordered_pseudonyms(Pseudonym.active_only)} p ON p.user_id = enrollments.user_id
                  AND p.account_id = enrollments.root_account_id
-                 AND p.workflow_state = 'active'
                INNER JOIN #{User.quoted_table_name} u ON u.id = p.user_id")
                          .where("enrollments.type = 'StudentEnrollment'
                AND enrollments.workflow_state = 'active'")
