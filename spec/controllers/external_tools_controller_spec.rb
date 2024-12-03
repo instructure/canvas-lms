@@ -2009,6 +2009,18 @@ describe ExternalToolsController do
         context "during a deep linking launch" do
           let(:message_type) { "LtiDeepLinkingRequest" }
 
+          before do
+            tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
+            tool.save!
+            user_session(@teacher)
+          end
+
+          it "includes the deep_linking_cancel_url as the return_url" do
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, editor: true }
+            url = launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"]["return_url"]
+            expect(url).to include(deep_linking_cancel_path)
+          end
+
           it_behaves_like "includes editor variables" do
             let(:selection_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
             let(:contents_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
@@ -2016,9 +2028,6 @@ describe ExternalToolsController do
 
           context "when the parent_frame_context param is sent" do
             before do
-              tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
-              tool.save!
-              user_session(@teacher)
               post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
             end
 
