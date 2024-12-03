@@ -60,7 +60,7 @@ describe('FilesUsageBar', () => {
     })
     return render(
       <MockedQueryClientProvider client={queryClient}>
-        <FilesUsageBar contextType="1" contextId="2" {...props} />
+        <FilesUsageBar contextType="course" contextId="2" {...props} />
       </MockedQueryClientProvider>
     )
   }

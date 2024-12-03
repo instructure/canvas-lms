@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ProgressBar} from '@instructure/ui-progress'
@@ -24,11 +24,12 @@ import {Text} from '@instructure/ui-text'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import formatMessage from '../../../../../packages/canvas-media/src/format-message'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
+import {generateFilesQuotaUrl} from '../../utils/apiUtils'
 
 const I18n = useI18nScope('files_v2')
 
 const fetchQuota = async (contextType: string, contextId: string) => {
-  const response = await fetch(`/api/v1/${contextType}/${contextId}/files/quota`)
+  const response = await fetch(generateFilesQuotaUrl(contextType, contextId))
   if (!response.ok) {
     throw new Error('Failed to fetch quota data')
   }
@@ -41,7 +42,8 @@ interface FilesUsageBarProps {
 }
 
 const FilesUsageBar = ({contextType, contextId}: FilesUsageBarProps) => {
-  const {data, error, isLoading} = useQuery(['quota'], () => fetchQuota(contextType, contextId))
+  const queryKey = useMemo(() => ['quota', contextType, contextId], [contextType, contextId])
+  const {data, error, isLoading} = useQuery(queryKey, () => fetchQuota(contextType, contextId))
 
   if (error) {
     showFlashError(I18n.t('An error occurred while loading files usage data'))(error as Error)
@@ -65,7 +67,7 @@ const FilesUsageBar = ({contextType, contextId}: FilesUsageBarProps) => {
       meterColor="brand"
       screenReaderLabel={formatMessage('File Storage Quota Used')}
       formatScreenReaderValue={() => filesUsageString}
-      renderValue={<Text>{filesUsageString}</Text>}
+      renderValue={<Text data-testid="files-usage-text">{filesUsageString}</Text>}
       size="x-small"
       valueMax={quota}
       valueNow={quota_used}
