@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-pascal-case */
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *

@@ -48,7 +48,7 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Post to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument()
     })
 
     test('is disabled', () => {
@@ -68,7 +68,7 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Post to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument()
     })
 
     test('is not read-only', () => {
@@ -91,7 +91,7 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Posting to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Posting to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Posting to Students'})).toBeInTheDocument()
     })
 
     test('is read-only', () => {
@@ -114,7 +114,7 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Grades Posted to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Grades Posted to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Grades Posted to Students'})).toBeInTheDocument()
     })
 
     test('is read-only', () => {
@@ -139,7 +139,7 @@ describe('GradeSummary PostToStudentsButton', () => {
     })
 
     test('is labeled with "Post to Students"', () => {
-      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument
+      expect(screen.getByRole('button', {name: 'Post to Students'})).toBeInTheDocument()
     })
 
     test('is not read-only', () => {

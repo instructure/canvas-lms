@@ -67,7 +67,6 @@ import qs from 'qs'
 import useStore from './stores/index'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
-
 const I18n = useI18nScope('assignments_2_file_upload')
 
 function DraftStatus({status}) {
@@ -273,7 +272,10 @@ const SubmissionManager = ({
     }
     setActiveSubmissionType(activeSubmissionTypeFromProps)
 
-    if ((assignment.env.peerReviewModeEnabled || assignment.rubricSelfAssessmentEnabled) && assignment.rubric) {
+    if (
+      (assignment.env.peerReviewModeEnabled || assignment.rubricSelfAssessmentEnabled) &&
+      assignment.rubric
+    ) {
       fetchRubricData().catch(() => {
         setOnFailure(I18n.t('Error fetching rubric data'))
       })
@@ -298,6 +300,7 @@ const SubmissionManager = ({
         useStore.setState({isSavingRubricAssessment: false})
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSavingRubricAssessment])
 
   const isRubricComplete = assessment => {
@@ -592,7 +595,7 @@ const SubmissionManager = ({
     useStore.setState({isSavingRubricAssessment: false})
   }
 
-  const handleSubmitSelfAssessment = async (assessment) => {
+  const handleSubmitSelfAssessment = async assessment => {
     if (!isRubricComplete(assessment)) {
       setOnFailure(I18n.t('Incomplete Self Assessment'))
       return
@@ -959,7 +962,7 @@ const SubmissionManager = ({
           }
         }),
       }
-    })
+    }),
   }
 
   const rubricAssessmentData = (selfAssessment?.data ?? []).map(data => {
@@ -998,7 +1001,7 @@ const SubmissionManager = ({
         onDismiss={() => setIsSelfAssessmentOpen(false)}
         rubricAssessmentData={rubricAssessmentData}
         rubric={rubricTrayData}
-        viewModeOverride='horizontal'
+        viewModeOverride="horizontal"
         onSubmit={assessment => {
           const assessmentFormatted = {
             score: assessment.reduce((prev, curr) => prev + (curr.points ?? 0), 0),

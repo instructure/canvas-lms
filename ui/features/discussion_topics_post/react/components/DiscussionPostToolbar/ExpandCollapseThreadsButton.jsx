@@ -37,6 +37,7 @@ export const ExpandCollapseThreadsButton = props => {
     setTimeout(() => {
       setAllThreadsStatus(AllThreadsState.None)
     }, 0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onExpandCollapseClick = () => {

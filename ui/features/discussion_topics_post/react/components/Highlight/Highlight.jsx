@@ -33,20 +33,19 @@ export function Highlight({...props}) {
     if (!element) {
       return
     }
-    let eventType = "onfocusin" in element ? "focusin" : "focus";
-    let bubbles = "onfocusin" in element;
-    let event;
+    let eventType = 'onfocusin' in element ? 'focusin' : 'focus'
+    let bubbles = 'onfocusin' in element
+    let event
 
-    if ("createEvent" in document) {
-        event = document.createEvent("Event");
-        event.initEvent(eventType, bubbles, true);
-    }
-    else if ("Event" in window) {
-        event = new Event(eventType, { bubbles: bubbles, cancelable: true });
+    if ('createEvent' in document) {
+      event = document.createEvent('Event')
+      event.initEvent(eventType, bubbles, true)
+    } else if ('Event' in window) {
+      event = new Event(eventType, {bubbles: bubbles, cancelable: true})
     }
 
-    element.focus();
-    element.dispatchEvent(event);
+    element.focus()
+    element.dispatchEvent(event)
   }
 
   useLayoutEffect(() => {
@@ -63,6 +62,7 @@ export function Highlight({...props}) {
         }
       }, 0)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.isHighlighted, highlightRef])
 
   return (

@@ -152,6 +152,7 @@ const DifferentiatedModulesSection = ({
       setHasModuleOverrides(overrides.some(card => card.context_module_id))
       const allModuleAssignees = overrides
         .filter(override => override.context_module_id)
+        // eslint-disable-next-line array-callback-return
         ?.map(moduleOverride => {
           if (moduleOverride.course_section_id) {
             return `section-${moduleOverride.course_section_id}`
