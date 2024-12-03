@@ -17,11 +17,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module FilesPage
+  def content
+    f("#content")
+  end
+
   def heading
     f("#content h1")
   end
 
   def all_my_files_button
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
+  end
+
+  def folder_link(folder_name)
+    f("[data-testid='#{folder_name}']")
+  end
+
+  def files_usage_text_selector
+    "[data-testid='files-usage-text']"
+  end
+
+  def files_usage_text
+    f(files_usage_text_selector)
   end
 end

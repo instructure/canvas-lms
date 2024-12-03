@@ -22,16 +22,27 @@ import FilesApp from './react/components/FilesApp'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {createRoot} from 'react-dom/client'
+import {generateFolderByPathUrl} from './utils/apiUtils'
 
-// TODO fix ENV typing
 const contextAssetString = window.ENV.context_asset_string
-const rootFolderId = filesEnv.contexts[0].root_folder_id
 
 const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <FilesApp contextAssetString={contextAssetString} folderId={rootFolderId} />,
+      element: <FilesApp contextAssetString={contextAssetString} />,
+      loader: async () => {
+        const url = generateFolderByPathUrl('')
+        return fetch(url)
+      },
+    },
+    {
+      path: '/folder/*',
+      element: <FilesApp contextAssetString={contextAssetString} />,
+      loader: async ({params}) => {
+        const url = generateFolderByPathUrl(`/${params['*']}`)
+        return fetch(url)
+      },
     },
   ],
   {

@@ -26,6 +26,7 @@ import {Link} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {type File, type Folder} from '../../../interfaces/File'
+import {generateUrlPath} from '../../../utils/folderUtils'
 
 interface NameLinkProps {
   item: File | Folder
@@ -58,8 +59,17 @@ const NameLink = ({item, isStacked}: NameLinkProps) => {
     )
   }
 
+  const urlPath = () => {
+    if (isFile) {
+      // TODO: file preview
+      return '/'
+    } else {
+      return generateUrlPath(item)
+    }
+  }
+
   return (
-    <Link to="/">
+    <Link to={urlPath()} data-testid={name}>
       {isStacked ? (
         <>
           {renderIconComponent()}
