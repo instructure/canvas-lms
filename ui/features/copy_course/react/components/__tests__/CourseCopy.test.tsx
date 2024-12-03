@@ -20,8 +20,10 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {useQuery, useMutation} from '@canvas/query'
 import CourseCopy from '../CourseCopy'
+import {useTermsQuery} from '../../queries/termsQuery'
 
 jest.mock('@canvas/query')
+jest.mock('../../queries/termsQuery')
 
 describe('CourseCopy', () => {
   const defaultProps = {
@@ -35,13 +37,24 @@ describe('CourseCopy', () => {
 
   const mockUseQuery = useQuery as jest.Mock
   const mockUseMutation = useMutation as jest.Mock
+  const mockUseTermsQuery = useTermsQuery as jest.Mock
 
   afterEach(() => {
     mockUseMutation.mockReset()
   })
 
-  it('renders loading state', () => {
+  it('renders loading state on course loading', () => {
     mockUseQuery.mockReturnValue({isLoading: true})
+    mockUseTermsQuery.mockReturnValue({isLoading: false})
+
+    const {getByText} = render(<CourseCopy {...defaultProps} />)
+
+    expect(getByText('Course copy page is loading')).toBeInTheDocument()
+  })
+
+  it('renders loading state on terms loading', () => {
+    mockUseQuery.mockReturnValue({isLoading: false})
+    mockUseTermsQuery.mockReturnValue({isLoading: true})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
 
@@ -49,8 +62,8 @@ describe('CourseCopy', () => {
   })
 
   it('renders success state', () => {
-    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: courseData})
-    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: termsData})
+    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
+    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, data: termsData})
     mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
 
     const {getByText} = render(<CourseCopy {...defaultProps} />)
@@ -60,8 +73,8 @@ describe('CourseCopy', () => {
 
   describe('when there is an error', () => {
     it('renders error state on course loading error', () => {
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: true, data: null})
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: null})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: true, data: null})
+      mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, data: null})
 
       const {getByText} = render(<CourseCopy {...defaultProps} />)
 
@@ -69,8 +82,8 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on terms loading error', () => {
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: null})
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: true, data: null})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
+      mockUseTermsQuery.mockReturnValue({isLoading: false, isError: true, data: null})
 
       const {getByText} = render(<CourseCopy {...defaultProps} />)
 
@@ -80,8 +93,8 @@ describe('CourseCopy', () => {
 
   describe('when there is no data returned', () => {
     it('renders error state on missing course data', () => {
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: null})
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: {}})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: null})
+      mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, data: {}})
 
       const {getByText} = render(<CourseCopy {...defaultProps} />)
 
@@ -89,8 +102,8 @@ describe('CourseCopy', () => {
     })
 
     it('renders error state on missing terms data', () => {
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: {}})
-      mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: null})
+      mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: {}})
+      mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, data: null})
 
       const {getByText} = render(<CourseCopy {...defaultProps} />)
 
@@ -102,8 +115,8 @@ describe('CourseCopy', () => {
     // @ts-ignore
     delete window.location
     window.location = {href: ''} as Location
-    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: courseData})
-    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: termsData})
+    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
+    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, data: termsData})
     mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false})
 
     const {getByRole} = render(<CourseCopy {...defaultProps} />)
@@ -114,8 +127,8 @@ describe('CourseCopy', () => {
 
   it('handleSubmit calls mutate', () => {
     const mockMutate = jest.fn()
-    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: courseData})
-    mockUseQuery.mockReturnValueOnce({isLoading: false, isError: false, data: termsData})
+    mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
+    mockUseTermsQuery.mockReturnValue({isLoading: false, isError: false, data: termsData})
     mockUseMutation.mockReturnValue({isLoading: false, isSuccess: false, mutate: mockMutate})
 
     const {getByRole} = render(<CourseCopy {...defaultProps} />)

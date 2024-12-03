@@ -18,20 +18,47 @@
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {Term} from '../types'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {useAllPages} from '@canvas/query'
+import {useMemo} from 'react'
+import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 
-export const termsQuery = async ({signal, queryKey}: QueryFunctionContext): Promise<Term[]> => {
+export const getTermsNextPage = (
+  lastPage: DoFetchApiResults<EnrollmentTerms>
+): {page?: string; per_page?: string} | undefined => {
+  return lastPage.link?.next
+}
+
+export const termsQuery = async ({
+  signal,
+  queryKey,
+  pageParam,
+}: QueryFunctionContext): Promise<DoFetchApiResults<EnrollmentTerms>> => {
   const [, , accountId] = queryKey
-  const data: Array<Term> = []
   const fetchOpts = {signal}
-  let path: any = `/api/v1/accounts/${accountId}/terms`
+  const page = pageParam?.page || '1'
+  const perPage = pageParam?.per_page || '10'
+  const path: string = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`
 
-  while (path) {
-    // eslint-disable-next-line no-await-in-loop
-    const {json, link} = await doFetchApi<EnrollmentTerms>({path, fetchOpts})
-    if (json) data.push(...json.enrollment_terms)
-    path = link?.next?.url || null
+  return doFetchApi<EnrollmentTerms>({path, fetchOpts})
+}
+
+export const useTermsQuery = (accountId: string) => {
+  const {isLoading, isError, data} = useAllPages({
+    queryKey: [courseCopyRootKey, enrollmentTermsFetchKey, accountId],
+    queryFn: termsQuery,
+    getNextPageParam: getTermsNextPage,
+    meta: {fetchAtLeastOnce: true},
+  })
+
+  const terms = useMemo(
+    () => data?.pages.flatMap(page => page.json?.enrollment_terms || []) ?? [],
+    [data]
+  )
+
+  return {
+    data: terms,
+    isLoading,
+    isError,
   }
-  return data
 }

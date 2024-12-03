@@ -23,9 +23,14 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {coursesQuery} from '../queries/courseQuery'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {termsQuery} from '../queries/termsQuery'
+import {useTermsQuery} from '../queries/termsQuery'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import type {CopyCourseFormSubmitData} from '../types'
+import {
+  type CopyCourseFormSubmitData,
+  courseCopyRootKey,
+  courseFetchKey,
+  createCourseAndMigrationKey,
+} from '../types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {copyCourseMutation} from '../mutations/copyCourseMutation'
 // @ts-ignore
@@ -55,19 +60,15 @@ export const CourseCopy = ({
   canImportAsNewQuizzes: boolean
 }) => {
   const courseQueryResult = useQuery({
-    queryKey: ['copy_course', 'course', courseId],
+    queryKey: [courseCopyRootKey, courseFetchKey, courseId],
     queryFn: coursesQuery,
     meta: {fetchAtLeastOnce: true},
   })
 
-  const termsQueryResult = useQuery({
-    queryKey: ['copy_course', 'enrollment_terms', accountId],
-    queryFn: termsQuery,
-    meta: {fetchAtLeastOnce: true},
-  })
+  const termsQueryResult = useTermsQuery(accountId)
 
   const mutation = useMutation({
-    mutationKey: ['copy_course', 'create_course_and_migration', accountId],
+    mutationKey: [courseCopyRootKey, createCourseAndMigrationKey, accountId],
     mutationFn: copyCourseMutation,
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
