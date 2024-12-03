@@ -49,6 +49,7 @@ interface NewLoginContextType {
   privacyPolicyUrl?: string
   requireEmail?: boolean
   passwordPolicy?: PasswordPolicy
+  forgotPasswordUrl?: string
 }
 
 const NewLoginContext = createContext<NewLoginContextType | undefined>(undefined)
@@ -84,6 +85,7 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
     privacyPolicyUrl,
     requireEmail,
     passwordPolicy,
+    forgotPasswordUrl,
   } = data
 
   return (
@@ -117,6 +119,7 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         privacyPolicyUrl,
         requireEmail,
         passwordPolicy,
+        forgotPasswordUrl,
       }}
     >
       {children}

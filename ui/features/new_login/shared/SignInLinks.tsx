@@ -29,7 +29,7 @@ const I18n = useI18nScope('new_login')
 
 const SignInLinks = () => {
   const navigate = useNavigate()
-  const {isPreviewMode, isUiActionPending} = useNewLogin()
+  const {isPreviewMode, isUiActionPending, forgotPasswordUrl} = useNewLogin()
   const isSignIn = useMatch(ROUTES.SIGN_IN)
   const isForgotPassword = useMatch(ROUTES.FORGOT_PASSWORD)
 
@@ -40,11 +40,26 @@ const SignInLinks = () => {
     }
   }
 
+  const handleForgotPasswordUrl = (url: string) => (event: React.MouseEvent<ViewOwnProps>) => {
+    event.preventDefault()
+    if (!(isPreviewMode || isUiActionPending)) {
+      window.location.href = url
+    }
+  }
+
   return (
     <Flex direction="column" gap="small">
       {isSignIn && (
         <Flex.Item overflowX="visible" overflowY="visible">
-          <Link onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}>{I18n.t('Forgot password?')}</Link>
+          {forgotPasswordUrl ? (
+            <Link href={forgotPasswordUrl} onClick={handleForgotPasswordUrl(forgotPasswordUrl)}>
+              {I18n.t('Forgot password?')}
+            </Link>
+          ) : (
+            <Link onClick={handleNavigate(ROUTES.FORGOT_PASSWORD)}>
+              {I18n.t('Forgot password?')}
+            </Link>
+          )}
         </Flex.Item>
       )}
 

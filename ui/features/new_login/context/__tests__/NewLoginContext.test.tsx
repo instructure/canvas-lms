@@ -50,6 +50,7 @@ const TestComponent = () => {
       <span data-testid="bodyBgColor">{context.bodyBgColor}</span>
       <span data-testid="bodyBgImage">{context.bodyBgImage}</span>
       <span data-testid="isPreviewMode">{context.isPreviewMode?.toString()}</span>
+      <span data-testid="forgotPasswordUrl">{context.forgotPasswordUrl}</span>
     </div>
   )
 }
@@ -71,6 +72,7 @@ describe('NewLoginContext', () => {
         bodyBgColor: '#ffffff',
         bodyBgImage: 'https://example.com/background.jpg',
         isPreviewMode: true,
+        forgotPasswordUrl: 'https://example.com/password',
       },
     })
   })
@@ -119,6 +121,9 @@ describe('NewLoginContext', () => {
       'https://example.com/background.jpg'
     )
     expect(screen.getByTestId('isPreviewMode')).toHaveTextContent('true')
+    expect(screen.getByTestId('forgotPasswordUrl')).toHaveTextContent(
+      'https://example.com/password'
+    )
   })
 
   it('allows context values to be updated correctly', () => {
@@ -171,6 +176,7 @@ describe('NewLoginContext', () => {
         bodyBgColor: undefined,
         bodyBgImage: undefined,
         isPreviewMode: undefined,
+        forgotPasswordUrl: undefined,
       },
     })
     render(
@@ -186,5 +192,6 @@ describe('NewLoginContext', () => {
     expect(screen.getByTestId('bodyBgColor')).toBeEmptyDOMElement()
     expect(screen.getByTestId('bodyBgImage')).toBeEmptyDOMElement()
     expect(screen.getByTestId('isPreviewMode')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('forgotPasswordUrl')).toBeEmptyDOMElement()
   })
 })
