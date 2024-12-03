@@ -51,8 +51,9 @@ class RubricAssessment < ActiveRecord::Base
   def track_outcomes
     outcome_ids = aligned_outcome_ids
     peer_review = assessment_type == "peer_review"
+    self_assessment = assessment_type == "self_assessment"
     provisional_grade = artifact_type == "ModeratedGrading::ProvisionalGrade"
-    update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
+    update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade && !self_assessment
     delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
   end
 
