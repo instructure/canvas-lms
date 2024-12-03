@@ -32,3 +32,8 @@ export type CopyCourseFormSubmitData = Readonly<
     selectedTerm: Term | null
   } & submitMigrationFormData
 >
+
+export const courseCopyRootKey = 'copy_course'
+export const courseFetchKey = 'course'
+export const enrollmentTermsFetchKey = 'enrollment_terms'
+export const createCourseAndMigrationKey = 'create_course_and_migration'
