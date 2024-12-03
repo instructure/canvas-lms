@@ -103,6 +103,12 @@ describe Types::RubricAssessmentType do
         submission_type.resolve("rubricAssessmentsConnection { nodes { rubricAssociation { _id } } }")
       ).to eq [rubric_association.id.to_s]
     end
+
+    it "updated_at" do
+      expect(
+        submission_type.resolve("rubricAssessmentsConnection { nodes { updatedAt } }")
+      ).to eq [rubric_assessment.updated_at.iso8601]
+    end
   end
 
   describe "artifact_attempt" do

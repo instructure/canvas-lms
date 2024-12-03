@@ -42,6 +42,8 @@ module Types
 
     field :score, Float, null: true
 
+    field :updated_at, Types::DateTimeType, null: true
+
     field :user, UserType, null: true
     def user
       load_association(:user)
