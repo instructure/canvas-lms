@@ -23,7 +23,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {IconSearchLine} from '@instructure/ui-icons'
+import {IconSearchLine, IconWarningSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -45,6 +45,9 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
   const [joinLevel, setJoinLevel] = useState('parent_context_auto_join')
   const [status, setStatus] = useState(null)
   const throttledFetchMoreUsers = useCallback(throttle(loadMore, 200), [])
+  const [nameValidationMessages, setNameValidationMessages] = useState([
+    {text: '', type: 'success'},
+  ])
 
   useEffect(() => {
     if (userCollection.length) {
@@ -53,20 +56,69 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
     if (!modalProps.open) resetState()
   }, [loadMore, modalProps.open, userCollection])
 
+  const validateName = (newName, shouldFocus) => {
+    if (newName.trim().length === 0) {
+      const nameErrorText = (
+        <Flex as="div" alignItems="center" justifyItems="end" margin="x-small 0 0 0">
+          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+            <IconWarningSolid color="error" />
+          </Flex.Item>
+          <Text size="small" color="danger">
+            {I18n.t('A group name is required.')}
+          </Text>
+        </Flex>
+      )
+      setNameValidationMessages([{text: nameErrorText, type: 'error'}])
+      if(shouldFocus){
+        const input = document.getElementById(`group-name`)
+        input?.focus()
+        shouldFocus = false
+      }
+      return false
+    } else if (newName.length > 255) {
+      const nameErrorText = (
+        <Flex as="div" alignItems="center" justifyItems="end" margin="x-small 0 0 0">
+          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+            <IconWarningSolid color="error" />
+          </Flex.Item>
+          <Text size="small" color="danger">
+            {I18n.t('Group name must be less than 255 characters.')}
+          </Text>
+        </Flex>
+      )
+      setNameValidationMessages([{text: nameErrorText, type: 'error'}])
+      if(shouldFocus){
+        const input = document.getElementById(`group-name`)
+        input?.focus()
+        shouldFocus = false
+      }
+      return false
+    } else {
+      setNameValidationMessages([{text: '', type: 'success'}])
+      return true
+    }
+  }
+
+  const validateFormFields = (shouldFocus = false) => {
+    return validateName(name, shouldFocus)
+  }
+
   function handleSend() {
-    const payload = {group: {name, join_level: joinLevel}, invitees: userIds.flat()}
-    setStatus('info')
-    doFetchApi({
-      method: 'POST',
-      path: `/courses/${ENV.course_id}/groups`,
-      body: payload,
-    })
-      .then(notifyDidSave)
-      .catch(err => {
-        console.error(err)  
-        captureException(err)
-        setStatus('error')
+    if (validateFormFields(true)) {
+      const payload = {group: {name, join_level: joinLevel}, invitees: userIds.flat()}
+      setStatus('info')
+      doFetchApi({
+        method: 'POST',
+        path: `/courses/${ENV.course_id}/groups`,
+        body: payload,
       })
+        .then(notifyDidSave)
+        .catch(err => {
+          console.error(err)
+          captureException(err)
+          setStatus('error')
+      })
+    }
   }
 
   function notifyDidSave() {
@@ -81,17 +133,10 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
   }
 
   function Footer() {
-    const saveButtonState = name.length === 0 || status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
-        <Button
-          type="submit"
-          interaction={saveButtonState}
-          color="primary"
-          margin="0 0 0 x-small"
-          onClick={handleSend}
-        >
+        <Button type="submit" color="primary" margin="0 0 0 x-small" onClick={handleSend}>
           {I18n.t('Submit')}
         </Button>
       </>
@@ -164,8 +209,14 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
               id="group-name"
               renderLabel={I18n.t('Group Name')}
               value={name}
-              onChange={(_event, value) => setName(value)}
+              onChange={(_event, value) => {
+                setName(value)
+              }}
+              onBlur={(e) => {
+                validateName(e.target.value)
+              }}
               isRequired={true}
+              messages={nameValidationMessages}
             />
           </Flex.Item>
           <Flex.Item padding="small">

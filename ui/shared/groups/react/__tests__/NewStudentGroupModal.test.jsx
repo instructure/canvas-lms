@@ -102,33 +102,73 @@ describe('NewStudentGroupModal', () => {
     expect(getByLabelText('Group Name *')).toHaveValue('')
   })
 
-  it('disables the submit button if group name is not provided', () => {
-    const {getByText} = render(
-      <NewStudentGroupModal
-        userCollection={userCollection}
-        loadMore={loadMore}
-        onSave={onSave}
-        open={open}
-        onDismiss={onDismiss}
-      />
-    )
-    expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
-  })
-
-  it('enables the submit button if group name is provided', () => {
-    const {getByText, getByLabelText} = render(
-      <NewStudentGroupModal
-        userCollection={userCollection}
-        loadMore={loadMore}
-        onSave={onSave}
-        open={open}
-        onDismiss={onDismiss}
-      />
-    )
-    fireEvent.input(getByLabelText('Group Name *'), {
-      target: {value: 'name'},
+  describe('group name validations', () => {
+    it('validates empty group name reminder', () => {
+      const {getByText, queryByText} = render(
+        <NewStudentGroupModal
+          userCollection={userCollection}
+          loadMore={loadMore}
+          onSave={onSave}
+          open={open}
+          onDismiss={onDismiss}
+        />
+      )
+      expect(queryByText('A group name is required.')).not.toBeInTheDocument()
+      getByText('Submit').closest('button').click()
+      expect(queryByText('A group name is required.')).toBeInTheDocument()
     })
-    expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
+
+    it('validates empty group name reminder with leading spaces', () => {
+      const {getByText, getByLabelText, queryByText} = render(
+        <NewStudentGroupModal
+          userCollection={userCollection}
+          loadMore={loadMore}
+          onSave={onSave}
+          open={open}
+          onDismiss={onDismiss}
+        />
+      )
+      expect(queryByText('A group name is required.')).not.toBeInTheDocument()
+      fireEvent.input(getByLabelText('Group Name *'), {
+        target: {value: '  '},
+      })
+      getByText('Submit').closest('button').click()
+      expect(queryByText('A group name is required.')).toBeInTheDocument()
+    })
+
+    it('shows too-long group name reminder.', () => {
+      const {getByText, getByLabelText, queryByText} = render(
+        <NewStudentGroupModal
+          userCollection={userCollection}
+          loadMore={loadMore}
+          onSave={onSave}
+          open={open}
+          onDismiss={onDismiss}
+        />
+      )
+      expect(queryByText('Group name must be less than 255 characters.')).not.toBeInTheDocument()
+      fireEvent.input(getByLabelText('Group Name *'), {
+        target: {value: 'A'.repeat(260)},
+      })
+      getByText('Submit').closest('button').click()
+      expect(queryByText('Group name must be less than 255 characters.')).toBeInTheDocument()
+    })
+
+    it('enables the submit button if group name is provided', () => {
+      const {getByText, getByLabelText} = render(
+        <NewStudentGroupModal
+          userCollection={userCollection}
+          loadMore={loadMore}
+          onSave={onSave}
+          open={open}
+          onDismiss={onDismiss}
+        />
+      )
+      fireEvent.input(getByLabelText('Group Name *'), {
+        target: {value: 'name'},
+      })
+      expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
+    })
   })
 
   it('fetches and reports status', async () => {
