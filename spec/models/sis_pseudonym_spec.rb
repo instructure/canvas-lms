@@ -165,6 +165,10 @@ describe SisPseudonym do
     expect { SisPseudonym.for(u, context) }.to raise_error("could not resolve root account")
   end
 
+  it "raises if no user is provided" do
+    expect { SisPseudonym.for(nil, @account) }.to raise_error("user is required")
+  end
+
   it "allows an explicit no-context... in implicit mode" do
     pseudonym = account1.pseudonyms.create!(user: u, unique_id: "user")
 
