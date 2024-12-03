@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -1028,8 +1027,8 @@ function DiscussionTopicForm({
           )}
           <FormFieldGroup description="" rowSpacing="small">
             {renderAllowParticipantsToComment()}
-            {!isStudent && (
-              <View {...(isAnnouncement && {margin: '0 0 0 medium'})}>
+            {!isStudent && (!isAnnouncement || (isAnnouncement && !locked)) && (
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
                 <Checkbox
                   data-testid="disallow_threaded_replies"
                   label={I18n.t('Disallow threaded replies')}
@@ -1049,18 +1048,19 @@ function DiscussionTopicForm({
               </View>
             )}
 
-            {!isGroupContext && (
-              <Checkbox
-                data-testid="require-initial-post-checkbox"
-                label={I18n.t(
-                  'Participants must respond to the topic before viewing other replies'
-                )}
-                value="must-respond-before-viewing-replies"
-                inline={true}
-                checked={requireInitialPost}
-                onChange={() => setRequireInitialPost(!requireInitialPost)}
-                disabled={isAnnouncement && locked}
-              />
+            {((!isGroupContext && !isAnnouncement) || (isAnnouncement && !locked)) && (
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
+                <Checkbox
+                  data-testid="require-initial-post-checkbox"
+                  label={I18n.t(
+                    'Participants must respond to the topic before viewing other replies'
+                  )}
+                  value="must-respond-before-viewing-replies"
+                  inline={true}
+                  checked={requireInitialPost}
+                  onChange={() => setRequireInitialPost(!requireInitialPost)}
+                />
+              </View>
             )}
 
             {shouldShowPodcastFeedOption && (
