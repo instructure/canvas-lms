@@ -443,7 +443,7 @@ export default (function (superClass) {
         }
       })(this),
     }
-    // eslint-disable-next-line react/no-render-return-value
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(React.createElement(DelayedPublishDialog, props), this.$dpd_mount[0])
   }
 

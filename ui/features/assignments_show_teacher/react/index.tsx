@@ -27,6 +27,7 @@ import type {InMemoryCache} from 'apollo-cache-inmemory'
 export default function renderAssignmentsApp(elt: HTMLElement | null) {
   const client: ApolloClient<InMemoryCache> = createClient()
   if (ENV.ASSIGNMENT_ID) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ApolloProvider client={client}>
         <TeacherQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />

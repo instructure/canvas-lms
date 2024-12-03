@@ -213,6 +213,7 @@ PaginatedCollectionView.prototype.showLoadingIndicator = function () {
   const ref = this.$loadingIndicator
   const node = ref?.get(0)
   if (node instanceof HTMLElement) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />

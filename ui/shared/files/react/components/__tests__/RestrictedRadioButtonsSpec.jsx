@@ -31,6 +31,7 @@ QUnit.module('RestrictedRadioButtons', {
       models: [new Folder({id: 999})],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.RestrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -72,6 +73,7 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
       ],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.RestrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -95,6 +97,7 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
       models: [new Folder({id: 999})],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -215,6 +218,7 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
       ],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]

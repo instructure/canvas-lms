@@ -141,6 +141,7 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
   parent.setAttribute('style', 'max-width:45em;margin:1rem auto;')
   parent.setAttribute('class', 'flashalert-message')
   getBoxContainer().appendChild(parent)
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ImportConfirmBox
       count={count}

@@ -41,6 +41,7 @@ const CoursePacingNotice = props => {
 }
 
 export function renderCoursePacingNotice(mountPoint, courseId) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<CoursePacingNotice courseId={courseId} />, mountPoint)
 }
 

@@ -76,6 +76,7 @@ describe('PostAssignmentGradesTray Layout', () => {
   }
 
   function mountComponent(props = {}) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<Layout {...layoutProps(props)} />, $container)
   }
 

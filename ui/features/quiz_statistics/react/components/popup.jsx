@@ -192,6 +192,7 @@ class Popup extends React.Component {
 
     const Content = this.props.content
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Content ref={this.contentRef} {...this.getContentProps(this.props)} />,
       $container[0]
@@ -220,6 +221,7 @@ class Popup extends React.Component {
     if (this.contentRef.current && this.state.container) {
       const Content = this.props.content
 
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <Content ref={this.contentRef} {...this.getContentProps(this.props)} />,
         this.state.container,

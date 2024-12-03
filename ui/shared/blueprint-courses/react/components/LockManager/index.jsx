@@ -136,6 +136,7 @@ export default class LockManager {
   renderLockToggle() {
     if (!this.props.toggleWrapperSelector) return
     this.setupToggle(() => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <LockToggle
           isLocked={this.state.isLocked}
@@ -149,6 +150,7 @@ export default class LockManager {
 
   renderBanner() {
     if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode(this.props?.bannerSelector)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <LockBanner isLocked={this.state.isLocked} itemLocks={this.state.itemLocks} />,
       this.bannerNode

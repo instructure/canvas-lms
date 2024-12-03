@@ -115,6 +115,7 @@ QUnit.module('GradingPeriodSet', {
     attrs.ref = ref => {
       component = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, attrs), wrapper)
     return component
   },
@@ -205,6 +206,7 @@ QUnit.module('GradingPeriodSet "Edit Grading Period"', {
     attrs.ref = ref => {
       component = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, attrs), wrapper)
     return component
   },
@@ -278,6 +280,7 @@ QUnit.module('GradingPeriodSet "Edit Grading Period - onSave"', {
     attrs.ref = ref => {
       component = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, attrs), wrapper)
     component._refs['show-grading-period-1']._refs.editButton.click()
     return component
@@ -399,6 +402,7 @@ QUnit.module('GradingPeriodSet "Edit Grading Period - validations"', {
         component = ref
       },
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     component._refs['show-grading-period-1']._refs.editButton.click()
     return component
@@ -568,6 +572,7 @@ QUnit.module('GradingPeriodSet "Add Grading Period"', {
         component = ref
       },
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     return component
   },
@@ -640,6 +645,7 @@ QUnit.module('GradingPeriodSet "Remove Grading Period"', {
         component = ref
       },
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     return component
   },
@@ -666,6 +672,7 @@ QUnit.module('GradingPeriodSet "New Grading Period - onSave"', {
         component = ref
       },
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     component._refs.addPeriodButton.click()
     return component
@@ -768,6 +775,7 @@ QUnit.module('GradingPeriodSet "New Grading Period - validations"', {
         component = ref
       },
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     component._refs.addPeriodButton.click()
     return component

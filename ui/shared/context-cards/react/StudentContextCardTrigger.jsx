@@ -44,6 +44,7 @@ const handleClickEvent = event => {
       return focusableItems
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <StudentContextTray
         key={`student_context_card_${courseId}_${studentId}`}

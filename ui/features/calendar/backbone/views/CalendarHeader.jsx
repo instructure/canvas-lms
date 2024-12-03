@@ -222,6 +222,7 @@ CalendarHeader.prototype.afterRender = function () {
     return this._loadObjects()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CalendarHeaderComponent
       bridge={{

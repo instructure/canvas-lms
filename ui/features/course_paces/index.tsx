@@ -32,5 +32,6 @@ const CoursePage = () => (
 )
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<CoursePage />, document.getElementById('course_paces'))
 })

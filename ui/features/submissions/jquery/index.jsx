@@ -246,10 +246,12 @@ function insertEmoji(emoji) {
 export function setup() {
   $(document).ready(function () {
     if (ENV.EMOJIS_ENABLED) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,
         document.getElementById('emoji-picker-container')
       )
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <EmojiQuickPicker insertEmoji={insertEmoji} />,
         document.getElementById('emoji-quick-picker-container')

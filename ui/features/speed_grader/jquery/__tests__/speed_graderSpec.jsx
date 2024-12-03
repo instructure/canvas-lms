@@ -4945,6 +4945,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
         QUnit.module('Post Grades Menu', hooks => {
           const findRenderCall = () =>
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render.args.find(
               argsForCall => argsForCall[1].id === 'speed_grader_post_grades_menu_mount_point'
             )
@@ -4955,11 +4956,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
 
           hooks.afterEach(() => {
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render.restore()
           })
 
           test('renders the Post Grades" menu once', () => {
             SpeedGrader.EG.jsonReady()
+            // eslint-disable-next-line no-restricted-properties
             const renderCalls = ReactDOM.render.args.filter(
               argsForCall => argsForCall[1].id === 'speed_grader_post_grades_menu_mount_point'
             )
@@ -6311,6 +6314,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       hooks.afterEach(() => {
         ReactDOM.unmountComponentAtNode.restore()
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render.restore()
         EG.setupProvisionalGraderDisplayNames.restore()
 
@@ -6319,6 +6323,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       test('displays the component if at least one provisional grade is present', () => {
         EG.renderProvisionalGradeSelector()
+        // eslint-disable-next-line no-restricted-properties
         strictEqual(ReactDOM.render.callCount, 1)
       })
 
@@ -6331,6 +6336,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the final grader id to the component', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(SpeedGraderProvisionalGradeSelector.props.finalGraderId, '1101')
       })
@@ -6339,6 +6345,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         window.jsonData.points_possible = 12
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(SpeedGraderProvisionalGradeSelector.props.pointsPossible, 12)
       })
@@ -6346,6 +6353,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the assignment grading type to the component as gradingType', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(SpeedGraderProvisionalGradeSelector.props.gradingType, 'gpa_scale')
       })
@@ -6353,6 +6361,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the list of provisional grades to the component', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         deepEqual(
           SpeedGraderProvisionalGradeSelector.props.provisionalGrades,
@@ -6363,6 +6372,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes "Custom" as the display name for the final grader', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(
           SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames['1'],
@@ -6373,6 +6383,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the hash of grader display names to the component', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         deepEqual(SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames, {
           1: 'Custom',

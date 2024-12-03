@@ -26,6 +26,7 @@ export const renderGameApp = domElement => {
   const AppRootElement = document.getElementById(domElement)
   const gamePool = [<OfficialNotFoundGame />, <SpaceInvaders />, <SlidePuzzle />]
   const index = Math.floor(Math.random() * 3)
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(gamePool[index], AppRootElement)
 }
 

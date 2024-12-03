@@ -73,6 +73,7 @@ class PostGradesApp extends React.Component<Props> {
     }
 
     store.reset()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<PostGradesDialog store={store} closeDialog={closeDialog} />, $dialog[0])
   }
 

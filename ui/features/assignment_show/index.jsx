@@ -105,6 +105,7 @@ function renderSpeedGraderLink() {
   const $mountPoint = document.getElementById('speed_grader_link_mount_point')
 
   if ($mountPoint) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SpeedGraderLink
         disabled={disabled}
@@ -120,6 +121,7 @@ function renderStudentGroupFilter() {
   const $mountPoint = document.getElementById('student_group_filter_mount_point')
 
   if ($mountPoint) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <StudentGroupFilter
         categories={ENV.group_categories}
@@ -218,6 +220,7 @@ $(() => {
 })
 
 function renderItemAssignToTray(open, returnFocusTo, itemProps) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ItemAssignToManager
       open={open}
@@ -263,6 +266,7 @@ $(() =>
 
 function openSendTo(event, open = true) {
   if (event) event.preventDefault()
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <DirectShareUserModal
       open={open}
@@ -279,6 +283,7 @@ function openSendTo(event, open = true) {
 
 function openCopyTo(event, open = true) {
   if (event) event.preventDefault()
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <DirectShareCourseTray
       open={open}
@@ -324,6 +329,7 @@ $(() => {
     const assignmentRubricAssociation = envRubricAssociation
       ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
       : undefined
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <RubricAssignmentContainer
         accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}

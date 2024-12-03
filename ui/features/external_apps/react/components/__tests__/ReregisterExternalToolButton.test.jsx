@@ -43,6 +43,7 @@ const createElement = data => (
   />
 )
 
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 
 const getDOMNodes = function (data) {

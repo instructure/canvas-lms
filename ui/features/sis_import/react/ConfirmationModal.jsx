@@ -74,6 +74,7 @@ export function ConfirmationModal({isOpen, onSubmit, onRequestClose}) {
 }
 
 export function renderBatchImportAlert(margin) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <BatchImportAlert margin={margin} />,
     document.getElementById('batch_import_instructions')
@@ -81,6 +82,7 @@ export function renderBatchImportAlert(margin) {
 }
 
 export function openModal(onSubmit, onRequestClose) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ConfirmationModal isOpen={true} onSubmit={onSubmit} onRequestClose={onRequestClose} />,
     document.getElementById('confirmation_modal_root')

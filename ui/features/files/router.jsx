@@ -29,6 +29,7 @@ import SearchResults from './react/components/SearchResults'
  * Route Handlers
  */
 function renderShowFolder(ctx) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <FilesApp
       query={ctx.query}
@@ -44,6 +45,7 @@ function renderShowFolder(ctx) {
 }
 
 function renderSearchResults(ctx) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <FilesApp
       query={ctx.query}

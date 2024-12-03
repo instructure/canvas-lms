@@ -35,6 +35,7 @@ export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) =
     }
     const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWithObserversDialog()
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ApolloProvider client={createClient()}>
         <MessageStudentsWhoDialog {...dialogeProps} />

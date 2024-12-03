@@ -82,6 +82,7 @@ const StudentView = createReactClass({
       $dialog.dialog('close')
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ManageGroupDialog
         userCollection={this.state.userCollection}

@@ -32,6 +32,7 @@ QUnit.module('ThemeEditorFileUpload Component', {
 })
 
 test('renders button disabled if nothing to reset', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = elem.getElementsByTagName('button')[0]
   equal(subject.disabled, true, 'button is disabled')
@@ -39,49 +40,59 @@ test('renders button disabled if nothing to reset', () => {
 
 test('renders button not disabled if something to reset', () => {
   props.userInput = {val: 'foo'}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = elem.getElementsByTagName('button')[0]
   equal(subject.disabled, false, 'button is enabled')
 })
 
 test('reset button label', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   let component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = elem.getElementsByTagName('button')[0]
   equal(subject.textContent, 'Reset', 'button label is "Reset"')
 
   props.currentValue = 'foo'
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   equal(subject.textContent, 'Clear', 'button label is "Clear"')
 
   props.userInput = {val: 'foo'}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   equal(subject.textContent, 'Undo', 'button label is "Undo"')
 })
 
 test('hasSomethingToReset', () => {
   props.userInput = {val: 'foo'}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   let component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   ok(component.hasSomethingToReset(), 'truthy userInput.val')
 
   props.userInput.val = ''
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   ok(component.hasSomethingToReset(), 'empty string userInput.val')
 
   props.userInput = {}
   props.currentValue = 'foo'
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   ok(component.hasSomethingToReset(), 'currentValue truthy')
 
   props.currentValue = null
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   notOk(component.hasSomethingToReset(), 'no value')
 })
 
 test('hasUserInput', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   let component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   notOk(component.hasUserInput(), 'no user input')
 
   props.userInput = {val: 'foo'}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   ok(component.hasUserInput(), 'non null input value')
 })
@@ -89,6 +100,7 @@ test('hasUserInput', () => {
 test('handleFileChanged', () => {
   const expected = {}
   sandbox.stub(window.URL, 'createObjectURL').returns(expected)
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   sandbox.spy(component, 'setState')
   const file = new Blob(['foo'], {type: 'text/plain'})
@@ -103,6 +115,7 @@ test('handleFileChanged', () => {
 })
 
 test('handleResetClicked', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = component.fileInput
   subject.setAttribute('type', 'text')
@@ -125,11 +138,13 @@ test('handleResetClicked', () => {
 })
 
 test('displayValue', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   let component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   sandbox.stub(component, 'hasUserInput').returns(false)
   equal(component.displayValue(), '', 'no input or current value, returns empty string')
 
   props.userInput = {val: 'foo'}
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const state = {selectedFileName: 'file.png'}
   component.setState(state)
@@ -140,12 +155,14 @@ test('displayValue', () => {
   )
 
   props.currentValue = 'bar'
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   equal(component.displayValue(), props.currentValue, 'returns current value')
 })
 
 test('sets accept on file input from prop', () => {
   props.accept = 'image/*'
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   const subject = component.fileInput
   equal(subject.accept, props.accept, 'accepted is set on file input')

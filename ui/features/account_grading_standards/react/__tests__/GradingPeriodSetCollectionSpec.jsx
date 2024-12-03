@@ -123,6 +123,7 @@ function renderComponent(props = {}) {
     ...exampleProps,
     ...props,
   })
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(element, wrapper)
   return component
 }

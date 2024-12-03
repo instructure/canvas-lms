@@ -51,6 +51,7 @@ export default function renderCanvasMediaRecorder(element, onSaveFile) {
     }
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CanvasMediaRecorder
       onSaveFile={onSaveFile}

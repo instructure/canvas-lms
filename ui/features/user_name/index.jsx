@@ -24,5 +24,6 @@ import './jquery/index'
 
 ready(() => {
   const suspendPlaceholder = document.getElementById('suspend-reactivate-link')
+  // eslint-disable-next-line no-restricted-properties
   if (suspendPlaceholder) ReactDOM.render(<UserSuspendLink />, suspendPlaceholder)
 })

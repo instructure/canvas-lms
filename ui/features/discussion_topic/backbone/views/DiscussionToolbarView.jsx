@@ -66,6 +66,7 @@ export default class DiscussionToolbarView extends View {
 
   afterRender() {
     if (this.$el.find('#search_entries_container')[0]) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <TextInput
           onChange={e => {

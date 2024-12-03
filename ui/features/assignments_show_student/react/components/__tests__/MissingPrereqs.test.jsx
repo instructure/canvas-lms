@@ -35,6 +35,7 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<MissingPrereqs moduleUrl="TEST" />, document.getElementById('fixtures'))
   const element = $('[data-testid="assignments-2-pre-req-title"]')
   expect(element).toHaveLength(1)

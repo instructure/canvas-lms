@@ -59,6 +59,7 @@ function renderShowDeveloperKeys(ctx) {
 
     const view = () => {
       const currentState = store.getState()
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <DeveloperKeysApp
           applicationState={currentState}
@@ -77,6 +78,7 @@ function renderShowDeveloperKeys(ctx) {
 }
 
 const renderDeveloperKeySettings = ctx => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <QueryProvider>
       <RegistrationSettings ctx={ctx} />

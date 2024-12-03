@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -102,6 +103,7 @@ export default class CanvasMediaRecorder extends React.Component {
     if (!indicatorBarMountPointId) return
     const mountPoint = document.getElementById(indicatorBarMountPointId)
     if (mountPoint) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <ScreenCaptureIndicatorBar
           onFinishClick={this.handleFinishClick}

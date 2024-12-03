@@ -60,6 +60,7 @@ QUnit.module('NewGradingPeriodSetForm', {
       readOnly: false,
     }
     const element = React.createElement(NewSetForm, defaults(props, defaultProps))
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(element, wrapper)
   },
 

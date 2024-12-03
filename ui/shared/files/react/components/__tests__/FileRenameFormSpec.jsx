@@ -38,6 +38,7 @@ QUnit.module('FileRenameForm', {
       },
     }
     this.renderForm = props => {
+      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
       this.form = ReactDOM.render(
         <FileRenameForm {...defaultProps} {...props} />,
         $('<div>').appendTo('#fixtures')[0]

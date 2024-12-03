@@ -23,5 +23,6 @@ import Confetti from './Confetti'
 export {Confetti}
 
 export default function renderConfettiApp(env, elt) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<Confetti />, elt)
 }

@@ -35,6 +35,7 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
     parent

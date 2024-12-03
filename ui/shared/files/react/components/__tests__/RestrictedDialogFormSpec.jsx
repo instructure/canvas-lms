@@ -40,6 +40,7 @@ QUnit.module('RestrictedDialogForm Multiple Selected Items', {
         }),
       ],
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedDialogForm = ReactDOM.render(
       <RestrictedDialogForm {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -73,6 +74,7 @@ QUnit.module('RestrictedDialogForm#handleSubmit', {
         }),
       ],
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedDialogForm = ReactDOM.render(
       <RestrictedDialogForm {...props} />,
       $('<div>').appendTo('#fixtures')[0]

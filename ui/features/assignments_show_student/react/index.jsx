@@ -36,6 +36,7 @@ const client = createClient()
 const I18n = useI18nScope('assignments_2')
 
 export default function renderAssignmentsApp(env, elt) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ApolloProvider client={client}>
       <ErrorBoundary
@@ -60,6 +61,7 @@ export default function renderAssignmentsApp(env, elt) {
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <View as="div" maxWidth="12em">
         <ObserverOptions

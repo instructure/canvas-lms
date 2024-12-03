@@ -51,6 +51,7 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
   })
 
   function renderComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<Lti2Iframe {...props} />, $container)
   }
 

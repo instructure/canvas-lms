@@ -468,6 +468,7 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
   })
 
   hooks.afterEach(() => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render.restore()
     React.createElement.restore()
     mountPoint.remove()
@@ -478,6 +479,7 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
       applyScoreToUngradedModalNode: mountPoint,
     })
     gradebook.onApplyScoreToUngradedRequested()
+    // eslint-disable-next-line no-restricted-properties
     ok(ReactDOM.render.notCalled)
   })
 
@@ -488,7 +490,9 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
     })
     gradebook.onApplyScoreToUngradedRequested()
 
+    // eslint-disable-next-line no-restricted-properties
     strictEqual(ReactDOM.render.callCount, 1)
+    // eslint-disable-next-line no-restricted-properties
     strictEqual(ReactDOM.render.firstCall.args[1], mountPoint)
   })
 

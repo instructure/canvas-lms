@@ -40,6 +40,7 @@ export function showImportOutcomesModal(props) {
     if (modal) modal.show()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ImportOutcomesModal {...props} parent={parent} ref={showImportOutcomesRef} />,
     parent

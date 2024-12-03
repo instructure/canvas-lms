@@ -40,6 +40,7 @@ describe('ThemeEditorImageRow Component', () => {
   test('renders with human name heading', () => {
     const expected = 'Human'
     props.varDef.human_name = expected
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const subject = elem.getElementsByTagName('h3')[0]
     expect(subject.textContent).toBe(expected)
@@ -48,6 +49,7 @@ describe('ThemeEditorImageRow Component', () => {
   test('renders with helper text', () => {
     const expected = 'Halp!'
     props.varDef.helper_text = expected
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const subject = elem.getElementsByClassName('Theme__editor-upload_restrictions')[0]
     expect(subject.textContent).toBe(expected)
@@ -56,6 +58,7 @@ describe('ThemeEditorImageRow Component', () => {
   test('renders image with placeholder', () => {
     const expected = 'image.png'
     props.placeholder = expected
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const subject = elem.getElementsByTagName('img')[0]
     expect(subject.src.split('/').pop()).toBe(expected)
@@ -66,12 +69,14 @@ describe('ThemeEditorImageRow Component', () => {
     const expected = 'image.png'
     props.placeholder = 'other.png'
     props.userInput = {val: expected}
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const subject = elem.getElementsByTagName('img')[0]
     expect(subject.src.split('/').pop()).toBe(expected)
   })
 
   test('setValue clears file input and calls onChange when arg is null', () => {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const subject = component.fileInput
     subject.setAttribute('type', 'text')
@@ -82,6 +87,7 @@ describe('ThemeEditorImageRow Component', () => {
   })
 
   test('setValue clears file input and calls onChange when arg is empty string', () => {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const subject = component.fileInput
     subject.setAttribute('type', 'text')
@@ -93,6 +99,7 @@ describe('ThemeEditorImageRow Component', () => {
 
   // we can't mutate window.URL
   test.skip('setValue calls onChange with blob url of input file', () => {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     const component = ReactDOM.render(<ThemeEditorImageRow {...props} />, elem)
     const blob = new Blob(['foo'], {type: 'text/plain'})
     const originalCreateObjectURL = window.URL.createObjectURL

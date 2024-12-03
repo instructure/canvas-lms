@@ -158,6 +158,7 @@ const ConferencesRouter = Backbone.Router.extend({
           }) || []
 
         const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <VideoConferenceModal
             open={true}
@@ -165,6 +166,7 @@ const ConferencesRouter = Backbone.Router.extend({
             availableAttendeesList={menuData}
             onDismiss={() => {
               window.location.hash = ''
+              // eslint-disable-next-line no-restricted-properties
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
             }}
             onSubmit={async (e, data) => {
@@ -341,6 +343,7 @@ const ConferencesRouter = Backbone.Router.extend({
         }
       })
 
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <VideoConferenceModal
           open={true}
@@ -361,6 +364,7 @@ const ConferencesRouter = Backbone.Router.extend({
           endCalendarDate={attributes.end_at}
           onDismiss={() => {
             window.location.hash = ''
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
           }}
           onSubmit={async (e, data) => {

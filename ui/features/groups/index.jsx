@@ -22,6 +22,7 @@ import ready from '@instructure/ready'
 import React from 'react'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <StudentView enableGroupCreation={true} enableEveryoneTab={true} />,
     document.getElementById('content')

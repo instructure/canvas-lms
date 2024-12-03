@@ -40,10 +40,12 @@ QUnit.module('ThemeEditorColorRow Component', {
 })
 
 test('showWarning', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   let component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
   notOk(component.showWarning(), 'not invalid')
   props.userInput = {invalid: true}
   sinon.stub(component, 'inputNotFocused').returns(false)
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
   notOk(component.showWarning(), 'invalid but input focused')
   component.inputNotFocused.returns(true)
@@ -51,6 +53,7 @@ test('showWarning', () => {
 })
 
 test('changedColor', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
   equal(component.changedColor('foo'), null, 'returns null if background color is invalid string')
 
@@ -82,6 +85,7 @@ test('changedColor', () => {
 })
 
 test('invalidHexString', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
   notOk(component.invalidHexString('foo'), 'hex string is not valid')
   ok(component.invalidHexString('#aabbccc'), 'hex string is valid')
@@ -89,6 +93,7 @@ test('invalidHexString', () => {
 })
 
 test('inputChange', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
   const expected = 'foo'
   sinon.stub(component, 'changedColor').returns(true)
@@ -119,6 +124,7 @@ test('inputChange', () => {
 })
 
 test('inputNotFocused', () => {
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const component = ReactDOM.render(<ThemeEditorColorRow {...props} />, elem)
   document.body.focus()
   ok(component.inputNotFocused, 'input is not focused')

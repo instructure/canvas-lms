@@ -35,6 +35,7 @@ describe('DueDateRemoveRowLink', () => {
     }
     handleClick = sandbox.stub(props, 'handleClick')
     const DueDateRemoveRowLinkElement = <DueDateRemoveRowLink {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     DueDateRemoveRowLink_ = ReactDOM.render(
       DueDateRemoveRowLinkElement,
       $('<div>').appendTo('body')[0]

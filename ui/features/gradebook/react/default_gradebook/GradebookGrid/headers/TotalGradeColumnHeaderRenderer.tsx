@@ -139,6 +139,7 @@ export default class TotalGradeColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, gridSupport, options)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
   }
 

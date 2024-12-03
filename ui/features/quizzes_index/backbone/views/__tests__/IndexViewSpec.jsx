@@ -154,8 +154,10 @@ test('renders choose quiz engine modal', () => {
   sinon.stub(ReactDOM, 'render')
   const view = indexView(null, null, null)
   view.$('.choose-quiz-engine').simulate('click')
+  // eslint-disable-next-line no-restricted-properties
   const args = ReactDOM.render.firstCall.args
   equal(args[0].props.setOpen, true)
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render.restore()
 })
 test('should render the view', () => {

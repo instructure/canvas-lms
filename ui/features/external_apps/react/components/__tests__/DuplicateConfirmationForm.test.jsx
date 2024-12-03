@@ -33,6 +33,7 @@ let domNode
 
 function renderComponent(props) {
   domNode = domNode || document.createElement('div')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<DuplicateConfirmationForm {...props} />, domNode)
 }
 

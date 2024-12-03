@@ -36,6 +36,7 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
       if (response.status === 200 && response.data.workflow_state === 'importing') {
         const importId = response.data.id
         const invokedImport = userId === response.data.user.id
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <OutcomesImporter
             {...props}
@@ -51,6 +52,7 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
 }
 
 export function showOutcomesImporter({mount, ...props}) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<OutcomesImporter {...props} hide={unmount(mount)} invokedImport={true} />, mount)
 }
 

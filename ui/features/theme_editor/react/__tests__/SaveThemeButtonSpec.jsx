@@ -48,6 +48,7 @@ QUnit.module('SaveThemeButton Component', {
 
 test('save', assert => {
   const done = assert.async()
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   let component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
   const updatedBrandConfig = {}
   sandbox.stub(jQuery, 'ajaxJSON').callsArgOnWith(3, component, updatedBrandConfig)
@@ -61,6 +62,7 @@ test('save', assert => {
   ok(props.onSave.calledWith(updatedBrandConfig), 'calls onSave with updated config')
 
   delete props.sharedBrandConfigBeingEdited
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   component = ReactDOM.render(<SaveThemeButton {...props} />, elem)
   jQuery.ajaxJSON.reset()
   component.save()

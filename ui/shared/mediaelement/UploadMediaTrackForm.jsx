@@ -63,6 +63,7 @@ export default class UploadMediaTrackForm {
         zIndex: 1000,
       })
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CopyToClipboard interaction="readonly" name="video_url" value={video_url} />,
       document.getElementById('media-track-video-url-container')

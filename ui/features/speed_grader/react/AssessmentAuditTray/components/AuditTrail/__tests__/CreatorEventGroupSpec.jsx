@@ -56,6 +56,7 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
   function buildAuditTrailAndMountComponent() {
     const auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
     props = {creatorEventGroup: auditTrail.creatorEventGroups[0]}
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<CreatorEventGroup {...props} />, $container)
   }
 

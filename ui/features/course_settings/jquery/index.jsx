@@ -388,6 +388,7 @@ $(document).ready(function () {
         // special value indicating the default grading scheme
         selectedGradingSchemeId = undefined
       }
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <GradingSchemesSelector
           canManage={ENV.PERMISSIONS.manage_grading_schemes}
@@ -419,6 +420,7 @@ $(document).ready(function () {
           renderGradingSchemeSelector($('#grading_standard_id').val())
         } else {
           $('#grading_standard_id').val('')
+          // eslint-disable-next-line no-restricted-properties
           ReactDOM.render(<></>, grading_scheme_selector)
           $course_form.find('.grading_scheme_selector').hide()
         }

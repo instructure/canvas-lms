@@ -175,6 +175,7 @@ export default class ItemView extends Backbone.View {
 
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
     const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -245,6 +246,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentSelection = isOldQuiz ? {quizzes: [quizId]} : {assignments: [quizId]}
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -268,6 +270,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentType = isOldQuiz ? 'quiz' : 'assignment'
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareUserModal
         open={open}

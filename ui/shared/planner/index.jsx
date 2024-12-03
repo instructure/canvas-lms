@@ -292,6 +292,7 @@ export function createPlannerApp() {
 createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(createPlannerApp(), element)
 }
 
@@ -300,6 +301,7 @@ function renderHeader(element, auxElement) {
   const ariaHideElement = document.getElementById('application')
 
   // Using this pattern because default params don't merge objects
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
@@ -331,6 +333,7 @@ export function renderToDoSidebar(element) {
     initializedOptions.env.current_user_roles.includes('teacher') &&
     initializedOptions.env.current_user_roles.includes('student')
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <Provider store={store}>
       <Suspense fallback={loading()}>

@@ -22,6 +22,7 @@ import AccountTabContainer from './react/AccountTabContainer'
 import ready from '@instructure/ready'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <AccountTabContainer
       {...{

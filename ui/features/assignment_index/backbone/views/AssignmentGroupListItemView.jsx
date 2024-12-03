@@ -758,7 +758,7 @@ AssignmentGroupListItemView.prototype.setExternalToolTray = function (tool, retu
     open: tool !== null,
   }
   const component = React.createElement(ContentTypeExternalToolTray, props)
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(component, $('#external-tool-mount-point')[0])
 }
 

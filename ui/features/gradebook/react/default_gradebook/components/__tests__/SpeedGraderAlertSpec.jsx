@@ -31,6 +31,7 @@ QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', hooks => {
   }
 
   function anonymousSpeedGraderAlertProps() {
+    // eslint-disable-next-line no-restricted-properties
     return ReactDOM.render.firstCall.args[0].props
   }
 
@@ -39,12 +40,14 @@ QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', hooks => {
   })
 
   hooks.afterEach(() => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render.restore()
   })
 
   test('renders the AnonymousSpeedGraderAlert component', () => {
     gradebook = createGradebook()
     gradebook.renderAnonymousSpeedGraderAlert(alertProps)
+    // eslint-disable-next-line no-restricted-properties
     const componentName = ReactDOM.render.firstCall.args[0].type.name
     strictEqual(componentName, 'AnonymousSpeedGraderAlert')
   })

@@ -60,6 +60,7 @@ QUnit.module('DueDateTokenWrapper', {
     }
     this.mountPoint = $('<div>').appendTo('body')[0]
     const DueDateTokenWrapperElement = <DueDateTokenWrapper {...this.props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, this.mountPoint)
     this.TokenInput = this.DueDateTokenWrapper.refs.TokenInput
   },
@@ -118,6 +119,7 @@ test('menu options are grouped by type', function () {
 test('handleTokenAdd is called when a token is added', function () {
   const addProp = sandbox.stub(this.props, 'handleTokenAdd')
   const DueDateTokenWrapperElement = <DueDateTokenWrapper {...this.props} />
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   this.DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, this.mountPoint)
   this.DueDateTokenWrapper.handleTokenAdd('sene')
   ok(addProp.calledOnce)
@@ -127,6 +129,7 @@ test('handleTokenAdd is called when a token is added', function () {
 test('handleTokenRemove is called when a token is removed', function () {
   const removeProp = sandbox.stub(this.props, 'handleTokenRemove')
   const DueDateTokenWrapperElement = <DueDateTokenWrapper {...this.props} />
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   this.DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, this.mountPoint)
   this.DueDateTokenWrapper.handleTokenRemove('sene')
   ok(removeProp.calledOnce)
@@ -193,6 +196,7 @@ QUnit.module('disabled DueDateTokenWrapper', {
     }
     this.mountPoint = $('<div>').appendTo('body')[0]
     const DueDateTokenWrapperElement = <DueDateTokenWrapper {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.DueDateTokenWrapper = ReactDOM.render(DueDateTokenWrapperElement, this.mountPoint)
   },
   teardown() {

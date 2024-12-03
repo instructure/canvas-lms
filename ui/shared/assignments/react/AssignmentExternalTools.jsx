@@ -211,6 +211,7 @@ const attach = function (element, placement, courseId, assignmentId) {
       assignmentId={assignmentId}
     />
   )
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(configTools, element)
 }
 

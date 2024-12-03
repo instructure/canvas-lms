@@ -50,6 +50,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     const bindRef = ref => {
       tray = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<HideAssignmentGradesTray ref={bindRef} />, $container)
   })
 

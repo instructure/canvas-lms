@@ -719,6 +719,7 @@ function getCourseId() {
 }
 
 function renderSelectMenuGroup() {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />,
     document.getElementById('GradeSummarySelectMenuGroup')
@@ -726,6 +727,7 @@ function renderSelectMenuGroup() {
 }
 
 function renderGradeSummaryTable() {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<GradeSummaryManager />, document.getElementById('grade-summary-react'))
 }
 
@@ -773,6 +775,7 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 
 function renderSubmissionCommentsTray() {
   ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <SubmissionCommentsTray
       onDismiss={() => {
@@ -789,6 +792,7 @@ function renderClearBadgeCountsButton() {
   ReactDOM.unmountComponentAtNode(document.getElementById('ClearBadgeCountsButton'))
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ClearBadgeCountsButton userId={userId} courseId={courseId} />,
     document.getElementById('ClearBadgeCountsButton')
