@@ -17,7 +17,7 @@
  */
 
 import React, {useRef, useState} from 'react'
-import {ActionPrompt, EMAIL_REGEX, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
+import {ActionPrompt, EMAIL_REGEX, ReCaptcha, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -55,6 +55,7 @@ const Parent = () => {
   const [pairingCode, setPairingCode] = useState('')
   const [password, setPassword] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const [confirmPasswordError, setConfirmPasswordError] = useState('')
   const [emailError, setEmailError] = useState('')
@@ -127,6 +128,14 @@ const Parent = () => {
       setTermsError('')
     }
 
+    if (recaptchaKey && !captchaToken) {
+      showFlashAlert({
+        message: I18n.t('Please complete the reCAPTCHA verification.'),
+        type: 'error',
+      })
+      return false
+    }
+
     return true
   }
 
@@ -145,12 +154,13 @@ const Parent = () => {
         confirmPassword,
         pairingCode,
         termsAccepted,
+        captchaToken: captchaToken ?? undefined,
       })
       if (response.status === 200) {
         handleRegistrationRedirect(response.data)
       } else {
         showFlashAlert({
-          message: 'Something went wrong. Please try again later.',
+          message: I18n.t('Something went wrong. Please try again later.'),
           type: 'error',
         })
       }
@@ -339,7 +349,11 @@ const Parent = () => {
             </Flex.Item>
           )}
 
-          {recaptchaKey && <Text>(TODO reCAPTCHA if enabled {recaptchaKey})</Text>}
+          {recaptchaKey && (
+            <Flex justifyItems="center" alignItems="center">
+              <ReCaptcha siteKey={recaptchaKey} onVerify={token => setCaptchaToken(token)} />
+            </Flex>
+          )}
 
           <Flex direction="row" gap="small">
             <Button

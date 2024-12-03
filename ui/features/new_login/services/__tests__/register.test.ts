@@ -29,36 +29,44 @@ describe('Register Service', () => {
     jest.clearAllMocks()
   })
 
-  describe('createTeacherAccount', () => {
-    it('should call doFetchApi with correct parameters and handle success', async () => {
-      const mockResponse = {
-        json: {success: true},
-        response: {status: 200},
-      }
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await createTeacherAccount('Test Teacher', 'test@example.com', true)
-      expect(doFetchApi).toHaveBeenCalledWith({
-        path: '/users',
-        method: 'POST',
-        body: {
-          user: {
-            name: 'Test Teacher',
-            terms_of_use: '1',
-          },
-          pseudonym: {
-            unique_id: 'test@example.com',
-          },
+  it('should call doFetchApi with correct parameters and handle success', async () => {
+    const mockResponse = {
+      json: {success: true},
+      response: {status: 200},
+    }
+    ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+    const result = await createTeacherAccount({
+      name: 'Test Teacher',
+      email: 'test@example.com',
+      termsAccepted: true,
+      captchaToken: 'mock-captcha-token',
+    })
+    expect(doFetchApi).toHaveBeenCalledWith({
+      path: '/users',
+      method: 'POST',
+      body: {
+        user: {
+          name: 'Test Teacher',
+          terms_of_use: '1',
         },
-      })
-      expect(result).toEqual({status: 200, data: {success: true}})
+        pseudonym: {
+          unique_id: 'test@example.com',
+        },
+        'g-recaptcha-response': 'mock-captcha-token',
+      },
     })
+    expect(result).toEqual({status: 200, data: {success: true}})
+  })
 
-    it('should handle missing JSON in response', async () => {
-      const mockResponse = {json: null, response: {status: 400}}
-      ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
-      const result = await createTeacherAccount('Test Teacher', 'test@example.com', false)
-      expect(result).toEqual({status: 400, data: {success: false}})
+  it('should handle missing JSON in response', async () => {
+    const mockResponse = {json: null, response: {status: 400}}
+    ;(doFetchApi as jest.Mock).mockResolvedValue(mockResponse)
+    const result = await createTeacherAccount({
+      name: 'Test Teacher',
+      email: 'test@example.com',
+      termsAccepted: false,
     })
+    expect(result).toEqual({status: 400, data: {success: false}})
   })
 
   describe('createParentAccount', () => {

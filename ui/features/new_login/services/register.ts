@@ -19,22 +19,24 @@
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {ApiResponse, RegistrationResponse} from '../types'
 
-export const createTeacherAccount = async (
-  name: string,
-  email: string,
-  termsAccepted?: boolean
-): Promise<ApiResponse<RegistrationResponse>> => {
+export const createTeacherAccount = async (payload: {
+  name: string
+  email: string
+  termsAccepted: boolean
+  captchaToken?: string
+}): Promise<ApiResponse<RegistrationResponse>> => {
   const {json, response} = await doFetchApi<RegistrationResponse>({
     path: '/users',
     method: 'POST',
     body: {
       user: {
-        name,
-        terms_of_use: termsAccepted ? '1' : '0',
+        name: payload.name,
+        terms_of_use: payload.termsAccepted ? '1' : '0',
       },
       pseudonym: {
-        unique_id: email,
+        unique_id: payload.email,
       },
+      'g-recaptcha-response': payload.captchaToken,
     },
   })
 
@@ -48,6 +50,7 @@ export const createParentAccount = async (payload: {
   confirmPassword: string
   pairingCode: string
   termsAccepted: boolean
+  captchaToken?: string
 }): Promise<ApiResponse<RegistrationResponse>> => {
   const {json, response} = await doFetchApi<RegistrationResponse>({
     path: '/users',
@@ -70,6 +73,7 @@ export const createParentAccount = async (payload: {
       communication_channel: {
         skip_confirmation: '1',
       },
+      'g-recaptcha-response': payload.captchaToken,
     },
   })
 
@@ -84,6 +88,7 @@ export const createStudentAccount = async (payload: {
   joinCode: string
   email?: string
   termsAccepted: boolean
+  captchaToken?: string
 }): Promise<ApiResponse<RegistrationResponse>> => {
   const {json, response} = await doFetchApi<RegistrationResponse>({
     path: '/users',
@@ -103,6 +108,7 @@ export const createStudentAccount = async (payload: {
       },
       self_enrollment: '1',
       pseudonym_type: 'username',
+      'g-recaptcha-response': payload.captchaToken,
     },
   })
 
