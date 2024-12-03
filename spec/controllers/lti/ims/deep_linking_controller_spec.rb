@@ -25,6 +25,41 @@ module Lti
     RSpec.describe DeepLinkingController do
       include_context "deep_linking_spec_helper"
 
+      describe "#deep_linking_cancel" do
+        subject do
+          params = {
+            placement: "editor_button",
+            lti_msg: "hello",
+            lti_log: "log",
+            lti_errormsg: "error",
+            lti_errorlog: "error log"
+          }
+          get :deep_linking_cancel, params:
+        end
+
+        it "renders the same page as the deep linking response URL" do
+          expect(subject).to render_template("lti/ims/deep_linking/deep_linking_response")
+        end
+
+        it "sets the JS ENV with no content_items" do
+          expected_dl_resp = {
+            placement: "editor_button",
+            content_items: [],
+            msg: "Message from external tool: hello",
+            log: "log",
+            errormsg: "Error message from external tool: error",
+            errorlog: "error log",
+            reloadpage: false,
+            moduleCreated: false,
+            replaceEditorContents: false
+          }
+
+          expect(controller).to receive(:js_env).with({ deep_link_response: expected_dl_resp })
+
+          subject
+        end
+      end
+
       describe "#deep_linking_response" do
         subject { post :deep_linking_response, params: }
 

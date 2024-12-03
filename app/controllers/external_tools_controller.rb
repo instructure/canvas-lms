@@ -563,13 +563,19 @@ class ExternalToolsController < ApplicationController
       selection_type = "editor_button" if params[:editor]
       selection_type = "homework_submission" if params[:homework]
 
-      @return_url = named_context_url(@context, :context_external_content_success_url, "external_tool_dialog", { include_host: true })
       @headers = false
 
       unless find_tool(params[:external_tool_id], selection_type)
         timing_meta.tags = { error: true }
         return
       end
+
+      @return_url =
+        if @tool&.use_1_3?
+          deep_linking_cancel_url(include_host: true, placement:)
+        else
+          named_context_url(@context, :context_external_content_success_url, "external_tool_dialog", include_host: true)
+        end
 
       @lti_launch = lti_launch(tool: @tool, selection_type:, launch_token: params[:launch_token])
       unless @lti_launch
