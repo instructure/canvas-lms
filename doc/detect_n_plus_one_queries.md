@@ -1,6 +1,6 @@
 # Detect N+1 Queries
 
-Canvas uses the [prosopite](https://github.com/charkost/prosopite) gem to detect N+1 query problems and prints information about them to `log/development.log` in development, and to `log/test.log` in test. It also prints this information to its own dedicated log file, `log/prosopite.log` when in development. Here's an example report:
+Canvas uses the [prosopite](https://github.com/charkost/prosopite) gem to detect N+1 query problems and prints information about them to `log/development.log`. It also prints this information to its own dedicated log file, `log/prosopite.log` when in development. Here's an example report:
 
 ```ruby
 N+1 queries detected:
@@ -64,6 +64,8 @@ Call stack:
 
 ## Enabling Detection
 
-Automatic N+1 detection for requests is off by default. Setting the N_PLUS_ONE_DETECTION environment variable to 'true' causes all controller actions to be wrapped in a `Prosopite.scan` while in `development` or `test`. It also causes all rspec tests to be wrapped in a `Prosopite.scan`.
+Automatic N+1 detection for requests is on by default (`development` env only). All controller actions are wrapped in a `Prosopite.scan` while in `development`.
 
-You can manually invoke `Prosopite.scan` in any environment, even when the N_PLUS_ONE_DETECTION environment variable is not set to 'true'.
+To disable N+1 detection, set the DISABLE_N_PLUS_ONE_DETECTION environment variable to 'true'.
+
+You can manually invoke `Prosopite.scan` in any environment.
