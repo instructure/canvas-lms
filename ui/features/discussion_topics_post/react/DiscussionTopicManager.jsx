@@ -233,6 +233,7 @@ const DiscussionTopicManager = props => {
   useEffect(() => {
     if (!discussionTopicQuery.data || !firstRequest) return
     setFirstRequest(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [discussionTopicQuery])
 
   // Unread filter
@@ -246,6 +247,7 @@ const DiscussionTopicManager = props => {
     if (firstRequest && ENV.current_page !== 0) return
     setPageNumber(0)
     setSearchPageNumber(0)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, unreadBefore])
 
   useEffect(() => {

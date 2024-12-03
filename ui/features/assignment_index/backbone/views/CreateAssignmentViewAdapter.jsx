@@ -1,3 +1,4 @@
+/* eslint-disable no-fallthrough */
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *

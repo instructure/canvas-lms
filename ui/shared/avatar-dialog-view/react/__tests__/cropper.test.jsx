@@ -43,6 +43,7 @@ describe('CanvasCropper', () => {
 
   test('getImage returns cropped image object', async () => {
     const done = jest.fn()
+    // eslint-disable-next-line promise/catch-or-return, jest/valid-expect-in-promise
     ref.current.crop().then(image => {
       expect(image instanceof Blob).toBeTruthy()
       expect(done).toHaveBeenCalledTimes(1)

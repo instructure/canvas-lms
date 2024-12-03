@@ -25,7 +25,7 @@ import UsersListRow from '../UsersListRow'
 import fetchMock from 'fetch-mock'
 import sinon from 'sinon'
 
-describe('Account Course User Search UsersList View', function (hooks) {
+describe('Account Course User Search UsersList View', function () {
   beforeEach(() => {
     fetchMock.mock(
       '/api/v1/users/1/enrollments?state%5B%5D=active&state%5B%5D=invited&temporary_enrollment_providers=true',

@@ -23,7 +23,7 @@ import {shallow} from 'enzyme'
 import BlueprintSidebar from '../BlueprintSidebar'
 import sinon from 'sinon'
 
-describe('BlueprintSidebar', hooks => {
+describe('BlueprintSidebar', () => {
   let clock
   let wrapper
 

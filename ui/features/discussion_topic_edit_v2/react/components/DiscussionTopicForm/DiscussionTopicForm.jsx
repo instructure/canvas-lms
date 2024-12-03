@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -167,6 +168,7 @@ function DiscussionTopicForm({
   const initialSelectedView = window.location.hash.includes('mastery-paths-editor')
     ? Views.MasteryPaths
     : Views.Details
+
   const [selectedView, setSelectedView] = useState(initialSelectedView)
 
   const [title, setTitle] = useState(currentDiscussionTopic?.title || '')
@@ -558,15 +560,20 @@ function DiscussionTopicForm({
           masteryPathsOption
         )
       )
-    } else if (isGraded && ENV.FEATURES?.selective_release_ui_api && !isGroupDiscussion && ENV.context_type !== 'Group') {
+    } else if (
+      isGraded &&
+      ENV.FEATURES?.selective_release_ui_api &&
+      !isGroupDiscussion &&
+      ENV.context_type !== 'Group'
+    ) {
       // Well, its fairly lame to call prepUngraded inside if isGraded, but availableUntil/From is ignored by selective release, so we need to fetch it somehow.
-      const { delayedPostAt, lockAt } = prepareUngradedDiscussionOverridesPayload(
+      const {delayedPostAt, lockAt} = prepareUngradedDiscussionOverridesPayload(
         assignedInfoList,
         defaultEveryoneOption,
         defaultEveryoneElseOption,
         masteryPathsOption
       )
-      Object.assign(payload, { delayedPostAt, lockAt })
+      Object.assign(payload, {delayedPostAt, lockAt})
     }
 
     const previousAnonymousState = !currentDiscussionTopic?.anonymousState

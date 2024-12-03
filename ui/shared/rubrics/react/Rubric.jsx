@@ -90,7 +90,7 @@ const Rubric = props => {
 
   // we show the last column for points or comments button
   const showPointsColumn = () => {
-    if (ENV['restrict_quantitative_data']) {
+    if (ENV.restrict_quantitative_data) {
       return false
     }
     if (isSummary) {
@@ -202,7 +202,7 @@ const Rubric = props => {
         </Table.Head>
         <Table.Body data-testid="criterions">
           {criteria}
-          {showTotalPoints && !ENV['restrict_quantitative_data'] && (
+          {showTotalPoints && !ENV.restrict_quantitative_data && (
             <Table.Row>
               <Table.Cell colSpan={numColumns}>
                 <Flex justifyItems="end">

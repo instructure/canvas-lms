@@ -27,8 +27,6 @@ import * as StudentActions from '../../students/StudentActions'
 import FlashMessageHolder from '../FlashMessageHolder'
 import configureStore from '../../configureStore'
 
-/* eslint-disable qunit/no-identical-names */
-
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(),
 }))
@@ -200,7 +198,7 @@ describe('GradeSummary FlashMessageHolder', () => {
     })
   })
 
-  test('does not display a flash alert when releasing grades starts', () => {
+  test('does not display a flash alert when releasing grades starts (2)', () => {
     mountComponent()
     store.dispatch(AssignmentActions.setReleaseGradesStatus(AssignmentActions.STARTED))
     expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(0)
@@ -483,4 +481,3 @@ describe('GradeSummary FlashMessageHolder', () => {
     })
   })
 })
-/* eslint-enable qunit/no-identical-names */
