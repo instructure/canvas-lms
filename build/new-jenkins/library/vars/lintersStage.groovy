@@ -26,7 +26,7 @@ def nodeRequirementsTemplate() {
     ]
   ]
 
-  def containers = ['bundle', 'gergichLinters', 'jsLinters', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
+  def containers = ['bundle', 'gergichLinters', 'ESLint', 'TypeScript', 'miscJsChecks', 'feature-flag', 'groovy', 'master-bouncer', 'webpack', 'yarn'].collect { containerName ->
     baseTestContainer + [name: containerName]
   }
 
@@ -50,7 +50,6 @@ def gergichLintersStage(stages) {
   { ->
     def codeEnvVars = [
       "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
-      "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
     ]
 
     callableWithDelegate(queueTestStage())(stages,
@@ -61,17 +60,34 @@ def gergichLintersStage(stages) {
   }
 }
 
-def jsLintersStage(stages) {
+def miscJsChecksStage(stages) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'miscJsChecks',
+      command: './build/new-jenkins/linters/run-misc-js-checks.sh'
+    )
+  }
+}
+
+def typescriptStage(stages) {
+  { ->
+    callableWithDelegate(queueTestStage())(stages,
+      name: 'TypeScript',
+      command: 'export NODE_OPTIONS="--max-old-space-size=8192" && node_modules/.bin/tsc -p tsconfig.json --noEmit'
+    )
+  }
+}
+
+def eslintStage(stages) {
   { ->
     def codeEnvVars = [
-      "PRIVATE_PLUGINS=${commitMessageFlag('canvas-lms-private-plugins') as String}",
       "SKIP_ESLINT=${commitMessageFlag('skip-eslint') as Boolean}",
     ]
 
     callableWithDelegate(queueTestStage())(stages,
-      name: 'jsLinters',
+      name: 'ESLint',
       envVars: codeEnvVars,
-      command: './build/new-jenkins/linters/run-js-linters.sh'
+      command: './build/new-jenkins/linters/run-eslint.sh'
     )
   }
 }
