@@ -35,7 +35,8 @@ const createMockContainer = (
   termsOfUseUrl: string | null,
   privacyPolicyUrl: string | null,
   requireEmail: string | null,
-  passwordPolicy: string | null
+  passwordPolicy: string | null,
+  forgotPasswordUrl: string | null
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -87,6 +88,9 @@ const createMockContainer = (
   if (passwordPolicy !== null) {
     container.setAttribute('data-password-policy', passwordPolicy)
   }
+  if (forgotPasswordUrl !== null) {
+    container.setAttribute('data-forgot-password-url', forgotPasswordUrl)
+  }
   document.body.appendChild(container)
 }
 
@@ -122,6 +126,7 @@ describe('useNewLoginData', () => {
       privacyPolicyUrl: undefined,
       requireEmail: undefined,
       passwordPolicy: undefined,
+      forgotPasswordUrl: undefined,
     })
   })
 
@@ -149,7 +154,8 @@ describe('useNewLoginData', () => {
         require_number_characters: 'false',
         require_symbol_characters: 'false',
         common_passwords_folder_id: '1234',
-      })
+      }),
+      'https://example.com/privacy'
     )
     const {result} = renderHook(() => useNewLoginData())
     expect(result.current.data).toEqual({
@@ -173,6 +179,7 @@ describe('useNewLoginData', () => {
         requireNumberCharacters: false,
         requireSymbolCharacters: false,
       },
+      forgotPasswordUrl: 'https://example.com/privacy',
     })
   })
 
@@ -181,6 +188,7 @@ describe('useNewLoginData', () => {
     createMockContainer(
       null,
       'invalid JSON',
+      null,
       null,
       null,
       null,
@@ -223,6 +231,7 @@ describe('useNewLoginData', () => {
       null,
       null,
       null,
+      null,
       null
     )
     const {result} = renderHook(() => useNewLoginData())
@@ -231,7 +240,7 @@ describe('useNewLoginData', () => {
   })
 
   it('returns undefined for empty string attributes', () => {
-    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
+    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
     const {result} = renderHook(() => useNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
@@ -250,6 +259,7 @@ describe('useNewLoginData', () => {
       privacyPolicyUrl: undefined,
       requireEmail: undefined,
       passwordPolicy: undefined,
+      forgotPasswordUrl: undefined,
     })
   })
 })
