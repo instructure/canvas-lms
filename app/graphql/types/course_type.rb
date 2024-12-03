@@ -351,13 +351,18 @@ module Types
       submissions
     end
 
-    field :groups_connection, GroupType.connection_type, null: true
-    def groups_connection
+    field :groups_connection, GroupType.connection_type, null: true do
+      argument :include_non_collaborative, Boolean, required: false, default_value: false
+    end
+    def groups_connection(include_non_collaborative: false)
+      show_non_collaborative = include_non_collaborative && course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+      groups_scope = show_non_collaborative ? course.combined_groups_and_differentiation_tags.active : course.active_groups
+
       # TODO: share this with accounts when groups are added there
       if course.grants_right?(current_user, session, :read_roster)
-        course.groups.active
-              .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-              .eager_load(:group_category)
+        groups_scope
+          .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+          .eager_load(:group_category)
       else
         nil
       end
