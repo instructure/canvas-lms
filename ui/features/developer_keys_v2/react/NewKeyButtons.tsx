@@ -56,8 +56,7 @@ export const NewKeyButtons = (props: NewKeyButtonsProps) => {
     <Menu placement="bottom" trigger={props.triggerButton} shouldHideOnSelect={true}>
       {developerKeyMenuItem(I18n.t('API Key'), props.showCreateDeveloperKey)}
       {developerKeyMenuItem(I18n.t('LTI Key'), props.showCreateLtiKey)}
-      {window.ENV.FEATURES.lti_dynamic_registration &&
-        developerKeyMenuItem(I18n.t('LTI Registration'), openDynRegModal)}
+      {developerKeyMenuItem(I18n.t('LTI Registration'), openDynRegModal)}
     </Menu>
   )
 }

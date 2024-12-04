@@ -392,7 +392,6 @@ class ApplicationController < ActionController::Base
     create_course_subaccount_picker
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
-    lti_dynamic_registration
     lti_registrations_next
     buttons_and_icons_root_account
     extended_submission_state
