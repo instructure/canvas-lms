@@ -30,7 +30,7 @@ import {isLastChild} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/resource-card')
+const I18n = useI18nScope('block-editor')
 
 const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: ResourceCardProps) => {
   const [myId] = useState(id)

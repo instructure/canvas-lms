@@ -28,7 +28,7 @@ import {type ContainerProps} from '../blocks/Container/types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/section-toolbar')
+const I18n = useI18nScope('block-editor')
 
 const SectionToolbar = () => {
   const {
@@ -62,6 +62,7 @@ const SectionToolbar = () => {
         withBackground={false}
         withBorder={false}
         screenReaderLabel={I18n.t('Background Color')}
+        title={I18n.t('Background Color')}
         disabled={props.variant === 'condensed'}
         onClick={handleBackgroundColorButtonClick}
       >

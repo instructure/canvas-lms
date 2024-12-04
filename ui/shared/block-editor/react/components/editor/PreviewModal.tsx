@@ -332,6 +332,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
                 size="small"
                 onClick={handleDesktopSize}
                 screenReaderLabel={I18n.t('Desktop')}
+                title={I18n.t('Desktop')}
                 withBackground={viewSize === 'desktop'}
                 withBorder={viewSize === 'desktop'}
                 aria-current={viewSize === 'desktop' ? 'true' : undefined}
@@ -343,6 +344,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
                 size="small"
                 onClick={handleTabletSize}
                 screenReaderLabel={I18n.t('Tablet')}
+                title={I18n.t('Tablet')}
                 withBackground={viewSize === 'tablet'}
                 withBorder={viewSize === 'tablet'}
                 aria-current={viewSize === 'tablet' ? 'true' : undefined}
@@ -354,6 +356,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
                 size="small"
                 onClick={handleMobileSize}
                 screenReaderLabel={I18n.t('Mobile')}
+                title={I18n.t('Mobile')}
                 withBackground={viewSize === 'mobile'}
                 withBorder={viewSize === 'mobile'}
                 aria-current={viewSize === 'mobile' ? 'true' : undefined}

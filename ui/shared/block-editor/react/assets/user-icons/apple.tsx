@@ -22,7 +22,7 @@ import {type IconProps} from './iconTypes'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/user-icons')
+const I18n = useI18nScope('block-editor')
 export default ({elementRef, size = 'small'}: IconProps) => {
   return (
     <SVGIcon

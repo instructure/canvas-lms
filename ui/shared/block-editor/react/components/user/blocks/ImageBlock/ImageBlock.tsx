@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/image-block')
+const I18n = useI18nScope('block-editor')
 
 const ImageBlock = ({
   src,

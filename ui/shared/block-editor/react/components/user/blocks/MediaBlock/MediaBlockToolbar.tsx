@@ -24,7 +24,7 @@ import {AddMediaButton} from './AddMediaButton'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import BlockEditorVideoOptionsTray from './BlockEditorVideoOptionsTray'
 
-const I18n = useI18nScope('block-editor/media-block')
+const I18n = useI18nScope('block-editor')
 
 const MediaBlockToolbar = () => {
   const {

@@ -22,7 +22,7 @@ import {useClassNames} from '../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/no-sections')
+const I18n = useI18nScope('block-editor')
 
 export type NoSectionsProps = {
   className?: string

@@ -54,6 +54,7 @@ const QuizSelect: React.FC<QuizSelectProps> = ({onSelect}) => {
         withBackground={false}
         withBorder={false}
         screenReaderLabel={I18n.t('Clear search')}
+        title={I18n.t('Clear search')}
         onClick={() => setValue('')}
       >
         <IconTroubleLine />
