@@ -24,15 +24,19 @@ describe('CourseCopyForm', () => {
   const courseName = 'Course name'
   const courseCode = 'Course code'
   const startAt = '2024-01-01'
+  const termStartAt = '2024-02-01'
   const endAt = '2024-01-02'
+  const termEndAt = '2024-02-02'
 
   const course: Course = {
     blueprint: false,
-    enrollment_term_id: 0,
+    enrollment_term_id: 2,
     homeroom_course: false,
     sections: [{id: '', name: ''}],
     sis_course_id: null,
-    term: {name: ''},
+    term: {
+      name: 'Option 2',
+    },
     time_zone: '',
     workflow_state: '',
     id: '1',
@@ -40,11 +44,12 @@ describe('CourseCopyForm', () => {
     course_code: courseCode,
     start_at: startAt,
     end_at: endAt,
+    restrict_enrollments_to_course_dates: true,
   }
 
   const terms = [
     {id: '1', name: 'Option 1'},
-    {id: '2', name: 'Option 2'},
+    {id: '2', name: 'Option 2', startAt: termStartAt, endAt: termEndAt},
     {id: '3', name: 'Option 3'},
   ]
 
@@ -100,26 +105,63 @@ describe('CourseCopyForm', () => {
         new_end_date: new Date(endAt).toISOString(),
         day_substitutions: [],
       },
+      restrictEnrollmentsToCourseDates: course.restrict_enrollments_to_course_dates,
     })
   })
 
-  it('should not call onSubmit on date validation error', () => {
-    const onSubmit = jest.fn()
-    const courseWithWrongDates = {
-      ...course,
-      start_at: endAt,
-      end_at: startAt,
-    }
-    const {getByText, getByRole} = renderCopyCourseForm({
-      onSubmit,
-      course: courseWithWrongDates,
+  describe('validation', () => {
+    it('should not call onSubmit on date validation error', () => {
+      const onSubmit = jest.fn()
+      const courseWithWrongDates = {
+        ...course,
+        start_at: endAt,
+        end_at: startAt,
+      }
+      const {getByText, getByRole} = renderCopyCourseForm({
+        onSubmit,
+        course: courseWithWrongDates,
+      })
+
+      fireEvent.click(getByRole('button', {name: 'Create course'}))
+
+      expect(onSubmit).not.toHaveBeenCalled()
+      expect(getByText('Start date must be before end date')).toBeInTheDocument()
+      expect(getByText('End date must be after start date')).toBeInTheDocument()
     })
 
-    fireEvent.click(getByRole('button', {name: 'Create course'}))
+    it('should not call onSubmit on courseName validation error', () => {
+      const onSubmit = jest.fn()
+      const courseWithWrongDates = {
+        ...course,
+        name: 'a'.repeat(256),
+      }
+      const {getByText, getByRole} = renderCopyCourseForm({
+        onSubmit,
+        course: courseWithWrongDates,
+      })
 
-    expect(onSubmit).not.toHaveBeenCalled()
-    expect(getByText('Start date must be before end date')).toBeInTheDocument()
-    expect(getByText('End date must be after start date')).toBeInTheDocument()
+      fireEvent.click(getByRole('button', {name: 'Create course'}))
+
+      expect(onSubmit).not.toHaveBeenCalled()
+      expect(getByText('Course name must be 255 characters or less')).toBeInTheDocument()
+    })
+
+    it('should not call onSubmit on courseCode validation error', () => {
+      const onSubmit = jest.fn()
+      const courseWithWrongDates = {
+        ...course,
+        course_code: 'a'.repeat(256),
+      }
+      const {getByText, getByRole} = renderCopyCourseForm({
+        onSubmit,
+        course: courseWithWrongDates,
+      })
+
+      fireEvent.click(getByRole('button', {name: 'Create course'}))
+
+      expect(onSubmit).not.toHaveBeenCalled()
+      expect(getByText('Course code must be 255 characters or less')).toBeInTheDocument()
+    })
   })
 
   it('renders all the fields as disabled on submit', () => {
@@ -163,6 +205,84 @@ describe('CourseCopyForm', () => {
       fireEvent.click(getByLabelText('Term'))
       terms.forEach(option => {
         expect(getByText(option.name)).toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('dates', () => {
+    describe('availability', () => {
+      describe('when restrictEnrollmentsToCourseDates is false', () => {
+        it('should disable start date input fields', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: false},
+          })
+
+          expect(getByDisplayValue('Feb 1 at 12am')).toBeDisabled()
+        })
+
+        it('should disable end date input fields', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: false},
+          })
+
+          expect(getByDisplayValue('Feb 2 at 12am')).toBeDisabled()
+        })
+      })
+
+      describe('when restrictEnrollmentsToCourseDates is true', () => {
+        it('should enable start date input fields', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: true},
+          })
+
+          expect(getByDisplayValue('Jan 1 at 12am')).toBeEnabled()
+        })
+
+        it('should enable end date input fields', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: true},
+          })
+
+          expect(getByDisplayValue('Jan 2 at 12am')).toBeEnabled()
+        })
+      })
+    })
+
+    describe('default date', () => {
+      describe('when restrictEnrollmentsToCourseDates is false', () => {
+        it('should use terms start date', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: false},
+          })
+
+          expect(getByDisplayValue('Feb 1 at 12am')).toBeInTheDocument()
+        })
+
+        it('should use terms end date', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: false},
+          })
+
+          expect(getByDisplayValue('Feb 2 at 12am')).toBeInTheDocument()
+        })
+      })
+
+      describe('when restrictEnrollmentsToCourseDates is true', () => {
+        it('should use course start date', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: true},
+          })
+
+          expect(getByDisplayValue('Jan 1 at 12am')).toBeInTheDocument()
+        })
+
+        it('should use course end date', () => {
+          const {getByDisplayValue} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: true},
+          })
+
+          expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
+        })
       })
     })
   })

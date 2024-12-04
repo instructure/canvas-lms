@@ -21,6 +21,8 @@ import type {submitMigrationFormData} from '@canvas/content-migrations/react/Com
 export type Term = Readonly<{
   name: string
   id: string
+  startAt?: string
+  endAt?: string
 }>
 
 export type CopyCourseFormSubmitData = Readonly<
@@ -30,6 +32,7 @@ export type CopyCourseFormSubmitData = Readonly<
     newCourseStartDate: Date | null
     newCourseEndDate: Date | null
     selectedTerm: Term | null
+    restrictEnrollmentsToCourseDates: boolean
   } & submitMigrationFormData
 >
 

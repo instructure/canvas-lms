@@ -31,8 +31,16 @@ jest.mock('@canvas/do-fetch-api-effect')
 describe('useTermsQuery', () => {
   const mockData: any = {
     pages: [
-      {json: {enrollment_terms: [{id: 1, name: 'Term 1'}]}},
-      {json: {enrollment_terms: [{id: 2, name: 'Term 2'}]}},
+      {
+        json: {
+          enrollment_terms: [{id: 1, name: 'Term 1', start_at: '2024-01-01', end_at: '2024-01-02'}],
+        },
+      },
+      {
+        json: {
+          enrollment_terms: [{id: 2, name: 'Term 2', start_at: '2024-01-03', end_at: '2024-01-04'}],
+        },
+      },
     ],
   }
 
@@ -47,16 +55,18 @@ describe('useTermsQuery', () => {
       isLoading: false,
       isError: false,
       data: mockData,
+      hasNextPage: false,
     })
 
     const {result} = renderHook(() => useTermsQuery('accountId'))
 
     expect(result.current.data).toEqual([
-      {id: 1, name: 'Term 1'},
-      {id: 2, name: 'Term 2'},
+      {id: 1, name: 'Term 1', startAt: '2024-01-01', endAt: '2024-01-02'},
+      {id: 2, name: 'Term 2', startAt: '2024-01-03', endAt: '2024-01-04'},
     ])
     expect(result.current.isLoading).toBe(false)
     expect(result.current.isError).toBe(false)
+    expect(result.current.hasNextPage).toBe(false)
   })
 
   it('should handle loading state', () => {
@@ -64,6 +74,7 @@ describe('useTermsQuery', () => {
       isLoading: true,
       isError: false,
       data: null,
+      hasNextPage: false,
     })
 
     const {result} = renderHook(() => useTermsQuery('accountId'))
@@ -71,6 +82,7 @@ describe('useTermsQuery', () => {
     expect(result.current.data).toEqual([])
     expect(result.current.isLoading).toBe(true)
     expect(result.current.isError).toBe(false)
+    expect(result.current.hasNextPage).toBe(false)
   })
 
   it('should handle error state', () => {
@@ -78,6 +90,7 @@ describe('useTermsQuery', () => {
       isLoading: false,
       isError: true,
       data: null,
+      hasNextPage: false,
     })
 
     const {result} = renderHook(() => useTermsQuery('accountId'))
@@ -85,6 +98,23 @@ describe('useTermsQuery', () => {
     expect(result.current.data).toEqual([])
     expect(result.current.isLoading).toBe(false)
     expect(result.current.isError).toBe(true)
+    expect(result.current.hasNextPage).toBe(false)
+  })
+
+  it('should return hasNextPage state', () => {
+    mockUseAllPages.mockReturnValue({
+      isLoading: false,
+      isError: false,
+      data: null,
+      hasNextPage: true,
+    })
+
+    const {result} = renderHook(() => useTermsQuery('accountId'))
+
+    expect(result.current.data).toEqual([])
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.isError).toBe(false)
+    expect(result.current.hasNextPage).toBe(true)
   })
 })
 

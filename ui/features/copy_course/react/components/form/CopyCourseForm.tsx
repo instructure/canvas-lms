@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {type Dispatch, useState, useReducer} from 'react'
+import React, {useState, useReducer} from 'react'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -34,6 +34,8 @@ import type {submitMigrationFormData} from '@canvas/content-migrations/react/Com
 type InvalidFormElements = {
   newCourseStartDate?: string
   newCourseEndDate?: string
+  courseName?: string
+  courseCode?: string
 }
 
 type InvalidForm = {
@@ -91,18 +93,34 @@ export const CopyCourseForm = ({
     dateOrNull(course?.start_at)
   )
   const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(dateOrNull(course?.end_at))
-  const [selectedTerm, setSelectedTerm] = useState<Term | null>(terms[0] || null)
+  const [selectedTerm, setSelectedTerm] = useState<Term | null>(
+    terms.find(term => term.id === course.enrollment_term_id.toString()) || null
+  )
   const [invalidForm, dispatchForm] = useReducer(validationReducer, defaultInvalidForm)
+  const restrictEnrollmentsToCourseDates = course.restrict_enrollments_to_course_dates
 
   const validateCourseDates = () => {
+    const validationErrors: InvalidFormElements = {}
+
     if (newCourseStartDate && newCourseEndDate && newCourseStartDate > newCourseEndDate) {
+      validationErrors.newCourseStartDate = I18n.t('Start date must be before end date')
+      validationErrors.newCourseEndDate = I18n.t('End date must be after start date')
+    }
+
+    if (courseName.length > 255) {
+      validationErrors.courseName = I18n.t('Course name must be 255 characters or less')
+    }
+
+    if (courseCode.length > 255) {
+      validationErrors.courseCode = I18n.t('Course code must be 255 characters or less')
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
       dispatchForm({
         type: 'invalidate',
-        payload: {
-          newCourseStartDate: I18n.t('Start date must be before end date'),
-          newCourseEndDate: I18n.t('End date must be after start date'),
-        },
+        payload: validationErrors,
       })
+
       return false
     }
 
@@ -119,6 +137,7 @@ export const CopyCourseForm = ({
       newCourseStartDate,
       newCourseEndDate,
       selectedTerm,
+      restrictEnrollmentsToCourseDates,
       ...formData,
     })
   }
@@ -127,13 +146,26 @@ export const CopyCourseForm = ({
     if (!selectedId) return
     const term = terms.find(({id}) => id === selectedId)
     term && setSelectedTerm(term)
+    if (!restrictEnrollmentsToCourseDates) {
+      setNewCourseStartDate(term?.startAt ? new Date(term.startAt) : null)
+      setNewCourseEndDate(term?.endAt ? new Date(term.endAt) : null)
+    }
   }
 
-  const isoNewCourseStartDate = parseDateToISOString(newCourseStartDate)
-  const isoNewCourseEndDate = parseDateToISOString(newCourseEndDate)
+  const newStartDateToParse = restrictEnrollmentsToCourseDates
+    ? newCourseStartDate
+    : selectedTerm?.startAt
+  const newEndDateToParse = restrictEnrollmentsToCourseDates
+    ? newCourseEndDate
+    : selectedTerm?.endAt
+  const isoNewCourseStartDate = parseDateToISOString(newStartDateToParse)
+  const isoNewCourseEndDate = parseDateToISOString(newEndDateToParse)
+
   const canImportBpSettings = course.blueprint || false
   const invalidNewCourseEndDateMessage = invalidForm.elements.newCourseEndDate
   const invalidNewCourseStartDateMessage = invalidForm.elements.newCourseStartDate
+  const invalidCourseNameMessage = invalidForm.elements.courseName
+  const invalidCourseCodeMessage = invalidForm.elements.courseCode
 
   return (
     <View as="div">
@@ -148,6 +180,7 @@ export const CopyCourseForm = ({
             inputValue={courseName}
             onChange={setCourseName}
             disabled={isSubmitting}
+            errorMessage={invalidCourseNameMessage}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -156,6 +189,7 @@ export const CopyCourseForm = ({
             inputValue={courseCode}
             onChange={setCourseCode}
             disabled={isSubmitting}
+            errorMessage={invalidCourseCodeMessage}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -166,7 +200,7 @@ export const CopyCourseForm = ({
             renderLabelText={I18n.t('Start date')}
             renderScreenReaderLabelText={I18n.t('Select a new beginning date')}
             timeZone={timeZone}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseStartDateMessage}
           />
         </View>
@@ -178,14 +212,14 @@ export const CopyCourseForm = ({
             renderLabelText={I18n.t('End date')}
             renderScreenReaderLabelText={I18n.t('Select a new end date')}
             timeZone={timeZone}
-            disabled={isSubmitting}
+            disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseEndDateMessage}
           />
         </View>
         <View as="div" margin="medium none none none">
           <ConfiguredSelectInput
             label={I18n.t('Term')}
-            defaultInputValue={terms[0]?.name}
+            defaultInputValue={selectedTerm?.name}
             options={terms}
             onSelect={handleSelectTerm}
             disabled={isSubmitting}

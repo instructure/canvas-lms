@@ -18,6 +18,7 @@
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
+import type {Term} from '../types'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {useAllPages} from '@canvas/query'
 import {useMemo} from 'react'
@@ -44,21 +45,22 @@ export const termsQuery = async ({
 }
 
 export const useTermsQuery = (accountId: string) => {
-  const {isLoading, isError, data} = useAllPages({
+  const {isLoading, isError, data, hasNextPage} = useAllPages({
     queryKey: [courseCopyRootKey, enrollmentTermsFetchKey, accountId],
     queryFn: termsQuery,
     getNextPageParam: getTermsNextPage,
     meta: {fetchAtLeastOnce: true},
   })
 
-  const terms = useMemo(
+  const terms: Term[] = useMemo(
     () => data?.pages.flatMap(page => page.json?.enrollment_terms || []) ?? [],
     [data]
-  )
+  ).map(term => ({id: term.id, name: term.name, startAt: term.start_at, endAt: term.end_at}))
 
   return {
     data: terms,
     isLoading,
     isError,
+    hasNextPage,
   }
 }

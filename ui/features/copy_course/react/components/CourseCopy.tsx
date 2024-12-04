@@ -32,7 +32,7 @@ import {
   createCourseAndMigrationKey,
 } from '../types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {copyCourseMutation} from '../mutations/copyCourseMutation'
+import {createCourseCopyMutation} from '../mutations/createCourseCopyMutation'
 // @ts-ignore
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 
@@ -44,7 +44,7 @@ export const onSuccessCallback = (newCourseId: string) => {
 
 export const onErrorCallback = () => {
   showFlashError(
-    I18n.t('Something went wrong during copy course operation. Reload the page and try again')
+    I18n.t('Something went wrong during copy course operation. Reload the page and try again.')
   )()
 }
 
@@ -69,7 +69,7 @@ export const CourseCopy = ({
 
   const mutation = useMutation({
     mutationKey: [courseCopyRootKey, createCourseAndMigrationKey, accountId],
-    mutationFn: copyCourseMutation,
+    mutationFn: createCourseCopyMutation,
     onSuccess: onSuccessCallback,
     onError: onErrorCallback,
   })
@@ -82,7 +82,11 @@ export const CourseCopy = ({
     mutation.mutate({accountId, formData, courseId})
   }
 
-  if (courseQueryResult.isLoading || termsQueryResult.isLoading) {
+  if (
+    courseQueryResult.isLoading ||
+    termsQueryResult.isLoading ||
+    (!termsQueryResult.isError && termsQueryResult.hasNextPage !== false)
+  ) {
     return (
       <Flex height="80vh" justifyItems="center" padding="large">
         <Flex.Item textAlign="center">
