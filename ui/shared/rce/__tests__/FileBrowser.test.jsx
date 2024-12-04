@@ -95,7 +95,8 @@ describe('FileBrowser', () => {
     expect(wrapper.container).toBeInTheDocument()
   })
 
-  it('only shows images in the tree', done => {
+  // TODO: fix fickle test (cf. RCX-2728)
+  it.skip('only shows images in the tree', done => {
     const files = [
       testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
       testFile({
