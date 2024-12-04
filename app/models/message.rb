@@ -37,8 +37,6 @@ class Message < ActiveRecord::Base
 
   extend TextHelper
 
-  MAX_TWITTER_MESSAGE_LENGTH = 140
-
   class QueuedNotFound < StandardError; end
 
   class Queued
@@ -822,11 +820,6 @@ self.user,
       Mailer.create_message(self).to_s
     when "push"
       sns_json
-    when "twitter"
-      url = main_link || self.url
-      message_length = MAX_TWITTER_MESSAGE_LENGTH - url.length - 1
-      truncated_body = HtmlTextHelper.strip_and_truncate(body, max_length: message_length)
-      "#{truncated_body} #{url}"
     else
       if to =~ /^\+[0-9]+$/ || path_type == "slack"
         body
@@ -843,15 +836,6 @@ self.user,
     case path_type
     when "push"
       user.notification_endpoints.select("DISTINCT ON (token, arn) *").map(&:arn)
-    when "twitter"
-      twitter_service = user.user_services.where(service: "twitter").first
-      return [] unless twitter_service
-
-      [
-        "access_token" => twitter_service.token,
-        "access_token_secret" => twitter_service.secret,
-        "user_id" => twitter_service.service_user_id
-      ]
     when "slack"
       [
         "recipient" => to,
@@ -1102,19 +1086,6 @@ self.user,
     end
 
     true
-  end
-
-  # Internal: Deliver the message through Twitter.
-  #
-  # The template should define the content for :link and not place into the body of the template itself
-  #
-  # Returns nothing.
-  def deliver_via_twitter
-    twitter_service = user.user_services.where(service: "twitter").first
-    host = HostUrl.context_host(link_root_account)
-    msg_id = AssetSignature.generate(self)
-    Twitter::Messenger.new(self, twitter_service, host, msg_id).deliver
-    complete_dispatch
   end
 
   # Internal: Send the message through SMS. This currently sends it via Twilio if the recipient is a E.164 phone

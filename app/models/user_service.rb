@@ -32,18 +32,7 @@ class UserService < ActiveRecord::Base
   after_save :touch_user
   after_save :clear_cache_key
 
-  def should_have_communication_channel?
-    [CommunicationChannel::TYPE_TWITTER].include?(service) && user
-  end
-
   def assert_relations
-    if should_have_communication_channel?
-      cc = user.communication_channels.where(path_type: service).first_or_initialize
-      cc.path_type = service
-      cc.workflow_state = "active"
-      cc.path = "#{service_user_id}@#{service}.com"
-      cc.save!
-    end
     if user_id && service
       UserService.where(user_id:, service:).where("id<>?", self).delete_all
     end
@@ -52,11 +41,6 @@ class UserService < ActiveRecord::Base
 
   def clear_cache_key
     user.clear_cache_key(:user_services)
-  end
-
-  def assert_communication_channel
-    # why is twitter getting special treatment?
-    touch if should_have_communication_channel? && !user.communication_channels.where(path_type: CommunicationChannel::TYPE_TWITTER).first
   end
 
   def infer_defaults
@@ -156,8 +140,6 @@ class UserService < ActiveRecord::Base
       2
     when "skype"
       3
-    when CommunicationChannel::TYPE_TWITTER
-      4
     when "diigo"
       8
     else
@@ -169,8 +151,6 @@ class UserService < ActiveRecord::Base
     case type
     when "google_drive"
       t "#user_service.descriptions.google_drive", "Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations."
-    when CommunicationChannel::TYPE_TWITTER
-      t "#user_service.descriptions.twitter", "X.com is a great resource for out-of-class communication."
     when "diigo"
       t "#user_service.descriptions.diigo", "Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users' Diigo accounts to share links of similar interest."
     when "skype"
@@ -186,8 +166,6 @@ class UserService < ActiveRecord::Base
       "https://www.google.com/drive/"
     when "google_calendar"
       "http://calendar.google.com"
-    when CommunicationChannel::TYPE_TWITTER
-      "http://twitter.com/signup"
     when "diigo"
       "https://www.diigo.com/sign-up"
     when "skype"
@@ -203,8 +181,6 @@ class UserService < ActiveRecord::Base
       "https://myaccount.google.com/?pli=1"
     when "google_calendar"
       "http://calendar.google.com"
-    when CommunicationChannel::TYPE_TWITTER
-      "http://www.twitter.com/#{service_user_name}"
     when "diigo"
       "http://www.diigo.com/user/#{service_user_name}"
     when "skype"

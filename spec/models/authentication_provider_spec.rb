@@ -141,7 +141,7 @@ describe AuthenticationProvider do
     end
 
     it "respects deletions for position management" do
-      aac3 = account.authentication_providers.create!(auth_type: "twitter")
+      aac3 = account.authentication_providers.create!(auth_type: "google")
       expect(aac2.reload.position).to eq(2)
       aac2.destroy
       expect(aac1.reload.position).to eq(1)

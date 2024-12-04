@@ -53,7 +53,7 @@ describe('ExternalApps.DeleteExternalToolButton', () => {
         description: null,
         enabled: true,
         installed_locally: true,
-        name: 'Twitter',
+        name: 'SomeTool',
       },
     ]
   })

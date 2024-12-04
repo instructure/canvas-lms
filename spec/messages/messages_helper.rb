@@ -26,8 +26,6 @@ module MessagesCommon
     when :email
       expect(message.subject).not_to be_nil
       expect(message.url).not_to be_nil
-    when :twitter
-      expect(message.main_link).to be_present
     end
     message
   end
@@ -62,14 +60,6 @@ shared_examples_for "a message" do
 
   describe ".summary" do
     let(:path_type) { :summary }
-
-    it "renders" do
-      generate_message(notification_name, path_type, asset, message_data_with_default)
-    end
-  end
-
-  describe ".twitter" do
-    let(:path_type) { :twitter }
 
     it "renders" do
       generate_message(notification_name, path_type, asset, message_data_with_default)

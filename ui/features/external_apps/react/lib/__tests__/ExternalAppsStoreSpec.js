@@ -43,7 +43,7 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
         description: null,
         enabled: true,
         installed_locally: true,
-        name: 'Twitter',
+        name: 'SomeTool',
         context: 'Course',
         context_id: 1,
       },

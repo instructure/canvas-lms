@@ -79,9 +79,6 @@ development:
 #      twilio_creds:
 #        account_sid: <sid>
 #        auth_token: <token>
-#      twitter_creds:
-#        api_key: <apikey>
-#        secret_key: <secretkey>
 test:
   'sts/testaccount/sts/canvas-shards-lookupper-test':
     access_key: 'fake-access-key'

@@ -59,8 +59,6 @@ class AuthenticationProvider < ActiveRecord::Base
       LinkedIn
     when "openid_connect"
       OpenIDConnect
-    when "twitter"
-      Twitter
     else
       super
     end
@@ -105,7 +103,7 @@ class AuthenticationProvider < ActiveRecord::Base
   acts_as_list scope: { account: self, workflow_state: [nil, "active"] }
 
   def self.valid_auth_types
-    %w[apple canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter].freeze
+    %w[apple canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery].freeze
   end
 
   validates :auth_type,

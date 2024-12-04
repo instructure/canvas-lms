@@ -35,7 +35,6 @@ import iconGithub from '../assets/images/github.svg'
 import iconGoogle from '../assets/images/google.svg'
 import iconLinkedin from '../assets/images/linkedin.svg'
 import iconMicrosoft from '../assets/images/microsoft.svg'
-import iconX from '../assets/images/x.svg'
 
 const I18n = createI18nScope('new_login')
 
@@ -48,7 +47,6 @@ const providerIcons: Record<string, string> = {
   google: iconGoogle,
   linkedin: iconLinkedin,
   microsoft: iconMicrosoft,
-  twitter: iconX,
 }
 
 const SSOButtons = () => {
