@@ -19,7 +19,10 @@
 import {ZLtiImsRegistrationId} from '../../../model/lti_ims_registration/LtiImsRegistrationId'
 import type {PaginatedList} from '../../../api/PaginatedList'
 import type {AccountId} from '../../../model/AccountId'
-import type {LtiRegistration} from '../../../model/LtiRegistration'
+import type {
+  LtiRegistration,
+  LtiRegistrationWithConfiguration,
+} from '../../../model/LtiRegistration'
 import type {LtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ZUserId} from '../../../model/UserId'
@@ -42,7 +45,7 @@ export const mockRegistration = (
   n: string,
   i: number,
   configuration: Partial<InternalLtiConfiguration> = {}
-): LtiRegistration => {
+): LtiRegistrationWithConfiguration => {
   const id = i.toString()
   const date = new Date()
   const user = {
@@ -76,6 +79,7 @@ export const mockRegistration = (
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
     ims_registration_id: ZLtiImsRegistrationId.parse(id),
+    manual_configuration_id: null,
     icon_url: null,
     vendor: null,
     admin_nickname: n,

@@ -28,7 +28,9 @@ export const mockInternalConfiguration = (
     target_link_uri: 'https://example.com',
     oidc_initiation_url: 'https://example.com/oidc',
     public_jwk_url: 'https://example.com/jwk',
-    launch_settings: {},
+    launch_settings: {
+      text: 'Default Title',
+    },
     redirect_uris: [],
     oidc_initiation_urls: {},
     privacy_level: 'anonymous',

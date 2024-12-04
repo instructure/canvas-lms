@@ -24,7 +24,6 @@ import {
   supportsDeepLinkingRequest,
   supportsResourceLinkRequest,
 } from '../../model/LtiPlacement'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -47,7 +46,7 @@ const I18n = useI18nScope('lti_registration.wizard')
 
 export type OverrideURIsConfirmationProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
-  registration: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration
   reviewing: boolean
   onNextClicked: () => void
   onPreviousClicked: () => void
@@ -55,12 +54,12 @@ export type OverrideURIsConfirmationProps = {
 
 export const OverrideURIsConfirmation = ({
   overlayStore,
-  registration,
+  internalConfig,
   reviewing,
   onNextClicked,
   onPreviousClicked,
 }: OverrideURIsConfirmationProps) => {
-  const [state, {setOverrideURI, setMessageType}] = useOverlayStore(overlayStore)
+  const {state, setOverrideURI, setMessageType} = overlayStore()
 
   const allURIsValid = React.useMemo(
     () => Object.values(state.override_uris.placements).every(p => !p.uri || isValidHttpUrl(p.uri)),
@@ -68,8 +67,8 @@ export const OverrideURIsConfirmation = ({
   )
 
   const placements = React.useMemo(
-    () => (state.placements.placements || registration.placements.map(p => p.placement)).sort(),
-    [state.placements.placements, registration.placements]
+    () => (state.placements.placements || internalConfig.placements.map(p => p.placement)).sort(),
+    [state.placements.placements, internalConfig.placements]
   )
   const overrides = state.override_uris.placements
   return (
@@ -90,11 +89,11 @@ export const OverrideURIsConfirmation = ({
               key={p}
               placement={p}
               defaultTargetLinkURI={
-                registration.placements.find(r => r.placement === p)?.target_link_uri ||
-                registration.target_link_uri
+                internalConfig.placements.find(r => r.placement === p)?.target_link_uri ||
+                internalConfig.target_link_uri
               }
               overrideURI={overrideURI}
-              defaultMessageType={LtiResourceLinkRequest}
+              defaultMessageType={overrides[p]?.message_type || LtiResourceLinkRequest}
               onChangeOverrideURI={setOverrideURI}
               onChangeMessageType={setMessageType}
             />
@@ -122,14 +121,11 @@ type PlacementOverrideURIFormFieldProps = {
   onChangeMessageType: (placement: LtiPlacement, messageType: LtiMessageType) => void
 }
 
-const PlacementOverrideURIFormField = React.memo((props: PlacementOverrideURIFormFieldProps) => {
-  let messageTypeComponent: JSX.Element
-
+const messageTypeElement = (props: PlacementOverrideURIFormFieldProps) => {
   const supportsDeepLinking = supportsDeepLinkingRequest(props.placement)
   const supportsResourceLinking = supportsResourceLinkRequest(props.placement)
-
   if (supportsDeepLinking && supportsResourceLinking) {
-    messageTypeComponent = (
+    return (
       <RadioInputGroup
         description={I18n.t('Message Type')}
         layout="columns"
@@ -146,7 +142,7 @@ const PlacementOverrideURIFormField = React.memo((props: PlacementOverrideURIFor
       </RadioInputGroup>
     )
   } else {
-    messageTypeComponent = (
+    return (
       <>
         <Heading level="h4" margin="0 0 x-small 0">
           {I18n.t('Message Type')}
@@ -155,13 +151,16 @@ const PlacementOverrideURIFormField = React.memo((props: PlacementOverrideURIFor
       </>
     )
   }
+}
+
+const PlacementOverrideURIFormField = React.memo((props: PlacementOverrideURIFormFieldProps) => {
   return (
     <View margin="medium 0 0 0" as="div">
       <Heading level="h4" margin="0 0 small 0">
         {i18nLtiPlacement(props.placement)}
       </Heading>
       <View padding="0 0 0 small" as="div">
-        {messageTypeComponent}
+        {messageTypeElement(props)}
         <View margin="small 0 0 0" as="div">
           <TextInput
             renderLabel={I18n.t('Override URI')}

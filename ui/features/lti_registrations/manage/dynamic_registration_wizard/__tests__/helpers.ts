@@ -32,7 +32,7 @@ export const mockDynamicRegistrationWizardService = (
   fetchRegistrationToken: jest.fn(),
   deleteDeveloperKey: jest.fn(),
   getRegistrationByUUID: jest.fn(),
-  getRegistrationById: jest.fn(),
+  getLtiImsRegistrationById: jest.fn(),
   updateDeveloperKeyWorkflowState: jest.fn(),
   updateRegistrationOverlay: jest.fn(),
   updateAdminNickname: jest.fn(),
@@ -44,6 +44,7 @@ export const mockLti1p3RegistrationWizardService = (
 ): Lti1p3RegistrationWizardService => ({
   createLtiRegistration: jest.fn(),
   updateLtiRegistration: jest.fn(),
+  fetchLtiRegistration: jest.fn(),
   ...mocked,
 })
 

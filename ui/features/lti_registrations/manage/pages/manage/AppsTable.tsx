@@ -36,8 +36,12 @@ import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
-import {MANAGE_APPS_PAGE_LIMIT} from './ManagePageLoadingState'
-import {openEditDynamicRegistrationWizard} from '../../registration_wizard/RegistrationWizardModalState'
+import {MANAGE_APPS_PAGE_LIMIT, refreshRegistrations} from './ManagePageLoadingState'
+import {
+  openEditDynamicRegistrationWizard,
+  openEditManualRegistrationWizard,
+} from '../../registration_wizard/RegistrationWizardModalState'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -173,6 +177,8 @@ const Columns: ReadonlyArray<Column> = [
     render: (r, {deleteApp}) => {
       const developerKeyId = r.developer_key_id
       const imsRegistrationId = r.ims_registration_id
+      const manualConfigurationId = r.manual_configuration_id
+
       return (
         <Menu
           trigger={
@@ -216,6 +222,17 @@ const Columns: ReadonlyArray<Column> = [
               {I18n.t('Edit App')}
             </Menu.Item>
           ) : null}
+          {manualConfigurationId && window.ENV.FEATURES.lti_registrations_next ? (
+            <Menu.Item
+              onClick={() => {
+                openEditManualRegistrationWizard(r.id, () => {
+                  refreshRegistrations()
+                })
+              }}
+            >
+              {I18n.t('Edit App')}
+            </Menu.Item>
+          ) : null}
           <Menu.Item
             themeOverride={{
               labelColor: colors.textDanger,
@@ -225,6 +242,16 @@ const Columns: ReadonlyArray<Column> = [
           >
             {I18n.t('Delete App')}
           </Menu.Item>
+          {/* <Menu.Item
+            onClick={() => {
+              confirm({
+                message: JSON.stringify(r, null, 2),
+                title: I18n.t('Registration Details'),
+              })
+            }}
+          >
+            Details
+          </Menu.Item> */}
         </Menu>
       )
     },

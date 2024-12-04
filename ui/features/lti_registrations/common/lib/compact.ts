@@ -16,19 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {
-  Lti1p3RegistrationOverlayStore,
-  Lti1p3RegistrationOverlayState,
-  Lti1p3RegistrationOverlayActions,
-} from '../Lti1p3RegistrationOverlayState'
-
-export const useOverlayStore = (
-  overlayStore: Lti1p3RegistrationOverlayStore
-): [Lti1p3RegistrationOverlayState, Lti1p3RegistrationOverlayActions] => {
-  const [{state, ...actions}, setState] = React.useState(overlayStore.getState())
-
-  React.useEffect(() => overlayStore.subscribe(setState), [overlayStore])
-
-  return [state, actions]
-}
+/**
+ * Removes keys with null or undefined values. Only performs a shallow filter.
+ * @param t
+ * @returns
+ */
+export const compact = <T extends Record<string, any>>(t: T): T =>
+  Object.fromEntries(Object.entries(t).filter(([_, v]) => v !== undefined && v !== null)) as T

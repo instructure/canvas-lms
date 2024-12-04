@@ -42,13 +42,14 @@ import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
-import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 import {Heading} from '@instructure/ui-heading'
+import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
+import {toUndefined} from '../../common/lib/toUndefined'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
-  registrationId?: LtiRegistrationId
+  existingRegistration?: LtiRegistrationWithConfiguration
   accountId: AccountId
   internalConfiguration: InternalLtiConfiguration
   service: Lti1p3RegistrationWizardService
@@ -58,7 +59,7 @@ export type Lti1p3RegistrationWizardProps = {
 }
 
 export const Lti1p3RegistrationWizard = ({
-  registrationId,
+  existingRegistration,
   accountId,
   internalConfiguration,
   service,
@@ -66,9 +67,17 @@ export const Lti1p3RegistrationWizard = ({
   unifiedToolId,
   onSuccessfulRegistration,
 }: Lti1p3RegistrationWizardProps) => {
+  const existingAdminNickname = existingRegistration?.admin_nickname
+  const existingOverlayData = existingRegistration?.overlay?.data
+
   const useLti1p3RegistrationWizardStore = React.useMemo(() => {
-    return createLti1p3RegistrationWizardState({internalConfig: internalConfiguration, service})
-  }, [internalConfiguration, service])
+    return createLti1p3RegistrationWizardState({
+      adminNickname: existingAdminNickname ?? '',
+      internalConfig: internalConfiguration,
+      service,
+      existingOverlay: toUndefined(existingOverlayData),
+    })
+  }, [internalConfiguration, service, existingAdminNickname, existingOverlayData])
 
   const store = useLti1p3RegistrationWizardStore()
 
@@ -94,6 +103,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'LaunchSettings':
       return (
         <LaunchSettings
+          internalConfig={internalConfiguration}
           overlayStore={store.state.overlayStore}
           unregister={unregister}
           reviewing={store.state.reviewing}
@@ -122,6 +132,7 @@ export const Lti1p3RegistrationWizard = ({
       return (
         <>
           <PrivacyConfirmationWrapper
+            internalConfig={internalConfiguration}
             appName={internalConfiguration.title}
             overlayStore={store.state.overlayStore}
           />
@@ -156,7 +167,7 @@ export const Lti1p3RegistrationWizard = ({
       return (
         <OverrideURIsConfirmation
           overlayStore={store.state.overlayStore}
-          registration={internalConfiguration}
+          internalConfig={internalConfiguration}
           reviewing={store.state.reviewing}
           onPreviousClicked={handlePreviousClicked('Placements')}
           onNextClicked={handleNextClicked('Naming')}
@@ -166,7 +177,7 @@ export const Lti1p3RegistrationWizard = ({
       return (
         <>
           <NamingConfirmationWrapper
-            config={internalConfiguration}
+            internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
           />
           <Modal.Footer>
@@ -182,7 +193,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Icons':
       return (
         <IconConfirmationWrapper
-          config={internalConfiguration}
+          internalConfig={internalConfiguration}
           reviewing={store.state.reviewing}
           overlayStore={store.state.overlayStore}
           onPreviousButtonClicked={handlePreviousClicked('Naming')}
@@ -203,8 +214,13 @@ export const Lti1p3RegistrationWizard = ({
             </Button>
             <Button
               onClick={() => {
-                if (registrationId) {
-                  store.update(onSuccessfulRegistration, accountId, registrationId, unifiedToolId)
+                if (existingRegistration) {
+                  store.update(
+                    onSuccessfulRegistration,
+                    accountId,
+                    existingRegistration.id,
+                    unifiedToolId
+                  )
                 } else {
                   store.install(onSuccessfulRegistration, accountId, unifiedToolId)
                 }
@@ -212,7 +228,7 @@ export const Lti1p3RegistrationWizard = ({
               color="primary"
               margin="small"
             >
-              {I18n.t('Install App')}
+              {existingRegistration ? I18n.t('Update App') : I18n.t('Install App')}
             </Button>
           </Modal.Footer>
         </>

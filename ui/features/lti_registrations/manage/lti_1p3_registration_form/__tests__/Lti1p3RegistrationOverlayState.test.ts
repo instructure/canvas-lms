@@ -18,11 +18,11 @@
 
 import type {LtiConfigurationOverlay} from '../../model/internal_lti_configuration/LtiConfigurationOverlay'
 import {
-  convertToLtiConfigurationOverlay,
   createLti1p3RegistrationOverlayStore,
   type Lti1p3RegistrationOverlayState,
   type Lti1p3RegistrationOverlayStore,
 } from '../Lti1p3RegistrationOverlayState'
+import {convertToLtiConfigurationOverlay} from '../Lti1p3RegistrationOverlayStateHelpers'
 import {mockInternalConfiguration} from './helpers'
 
 describe('Lti1p3RegistrationOverlayState', () => {
@@ -46,7 +46,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
     let state: Lti1p3RegistrationOverlayStore
 
     beforeEach(() => {
-      state = createLti1p3RegistrationOverlayStore(internalConfig)
+      state = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
       state.setState(
         prev => ({
@@ -57,18 +57,13 @@ describe('Lti1p3RegistrationOverlayState', () => {
       )
     })
 
-    it('handles the title properly', () => {
-      state.getState().setAdminNickname('nickname')
-
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
-
-      expect(result.title).toBe('nickname')
-    })
-
     it('handles custom fields properly', () => {
       state.getState().setCustomFields('foo=$bar\nbaz=$qux')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.custom_fields).toEqual({
         foo: '$bar',
@@ -81,7 +76,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
         .getState()
         .setRedirectURIs('https://example.com/redirect1\nhttps://example.com/redirect2')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {config: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.redirect_uris).toEqual([
         'https://example.com/redirect1',
@@ -92,15 +90,22 @@ describe('Lti1p3RegistrationOverlayState', () => {
     it('handles OIDC initiation URL properly', () => {
       state.getState().setOIDCInitiationURI('https://example.com/oidc')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {config: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.oidc_initiation_url).toBe('https://example.com/oidc')
     })
 
     it('handles public JWK URL properly', () => {
       state.getState().setJwkURL('https://example.com/jwk')
+      state.getState().setJwkMethod('public_jwk_url')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {config: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.public_jwk_url).toBe('https://example.com/jwk')
     })
@@ -108,8 +113,12 @@ describe('Lti1p3RegistrationOverlayState', () => {
     it('handles public JWK properly', () => {
       const jwk = JSON.stringify({kty: 'RSA', e: 'AQAB', n: '...'})
       state.getState().setJwk(jwk)
+      state.getState().setJwkMethod('public_jwk')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {config: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.public_jwk).toEqual(JSON.parse(jwk))
     })
@@ -117,7 +126,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
     it('handles domain properly', () => {
       state.getState().setDomain('example.com')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.domain).toBe('example.com')
     })
@@ -125,7 +137,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
     it('handles privacy level properly', () => {
       state.getState().setPrivacyLevel('public')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.privacy_level).toBe('public')
     })
@@ -133,7 +148,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
     it('handles disabled placements properly', () => {
       // internalConfig has both course_navigation and global_navigation placements by default.
       // An empty state should result in both placements being disabled.
-      const result = convertToLtiConfigurationOverlay(state.getState().state, internalConfig)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.disabled_placements).toEqual(['course_navigation', 'global_navigation'])
     })
@@ -145,7 +163,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
       state.getState().setPlacementLabel('global_navigation', 'Global Navigation')
       state.getState().setPlacementIconUrl('global_navigation', 'https://example.com/icon.png')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state, internalConfig)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.placements).toEqual({
         global_navigation: {
@@ -161,7 +182,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
       state.getState().togglePlacement('course_navigation')
       state.getState().toggleCourseNavigationDefaultDisabled()
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state, internalConfig)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.placements?.course_navigation?.default).toBe('disabled')
     })
@@ -169,7 +193,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
     it('handles scopes properly', () => {
       state.getState().toggleScope('https://purl.imsglobal.org/spec/lti-ags/scope/lineitem')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state, internalConfig)
+      const {config: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       expect(result.scopes).toEqual(['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'])
     })
@@ -178,7 +205,10 @@ describe('Lti1p3RegistrationOverlayState', () => {
       state.getState().setDefaultTargetLinkURI('https://example.com')
       state.getState().setPrivacyLevel('anonymous')
 
-      const result = convertToLtiConfigurationOverlay(state.getState().state)
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
 
       const expectedNonExistentProperties: Omit<keyof LtiConfigurationOverlay, 'title'>[] = [
         'title',
@@ -188,9 +218,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
         'redirect_uris',
         'public_jwk',
         'public_jwk_url',
-        'disabled_scopes',
         'domain',
-        'disabled_placements',
         'placements',
         'scopes',
       ] as const

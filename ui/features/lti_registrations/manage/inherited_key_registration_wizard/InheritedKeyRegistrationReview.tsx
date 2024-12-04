@@ -36,10 +36,10 @@ import {
   type LtiPlacementWithIcon,
 } from '../model/LtiPlacement'
 import {LaunchSettingsHeader, ReviewSection} from '../registration_wizard_forms/ReviewScreen'
-import type {LtiRegistration} from '../model/LtiRegistration'
+import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 
 export type InheritedKeyRegistrationReviewProps = {
-  result: ApiResult<LtiRegistration>
+  result: ApiResult<LtiRegistrationWithConfiguration>
 }
 
 const I18n = useI18nScope('lti_registration.wizard')
