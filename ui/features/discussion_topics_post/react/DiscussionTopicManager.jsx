@@ -306,7 +306,7 @@ const DiscussionTopicManager = props => {
         // if we have a new entry update the counts, because we are about to add to the cache (something useMutation dont do, that useQuery does)
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
         // add the new entry to the current entries in the cache
-        if (variables.sort === 'desc') {
+        if (currentDiscussion.legacyNode.participant.sortOrder === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
         } else {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.push(newDiscussionEntry)
