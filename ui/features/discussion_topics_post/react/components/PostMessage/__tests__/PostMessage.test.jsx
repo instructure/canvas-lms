@@ -18,10 +18,10 @@
 
 import {PostMessage} from '../PostMessage'
 import React from 'react'
-import {render, screen, act} from '@testing-library/react'
-import {SearchContext} from '../../../utils/constants'
+import {render, screen, act, waitFor} from '@testing-library/react'
+import {DiscussionManagerUtilityContext, SearchContext} from '../../../utils/constants'
 import {User} from '../../../../graphql/User'
-import {responsiveQuerySizes} from '../../../utils'
+import {getTranslation, responsiveQuerySizes} from '../../../utils'
 
 jest.mock('../../../utils')
 
@@ -54,6 +54,27 @@ const setup = (props, {searchTerm = ''} = {}) => {
         {...props}
       />
     </SearchContext.Provider>
+  )
+}
+
+const setupWithTranslationLanguageSelected = (props, {searchTerm = ''} = {}) => {
+  return render(
+    <DiscussionManagerUtilityContext.Provider
+      value={{
+        translationLanguages: [{id: 'en', name: 'English'}],
+        translateTargetLanguage: 'en',
+      }}
+    >
+      <SearchContext.Provider value={{searchTerm}}>
+        <PostMessage
+          author={User.mock()}
+          timingDisplay="Jan 1 2000"
+          message="Posts are fun"
+          title="Thoughts"
+          {...props}
+        />
+      </SearchContext.Provider>
+    </DiscussionManagerUtilityContext.Provider>
   )
 }
 
@@ -133,6 +154,47 @@ describe('PostMessage', () => {
       // Check if the new message is displayed
       expect(screen.getByText('Updated message')).toBeInTheDocument()
       expect(screen.queryByText('Initial message')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('AI translation', () => {
+    it('should display the translated message when translation is complete', async () => {
+      getTranslation.mockImplementation(() => '<p>Translated message</p>')
+
+      const {findAllByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      expect(getTranslation).toHaveBeenCalled()
+      const translatedMessages = await findAllByTestId('post-message-translated')
+      expect(translatedMessages).toHaveLength(1)
+      const translatedMessage = translatedMessages[0]
+      expect(translatedMessage.children[0]).toHaveTextContent('Translated message')
+    })
+
+    it('should not display the translated message if there is no translation', async () => {
+      getTranslation.mockImplementation(() => '')
+
+      const {queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      expect(getTranslation).toHaveBeenCalled()
+      expect(queryByTestId('post-message-translated')).toBeNull()
+    })
+
+    it('should not display the translated message if the translation ran into an error', async () => {
+      getTranslation.mockImplementation(() => Promise.reject(new Error('Translation error')))
+
+      const {queryByTestId} = setupWithTranslationLanguageSelected({
+        message: '<p>Leforditando uzenet<p/>',
+        title: 'Gondolatok',
+      })
+
+      await waitFor(() => expect(getTranslation).toHaveBeenCalled())
+      expect(queryByTestId('post-message-translated')).toBeNull()
     })
   })
 })
