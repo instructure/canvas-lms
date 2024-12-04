@@ -468,6 +468,7 @@ const SubmissionManager = ({
 
   const shouldRenderSelfAssessment = () => {
     return (
+      !assignment.env.peerReviewModeEnabled &&
       ENV.enhanced_rubrics_enabled &&
       assignment.rubric &&
       assignment.rubricSelfAssessmentEnabled &&
