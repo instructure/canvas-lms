@@ -30,6 +30,7 @@ import type {
   SortableColumn,
   PaceContextProgress,
 } from '../types'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -40,11 +41,14 @@ import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {formatTimeAgoDate} from '../utils/date_stuff/date_helpers'
 import {paceContextsActions} from '../actions/pace_contexts'
 import {generateModalLauncherId} from '../utils/utils'
-import NoResults from './no_results'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Menu} from '@instructure/ui-menu'
+import {IconDownloadLine, IconMoreLine} from '@instructure/ui-icons'
 
 import type {SpinnerProps} from '@instructure/ui-spinner'
 import type {ViewProps} from '@instructure/ui-view'
 import type {TableColHeaderProps} from '@instructure/ui-table'
+import NoResults from './no_results'
 
 type SortingProps = {
   onRequestSort: () => void
@@ -71,7 +75,8 @@ export interface PaceContextsTableProps {
 
 interface Header {
   key: string
-  text: string
+  label: string
+  content: string | React.ReactElement
   width: string
   sortable?: boolean
 }
@@ -109,6 +114,26 @@ const PaceContextsTable = ({
 }: PaceContextsTableProps) => {
   const [headers, setHeaders] = useState<Header[]>([])
   const [newOrderType, setNewOrderType] = useState(currentOrderType)
+  const [selectedPacesIds, setSelectedPacesIds] = useState(new Set())
+
+  const handleSelectAllPacesIds = (allSelected: boolean) => {
+    setSelectedPacesIds(allSelected ? new Set() : new Set(paceContexts.map(({item_id}) => item_id)))
+  }
+
+  const handleSelectPaceId = (rowSelected: boolean, rowId: string) => {
+    const copy = new Set(selectedPacesIds)
+    if (rowSelected) {
+      copy.delete(rowId)
+    } else {
+      copy.add(rowId)
+    }
+    setSelectedPacesIds(copy)
+  }
+
+  const allPacesSelected =
+    selectedPacesIds.size > 0 && paceContexts.every(({item_id}) => selectedPacesIds.has(item_id))
+  const somePacesSelected = selectedPacesIds.size > 0 && !allPacesSelected
+
   const tableRef = useRef<HTMLElement | null>(null)
   const paceType = contextType === 'student_enrollment' ? 'student' : 'section'
   const tableCaption = I18n.t('%{paceType} paces: sorted by %{sortBy} in %{orderType} order', {
@@ -150,18 +175,50 @@ const PaceContextsTable = ({
     switch (contextType) {
       case 'section':
         headerCols = [
-          {key: 'name', text: I18n.t('Section'), width: '35%', sortable: true},
-          {key: 'size', text: I18n.t('Section Size'), width: '25%'},
-          {key: 'paceType', text: I18n.t('Pace Type'), width: '20%'},
-          {key: 'modified', text: I18n.t('Last Modified'), width: '20%'},
+          {
+            key: 'name',
+            label: I18n.t('Section'),
+            content: I18n.t('Section'),
+            width: '35%',
+            sortable: true,
+          },
+          {
+            key: 'size',
+            label: I18n.t('Section Size'),
+            content: I18n.t('Section Size'),
+            width: '25%',
+          },
+          {key: 'paceType', label: I18n.t('Pace Type'), content: I18n.t('Pace Type'), width: '20%'},
+          {
+            key: 'modified',
+            label: I18n.t('Last Modified'),
+            content: I18n.t('Last Modified'),
+            width: '20%',
+          },
         ]
         break
       case 'student_enrollment':
         headerCols = [
-          {key: 'name', text: I18n.t('Student'), width: '35%', sortable: true},
-          {key: 'pace', text: I18n.t('Assigned Pace'), width: '25%'},
-          {key: 'paceType', text: I18n.t('Pace Type'), width: '20%'},
-          {key: 'modified', text: I18n.t('Last Modified'), width: '20%'},
+          {
+            key: 'name',
+            label: I18n.t('Student'),
+            content: I18n.t('Student'),
+            width: '35%',
+            sortable: true,
+          },
+          {
+            key: 'pace',
+            label: I18n.t('Assigned Pace'),
+            content: I18n.t('Assigned Pace'),
+            width: '25%',
+          },
+          {key: 'paceType', label: I18n.t('Pace Type'), content: I18n.t('Pace Type'), width: '20%'},
+          {
+            key: 'modified',
+            label: I18n.t('Last Modified'),
+            content: I18n.t('Last Modified'),
+            width: '20%',
+          },
         ]
         break
       default:
@@ -251,10 +308,25 @@ const PaceContextsTable = ({
         orderType: SORT_TYPE[newOrderType],
       }),
     }
+
+    const tableHeaders = window.ENV.FEATURES.course_pace_download_document
+      ? [
+          {
+            key: 'select',
+            label: 'Select all paces',
+            content: selectAllPacesCheckbox,
+            width: '3.8rem',
+            sortable: false,
+          },
+          ...headers,
+          {key: 'moreMenu', label: 'More options', content: '', width: '3.8rem', sortable: false},
+        ]
+      : headers
+
     return (
       <Table.Head renderSortLabel={I18n.t('Sort By')}>
-        <Table.Row>
-          {headers.map(header => (
+        <Table.Row key="header-table">
+          {tableHeaders.map(header => (
             <Table.ColHeader
               id={`header-table-${header.key}`}
               key={`contexts-header-table-${header.key}`}
@@ -262,12 +334,16 @@ const PaceContextsTable = ({
               themeOverride={{padding: '0.75rem'}}
               {...(header.sortable && {
                 ...sortingProps,
-                'aria-label': header.text,
+                'aria-label': header.label,
                 'data-testid': `sortable-column-${header.key}`,
               })}
             >
               <View display="inline-block">
-                <Text weight="bold">{header.text}</Text>
+                {typeof header.content === 'string' ? (
+                  <Text weight="bold">{header.content}</Text>
+                ) : (
+                  header.content
+                )}
               </View>
             </Table.ColHeader>
           ))}
@@ -276,26 +352,74 @@ const PaceContextsTable = ({
     )
   }
 
+  const selectPaceRowOption = (row_item_id: string) => {
+    const rowSelected = selectedPacesIds.has(row_item_id)
+    return (
+      <Checkbox
+        label=""
+        key={`select-pace-row-${row_item_id}`}
+        onChange={() => handleSelectPaceId(rowSelected, row_item_id)}
+        checked={rowSelected}
+      />
+    )
+  }
+
+  const downloadPaceDocxOption = (
+    <Menu.Item data-testid="download-pace">
+      <IconDownloadLine /> Download
+    </Menu.Item>
+  )
+
   const renderRow = (paceContext: PaceContext) => {
-    const rowCells = getValuesByContextType(paceContext)
+    const cells = getValuesByContextType(paceContext).map((cell, index) => (
+      <Table.Cell
+        data-testid="course-pace-item"
+        // eslint-disable-next-line react/no-array-index-key
+        key={`contexts-table-cell-${index}`}
+        themeOverride={{padding: '0.7rem'}}
+      >
+        {cell}
+      </Table.Cell>
+    ))
+
+    const rowCells = window.ENV.FEATURES.course_pace_download_document
+      ? [
+          <Table.Cell key="select-pace-row" themeOverride={{padding: '0.7rem'}}>
+            {selectPaceRowOption(paceContext.item_id)}
+          </Table.Cell>,
+          ...cells,
+          <Table.Cell key="more-menu" themeOverride={{padding: '0.7rem'}}>
+            <Menu
+              themeOverride={{minWidth: '16.25rem', maxWidth: '16.25rem'}}
+              trigger={
+                <IconButton
+                  withBackground={false}
+                  withBorder={false}
+                  renderIcon={IconMoreLine}
+                  data-testid="show-more-options"
+                  screenReaderLabel="Show more options"
+                />
+              }
+              offsetX={100}
+              withArrow={false}
+            >
+              {downloadPaceDocxOption}
+            </Menu>
+          </Table.Cell>,
+        ]
+      : cells
+
     return (
       <Table.Row data-testid="course-pace-row" key={paceContext.item_id}>
-        {rowCells.map((cell, index) => (
-          <Table.Cell
-            data-testid="course-pace-item"
-            // eslint-disable-next-line react/no-array-index-key
-            key={`contexts-table-cell-${index}`}
-            themeOverride={{padding: '0.7rem'}}
-          >
-            {cell}
-          </Table.Cell>
-        ))}
+        {rowCells}
       </Table.Row>
     )
   }
 
   const renderMobileRow = (paceContext: PaceContext) => {
     const values = getValuesByContextType(paceContext)
+    const downloadDocxRowItemWidth = `${window.innerWidth - 60}px`
+
     return (
       <View
         key={`context-row-${paceContext.item_id}`}
@@ -304,7 +428,12 @@ const PaceContextsTable = ({
         padding="xx-small small"
         margin="small 0"
       >
-        {headers.map(({text: title}, index) => (
+        {window.ENV.FEATURES.course_pace_download_document && (
+          <Flex key="mobile-context-row-checkbox" as="div" width="3,8rem" margin="medium 0">
+            {selectPaceRowOption(paceContext.item_id)}
+          </Flex>
+        )}
+        {headers.map(({content: title}, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <Flex key={`mobile-context-row-${index}`} as="div" width="100%" margin="medium 0">
             <Flex.Item size="50%">
@@ -313,10 +442,40 @@ const PaceContextsTable = ({
             <Flex.Item size="50%">{values[index]}</Flex.Item>
           </Flex>
         ))}
+        {window.ENV.FEATURES.course_pace_download_document && (
+          <Flex key="mobile-context-row-more-menu" as="div" width="100%" margin="medium 0">
+            <Flex.Item as="div" width="100%" margin="none" padding="none">
+              <Menu
+                themeOverride={{
+                  minWidth: downloadDocxRowItemWidth,
+                  maxWidth: downloadDocxRowItemWidth,
+                }}
+                trigger={
+                  <Button display="block" width="100%" data-testid="show-more-options">
+                    More
+                  </Button>
+                }
+                withArrow={false}
+                placement="bottom start"
+              >
+                {downloadPaceDocxOption}
+              </Menu>
+            </Flex.Item>
+          </Flex>
+        )}
       </View>
     )
   }
 
+  const selectAllPacesCheckbox = (
+    <Checkbox
+      label=""
+      data-testid="select-all-paces-checkbox"
+      onChange={() => handleSelectAllPacesIds(allPacesSelected)}
+      checked={allPacesSelected}
+      indeterminate={somePacesSelected}
+    />
+  )
   const loadingView = (
     dataTestId: string,
     title: string,
@@ -327,6 +486,35 @@ const PaceContextsTable = ({
       <Spinner size={size} renderTitle={title} margin="none" />
     </View>
   )
+
+  const downloadDocxRow = () => {
+    const interactionValue = selectedPacesIds.size > 0 ? 'enabled' : 'disabled'
+
+    return window.ENV.FEATURES.course_pace_download_document ? (
+      <View as="div" padding="small" background="transparent" display="block">
+        <Flex justifyItems="space-between" margin="0 0 small">
+          <Flex>
+            <Flex.Item>{responsiveSize === 'small' && <>{selectAllPacesCheckbox}</>}</Flex.Item>
+          </Flex>
+
+          <Flex justifyItems="end" direction="row" gap="small">
+            <Flex.Item width="4.5rem">
+              <Text> {`${selectedPacesIds.size} selected`}</Text>
+            </Flex.Item>
+
+            <Flex.Item width="2.375rem">
+              <IconButton
+                data-testid="download-selected-button"
+                screenReaderLabel="Download selected paces"
+                renderIcon={IconDownloadLine}
+                interaction={interactionValue}
+              />
+            </Flex.Item>
+          </Flex>
+        </Flex>
+      </View>
+    ) : null
+  }
 
   if (!isLoading && paceContexts.length === 0) {
     return (
@@ -341,11 +529,13 @@ const PaceContextsTable = ({
       {responsiveSize === 'small' ? (
         !isLoading && (
           <View data-testid="pace-contexts-mobile-view">
+            {downloadDocxRow()}
             {paceContexts.map((paceContext: PaceContext) => renderMobileRow(paceContext))}
           </View>
         )
       ) : (
         <View as="div" margin="none none large none" borderWidth="0 small">
+          {downloadDocxRow()}
           <Table
             elementRef={e => {
               tableRef.current = e as HTMLElement
