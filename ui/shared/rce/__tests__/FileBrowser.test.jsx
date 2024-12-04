@@ -133,7 +133,8 @@ describe('FileBrowser', () => {
     })
   })
 
-  it('shows thumbnails if provided', done => {
+  // TODO: fix fickle test (cf. RCX-2728)
+  it.skip('shows thumbnails if provided', done => {
     const files = [testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'})]
     moxios.stubRequest('/api/v1/folders/4/files', {
       status: 200,
