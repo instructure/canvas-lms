@@ -633,6 +633,7 @@ export type Course = Readonly<{
       name: string
     }
   ]
+  restrict_enrollments_to_course_dates: boolean
 }>
 
 export type ContentMigration = Readonly<{
@@ -640,15 +641,15 @@ export type ContentMigration = Readonly<{
   migration_type: string
 }>
 
+export type Term = Readonly<{
+  id: string
+  name: string
+  start_at: string
+  end_at: string
+}>
+
 export type EnrollmentTerms = Readonly<{
-  enrollment_terms: [
-    {
-      id: string
-      name: string
-      end_at: string
-      start_at: string
-    }
-  ]
+  enrollment_terms: Term[]
 }>
 
 // '/api/v1/users/self/tabs',

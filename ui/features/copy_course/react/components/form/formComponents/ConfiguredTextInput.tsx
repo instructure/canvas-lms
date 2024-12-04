@@ -18,23 +18,42 @@
 
 import React, {type ChangeEvent} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {ErrorFormMessage} from '@canvas/content-migrations'
 
 export const ConfiguredTextInput = ({
   label,
   inputValue,
   onChange,
   disabled = false,
+  errorMessage,
 }: {
   label: string
   inputValue: string
   onChange: (value: string) => void
   disabled?: boolean
+  errorMessage?: string
 }) => {
+  const generateErrorMessage = (message: string): FormMessage[] => {
+    return [
+      {
+        text: <ErrorFormMessage>{message}</ErrorFormMessage>,
+        type: 'error',
+      },
+    ]
+  }
+
   const handleInput = (_: ChangeEvent<HTMLInputElement>, value: string) => {
     onChange(value)
   }
 
   return (
-    <TextInput renderLabel={label} value={inputValue} onChange={handleInput} disabled={disabled} />
+    <TextInput
+      renderLabel={label}
+      value={inputValue}
+      onChange={handleInput}
+      disabled={disabled}
+      messages={errorMessage ? generateErrorMessage(errorMessage) : []}
+    />
   )
 }

@@ -22,18 +22,24 @@ import type {ContentMigration, Course} from '../../../../api'
 import {convertFormDataToMigrationCreateRequest} from '@canvas/content-migrations/react/CommonMigratorControls/converter/form_data_converter'
 
 const convertToCourseCreationParams = (formData: CopyCourseFormSubmitData) => {
-  return {
-    course: {
-      name: formData.courseName,
-      course_code: formData.courseCode,
-      start_at: formData.newCourseStartDate?.toISOString(),
-      end_at: formData.newCourseEndDate?.toISOString(),
-      term_id: formData.selectedTerm?.id || null,
-    },
+  const course = {
+    name: formData.courseName,
+    course_code: formData.courseCode,
+    start_at: formData.newCourseStartDate?.toISOString(),
+    end_at: formData.newCourseEndDate?.toISOString(),
+    term_id: formData.selectedTerm?.id || null,
+    restrict_enrollments_to_course_dates: formData.restrictEnrollmentsToCourseDates,
   }
+
+  if (!formData.restrictEnrollmentsToCourseDates) {
+    delete course.start_at
+    delete course.end_at
+  }
+
+  return {course}
 }
 
-export const copyCourseMutation = async ({
+export const createCourseCopyMutation = async ({
   accountId,
   courseId,
   formData,
