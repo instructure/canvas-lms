@@ -63,7 +63,7 @@ class CommunicationChannel < ActiveRecord::Base
   TYPE_PUSH           = "push"
   TYPE_SMS            = "sms"
   TYPE_SLACK          = "slack"
-  TYPE_TWITTER        = "twitter"
+  TYPE_TWITTER        = "twitter" # NOTE: Deprecated
   TYPE_PERSONAL_EMAIL = "personal_email"
 
   VALID_TYPES = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_SLACK, TYPE_PERSONAL_EMAIL].freeze
@@ -229,13 +229,8 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   # Return the 'path' for simple communication channel types like email and sms.
-  # For Twitter, return the user's configured user_name for the service.
   def path_description
     case path_type
-    when TYPE_TWITTER
-      res = user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
-      res ||= t :default_twitter_handle, "X.com Handle"
-      res
     when TYPE_PUSH
       t "For All Devices"
     else
@@ -380,14 +375,7 @@ class CommunicationChannel < ActiveRecord::Base
   # Get the list of communication channels that overrides an association's default order clause.
   # This returns an unretired and properly ordered already fetch array of CommunicationChannel objects ready for usage.
   def self.all_ordered_for_display(user)
-    # Add communication channel for users that already had Twitter
-    # integrated before we started offering it as a cc
-    twitter_service = user.user_services.for_service(CommunicationChannel::TYPE_TWITTER).first
-    twitter_service&.assert_communication_channel
-
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
-    # Add twitter and yo (in that order) if the user's account is setup for them.
-    rank_order << TYPE_TWITTER if twitter_service
     rank_order << TYPE_SLACK if user.associated_root_accounts.any? { |a| a.settings[:encrypted_slack_key] }
     unretired.where(communication_channels: { path_type: rank_order })
              .order(Arel.sql("#{rank_sql(rank_order, "communication_channels.path_type")} ASC, communication_channels.position asc")).to_a

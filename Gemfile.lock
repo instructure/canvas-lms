@@ -245,9 +245,6 @@ PATH
       faraday-multipart (~> 1.0)
       inst_statsd
       simple_oauth (~> 0.3)
-    twitter (1.0.0)
-      html_text_helper
-      oauth
     utf8_cleaner (0.0.1)
     workflow (0.0.1)
       activesupport (>= 3.2)
@@ -1393,7 +1390,6 @@ DEPENDENCIES
   timecop (~> 0.9)
   turnitin_api!
   twilio-ruby (~> 7.0)
-  twitter!
   utf8_cleaner!
   vault (~> 0.17)
   vericite_api (= 1.5.3)

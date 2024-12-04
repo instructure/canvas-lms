@@ -38,7 +38,7 @@ module Api::V1::CommunicationChannel
   def communication_channel_json(channel, current_user, session)
     only = %w[id path_type position workflow_state user_id created_at]
     # Uses the method "path_description" instead of the field "path" because
-    # when path_type is twitter or yo, it goes and fetches tha user's account
+    # when path_type is yo, it goes and fetches tha user's account
     # name with a fallback display value.
     methods = %w[path_description]
 

@@ -60,7 +60,7 @@ describe('ExternalApps.ReregisterExternalToolButton', () => {
         description: null,
         enabled: true,
         installed_locally: true,
-        name: 'Twitter',
+        name: 'SomeTool',
         reregistration_url: 'http://some.lti/reregister',
       },
     ]

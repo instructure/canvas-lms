@@ -836,7 +836,7 @@ describe CommunicationChannel do
       it "doesn't flag old mappings if path type is not email" do
         cc.update!(path_type: described_class::TYPE_SMS, path: "8005551212")
         expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
-        cc.update!(path_type: described_class::TYPE_TWITTER)
+        cc.update!(path_type: described_class::TYPE_PUSH)
         cc.update!(path: "instructure")
       end
 

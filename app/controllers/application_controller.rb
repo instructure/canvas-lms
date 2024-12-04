@@ -2489,8 +2489,6 @@ class ApplicationController < ActionController::Base
 
     @features_enabled[feature] ||= if [:question_banks].include?(feature)
                                      true
-                                   elsif feature == :twitter
-                                     !!Twitter::Connection.config
                                    elsif feature == :diigo
                                      !!Diigo::Connection.config
                                    elsif feature == :google_drive

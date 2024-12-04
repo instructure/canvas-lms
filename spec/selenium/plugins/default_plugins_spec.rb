@@ -31,36 +31,6 @@ describe.skip "default plugins FOO-2994" do
     Account.site_admin.account_users.create!(user: @user)
   end
 
-  it "allows configuring twitter plugin" do
-    settings = Canvas::Plugin.find(:twitter).try(:settings)
-    expect(settings).to be_nil
-
-    allow(Twitter::Connection).to receive(:config_check).and_return("Bad check")
-    get "/plugins/twitter"
-
-    multiple_accounts_select
-    f("#plugin_setting_disabled").click
-    wait_for_ajaximations
-    f("#settings_consumer_key").send_keys("asdf")
-    f("#settings_consumer_secret").send_keys("asdf")
-    submit_form("#new_plugin_setting")
-
-    assert_flash_error_message "There was an error"
-
-    f("#settings_consumer_secret").send_keys("asdf")
-    allow(Twitter::Connection).to receive(:config_check).and_return(nil)
-
-    submit_form("#new_plugin_setting")
-    wait_for_ajax_requests
-
-    assert_flash_notice_message "successfully updated"
-
-    settings = Canvas::Plugin.find(:twitter).try(:settings)
-    expect(settings).not_to be_nil
-    expect(settings[:consumer_key]).to eq "asdf"
-    expect(settings[:consumer_secret_dec]).to eq "asdf"
-  end
-
   it "allows configuring etherpad plugin" do
     settings = Canvas::Plugin.find(:etherpad).try(:settings)
     expect(settings).to be_nil
