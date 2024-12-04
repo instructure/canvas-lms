@@ -29,7 +29,7 @@ import {UNDOCUMENTED_PLACEMENTS} from '../../registration_wizard_forms/Placement
 describe('PlacementsConfirmationWrapper', () => {
   it('renders a checkbox for every available placement', () => {
     const internalConfig = mockInternalConfiguration({placements: []})
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
@@ -45,7 +45,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}, {placement: 'global_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
@@ -61,7 +61,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
@@ -78,7 +78,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
@@ -92,7 +92,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
@@ -105,7 +105,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
@@ -134,7 +134,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />

@@ -23,7 +23,7 @@ import type {
 } from '../api/developerKey'
 import type {
   fetchRegistrationToken,
-  getRegistrationById,
+  getLtiImsRegistrationById,
   getRegistrationByUUID,
   updateRegistrationOverlay,
 } from '../api/ltiImsRegistration'
@@ -31,7 +31,7 @@ import type {
 export interface DynamicRegistrationWizardService {
   fetchRegistrationToken: typeof fetchRegistrationToken
   getRegistrationByUUID: typeof getRegistrationByUUID
-  getRegistrationById: typeof getRegistrationById
+  getLtiImsRegistrationById: typeof getLtiImsRegistrationById
   updateRegistrationOverlay: typeof updateRegistrationOverlay
   updateDeveloperKeyWorkflowState: typeof updateDeveloperKeyWorkflowState
   updateAdminNickname: typeof updateAdminNickname

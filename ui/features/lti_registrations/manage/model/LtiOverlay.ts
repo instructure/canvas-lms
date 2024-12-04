@@ -15,14 +15,23 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import type {
-  CreateRegistration,
-  FetchLtiRegistration,
-  UpdateRegistration,
-} from '../api/registrations'
 
-export interface Lti1p3RegistrationWizardService {
-  createLtiRegistration: CreateRegistration
-  updateLtiRegistration: UpdateRegistration
-  fetchLtiRegistration: FetchLtiRegistration
-}
+import {z} from 'zod'
+import {ZAccountId} from './AccountId'
+import {ZLtiConfigurationOverlay} from './internal_lti_configuration/LtiConfigurationOverlay'
+import {ZLtiRegistrationId} from './LtiRegistrationId'
+import {ZUser} from './User'
+import {ZLtiOverlayId} from './ZLtiOverlayId'
+
+export const ZLtiOverlay = z.object({
+  id: ZLtiOverlayId,
+  account_id: ZAccountId,
+  registration_id: ZLtiRegistrationId,
+  root_account_id: ZAccountId,
+  data: ZLtiConfigurationOverlay.nullable().optional(),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+  updated_by: ZUser,
+})
+
+export type LtiRegistration = z.infer<typeof ZLtiOverlay>

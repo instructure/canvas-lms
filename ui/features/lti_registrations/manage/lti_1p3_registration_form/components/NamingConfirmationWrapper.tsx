@@ -20,34 +20,34 @@ import React from 'react'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {NamingConfirmation} from '../../registration_wizard_forms/NamingConfirmation'
 import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+import {getDefaultPlacementTextFromConfig} from './helpers'
 
 export type NamingConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
-  config: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration
 }
 
 export const NamingConfirmationWrapper = ({
   overlayStore,
-  config,
+  internalConfig,
 }: NamingConfirmationWrapperProps) => {
-  const [state, actions] = useOverlayStore(overlayStore)
+  const {state, ...actions} = overlayStore()
 
   const placements = (state.placements.placements ?? []).map(p => ({
     placement: p,
     label: state.naming.placements[p] ?? '',
+    defaultValue: getDefaultPlacementTextFromConfig(p, internalConfig),
   }))
 
   return (
     <RegistrationModalBody>
       <NamingConfirmation
-        toolName={config.title}
+        toolName={internalConfig.title}
         adminNickname={state.naming.nickname}
         onUpdateAdminNickname={actions.setAdminNickname}
-        description={
-          state.naming.description ?? (config.description === null ? undefined : config.description)
-        }
+        description={state.naming.description}
+        descriptionPlaceholder={internalConfig.description ?? undefined}
         onUpdateDescription={actions.setDescription}
         placements={placements}
         onUpdatePlacementLabel={actions.setPlacementLabel}

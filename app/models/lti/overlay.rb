@@ -123,7 +123,7 @@ class Lti::Overlay < ActiveRecord::Base
     return internal_config.with_indifferent_access if overlay.blank?
 
     overlay = overlay.with_indifferent_access
-    internal_config = internal_config.with_indifferent_access
+    internal_config = internal_config.deep_dup.with_indifferent_access
 
     internal_config.merge!(overlay.slice(*Schemas::Lti::Overlay::ROOT_KEYS))
     internal_config[:launch_settings].merge!(overlay.slice(*Schemas::Lti::Overlay::LAUNCH_SETTINGS_KEYS))

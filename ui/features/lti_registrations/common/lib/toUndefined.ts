@@ -15,14 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import type {
-  CreateRegistration,
-  FetchLtiRegistration,
-  UpdateRegistration,
-} from '../api/registrations'
 
-export interface Lti1p3RegistrationWizardService {
-  createLtiRegistration: CreateRegistration
-  updateLtiRegistration: UpdateRegistration
-  fetchLtiRegistration: FetchLtiRegistration
-}
+/**
+ * Converts a value from null to undefined if it is null
+ * @param value
+ * @returns
+ */
+export const toUndefined = <T>(value: T | null | undefined): T | undefined =>
+  value === null ? undefined : value

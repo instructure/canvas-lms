@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
+import {
+  ZLtiRegistrationWithConfiguration,
+  ZLtiRegistration,
+  type LtiRegistrationWithConfiguration,
+  type LtiRegistration,
+} from '../model/LtiRegistration'
 import {
   type ApiResult,
   parseFetchResult,
@@ -209,15 +214,15 @@ export const updateRegistration: UpdateRegistration = (
   )
 
 export const fetchRegistrationByClientId = (accountId: AccountId, clientId: DeveloperKeyId) =>
-  parseFetchResult(ZLtiRegistration)(
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(`/api/v1/accounts/${accountId}/lti_registration_by_client_id/${clientId}`, {
       ...defaultFetchOptions(),
     })
   )
 
 export const bindGlobalLtiRegistration = (
-  ltiRegistrationId: LtiRegistrationId,
-  accountId: AccountId
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
@@ -231,4 +236,29 @@ export const bindGlobalLtiRegistration = (
         workflow_state: 'on',
       }),
     })
+  )
+
+export type FetchLtiRegistration = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId
+) => Promise<ApiResult<LtiRegistrationWithConfiguration>>
+
+/**
+ * Fetch a single LtiRegistration
+ * @returns
+ */
+export const fetchLtiRegistration: FetchLtiRegistration = (
+  accountId,
+  ltiRegistrationId,
+  includes: Array<'overlay' | 'overlay_history'> = ['overlay', 'overlay_history']
+) =>
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?${includes
+        .map(i => `include[]=${i}`)
+        .join('&')}`,
+      {
+        ...defaultFetchOptions(),
+      }
+    )
   )

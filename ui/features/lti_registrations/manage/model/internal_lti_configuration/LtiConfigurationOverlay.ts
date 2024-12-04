@@ -37,15 +37,20 @@ export const ZLtiConfigurationOverlay = z.object({
   description: z.string().optional(),
   custom_fields: z.record(z.string()).optional(),
   target_link_uri: z.string().optional(),
+  /** @deprecated */
   oidc_initiation_url: z.string().optional(),
+  /** @deprecated */
   redirect_uris: z.array(z.string()).optional(),
-  public_jwk: z.any().optional(),
+  /** @deprecated */
+  public_jwk: z.unknown().optional(),
+  /** @deprecated */
   public_jwk_url: z.string().optional(),
   disabled_scopes: z.array(ZLtiScope).optional(),
   domain: z.string().optional(),
   privacy_level: ZLtiPrivacyLevel.optional(),
   disabled_placements: z.array(ZLtiPlacement).optional(),
   placements: z.record(ZLtiPlacement, ZLtiPlacementOverlay.optional()).optional(),
+  /** @deprecated */
   scopes: z.array(ZLtiScope).optional(),
 })
 

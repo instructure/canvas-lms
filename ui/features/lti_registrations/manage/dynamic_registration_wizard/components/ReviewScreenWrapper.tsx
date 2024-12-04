@@ -48,7 +48,7 @@ export const ReviewScreenWrapper = ({
   const privacyLevel =
     overlayState.registration.privacy_level ??
     canvasPlatformSettings(registration.tool_configuration)?.privacy_level ??
-    undefined
+    'anonymous'
   const placements =
     canvasPlatformSettings(registration.tool_configuration)
       ?.settings.placements.filter(

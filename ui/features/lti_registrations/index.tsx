@@ -30,7 +30,7 @@ import {
 } from './manage/api/developerKey'
 import {
   fetchRegistrationToken,
-  getRegistrationById,
+  getLtiImsRegistrationById,
   getRegistrationByUUID,
   updateRegistrationOverlay,
 } from './manage/api/ltiImsRegistration'
@@ -40,6 +40,7 @@ import {
   fetchRegistrationByClientId,
   fetchThirdPartyToolConfiguration,
   updateRegistration,
+  fetchLtiRegistration,
 } from './manage/api/registrations'
 import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
 import {InheritedKeyRegistrationWizard} from './manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizard'
@@ -93,7 +94,7 @@ const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
   deleteDeveloperKey,
   fetchRegistrationToken,
   getRegistrationByUUID,
-  getRegistrationById,
+  getLtiImsRegistrationById,
   updateDeveloperKeyWorkflowState,
   updateAdminNickname,
   updateRegistrationOverlay,
@@ -106,6 +107,7 @@ const jsonUrlWizardService: JsonUrlWizardService = {
 const lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService = {
   createLtiRegistration: createRegistration,
   updateLtiRegistration: updateRegistration,
+  fetchLtiRegistration,
 }
 
 const inheritedKeyService: InheritedKeyService = {

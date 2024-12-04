@@ -91,7 +91,7 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
               install()
               // eslint-disable-next-line promise/catch-or-return
               props.service
-                .bindGlobalLtiRegistration(state.result.data.id, props.accountId)
+                .bindGlobalLtiRegistration(props.accountId, state.result.data.id)
                 .then(result => {
                   // redirect to the app list
                   // or show an error

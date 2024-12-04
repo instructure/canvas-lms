@@ -30,9 +30,15 @@ describe('PrivacyConfirmationWrapper', () => {
 
   it('renders the PrivacyConfirmation component with the correct props', () => {
     const internalConfig = mockInternalConfiguration()
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
-    render(<PrivacyConfirmationWrapper overlayStore={overlayStore} appName={appName} />)
+    render(
+      <PrivacyConfirmationWrapper
+        overlayStore={overlayStore}
+        appName={appName}
+        internalConfig={internalConfig}
+      />
+    )
 
     expect(screen.getByText(/Data Sharing/i)).toBeInTheDocument()
     expect(screen.getByText(/Test App/i)).toBeInTheDocument()
@@ -41,9 +47,15 @@ describe('PrivacyConfirmationWrapper', () => {
 
   it('displays the correct initial privacy level', () => {
     const internalConfig = mockInternalConfiguration()
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
-    render(<PrivacyConfirmationWrapper overlayStore={overlayStore} appName={appName} />)
+    render(
+      <PrivacyConfirmationWrapper
+        overlayStore={overlayStore}
+        appName={appName}
+        internalConfig={internalConfig}
+      />
+    )
 
     const select = screen.getByLabelText(/User Data Shared With This App/i)
     expect(select).toHaveValue(i18nLtiPrivacyLevel(LtiPrivacyLevels.Anonymous))
@@ -51,9 +63,15 @@ describe('PrivacyConfirmationWrapper', () => {
 
   it('updates the privacy level when a new option is selected', async () => {
     const internalConfig = mockInternalConfiguration()
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
 
-    render(<PrivacyConfirmationWrapper overlayStore={overlayStore} appName={appName} />)
+    render(
+      <PrivacyConfirmationWrapper
+        overlayStore={overlayStore}
+        appName={appName}
+        internalConfig={internalConfig}
+      />
+    )
 
     const select = screen.getByLabelText(/User Data Shared With This App/i)
     await userEvent.click(select)

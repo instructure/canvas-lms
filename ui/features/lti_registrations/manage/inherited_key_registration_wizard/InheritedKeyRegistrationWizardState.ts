@@ -19,7 +19,7 @@
 import create from 'zustand'
 import {type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
-import type {LtiRegistration} from '../model/LtiRegistration'
+import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 
 /**
  * Actions for the inherited key registration modal
@@ -27,7 +27,7 @@ import type {LtiRegistration} from '../model/LtiRegistration'
 export interface InheritedKeyActions {
   open: (developerKeyId: DeveloperKeyId, onSuccessfulInstallation?: () => void) => void
   close: () => void
-  loaded: (result: ApiResult<LtiRegistration>) => void
+  loaded: (result: ApiResult<LtiRegistrationWithConfiguration>) => void
   install: () => void
 }
 
@@ -47,13 +47,13 @@ export type InheritedKeyWizardState = {
     }
   | {
       _type: 'RegistrationLoaded'
-      result: ApiResult<LtiRegistration>
+      result: ApiResult<LtiRegistrationWithConfiguration>
       onSuccessfulInstallation?: () => void
       developerKeyId: DeveloperKeyId
     }
   | {
       _type: 'InstallingRegistration'
-      result: ApiResult<LtiRegistration>
+      result: ApiResult<LtiRegistrationWithConfiguration>
       onSuccessfulInstallation?: () => void
       developerKeyId: DeveloperKeyId
     }
