@@ -2117,6 +2117,13 @@ describe('SubmissionManager', () => {
       expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
     })
 
+    it('does not render self assessment button when in peer review mode', async () => {
+      originalENV.peerReviewModeEnabled = false
+      const {queryByTestId} = await renderComponent({rubricSelfAssessmentEnabled: false})
+
+      expect(queryByTestId('self-assess-button')).not.toBeInTheDocument()
+    })
+
     it('renders self assessment button when assignment has a rubric and self assessment is enabled', async () => {
       const {queryByTestId} = await renderComponent()
 
