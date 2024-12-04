@@ -32,7 +32,7 @@ describe('PermissionConfirmationWrapper', () => {
 
   it('renders the component', () => {
     const internalConfig = mockInternalConfiguration({title: 'Test App'})
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     render(
       <PermissionConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
     )
@@ -47,7 +47,7 @@ describe('PermissionConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({
       scopes: [LtiScopes.AgsLineItem, LtiScopes.AgsScore],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     render(
       <PermissionConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
     )
@@ -60,7 +60,7 @@ describe('PermissionConfirmationWrapper', () => {
 
   it('toggles the scope when a checkbox is clicked', async () => {
     const internalConfig = mockInternalConfiguration({scopes: [LtiScopes.AgsLineItem]})
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     render(
       <PermissionConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />
     )

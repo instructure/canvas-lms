@@ -333,7 +333,7 @@ export const mkUseDynamicRegistrationWizardState = (service: DynamicRegistration
        */
       loadRegistration: async (accountId: AccountId, registrationId: LtiImsRegistrationId) => {
         set(stateFor({_type: 'LoadingRegistration'}))
-        const reg = await service.getRegistrationById(accountId, registrationId)
+        const reg = await service.getLtiImsRegistrationById(accountId, registrationId)
 
         if (isSuccessful(reg)) {
           const store: RegistrationOverlayStore = createRegistrationOverlayStore(

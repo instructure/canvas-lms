@@ -20,6 +20,7 @@ import {isSuccessful, type ApiResult} from '../../common/lib/apiResult/ApiResult
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {LtiRegistrationId} from '../model/LtiRegistrationId'
 
 export type JsonFetchStatus =
   | {
@@ -67,6 +68,12 @@ export type RegistrationWizardModalState = {
    * If this is not set, the registration wizard will follow the typical flow.
    */
   ltiImsRegistrationId?: LtiImsRegistrationId
+  /**
+   * The ID of the existing registration to edit. If this is set, the registration wizard will
+   * open to the Manual Registration review screen, once the registration has been loaded from the backend.
+   * If this is not set, the registration wizard will continue as if it were a new registration.
+   */
+  existingRegistrationId?: LtiRegistrationId
   unifiedToolId?: UnifiedToolId
   /**
    * Contains the state of fetching the JSON for the
@@ -196,5 +203,18 @@ export const openEditDynamicRegistrationWizard = (
     registering: true,
     exitOnCancel: true,
     onSuccessfulInstallation,
+  })
+}
+
+export const openEditManualRegistrationWizard = (
+  existingRegistrationId: LtiRegistrationId,
+  onSuccessfulInstallation?: () => void
+) => {
+  openRegistrationWizard({
+    existingRegistrationId,
+    registering: true,
+    exitOnCancel: true,
+    onSuccessfulInstallation,
+    method: 'manual',
   })
 }

@@ -38,7 +38,7 @@ describe('Review Screen Wrapper', () => {
     stateOverrides: Partial<Lti1p3RegistrationOverlayState> = {}
   ) => {
     const internalConfig = mockInternalConfiguration(internalConfigOverrides)
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     const state = overlayStore.getState()
     overlayStore.setState({...state, state: {...state.state, ...stateOverrides}})
 
