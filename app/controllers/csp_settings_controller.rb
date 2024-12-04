@@ -30,6 +30,8 @@ class CspSettingsController < ApplicationController
   before_action :require_permissions, except: [:get_csp_settings, :csp_log]
   before_action :get_domain, only: [:add_domain, :remove_domain]
 
+  after_action :set_sentry_context, only: [:set_csp_setting]
+
   # @API Get current settings for account or course
   #
   # Update multiple modules in an account.
@@ -204,5 +206,26 @@ class CspSettingsController < ApplicationController
       json[:current_account_whitelist] = @context.csp_domains.active.pluck(:domain).sort
     end
     json
+  end
+
+  private
+
+  def set_sentry_context
+    if @context.is_a?(Account) && @context.root_account? && @context.feature_enabled?(:default_source_csp_logging)
+      Sentry.with_scope do |scope|
+        scope.set_context(
+          "CSP Setting Details",
+          {
+            user_id: logged_in_user.global_id,
+            status_set: params[:status],
+            csp_inherited_data_value: @context.settings[:csp_inherited_data],
+            enabled: @context.csp_enabled?,
+            locked: @context.csp_locked?,
+            account_host: @context.primary_domain.host
+          }
+        )
+        Sentry.capture_message("CSP settings updated", level: :warning)
+      end
+    end
   end
 end
