@@ -48,6 +48,7 @@ import {ExpandCollapseThreadsButton} from './ExpandCollapseThreadsButton'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {SummarizeButton} from './SummarizeButton'
 import MoreMenuButton from './MoreMenuButton'
+import AiIcon from '@canvas/ai-icon'
 
 const I18n = useI18nScope('discussions_posts')
 
@@ -86,8 +87,7 @@ export const DiscussionPostToolbar = props => {
   const {translationLanguages, setShowTranslationControl} = useContext(
     DiscussionManagerUtilityContext
   )
-  const [translationOptionText, setTranslationOptionText] = useState(I18n.t('Translate Text'))
-  const [hideTranslateText, setHideTranslateText] = useState(false)
+  const [showTranslate, setShowTranslate] = useState(false)
 
   const clearButton = () => {
     return getClearButton({
@@ -106,18 +106,26 @@ export const DiscussionPostToolbar = props => {
 
   const toggleTranslateText = () => {
     // Update local state
-    setHideTranslateText(!hideTranslateText)
-    setTranslationOptionText(
-      hideTranslateText ? I18n.t('Translate Text') : I18n.t('Hide Translate Text')
-    )
+    setShowTranslate(!showTranslate)
     // Update context
-    setShowTranslationControl(!hideTranslateText)
+    setShowTranslationControl(!showTranslate)
   }
 
   const renderMore = () => {
     const menuOptions = []
     if (translationLanguages.current.length > 0) {
-      menuOptions.push({text: translationOptionText, clickItem: toggleTranslateText})
+      const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
+      const translationMenuOption = {text, clickItem: toggleTranslateText}
+
+      if (ENV.ai_translation_improvements) {
+        const improvedText = showTranslate
+          ? I18n.t('Turn off Translation')
+          : I18n.t('Translate Discussion')
+        translationMenuOption.text = improvedText
+        translationMenuOption.buttonIcon = AiIcon
+      }
+
+      menuOptions.push(translationMenuOption)
     }
 
     return menuOptions.length > 0 && <MoreMenuButton menuOptions={menuOptions} />

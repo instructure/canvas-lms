@@ -56,20 +56,20 @@ const DiscussionPostButtonsToolbar = props => {
   const {translationLanguages, setShowTranslationControl} = useContext(
     DiscussionManagerUtilityContext
   )
-  const [translationOptionText, setTranslationOptionText] = useState(I18n.t('Translate Text'))
-  const [hideTranslateText, setHideTranslateText] = useState(false)
+  const [showTranslate, setShowTranslate] = useState(false)
 
   const handleClose = () => setShowAssignToTray(false)
 
   const toggleTranslateText = () => {
     // Update local state
-    setHideTranslateText(!hideTranslateText)
-    setTranslationOptionText(
-      hideTranslateText ? I18n.t('Translate Text') : I18n.t('Hide Translate Text')
-    )
+    setShowTranslate(!showTranslate)
     // Update context
-    setShowTranslationControl(!hideTranslateText)
+    setShowTranslationControl(!showTranslate)
   }
+
+  const translationOptionText = showTranslate
+    ? I18n.t('Turn off Translation')
+    : I18n.t('Translate Discussion')
 
   const renderGroup = () =>
     props.childTopics?.length &&

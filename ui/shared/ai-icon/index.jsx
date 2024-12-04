@@ -21,12 +21,12 @@ import {SVGIcon} from '@instructure/ui-svg-images'
 
 const aiSvg = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Icon" clip-path="url(#clip0_705_16200)">
-<path id="Vector" fill-rule="evenodd" clip-rule="evenodd" d="M11.4308 6.56918L9 0L6.56918 6.56918L0 9L6.56918 11.4308L9 18L11.4308 11.4308L18 9L11.4308 6.56918ZM10.6334 7.36658L9 2.95233L7.36658 7.36658L2.95233 9L7.36658 10.6334L9 15.0477L10.6334 10.6334L15.0477 9L10.6334 7.36658Z" fill="#273540"/>
-<path id="Vector_2" d="M15 0L15.8103 2.18973L18 3L15.8103 3.81027L15 6L14.1897 3.81027L12 3L14.1897 2.18973L15 0Z" fill="#273540"/>
+<path id="Vector" fill-rule="evenodd" clip-rule="evenodd" d="M11.4308 6.56918L9 0L6.56918 6.56918L0 9L6.56918 11.4308L9 18L11.4308 11.4308L18 9L11.4308 6.56918ZM10.6334 7.36658L9 2.95233L7.36658 7.36658L2.95233 9L7.36658 10.6334L9 15.0477L10.6334 10.6334L15.0477 9L10.6334 7.36658Z"/>
+<path id="Vector_2" d="M15 0L15.8103 2.18973L18 3L15.8103 3.81027L15 6L14.1897 3.81027L12 3L14.1897 2.18973L15 0Z" />
 </g>
 <defs>
 <clipPath id="clip0_705_16200">
-<rect width="18" height="18" fill="white"/>
+<rect width="18" height="18" />
 </clipPath>
 </defs>
 </svg>

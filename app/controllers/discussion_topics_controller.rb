@@ -872,6 +872,7 @@ class DiscussionTopicsController < ApplicationController
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(@context, :translation), # Is translation enabled on the course.
+               ai_translation_improvements: @domain_root_account.feature_enabled?(:translate_inbox_messages),
                discussion_translation_languages: Translation.available?(@context, :translation) ? Translation.translated_languages(@current_user) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
