@@ -47,9 +47,6 @@
      # captcha
      recaptcha_key = @domain_root_account.recaptcha_key
 
-     # free for teacher custom registration url
-     fft_registration_url = @domain_root_account.settings[:fft_registration_url]
-
      # terms required
      terms_required = @domain_root_account.terms_required?
 
@@ -78,7 +75,6 @@
      <%= "data-is-preview-mode='true'".html_safe if is_preview_mode %>
      <%= "data-self-registration-type='#{allowed_self_registration_type}'".html_safe if allowed_self_registration_type.present? %>
      <%= "data-recaptcha-key='#{recaptcha_key}'".html_safe if recaptcha_key.present? %>
-     <%= "data-fft-registration-url='#{fft_registration_url}'".html_safe if fft_registration_url.present? %>
      <%= "data-terms-required='true'".html_safe if terms_required %>
      <%= "data-terms-of-use-url='#{tou_url}'".html_safe if tou_url.present? %>
      <%= "data-privacy-policy-url='#{pp_url}'".html_safe if pp_url.present? %>

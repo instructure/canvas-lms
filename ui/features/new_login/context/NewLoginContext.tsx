@@ -43,7 +43,6 @@ interface NewLoginContextType {
   isPreviewMode?: boolean
   selfRegistrationType?: SelfRegistrationType
   recaptchaKey?: string
-  fftRegistrationUrl?: string
   termsRequired?: boolean
   termsOfUseUrl?: string
   privacyPolicyUrl?: string
@@ -79,7 +78,6 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
     isPreviewMode,
     selfRegistrationType,
     recaptchaKey,
-    fftRegistrationUrl,
     termsRequired,
     termsOfUseUrl,
     privacyPolicyUrl,
@@ -113,7 +111,6 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         isPreviewMode,
         selfRegistrationType,
         recaptchaKey,
-        fftRegistrationUrl,
         termsRequired,
         termsOfUseUrl,
         privacyPolicyUrl,

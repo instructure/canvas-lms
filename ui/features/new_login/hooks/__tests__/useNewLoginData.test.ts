@@ -30,7 +30,6 @@ const createMockContainer = (
   isPreviewMode: string | null,
   selfRegistrationType: string | null,
   recaptchaKey: string | null,
-  fftRegistrationUrl: string | null,
   termsRequired: string | null,
   termsOfUseUrl: string | null,
   privacyPolicyUrl: string | null,
@@ -69,9 +68,6 @@ const createMockContainer = (
   }
   if (recaptchaKey !== null) {
     container.setAttribute('data-recaptcha-key', recaptchaKey)
-  }
-  if (fftRegistrationUrl !== null) {
-    container.setAttribute('data-fft-registration-url', fftRegistrationUrl)
   }
   if (termsRequired !== null) {
     container.setAttribute('data-terms-required', termsRequired)
@@ -120,7 +116,6 @@ describe('useNewLoginData', () => {
       isPreviewMode: undefined,
       selfRegistrationType: undefined,
       recaptchaKey: undefined,
-      fftRegistrationUrl: undefined,
       termsRequired: undefined,
       termsOfUseUrl: undefined,
       privacyPolicyUrl: undefined,
@@ -142,7 +137,6 @@ describe('useNewLoginData', () => {
       'true',
       'all',
       'recaptcha_key_value',
-      'https://example.com/register',
       'true',
       'https://example.com/terms-of-use',
       'https://example.com/privacy',
@@ -169,7 +163,6 @@ describe('useNewLoginData', () => {
       isPreviewMode: true,
       selfRegistrationType: 'all',
       recaptchaKey: 'recaptcha_key_value',
-      fftRegistrationUrl: 'https://example.com/register',
       termsRequired: true,
       termsOfUseUrl: 'https://example.com/terms-of-use',
       privacyPolicyUrl: 'https://example.com/privacy',
@@ -188,7 +181,6 @@ describe('useNewLoginData', () => {
     createMockContainer(
       null,
       'invalid JSON',
-      null,
       null,
       null,
       null,
@@ -231,7 +223,6 @@ describe('useNewLoginData', () => {
       null,
       null,
       null,
-      null,
       null
     )
     const {result} = renderHook(() => useNewLoginData())
@@ -240,7 +231,7 @@ describe('useNewLoginData', () => {
   })
 
   it('returns undefined for empty string attributes', () => {
-    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
+    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
     const {result} = renderHook(() => useNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
@@ -253,7 +244,6 @@ describe('useNewLoginData', () => {
       isPreviewMode: undefined,
       selfRegistrationType: undefined,
       recaptchaKey: undefined,
-      fftRegistrationUrl: undefined,
       termsRequired: undefined,
       termsOfUseUrl: undefined,
       privacyPolicyUrl: undefined,
