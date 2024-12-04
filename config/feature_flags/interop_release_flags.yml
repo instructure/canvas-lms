@@ -136,11 +136,6 @@ lti_deep_linking_module_index_menu_modal:
   display_name: LTI Deep Linking for Module Index Menu
   description: If enabled, allows deep linking from the module index via a modal.
   applies_to: RootAccount
-lti_dynamic_registration:
-  state: hidden
-  display_name: LTI Dynamic Registration
-  description: Enables administrators to register LTI tools with Dynamic Registration
-  applies_to: RootAccount
 lti_find_external_tool_prefer_original_client_id:
   state: hidden
   applies_to: RootAccount

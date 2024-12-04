@@ -32,7 +32,6 @@ describe('InheritedTable', () => {
 
     window.ENV = {
       FEATURES: {
-        lti_dynamic_registration: true,
         enhanced_developer_keys_tables: true,
       },
     }

@@ -35,11 +35,6 @@ const renderDeveloperKeyModalTrigger = () =>
 
 describe('DeveloperKeyModalTrigger', () => {
   beforeEach(async () => {
-    window.ENV = {
-      FEATURES: {
-        lti_dynamic_registration: true,
-      },
-    }
     renderDeveloperKeyModalTrigger()
 
     await userEvent.click(

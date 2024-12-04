@@ -271,7 +271,6 @@ export type RootAccountFeatureId =
   | 'extended_submission_state'
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
-  | 'lti_dynamic_registration'
   | 'lti_registrations_next'
   | 'mobile_offline_mode'
   | 'product_tours'

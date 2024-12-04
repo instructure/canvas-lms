@@ -26,7 +26,6 @@ module Lti
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
-      before_action :require_dynamic_registration_flag, except: [:create]
       before_action :require_user, except: [:create]
       before_action :require_account, except: [:create]
 
@@ -156,11 +155,6 @@ module Lti
           return
         end
 
-        unless root_account.feature_enabled? :lti_dynamic_registration
-          render status: :not_found, template: "shared/errors/404_message"
-          return
-        end
-
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
           {errors:, registration_attrs:}
         return render status: :unprocessable_entity, json: { errors: } if errors.present?
@@ -254,12 +248,6 @@ module Lti
                json: {
                  errorMessage: message
                }
-      end
-
-      def require_dynamic_registration_flag
-        unless account_context.feature_enabled? :lti_dynamic_registration
-          render status: :not_found, template: "shared/errors/404_message"
-        end
       end
     end
   end
