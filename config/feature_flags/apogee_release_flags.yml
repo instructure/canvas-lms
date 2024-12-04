@@ -400,3 +400,14 @@ rubric_assessment_imports_exports:
       state: allowed
     development:
       state: allowed
+rubric_self_assessment:
+  state: hidden
+  applies_to: RootAccount
+  root_opt_in: true
+  display_name: Rubric Self Assessments
+  description: This feature allows rubric self assessments to be enabled for an assignment. Students can assess their own submission using the assignment rubric.
+  environments:
+    ci:
+      state: allowed
+    development:
+      state: allowed
