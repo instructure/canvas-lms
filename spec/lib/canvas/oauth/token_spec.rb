@@ -208,7 +208,8 @@ module Canvas::OAuth
                                      "id" => user.id,
                                      "name" => user.name,
                                      "global_id" => user.global_id.to_s,
-                                     "effective_locale" => "en"
+                                     "effective_locale" => "en",
+                                     "fake_student" => false
                                    })
       end
 
