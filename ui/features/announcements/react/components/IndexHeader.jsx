@@ -30,7 +30,6 @@ import {
   IconPlusLine,
   IconTrashLine,
   IconUnlockLine,
-  IconInvitationLine,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -44,6 +43,7 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 import {SearchField} from '@canvas/discussions/react/components/SearchField'
 import {ActionDropDown} from '@canvas/announcements/react/components/ActionDropDown'
+import ReadIcon from '@canvas/read-icon'
 
 const I18n = useI18nScope('announcements_v2')
 
@@ -134,8 +134,9 @@ export default class IndexHeader extends Component {
     return (
       <ActionDropDown
         label={I18n.t('More')}
-        disabled={this.props.isBusy || this.props.selectedCount === 0}
+        disabled={this.props.isBusy}
         key="actionDropDown"
+        withArrow={false}
         actions={[
           {
             icon: IconTrashLine,
@@ -187,7 +188,7 @@ export default class IndexHeader extends Component {
       <Button
         id="mark_all_announcement_read"
         data-testid="mark-all-announcement-read"
-        renderIcon={IconInvitationLine}
+        renderIcon={ReadIcon}
         display={responsiveStyles.buttonDisplay}
         onClick={this.props.markAllAnnouncementRead}
         disabled={this.props.isBusy}

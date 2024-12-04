@@ -39,7 +39,7 @@ describe "Section Paces API" do
   def assert_grant_check
     user_session(@user)
     yield
-    expect(response).to have_http_status :unauthorized
+    expect(response).to have_http_status :forbidden
   end
 
   describe "show" do
@@ -102,7 +102,7 @@ describe "Section Paces API" do
       expect(response).to have_http_status :not_found
     end
 
-    it "returns a 401 if the user lacks permission" do
+    it "returns a 403 if the user lacks permission" do
       assert_grant_check { post api_v1_new_section_pace_path(course, section), params: { format: :json } }
     end
 

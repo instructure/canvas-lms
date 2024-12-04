@@ -32,7 +32,7 @@ describe "course copy" do
 
   def wait_for_migration_to_complete
     keep_trying_for_attempt_times(attempts: 10, sleep_interval: 1) do
-      disable_implicit_wait { ContentMigrationPage.progress_status_label.text == "Completed" }
+      disable_implicit_wait { NewContentMigrationPage.progress_status_label.text == "Completed" }
     end
   end
 
@@ -49,7 +49,7 @@ describe "course copy" do
     @course.save!
     get "/courses/#{@course.id}/copy"
     expect_new_page_load { CourseCopyPage.create_course_button.click }
-    expect(ContentMigrationPage.progress_status_label.text.include?("Running")).to be(true)
+    expect(NewContentMigrationPage.progress_status_label.text.include?("Running")).to be(true)
     run_jobs
     wait_for_ajaximations
     wait_for_migration_to_complete

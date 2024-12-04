@@ -40,6 +40,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -63,6 +64,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -85,6 +87,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -116,6 +119,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -141,6 +145,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -166,6 +171,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -191,6 +197,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -214,6 +221,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -238,6 +246,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 
@@ -272,6 +281,7 @@ describe('OverrideURIsConfirmation', () => {
         registration={internalConfig}
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
+        reviewing={false}
       />
     )
 

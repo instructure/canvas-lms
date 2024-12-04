@@ -1796,25 +1796,6 @@ class Course < ActiveRecord::Base
     can :read_grades
 
     # Active admins (Teacher/TA/Designer)
-    #################### Begin legacy permission block #########################
-    given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_courses) && !deleted? &&
-        !sis_source_id && user && !template? &&
-        fetch_on_enrollments("active_content_admin_enrollments", user) do
-          enrollments.for_user(user).of_content_admins.active_by_date.to_a
-        end.any? { |e| e.has_permission_to?(:change_course_state) }
-    end
-    can :delete
-
-    given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_courses) && !deleted? &&
-        user && fetch_on_enrollments("has_active_content_admin_enrollment", user) do
-          enrollments.for_user(user).of_content_admins.active_by_date.exists?
-        end
-    end
-    can :reset_content
-    ##################### End legacy permission block ##########################
-
     given do |user|
       user && (available? || created? || claimed?) &&
         fetch_on_enrollments("has_active_admin_enrollment", user) do
@@ -1837,8 +1818,7 @@ class Course < ActiveRecord::Base
 
     # Teachers and Designers can reset content, but not TAs
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        user && !deleted? && !template? &&
+      user && !deleted? && !template? &&
         fetch_on_enrollments("active_content_admin_enrollments", user) do
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
         end.any? { |e| e.has_permission_to?(:manage_courses_reset) }
@@ -1847,8 +1827,7 @@ class Course < ActiveRecord::Base
 
     # Teachers and Designers can delete, but not TAs
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_courses) && user &&
-        !template? && !deleted? && !sis_source_id &&
+      user && !template? && !deleted? && !sis_source_id &&
         fetch_on_enrollments("active_content_admin_enrollments", user) do
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
         end.any? { |e| e.has_permission_to?(:manage_courses_delete) }
@@ -1885,20 +1864,8 @@ class Course < ActiveRecord::Base
     end
 
     # Teacher or Designer of a concluded course
-    #################### Begin legacy permission block #########################
     given do |user|
-      !root_account.feature_enabled?(:granular_permissions_manage_courses) && !deleted? &&
-        !sis_source_id && user && !template? &&
-        enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any? do |e|
-          e.has_permission_to?(:change_course_state)
-        end
-    end
-    can :delete
-    ##################### End legacy permission block ##########################
-
-    given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_courses) && user &&
-        !sis_source_id && !deleted? && !template? &&
+      user && !sis_source_id && !deleted? && !template? &&
         enrollments.for_user(user).of_content_admins.completed_by_date.to_a.any? do |e|
           e.has_permission_to?(:manage_courses_delete)
         end
@@ -1918,25 +1885,6 @@ class Course < ActiveRecord::Base
     # Admin
     #################### Begin legacy permission block #########################
     given do |user|
-      !root_account&.feature_enabled?(:granular_permissions_manage_courses) &&
-        account_membership_allows(user, :manage_courses)
-    end
-    can :read_as_admin and can :manage and can :update and can :use_student_view and can :reset_content and
-      can :view_unpublished_items and can :manage_feature_flags and can :view_feature_flags
-
-    given do |user|
-      !root_account&.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
-        grants_right?(user, :change_course_state) && account_membership_allows(user, :manage_courses)
-    end
-    can :delete
-
-    given do |user|
-      !root_account&.feature_enabled?(:granular_permissions_manage_courses) && !deleted? &&
-        sis_source_id && !template? && grants_right?(user, :change_course_state) && account_membership_allows(user, :manage_sis)
-    end
-    can :delete
-
-    given do |user|
       user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
         grants_right?(user, :lti_add_edit)
     end
@@ -1947,23 +1895,20 @@ class Course < ActiveRecord::Base
     can :read_as_admin and can :view_unpublished_items
 
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        account_membership_allows(user, :manage_courses_admin)
+      account_membership_allows(user, :manage_courses_admin)
     end
     can :manage and can :update and can :use_student_view and can :manage_feature_flags and
       can :view_feature_flags
 
     # reset course content
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
-        account_membership_allows(user, :manage_courses_reset)
+      !template? && account_membership_allows(user, :manage_courses_reset)
     end
     can :reset_content
 
     # delete or undelete a given course
     given do |user|
-      root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
-        account_membership_allows(user, :manage_courses_delete)
+      !template? && account_membership_allows(user, :manage_courses_delete)
     end
     can :delete
 
@@ -1982,7 +1927,7 @@ class Course < ActiveRecord::Base
     can :direct_share
 
     given do |user|
-      account.grants_any_right?(user, :manage_courses, :manage_courses_admin) ||
+      account.grants_right?(user, :manage_courses_admin) ||
         (grants_right?(user, :manage) && !root_account.settings[:prevent_course_availability_editing_by_teachers])
     end
     can :edit_course_availability
@@ -2625,7 +2570,7 @@ class Course < ActiveRecord::Base
     if grading_standard_id
       grading_standard
     else
-      account.default_grading_standard
+      account.default_grading_standard unless concluded?
     end
   end
 
@@ -2896,7 +2841,8 @@ class Course < ActiveRecord::Base
        homeroom_course
        course_color
        alt_name
-       restrict_quantitative_data]
+       restrict_quantitative_data
+       horizon_course]
   end
 
   def student_reporting?
@@ -3542,7 +3488,8 @@ class Course < ActiveRecord::Base
         hidden_external_tabs = tabs.select do |t|
           next false unless t[:external]
 
-          t[:hidden] || (elementary_subject_course? && !course_subject_tabs && tab_hidden?(t[:id]))
+          elementary_enabled = elementary_subject_course? && !course_subject_tabs
+          (t[:hidden] && !elementary_enabled) || (elementary_enabled && tab_hidden?(t[:id]))
         end
         tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
@@ -3947,8 +3894,10 @@ class Course < ActiveRecord::Base
   end
 
   def student_view_student
-    fake_student = find_or_create_student_view_student
-    sync_enrollments(fake_student)
+    User.transaction do
+      fake_student = find_or_create_student_view_student
+      sync_enrollments(fake_student)
+    end
   end
 
   # part of the way we isolate this fake student from places we don't want it

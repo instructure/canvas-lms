@@ -29,15 +29,15 @@ end
 
 def select_migration_type(type = nil)
   type ||= @type
-  ContentMigrationPage.migration_type_dropdown.click
-  ContentMigrationPage.migration_type_option_by_id(type).click
+  NewContentMigrationPage.migration_type_dropdown.click
+  NewContentMigrationPage.migration_type_option_by_id(type).click
 end
 
 def select_migration_file(opts = {})
   filename = opts[:filename] || @filename
 
   new_filename, fullpath, _data = get_file(filename, opts[:data])
-  ContentMigrationPage.migration_file_upload_input.send_keys(fullpath)
+  NewContentMigrationPage.migration_file_upload_input.send_keys(fullpath)
   new_filename
 end
 
@@ -52,7 +52,7 @@ def submit
   # depending on the type of migration, we need to wait for it to have one of these states
   scope = { workflow_state: %w[queued exporting exported] }
   count = @course.content_migrations.where(scope).count
-  ContentMigrationPage.add_import_queue_button.click
+  NewContentMigrationPage.add_import_queue_button.click
   keep_trying_until do
     expect(@course.content_migrations.where(scope).count).to eq count + 1
   end
@@ -78,21 +78,21 @@ def test_selective_content(source_course = nil)
   visit_page
 
   # Open selective dialog
-  expect(ContentMigrationPage.progress_status_label).to include_text("Waiting for Selection")
-  ContentMigrationPage.select_content_button.click
+  expect(NewContentMigrationPage.progress_status_label).to include_text("Waiting for Selection")
+  NewContentMigrationPage.select_content_button.click
   wait_for_ajaximations
 
-  ContentMigrationPage.all_assignments_checkbox.click
+  NewContentMigrationPage.all_assignments_checkbox.click
 
   # Submit selection
-  ContentMigrationPage.select_content_submit_button.click
+  NewContentMigrationPage.select_content_submit_button.click
   wait_for_ajaximations
 
   source_course ? run_migration : import
 
   visit_page
 
-  expect(ContentMigrationPage.progress_status_label).to include_text("Completed")
+  expect(NewContentMigrationPage.progress_status_label).to include_text("Completed")
   expect(@course.assignments.count).to eq(source_course ? source_course.assignments.count : 1)
 end
 
@@ -107,7 +107,7 @@ describe "content migrations", :non_parallel do
     visit_page
 
     # Open selective dialog
-    ContentMigrationPage.select_content_button.click
+    NewContentMigrationPage.select_content_button.click
 
     # Expand learning outcomes
     SelectContentPage.outcome_parent.click
@@ -146,22 +146,16 @@ describe "content migrations", :non_parallel do
       @filename = "cc_outcomes.imscc"
     end
 
-    context "with selectable_outcomes_in_course_copy enabled" do
-      before do
-        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
-      end
+    it "selectively copies outcomes", skip: "learning outcomes not working" do
+      visit_page
 
-      it "selectively copies outcomes", skip: "learning outcomes not working" do
-        visit_page
+      fill_migration_form
 
-        fill_migration_form
+      NewContentMigrationPage.specific_content_radio.click
+      submit
+      run_migration
 
-        ContentMigrationPage.specific_content_radio.click
-        submit
-        run_migration
-
-        test_selective_outcome
-      end
+      test_selective_outcome
     end
   end
 
@@ -175,14 +169,14 @@ describe "content migrations", :non_parallel do
     it "shows each form" do
       visit_page
 
-      ContentMigrationPage.migration_type_dropdown.click
+      NewContentMigrationPage.migration_type_dropdown.click
       migration_types = CourseCopyPage.migration_type_options_values.pluck("value") - ["empty"]
-      ContentMigrationPage.migration_type_dropdown.click
+      NewContentMigrationPage.migration_type_dropdown.click
       migration_types.each do |type|
         select_migration_type(type)
-        expect(ContentMigrationPage.add_import_queue_button).to be_displayed
+        expect(NewContentMigrationPage.add_import_queue_button).to be_displayed
         select_migration_type("empty")
-        expect(element_exists?(ContentMigrationPage.add_import_queue_button_selector)).to be false
+        expect(element_exists?(NewContentMigrationPage.add_import_queue_button_selector)).to be false
       end
 
       # Cancel not implemented
@@ -192,26 +186,26 @@ describe "content migrations", :non_parallel do
       # expect(cancel_btn).to be_displayed
       # cancel_btn.click
 
-      # expect(ContentMigrationPage.content).not_to contain_css(ContentMigrationPage.migration_file_upload_input_id)
+      # expect(NewContentMigrationPage.content).not_to contain_css(NewContentMigrationPage.migration_file_upload_input_id)
     end
 
     it "submit's queue and list migrations", skip: "no file upload" do
       visit_page
       fill_migration_form
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
       submit
 
-      expect(ContentMigrationPage.migration_progress_items.count).to eq 1
+      expect(NewContentMigrationPage.migration_progress_items.count).to eq 1
 
       fill_migration_form(filename: "cc_ark_test.zip")
 
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
       submit
 
       visit_page
       expect(@course.content_migrations.count).to eq 2
 
-      progress_items = ContentMigrationPage.migration_progress_items
+      progress_items = NewContentMigrationPage.migration_progress_items
       expect(progress_items.count).to eq 2
 
       source_links = []
@@ -233,7 +227,7 @@ describe "content migrations", :non_parallel do
       visit_page
       fill_migration_form
       CourseCopyPage.date_adjust_checkbox.click
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
       replace_and_proceed(CourseCopyPage.old_start_date_input, "7/1/2014")
       replace_and_proceed(CourseCopyPage.old_end_date_input, "Jul 11, 2014")
       replace_and_proceed(CourseCopyPage.new_start_date_input, "8-5-2014")
@@ -296,13 +290,13 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      ContentMigrationPage.course_search_input.send_keys(@copy_from.name)
-      ContentMigrationPage.course_search_input.send_keys(:enter)
+      NewContentMigrationPage.course_search_input.send_keys(@copy_from.name)
+      NewContentMigrationPage.course_search_input.send_keys(:enter)
       wait_for_ajaximations
-      expect(ContentMigrationPage.course_search_result(@copy_from.id.to_s)).to be_displayed
+      expect(NewContentMigrationPage.course_search_result(@copy_from.id.to_s)).to be_displayed
 
-      ContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(ContentMigrationPage.course_search_result(new_course.id.to_s)).not_to be_displayed
+      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
+      expect(NewContentMigrationPage.course_search_result(new_course.id.to_s)).not_to be_displayed
 
       user_logged_in(active_all: true)
       @course.enroll_teacher(@user, enrollment_state: "active")
@@ -312,8 +306,8 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      ContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(ContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
+      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
     end
 
     it "includes completed courses when checked", priority: "1" do
@@ -325,13 +319,13 @@ describe "content migrations", :non_parallel do
 
       select_migration_type
       wait_for_ajaximations
-      ContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(ContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
+      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
 
-      ContentMigrationPage.include_completed_courses_checkbox.click
+      NewContentMigrationPage.include_completed_courses_checkbox.click
       wait_for_ajaximations
-      ContentMigrationPage.course_search_input.send_keys(new_course.name)
-      expect(ContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
+      NewContentMigrationPage.course_search_input.send_keys(new_course.name)
+      expect(NewContentMigrationPage.course_search_result(new_course.id)).not_to be_displayed
     end
 
     it "finds courses in other accounts", priority: "1" do
@@ -348,15 +342,15 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
 
-      search = ContentMigrationPage.course_search_input
+      search = NewContentMigrationPage.course_search_input
       search.send_keys("another")
       wait_for_ajaximations
-      expect(ContentMigrationPage.course_search_results_visible[0].text).to eq admin_course.name
+      expect(NewContentMigrationPage.course_search_results_visible[0].text).to eq admin_course.name
 
       search.clear
       search.send_keys("faraway")
       wait_for_ajaximations
-      expect(ContentMigrationPage.course_search_results_visible[0].text).to eq enrolled_course.name
+      expect(NewContentMigrationPage.course_search_results_visible[0].text).to eq enrolled_course.name
     end
 
     context "Qti Enabled" do
@@ -387,7 +381,7 @@ describe "content migrations", :non_parallel do
         wait_for_ajaximations
 
         click_option("#courseSelect", @copy_from.id.to_s, :value)
-        ContentMigrationPage.all_content_radio.click
+        NewContentMigrationPage.all_content_radio.click
         submit
 
         run_migration
@@ -408,7 +402,7 @@ describe "content migrations", :non_parallel do
         wait_for_ajaximations
 
         click_option("#courseSelect", @copy_from.id.to_s, :value)
-        ContentMigrationPage.specific_content_radio.click
+        NewContentMigrationPage.specific_content_radio.click
         submit
 
         test_selective_content(@copy_from)
@@ -417,7 +411,6 @@ describe "content migrations", :non_parallel do
 
     context "with selectable_outcomes_in_course_copy enabled" do
       before do
-        @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
         root = @copy_from.root_outcome_group(true)
         outcome_model(context: @copy_from, title: "root1")
 
@@ -429,17 +422,13 @@ describe "content migrations", :non_parallel do
         outcome_model(context: @copy_from, outcome_group: subgroup, title: "non-root3")
       end
 
-      after do
-        @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
-      end
-
       it "selectively copies outcomes", skip: "issues with CC search" do
         visit_page
 
         select_migration_type
         wait_for_ajaximations
 
-        ContentMigrationPage.specific_content_radio.click
+        NewContentMigrationPage.specific_content_radio.click
         submit
 
         test_selective_outcome(@copy_from)
@@ -477,7 +466,7 @@ describe "content migrations", :non_parallel do
       CourseCopyPage.new_start_date_input.send_keys("8-5-2012")
       CourseCopyPage.new_end_date_input.send_keys("Aug 15, 2012")
 
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
       submit
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
@@ -508,7 +497,7 @@ describe "content migrations", :non_parallel do
       click_option("#courseSelect", new_course.id.to_s, :value)
 
       CourseCopyPage.date_adjust_checkbox.click
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
 
       submit
 
@@ -537,7 +526,7 @@ describe "content migrations", :non_parallel do
 
       CourseCopyPage.date_adjust_checkbox.click
       CourseCopyPage.date_remove_option.click
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
 
       submit
 
@@ -554,7 +543,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
       click_option("#courseSelect", @copy_from.id.to_s, :value)
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
       # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
@@ -575,7 +564,7 @@ describe "content migrations", :non_parallel do
       select_migration_type
       wait_for_ajaximations
       click_option("#courseSelect", @copy_from.id.to_s, :value)
-      ContentMigrationPage.all_content_radio.click
+      NewContentMigrationPage.all_content_radio.click
       submit
       run_jobs
       # Wait until the item is imported on the back-end, otherwise the selenium tools will fail the test due to runtime
@@ -642,30 +631,30 @@ describe "content migrations", :non_parallel do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      expect(ContentMigrationPage.external_tool_launch).to be_displayed
-      expect(ContentMigrationPage.lti_select_content).to be_displayed
+      expect(NewContentMigrationPage.external_tool_launch).to be_displayed
+      expect(NewContentMigrationPage.lti_select_content).to be_displayed
     end
 
     it "launches LTI tool on browse and get content link" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      ContentMigrationPage.external_tool_launch_button.click
-      tool_iframe = ContentMigrationPage.lti_iframe
-      expect(ContentMigrationPage.lti_title.text).to eq import_tool.label_for(:migration_selection)
+      NewContentMigrationPage.external_tool_launch_button.click
+      tool_iframe = NewContentMigrationPage.lti_iframe
+      expect(NewContentMigrationPage.lti_title.text).to eq import_tool.label_for(:migration_selection)
 
       in_frame(tool_iframe, "#basic_lti_link") do
-        ContentMigrationPage.basic_lti_link.click
+        NewContentMigrationPage.basic_lti_link.click
       end
 
-      expect(ContentMigrationPage.file_name_label).to include_text "lti embedded link"
+      expect(NewContentMigrationPage.file_name_label).to include_text "lti embedded link"
     end
 
     it "has content selection option" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
-      expect(ContentMigrationPage.selective_import_dropdown.size).to eq 2
+      expect(NewContentMigrationPage.selective_import_dropdown.size).to eq 2
     end
   end
 
@@ -690,12 +679,12 @@ describe "content migrations", :non_parallel do
 
     visit_page
 
-    ContentMigrationPage.select_content_button.click
+    NewContentMigrationPage.select_content_button.click
     wait_for_ajaximations
-    ContentMigrationPage.module.click
+    NewContentMigrationPage.module.click
     wait_for_ajaximations
 
-    submod = ContentMigrationPage.submodule
+    submod = NewContentMigrationPage.submodule
     expect(submod).to include_text("1 sub-module")
     submod.find_element(:css, "a.checkbox-caret").click
     wait_for_ajaximations
@@ -713,7 +702,7 @@ describe "content migrations", :non_parallel do
     radio_to_click = submod.find_element(:css, 'input[type="radio"][value="separate"]')
     move_to_click("label[for=#{radio_to_click["id"]}]")
 
-    ContentMigrationPage.select_content_submit_button.click
+    NewContentMigrationPage.select_content_submit_button.click
     wait_for_ajaximations
 
     run_jobs

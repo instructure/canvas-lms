@@ -4175,6 +4175,18 @@ class AbstractAssignment < ActiveRecord::Base
     (settings || {}).delete "common_cartridge_import"
   end
 
+  def can_update_rubric_self_assessment?
+    return false unless active_rubric_association?
+
+    return false if rubric_association.rubric_assessments.where(assessment_type: "self_assessment").any?
+
+    earliest_due_date = submissions.active.minimum(:cached_due_date)
+
+    return true if earliest_due_date.nil?
+
+    Time.zone.now < earliest_due_date
+  end
+
   private
 
   def grading_type_requires_points?

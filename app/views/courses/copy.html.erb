@@ -18,122 +18,126 @@
 
 <% provide :page_title, t('titles.copy_course', 'Copy Course') %>
 <% add_crumb t('#crumbs.copy_course', 'Copy Course') %>
-<div id="warning_messages_modal_container"></div>
-<% js_bundle :copy_warnings_modal %>
+
+<% if Account.site_admin.feature_enabled?(:instui_for_course_copy_page) %>
+  <div id="instui_course_copy"></div>
+<% else %>
+  <div id="warning_messages_modal_container"></div>
+  <% js_bundle :copy_warnings_modal %>
 
 
-<h1><%= t'headings.copy_course', 'Copy %{course}', :course => @context.name %></h1>
-<p>
-  <%= t('details', %{Please enter the details for the new course.}) %>
-</p>
-<%= form_for :course, :url => course_copy_course_url(@context), :html => {:id => "copy_course_form", :class => "form-horizontal"} do |f| %>
+  <h1><%= t'headings.copy_course', 'Copy %{course}', :course => @context.name %></h1>
+  <p>
+    <%= t('details', %{Please enter the details for the new course.}) %>
+  </p>
+  <%= form_for :course, :url => course_copy_course_url(@context), :html => {:id => "copy_course_form", :class => "form-horizontal"} do |f| %>
 
-  <div class="control-group">
-    <label class="control-label"><strong><%= t('name', 'Name') %></strong></label>
-    <div class="controls"><%= f.text_field :name, :value => @context.name %></div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label"><strong><%= t('course_code', 'Course Code') %></strong></label>
-    <div class="controls"><%= f.text_field :course_code, :value => @context.course_code %></div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">
-      <strong><%= t('start_at', 'Start Date') %></strong>
-    </label>
-    <label class="screenreader-only" id="course_starts_at_label">
-      <%= t("Course starts at") %>
-      <%= datepicker_screenreader_prompt %>
-    </label>
-    <div class="controls">
-      <%= f.text_field :start_at,
-                       class: 'datetime_field',
-                       style: "width: 165px;",
-                       value: datetime_string(@context.start_at, :verbose),
-                       "aria-labelledby" => "course_starts_at_label",
-                       "data-tooltip" => "",
-                       title: accessible_date_format %>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label">
-      <strong><%= t('conclude_at', 'End Date') %></strong>
-    </label>
-    <label class="screenreader-only" id="course_ends_at_label">
-      <%= t("Course ends at") %>
-      <%= datepicker_screenreader_prompt %>
-    </label>
-    <div class="controls">
-      <%= f.text_field :conclude_at,
-                       class: 'datetime_field',
-                       style: "width: 165px;",
-                       value: datetime_string(@context.conclude_at, :verbose),
-                       "aria-labelledby" => "course_ends_at_label",
-                       "data-tooltip" => "",
-                       title: accessible_date_format %>
-    </div>
-  </div>
-  <% if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin) %>
     <div class="control-group">
-      <label class="control-label"><strong><%= t('enrollment_term_id', 'Term') %></strong></label>
+      <label class="control-label"><strong><%= t('name', 'Name') %></strong></label>
+      <div class="controls"><%= f.text_field :name, :value => @context.name %></div>
+    </div>
 
+    <div class="control-group">
+      <label class="control-label"><strong><%= t('course_code', 'Course Code') %></strong></label>
+      <div class="controls"><%= f.text_field :course_code, :value => @context.course_code %></div>
+    </div>
+    <div class="control-group">
+      <label class="control-label">
+        <strong><%= t('start_at', 'Start Date') %></strong>
+      </label>
+      <label class="screenreader-only" id="course_starts_at_label">
+        <%= t("Course starts at") %>
+        <%= datepicker_screenreader_prompt %>
+      </label>
       <div class="controls">
-        <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
-          <% @context.root_account.enrollment_terms.active.sort_by { |t| t.start_at || CanvasSort::First }.each do |term| %>
-            <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
-          <% end %>
-        </select>
+        <%= f.text_field :start_at,
+                         class: 'datetime_field',
+                         style: "width: 165px;",
+                         value: datetime_string(@context.start_at, :verbose),
+                         "aria-labelledby" => "course_starts_at_label",
+                         "data-tooltip" => "",
+                         title: accessible_date_format %>
       </div>
     </div>
-  <% end %>
-
-  <div class="control-group">
-    <div class="control-label">
-      <strong><%= t('content_label', 'Content') %></strong>
-    </div>
-
-    <div class="controls">
-      <div class="radio">
-        <label>
-          <input type="radio" name="selective_import" checked value=false>
-          <%= t('select_all_content', 'All content') %>
-          <br />
-          <%= t('select_all_content_subtext', 'Note the following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.') %>
-        </label>
+    <div class="control-group">
+      <label class="control-label">
+        <strong><%= t('conclude_at', 'End Date') %></strong>
+      </label>
+      <label class="screenreader-only" id="course_ends_at_label">
+        <%= t("Course ends at") %>
+        <%= datepicker_screenreader_prompt %>
+      </label>
+      <div class="controls">
+        <%= f.text_field :conclude_at,
+                         class: 'datetime_field',
+                         style: "width: 165px;",
+                         value: datetime_string(@context.conclude_at, :verbose),
+                         "aria-labelledby" => "course_ends_at_label",
+                         "data-tooltip" => "",
+                         title: accessible_date_format %>
       </div>
+    </div>
+    <% if can_do(@context.account, @current_user, :manage_courses_admin) %>
+      <div class="control-group">
+        <label class="control-label"><strong><%= t('enrollment_term_id', 'Term') %></strong></label>
 
-      <% if MasterCourses::MasterTemplate.is_master_course?(@context) %>
-        <div class="controls import-blueprint-settings" style="margin-left: 2em; padding-bottom: 0.75em;">
-          <label class="checkbox">
-            <input type="checkbox" name="settings[import_blueprint_settings]">
-            <%= t('Copy Blueprint Course settings') %>
-          </label>
+        <div class="controls">
+          <select name="course[enrollment_term_id]" id="course_enrollment_term_id">
+            <% @context.root_account.enrollment_terms.active.sort_by { |t| t.start_at || CanvasSort::First }.each do |term| %>
+              <option value="<%= term.id %>" <%= 'selected' if term.id == @context.enrollment_term_id %>><%= term.name %></option>
+            <% end %>
+          </select>
         </div>
-      <% end %>
-
-      <div class="radio">
-        <label>
-          <input type="radio" name="selective_import" value=true>
-          <%= t('select_specific_content', 'Select specific content') %>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <div class="control-group">
-    <% if @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration) %>
-      <div class="controls">
-        <div id="new_quizzes_migrate"></div>
       </div>
     <% end %>
-    <div id="date_shift"></div>
-  </div>
 
-  <div class='form-actions'>
-    <a href="<%= course_settings_url(@context) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
-    <button type="submit" class="btn btn-primary"><%= t('buttons.create_course', %{Create Course}) %></button>
-  </div>
+    <div class="control-group">
+      <div class="control-label">
+        <strong><%= t('content_label', 'Content') %></strong>
+      </div>
 
+      <div class="controls">
+        <div class="radio">
+          <label>
+            <input type="radio" name="selective_import" checked value=false>
+            <%= t('select_all_content', 'All content') %>
+            <br />
+            <%= t('select_all_content_subtext', 'Note the following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.') %>
+          </label>
+        </div>
+
+        <% if MasterCourses::MasterTemplate.is_master_course?(@context) %>
+          <div class="controls import-blueprint-settings" style="margin-left: 2em; padding-bottom: 0.75em;">
+            <label class="checkbox">
+              <input type="checkbox" name="settings[import_blueprint_settings]">
+              <%= t('Copy Blueprint Course settings') %>
+            </label>
+          </div>
+        <% end %>
+
+        <div class="radio">
+          <label>
+            <input type="radio" name="selective_import" value=true>
+            <%= t('select_specific_content', 'Select specific content') %>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <% if @context.root_account.feature_allowed?(:quizzes_next) && @context.root_account.feature_enabled?(:new_quizzes_migration) %>
+        <div class="controls">
+          <div id="new_quizzes_migrate"></div>
+        </div>
+      <% end %>
+      <div id="date_shift"></div>
+    </div>
+
+    <div class='form-actions'>
+      <a href="<%= course_settings_url(@context) %>" class="btn button-secondary"><%= t '#buttons.cancel', 'Cancel' %></a>
+      <button type="submit" class="btn btn-primary"><%= t('buttons.create_course', %{Create Course}) %></button>
+    </div>
+
+  <% end %>
 <% end %>
-
 <% js_bundle :copy_course %>

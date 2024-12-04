@@ -150,5 +150,22 @@ describe Api::V1::Lti::Registration do
         expect(subject[:dynamic_registration]).to be(true)
       end
     end
+
+    context "with an overlay" do
+      let(:includes) { [:overlay] }
+      let(:overlay) { lti_overlay_model(registration:, account: context, data:) }
+      let(:data) { { title: "Test" } }
+
+      before do
+        overlay
+      end
+
+      it "includes the overlay" do
+        expect(subject[:overlay]).to include({
+                                               id: overlay.id,
+                                               data:
+                                             })
+      end
+    end
   end
 end

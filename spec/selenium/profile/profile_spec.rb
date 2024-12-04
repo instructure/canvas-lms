@@ -30,28 +30,28 @@ describe "profile" do
 
   def add_skype_service
     f("#unregistered_service_skype > a").click
-    skype_dialog = f("#unregistered_service_skype_dialog")
-    skype_dialog.find_element(:id, "skype_user_service_user_name").send_keys("jakesorce")
-    wait_for_new_page_load { submit_dialog(skype_dialog, ".btn") }
+    skype_dialog = f("[role=dialog][aria-label='Register Skype']")
+    skype_dialog.find_element(:name, "username").send_keys("jakesorce")
+    wait_for_new_page_load { submit_form(skype_dialog) }
     expect(f("#registered_services")).to include_text("Skype")
   end
 
-  def generate_access_token(purpose = "testing", close_dialog = false)
-    generate_access_token_with_expiration(nil, purpose)
-    if close_dialog
-      close_visible_dialog
-    end
-  end
-
-  def generate_access_token_with_expiration(date, purpose = "testing")
+  def generate_access_token(expiration: nil, purpose: "testing", close_dialog: true)
     f(".add_access_token_link").click
-    access_token_form = f("#access_token_form")
-    access_token_form.find_element(:id, "token_purpose").send_keys(purpose)
-    access_token_form.find_element(:id, "token_expires_at").send_keys(date) unless date.nil?
-    submit_dialog_form(access_token_form)
+    access_token_dialog = f("[role=dialog][aria-label='New Access Token']")
+    access_token_dialog.find_element(:name, "purpose").send_keys(purpose)
+    if expiration.present?
+      expiration_date = access_token_dialog.find_element(:css, "[data-testid='expiration-date']")
+      expiration_date.send_keys(expiration)
+      expiration_date.send_keys(:tab)
+    end
+    submit_form(access_token_dialog)
     wait_for_ajax_requests
-    details_dialog = f("#token_details_dialog")
+    details_dialog = f("[role=dialog][aria-label='Access Token Details']")
     expect(details_dialog).to be_displayed
+    if close_dialog
+      close_instui_dialog
+    end
   end
 
   def log_in_to_settings
@@ -67,6 +67,10 @@ describe "profile" do
     edit_form.find_element(:id, "pseudonym_password").send_keys(new_password)
     edit_form.find_element(:id, "pseudonym_password_confirmation").send_keys(new_password)
     wait_for_new_page_load { submit_form(edit_form) }
+  end
+
+  def close_instui_dialog
+    f("[role=dialog] [class*='closeButton']").click
   end
 
   it "gives error - wrong old password" do
@@ -114,16 +118,16 @@ describe "profile" do
 
       get "/profile/settings"
       add_email_link
-      f('#communication_channels a[href="#register_email_address"]').click
-      form = f("#register_email_address")
+      form = f("[role=dialog][aria-label='Register Communication']")
       test_email = "nobody+1234@example.com"
-      form.find_element(:id, "communication_channel_email").send_keys(test_email)
+      form.find_element(:name, "email").send_keys(test_email)
       submit_form(form)
 
-      confirmation_dialog = f("#confirm_email_channel")
+      confirmation_dialog_selector = "[role=dialog][aria-label='Confirm Email Address']"
+      confirmation_dialog = f(confirmation_dialog_selector)
       expect(confirmation_dialog).to be_displayed
-      submit_dialog(confirmation_dialog, ".cancel_button")
-      expect(confirmation_dialog).not_to be_displayed
+      submit_form(confirmation_dialog)
+      expect(element_exists?(confirmation_dialog_selector)).to be_falsey
       expect(f(".email_channels")).to include_text(test_email)
     end
 
@@ -217,12 +221,12 @@ describe "profile" do
         test_cell_number = "8017121011"
         get "/profile/settings"
         f(".add_contact_link").click
-        register_form = f("#register_sms_number")
-        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        register_form = f("[role=dialog][aria-label='Register Communication']")
+        register_form.find_element(:name, "sms").send_keys(test_cell_number)
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
-        close_visible_dialog
+        close_instui_dialog
         expect(f(".other_channels .path")).to include_text(test_cell_number)
       end
 
@@ -234,10 +238,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 2A: MFA disabled, in US region
@@ -248,10 +252,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 2B: MFA disabled, NOT in US region
@@ -262,10 +266,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 3A: MFA required for admins, in US region
@@ -277,12 +281,12 @@ describe "profile" do
         test_cell_number = "8017121011"
         get "/profile/settings"
         f(".add_contact_link").click
-        register_form = f("#register_sms_number")
-        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        register_form = f("[role=dialog][aria-label='Register Communication']")
+        register_form.find_element(:name, "sms").send_keys(test_cell_number)
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
-        close_visible_dialog
+        close_instui_dialog
         expect(f(".other_channels .path")).to include_text(test_cell_number)
       end
 
@@ -294,10 +298,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
 
       # scenario 4A: MFA required, in US region
@@ -309,12 +313,12 @@ describe "profile" do
         test_cell_number = "8017121011"
         get "/profile/settings"
         f(".add_contact_link").click
-        register_form = f("#register_sms_number")
-        register_form.find_element(:css, ".sms_number").send_keys(test_cell_number)
+        register_form = f("[role=dialog][aria-label='Register Communication']")
+        register_form.find_element(:name, "sms").send_keys(test_cell_number)
         driver.action.send_keys(:tab).perform
         submit_form(register_form)
         wait_for_ajaximations
-        close_visible_dialog
+        close_instui_dialog
         expect(f(".other_channels .path")).to include_text(test_cell_number)
       end
 
@@ -326,10 +330,10 @@ describe "profile" do
         Account.default.save!
         get "/profile/settings"
         f(".add_contact_link").click
-        # ensure sms number registration form is not present
-        expect(element_exists?("#register_sms_number")).to be false
-        # ensure email address registration form is shown
-        expect(f("#register_email_address")).to be_present
+        # ensure sms number registration tab is not present
+        expect(element_exists?("[role=tab][aria-controls=sms]")).to be false
+        # ensure email address registration tab is shown
+        expect(f("[role=tab][aria-controls=email]")).to be_present
       end
     end
 
@@ -338,13 +342,12 @@ describe "profile" do
       test_slack_email = "sburnett@instructure.com"
       get "/profile/settings"
       f(".add_contact_link").click
-      f('a[href="#register_slack_handle"]').click
-      f("#communication_channel_slack").send_keys(test_slack_email)
-      driver.action.send_keys(:tab).perform
-      register_form = f("#register_slack_handle")
+      register_form = f("[role=dialog][aria-label='Register Communication']")
+      f("[role=tab][aria-controls=slack]", register_form).click
+      register_form.find_element(:name, "slack").send_keys(test_slack_email)
       submit_form(register_form)
       wait_for_ajaximations
-      close_visible_dialog
+      close_instui_dialog
       expect(f(".other_channels .path")).to include_text(test_slack_email)
     end
 
@@ -382,15 +385,14 @@ describe "profile" do
 
     it "generates a new access token without an expiration", priority: "2" do
       get "/profile/settings"
-      generate_access_token("testing", true)
+      generate_access_token
       expect(fj(".access_token:visible .expires")).to include_text("never")
     end
 
     it "generates a new access token with an expiration", priority: "2" do
       Timecop.freeze do
         get "/profile/settings"
-        generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
-        close_visible_dialog
+        generate_access_token(expiration: format_date_for_view(2.days.from_now, :medium))
       end
       expect(fj(".access_token:visible .expires")).to include_text(format_time_for_view(2.days.from_now.midnight))
     end
@@ -398,36 +400,38 @@ describe "profile" do
     it "regenerates a new access token", priority: "2" do
       skip_if_safari(:alert)
       get "/profile/settings"
-      generate_access_token
-      token = f(".visible_token").text
-      f(".regenerate_token").click
+      generate_access_token(close_dialog: false)
+      token_selector = "[data-testid='visible_token']"
+      token = f(token_selector).text
+      f("[type=submit][aria-label='Regenerate Token']").click
       expect(driver.switch_to.alert).not_to be_nil
       driver.switch_to.alert.accept
       wait_for_ajaximations
-      new_token = f(".visible_token").text
+      new_token = f(token_selector).text
       expect(token).not_to eql(new_token)
     end
 
     it "tests canceling creating a new access token" do
       get "/profile/settings"
       f(".add_access_token_link").click
-      access_token_form = f("#access_token_form")
-      access_token_form.find_element(:xpath, "../..").find_element(:css, ".ui-dialog-buttonpane .cancel_button").click
-      expect(access_token_form).not_to be_displayed
+      access_token_dialog_selector = "[role=dialog][aria-label='New Access Token']"
+      access_token_dialog = f(access_token_dialog_selector)
+      access_token_dialog.find_element(:css, "[aria-label='Cancel']").click
+      expect(element_exists?(access_token_dialog_selector)).to be_falsey
     end
 
     it "views the details of an access token" do
       get "/profile/settings"
-      generate_access_token("testing", true)
+      generate_access_token
       # using :visible because we don't want to grab the template element
       fj("#access_tokens .show_token_link:visible").click
-      expect(f("#token_details_dialog")).to be_displayed
+      expect(f("[role=dialog][aria-label='Access Token Details']")).to be_displayed
     end
 
     it "deletes an access token", priority: "2" do
       skip_if_safari(:alert)
       get "/profile/settings"
-      generate_access_token("testing", true)
+      generate_access_token
       # using :visible because we don't want to grab the template element
       fj("#access_tokens .delete_key_link:visible").click
       expect(driver.switch_to.alert).not_to be_nil
@@ -475,11 +479,19 @@ describe "profile" do
       course_with_teacher_logged_in
     end
 
-    it "links back to profile/settings in oauth callbacks" do
-      get "/profile/settings"
-      links = ff("#unregistered_services .service .content a")
-      links.each do |l|
-        expect(l).to have_attribute("href", "profile%2Fsettings")
+    context "google drive" do
+      it "links back to profile/settings in oauth callbacks" do
+        allow(Canvas::Plugin).to receive(:find).and_call_original
+        allow(Canvas::Plugin).to receive(:find).with(:google_drive).and_return(double(enabled?: true))
+        @user.account.enable_service(:google_drive)
+        @user.account.save!
+        get "/profile/settings"
+
+        f("#unregistered_service_google_drive > a").click
+
+        dialog = f("[role=dialog][aria-label='Authorize Google Drive']")
+        link = dialog.find_element(:css, "a[aria-label='Authorize Google Drive Access']")
+        expect(link).to have_attribute("href", "profile%2Fsettings")
       end
     end
   end

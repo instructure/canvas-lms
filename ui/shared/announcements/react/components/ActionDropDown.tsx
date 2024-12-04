@@ -17,7 +17,6 @@
  */
 
 import React, {useState} from 'react'
-import {Flex} from '@instructure/ui-flex'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
@@ -46,6 +45,10 @@ export const ActionDropDown: React.FC<Props> = ({label, actions, disabled = fals
       <Menu
         disabled={disabled}
         placement="bottom stretch"
+        themeOverride={{
+          maxWidth: '100%',
+        }}
+        withArrow={false}
         trigger={
           <Button width="100%" display="block" data-testid="action-dropdown-button">
             <View margin="0 0 0 small">

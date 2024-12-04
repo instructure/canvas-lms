@@ -161,7 +161,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section).to eq @section
       end
 
-      it "is unauthorized for users without manage_students permission (non-granular)" do
+      it "is forbidden for users without manage_students permission (non-granular)" do
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         api_call :post,
@@ -179,10 +179,10 @@ describe EnrollmentsApiController, type: :request do
                    }
                  },
                  {},
-                 { expected_status: 401 }
+                 { expected_status: 403 }
       end
 
-      it "is unauthorized for users without add_student_to_course permission (granular)" do
+      it "is forbidden for users without add_student_to_course permission (granular)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: true, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
@@ -201,7 +201,7 @@ describe EnrollmentsApiController, type: :request do
                    }
                  },
                  {},
-                 { expected_status: 401 }
+                 { expected_status: 403 }
       end
 
       it "creates a new teacher enrollment" do
@@ -637,7 +637,7 @@ describe EnrollmentsApiController, type: :request do
                  @path_options,
                  { enrollment: { user_id: @unenrolled_user.id } },
                  {},
-                 { expected_status: 401 }
+                 { expected_status: 403 }
       end
 
       context "custom course-level roles" do
@@ -873,7 +873,7 @@ describe EnrollmentsApiController, type: :request do
                          type: "StudentEnrollment"
                        }
                      }
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -886,7 +886,7 @@ describe EnrollmentsApiController, type: :request do
         @user                   = @student
       end
 
-      it "returns 401 Unauthorized" do
+      it "returns 403 Forbidden" do
         raw_api_call :post,
                      @path,
                      @path_options,
@@ -896,7 +896,7 @@ describe EnrollmentsApiController, type: :request do
                          type: "StudentEnrollment"
                        }
                      }
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -1249,14 +1249,14 @@ describe EnrollmentsApiController, type: :request do
           expect(json).to be_empty
         end
 
-        it "renders unauthorized if user is not an account admin" do
+        it "renders forbidden if user is not an account admin" do
           user_path = "/api/v1/users/#{@recipient.id}/enrollments"
           api_call_as_user(@provider,
                            :get,
                            user_path,
                            @user_params.merge(temporary_enrollments_for_recipient: true,
                                               user_id: @recipient.id))
-          expect(response).to have_http_status(:unauthorized)
+          expect(response).to have_http_status(:forbidden)
         end
       end
 
@@ -1944,14 +1944,14 @@ describe EnrollmentsApiController, type: :request do
           expect(json).to be_empty
         end
 
-        it "returns unauthorized when caller doesn't have read roster rights and target user has no associated accounts" do
+        it "returns forbidden when caller doesn't have read roster rights and target user has no associated accounts" do
           @observer = user_factory
 
           path = "/api/v1/users/#{@student.id}/enrollments"
           params = { controller: "enrollments_api", action: "index", user_id: @student.id.to_param, format: "json" }
           api_call_as_user(@observer, :get, path, params)
 
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
 
@@ -2627,10 +2627,10 @@ describe EnrollmentsApiController, type: :request do
           end
         end
 
-        it "returns unauthorized if the user has no non-deleted observer enrollments" do
+        it "returns forbidden if the user has no non-deleted observer enrollments" do
           observer.observer_enrollments.destroy_all
           api_call_as_user(observer, :get, "/api/v1/courses/#{course.id}/enrollments", request_params)
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
 
@@ -2660,24 +2660,24 @@ describe EnrollmentsApiController, type: :request do
         @user = user_with_pseudonym(name: "Don Draper", username: "ddraper@sterling-cooper.com")
       end
 
-      it "returns 401 unauthorized for a course listing" do
+      it "returns 403 forbidden for a course listing" do
         raw_api_call(:get, "/api/v1/courses/#{@course.id}/enrollments", @params.merge(course_id: @course.id.to_param))
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
-      it "returns 401 unauthorized for a user listing" do
+      it "returns 403 forbidden for a user listing" do
         raw_api_call(:get, @user_path, @user_params)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
-      it "returns 401 unauthorized for a user requesting an enrollment object by id" do
+      it "returns 403 forbidden for a user requesting an enrollment object by id" do
         raw_api_call(:get, "#{@enroll_path}/#{@enrollment.id}", @enroll_params)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
-      it "returns 401 unauthorized for a course listing with a specific user_if provided" do
+      it "returns 403 forbidden for a course listing with a specific user_if provided" do
         raw_api_call(:get, @path, @params.merge(user_id: @course.students.active.first.id))
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "returns 404 for a user querying from the wrong account" do
@@ -2720,7 +2720,7 @@ describe EnrollmentsApiController, type: :request do
         path = "/api/v1/users/#{@other_student.id}/enrollments"
         params = { controller: "enrollments_api", action: "index", user_id: @other_student.id.to_param, format: "json" }
         raw_api_call(:get, path, params)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -3111,7 +3111,7 @@ describe EnrollmentsApiController, type: :request do
 
           raw_api_call(:delete, "#{@path}?task=delete", @params)
 
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
           expect(JSON.parse(response.body)).to eq({
                                                     "errors" => [{ "message" => "user not authorized to perform that action" }],
                                                     "status" => "unauthorized"
@@ -3134,19 +3134,19 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "an unauthorized user" do
-        it "returns 401" do
+        it "returns 403" do
           @user = @student
           raw_api_call(:delete, @path, @params)
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
 
           raw_api_call(:delete, "#{@path}?task=delete", @params.merge(task: "delete"))
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
 
           raw_api_call(:delete, "#{@path}?task=inactivate", @params.merge(task: "inactivate"))
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
 
           raw_api_call(:delete, "#{@path}?task=deactivate", @params.merge(task: "deactivate"))
-          expect(response).to have_http_status :unauthorized
+          expect(response).to have_http_status :forbidden
         end
       end
     end
@@ -3169,7 +3169,7 @@ describe EnrollmentsApiController, type: :request do
       it "requires authorization" do
         @user = @student
         raw_api_call(:put, @path, @params)
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "is able to reactivate an enrollment" do
@@ -3217,7 +3217,7 @@ describe EnrollmentsApiController, type: :request do
           student = @student
           other_enrollment = student_in_course(active_all: true)
           @user = student
-          api_call(:get, @base_path + "/#{other_enrollment.id}", @params.merge(id: other_enrollment.to_param), {}, {}, { expected_status: 401 })
+          api_call(:get, @base_path + "/#{other_enrollment.id}", @params.merge(id: other_enrollment.to_param), {}, {}, { expected_status: 403 })
         end
       end
 

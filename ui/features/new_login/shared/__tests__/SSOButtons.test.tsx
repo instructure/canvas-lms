@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {SSOButtons} from '../index'
+import {SSOButtons} from '..'
 import {MemoryRouter} from 'react-router-dom'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 

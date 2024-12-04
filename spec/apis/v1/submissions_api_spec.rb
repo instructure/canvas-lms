@@ -94,7 +94,7 @@ describe "Submissions API", type: :request do
                  section_id: @default_section.id.to_s },
                { student_ids: [@student1.id] },
                {},
-               expected_status: 401)
+               expected_status: 403)
 
       json = api_call(:get,
                       "/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions",
@@ -657,7 +657,7 @@ describe "Submissions API", type: :request do
       it "doesn't let you attach files you don't have permission for" do
         course_with_student_logged_in(course: @course, active_all: true)
         put_comment_attachment
-        assert_status(401)
+        assert_forbidden
       end
 
       it "works" do
@@ -1229,7 +1229,7 @@ describe "Submissions API", type: :request do
                    assignment_id: a1.id.to_s,
                    user_id: student1.id.to_s },
                  { include: %w[submission_comments] })
-    assert_status(401)
+    assert_forbidden
   end
 
   it "returns grading information for observers" do
@@ -2479,7 +2479,7 @@ describe "Submissions API", type: :request do
                { controller: "submissions_api", action: "for_students", format: "json", section_id: @section2.to_param },
                { student_ids: [@student1.id, @student2.id], grouped: true },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 
@@ -2610,7 +2610,7 @@ describe "Submissions API", type: :request do
                                user_id: @student.id.to_s },
                              { include: %w[submission_comments rubric_assessment] },
                              {},
-                             expected_status: 401)
+                             expected_status: 403)
           end
 
           it "does not return the submission, even if it is graded" do
@@ -2701,7 +2701,7 @@ describe "Submissions API", type: :request do
                              user_id: @student.id.to_s },
                            { include: %w[full_rubric_assessment] },
                            {},
-                           expected_status: 401)
+                           expected_status: 403)
         end
       end
     end
@@ -3091,7 +3091,7 @@ describe "Submissions API", type: :request do
                            course_id: @course.to_param },
                          { student_ids: [rando.id] },
                          {},
-                         { expected_status: 401 })
+                         { expected_status: 403 })
       end
     end
 
@@ -3174,7 +3174,7 @@ describe "Submissions API", type: :request do
                    student_ids: [@student1.to_param, @student2.to_param] },
                  {},
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
 
       it "errors if too many students requested" do
@@ -3328,7 +3328,7 @@ describe "Submissions API", type: :request do
                    course_id: @course.to_param },
                  { student_ids: [@student1.id, @student2.id, student3.id] },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "does not work with a non-active ObserverEnrollment" do
@@ -3342,7 +3342,7 @@ describe "Submissions API", type: :request do
                    course_id: @course.to_param },
                  { student_ids: [@student1.id, @student2.id] },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -4483,7 +4483,7 @@ describe "Submissions API", type: :request do
                    user_id: student.id.to_s },
                  { comment: { text_comment: "witty remark" },
                    submission: { posted_grade: "B" } })
-    assert_status(401)
+    assert_forbidden
   end
 
   it "does not allow grading of a student not assigned to the assignment" do
@@ -4505,7 +4505,7 @@ describe "Submissions API", type: :request do
                    user_id: student2.id.to_s },
                  { comment: { text_comment: "witty remark" },
                    submission: { posted_grade: "B" } })
-    assert_status(401)
+    assert_forbidden
   end
 
   it "does not allow rubricking by a student" do
@@ -4526,7 +4526,7 @@ describe "Submissions API", type: :request do
                    user_id: student.id.to_s },
                  { comment: { text_comment: "witty remark" },
                    rubric_assessment: { criteria: { points: 5 } } })
-    assert_status(401)
+    assert_forbidden
   end
 
   context "moderated grading" do
@@ -4604,7 +4604,7 @@ describe "Submissions API", type: :request do
           },
         }
       )
-      assert_status(401)
+      assert_forbidden
     end
 
     it "allows posting provisional grades of a moderated assignment whose grades have not been published" do
@@ -5242,7 +5242,7 @@ describe "Submissions API", type: :request do
                course_id: @course.id.to_s },
              { student_ids: [s1.user_id, s2.user_id], grouped: 1 },
              {},
-             expected_status: 401)
+             expected_status: 403)
 
     # try querying the other section directly
     api_call(:get,
@@ -5253,7 +5253,7 @@ describe "Submissions API", type: :request do
                section_id: section2.id.to_s },
              { student_ids: [s1.user_id, s2.user_id], grouped: 1 },
              {},
-             expected_status: 401)
+             expected_status: 403)
 
     # grade the s1 submission, succeeds because the section is the same
     api_call(:put,
@@ -5358,7 +5358,7 @@ describe "Submissions API", type: :request do
 
       it "rejects a submission by a non-student" do
         @user = course_with_teacher(course: @course).user
-        api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com" } }, {}, expected_status: 401)
+        api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com" } }, {}, expected_status: 403)
       end
 
       it "rejects a request with an invalid submission_type" do
@@ -5521,7 +5521,7 @@ describe "Submissions API", type: :request do
             api_url: "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student2.id}/files",
             request_params: { user_id: @student2.to_param }
           )
-          assert_status(401)
+          assert_forbidden
         end
 
         it "allows a teacher to upload files for a student" do
@@ -5655,7 +5655,7 @@ describe "Submissions API", type: :request do
             @course.account.settings[:enable_limited_access_for_students] = true
             @course.account.save!
             preflight({ name: "test.txt", size: 12_345, content_type: "text/plain" })
-            assert_status(401)
+            assert_forbidden
           end
         end
       end
@@ -5682,7 +5682,7 @@ describe "Submissions API", type: :request do
       it "rejects submissions for one student from another" do
         @student1 = @student
         @user = course_with_student(course: @course).user
-        api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com", user_id: @student1.id } }, {}, expected_status: 401)
+        api_call(:post, @url, @args, { submission: { submission_type: "online_url", url: "www.example.com", user_id: @student1.id } }, {}, expected_status: 403)
       end
 
       it "prevents a student from sending submitted_at for their own submission" do
@@ -5855,7 +5855,7 @@ describe "Submissions API", type: :request do
         },
         opts
       )
-      assert_status(401)
+      assert_forbidden
     end
   end
 
@@ -6054,7 +6054,7 @@ describe "Submissions API", type: :request do
     context "when current user is not the student" do
       it "doesn't allow you to mark someone else's submission item read" do
         @submission.add_comment(author: @teacher, comment: "teacher")
-        api_call_as_user(@teacher, :put, endpoint, params, {}, {}, { expected_status: 401 })
+        api_call_as_user(@teacher, :put, endpoint, params, {}, {}, { expected_status: 403 })
         expect(@submission.reload.unread_item?(@student, "comment")).to be_truthy
       end
     end
@@ -6107,7 +6107,7 @@ describe "Submissions API", type: :request do
                          format: "json" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "marks document annotations read" do
@@ -6136,7 +6136,7 @@ describe "Submissions API", type: :request do
                          format: "json" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
   end
 
@@ -6214,7 +6214,7 @@ describe "Submissions API", type: :request do
     it "does not mark submission grade as read if user is not a Site Admin" do
       @user = @teacher
       raw_api_call(:put, endpoint, params)
-      assert_status(401)
+      assert_forbidden
     end
   end
 
@@ -6265,7 +6265,7 @@ describe "Submissions API", type: :request do
                          format: "json" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "marks rubric comments read" do
@@ -6294,7 +6294,7 @@ describe "Submissions API", type: :request do
                          format: "json" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
   end
 
@@ -6527,7 +6527,7 @@ describe "Submissions API", type: :request do
                      assignment_id: @a1.id.to_s,
                      grade_data: { foo: "bar" } },
                    {})
-      assert_status(401)
+      assert_forbidden
     end
 
     it "excuses assignments" do
@@ -6705,7 +6705,7 @@ describe "Submissions API", type: :request do
     end
 
     it "requires grading rights" do
-      api_call_as_user(@student1, :get, @path, @params, {}, {}, { expected_status: 401 })
+      api_call_as_user(@student1, :get, @path, @params, {}, {}, { expected_status: 403 })
     end
 
     it "lists students with and without submissions" do
@@ -6761,12 +6761,12 @@ describe "Submissions API", type: :request do
       end
 
       it "is unauthorized when the user is not the assigned final grader" do
-        api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 401)
+        api_call_as_user(@teacher, :get, @path, @params, {}, {}, expected_status: 403)
       end
 
       it "is unauthorized when the user is an account admin without 'Select Final Grade for Moderation' permission" do
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
-        api_call_as_user(account_admin_user, :get, @path, @params, {}, {}, expected_status: 401)
+        api_call_as_user(account_admin_user, :get, @path, @params, {}, {}, expected_status: 403)
       end
 
       it "is authorized when the user is the final grader" do
@@ -6875,7 +6875,7 @@ describe "Submissions API", type: :request do
     end
 
     it "requires grading rights" do
-      api_call_as_user(@student1, :get, @path, @params, {}, {}, { expected_status: 401 })
+      api_call_as_user(@student1, :get, @path, @params, {}, {}, { expected_status: 403 })
     end
 
     it "lists students" do

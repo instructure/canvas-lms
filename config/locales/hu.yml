@@ -6991,6 +6991,8 @@ hu:
   conversations_send_messages_to_entire_class_3f414741: "Beszélgetések - üzenetek küldése egész osztálynak"
   conversations_send_messages_to_individual_course_m_733620b: "Beszélgetések - üzenetek küldése egyedi kurzusrésztvevőknek"
   cookie_notice_fe4f182e: Cookie-közlemény
+  copied_from_2094bec4: "Innen másolva: "
+  copied_to_b437eff8: "Ide másolva: "
   copy_9748f9f: Másolás
   copy_announcement_title_9d23ddde: "Hirdetmény másolása %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Másolja a %{name} feladatot egy másik kurzusba"
@@ -8191,6 +8193,7 @@ hu:
   create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "Értékelés létrehozása az Új kvízekkel és korábbi Canvas kvízek migrálása."
   create_assignment_68532ceb: "Feladat létrehozása"
   create_course_9a69b32c: "Kurzus létrehozása"
+  create_course_9dc5b61a: "Kurzus létrehozása"
   create_course_pace_3dff129: "Kurzus ütemezés létrehozása"
   create_criterion_6df4d4ad: "Kritérium létrehozása"
   create_delete_edit_157bb1a3: "létrehozás / törlés / szerkesztés"
@@ -10465,6 +10468,7 @@ hu:
   event_creation_failed_71b75bea: "Az esemény létrehozása nem sikerült"
   event_date_c9459fe3: "Esemény dátuma"
   event_date_f05219e7: "Esemény dátuma: "
+  event_details_e646df52: "Esemény részletei"
   event_end_time_ef830e66: "Esemény vége"
   event_fe9ba3fe: Esemény
   event_start_time_441b491f: "Esemény kezdete"
@@ -18238,6 +18242,7 @@ hu:
   please_enter_a_valid_search_term_5c69b0b0: "Kérjük, adjon meg egy érvényes keresési kifejezést"
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Kérjük, adjon meg egy érvényes url-t (pl. https://example.com)."
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: " Kérjük, adjon meg egy érvényes URL-t. Protokoll szükséges (pl. http://, https://, ftp://, tel:, mailto:)."
+  please_enter_the_details_for_the_new_course_dc705b8c: "Kérjük, adja meg az új kurzus részleteit."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Kérjük, írja be az ellenőrzőkódját, amit a tokenje mutat."
   please_enter_your_label_name_7745272d: "Kérjük, adja meg a következőt: %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Kérjük, adja meg a következőt: %{label_name}, majd írja be a jelszavát: "
@@ -21115,11 +21120,13 @@ hu:
   reset_available_from_102b946: "Elréhető ettől dátum törlése"
   reset_available_until_db5b42d6: "Elréhető eddig dátum törlése"
   reset_courses_fe29ddf9: "Kurzusok visszaállítása"
+  reset_from_322d819a: "Visszaállítás innen"
   reset_multi_factor_authentication_2b63a558: "A többlépcsős hitelesítés alaphelyzetbe hozása"
   reset_name_6a0aa0f: "\"%{name}\" visszaállítása"
   reset_quiz_engine_choice_323a40e6: "A kvízmotor választásának visszaállítása"
   reset_this_contact_method_s_bounce_count_3845ecf4: "A kapcsolatfelvételi mód visszapattanás-számlálójának alaphelyzetbe állítása"
   reset_this_email_address_s_bounce_count_d81d8fd9: "E-mail cím visszapattanás-számlálójának alaphelyzetbe állítása"
+  reset_to_ee9265ef: "Visszaállítás ide"
   reset_to_original_score_4d815afd: "Visszaállítás az eredeti pontszámra"
   reset_what_if_score_98fa18dd: "A mi lenne, ha pontszám visszaállítása"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "a forrás-URL és a forráskezelő tartományának meg kell egyeznie"
@@ -23029,6 +23036,7 @@ hu:
       unrecorgnized_type: "Ismeretlen import típus"
     instructure_csv: "Instructure formázott CSV vagy CSV-k zip-pel tömörítve"
     upload_filename: "sis_feltöltés_%{id}.zip"
+  sis_batch_d0050e20: "SIS kötegelt feldolgozás"
   sis_batch_id_8b755858: sis_batch_id
   sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: "SIS adat"
@@ -23888,6 +23896,7 @@ hu:
   submitted_318fad53: Beadva
   submitted_718f5cbc: "BEADOTT:"
   submitted_at_4d5ea3aa: "Beadva ekkor"
+  submitted_b37e2ff0: beadva
   submitted_by_name_dab6d5e1: "Beküldte:%{name}"
   submitted_by_proxy_on_date_569cbae9: "Beküldte %{proxy} -n %{date}"
   submitted_by_submitter_1dcd07a1: "Beküldte %{submitter}"
@@ -25475,6 +25484,7 @@ hu:
                 engedélyezni kell.
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: " A szekciók keresztlistázásához engedélyezni kell a Kurzusszekciók - szerkesztés opciót.\n\
       \x20                       "
+  to_date_7c45ee77: "Eddig a dátumig"
   to_date_cannot_come_before_from_date_3eeb2633: "A Dátumig nem lehet a Dátumtól dátum előtt"
   to_delete_groups_groups_delete_must_also_be_enable_5157ff6e: "A csoportok törléséhez a Csoportok - törlés funkciót is engedélyezni kell."
   to_differentiate_assignments_to_individual_student_69373d88: |-
@@ -26115,6 +26125,7 @@ hu:
   updating_discussion_failed_aadb2d35: "A Fórum frissítése sikertelen"
   updating_publication_date_62cc1622: "A közzététel dátumának frissítése"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "A katalógus URL-jének frissítése azonnali hatállyal elérhetetlenné teszi a régi URL-t a felhasználók számára! Ha egy meglévő fizetési processzor van beállítva, a változtatásokhoz egy katalógusmérnök segítségére lesz szükség."
+  updating_user_details_b8520b3e: "Felhasználó részleteinek frissítése..."
   upload_8b403d05: Feltöltés
   upload_a_file_228b8cf9: "Fájl feltöltése"
   upload_a_list_of_forbidden_words_terms_in_addition_e9ac69d3: "Töltse fel a tiltott szavak/kifejezések listáját az alapértelmezett listán kívül. A fájl szövegfájl (.txt) legyen, soronként egyetlen szóval vagy kifejezéssel."
@@ -27411,7 +27422,7 @@ hu:
   you_can_t_edit_this_rubric_either_because_you_don__ab22f243: " Ezt az értékelőtáblát nem szerkesztheti, mert vagy nincs engedélye, vagy mert több helyen is használják. "
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Ön nem szerkesztheti ezt az értékelőtáblát, mert nincs engedélye vagy már használatban van. Minden módosítás egy új értékelőtáblába lesz átvezetve, ami az eredeti alapján készül el. Mindenképpen folytatja?"
   you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "Nem küldhet be feladatot, ha az még nincs közzétéve."
-  you_can_update_some_of_this_user_s_information_but_8e99a045: "Ön frissítheti az itt látható felhasználó egyes adatait, de a felhasználó visszaváltoztathatja azokat, ha kívánja. "
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "Ön frissítheti az itt látható felhasználó egyes adatait, de a felhasználó visszaváltoztathatja ezeket, ha kívánja. "
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Ön egy 16x16, 32x32, 48x48 méretű ikonfájlt alkalmazhat."
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: "Az elbocsátott hirdetményeket a Fiók menüpontban és a Globális hirdetmények menüpontot választja."
   you_can_view_your_grades_based_on_what_if_scores_s_a1aeae72: " A Mi lenne, ha pontszámok alapján megtekintheti az osztályzatokat, hogy tudja, hogyan befolyásolják az osztályzatokat a következő vagy újra benyújtott feladatok. "

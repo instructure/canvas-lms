@@ -4600,6 +4600,8 @@ hy:
     unstar: "Հանել աստղիկը"
     unstar_conversation: "Խոսակցության աստղիկով նշումը հանել "
   conversations_69a8dc26: Խոսակցություններ
+  copied_from_2094bec4: "Պատճենված է ___ից"
+  copied_to_b437eff8: "Պատճենվել է ___ում"
   copy_9748f9f: Պատճենել
   copy_to_folder_32ecc3c3: "Պատճենել Թղթապանակում"
   copying_628a9607: "Պատճենում է..."
@@ -5445,6 +5447,7 @@ hy:
   create_132b3be1: Ստեղծել
   create_assignment_68532ceb: "Ստեղծել հանձնարարություն"
   create_course_9a69b32c: "Ստեղծել դասընթաց"
+  create_course_9dc5b61a: "Ստեղծել դասընթաց"
   create_discussion_982f915e: "Ստեղծել քննարկում"
   create_discussion_topics_8330d52b: "Ստեղծել քննարկման թեմաներ"
   create_group_set_7fe1cd53: "Ստեղծել խմբերի շարք"
@@ -6838,6 +6841,7 @@ hy:
     wrong_file_extension: "Ձեր կողմից ընտրված \"{extension}\" ընդլայնմամբ ֆայլը թույլատրված չէ ուղարկման համար:"
   event_date_c9459fe3: "Միջոցառման ամսաթիվ"
   event_date_f05219e7: "Միջոցառման ամսաթիվ՝"
+  event_details_e646df52: "Միջոցառման մանրամասները"
   event_end_time_ef830e66: "Միջոցառման ավարտման ամսաթիվ"
   event_start_time_441b491f: "Միջոցառման մեկնարկի ամսաթիվ"
   event_title_7f1051a6: "Միջոցառման անվանում"
@@ -7230,6 +7234,7 @@ hy:
   forgot_password_url_3f9c04b: "Մոռացել եմ URL գաղտնաբառը"
   form_background_fb654518: "Ձեւավորել ֆոն"
   forward_d143f64: Ուղարկել
+  from_date_27317230: "սկսված ամսաթից"
   from_fdd4956d: Ումից
   from_from_to_to_e31f6422: "%{from}-ից %{to}-ին"
   from_gravatar_58372d5a: Gravatar-ից
@@ -12046,6 +12051,7 @@ hy:
     video: Վիդեո
   please_add_at_least_one_non_blank_answer_213c2c8e: "Ավելացրեք առնվազն մեկ լրացված պատասխան"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Խնդրում ենք ավելացնել առնվազն մեկ լրացված պատասխան յուրաքանչյուր փոփոխականի համար:"
+  please_enter_the_details_for_the_new_course_dc705b8c: "Մուտքագրեք նոր դասընթացի մանրամասները:"
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Մուտքագրեք ձեր token-ում ցույց տրված հաստատման կոդը"
   please_enter_your_label_name_7745272d: "Մուտքագրեք ձեր  %{label_name}՝"
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
@@ -14519,6 +14525,8 @@ hy:
   required_5f7ef8c0: "Պահանջվում է"
   reregister_9ab95a57: "Կրկին գրանցել"
   reregister_toolname_3dde0bfc: "Վերագրանցել %{toolName}"
+  reset_from_322d819a: "Սկզբնական Վիճակին Բերել Սկսած"
+  reset_to_ee9265ef: "Սկզբնական Վիճակին Բերել Դեպի"
   respondus_lockdown_browser_support_413352eb: "Respondus LockDow բրաուզերի աջակցությունը"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -15881,6 +15889,7 @@ hy:
       unrecorgnized_type: "Ներմուծման չճանաչված տեսակ"
     instructure_csv: "Ֆորմատավորված Instructure CSV կամ CSV ֆայլերի արխիվ"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "SIS փաթեթ"
   sis_export_title: "SIS արտահանում"
   sis_grade_export_settings_45a9f709: "SIS գնահատականների արտահանման կարգաբերումներ"
   sis_id_4495a887: "SIS ID"
@@ -16360,6 +16369,7 @@ hy:
       agree_to_pledge: "Այս հանձնարարությունն ուղարկելուց առաջ դուք պետք է ընդունեք հանձնարարությունն ուղարկելու պայմանները:"
   submit_media_file_f334c1ba: "Ուղարկել մեդի ֆայլ"
   submitted_318fad53: "Ներկայացված է "
+  submitted_b37e2ff0: "ուղարկված է"
   submitted_d5ba370a: "Ուղարկված է՝"
   submitted_datetime_fa2e9287: "Ուղարկված է՝ %{dateTime}"
   submitting_types_7c5a7096: "Ուղարկվում է. %{types}"
@@ -16887,6 +16897,7 @@ hy:
       ձեռք բերեք օգտատիրոջ ID և գաղտնի բանալի:
       
       Եթե պրովայդերը կարող է կարգաբերել ընդունելի callback կամ ուղղորդելURI-ները, օգտագործեք  %{callback_url}:
+  to_date_7c45ee77: "մինչև ամսաթիվը"
   to_minscore_43e5452e: "%{minScore}% համար"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Քննարկումը էջի վերևում տեղադրելու համար քննարկումը քաշեք այստեղ կամ քննարկումների կարգաբերումների մենյուից ընտրեք \"Ամրացնել\" կետը: "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "Օգտատերերի համար կոնկրետ Google Apps դոմեյնը սահմանափակելու համար, մուտքագրեք դոմենը այստեղ"
@@ -17001,6 +17012,7 @@ hy:
   unused_courses_title: "Չօգտագործված դասընթացներ"
   up_c553575d: Վերև
   update_4d8ee62: Թարմացնել
+  update_details_6abfed16: "Թարմացնել Տվյալները"
   update_grade_b47eb3ff: "Թարմացնել գնահատականը"
   update_module_b984c2e5: "Թարմացնել մոդուլը"
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
@@ -17008,6 +17020,7 @@ hy:
   update_your_notification_settings_ed9564f3: "Թարմացնել ծանուցման ձեր կարգաբերումները"
   updated_group_group_name_727b1d98: "%{group_name} թարմացված խումբ"
   updating_6edbab78: "Թարմացվում է"
+  updating_user_details_b8520b3e: "Օգտատիրոջ տվյալների թարմացում..."
   upload_8b403d05: Բեռնել
   upload_a_css_file_ec22214b: "Բեռնել CSS ֆայլ..."
   upload_a_js_file_c89d795: "Բեռնել JS ֆայլ..."
@@ -17770,6 +17783,7 @@ hy:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Դուք չեք կարող ջնջել ենթահաշիվ, որը դասընթացներ ունի իր մեջ:"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Դուք չեք կարող խմբագրել այս ռուբրիկը, որովհետև  թույլտվություն չունեք, կամ այն օգտագործվում է մեկից ավելի տեղերում: Ձեր կատարած ցանկացած փոփոխություն կհանգեցնի հին ռուբրիկի վրա հիմնված նոր ռուբրիկի: Ցանկանո՞ւմ եք շարունակել: "
   you_can_try_to_log_in_again_2b23ef0f: "Դուք կարող եք փորձել *կրկին մուտք գործել:*"
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "Դուք կարող եք թարմացնել օգտատիրոջ վերաբերյալ որոշ տեղեկություններ, բայց նա կարող է դրանք նորից հին տեղեկություններով փոխարինել:"
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Դուք կարող եք օգտագործել 16x16, 32x32, 48x48 ico ֆայլերը"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Դուք չեք կարող խմբագրել թեմաներն այս ենթահաշվում:"
   you_cannot_remove_this_enrollment_c87be1cb: "Դուք չեք կարող ջնջել այս գրանցումը:"

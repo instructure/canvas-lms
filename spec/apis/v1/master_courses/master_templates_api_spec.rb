@@ -40,23 +40,12 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     it "requires authorization" do
-      @account.disable_feature!(:granular_permissions_manage_courses)
-      @account.role_overrides.create!(
-        role: admin_role,
-        permission: "manage_courses",
-        enabled: false
-      )
-      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
-    end
-
-    it "requires authorization (granular permissions)" do
-      @account.enable_feature!(:granular_permissions_manage_courses)
       @account.role_overrides.create!(
         role: admin_role,
         permission: "manage_courses_admin",
         enabled: false
       )
-      api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
+      api_call(:get, @url, @params, {}, {}, { expected_status: 403 })
     end
 
     it "lets teachers in the master course view details" do
@@ -132,12 +121,12 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "requires account-level authorization" do
       course_with_teacher(course: @course, active_all: true)
-      api_call(:put, @url, @params, {}, {}, { expected_status: 401 })
+      api_call(:put, @url, @params, {}, {}, { expected_status: 403 })
     end
 
     it "requires account-level blueprint permissions" do
       Account.default.role_overrides.create!(role: admin_role, permission: "manage_master_courses", enabled: false)
-      api_call(:put, @url, @params, {}, {}, { expected_status: 401 })
+      api_call(:put, @url, @params, {}, {}, { expected_status: 403 })
     end
 
     it "does not try to add other blueprint courses" do
@@ -718,7 +707,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                          action: "import_details" },
                        {},
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
     it "syncs syllabus content unless changed downstream" do

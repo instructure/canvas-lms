@@ -408,7 +408,7 @@ describe FilesController do
         stub_request(:get, "http://instfs.test/files/stuff/metadata").to_return(status: 404, body: { error: "weird" }.to_json)
 
         get "show", params: { course_id: @course.id, id: @file.id, access_token: @token_string, instfs_id: "stuff" }, format: "json"
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
 
       it "allows download" do
@@ -1224,13 +1224,13 @@ describe FilesController do
       it "does not move a file into a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @file.id, attachment: { folder_id: @sub_folder.id } }, format: "json"
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
 
       it "does not move a file out of a submissions folder" do
         user_session(@student)
         put "update", params: { user_id: @student.id, id: @sub_file.id, attachment: { folder_id: @root_folder.id } }, format: "json"
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -1705,7 +1705,7 @@ describe FilesController do
     it "rejects if JWT is excluded or improperly formed" do
       wrong_token = Canvas::Security.create_jwt({}, nil, "the wrong key")
       post "api_capture", params: { id: 1, token: wrong_token }
-      assert_status(403)
+      assert_forbidden
     end
 
     it "rejects if required params aren't included" do

@@ -46,6 +46,8 @@ import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import CreateAssignmentView from './CreateAssignmentView'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {captureException} from '@sentry/browser'
+import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter.jsx'
+import {createRoot} from 'react-dom/client'
 
 const I18n = useI18nScope('AssignmentListItemView')
 
@@ -103,12 +105,10 @@ export default AssignmentListItemView = (function () {
       this.child('lockIconView', '[data-view=lock-icon]')
       this.child('dateDueColumnView', '[data-view=date-due]')
       this.child('dateAvailableColumnView', '[data-view=date-available]')
-      this.child('editAssignmentView', '[data-view=edit-assignment]')
       this.child('sisButtonView', '[data-view=sis-button]')
 
       this.prototype.els = {
         '.al-trigger': '$settingsButton',
-        '.edit_assignment': '$editAssignmentButton',
         '.move_assignment': '$moveAssignmentButton',
       }
 
@@ -130,6 +130,7 @@ export default AssignmentListItemView = (function () {
         'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
         'click .alignment-clone-failed-retry': 'onAlignmentCloneFailedRetry',
         'click .alignment-clone-failed-cancel': 'onDuplicateOrImportFailedCancel',
+        'click .edit_assignment': 'renderCreateEditAssignmentModal',
       }
 
       this.prototype.messages = shimGetterShorthand(
@@ -317,13 +318,6 @@ export default AssignmentListItemView = (function () {
 
     afterRender() {
       this.createModuleToolTip()
-
-      if (this.editAssignmentView) {
-        this.editAssignmentView.hide()
-        if (this.canEdit()) {
-          this.editAssignmentView.setTrigger(this.$editAssignmentButton)
-        }
-      }
 
       const {attributes = {}} = this.model
       const {assessment_requests: assessmentRequests, checkpoints} = attributes
@@ -599,6 +593,23 @@ export default AssignmentListItemView = (function () {
     onDuplicateOrImportFailedCancel(e) {
       e.preventDefault()
       return this.delete({silent: true})
+    }
+
+    renderCreateEditAssignmentModal() {
+      const mountPoint = document.getElementById('create-edit-mount-point')
+      const root = createRoot(mountPoint)
+      const onClose = () => {
+        root.unmount()
+
+        // Rerender the list item
+        this.render()
+      }
+      root.render(
+        <CreateAssignmentViewAdapter
+          assignment={this.model}
+          closeHandler={onClose}
+        />
+      )
     }
 
     renderItemAssignToTray(open, returnFocusTo, itemProps) {

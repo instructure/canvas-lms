@@ -186,6 +186,8 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/filters'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/learn_platform/organizations/:organization_salesforce_id/products'
+- verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/products'
 - verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/products/:id'
@@ -201,6 +203,8 @@
   path: '/api/v1/accounts/:account_id/lti_apps'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_apps/launch_definitions'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registration_by_client_id/:client_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registrations'
 - verb: DELETE
@@ -2048,7 +2052,7 @@
 - verb: POST
   path: '/api/v1/users/:id/split'
 - verb: PUT
-  path: "/api/v1/users/:id/text_editor_preference"
+  path: '/api/v1/users/:id/text_editor_preference'
 - verb: GET
   path: '/api/v1/users/:user_id/avatars'
 - verb: GET

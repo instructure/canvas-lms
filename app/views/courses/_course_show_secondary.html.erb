@@ -6,7 +6,7 @@
 <div id="course_show_secondary">
   <% @can_manage = can_do(@context, @current_user, :manage) %>
   <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
-  <% if can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?) %>
+  <% if can_do(@context, @current_user, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?) %>
     <div id="course_status">
       <h3>
         <%= t('headers.course_status', %{Course Status}) %>
@@ -66,7 +66,7 @@
               publish_course: course_path(@context)
             },
             permissions: {
-              can_change_course_publish_state: can_do(@context, @current_user, :change_course_state, :manage_courses_publish)
+              can_change_course_publish_state: can_do(@context, @current_user, :manage_courses_publish)
             }
           }
         }).to_json %>

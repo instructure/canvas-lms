@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "active_support/callbacks/suspension"
+require Rails.root.join("lib/extensions/active_record")
 
 class ActiveRecord::Base
   self.cache_timestamp_format = :usec
@@ -2242,3 +2243,5 @@ module RollbackIgnoreNonDatedMigrations
   end
 end
 ActiveRecord::MigrationContext.prepend(RollbackIgnoreNonDatedMigrations)
+
+ActiveRecord::Enum.prepend(Extensions::ActiveRecord::Enum)

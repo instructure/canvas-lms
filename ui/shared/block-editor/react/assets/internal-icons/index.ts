@@ -23,6 +23,9 @@ import IconResize from './resize'
 import IconPlacementTop from './placement-top'
 import IconPlacementMiddle from './placement-middle'
 import IconPlacementBottom from './placement-bottom'
+import IconDesktop from './desktop'
+import IconTablet from './tablet'
+import IconMobile from './mobile'
 
 export {
   IconUndo,
@@ -32,4 +35,7 @@ export {
   IconPlacementTop,
   IconPlacementMiddle,
   IconPlacementBottom,
+  IconDesktop,
+  IconTablet,
+  IconMobile,
 }

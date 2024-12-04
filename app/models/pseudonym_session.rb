@@ -30,7 +30,13 @@ class PseudonymSession < Authlogic::Session::Base
   consecutive_failed_logins_limit 0
 
   attr_accessor :remote_ip
+  attr_writer :non_explicit_session
   attr_reader :login_error
+
+  def initialize(...)
+    super
+    @non_explicit_session = false
+  end
 
   # In authlogic 3.2.0, it tries to parse the last part of the cookie (delimited by '::')
   # as a timestamp to verify whether the cookie is stale.
@@ -174,5 +180,11 @@ class PseudonymSession < Authlogic::Session::Base
         r.save_without_transaction
       end
     end
+  end
+
+  def update_info
+    return if @non_explicit_session
+
+    super
   end
 end

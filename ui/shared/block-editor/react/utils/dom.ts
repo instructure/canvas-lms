@@ -116,11 +116,22 @@ export function mountNode(): HTMLElement {
   return document.querySelector('.block-editor-editor') as HTMLElement
 }
 
-// export function validateSVG(svg: string): boolean {
-//   const parser = new DOMParser()
-//   const doc = parser.parseFromString(svg, 'image/svg+xml')
-//   if (doc.documentElement.childElementCount !== 1 || doc.querySelector('svg') === null) {
-//     return false
-//   }
-//   return true
-// }
+const focusableSelector = `
+  a[href],
+  button,
+  input:not([type="hidden"]),
+  select,
+  textarea,
+  [tabindex]:not([tabindex="-1"]),
+  summary
+`
+
+function isFocusable(element: HTMLElement): boolean {
+  return typeof element.focus === 'function' && !element.hasAttribute('disabled')
+}
+export function firstFocusableElement(parent?: HTMLElement): HTMLElement | undefined {
+  if (!parent) return undefined
+  const focusableElements = Array.from(parent.querySelectorAll(focusableSelector)) as HTMLElement[]
+  const firstFocusable = focusableElements.find(isFocusable)
+  return firstFocusable
+}

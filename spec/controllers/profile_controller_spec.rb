@@ -21,9 +21,17 @@
 require "timecop"
 
 describe ProfileController do
+  let(:mfa_settings) { :disabled }
+  let(:otp_via_sms) { false }
+
   before :once do
     course_with_teacher(active_all: true)
     user_with_pseudonym(active_user: true)
+  end
+
+  before do
+    allow_any_instance_of(ProfileHelper).to receive(:current_mfa_settings).and_return(mfa_settings)
+    allow_any_instance_of(Login::OtpHelper).to receive(:otp_via_sms_in_us_region?).and_return(otp_via_sms)
   end
 
   describe "show" do
@@ -431,6 +439,56 @@ describe ProfileController do
     end
 
     describe "js_env" do
+      context "register_cc_tabs" do
+        let(:mfa_settings) { :required }
+        let(:otp_via_sms) { true }
+
+        it "should include 'sms'" do
+          user_session(@user)
+
+          get "settings"
+
+          expect(assigns[:js_env][:register_cc_tabs]).to include("sms")
+        end
+
+        it "should include 'slack'" do
+          @user.account.enable_feature! :slack_notifications
+          user_session(@user)
+
+          get "settings"
+
+          expect(assigns[:js_env][:register_cc_tabs]).to include("slack")
+        end
+      end
+
+      context "is_default_account" do
+        it "should be 'true' if the domain root account is the default" do
+          user_session(@user)
+
+          get "settings"
+
+          expect(assigns[:js_env][:is_default_account]).to be true
+        end
+      end
+
+      context "is_eligible_for_token_regeneration" do
+        it "should be 'true' if the user is eligible for token regeneration" do
+          user_session(@user)
+          get "settings"
+
+          expect(assigns[:js_env][:is_eligible_for_token_regeneration]).to be true
+        end
+
+        it "should be 'false' if the user is NOT eligible for token regeneration" do
+          @user.account.change_root_account_setting!(:limit_personal_access_tokens, true)
+          @user.account.enable_feature!(:admin_manage_access_tokens)
+          user_session(@user)
+          get "settings"
+
+          expect(assigns[:js_env][:is_eligible_for_token_regeneration]).to be false
+        end
+      end
+
       it "sets discussions_reporting to falsey if discussions_reporting is off" do
         Account.default.disable_feature! :discussions_reporting
         user_session(@user)

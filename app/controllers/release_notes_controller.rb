@@ -150,7 +150,7 @@ class ReleaseNotesController < ApplicationController
   end
 
   def allowed_langs
-    Setting.get("release_notes_langs", "en,es,pt,nn,nl,zh").split(",")
+    Setting.get("release_notes_langs", "en,es,pt,fr-CA,no,nl,sv,zh").split(",")
   end
 
   def allowed_envs

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {InstructureLogo} from '../index'
+import {InstructureLogo} from '..'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 import {render} from '@testing-library/react'
 

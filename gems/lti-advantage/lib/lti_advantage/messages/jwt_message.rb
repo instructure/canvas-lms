@@ -123,8 +123,9 @@ module LtiAdvantage::Messages
       send(attribute)
     end
 
-    def to_h
-      LtiAdvantage::Serializers::JwtMessageSerializer.new(self).serializable_hash
+    # TODO: remove without_validation_fields when we remove the remove_unwanted_lti_validation_claims flag
+    def to_h(without_validation_fields: true)
+      LtiAdvantage::Serializers::JwtMessageSerializer.new(self).serializable_hash(without_validation_fields:)
     end
 
     def to_jws(private_key, alg = :RS256)

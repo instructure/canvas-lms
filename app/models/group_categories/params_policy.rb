@@ -37,6 +37,7 @@ module GroupCategories
         group_category.non_collaborative = params.non_collaborative
         group_category.create_group_count = params.create_group_count
         group_category.create_group_member_count = params.create_group_member_count
+        group_category.self_signup_end_at = params.self_signup_end_at if context.account.feature_enabled?(:self_signup_deadline)
         unless params.assign_async
           group_category.assign_unassigned_members = params.assign_unassigned_members
         end

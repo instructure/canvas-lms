@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Factories
-  VALID_GROUP_CATEGORY_ATTRIBUTES = %i[name context group_limit sis_source_id].freeze
+  VALID_GROUP_CATEGORY_ATTRIBUTES = %i[name context self_signup self_signup_end_at group_limit sis_source_id].freeze
 
   def group_category(opts = {})
     opts[:name] = opts[:name].presence || "foo"

@@ -16,31 +16,77 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Background from './Background'
-import React from 'react'
+import React, {Suspense} from 'react'
 import classNames from 'classnames'
+import {Background, Loading} from '.'
+import {Responsive} from '@instructure/ui-responsive'
 import {View} from '@instructure/ui-view'
+import {canvas} from '@instructure/ui-theme-tokens'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 // @ts-expect-error
 import styles from './ContentLayout.module.css'
 
+const I18n = useI18nScope('new_login')
+
+const breakpoints = {
+  tablet: {minWidth: canvas.breakpoints.tablet}, // 768px
+  desktop: {minWidth: canvas.breakpoints.desktop}, // 1024px
+}
+
 interface Props {
-  className?: string
   children: React.ReactNode
 }
 
-const ContentLayout = ({className, children}: Props) => (
-  <View as="div" height="100%" position="relative" className={styles.contentLayout}>
-    <View
-      as="div"
-      className={classNames(className, styles.contentLayout__wrapper)}
-      background="primary"
-    >
-      {children}
-    </View>
+const ContentLayout = ({children}: Props) => {
+  // <Responsive> renders as a <div> with display="block", so we set its height to 100% to fill the
+  // available space within its parent, which is a flex item
+  const setResponsiveRef = (el: HTMLDivElement | null) => {
+    if (el) el.style.height = '100%'
+  }
 
-    <Background className={styles.contentLayout__background} />
-  </View>
-)
+  return (
+    <Responsive match="media" query={breakpoints} elementRef={setResponsiveRef}>
+      {(_props, matches) => {
+        const isDesktop = matches?.includes('desktop')
+        const isTablet = matches?.includes('tablet')
+        const isTabletOnly = isTablet && !isDesktop
+
+        return (
+          <View
+            as="div"
+            height="100%"
+            position="relative"
+            className={classNames({
+              [styles['contentLayout--desktop']]: isDesktop,
+              [styles['contentLayout--tablet']]: isTabletOnly,
+            })}
+          >
+            <View
+              as="div"
+              className={classNames(styles.contentLayout__content, {
+                [styles['contentLayout__content--desktop']]: isDesktop,
+                [styles['contentLayout__content--tablet']]: isTabletOnly,
+              })}
+              background="primary"
+              position="relative"
+              stacking="above"
+            >
+              <Suspense fallback={<Loading title={I18n.t('Loading page …')} />}>
+                {children}
+              </Suspense>
+            </View>
+
+            <Background
+              className={classNames(styles.contentLayout__background, {
+                [styles['contentLayout__background--desktop']]: isDesktop,
+              })}
+            />
+          </View>
+        )
+      }}
+    </Responsive>
+  )
+}
 
 export default ContentLayout

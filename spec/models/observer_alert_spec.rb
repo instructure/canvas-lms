@@ -463,7 +463,6 @@ describe ObserverAlert do
       expect(alert.count).to eq 1
 
       expect(alert.first.context).to eq notification
-      expect(alert.first.title).to include("Institution announcement:")
     end
 
     it "does not duplicate alerts" do

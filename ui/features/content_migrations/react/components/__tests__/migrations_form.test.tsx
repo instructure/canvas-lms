@@ -72,8 +72,6 @@ const submitAMigration = async () => {
   await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
   await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
 
-  await userEvent.click(screen.getByText('All content'))
-
   await userEvent.click(screen.getByTestId('submitMigration'))
 }
 
@@ -144,8 +142,6 @@ describe('ContentMigrationForm', () => {
     await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
     await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
 
-    await userEvent.click(screen.getByText('All content'))
-
     await userEvent.click(screen.getByTestId('submitMigration'))
 
     // @ts-expect-error
@@ -197,8 +193,6 @@ describe('ContentMigrationForm', () => {
     const input = screen.getByTestId('migrationFileUpload')
     await userEvent.upload(input, file)
 
-    await userEvent.click(screen.getByText('All content'))
-
     await userEvent.click(screen.getByTestId('submitMigration'))
 
     await waitFor(() => {
@@ -243,8 +237,6 @@ describe('ContentMigrationForm', () => {
 
     await userEvent.type(screen.getByPlaceholderText('Search...'), 'MyCourse')
     await userEvent.click(await screen.findByRole('option', {name: 'MyCourse'}))
-
-    await userEvent.click(screen.getByText('All content'))
 
     await userEvent.click(screen.getByTestId('submitMigration'))
     expect(screen.queryByTestId('submitMigration')).not.toBeInTheDocument()

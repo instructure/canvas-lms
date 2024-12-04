@@ -95,7 +95,7 @@ describe "Account Notification API", type: :request do
         non_admin = user_with_managed_pseudonym(account: @admin.account)
         api_call_as_user(non_admin, :get, @path, @api_params.merge(include_all: true))
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -297,7 +297,7 @@ describe "Account Notification API", type: :request do
                            message: "This is a notification"
                          } },
                        {},
-                       expected_status: 401)
+                       expected_status: 403)
     end
 
     it "returns an error for missing required params" do
@@ -353,7 +353,7 @@ describe "Account Notification API", type: :request do
       @end_at = 1.day.from_now
     end
 
-    it "returns not authorized for non admin user" do
+    it "returns forbidden for non admin user" do
       user = user_with_managed_pseudonym
       api_call_as_user(user,
                        :put,
@@ -367,7 +367,7 @@ describe "Account Notification API", type: :request do
                            message: "This is a notification"
                          } },
                        {},
-                       expected_status: 401)
+                       expected_status: 403)
     end
 
     it "updates an existing account notification" do

@@ -29,8 +29,9 @@ import {Topbar} from './components/editor/Topbar'
 import {blocks} from './components/blocks'
 import {RenderNode} from './components/editor/RenderNode'
 import {ErrorBoundary} from './components/editor/ErrorBoundary'
-import {closeExpandedBlocks} from './utils/cleanupBlocks'
 import {
+  closeExpandedBlocks,
+  firstFocusableElement,
   transform,
   LATEST_BLOCK_DATA_VERSION,
   type BlockEditorDataTypes,
@@ -51,14 +52,68 @@ import CreateFromTemplate from '@canvas/block-editor/react/CreateFromTemplate'
 
 const I18n = useI18nScope('block-editor')
 
+declare global {
+  interface Window {
+    block_editor?: () => {
+      query: any
+      getBlocks: () => BlockEditorData
+    }
+  }
+}
+
+// NOTE: handleDrop and  maybeFocusFirstElementOnThePage work together
+//       to get focus correct when a page is first loaded. We want (1) the page title to be
+//       focused, and (2) the PageBlock to be selected. Craft.js doesn't provide any hooks
+//       for knowing when content is loaded and rendered, so we have to resort to this hack.
+//       This is complicated by the fact that when we create a page from scratch, we load
+//       a default page then let the user select a template and load it which we need to account for.
+
+interface MaybeFocusFirstElementOnThePage {
+  (actions: any, query: any): void
+  done: boolean
+  time: number
+}
+
+const maybeFocusFirstElementOnThePage = function (actions: any, query: any): void {
+  if (maybeFocusFirstElementOnThePage.done) return
+
+  // ignore the default content we load while waiting for the user to select a page template
+  if (!query.node('ROOT').get().data.custom?.isDefaultPage) {
+    maybeFocusFirstElementOnThePage.done = true
+
+    actions.selectNode('ROOT')
+    // TODO: '.edit-content' is wiki page specific. We need to generalize.
+    const elem = firstFocusableElement(document.querySelector('.edit-content') as HTMLElement)
+    elem?.focus()
+  }
+} as MaybeFocusFirstElementOnThePage
+
+maybeFocusFirstElementOnThePage.done = false
+maybeFocusFirstElementOnThePage.time = 0
+
 class CustomEventHandlers extends DefaultEventHandlers {
   loaded: boolean = false
 
+  loadingTimer: number = 0
+
   handleDrop = (el: HTMLElement, id: NodeId) => {
+    // When the page is first loaded, handleDrop is called on the PageBlock,
+    // then on down the tree. Use a timer to discover the last drop event
+    // then try to focus on the first focusable element on the page.
+    if (!maybeFocusFirstElementOnThePage.done) {
+      window.clearTimeout(this.loadingTimer)
+      this.loadingTimer = window.setTimeout(() => {
+        maybeFocusFirstElementOnThePage(this.options.store.actions, this.options.store.query)
+      }, 20)
+    }
+
     // on initial load, the root node is the last selected
     // wait for that before handling drops
     if (id === 'ROOT') {
       this.loaded = true
+      if (maybeFocusFirstElementOnThePage.done) {
+        this.options.store.actions.selectNode('ROOT')
+      }
       return
     }
     if (this.loaded) {
@@ -79,21 +134,6 @@ class CustomEventHandlers extends DefaultEventHandlers {
   }
 }
 
-const DEFAULT_CONTENT = JSON.stringify({
-  ROOT: {
-    type: {
-      resolvedName: 'PageBlock',
-    },
-    isCanvas: true,
-    props: {},
-    displayName: 'Page',
-    custom: {},
-    hidden: false,
-    nodes: [],
-    linkedNodes: {},
-  },
-})
-
 export type BlockEditorProps = {
   enabled?: boolean
   enableResizer?: boolean
@@ -110,10 +150,7 @@ export default function BlockEditor({
   content,
 }: BlockEditorProps) {
   const [data] = useState<BlockEditorData>(() => {
-    if (content?.blocks) {
-      return transform(content)
-    }
-    return {version: '0.2', blocks: DEFAULT_CONTENT} as BlockEditorData
+    return transform(content)
   })
   const [toolboxOpen, setToolboxOpen] = useState(false)
   const [templateEditor, setTemplateEditor] = useState<TemplateEditor>(TemplateEditor.UNKNOWN)
@@ -126,7 +163,7 @@ export default function BlockEditor({
   // currently imported from the assets folder (though this will eventually be replaced with an API call)
   const getBlockTemplates = useCallback(
     (editor: TemplateEditor) => {
-      getTemplates({course_id, drafts: editor > 0})
+      getTemplates({course_id, drafts: editor > 0, globals_only: false})
         .then(setBlockTemplates)
         .catch((err: Error) => {
           showFlashError(I18n.t('Cannot get block custom templates'))(err)
@@ -168,7 +205,6 @@ export default function BlockEditor({
         ? `/api/v1/courses/${course_id}/block_editor_templates/${template.id}`
         : `/api/v1/courses/${course_id}/block_editor_templates`
       const method = template.id ? 'PUT' : 'POST'
-      template.editor_version = LATEST_BLOCK_DATA_VERSION
       doFetchApi<BlockTemplate>({
         path,
         method,
@@ -217,6 +253,7 @@ export default function BlockEditor({
       const template = saveTemplateEvent.detail.template
       const globalTemplate = saveTemplateEvent.detail.globalTemplate
       template.node_tree.nodes[template.node_tree.rootNodeId].custom.displayName = template.name
+      template.editor_version = LATEST_BLOCK_DATA_VERSION
 
       if (globalTemplate) {
         template.global_id = template.id = uuid.v4()
@@ -266,12 +303,11 @@ export default function BlockEditor({
 
   const handleNodesChange = useCallback(
     (query: any) => {
-      // @ts-expect-error
       window.block_editor = () => ({
         query,
         getBlocks: (): BlockEditorData => ({
           id: data.id || '',
-          version: '0.2',
+          version: LATEST_BLOCK_DATA_VERSION,
           blocks: closeExpandedBlocks(query),
         }),
       })
@@ -307,6 +343,11 @@ export default function BlockEditor({
             className: 'block-editor-dnd-indicator',
             error: 'red',
             success: 'rgb(98, 196, 98)',
+            thickness: 5,
+            style: {
+              borderColor: 'dodgerblue',
+              borderStyle: 'dashed',
+            },
           }}
           resolver={blocks}
           onNodesChange={handleNodesChange}

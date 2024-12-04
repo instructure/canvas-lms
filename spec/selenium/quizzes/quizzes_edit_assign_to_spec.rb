@@ -205,6 +205,7 @@ describe "quiz edit page assign to" do
       turn_on_sis_settings(@account)
       @account.settings[:sis_require_assignment_due_date] = { value: true }
       @account.save!
+      @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
       @quiz = course_quiz
       @quiz.post_to_sis = "1"
     end
@@ -217,6 +218,9 @@ describe "quiz edit page assign to" do
       wait_for_assign_to_tray_spinner
 
       expect(assign_to_date_and_time[0].text).not_to include("Please add a due date")
+
+      click_add_assign_to_card
+      select_module_item_assignee(1, @student1.name)
 
       click_save_button("Apply")
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
@@ -231,6 +235,7 @@ describe "quiz edit page assign to" do
 
       update_due_date(0, format_date_for_view(due_date, "%-m/%-d/%Y"))
       update_due_time(0, "11:59 PM")
+      update_due_date(1, format_date_for_view(due_date, "%-m/%-d/%Y"))
       click_save_button("Apply")
       keep_trying_until { expect(element_exists?(module_item_edit_tray_selector)).to be_falsey }
     end

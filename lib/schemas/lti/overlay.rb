@@ -20,49 +20,56 @@
 
 module Schemas::Lti
   class Overlay < Schemas::Base
-    def schema
-      {
-        type: "object",
-        properties: {
-          title: { type: "string" },
-          description: { type: "string" },
-          custom_fields: { type: "object" },
-          target_link_uri: { type: "string" },
-          oidc_initiation_url: { type: "string" },
-          domain: { type: "string" },
-          privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
-          redirect_uris: { type: "array", items: { type: "string" } },
-          public_jwk: { type: "object" },
-          public_jwk_url: { type: "string" },
-          disabled_scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
-          scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
-          disabled_placements: { type: "array", items: { type: "string", enum: ::Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) } },
-          placements: self.class.placements_schema,
-        }
-      }.freeze
-    end
-
-    def self.placements_schema
-      {
-        type: "object",
-        additionalProperties: false,
-        properties: Lti::ResourcePlacement::PLACEMENTS.index_with { placement_schema }
+    PLACEMENT_SCHEMA = {
+      type: "object",
+      properties: {
+        text: { type: "string" },
+        target_link_uri: { type: "string" },
+        message_type: { type: "string", enum: ::Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES },
+        launch_height: { type: "number" },
+        launch_width: { type: "number" },
+        icon_url: { type: "string" },
+        default: { type: "string", enum: %w[enabled disabled] },
       }
-    end
+    }.freeze
+    SCHEMA = {
+      type: "object",
+      properties: {
 
-    def self.placement_schema
-      {
-        type: "object",
-        properties: {
-          text: { type: "string" },
-          target_link_uri: { type: "string" },
-          message_type: { type: "string", enum: ::Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES },
-          launch_height: { type: "number" },
-          launch_width: { type: "number" },
-          icon_url: { type: "string" },
-          default: { type: "string", enum: %w[enabled disabled] },
-        }
-      }.freeze
+        title: { type: "string" },
+        description: { type: "string" },
+        custom_fields: { type: "object" },
+        target_link_uri: { type: "string" },
+        oidc_initiation_url: { type: "string" },
+        domain: { type: "string" },
+        privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
+        redirect_uris: { type: "array", items: { type: "string" } },
+        public_jwk: { type: "object" },
+        public_jwk_url: { type: "string" },
+        disabled_scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
+        scopes: { type: "array", items: { type: "string", enum: [*TokenScopes::LTI_SCOPES.keys, *TokenScopes::LTI_HIDDEN_SCOPES.keys] } },
+        disabled_placements: { type: "array", items: { type: "string", enum: ::Lti::ResourcePlacement::PLACEMENTS.map(&:to_s) } },
+        placements: {
+          type: "object",
+          additionalProperties: false,
+          properties: Lti::ResourcePlacement::PLACEMENTS.index_with { PLACEMENT_SCHEMA }
+        },
+      }
+    }.freeze
+    SPECIALLY_OVERLAID_KEYS = %i[placements disabled_scopes disabled_placements].freeze
+    ROOT_KEYS = Schemas::InternalLtiConfiguration
+                .schema[:properties]
+                .except(:launch_settings, *SPECIALLY_OVERLAID_KEYS)
+                .keys
+                .intersection(SCHEMA[:properties].keys)
+    LAUNCH_SETTINGS_KEYS = Schemas::InternalLtiConfiguration
+                           .schema
+                           .dig(:properties, :launch_settings, :properties)
+                           .keys
+                           .intersection(SCHEMA[:properties].keys)
+
+    def schema
+      SCHEMA
     end
   end
 end

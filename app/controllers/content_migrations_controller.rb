@@ -152,8 +152,7 @@ class ContentMigrationsController < ApplicationController
       js_env UPLOAD_LIMIT: Attachment.quota_available(@context)
       js_env QUESTION_BANKS: @context.assessment_question_banks.except(:preload).select([:title, :id]).active
       js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-        @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
-        @context.account.grants_right?(@current_user, :manage_master_courses))
+        @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses))
 
       # These values are used based on the same logic as ui/features/content_migrations/setup.js do.
       js_env(QUIZZES_NEXT_ENABLED: new_quizzes_enabled?)
@@ -163,8 +162,8 @@ class ContentMigrationsController < ApplicationController
       js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
       js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
 
-      js_env(OLD_START_DATE: @context.start_at)
-      js_env(OLD_END_DATE: @context.conclude_at)
+      js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
+      js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
     else
       scope = @context.content_migrations.where(child_subscription_id: nil).order("id DESC")
       @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
@@ -203,11 +202,9 @@ class ContentMigrationsController < ApplicationController
         js_env(NEW_QUIZZES_MIGRATION_DEFAULT: new_quizzes_migration_default)
         js_env(NEW_QUIZZES_MIGRATION_REQUIRED: new_quizzes_require_migration?)
         js_env(NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS: new_quizzes_unattached_bank_migrations_enabled?)
-        js_env(SHOW_SELECTABLE_OUTCOMES_IN_IMPORT: @domain_root_account.feature_enabled?("selectable_outcomes_in_course_copy"))
         js_env(BLUEPRINT_ELIGIBLE_IMPORT: MasterCourses::MasterTemplate.blueprint_eligible?(@context))
         js_env(SHOW_BP_SETTINGS_IMPORT_OPTION: MasterCourses::MasterTemplate.blueprint_eligible?(@context) &&
-          @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
-          @context.account.grants_right?(@current_user, :manage_master_courses))
+          @context.account.grants_all_rights?(@current_user, session, :manage_courses_admin, :manage_master_courses))
         set_tutorial_js_env
       end
     end

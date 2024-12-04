@@ -59,6 +59,13 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
         .to eq(second_account_key.internal_service)
     end
 
+    it "links tool configuration to registration" do
+      described_class.run
+      second_account_key.reload
+      expect(second_account_key.lti_registration.manual_configuration)
+        .to eq(second_account_key.referenced_tool_configuration)
+    end
+
     context "and with a developer key that already has a registration" do
       # registration will be created for this key automatically
       before { dev_key_model_1_3(account: first_account) }
@@ -66,6 +73,31 @@ describe DataFixup::CreateLtiRegistrationsFromDeveloperKeys do
       it "only creates registrations for the keys without registrations" do
         expect { described_class.run }
           .to change { Lti::Registration.where(account: first_account).count }.by(number_of_keys_without_registrations)
+      end
+    end
+
+    context "with invalid developer key" do
+      before do
+        second_account_key.scopes += ["invalid_scope"]
+        second_account_key.save!(validate: false)
+      end
+
+      it "still associates the registration with the key" do
+        described_class.run
+        expect(second_account_key.reload.lti_registration).to be_present
+      end
+    end
+
+    context "with invalid tool configuration" do
+      before do
+        second_account_key.tool_configuration.privacy_level = "invalid"
+        second_account_key.tool_configuration.save!(validate: false)
+      end
+
+      it "still associates the registration to the tool configuration" do
+        described_class.run
+        expect(second_account_key.reload.lti_registration.manual_configuration).to be_present
+        expect(second_account_key.tool_configuration.lti_registration).to be_present
       end
     end
 

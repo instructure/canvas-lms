@@ -4668,6 +4668,7 @@ ko:
       invalid_link: "사용한 등록 링크가 더 이상 유효하지 않은 것으로 보입니다. 과목 강사에게 문의하여 올바르게 등록되었는지 확인하시기 바랍니다."
   courses_43204aae: 과목
   create_course_9a69b32c: "과목 만들기"
+  create_course_9dc5b61a: "과목 만들기"
   create_discussion_topics_8330d52b: "토론 주제 만들기"
   create_group_set_7fe1cd53: "그룹 집합 만들기"
   create_module_item: 
@@ -5794,6 +5795,7 @@ ko:
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
     unsaved_changes: "저장하지 않은 변경 사항이 있습니다."
     wrong_file_extension: "선택한 파일의 확장자 \"%{extension}\"는 제출이 허용되지 않습니다."
+  event_details_e646df52: "행사 세부 정보"
   event_title_7f1051a6: "행사 제목"
   everyone_854554dd: 모두
   everyone_else_6c6dc7b6: "나머지 모든 사람"
@@ -6078,6 +6080,7 @@ ko:
   for_title_69d92b3a: "%{title}"
   forgot_password_9098c30d: "암호 잊음"
   forward_d143f64: 전달
+  from_date_27317230: "시작 날짜"
   from_fdd4956d: 시작
   from_from_to_to_e31f6422: "%{from}부터 %{to}까지"
   from_gravatar_58372d5a: "Gravatar 사용"
@@ -10131,6 +10134,7 @@ ko:
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
     statistics: 통계
+  please_enter_the_details_for_the_new_course_dc705b8c: "새 과목에 대한 세부 정보를 입력하시기 바랍니다."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "토큰에 의해 표시되는 인증 코드를 입력하시기 바랍니다."
   plugins: 
     academic_benchmark_importer: 
@@ -13499,6 +13503,7 @@ ko:
       agree_to_pledge: "이 과제를 체출하기 전에 제출물 서약에 동의해야 합니다."
   submit_media_file_f334c1ba: "미디어 파일 제출"
   submitted_318fad53: 제출됨
+  submitted_b37e2ff0: 제출일
   submitted_d5ba370a: "제출:"
   subscribe_4b301fb7: 구독
   subscribed_fe74d22a: 구독함
@@ -13909,6 +13914,7 @@ ko:
     view_in_separate_window: "별도 창에 보기"
   to_51406be9: "받는 사람"
   to_c4c44f4b: "다음 요일로"
+  to_date_7c45ee77: "끝 날짜"
   to_f0e90538: "수신:"
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Canvas 사용자에게 전송된 모든 알림을 보려면 검색을 위한 사용자와 날짜 범위를 선택하십시오."
   token_9a020862: 토큰
@@ -13969,8 +13975,10 @@ ko:
   unsubscribed_c93564a2: "구독 해제함"
   unsupported_package: "지원하지 않는 내용 묶음"
   until_date_949017c4: "%{date} 까지"
+  update_details_6abfed16: "세부 정보 업데이트"
   update_module_b984c2e5: "모듈 업데이트"
   update_settings_9b422d0f: "설정 업데이트"
+  updating_user_details_b8520b3e: "사용자 세부 정보 업데이트 중..."
   upload_8b403d05: 업로드
   upload_a_picture_9f5f6e3c: "사진 업로드"
   upload_button: 
@@ -14593,6 +14601,7 @@ ko:
   yesterday_c6bd6abf: 어제
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "권한이 없거나 한 곳 이상의 장소에서 사용하고 있으므로 이 루브릭을 편집할 수 없습니다. 변경한 내용은 기존 루브릭을 바탕으로 한 새 루브릭이 됩니다. 계속 진행하시겠습니까?"
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "이 사용자의 정보를 업데이트할 수 있지만 사용자가 원래대로 바꿀 수 있습니다."
   you_created_an_announcement_in_course_c49e3d70: "%{course}에 공지를 생성했습니다"
   you_currently_have_no_pinned_discussions_6f0078b8: "고정한 토론이 없음"
   you_must_allow_at_least_one_group_to_attend_68531eab: "적어도 하나 이상의 참가할 그룹을 허용해야 합니다."

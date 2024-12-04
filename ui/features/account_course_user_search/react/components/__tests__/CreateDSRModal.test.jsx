@@ -1,9 +1,24 @@
+/*
+ * Copyright (C) 2024 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {IconButton} from '@instructure/ui-buttons'
-import {IconEditLine, IconMasqueradeLine, IconMessageLine, IconExportLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CreateDSRModal from '../CreateDSRModal'
 import axios from '@canvas/axios'
@@ -15,7 +30,6 @@ jest.mock('@canvas/axios')
 const mockUser = {
   id: '1',
   name: 'John Doe',
-  email: 'john.doe@example.com',
 }
 
 const mockAccountId = '123'
@@ -23,35 +37,27 @@ const mockAccountId = '123'
 describe('CreateDSRModal', () => {
   const afterSave = jest.fn()
 
-  beforeAll(() => {
-    window.ENV.ROOT_ACCOUNT_NAME = 'Root Account'
-  })
-
   const renderComponent = (props = {}) =>
     render(
       <CreateDSRModal accountId={mockAccountId} user={mockUser} afterSave={afterSave} {...props}>
-        <span>
-              <Tooltip
-                data-testid="user-list-row-tooltip"
-                renderTip={I18n.t('Create DSR Request for %{name}', {name: mockUser.name})}
-              >
-                <IconButton
-                  withBorder={false}
-                  withBackground={false}
-                  size="small"
-                  screenReaderLabel={I18n.t('Create DSR Request for %{name}', {name: mockUser.name})}
-                >
-                  <IconExportLine title={I18n.t('Create DSR Request for %{name}', {name: mockUser.name})} />
-                </IconButton>
-              </Tooltip>
-            </span>
+        <button title="Create DSR Request for John Doe" />
       </CreateDSRModal>
     )
 
-  it('should not show latest request if there is none', async () => {
-    axios.get.mockResolvedValueOnce({ status: 204, data: {} })
+  it('uses the user\'s name in the default report name', () => {
+    axios.get.mockResolvedValueOnce({status: 204, data: {}})
 
-    const { queryByText, getByTitle } = renderComponent()
+    const {getByTitle, getByTestId} = renderComponent()
+    fireEvent.click(getByTitle('Create DSR Request for John Doe'))
+
+    const input = getByTestId('DSR Request Name')
+    expect(input.value).toMatch(/John-Doe/)
+  })
+
+  it('should not show latest request if there is none', async () => {
+    axios.get.mockResolvedValueOnce({status: 204, data: {}})
+
+    const {queryByText, getByTitle} = renderComponent()
     fireEvent.click(getByTitle('Create DSR Request for John Doe'))
 
     await waitFor(() => {
@@ -69,7 +75,7 @@ describe('CreateDSRModal', () => {
       },
     })
 
-    const { getByText, getByTitle } = renderComponent()
+    const {getByText, getByTitle} = renderComponent()
     fireEvent.click(getByTitle('Create DSR Request for John Doe'))
 
     await waitFor(() => {
@@ -87,11 +93,13 @@ describe('CreateDSRModal', () => {
       },
     })
 
-    const { getByText, queryByText, getByTitle } = renderComponent()
+    const {getByText, queryByText, getByTitle} = renderComponent()
     fireEvent.click(getByTitle('Create DSR Request for John Doe'))
 
     await waitFor(() => {
-      expect(getByText((_, element) => element.textContent === 'Latest DSR: In progress')).toBeInTheDocument()
+      expect(
+        getByText((_, element) => element.textContent === 'Latest DSR: In progress')
+      ).toBeInTheDocument()
       expect(queryByText('Download:')).not.toBeInTheDocument()
     })
   })

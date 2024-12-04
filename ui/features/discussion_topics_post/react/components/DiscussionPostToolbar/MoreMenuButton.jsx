@@ -22,12 +22,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useContext, useEffect, useState} from 'react'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {Menu} from '@instructure/ui-menu'
-import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('discussions_posts')
 
 export const MoreMenuButton = () => {
-  const [showMenu, setShowMenu] = useState(false)
   const {translationLanguages, setShowTranslationControl} = useContext(
     DiscussionManagerUtilityContext
   )
@@ -42,7 +40,6 @@ export const MoreMenuButton = () => {
     )
     // Update context
     setShowTranslationControl(!hideTranslateText)
-    setShowMenu(false)
   }
 
   const menuOptions = []

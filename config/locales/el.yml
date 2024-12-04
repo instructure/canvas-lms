@@ -2744,6 +2744,7 @@ el:
   available_from_date_43b5e11d: "Διατίθεται/νται Από"
   available_from_f84e4611: "Διαθέσιμο από"
   available_from_field_for_styleguide_7ced3861: "Διαθέσιμο πεδίο Από για styleguide"
+  available_from_from_date_until_until_date_3969df7a: "Διατίθεται από %{from_date} έως %{until_date}"
   available_to_b7350e02: "Διαθέσιμο στους"
   available_until_3278ebe9: "Διαθέσιμο μέχρι"
   available_until_date_cd125c62: "Διατίθεται/νται Έως"
@@ -2902,6 +2903,7 @@ el:
   by_assignment_group_and_position_57a4be14: "Ανά Ομάδα και Θέση Υποβολής"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Από προεπιλογή, όλοι οι σύνδεσμοι μαθήματος είναι ενεργοποιημένοι. Οι φοιτητές/τριες δεν θα βλέπουν τους συνδέσμους στους τομείς χωρίς περιεχόμενο. Για παράδειγμα, αν δεν έχετε δημιουργήσει κουίζ, δεν θα βλέπουν τον σύνδεσμο στα κουίζ. Μπορείτε να ταξινομήσετε και να απενεργοποιήσετε ρητά αυτούς τους συνδέσμους αν υπάρχουν περιοχές στο μάθημά σας στις οποίες δεν θέλετε να έχουν πρόσβαση οι φοιτητές/τριές σας."
   by_due_date_648d7f3b: "Μέχρι την ημερομηνία λήξης"
+  by_instructure_979eeaff: "Από την Instructure"
   by_lti_2_registration_url_e421e523: "Από URL Καταχώρισης LTI 2"
   by_url_a163275e: "μέσω URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -4348,6 +4350,8 @@ el:
     unarchive: Απο-αρχειοθέτηση
     unstar: "Αφαίρεση αστερίσκου"
   conversations_69a8dc26: Συνομιλίες
+  copied_from_2094bec4: "Αντιγράφτηκε απο"
+  copied_to_b437eff8: "Αντιγράφτηκε στο"
   copy_9748f9f: Αντιγραφή
   copy_to_folder_32ecc3c3: "Αντιγραφή σε Φάκελο"
   copying_628a9607: Αντιγραφή...
@@ -5061,6 +5065,7 @@ el:
   create_account_263ec6: "Δημιουργία Λογαριασμού"
   create_assignment_68532ceb: "Δημιουργία Εργασίας"
   create_course_9a69b32c: "Δημιουργία Μαθήματος"
+  create_course_9dc5b61a: "Δημιουργία Μαθήματος"
   create_discussion_topics_8330d52b: "Δημιουργία θεμάτων συζητήσεων"
   create_failed_15d07ad4: "Η δημιουργία απέτυχε"
   create_group_set_7fe1cd53: "Δημιουργία Σετ Ομάδων"
@@ -6339,6 +6344,7 @@ el:
     wrong_file_extension: "Το αρχείο με επέκταση «%{extension}» που επιλέξατε δεν είναι εξουσιοδοτημένο για υποβολή"
   event_date_c9459fe3: "Ημερομηνία Γεγονότος"
   event_date_f05219e7: "Ημερομηνία Γεγονότος:"
+  event_details_e646df52: "Λεπτομέρειες συμβάντος"
   event_end_time_ef830e66: "Ώρα Τερματισμού του Γεγονότος"
   event_start_time_441b491f: "Ώρα Έναρξης του Γεγονότος"
   event_title_7f1051a6: "Τίτλος Γεγονότος"
@@ -6603,6 +6609,7 @@ el:
   form_border_f61f12dc: "Δημιουργία Πλαισίου"
   forward_d143f64: Προώθηση
   france_33_90b595d7: "Γαλλία (+33)"
+  from_date_27317230: "Απο την ημερ/νία"
   from_fdd4956d: Από
   from_from_to_to_e31f6422: "Από %{from} μέχρι %{to}"
   from_gravatar_58372d5a: "Από Gravatar"
@@ -10772,6 +10779,7 @@ el:
     video: "Αρχείο Βίντεο"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Παρακαλώ προσθέστε τουλάχιστον μια όχι κενή απάντηση."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Παρακαλώ προσθέστε τουλάχιστον μια όχι κενή απάντηση για κάθε μεταβλητή."
+  please_enter_the_details_for_the_new_course_dc705b8c: "Παρακαλώ πληκτρολογείστε τις λεπτομέρειες του νέου μαθήματος."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Παρακαλώ, εισαγάγετε τον κωδικό επιβεβαίωσης που εμφανίζει το token σας."
   please_enter_your_label_name_7745272d: "Παρακαλώ, πληκτρολογήστε το %{label_name} σας:"
   please_enter_your_label_name_and_password_5c56be80: "Παρακαλώ πληκτρολογήστε το %{label_name} σας και συνθηματικό:"
@@ -12989,9 +12997,11 @@ el:
   reserved_by_d563e7d2: "Έχει γίνει κράτηση απο:"
   reserved_f247b60b: "Έχει γίνει κράτηση"
   reset_95a81614: Επαναφορά
+  reset_from_322d819a: "Επαναφορά Απο"
   reset_multi_factor_authentication_2b63a558: "Επαναφορά Ελέγχου Ταυτότητας Πολλών Παραγόντων"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Επαναφορά του αριθμού επιστροφών αυτού του τρόπου επικοινωνίας"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Επαναφορά του αριθμού επιστροφών αυτής της ηλεκτρονικής διεύθυνσης"
+  reset_to_ee9265ef: "Επαναφορά Μέχρι"
   respondus_lockdown_browser_support_413352eb: "Υποστήριξη Respondus LockDown Browser"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -14147,6 +14157,7 @@ el:
       unrecorgnized_type: "Μη αναγνωρισμένος τύπος εισαγωγής"
     instructure_csv: "Αρχείο CSV ή αρχείο zip που περιέχει περισσότερα CSV που δημιουργήθηκε από την Instructure"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "SIS Batch"
   sis_export_title: "Εξαγωγή SIS"
   sis_grade_export_settings_45a9f709: "Ρυθμίσεις Εξαγωγής Βαθμών από το SIS"
   sis_id_4495a887: "SIS ID"
@@ -14579,6 +14590,7 @@ el:
       agree_to_pledge: "Πρέπει να συμφωνήσετε με τη δέσμευση υποβολής πριν υποβάλετε αυτή την εργασία."
   submit_media_file_f334c1ba: "Υποβολή Αρχείου Πολυμέσων"
   submitted_318fad53: Υποβλήθηκαν
+  submitted_b37e2ff0: υποβλήθηκε
   submitted_d5ba370a: "Υποβλήθηκε:"
   submitted_datetime_fa2e9287: "<mrk mid=\"1154\" mtype=\"seg\">Υποβλήθηκε:</mrk> <mrk mid=\"1155\" mtype=\"seg\">%{dateTime}</mrk>"
   submitting_types_7c5a7096: "<mrk mid=\"5857\" mtype=\"seg\">Υποβολή σε εξέλιξη:</mrk> <mrk mid=\"5858\" mtype=\"seg\">%{types}</mrk>"
@@ -15094,6 +15106,7 @@ el:
       <mrk mid="4696" mtype="seg">Για τη ρύθμιση παρόχου OpenID Connect, θα χρειαστείτε τα url εξουσιοδότησης και token, καθώς και ένα ID Πελάτη και ένα Μυστικό Πελάτη.</mrk>
       
       <mrk mid="4697" mtype="seg">Αν ο πάροχος μπορεί να δημιουργήσει έγκυρα URL επανάκλησης ή ανακατεύθυνσης, χρησιμοποιήστε το %{callback_url}.</mrk>
+  to_date_7c45ee77: "Μέχρι την ημερ/νία"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Για να συνδέσετε τον παρατηρητή του μαθήματος *%{name}* με κάποιον σπουδαστή, ξεκινήστε να πληκτρολογείτε το όνομα του σπουδαστή παρακάτω για να τον βρείτε και μετά πατήστε Ενημέρωση."
   to_minscore_43e5452e: "σε %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Για να καρφιτσώσετε μια συζήτηση στο επάνω μέρος της σελίδας, σύρετε τη συζήτηση εδώ ή επιλέξτε Καρφίτσωμα από το μενού ρυθμίσεων της συζήτησης."
@@ -15209,6 +15222,7 @@ el:
   unused_courses_title: "Μη Χρησιμοποιημένα Μαθήματα"
   up_c553575d: Επάνω
   update_4d8ee62: Ενημέρωση
+  update_details_6abfed16: "Ενημέρωση Λεπτομερειών"
   update_grade_b47eb3ff: "Ενημέρωση Βαθμού"
   update_module_b984c2e5: "Ενημέρωση Αρθρώματος"
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
@@ -15217,6 +15231,7 @@ el:
   updated_group_group_name_727b1d98: "Η Ομάδα %{group_name} Ενημερώθηκε"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Ενημερωμένο UI για αναζήτηση και εμφάνιση χρηστών και μαθημάτων σε κάποιον λογαριασμό."
   updating_6edbab78: "Ενημέρωση σε εξέλιξη"
+  updating_user_details_b8520b3e: "Γίνεται Ενημέρωση των Λεπτομερειών Χρήστη..."
   upload_8b403d05: Μεταφόρτωση
   upload_a_picture_9f5f6e3c: "Μεταφόρτωση Φωτογραφίας"
   upload_data_dc4fa4cb: "Φόρτωση Δεδομένων"
@@ -15905,6 +15920,7 @@ el:
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "<mrk mid=\"4917\" mtype=\"seg\">Μπορείτε να δείτε λεπτομέρειες για αυτή την ομάδα κάνοντας κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"4918\" mtype=\"seg\">%{link}.</mrk>"
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Δεν μπορείτε να διαγράψετε ένα υπολογαριασμό που περιέχει μαθήματα."
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "<mrk mid=\"862\" mtype=\"seg\">Δεν μπορείτε να επεξεργαστείτε αυτή τη ρουμπρίκα είτε επειδή δεν έχετε άδεια ή επειδή χρησιμοποιείται σε περισσότερα από ένα σημεία.</mrk> <mrk mid=\"863\" mtype=\"seg\">Τυχόν αλλαγές που θα πραγματοποιήσετε θα έχουν ως αποτέλεσμα μια νέα ρουμπρίκα βασισμένη στην παλιά ρουμπρίκα.</mrk> <mrk mid=\"864\" mtype=\"seg\">Θέλετε, παρόλα αυτά, να συνεχίσετε;</mrk>"
+  you_can_update_some_of_this_user_s_information_but_8e99a045: "Μπορείτε να ενημερώσετε μερικές από τις πληροφορίες αυτού του χρήστη, αλλά ο ίδιος μπορεί να τις επαναφέρει αν θέλει."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Μπορείτε να χρησιμοποιήσετε ένα μεμονωμένο 16x16, 32x32, 48x48 αρχείο τύπου ico."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Δεν μπορείτε να τροποποιήσετε θέματα σε αυτό τον υπο-λογαρισμό"
   you_cannot_remove_this_enrollment_c87be1cb: "Δεν μπορείτε να αφαιρέσετε αυτή την εγγραφή."

@@ -148,209 +148,291 @@ describe Lti::RegistrationsController do
         lti_registration_model(account: Account.site_admin, name: "Site admin registration with no binding")
       end
 
-      context "with a user session" do
-        it "is successful" do
+      it "is successful" do
+        subject
+        expect(response).to be_successful
+      end
+
+      it "returns the total count of registrations" do
+        subject
+        expect(response_json[:total]).to eq(4)
+      end
+
+      it "returns a list of registrations" do
+        subject
+        expect(response_data.length).to eq(4)
+      end
+
+      it "has the expected fields in the results" do
+        subject
+
+        expect(response_data.first)
+          .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
+
+        expect(response_data.first[:account_binding])
+          .to include({ workflow_state: an_instance_of(String) })
+
+        expect(response_data.first[:account_binding][:created_by])
+          .to include({ id: an_instance_of(Integer) })
+      end
+
+      it "sorts the results by newest first by default" do
+        lti_registration_model(account:, name: "created just now")
+        lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
+
+        subject
+        expect(response_data.first["name"]).to eq("created just now")
+        expect(response_data.last["name"]).to eq("created an hour ago")
+      end
+
+      it "only queries for account bindings once" do
+        # With LRABs being preloaded, it should not call either of these "find" methods
+        expect(Lti::RegistrationAccountBinding).not_to receive(:find_in_site_admin)
+        expect(Lti::RegistrationAccountBinding).not_to receive(:find_by)
+        subject
+      end
+
+      context "with a Lti::IMS::Registration in the list" do
+        let(:registration) { lti_registration_model(account:) }
+        let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+
+        it "includes the ims_registration_id" do
+          ims_registration
           subject
-          expect(response).to be_successful
+          expect(response_data.find { |r| r["id"] == ims_registration.lti_registration_id }["ims_registration_id"]).to eq(ims_registration.id)
+        end
+      end
+
+      context "when developer key is deleted" do
+        # introduces `tool_configuration`
+        include_context "lti_1_3_tool_configuration_spec_helper"
+
+        let(:developer_key) { dev_key_model_1_3(account:) }
+        let(:registration) { developer_key.lti_registration }
+
+        before do
+          # enable key
+          developer_key.developer_key_account_bindings.first.update! workflow_state: :on
+          developer_key.destroy
         end
 
-        it "returns the total count of registrations" do
+        it "should not include registration" do
+          expect(registration.reload).to be_deleted
           subject
-          expect(response_json[:total]).to eq(4)
+          expect(response_data.pluck(:id)).not_to include(registration.id)
+        end
+      end
+
+      context "when sorting by installed_by" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
+
+        before do
+          # Other admin is "A User" -- registrations with an LRAB by B User should be last
+          admin2 = account_admin_user(name: "B User", account:)
+          lti_registration_model(name: "Created by B User", created_by: admin2, account:)
         end
 
-        it "returns a list of registrations" do
+        it "sorts by the lti_registration_account_binding.created_by" do
           subject
-          expect(response_data.length).to eq(4)
+          expect(response_data.last["name"]).to eq("Created by B User")
         end
 
-        it "has the expected fields in the results" do
+        context "with the dir=asc parameter" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by&dir=asc" }
+
+          it "puts the results in ascending order" do
+            subject
+            expect(response_data.first["name"]).to eq("Created by B User")
+          end
+        end
+      end
+
+      context "when sorting by name" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name" }
+
+        before do
+          lti_registration_model(account:, name: "AAA registration")
+          lti_registration_model(account:, name: "ZZZ registration")
+        end
+
+        it "sorts by name" do
           subject
-
-          expect(response_data.first)
-            .to include({ account_id: an_instance_of(Integer), name: an_instance_of(String) })
-
-          expect(response_data.first[:account_binding])
-            .to include({ workflow_state: an_instance_of(String) })
-
-          expect(response_data.first[:account_binding][:created_by])
-            .to include({ id: an_instance_of(Integer) })
+          expect(response_data.first["name"]).to eq("ZZZ registration")
+          expect(response_data.last["name"]).to eq("AAA registration")
         end
 
-        it "sorts the results by newest first by default" do
-          lti_registration_model(account:, name: "created just now")
-          lti_registration_model(account:, name: "created an hour ago", created_at: 1.hour.ago)
+        context "with the dir=asc parameter" do
+          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name&dir=asc" }
 
+          it "puts the results in ascending order" do
+            subject
+            expect(response_data.first["name"]).to eq("AAA registration")
+            expect(response_data.last["name"]).to eq("ZZZ registration")
+          end
+        end
+      end
+
+      context "when sorting by a nil attribute" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=nickname" }
+
+        it "treats nil like an empty value" do
+          lti_registration_model(admin_nickname: "a nickname", account:)
+          lti_registration_model(admin_nickname: nil, account:)
           subject
-          expect(response_data.first["name"]).to eq("created just now")
-          expect(response_data.last["name"]).to eq("created an hour ago")
+          expect(response_data.first["admin_nickname"]).to eq("a nickname")
+        end
+      end
+
+      context "when sorting by a workflow_state" do
+        subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on" }
+
+        it "does not error if the account binding is nil" do
+          reg = lti_registration_model(account:, name: "no account bindings")
+          # expect it to have no account bindings, just in case we start automatically
+          # creating a default one in the future.
+          expect(reg.lti_registration_account_bindings).to eq([])
+          subject
+          expect(response_data.last["name"]).to eq("no account bindings")
+        end
+      end
+
+      context "with a search query param matching no results" do
+        let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=searchterm" }
+
+        it "finds no registrations" do
+          subject
+          expect(response_data.length).to eq(0)
+        end
+      end
+
+      context "with a search query param matching some results" do
+        # search for "registration no" which should find "Registration no. 1" etc.
+        let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=registration%20no" }
+
+        it "finds matching registrations" do
+          subject
+          # searching "registration no" should find the three registrations titled
+          # "Registration no. N"
+          expect(response_data.length).to eq(3)
         end
 
-        it "only queries for account bindings once" do
-          # With LRABs being preloaded, it should not call either of these "find" methods
-          expect(Lti::RegistrationAccountBinding).not_to receive(:find_in_site_admin)
-          expect(Lti::RegistrationAccountBinding).not_to receive(:find_by)
+        it "rejects registrations that do not match all terms" do
+          # The name "registration" alone is not enough to match search terms "registration no"
+          incomplete_match = lti_registration_model(account:, name: "registration")
+          subject
+          expect(response_data.pluck(:id)).not_to include(incomplete_match.id)
+        end
+
+        it "finds registrations with matching terms across different model attributes" do
+          multi_attribute_match = lti_registration_model(account:, name: "registration", vendor: "no")
+          subject
+          expect(response_data.pluck(:id)).to include(multi_attribute_match.id)
+        end
+
+        it "includes the current search parameters in the Link header" do
+          subject
+          expect(response.headers["Link"]).to include("?query=registration+no")
+        end
+
+        context "query param validations" do
+          it "returns a 422 if the page param isn't an integer" do
+            get "/api/v1/accounts/#{account.id}/lti_registrations?page=bad"
+            expect(response_json["errors"].first["message"]).to eq("page param should be an integer")
+          end
+
+          it "returns a 422 if the dir param isn't valid" do
+            get "/api/v1/accounts/#{account.id}/lti_registrations?dir=bad"
+            expect(response_json["errors"].first["message"]).to eq("dir param should be asc, desc, or empty")
+          end
+
+          it "returns a 422 if the sort param isn't valid" do
+            get "/api/v1/accounts/#{account.id}/lti_registrations?sort=bad"
+            expect(response_json["errors"].first["message"]).to eq("bad is not a valid field for sorting")
+          end
+        end
+      end
+
+      context "with 'overlay' in include[] parameter" do
+        let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?include[]=overlay" }
+        let(:overlay) { lti_overlay_model(account:, registration:) }
+        let(:registration) { lti_registration_model(account:) }
+
+        before do
+          overlay
+        end
+
+        it "includes the overlay" do
+          subject
+          expect(response_data.first).to have_key("overlay")
+        end
+
+        it "only queries for overlays once" do
+          expect(Lti::Overlay).not_to receive(:find_in_site_admin)
+          expect(Lti::Overlay).not_to receive(:find_by)
           subject
         end
+      end
 
-        context "with a Lti::IMS::Registration in the list" do
-          let(:registration) { lti_registration_model(account:) }
-          let(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
-
-          it "includes the ims_registration_id" do
-            ims_registration
-            subject
-            expect(response_data.find { |r| r["id"] == ims_registration.lti_registration_id }["ims_registration_id"]).to eq(ims_registration.id)
-          end
+      context "with 'overlay_versions' in include[] parameter" do
+        let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?include[]=overlay&include[]=overlay_versions" }
+        let(:overlay) { lti_overlay_model(account:, registration:) }
+        let(:registration) { lti_registration_model(account:) }
+        let(:overlay_versions) do
+          lti_overlay_versions_model(
+            {
+              lti_overlay: overlay,
+              diff: [["+", "disabled_scopes[0]", "https://canvas.instructure.com/lti-ags/progress/scope/show"]],
+            },
+            6
+          )
         end
 
-        context "when developer key is deleted" do
-          # introduces `tool_configuration`
-          include_context "lti_1_3_tool_configuration_spec_helper"
-
-          let(:developer_key) { dev_key_model_1_3(account:) }
-          let(:registration) { developer_key.lti_registration }
-
-          before do
-            # enable key
-            developer_key.developer_key_account_bindings.first.update! workflow_state: :on
-            developer_key.destroy
-          end
-
-          it "should not include registration" do
-            expect(registration.reload).to be_deleted
-            subject
-            expect(response_data.pluck(:id)).not_to include(registration.id)
-          end
+        before do
+          overlay_versions
         end
 
-        context "when sorting by installed_by" do
-          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by" }
+        it "does not include overlay_versions" do
+          subject
+          expect(response_data.first["overlay"]).not_to have_key("versions")
+        end
+      end
 
-          before do
-            # Other admin is "A User" -- registrations with an LRAB by B User should be last
-            admin2 = account_admin_user(name: "B User", account:)
-            lti_registration_model(name: "Created by B User", created_by: admin2, account:)
-          end
+      context "with cross-shard SiteAdmin on registration" do
+        specs_require_sharding
 
-          it "sorts by the lti_registration_account_binding.created_by" do
-            subject
-            expect(response_data.last["name"]).to eq("Created by B User")
-          end
+        subject { @shard2.activate { get url } }
 
-          context "with the dir=asc parameter" do
-            subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=installed_by&dir=asc" }
+        let(:site_admin_registration) { lti_registration_model(account: Account.site_admin, name: "Site admin registration", bound: true) }
 
-            it "puts the results in ascending order" do
-              subject
-              expect(response_data.first["name"]).to eq("Created by B User")
-            end
-          end
+        before do
+          site_admin_registration
         end
 
-        context "when sorting by name" do
-          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name" }
+        it "includes the site admin registration" do
+          subject
+          expect(response_data.pluck(:id)).to include(site_admin_registration.global_id)
+        end
+      end
 
-          before do
-            lti_registration_model(account:, name: "AAA registration")
-            lti_registration_model(account:, name: "ZZZ registration")
-          end
+      context "with cross-shard inherited on registration" do
+        specs_require_sharding
 
-          it "sorts by name" do
-            subject
-            expect(response_data.first["name"]).to eq("ZZZ registration")
-            expect(response_data.last["name"]).to eq("AAA registration")
-          end
+        subject { @shard2.activate { get url } }
 
-          context "with the dir=asc parameter" do
-            subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=name&dir=asc" }
+        let(:site_admin_registration) { Shard.default.activate { lti_registration_model(account: Account.site_admin, name: "Site admin registration") } }
+        let(:inherited_binding) { @shard2.activate { lti_registration_account_binding_model(registration: site_admin_registration, account:, workflow_state: "on") } }
+        let(:account) { @shard2.activate { account_model } }
+        let(:admin) { @shard2.activate { account_admin_user(name: "A User", account:) } }
 
-            it "puts the results in ascending order" do
-              subject
-              expect(response_data.first["name"]).to eq("AAA registration")
-              expect(response_data.last["name"]).to eq("ZZZ registration")
-            end
-          end
+        before do
+          user_session(admin)
+          account.enable_feature!(:lti_registrations_page)
+          inherited_binding
         end
 
-        context "when sorting by a nil attribute" do
-          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=nickname" }
-
-          it "treats nil like an empty value" do
-            lti_registration_model(admin_nickname: "a nickname", account:)
-            lti_registration_model(admin_nickname: nil, account:)
-            subject
-            expect(response_data.first["admin_nickname"]).to eq("a nickname")
-          end
-        end
-
-        context "when sorting by a workflow_state" do
-          subject { get "/api/v1/accounts/#{account.id}/lti_registrations?sort=on" }
-
-          it "does not error if the account binding is nil" do
-            reg = lti_registration_model(account:, name: "no account bindings")
-            # expect it to have no account bindings, just in case we start automatically
-            # creating a default one in the future.
-            expect(reg.lti_registration_account_bindings).to eq([])
-            subject
-            expect(response_data.last["name"]).to eq("no account bindings")
-          end
-        end
-
-        context "with a search query param matching no results" do
-          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=searchterm" }
-
-          it "finds no registrations" do
-            subject
-            expect(response_data.length).to eq(0)
-          end
-        end
-
-        context "with a search query param matching some results" do
-          # search for "registration no" which should find "Registration no. 1" etc.
-          let(:url) { "/api/v1/accounts/#{account.id}/lti_registrations?query=registration%20no" }
-
-          it "finds matching registrations" do
-            subject
-            # searching "registration no" should find the three registrations titled
-            # "Registration no. N"
-            expect(response_data.length).to eq(3)
-          end
-
-          it "rejects registrations that do not match all terms" do
-            # The name "registration" alone is not enough to match search terms "registration no"
-            incomplete_match = lti_registration_model(account:, name: "registration")
-            subject
-            expect(response_data.pluck(:id)).not_to include(incomplete_match.id)
-          end
-
-          it "finds registrations with matching terms across different model attributes" do
-            multi_attribute_match = lti_registration_model(account:, name: "registration", vendor: "no")
-            subject
-            expect(response_data.pluck(:id)).to include(multi_attribute_match.id)
-          end
-
-          it "includes the current search parameters in the Link header" do
-            subject
-            expect(response.headers["Link"]).to include("?query=registration+no")
-          end
-
-          context "query param validations" do
-            it "returns a 422 if the page param isn't an integer" do
-              get "/api/v1/accounts/#{account.id}/lti_registrations?page=bad"
-              expect(response_json["errors"].first["message"]).to eq("page param should be an integer")
-            end
-
-            it "returns a 422 if the dir param isn't valid" do
-              get "/api/v1/accounts/#{account.id}/lti_registrations?dir=bad"
-              expect(response_json["errors"].first["message"]).to eq("dir param should be asc, desc, or empty")
-            end
-
-            it "returns a 422 if the sort param isn't valid" do
-              get "/api/v1/accounts/#{account.id}/lti_registrations?sort=bad"
-              expect(response_json["errors"].first["message"]).to eq("bad is not a valid field for sorting")
-            end
-          end
+        it "includes the inherited registration" do
+          subject
+          expect(response_data.pluck(:id)).to include(site_admin_registration.global_id)
         end
       end
 
@@ -366,9 +448,9 @@ describe Lti::RegistrationsController do
       context "with non-admin user" do
         before { user_session(student_in_course(account:).user) }
 
-        it "returns 401" do
+        it "returns 403" do
           subject
-          expect(response).to be_unauthorized
+          expect(response).to be_forbidden
         end
       end
 
@@ -495,9 +577,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -538,6 +620,106 @@ describe Lti::RegistrationsController do
       subject
       expect(response_json).to have_key(:configuration)
     end
+
+    context "with 'overlay' in include[] parameter" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlay" }
+
+      let(:overlay) { lti_overlay_model(account:, registration:) }
+
+      before do
+        overlay
+      end
+
+      it "includes the overlay" do
+        subject
+        expect(response_json).to have_key(:overlay)
+      end
+    end
+
+    context "with 'overlay_versions' in include[] parameter" do
+      subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}?include[]=overlay&include[]=overlay_versions" }
+
+      let(:overlay) { lti_overlay_model(account:, registration:) }
+      let(:overlay_versions) do
+        lti_overlay_versions_model(
+          {
+            lti_overlay: overlay,
+            diff: [["+", "disabled_scopes[0]", "https://canvas.instructure.com/lti-ags/progress/scope/show"]],
+          },
+          6
+        )
+      end
+
+      before do
+        overlay_versions
+      end
+
+      it "includes the overlay versions" do
+        subject
+        expect(response_json[:overlay]).to have_key(:versions)
+        expect(response_json[:overlay][:versions].length).to eq(5)
+      end
+    end
+  end
+
+  describe "GET show_by_client_id", type: :request do
+    subject { get "/api/v1/accounts/#{account.id}/lti_registration_by_client_id/#{developer_key.id}" }
+
+    let(:developer_key) { dev_key_model_1_3(account:) }
+    let(:registration) { developer_key.lti_registration }
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "for nonexistent developer key" do
+      it "returns 404" do
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{developer_key.id + 1}"
+        expect(response).to be_not_found
+      end
+    end
+
+    it "is successful" do
+      subject
+      expect(response).to be_successful
+    end
+
+    it "returns the registration" do
+      subject
+      expect(response_json).to include({
+                                         id: registration.id,
+                                       })
+    end
+
+    it "includes the configuration" do
+      subject
+      expect(response_json).to have_key(:configuration)
+    end
   end
 
   describe "PUT update", type: :request do
@@ -571,9 +753,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -613,6 +795,8 @@ describe Lti::RegistrationsController do
 
     let_once(:registration) { lti_registration_model(account:) }
     let_once(:ims_registration) { lti_ims_registration_model(lti_registration: registration) }
+    let_once(:account_binding) { lti_registration_account_binding_model(registration:, account:) }
+    let_once(:overlay) { lti_overlay_model(account:, registration:) }
 
     before { ims_registration }
 
@@ -630,9 +814,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -668,6 +852,21 @@ describe Lti::RegistrationsController do
       subject
       expect(registration.reload).to be_deleted
     end
+
+    it "includes the account binding" do
+      subject
+      expect(response_json).to have_key(:account_binding)
+    end
+
+    it "includes the configuration" do
+      subject
+      expect(response_json).to have_key(:configuration)
+    end
+
+    it "includes the overlay" do
+      subject
+      expect(response_json).to have_key(:overlay)
+    end
   end
 
   describe "POST bind", type: :request do
@@ -690,9 +889,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 
@@ -788,9 +987,9 @@ describe Lti::RegistrationsController do
 
       before { user_session(student) }
 
-      it "returns 401" do
+      it "returns 403" do
         subject
-        expect(response).to be_unauthorized
+        expect(response).to be_forbidden
       end
     end
 

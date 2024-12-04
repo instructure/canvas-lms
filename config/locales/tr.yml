@@ -209,6 +209,8 @@ tr:
   a_role_name_is_required_47efd33: "Rol adı gereklidir."
   a_save_is_in_progress_63a2887d: "Kaydetme işlemi devam ediyor"
   a_section_is_required_64103992: "Bir bölüm gerekli"
+  a_setting_with_the_name_name_already_exists_3bf5f9b8: " \"%{name}\" adıyla bir ayar zaten var."
+  a_single_certificate_file_e7f347f1: "Tek bir sertifika dosyası"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Yeni bir ÖBS entegrasyonu yapılandırılmamış ve yeni ÖBS Entegrasyonunu Etkinleştirme ayarları etkin değil."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "Notlandırma şemaları, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Notlandırma şemasının adını, şemayı düzenleme ya da silme ikonlarının adlarını içeren tablo"
@@ -5729,6 +5731,8 @@ tr:
     unstar_conversation: "Tartışmadan yıldızı kaldır"
   conversations_69a8dc26: Mesajlaşmalar
   conversations_send_messages_to_individual_course_m_733620b: "Mesajlar - ders üyelerine bireysel mesaj gönder"
+  copied_from_2094bec4: "Şuradan Kopyalandı"
+  copied_to_b437eff8: "Şuraya Kopyalandı"
   copy_9748f9f: Kopyala
   copy_operation_started_successfully_b2f236a1: "Kopyalama işlemi abşarılı bir şekilde başladı"
   copy_page_to_another_course_405cc07c: "Sayfayı başka derse kopyala"
@@ -6748,6 +6752,7 @@ tr:
   create_assignment_68532ceb: "Ödev Oluştur"
   create_content_for_your_course_500a7032: "Dersiniz için içerik oluşturun"
   create_course_9a69b32c: "Dersi Oluştur"
+  create_course_9dc5b61a: "Dersi Oluştur"
   create_criterion_6df4d4ad: "Kriter Oluştur"
   create_discussion_982f915e: "Tartışma Oluştur"
   create_discussion_topics_8330d52b: "Tarışma başlıkları oluştur"
@@ -8409,6 +8414,7 @@ tr:
     wrong_file_extension: "Seçmiş olduğunuz \"%{extension}\" uzantılı dosyanın gönderilmesine onay verilmemiş."
   event_date_c9459fe3: "Olay Tarihi"
   event_date_f05219e7: "Olay Tarihi:"
+  event_details_e646df52: "Olay Ayrıntıları"
   event_end_time_ef830e66: "Olay Bitiş Zamanı"
   event_fe9ba3fe: Olay
   event_start_time_441b491f: "Olay Başlama Zamanı"
@@ -8889,6 +8895,7 @@ tr:
     one: "Kırık 1 bağlantı bulundu"
     other: "%{count} kırık bağlantı bulundu"
   france_33_90b595d7: "Fransa (+33)"
+  from_date_27317230: "Kimden Tarihi"
   from_fdd4956d: Kimden
   from_from_to_to_e31f6422: "%{from}'dan %{to}'a"
   from_gravatar_58372d5a: "Gravatar'dan al"
@@ -14301,6 +14308,7 @@ tr:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Lütfen en az bir tane boş olmayan cevap ekleyin."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lütfen her değişken için en az bir tane boş olmayan cevap ekleyin."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Lütfen üç veya daha fazla karakter içeren bir arama terimi girin"
+  please_enter_the_details_for_the_new_course_dc705b8c: "Lütfen yeni dersin detaylarını girin."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Token'da gözüken doğrulama kodunu giriniz"
   please_enter_your_label_name_7745272d: "Lütfen %{label_name} inizi girin:"
   please_enter_your_label_name_and_password_5c56be80: "Lütfen %{label_name} Eposta adresiniz ve şifrenizi girin:"
@@ -16916,7 +16924,9 @@ tr:
   reregister_9ab95a57: "Tekrar kayıt ol"
   reserved_f247b60b: "Rezerve edildi"
   reset_95a81614: Sıfırla
+  reset_from_322d819a: "Şuradan Ayarla"
   reset_multi_factor_authentication_2b63a558: "Çoklu Kimlik Doğrulama'yı Sıfırla"
+  reset_to_ee9265ef: "Şuraya Ayarla"
   respondus_soap_endpoint: 
     plugin_settings: 
       labels: 
@@ -18348,6 +18358,7 @@ tr:
       unrecorgnized_type: "Bilinmeyen içeri aktarma türü"
     instructure_csv: "Instructure CSV veya CSV uzantılarının bulunduğu zip dosya formatında olmalıdır"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "ÖBS Toplu İş"
   sis_data_eee75d5b: "SIS verisi"
   sis_data_import_8bb623ce: "ÖBS Verisi - içeri aktar"
   sis_data_manage_328a4799: "ÖBS verisi - yönet"
@@ -18874,6 +18885,7 @@ tr:
   submit_ticket_5515ffd: "Yardım İsteği Gönder"
   submitted_318fad53: Gönderildi
   submitted_at_4d5ea3aa: "Gönderildi:"
+  submitted_b37e2ff0: gönderildi
   submitted_d5ba370a: "Gönderilen:"
   submitted_datetime_fa2e9287: "Gönderildi: %{dateTime}"
   submitted_files_82dd3009: "Gönderilen Dosyalar"
@@ -19425,6 +19437,7 @@ tr:
   to_c4c44f4b: ile
   to_change_sis_account_id_the_user_must_have_manage_4b8a37a8: "sis_account_id değiştirmek için kullanıcının manage_sis izni olmalı"
   to_close_comments_on_a_discussion_drag_a_discussio_85b27448: "Bir tartışmayı yorumlara kapatmak için buraya sürükleyin veya tartışma ayarları menüsünden Yorumları Kapat'ı seçin."
+  to_date_7c45ee77: "Kime Tarihi"
   to_do_1d554f36: Yapılacaklar
   to_do_date_2cb4bf7b: "Yapılacak Tarihi:"
   to_do_list_dashboard_d741f64e: "Yapılacaklar Listesi Paneli"
@@ -19581,6 +19594,7 @@ tr:
   updated_at_ab9f625d: updated_at
   updated_group_group_name_727b1d98: "%{group_name} Grubu Güncellendi"
   updating_6edbab78: Güncelleniyor
+  updating_user_details_b8520b3e: "Kullanıcı Ayrıntıları Güncelleniyor..."
   upload_8b403d05: Yükle
   upload_a_picture_9f5f6e3c: "Fotoğraf yükle"
   upload_button: 

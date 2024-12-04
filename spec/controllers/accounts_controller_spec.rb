@@ -153,7 +153,7 @@ describe AccountsController do
     it "does not allow users without login permissions to restore deleted users" do
       account_admin_user_with_role_changes(user: @admin, role_changes: { manage_user_logins: false })
       put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }, format: "json"
-      expect(response).to be_unauthorized
+      expect(response).to be_forbidden
     end
 
     it "404s for non-existent users" do
@@ -182,6 +182,14 @@ describe AccountsController do
 
       put "restore_user", params: { account_id: @account.id, user_id: @active_user.id }
       expect(response).to be_bad_request
+    end
+
+    it "restores the most recently deleted pseudonym" do
+      pseudonym = @deleted_user.pseudonym_for_restoration_in(@account)
+
+      expect do
+        put "restore_user", params: { account_id: @account.id, user_id: @deleted_user.id }
+      end.to change { pseudonym.reload.workflow_state }.from("deleted").to("active")
     end
   end
 
@@ -2044,21 +2052,7 @@ describe AccountsController do
       expect(accounts[2]["name"]).to eq "Account 2"
     end
 
-    it "does not include accounts where admin doesn't have manage_courses or create_courses permissions" do
-      Account.default.disable_feature!(:granular_permissions_manage_courses)
-      account3 = Account.create!(name: "Account 3", root_account: Account.default)
-      account_admin_user_with_role_changes(account: account3, user: @admin1, role_changes: { manage_courses: false, create_courses: false })
-      user_session @admin1
-      get "manageable_accounts"
-      accounts = json_parse(response.body)
-      expect(accounts.length).to be 3
-      accounts.each do |a|
-        expect(a["name"]).not_to eq "Account 3"
-      end
-    end
-
-    it "does not include accounts where admin doesn't have manage_courses_admin or create_courses permissions (granular permissions)" do
-      Account.default.enable_feature!(:granular_permissions_manage_courses)
+    it "does not include accounts where admin doesn't have manage_courses_admin or create_courses permissions" do
       account3 = Account.create!(name: "Account 3", root_account: Account.default)
       account_admin_user_with_role_changes(
         account: account3,

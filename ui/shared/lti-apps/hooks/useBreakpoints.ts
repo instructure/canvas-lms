@@ -17,7 +17,7 @@
  */
 
 import {useMedia} from 'react-use'
-import {breakpoints} from '../breakpoints'
+import {breakpoints} from '../utils/breakpoints'
 
 export default function useBreakpoints() {
   const isDesktop = useMedia(`(min-width: ${breakpoints.desktop})`)

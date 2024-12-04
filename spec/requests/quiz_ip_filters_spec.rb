@@ -25,6 +25,7 @@ describe "Quiz IP Filters API" do
   before :once do
     account_admin_user(active_all: true)
     @account = Account.default
+    @course = @account.courses.create!(name: "Test Course")
   end
 
   describe "GET /api/v1/accounts/:account_id/quiz_ip_filters" do
@@ -42,7 +43,7 @@ describe "Quiz IP Filters API" do
       end
 
       it "returns an empty list when no filters exist" do
-        api_call_index
+        api_call_index(course_uuid: @course.uuid)
         expect(response).to have_http_status(:ok)
         json = json_parse(response.body)
         expect(json["quiz_ip_filters"]).to be_empty
@@ -55,7 +56,7 @@ describe "Quiz IP Filters API" do
         }
         @account.save!
 
-        api_call_index
+        api_call_index(course_uuid: @course.uuid)
         expect(response).to have_http_status(:ok)
         json = json_parse(response.body)
         expect(json["quiz_ip_filters"].length).to eq 2
@@ -72,17 +73,17 @@ describe "Quiz IP Filters API" do
         end
 
         it "paginates results" do
-          api_call_index(per_page: 25)
+          api_call_index(per_page: 25, course_uuid: @course.uuid)
           json = json_parse(response.body)
           expect(json["quiz_ip_filters"].length).to eq 25
 
-          api_call_index(page: 2, per_page: 25)
+          api_call_index(page: 2, per_page: 25, course_uuid: @course.uuid)
           json = json_parse(response.body)
           expect(json["quiz_ip_filters"].length).to eq 15
         end
 
         it "returns an empty array with a cursor past the end" do
-          api_call_index(page: 3, per_page: 25)
+          api_call_index(page: 3, per_page: 25, course_uuid: @course.uuid)
           json = json_parse(response.body)
           expect(json["quiz_ip_filters"]).to be_empty
         end
@@ -95,11 +96,11 @@ describe "Quiz IP Filters API" do
         end
 
         it "allows searching by filter name" do
-          api_call_index(search_term: "Test")
+          api_call_index(search_term: "Test", course_uuid: @course.uuid)
           json = json_parse(response.body)
           expect(json["quiz_ip_filters"].length).to eq 1
 
-          api_call_index(search_term: "Nonexistent")
+          api_call_index(search_term: "Nonexistent", course_uuid: @course.uuid)
           json = json_parse(response.body)
           expect(json["quiz_ip_filters"]).to be_empty
         end
@@ -109,7 +110,7 @@ describe "Quiz IP Filters API" do
         @account.ip_filters = { "Test Filter" => "192.168.1.1/24" }
         @account.save!
 
-        api_call_index
+        api_call_index(course_uuid: @course.uuid)
         json = json_parse(response.body)
         filter = json["quiz_ip_filters"].first
         expect(filter["name"]).to eq "Test Filter"
@@ -121,7 +122,7 @@ describe "Quiz IP Filters API" do
     context "when user is unauthorized" do
       it "returns a 401 error" do
         user_model
-        api_call_index
+        api_call_index(course_uuid: @course.uuid)
         expect(response).to have_http_status(:unauthorized)
       end
     end

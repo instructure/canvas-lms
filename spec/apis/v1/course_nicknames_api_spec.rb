@@ -92,7 +92,7 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "show", course_id: other_course.to_param),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -156,7 +156,7 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "update", course_id: other_course.to_param, nickname: "blah"),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "rejects for students in limited access accounts" do
@@ -167,7 +167,7 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "update", course_id: @course.to_param, nickname: "new_nickname"),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -189,7 +189,7 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "delete", course_id: @course.to_param),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -212,7 +212,7 @@ describe "Course Nicknames API", type: :request do
                  @params.merge(action: "clear"),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end

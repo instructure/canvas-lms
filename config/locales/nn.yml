@@ -7597,6 +7597,8 @@ nn:
   conversations_send_messages_to_entire_class_3f414741: "Samtaler - send meldingar til alle på emnet"
   conversations_send_messages_to_individual_course_m_733620b: "Samtaler - send meldingar til individuelle emnedeltakarar"
   cookie_notice_fe4f182e: "Varsel om informasjonskapslar"
+  copied_from_2094bec4: "Kopiert frå"
+  copied_to_b437eff8: "Kopiert til"
   copy_9748f9f: Kopi
   copy_announcement_title_9d23ddde: "Kopier kunngjering %{title}"
   copy_assignment_name_to_another_course_b62d0a54: "Kopier oppgåve %{name} til eit anna emne"
@@ -8912,6 +8914,7 @@ nn:
       eller Quizar. Oppgåvegrupper kan vektast.
   create_content_for_your_course_500a7032: "Opprett emneinnhald"
   create_course_9a69b32c: "Opprett emne"
+  create_course_9dc5b61a: "Opprett emne"
   create_course_pace_3dff129: "Lag ein framdriftsplan for emne"
   create_criterion_6df4d4ad: "Opprett kriterium"
   create_delete_edit_157bb1a3: "opprett / slett / rediger"
@@ -11296,6 +11299,7 @@ nn:
   event_creation_failed_71b75bea: "Oppretting av hending feila"
   event_date_c9459fe3: Hendingsdato
   event_date_f05219e7: Hendingsdato
+  event_details_e646df52: Hendingsdetaljar
   event_end_time_ef830e66: "Sluttidspunkt for hending"
   event_fe9ba3fe: Hending
   event_start_time_441b491f: "Starttidspunkt for hending"
@@ -11927,6 +11931,7 @@ nn:
   friendly_description_for_parent_student_display_e608ecf3: "Venleg skildring (for foreldre/studentvisning)"
   friendly_name_601153fb: "Vennleg namn"
   friendly_panda_3a0df50e: "Venleg panda"
+  from_date_27317230: "Frå dato"
   from_date_must_be_before_to_date_79f00046: "'Frå'-dato må vere før 'Til'-dato"
   from_fdd4956d: Frå
   from_from_to_to_e31f6422: "Frå %{from} til %{to}"
@@ -19573,6 +19578,7 @@ nn:
   please_enter_a_valid_url_e_g_https_example_com_87675bca: "Skriv inn ein gyldig URL (til dømes https://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://)."
+  please_enter_the_details_for_the_new_course_dc705b8c: "Sett inn detaljane for det nye emnet."
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "Oppgi godkjenningskoden vist av token."
   please_enter_your_label_name_7745272d: "Oppgi %{label_name}:"
   please_enter_your_label_name_and_password_5c56be80: "Oppgi %{label_name} og passord:"
@@ -22564,11 +22570,13 @@ nn:
   reset_available_from_102b946: "Tilbakestilling tilgjengeleg frå"
   reset_available_until_db5b42d6: "Tilbakestilling tilgjengeleg til"
   reset_courses_fe29ddf9: "Tilbakestill emne"
+  reset_from_322d819a: "Still tilbake frå"
   reset_multi_factor_authentication_2b63a558: "Tilbakestill godkjenning med fleire faktorar"
   reset_name_6a0aa0f: "Tilbakestill \"%{name}\""
   reset_quiz_engine_choice_323a40e6: "Reset quizval"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Tilbakestill retur av kontaktmetoden"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Tilbakestill retur av e-postadressa"
+  reset_to_ee9265ef: "Still tilbake til"
   reset_to_original_score_4d815afd: "Tilbakestill til det opphavelege resultatet"
   reset_what_if_score_98fa18dd: "Tilbakestill kva-skjer-dersom-resultat"
   resource_link_not_found_for_given_resource_link_lo_43f5183a: "Kunne ikkje finne ressurs-lenka for gjeven `resource_link_lookup_uuid`"
@@ -24669,6 +24677,7 @@ nn:
       unrecorgnized_type: "Ukjend importtype"
     instructure_csv: "Instructure-formatert CSV-fil eller ei ZIP-fil med CSV-filer"
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: SIS-batch
   sis_batch_id_8b755858: sis_batch_id
   sis_batch_user_id_c3767a4a: sis_batch_user_id
   sis_data_eee75d5b: SIS-data
@@ -25571,6 +25580,7 @@ nn:
   submitted_318fad53: Innlevert
   submitted_718f5cbc: "Levert:"
   submitted_at_4d5ea3aa: Levert
+  submitted_b37e2ff0: levert
   submitted_by_name_dab6d5e1: "Levert av: %{name}"
   submitted_by_proxy_on_date_569cbae9: "Levert av %{proxy}den %{date}"
   submitted_by_submitter_1dcd07a1: "Levert av %{submitter}"
@@ -27170,6 +27180,7 @@ nn:
   to_cross_list_sections_course_sections_edit_and_co_59598c07: "For å kryssliste seksjonar må Emneseksjonar - rediger og Emne - administrer vere slått på"
   to_cross_list_sections_course_sections_edit_must_b_4ffea833: "For å kryssliste seksjonar må Emneseksjonar - rediger vere slått på. Brukaren må også vere påmeldt som ein faglærar i emna som vert krysslista."
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "For å kryssliste seksjonar må brukaren også ha løyve til å redigere emne -  legg til / rediger / slett."
+  to_date_7c45ee77: "Til dato"
   to_date_can_t_come_before_from_date_cf9e18aa: "Til-dato kan ikkje vere før Frå-dato"
   to_date_cannot_come_before_from_date_3eeb2633: "Til-dato kan ikkje komme føre frå-dato"
   to_delete_groups_groups_delete_must_also_be_enable_5157ff6e: "For å slette grupper må Grupper - slett vere slått på."
@@ -27958,6 +27969,7 @@ nn:
   updating_discussion_failed_aadb2d35: "Oppdatering av diskusjon mislukkast"
   updating_publication_date_62cc1622: "Oppdaterer publiseringsdato"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Oppdatering av Catalog URL vil gjere den gamle URL-en utilgjengeleg for brukarar med ein gong! Dersom det er konfigurert ein eksisterande betalingsbehandlar, vil endringar kreve hjelp frå en Catalog-ingeniør."
+  updating_user_details_b8520b3e: "Oppdaterer brukardetaljar..."
   upload_8b403d05: "Last opp"
   upload_a_file_228b8cf9: "Last opp ei fil"
   upload_a_picture_9f5f6e3c: "Last opp eit bilde"

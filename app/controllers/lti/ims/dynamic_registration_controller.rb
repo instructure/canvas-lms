@@ -79,11 +79,11 @@ module Lti
       end
 
       def registration_by_uuid
-        render json: Lti::IMS::Registration.find_by(guid: params[:registration_uuid])
+        render json: Lti::IMS::Registration.find_by(guid: params[:registration_uuid]).as_json(context: account_context)
       end
 
       def show
-        render json: Lti::IMS::Registration.find(params[:registration_id])
+        render json: Lti::IMS::Registration.find(params[:registration_id]).as_json(context: account_context)
       end
 
       def oidc_configuration_url(registration_token)
@@ -103,9 +103,35 @@ module Lti
 
       def update_registration_overlay
         registration = Lti::IMS::Registration.find(params[:registration_id])
-        registration.registration_overlay = JSON.parse(request.body.read)
-        registration.save!
-        registration.update_external_tools!
+        # Historically, the overlay for an IMS Registration lived on its
+        # registration_overlay column. However, we're transitioning over to using
+        # the Lti::Overlay and Lti::Registration models, so that more than just Dynamic
+        # Registrations can be overlaid, hence the reason for keeping two data
+        # sources in sync.
+        Lti::IMS::Registration.transaction do
+          registration_overlay = JSON.parse(request.body.read)
+          overlay = registration.lti_registration.overlay_for(@context)
+
+          # Let the registration validate the data they passed
+          registration.update!(registration_overlay:)
+
+          # also update the DK scopes
+          if registration_overlay["disabledScopes"].present?
+            registration.developer_key.update!(scopes: registration.scopes - registration_overlay["disabledScopes"])
+          end
+
+          data = Schemas::Lti::IMS::RegistrationOverlay.to_lti_overlay(registration_overlay)
+
+          if overlay.blank?
+            Lti::Overlay.create!(registration: registration.lti_registration,
+                                 updated_by: @current_user,
+                                 account: account_context,
+                                 data:)
+          else
+            overlay.update!(data:, updated_by: @current_user)
+          end
+          registration.update_external_tools!
+        end
         render json: registration
       end
 

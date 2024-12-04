@@ -20,12 +20,11 @@ import React from 'react'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
+import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-// @ts-expect-error
 import CanvasLmsLogoIcon from '../assets/images/canvas-logo-small.svg'
-// @ts-expect-error
 import CanvasLmsLogo from '../assets/images/canvas-logo.svg'
 
 const I18n = useI18nScope('new_login')
@@ -49,11 +48,11 @@ const AppNavBar = () => {
                   <Responsive
                     match="media"
                     query={{
-                      small: {minWidth: '48rem'},
+                      tablet: {minWidth: canvas.breakpoints.tablet},
                     }}
                   >
                     {(_props, matches) => {
-                      if (matches?.includes('small')) {
+                      if (matches?.includes('tablet')) {
                         return (
                           <Img
                             src={CanvasLmsLogo}

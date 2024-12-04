@@ -138,7 +138,7 @@
 # @model Lti::ToolConfiguration
 #     {
 #       "id": "Lti::ToolConfiguration",
-#       "description": "A Registration's Canvas-specific tool configuration. Tool-provided and standardized.",
+#       "description": "A Registration's Canvas-specific tool configuration. Any Lti::Overlays returned are already applied to the configuration.",
 #       "properties": {
 #         "title": {
 #           "description": "The display name of the tool",
@@ -246,7 +246,7 @@
 #         "text": {
 #           "description": "The text of the link to the tool (if applicable).",
 #           "example": "Hello World",
-#           "type": "object"
+#           "type": "string"
 #         },
 #         "labels": {
 #           "description": "Canvas-specific i18n for placement text. See the Navigation Placement docs.",
@@ -422,7 +422,7 @@
 #         "text": {
 #           "description": "The text of the link to the tool (if applicable).",
 #           "example": "Hello World",
-#           "type": "object"
+#           "type": "string"
 #         },
 #         "labels": {
 #           "description": "Canvas-specific i18n for placement text. See the Navigation Placement docs.",
@@ -527,6 +527,144 @@
 #       }
 #     }
 #
+# @model Lti::Overlay
+#     {
+#       "id": "Lti::Overlay",
+#       "description": "Changes made by a Canvas admin to a tool's configuration.",
+#       "properties": {
+#         "title": {
+#           "description": "The display name of the tool",
+#           "example": "My Tool",
+#           "type": "string"
+#         },
+#         "description": {
+#           "description": "The description of the tool",
+#           "example": "My Tool is built by me, for me.",
+#           "type": "string"
+#         },
+#         "custom_fields": {
+#           "description": "A key-value listing of all custom fields the tool has requested",
+#           "example": { "context_title": "$Context.title", "special_tool_thing": "foo1234" },
+#           "type": "object"
+#         },
+#         "target_link_uri": {
+#           "description": "The default launch URL for the tool. Overridable by placements.",
+#           "example": "https://mytool.com/launch",
+#           "type": "string"
+#         },
+#         "domain": {
+#           "description": "The tool's main domain. Highly recommended for deep linking, used to match links to the tool.",
+#           "example": "mytool.com",
+#           "type": "string"
+#         },
+#         "privacy_level": {
+#           "description": "Canvas-defined privacy level for the tool",
+#           "example": "public",
+#           "type": "string",
+#           "enum":
+#           [
+#             "public",
+#             "anonymous",
+#             "name_only",
+#             "email_only"
+#           ]
+#         },
+#         "oidc_initiation_url": {
+#           "description": "1.3 specific. URL used for initial login request",
+#           "example": "https://mytool.com/1_3/login",
+#           "type": "string"
+#         },
+#         "public_jwk": {
+#           "description": "1.3 specific. The tool's public JWK in JSON format. Discouraged in favor of a url hosting a JWK set.",
+#           "example": { "e": "AQAB", "etc": "etc" },
+#           "type": "object"
+#         },
+#         "public_jwk_url": {
+#           "description": "1.3 specific. The tool-hosted URL containing its public JWK keyset.",
+#           "example": "https://mytool.com/1_3/jwks",
+#           "type": "string"
+#         },
+#         "scopes": {
+#           "description": "1.3 specific. List of LTI scopes requested by the tool",
+#           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "redirect_uris": {
+#           "description": "1.3 specific. List of possible launch URLs for after the Canvas authorize redirect step",
+#           "example": ["https://mytool.com/launch", "https://mytool.com/1_3/launch"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "disabled_scopes": {
+#           "description": "1.3 specific. List of LTI scopes that the tool has requested but an admin has disabled",
+#           "example": ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "disabled_placements": {
+#           "description": "List of placements that the tool has requested but an admin has disabled",
+#           "example": ["course_navigation"],
+#           "type": "array",
+#           "items": { "type": "string" }
+#         },
+#         "placements": {
+#           "description": "Placement-specific settings changed by an admin",
+#           "example": { "course_navigation": { "$ref": "Lti::Placement" } },
+#           "type": "object",
+#           "items": { "$ref": "Lti::PlacementOverlay" }
+#         }
+#       }
+#     }
+#
+# @model Lti::PlacementOverlay
+#     {
+#       "id": "Lti::PlacementOverlay",
+#       "description": "Changes made by a Canvas admin to a tool's configuration for a specific placement.",
+#       "properties": {
+#         "text": {
+#           "description": "The text of the link to the tool (if applicable).",
+#           "example": "Hello World",
+#           "type": "string"
+#         },
+#         "target_link_uri": {
+#           "description": "The default launch URL for the tool. Overridable by placements.",
+#           "example": "https://mytool.com/launch",
+#           "type": "string"
+#         },
+#         "message_type": {
+#           "description": "Default message type for all placements",
+#           "example": "LtiResourceLinkRequest",
+#           "type": "string",
+#           "enum":
+#           [
+#             "LtiResourceLinkRequest",
+#             "LtiDeepLinkingRequest"
+#           ]
+#         },
+#         "launch_height": {
+#           "description": "Default iframe height. Not valid for all placements. Overrides tool-level launch_height.",
+#           "example": 800,
+#           "type": "number"
+#         },
+#         "launch_width": {
+#           "description": "Default iframe width. Not valid for all placements. Overrides tool-level launch_width.",
+#           "example": 1000,
+#           "type": "number"
+#         },
+#         "icon_url": {
+#           "description": "Default icon URL. Not valid for all placements. Overrides tool-level icon_url.",
+#           "example": "https://mytool.com/icon.png",
+#           "type": "string"
+#         },
+#         "default": {
+#           "description": "Default display state for course_navigation. If 'enabled', will show in course sidebar. If 'disabled', will be hidden.",
+#           "example": "disabled",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
@@ -575,6 +713,13 @@ class Lti::RegistrationsController < ApplicationController
   # @argument dir [String, "asc"|"desc"]
   #   The order to sort the given column by. Defaults to desc.
   #
+  # @argument include[] [String]
+  #   Array of additional data to include. Always includes [account_binding].
+  #
+  #   "account_binding":: the registration's binding to the given account
+  #   "configuration":: the registration's Canvas-style tool configuration
+  #   "overlay":: the registration's admin-defined configuration overlay
+  #
   # @returns {"total": "integer", data: [Lti::Registration] }
   #
   # @example_request
@@ -584,51 +729,53 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def list
     GuardRail.activate(:secondary) do
-      eager_load_models = [
+      preload_models = [
         { lti_registration_account_bindings: [:created_by, :updated_by] },
         :ims_registration,
+        :manual_configuration,
+        :developer_key,
         :created_by, # registration's created_by
         :updated_by  # registration's updated_by
       ]
+      # eager loaded instead of preloaded for use in where queries
+      eager_load_models = [:lti_registration_account_bindings]
+      all_active_registrations = Lti::Registration.active.preload(preload_models).eager_load(eager_load_models)
 
       # Get all registrations on this account, regardless of their bindings
-      account_registrations = Lti::Registration.active
-                                               .where(account_id: params[:account_id])
-                                               .eager_load(eager_load_models)
+      account_registrations = all_active_registrations.where(account_id: params[:account_id])
 
       # Get all registration account bindings that are bound to the site admin account and that are "on,"
       # since they will apply to this account (and all accounts)
-      forced_on_in_site_admin = Shard.default.activate do
-        Lti::Registration.active
-                         .where(account: Account.site_admin)
-                         .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
-                         .eager_load(eager_load_models)
-      end
+      forced_on_in_site_admin = all_active_registrations
+                                .shard(Shard.default)
+                                .where(account: Account.site_admin)
+                                .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
 
       consortia_registrations = if @account.root_account.primary_settings_root_account? || @account.root_account.consortium_parent_account.blank?
                                   Lti::RegistrationAccountBinding.none
                                 else
-                                  @account.root_account.consortium_parent_account.shard.activate do
-                                    Lti::Registration.active
-                                                     .where(account: @account.consortium_parent_account)
-                                                     .where(lti_registration_account_bindings: {
-                                                              workflow_state: "on",
-                                                              account: @account.consortium_parent_account
-                                                            })
-                                                     .eager_load(eager_load_models)
-                                  end
+                                  consortium_parent = @account.root_account.consortium_parent_account
+                                  all_active_registrations
+                                    .shard(consortium_parent.shard)
+                                    .where(account: consortium_parent)
+                                    .where(lti_registration_account_bindings: {
+                                             workflow_state: "on",
+                                             account: consortium_parent
+                                           })
                                 end
 
       # Get all registration account bindings in this account, then fetch the registrations from their own shards
       # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
       # are uniquely being inherited from a different account.
-      inherited_on_registration_bindings = Lti::RegistrationAccountBinding.where(workflow_state: "on")
-                                                                          .where(account_id: params[:account_id])
-                                                                          .where.not(registration_id: account_registrations.map(&:id))
+      inherited_on_registration_ids = Lti::RegistrationAccountBinding
+                                      .where(workflow_state: "on")
+                                      .where(account_id: params[:account_id])
+                                      .where.not(registration_id: account_registrations.map(&:id))
+                                      .pluck(:registration_id)
+                                      .uniq
 
-      registration_ids = inherited_on_registration_bindings.map(&:registration_id)
-      inherited_on_registrations = Shard.partition_by_shard(registration_ids) do |registration_ids_for_shard|
-        Lti::Registration.active.where(id: registration_ids_for_shard).eager_load(eager_load_models)
+      inherited_on_registrations = Shard.partition_by_shard(inherited_on_registration_ids) do |registration_ids_for_shard|
+        all_active_registrations.where(id: registration_ids_for_shard)
       end.flatten
 
       all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
@@ -662,9 +809,10 @@ class Lti::RegistrationsController < ApplicationController
 
       per_page = Api.per_page_for(self, default: 15)
       paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
+      includes = [:account_binding] + (Array(params[:include]).map(&:to_sym) - [:overlay_versions])
       render json: {
         total: all_registrations.size,
-        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes: [:account_binding])
+        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes:)
       }
     end
   rescue => e
@@ -738,6 +886,14 @@ class Lti::RegistrationsController < ApplicationController
   # Return details about the specified LTI registration, including the
   # configuration and account binding.
   #
+  # @argument include[] [String]
+  #   Array of additional data to include. Always includes [account_binding configuration].
+  #
+  #   "account_binding":: the registration's binding to the given account
+  #   "configuration":: the registration's Canvas-style tool configuration
+  #   "overlay":: the registration's admin-defined configuration overlay
+  #   "overlay_versions":: the registration's overlay's edit history
+  #
   # @returns Lti::Registration
   #
   # @example_request
@@ -748,6 +904,33 @@ class Lti::RegistrationsController < ApplicationController
   def show
     GuardRail.activate(:secondary) do
       registration = Lti::Registration.active.find(params[:id])
+      includes = [:account_binding, :configuration] + Array(params[:include]).map(&:to_sym)
+      render json: lti_registration_json(registration, @current_user, session, @context, includes:)
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
+  # @API Show an LTI Registration (via the client_id)
+  # Returns details about the specified LTI registration, including the
+  # configuration and account binding.
+  #
+  # @returns Lti::Registration
+  #
+  # @example_request
+  #
+  #   This would return the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registration_by_client_id/<client_id>' \
+  #        -H "Authorization: Bearer <token>"
+  def show_by_client_id
+    GuardRail.activate(:secondary) do
+      developer_key = DeveloperKey.find(params[:client_id])
+      unless developer_key&.lti_registration.present?
+        return render json: { errors: "LTI registration not found" }, status: :not_found
+      end
+
+      registration = developer_key.lti_registration
       render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
     end
   rescue => e
@@ -788,7 +971,7 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     registration.destroy
-    render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
+    render json: lti_registration_json(registration, @current_user, session, @context, includes: %i[account_binding configuration overlay])
   rescue => e
     report_error(e)
     raise e

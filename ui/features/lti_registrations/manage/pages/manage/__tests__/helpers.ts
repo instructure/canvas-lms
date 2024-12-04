@@ -71,8 +71,8 @@ export const mockRegistration = (n: string, i: number): LtiRegistration => {
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
     ims_registration_id: ZLtiImsRegistrationId.parse(id),
-    legacy_configuration_id: null,
-    manual_configuration_id: null,
     admin_nickname: n,
+    icon_url: null,
+    vendor: null,
   }
 }

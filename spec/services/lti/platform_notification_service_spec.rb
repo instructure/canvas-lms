@@ -32,12 +32,15 @@ describe Lti::PlatformNotificationService do
       root_account: Account.default
     )
   end
+  let(:builder) { Lti::Pns::LtiHelloWorldNoticeBuilder.new }
 
   before do
-    @valid_notice_type = "LtiHelloWorldNotice"
+    @valid_notice_type = "Notice2"
+    @hello_world_notice_type = "LtiHelloWorldNotice"
     @invalid_notice_type = "InvalidNoticeType"
     @valid_handler_url = tool.url + "/handler"
     @invalid_handler_url = "invalid_url"
+    stub_const("Lti::Pns::NoticeTypes::ALL", [@hello_world_notice_type, @valid_notice_type])
   end
 
   describe "subscribe_tool_for_notice" do
@@ -60,6 +63,18 @@ describe Lti::PlatformNotificationService do
         )
         expect(handler).to eq({ notice_type: @valid_notice_type, handler: @valid_handler_url })
       end
+
+      it "sends out test notice for hello_world notice_type" do
+        expect(Lti::Pns::LtiHelloWorldNoticeBuilder).to receive(:new).and_return(builder)
+        expect(builder).to receive(:build).and_return({ jwt: "jwt" })
+        expect(Services::NotificationService).to receive(:process).and_return("response")
+        handler = Lti::PlatformNotificationService.subscribe_tool_for_notice(
+          tool:,
+          notice_type: @hello_world_notice_type,
+          handler_url: @valid_handler_url
+        )
+        expect(handler).to eq({ notice_type: @hello_world_notice_type, handler: @valid_handler_url })
+      end
     end
 
     context "with invalid notice_type" do
@@ -70,7 +85,7 @@ describe Lti::PlatformNotificationService do
             notice_type: @invalid_notice_type,
             handler_url: @valid_handler_url
           )
-        end.to raise_error(ArgumentError, "unknown notice_type, it must be one of [#{Lti::PlatformNotificationService::NOTICE_TYPES.join(", ")}]")
+        end.to raise_error(ArgumentError, "unknown notice_type, it must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]")
       end
     end
 
@@ -135,8 +150,41 @@ describe Lti::PlatformNotificationService do
             tool:,
             notice_type: @invalid_notice_type
           )
-        end.to raise_error(ArgumentError, "unknown notice_type, it must be one of [#{Lti::PlatformNotificationService::NOTICE_TYPES.join(", ")}]")
+        end.to raise_error(ArgumentError, "unknown notice_type, it must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]")
       end
+    end
+  end
+
+  describe "notify_tools" do
+    let(:builder) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 1 }) }
+    let(:builder2) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 2 }) }
+
+    it "sends out notification_service webhook requests" do
+      Lti::NoticeHandler.create!(
+        context_external_tool_id: tool.id,
+        notice_type: "LtiHelloWorldNotice",
+        url: @valid_handler_url,
+        root_account: tool.root_account,
+        account: tool.account
+      )
+      allow(builder).to receive(:build).and_return({ jwt: "jwt" })
+      allow(SecureRandom).to receive(:uuid).and_return("uuid")
+      expect(Services::NotificationService).to receive(:process).with(
+        "pns-notify/uuid",
+        '{"notices":[{"jwt":"jwt"}]}',
+        "webhook",
+        '{"url":"http://www.tool.com/launch/handler"}'
+      )
+      Lti::PlatformNotificationService.notify_tools(tool.account, builder)
+    end
+
+    it "raises an ArgumentError when builders have different notice_types" do
+      allow(builder).to receive(:build).and_return('{"jwt":"jwt"}')
+      allow(builder2).to receive_messages(build: '{"jwt":"jwt"}', notice_type: "OtherNoticeType")
+      allow(LtiAdvantage::Messages::JwtMessage).to receive(:create_jws).and_return("signed_jwt")
+      expect do
+        Lti::PlatformNotificationService.notify_tools(tool.account, builder, builder2)
+      end.to raise_error(ArgumentError, "builders must have the same notice_type")
     end
   end
 end

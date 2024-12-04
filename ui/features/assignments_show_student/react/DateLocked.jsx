@@ -18,7 +18,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string, oneOf} from 'prop-types'
-import '@canvas/content-locks/jquery/lock_reason'
+import lockExplanation from '@canvas/content-locks/jquery/lock_reason'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 
@@ -36,7 +36,7 @@ export default function DateLocked(props) {
         <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
           <Flex.Item>
             <Heading size="large" data-testid="assignments-2-date-locked" margin="small">
-              {INST.lockExplanation({unlock_at: props.date}, props.type)}
+              {lockExplanation({unlock_at: props.date}, props.type)}
             </Heading>
           </Flex.Item>
         </Flex>

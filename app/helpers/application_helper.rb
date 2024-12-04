@@ -435,14 +435,9 @@ module ApplicationHelper
   end
 
   def show_user_create_course_button(user, account = nil)
-    return true if account&.grants_any_right?(user, session, :manage_courses, :create_courses)
+    return true if account&.grants_right?(user, :create_courses)
 
-    @domain_root_account.manually_created_courses_account.grants_any_right?(
-      user,
-      session,
-      :manage_courses,
-      :create_courses
-    )
+    @domain_root_account.manually_created_courses_account.grants_right?(user, :create_courses)
   end
 
   # Public: Create HTML for a sidebar button w/ icon.

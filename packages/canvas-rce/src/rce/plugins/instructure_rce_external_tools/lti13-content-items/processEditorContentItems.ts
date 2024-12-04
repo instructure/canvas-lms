@@ -29,6 +29,8 @@ export default function processEditorContentItems(
       content_items?: Lti13ContentItemJson[] | null
       ltiEndpoint?: string | null
       replaceEditorContents?: boolean | null
+      msg?: string | null
+      errorMsg?: string | null
     }
   },
   env: ExternalToolsEnv,
@@ -75,6 +77,13 @@ export default function processEditorContentItems(
     // Remove "unsaved changes" warnings and close modal
     if (event.data?.content_items) {
       dialog?.close()
+    }
+
+    if (event.data?.msg !== undefined) {
+      showFlashAlert({message: event.data.msg.toString()})
+    }
+    if (event.data?.errormsg !== undefined) {
+      showFlashAlert({message: event.data.errormsg.toString(), type: 'error'})
     }
   } catch (e) {
     showFlashAlert({

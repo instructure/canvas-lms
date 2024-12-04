@@ -630,6 +630,83 @@ describe "Accounts API", type: :request do
       expect(@a1.settings[:setting]).to be_nil
     end
 
+    context "parent_account_id" do
+      before :once do
+        @subaccount = account_model(name: "subaccount", parent_account: @a1, root_account: @a1)
+      end
+
+      it "moves a subaccount to a new parent account" do
+        json = api_call(:put,
+                        "/api/v1/accounts/#{@subaccount.id}",
+                        { controller: "accounts", action: "update", id: @subaccount.to_param, format: "json" },
+                        { account: { parent_account_id: @a2.id } })
+        expect(response).to have_http_status(:ok)
+        expect(json["parent_account_id"]).to eq @a2.id
+        expect(@subaccount.reload.parent_account).to eq @a2
+      end
+
+      it "accepts a sis id as the parent_account_id" do
+        json = api_call(:put,
+                        "/api/v1/accounts/#{@subaccount.id}",
+                        { controller: "accounts", action: "update", id: @subaccount.to_param, format: "json" },
+                        { account: { parent_account_id: "sis_account_id:sis1" } })
+        expect(response).to have_http_status(:ok)
+        expect(json["parent_account_id"]).to eq @a2.id
+        expect(@subaccount.reload.parent_account).to eq @a2
+      end
+
+      it "does not allow moving to a soft-deleted account" do
+        @a2.destroy
+        api_call(:put,
+                 "/api/v1/accounts/#{@subaccount.id}",
+                 { controller: "accounts", action: "update", id: @subaccount.to_param, format: "json" },
+                 { account: { parent_account_id: @a2.id } })
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "does not allow moving a root account" do
+        json = api_call(:put,
+                        "/api/v1/accounts/#{@a1.id}",
+                        { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                        { account: { parent_account_id: @subaccount.id } })
+        expect(response).to have_http_status(:unauthorized)
+        expect(json["errors"]["unauthorized"][0]["message"]).to eq "You cannot move a root account."
+      end
+
+      it "requires admin rights in the source parent account" do
+        account_admin_user(account: @subaccount)
+        @a2.account_users.create!(user: @user)
+        json = api_call(:put,
+                        "/api/v1/accounts/#{@subaccount.id}",
+                        { controller: "accounts", action: "update", id: @subaccount.to_param, format: "json" },
+                        { account: { parent_account_id: @a2.id } })
+        expect(response).to have_http_status(:unauthorized)
+        expect(json["errors"]["unauthorized"][0]["message"]).to eq "You are not authorized to manage the source parent account."
+        expect(@subaccount.reload.parent_account).to eq @a1
+      end
+
+      it "requires admin rights in the destination parent account" do
+        account_admin_user(account: @subaccount)
+        subsub = @subaccount.sub_accounts.create!(name: "subaccount2")
+        json = api_call(:put,
+                        "/api/v1/accounts/#{subsub.id}",
+                        { controller: "accounts", action: "update", id: subsub.to_param, format: "json" },
+                        { account: { parent_account_id: @a2.id } })
+        expect(response).to have_http_status(:unauthorized)
+        expect(json["errors"]["unauthorized"][0]["message"]).to eq "You are not authorized to manage the destination parent account."
+        expect(subsub.reload.parent_account).to eq @subaccount
+      end
+
+      it "requires the new account to be in the same root account" do
+        @a3.account_users.create!(user: @user)
+        api_call(:put,
+                 "/api/v1/accounts/#{@subaccount.id}",
+                 { controller: "accounts", action: "update", id: @subaccount.to_param, format: "json" },
+                 { account: { parent_account_id: @a3.id } })
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     context "Microsoft Teams Sync" do
       let(:update_sync_settings_params) do
         {
@@ -2181,7 +2258,7 @@ describe "Accounts API", type: :request do
                  permissions: %w[become_user] },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 
@@ -2191,7 +2268,7 @@ describe "Accounts API", type: :request do
     let(:generic_user) { user_factory }
 
     it "does not allow regular users to see settings" do
-      api_call_as_user(generic_user, :get, show_settings_path, show_settings_header, {}, { expected_status: 401 })
+      api_call_as_user(generic_user, :get, show_settings_path, show_settings_header, {}, { expected_status: 403 })
     end
 
     it "allows account admins to see selected settings" do

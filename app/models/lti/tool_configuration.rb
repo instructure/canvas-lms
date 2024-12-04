@@ -28,7 +28,6 @@ module Lti
     before_validation :normalize_configuration
     before_validation :transform_updated_settings
     before_save :update_privacy_level_from_extensions
-    before_save :update_lti_registration
     before_save :set_redirect_uris
 
     after_update :update_external_tools!, if: :configuration_changed?
@@ -43,7 +42,7 @@ module Lti
     def settings
       return self[:settings] unless transformed?
 
-      Schemas::LtiConfiguration.from_internal_lti_configuration(internal_configuration).with_indifferent_access
+      Schemas::LtiConfiguration.from_internal_lti_configuration(internal_lti_configuration).with_indifferent_access
     end
 
     def configuration
@@ -55,14 +54,17 @@ module Lti
 
       transform_settings
       self.redirect_uris = developer_key.redirect_uris.presence || [target_link_uri]
-      save!(validate: false)
+
+      ToolConfiguration.suspend_callbacks(:update_external_tools!, :update_unified_tool_id) do
+        save!(validate: false)
+      end
     end
 
     def untransform!
       return unless transformed?
 
       self[:settings] = settings
-      internal_configuration.except(:privacy_level).each_key do |key|
+      internal_lti_configuration.except(:privacy_level).each_key do |key|
         self[key] = if %i[oidc_initiation_urls custom_fields launch_settings].include?(key)
                       {}
                     elsif %i[placements scopes redirect_uris].include?(key)
@@ -73,7 +75,9 @@ module Lti
       end
 
       @transformed = false
-      save!(validate: false)
+      ToolConfiguration.suspend_callbacks(:update_external_tools!, :update_unified_tool_id) do
+        save!(validate: false)
+      end
     end
 
     def transformed?
@@ -83,7 +87,7 @@ module Lti
     def transform_settings
       internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(self[:settings]).except(:vendor_extensions)
 
-      allowed_keys = internal_config.keys & internal_configuration.keys
+      allowed_keys = internal_config.keys & Schemas::InternalLtiConfiguration.allowed_base_properties
       allowed_keys.each do |key|
         self[key] = internal_config[key]
       end
@@ -124,6 +128,7 @@ module Lti
         internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
         create!(
           developer_key: dk,
+          lti_registration: dk.lti_registration,
           disabled_placements: tool_configuration_params[:disabled_placements],
           privacy_level: tool_configuration_params[:privacy_level] || internal_config[:privacy_level],
           title: internal_config[:title],
@@ -213,29 +218,14 @@ module Lti
       warnings
     end
 
-    def importable_configuration
-      if transformed?
-        placements = internal_configuration[:placements].reject { |p| disabled_placements&.include?(p["placement"]) }
-        settings = {
-          **internal_configuration[:launch_settings],
-          placements:
-        }
-        # legacy: add placements in both array and hash form
-        placements.each do |p|
-          settings[p["placement"]] = p
-        end
-
-        internal_configuration
-          .except(:redirect_uris, :launch_settings, :placements)
-          .merge({ settings: }, default_tool_settings)
-          .with_indifferent_access.compact
-      else
-        configuration&.merge(canvas_extensions)&.merge(default_tool_settings)
-      end
-    end
-
     # @returns InternalLtiConfiguration
-    def internal_configuration
+    def internal_lti_configuration
+      unless transformed?
+        internal_config = Schemas::InternalLtiConfiguration.from_lti_configuration(configuration)
+
+        return internal_config
+      end
+
       {
         title:,
         description:,
@@ -280,11 +270,6 @@ module Lti
       developer_key.update_external_tools!
     end
 
-    def update_lti_registration
-      self.lti_registration_id = developer_key&.lti_registration_id if developer_key
-      true
-    end
-
     def set_redirect_uris
       return unless transformed?
       return if redirect_uris.present?
@@ -299,12 +284,17 @@ module Lti
         errors.add(:lti_key, "tool configuration must have public jwk or public jwk url")
       end
       if configuration["public_jwk"].present?
-        jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(configuration["public_jwk"])
-        errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
+        if Account.site_admin.feature_enabled?(:lti_report_multiple_schema_validation_errors)
+          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_errors(configuration["public_jwk"])
+          jwk_schema_errors&.each { |err| errors.add(:configuration, err) }
+        else
+          jwk_schema_errors = Schemas::Lti::PublicJwk.simple_validation_first_error(configuration["public_jwk"])
+          errors.add(:configuration, jwk_schema_errors) if jwk_schema_errors.present?
+        end
       end
 
       schema_errors = if transformed?
-                        Schemas::InternalLtiConfiguration.simple_validation_errors(internal_configuration.compact)
+                        Schemas::InternalLtiConfiguration.simple_validation_errors(internal_lti_configuration.compact)
                       else
                         Schemas::LtiConfiguration.simple_validation_errors(configuration.compact)
                       end
@@ -339,10 +329,6 @@ module Lti
       end
     rescue CanvasHttp::Error, URI::Error, ArgumentError
       errors.add(:configuration, "oidc_initiation_urls must be valid urls")
-    end
-
-    def default_tool_settings
-      { url: configuration["target_link_uri"], lti_version: "1.3", unified_tool_id: }
     end
 
     def canvas_extensions
@@ -392,7 +378,7 @@ module Lti
     end
 
     def configuration_changed?
-      saved_changes.keys.intersect?(internal_configuration.keys.map(&:to_s)) || saved_change_to_settings?
+      saved_changes.keys.intersect?(internal_lti_configuration.keys.map(&:to_s)) || saved_change_to_settings?
     end
   end
 end

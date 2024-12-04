@@ -604,9 +604,9 @@ class DiscussionTopicsController < ApplicationController
       when :none
         []
       when :all
-        @context.course_sections.active.to_a
+        @context.course_sections.active.order(:name).to_a
       else
-        @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
+        @context.course_sections.active.order(:name).select { |s| section_visibilities.include?(s.id) }
       end
 
     js_hash = {
@@ -867,8 +867,8 @@ class DiscussionTopicsController < ApplicationController
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
-               discussion_translation_available: Translation.available?(@domain_root_account, :translation), # Is translation enabled on the course.
-               discussion_translation_languages: Translation.available?(@domain_root_account, :translation) ? Translation.translated_languages(@current_user) : [],
+               discussion_translation_available: Translation.available?(@context, :translation), # Is translation enabled on the course.
+               discussion_translation_languages: Translation.available?(@context, :translation) ? Translation.translated_languages(@current_user) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
                discussion_summary_enabled: @topic.summary_enabled,

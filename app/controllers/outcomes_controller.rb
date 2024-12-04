@@ -48,7 +48,7 @@ class OutcomesController < ApplicationController
       PERMISSIONS: {
         manage_outcomes: @context.grants_right?(@current_user, session, :manage_outcomes),
         manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics),
-        can_manage_courses: @context.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
+        can_manage_courses: @context.grants_right?(@current_user, session, :manage_courses_admin),
         import_outcomes: @context.grants_right?(@current_user, session, :import_outcomes),
         manage_proficiency_scales:
           @context.grants_right?(@current_user, session, :manage_proficiency_scales),

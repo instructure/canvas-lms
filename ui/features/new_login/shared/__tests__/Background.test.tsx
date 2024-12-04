@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {Background} from '../index'
+import {Background} from '..'
 import {NewLoginProvider} from '../../context/NewLoginContext'
 
 describe('Background', () => {

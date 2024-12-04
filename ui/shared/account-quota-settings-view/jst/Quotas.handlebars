@@ -10,6 +10,9 @@
           id="default_course_storage_mb">
         <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
       </div>
+      {{#ifGreaterThan default_storage_quota_mb 100000}}
+      <p class="help-inline"><strong>Note:</strong> This storage quota may exceed typical usage.</p>
+      {{/ifGreaterThan}}
     </div>
   </div>
   {{#if root_account}}
@@ -23,6 +26,9 @@
           id="default_user_storage_mb">
         <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
       </div>
+      {{#ifGreaterThan default_user_storage_quota_mb 100000}}
+      <p class="help-inline"><strong>Note:</strong> This storage quota may exceed typical usage.</p>
+      {{/ifGreaterThan}}
     </div>
   </div>
   {{/if}}
@@ -36,6 +42,9 @@
           id="default_group_storage_mb">
         <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
       </div>
+      {{#ifGreaterThan default_group_storage_quota_mb 100000}}
+      <p class="help-inline"><strong>Note:</strong> This storage quota may exceed typical usage.</p>
+      {{/ifGreaterThan}}
     </div>
   </div>
 

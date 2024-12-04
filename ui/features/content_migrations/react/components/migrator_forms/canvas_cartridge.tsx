@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
+import React from 'react'
 import CommonMigratorControls from './common_migrator_controls'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
-
-const I18n = useI18nScope('content_migrations_redesign')
+import {noFileSelectedFormMessage} from '../utils'
+import {useSubmitHandler} from '../../hooks/form_handler_hooks'
 
 type CanvasCartridgeImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -38,25 +36,7 @@ const CanvasCartridgeImporter = ({
   fileUploadProgress,
   isSubmitting,
 }: CanvasCartridgeImporterProps) => {
-  const [file, setFile] = useState<File | null>(null)
-  const [fileError, setFileError] = useState<boolean>(false)
-
-  const handleSubmit: onSubmitMigrationFormCallback = useCallback(
-    formData => {
-      if (file) {
-        setFileError(false)
-        formData.pre_attachment = {
-          name: file.name,
-          size: file.size,
-          no_redirect: true,
-        }
-        onSubmit(formData, file)
-      } else {
-        setFileError(true)
-      }
-    },
-    [file, onSubmit]
-  )
+  const {setFile, fileError, handleSubmit} = useSubmitHandler(onSubmit)
 
   return (
     <>
@@ -64,12 +44,8 @@ const CanvasCartridgeImporter = ({
         fileUploadProgress={fileUploadProgress}
         onChange={setFile}
         isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
       />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
       <CommonMigratorControls
         fileUploadProgress={fileUploadProgress}
         isSubmitting={isSubmitting}

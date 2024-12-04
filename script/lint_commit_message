@@ -122,6 +122,11 @@ if touches_db_migrate_file
   comment "info", nil, "Your commit modifies migration files. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/49643724/Rails+Migrations, including completing an additional migration review."
 end
 
+touches_permissions_registry_file = commit_files.any? { |f| f.start_with?("config/initializers/permissions_registry") }
+if touches_permissions_registry_file
+  comment "info", nil, "Your commit modifies the permissions registry file. Please review and follow the instructions in https://instructure.atlassian.net/wiki/spaces/CE/pages/85519794197/Users+Roles+and+Permissions, including adding an additional migration to backfill those permission(s)."
+end
+
 touches_lti_variable_expander_file = commit_files.any? { |f| f.start_with?("lib/lti/variable_expander") }
 touches_lti_variable_expander_docs = commit_files.any? { |f| f.start_with?("doc/api/tools_variable_substitutions") }
 if touches_lti_variable_expander_file && !touches_lti_variable_expander_docs

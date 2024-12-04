@@ -32,6 +32,12 @@ class UserMerge
     @data = []
   end
 
+  def pseudonyms_to_move_in_this_shard
+    Pseudonym.where(user_id: from_user)
+  end
+
+  def handle_instructure_identity(pseudonyms_to_move, target_user) end
+
   def into(target_user, merger: nil, source: nil)
     return unless target_user
     return if target_user == from_user
@@ -100,8 +106,12 @@ class UserMerge
 
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       max_position = Pseudonym.where(user_id: target_user).ordered.last.try(:position) || 0
-      pseudonyms_to_move = Pseudonym.where(user_id: from_user)
+
+      # Modify to not include inst pseudonym
+      pseudonyms_to_move = pseudonyms_to_move_in_this_shard
+
       merge_data.add_more_data(pseudonyms_to_move)
+      handle_instructure_identity(pseudonyms_to_move, target_user)
       pseudonyms_to_move.update_all(["updated_at=NOW(), user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|

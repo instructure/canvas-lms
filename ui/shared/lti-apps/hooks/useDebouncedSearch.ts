@@ -25,14 +25,17 @@ const useDebouncedSearch = (props: {
   initialValue: string
   delay: number
   updateQueryParams: (params: Partial<DiscoverParams>) => void
+  isDisabled?: boolean
 }) => {
   const {initialValue, delay, updateQueryParams} = props
   const [searchValue, setSearchValue] = useState(initialValue)
 
   const [,] = useDebounce(
-    () => {
-      updateQueryParams({search: searchValue, page: 1})
-    },
+    props.isDisabled
+      ? () => {}
+      : () => {
+          updateQueryParams({search: searchValue, page: 1})
+        },
     delay,
     [searchValue]
   )

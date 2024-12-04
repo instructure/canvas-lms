@@ -84,6 +84,9 @@ jest.mock('@craftjs/core', () => {
                   dom: {
                     focus: mockFocus,
                   },
+                  data: {
+                    parent: undefined,
+                  },
                 }
               },
             }
@@ -242,7 +245,7 @@ describe('BlockToolbar', () => {
       expect(firstButton.getAttribute('tabindex')).toEqual('0')
     })
 
-    it('should wrap around on left arrow from the first butotn', async () => {
+    it('should wrap around on left arrow from the first button', async () => {
       isSaveable = false
       const {getByText} = renderBlockToolbar()
       const firstButton = getByText('Go up').closest('button') as HTMLButtonElement

@@ -5468,6 +5468,8 @@ he:
     unstar: "הסרת כוכבית"
     unstar_conversation: "הסר/י את הכוכבית מהשיחה"
   conversations_69a8dc26: שיחות
+  copied_from_2094bec4: "הועתק מ-"
+  copied_to_b437eff8: "הועתק אל"
   copy_9748f9f: העתקה
   copy_to_folder_32ecc3c3: "העתקה לתיקיה"
   copying_628a9607: מעתיק...
@@ -6473,6 +6475,7 @@ he:
   create_assignments_on_the_assignments_page_organiz_90c78fdc: "יצירת מטלות בדף המטולות. ארגן / י מטלות בקבוצות כמו שיעורי בית. עבודות בכיתה, מאמרים, דיונים ובחנים. משימות קבוצה ניתנות לשיקלול."
   create_content_for_your_course_500a7032: "הכנת תכנים לקורס שלך"
   create_course_9a69b32c: "יצירת קורס"
+  create_course_9dc5b61a: "יצירת קורס"
   create_criterion_6df4d4ad: "יצירת קריטריון"
   create_discussion_topics_8330d52b: "יצירת נושאי דיון"
   create_educational_resources_8219326e: "הכנת מקורות חינוכיים"
@@ -8150,6 +8153,7 @@ he:
     wrong_file_extension: "הקובץ שבחרת עם הסיומת \"%{extension}\", אינו מורשה להגשה"
   event_date_c9459fe3: "תאריך אירוע"
   event_date_f05219e7: "תאריך אירוע:"
+  event_details_e646df52: "פרטי אירוע"
   event_end_time_ef830e66: "זמן סיום אירוע"
   event_fe9ba3fe: אירוע
   event_start_time_441b491f: "זמן תחילת אירוע"
@@ -8636,6 +8640,7 @@ he:
     other: "נמצאו %{count} קישורים שאינם מגיבים"
     two: "נמצאו %{count} קישורים שאינם מגיבים"
   france_33_90b595d7: צרפת(+33)
+  from_date_27317230: מתאריך
   from_date_must_be_before_to_date_79f00046: "תאריך תחילה צריך להיות קודם לתאריך סיום"
   from_fdd4956d: מ-
   from_from_to_to_e31f6422: "מ %{from} עד %{to}"
@@ -14221,6 +14226,7 @@ he:
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "בבקשה להקליד מונח חיפוש עם 3 תווים ומעלה "
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "בבקשה להקליד כתובת אינטרנט תקינה כולל קידומת, למשל.  ( http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "בבקשה לספק כתובת אינטרנט תקינה, כוול הקידומת (כגון http://, https://, ftp://)."
+  please_enter_the_details_for_the_new_course_dc705b8c: "נא להזין את פרטי הקורס החדש"
   please_enter_the_verification_code_shown_by_your_t_acc7c404: "נא להזין את קוד האימות אשר האסימון שלך מראה."
   please_enter_your_label_name_7745272d: "בבקשה לספק את ה %{label_name}: שלך"
   please_enter_your_label_name_and_password_5c56be80: "בבקשה לספק את ה %{label_name}  והסיסמה שלך"
@@ -16876,9 +16882,11 @@ he:
   reserved_by_you_cd03b62d: "הוזמן על ידך"
   reserved_f247b60b: שמור
   reset_95a81614: "חזרה למצב ברירת מחדל"
+  reset_from_322d819a: "חזרה למצב ברירות מחדל מ-"
   reset_multi_factor_authentication_2b63a558: "איפוס הזדהות רב שלבית"
   reset_this_contact_method_s_bounce_count_3845ecf4: "איפוס מונה תעופות של סוג התקשרות זה "
   reset_this_email_address_s_bounce_count_d81d8fd9: "איפוס מונה תעופות של כתובת דוא\"ל זו"
+  reset_to_ee9265ef: "חזרה למצב ברירות מחדל עד"
   respondus_lockdown_browser_support_413352eb: "עזרה לגבי דפדפן Respondus LockDown"
   respondus_soap_endpoint: 
     plugin_settings: 
@@ -18401,6 +18409,7 @@ he:
       unrecorgnized_type: "סוג ייבוא לא מוכר"
     instructure_csv: "פורמט CSV או קבצי זיפ של CSVs של Instructure "
     upload_filename: "sis_upload_%{id}.zip"
+  sis_batch_d0050e20: "אוגדן SIS  "
   sis_export_title: "ייצוא ממערכת המידע הבית ספרית"
   sis_friendly_name_52b5683d: "שם ידידותי של המערכת הבית ספרית"
   sis_grade_export_settings_45a9f709: "הגדרות ייצוא הערכות של המערכת הבית ספרית"
@@ -18973,6 +18982,7 @@ he:
   submit_ticket_5515ffd: "דווח תקלה"
   submitted_318fad53: הוגשה
   submitted_at_4d5ea3aa: "הוגש ב"
+  submitted_b37e2ff0: הוגש
   submitted_d5ba370a: "הוגש:"
   submitted_datetime_fa2e9287: "הוגש: %{dateTime}"
   submitted_files_82dd3009: "קבצים שהוגשו"
@@ -19675,6 +19685,7 @@ he:
       ולקבל מזהה Client ומילה סודית שלו
       
       אם הספק יכול לקנפג קריאה חוזרת תקינה או לנתב URIים, אפשר להשתמש ב  %{callback_url}.
+  to_date_7c45ee77: "עד תאריך"
   to_do_1d554f36: "מטלות לביצוע"
   to_do_items_loading_d1cdfcd5: "משימות לביצוע נטענות"
   to_f0e90538: "עבור:"
@@ -19859,6 +19870,7 @@ he:
   updated_group_group_name_727b1d98: "עדכון קבוצה %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "ממשק משתמש מעודכן לחיפוש והצגת משתמשים וקורסים של חשבון נבחר."
   updating_6edbab78: מעדכן
+  updating_user_details_b8520b3e: "עדכון פרטי משתמש..."
   upload_8b403d05: העלאה
   upload_a_picture_9f5f6e3c: "העלאת תמונה"
   upload_button: 

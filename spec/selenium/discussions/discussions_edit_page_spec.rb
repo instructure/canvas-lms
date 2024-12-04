@@ -19,6 +19,7 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/items_assign_to_tray"
+require_relative "../helpers/assignments_common"
 require_relative "../helpers/context_modules_common"
 require_relative "../../helpers/k5_common"
 require_relative "../dashboard/pages/k5_important_dates_section_page"
@@ -32,6 +33,7 @@ require_relative "../../helpers/selective_release_common"
 describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
+  include AssignmentsCommon
   include DiscussionHelpers
   include ItemsAssignToTray
   include ContextModulesCommon
@@ -552,10 +554,7 @@ describe "discussions" do
           it "able to save anon, not graded, quick added from assignments", :ignore_js_errors do
             get "/courses/#{course.id}/assignments"
 
-            f(".add_assignment").click
-            click_option(f('[name="submission_types"]'), "Discussion")
-            f(".create_assignment_dialog input[type=text]").send_keys("anon disc from assignment")
-            f(".more_options").click
+            build_assignment_with_type("Discussion", name: "anon disc from assignment", more_options: true)
 
             f("input[type=radio][value=partial_anonymity]").click
             f("input#use_for_grading").click
@@ -1202,6 +1201,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@announcement_all_options.id}/edit"
 
           expect(f("input[value='enable-participants-commenting']").selected?).to be_truthy
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_truthy
           expect(f("input[value='allow-liking']").selected?).to be_truthy
           expect(f("input[value='only-graders-can-like']").selected?).to be_truthy
           expect(f("input[value='enable-podcast-feed']").selected?).to be_truthy
@@ -1216,6 +1216,7 @@ describe "discussions" do
           get "/courses/#{course.id}/discussion_topics/#{@announcement_no_options.id}/edit"
 
           expect(f("input[value='enable-participants-commenting']").selected?).to be_falsey
+          expect(f("input[value='must-respond-before-viewing-replies']").selected?).to be_falsey
           expect(f("input[value='allow-liking']").selected?).to be_falsey
           expect(f("input[value='enable-podcast-feed']").selected?).to be_falsey
         end
@@ -1770,6 +1771,7 @@ describe "discussions" do
           end
 
           it "does not create an override if the modules override is not updated" do
+            skip("Assign to tray is no longer used in the edit page")
             graded_discussion = create_graded_discussion(course)
             module1 = course.context_modules.create!(name: "Module 1")
             graded_discussion.context_module_tags.create! context_module: module1, context: course, tag_type: "context_module"
@@ -1811,9 +1813,9 @@ describe "discussions" do
             # Expect there to be no highlighted cards
             expect(module_item_assign_to_card.count).to eq 1
             expect(f("body")).not_to contain_jqcss(highlighted_card_selector)
-            click_save_button("Apply")
+            click_cancel_button
 
-            # Expect that if no changes were made, that the apply button doens't highlight old cards
+            # Expect that if no changes were made, that the cancel button doens't highlight old cards
             Discussion.assign_to_button.click
             wait_for_assign_to_tray_spinner
             expect(module_item_assign_to_card.count).to eq 1
@@ -2956,6 +2958,7 @@ describe "discussions" do
           end
 
           it "checkpointed discussion assigned to Everyone with no dates appears correctly with assign to tray" do
+            skip("Assign to tray is no longer used in the edit page")
             Account.site_admin.disable_feature!(:selective_release_edit_page)
 
             get "/courses/#{course.id}/discussion_topics/new"

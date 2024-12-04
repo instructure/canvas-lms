@@ -20,6 +20,7 @@ import $ from 'jquery'
 import ModuleDuplicationSpinner from '../react/ModuleDuplicationSpinner'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
@@ -861,18 +862,19 @@ const renderDifferentiatedModulesTray = (
   options = {initialTab: 'settings'}
 ) => {
   const container = document.getElementById('differentiated-modules-mount-point')
-  ReactDOM.render(
+  if (container.reactRoot) container.reactRoot.unmount()
+  container.reactRoot = createRoot(container)
+  container.reactRoot.render(
     <DifferentiatedModulesTray
       onDismiss={() => {
-        ReactDOM.unmountComponentAtNode(container)
+        container.reactRoot.unmount()
         returnFocusTo.focus()
       }}
       initialTab={options.initialTab}
       moduleElement={moduleElement}
       courseId={ENV.COURSE_ID ?? ''}
       {...settingsProps}
-    />,
-    container
+    />
   )
 }
 
@@ -1580,7 +1582,7 @@ modules.initModuleManagement = async function (duplicate) {
             refreshDuplicateLinkStatus($currentModule)
           })
           $.flashMessage(
-            I18n.t('Module item %{module_item_name} was successfully deleted.', {
+            I18n.t('Module item %{module_item_name} was successfully removed.', {
               module_item_name: data.content_tag.title,
             })
           )
@@ -2600,16 +2602,17 @@ $(document).ready(function () {
   }
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-    ReactDOM.render(
+    const container = document.getElementById('differentiated-modules-mount-point')
+    if (container.reactRoot) container.reactRoot.unmount()
+    container.reactRoot = createRoot(container)
+    container.reactRoot.render(
       <ItemAssignToManager
         open={open}
         onClose={() => {
-          ReactDOM.unmountComponentAtNode(
-            document.getElementById('differentiated-modules-mount-point')
-          )
+          container.reactRoot.unmount()
         }}
         onDismiss={() => {
-          renderItemAssignToTray(false, returnFocusTo, itemProps)
+          container.reactRoot.unmount()
           returnFocusTo.focus()
         }}
         courseId={itemProps.courseId}
@@ -2622,8 +2625,7 @@ $(document).ready(function () {
         timezone={ENV.TIMEZONE || 'UTC'}
         removeDueDateInput={handleRemoveDueDateInput(itemProps)}
         isCheckpointed={itemProps.moduleItemHasCheckpoint === 'true'}
-      />,
-      document.getElementById('differentiated-modules-mount-point')
+      />
     )
   }
 

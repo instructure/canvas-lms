@@ -877,7 +877,7 @@ class CoursesController < ApplicationController
   def create
     @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
 
-    if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
+    if authorized_action(@account, @current_user, :create_courses)
       params[:course] ||= {}
       params_for_create = course_params
 
@@ -1043,7 +1043,7 @@ class CoursesController < ApplicationController
 
   def unconclude
     get_context
-    if authorized_action(@context, @current_user, [:change_course_state, :manage_courses_conclude])
+    if authorized_action(@context, @current_user, :manage_courses_conclude)
       @context.unconclude
       Auditors::Course.record_unconcluded(@context, @current_user, source: (api_request? ? :api : :manual))
       flash[:notice] = t("notices.unconcluded", "Course un-concluded")
@@ -1554,7 +1554,7 @@ class CoursesController < ApplicationController
       @publishing_enabled = @context.allows_grade_publishing_by(@current_user) &&
                             can_do(@context, @current_user, :manage_grades)
 
-      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses, :manage_courses_admin)
+      @homeroom_courses = if can_do(@context.account, @current_user, :manage_courses_admin)
                             @context.account.courses.active.homeroom.to_a
                           else
                             @current_user.courses_for_enrollments(@current_user.teacher_enrollments).homeroom.to_a
@@ -1568,7 +1568,7 @@ class CoursesController < ApplicationController
       add_crumb(t("#crumbs.settings", "Settings"), named_context_url(@context, :context_details_url))
 
       js_permissions = {
-        can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
+        can_manage_courses: @context.account.grants_right?(@current_user, session, :manage_courses_admin),
         manage_grading_schemes: @context.grants_right?(@current_user, session, :manage_grades),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
@@ -1800,7 +1800,8 @@ class CoursesController < ApplicationController
       :enable_course_paces,
       :conditional_release,
       :show_student_only_module_id,
-      :show_teacher_only_module_id
+      :show_teacher_only_module_id,
+      :horizon_course
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
@@ -2378,7 +2379,7 @@ class CoursesController < ApplicationController
           load_announcements
         else
           set_active_tab "home"
-          if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+          if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
             @contexts += @context.groups
           elsif @user_groups
             @contexts += @user_groups
@@ -2452,10 +2453,7 @@ class CoursesController < ApplicationController
               manage: @context.grants_right?(@current_user, session, :manage),
               manage_groups: @context.grants_any_right?(@current_user,
                                                         session,
-                                                        :manage_groups,
-                                                        :manage_groups_add,
-                                                        :manage_groups_manage,
-                                                        :manage_groups_delete),
+                                                        *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS),
               read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
               read_announcements: @context.grants_right?(@current_user, session, :read_announcements)
             },
@@ -2736,11 +2734,11 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     account = @context.account
-    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses, :manage_courses_admin)
+    unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses_admin)
       account = @domain_root_account.manually_created_courses_account
     end
 
-    return unless authorized_action(account, @current_user, [:manage_courses, :create_courses])
+    return unless authorized_action(account, @current_user, :create_courses)
 
     # For warnings messages previous to export
     warnings = @context.export_warnings
@@ -2766,11 +2764,11 @@ class CoursesController < ApplicationController
       if params[:course][:account_id]
         account = Account.find(params[:course][:account_id])
       end
-      account = nil unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses, :manage_courses_admin)
+      account = nil unless account.grants_any_right?(@current_user, session, :create_courses, :manage_courses_admin)
       account ||= @domain_root_account.manually_created_courses_account
-      return unless authorized_action(account, @current_user, [:manage_courses, :create_courses])
+      return unless authorized_action(account, @current_user, :create_courses)
 
-      if account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
+      if account.grants_right?(@current_user, session, :manage_courses_admin)
         root_account = account.root_account
         enrollment_term_id =
           params[:course].delete(:term_id).presence ||
@@ -3128,15 +3126,15 @@ class CoursesController < ApplicationController
       end
 
       account_id = params[:course].delete :account_id
-      if account_id && @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
+      if account_id && @course.account.grants_right?(@current_user, session, :manage_courses_admin)
         account = api_find(Account, account_id)
-        if account && account != @course.account && account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
+        if account && account != @course.account && account.grants_right?(@current_user, session, :manage_courses_admin)
           @course.account = account
         end
       end
 
       root_account_id = params[:course].delete :root_account_id
-      if root_account_id && Account.site_admin.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
+      if root_account_id && Account.site_admin.grants_right?(@current_user, session, :manage_courses_admin)
         @course.root_account = Account.root_accounts.find(root_account_id)
         @course.account = @course.root_account if @course.account.root_account != @course.root_account
       end
@@ -3156,7 +3154,7 @@ class CoursesController < ApplicationController
       term_id_param_was_sent = params[:course][:term_id] || params[:course][:enrollment_term_id]
       term_id = params[:course].delete(:term_id)
       enrollment_term_id = params[:course].delete(:enrollment_term_id) || term_id
-      if enrollment_term_id && @course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin)
+      if enrollment_term_id && @course.account.grants_right?(@current_user, session, :manage_courses_admin)
         enrollment_term = api_find(@course.root_account.enrollment_terms, enrollment_term_id)
         @course.enrollment_term = enrollment_term if enrollment_term && enrollment_term != @course.enrollment_term
       end
@@ -3192,7 +3190,7 @@ class CoursesController < ApplicationController
         params_for_update.delete :storage_quota
         params_for_update.delete :storage_quota_mb
       end
-      if !@course.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin) &&
+      if !@course.account.grants_right?(@current_user, session, :manage_courses_admin) &&
          @course.root_account.settings[:prevent_course_renaming_by_teachers]
         params_for_update.delete :name
         params_for_update.delete :course_code
@@ -3343,6 +3341,11 @@ class CoursesController < ApplicationController
       if params[:course][:enable_course_paces].present? && value_to_boolean(params[:course][:enable_course_paces]) && @course.homeroom_course
         pacing_message = t("Course Pacing cannot be used with Homeroom Course")
         @course.errors.add(:enable_course_paces, pacing_message)
+      end
+
+      if params[:course][:horizon_course].present? && !@course.account.feature_enabled?(:horizon_course_setting)
+        horizon_message = t("Horizon Course cannot be set without the feature flag enabled")
+        @course.errors.add(:horizon_course, horizon_message)
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
@@ -3549,7 +3552,7 @@ class CoursesController < ApplicationController
     permission = if params[:event] == "undelete"
                    :undelete_courses
                  else
-                   [:manage_courses, :manage_courses_admin]
+                   :manage_courses_admin
                  end
 
     if authorized_action(@account, @current_user, permission)
@@ -3833,25 +3836,11 @@ class CoursesController < ApplicationController
     @context ||= @course
     case event
     when "offer", "claim"
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
-        :manage_courses_publish
-      else
-        :change_course_state
-      end
+      :manage_courses_publish
     when "conclude", "complete"
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
-        :manage_courses_conclude
-      else
-        :change_course_state
-      end
-    when "delete"
+      :manage_courses_conclude
+    when "delete", "undelete"
       :delete
-    when "undelete"
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_courses)
-        :delete
-      else
-        :change_course_state
-      end
     else
       :nothing
     end
@@ -4276,7 +4265,8 @@ class CoursesController < ApplicationController
       :enable_course_paces,
       :default_due_time,
       :conditional_release,
-      :post_manually
+      :post_manually,
+      :horizon_course
     )
   end
 

@@ -23,25 +23,25 @@ import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
 import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
 import {ZUser} from './User'
 import {ZLtiImsRegistrationId} from './lti_ims_registration/LtiImsRegistrationId'
+import {ZInternalLtiConfiguration} from './internal_lti_configuration/InternalLtiConfiguration'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
   account_id: ZAccountId,
-  icon_url: z.string().optional().nullable(),
+  icon_url: z.string().nullable(),
   name: z.string(),
-  admin_nickname: z.string().optional().nullable(),
+  admin_nickname: z.string().nullable(),
   workflow_state: z.string(),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
-  created_by: ZUser.optional().nullable(),
-  updated_by: ZUser.optional().nullable(),
-  vendor: z.string().optional().nullable(),
+  created_by: ZUser.optional(),
+  updated_by: ZUser.optional(),
+  vendor: z.string().nullable(),
   internal_service: z.boolean(),
-  developer_key_id: ZDeveloperKeyId.optional().nullable(),
-  ims_registration_id: ZLtiImsRegistrationId.optional().nullable(),
-  manual_configuration_id: z.string().optional().nullable(),
-  legacy_configuration_id: z.string().optional().nullable(),
-  account_binding: ZLtiRegistrationAccountBinding.optional().nullable(),
+  developer_key_id: ZDeveloperKeyId.nullable(),
+  ims_registration_id: ZLtiImsRegistrationId.nullable(),
+  account_binding: ZLtiRegistrationAccountBinding.nullable().optional(),
+  configuration: ZInternalLtiConfiguration.optional(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>

@@ -66,7 +66,7 @@ module ConditionalRelease
 
       it "requires authorization" do
         @user = user_factory
-        api_call(:get, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:get, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "returns all rules for a course" do
@@ -180,7 +180,7 @@ module ConditionalRelease
       it "requires management rights" do
         student_in_course(course: @course)
         @user = @student
-        api_call(:post, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:post, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "creates successfully" do
@@ -263,7 +263,7 @@ module ConditionalRelease
       it "requires management rights" do
         student_in_course(course: @course)
         @user = @student
-        api_call(:put, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:put, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "fails for deleted rule" do
@@ -401,7 +401,7 @@ module ConditionalRelease
       it "requires management rights" do
         student_in_course(course: @course)
         @user = @student
-        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 401 })
+        api_call(:delete, @url, @base_params, {}, {}, { expected_status: 403 })
       end
 
       it "deletes a rule" do

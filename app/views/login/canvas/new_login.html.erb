@@ -32,10 +32,10 @@
      possibly_customized_login_logo = brand_variable("ic-brand-Login-logo")
      default_login_logo = BrandableCSS.brand_variable_value("ic-brand-Login-logo")
      login_logo_url = possibly_customized_login_logo != default_login_logo ? possibly_customized_login_logo : nil
-     login_logo_alt = login_logo_url.present? ? @domain_root_account.short_name : nil
+     login_logo_text = login_logo_url.present? ? @domain_root_account.short_name : nil
 
      # custom background
-     body_bg_color = brand_variable("ic-brand-Login-body-bgd-shadow-color")
+     body_bg_color = brand_variable("ic-brand-Login-body-bgd-color")
      body_bg_image = brand_variable("ic-brand-Login-body-bgd-image")
 
      # theme editor preview mode boolean
@@ -47,7 +47,7 @@
      <%= "data-auth-providers=#{raw auth_providers_json}" if auth_providers_json.present? %>
      <%= "data-login-handle-name='#{login_handle_name}'".html_safe if login_handle_name.present? %>
      <%= "data-login-logo-url='#{login_logo_url}'".html_safe if login_logo_url.present? %>
-     <%= "data-login-logo-alt='#{login_logo_alt}'".html_safe if login_logo_alt.present? %>
+     <%= "data-login-logo-text='#{login_logo_text}'".html_safe if login_logo_text.present? %>
      <%= "data-body-bg-color='#{body_bg_color}'".html_safe if body_bg_color.present? %>
      <%= "data-body-bg-image='#{body_bg_image}'".html_safe if body_bg_image.present? %>
      <%= "data-is-preview-mode='true'".html_safe if is_preview_mode %>

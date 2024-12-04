@@ -506,6 +506,7 @@ describe Lti::IMS::DynamicRegistrationController do
     let(:overlay) do
       {
         disabledPlacements: ["course_navigation"],
+        disabledScopes: ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
         placements: [
           {
             type: "account_navigation",
@@ -514,20 +515,143 @@ describe Lti::IMS::DynamicRegistrationController do
         ]
       }
     end
+    let(:account) { Account.default }
+    let(:registration) { lti_ims_registration_model(account:) }
+    let(:user) { account_admin_user(account:) }
 
     it "updates the registration_overlay on the registration" do
-      registration = lti_ims_registration_model(account: Account.default)
-      user_session(account_admin_user(account: Account.default))
-      put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.to_json
+      user_session(user)
+      put :update_registration_overlay,
+          params: { account_id: Account.default.id,
+                    registration_id: registration.id },
+          body: overlay.to_json
       expect(response).to be_successful
-      expect(Lti::IMS::Registration.find(registration.id).registration_overlay).to eq(overlay.deep_stringify_keys)
+      expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
+    end
+
+    it "removes disabled scopes from the associated developer key" do
+      user_session(user)
+      put :update_registration_overlay,
+          params: { account_id: Account.default.id,
+                    registration_id: registration.id },
+          body: overlay.to_json
+      expect(response).to be_successful
+      expect(registration.reload.developer_key.scopes).not_to include("https://purl.imsglobal.org/spec/lti-ags/scope/lineitem")
+    end
+
+    it "doesn't error if no disabledScopes are included in the request" do
+      user_session(user)
+      put :update_registration_overlay,
+          params: { account_id: Account.default.id,
+                    registration_id: registration.id },
+          body: overlay.except(:disabledScopes).to_json
+      expect(response).to be_successful
+
+      expect(registration.reload.registration_overlay).to eq(overlay.except(:disabledScopes).deep_stringify_keys)
     end
 
     it "returns a 422 if the request body does not meet the schema" do
-      registration = lti_ims_registration_model(account: Account.default)
-      user_session(account_admin_user(account: Account.default))
-      put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.merge({ invalid: "data" }).to_json
+      user_session(user)
+      put :update_registration_overlay,
+          params: {
+            account_id: Account.default.id,
+            registration_id: registration.id
+          },
+          body: overlay.merge({ invalid: "data" }).to_json
       expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it "returns a 404 if the registration cannot be found" do
+      user_session(user)
+      put :update_registration_overlay,
+          params: {
+            account_id: Account.default.id,
+            registration_id: registration.id + 500,
+          },
+          body: overlay.to_json
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "creates an Lti::Overlay if one isn't present" do
+      user_session(user)
+
+      expect do
+        put :update_registration_overlay,
+            params: { account_id: Account.default.id, registration_id: registration.id },
+            body: overlay.to_json
+      end.to change { Lti::Overlay.count }
+      expect(response).to be_successful
+
+      expect(Lti::Overlay.last.data)
+        .to eq({
+                 "disabled_placements" => overlay[:disabledPlacements],
+                 "disabled_scopes" => overlay[:disabledScopes],
+                 "placements" => {
+                   "account_navigation" => {
+                     "icon_url" => "https://example.com/icon.jpg"
+                   }
+                 }
+               })
+    end
+
+    context "Lti::Overlay is present" do
+      let(:lti_overlay) do
+        lti_overlay = Lti::Overlay.new(account: Account.default,
+                                       updated_by: user_model,
+                                       registration: registration.lti_registration,
+                                       data: {})
+        lti_overlay.save!
+        lti_overlay
+      end
+
+      before do
+        lti_overlay
+      end
+
+      it "updates the registration and Lti::Overlay model" do
+        user_session(user)
+        put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.to_json
+
+        expect(response).to be_successful
+        expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
+        expect(lti_overlay.reload.updated_by).to eq(user)
+        expect(lti_overlay.data).to eq({
+                                         "disabled_placements" => ["course_navigation"],
+                                         "disabled_scopes" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+                                         "placements" => {
+                                           "account_navigation" => {
+                                             "icon_url" => "https://example.com/icon.jpg"
+                                           }
+                                         }
+                                       })
+      end
+
+      # This is rare but does happen, particularly for overlays that were
+      # backfilled from IMS registrations
+      context "the overlay doesn't have a user associated with it" do
+        before do
+          lti_overlay.update_column(:updated_by_id, nil)
+        end
+
+        it "updates the registration and Lti::Overlay model" do
+          user_session(user)
+          put :update_registration_overlay, params: { account_id: Account.default.id, registration_id: registration.id }, body: overlay.to_json
+
+          expect(response).to be_successful
+          expect(registration.reload.registration_overlay).to eq(overlay.deep_stringify_keys)
+          expect(lti_overlay.reload.updated_by).to eq(user)
+          expect(lti_overlay.data).to eq({
+                                           "disabled_placements" => ["course_navigation"],
+                                           "disabled_scopes" => ["https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"],
+                                           "placements" => {
+                                             "account_navigation" => {
+                                               "icon_url" => "https://example.com/icon.jpg"
+                                             }
+                                           }
+                                         })
+        end
+      end
     end
   end
 end

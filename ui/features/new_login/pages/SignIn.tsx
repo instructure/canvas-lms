@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
-import OtpForm from '../shared/OtpForm'
-import SSOButtons from '../shared/SSOButtons'
-import SignInLinks from '../shared/SignInLinks'
+import React, {useEffect, useRef, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {OtpForm, RememberMeCheckbox, SignInLinks, SSOButtons} from '../shared'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {performSignIn} from '../services'
@@ -36,7 +33,6 @@ const I18n = useI18nScope('new_login')
 const SignIn = () => {
   const {
     rememberMe,
-    setRememberMe,
     isUiActionPending,
     setIsUiActionPending,
     otpRequired,
@@ -48,62 +44,95 @@ const SignIn = () => {
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [formValid, setFormValid] = useState(false)
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const isRedirectingRef = useRef(false)
 
-  const validateForm = useCallback(() => {
-    return username.trim() !== '' && password.trim() !== ''
-  }, [username, password])
+  const usernameInputRef = useRef<HTMLInputElement | undefined>(undefined)
+  const passwordInputRef = useRef<HTMLInputElement | undefined>(undefined)
 
   useEffect(() => {
-    setFormValid(validateForm())
-  }, [validateForm])
+    setUsername('')
+    setPassword('')
+    setUsernameError('')
+    setPasswordError('')
+  }, [otpRequired])
+
+  useEffect(() => {
+    if (usernameError) {
+      usernameInputRef.current?.focus()
+    } else if (passwordError) {
+      passwordInputRef.current?.focus()
+    }
+  }, [usernameError, passwordError])
+
+  const validateForm = (): boolean => {
+    setUsernameError('')
+    setPasswordError('')
+
+    let formIsValid = true
+    if (username.trim() === '') {
+      setUsernameError(I18n.t('Please enter your %{loginHandleName}', {loginHandleName}))
+      formIsValid = false
+    }
+    if (password.trim() === '' && formIsValid) {
+      setPasswordError(I18n.t('Please enter your password'))
+      formIsValid = false
+    }
+    return formIsValid
+  }
+
+  const handleFailedLogin = () => {
+    setUsernameError(
+      I18n.t('Please verify your %{loginHandleName} and password and try again', {loginHandleName})
+    )
+    setPassword('')
+  }
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (isPreviewMode || isUiActionPending) return
 
-    if (isPreviewMode) return
-
-    if (!validateForm()) {
-      showFlashAlert({
-        message: I18n.t('Please enter a username and password.'),
-        type: 'error',
-      })
-      return
-    }
+    if (!validateForm()) return
 
     setIsUiActionPending(true)
 
     try {
       const response = await performSignIn(username, password, rememberMe)
 
-      if (response.status === 200 && response.data?.otp_required) {
-        setOtpRequired(true)
-      } else if (response.status === 200 && response.data?.pseudonym) {
-        window.location.href = response.data.location || '/dashboard'
+      if (response.status === 200) {
+        if (response.data?.otp_required) {
+          setOtpRequired(true)
+        } else if (response.data?.pseudonym) {
+          isRedirectingRef.current = true
+          window.location.replace(response.data.location || '/dashboard')
+          return
+        } else {
+          handleFailedLogin()
+        }
+      }
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        handleFailedLogin()
       } else {
         showFlashAlert({
           message: I18n.t('There was an error logging in. Please try again.'),
           type: 'error',
         })
       }
-    } catch (_error: unknown) {
-      showFlashAlert({
-        message: I18n.t('There was an error logging in. Please try again.'),
-        type: 'error',
-      })
     } finally {
-      setIsUiActionPending(false)
+      if (!isRedirectingRef.current) setIsUiActionPending(false)
     }
   }
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    if (isPreviewMode) return
-    setUsername(value)
+    setUsername(value.trim())
+    if (usernameError) setUsernameError('')
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    if (isPreviewMode) return
-    setPassword(value)
+    setPassword(value.trim())
+    if (passwordError) setPasswordError('')
   }
 
   if (otpRequired && !isPreviewMode) {
@@ -112,60 +141,55 @@ const SignIn = () => {
 
   return (
     <Flex direction="column" gap="large">
-      <Heading level="h2" as="h1">
-        {I18n.t('Welcome to Canvas LMS')}
+      <Heading as="h1" level="h2">
+        {I18n.t('Welcome to Canvas')}
       </Heading>
 
       {authProviders && authProviders.length > 0 && (
         <Flex direction="column" gap="large">
           <SSOButtons />
-
           <View as="hr" borderWidth="small none none none" margin="small none" />
         </Flex>
       )}
 
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} noValidate={true}>
         <Flex direction="column" gap="large">
-          <Flex direction="column" gap="small">
+          <Flex direction="column" gap="mediumSmall">
             <TextInput
               id="username"
+              inputRef={inputElement => {
+                usernameInputRef.current = inputElement as HTMLInputElement | undefined
+              }}
               renderLabel={loginHandleName}
-              type="text"
               value={username}
               onChange={handleUsernameChange}
               autoComplete="username"
               disabled={isUiActionPending}
+              messages={usernameError ? [{type: 'error', text: usernameError}] : []}
             />
 
             <TextInput
               id="password"
+              inputRef={inputElement => {
+                passwordInputRef.current = inputElement as HTMLInputElement | undefined
+              }}
               renderLabel={I18n.t('Password')}
               type="password"
               value={password}
               onChange={handlePasswordChange}
               autoComplete="current-password"
               disabled={isUiActionPending}
+              messages={passwordError ? [{type: 'error', text: passwordError}] : []}
             />
 
             <Flex.Item overflowY="visible" overflowX="visible">
-              <Checkbox
-                label={I18n.t('Stay signed in')}
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                inline={true}
-                disabled={isUiActionPending}
-              />
+              <RememberMeCheckbox />
             </Flex.Item>
           </Flex>
 
-          <Flex direction="column" gap="small">
-            <Button
-              type="submit"
-              color="primary"
-              display="block"
-              disabled={!formValid || isUiActionPending}
-            >
-              {I18n.t('Sign In')}
+          <Flex direction="column" gap="mediumSmall">
+            <Button type="submit" color="primary" display="block" disabled={isUiActionPending}>
+              {I18n.t('Log In')}
             </Button>
 
             <Flex.Item align="center">

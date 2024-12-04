@@ -41,7 +41,7 @@ describe('PeerReviewOptions', () => {
     expect(getByText('Assign manually')).toBeInTheDocument()
     expect(getByText('Automatically assign')).toBeInTheDocument()
     expect(queryByText('Reviews Per Student')).not.toBeInTheDocument()
-    expect(queryByText('Reviews Due')).not.toBeInTheDocument()
+    expect(queryByText('Assign Reviews')).not.toBeInTheDocument()
     expect(queryByText('If left blank, uses due date')).not.toBeInTheDocument()
     expect(queryByText('Allow intra-group peer reviews')).not.toBeInTheDocument()
   })

@@ -1203,6 +1203,14 @@ describe LearningObjectDatesController do
         put :update, params: { **@default_params, unlock_at: "2020-03-02T05:59:00Z" }
         expect(response).to be_unauthorized
       end
+
+      it "does not alter discussion.reply_to_entry_required_count" do
+        reply_to_entry_required_count = @discussion.reply_to_entry_required_count
+        expect do
+          put :update, params: { **@default_params }
+          expect(response).to be_no_content
+        end.not_to change { @discussion.reply_to_entry_required_count }.from(reply_to_entry_required_count)
+      end
     end
 
     context "basic checkpointed discussions w/all dates" do

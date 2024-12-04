@@ -475,7 +475,11 @@ pipeline {
                     .obeysAllowStages(false)
                     .required(!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master")
                     .timeout(2)
-                    .execute {
+                    .execute { stageConfig, buildConfig ->
+                      if (filesChangedStage.hasErbFiles(buildConfig)) {
+                        echo 'Ignoring Crystalball prediction due to .erb file changes'
+                        env.SKIP_CRYSTALBALL = 1
+                      }
                       try {
                         /* groovylint-disable-next-line GStringExpressionWithinString */
                         sh '''#!/bin/bash

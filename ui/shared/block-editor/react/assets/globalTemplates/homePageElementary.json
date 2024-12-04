@@ -2,6 +2,7 @@
   "name": "Course Home - Elementary",
   "description": "Home page with images, navigation, teacher's note, and footer",
   "workflow_state": "active",
+  "editor_version": "0.3",
   "node_tree": {
     "rootNodeId": "ROOT",
     "nodes": {
@@ -114,7 +115,7 @@
       },
       "fnCfTyiE5O": {
         "type": {
-          "resolvedName": "RCEBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
@@ -557,7 +558,7 @@
       },
       "Sqmp4IL7Q6": {
         "type": {
-          "resolvedName": "RCEBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {

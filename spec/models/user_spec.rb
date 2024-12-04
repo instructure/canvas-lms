@@ -30,6 +30,28 @@ describe User do
       expect(user_model).to be_valid
     end
 
+    context "when instructure_identity_id is not unique" do
+      before { user_model(instructure_identity_id: duplicate_id) }
+
+      let(:duplicate_id) { SecureRandom.uuid }
+      let(:user_two) { user_model(instructure_identity_id: duplicate_id) }
+
+      it "does not permit saving a record with a duplicate instructure_identity_id" do
+        expect { user_two }.to raise_error("Validation failed: Instructure identity has already been taken")
+      end
+
+      context "when the instructure_identity_id is nil" do
+        before { user_model(instructure_identity_id: duplicate_id) }
+
+        let(:duplicate_id) { nil }
+        let(:user_two) { user_model(instructure_identity_id: duplicate_id) }
+
+        it "does permit saving a record with a duplicate instructure_identity_id" do
+          expect { user_two }.not_to raise_error
+        end
+      end
+    end
+
     context "on update" do
       let(:user) { user_model }
 
@@ -73,6 +95,44 @@ describe User do
           end
         end
       end
+    end
+  end
+
+  describe "#fake_student?" do
+    subject(:is_fake_student) { user.fake_student? }
+
+    context "when the user has fake student preference and enrollment" do
+      let(:course) { course_model }
+      let(:user) { course.student_view_student }
+
+      it { is_expected.to be true }
+    end
+
+    context "when the user has fake student preference" do
+      let(:user) { user_model(preferences: { fake_student: true }) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the user has a blank `fake_student` preference key" do
+      let(:user) { user_model(preferences: { fake_student: "" }) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the user has fake student enrollment" do
+      let(:course) { course_model }
+      let(:user) { course.student_view_student }
+
+      before { user.update!(preferences: {}) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the user has neither fake student preference nor enrollment" do
+      let(:user) { user_model }
+
+      it { is_expected.to be false }
     end
   end
 
@@ -308,6 +368,33 @@ describe User do
           expect(subject).to eq [shard_one_account]
         end
       end
+    end
+  end
+
+  describe "#pseudonym_for_restoration_in" do
+    subject(:restore_pseudonym) { user.pseudonym_for_restoration_in(root_account) }
+
+    let(:user) { user_model }
+    let(:root_account) { account_model }
+    let(:pseudonym_one) { pseudonym_model(user:, account: root_account) }
+    let(:pseudonym_two) { pseudonym_model(user:, account: root_account) }
+
+    context "when pseudonym one is deleted before pseudonym two" do
+      before do
+        pseudonym_one.destroy!
+        pseudonym_two.destroy!
+      end
+
+      it { is_expected.to eq pseudonym_two }
+    end
+
+    context "when pseudonym two is deleted before pseudonym one" do
+      before do
+        pseudonym_two.destroy!
+        pseudonym_one.destroy!
+      end
+
+      it { is_expected.to eq pseudonym_one }
     end
   end
 
@@ -4372,13 +4459,13 @@ describe User do
       @account = Account.default
     end
 
-    it "returns :admin for AccountUsers with :manage_courses" do
+    it "returns :admin for AccountUsers with :manage_courses_admin" do
       account_admin_user(user: @user)
       expect(@user.create_courses_right(@account)).to be(:admin)
     end
 
-    it "returns nil for AccountUsers without :manage_courses" do
-      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses_add: false })
+    it "returns nil for AccountUsers without :manage_courses_admin and manage_courses_add" do
+      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses_admin: false, manage_courses_add: false })
       expect(@user.create_courses_right(@account)).to be_nil
     end
 

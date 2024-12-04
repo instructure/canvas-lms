@@ -1590,7 +1590,7 @@ class RCEWrapper extends React.Component {
       // This is just so we inject the helper class names that tinyMCE uses for
       // things like table resizing and stuff.
       content_css: options.content_css || [],
-      content_style: contentCSS,
+      content_style: contentCSS + (options.content_style || ''),
 
       menubar: mergeMenuItems(getMenubarForVariant(this.variant), possibleNewMenubarItems),
 
@@ -1629,6 +1629,7 @@ class RCEWrapper extends React.Component {
           'lists',
           'textpattern',
           'hr',
+          'instructure_color',
           'instructure-ui-icons',
           'instructure_condensed_buttons',
           'instructure_links',

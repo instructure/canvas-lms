@@ -376,11 +376,13 @@ class ApplicationController < ActionController::Base
     assignment_edit_placement_not_on_announcements
     instui_header
     rce_find_replace
+    rce_transform_iframe_sandbox_attributes
     courses_popout_sisid
     dashboard_graphql_integration
     discussion_checkpoints
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
+    horizon_course_setting
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -1653,7 +1655,10 @@ class ApplicationController < ActionController::Base
           if pseudonym && pseudonym != @current_pseudonym
             return_to = session.delete(:return_to)
             reset_session_saving_keys(:oauth2)
-            PseudonymSession.create!(pseudonym)
+            pseudonym_session = PseudonymSession.new(pseudonym)
+            # this doesn't count as a real login
+            pseudonym_session.non_explicit_session = true
+            pseudonym_session.save!
             session[:used_remember_me_token] = true if token.used_remember_me_token
           end
           if pseudonym && token.current_user_id

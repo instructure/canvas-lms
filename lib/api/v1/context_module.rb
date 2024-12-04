@@ -52,7 +52,7 @@ module Api::V1::ContextModule
     end
     can_view_published = context_module.grants_right?(current_user, :update) || opts[:can_view_published]
     hash["published"] = context_module.active? if can_view_published
-    tags = context_module.content_tags_visible_to(@current_user, opts.slice(:observed_student_ids))
+    tags = context_module.content_tags_visible_to(current_user, opts.slice(:observed_student_ids))
     count = tags.count
     hash["items_count"] = count
     hash["items_url"] = polymorphic_url([:api_v1, context_module.context, context_module, :items])

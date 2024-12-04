@@ -412,7 +412,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows creating a section" do
-        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 401)
+        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 403)
       end
     end
 
@@ -523,7 +523,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows creating a section" do
-        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 401)
+        api_call(:post, @path_prefix, @path_params, {}, {}, expected_status: 403)
       end
     end
   end
@@ -622,7 +622,7 @@ describe SectionsController, type: :request do
                  @path_params.merge(id: @section.to_param),
                  { course_section: { name: "New Name" } },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
 
@@ -730,7 +730,7 @@ describe SectionsController, type: :request do
                  @path_params.merge(id: @section.to_param),
                  { course_section: { name: "New Name" } },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end
@@ -784,7 +784,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows deleting a section" do
-        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 401)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 403)
       end
     end
 
@@ -819,7 +819,7 @@ describe SectionsController, type: :request do
       end
 
       it "disallows deleting a section" do
-        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 401)
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), {}, {}, expected_status: 403)
       end
     end
   end
@@ -961,31 +961,6 @@ describe SectionsController, type: :request do
       end
 
       it "does not confirm crosslisting when the caller lacks :manage rights on the destination course" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_courses)
-        account_admin =
-          account_admin_user_with_role_changes(
-            account: @course.root_account,
-            role_changes: {
-              manage_courses: false
-            }
-          )
-        user_session(account_admin)
-        json =
-          api_call(
-            :get,
-            "/courses/#{@course.id}/sections/#{@section.id}/crosslist/confirm/#{@dest_course.id}",
-            @params.merge(
-              action: "crosslist_check",
-              course_id: @course.to_param,
-              section_id: @section.to_param,
-              new_course_id: @dest_course.id
-            )
-          )
-        expect(json["allowed"]).to be false
-      end
-
-      it "does not confirm crosslisting when the caller lacks :manage rights on the destination course (granular permissions)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         account_admin =
           account_admin_user_with_role_changes(
             account: @course.root_account,
@@ -1020,7 +995,7 @@ describe SectionsController, type: :request do
                  @params.merge(id: @section.to_param, new_course_id: @dest_course.to_param),
                  {},
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end
@@ -1134,7 +1109,7 @@ describe SectionsController, type: :request do
                  @params.merge(id: @section.to_param),
                  {},
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end

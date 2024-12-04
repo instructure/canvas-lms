@@ -69,7 +69,7 @@ describe "Folders API", type: :request do
         course_with_student(course: @course)
         raw_api_call(:get, @folders_path + "/#{@f4.id}/folders", @folders_path_options.merge(action: "api_index", id: @f4.id.to_param), {})
 
-        expect(response).to have_http_status :unauthorized
+        expect(response).to have_http_status :forbidden
       end
     end
 
@@ -144,11 +144,11 @@ describe "Folders API", type: :request do
       expect(json["folders_url"].ends_with?("/api/v1/folders/#{@root.id}/folders")).to be true
     end
 
-    it "returns unauthorized error if requestor is not permitted to view folder" do
+    it "returns forbidden error if requestor is not permitted to view folder" do
       @f1 = @root.sub_folders.create!(name: "folder1", context: @course, hidden: true)
       course_with_student(course: @course)
       raw_api_call(:get, @folders_path + "/#{@f1.id}", @folders_path_options.merge(action: "show", id: @f1.id.to_param), {})
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
 
     it "404s for no folder found" do
@@ -382,14 +382,14 @@ describe "Folders API", type: :request do
                        @folders_path_options.merge(action: "api_destroy", id: @user.submissions_folder.to_param),
                        { force: true },
                        {},
-                       { expected_status: 401 })
+                       { expected_status: 403 })
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
       @f1 = @root.sub_folders.create!(name: "folder1", context: @course)
       raw_api_call(:delete, @folders_path + "/#{@f1.id}", @folders_path_options.merge(action: "api_destroy", id: @f1.id.to_param), {})
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
       @f1.reload
       expect(@f1.workflow_state).to eq "visible"
     end
@@ -559,14 +559,14 @@ describe "Folders API", type: :request do
       expect(json["message"]).to eq "Can't set folder path and folder id"
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
       api_call(:post,
                "/api/v1/courses/#{@course.id}/folders",
                @folders_path_options.merge(course_id: @course.id.to_param),
                { name: "sub1" },
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "errors if the name is too long" do
@@ -585,7 +585,7 @@ describe "Folders API", type: :request do
                @folders_path_options.merge(user_id: @user.to_param),
                { name: "booga", parent_folder_id: sub_folder.to_param },
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     it "fails to create in a submissions folder (folder context)" do
@@ -595,7 +595,7 @@ describe "Folders API", type: :request do
                @folders_path_options.merge(folder_id: sub_folder.to_param),
                { name: "booga" },
                {},
-               expected_status: 401)
+               expected_status: 403)
     end
 
     context "as teacher without manage_files_add permission" do
@@ -615,7 +615,7 @@ describe "Folders API", type: :request do
                  @folders_path_options.merge(course_id: @course.id.to_param),
                  { name: "sub1", parent_folder_path: "subfolder/path" },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
 
@@ -636,13 +636,13 @@ describe "Folders API", type: :request do
         expect(subfolder.full_name).to eq "files/new_folder"
       end
 
-      it "returns unauthorized when creating by folder path with non admin" do
+      it "returns forbidden when creating by folder path with non admin" do
         api_call(:post,
                  "/api/v1/accounts/#{Account.default.id}/folders",
                  @folders_path_options.merge(account_id: Account.default.id.to_param),
                  { name: "new_folder", parent_folder_path: "files/" },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end
@@ -662,9 +662,9 @@ describe "Folders API", type: :request do
       expect(@sub1.parent_folder_id).to eq @sub2.id
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      api_call(:put, @update_url, @folders_path_options, { name: "new name" }, {}, expected_status: 401)
+      api_call(:put, @update_url, @folders_path_options, { name: "new name" }, {}, expected_status: 403)
     end
 
     it "404s with invalid parent id" do
@@ -684,7 +684,7 @@ describe "Folders API", type: :request do
                @folders_path_options.merge(id: source_folder.to_param),
                { parent_folder_id: sub_folder.to_param },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     context "as teacher without manage_files_edit permission" do
@@ -705,7 +705,7 @@ describe "Folders API", type: :request do
                  @folders_path_options,
                  { name: "new name", parent_folder_id: @sub2.id.to_param },
                  {},
-                 expected_status: 401)
+                 expected_status: 403)
       end
     end
   end
@@ -731,7 +731,7 @@ describe "Folders API", type: :request do
                { controller: "folders", action: "create_file", format: "json", folder_id: sub_folder.to_param },
                { name: "with_path.txt" },
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     context "as teacher without manage_files_add permission" do
@@ -751,7 +751,7 @@ describe "Folders API", type: :request do
                  { controller: "folders", action: "create_file", format: "json", folder_id: @root.id.to_param },
                  { name: "with_path.txt" },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -763,14 +763,14 @@ describe "Folders API", type: :request do
         @course.account.save!
       end
 
-      it "renders unauthorized" do
+      it "renders forbidden" do
         @root_folder = Folder.root_folders(@course).first
         api_call(:post,
                  "/api/v1/folders/#{@root_folder.id}/files",
                  { controller: "folders", action: "create_file", format: "json", folder_id: @root_folder.id.to_param },
                  { name: "with_path.txt" },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -790,7 +790,7 @@ describe "Folders API", type: :request do
 
       it "checks permissions" do
         user_factory
-        api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 401 })
+        api_call(:get, @request_path, @params_hash, {}, {}, { expected_status: 403 })
       end
 
       it "operates on an empty path" do
@@ -900,7 +900,7 @@ describe "Folders API", type: :request do
                @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_folder_id: @source_folder.to_param),
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "requires :create permission on the destination folder" do
@@ -911,7 +911,7 @@ describe "Folders API", type: :request do
                @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_folder_id: @source_folder.to_param),
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "copies a folder" do
@@ -985,7 +985,7 @@ describe "Folders API", type: :request do
                  @params_hash.merge(dest_folder_id: sub_folder.to_param, source_folder_id: source_folder.to_param),
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
   end
@@ -1017,7 +1017,7 @@ describe "Folders API", type: :request do
                @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param),
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       expect(@dest_folder.active_file_attachments).not_to be_exists
     end
 
@@ -1027,7 +1027,7 @@ describe "Folders API", type: :request do
                @params_hash.merge(dest_folder_id: @dest_folder.to_param, source_file_id: @source_file.to_param),
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
       expect(@dest_folder.active_file_attachments).not_to be_exists
     end
 
@@ -1117,7 +1117,7 @@ describe "Folders API", type: :request do
                @params_hash.merge(dest_folder_id: sub_folder.to_param, source_file_id: @source_file.to_param),
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 
@@ -1162,14 +1162,14 @@ describe "Folders API", type: :request do
         expect(res).to eq ["course files", "folder1", "folder1", "folder1", "folder1", "folder2", "folder2.1", "folder2.1.1"]
       end
 
-      it "returns a 401 for unauthorized users" do
+      it "returns a 403 for unauthorized users" do
         @user = user_factory(active_all: true)
         api_call(:get,
                  "/api/v1/courses/#{@course.id}/folders",
                  { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param },
                  {},
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
 
       it "paginates the folder list" do

@@ -39,6 +39,7 @@ describe "session token" do
 
     follow_redirect!
     expect(response).to be_successful
+    expect(@pseudonym.reload.current_login_at).to be_nil
   end
 
   it "sets used_remember_me_token" do

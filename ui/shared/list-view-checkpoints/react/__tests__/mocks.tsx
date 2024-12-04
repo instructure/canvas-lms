@@ -52,7 +52,7 @@ export const checkpointedAssignmentWithDueDates = {
     name: 'Checkpoint Assignment',
     checkpoints: [
       {
-        due_at: '2024-06-02T17:43:13Z',
+        due_at: '2023-06-02T17:43:13Z',
         name: 'Checkpoint Assignment',
         only_visible_to_overrides: false,
         overrides: [],
@@ -60,7 +60,7 @@ export const checkpointedAssignmentWithDueDates = {
         tag: 'reply_to_topic',
       },
       {
-        due_at: '2024-06-04T17:43:13Z',
+        due_at: '2023-06-04T17:43:13Z',
         name: 'Checkpoint Assignment',
         only_visible_to_overrides: false,
         overrides: [],
@@ -86,7 +86,7 @@ export const checkpointedAssignmentWithOverrides = {
         only_visible_to_overrides: false,
         overrides: [
           {
-            due_at: '2024-06-02T17:43:13Z',
+            due_at: '2023-06-02T17:43:13Z',
             student_ids: ['1'],
             all_day: false,
             all_day_date: '',
@@ -105,7 +105,7 @@ export const checkpointedAssignmentWithOverrides = {
         only_visible_to_overrides: false,
         overrides: [
           {
-            due_at: '2024-06-04T17:43:13Z',
+            due_at: '2023-06-04T17:43:13Z',
             student_ids: ['1'],
             all_day: false,
             all_day_date: '',

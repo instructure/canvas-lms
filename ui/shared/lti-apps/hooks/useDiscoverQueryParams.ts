@@ -18,7 +18,7 @@
 
 import {useCallback, useMemo} from 'react'
 import {useSearchParams} from 'react-router-dom'
-import type {LtiFilters} from '../model/Filter'
+import type {LtiFilters} from '../models/Filter'
 
 export type DiscoverParams = {
   search: string
@@ -50,12 +50,17 @@ const useDiscoverQueryParams = () => {
   const setQueryParams = useCallback(
     (params: Partial<DiscoverParams>) => {
       const {search, page, filters} = params
+      const currentHash = window.location.hash
 
       setSearchParams({
         search: search ?? '',
         page: page?.toString() ?? '',
         filters: JSON.stringify(filters) ?? '',
       })
+
+      if (currentHash) {
+        window.location.hash = currentHash
+      }
     },
     [setSearchParams]
   )
@@ -64,12 +69,17 @@ const useDiscoverQueryParams = () => {
     (params: Partial<DiscoverParams>) => {
       const oldParams = new URLSearchParams(window.location.search)
       const {search, page, filters} = parseUrlParams(oldParams)
+      const currentHash = window.location.hash
 
       setSearchParams({
         search: params.search ?? search,
         page: params.page?.toString() ?? page.toString(),
         filters: JSON.stringify(params.filters ?? filters) ?? '',
       })
+
+      if (currentHash) {
+        window.location.hash = currentHash
+      }
     },
     [setSearchParams]
   )

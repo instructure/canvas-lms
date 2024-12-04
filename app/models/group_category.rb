@@ -41,6 +41,7 @@ class GroupCategory < ActiveRecord::Base
 
   after_save :auto_create_groups
   after_update :update_groups_max_membership
+  after_update :clear_permissions_cache_for_selfsignup
 
   delegate :time_zone, to: :context
 
@@ -206,6 +207,12 @@ class GroupCategory < ActiveRecord::Base
 
   def restricted_self_signup?
     self_signup.present? && self_signup == "restricted"
+  end
+
+  def past_self_signup_end_at?
+    return false unless context.is_a?(Course) && context.account.feature_enabled?(:self_signup_deadline)
+
+    self_signup? && self_signup_end_at.present? && self_signup_end_at < Time.now.utc
   end
 
   def has_heterogenous_group?
@@ -696,5 +703,11 @@ class GroupCategory < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def clear_permissions_cache_for_selfsignup
+    return unless %i[self_signup self_signup_end_at].any? { |k| saved_changes.key?(k) } # Skip if neither setting was changed
+
+    context.students.each { |student| clear_permissions_cache(student) } if context.is_a?(Course)
   end
 end

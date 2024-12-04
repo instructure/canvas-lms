@@ -273,16 +273,20 @@ const renderSendScoresInEmailsToggle = (
 }
 
 const formatPreferencesData = preferences => {
-  preferences.channels.forEach((channel, i) => {
+  const formattedPreferences = JSON.parse(JSON.stringify(preferences))
+
+  formattedPreferences.channels.forEach((channel, i) => {
     // copying the notificationCategories object defined above and setting it on each comms channel
     // so that we can update and mutate the object for each channel without it effecting the others.
     // We are also using the structure defined above because we care about the order that the
     // preferences are displayed in.
-    preferences.channels[i].categories = JSON.parse(JSON.stringify(notificationCategories))
-    setNotificationPolicy(channel.notificationPolicies, preferences.channels[i].categories)
-    setNotificationPolicy(channel.notificationPolicyOverrides, preferences.channels[i].categories)
-    dropEmptyCategories(preferences.channels[i].categories)
+    formattedPreferences.channels[i].categories = JSON.parse(JSON.stringify(notificationCategories))
+    setNotificationPolicy(channel.notificationPolicies, formattedPreferences.channels[i].categories)
+    setNotificationPolicy(channel.notificationPolicyOverrides, formattedPreferences.channels[i].categories)
+    dropEmptyCategories(formattedPreferences.channels[i].categories)
   })
+
+  return formattedPreferences
 }
 
 const setNotificationPolicy = (policies, categories) => {
@@ -324,12 +328,12 @@ const NotificationPreferencesTable = props => {
   }
 
   if (props.preferences.channels?.length > 0) {
-    formatPreferencesData(props.preferences)
+    const formattedPreferences = formatPreferencesData(props.preferences)
     return (
       <>
-        {Object.keys(props.preferences.channels[0].categories).map((notificationCategory, i) =>
+        {Object.keys(formattedPreferences.channels[0].categories).map((notificationCategory, i) =>
           renderNotificationCategory(
-            props.preferences,
+            formattedPreferences,
             notificationCategory,
             props.updatePreference,
             i === 0,

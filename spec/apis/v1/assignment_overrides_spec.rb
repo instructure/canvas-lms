@@ -1307,7 +1307,7 @@ describe AssignmentOverridesController, type: :request do
 
       it "fails for user without permissions" do
         student_in_course
-        call_batch_update({ @a.id => [{ id: @a1.id, due_at: Time.zone.now.to_s }] }, expected_status: 401)
+        call_batch_update({ @a.id => [{ id: @a1.id, due_at: Time.zone.now.to_s }] }, expected_status: 403)
       end
 
       it "fails if ids not present" do

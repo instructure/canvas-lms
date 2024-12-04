@@ -56,6 +56,7 @@ module BroadcastPolicies
                                      has_submission?: true,
                                      late?: false,
                                      posted?: true,
+                                     autograded?: false,
                                      quiz_submission_id: nil,
                                      user:,
                                      context: course,
@@ -280,6 +281,7 @@ module BroadcastPolicies
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(policy).to receive(:user_active_or_invited?).and_return(false) } }
       specify { wont_send_when { allow(course).to receive(:concluded?).and_return true } }
+      specify { wont_send_when { allow(submission).to receive(:autograded?).and_return true } }
     end
 
     describe "#should_dispatch_submission_grade_changed?" do

@@ -458,8 +458,7 @@ module Canvas::Migration
         end
       end
 
-      selectable_outcomes = content_migration.respond_to?(:root_account) &&
-                            content_migration.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
+      selectable_outcomes = content_migration.respond_to?(:root_account)
 
       if @course[:learning_outcomes]
         @overview[:learning_outcomes] = []

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 
 import CommonMigratorControls from './common_migrator_controls'
-import {humanReadableSize} from '../utils'
+import {noFileSelectedFormMessage} from '../utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -87,34 +87,10 @@ const ZipFileImporter = ({
 }: ZipFileImporterProps) => {
   const [folders, setFolders] = useState<Array<Folder>>([])
   const [folder, setFolder] = useState<Folder | null>(null)
-  const fileInput = createRef<HTMLInputElement>()
   const [file, setFile] = useState<File | null>(null)
   const [searchValue, setSearchValue] = useState('')
   const [fileError, setFileError] = useState<boolean>(false)
   const [folderError, setFolderError] = useState<boolean>(false)
-
-  // TODO Remove this function if it's not going to be used, or remove
-  //      this linter rule disable if/when it ever is.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSelectFile = useCallback(() => {
-    const files = fileInput.current?.files
-    if (!files) {
-      return
-    }
-    const selectedFile = files[0]
-
-    if (selectedFile && ENV.UPLOAD_LIMIT && selectedFile.size > ENV.UPLOAD_LIMIT) {
-      setFile(null)
-      showFlashError(
-        I18n.t('Your migration can not exceed %{file_size}', {
-          file_size: humanReadableSize(ENV.UPLOAD_LIMIT),
-        })
-      )()
-    } else {
-      setFile(selectedFile)
-      setFileError(false)
-    }
-  }, [fileInput])
 
   const handleSubmit: onSubmitMigrationFormCallback = useCallback(
     formData => {
@@ -247,12 +223,8 @@ const ZipFileImporter = ({
         accepts=".zip"
         onChange={setFile}
         isSubmitting={isSubmitting}
+        externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
       />
-      {fileError && (
-        <p>
-          <Text color="danger">{I18n.t('You must select a file to import content from')}</Text>
-        </p>
-      )}
       {!isSubmitting && (
         <View as="div" margin="medium none none none" width="100%">
           {folders.length > 0 ? (
@@ -290,7 +262,9 @@ const ZipFileImporter = ({
       )}
       {folderError && (
         <p>
-          <Text color="danger">{I18n.t('You must select a folder to import content to')}</Text>
+          <Text color="danger" size="small">
+            {I18n.t('You must select a folder to import content to')}
+          </Text>
         </p>
       )}
       <CommonMigratorControls

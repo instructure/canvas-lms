@@ -16,43 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-InstUI breakpoint values:
-(found in node_modules/@instructure/ui-theme-tokens/src/canvas/breakpoints.ts)
-
-- xxSmall: 8em      (128px)
-- xSmall: 16em      (256px)
-- small: 30em       (480px)
-- medium: 48em      (768px)
-- tablet: 48em      (768px)  // Shares value with medium
-- large: 62em       (992px)
-- desktop: 64em     (1024px)
-- xLarge: 75em      (1200px)
-*/
-
-.contentLayout {
-    @media (min-width: 48rem) and (max-width: 74.9375rem) { /* 768px – 1199px */
-        padding: 5rem 0 8rem; /* 80px 128px */
-    }
+.contentLayout--tablet {
+    padding: 5rem 0 8rem; /* 80px 0 128px */
+}
+.contentLayout--desktop {
+    padding: 0;
 }
 
-.contentLayout__wrapper {
+.contentLayout__content {
     height: 100%;
     padding: 2.25rem 1.5rem; /* 36px 24px */
-
-    @media (min-width: 48rem) { /* 768px */
-        height: unset;
-        margin: 0 auto;
-        padding: 3.75rem 6.25rem; /* 60px 100px */
-        width: 35.75rem; /* 572px */
-    }
-
-    @media (min-width: 75rem) { /* 1200px */
-        height: 100%;
-        margin: unset;
-        padding: 5rem; /* 80px */
-        width: 45rem; /* 720px */
-    }
+}
+.contentLayout__content--tablet {
+    height: unset;
+    margin: 0 auto;
+    padding: 3.75rem 6.25rem; /* 60px 100px */
+    width: 35.75rem; /* 572px */
+}
+.contentLayout__content--desktop {
+    height: 100%;
+    margin: unset;
+    padding: 5rem; /* 80px */
+    width: 45rem; /* 720px */
 }
 
 .contentLayout__background {
@@ -61,9 +46,7 @@ InstUI breakpoint values:
     position: absolute;
     right: 0;
     top: 0;
-    z-index: -1;
-
-    @media (min-width: 75rem) { /* 1200px */
-        left: 45rem; /* 720px */
-    }
+}
+.contentLayout__background--desktop {
+    left: 45rem; /* 720px (width of content) */
 }

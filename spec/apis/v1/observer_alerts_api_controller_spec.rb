@@ -129,6 +129,18 @@ describe ObserverAlertsApiController, type: :request do
         end
       end
     end
+
+    it "filters out expired AccountNotifications" do
+      account = @course.root_account
+      account_admin_user(account:)
+      ObserverAlertThreshold.create!(observer: @observer, student: @student, alert_type: "institution_announcement")
+      @observer.user_account_associations.create!(account:, depth: 0) # ordinarily this would happen in an after transaction commit callback
+      account.announcements.create!(user: @admin, subject: "expired", message: "...", start_at: 1.day.ago, end_at: 1.hour.ago)
+      active = account.announcements.create!(user: @admin, subject: "active", message: "...", start_at: 1.day.ago, end_at: 1.day.from_now)
+      json = api_call_as_user(@observer, :get, @path, @params)
+      account_notification_alerts = json.select { |row| row["context_type"] == "AccountNotification" }
+      expect(account_notification_alerts.pluck("context_id")).to eq [active.id]
+    end
   end
 
   describe "#alerts_count" do
@@ -224,7 +236,7 @@ describe ObserverAlertsApiController, type: :request do
       user = user_model
       params = @params.merge(workflow_state: "read")
       api_call_as_user(user, :put, "#{@path}/read", params)
-      expect(response).to have_http_status :unauthorized
+      expect(response).to have_http_status :forbidden
     end
   end
 end

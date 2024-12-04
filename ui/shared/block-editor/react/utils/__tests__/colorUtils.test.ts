@@ -16,13 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  getContrastingColor,
-  getContrastingButtonColor,
-  isTransparent,
-  white,
-  black,
-} from '../colorUtils'
+import {getContrastingColor, getContrastingButtonColor, white, black} from '../colorUtils'
 
 // basically, just testing instui's `contrast` function
 describe('colorUtils', () => {
@@ -43,32 +37,6 @@ describe('colorUtils', () => {
 
     it('should return secondary when the color is black', () => {
       expect(getContrastingButtonColor(black)).toBe('secondary')
-    })
-  })
-
-  describe('isTransparent', () => {
-    it('should return true when the color is transparent', () => {
-      expect(isTransparent('transparent')).toBe(true)
-    })
-
-    it('should retun true when a hex color is transparent', () => {
-      expect(isTransparent('#AABBCC00')).toBe(true)
-    })
-
-    it('should return true when an rgba color is transparent', () => {
-      expect(isTransparent('rgba(10, 20, 30, 0)')).toBe(true)
-    })
-
-    it('should return false when the color is invalid', () => {
-      expect(isTransparent('invalid')).toBe(false)
-    })
-
-    it('should return false when a hex color is not transparent', () => {
-      expect(isTransparent('#AABBCCDD')).toBe(false)
-    })
-
-    it('should return false when an rgba color is not transparent', () => {
-      expect(isTransparent('rgba(10, 20, 30, .5)')).toBe(false)
     })
   })
 })

@@ -31,6 +31,7 @@ import {EnvContextModules} from './EnvContextModules'
 import {EnvWikiPages} from './EnvWikiPages'
 import {EnvContentMigrations} from './ContentMigrations'
 import {EnvDiscussions} from './EnvDiscussions'
+import {EnvProfiles} from './EnvProfiles'
 
 /**
  * Top level ENV variable.
@@ -60,5 +61,6 @@ export type GlobalEnv =
         EnvContextModules &
         EnvWikiPages &
         EnvContentMigrations &
-        EnvDiscussions
+        EnvDiscussions &
+        EnvProfiles
     >

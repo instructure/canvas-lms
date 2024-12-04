@@ -85,10 +85,13 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     is_announcement = input[:is_announcement] || false
 
-    # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
     if input[:checkpoints].present?
+      # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
       err_message = validate_possible_points_with_checkpoints(input)
       return validation_error(err_message) unless err_message.nil?
+
+      # If discussion topic has checkpoints, it cannot also be assigned to a group category
+      return validation_error(I18n.t("Group discussions cannot have checkpoints.")) if input[:group_category_id].present?
     end
 
     # TODO: On update, we load here instead of creating a new one.

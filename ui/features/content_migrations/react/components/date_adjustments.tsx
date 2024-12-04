@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
@@ -51,29 +51,46 @@ export const remapSubstitutions = (
 }
 
 export const DateAdjustments = ({
-  dateAdjustments,
+  dateAdjustmentConfig,
   setDateAdjustments,
   disabled,
 }: {
-  dateAdjustments: DateAdjustmentConfig | false
+  dateAdjustmentConfig: DateAdjustmentConfig
   setDateAdjustments: (arg0: DateAdjustmentConfig) => void
   disabled?: boolean
 }) => {
   const [dateOperation, setDateOperation] = useState<'shift_dates' | 'remove_dates'>('shift_dates')
-  const [start_from_date, setStartFromDate] = useState('')
-  const [start_to_date, setStartToDate] = useState(ENV.OLD_START_DATE || '')
-  const [end_from_date, setEndFromDate] = useState('')
-  const [end_to_date, setEndToDate] = useState(ENV.OLD_END_DATE || '')
+  const [start_from_date, setOldStartDate] = useState(
+    dateAdjustmentConfig.date_shift_options.old_start_date || ''
+  )
+  const [start_to_date, setStartToDate] = useState(
+    dateAdjustmentConfig.date_shift_options.new_start_date || ''
+  )
+  const [end_from_date, setEndFromDate] = useState(
+    dateAdjustmentConfig.date_shift_options.old_end_date || ''
+  )
+  const [end_to_date, setEndToDate] = useState(
+    dateAdjustmentConfig.date_shift_options.new_end_date || ''
+  )
+
+  useEffect(() => {
+    if (dateAdjustmentConfig) {
+      setOldStartDate(dateAdjustmentConfig.date_shift_options.old_start_date || '')
+      setStartToDate(dateAdjustmentConfig.date_shift_options.new_start_date || '')
+      setEndFromDate(dateAdjustmentConfig.date_shift_options.old_end_date || '')
+      setEndToDate(dateAdjustmentConfig.date_shift_options.new_end_date || '')
+    }
+  }, [dateAdjustmentConfig])
 
   const handleSetDate = (date: Date | null, setter: any, key: string) => {
-    const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+    const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
     tmp.date_shift_options[key] = date ? date.toISOString() : ''
     setDateAdjustments(tmp)
     setter(date ? date.toISOString() : '')
   }
 
   const setSubstitution = (id: number, data: any, to_or_from: 'to' | 'from') => {
-    const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+    const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
     tmp.date_shift_options.day_substitutions.map((ds: DaySub) => {
       if (ds.id !== id) return ds
       ds[to_or_from] = data.value
@@ -84,7 +101,7 @@ export const DateAdjustments = ({
 
   const changeDateOperation = (operation: 'shift_dates' | 'remove_dates') => {
     setDateOperation(operation)
-    const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+    const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
     tmp.adjust_dates.operation = operation
     setDateAdjustments(tmp)
   }
@@ -99,7 +116,7 @@ export const DateAdjustments = ({
     {key: 'Sat', name: I18n.t('Saturday')},
   ]
 
-  if (!dateAdjustments) {
+  if (!dateAdjustmentConfig) {
     return null
   }
 
@@ -151,7 +168,7 @@ export const DateAdjustments = ({
                     <CanvasDateInput
                       selectedDate={start_from_date}
                       onSelectedDateChange={d => {
-                        handleSetDate(d, setStartFromDate, 'old_start_date')
+                        handleSetDate(d, setOldStartDate, 'old_start_date')
                       }}
                       formatDate={formatDate}
                       placeholder={I18n.t('Select a date (optional)')}
@@ -235,9 +252,9 @@ export const DateAdjustments = ({
                     />
                   </Flex>
                 </View>
-                {dateAdjustments.date_shift_options.day_substitutions.map(substitution => (
+                {dateAdjustmentConfig.date_shift_options.day_substitutions.map(substitution => (
                   <View as="div" margin="medium none none none" key={substitution.id}>
-                    <Text weight="bold">{I18n.t('Move to:')}</Text>
+                    <Text weight="bold">{I18n.t('Move from:')}</Text>
                     <Flex as="div" direction={matches?.includes('small') ? 'column' : 'row'}>
                       <SimpleSelect
                         autoFocus={true}
@@ -288,7 +305,7 @@ export const DateAdjustments = ({
                         withBackground={false}
                         disabled={disabled}
                         onClick={() => {
-                          const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+                          const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
                           tmp.date_shift_options.day_substitutions =
                             tmp.date_shift_options.day_substitutions.filter(
                               (sub: DaySub) => sub.id !== substitution.id
@@ -312,7 +329,7 @@ export const DateAdjustments = ({
                 <Button
                   margin="medium none none none"
                   onClick={() => {
-                    const tmp = JSON.parse(JSON.stringify(dateAdjustments))
+                    const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
                     tmp.date_shift_options.day_substitutions.push({from: 0, to: 0, id: subs_id++})
                     setDateAdjustments(tmp)
                   }}

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {fireEvent, render} from '@testing-library/react'
 import {
   CriterionModal,
@@ -24,7 +25,6 @@ import {
   reorder,
   type CriterionModalProps,
 } from '../CriterionModal'
-import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
 describe('CriterionModal tests', () => {
   const renderComponent = (props?: Partial<CriterionModalProps>) => {
@@ -210,7 +210,7 @@ describe('CriterionModal tests', () => {
     })
 
     it('should not render range checkbox if FF is false', () => {
-      const {queryByTestId, queryAllByTestId} = renderComponent({criterionUseRangeEnabled: false})
+      const {queryByTestId} = renderComponent({criterionUseRangeEnabled: false})
 
       expect(queryByTestId('enable-range-checkbox')).toBeNull()
     })
@@ -330,6 +330,14 @@ describe('CriterionModal tests', () => {
 
       fireEvent.click(getByTestId('rubric-criterion-cancel'))
 
+      const warningModal = getByTestId('rubric-assignment-exit-warning-modal')
+      expect(warningModal).toBeInTheDocument()
+
+      const exitWarningModalButton = getByTestId('exit-rubric-warning-button')
+      expect(exitWarningModalButton).toBeInTheDocument()
+
+      fireEvent.click(exitWarningModalButton)
+
       expect(onDismiss).toHaveBeenCalled()
     })
   })
@@ -378,6 +386,109 @@ describe('CriterionModal tests', () => {
       expect(queryByTestId('enable-range-checkbox')).toBeNull()
       expect(queryAllByTestId('rating-points').length).toEqual(0)
       expect(queryAllByTestId('rating-points-assessed').length).toEqual(0)
+    })
+  })
+
+  describe('Warning Modal Tests', () => {
+    it('should show call dismiss if nothing changed', () => {
+      const onDismiss = jest.fn()
+      const {getByTestId} = renderComponent({
+        onDismiss,
+        criterion: getCriterion(),
+      })
+
+      fireEvent.click(getByTestId('rubric-criterion-cancel'))
+      expect(onDismiss).toHaveBeenCalled()
+    })
+
+    it('should show warning modal when criterion description has been changed', () => {
+      const onDismiss = jest.fn()
+      const {getByTestId} = renderComponent({
+        onDismiss,
+        criterion: getCriterion(),
+      })
+
+      const descriptionInput = getByTestId('rubric-criterion-name-input') as HTMLInputElement
+      fireEvent.change(descriptionInput, {target: {value: 'Modified Criterion Description'}})
+
+      fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+      const warningModal = getByTestId('rubric-assignment-exit-warning-modal')
+      expect(warningModal).toBeInTheDocument()
+
+      const exitWarningModalButton = getByTestId('exit-rubric-warning-button')
+      expect(exitWarningModalButton).toBeInTheDocument()
+
+      fireEvent.click(exitWarningModalButton)
+      expect(onDismiss).toHaveBeenCalled()
+    })
+
+    it('should show warning modal when criterion long description has been changed', () => {
+      const onDismiss = jest.fn()
+      const {getByTestId} = renderComponent({
+        onDismiss,
+        criterion: getCriterion(),
+      })
+
+      const longDescriptionInput = getByTestId(
+        'rubric-criterion-description-input'
+      ) as HTMLInputElement
+      fireEvent.change(longDescriptionInput, {target: {value: 'Modified Long Description'}})
+
+      fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+      const warningModal = getByTestId('rubric-assignment-exit-warning-modal')
+      expect(warningModal).toBeInTheDocument()
+
+      const exitWarningModalButton = getByTestId('exit-rubric-warning-button')
+      expect(exitWarningModalButton).toBeInTheDocument()
+
+      fireEvent.click(exitWarningModalButton)
+      expect(onDismiss).toHaveBeenCalled()
+    })
+
+    it('should show warning modal when criterion use range has been changed', () => {
+      const onDismiss = jest.fn()
+      const {getByTestId} = renderComponent({
+        onDismiss,
+        criterion: getCriterion({criterionUseRange: false}),
+      })
+
+      const useRangeCheckbox = getByTestId('enable-range-checkbox') as HTMLInputElement
+      fireEvent.click(useRangeCheckbox)
+
+      fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+      const warningModal = getByTestId('rubric-assignment-exit-warning-modal')
+      expect(warningModal).toBeInTheDocument()
+
+      const exitWarningModalButton = getByTestId('exit-rubric-warning-button')
+      expect(exitWarningModalButton).toBeInTheDocument()
+
+      fireEvent.click(exitWarningModalButton)
+      expect(onDismiss).toHaveBeenCalled()
+    })
+
+    it('should show warning modal when ratings have been changed', () => {
+      const onDismiss = jest.fn()
+      const {getByTestId, queryAllByTestId} = renderComponent({
+        onDismiss,
+        criterion: getCriterion(),
+      })
+
+      const ratingDescriptionInput = queryAllByTestId('rating-name')[0] as HTMLInputElement
+      fireEvent.change(ratingDescriptionInput, {target: {value: 'Modified Rating'}})
+
+      fireEvent.click(getByTestId('rubric-criterion-cancel'))
+
+      const warningModal = getByTestId('rubric-assignment-exit-warning-modal')
+      expect(warningModal).toBeInTheDocument()
+
+      const exitWarningModalButton = getByTestId('exit-rubric-warning-button')
+      expect(exitWarningModalButton).toBeInTheDocument()
+
+      fireEvent.click(exitWarningModalButton)
+      expect(onDismiss).toHaveBeenCalled()
     })
   })
 })

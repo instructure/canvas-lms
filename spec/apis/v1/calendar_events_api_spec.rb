@@ -556,7 +556,7 @@ describe CalendarEventsApiController, type: :request do
       expect(response.headers["Link"]).to include "appointment_group_ids="
     end
 
-    it "fails with unauthorized if provided a context the user cannot access" do
+    it "fails with forbidden if provided a context the user cannot access" do
       contexts = [@course.asset_string]
 
       # second context the user cannot access
@@ -577,7 +577,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "allows specifying an unenrolled but accessible context" do
@@ -663,7 +663,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     def public_course_query(options = {})
@@ -1349,7 +1349,7 @@ describe CalendarEventsApiController, type: :request do
                              :get,
                              "/api/v1/calendar_events/#{@parent_event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
           end
 
           it "returns empty participants for a teacher" do
@@ -1489,14 +1489,14 @@ describe CalendarEventsApiController, type: :request do
             ]
           end
 
-          it "returns 401 if not allowed to view participants" do
+          it "returns 403 if not allowed to view participants" do
             @ag.participant_visibility = "private"
             @ag.save!
             api_call_as_user(@student1,
                              :get,
                              "/api/v1/calendar_events/#{@event.id}/participants",
                              { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-            expect(response).to have_http_status :unauthorized
+            expect(response).to have_http_status :forbidden
           end
         end
       end
@@ -1569,7 +1569,7 @@ describe CalendarEventsApiController, type: :request do
                  { controller: "calendar_events_api", action: "create", format: "json" },
                  { calendar_event: { context_code: "account_#{Account.default.id}", title: "API Test" } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -2045,6 +2045,58 @@ describe CalendarEventsApiController, type: :request do
           end
         end
 
+        context "notifications" do
+          before do
+            Notification.create!(name: "Event Date Changed", category: "TestImmediately")
+
+            start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+            end_at = Time.zone.now.utc.change(hour: 23)
+            @new_event_series = api_call(
+              :post,
+              "/api/v1/calendar_events",
+              { controller: "calendar_events_api", action: "create", format: "json" },
+              {
+                calendar_event: {
+                  context_code: @course.asset_string,
+                  title: "many me",
+                  start_at: start_at.iso8601,
+                  end_at: end_at.iso8601,
+                  rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+                }
+              }
+            )
+          end
+
+          it "only sends one notification when updating all events in a series" do
+            student_1 = user_with_communication_channel(active_all: true)
+            @course.enroll_student(student_1, enrollment_state: "active")
+            orig_events = [@new_event_series.except("duplicates")]
+            orig_events += @new_event_series["duplicates"].pluck("calendar_event")
+            target_event = @new_event_series["duplicates"][0]["calendar_event"]
+            target_event_id = target_event["id"]
+            new_title = "a new title"
+            new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+            json = api_call_as_user(@teacher,
+                                    :put,
+                                    "/api/v1/calendar_events/#{target_event_id}",
+                                    { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                                    { calendar_event: { start_at: new_start_at, title: new_title }, which: "all" })
+            assert_status(200)
+            expect(json.length).to be 3
+            json.each_with_index do |event, i|
+              expect(event.keys).to match_array expected_series_fields
+              expect(event["id"]).to eql orig_events[i]["id"]
+              expect(event["title"]).to eql new_title
+              expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+            end
+            expect(Message.count).to eq 1
+            expect(Message.last.user_id).to eq student_1.id
+            expect(Message.last.notification_name).to eq "Event Date Changed"
+            expect(Message.last.context_id).to eq @new_event_series["id"]
+          end
+        end
+
         it "updates an event and all following" do
           orig_events = [@event_series.except("duplicates")]
           orig_events += @event_series["duplicates"].pluck("calendar_event")
@@ -2323,7 +2375,7 @@ describe CalendarEventsApiController, type: :request do
                  { controller: "calendar_events_api", action: "update", id: event.to_param, format: "json" },
                  { calendar_event: { context_code: other_course.asset_string } },
                  {},
-                 { expected_status: 401 })
+                 { expected_status: 403 })
       end
     end
 
@@ -5033,7 +5085,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
 
     it "returns observee's calendar events in a group in the observed course" do
@@ -5069,7 +5121,7 @@ describe CalendarEventsApiController, type: :request do
                },
                {},
                {},
-               { expected_status: 401 })
+               { expected_status: 403 })
     end
   end
 

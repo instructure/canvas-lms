@@ -67,9 +67,9 @@ describe "AuthenticationProviders API", type: :request do
       expect(res.pluck("idp_entity_id").join).to eq "rad"
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      call_index(401)
+      call_index(403)
     end
   end
 
@@ -220,9 +220,9 @@ describe "AuthenticationProviders API", type: :request do
       )
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      call_create({}, 401)
+      call_create({}, 403)
     end
 
     it "disables open registration when setting delegated auth" do
@@ -365,9 +365,9 @@ describe "AuthenticationProviders API", type: :request do
       call_update(0, {}, 404)
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      call_update(0, {}, 401)
+      call_update(0, {}, 403)
     end
 
     it "can disable MFA" do
@@ -453,9 +453,9 @@ describe "AuthenticationProviders API", type: :request do
       call_show(0, 404)
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      call_show(0, 401)
+      call_show(0, 403)
     end
 
     it "allows seeing the canvas auth type for any authenticated user" do
@@ -513,9 +513,9 @@ describe "AuthenticationProviders API", type: :request do
       call_destroy(0, 404)
     end
 
-    it "returns unauthorized error" do
+    it "returns forbidden error" do
       course_with_student(course: @course)
-      call_destroy(0, 401)
+      call_destroy(0, 403)
     end
   end
 
@@ -540,7 +540,7 @@ describe "AuthenticationProviders API", type: :request do
 
     it "requires authorization" do
       course_with_student(course: @course)
-      update_settings({}, 401)
+      update_settings({}, 403)
     end
 
     it "sets auth settings" do

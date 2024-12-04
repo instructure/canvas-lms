@@ -21,7 +21,7 @@ import {useQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {SpeedGraderCheckpoint} from './SpeedGraderCheckpoint'
+import {SpeedGraderCheckpoint, EXCUSED} from './SpeedGraderCheckpoint'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import AssessmentGradeInput from './AssessmentGradeInput'
 import {Flex} from '@instructure/ui-flex'
@@ -149,19 +149,21 @@ const putSubmissionStatus = ({
   customGradeStatusId,
   secondsLate,
 }: SubmissionStatusParams) => {
+  const excuse = latePolicyStatus === EXCUSED
   return doFetchApi({
     method: 'PUT',
     path: `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`,
-    params: {
+    body: {
       course_id: courseId,
       sub_assignment_tag: subAssignmentTag,
       submission: {
         sub_assignment_tag: subAssignmentTag,
         assignment_id: assignmentId,
         user_id: studentId,
-        ...(latePolicyStatus ? {late_policy_status: latePolicyStatus} : {}),
+        ...(latePolicyStatus && !excuse ? {late_policy_status: latePolicyStatus} : {}),
         ...(customGradeStatusId ? {custom_grade_status_id: customGradeStatusId} : {}),
         ...(secondsLate ? {seconds_late_override: secondsLate} : {}),
+        ...(latePolicyStatus ? {excuse} : {}),
       },
     },
   })

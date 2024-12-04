@@ -733,6 +733,7 @@ describe DeveloperKey do
     describe "public_jwk validations" do
       subject do
         developer_key_saved.save
+        developer_key_saved.errors
       end
 
       before { developer_key_saved.generate_rsa_keypair! }
@@ -740,19 +741,19 @@ describe DeveloperKey do
       context 'when the kty is not "RSA"' do
         before { developer_key_saved.public_jwk["kty"] = "foo" }
 
-        it { is_expected.to be false }
+        it { is_expected.not_to be_empty }
       end
 
       context 'when the alg is not "RS256"' do
         before { developer_key_saved.public_jwk["alg"] = "foo" }
 
-        it { is_expected.to be false }
+        it { is_expected.not_to be_empty }
       end
 
       context "when required claims are missing" do
-        before { developer_key_saved.update public_jwk: { foo: "bar" } }
+        before { developer_key_saved.update public_jwk: { foo: "bar", alg: "MYALG" } }
 
-        it { is_expected.to be false }
+        it { expect(subject.size).to eq 2 }
       end
     end
 
@@ -907,6 +908,8 @@ describe DeveloperKey do
         let(:user) { user_model }
         let(:developer_key_with_scopes) do
           DeveloperKey.create!(scopes: valid_scopes,
+                               is_lti_key: true,
+                               public_jwk_url: "https://example.com",
                                name: "test_tool",
                                current_user: user,
                                account:,
@@ -965,6 +968,26 @@ describe DeveloperKey do
           it "does not update the corresponding lti registration if skip_lti_sync is true" do
             developer_key_with_scopes.update!(skip_lti_sync: true, name: "new tool name")
             expect(developer_key_with_scopes.lti_registration.reload.admin_nickname).to_not eq "new tool name"
+          end
+
+          it "sets the lti_registration.manual_configuration if the dev key has a tool_configuration" do
+            expect(developer_key_with_scopes.lti_registration.manual_configuration)
+              .to eq(developer_key_with_scopes.tool_configuration)
+          end
+
+          context "when the developer key has an Lti::IMS::Registration for a configuration" do
+            let(:developer_key_with_ims_registration) do
+              dk = dev_key_model_1_3
+              # This is necessary because a TC is created automatically; clean this up with INTEROP-8943
+              dk.tool_configuration = nil
+              dk.ims_registration = lti_ims_registration_model
+              dk.save!
+              dk
+            end
+
+            it "does not set lti_registration.manual_configuration" do
+              expect(developer_key_with_ims_registration.lti_registration.manual_configuration).to be_nil
+            end
           end
         end
       end

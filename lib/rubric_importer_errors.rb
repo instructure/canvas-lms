@@ -20,4 +20,5 @@
 
 module RubricImporterErrors
   class DataFormatError < StandardError; end
+  class UnauthorizedError < StandardError; end
 end

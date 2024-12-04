@@ -1981,7 +1981,7 @@ describe GradebooksController do
     it "returns unauthorized when the user is not authorized to manage grades" do
       user_session(@student)
       get :final_grade_overrides, params: { course_id: @course.id }, format: :json
-      assert_status(401)
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -2019,7 +2019,7 @@ describe GradebooksController do
     it "returns unauthorized if the user is not authorized to manage grades" do
       user_session(@student)
       get :user_ids, params: { course_id: @course.id }, format: :json
-      assert_status(401)
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -2071,7 +2071,7 @@ describe GradebooksController do
     it "returns unauthorized if the user is not authorized to manage grades" do
       user_session(@student)
       get :grading_period_assignments, params: { course_id: @course.id }, format: :json
-      assert_status(401)
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -3160,6 +3160,12 @@ describe GradebooksController do
         expect(js_env.fetch(:media_comment_asset_string)).to eq @teacher.asset_string
       end
 
+      it "sets rce_js_env" do
+        @course.root_account.enable_feature!(:rce_lite_enabled_speedgrader_comments)
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env).to have_key :RICH_CONTENT_APP_HOST
+      end
+
       describe "student group filtering" do
         before do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
@@ -3696,7 +3702,7 @@ describe GradebooksController do
     it "returns unauthorized when the user is not authorized to manage grades" do
       user_session(@student)
       put :update_final_grade_overrides, params: update_params, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "returns unauthorized when the course does not allow final grade override" do
@@ -3704,7 +3710,7 @@ describe GradebooksController do
       @course.save!
 
       put :update_final_grade_overrides, params: update_params, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "grants authorization to teachers in active courses" do
@@ -3715,7 +3721,7 @@ describe GradebooksController do
     it "returns unauthorized when the course is concluded" do
       @course.complete!
       put :update_final_grade_overrides, params: update_params, format: :json
-      assert_unauthorized
+      assert_forbidden
     end
 
     it "returns an error when the override_scores param is not supplied" do
@@ -3782,13 +3788,13 @@ describe GradebooksController do
       it "rejects requests if the caller does not have the manage_grades permission" do
         user_session(@student)
         make_request(percent: 50.0)
-        assert_unauthorized
+        assert_forbidden
       end
 
       it "rejects requests if the account does not have the apply_score_to_ungraded feature enabled" do
         @course.account.disable_feature!(:apply_score_to_ungraded)
         make_request(percent: 50.0)
-        assert_unauthorized
+        assert_forbidden
       end
     end
 

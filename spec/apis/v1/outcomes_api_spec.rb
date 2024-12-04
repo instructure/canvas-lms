@@ -186,7 +186,7 @@ describe "Outcomes API", type: :request do
                      action: "show",
                      id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "does not require any permission for global outcomes" do
@@ -427,7 +427,7 @@ describe "Outcomes API", type: :request do
                      action: "update",
                      id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "requires manage_global_outcomes permission for global outcomes" do
@@ -440,7 +440,7 @@ describe "Outcomes API", type: :request do
                      action: "update",
                      id: @outcome.id.to_s,
                      format: "json")
-        assert_status(401)
+        assert_forbidden
       end
 
       it "fails (400) if the outcome is invalid" do
