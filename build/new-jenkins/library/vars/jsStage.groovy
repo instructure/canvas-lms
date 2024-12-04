@@ -19,7 +19,8 @@
 import groovy.transform.Field
 
 @Field static final KARMA_NODE_COUNT = 4
-@Field static final JEST_NODE_COUNT = 5
+@Field static final JEST_NODE_COUNT = 6
+@Field static final RCE_NODE_COUNT = 4
 
 def jestNodeRequirementsTemplate(index) {
   def baseTestContainer = [
@@ -29,6 +30,17 @@ def jestNodeRequirementsTemplate(index) {
 
   return [
     containers: [baseTestContainer + [name: "jest-${index}"]]
+  ]
+}
+
+def rceNodeRequirementsTemplate(index) {
+  def baseTestContainer = [
+    image: 'local/karma-runner',
+    command: 'cat'
+  ]
+
+  return [
+    containers: [baseTestContainer + [name: "rce-${index}"]]
   ]
 }
 
@@ -141,9 +153,19 @@ def queueKarmaDistribution(index) {
   }
 }
 
+def queueRceDistribution(index) {
+  { stages ->
+    def jsgEnvVars = [
+        "CI_NODE_INDEX=${index.toInteger() + 1}",
+        "CI_NODE_TOTAL=${RCE_NODE_COUNT}",
+      ]
+    callableWithDelegate(queueTestStage())(stages, "rce-${index}", jsgEnvVars, 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:canvas-rce')
+  }
+}
+
 def queuePackagesDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'packages', ['CANVAS_RCE_PARALLEL=1'], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
+    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
   }
 }
 

@@ -9,7 +9,7 @@
     "integration-test": "nightwatch --env integration",
     "lint": "eslint \"src/**/*.js\" \"test/**/*.js\" \"src/**/*.ts*\" \"test/**/*.ts*\"",
     "lint:fix": "eslint --fix \"src/**/*.js\" \"test/**/*.js\" \"src/**/*.ts*\" \"test/**/*.ts*\"",
-    "test": "if [ \"$CANVAS_RCE_PARALLEL\" = \"1\" ]; then yarn test:parallel; else yarn test:serial; fi",
+    "test": "yarn test:serial",
     "test:parallel": "concurrently --names \"mocha,jest\" \"yarn test:mocha\" \"yarn test:jest\"",
     "test:serial": "yarn test:mocha && yarn test:jest",
     "test:mocha": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' mocha 'test/**/*.test.{js,ts,tsx}' --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.js --exit",

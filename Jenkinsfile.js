@@ -75,9 +75,7 @@ pipeline {
               String index = i
               extendedStage("Runner - Jest ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
                 def tests = [:]
-
                 callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
-
                 parallel(tests)
               }
             }
@@ -86,18 +84,23 @@ pipeline {
               String index = i
               extendedStage("Runner - Karma ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.karmaNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
                 def tests = [:]
-
                 callableWithDelegate(jsStage.queueKarmaDistribution(index))(tests)
+                parallel(tests)
+              }
+            }
 
+            for (int i = 0; i < jsStage.RCE_NODE_COUNT; i++) {
+              String index = i
+              extendedStage("Runner - RCE ${i}").hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.rceNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(12).queue(runnerStages) {
+                def tests = [:]
+                callableWithDelegate(jsStage.queueRceDistribution(index))(tests)
                 parallel(tests)
               }
             }
 
             extendedStage('Runner - Packages').hooks(stageHooks).nodeRequirements(label: nodeLabel(), podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(12).queue(runnerStages) {
               def tests = [:]
-
               callableWithDelegate(jsStage.queuePackagesDistribution())(tests)
-
               parallel(tests)
             }
 
