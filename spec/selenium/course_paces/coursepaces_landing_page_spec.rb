@@ -151,6 +151,35 @@ describe "course pace landing page" do
 
       expect(course_pace_table_rows.count).to eq(9)
     end
+
+    context "when course_pace_download_document flag is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_download_document)
+        @course_pace.course.root_account.reload
+      end
+
+      it "shows download button" do
+        visit_course_paces_page
+        expect(download_selected_paces_button).to be_displayed
+      end
+
+      it "shows select all paces checkbox" do
+        visit_course_paces_page
+        expect(select_all_paces_checkbox).to be_displayed
+      end
+
+      it "shows row select pace checkbox" do
+        visit_course_paces_page
+        checkbox = course_pace_table_rows.first.find_element(:css, 'input[type="checkbox"]')
+        expect(checkbox.displayed?).to be true
+      end
+
+      it "shows more menu for pace row" do
+        visit_course_paces_page
+        more_options_button.click
+        expect(download_pace).to be_displayed
+      end
+    end
   end
 
   context "course pace table for users" do

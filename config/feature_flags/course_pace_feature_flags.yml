@@ -4,3 +4,9 @@ course_pace_draft_state:
   applies_to: RootAccount
   display_name: Course Pace Drafts
   description: Allows for creating course paces in a draft/unpublished state, and allows for updating a pace draft unlimited times before publishing
+
+course_pace_download_document:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Course Pace Download Document
+  description: Allows for downloading a document that contains the course pace information
