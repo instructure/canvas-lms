@@ -18,6 +18,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
@@ -147,6 +148,14 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         </View>,
         node,
       )
+    }
+
+    let parent = document.getElementById('wikiPageIndexEditModal')
+    if (!parent) {
+      parent = document.createElement('div')
+      parent.setAttribute('id', 'wikiPageIndexEditModal')
+      document.body.appendChild(parent)
+      this.itemViewOptions.editModalRoot = createRoot(parent)
     }
   }
 
