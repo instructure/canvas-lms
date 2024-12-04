@@ -25,7 +25,7 @@ import {type RCEBlockProps} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/rce-block')
+const I18n = useI18nScope('block-editor')
 
 export const RCEBlock = ({id, text, onContentChange}: RCEBlockProps) => {
   const {actions, enabled} = useEditor(state => ({

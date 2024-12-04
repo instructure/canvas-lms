@@ -24,7 +24,7 @@ import {useClassNames} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/blank-section')
+const I18n = useI18nScope('block-editor')
 
 export const BlankSection = () => {
   const {enabled} = useEditor(state => ({

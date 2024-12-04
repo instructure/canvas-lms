@@ -44,6 +44,7 @@ const ToolbarCorners = ({rounded, onSave}: ToolbarCornersProps) => {
         withBorder={false}
         withBackground={false}
         screenReaderLabel={I18n.t('Rouned corners')}
+        title={I18n.t('Rouned corners')}
       >
         <SVGIcon size="x-small" src={rounded ? roundedCorners : squareCorners} />
       </IconButton>

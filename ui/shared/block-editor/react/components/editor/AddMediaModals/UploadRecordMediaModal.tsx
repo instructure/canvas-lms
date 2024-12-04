@@ -27,7 +27,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
-const I18n = useI18nScope('block-editor/add-media-modal')
+const I18n = useI18nScope('block-editor')
 
 declare const ENV: GlobalEnv
 

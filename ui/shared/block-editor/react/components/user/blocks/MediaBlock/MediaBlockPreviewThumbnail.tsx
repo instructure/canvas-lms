@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {MediaPreviewModal} from './MediaPreviewModal'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('block-editor/media-block')
+const I18n = useI18nScope('block-editor')
 
 export const MediaBlockPreviewThumbnail = ({
   attachmentId,

@@ -27,7 +27,7 @@ import {HeadingBlockToolbar} from './HeadingBlockToolbar'
 import {type HeadingBlockProps, type HeadingLevel} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/text-block')
+const I18n = useI18nScope('block-editor')
 
 export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) => {
   const {enabled} = useEditor(state => {

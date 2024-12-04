@@ -26,6 +26,9 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {PreviewModal} from './PreviewModal'
 import {IconUndo, IconRedo} from '../../assets/internal-icons'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 export type TopbarProps = {
   toolboxOpen: boolean
@@ -64,7 +67,8 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
               Preview
             </Button>
             <IconButton
-              screenReaderLabel="Undo"
+              screenReaderLabel={I18n.t('Undo')}
+              title={I18n.t('Undo')}
               onClick={() => actions.history.undo()}
               disabled={!canUndo}
               size="small"
@@ -72,7 +76,8 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
               <IconUndo size="x-small" />
             </IconButton>
             <IconButton
-              screenReaderLabel="Redo"
+              screenReaderLabel={I18n.t('Redo')}
+              title={I18n.t('Redo')}
               onClick={() => actions.history.redo()}
               disabled={!canRedo}
               size="small"

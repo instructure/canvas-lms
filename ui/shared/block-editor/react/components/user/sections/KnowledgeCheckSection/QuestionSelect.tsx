@@ -50,6 +50,7 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
         withBackground={false}
         withBorder={false}
         screenReaderLabel={I18n.t('Clear search')}
+        title={I18n.t('Clear search')}
         onClick={() => setValue('')}
       >
         <IconTroubleLine />

@@ -66,6 +66,7 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Color')}
+          title={I18n.t('Color')}
         >
           <IconBackgroundColor size="x-small" />
         </IconButton>
