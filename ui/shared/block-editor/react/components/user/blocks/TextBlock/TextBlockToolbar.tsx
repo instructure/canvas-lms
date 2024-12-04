@@ -55,7 +55,7 @@ import {type TextBlockProps} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/text-block')
+const I18n = useI18nScope('block-editor')
 
 // NOTE: This component uses document.execCommand which is deprecated, but there
 //       (1) is still supported by browsers, and
@@ -159,7 +159,8 @@ const TextBlockToolbar = () => {
   return (
     <>
       <IconButton
-        screenReaderLabel="Bold"
+        screenReaderLabel={I18n.t('Bold')}
+        title={I18n.t('Bold')}
         size="small"
         withBackground={false}
         withBorder={isBold}
@@ -169,6 +170,7 @@ const TextBlockToolbar = () => {
       </IconButton>
       <IconButton
         screenReaderLabel={I18n.t('Italic')}
+        title={I18n.t('Italic')}
         size="small"
         withBackground={false}
         withBorder={isItalic}
@@ -178,6 +180,7 @@ const TextBlockToolbar = () => {
       </IconButton>
       <IconButton
         screenReaderLabel={I18n.t('Underline')}
+        title={I18n.t('Underline')}
         size="small"
         withBackground={false}
         withBorder={isUnderline}
@@ -187,6 +190,7 @@ const TextBlockToolbar = () => {
       </IconButton>
       <IconButton
         screenReaderLabel={I18n.t('Strikethrough')}
+        title={I18n.t('Strikethrough')}
         size="small"
         withBackground={false}
         withBorder={isStrikeThrough}
@@ -223,6 +227,7 @@ const TextBlockToolbar = () => {
         withBackground={false}
         withBorder={false}
         screenReaderLabel={I18n.t('Color')}
+        title={I18n.t('Color')}
         onClick={handleColorButtonClick}
       >
         <IconTextColorLine />

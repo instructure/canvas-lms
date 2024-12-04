@@ -31,7 +31,7 @@ import type {ImageSizeVariant} from '../blocks/ImageBlock/types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/image-block')
+const I18n = useI18nScope('block-editor')
 
 type ResizePopupProps = {
   width: number
@@ -114,6 +114,7 @@ const ResizePopup = ({
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Image Size')}
+          title={I18n.t('Image Size')}
         >
           <IconResize size="x-small" />
         </IconButton>

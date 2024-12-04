@@ -29,7 +29,7 @@ import {type IconProps} from './iconTypes'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/user-icons')
+const I18n = useI18nScope('block-editor')
 
 export const IconAnnouncement = ({elementRef, size = 'small'}: IconProps) => {
   return <IconAnnouncementLine elementRef={elementRef} size={size} title={I18n.t('announcement')} />

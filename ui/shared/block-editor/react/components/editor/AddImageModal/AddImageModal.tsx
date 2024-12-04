@@ -23,7 +23,7 @@ import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/add-image-modal')
+const I18n = useI18nScope('block-editor')
 
 const handleImageSubmit = async (
   selectedPanel: UploadFilePanelId,

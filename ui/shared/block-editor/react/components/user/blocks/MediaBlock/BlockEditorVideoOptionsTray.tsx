@@ -26,7 +26,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/media-block')
+const I18n = useI18nScope('block-editor')
 
 export default function BlockEditorVideoOptionsTray({
   open,

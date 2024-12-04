@@ -26,7 +26,7 @@ import {type TabsBlockProps, type TabsBlockTab} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/tabs-block')
+const I18n = useI18nScope('block-editor')
 
 const TabsBlockToolbar = () => {
   const {
@@ -64,7 +64,8 @@ const TabsBlockToolbar = () => {
       <Menu
         trigger={
           <IconButton
-            screenReaderLabel="Style"
+            screenReaderLabel={I18n.t('Style')}
+            title={I18n.t('Style')}
             size="small"
             withBackground={false}
             withBorder={false}
@@ -93,6 +94,7 @@ const TabsBlockToolbar = () => {
 
       <IconButton
         screenReaderLabel={I18n.t('Add Tab')}
+        title={I18n.t('Add Tab')}
         size="small"
         withBackground={false}
         withBorder={false}

@@ -36,7 +36,7 @@ import {TextArea} from '@instructure/ui-text-area'
 
 import {changeSizeVariant} from '../../../../utils/resizeHelpers'
 
-const I18n = useI18nScope('block-editor/image-block')
+const I18n = useI18nScope('block-editor')
 
 const ImageBlockToolbar = () => {
   const {
@@ -126,6 +126,7 @@ const ImageBlockToolbar = () => {
     <Flex gap="small">
       <IconButton
         screenReaderLabel={I18n.t('Upload Image')}
+        title={I18n.t('Upload Image')}
         withBackground={false}
         withBorder={false}
         onClick={handleShowUploadModal}
@@ -178,6 +179,7 @@ const ImageBlockToolbar = () => {
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Image Size')}
+            title={I18n.t('Image Size')}
           >
             <IconResize size="x-small" />
           </IconButton>
@@ -225,6 +227,7 @@ const ImageBlockToolbar = () => {
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Image Description')}
+            title={I18n.t('Image Description')}
           >
             <IconTextareaLine size="x-small" />
           </IconButton>

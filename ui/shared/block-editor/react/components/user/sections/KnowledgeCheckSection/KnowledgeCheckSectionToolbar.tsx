@@ -58,6 +58,7 @@ const KnowledgeCheckSectionToolbar = () => {
         withBackground={false}
         withBorder={false}
         screenReaderLabel={I18n.t('Edit Quiz')}
+        title={I18n.t('Edit Quiz')}
         onClick={() => setModalOpen(true)}
         data-testid="edit-quiz-button"
       >

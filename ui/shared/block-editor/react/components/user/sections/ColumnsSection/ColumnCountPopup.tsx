@@ -27,7 +27,7 @@ import {type ColumnsSectionProps} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/columnss-block')
+const I18n = useI18nScope('block-editor')
 
 const MIN_COLS = 1
 const MAX_COLS = 4
@@ -68,6 +68,7 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Columns')}
+          title={I18n.t('Columns')}
         >
           <IconTableInsertColumnAfterLine size="x-small" />
         </IconButton>

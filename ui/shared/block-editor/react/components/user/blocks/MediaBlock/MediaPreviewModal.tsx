@@ -25,7 +25,7 @@ import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import StudioMediaPlayer from '@canvas/canvas-studio-player'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
-const I18n = useI18nScope('block-editor/media-block')
+const I18n = useI18nScope('block-editor')
 
 declare const ENV: GlobalEnv & {FEATURES: {consolidated_media_player_iframe: boolean}}
 

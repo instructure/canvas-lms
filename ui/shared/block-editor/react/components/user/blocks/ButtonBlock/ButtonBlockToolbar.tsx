@@ -30,6 +30,9 @@ import {IconBackgroundColor} from '../../../../assets/internal-icons'
 import {isInstuiButtonColor} from './types'
 import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './types'
 import {IconPopup} from '../../common/IconPopup'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('block-editor')
 
 const ButtonBlockToolbar = () => {
   const {
@@ -108,7 +111,8 @@ const ButtonBlockToolbar = () => {
         size="small"
         withBackground={false}
         withBorder={false}
-        screenReaderLabel="Link"
+        screenReaderLabel={I18n.t('Link')}
+        title={I18n.t('Link')}
         onClick={handleLinkButtonClick}
       >
         <IconLinkLine />
@@ -121,7 +125,8 @@ const ButtonBlockToolbar = () => {
             size="small"
             withBackground={false}
             withBorder={false}
-            screenReaderLabel="Size"
+            screenReaderLabel={I18n.t('Size')}
+            title={I18n.t('Size')}
           >
             <IconBoxLine />
           </IconButton>
@@ -129,13 +134,13 @@ const ButtonBlockToolbar = () => {
         onSelect={handleSizeChange}
       >
         <Menu.Item value="small" type="checkbox" defaultSelected={props.size === 'small'}>
-          Small
+          {I18n.t('Small')}
         </Menu.Item>
         <Menu.Item value="medium" type="checkbox" defaultSelected={props.size === 'medium'}>
-          Medium
+          {I18n.t('Medium')}
         </Menu.Item>
         <Menu.Item value="large" type="checkbox" defaultSelected={props.size === 'large'}>
-          Large
+          {I18n.t('Large')}
         </Menu.Item>
       </Menu>
 
@@ -146,7 +151,8 @@ const ButtonBlockToolbar = () => {
             size="small"
             withBackground={false}
             withBorder={false}
-            screenReaderLabel="Style"
+            screenReaderLabel={I18n.t('Style')}
+            title={I18n.t('Style')}
           >
             <IconButtonAndIconMakerLine />
           </IconButton>
@@ -158,13 +164,13 @@ const ButtonBlockToolbar = () => {
           type="checkbox"
           defaultSelected={props.variant === 'condensed'}
         >
-          Text
+          {I18n.t('Text')}
         </Menu.Item>
         <Menu.Item value="outlined" type="checkbox" defaultSelected={props.variant === 'outlined'}>
-          Outlined
+          {I18n.t('Outlined')}
         </Menu.Item>
         <Menu.Item value="filled" type="checkbox" defaultSelected={props.variant === 'filled'}>
-          Filled
+          {I18n.t('Filled')}
         </Menu.Item>
       </Menu>
 
@@ -172,7 +178,8 @@ const ButtonBlockToolbar = () => {
         size="small"
         withBackground={false}
         withBorder={false}
-        screenReaderLabel="Color"
+        screenReaderLabel={I18n.t('Color')}
+        title={I18n.t('Color')}
         disabled={props.variant === 'condensed'}
         onClick={handleColorButtonClick}
       >

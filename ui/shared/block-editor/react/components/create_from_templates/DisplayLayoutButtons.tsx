@@ -114,6 +114,7 @@ export default function DisplayLayoutButtons({
         withBorder={displayType === 'grid'}
         onClick={selectGrid}
         screenReaderLabel={I18n.t('Display templates as grid')}
+        title={I18n.t('Display templates as grid')}
       >
         <SVGIcon src={gridSVG} />
       </IconButton>
@@ -122,6 +123,7 @@ export default function DisplayLayoutButtons({
         withBorder={displayType === 'rows'}
         onClick={selectRows}
         screenReaderLabel={I18n.t('Display templates as rows')}
+        title={I18n.t('Display templates as rows')}
       >
         <SVGIcon src={rowSVG} />
       </IconButton>

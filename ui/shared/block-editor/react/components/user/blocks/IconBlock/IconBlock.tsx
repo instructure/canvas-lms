@@ -24,7 +24,7 @@ import {type IconBlockProps, type IconSize} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/icon-block')
+const I18n = useI18nScope('block-editor')
 
 const IconBlock = ({iconName, size}: IconBlockProps) => {
   const {
