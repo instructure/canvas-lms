@@ -191,7 +191,7 @@ class SisPseudonym
   def pick_pseudonym(account_ids)
     relation = Pseudonym.active.where(user_id: user)
     relation = relation.where(account_id: account_ids) if account_ids
-    relation = relation.where.not(sis_user_id: nil) if require_sis
+    relation = relation.sis if require_sis
     relation = self.class.order(relation)
 
     if root_account.nil? && include_all_pseudonyms

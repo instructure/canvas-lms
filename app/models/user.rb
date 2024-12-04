@@ -1546,7 +1546,7 @@ class User < ActiveRecord::Base
     check_pseudonym ||= Pseudonym.new(account:, user: self) if associated_accounts.exists?
     check_pseudonym&.grants_right?(other_user, :delete) &&
       (check_pseudonym&.grants_right?(other_user, :manage_sis) ||
-       account.pseudonyms.active.where(user_id: other_user).where.not(sis_user_id: nil).none?)
+       account.pseudonyms.active.where(user_id: other_user).sis.none?)
   end
 
   def self.infer_id(obj)
