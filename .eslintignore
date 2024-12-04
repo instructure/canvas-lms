@@ -4,3 +4,4 @@ node_modules
 **/*/.mocharc.js
 /packages/jqueryui-unpatched/**
 /packages/jquery/jquery.js
+Jenkinsfile.js
