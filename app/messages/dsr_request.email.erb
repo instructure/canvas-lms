@@ -1,5 +1,5 @@
-We've finished creating a copy of the Canvas data you requested on <%= @data[:request_time] %>.
-Your download will contain data from Canvas LMS and should be treated with care.
+  <%= t("We've finished creating a copy of the Canvas data you requested on %{request_time}", request_time: I18n.l(@data[:request_time], format: :long)) %>
+  <%= t("Your download will contain data from Canvas LMS and should be treated with care.") %>
 
-Follow the link below to download your export
-<%= @data[:download_url] %>
+  <%= t("Follow the link below to download your export") %>
+  <%= @data[:download_url] %>
