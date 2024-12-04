@@ -1852,6 +1852,23 @@ module Lti
           end
         end
 
+        describe "$LineItem.resultValue.max" do
+          it "has substitution for $LineItem.resultValue.max" do
+            allow(assignment).to receive(:points_possible).and_return(10.0)
+            expect(expand!("$LineItem.resultValue.max")).to eq 10
+          end
+
+          it "does not round if not whole" do
+            allow(assignment).to receive(:points_possible).and_return(9.5)
+            expect(expand!("$LineItem.resultValue.max").to_s).to eq "9.5"
+          end
+
+          it "rounds if whole" do
+            allow(assignment).to receive(:points_possible).and_return(9.0)
+            expect(expand!("$LineItem.resultValue.max").to_s).to eq "9"
+          end
+        end
+
         it "has substitution for $Canvas.assignment.unlockAt" do
           allow(assignment).to receive(:unlock_at).and_return(right_now.to_s)
           expect(expand!("$Canvas.assignment.unlockAt")).to eq right_now.to_s

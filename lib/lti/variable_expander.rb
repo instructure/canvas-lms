@@ -1671,6 +1671,8 @@ module Lti
 
     # Returns the points possible of the assignment that was launched.
     #
+    # This is an alias of `LineItem.resultValue.max`.
+    #
     # @example
     #   ```
     #   100
@@ -2089,6 +2091,20 @@ module Lti
                          (past_ids + [@current_user.lti_context_id]).join(",")
                        },
                        USER_GUARD
+
+    # Returns the points possible of the assignment that was launched.
+    # For other LineItem properties, use the LTI 1.3 <a href="file.assignment_tools.html">Assignments and Grade Services</a>
+    #
+    # This is an alias of `Canvas.assignment.pointsPossible`.
+    #
+    # @example
+    #   ```
+    #   100
+    #   ```
+    register_expansion "LineItem.resultValue.max",
+                       [],
+                       -> { TextHelper.round_if_whole(@assignment.points_possible) },
+                       ASSIGNMENT_GUARD
 
     private
 
