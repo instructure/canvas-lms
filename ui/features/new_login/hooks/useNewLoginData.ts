@@ -30,7 +30,6 @@ interface NewLoginData {
   isPreviewMode?: boolean
   selfRegistrationType?: SelfRegistrationType
   recaptchaKey?: string
-  fftRegistrationUrl?: string
   termsRequired?: boolean
   termsOfUseUrl?: string
   privacyPolicyUrl?: string
@@ -121,7 +120,6 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
           transformSelfRegistrationType
         ),
         recaptchaKey: getStringAttribute(container, 'data-recaptcha-key'),
-        fftRegistrationUrl: getStringAttribute(container, 'data-fft-registration-url'),
         termsRequired: getBooleanAttribute(container, 'data-terms-required'),
         termsOfUseUrl: getStringAttribute(container, 'data-terms-of-use-url'),
         privacyPolicyUrl: getStringAttribute(container, 'data-privacy-policy-url'),
@@ -149,7 +147,6 @@ export const useNewLoginData = (): NewLoginDataResult => {
     isPreviewMode: undefined,
     selfRegistrationType: undefined,
     recaptchaKey: undefined,
-    fftRegistrationUrl: undefined,
     termsRequired: undefined,
     termsOfUseUrl: undefined,
     privacyPolicyUrl: undefined,
