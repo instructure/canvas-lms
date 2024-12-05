@@ -122,6 +122,32 @@ describe ErrorReport do
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
 
+  it "filters password reset params" do
+    mock_attrs = {
+      env: { "REQUEST_URI" => "https://www.example.instructure.com/profile" },
+      remote_ip: "",
+      url: "https://www.example.instructure.com/profile",
+      path_parameters: { controller: "profile", action: "update" },
+      query_parameters: {},
+      request_parameters: { "pseudonym" =>
+        { "old_password" => "elitepotato", "password" => "ghosthunter", "password_confirmation" => "ghosthunter" } }
+    }
+    req = double(mock_attrs)
+    report = described_class.new
+    report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
+
+    expect(report.data["request_parameters"]).to eq(
+      {
+        "pseudonym" =>
+          {
+            "old_password" => "[FILTERED]",
+            "password" => "[FILTERED]",
+            "password_confirmation" => "[FILTERED]"
+          }
+      }.inspect
+    )
+  end
+
   it "does not try to assign protected fields" do
     report = described_class.new
     report.assign_data(id: 1)
