@@ -30,6 +30,7 @@ import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternal
 import QuizEngineModal from '../../react/QuizEngineModal'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import getCookie from '@instructure/get-cookie'
+import {getQuizTypes} from '@canvas/util/resourceTypeUtil'
 
 const I18n = useI18nScope('quizzesIndexView')
 
@@ -224,7 +225,7 @@ export default class IndexView extends Backbone.View {
       <ContentTypeExternalToolTray
         tool={tool}
         placement="quiz_index_menu"
-        acceptedResourceTypes={['quiz']}
+        acceptedResourceTypes={getQuizTypes()}
         targetResourceType="quiz"
         allowItemSelection={false}
         selectableItems={[]}
