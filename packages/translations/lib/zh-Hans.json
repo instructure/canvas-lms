@@ -1442,12 +1442,6 @@
     "music_icon_4db5c972": {
         "message": "音乐图标"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "必须至少达到 { percentage }%"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "必须至少为 { width } x { height }px"
-    },
     "my_files_2f621040": {
         "message": "我的文件"
     },

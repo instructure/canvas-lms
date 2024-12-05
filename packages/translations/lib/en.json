@@ -1485,12 +1485,6 @@
   "music_icon_4db5c972": {
     "message": "Music Icon"
   },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Must be at least { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Must be at least { width } x { height }px"
-  },
   "my_files_2f621040": {
     "message": "My files"
   },
@@ -1728,6 +1722,9 @@
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Percentage must be at least { percentage }%"
+  },
   "performing_arts_icon_f3497486": {
     "message": "Performing Arts Icon"
   },
@@ -1760,6 +1757,9 @@
   },
   "pixels_52ece7d1": {
     "message": "Pixels"
+  },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Pixels must be at least { width } x { height }px"
   },
   "play_1a47eaa7": {
     "message": "Play"
