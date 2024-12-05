@@ -109,6 +109,7 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
       <div>
         <div id="textarea-container">
           <TextArea
+            data-testid="comment-textarea"
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
             placeholder={I18n.t('Leave a comment')}
             onChange={this.handleCommentChange}

@@ -333,6 +333,7 @@
     "jest-junit": "^7",
     "jest-localstorage-mock": "^2",
     "jest-moxios-utils": "^1",
+    "jsdom": "25.0.1",
     "jsdom-global": "^3.0.2",
     "json-loader": "^0.5.7",
     "karma": "^6.4.2",
