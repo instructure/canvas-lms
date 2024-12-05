@@ -21,6 +21,7 @@ import {useEditor} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
+// @ts-expect-error
 import {ColorPicker, type ColorSpec, type TabSpec} from '@instructure/canvas-rce'
 import {getColorsInUse, type ColorsInUse} from '../../../utils'
 
@@ -80,6 +81,7 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
       shouldCloseOnDocumentClick={true}
     >
       <ColorPicker
+        // @ts-expect-error
         tabs={tabs}
         // @ts-ignore
         colorsInUse={colorsInUse}

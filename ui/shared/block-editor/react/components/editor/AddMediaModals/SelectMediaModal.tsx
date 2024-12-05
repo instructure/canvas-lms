@@ -17,6 +17,7 @@
  */
 
 import React, {useContext, useState} from 'react'
+// @ts-expect-error
 import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {RCSPropsContext} from '../../../Contexts'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -76,6 +77,7 @@ export const SelectMediaModal = ({
       trayProps={trayProps}
       label={label}
       panels={modalPanels}
+      // @ts-expect-error
       onDismiss={onDismiss}
       onSubmit={handleSubmit}
       forBlockEditorUse={true}

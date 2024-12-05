@@ -17,6 +17,7 @@
  */
 
 import React, {useContext, useState} from 'react'
+// @ts-expect-error
 import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
@@ -116,6 +117,7 @@ export const AddImageModal = ({
       trayProps={trayProps}
       label={label}
       panels={modalPanels}
+      // @ts-expect-error
       onDismiss={onDismiss}
       onSubmit={handleSubmit}
       forBlockEditorUse={true}
