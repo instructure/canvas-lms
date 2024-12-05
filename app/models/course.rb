@@ -164,6 +164,7 @@ class Course < ActiveRecord::Base
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :group_categories, -> { collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :all_group_categories, -> { collaborative }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :combined_group_and_differentiation_tag_categories, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :groups, -> { collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :active_groups, -> { active.collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :differentiation_tag_categories, -> { non_collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
