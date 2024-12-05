@@ -260,12 +260,7 @@ export function handleContentItemResult(
   }
   const populateUrl = (url: string) => {
     if (url && url !== '') {
-      if (
-        $('#external_tool_create_url').val() === '' ||
-        window.ENV.FEATURES.lti_overwrite_user_url_input_select_content_dialog
-      ) {
-        $('#external_tool_create_url').val(url)
-      }
+      $('#external_tool_create_url').val(url)
     }
   }
   if (typeof result.url !== 'undefined' && result.url !== '') {

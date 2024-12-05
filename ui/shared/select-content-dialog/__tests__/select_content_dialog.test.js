@@ -147,9 +147,6 @@ describe('SelectContentDialog', () => {
   })
 
   it('close dialog when 1.1 content items are empty', () => {
-    window.ENV.FEATURES = {
-      lti_overwrite_user_url_input_select_content_dialog: true,
-    }
     const l = document.getElementById('test-tool')
     Events.onContextExternalToolSelect.bind(l)(clickEvent)
     const $dialog = $('#resource_selection_dialog')
@@ -227,9 +224,6 @@ describe('SelectContentDialog: Dialog options', () => {
 
 describe('SelectContentDialog: deepLinkingResponseHandler', () => {
   beforeEach(() => {
-    window.ENV.FEATURES = {
-      lti_overwrite_user_url_input_select_content_dialog: true,
-    }
     $('#fixtures').html(`
         <div>
           <div id='select_context_content_dialog'>
@@ -351,7 +345,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
     expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/tool-url')
   })
 
-  it('Overwrites the tool url if the lti_overwrite_user_url_input_select_content_dialog feature flag is set', async () => {
+  it('Overwrites the tool url', async () => {
     $('#external_tool_create_url').val('foo')
     deepLinkingResponseHandler(
       makeDeepLinkingEvent(
@@ -362,17 +356,6 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
       )
     )
     expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/tool-url')
-  })
-
-  it("Doesn't overwrite the tool url if the lti_overwrite_user_url_input_select_content_dialog feature flag is not set", async () => {
-    window.ENV.FEATURES.lti_overwrite_user_url_input_select_content_dialog = false
-    $('#external_tool_create_url').val('foo')
-    deepLinkingResponseHandler(
-      makeDeepLinkingEvent({
-        title: 'My Tool',
-      })
-    )
-    expect($('#external_tool_create_url').val()).toEqual('foo')
   })
 
   it('sets the tool title', async () => {
