@@ -17,7 +17,6 @@
  */
 
 import 'isomorphic-fetch'
-import {parse} from 'url'
 import {
   saveClosedCaptions,
   saveClosedCaptionsForAttachment,
@@ -27,6 +26,7 @@ import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
 import alertHandler from '../rce/alertHandler'
 import buildError from './buildError'
 import RCEGlobals from '../rce/RCEGlobals'
+import {parseUrlPath} from '../util/url-util'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -425,7 +425,7 @@ class RceApiSource {
       // response. we can't just fetch the location as would be intended because
       // it requires Canvas authentication. we also don't have an RCE API
       // endpoint to forward it through.
-      const {pathname} = parse(uploadResults.location)
+      const pathname = parseUrlPath(uploadResults.location)
       const matchData = pathname.match(/^\/api\/v1\/files\/((?:\d+~)?\d+)$/)
       if (!matchData) {
         const error = new Error('cannot determine file ID from location')
@@ -479,7 +479,7 @@ class RceApiSource {
 
     try {
       url = new URL(uri)
-    } catch (e) {
+    } catch (_e) {
       // Just return the URI if it was invalid
       return uri
     }
