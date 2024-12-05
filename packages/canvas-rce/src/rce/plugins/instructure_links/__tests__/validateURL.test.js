@@ -16,14 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import validateURL from '../plugins/instructure_links/validateURL'
+import validateURL from '../validateURL'
 
 describe('validateURL', () => {
   it('accepts ftp URLs', () => {
+    expect(validateURL('ftp://host/path')).toBe(true)
     expect(validateURL('ftp://host:port/path')).toBe(true)
   })
   it('accepts http URLs', () => {
     expect(validateURL('http://host:port/path')).toBe(true)
+    expect(validateURL('http://host:port/path?query')).toBe(true)
+    expect(validateURL('http://host:port/path?query#fragment')).toBe(true)
   })
   it('accepts https URLs', () => {
     expect(validateURL('https://host:port/path')).toBe(true)
@@ -31,6 +34,7 @@ describe('validateURL', () => {
   it('accepts mailto URLs', () => {
     expect(validateURL('mailto://you@address')).toBe(true)
     expect(validateURL('mailto:you@address')).toBe(true)
+    expect(validateURL('mailto://you@address?subject=subject&body=body')).toBe(true)
   })
   it('accepts skype URLs', () => {
     expect(validateURL('skype://participant1;participant2')).toBe(true)
@@ -69,5 +73,13 @@ describe('validateURL', () => {
     expect(validateURL('//')).toBe(false)
     expect(validateURL('mailto:')).toBe(false)
     expect(validateURL('mailto://')).toBe(false)
+    expect(validateURL('skype:')).toBe(false)
+    expect(validateURL('skype://')).toBe(false)
+    expect(validateURL('tel:')).toBe(false)
+    expect(validateURL('tel://')).toBe(false)
+    expect(validateURL('ftp:')).toBe(false)
+    expect(validateURL('ftp:/')).toBe(false)
+    expect(validateURL('ftp://')).toBe(false)
+    expect(validateURL('ftp://x')).toBe(true)
   })
 })
