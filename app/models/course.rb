@@ -1025,6 +1025,7 @@ class Course < ActiveRecord::Base
   scope :unpublished, -> { where(workflow_state: %w[created claimed]) }
 
   scope :deleted, -> { where(workflow_state: "deleted") }
+  scope :archived, -> { deleted.where.not(archived_at: nil) }
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => { workflow_state: "deleted" }) }
   scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") } # rubocop:disable Rails/WhereEquals mct is a table, not a column
@@ -1339,14 +1340,12 @@ class Course < ActiveRecord::Base
           appointment_participants.active.current.update_all(workflow_state: "deleted")
           appointment_groups.each(&:clear_cached_available_slots!)
         elsif deleted?
-          enroll_scope = Enrollment.where("course_id=? AND workflow_state<>'deleted'", self)
-
-          user_ids = enroll_scope.group(:user_id).pluck(:user_id).uniq
+          user_ids = enrollments.group(:user_id).pluck(:user_id).uniq
           if user_ids.any?
-            enrollment_info = enroll_scope.select(:id, :workflow_state).to_a
+            enrollment_info = enrollments.select(:id, :workflow_state).to_a
             if enrollment_info.any?
               data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "deleted")
-              Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted")
+              Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted", archived_at:)
               EnrollmentState.transaction do
                 locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
                 EnrollmentState.where(enrollment_id: locked_ids)
@@ -1631,7 +1630,20 @@ class Course < ActiveRecord::Base
     save!
   end
 
-  def self.destroy_batch(courses, sis_batch: nil, batch_mode: false)
+  def archived?
+    deleted? && archived_at.present?
+  end
+
+  def archive!
+    return false if template?
+
+    self.workflow_state = "deleted"
+    self.deleted_at = self.archived_at = Time.now.utc
+    save!
+  end
+
+  def self.destroy_batch(courses, sis_batch: nil, batch_mode: false, archive: false)
+    archived_at = Time.now.utc if archive
     enroll_scope = Enrollment.active.where(course_id: courses)
     enroll_scope.find_in_batches do |e_batch|
       user_ids = e_batch.map(&:user_id).uniq.sort
@@ -1640,7 +1652,7 @@ class Course < ActiveRecord::Base
                                                        updated_state: "deleted",
                                                        batch_mode_delete: batch_mode)
       SisBatchRollBackData.bulk_insert_roll_back_data(data) if data
-      Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
+      Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: "deleted", updated_at: Time.zone.now, archived_at:)
       EnrollmentState.where(enrollment_id: e_batch.map(&:id))
                      .update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
@@ -1648,7 +1660,7 @@ class Course < ActiveRecord::Base
     end
     c_data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: courses, updated_state: "deleted", batch_mode_delete: batch_mode)
     SisBatchRollBackData.bulk_insert_roll_back_data(c_data) if c_data
-    Course.where(id: courses).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
+    Course.where(id: courses).update_all(workflow_state: "deleted", updated_at: Time.zone.now, archived_at:)
     courses.count
   end
 
