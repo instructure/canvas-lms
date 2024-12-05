@@ -52,7 +52,7 @@ const AccessTokenDetails = ({
 }: AccessTokenDetailsProps) => {
   const [token, setToken] = useState(loadedToken)
   const [networkState, setNetworkState] = useState<NetworkState>(token ? 'loaded' : 'loading')
-  const shouldShowTokenWarning = (token?.visible_token.length ?? 0) > 10
+  const shouldShowTokenWarning = (token?.visible_token?.length ?? 0) > 10
   const title = I18n.t('Access Token Details')
   const buttonText =
     networkState === 'submitting' ? I18n.t('Regenerating token...') : I18n.t('Regenerate Token')
