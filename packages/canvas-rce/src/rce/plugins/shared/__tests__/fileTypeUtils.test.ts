@@ -25,14 +25,33 @@ import {
   isText,
   isVideo,
   mediaPlayerURLFromFile,
+  getIconFromType,
 } from '../fileTypeUtils'
 import RCEGlobals from '../../../RCEGlobals'
+import {
+  IconAudioLine,
+  IconDocumentLine,
+  IconMsExcelLine,
+  IconMsPptLine,
+  IconMsWordLine,
+  IconPdfLine,
+  IconVideoLine,
+} from '@instructure/ui-icons'
 
 describe('fileTypeUtils', () => {
   describe('isImage', () => {
-    it('detects audio types', () => {
+    it('detects image types', () => {
       expect(isImage('image')).toBe(true)
       expect(isImage('image/png')).toBe(true)
+      expect(isImage('image/jpeg')).toBe(true)
+      expect(isImage('image/gif')).toBe(true)
+      expect(isImage('image/webp')).toBe(true)
+    })
+
+    it('rejects non-image types', () => {
+      expect(isImage('text/plain')).toBe(false)
+      expect(isImage('application/pdf')).toBe(false)
+      expect(isImage('')).toBe(false)
     })
   })
 
@@ -66,6 +85,16 @@ describe('fileTypeUtils', () => {
     it('detects text types', () => {
       expect(isText('text')).toBe(true)
       expect(isText('text/html')).toBe(true)
+      expect(isText('text/plain')).toBe(true)
+      expect(isText('text/css')).toBe(true)
+      expect(isText('text/javascript')).toBe(true)
+    })
+
+    it('rejects non-text types', () => {
+      expect(isText('application/json')).toBe(false)
+      expect(isText('image/png')).toBe(false)
+      expect(isText('plain/text')).toBe(false)
+      expect(isText('')).toBe(false)
     })
   })
 
@@ -108,6 +137,51 @@ describe('fileTypeUtils', () => {
 
     it('returns empty string if the extension is not iWork', () => {
       expect(getIWorkType('test.txt')).toEqual('')
+    })
+  })
+
+  describe('getIconFromType', () => {
+    it('returns video icon for video types', () => {
+      expect(getIconFromType('video/mp4')).toBe(IconVideoLine)
+      expect(getIconFromType('video/quicktime')).toBe(IconVideoLine)
+    })
+
+    it('returns audio icon for audio types', () => {
+      expect(getIconFromType('audio/mp3')).toBe(IconAudioLine)
+      expect(getIconFromType('audio/wav')).toBe(IconAudioLine)
+    })
+
+    it('returns word icon for word processing types', () => {
+      expect(getIconFromType('application/msword')).toBe(IconMsWordLine)
+      expect(
+        getIconFromType('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+      ).toBe(IconMsWordLine)
+      expect(getIconFromType('application/vnd.apple.pages')).toBe(IconMsWordLine)
+    })
+
+    it('returns powerpoint icon for presentation types', () => {
+      expect(getIconFromType('application/vnd.ms-powerpoint')).toBe(IconMsPptLine)
+      expect(
+        getIconFromType('application/vnd.openxmlformats-officedocument.presentationml.presentation')
+      ).toBe(IconMsPptLine)
+      expect(getIconFromType('application/vnd.apple.keynote')).toBe(IconMsPptLine)
+    })
+
+    it('returns excel icon for spreadsheet types', () => {
+      expect(getIconFromType('application/vnd.ms-excel')).toBe(IconMsExcelLine)
+      expect(
+        getIconFromType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+      ).toBe(IconMsExcelLine)
+      expect(getIconFromType('application/vnd.apple.numbers')).toBe(IconMsExcelLine)
+    })
+
+    it('returns pdf icon for pdf type', () => {
+      expect(getIconFromType('application/pdf')).toBe(IconPdfLine)
+    })
+
+    it('returns default document icon for unknown types', () => {
+      expect(getIconFromType('application/unknown')).toBe(IconDocumentLine)
+      expect(getIconFromType('')).toBe(IconDocumentLine)
     })
   })
 
@@ -170,6 +244,7 @@ describe('fileTypeUtils', () => {
       RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
 
       afterAll(() => {
+        // @ts-expect-error
         RCEGlobals.getFeatures.mockRestore()
       })
 
