@@ -15,17 +15,18 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import PaginatedCollectionView from '@canvas/pagination/backbone/views/PaginatedCollectionView'
-import DateRangeSearchView from './DateRangeSearchView'
-import AutocompleteView from './AutocompleteView'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import GradeChangeLoggingItemView from './GradeChangeLoggingItemView'
 import GradeChangeLoggingCollection from '../collections/GradeChangeLoggingCollection'
 import template from '../../jst/gradeChangeLoggingContent.handlebars'
 import gradeChangeLoggingResultsTemplate from '../../jst/gradeChangeLoggingResults.handlebars'
 import {extend} from '@canvas/backbone/utils'
+import GradeChangeActivityForm from '../../react/GradeChangeActivityForm'
 
 extend(GradeChangeLoggingContentView, Backbone.View)
 
@@ -35,19 +36,6 @@ export default function GradeChangeLoggingContentView(options) {
   this.options = options
   this.collection = new GradeChangeLoggingCollection()
   Backbone.View.apply(this, arguments)
-  this.dateRangeSearch = new DateRangeSearchView({
-    name: 'gradeChangeLogging',
-  })
-  this.graderSearch = new AutocompleteView({
-    collection: this.options.users,
-    fieldName: 'grader_id',
-    placeholder: 'Grader',
-  })
-  this.studentSearch = new AutocompleteView({
-    collection: this.options.users,
-    fieldName: 'student_id',
-    placeholder: 'Student',
-  })
   this.resultsView = new PaginatedCollectionView({
     template: gradeChangeLoggingResultsTemplate,
     itemView: GradeChangeLoggingItemView,
@@ -58,52 +46,26 @@ export default function GradeChangeLoggingContentView(options) {
 GradeChangeLoggingContentView.mixin(ValidatedMixin)
 
 GradeChangeLoggingContentView.child('resultsView', '#gradeChangeLoggingSearchResults')
-GradeChangeLoggingContentView.child('dateRangeSearch', '#gradeChangeDateRangeSearch')
-GradeChangeLoggingContentView.child('graderSearch', '#gradeChangeGraderSearch')
-GradeChangeLoggingContentView.child('studentSearch', '#gradeChangeStudentSearch')
 
 Object.assign(GradeChangeLoggingContentView.prototype, {
-  els: {
-    '#gradeChangeLoggingSearch': '$gradeChangeLogginSearch',
-    '#gradeChangeLoggingForm': '$form',
-  },
-
   template,
 
-  events: {'submit #gradeChangeLoggingForm': 'onSubmit'},
+  afterRender() {
+    const mountPoint = document.getElementById('grade_change_activity_form_mount_point')
+    const root = createRoot(mountPoint)
 
-  onSubmit(event) {
-    event.preventDefault()
-    const json = this.$form.toJSON()
-    if (this.validate(json)) {
-      return this.updateCollection(json)
-    }
+    root.render(
+      <GradeChangeActivityForm
+        accountId={ENV.ACCOUNT_ID}
+        onSubmit={data => {
+          this.updateCollection(data)
+        }}
+      />
+    )
   },
 
   updateCollection(json) {
-    // Update the params (which fetches the collection)
-    if (!json) json = this.$form.toJSON()
-
     return this.collection.setParams(json)
-  },
-
-  validate(json) {
-    if (!json) {
-      json = this.$form.toJSON()
-    }
-    delete json.gradeChange_submit
-    const errors = this.dateRangeSearch.validate(json) || {}
-    if (!json.course_id && !json.student_id && !json.grader_id && !json.assignment_id) {
-      errors.gradeChange_submit = [
-        {
-          type: 'required',
-          message:
-            'A valid Grader, Student, Course Id, or Assignment Id is required to search events.',
-        },
-      ]
-    }
-    this.showErrors(errors)
-    return $.isEmptyObject(errors)
   },
 
   attach() {

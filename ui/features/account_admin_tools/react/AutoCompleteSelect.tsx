@@ -21,6 +21,7 @@ import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {QueryParameterRecord} from '@instructure/query-string-encoding'
 
 const I18n = useI18nScope('course_logging_content')
 
@@ -37,12 +38,14 @@ interface SelectState<T> {
 export interface AutoCompleteSelectProps<T> extends ComponentProps<typeof Select> {
   url: string
   renderOptionLabel: (option: T) => string
+  fetchParams?: QueryParameterRecord
   overrideSelectProps?: Partial<ComponentProps<typeof Select>>
 }
 
 const AutoCompleteSelect = <T extends {id: string}>({
   url,
   renderOptionLabel,
+  fetchParams,
   overrideSelectProps,
   ...selectProps
 }: AutoCompleteSelectProps<T>) => {
@@ -114,7 +117,7 @@ const AutoCompleteSelect = <T extends {id: string}>({
           doFetchApi<Array<T>>({
             path: url,
             method: 'GET',
-            params: {search_term: searchTerm, 'state[]': 'all'},
+            params: {search_term: searchTerm, ...fetchParams},
             signal: abortControllerRef.current.signal,
           })
             .then(({json}) => {

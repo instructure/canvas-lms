@@ -37,16 +37,7 @@ describe "admin_tools" do
     fj("#{form_sel} .roster tbody tr:nth(#{click_row}) td").click
   end
 
-  def perform_autocomplete_search(field_sel, search_term, click_row = 0)
-    set_value f(field_sel), search_term
-    sleep 0.5
-    wait_for_ajaximations
-    autocomplete_value = fj(".ui-autocomplete.ui-menu > .ui-menu-item:nth(#{click_row}) > a")
-    autocomplete_value.click
-    autocomplete_value
-  end
-
-  def perform_autocomplete_search_react(input, search_term, row_index_to_select = 0)
+  def perform_autocomplete_search(input, search_term, row_index_to_select = 0)
     input.send_keys(search_term)
     wait_for_ajaximations
     selected_option = fj("[role='listbox'] [role='option']:nth(#{row_index_to_select})")
@@ -88,7 +79,7 @@ describe "admin_tools" do
     event ||= @event
 
     form = f('[aria-label="Course Activity Form"]')
-    perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), search_term)
+    perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), search_term)
     form.find("button[aria-label='Find']").click
     wait_for_ajaximations
 
@@ -418,8 +409,9 @@ describe "admin_tools" do
     end
 
     it "searches by grader name and show history" do
-      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      perform_autocomplete_search(form.find("[name='grader_id'][aria-autocomplete='both']"), @teacher.name)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
 
@@ -436,8 +428,9 @@ describe "admin_tools" do
     end
 
     it "displays 'y' if graded anonymously" do
-      perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      perform_autocomplete_search(form.find("[name='grader_id'][aria-autocomplete='both']"), @teacher.name)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
 
       cols = ffj("#gradeChangeLoggingSearchResults table tbody tr:first td")
@@ -445,30 +438,34 @@ describe "admin_tools" do
     end
 
     it "searches by student name" do
-      perform_autocomplete_search("#student_id-autocompleteField", @student.name)
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      perform_autocomplete_search(form.find("[name='student_id'][aria-autocomplete='both']"), @student.name)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "searches by course id" do
-      set_value f("#gradeChangeCourseSearch"), @course.id
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      form.find("[name='course_id']").send_keys(@course.id)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "searches by assignment id" do
-      set_value f("#gradeChangeAssignmentSearch"), @assignment.id
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      form.find("[name='assignment_id']").send_keys(@assignment.id)
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       scroll_page_to_bottom
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
 
     it "fails gracefully with invalid ids" do
-      set_value f("#gradeChangeAssignmentSearch"), "notarealid"
-      f("#loggingGradeChange button[name=gradeChange_submit]").click
+      form = f('[aria-label="Grade Change Activity Form"]')
+      form.find("[name='assignment_id']").send_keys("notarealid")
+      form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(f("#gradeChangeLoggingSearchResults").text).to eq "No items found"
     end
@@ -497,7 +494,7 @@ describe "admin_tools" do
       @course.save
 
       form = f('[aria-label="Course Activity Form"]')
-      perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
+      perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
       form.find("button[aria-label='Find']").click
       wait_for_ajaximations
 
@@ -516,7 +513,7 @@ describe "admin_tools" do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
       form = f('[aria-label="Course Activity Form"]')
-      perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), @course.id)
+      perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), @course.id)
       form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       cols = ffj("#courseLoggingSearchResults table tbody tr:last td")
@@ -525,7 +522,7 @@ describe "admin_tools" do
 
     it "fails gracefully with invalid ids" do
       form = f('[aria-label="Course Activity Form"]')
-      perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), "notarealid")
+      perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), "notarealid")
       form.find("button[aria-label='Find']").click
       wait_for_ajaximations
       expect(f("#courseLoggingSearchResults ").text).to eq "No items found"
@@ -536,7 +533,7 @@ describe "admin_tools" do
       @course.destroy
 
       form = f('[aria-label="Course Activity Form"]')
-      selection_option = perform_autocomplete_search_react(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
+      selection_option = perform_autocomplete_search(form.find("[name='course_id'][aria-autocomplete='both']"), @course.name)
       expect(selection_option).not_to be_nil
 
       form.find("button[aria-label='Find']").click
