@@ -6496,6 +6496,7 @@ he:
   created_by_sis_e1449c31: "נוצר ע\"י המערכת הבית ספרית"
   created_created_bf5714b8: "נוצר%{created}"
   created_group_group_name_2097306b: "הקבוצה %{group_name} נוצרה "
+  creating_261dbb7a: יוצר...
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "יצירת ייצוא הגשות תאפשר לך להוריד קובץ זיפ של כל המשימות שהוגשו לכל הקורסים הנוכחיים ואלו שנסתיימו. הקובץ שיווצר יכול להיות גדול מאד, כך שיתכן שהתהליך יתארך. ניתן לעזוב דף זה ולחזור אליו מאוחר יותר."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "זכויות במסגרת Creative Commons"
@@ -10401,6 +10402,7 @@ he:
   international_sms_send_from_recipient_s_country_43881ea4: "מסרון בינלאומי - שיגור ממדינת הנמען"
   international_text_messaging_rates_may_apply_d4b4a97a: "יתכן חיוב לפי שיעורי עלות מסרונים בינלאומיים"
   internet2_254c6ca6: Internet2
+  introduction_43f53b7d: הקדמה
   invalid_address_book_strategy_904a7ada: "איסטרטגיה לא תקינה של פנקס הכתובות"
   invalid_authenticity_token_b753558c: "אסימון הזדהות לא תקין"
   invalid_aws_configuration_e8a6ae0f: "הגדרות לא תקינות של AWS"
