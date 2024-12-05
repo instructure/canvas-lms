@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// eslint-disable-next-line import/no-nodejs-modules
 import {format, parse} from 'url'
 import {absoluteToRelativeUrl} from '../../../common/fileUrl'
 import {
@@ -29,7 +30,25 @@ import {
 } from '@instructure/ui-icons'
 import RCEGlobals from '../../RCEGlobals'
 
-export function getIconFromType(type) {
+type FileType = {
+  'content-type'?: string
+  content_type?: string
+  contextId?: string
+  contextType?: string
+  embed?: {
+    id: string
+  }
+  embedded_iframe_url?: string
+  href?: string
+  id?: string
+  media_entry_id?: string
+  mediaEntryId?: string
+  type?: string
+  url?: string
+  uuid?: string
+}
+
+export function getIconFromType(type: string) {
   if (isVideo(type)) {
     return IconVideoLine
   } else if (isAudio(type)) {
@@ -55,31 +74,31 @@ export function getIconFromType(type) {
   }
 }
 
-export function isImage(type) {
+export function isImage(type: string) {
   return /^image/.test(type)
 }
 
-export function isAudioOrVideo(type) {
+export function isAudioOrVideo(type: string) {
   return isVideo(type) || isAudio(type)
 }
 
-export function isVideo(type) {
+export function isVideo(type: string) {
   return /^video/.test(type)
 }
 
-export function isAudio(type) {
+export function isAudio(type: string) {
   return /^audio/.test(type)
 }
 
-export function isText(type) {
+export function isText(type: string) {
   return /^text/.test(type)
 }
 
-export function isIWork(filename) {
+export function isIWork(filename: string) {
   return [/.pages$/i, /.key$/i, /.numbers$/i].some(regex => regex.test(filename))
 }
 
-export function getIWorkType(filename) {
+export function getIWorkType(filename: string) {
   const tokens = filename.split('.')
   if (tokens.length <= 1) return ''
   const lastToken = tokens[tokens.length - 1]
@@ -95,27 +114,37 @@ export function getIWorkType(filename) {
   }
 }
 
-export function mediaPlayerURLFromFile(file, canvasOrigin) {
+export function mediaPlayerURLFromFile(file: FileType, canvasOrigin?: string) {
   // why oh why aren't we consistent?
   const content_type = file['content-type'] || file.content_type || file.type
+  if (typeof content_type !== 'string') throw new Error('Invalid content type')
   const type = content_type.replace(/\/.*$/, '')
 
   if (
+    // @ts-expect-error
     RCEGlobals.getFeatures()?.media_links_use_attachment_id &&
     isAudioOrVideo(content_type) &&
     file.id
   ) {
     const url = parse(`/media_attachments_iframe/${file.id}`, true)
     url.query.type = type
+    // @ts-expect-error
     url.query.embedded = true
-    if (file.uuid && (file.contextType == 'User' ||
-      (!!canvasOrigin &&
-        canvasOrigin !== window.location.origin &&
-        RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
+    if (
+      file.uuid &&
+      (file.contextType == 'User' ||
+        (!!canvasOrigin &&
+          canvasOrigin !== window.location.origin &&
+          // @ts-expect-error
+          RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
     ) {
       url.query.verifier = file.uuid
     } else if (file.url || file.href) {
-      const parsed_url = parse(file.url || file.href, true)
+      const href = file.url || file.href
+      if (typeof href !== 'string') {
+        throw new Error('Invalid URL')
+      }
+      const parsed_url = parse(href, true)
       if (parsed_url.query.verifier) {
         url.query.verifier = parsed_url.query.verifier
       }
@@ -140,7 +169,11 @@ export function mediaPlayerURLFromFile(file, canvasOrigin) {
       return `/media_objects_iframe/${mediaEntryId}?type=${type}`
     }
 
-    const parsed_url = parse(file.url || file.href, true)
+    const href = file.url || file.href
+    if (typeof href !== 'string') {
+      throw new Error('Invalid URL')
+    }
+    const parsed_url = parse(href, true)
     const verifier = parsed_url.query.verifier ? `&verifier=${parsed_url.query.verifier}` : ''
     return `/media_objects_iframe?mediahref=${parsed_url.pathname}${verifier}&type=${type}`
   }
