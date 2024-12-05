@@ -31,8 +31,8 @@ const renderComponent = (props = {}) => {
   return render(
     <ColorPicker
       tabs={{
-        foreground: '#000000',
-        background: '#ffffff',
+        foreground: '#111111',
+        background: '#ff0000',
       }}
       onCancel={jest.fn()}
       onSave={jest.fn()}
@@ -120,10 +120,44 @@ describe('ColorPicker', () => {
     expect(queryByTestId('color-contrast-summary')).not.toBeInTheDocument()
   })
 
+  it('does show color contrast when given a foreground and effective background color', () => {
+    const {getAllByRole, getByTestId} = renderComponent({
+      tabs: {
+        effectiveBgColor: '#ff0000',
+        foreground: '#000000',
+      },
+    })
+
+    const tabs = getAllByRole('tab')
+    expect(tabs).toHaveLength(1)
+    const contrastSummary = getByTestId('color-contrast-summary')
+    expect(contrastSummary.textContent).toContain('PASS')
+    contrastSummary.click()
+    const constrast = getByTestId('color-contrast')
+    expect(constrast.textContent).toContain('5.25:1')
+  })
+
+  it('does show color contrast when given a background and border color', () => {
+    const {getAllByRole, getByTestId} = renderComponent({
+      tabs: {
+        background: '#ffffff',
+        border: '#000000',
+      },
+    })
+
+    const tabs = getAllByRole('tab')
+    expect(tabs).toHaveLength(2)
+    const contrastSummary = getByTestId('color-contrast-summary')
+    expect(contrastSummary.textContent).toContain('PASS')
+    contrastSummary.click()
+    const constrast = getByTestId('color-contrast')
+    expect(constrast.textContent).toContain('21:1')
+  })
+
   it('uses colors on the page for presets', async () => {
     const {getByTestId} = renderComponent({
       tabs: {
-        background: '#ffffff',
+        background: '#ff0000',
         border: '#000000',
       },
       colorsInUse: {background: ['#ababab', '#cdcdcd']},
@@ -162,7 +196,7 @@ describe('ColorPicker', () => {
 
     expect(onSave).toHaveBeenCalledWith({
       fgcolor: '#b82828',
-      bgcolor: '#ffffff',
+      bgcolor: '#ff0000',
     })
   })
 })
