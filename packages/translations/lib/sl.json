@@ -1442,12 +1442,6 @@
     "music_icon_4db5c972": {
         "message": "Ikona glasbe"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Mora biti vsaj { percentage }%."
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Mora biti vsaj { width } x { height } px."
-    },
     "my_files_2f621040": {
         "message": "Moje datoteke"
     },

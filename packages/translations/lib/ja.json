@@ -1442,12 +1442,6 @@
     "music_icon_4db5c972": {
         "message": "音楽のアイコン"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "{ percentage }%以上でなければなりません"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "少なくとも { width } x { height }px でなければなりません"
-    },
     "my_files_2f621040": {
         "message": "マイ ファイル"
     },
