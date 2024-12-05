@@ -802,7 +802,7 @@ const CanvasInbox = ({breakpoints}) => {
             >
               <MessageListActionContainer
                 activeMailbox={scope}
-                activeCourseFilter={courseFilter}
+                activeCourseFilterID={courseFilter}
                 onSelectMailbox={newScope => {
                   setSelectedConversations([])
                   setScope(newScope)
@@ -944,7 +944,7 @@ const CanvasInbox = ({breakpoints}) => {
           selectedIds={selectedIds}
           contextIdFromUrl={urlContextId}
           maxGroupRecipientsMet={maxGroupRecipientsMet}
-          currentCourseFilter={courseFilter}
+          activeCourseFilterID={courseFilter}
           inboxSignatureBlock={inboxSignatureBlock}
         />
         <ManageUserLabels
