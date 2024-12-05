@@ -16,37 +16,60 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext, useState} from 'react'
-import {SimpleSelect} from '@instructure/ui-simple-select'
+import React, {useContext, useMemo, useState} from 'react'
+import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-// TODO: Translate the language controls into the canvas target locale.
+const I18n = useI18nScope('discussion_posts')
+
+// TODO: Translate the language co> ntrols into the canvas target locale.
 export const TranslationControls = () => {
-  const heading = `Translate Discussion`
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
     DiscussionManagerUtilityContext
   )
-  const [language, setLanguage] = useState(translationLanguages.current[0].name)
+  const [input, setInput] = useState(translationLanguages.current?.[0]?.name || '')
+  const [selected, setSelected] = useState(null)
 
-  const handleSelect = (e, {id, value}) => {
-    setLanguage(value)
+  const handleSelect = selectedArray => {
+    const id = selectedArray[0]
+    const result = translationLanguages.current.find(({id: _id}) => id === _id)
 
-    // Also set global language in context
-    setTranslateTargetLanguage(id)
+    if (!result) {
+      return
+    }
+
+    setInput(result.name)
+    setSelected(result.id)
+    setTranslateTargetLanguage(result.id)
   }
+
+  const filteredLanguages = useMemo(() => {
+    if (!input) {
+      return translationLanguages.current
+    }
+
+    return translationLanguages.current.filter(({name}) =>
+      name.toLowerCase().startsWith(input.toLowerCase())
+    )
+  }, [translationLanguages, input])
 
   return (
     <View as="div" margin="x-small 0 0">
-      <SimpleSelect renderLabel={heading} value={language} onChange={handleSelect} width="360px">
-        {translationLanguages.current.map(({id, name}) => {
-          return (
-            <SimpleSelect.Option key={id} id={id} value={name}>
-              {name}
-            </SimpleSelect.Option>
-          )
-        })}
-      </SimpleSelect>
+      <CanvasMultiSelect
+        label={I18n.t('Translate Discussion')}
+        onChange={handleSelect}
+        inputValue={input}
+        onInputChange={e => setInput(e.target.value)}
+        width="360px"
+      >
+        {filteredLanguages.map(({id, name}) => (
+          <CanvasMultiSelect.Option key={id} id={id} value={id} isSelected={id === selected}>
+            {name}
+          </CanvasMultiSelect.Option>
+        ))}
+      </CanvasMultiSelect>
     </View>
   )
 }
