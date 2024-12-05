@@ -25,18 +25,6 @@ assignment_submission_type_card:
       state: allowed_on
     ci:
       state: allowed_on
-lti_deployment_id_in_login_request:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Send lti_deployment_id in the LTI login request
-  description: |-
-    When enabled the lti_deployment_id will be sent in the LTI 1.3 login request.
-    When disabled both deployment_id and lti_deployment_id will be sent.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
 disable_graphql_authentication:
   state: hidden
   display_name: Disable authentication for GraphQL
@@ -94,8 +82,7 @@ import_numeric_lti_custom_params_as_string:
   shadow: true
   applies_to: SiteAdmin
   display_name: Copy numeric lti custom params as strings on imports.
-  description: |-
-    Prevent ResourceLink custom parameters from being converted to numbers during course copy.
+  description: Prevent ResourceLink custom parameters from being converted to numbers during course copy.
   environments:
     development:
       state: allowed_on
@@ -111,6 +98,29 @@ lti_ags_remove_top_submitted_at:
   description: |-
     When enabled, removes support for passing submittedAt as a top-level parameter in an
     LTI AGS Score request, to better conform to LTI AGS spec.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_apps_page_instructors:
+  state: hidden
+  applies_to: RootAccount
+  display_name: LTI Apps Page for Instructors
+  description: When enabled, the LTI Apps page will be available in the Course navigation sidebar.
+  environments:
+    development:
+      state: hidden
+lti_asset_processor:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Enable tools to use Asset Processor-related services and placements
+  description: |-
+    This feature enables LTI tools to create Asset Processors and use services and placements associated
+    with the 1EdTech Asset Processor specifications.
   environments:
     development:
       state: allowed_on
@@ -136,6 +146,18 @@ lti_deep_linking_module_index_menu_modal:
   display_name: LTI Deep Linking for Module Index Menu
   description: If enabled, allows deep linking from the module index via a modal.
   applies_to: RootAccount
+lti_deployment_id_in_login_request:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Send lti_deployment_id in the LTI login request
+  description: |-
+    When enabled the lti_deployment_id will be sent in the LTI 1.3 login request.
+    When disabled both deployment_id and lti_deployment_id will be sent.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_find_external_tool_prefer_original_client_id:
   state: hidden
   applies_to: RootAccount
@@ -234,14 +256,6 @@ lti_registrations_discover_page:
     development:
       state: hidden
   custom_transition_proc: lti_registrations_discover_page_hook
-lti_apps_page_instructors:
-  state: hidden
-  applies_to: RootAccount
-  display_name: LTI Apps Page for Instructors
-  description: When enabled, the LTI Apps page will be available in the Course navigation sidebar.
-  environments:
-    development:
-      state: hidden
 lti_registrations_next:
   state: hidden
   applies_to: RootAccount
@@ -260,6 +274,21 @@ lti_registrations_page:
   environments:
     development:
       state: hidden
+lti_report_multiple_schema_validation_errors:
+  state: hidden
+  shadow: true
+  applies_to: SiteAdmin
+  display_name: Return multiple json schema validation errors at once (not just the first one).
+  description: INTEROP-8899. This is a low risk change, because tools should not depend on error messages coming from json schema validator.
+  environments:
+    ci:
+      state: allowed_on
+    test:
+      state: allowed_on
+    development:
+      state: allowed_on
+    production:
+      state: allowed_on
 lti_resource_link_id_speedgrader_launches_reference_assignment:
   state: hidden
   applies_to: RootAccount
@@ -282,22 +311,6 @@ lti_resource_links_api:
     development:
       state: allowed_on
     ci:
-      state: allowed_on
-lti_report_multiple_schema_validation_errors:
-  state: hidden
-  shadow: true
-  applies_to: SiteAdmin
-  display_name: Return multiple json schema validation errors at once (not just the first one).
-  description: |-
-    INTEROP-8899. This is a low risk change, because tools should not depend on error messages coming from json schema validator.
-  environments:
-    ci:
-      state: allowed_on
-    test:
-      state: allowed_on
-    development:
-      state: allowed_on
-    production:
       state: allowed_on
 lti_toggle_placements:
   state: hidden
@@ -325,7 +338,7 @@ lti_variable_expansions_use_group_course_as_course:
   state: hidden
   shadow: true
   applies_to: RootAccount
-  display_name: "LTI Variable Expansions: Use Group's Course as Course"
+  display_name: 'LTI Variable Expansions: Use Group''s Course as Course'
   description: >-
     If enabled, if an LTI tool is launched in the context of Course-based Group (Group within a Course), Course-related LTI variable expansions will use
     the Group's Course as the Course. If disabled, legacy behavior will apply -- Course-related LTI variable expansions will only apply when the Course
@@ -359,19 +372,6 @@ platform_notification_service:
       state: allowed_on
     ci:
       state: allowed_on
-remove_unwanted_lti_validation_claims:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Do not include validation_context and errors claims in LTI Launches
-  description: |-
-    If enabled, the unwanted LTI validation claims like validation_context and errors will not be included in every LTI launch.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 remove_submission_type_selection_from_dev_keys_edit_page:
   state: hidden
   shadow: true
@@ -383,6 +383,18 @@ remove_submission_type_selection_from_dev_keys_edit_page:
     placement by editing the JSON, and it will still show up for Dev Keys which
     already have it. This flag is to be removed when after it is completely
     turned on in roughly April-May 2024.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+remove_unwanted_lti_validation_claims:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Do not include validation_context and errors claims in LTI Launches
+  description: If enabled, the unwanted LTI validation claims like validation_context and errors will not be included in every LTI launch.
   environments:
     development:
       state: allowed_on
