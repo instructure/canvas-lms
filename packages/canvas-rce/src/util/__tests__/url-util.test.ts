@@ -21,6 +21,7 @@ import {
   parseUrlOrNull,
   relativeHttpUrlForHostname,
   relativizeUrl,
+  parseUrlPath,
 } from '../url-util'
 
 describe('parseUrlOrNull', () => {
@@ -137,7 +138,7 @@ describe('relativeHttpUrlForHostname', () => {
         value: 'https://canvas.com:1234',
         shouldTransform: () => true,
       },
-    ] as Array<{value: string; shouldTransform(url: string): boolean}>
+    ] as Array<{value: string; shouldTransform(_url: string): boolean}>
 
     const urlOrigins = [
       {value: 'HTTP://CANVAS.COM', shouldTransform: true},
@@ -334,5 +335,16 @@ describe('addQueryParamsToUrl', () => {
 
   it('should not remove inputs that are null', () => {
     expect(addQueryParamsToUrl('?x=10&y=20', {x: null, y: undefined})).toEqual('?x=10&y=20')
+  })
+})
+
+describe('parseUrlPath', () => {
+  it('should parse a valid url', () => {
+    expect(parseUrlPath('https://foobar.local/123')).toEqual('/123')
+  })
+
+  // relative
+  it('should parse a relative url', () => {
+    expect(parseUrlPath('/123')).toEqual('/123')
   })
 })
