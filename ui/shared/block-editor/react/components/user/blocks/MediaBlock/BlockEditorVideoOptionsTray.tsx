@@ -107,7 +107,6 @@ export default function BlockEditorVideoOptionsTray({
         videoOptions={{
           titleText: videoContainer?.getAttribute('title') || '',
         }}
-        // @ts-expect-error
         requestSubtitlesFromIframe={(cb: any) => requestSubtitlesFromIframe(cb)}
         forBlockEditorUse={true}
       />

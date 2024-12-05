@@ -217,7 +217,7 @@
     "testcafe": "1.14.2",
     "testcafe-browser-provider-selenium": "^1.2.0",
     "testcafe-react-selectors": "^3.3.0",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "typescript": "workspace:*",
     "url-loader": "^4.1.1",
     "webpack": "^5",

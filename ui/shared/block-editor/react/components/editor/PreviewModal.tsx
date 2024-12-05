@@ -274,7 +274,6 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
 
   useEffect(() => {
     if (viewRef && rendered) {
-      // @ts-expect-error enhandeUserContent is not typed
       enhanceUserContent(viewRef, {canvasOrigin: window.location.origin})
     }
   }, [viewRef, rendered])
