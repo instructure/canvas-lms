@@ -18,7 +18,7 @@
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
-import type {Term} from '../types'
+import type {NextPageTerms, Term} from '../types'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {useAllPages} from '@canvas/query'
 import {useMemo} from 'react'
@@ -26,7 +26,7 @@ import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 
 export const getTermsNextPage = (
   lastPage: DoFetchApiResults<EnrollmentTerms>
-): {page?: string; per_page?: string} | undefined => {
+): NextPageTerms | undefined => {
   return lastPage.link?.next
 }
 
@@ -34,12 +34,14 @@ export const termsQuery = async ({
   signal,
   queryKey,
   pageParam,
-}: QueryFunctionContext): Promise<DoFetchApiResults<EnrollmentTerms>> => {
+}: QueryFunctionContext<[string, string, string], NextPageTerms>): Promise<
+  DoFetchApiResults<EnrollmentTerms>
+> => {
   const [, , accountId] = queryKey
   const fetchOpts = {signal}
   const page = pageParam?.page || '1'
   const perPage = pageParam?.per_page || '10'
-  const path: string = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`
+  const path = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`
 
   return doFetchApi<EnrollmentTerms>({path, fetchOpts})
 }
