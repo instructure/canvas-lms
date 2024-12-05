@@ -29,6 +29,7 @@ const convertToCourseCreationParams = (formData: CopyCourseFormSubmitData) => {
     end_at: formData.newCourseEndDate?.toISOString(),
     term_id: formData.selectedTerm?.id || null,
     restrict_enrollments_to_course_dates: formData.restrictEnrollmentsToCourseDates,
+    time_zone: formData.courseTimeZone,
   }
 
   if (!formData.restrictEnrollmentsToCourseDates) {

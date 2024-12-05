@@ -19,6 +19,15 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {CopyCourseForm} from '../CopyCourseForm'
 import type {Course} from '../../../../../../api'
+import moment from 'moment-timezone'
+import tzInTest from '@instructure/moment-utils/specHelpers'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
+// @ts-ignore
+import tz from 'timezone'
+// @ts-ignore
+import chicago from 'timezone/America/Chicago'
+// @ts-ignore
+import detroit from 'timezone/America/Detroit'
 
 describe('CourseCopyForm', () => {
   const courseName = 'Course name'
@@ -37,7 +46,7 @@ describe('CourseCopyForm', () => {
     term: {
       name: 'Option 2',
     },
-    time_zone: '',
+    time_zone: 'America/Detroit',
     workflow_state: '',
     id: '1',
     name: courseName,
@@ -106,6 +115,7 @@ describe('CourseCopyForm', () => {
         day_substitutions: [],
       },
       restrictEnrollmentsToCourseDates: course.restrict_enrollments_to_course_dates,
+      courseTimeZone: course.time_zone,
     })
   })
 
@@ -283,6 +293,42 @@ describe('CourseCopyForm', () => {
 
           expect(getByDisplayValue('Jan 2 at 12am')).toBeInTheDocument()
         })
+      })
+    })
+
+    describe('timezone', () => {
+      beforeEach(() => {
+        moment.tz.setDefault('America/Denver')
+
+        tzInTest.configureAndRestoreLater({
+          tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
+          tzData: {
+            'America/Chicago': chicago,
+            'America/Detroit': detroit,
+          },
+          formats: getI18nFormats(),
+        })
+      })
+
+      const courseTimeZone = 'America/Detroit'
+      const userTimeZone = 'America/Chicago'
+      const startDate = '2024-02-03T00:00:00.000Z'
+      const expectedStartDateCourseDateString = 'Local: Feb 2 at 6pm'
+      const expectedStartDateUserDateString = 'Course: Feb 2 at 7pm'
+      const endDate = '2024-03-03T00:00:00.000Z'
+      const expectedEndDateCourseDateString = 'Local: Mar 2 at 6pm'
+      const expectedEndDateUserDateString = 'Course: Mar 2 at 7pm'
+
+      it('renders time zone data on different timezones', () => {
+        const {getByText} = renderCopyCourseForm({
+          course: {...course, start_at: startDate, end_at: endDate},
+          courseTimeZone,
+          userTimeZone,
+        })
+        expect(getByText(expectedStartDateCourseDateString)).toBeInTheDocument()
+        expect(getByText(expectedStartDateUserDateString)).toBeInTheDocument()
+        expect(getByText(expectedEndDateCourseDateString)).toBeInTheDocument()
+        expect(getByText(expectedEndDateUserDateString)).toBeInTheDocument()
       })
     })
   })

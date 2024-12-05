@@ -201,8 +201,8 @@ export const sharedDateParsingTests = (InputComponent: React.ComponentType<any>)
   const renderComponent = (overrideProps?: any) =>
     render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
 
-  const expectDateField = (label: string, value: string) => {
-    expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+  const expectDateField = (dataCid: string, value: string) => {
+    expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)
   }
 
   describe('target course adjust date field prefills', () => {
@@ -212,7 +212,7 @@ export const sharedDateParsingTests = (InputComponent: React.ComponentType<any>)
 
       await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
 
-      expectDateField('Select new end date', 'Oct 15 at 8pm')
+      expectDateField('new_end_date', 'Oct 15 at 8pm')
     })
 
     it('parse the date from ENV.OLD_START_DATE', async () => {
@@ -221,7 +221,7 @@ export const sharedDateParsingTests = (InputComponent: React.ComponentType<any>)
 
       await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
 
-      expectDateField('Select new beginning date', 'Oct 15 at 8pm')
+      expectDateField('new_start_date', 'Oct 15 at 8pm')
     })
   })
 }

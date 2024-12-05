@@ -19,6 +19,15 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import {ConfiguredDateInput} from '../ConfiguredDateInput'
+import moment from 'moment-timezone'
+import tzInTest from '@instructure/moment-utils/specHelpers'
+import {getI18nFormats} from '@canvas/datetime/configureDateTime'
+// @ts-ignore
+import tz from 'timezone'
+// @ts-ignore
+import chicago from 'timezone/America/Chicago'
+// @ts-ignore
+import detroit from 'timezone/America/Detroit'
 
 describe('ConfiguredDateInput', () => {
   const placeholder = 'Select a date (optional)'
@@ -92,5 +101,70 @@ describe('ConfiguredDateInput', () => {
       />
     )
     expect(getByText(errorMessage)).toBeInTheDocument()
+  })
+
+  describe('course and user timezone', () => {
+    beforeEach(() => {
+      moment.tz.setDefault('America/Denver')
+
+      tzInTest.configureAndRestoreLater({
+        tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
+        tzData: {
+          'America/Chicago': chicago,
+          'America/Detroit': detroit,
+        },
+        formats: getI18nFormats(),
+      })
+    })
+    const courseTimeZone = 'America/Detroit'
+    const userTimeZone = 'America/Chicago'
+    const expectedCourseDateString = 'Local: Feb 2 at 6pm'
+    const expectedUserDateString = 'Course: Feb 2 at 7pm'
+
+    it('renders time zone data on different timezones', () => {
+      const {getByText} = render(
+        <ConfiguredDateInput
+          selectedDate="2024-02-03T00:00:00.000Z"
+          onSelectedDateChange={() => {}}
+          placeholder={placeholder}
+          renderLabelText={renderLabelText}
+          renderScreenReaderLabelText={renderScreenReaderLabelText}
+          courseTimeZone={courseTimeZone}
+          userTimeZone={userTimeZone}
+        />
+      )
+      expect(getByText(expectedCourseDateString)).toBeInTheDocument()
+      expect(getByText(expectedUserDateString)).toBeInTheDocument()
+    })
+
+    it('not renders time zone data on same timezones', () => {
+      const {queryByText} = render(
+        <ConfiguredDateInput
+          selectedDate="2024-02-03T00:00:00.000Z"
+          onSelectedDateChange={() => {}}
+          placeholder={placeholder}
+          renderLabelText={renderLabelText}
+          renderScreenReaderLabelText={renderScreenReaderLabelText}
+          courseTimeZone={courseTimeZone}
+          userTimeZone={courseTimeZone}
+        />
+      )
+      expect(queryByText(expectedCourseDateString)).toBeNull()
+      expect(queryByText(expectedUserDateString)).toBeNull()
+    })
+
+    it('not renders time zone data on missing timezones', () => {
+      const {queryByText} = render(
+        <ConfiguredDateInput
+          selectedDate="2024-02-03T00:00:00.000Z"
+          onSelectedDateChange={() => {}}
+          placeholder={placeholder}
+          renderLabelText={renderLabelText}
+          renderScreenReaderLabelText={renderScreenReaderLabelText}
+        />
+      )
+      expect(queryByText(expectedCourseDateString)).toBeNull()
+      expect(queryByText(expectedUserDateString)).toBeNull()
+    })
   })
 })

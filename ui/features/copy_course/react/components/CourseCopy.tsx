@@ -51,12 +51,14 @@ export const onErrorCallback = () => {
 export const CourseCopy = ({
   courseId,
   accountId,
-  timeZone,
+  userTimeZone,
+  courseTimeZone,
   canImportAsNewQuizzes,
 }: {
   courseId: string
   accountId: string
-  timeZone?: string
+  userTimeZone?: string
+  courseTimeZone?: string
   canImportAsNewQuizzes: boolean
 }) => {
   const courseQueryResult = useQuery({
@@ -117,7 +119,8 @@ export const CourseCopy = ({
       canImportAsNewQuizzes={canImportAsNewQuizzes}
       course={courseQueryResult.data}
       terms={termsQueryResult.data}
-      timeZone={timeZone}
+      userTimeZone={userTimeZone}
+      courseTimeZone={courseTimeZone}
       isSubmitting={mutation.isLoading || mutation.isSuccess}
       onCancel={handleCancel}
       onSubmit={handleSubmit}

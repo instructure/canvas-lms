@@ -44,6 +44,7 @@ describe('createCourseCopyMutation', () => {
     selective_import: true,
     settings: {},
     restrictEnrollmentsToCourseDates: true,
+    courseTimeZone: 'America/Detroit',
   }
   const mockReturnValue = {settings: {}}
   const courseCreationResult = {id: '4'}
@@ -102,6 +103,7 @@ describe('createCourseCopyMutation', () => {
             end_at: formData.newCourseEndDate?.toISOString(),
             term_id: formData.selectedTerm?.id,
             restrict_enrollments_to_course_dates: true,
+            time_zone: formData.courseTimeZone,
           },
         },
       })
@@ -138,6 +140,7 @@ describe('createCourseCopyMutation', () => {
             course_code: formData.courseCode,
             term_id: formData.selectedTerm?.id,
             restrict_enrollments_to_course_dates: false,
+            time_zone: formData.courseTimeZone,
           },
         },
       })

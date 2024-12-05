@@ -18,6 +18,11 @@
 
 import type {submitMigrationFormData} from '@canvas/content-migrations/react/CommonMigratorControls/types'
 
+export type NextPageTerms = {
+  page?: string
+  per_page?: string
+}
+
 export type Term = Readonly<{
   name: string
   id: string
@@ -33,6 +38,7 @@ export type CopyCourseFormSubmitData = Readonly<
     newCourseEndDate: Date | null
     selectedTerm: Term | null
     restrictEnrollmentsToCourseDates: boolean
+    courseTimeZone: string
   } & submitMigrationFormData
 >
 

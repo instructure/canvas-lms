@@ -22,6 +22,7 @@ import {useAllPages} from '@canvas/query'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../../api'
+import type {NextPageTerms} from '../../types'
 
 jest.mock('@canvas/query', () => ({
   useAllPages: jest.fn(),
@@ -125,7 +126,7 @@ describe('termsQuery', () => {
     const mockResponse: any = {json: {enrollment_terms: []}, link: {}}
     mockDoFetchApi.mockResolvedValue(mockResponse)
 
-    const context: QueryFunctionContext = {
+    const context: QueryFunctionContext<[string, string, string], NextPageTerms> = {
       meta: undefined,
       signal: new AbortController().signal,
       queryKey: ['copy_course', 'enrollment_terms', '1'],
@@ -145,7 +146,7 @@ describe('termsQuery', () => {
     const mockResponse: any = {json: {enrollment_terms: []}, link: {}}
     mockDoFetchApi.mockResolvedValue(mockResponse)
 
-    const context: QueryFunctionContext = {
+    const context: QueryFunctionContext<[string, string, string], NextPageTerms> = {
       meta: undefined,
       signal: new AbortController().signal,
       queryKey: ['copy_course', 'enrollment_terms', '1'],

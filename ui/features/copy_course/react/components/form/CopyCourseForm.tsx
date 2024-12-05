@@ -32,10 +32,10 @@ import {CreateCourseInProgressLabel} from './formComponents/CreateCourseInProgre
 import type {submitMigrationFormData} from '@canvas/content-migrations/react/CommonMigratorControls/types'
 
 type InvalidFormElements = {
-  newCourseStartDate?: string
-  newCourseEndDate?: string
-  courseName?: string
-  courseCode?: string
+  newCourseStartDateErrorMsg?: string
+  newCourseEndDateErrorMsg?: string
+  courseNameErrorMsg?: string
+  courseCodeErrorMsg?: string
 }
 
 type InvalidForm = {
@@ -73,7 +73,8 @@ const validationReducer = (
 export const CopyCourseForm = ({
   course,
   terms,
-  timeZone,
+  userTimeZone,
+  courseTimeZone,
   canImportAsNewQuizzes,
   isSubmitting,
   onSubmit,
@@ -81,7 +82,8 @@ export const CopyCourseForm = ({
 }: {
   course: Course
   terms: Term[]
-  timeZone?: string
+  userTimeZone?: string
+  courseTimeZone?: string
   canImportAsNewQuizzes: boolean
   isSubmitting: boolean
   onSubmit: (data: CopyCourseFormSubmitData) => void
@@ -103,16 +105,16 @@ export const CopyCourseForm = ({
     const validationErrors: InvalidFormElements = {}
 
     if (newCourseStartDate && newCourseEndDate && newCourseStartDate > newCourseEndDate) {
-      validationErrors.newCourseStartDate = I18n.t('Start date must be before end date')
-      validationErrors.newCourseEndDate = I18n.t('End date must be after start date')
+      validationErrors.newCourseStartDateErrorMsg = I18n.t('Start date must be before end date')
+      validationErrors.newCourseEndDateErrorMsg = I18n.t('End date must be after start date')
     }
 
     if (courseName.length > 255) {
-      validationErrors.courseName = I18n.t('Course name must be 255 characters or less')
+      validationErrors.courseNameErrorMsg = I18n.t('Course name must be 255 characters or less')
     }
 
     if (courseCode.length > 255) {
-      validationErrors.courseCode = I18n.t('Course code must be 255 characters or less')
+      validationErrors.courseCodeErrorMsg = I18n.t('Course code must be 255 characters or less')
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -138,6 +140,7 @@ export const CopyCourseForm = ({
       newCourseEndDate,
       selectedTerm,
       restrictEnrollmentsToCourseDates,
+      courseTimeZone: course.time_zone,
       ...formData,
     })
   }
@@ -162,10 +165,10 @@ export const CopyCourseForm = ({
   const isoNewCourseEndDate = parseDateToISOString(newEndDateToParse)
 
   const canImportBpSettings = course.blueprint || false
-  const invalidNewCourseEndDateMessage = invalidForm.elements.newCourseEndDate
-  const invalidNewCourseStartDateMessage = invalidForm.elements.newCourseStartDate
-  const invalidCourseNameMessage = invalidForm.elements.courseName
-  const invalidCourseCodeMessage = invalidForm.elements.courseCode
+  const invalidNewCourseEndDateMessage = invalidForm.elements.newCourseEndDateErrorMsg
+  const invalidNewCourseStartDateMessage = invalidForm.elements.newCourseStartDateErrorMsg
+  const invalidCourseNameMessage = invalidForm.elements.courseNameErrorMsg
+  const invalidCourseCodeMessage = invalidForm.elements.courseCodeErrorMsg
 
   return (
     <View as="div">
@@ -199,7 +202,8 @@ export const CopyCourseForm = ({
             placeholder={I18n.t('Select start date')}
             renderLabelText={I18n.t('Start date')}
             renderScreenReaderLabelText={I18n.t('Select a new beginning date')}
-            timeZone={timeZone}
+            userTimeZone={userTimeZone}
+            courseTimeZone={courseTimeZone}
             disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseStartDateMessage}
           />
@@ -211,7 +215,8 @@ export const CopyCourseForm = ({
             placeholder={I18n.t('Select end date')}
             renderLabelText={I18n.t('End date')}
             renderScreenReaderLabelText={I18n.t('Select a new end date')}
-            timeZone={timeZone}
+            userTimeZone={userTimeZone}
+            courseTimeZone={courseTimeZone}
             disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseEndDateMessage}
           />
