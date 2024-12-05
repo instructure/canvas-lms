@@ -5476,6 +5476,7 @@ hy:
   created_6ee36dff: "Ստեղծվել է՝"
   created_by_b39b9c8b: "Ստեղծվել է ___________կողմից"
   created_group_group_name_2097306b: "Ստեղծված %{group_name} խումբ"
+  creating_261dbb7a: "Ստեղծվում է..."
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Ուղարկված փաստաթղթերի արտահանման այս հնարավորությունը թույլ կտա Ձեզ ներբեռնել Ձեր բոլոր ներկա և նախկին դասընթացների շրջանակներում ստացված հանձնարարությունների արխիվացված /zip/ ֆայլը: Ստեղծվող ֆայլի չափը կարող է մեծ լինել, ուստի դրա արխիվացումը որոշակի ժամանակ կպահանջի: Դուք կարող եք դուրս գալ այս էջից և վերադառնալ ավելի ուշ:"
   creative_commons_714a065f: "\"Creative Commons\""
   creative_commons_license_725584ae: "\"Creative Commons\" լիցենզիա"
@@ -8628,6 +8629,7 @@ hy:
   international_sms_9edb9868: "Միջազգային հաղորդագրություն"
   international_sms_send_from_recipient_s_country_43881ea4: "Միջազգային հաղորդագրություն - ուղարկել ստացողի երկրից"
   international_text_messaging_rates_may_apply_d4b4a97a: "Միջազգային հաղորդագրության սակագները կարող են կիրառելի լինել:"
+  introduction_43f53b7d: Ներածություն
   invalid_authenticity_token_b753558c: "Իսկության ստուգման սխալ token"
   invalid_content_type_utf_8_required_bd458b78: "Բովանդակության սխալ տեսակ, պահանջվում է UTF-8 "
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "csv սխալ ֆայլ, գնահատականները հնարավոր չէ թարմացնել:"

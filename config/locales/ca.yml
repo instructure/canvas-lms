@@ -12402,12 +12402,12 @@ ca:
         auto_random_group_leader: "Estableix com a líder del grup un estudiant aleatori"
         leadership: Lideratge
       group_categories: 
-        account_group_explanation: "Els grups d'estudiants a nivell de l'usuari són una bona manera d'agrupar estudiants sense que estiguin vinculats a una assignatura concreta. Cada grup d'estudiants té el seu propi calendari, tauler de fòrum i eines de col·laboració per què es puguin organitzar i treballar conjuntament de manera més eficient."
+        account_group_explanation: "Els grups d'estudiants a nivell de subcompte són una bona manera d'agrupar estudiants sense que estiguin vinculats a una assignatura concreta. Cada grup d'estudiants té el seu propi calendari, tauler de fòrum i eines de col·laboració per què es puguin organitzar i treballar conjuntament de manera més eficient."
         course_group_explanation: "Els grups d'estudiants són una manera útil d'organitzar els estudiants per a coses com projectes o tasques de grup. Cada grup d'estudiants té el seu propi calendari, tauler de fòrum i eines de col·laboració per què es puguin organitzar i treballar conjuntament de manera més eficient."
         group_assignment_instructions: "Podeu assignar estudiants aleatòriament a grups d'una mida concreta, o bé crear i organitzar manualment els grups. Un cop hàgiu creat els vostres grups, podeu establir activitats perquè siguin \"activitats de grup\", és a dir que cada grup tindrà una única entrega per a tots els usuaris del grup."
         group_set: "Conjunt de grups"
         headings: 
-          account_groups: "Grups d'estudiants a nivell de l'usuari"
+          account_groups: "Grups d'estudiants a nivell de subcompte"
           course_groups: "Grups d'estudiants"
           groups: Grups
         tabs: 

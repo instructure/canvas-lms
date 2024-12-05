@@ -8132,6 +8132,7 @@ fa:
   created_group_group_name_2097306b: "گروه %{group_name} ایجاد شد"
   created_group_group_name_224ce5f9: "  گروه ایجاد شده: %{group_name}"
   created_timingdisplay_82e15b1e: "ایجاد شده %{timingDisplay}"
+  creating_261dbb7a: "در حال ایجاد..."
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "ایجاد گروه هنوز توسط روند تکالیف جدید کنترل نشده است. به صفحه تکالیف قدیمی می‌روید؟"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "ایجاد صدور مورد ارسالی به شما امکان می دهد فایل فشرده همه تکلیف های ارسالی خود را در همه درس های فعلی و قبلی خود بارگیری کنید. این فایل می تواند یک فایل بزرگ باشد و بنابراین ممکن است مدتی طول بکشد. می تواند از صفحه خارج شوید و بعدا برگردید."
   creating_conference_95b59116: "ایجاد کنفرانس"
@@ -12929,6 +12930,7 @@ fa:
   international_sms_9edb9868: "پیامک بین المللی"
   international_text_messaging_rates_may_apply_d4b4a97a: " ممکن است نرخ های پیام رسانی متنی بین المللی به کار رود."
   internet2_254c6ca6: Internet2
+  introduction_43f53b7d: مقدمه
   invalid_address_book_strategy_904a7ada: "راهبرد فهرست نشانی معتبر نیست."
   invalid_authenticity_token_b753558c: "نشانه اعتبار معتبر نیست"
   invalid_aws_configuration_e8a6ae0f: "پیکربندی AWS معتبر نیست"
