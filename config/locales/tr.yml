@@ -6795,6 +6795,7 @@ tr:
   created_by_sis_e1449c31: "ÖBS tarafından oluşturuldu"
   created_created_bf5714b8: "Oluşturulan %{created}"
   created_group_group_name_2097306b: "Oluşturulan Grup %{group_name}"
+  creating_261dbb7a: Oluşturuluyor...
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Gönderileri Dışa Aktar oluşturma şimdiki ve geçmiş tüm derslerinizdeki ödev gönderilerini zip dosyası olarak indirmenizi sağlar. Dosya boyutu büyükse, indirmek zaman alabilir. Bu sayfadan ayrılıp sonra tekrar buraya gelebilirsiniz."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons Lisansı:"
@@ -10499,6 +10500,7 @@ tr:
   integrations_cadb03f3: Entegrasyonlar
   international_sms_9edb9868: "Uluslararası SMS"
   international_text_messaging_rates_may_apply_d4b4a97a: "Uluslararası kısa mesaj gönderme ücreti ödeyebilirsiniz."
+  introduction_43f53b7d: Giriş
   invalid_authenticity_token_b753558c: "Geçersiz Yetkilendirme Anahtarı"
   invalid_content_type_utf_8_required_bd458b78: "Geçersiz içerik türü, UTF-8 gerekiyor"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Geçersiz csv dosyası, notlar güncellenemedi."
