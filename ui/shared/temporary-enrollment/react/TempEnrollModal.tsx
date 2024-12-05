@@ -103,6 +103,7 @@ export function TempEnrollModal(props: Props) {
   const [isModalOpenAnimationComplete, setIsModalOpenAnimationComplete] = useState(false)
   const [tempEnrollmentsPairing, setTempEnrollmentsPairing] = useState<Enrollment[] | null>(null)
   const [title, setTitle] = useState(' ')
+  const [duplicateReq, setDuplicateReq] = useState(false)
 
   useEffect(() => {
     if (isModalOpenAnimationComplete) {
@@ -182,10 +183,16 @@ export function TempEnrollModal(props: Props) {
 
   const handleSetEnrollmentsFromSearch = (enrollmentUsers: User[]) => {
     setEnrollments(enrollmentUsers)
+    setDuplicateReq(false)
   }
 
   const handlePageChange = (change: number) => {
-    setPage((currentPage: number) => currentPage + change)
+    // don't change page if duplicates are not selected
+    if (page !== 1 || enrollments.length !== 0) {
+      setPage((currentPage: number) => currentPage + change)
+    } else {
+      setDuplicateReq(true)
+    }
   }
 
   const isSubmissionPage = () => {
@@ -267,6 +274,7 @@ export function TempEnrollModal(props: Props) {
           searchSuccess={handleSetEnrollmentsFromSearch}
           foundUsers={enrollments}
           wasReset={wasReset}
+          duplicateReq={duplicateReq}
         />
       )
     }
@@ -308,7 +316,7 @@ export function TempEnrollModal(props: Props) {
         !props.isEditMode && (
           <Flex.Item key="nextOrSubmit">
             <Button
-              disabled={buttonsDisabled || (enrollments.length === 0 && page === 1)}
+              disabled={buttonsDisabled}
               color="primary"
               onClick={() => handlePageChange(1)}
               {...analyticProps(page === 2 ? 'Submit' : 'Next')}

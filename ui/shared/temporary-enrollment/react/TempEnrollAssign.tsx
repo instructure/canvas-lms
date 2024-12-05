@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useMemo, useState} from 'react'
+import React, {createRef, useEffect, useMemo, useRef, useState} from 'react'
 import type {ChangeEvent, Dispatch, SetStateAction, SyntheticEvent} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -35,6 +35,7 @@ import {
   generateDateTimeMessage,
   getDayBoundaries,
   getFromLocalStorage,
+  handleCollectSelectedEnrollments,
   removeStringAffix,
   safeDateConversion,
   updateLocalStorageObject,
@@ -70,6 +71,7 @@ import EnrollmentStateSelect, {
   getLabelForState,
 } from './EnrollmentStateSelect'
 import {captureException} from '@sentry/browser'
+import type {Checkbox} from '@instructure/ui-checkbox'
 
 declare const ENV: GlobalEnv & EnvCommon
 
@@ -104,6 +106,7 @@ interface RoleChoice {
 interface DateErrors {
   invalidStart: boolean
   invalidEnd: boolean
+  wrongOrder: boolean
 }
 
 interface StoredData {
@@ -247,7 +250,17 @@ export function TempEnrollAssign(props: Props) {
   const [endDate, setEndDate] = useState<Date>(storedData.endDate)
   const [roleChoice, setRoleChoice] = useState<RoleChoice>(storedData.roleChoice)
   const [stateChoice, setStateChoice] = useState<EnrollmentStateOption>(storedData.stateChoice)
-  const [dateErrors, setDateErrors] = useState<DateErrors>({invalidEnd: false, invalidStart: false})
+  const [dateErrors, setDateErrors] = useState<DateErrors>({
+    invalidEnd: false,
+    invalidStart: false,
+    wrongOrder: false,
+  })
+  const [isInvalidRole, setIsInvalidRole] = useState<boolean>(false)
+
+  const startDateRef = useRef<HTMLElement | null>(null)
+  const endDateRef = useRef<HTMLElement | null>(null)
+  const treeRef = createRef<HTMLElement>()
+  const roleRef = useRef<HTMLElement | null>(null)
 
   // reminders …
   // enrollmentProps = recipient user object
@@ -293,7 +306,6 @@ export function TempEnrollAssign(props: Props) {
           }
         })
         .catch(error => {
-           
           console.error('Error fetching temporary enrollment pairing:', error)
           captureException(error)
         })
@@ -325,15 +337,6 @@ export function TempEnrollAssign(props: Props) {
     fetchData()
   }, [userProps.id])
 
-  useEffect(() => {
-    if (endDate.getTime() <= startDate.getTime()) {
-      setErrorMsg(I18n.t('The start date must be before the end date'))
-    } else if (errorMsg !== '') {
-      setErrorMsg('')
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endDate, startDate])
-
   /**
    * Handle change to date value in the DateTimeInput component
    *
@@ -359,10 +362,29 @@ export function TempEnrollAssign(props: Props) {
       setDateState(validatedDate)
       updateLocalStorageObject(tempEnrollAssignData, {[localStorageKey]: validatedDate})
     }
+
     // set error state for DateTime
-    localStorageKey === 'startDate'
-      ? setDateErrors({...dateErrors, invalidStart: !validatedDate})
-      : setDateErrors({...dateErrors, invalidEnd: !validatedDate})
+    if (localStorageKey === 'startDate') {
+      if (validatedDate) {
+        if (validatedDate.getTime() <= endDate.getTime()) {
+          setDateErrors({...dateErrors, invalidStart: false, wrongOrder: false})
+        } else {
+          setDateErrors({...dateErrors, invalidStart: false, wrongOrder: true})
+        }
+      } else {
+        setDateErrors({...dateErrors, invalidStart: !validatedDate})
+      }
+    } else {
+      if (validatedDate) {
+        if (startDate.getTime() <= validatedDate.getTime()) {
+          setDateErrors({...dateErrors, invalidEnd: false, wrongOrder: false})
+        } else {
+          setDateErrors({...dateErrors, invalidEnd: false, wrongOrder: true})
+        }
+      } else {
+        setDateErrors({...dateErrors, invalidEnd: !validatedDate})
+      }
+    }
   }
 
   const handleStartDateChange = (event: SyntheticEvent<Element, Event>, dateValue?: string) => {
@@ -399,67 +421,24 @@ export function TempEnrollAssign(props: Props) {
     })
   }
 
-  const handleValidationError = (message: string) => {
-    setErrorMsg(message)
-    props.setEnrollmentStatus(false, false, false)
-    setLoading(false)
-  }
-
-  const handleCollectSelectedEnrollments = (tree: NodeStructure[]): SelectedEnrollment[] => {
-    const selectedEnrolls: SelectedEnrollment[] = []
-    for (const role in tree) {
-      for (const course of tree[role].children) {
-        for (const section of course.children) {
-          if (section.isCheck || (course.children.length === 1 && course.isCheck)) {
-            if (enrollmentsByCourse) {
-              enrollmentsByCourse.forEach((c: Course) => {
-                const courseId = course.id.slice(1) // remove leading 'c' prefix from course.id
-                const sectionId = section.id.slice(1) // remove leading 's' prefix from section.id
-                let enrollment
-                if (c.id === courseId) {
-                  enrollment = c.enrollments.find(
-                    matchedEnrollment =>
-                      // covers base role types
-                      matchedEnrollment.role_id === roleChoice.id ||
-                      // covers custom role types if existing enrollment with same role type is present
-                      matchedEnrollment.type === roleChoice.name.toLowerCase()
-                  )
-                  if (enrollment === undefined) {
-                    // covers custom role types if no matching enrollment role type is present
-                    enrollment = c.enrollments[c.enrollments.length - 1]
-                  }
-                  if (enrollment) {
-                    selectedEnrolls.push({
-                      section: sectionId,
-                      limit_privileges_to_course_section:
-                        enrollment.limit_privileges_to_course_section,
-                    })
-                  }
-                }
-              })
-            }
-          }
-        }
-      }
-    }
-    return selectedEnrolls
-  }
-
   const handleCreateTempEnroll = async (tree: NodeStructure[]): Promise<void> => {
-    setLoading(true)
-    if (endDate.getTime() <= startDate.getTime()) {
-      return handleValidationError(I18n.t('The start date must be before the end date'))
+    const submitEnrolls = handleCollectSelectedEnrollments(tree, enrollmentsByCourse, roleChoice)
+    // set focus if an error appears
+    if (dateErrors.invalidStart || endDate.getTime() <= startDate.getTime()) {
+      startDateRef.current?.focus()
+    } else if (roleChoice.id === '' || isInvalidRole) {
+      roleRef.current?.focus()
+    } else if (dateErrors.invalidEnd) {
+      endDateRef.current?.focus()
+    } else if (submitEnrolls.length === 0) {
+      treeRef.current?.focus()
+    } else {
+      // no errors; process enrollments
+      setLoading(true)
+      await handleProcessEnrollments(submitEnrolls)
+      return
     }
-    if (roleChoice.id === '') {
-      return handleValidationError(I18n.t('Please select a role before submitting'))
-    }
-    const submitEnrolls = handleCollectSelectedEnrollments(tree)
-    if (!props.tempEnrollmentsPairing && submitEnrolls.length === 0) {
-      return handleValidationError(
-        I18n.t('Please select at least one enrollment before submitting')
-      )
-    }
-    await handleProcessEnrollments(submitEnrolls)
+    props.setEnrollmentStatus(false, false, false)
   }
 
   const handleProcessEnrollments = async (submitEnrolls: SelectedEnrollment[]): Promise<void> => {
@@ -605,13 +584,17 @@ export function TempEnrollAssign(props: Props) {
               <Grid.Col id="roleSearchSelectGridCol">
                 <RoleSearchSelect
                   noResultsLabel={I18n.t('No roles available')}
-                  noSearchMatchLabel={I18n.t('')}
+                  noSearchMatchLabel={I18n.t('No matching roles')}
                   id="termFilter"
                   placeholder={I18n.t('Select a Role')}
                   isLoading={false}
                   label={I18n.t('Select role')}
                   value={roleChoice.id}
                   onChange={handleRoleSearchChange}
+                  setRef={(ref: HTMLElement) => {
+                    roleRef.current = ref
+                  }}
+                  invalidRole={(isInvalid: boolean) => setIsInvalidRole(isInvalid)}
                 >
                   {roleOptions}
                 </RoleSearchSelect>
@@ -636,14 +619,20 @@ export function TempEnrollAssign(props: Props) {
                   nextMonthLabel={I18n.t('Next')}
                   value={startDate.toISOString()}
                   onChange={handleStartDateChange}
-                  messages={generateDateTimeMessage(
-                    startDate.toISOString(),
-                    dateErrors.invalidStart
+                  messages={generateDateTimeMessage({
+                    value: startDate.toISOString(),
+                    isInvalid: dateErrors.invalidStart,
+                    wrongOrder: dateErrors.wrongOrder}
                   )}
                   showMessages={false}
                   invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
-                  dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartDate'))}
-                  timeInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('StartTime'))}
+                  dateInputRef={ref => {
+                    startDateRef.current = ref
+                    setAnalyticPropsOnRef(ref, analyticProps('StartDate'))
+                  }}
+                  timeInputRef={ref => {
+                    setAnalyticPropsOnRef(ref, analyticProps('StartTime'))
+                  }}
                 />
               </Grid.Col>
             </Grid.Row>
@@ -668,7 +657,7 @@ export function TempEnrollAssign(props: Props) {
                   nextMonthLabel={I18n.t('Next')}
                   value={endDate.toISOString()}
                   onChange={handleEndDateChange}
-                  messages={generateDateTimeMessage(endDate.toISOString(), dateErrors.invalidEnd)}
+                  messages={generateDateTimeMessage({value: endDate.toISOString(), isInvalid: dateErrors.invalidEnd, wrongOrder: false})}
                   showMessages={false}
                   invalidDateTimeMessage={I18n.t('The chosen date and time is invalid.')}
                   dateInputRef={ref => setAnalyticPropsOnRef(ref, analyticProps('EndDate'))}
@@ -714,6 +703,7 @@ export function TempEnrollAssign(props: Props) {
                   roles={props.roles}
                   selectedRole={roleChoice}
                   createEnroll={handleCreateTempEnroll}
+                  elementRef={treeRef}
                 />
               ) : (
                 <EnrollmentTree
@@ -721,6 +711,7 @@ export function TempEnrollAssign(props: Props) {
                   roles={props.roles}
                   selectedRole={roleChoice}
                   tempEnrollmentsPairing={props.tempEnrollmentsPairing}
+                  elementRef={treeRef}
                 />
               )}
             </Flex.Item>
