@@ -18,11 +18,10 @@
 
 import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 import {isOnlyTextSelected} from '../../contentInsertionUtils'
-// eslint-disable-next-line import/no-nodejs-modules
-import * as url from 'url'
 import formatMessage from '../../../format-message'
 import {isStudioEmbeddedMedia} from './StudioLtiSupportUtils'
 import RCEGlobals from '../../RCEGlobals'
+import {parseUrlPath} from '../../../util/url-util'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -62,7 +61,8 @@ export function asLink($element, editor) {
     return null
   }
 
-  const {pathname} = url.parse($link.href)
+  const pathname = parseUrlPath($link.href)
+
   const type = FILE_DOWNLOAD_PATH_REGEX.test(pathname) ? FILE_LINK_TYPE : LINK_TYPE
   let displayAs = DISPLAY_AS_LINK
   if ($link.classList.contains('no_preview')) {
