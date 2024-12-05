@@ -30,8 +30,7 @@ describe('AutoCompleteSelect', () => {
 
   afterEach(() => fetchMock.restore())
 
-  const enhanceUrl = (searchTerm: string) =>
-    encodeURI(`${props.url}?search_term=${searchTerm}&state[]=all`)
+  const enhanceUrl = (searchTerm: string) => encodeURI(`${props.url}?search_term=${searchTerm}`)
 
   it('should show "Type to search" when the input is focused', () => {
     render(<AutoCompleteSelect {...props} />)

@@ -31,17 +31,37 @@ import {
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AutoCompleteSelect from './AutoCompleteSelect'
+import {TextInput} from '@instructure/ui-text-input'
+import {FormFieldGroup} from '@instructure/ui-form-field'
 
-const I18n = useI18nScope('course_logging_content')
+const I18n = useI18nScope('grade_change_logging_content')
 
-const defaultValues = {course_id: '', start_time: undefined, end_time: undefined}
+const defaultValues = {
+  grader_id: '',
+  student_id: '',
+  course_id: '',
+  assignment_id: '',
+  start_time: undefined,
+  end_time: undefined,
+}
 
 const validationSchema = z
   .object({
-    course_id: z.string().min(1, I18n.t('Course ID is required.')),
+    grader_id: z.string().optional(),
+    student_id: z.string().optional(),
+    course_id: z.string().optional(),
+    assignment_id: z.string().optional(),
     start_time: z.string().optional(),
     end_time: z.string().optional(),
   })
+  .refine(
+    ({grader_id, student_id, course_id, assignment_id}) =>
+      grader_id || student_id || course_id || assignment_id,
+    {
+      message: 'One of Grader, Student, Course, or Assignment ID is required.',
+      path: ['grader_id'],
+    }
+  )
   .refine(
     ({start_time, end_time}) => {
       if (!start_time || !end_time) return true
@@ -58,18 +78,17 @@ const validationSchema = z
 
 type FormValues = z.infer<typeof validationSchema>
 
-type Course = {
+type User = {
   id: string
   name: string
-  course_code: string
 }
 
-export interface CourseActivityFormProps {
+export interface GradeChangeActivityFormProps {
   accountId: string
   onSubmit: (data: FormValues) => void
 }
 
-const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
+const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormProps) => {
   const {
     control,
     formState: {errors},
@@ -95,36 +114,87 @@ const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
 
   return (
     <form
-      aria-label={I18n.t('Course Activity Form')}
+      aria-label={I18n.t('Grade Change Activity Form')}
       className="form-horizontal pad-box border border-trbl search-controls"
       noValidate={true}
       onSubmit={handleSubmit(handleFormSubmit)}
     >
       <Flex direction="column" gap="small">
-        <Controller
-          name="course_id"
-          control={control}
-          render={({field: {ref, ...fieldWithoutRef}}) => (
-            <AutoCompleteSelect<Course>
-              {...fieldWithoutRef}
-              maxLength={255}
-              inputRef={ref}
-              isRequired={true}
-              renderLabel={I18n.t('Course ID')}
-              assistiveText={I18n.t('Type to search')}
-              url={`/api/v1/accounts/${accountId}/courses`}
-              renderOptionLabel={option => `${option.id} - ${option.name} - ${option.course_code}`}
-              messages={getFormErrorMessage(errors, 'course_id')}
-              fetchParams={{'state[]': 'all'}}
-              onInputChange={event => {
-                fieldWithoutRef.onChange(event)
-              }}
-              onRequestSelectOption={(_, {id}) => {
-                fieldWithoutRef.onChange(id)
-              }}
-            />
-          )}
-        />
+        <FormFieldGroup
+          description={<ScreenReaderContent>{I18n.t('Search by')}</ScreenReaderContent>}
+          messages={getFormErrorMessage(errors, 'grader_id')}
+          rowSpacing="small"
+        >
+          <Controller
+            name="grader_id"
+            control={control}
+            rules={{deps: ['assignment_id', 'course_id', 'student_id']}}
+            render={({field: {ref, ...fieldWithoutRef}}) => (
+              <AutoCompleteSelect<User>
+                {...fieldWithoutRef}
+                maxLength={255}
+                inputRef={ref}
+                renderLabel={I18n.t('Grader ID')}
+                assistiveText={I18n.t('Type to search')}
+                url={`/api/v1/accounts/${accountId}/users`}
+                renderOptionLabel={option => option.name}
+                onInputChange={event => {
+                  fieldWithoutRef.onChange(event)
+                }}
+                onRequestSelectOption={(_, {id}) => {
+                  fieldWithoutRef.onChange(id)
+                }}
+              />
+            )}
+          />
+          <Controller
+            name="student_id"
+            control={control}
+            rules={{deps: ['assignment_id', 'course_id', 'grader_id']}}
+            render={({field: {ref, ...fieldWithoutRef}}) => (
+              <AutoCompleteSelect<User>
+                {...fieldWithoutRef}
+                maxLength={255}
+                inputRef={ref}
+                renderLabel={I18n.t('Student ID')}
+                assistiveText={I18n.t('Type to search')}
+                url={`/api/v1/accounts/${accountId}/users`}
+                renderOptionLabel={option => option.name}
+                messages={getFormErrorMessage(errors, 'student_id')}
+                onInputChange={event => {
+                  fieldWithoutRef.onChange(event)
+                }}
+                onRequestSelectOption={(_, {id}) => {
+                  fieldWithoutRef.onChange(id)
+                }}
+              />
+            )}
+          />
+          <Controller
+            name="course_id"
+            control={control}
+            rules={{deps: ['assignment_id', 'student_id', 'grader_id']}}
+            render={({field}) => (
+              <TextInput
+                {...field}
+                renderLabel={I18n.t('Course ID')}
+                messages={getFormErrorMessage(errors, 'course_id')}
+              />
+            )}
+          />
+          <Controller
+            name="assignment_id"
+            control={control}
+            rules={{deps: ['course_id', 'student_id', 'grader_id']}}
+            render={({field}) => (
+              <TextInput
+                {...field}
+                renderLabel={I18n.t('Assignment ID')}
+                messages={getFormErrorMessage(errors, 'assignment_id')}
+              />
+            )}
+          />
+        </FormFieldGroup>
         <Controller
           name="start_time"
           control={control}
@@ -201,4 +271,4 @@ const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
   )
 }
 
-export default CourseActivityForm
+export default GradeChangeActivityForm

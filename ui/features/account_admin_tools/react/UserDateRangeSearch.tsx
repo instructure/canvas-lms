@@ -119,6 +119,7 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
           <Controller
             name="from"
             control={control}
+            rules={{deps: ['to']}}
             render={({field: {onChange, ref, ...rest}}) => (
               <DateTimeInput
                 {...rest}
@@ -155,6 +156,7 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
           <Controller
             name="to"
             control={control}
+            rules={{deps: ['from']}}
             render={({field: {onChange, ref, ...rest}}) => (
               <DateTimeInput
                 {...rest}
