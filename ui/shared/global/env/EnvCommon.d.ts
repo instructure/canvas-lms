@@ -273,7 +273,6 @@ export type RootAccountFeatureId =
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'
   | 'lti_registrations_next'
-  | 'lti_overwrite_user_url_input_select_content_dialog'
   | 'mobile_offline_mode'
   | 'product_tours'
   | 'rce_transform_loaded_content'
