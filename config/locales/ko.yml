@@ -4686,6 +4686,7 @@ ko:
   create_users_view: 
     required: "이메일 주소 입력"
   created_6ee36dff: "작성:"
+  creating_261dbb7a: "만드는 중..."
   criteria_9fac648: 기준
   criterion_ratings_3eed22e2: "기준 등급"
   crowdsourced: true
@@ -7208,6 +7209,7 @@ ko:
   instructure_misc_plugins: 
     confirms: 
       default_delete_thing: 삭제하시겠습니까?
+  introduction_43f53b7d: 소개
   invalid_content_type_utf_8_required_bd458b78: "유효하지 않은 내용 유형 - UTF-8 필요"
   invalid_date_8a221445: "유효하지 않은 날짜"
   invalid_domain_e810c1d: "올바르지 않은 도메인"
