@@ -6812,6 +6812,40 @@ describe Course do
     end
   end
 
+  describe "archival" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it "identifies archived courses via predicate and scope" do
+      expect(@course.archived?).to be false
+      expect(Course.archived).to be_empty
+
+      @course.archive!
+      expect(@course.archived?).to be true
+      expect(Course.archived).to eq [@course]
+    end
+
+    it "sets the archived_at timestamp on the course and enrollments when archived individually" do
+      student_in_course.destroy # test that this enrollment is not part of the archive
+      @course.archive!
+      expect(@course.archived_at).to be_present
+      expect(@course.all_enrollments.pluck(:type, :workflow_state, :archived_at)).to match_array(
+        [["TeacherEnrollment", "deleted", @course.archived_at],
+         ["StudentEnrollment", "deleted", @course.archived_at],
+         ["StudentEnrollment", "deleted", nil]]
+      )
+    end
+
+    it "sets the archived_at timestamp on courses and enrollments when archived in bulk" do
+      courses = [@course, course_with_student(active_all: true).course]
+      Course.destroy_batch(courses, archive: true)
+      dates = courses.flat_map { |c| [c.reload.archived_at] + c.all_enrollments.pluck(:archived_at) }
+      expect(dates.uniq.size).to eq 1
+      expect(dates.first).to be_present
+    end
+  end
+
   describe "#apply_nickname_for!" do
     before(:once) do
       @course = Course.create! name: "some terrible name"
