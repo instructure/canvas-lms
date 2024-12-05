@@ -275,6 +275,7 @@ class AuthenticationProvider < ActiveRecord::Base
   ].freeze
 
   def provision_user(unique_ids, provider_attributes = {})
+    unique_id = nil
     User.transaction(requires_new: true) do
       if unique_ids.is_a?(Hash)
         unique_id = unique_ids[login_attribute]
@@ -293,7 +294,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   rescue ActiveRecord::RecordNotUnique
     self.class.uncached do
-      pseudonyms.active_only.by_unique_id(unique_id).take!
+      pseudonyms.active_only.by_unique_id(unique_id).take
     end
   end
 
