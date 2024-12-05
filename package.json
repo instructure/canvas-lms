@@ -205,7 +205,6 @@
     "redux-thunk": "^3.1.0",
     "reselect": "^4.0.0",
     "rspack-manifest-plugin": "^5.0.0",
-    "shallow-equal": "^1.2.0",
     "slick-carousel": "^1.8.1",
     "spin.js": "2.3.2",
     "swc-loader": "^0.2.6",
