@@ -142,7 +142,8 @@ describe('helpers.ts', () => {
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
         })
-        const messages = generateDateTimeMessage(date, false)
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {
           return msg.text
         })
@@ -156,7 +157,8 @@ describe('helpers.ts', () => {
           context_asset_string: 'users_1',
           TIMEZONE: 'America/Denver',
         })
-        const messages = generateDateTimeMessage(date, false)
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {
           return msg.text
         })
@@ -170,7 +172,8 @@ describe('helpers.ts', () => {
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
         })
-        const messages = generateDateTimeMessage(date, false)
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {
           return msg.text
         })
@@ -184,7 +187,8 @@ describe('helpers.ts', () => {
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
         })
-        const messages = generateDateTimeMessage(date, false)
+        const dateTime = {value: date, isInvalid: false, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {
           return msg.text
         })
@@ -199,12 +203,29 @@ describe('helpers.ts', () => {
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
         })
-        const messages = generateDateTimeMessage(date, true)
+        const dateTime = {value: date, isInvalid: true, wrongOrder: false}
+        const messages = generateDateTimeMessage(dateTime)
         const messageText = messages.map(function (msg) {
           return msg.text
         })
 
         expect(messageText).toContain('The chosen date and time is invalid.')
+      })
+
+      it('returns error message if wrongOrder', () => {
+        // @ts-expect-error
+        window.ENV = {
+          CONTEXT_TIMEZONE: 'Asia/Brunei',
+          context_asset_string: 'account_1',
+          TIMEZONE: 'America/Denver',
+        }
+        const dateTime = {value: date, isInvalid: false, wrongOrder: true}
+        const messages = generateDateTimeMessage(dateTime)
+        const messageText = messages.map(function (msg) {
+          return msg.text
+        })
+
+        expect(messageText).toContain('The start date must be before the end date')
       })
     })
   })

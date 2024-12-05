@@ -29,6 +29,8 @@ const props = {
   onChange: jest.fn(),
   id: '',
   value: '',
+  setRef: jest.fn(),
+  invalidRole: jest.fn(),
 }
 
 const roleOptions = [

@@ -16,13 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, type RefObject} from 'react'
 import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
 import type {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import cloneDeep from 'lodash/cloneDeep'
+import {Text} from '@instructure/ui-text'
+import {handleCollectSelectedEnrollments} from './util/helpers'
+import {Heading} from '@instructure/ui-heading'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('temporary_enrollment')
 
@@ -32,6 +36,7 @@ export interface Props {
   selectedRole: RoleChoice
   createEnroll?: Function
   tempEnrollmentsPairing?: Enrollment[] | null
+  elementRef: RefObject<HTMLElement>
 }
 
 export function EnrollmentTree(props: Props) {
@@ -303,9 +308,14 @@ export function EnrollmentTree(props: Props) {
   const renderTree = () => {
     const roleElements = []
     for (const role in tree) {
+      let additionalProps = {}
+      if (role === '0') {
+        additionalProps = {elementRef: props.elementRef}
+      }
       roleElements.push(
         <Flex.Item key={tree[role].id} shouldGrow={true} overflowY="visible">
           <EnrollmentTreeGroup
+            {...additionalProps}
             id={tree[role].id}
             label={tree[role].label}
             indent="0"
@@ -327,6 +337,12 @@ export function EnrollmentTree(props: Props) {
     )
   }
 
+  const selectedEnrollments = handleCollectSelectedEnrollments(
+    tree,
+    props.enrollmentsByCourse,
+    props.selectedRole
+  )
+  const isError = selectedEnrollments.length === 0
   if (loading) {
     return (
       <Flex justifyItems="center" alignItems="center">
@@ -334,6 +350,20 @@ export function EnrollmentTree(props: Props) {
       </Flex>
     )
   } else {
-    return renderTree()
+    return (
+      <>
+        <Heading level="h3">
+          <Text>{I18n.t('Enrollments')}</Text>
+          <Text color={isError ? 'danger' : 'primary'}> *</Text>
+        </Heading>
+        <Flex gap="x-small" margin="0 0 x-small small">
+          {isError ? <IconWarningSolid color="error" /> : null}
+          <Text color={isError ? 'danger' : 'primary'}>
+            {I18n.t('Select at least one enrollment')}
+          </Text>
+        </Flex>
+        {renderTree()}
+      </>
+    )
   }
 }

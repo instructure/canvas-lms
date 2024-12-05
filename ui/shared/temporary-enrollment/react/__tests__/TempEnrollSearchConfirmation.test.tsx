@@ -28,6 +28,7 @@ const props = {
   searchFailure: jest.fn(),
   readySubmit: jest.fn(),
   canReadSIS: true,
+  duplicateReq: false,
 }
 
 const oneUser = {

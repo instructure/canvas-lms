@@ -17,7 +17,7 @@
  */
 
 import type {ChangeEvent} from 'react'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -44,11 +44,12 @@ const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 interface Props {
   user: User
   page: number
-  searchFail: Function
-  searchSuccess: Function
+  searchFail: () => void
+  searchSuccess: (enrollments: User[]) => void
   canReadSIS: boolean
   foundUsers: User[]
   wasReset?: boolean
+  duplicateReq: boolean
 }
 
 export function TempEnrollSearch(props: Props) {
@@ -57,8 +58,10 @@ export function TempEnrollSearch(props: Props) {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
+  const [searchMessage, setSearchMessage] = useState('')
   const [duplicateUsers, setDuplicateUsers] = useState<Record<string, DuplicateUser[]>>({})
   const [foundUsers, setFoundUsers] = useState<User[]>(props.foundUsers)
+  const textAreaRef = useRef<TextArea | null>(null)
 
   const handleSearchTypeChange = (_event: ChangeEvent<HTMLInputElement>, value: string) => {
     setSearchType(value)
@@ -66,7 +69,15 @@ export function TempEnrollSearch(props: Props) {
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target !== null) {
-      setSearch(event.target.value)
+      const searchValue = event.target.value
+      setSearch(searchValue)
+      setSearchMessage('')
+    }
+  }
+
+  const handleSearchBlur = () => {
+    if (search.length === 0) {
+      setSearchMessage(I18n.t('Search value is required.'))
     }
   }
 
@@ -117,8 +128,12 @@ export function TempEnrollSearch(props: Props) {
 
   useEffect(() => {
     if (props.page === 1 && props.foundUsers.length === 0) {
+      if (search.length === 0) {
+        textAreaRef.current?.focus()
+        props.searchFail()
+        return
+      }
       setLoading(true)
-
       const findUser = async () => {
         try {
           const searchArray = search.split(',')
@@ -205,6 +220,7 @@ export function TempEnrollSearch(props: Props) {
           searchFailure={props.searchFail}
           readySubmit={(enrollments: User[]) => props.searchSuccess(enrollments)}
           canReadSIS={props.canReadSIS}
+          duplicateReq={props.duplicateReq}
         />
       </Flex>
     )
@@ -254,6 +270,7 @@ export function TempEnrollSearch(props: Props) {
         </Flex.Item>
         <Flex.Item overflowY="visible">
           <TextArea
+            required={true}
             label={
               <>
                 {labelText}
@@ -267,6 +284,10 @@ export function TempEnrollSearch(props: Props) {
             placeholder={exampleText}
             // @ts-expect-error
             onChange={handleSearchChange}
+            onBlur={handleSearchBlur}
+            ref={ref => (textAreaRef.current = ref)}
+            messages={searchMessage === '' ? [] : [{type: 'newError', text: searchMessage}]}
+            data-testid="search_area"
           />
         </Flex.Item>
       </Flex>
