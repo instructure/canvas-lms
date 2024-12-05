@@ -677,12 +677,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Multi Color Image" },
   "multiplication_sign_15f95c22": { "message": "Multiplication Sign" },
   "music_icon_4db5c972": { "message": "Music Icon" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Must be at least { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Must be at least { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "My files" },
   "n_th_root_9991a6e4": { "message": "N-th Root" },
   "nabla_1e216d25": { "message": "Nabla" },
@@ -793,6 +787,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Percentage must be at least { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Performing Arts Icon" },
   "perpendicular_7c48ede4": { "message": "Perpendicular" },
   "phi_4ac33b6d": { "message": "Phi" },
@@ -803,6 +800,9 @@ const locale = {
   "pick_a_color_557abfb0": { "message": "Pick a color" },
   "pink_68ad45cb": { "message": "Pink" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Pixels must be at least { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Play" },
   "play_media_comment_35257210": { "message": "Play media comment." },
   "play_media_comment_by_name_from_createdat_c230123d": {

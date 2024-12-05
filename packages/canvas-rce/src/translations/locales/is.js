@@ -660,12 +660,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Fjöllita mynd" },
   "multiplication_sign_15f95c22": { "message": "Margföldunarmerki" },
   "music_icon_4db5c972": { "message": "Tónlistar tákn" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Verður að vera að minnsta kosti { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Verður að vera að minnsta kosti { width } x { height }pt"
-  },
   "my_files_2f621040": { "message": "Mínar skrár" },
   "n_th_root_9991a6e4": { "message": "N-ta rót" },
   "nabla_1e216d25": { "message": "Nabla" },
