@@ -13147,6 +13147,7 @@ hu:
   international_text_messaging_rates_may_apply_d4b4a97a: "Nemzetközi szöveges üzenetküldési tarifák lehetnek érvényben"
   internet2_254c6ca6: Internet2
   interval_must_be_0_e7b8eb5: "INTERVAL-nak > 0-nak kell lennie"
+  introduction_43f53b7d: Bevezetés
   invalid_address_book_strategy_904a7ada: "Helytelen címjegyzék stratégia"
   invalid_authenticity_token_b753558c: "Hibás hitelesítő token"
   invalid_aws_configuration_e8a6ae0f: "Érvénytelen AWS konfiguráció"
