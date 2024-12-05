@@ -274,6 +274,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
 
   useEffect(() => {
     if (viewRef && rendered) {
+      // @ts-expect-error
       enhanceUserContent(viewRef, {canvasOrigin: window.location.origin})
     }
   }, [viewRef, rendered])

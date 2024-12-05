@@ -77,7 +77,6 @@ export const SelectMediaModal = ({
       trayProps={trayProps}
       label={label}
       panels={modalPanels}
-      // @ts-expect-error
       onDismiss={onDismiss}
       onSubmit={handleSubmit}
       forBlockEditorUse={true}
