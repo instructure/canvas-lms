@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
+import React, {useState, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -24,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {useQuery} from '@tanstack/react-query'
 
 import {type File, type Folder} from '../../../interfaces/File'
@@ -68,7 +69,10 @@ const columnRenderers: {
   [key: string]: (
     row: File | Folder,
     isStacked: boolean,
-    userCanEditFilesForContext: boolean
+    userCanEditFilesForContext: boolean,
+    size: 'small' | 'medium' | 'large',
+    isSelected: boolean,
+    toggleSelect: () => void
   ) => React.ReactNode
 } = {
   name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
@@ -108,6 +112,31 @@ const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolde
   }
 
   const rows = !isFetching && data && data.length > 0 ? data : []
+
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
+
+  const toggleRowSelection = (rowId: string) => {
+    setSelectedRows(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(rowId)) {
+        newSet.delete(rowId)
+      } else {
+        newSet.add(rowId)
+      }
+      return newSet
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedRows.size === rows.length) {
+      setSelectedRows(new Set()) // Unselect all
+    } else {
+      setSelectedRows(new Set(rows.map(row => row.id))) // Select all
+    }
+
+  }
+  const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
+  const someRowsSelected = selectedRows.size > 0 && !allRowsSelected
   return (
     <>
       <Table
@@ -117,29 +146,72 @@ const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolde
       >
         <Table.Head>
           <Table.Row>
-            {columnHeaders.map(columnHeader => (
+            <>
               <Table.ColHeader
-                key={columnHeader.id}
-                id={columnHeader.id}
-                textAlign={isStacked ? undefined : columnHeader.textAlign}
-                width={columnHeader.width}
-                data-testid={columnHeader.id}
+                key="select"
+                id="select"
+                textAlign="center"
+                width="1em"
+                data-testid="select"
               >
-                {columnHeader.title}
+                <Checkbox
+                  label=""
+                  size={size}
+                  checked={allRowsSelected}
+                  indeterminate={someRowsSelected}
+                  onChange={toggleSelectAll}
+                  data-testid="select-all-checkbox"
+                />
               </Table.ColHeader>
-            ))}
+              {columnHeaders.map(columnHeader => (
+                <Table.ColHeader
+                  key={columnHeader.id}
+                  id={columnHeader.id}
+                  textAlign={isStacked ? undefined : columnHeader.textAlign}
+                  width={columnHeader.width}
+                  data-testid={columnHeader.id}
+                >
+                  {columnHeader.title}
+                </Table.ColHeader>
+              ))}
+            </>
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {rows.map(row => (
-            <Table.Row key={row.id} data-testid="table-row">
-              {columnHeaders.map(column => (
-                <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
-                  {columnRenderers[column.id](row, isStacked, userCanEditFilesForContext)}
-                </Table.Cell>
-              ))}
-            </Table.Row>
-          ))}
+          {rows.map(row => {
+            const isSelected = selectedRows.has(row.id)
+            return (
+              <Table.Row
+                key={row.id}
+                data-testid="table-row"
+                themeOverride={isSelected ? {borderColor: 'brand'} : undefined}
+              >
+                <>
+                  <Table.RowHeader>
+                    <Checkbox
+                      label=""
+                      size={size}
+                      checked={isSelected}
+                      onChange={() => toggleRowSelection(row.id)}
+                      data-testid="row-select-checkbox"
+                    />
+                  </Table.RowHeader>
+                  {columnHeaders.map(column => (
+                    <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
+                      {columnRenderers[column.id](
+                        row,
+                        isStacked,
+                        userCanEditFilesForContext,
+                        size,
+                        isSelected,
+                        () => toggleRowSelection(row.id)
+                      )}
+                    </Table.Cell>
+                  ))}
+                </>
+              </Table.Row>
+            )
+          })}
         </Table.Body>
       </Table>
       <SubTableContent
