@@ -39,6 +39,11 @@ describe Login::OAuth2Controller do
 
   describe "#create" do
     let(:token) { instance_double("OAuth2::AccessToken", options: {}) }
+    let(:root_account) { Account.default }
+
+    before do
+      controller.instance_variable_set(:@domain_root_account, root_account)
+    end
 
     it "checks the OAuth2 CSRF token" do
       session[:oauth2_nonce] = "bob"
@@ -86,6 +91,17 @@ describe Login::OAuth2Controller do
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       # ensure the session was reset
       expect(session[:sentinel]).to be_nil
+    end
+
+    it "includes the domain root account in the get_token arguments" do
+      session[:oauth2_nonce] = "bob"
+      expect_any_instantiation_of(aac).to receive(:get_token).with(anything, anything, hash_including(root_account:))
+      user_with_pseudonym(username: "user", active_all: 1)
+
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
+
+      get :create, params: { state: jwt }
     end
 
     it "handles multi-valued identifiers from providers" do
