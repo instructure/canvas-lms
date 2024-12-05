@@ -31,21 +31,39 @@ describe "quiz index menu tool placement" do
     @tool.save!
   end
 
-  it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
-    visit_quizzes_index_page(@course.id)
-    quiz_index_settings_button.click
-    expect(quiz_index_settings_menu_items).to include_text("Import Stuff")
+  shared_examples "launches the index menu tool via the tray" do |expected_resource_types|
+    it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
+      visit_quizzes_index_page(@course.id)
+      quiz_index_settings_button.click
+      expect(quiz_index_settings_menu_items).to include_text("Import Stuff")
 
-    quiz_index_settings_menu_tool_link("Import Stuff").click
-    wait_for_ajaximations
-    expect(tool_dialog_header.text).to eq "Import Stuff"
+      quiz_index_settings_menu_tool_link("Import Stuff").click
+      wait_for_ajaximations
+      expect(tool_dialog_header.text).to eq "Import Stuff"
 
-    expect(tool_dialog_iframe["src"]).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
-    query_params = Rack::Utils.parse_nested_query(URI.parse(tool_dialog_iframe["src"]).query)
-    expect(query_params["launch_type"]).to eq "quiz_index_menu"
-    expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
-    expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "quiz"
-    expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to eq ["quiz"]
-    expect(query_params["com_instructure_course_available_canvas_resources"]).to be_blank
+      expect(tool_dialog_iframe["src"]).to include("/courses/#{@course.id}/external_tools/#{@tool.id}")
+      query_params = Rack::Utils.parse_nested_query(URI.parse(tool_dialog_iframe["src"]).query)
+      expect(query_params["launch_type"]).to eq "quiz_index_menu"
+      expect(query_params["com_instructure_course_allow_canvas_resource_selection"]).to eq "false"
+      expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "quiz"
+      expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to eq expected_resource_types
+      expect(query_params["com_instructure_course_available_canvas_resources"]).to be_blank
+    end
+  end
+
+  context "new_quizzes_media_type feature flag is disabled" do
+    before do
+      Account.site_admin.disable_feature!(:new_quizzes_media_type)
+    end
+
+    include_examples "launches the index menu tool via the tray", ["quiz"]
+  end
+
+  context "new_quizzes_media_type feature flag is enabled" do
+    before do
+      Account.site_admin.enable_feature!(:new_quizzes_media_type)
+    end
+
+    include_examples "launches the index menu tool via the tray", ["quiz", "quizzesnext"]
   end
 end

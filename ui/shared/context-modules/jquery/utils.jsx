@@ -30,6 +30,7 @@ import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternal
 import {ltiState} from '@canvas/lti/jquery/messages'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
+import {getResourceTypes} from '@canvas/util/resourceTypeUtil'
 
 const I18n = useI18nScope('context_modulespublic')
 
@@ -560,17 +561,7 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
     <ContentTypeExternalToolTray
       tool={tool}
       placement={placement}
-      acceptedResourceTypes={[
-        'assignment',
-        'audio',
-        'discussion_topic',
-        'document',
-        'image',
-        'module',
-        'quiz',
-        'page',
-        'video',
-      ]}
+      acceptedResourceTypes={getResourceTypes()}
       targetResourceType="module"
       allowItemSelection={placement === 'module_index_menu'}
       selectableItems={moduleData}
