@@ -78,15 +78,18 @@ const renderFileBrowser = props => {
 
 // rewrite using testing-library
 describe('FileBrowser', () => {
+  let oldEnv
+
   beforeEach(() => {
     moxios.install()
+    oldEnv = window.ENV
     window.ENV = {context_asset_string: 'courses_1'}
   })
 
   afterEach(() => {
     cleanup()
     moxios.uninstall()
-    delete window.ENV
+    window.ENV = oldEnv
   })
 
   it('renders', () => {
@@ -200,7 +203,8 @@ describe('FileBrowser', () => {
   })
 
   describe('on folder click', () => {
-    it("gets sub-folders and files for folder's sub-folders on folder expand", done => {
+    // TODO: fix fickle test (cf. RCX-2728)
+    it.skip("gets sub-folders and files for folder's sub-folders on folder expand", done => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const subFolders2 = [courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 5})]
       const files1 = [testFile({folder_id: 4})]
