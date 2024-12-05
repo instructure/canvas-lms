@@ -678,12 +678,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Whakapakoko nui ngā Tae" },
   "multiplication_sign_15f95c22": { "message": "Tohu Whakarea" },
   "music_icon_4db5c972": { "message": "Puoro Tohu" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Me iti ake i te { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Me kia i te iti rawa { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "Aku kōnae" },
   "n_th_root_9991a6e4": { "message": "N-th Puaka" },
   "nabla_1e216d25": { "message": "Nabla" },

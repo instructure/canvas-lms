@@ -691,12 +691,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Imagem multicolorida" },
   "multiplication_sign_15f95c22": { "message": "Sinal de multiplicação" },
   "music_icon_4db5c972": { "message": "Ícone de música" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Deve ser ao menos { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Deve ter ao menos { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "Meus arquivos" },
   "n_th_root_9991a6e4": { "message": "N-ésima raiz" },
   "nabla_1e216d25": { "message": "Nabla" },

@@ -649,12 +649,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
   "multiplication_sign_15f95c22": { "message": "علامة الضرب" },
   "music_icon_4db5c972": { "message": "أيقونة الموسيقى" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "يجب أن يكون { percentage }% على الأقل"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
-  },
   "my_files_2f621040": { "message": "ملفاتي" },
   "n_th_root_9991a6e4": { "message": "N-th Root" },
   "nabla_1e216d25": { "message": "Nabla" },
