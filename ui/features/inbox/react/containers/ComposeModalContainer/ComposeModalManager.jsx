@@ -376,7 +376,7 @@ const ComposeModalManager = props => {
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
       modalError={modalError}
       isPrivateConversation={!!props?.conversation?.isPrivate}
-      currentCourseFilter={props.currentCourseFilter}
+      activeCourseFilterID={props.activeCourseFilterID}
       setModalError={setModalError}
     />
   )
@@ -395,7 +395,7 @@ ComposeModalManager.propTypes = {
   selectedIds: PropTypes.array,
   contextIdFromUrl: PropTypes.string,
   maxGroupRecipientsMet: PropTypes.bool,
-  currentCourseFilter: PropTypes.string,
+  activeCourseFilterID: PropTypes.string,
   inboxSignatureBlock: PropTypes.bool,
 }
 

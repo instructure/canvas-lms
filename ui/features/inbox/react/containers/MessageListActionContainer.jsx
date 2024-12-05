@@ -96,13 +96,13 @@ const MessageListActionContainer = props => {
   useEffect(() => {
     if (
       !loading &&
-      !doesCourseFilterOptionExist(props.activeCourseFilter, courseSelectorOptions) &&
-      props.activeCourseFilter !== undefined
+      !doesCourseFilterOptionExist(props.activeCourseFilterID, courseSelectorOptions) &&
+      props.activeCourseFilterID !== undefined
     ) {
       props.onCourseFilterSelect(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.activeCourseFilter])
+  }, [props.activeCourseFilterID])
 
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
@@ -184,7 +184,7 @@ const MessageListActionContainer = props => {
               <CourseSelect
                 mainPage={true}
                 options={courseSelectorOptions}
-                activeCourseFilterID={props.activeCourseFilter}
+                activeCourseFilterID={props.activeCourseFilterID}
                 onCourseFilterSelect={contextObject => {
                   props.onCourseFilterSelect(contextObject.contextID)
                 }}
@@ -267,7 +267,7 @@ MessageListActionContainer.propTypes = {
   onStar: PropTypes.func,
   onDelete: PropTypes.func,
   onReadStateChange: PropTypes.func,
-  activeCourseFilter: PropTypes.string,
+  activeCourseFilterID: PropTypes.string,
   canReply: PropTypes.bool,
   showComposeButton: PropTypes.bool,
 }

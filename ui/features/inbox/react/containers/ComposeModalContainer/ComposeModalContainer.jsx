@@ -181,14 +181,14 @@ const ComposeModalContainer = props => {
   }, [])
 
   useEffect(() => {
-    if (!props.isReply && !props.isForward && props.currentCourseFilter) {
+    if (!props.isReply && !props.isForward && props.activeCourseFilterID) {
       setSelectedContext({
-        contextID: props.currentCourseFilter,
-        contextName: getContextName(props.currentCourseFilter),
+        contextID: props.activeCourseFilterID,
+        contextName: getContextName(props.activeCourseFilterID),
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.courses, props.currentCourseFilter, props.isForward, props.isReply])
+  }, [props.courses, props.activeCourseFilterID, props.isForward, props.isReply])
 
   const getRecipientsObserver = () => {
     if (selectedContext?.contextID) {
@@ -604,6 +604,6 @@ ComposeModalContainer.propTypes = {
   modalError: PropTypes.string,
   setModalError: PropTypes.func,
   isPrivateConversation: PropTypes.bool,
-  currentCourseFilter: PropTypes.string,
+  activeCourseFilterID: PropTypes.string,
   inboxSignatureBlock: PropTypes.bool,
 }

@@ -44,6 +44,8 @@ const HeaderInputs = props => {
     )
   }
 
+  const [modalContextCourseFilter, setModalContextCourseFilter] = React.useState(props.activeCourseFilter)
+
   const canIncludeObservers = useMemo(() => {
     if (ENV?.CONVERSATIONS?.CAN_MESSAGE_ACCOUNT_CONTEXT) {
       return true
@@ -65,7 +67,7 @@ const HeaderInputs = props => {
     if (context.contextID === null && context.contextName === null) {
       props.onSelectedIdsChange([])
     }
-
+    setModalContextCourseFilter(context)
     props.onContextSelect(context)
   }
 
@@ -91,7 +93,7 @@ const HeaderInputs = props => {
                   groups: props.courses?.favoriteGroupsConnection.nodes,
                 }}
                 onCourseFilterSelect={onContextSelect}
-                activeCourseFilterID={props.activeCourseFilter?.contextID}
+                activeCourseFilterID={modalContextCourseFilter?.contextID}
                 courseMessages={props.courseMessages}
               />
             )
@@ -131,7 +133,7 @@ const HeaderInputs = props => {
                   props.onSelectedIdsChange(ids)
                 }}
                 onInputValueChange={props.onAddressBookInputValueChange}
-                activeCourseFilter={props.activeCourseFilter}
+                activeCourseFilter={modalContextCourseFilter}
                 hasSelectAllFilterOption={true}
                 selectedRecipients={props.selectedRecipients}
                 addressBookMessages={props.addressBookMessages}
