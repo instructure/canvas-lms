@@ -49,4 +49,13 @@ describe('IconBlock', () => {
     expect(getByTitle('idea')).toBeInTheDocument()
     expect(icon).toHaveStyle({width: '1em', height: '1em', fontSize: '5rem'}) // large
   })
+
+  it('should honor color prop', () => {
+    const {container, getByTitle} = renderBlock({color: 'red'})
+
+    const icon = container.querySelector('svg')
+    expect(icon).toBeInTheDocument()
+    expect(getByTitle('idea')).toBeInTheDocument()
+    expect(document.querySelector('.icon-block')).toHaveStyle({color: 'red'})
+  })
 })

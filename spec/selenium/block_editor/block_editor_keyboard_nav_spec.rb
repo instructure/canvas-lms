@@ -214,6 +214,7 @@ describe "Block Editor", :ignore_js_errors do
         driver.action.send_keys(:arrow_right).perform
         driver.action.send_keys(:arrow_right).perform
         driver.action.send_keys(:arrow_right).perform
+        driver.action.send_keys(:arrow_right).perform
         expect(active_element.attribute("textContent")).to eq("Delete")
 
         # one more and it wraps around
@@ -246,6 +247,7 @@ describe "Block Editor", :ignore_js_errors do
           kb_focus_block_toolbar
           expect(active_element.attribute("textContent")).to eq("Go up")
 
+          driver.action.send_keys(:arrow_right).perform
           driver.action.send_keys(:arrow_right).perform
           driver.action.send_keys(:arrow_right).perform
           expect(active_element.attribute("textContent")).to eq("Select Icon")

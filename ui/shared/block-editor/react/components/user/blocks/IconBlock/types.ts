@@ -23,4 +23,5 @@ export {type IconSize}
 export type IconBlockProps = {
   iconName: string
   size?: IconSize
+  color?: string
 }
