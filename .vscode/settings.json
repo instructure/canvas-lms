@@ -24,4 +24,7 @@
   "cSpell.words": [
     "urlsafe"
   ],
+  "search.exclude": {
+      "packages/*/es/**": true
+  }
 }
