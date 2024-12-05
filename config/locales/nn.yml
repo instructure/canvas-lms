@@ -8982,6 +8982,7 @@ nn:
   creates_file_objects_initially_hidden_to_students__7f333bf0: |-
       Opprettar filobjekt (I første omgang gøymd for studentar dersom i eit emne) etter
       at media er opplasta eller innspelt gjennom RCEen.
+  creating_261dbb7a: "Opprettar ...\""
   creating_88cc5158: Oppretter
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Gruppeoppretting er ikkje inkludert i den nye oppgåveprosessen. Gå til den gamle oppgåve-sida?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Dersom du opprettar innleveringseksport kan du laste ned ei ZIP-fil med alle innleveringane dine i noverande og tidlegare emne. Fila kan vere stor, så det kan ta ei stund. Du kan forlate sida og kome tilbake seinare."
@@ -14398,6 +14399,7 @@ nn:
   international_sms_9edb9868: "Internasjonal SMS"
   international_text_messaging_rates_may_apply_d4b4a97a: "Det kan vere at internasjonale prisar for tekstmeldingar er brukt."
   internet2_254c6ca6: Internet2
+  introduction_43f53b7d: Introduksjon
   invalid_address_book_strategy_904a7ada: "Ugyldig adressebok-val."
   invalid_authenticity_token_b753558c: "Ugyldig ID"
   invalid_aws_configuration_e8a6ae0f: "Ugyldig AWS-konfigurasjon"
