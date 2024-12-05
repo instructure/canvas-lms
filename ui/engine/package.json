@@ -9,7 +9,8 @@
   },
   "scripts": {
     "lint": "eslint . --ext .ts,.js",
-    "build:canvas": "yarn run lint"
+    "build": "yarn run lint",
+    "build:canvas": "yarn run build"
   },
   "dependencies": {
     "@instructure/updown": "^1.3",
