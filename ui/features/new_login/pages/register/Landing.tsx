@@ -100,7 +100,9 @@ const Landing = () => {
           {I18n.t('Create your account')}
         </Heading>
 
-        <ActionPrompt variant="signIn" />
+        <Flex.Item overflowX="visible" overflowY="visible">
+          <ActionPrompt variant="signIn" />
+        </Flex.Item>
       </Flex>
 
       {renderCards()}

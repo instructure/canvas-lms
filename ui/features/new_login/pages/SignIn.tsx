@@ -146,13 +146,15 @@ const SignIn = () => {
         </Heading>
 
         {selfRegistrationType && (
-          <ActionPrompt
-            variant={
-              selfRegistrationType === SelfRegistrationType.ALL
-                ? 'createAccount'
-                : 'createParentAccount'
-            }
-          />
+          <Flex.Item overflowX="visible" overflowY="visible">
+            <ActionPrompt
+              variant={
+                selfRegistrationType === SelfRegistrationType.ALL
+                  ? 'createAccount'
+                  : 'createParentAccount'
+              }
+            />
+          </Flex.Item>
         )}
       </Flex>
 

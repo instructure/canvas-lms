@@ -398,7 +398,7 @@ const Student = () => {
         </Flex>
       </form>
 
-      <Flex.Item align="center">
+      <Flex.Item align="center" overflowX="visible" overflowY="visible">
         <ActionPrompt variant="signIn" />
       </Flex.Item>
     </Flex>
