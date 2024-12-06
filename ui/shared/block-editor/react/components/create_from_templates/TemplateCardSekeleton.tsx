@@ -21,6 +21,11 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import type {BlockTemplate} from '../../types'
 import {Button} from '@instructure/ui-buttons'
+import {Heading} from '@instructure/ui-heading'
+import {Pill} from '@instructure/ui-pill'
+import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {AvailableTags} from './TagSelect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor')
@@ -36,6 +41,58 @@ export default function TemplateCardSkeleton({
   quickLookAction?: () => void
   inLayout: 'grid' | 'rows'
 }) {
+  const renderBlankPageCard = () => {
+    return (
+      <>
+        <div className="curl" />
+        <Flex alignItems="center" height="100%" justifyItems="center" width="100%">
+          <Button color="primary" size="small" onClick={createAction}>
+            {I18n.t('New Blank Page')}
+          </Button>
+        </Flex>
+      </>
+    )
+  }
+
+  const renderTemplateCard = () => {
+    return (
+      <div
+        className="block-template-preview-card__content"
+        style={{
+          position: 'absolute',
+          height: 'auto',
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundColor: '#fff',
+        }}
+      >
+        <Flex direction="column" gap="xx-small" padding="x-small">
+          <Heading level="h4" margin="0">
+            {template.name}
+          </Heading>
+          {template.description && (
+            <div id={`${template.id}-description`}>
+              <TruncateText maxLines={2}>
+                <Text as="div" size="x-small" lineHeight="condensed">
+                  {template.description}
+                </Text>
+              </TruncateText>
+            </div>
+          )}
+          <Flex alignItems="end" height="100%" justifyItems="end" width="100%" gap="x-small">
+            <Button color="secondary" size="small" onClick={quickLookAction}>
+              {I18n.t('Quick Look')}
+            </Button>
+            <Button color="primary" size="small" onClick={createAction}>
+              {I18n.t('Customize')}
+            </Button>
+          </Flex>
+        </Flex>
+      </div>
+    )
+  }
+
   return (
     <View
       data-testid="template-card-skeleton"
@@ -43,7 +100,6 @@ export default function TemplateCardSkeleton({
       className={`block-template-preview-card ${inLayout} ${
         template.id === 'blank_page' ? 'blank-card' : ''
       }`}
-      display="flex"
       position="relative"
       shadow="above"
       tabIndex={0}
@@ -51,28 +107,14 @@ export default function TemplateCardSkeleton({
       aria-label={I18n.t('%{name} template', {name: template.name})}
       aria-describedby={template.description ? `${template.id}-description` : undefined}
     >
-      {template.id === 'blank_page' && <div className="curl" />}
-      <Flex alignItems="center" height="100%" justifyItems="center" width="100%">
-        {template.id !== 'blank_page' ? (
-          <div className="buttons">
-            <Button color="secondary" margin="0 x-small 0 0" size="small" onClick={quickLookAction}>
-              {I18n.t('Quick Look')}
-            </Button>
-            <Button color="primary" size="small" onClick={createAction}>
-              {I18n.t('Customize')}
-            </Button>
-          </div>
-        ) : (
-          <Button color="primary" size="small" onClick={createAction}>
-            {I18n.t('New Blank Page')}
-          </Button>
-        )}
+      <Flex as="div" margin="x-small" justifyItems="end" gap="x-small">
+        {template.tags?.map((tag: string) => (
+          <Pill key={tag} margin="0">
+            {AvailableTags[tag] || tag}
+          </Pill>
+        ))}
       </Flex>
-      {template.description && (
-        <div id={`${template.id}-description`} style={{position: 'absolute', left: '-9999px'}}>
-          {template.description}
-        </div>
-      )}
+      {template.id === 'blank_page' ? renderBlankPageCard() : renderTemplateCard()}
     </View>
   )
 }

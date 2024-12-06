@@ -578,18 +578,6 @@
   overflow: hidden;
 }
 
-
-/*
-.iframe-block__overlay {
-  position: absolute;
-  box-sizing: border-box;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  background-color: rgba(0,0,0,0.1);
-}
-*/
-
 .iframe-block iframe {
   width: 100%;
   height: 100%;
@@ -760,7 +748,5 @@
     height: 40vh;
   }
 
-  > * { background-color: rgba(255, 255, 255, 0.7) }
-
-  &:not(:hover):not(:focus):not(:focus-within):not(.blank-card) > * { display: none; }
+  &:not(:hover):not(:focus):not(:focus-within):not(.blank-card) > .block-template-preview-card__content { display: none; }
 }
