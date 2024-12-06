@@ -20,23 +20,81 @@
 // or a base URL makes testing difficult, esp since window.location is "about:blank"
 // in mocha tests.
 
-// eslint-disable-next-line import/no-nodejs-modules
-import {parse, format, UrlWithParsedQuery} from 'url'
 import RCEGlobals from '../rce/RCEGlobals'
+
+interface ParsedUrl {
+  pathname: string | null
+  search: string | null
+  hash: string | null
+  host: string | null
+  hostname: string | null
+  protocol: string | null
+  query: Record<string, string>
+  slashes?: boolean
+}
 
 function parseCanvasUrl(
   url: string | undefined | null,
   canvasOrigin: string = window.location.origin
-): UrlWithParsedQuery | null {
+): ParsedUrl | null {
   if (!url) {
     return null
   }
-  const parsed = parse(url, true)
-  const canvasHost = parse(canvasOrigin, true).host
-  if (parsed.host && canvasHost !== parsed.host) {
+
+  try {
+    // For absolute URLs
+    const fullUrl = url.startsWith('http')
+      ? url
+      : `${canvasOrigin}${url.startsWith('/') ? '' : '/'}${url}`
+    const parsed = new URL(fullUrl)
+    const canvasUrl = new URL(canvasOrigin)
+
+    if (parsed.host && canvasUrl.host !== parsed.host) {
+      return null
+    }
+
+    // Convert URLSearchParams to query object
+    const query: Record<string, string> = {}
+    parsed.searchParams.forEach((value, key) => {
+      query[key] = value
+    })
+
+    return {
+      pathname: parsed.pathname,
+      search: parsed.search,
+      hash: parsed.hash,
+      host: parsed.host,
+      hostname: parsed.hostname,
+      protocol: parsed.protocol,
+      query,
+    }
+  } catch {
+    // If URL parsing fails, return null
     return null
   }
-  return parsed
+}
+
+function formatUrl(parsed: ParsedUrl): string {
+  try {
+    // Format query string while preserving original encoding
+    const queryPairs = Object.entries(parsed.query || {}).map(([key, value]) => {
+      // Use encodeURIComponent to preserve %20 encoding
+      return `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    })
+    const search = queryPairs.join('&')
+    const pathname = parsed.pathname || ''
+    const hash = parsed.hash || ''
+
+    if (parsed.protocol || parsed.host) {
+      const protocol = parsed.protocol ? parsed.protocol.replace(/:$/, '') : ''
+      const host = parsed.host || ''
+      return `${protocol}://${host}${pathname}${search ? '?' + search : ''}${hash}`
+    }
+
+    return `${pathname}${search ? '?' + search : ''}${hash}`
+  } catch {
+    return ''
+  }
 }
 
 export function absoluteToRelativeUrl(url: string, canvasOrigin?: string): string {
@@ -46,18 +104,16 @@ export function absoluteToRelativeUrl(url: string, canvasOrigin?: string): strin
   }
   parsed.host = ''
   parsed.hostname = ''
-  parsed.slashes = false
   parsed.protocol = ''
-  const newUrl = format(parsed)
-  return newUrl
+  return formatUrl(parsed)
 }
 
-function changeDownloadToWrapParams(parsedUrl: UrlWithParsedQuery): UrlWithParsedQuery {
+function changeDownloadToWrapParams(parsedUrl: ParsedUrl): ParsedUrl {
   if (parsedUrl.search) {
-    // @ts-expect-error
-    delete parsedUrl.search
+    parsedUrl.search = null
   }
-  if (parsedUrl.query && parsedUrl.query.download_frd !== undefined) {
+  if (parsedUrl.query) {
+    // Remove all download-related parameters
     delete parsedUrl.query.download_frd
   }
   if (!parsedUrl.query) {
@@ -71,10 +127,10 @@ function changeDownloadToWrapParams(parsedUrl: UrlWithParsedQuery): UrlWithParse
 }
 
 function addContext(
-  parsedUrl: UrlWithParsedQuery,
+  parsedUrl: ParsedUrl,
   contextType: string,
   contextId: string | number
-): UrlWithParsedQuery {
+): ParsedUrl {
   // if this is a http://canvas/files... url. change it to be contextual
   if (parsedUrl.pathname && /^\/files/.test(parsedUrl.pathname)) {
     const context = contextType.replace(/([^s])$/, '$1s') // canvas contexts are plural
@@ -91,7 +147,8 @@ export function downloadToWrap(url: string): string {
   if (!parsed) {
     return url
   }
-  return format(changeDownloadToWrapParams(parsed))
+  const formattedUrl = formatUrl(changeDownloadToWrapParams(parsed))
+  return absoluteToRelativeUrl(formattedUrl)
 }
 
 // take a url to a file (e.g. /files/17), and convert it to
@@ -110,7 +167,8 @@ export function fixupFileUrl(
 ): {href?: string; url?: string; uuid?: string} {
   const key = fileInfo.href ? 'href' : 'url'
   if (fileInfo[key]) {
-    let parsed = parseCanvasUrl(fileInfo[key], canvasOrigin || window.location.origin)
+    const currentOrigin = canvasOrigin || window.location.origin
+    let parsed = parseCanvasUrl(fileInfo[key], currentOrigin)
     if (!parsed) {
       return fileInfo
     }
@@ -118,6 +176,7 @@ export function fixupFileUrl(
     parsed = addContext(parsed, contextType, contextId)
     // if this is a user file, add the verifier
     // if this is in New Quizzes and the feature flag is enabled, add the verifier
+
     if (
       fileInfo.uuid &&
       (contextType.includes('user') ||
@@ -125,13 +184,20 @@ export function fixupFileUrl(
           canvasOrigin !== window.location.origin &&
           RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
     ) {
-      // @ts-expect-error
-      delete parsed.search
+      parsed.search = null
       parsed.query.verifier = fileInfo.uuid
     } else {
       delete parsed.query.verifier
     }
-    fileInfo[key] = format(parsed)
+    const formattedUrl = formatUrl(parsed)
+
+    // Keep absolute URLs if they match the canvas origin and input was absolute
+    const isAbsoluteUrl = fileInfo[key]?.startsWith('http')
+    const matchesCanvasOrigin = fileInfo[key]?.startsWith(currentOrigin)
+    fileInfo[key] =
+      isAbsoluteUrl && matchesCanvasOrigin
+        ? formattedUrl
+        : absoluteToRelativeUrl(formattedUrl, currentOrigin)
   }
   return fileInfo
 }
@@ -149,10 +215,16 @@ export function prepEmbedSrc(url: string, canvasOrigin: string = window.location
   if (parsed.pathname && !/\/preview(?:\?|$)/.test(parsed.pathname)) {
     parsed.pathname = parsed.pathname.replace(/(?:\/download)?\/?(\?|$)/, '/preview$1')
   }
-  // @ts-expect-error
-  delete parsed.search
+  parsed.search = null
   delete parsed.query.wrap
-  return format(parsed)
+  const formattedUrl = formatUrl(parsed)
+
+  // Keep absolute URLs if they match the canvas origin
+  const isAbsoluteUrl = url.startsWith('http')
+  const matchesCanvasOrigin = url.startsWith(canvasOrigin)
+  return isAbsoluteUrl && matchesCanvasOrigin
+    ? formattedUrl
+    : absoluteToRelativeUrl(formattedUrl, canvasOrigin)
 }
 
 // when the user opens a link to a resource, we want its view
@@ -162,10 +234,9 @@ export function prepLinkedSrc(url: string): string {
   if (!parsed) {
     return url
   }
-  // @ts-expect-error
-  delete parsed.search
   if (parsed.pathname) {
-    parsed.pathname = parsed.pathname.replace(/\/preview(\?|$)/, '$1')
+    parsed.pathname = parsed.pathname.replace(/\/preview(?:\?|$)/, '')
   }
-  return format(parsed)
+  const formattedUrl = formatUrl(parsed)
+  return absoluteToRelativeUrl(formattedUrl)
 }
