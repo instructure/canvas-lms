@@ -28,10 +28,10 @@ export type DaySub = {
 }
 
 export type DateShiftsCommon = {
-  old_start_date: string
-  new_start_date: string
-  old_end_date: string
-  new_end_date: string
+  old_start_date?: string
+  new_start_date?: string
+  old_end_date?: string
+  new_end_date?: string
 }
 
 export type DateShifts = DateShiftsCommon & {
@@ -45,9 +45,9 @@ export type DateAdjustmentConfig = {
 
 export type submitMigrationFormData = {
   errored?: boolean
-  adjust_dates: AdjustDates
-  selective_import: boolean
-  date_shift_options: DateShifts
+  adjust_dates?: AdjustDates
+  selective_import?: boolean
+  date_shift_options?: DateShifts
   settings: {[key: string]: any}
   daySubCollection?: object
   pre_attachment?: {
@@ -65,7 +65,7 @@ export type onSubmitMigrationFormCallback = (
 export type DateShiftsRequestBody = DateShiftsCommon & {
   remove_dates?: boolean
   shift_dates?: boolean
-  day_substitutions: Record<string, string>
+  day_substitutions?: Record<string, string>
 }
 
 export type MigrationCreateRequestBody = {

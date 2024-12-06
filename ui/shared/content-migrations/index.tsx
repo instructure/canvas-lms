@@ -30,6 +30,7 @@ import {
   type DateShiftsCommon,
   type DateAdjustmentConfig,
   type MigrationCreateRequestBody,
+  type onSubmitMigrationFormCallback,
 } from './react/CommonMigratorControls/types'
 
 export {CollapsableList}
@@ -42,6 +43,7 @@ export type {
   DateShiftsCommon,
   DateAdjustmentConfig,
   MigrationCreateRequestBody,
+  onSubmitMigrationFormCallback,
 }
 
 export {parseDateToISOString} from './react/utils'

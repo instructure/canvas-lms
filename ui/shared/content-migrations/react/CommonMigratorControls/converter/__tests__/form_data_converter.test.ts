@@ -116,4 +116,58 @@ describe('convertFormDataToMigrationCreateRequest', () => {
       ...commonFields,
     })
   })
+
+  describe('when date_shift_options is undefined', () => {
+    const formData: submitMigrationFormData = {
+      ...baseFormData,
+      date_shift_options: undefined,
+    }
+
+    it('should return date_shift_options without date and day_substitutions data', () => {
+      const result = convertFormDataToMigrationCreateRequest(formData, courseId, chosenMigrator)
+      expect(result.date_shift_options).toEqual({
+        shift_dates: true,
+      })
+    })
+  })
+
+  describe('when date_shift_options dates are undefined', () => {
+    const formData: submitMigrationFormData = {
+      ...baseFormData,
+      date_shift_options: {
+        day_substitutions: [{from: 0, to: 1, id: 1}],
+        old_start_date: undefined,
+        new_start_date: undefined,
+        old_end_date: undefined,
+        new_end_date: undefined,
+      },
+    }
+
+    it('should return date_shift_options with undefined dates', () => {
+      const result = convertFormDataToMigrationCreateRequest(formData, courseId, chosenMigrator)
+      expect(result.date_shift_options).toEqual({
+        day_substitutions: {'0': '1'},
+        shift_dates: true,
+        old_start_date: undefined,
+        new_start_date: undefined,
+        old_end_date: undefined,
+        new_end_date: undefined,
+      })
+    })
+  })
+
+  describe('when adjust_date is undefined', () => {
+    const formData: submitMigrationFormData = {
+      ...baseFormData,
+      adjust_dates: undefined,
+    }
+
+    it('should return date_shift_options without shift_dates or remove_dates operation', () => {
+      const result = convertFormDataToMigrationCreateRequest(formData, courseId, chosenMigrator)
+      expect(result.date_shift_options).toEqual({
+        day_substitutions: {'0': '1'},
+        ...dates,
+      })
+    })
+  })
 })

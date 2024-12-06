@@ -50,6 +50,7 @@ type CommonMigratorControlsProps = {
   newEndDate?: string | null
   SubmitLabel: ComponentType
   SubmittingLabel: ComponentType
+  CancelLabel: ComponentType
 }
 
 const generateNewQuizzesLabel = () => {
@@ -132,6 +133,7 @@ export const CommonMigratorControls = ({
   newEndDate,
   SubmitLabel,
   SubmittingLabel,
+  CancelLabel,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -345,7 +347,7 @@ export const CommonMigratorControls = ({
 
       <View as="div" margin="medium none none none">
         <Button disabled={isSubmitting} onClick={onCancel} data-testid="clear-migration-button">
-          {I18n.t('Clear')}
+          <CancelLabel />
         </Button>
         <Button
           disabled={isSubmitting}

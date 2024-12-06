@@ -26,6 +26,7 @@ import {parseDateToISOString} from '../utils'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
 import {ImportLabel} from './import_label'
 import {ImportInProgressLabel} from './import_in_progress_label'
+import {ImportClearLabel} from './import_clear_label'
 
 type MoodleZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -75,6 +76,7 @@ const MoodleZipImporter = ({
         newEndDate={parseDateToISOString(ENV.OLD_END_DATE)}
         SubmitLabel={ImportLabel}
         SubmittingLabel={ImportInProgressLabel}
+        CancelLabel={ImportClearLabel}
       />
     </>
   )

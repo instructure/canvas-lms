@@ -84,7 +84,7 @@ describe('CourseCopyForm', () => {
     expect(getByText('Term')).toBeInTheDocument()
     expect(getByRole('radiogroup', {name: 'Content *'})).toBeInTheDocument()
     expect(getByRole('group', {name: 'Options'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Clear'})).toBeInTheDocument()
+    expect(getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
     expect(getByRole('button', {name: 'Create course'})).toBeInTheDocument()
   })
 

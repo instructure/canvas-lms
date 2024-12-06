@@ -30,6 +30,7 @@ import type {Course} from '../../../../../api'
 import type {CopyCourseFormSubmitData, Term} from '../../types'
 import {CreateCourseInProgressLabel} from './formComponents/CreateCourseInProgressLabel'
 import type {submitMigrationFormData} from '@canvas/content-migrations/react/CommonMigratorControls/types'
+import {CreateCourseCancelLabel} from './formComponents/CreateCourseCancelLabel'
 
 type InvalidFormElements = {
   newCourseStartDateErrorMsg?: string
@@ -246,6 +247,7 @@ export const CopyCourseForm = ({
         onSubmit={handleSubmit}
         SubmitLabel={CreateCourseLabel}
         SubmittingLabel={CreateCourseInProgressLabel}
+        CancelLabel={CreateCourseCancelLabel}
       />
     </View>
   )
