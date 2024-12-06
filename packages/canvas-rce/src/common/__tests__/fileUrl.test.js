@@ -55,6 +55,18 @@ describe('Common file url utils', () => {
       expect(absoluteToRelativeUrl(null, canvasOrigin)).toEqual(null)
       expect(absoluteToRelativeUrl(undefined, canvasOrigin)).toEqual(undefined)
     })
+
+    it('handles URLs with special characters in query params', () => {
+      const absoluteUrl = 'https://mycanvas.com:3000/path?param=hello%20world#hash'
+      expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual(
+        '/path?param=hello%20world#hash'
+      )
+    })
+
+    it('handles URLs with multiple query parameters', () => {
+      const absoluteUrl = 'https://mycanvas.com:3000/path?a=1&b=2&c=3'
+      expect(absoluteToRelativeUrl(absoluteUrl, canvasOrigin)).toEqual('/path?a=1&b=2&c=3')
+    })
   })
 
   describe('downloadToWrap', () => {
@@ -107,6 +119,12 @@ describe('Common file url utils', () => {
       const testurl = '/some/path/download'
       url = downloadToWrap(testurl)
       expect(url).toEqual('/some/path?wrap=1')
+    })
+
+    it('preserves hash fragments in URLs', () => {
+      const testurl = '/path/download?download_frd=1#section'
+      url = downloadToWrap(testurl)
+      expect(url).toEqual('/path?wrap=1#section')
     })
   })
 
@@ -163,6 +181,18 @@ describe('Common file url utils', () => {
         const emptyInfo = {}
         const result = fixupFileUrl('course', 2, emptyInfo)
         expect(result).toEqual(emptyInfo)
+      })
+
+      it('preserves hash fragments in course file urls', () => {
+        fileInfo.href = '/files/17/download?download_frd=1#section'
+        const result = fixupFileUrl('course', 2, fileInfo)
+        expect(result.href).toEqual('/courses/2/files/17?wrap=1#section')
+      })
+
+      it('handles file paths with special characters', () => {
+        fileInfo.href = '/files/17/my%20file.pdf/download?download_frd=1'
+        const result = fixupFileUrl('course', 2, fileInfo)
+        expect(result.href).toEqual('/courses/2/files/17/my%20file.pdf?wrap=1')
       })
     })
 
@@ -242,6 +272,16 @@ describe('Common file url utils', () => {
       const url = '/users/2/files/17/download?wrap=1&foo=bar'
       expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview?foo=bar')
     })
+
+    it('handles URLs with special characters in path', () => {
+      const url = '/users/2/files/17/my%20document.pdf/preview'
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/my%20document.pdf/preview')
+    })
+
+    it('handles multiple query parameters correctly', () => {
+      const url = '/users/2/files/17/download?param1=value1&param2=value2&wrap=1'
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview?param1=value1&param2=value2')
+    })
   })
 
   describe('prepLinkedSrc', () => {
@@ -264,6 +304,16 @@ describe('Common file url utils', () => {
     it('preserves query parameters and hash after removing /preview', () => {
       const url = '/users/2/files/17/preview?foo=bar#section'
       expect(prepLinkedSrc(url)).toEqual('/users/2/files/17?foo=bar#section')
+    })
+
+    it('handles URLs with encoded characters', () => {
+      const url = '/users/2/files/17/preview?name=test%20file.pdf'
+      expect(prepLinkedSrc(url)).toEqual('/users/2/files/17?name=test%20file.pdf')
+    })
+
+    it('handles empty query parameters', () => {
+      const url = '/users/2/files/17/preview?'
+      expect(prepLinkedSrc(url)).toEqual('/users/2/files/17')
     })
   })
 })
