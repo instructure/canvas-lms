@@ -73,8 +73,8 @@ const Teacher = () => {
 
     if (termsRequired && !termsAccepted) {
       setTermsError(I18n.t('You must accept the terms to create an account.'))
-      const checkboxElement = document.querySelector('.terms-checkbox') as HTMLElement
-      checkboxElement?.focus()
+      const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
+      checkbox?.focus()
       return false
     } else {
       setTermsError('')
@@ -193,7 +193,7 @@ const Teacher = () => {
             <Flex.Item overflowX="visible" overflowY="visible">
               <TermsAndPolicyCheckbox
                 checked={termsAccepted}
-                className="terms-checkbox"
+                id="terms-checkbox"
                 isDisabled={isUiActionPending}
                 messages={createErrorMessage(termsError)}
                 onChange={handleTermsChange}

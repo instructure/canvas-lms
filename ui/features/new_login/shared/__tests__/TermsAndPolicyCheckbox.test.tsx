@@ -25,12 +25,20 @@ describe('TermsAndPolicyCheckbox', () => {
   const privacyPolicyUrl = 'http://www.canvaslms.com/policies/privacy-policy'
 
   it('mounts without crashing', () => {
-    render(<TermsAndPolicyCheckbox checked={false} isDisabled={false} onChange={jest.fn()} />)
+    render(
+      <TermsAndPolicyCheckbox
+        id="terms-checkbox"
+        checked={false}
+        isDisabled={false}
+        onChange={jest.fn()}
+      />
+    )
   })
 
   it('renders both terms of use and privacy policy links when both URLs are provided', () => {
     render(
       <TermsAndPolicyCheckbox
+        id="terms-checkbox"
         checked={false}
         isDisabled={false}
         onChange={jest.fn()}
@@ -50,6 +58,7 @@ describe('TermsAndPolicyCheckbox', () => {
   it('renders only the terms of use link when only termsOfUseUrl is provided', () => {
     render(
       <TermsAndPolicyCheckbox
+        id="terms-checkbox"
         checked={false}
         isDisabled={false}
         onChange={jest.fn()}
@@ -64,6 +73,7 @@ describe('TermsAndPolicyCheckbox', () => {
   it('renders only the privacy policy link when only privacyPolicyUrl is provided', () => {
     render(
       <TermsAndPolicyCheckbox
+        id="terms-checkbox"
         checked={false}
         isDisabled={false}
         onChange={jest.fn()}
@@ -80,7 +90,12 @@ describe('TermsAndPolicyCheckbox', () => {
 
   it('renders nothing when neither termsOfUseUrl nor privacyPolicyUrl is provided', () => {
     const {container} = render(
-      <TermsAndPolicyCheckbox checked={false} isDisabled={false} onChange={jest.fn()} />
+      <TermsAndPolicyCheckbox
+        id="terms-checkbox"
+        checked={false}
+        isDisabled={false}
+        onChange={jest.fn()}
+      />
     )
     expect(container).toBeEmptyDOMElement()
   })
