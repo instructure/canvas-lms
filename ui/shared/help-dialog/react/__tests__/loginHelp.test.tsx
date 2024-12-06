@@ -15,10 +15,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {cleanup, render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import LoginHelp, {renderLoginHelp} from '../loginHelp'
+import {act} from 'react-dom/test-utils'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -33,6 +34,8 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
 describe('LoginHelp Component and Helpers', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Clean up any elements from previous tests
+    document.body.innerHTML = ''
   })
 
   describe('LoginHelp Component', () => {
@@ -42,7 +45,7 @@ describe('LoginHelp Component and Helpers', () => {
           <LoginHelp linkText="Help" />
         </MockedQueryProvider>
       )
-      expect(screen.getByText('Help')).toBeInTheDocument()
+      expect(screen.getByRole('button', {name: 'Help'})).toBeInTheDocument()
     })
 
     it('opens and closes the modal correctly', async () => {
@@ -51,12 +54,48 @@ describe('LoginHelp Component and Helpers', () => {
           <LoginHelp linkText="Help" />
         </MockedQueryProvider>
       )
-      userEvent.click(screen.getByText('Help'))
-      expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
-      await userEvent.click(screen.getByTestId('login-help-close-button'))
-      await waitForElementToBeRemoved(screen.queryByText('Login Help for Canvas LMS')).then(() =>
-        expect(screen.queryByText('Login Help for Canvas LMS')).not.toBeInTheDocument()
+
+      // Open modal
+      await userEvent.click(screen.getByRole('button', {name: 'Help'}))
+
+      // Verify modal opened
+      const modalTitle = screen.getByText('Login Help for Canvas LMS')
+      expect(modalTitle).toBeInTheDocument()
+      expect(modalTitle.tagName.toLowerCase()).toBe('h2')
+
+      // Close modal
+      const closeButton = screen.getByTestId('login-help-close-button')
+      await userEvent.click(closeButton)
+
+      // Wait for modal to be removed
+      await waitFor(
+        () => {
+          expect(screen.queryByText('Login Help for Canvas LMS')).not.toBeInTheDocument()
+        },
+        {timeout: 1000}
       )
+    })
+
+    it('renders help link when the provided element is an anchor element', async () => {
+      const anchorElement = document.createElement('a')
+      anchorElement.textContent = 'Help'
+      document.body.appendChild(anchorElement)
+      renderLoginHelp(anchorElement)
+      await waitFor(() => {
+        expect(screen.getAllByRole('button', {name: 'Help'})).toHaveLength(1)
+      })
+    })
+
+    it('renders help link when the provided element is a direct child of an anchor element', async () => {
+      const anchorElement = document.createElement('a')
+      const spanElement = document.createElement('span')
+      spanElement.textContent = 'Help'
+      anchorElement.appendChild(spanElement)
+      document.body.appendChild(anchorElement)
+      renderLoginHelp(anchorElement)
+      await waitFor(() => {
+        expect(screen.getAllByRole('button', {name: 'Help'})).toHaveLength(1)
+      })
     })
   })
 
@@ -76,9 +115,9 @@ describe('LoginHelp Component and Helpers', () => {
       anchorElement.textContent = 'Help'
       document.body.appendChild(anchorElement)
       renderLoginHelp(anchorElement)
-      userEvent.click(screen.getByText('Help'))
+      userEvent.click(screen.getByRole('button', {name: 'Help'}))
       await waitFor(() => {
-        expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
+        expect(screen.getByRole('heading', {name: 'Login Help for Canvas LMS'})).toBeInTheDocument()
       })
     })
 
@@ -99,7 +138,7 @@ describe('LoginHelp Component and Helpers', () => {
       })
       userEvent.click(spanElement)
       await waitFor(() => {
-        expect(screen.getByText('Login Help for Canvas LMS')).toBeInTheDocument()
+        expect(screen.getByRole('heading', {name: 'Login Help for Canvas LMS'})).toBeInTheDocument()
       })
     })
 
@@ -109,28 +148,6 @@ describe('LoginHelp Component and Helpers', () => {
       expect(() => renderLoginHelp(divElement)).toThrow(
         'Element must be an <a> element or a descendant of an <a> element'
       )
-    })
-
-    it('renders help link when the provided element is an anchor element', async () => {
-      const anchorElement = document.createElement('a')
-      anchorElement.textContent = 'Help'
-      document.body.appendChild(anchorElement)
-      renderLoginHelp(anchorElement)
-      await waitFor(() => {
-        expect(screen.getByText('Help')).toBeInTheDocument()
-      })
-    })
-
-    it('renders help link when the provided element is a direct child of an anchor element', async () => {
-      const anchorElement = document.createElement('a')
-      const spanElement = document.createElement('span')
-      spanElement.textContent = 'Help'
-      anchorElement.appendChild(spanElement)
-      document.body.appendChild(anchorElement)
-      renderLoginHelp(anchorElement)
-      await waitFor(() => {
-        expect(screen.getByText('Help')).toBeInTheDocument()
-      })
     })
   })
 })
