@@ -93,17 +93,6 @@ describe Login::OAuth2Controller do
       expect(session[:sentinel]).to be_nil
     end
 
-    it "includes the domain root account in the get_token arguments" do
-      session[:oauth2_nonce] = "bob"
-      expect_any_instantiation_of(aac).to receive(:get_token).with(anything, anything, hash_including(root_account:))
-      user_with_pseudonym(username: "user", active_all: 1)
-
-      session[:sentinel] = true
-      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-
-      get :create, params: { state: jwt }
-    end
-
     it "handles multi-valued identifiers from providers" do
       session[:oauth2_nonce] = "bob"
       expect_any_instantiation_of(aac).to receive(:get_token).and_return(token)

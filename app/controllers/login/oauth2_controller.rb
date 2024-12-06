@@ -54,7 +54,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     token = nil
     return unless timeout_protection do
       begin
-        token = @aac.get_token(params[:code], oauth2_login_callback_url, params.merge(root_account: @domain_root_account))
+        token = @aac.get_token(params[:code], oauth2_login_callback_url, params)
         token.options[:nonce] = jwt["nonce"]
       rescue => e
         @aac.debug_set(:get_token_response, e) if debugging
