@@ -343,8 +343,23 @@ describe('parseUrlPath', () => {
     expect(parseUrlPath('https://foobar.local/123')).toEqual('/123')
   })
 
-  // relative
   it('should parse a relative url', () => {
     expect(parseUrlPath('/123')).toEqual('/123')
+  })
+
+  it('should parse a relative url with query params', () => {
+    expect(parseUrlPath('/123?x=10&y=20')).toEqual('/123')
+  })
+
+  it('should parse a relative url with hash', () => {
+    expect(parseUrlPath('/123#hash')).toEqual('/123')
+  })
+
+  it('should parse a blank url', () => {
+    expect(parseUrlPath('')).toEqual('')
+  })
+
+  it('should parse a #', () => {
+    expect(parseUrlPath('#')).toEqual('')
   })
 })
