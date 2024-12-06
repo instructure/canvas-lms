@@ -7630,6 +7630,7 @@ el:
   integration_id_int_id_is_already_in_use_f30f03b5: "To ID ενσωμάτωσης «%{int_id}» χρησιμοποιείται ήδη"
   international_sms_9edb9868: "Διεθνή SMS"
   international_text_messaging_rates_may_apply_d4b4a97a: "Ενδέχεται να εφαρμόζεται χρέωση διεθνών μηνυμάτων κειμένου."
+  introduction_43f53b7d: Εισαγωγή
   invalid_authenticity_token_b753558c: "Μη Έγκυρο Token Επαλήθευσης"
   invalid_content_type_utf_8_required_bd458b78: "Μη έγκυρος τύπος περιεχομένου, απαιτείται UTF-8"
   invalid_csv_file_2c076da5: "Μη έγκυρο CVS αρχείο "
