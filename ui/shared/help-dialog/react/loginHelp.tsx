@@ -1,7 +1,7 @@
 /**
  * Canvas LMS - The open-source learning management system
  *
- * Copyright (C) 2024 Instructure, Inc.
+ * Copyright (C) 2013 - present Instructure, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
