@@ -764,9 +764,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Warna Outline" },
   "outline_size_a6059a21": { "message": "Ukuran Outline" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } bukan protokol valid yang harus berupa ftp, http, https, mailto, skype, tel, atau dapat diabaikan"
-  },
   "page_50c4823d": { "message": "Halaman" },
   "pages_e5414c2c": { "message": "Halaman" },
   "paragraph_5e5ad8eb": { "message": "Paragraf" },

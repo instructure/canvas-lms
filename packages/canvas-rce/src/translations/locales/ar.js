@@ -746,9 +746,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "لون المخطط التفصيلي" },
   "outline_size_a6059a21": { "message": "حجم المخطط التفصيلي" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } ليس بروتوكولاً صالحًا الذي يجب أن يكون ftp وhttp وhttps وmailto وskype وإلا سيتم حذفه"
-  },
   "page_50c4823d": { "message": "صفحة" },
   "pages_e5414c2c": { "message": "الصفحات" },
   "paragraph_5e5ad8eb": { "message": "الفقرة" },

@@ -786,9 +786,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Omtrekkleur" },
   "outline_size_a6059a21": { "message": "Omtrtekgrootte" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } is geen geldig protocol; dat moet ftp, http, https, mailto, skype of tel zijn, of het kan worden weggelaten"
-  },
   "page_50c4823d": { "message": "Pagina" },
   "pages_e5414c2c": { "message": "Pagina''s" },
   "paragraph_5e5ad8eb": { "message": "Alinea" },

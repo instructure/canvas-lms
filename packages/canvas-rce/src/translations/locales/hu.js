@@ -747,9 +747,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Vázlat színe" },
   "outline_size_a6059a21": { "message": "Vázlat mérete" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } nem egy érvényes protokoll; lehet ftp, http, https, mailto, skype, tel, vagy esetleg elhagyható"
-  },
   "page_50c4823d": { "message": "Oldal" },
   "pages_e5414c2c": { "message": "Oldalak" },
   "paragraph_5e5ad8eb": { "message": "Bekezdés" },

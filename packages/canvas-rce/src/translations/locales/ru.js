@@ -794,9 +794,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Цвет контура" },
   "outline_size_a6059a21": { "message": "Размер контура" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } — недействительный протокол. Это должен быть ftp, http, https, mailto, skype, tel или может не указываться"
-  },
   "page_50c4823d": { "message": "Страница" },
   "pages_e5414c2c": { "message": "Страницы" },
   "paragraph_5e5ad8eb": { "message": "Параграф" },
