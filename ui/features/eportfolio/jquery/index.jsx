@@ -374,7 +374,7 @@ $(document).ready(function () {
           const $richText = $section.find('.edit_section')
           const editorContent = RichContentEditor.callOnRCE($richText, 'get_code')
           if (editorContent) {
-            $preview.html(raw(editorContent))
+            $preview.html(sanitizeHtml(editorContent))
           }
           $section.find('.section_content').after($preview)
         }
@@ -413,7 +413,7 @@ $(document).ready(function () {
             const $richText = $section.find('.edit_section')
             const editorContent = RichContentEditor.callOnRCE($richText, 'get_code')
             if (editorContent) {
-              $section.find('.section_content').html(raw(editorContent))
+              $section.find('.section_content').html(sanitizeHtml(editorContent))
             }
             RichContentEditor.destroyRCE($richText)
           } else {
