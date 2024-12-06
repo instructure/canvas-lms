@@ -38,6 +38,7 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect} from 'react'
 import {useMutation, useQuery} from '@apollo/react-hooks'
 import {ConversationContext} from '../../../util/constants'
+import {captureException} from '@sentry/react'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -254,6 +255,7 @@ const ComposeModalManager = props => {
       } else if (props.isReply || props.isReplyAll || props.isForward) {
         setModalError(I18n.t('Error occurred while adding message to conversation'))
       } else {
+        captureException(new Error(`Error occurred while creating conversation message: ${data}`))
         setModalError(I18n.t('Error occurred while creating conversation message'))
       }
 
