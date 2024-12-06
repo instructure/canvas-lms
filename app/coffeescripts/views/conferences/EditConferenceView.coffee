@@ -57,7 +57,6 @@ define [
           @model.set(data)
           @model.trigger('startSync')
         success: (data) =>
-          data = deparam($.param(data)).web_conference
           @model.set(data)
           @model.trigger('sync')
         error: =>
@@ -85,6 +84,7 @@ define [
     update: =>
       @$('form').submit()
       @close()
+      @$('form').submit() if !@model.isNew()
 
     onClose: =>
       window.router.navigate('')
