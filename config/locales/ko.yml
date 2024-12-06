@@ -2298,6 +2298,7 @@ ko:
     upload_error_too_many_redirects: "너무 많은 리디렉션"
     upload_error_unexpected: "%{url}에서 다운로드하는 중에 알 수 없는 오류 발생"
   attachment_deffe5a9: 첨부
+  attachments_694cf227: 첨부
   attempt_3dd42b18: 시도
   attempt_f2691284: 시도
   attendance: 
@@ -5014,6 +5015,7 @@ ko:
       technologist: 기술자
       vp: VP
   description_436c48d7: 설명
+  description_709b38db: "설명:"
   designer_c458392: "과목 디자이너"
   developer_key: 
     api_key: "키: *%{api_key}*"
@@ -14008,6 +14010,7 @@ ko:
       too_long: "%{max}글자를 초과할 수 없습니다."
     registration: 
       agree_to_terms_with_code_of_conduct: "*사용 조건*과 **준수 사항**에 동의합니다."
+  user_agent_585ccbc7: "사용자 에이전트"
   user_c95de254: 사용자
   user_date_range_search: 
     cant_be_blank: "Canvas 사용자 ID는 공란일 수 없음"
@@ -14074,6 +14077,7 @@ ko:
       updating_user_details: "사용자 세부 정보 업데이트 중..."
     notices: 
       image_reported: "이미지가 보고되었습니다."
+  user_name_dc9baa66: "사용자 이름"
   user_name_fe5887fb: "사용자 이름"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name}이(가) %{course_name} 과목의 %{assignment_name} 과제에 대한 제출물을 제출함"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냈습니다."
