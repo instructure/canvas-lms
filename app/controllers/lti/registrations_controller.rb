@@ -877,7 +877,6 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
-  before_action :require_dynamic_registration, only: %i[destroy]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
   before_action :validate_registration_params, only: %i[create update]
@@ -1521,12 +1520,6 @@ class Lti::RegistrationsController < ApplicationController
 
   def require_registration_params
     params.require(:configuration)
-  end
-
-  def require_dynamic_registration
-    return if registration.dynamic_registration?
-
-    render_error(:dynamic_registration_required, "Temporarily, only Registrations created using LTI Dynamic Registration can be modified")
   end
 
   def restrict_dynamic_registration_updates

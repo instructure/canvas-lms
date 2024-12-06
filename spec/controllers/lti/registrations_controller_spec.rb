@@ -1102,14 +1102,14 @@ RSpec.describe Lti::RegistrationsController do
     context "with non-dynamic registration" do
       before { ims_registration.update!(lti_registration: nil) }
 
-      it "returns 422" do
+      it "is successful" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to be_successful
       end
 
-      it "does not delete the registration" do
+      it "deletes the registration" do
         subject
-        expect(registration.reload).not_to be_deleted
+        expect(registration.reload).to be_deleted
       end
     end
 
