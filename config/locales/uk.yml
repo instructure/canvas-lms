@@ -3023,6 +3023,7 @@ uk:
     upload_error_too_many_redirects: "Забагато перенаправлень"
     upload_error_unexpected: "Виникла невідома помилка завантаження з %{url}"
   attachment_deffe5a9: Вкладення
+  attachments_694cf227: Вкладення
   attempt_3dd42b18: спроба
   attempt_f2691284: Спроба
   attendance_ca433183: Відвідування
@@ -5904,6 +5905,7 @@ uk:
   created_58b8a75a: Створено
   created_6ee36dff: "Створено:"
   created_at_73839757: "Створено в"
+  created_at_e607b3f5: "Створено в"
   created_by_b39b9c8b: Створено
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Створено для SIS"
@@ -6413,6 +6415,7 @@ uk:
       vp: VP
   denmark_45_929d5d34: "Данія (+45)"
   description_436c48d7: Опис
+  description_709b38db: "Опис:"
   designer_c458392: Конструктор
   details_98a31b68: Подробиці
   details_a6f427c3: "Подробиці:"
@@ -16792,6 +16795,7 @@ uk:
   stay_signed_in_1853e9b6: "Залишатися в системі"
   step: Крок
   stop_acting_as_user_8809a97f: "Припинити діяти як користувач"
+  storage_quota_9187910a: "Квота зберігання"
   storage_used_in_mb_c75fbd9c: "використаний простір у МБ"
   strand_955969b1: Рядок
   stream_items_api: 
@@ -16808,6 +16812,7 @@ uk:
   student_id: "ID студента"
   student_id_236970d8: student_id
   student_id_7cc45fb5: "іd студента"
+  student_id_9d73580f: "ID студента"
   student_id_a61d78c7: "Id студента"
   student_information_8715d0c7: "Інформація про студента"
   student_interactions_report_7717b685: "Звіт про взаємодії студентів"
@@ -18033,6 +18038,7 @@ uk:
   update_tool_7d48ef2a: "Оновити %{tool}"
   update_your_notification_settings_ed9564f3: "Оновити Ваші налаштування оповіщень"
   updated_2c1e8615: Оновлено
+  updated_at_2eeb6a42: "Оновлено в"
   updated_group_group_name_727b1d98: "Оновлена група %{group_name}"
   updated_terms_of_service_82f34148: "Оновити Умови надання сервісу"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Оновлений інтерфейс користувача для пошуку та відображення користувачів і курсів в обліковому записі."
@@ -18099,6 +18105,7 @@ uk:
   user_696f4d6a: користувач
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user}прийняв їх запрошення на курс, %{course}. "
   user_access_tokens_title: "Токени доступу користувача"
+  user_agent_585ccbc7: "Агент користувача"
   user_avatars_e4fc4ed3: "Аватари користувачів"
   user_c95de254: Користувач
   user_content_aaf0fb5a: "Контент користувача"
@@ -18192,6 +18199,7 @@ uk:
       updating_user_details: "Оновлення даних користувача..."
     notices: 
       image_reported: "Повідомлення про зображення відправлено"
+  user_name_dc9baa66: "Ім'я користувача"
   user_name_fe5887fb: "імя користувача"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} повернули подання із запізненням для  %{assignment_name} у курсі %{course_name}"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name}щойно додав вас до бесіди в Canvas. Щоб переглянути бесіду, натисніть це посилання: %{link}."
@@ -18818,6 +18826,7 @@ uk:
   windows_tile_wide_4d40910: "Windows плитка: Широка"
   withdrawn_4c838347: Вилучено
   work_and_create_together_c65f358b: "Працюйте та створюйте разом"
+  workflow_state_cc8d711a: "Стан робочого процесу"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Ви бажаєте прийняти чи відхилити це оновлення?"
   would_you_like_to_enable_this_app_ccdf735d: "Хочете увімкнути цей додаток?"
   would_you_like_to_go_back_to_include_1d279044: "Чи хочете Ви вернутися назад, щоб включити:"
