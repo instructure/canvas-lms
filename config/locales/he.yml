@@ -3309,6 +3309,7 @@ he:
     upload_error_too_many_redirects: "יותר מדי הפניות"
     upload_error_unexpected: "אירעה שגיאה לא ברורה בעת הורדה מהדף: %{url}"
   attachment_deffe5a9: תצריף
+  attachments_694cf227: תצריפים
   attempt_3dd42b18: ניסיון
   attempt_f2691284: נסיון
   attendance: 
@@ -6491,6 +6492,7 @@ he:
   created_58b8a75a: נוצר
   created_6ee36dff: "נוצר:"
   created_at_73839757: "נוצר במועד:"
+  created_at_e607b3f5: "נוצר ב"
   created_by_b39b9c8b: "נוצר ע\"י"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "נוצר ע\"י המערכת הבית ספרית"
@@ -7014,6 +7016,7 @@ he:
   denmark_45_929d5d34: "דנמרק (+45)"
   department_6abddd98: מחלקה
   description_436c48d7: תיאור
+  description_709b38db: "תיאור:"
   designer_c458392: מתכנן
   details_98a31b68: פרטים
   details_a6f427c3: "פרטים:"
@@ -18678,6 +18681,7 @@ he:
   status_e7fdbe06: מצב
   stay_signed_in_1853e9b6: "השאר/י מחובר/ת "
   step: שלב
+  storage_quota_9187910a: "מכסת איחסון"
   storage_used_in_mb_c75fbd9c: "יחידת המידה של איחסון הנה במגהבייט"
   strand_955969b1: strand
   stream_items_api: 
@@ -18696,6 +18700,7 @@ he:
        חווית רישום נוחה וגמישה יותר לקבוצה.
   student_id: "מזהה תלמיד/ה"
   student_id_7cc45fb5: "מזהה תלמיד"
+  student_id_9d73580f: "מזהה תלמיד/ה"
   student_id_a61d78c7: "מזהה תלמיד"
   student_information_8715d0c7: "מידע על תלמיד "
   student_interactions_report_7717b685: "דוח אינטרקציות התלמיד"
@@ -19869,6 +19874,7 @@ he:
   update_settings_9b422d0f: "עדכון הגדרות"
   update_tool_7d48ef2a: "עדכון %{tool}"
   update_your_notification_settings_ed9564f3: "עדכון הגדרות ההתראות שלך"
+  updated_at_2eeb6a42: "עודכן ב"
   updated_group_group_name_727b1d98: "עדכון קבוצה %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "ממשק משתמש מעודכן לחיפוש והצגת משתמשים וקורסים של חשבון נבחר."
   updating_6edbab78: מעדכן
@@ -19943,6 +19949,7 @@ he:
   user_accepted_their_invitation_for_the_course_cour_5eaa1357: "%{user} קיבל/ה אל ההזמנה לקורס, %{course}. תפקיד בקורס: %{role_type}"
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user} קיבלו את ההזמנה לקורס %{course}."
   user_access_tokens_title: "אסימוני גישת משתמש"
+  user_agent_585ccbc7: "מאפייני סביבת המיחשוב של המשתמש"
   user_avatars_e4fc4ed3: "אוואטארי משתמש"
   user_c95de254: משתמש
   user_content_aaf0fb5a: "תוכן משתמש"
@@ -20036,6 +20043,7 @@ he:
       updating_user_details: "עדכון פרטי משתמש..."
     notices: 
       image_reported: "תמונה זו דווחה"
+  user_name_dc9baa66: "שם משתמש "
   user_name_fe5887fb: "שם משתמש"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} הגיש/ה באיחור את המשימה %{assignment_name} בקורס %{course_name} "
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לדיון קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
@@ -20699,6 +20707,7 @@ he:
   windows_tile_color_2b786bd9: "צבעי Windows Tile "
   windows_tile_square_b91d2b33: "Windows Tile: ריבוע"
   windows_tile_wide_4d40910: "Windows Tile: רוחב"
+  workflow_state_cc8d711a: "מצב זרימת העבודה (Workflow)"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "האם ברצונך לקבל או לדחות את העדכון הזה?"
   would_you_like_to_enable_this_app_ccdf735d: "האם ברצונך להפוך אפליקציה זו לפעילה?"
   would_you_like_to_go_back_to_include_1d279044: "האם ברצנוך לחזור אחורנית כדי לכלול:"

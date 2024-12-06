@@ -4732,6 +4732,7 @@ nn:
     upload_error_too_many_redirects: "For mange omdirigeringer for %{url}"
     upload_error_unexpected: "Ein ukjent feil oppstod under nedlasting frå %{url}"
   attachment_deffe5a9: Vedlegg
+  attachments_694cf227: Vedlegg
   attempt_1_7ba3c30f: "Forsøk 1"
   attempt_1_grade_484b35e4: "Forsøk 1: %{grade}"
   attempt_3dd42b18: forsøk
@@ -8969,6 +8970,7 @@ nn:
   created_ascending_cff48774: "Oppretta: i stigande rekkefølge"
   created_at_6373bbea: created_at
   created_at_73839757: Oppretta
+  created_at_e607b3f5: "Oppretta den"
   created_by_b39b9c8b: "Oppretta av"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_b590894c: "Oppretta av SIS;"
@@ -9644,6 +9646,7 @@ nn:
   descending_b7828162: Synkande
   description_436c48d7: Skildring
   description_61f4296: "* Skildring"
+  description_709b38db: "Skildring:"
   description_for_mastery_level_position_description_cc17114b: "Skildring av ekspertisenivå %{position}: %{description}"
   description_must_be_less_than_2500_characters_1ee7c522: "Beskrivinga må vere mindre enn 2500 teikn."
   descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} vart endra frå %{formattedOldValue} til %{formattedNewValue}."
@@ -25112,6 +25115,7 @@ nn:
   stop_acting_as_user_8809a97f: "Slutt å opptre som brukar"
   stop_button_click_to_discontinue_processing_422fea42: "Stoppknapp. Trykk for å avslutte prosessen."
   stop_fd9822ab: Stopp
+  storage_quota_9187910a: Lagringskvote
   storage_quotas_manage_6ca14bbb: "Lagrinskvote - administrer"
   storage_used_in_mb_c75fbd9c: "lagringskapasitet brukt i MB"
   store_and_share_course_assets_82a9967c: "Lagre og dele emneressursar"
@@ -25172,6 +25176,7 @@ nn:
   student_id: Student-ID
   student_id_236970d8: student_id
   student_id_7cc45fb5: student-ID
+  student_id_9d73580f: Student-ID
   student_id_a61d78c7: Student-ID
   student_id_c2a72227: "Student %{id}"
   student_information_8715d0c7: Studentinformasjon
@@ -27955,6 +27960,7 @@ nn:
   update_your_notification_settings_ed9564f3: "Oppdater varslingsinnstillingane"
   updated_2c1e8615: Oppdatert
   updated_after_3a81825c: "Oppdatert etter"
+  updated_at_2eeb6a42: "Oppdatert den"
   updated_at_ab9f625d: updated_at
   updated_count_accounts_5fe53c96: 
     one: "Oppdaterte 1 konto"
@@ -28113,6 +28119,7 @@ nn:
   user_access_report_ddbedbfe: Brukartilgangsrapport
   user_access_report_prospect_education_6bf448c: "Brukartilgangsrapport - Prospect Education"
   user_access_tokens_title: "Tokens for brukartilgang"
+  user_agent_585ccbc7: Brukaragent
   user_avatars_e4fc4ed3: "Avatar for brukar"
   user_c95de254: Brukar
   user_cannot_manage_individual_course_content_witho_d7b65fd4: "Brukar kan ikkje handtera individuelle emneelement utan å ha løyve for det innhaldet"
@@ -28210,6 +28217,7 @@ nn:
       updating_user_details: "Oppdaterer brukardetaljar..."
     notices: 
       image_reported: "Dette bildet er rapportert"
+  user_name_dc9baa66: Brukarnamn
   user_name_fe5887fb: brukarnamn
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} har akkurat levert ei sein innlevering for %{assignment_name} på emnet %{course_name}"
   user_name_has_just_turned_in_a_re_submission_for_a_bcd6a6a5: "%{user_name} har akkurat levert ei ny innlevering for %{assignment_title} på emnet %{course_name}"
@@ -29168,6 +29176,7 @@ nn:
   word_count_c77fe3a6: Ordtelling
   work_and_create_together_c65f358b: "Opprett og arbeid saman"
   workflow_state_3a5c99d2: workflow_state
+  workflow_state_cc8d711a: Arbeidsflytstatus
   working_68a224fa: arbeider
   working_a71f1d66: arbeider
   working_b1f63edf: arbeider...

@@ -4284,6 +4284,7 @@ hu:
     upload_error_too_many_redirects: "Túl sok átirányítás a következőhöz: %{url}"
     upload_error_unexpected: "Ismeretlen hiba történt a letöltés közben erről a webcímről: %{url}"
   attachment_deffe5a9: Melléklet
+  attachments_694cf227: Mellékletek
   attempt_3dd42b18: próbálkozás
   attempt_attempt_d3911720: "%{attempt} kísérlet"
   attempt_attempt_feedback_1b042ff5: "%{attempt} kísérlet Visszajelzés"
@@ -8246,6 +8247,7 @@ hu:
   created_ascending_cff48774: "Létrehozva: Növekvő"
   created_at_6373bbea: created_at
   created_at_73839757: "Létrehozva ekkor:"
+  created_at_e607b3f5: "Létrehozva ekkor: "
   created_by_b39b9c8b: "Általa létrehozva:  "
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_b590894c: "Létrehozta: SIS;"
@@ -8917,6 +8919,7 @@ hu:
   descending_b7828162: Csökkenő
   description_436c48d7: Leírás
   description_61f4296: "* Leírás"
+  description_709b38db: "Leírás:"
   description_for_mastery_level_position_description_cc17114b: "%{position} jártassági szint leírása: %{description}"
   description_must_be_less_than_2500_characters_1ee7c522: "A leírásnak 2500 karakternél kevesebbnek kell lennie"
   descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} módosult %{formattedOldValue} értékről %{formattedNewValue} értékre."
@@ -23445,6 +23448,7 @@ hu:
   stop_acting_as_user_8809a97f: "Felhasználó nevében történő tevékenység leállítása"
   stop_button_click_to_discontinue_processing_422fea42: " Stop gomb. Kattintson a gombra a feldolgozás megszüntetéséhez."
   stop_fd9822ab: Leállít
+  storage_quota_9187910a: "Tárhely kvóta"
   storage_quotas_manage_6ca14bbb: "Tárhely kvóták - kezelés"
   storage_used_in_mb_c75fbd9c: "tárhely használat MB-ban"
   store_and_share_course_assets_82a9967c: "Kurzus eszközök tárolása és megosztása"
@@ -23506,6 +23510,7 @@ hu:
   student_id: "Hallgatói azonosító"
   student_id_236970d8: student_id
   student_id_7cc45fb5: "hallgatói azonosító"
+  student_id_9d73580f: "Hallgatói azonosító"
   student_id_a61d78c7: "Hallgatói azonosító"
   student_id_c2a72227: "Hallgató %{id}"
   student_information_8715d0c7: Hallgatóinformációk
@@ -26113,6 +26118,7 @@ hu:
   update_your_notification_settings_ed9564f3: "Értesítési beállítások frissítése"
   updated_2c1e8615: Frissített
   updated_after_3a81825c: "Frissítve után"
+  updated_at_2eeb6a42: "Frissítve ekkor: "
   updated_at_ab9f625d: updated_at
   updated_count_accounts_5fe53c96: 
     one: "1 fiók frissítve"
@@ -26259,6 +26265,7 @@ hu:
   user_access_report_ddbedbfe: "Felhasználói hozzáférési jelentés"
   user_access_report_prospect_education_6bf448c: "Felhasználói hozzáférési jelentés - Prospect Education"
   user_access_tokens_title: "Felhasználói hozzáférési tokenek"
+  user_agent_585ccbc7: "Felhasználói ügynök"
   user_avatars_e4fc4ed3: "Felhasználói avatárok"
   user_c95de254: Felhasználó
   user_can_opt_in_to_mfa_canvas_will_only_challenge__649cd2a: "A felhasználó választhatja az MFA-t *A canvas csak akkor hívja ki a felhasználót az MFA-val, ha azt korábban konfigurálta.*"
@@ -26358,6 +26365,7 @@ hu:
       updating_user_details: "Felhasználó részleteinek frissítése..."
     notices: 
       image_reported: "Ezt a képet kifogásolható tartalomnak jelentették."
+  user_name_dc9baa66: Felhasználónév
   user_name_fe5887fb: "felhasználó neve"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} határidőn túl beadta a/az: %{assignment_name} feladatot a/az %{course_name} kurzusra"
   user_name_has_just_turned_in_a_re_submission_for_a_bcd6a6a5: "%{user_name} újra beadta a/az: %{assignment_title} feladatot a/az %{course_name} kurzusra "
@@ -27315,6 +27323,7 @@ hu:
   workflow_state_3a5c99d2: workflow_state
   workflow_state_allow_is_only_valid_for_site_admin__71dd26e2: "A workflow_state 'allow' csak a webhely adminisztrátori regisztrációkra érvényes.\n\
       \x20                       "
+  workflow_state_cc8d711a: "Munkafolyamat állapota"
   working_68a224fa: működő
   working_a71f1d66: Munkavégzés
   working_b1f63edf: dolgozik...
