@@ -26,10 +26,12 @@ import {TextInput} from '@instructure/ui-text-input'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import update from 'immutability-helper'
 import {get, isEmpty} from 'lodash'
 import axios from '@canvas/axios'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
@@ -79,6 +81,22 @@ export default class CreateDSRModal extends React.Component {
         },
       })
     )
+  }
+
+  creationDisabled = () => {
+    const {expires_at, progress_status} = this.state.latestRequest || {}
+    return progress_status === 'running' || expires_at > new Date().toISOString()
+  }
+
+  disabledText = () => {
+    const {expires_at, progress_status} = this.state.latestRequest || {}
+    if (progress_status === 'running') {
+      return I18n.t('A request is already in progress')
+    } else {
+      return I18n.t('The previous request expires %{expires_at}', {
+        expires_at: datetimeString(expires_at),
+      })
+    }
   }
 
   componentDidUpdate(_prevProps, prevState) {
@@ -220,9 +238,19 @@ export default class CreateDSRModal extends React.Component {
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
-          <Button type="submit" color="primary">
-            {I18n.t('Create')}
-          </Button>
+          <Tooltip
+            renderTip={this.disabledText()}
+            on={this.creationDisabled() ? ['hover', 'focus'] : []}
+          >
+            <Button
+              type="submit"
+              color="primary"
+              disabled={this.creationDisabled()}
+              data-testid="submit-button"
+            >
+              {I18n.t('Create')}
+            </Button>
+          </Tooltip>
         </Modal.Footer>
       </Modal>
       {React.Children.map(this.props.children, child =>
