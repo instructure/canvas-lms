@@ -27,6 +27,7 @@ if [ "$GERRIT_PROJECT" == "canvas-lms" ]; then
 fi
 
 cp ui/shared/apollo/fragmentTypes.json ui/shared/apollo/fragmentTypes.json.old
+cp ui/shared/apollo-v3/possibleTypes.json ui/shared/apollo-v3/possibleTypes.json.old
 
 # always keep the graphQL schema up-to-date
 bin/rails graphql:schema RAILS_ENV=test
@@ -34,6 +35,11 @@ bin/rails graphql:schema RAILS_ENV=test
 if ! diff ui/shared/apollo/fragmentTypes.json ui/shared/apollo/fragmentTypes.json.old; then
   message="ui/shared/apollo/fragmentTypes.json needs to be kept up-to-date. Run bundle exec rake graphql:schema and push the changes.\\n"
   gergich comment "{\"path\":\"ui/shared/apollo/fragmentTypes.json\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
+fi
+
+if ! diff ui/shared/apollo-v3/possibleTypes.json ui/shared/apollo-v3/possibleTypes.json.old; then
+  message="ui/shared/apollo-v3/possibleTypes.json needs to be kept up-to-date. Run bundle exec rake graphql:schema and push the changes.\\n"
+  gergich comment "{\"path\":\"ui/shared/apollo-v3/possibleTypes.json\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
 gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'

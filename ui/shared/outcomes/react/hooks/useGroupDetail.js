@@ -218,7 +218,7 @@ const useGroupDetail = ({
     return [...selectedIds]
       .map(linkId => {
         const link = client.readFragment({
-          id: `ContentTag:${linkId}`,
+          id: `ContentTag${linkId}`,
           fragment: gql`
             fragment LearningOutcomeFragment on ContentTag {
               _id
