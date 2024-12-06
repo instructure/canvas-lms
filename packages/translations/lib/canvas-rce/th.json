@@ -717,9 +717,6 @@
   },
   "outline_color_3ef2cea7": { "message": "สีเค้าโครง" },
   "outline_size_a6059a21": { "message": "ขนาดเค้าโครง" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } ไม่ใช่โปรโตคอลที่ถูกต้อง โดยจะต้องเป็น ftp, http, https, mailto, skype, tel หรือสามารถเว้นว่าง"
-  },
   "page_50c4823d": { "message": "หน้า" },
   "pages_e5414c2c": { "message": "เพจ" },
   "paragraph_5e5ad8eb": { "message": "ย่อหน้า" },
