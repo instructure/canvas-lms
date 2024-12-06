@@ -2772,6 +2772,7 @@ tr:
   assignment_groups_bc9cc3c9: "Ödev Grupları"
   assignment_groups_weight_2f1a5a7c: "Ödev Grup Ağırlığı"
   assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "Ödevin kilitlenmiş bir tarihi var. Son teslim tarihi kilitlenmiş tarih aralığı dışında ayarlanamaz."
+  assignment_id_8b2eee28: "Değerlendirme ID"
   assignment_id_96baa1b7: "ödev id'si"
   assignment_id_b040cee0: "Ödev Id"
   assignment_information_e871d0e0: "Ödev Bilgileri"
@@ -3497,6 +3498,7 @@ tr:
     upload_error_too_many_redirects: "Çok fazla yönlendirmeler"
     upload_error_unexpected: "%{url} indirilirken bilinmeyen hata meydana geldi"
   attachment_deffe5a9: "Dosya Eki"
+  attachments_694cf227: "Dosya Ekleri"
   attempt_3dd42b18: girişim
   attempt_current_attempt_of_max_attempts_427ed508: "%{max_attempts}üzerinde %{current_attempt}girişim"
   attempt_f2691284: Hak
@@ -6790,6 +6792,7 @@ tr:
   created_58b8a75a: Oluşturuldu
   created_6ee36dff: "Oluşturuldu:"
   created_at_73839757: "Şu zamanda oluşturuldu:"
+  created_at_e607b3f5: "Şu tarihte Oluşturuldu"
   created_by_b39b9c8b: Oluşturan
   created_by_sis_93fbb66b: öbs_tarafından_oluşturuldu
   created_by_sis_e1449c31: "ÖBS tarafından oluşturuldu"
@@ -7283,6 +7286,7 @@ tr:
   denmark_45_929d5d34: "Danimarka (+45)"
   department_6abddd98: Bölüm
   description_436c48d7: Açıklama
+  description_709b38db: "Açıklama:"
   designer_c458392: Tasarımcı
   details_98a31b68: Ayrıntılar
   details_a6f427c3: "Ayrıntılar:"
@@ -18596,6 +18600,7 @@ tr:
   statuses_f41543d8: Durumlar
   stay_signed_in_1853e9b6: "Oturumunuz açık kalsın"
   step: Adım
+  storage_quota_9187910a: "Depolama Kotası"
   storage_quotas_manage_6ca14bbb: "Dosya Depolama Kotası - yönet"
   storage_used_in_mb_c75fbd9c: "MB olarak kullanılan depolama"
   strand_955969b1: Dizi
@@ -18615,6 +18620,7 @@ tr:
   student_id: "Öğrenci ID"
   student_id_236970d8: student_id
   student_id_7cc45fb5: "öğrenci id"
+  student_id_9d73580f: "Öğrenci ID"
   student_information_8715d0c7: "Öğrenci Bilgisi"
   student_interactions_report_7717b685: "Öğrenci Etkileşim Raporu"
   student_ip_addresses_d99fbd06: "Öğrenci IP adresi"
@@ -19593,6 +19599,7 @@ tr:
   update_settings_9b422d0f: "Ayarları Güncelle"
   update_tool_7d48ef2a: "%{tool} güncelle"
   update_your_notification_settings_ed9564f3: "Bildirim ayarlarınızı güncelleyin"
+  updated_at_2eeb6a42: "Şu Tarihte Güncellendi"
   updated_at_ab9f625d: updated_at
   updated_group_group_name_727b1d98: "%{group_name} Grubu Güncellendi"
   updating_6edbab78: Güncelleniyor
@@ -19655,6 +19662,7 @@ tr:
   user_696f4d6a: kullanıcı
   user_access_report_ddbedbfe: "Kullanıcı Erişim Raporu"
   user_access_tokens_title: "Kullanıcı Erişim Anahtarları"
+  user_agent_585ccbc7: "Kullanıcı Temsilcisi"
   user_avatars_e4fc4ed3: "Kullanıcı Avatarları"
   user_c95de254: Kullanıcı
   user_content_aaf0fb5a: "Kullanıcı İçeriği"
@@ -19728,6 +19736,7 @@ tr:
       updating_user_details: "Kullanıcı Ayrıntıları Güncelleniyor..."
     notices: 
       image_reported: "Bu resim raporlandı"
+  user_name_dc9baa66: "Kullanıcı Adı"
   user_name_fe5887fb: "kullanıcı adı"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name}, %{course_name} dersindeki  %{assignment_name} ödevi için geç bir gönderim yaptı"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
@@ -20377,6 +20386,7 @@ tr:
       archive_link: "Arşiv(leri) görüntüle"
   windows_tile_color_2b786bd9: "Pencere Döşeme Rengi"
   workflow_state_3a5c99d2: workflow_state
+  workflow_state_cc8d711a: "İş akış Durumu"
   would_you_like_to_enable_this_app_ccdf735d: "Bu uygulamayı etkinleştirmek ister misiniz?"
   would_you_like_to_go_back_to_include_1d279044: "Aşağıdakileri dahil etmek için geri dönmek ister misiniz:"
   would_you_like_to_let_students_continue_in_the_cou_a4c36171: "Öğrenciler derse devam etsinler mi yoksa yeni gereksinimler tamamlanana kadar bu modülleri yeniden kilitlemek mi istersiniz?"
