@@ -687,12 +687,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Veelkleurige afbeelding" },
   "multiplication_sign_15f95c22": { "message": "Vermenigvuldigingsteken" },
   "music_icon_4db5c972": { "message": "Muziekpictogram" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Moet ten minste { percentage }% zijn"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Moet minstens { width } x { height }px zijn"
-  },
   "my_files_2f621040": { "message": "Mijn bestanden" },
   "n_th_root_9991a6e4": { "message": "N-de wortel" },
   "nabla_1e216d25": { "message": "Nabla" },

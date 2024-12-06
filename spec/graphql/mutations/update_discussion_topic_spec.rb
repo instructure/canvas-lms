@@ -686,6 +686,21 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@topic.reload.lock_at).to eq lock_at.to_s
       expect(@topic.reload.unlock_at).to eq unlock_at.to_s
     end
+
+    it "clears discussion topic lock_at if assignment lock_at is cleared" do
+      @topic.update!(lock_at: 5.days.from_now)
+      result = run_mutation(id: @topic.id, assignment: { lockAt: nil })
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.lock_at).to be_nil
+    end
+
+    it "sets discussion topic lock_at to root lock_at even if assignment lock_at is nil" do
+      @topic.update!(lock_at: 5.days.from_now)
+      new_lock_at = 10.days.from_now.iso8601
+      result = run_mutation(id: @topic.id, lock_at: new_lock_at, assignment: { lockAt: nil })
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.lock_at).to eq(new_lock_at)
+    end
   end
 
   context "discussion checkpoints" do

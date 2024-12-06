@@ -108,4 +108,9 @@ export default class VideoOptionsTrayDriver {
     const $options = getSizeOptions(this.$sizeSelect)
     $options.find($option => $option.textContent.trim().includes(sizeText)).click()
   }
+
+  messageText() {
+    const message = queryByTestId(this.$element, 'message')
+    return message.textContent
+  }
 }

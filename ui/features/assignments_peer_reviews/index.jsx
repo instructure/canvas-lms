@@ -173,5 +173,6 @@ $(document).ready(() => {
     $('.peer_review.assigned .remind_peer_review_link').click()
   })
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

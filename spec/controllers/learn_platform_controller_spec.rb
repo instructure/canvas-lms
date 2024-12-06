@@ -302,6 +302,80 @@ describe LearnPlatformController do
       expect(json["versions"]).to be_present
     end
 
+    it "gets custom filters from an organization with LearnPlatform as a source" do
+      salesforce_id = 12
+      response_fixture = {
+        organization_filters: [
+          {
+            id: 68,
+            name: "blah filter",
+            description: "",
+            tag_groups: [{
+              id: 110,
+              name: "blahhhh",
+              tags: [
+                {
+                  id: 305,
+                  name: "1 More 3"
+                },
+                {
+                  id: 306,
+                  name: "2 More"
+                },
+                {
+                  id: 307,
+                  name: "3 More"
+                },
+                {
+                  id: 308,
+                  name: "4 More"
+                }
+              ]
+            }]
+          }
+        ],
+        privacy_status: [
+          {
+            id: 101,
+            name: "Compliant",
+            description: ""
+          },
+          {
+            id: 100,
+            name: "Not applicable",
+            description: ""
+          },
+        ],
+        approval_status: [
+          {
+            id: 200,
+            name: "Definitely Recommend",
+            description: "Hit a Purple path with this product"
+          },
+          {
+            id: 201,
+            name: "Approved for Use",
+            description: "Changing system status from approved for use to approved"
+          },
+        ],
+      }.to_json
+      stub_request(:get, %r{api/v2/lti/organizations/#{salesforce_id}/tools_filters})
+        .to_return(body: response_fixture,
+                   status: 200,
+                   headers: {
+                     "Content-Type" => "application/json",
+                     "Content-Length" => response_fixture.size
+                   })
+
+      get :custom_filters, params: { account_id: @account.id, salesforce_id: }
+      expect(response).to have_http_status(:success)
+
+      json = json_parse(response.body)
+      expect(json["organization_filters"]).to be_present
+      expect(json["privacy_status"]).to be_present
+      expect(json["approval_status"]).to be_present
+    end
+
     it "responds with error when LearnPlatform returns an error" do
       response_fixture = {
         errors: [

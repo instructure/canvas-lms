@@ -24,8 +24,11 @@ class Lti::Registration < ActiveRecord::Base
   extend RootAccountResolver
   include Canvas::SoftDeletable
 
-  attr_accessor :skip_lti_sync, :account_binding, :overlay
-  attr_writer :account_binding_loaded, :overlay_loaded
+  attr_accessor :skip_lti_sync
+  # these preloaded* variables are used during bulk loading of Registrations
+  # to avoid N+1 queries. During bulk loading, *_loaded is set to true for all
+  # Registrations even if they don't have a value, to avoid re-running the query.
+  attr_writer :account_binding_loaded, :overlay_loaded, :preloaded_account_binding, :preloaded_overlay
 
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
@@ -60,7 +63,7 @@ class Lti::Registration < ActiveRecord::Base
   # @return [Lti::RegistrationAccountBinding | nil]
   def account_binding_for(account)
     return nil unless account
-    return account_binding if @account_binding_loaded
+    return @preloaded_account_binding if @account_binding_loaded
 
     # If subaccount support/bindings are needed in the future, reference
     # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
@@ -91,7 +94,7 @@ class Lti::Registration < ActiveRecord::Base
   # @param context [Account | Course | nil]
   # @return [Lti::Overlay | nil]
   def overlay_for(context)
-    return overlay if @overlay_loaded
+    return @preloaded_overlay if @overlay_loaded
 
     # If subaccount support is needed in the future, reference
     # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority.
@@ -156,7 +159,7 @@ class Lti::Registration < ActiveRecord::Base
     account_bindings.each do |acct_binding|
       global_registration_id = Shard.global_id_for(acct_binding.registration_id, Shard.current)
       registration = registrations_by_id[global_registration_id]
-      registration&.account_binding = acct_binding
+      registration&.preloaded_account_binding = acct_binding
     end
   end
   private_class_method :associate_bindings
@@ -185,7 +188,7 @@ class Lti::Registration < ActiveRecord::Base
     overlays.each do |overlay|
       global_registration_id = Shard.global_id_for(overlay.registration_id, Shard.current)
       registration = registrations_by_id[global_registration_id]
-      registration&.overlay = overlay
+      registration&.preloaded_overlay = overlay
     end
   end
   private_class_method :associate_overlays
@@ -213,11 +216,10 @@ class Lti::Registration < ActiveRecord::Base
   # Returns a Hash conforming to the InternalLtiConfiguration schema. If a context is specified, the
   # overlay for said context, if one exists, will be applied to the configuration.
   # @param [Account | Course | nil] context The context for which to generate the configuration.
+  # @param [Boolean] include_overlay Whether or not to apply the overlay to the configuration.
   # @return [Hash] A Hash conforming to the InternalLtiConfiguration schema.
   # TODO: this will eventually need to account for 1.1 registrations
-  def internal_lti_configuration(context: nil)
-    overlay = overlay_for(context)&.data
-
+  def internal_lti_configuration(context: nil, include_overlay: true)
     # hack; remove the need to look for developer_key.tool_configuration and ensure that is
     # always available as manual_configuration. This would need to happen in an after_save
     # callback on the developer key.
@@ -226,6 +228,9 @@ class Lti::Registration < ActiveRecord::Base
                       developer_key&.tool_configuration&.internal_lti_configuration ||
                       {}
 
+    return internal_config unless include_overlay
+
+    overlay = overlay_for(context)&.data
     # TODO: Remove this clause once we have backfilled all Lti::IMS::Registration overlays into the
     # actual Lti::Overlay table.
     if ims_registration.present? && overlay.blank?
@@ -281,6 +286,9 @@ class Lti::Registration < ActiveRecord::Base
   end
 
   private
+
+  # private readers exposed only for testing.
+  attr_reader :preloaded_account_binding, :preloaded_overlay
 
   # Returns which placements are disabled at the Lti::IMS::Registration or Lti::ToolConfiguration level.
   # Note that this is legacy behavior, as moving forward, the overlay will be the source of truth. This method

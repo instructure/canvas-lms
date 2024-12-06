@@ -17,12 +17,13 @@
  */
 
 import React, {useState} from 'react'
-import CommonMigratorControls from './common_migrator_controls'
+import {CommonMigratorControls, noFileSelectedFormMessage} from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import QuestionBankSelector from './question_bank_selector'
 import MigrationFileInput from './file_input'
-import {noFileSelectedFormMessage} from '../utils'
 import {useSubmitHandlerWithQuestionBank} from '../../hooks/form_handler_hooks'
+import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
 
 type QTIZipImporterProps = {
   onSubmit: onSubmitMigrationFormCallback
@@ -55,6 +56,7 @@ const QTIZipImporter = ({
         onChange={setFile}
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
       />
       <QuestionBankSelector
         onChange={setQuestionBankSettings}
@@ -71,6 +73,8 @@ const QTIZipImporter = ({
         onSubmit={handleSubmit}
         onCancel={onCancel}
         setIsQuestionBankDisabled={setIsQuestionBankDisabled}
+        SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
       />
     </>
   )

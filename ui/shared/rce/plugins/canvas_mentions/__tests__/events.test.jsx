@@ -109,6 +109,7 @@ describe('events', () => {
           return false
         })
         subject()
+        // eslint-disable-next-line no-restricted-properties
         expect(ReactDOM.render).toHaveBeenCalled()
       })
     })

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -39,7 +38,9 @@ function GridColor(props: Props) {
   const styleRules = props.statuses
     .map(status =>
       [
+        // @ts-expect-error
         `.even .gradebook-cell.${status} { background-color: ${props.colors[status]}; }`,
+        // @ts-expect-error
         `.odd .gradebook-cell.${status} { background-color: ${darken(props.colors[status], 5)}; }`,
         `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`,
       ].join('')

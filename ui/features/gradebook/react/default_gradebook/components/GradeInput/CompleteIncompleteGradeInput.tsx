@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -25,6 +24,7 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 function optionIdForGradeInfo(gradeInfo) {
   if (gradeInfo.excused) {
     return 'excused'
@@ -37,12 +37,14 @@ function optionIdForGradeInfo(gradeInfo) {
   return gradeInfo.grade
 }
 
+// @ts-expect-error
 function labelForGradeInfo(gradeInfo) {
   if (gradeInfo.excused) {
     return I18n.t('Excused')
   }
 
   return (
+    // @ts-expect-error
     {
       complete: I18n.t('Complete'),
       incomplete: I18n.t('Incomplete'),
@@ -50,6 +52,7 @@ function labelForGradeInfo(gradeInfo) {
   )
 }
 
+// @ts-expect-error
 export default function CompleteIncompleteGradeInput(props) {
   const {anonymizeStudents, isDisabled, gradeInfo, isBusy} = props
 
@@ -58,12 +61,15 @@ export default function CompleteIncompleteGradeInput(props) {
   const [highlightedItemId, setHighlightedItemId] = useState(currentGradeValue)
   const [isShowingOptions, setIsShowingOptions] = useState(false)
 
+  // @ts-expect-error
   function handleHighlightOption(_event, {id}) {
     setHighlightedItemId(id)
   }
 
+  // @ts-expect-error
   function gradeForOptionId(optionId) {
     return (
+      // @ts-expect-error
       {
         complete: 'complete',
         incomplete: 'incomplete',
@@ -71,6 +77,7 @@ export default function CompleteIncompleteGradeInput(props) {
     )
   }
 
+  // @ts-expect-error
   function handleSelectOption(_event, {id}) {
     setIsShowingOptions(false)
     if (!isDisabled && id !== gradeInfo.grade) {
@@ -82,6 +89,7 @@ export default function CompleteIncompleteGradeInput(props) {
     inputValue: anonymizeStudents ? '' : labelForGradeInfo(gradeInfo),
   }
 
+  // @ts-expect-error
   function isItemDisabled(optionId) {
     return isDisabled || (isBusy && gradeInfo.grade === gradeForOptionId(optionId))
   }
@@ -89,10 +97,12 @@ export default function CompleteIncompleteGradeInput(props) {
   let options
 
   if (gradeInfo.excused) {
+    // @ts-expect-error
     selectProps.interaction = isDisabled ? 'disabled' : 'readonly'
 
     options = [{id: 'excused', label: I18n.t('Excused')}]
   } else {
+    // @ts-expect-error
     selectProps.interaction = isDisabled ? 'disabled' : 'enabled'
 
     options = [
@@ -105,6 +115,7 @@ export default function CompleteIncompleteGradeInput(props) {
   const label = I18n.t('Grade')
 
   return (
+    // @ts-expect-error
     <Select
       {...selectProps}
       id="grade-detail-tray--grade-input"

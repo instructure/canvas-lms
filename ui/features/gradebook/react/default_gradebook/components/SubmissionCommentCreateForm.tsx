@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -25,14 +24,17 @@ const I18n = useI18nScope('gradebook')
 
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   static propTypes = {
+    // @ts-expect-error
     ...SubmissionCommentForm.propTypes,
     createSubmissionComment: func.isRequired,
   }
 
+  // @ts-expect-error
   handleCancel(event) {
     super.handleCancel(event, this.focusTextarea)
   }
 
+  // @ts-expect-error
   handlePublishComment(event) {
     super.handlePublishComment(event)
     this.setState({comment: ''}, this.focusTextarea)
@@ -46,6 +48,7 @@ export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   }
 
   publishComment() {
+    // @ts-expect-error
     return this.props.createSubmissionComment(this.state.comment)
   }
 

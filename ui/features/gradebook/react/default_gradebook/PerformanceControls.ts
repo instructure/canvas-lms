@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -41,6 +40,7 @@ const MAXIMUMS = {
   apiMaxPerPage: 500,
 }
 
+// @ts-expect-error
 function integerBetween(value, min: number, max: number, defaultValue: number) {
   const integer = Number.parseInt(value, 10)
   const assuredValue = Number.isNaN(integer) ? defaultValue : integer
@@ -98,9 +98,13 @@ export default class PerformanceControls {
 
   __getInteger(name: string): number {
     return integerBetween(
+      // @ts-expect-error
       this._values[name],
+      // @ts-expect-error
       MINIMUMS[name] || MINIMUMS.perPage,
+      // @ts-expect-error
       MAXIMUMS[name] || this.apiMaxPerPage,
+      // @ts-expect-error
       DEFAULTS[name] || DEFAULTS.apiMaxPerPage
     )
   }

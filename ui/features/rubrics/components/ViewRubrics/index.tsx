@@ -279,6 +279,7 @@ export const ViewRubrics = ({
         <FlexItem margin="small">
           {canManageRubrics && canImportExportRubrics && (
             <Button
+              // @ts-expect-error
               renderIcon={IconImportLine}
               color="secondary"
               data-testid="import-rubric-button"
@@ -291,6 +292,7 @@ export const ViewRubrics = ({
         <FlexItem>
           {canManageRubrics && (
             <Button
+              // @ts-expect-error
               renderIcon={IconAddLine}
               color="primary"
               onClick={() => navigate('./create')}
@@ -371,6 +373,7 @@ export const ViewRubrics = ({
               <Flex.Item margin="0 medium 0 0">
                 <Button
                   color="primary"
+                  // @ts-expect-error
                   renderIcon={IconDownloadLine}
                   data-testid="download-rubrics"
                   disabled={selectedRubricIds.length === 0}

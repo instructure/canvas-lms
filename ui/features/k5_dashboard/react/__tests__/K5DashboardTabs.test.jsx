@@ -26,7 +26,8 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 
 jest.useFakeTimers()
 
-const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+const render = children =>
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 // getByRole() causes these tests to be very slow, so provide a much faster helper
 // function that does the same thing

@@ -86,6 +86,7 @@ export const ImportRubricTray = ({
         overflowY="hidden"
       >
         <Button
+          // @ts-expect-error
           renderIcon={IconDownloadLine}
           color="secondary"
           data-testid="download-template"

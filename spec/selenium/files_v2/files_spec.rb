@@ -37,4 +37,10 @@ describe "files index page" do
     all_my_files_button.click
     expect(heading).to include_text("All My Files")
   end
+
+  it "Displays files in table" do
+    file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf")
+    get "/courses/#{@course.id}/files"
+    expect(f("#content")).to include_text(file_attachment.display_name)
+  end
 end

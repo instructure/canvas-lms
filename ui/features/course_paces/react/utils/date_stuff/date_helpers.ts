@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import moment from 'moment-timezone'
 
-import {BlackoutDate} from '../../shared/types'
+import type {BlackoutDate} from '../../shared/types'
 import {weekendIntegers} from '../../shared/api/backend_serializer'
 import * as tz from '@instructure/moment-utils'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -139,6 +138,7 @@ const dayIsDisabled = (
   )
 }
 
+// @ts-expect-error
 export const formatTimeAgoDate = date => {
   if (typeof date === 'string') {
     date = Date.parse(date)

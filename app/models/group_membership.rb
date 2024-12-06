@@ -59,6 +59,9 @@ class GroupMembership < ActiveRecord::Base
           .merge(Assignment.active).where(assignments: { id: ids })
   }
 
+  scope :for_collaborative_groups, -> { joins(:group).merge(Group.collaborative) }
+  scope :for_non_collaborative_groups, -> { joins(:group).merge(Group.non_collaborative) }
+
   scope :for_students, ->(ids) { where(user_id: ids) }
 
   resolves_root_account through: :group

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -52,6 +51,7 @@ export interface ExternalToolsEditor {
     getContent(): string
   }
   getContent(): string
+  // @ts-expect-error
   focus()
   editorContainer: HTMLElement
   $: Editor['$']
@@ -76,7 +76,9 @@ export interface ExternalToolsEnv {
   editorSelection: string | null
   editorContent: string | null
 
+  // @ts-expect-error
   insertCode(code: string)
+  // @ts-expect-error
   replaceCode(code: string)
 }
 

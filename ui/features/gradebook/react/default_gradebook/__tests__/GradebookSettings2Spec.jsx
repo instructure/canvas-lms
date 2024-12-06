@@ -67,6 +67,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       performanceControls,
       dispatch,
     })
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(component, container2)
 
     gradebook.gotAllAssignmentGroups([

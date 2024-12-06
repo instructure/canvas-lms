@@ -1,4 +1,3 @@
-// @ts-nocheck
 //
 // Copyright (C) 2016 - present Instructure, Inc.
 //
@@ -24,7 +23,7 @@ import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
 import type {CamelizedGradingPeriodSet} from '../grading.d'
 import type {GradingPeriodSet, GradingPeriodSetGroup} from 'api.d'
-import {EnvGradingStandardsCommon} from '@canvas/global/env/EnvGradingStandards'
+import type {EnvGradingStandardsCommon} from '@canvas/global/env/EnvGradingStandards'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
 
@@ -37,6 +36,7 @@ const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
 const createUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
+// @ts-expect-error
 const updateUrl = id => replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL, 'id', id)
 
 const serializeSet = (set: CamelizedGradingPeriodSet) => {
@@ -56,12 +56,14 @@ const baseDeserializeSet = (set: GradingPeriodSet): CamelizedGradingPeriodSet =>
   title: gradingPeriodSetTitle(set),
   weighted: !!set.weighted,
   displayTotalsForAllGradingPeriods: set.display_totals_for_all_grading_periods,
+  // @ts-expect-error
   gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods),
   permissions: set.permissions,
   createdAt: new Date(set.created_at),
   enrollmentTermIDs: undefined,
 })
 
+// @ts-expect-error
 const gradingPeriodSetTitle = set => {
   if (set.title && set.title.trim()) {
     return set.title.trim()
@@ -89,18 +91,22 @@ export default {
       /* eslint-disable promise/catch-or-return */
       dispatch
         .getDepaginated(listUrl())
+        // @ts-expect-error
         .then(response => resolve(deserializeSets(response)))
+        // @ts-expect-error
         .fail(error => reject(error))
       /* eslint-enable promise/catch-or-return */
     })
   },
 
+  // @ts-expect-error
   create(set) {
     return axios
       .post(createUrl(), serializeSet(set))
       .then(response => deserializeSet(response.data.grading_period_set))
   },
 
+  // @ts-expect-error
   update(set) {
     return axios.patch(updateUrl(set.id), serializeSet(set)).then(_response => set)
   },

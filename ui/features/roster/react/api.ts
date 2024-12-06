@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {QueryFunctionContext} from '@tanstack/react-query'
+import type {QueryFunctionContext} from '@tanstack/react-query'
 
 type FetchSectionsOptions = {
   exclude: string[]

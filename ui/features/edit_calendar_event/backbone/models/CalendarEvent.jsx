@@ -137,6 +137,7 @@ export default class CalendarEvent extends Backbone.Model {
       if (this.view?.el) {
         if (this.loadingState === LOADING_STATE.LOADED) return
         this.loadingState = LOADING_STATE.SPINNER_UP
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <div>
             <Spinner renderTitle={I18n.t('Loading')} size="medium" />

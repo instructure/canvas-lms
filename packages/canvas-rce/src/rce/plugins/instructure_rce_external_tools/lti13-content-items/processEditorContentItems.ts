@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -35,6 +34,7 @@ export default function processEditorContentItems(
   },
   env: ExternalToolsEnv,
   dialog: {
+    // @ts-expect-error
     close()
   } | null
 ) {
@@ -80,9 +80,12 @@ export default function processEditorContentItems(
     }
 
     if (event.data?.msg !== undefined) {
+      // @ts-expect-error
       showFlashAlert({message: event.data.msg.toString()})
     }
+    // @ts-expect-error
     if (event.data?.errormsg !== undefined) {
+      // @ts-expect-error
       showFlashAlert({message: event.data.errormsg.toString(), type: 'error'})
     }
   } catch (e) {

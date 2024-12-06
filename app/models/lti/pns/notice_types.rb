@@ -21,8 +21,9 @@ module Lti
   module Pns
     class NoticeTypes
       HELLO_WORLD = "LtiHelloWorldNotice"
+      ASSET_PROCESSOR_SUBMISSION = "LtiAssetProcessorSubmissionNotice"
 
-      ALL = [HELLO_WORLD].freeze
+      ALL = [HELLO_WORLD, ASSET_PROCESSOR_SUBMISSION].freeze
     end
   end
 end

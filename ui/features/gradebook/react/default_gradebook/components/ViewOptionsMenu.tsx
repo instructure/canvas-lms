@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -31,6 +30,7 @@ const I18n = useI18nScope('gradebook')
 
 const {Item: MenuItem, Group: MenuGroup, Separator: MenuSeparator} = Menu as any
 
+// @ts-expect-error
 function renderTriggerButton(bindButton) {
   return (
     <Link ref={bindButton} as="button">
@@ -117,7 +117,9 @@ class ViewOptionsMenu extends React.Component<Props> {
     allowViewUngradedAsZero: bool.isRequired,
   }
 
+  // @ts-expect-error
   onFilterSelect = (_event, filters) => {
+    // @ts-expect-error
     this.props.filterSettings.onSelect(filters)
   }
 
@@ -129,14 +131,19 @@ class ViewOptionsMenu extends React.Component<Props> {
     this.button = button
   }
 
+  // @ts-expect-error
   bindStatusesMenuItem = menuItem => {
+    // @ts-expect-error
     this.statusesMenuItem = menuItem
   }
 
+  // @ts-expect-error
   bindArrangeByMenuContent = menuContent => {
+    // @ts-expect-error
     this.arrangeByMenuContent = menuContent
   }
 
+  // @ts-expect-error
   bindFiltersMenuContent = menuContent => {
     this.filtersMenuContent = menuContent
   }
@@ -158,12 +165,15 @@ class ViewOptionsMenu extends React.Component<Props> {
 
   render() {
     return (
+      // @ts-expect-error
       <Menu trigger={renderTriggerButton(this.bindButton)} menuRef={this.bindMenuContent}>
         <Menu menuRef={this.bindArrangeByMenuContent} label={I18n.t('Arrange By')}>
           <MenuGroup label={<ScreenReaderContent>{I18n.t('Arrange By')}</ScreenReaderContent>}>
             <MenuItem
               disabled={this.props.columnSortSettings.disabled}
+              // @ts-expect-error
               selected={this.areColumnsOrderedBy('default')}
+              // @ts-expect-error
               onSelect={this.props.columnSortSettings.onSortByDefault}
             >
               {I18n.t('Default Order')}
@@ -188,6 +198,7 @@ class ViewOptionsMenu extends React.Component<Props> {
             <MenuItem
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('due_date', 'ascending')}
+              // @ts-expect-error
               onSelect={this.props.columnSortSettings.onSortByDueDateAscending}
             >
               {I18n.t('Due Date - Oldest to Newest')}
@@ -204,6 +215,7 @@ class ViewOptionsMenu extends React.Component<Props> {
             <MenuItem
               disabled={this.props.columnSortSettings.disabled}
               selected={this.areColumnsOrderedBy('points', 'ascending')}
+              // @ts-expect-error
               onSelect={this.props.columnSortSettings.onSortByPointsAscending}
             >
               {I18n.t('Points - Lowest to Highest')}
@@ -221,6 +233,7 @@ class ViewOptionsMenu extends React.Component<Props> {
               <MenuItem
                 disabled={this.props.columnSortSettings.disabled}
                 selected={this.areColumnsOrderedBy('module_position', 'ascending')}
+                // @ts-expect-error
                 onSelect={this.props.columnSortSettings.onSortByModuleAscending}
               >
                 {I18n.t('Module - First to Last')}
@@ -251,6 +264,7 @@ class ViewOptionsMenu extends React.Component<Props> {
             >
               {this.props.filterSettings.available.map(filterKey => (
                 <MenuItem key={filterKey} value={filterKey}>
+                  {/* @ts-expect-error */}
                   {filterLabels[filterKey]}
                 </MenuItem>
               ))}
@@ -260,6 +274,7 @@ class ViewOptionsMenu extends React.Component<Props> {
 
         {this.props.filterSettings.available.length > 0 && <MenuSeparator />}
 
+        {/* @ts-expect-error */}
         <MenuItem ref={this.bindStausMenuItem} onSelect={this.props.onSelectShowStatusesModal}>
           {I18n.t('Statuses…')}
         </MenuItem>
@@ -295,7 +310,9 @@ class ViewOptionsMenu extends React.Component<Props> {
 
           {this.props.allowShowSeparateFirstLastNames && (
             <MenuItem
+              // @ts-expect-error
               selected={this.props.showSeparateFirstLastNames}
+              // @ts-expect-error
               onSelect={this.props.onSelectShowSeparateFirstLastNames}
             >
               {I18n.t('Split Student Names')}

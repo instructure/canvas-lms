@@ -143,6 +143,7 @@ export default (
       'grades_published',
       'post_manually',
       'checkpoints',
+      'has_rubric',
     ]
 
     if (get().hasModules) {

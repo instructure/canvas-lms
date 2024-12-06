@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -233,9 +232,12 @@ export default class AssignmentRowCell extends Component<Props> {
               disabled={this.props.submissionIsUpdating}
               gradingScheme={this.props.gradingScheme}
               pointsBasedGradingScheme={this.props.pointsBasedGradingScheme}
+              // @ts-expect-error
               pendingGradeInfo={this.props.pendingGradeInfo}
               ref={this.bindGradeInput}
+              // @ts-expect-error
               scalingFactor={this.props.scalingFactor}
+              // @ts-expect-error
               submission={this.props.submission}
             />
           </div>

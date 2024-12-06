@@ -99,20 +99,46 @@
   width: 130px;
 }
 
-#message_participants_form .participant_list {
-  margin: 10px 0 20px;
+#message_participants_form {  
+  .participant_list {
+    margin: 10px 0 20px;
+  
+    .student-recipient {
+      list-style-type: none;
+      box-shadow: 0 0 1px $ic-color-dark;
+      background: $ic-color-medium-light;
+      padding: 2px 10px;
+      margin-#{direction(right)}: 5px;
+      border-radius: 12px;
+      display: inline-block;
+      font-size: 0.9em;
+    }
+  }
 
-  .student-recipient {
-    list-style-type: none;
-    box-shadow: 0 0 1px $ic-color-dark;
-    background: $ic-color-medium-light;
-    padding: 2px 10px;
-    margin-#{direction(right)}: 5px;
-    border-radius: 12px;
-    display: inline-block;
-    font-size: 0.9em;
+  .error-text {
+    color: $ic-bg-light-danger-text;
+  }
+
+  textarea#body.error {
+    border: 1px solid $crimson;
+    margin-bottom: 0;
+  }
+
+  .error-message {
+    display: flex;
+    gap: 0.3em;
+    font-size: 0.875rem;
+    color: $ic-bg-light-danger-text;
+    margin-top: 0.25em;
+    margin-bottom: $baseLineHeight * 0.5;
+
+    i {
+      margin-top: 0.175em;
+    }
   }
 }
+
+
 
 .CourseListItem {
   font-family: $ic-font-family;

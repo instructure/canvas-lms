@@ -78,7 +78,10 @@ export const UsedLocationsModal = ({
   onClose,
 }: UsedLocationsModalProps) => {
   const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
-  const [accountUsedLocations, setAccountUsedLocations] = useState<AccountUsedLocation[]>([])
+  const [accountUsedLocations, setAccountUsedLocations] = useState<AccountUsedLocation[] | null>(
+    null
+  )
+
   const [filter, setFilter] = useState<string>('')
   const [loadingAssignments, setLoadingAssignments] = useState<{[key: string]: boolean}>({})
   const sentinelRef = useRef(null)
@@ -154,7 +157,7 @@ export const UsedLocationsModal = ({
     try {
       const newLocations = await fetchAccountUsedLocations()
 
-      if (newLocations.accountUsedLocations.length) {
+      if (newLocations.accountUsedLocations) {
         setAccountUsedLocations(newLocations.accountUsedLocations)
       }
 
@@ -166,7 +169,7 @@ export const UsedLocationsModal = ({
 
   const reset = () => {
     setUsedLocations([])
-    setAccountUsedLocations([])
+    setAccountUsedLocations(null)
     moreLocationsLeft.current = true
     onClose()
   }
@@ -205,7 +208,7 @@ export const UsedLocationsModal = ({
   }, [isLoading, loadMoreCourseLocations, moreLocationsLeft, isOpen])
 
   useEffect(() => {
-    if (isOpen && accountUsedLocations.length === 0) {
+    if (isOpen && !accountUsedLocations) {
       loadAccountLocations()
     }
   }, [accountUsedLocations, isOpen, loadAccountLocations])

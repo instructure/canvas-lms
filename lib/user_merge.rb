@@ -36,7 +36,7 @@ class UserMerge
     Pseudonym.where(user_id: from_user)
   end
 
-  def handle_instructure_identity(pseudonyms_to_move, target_user) end
+  def handle_instructure_identity(pseudonyms_to_move) end
 
   def into(target_user, merger: nil, source: nil)
     return unless target_user
@@ -111,7 +111,7 @@ class UserMerge
       pseudonyms_to_move = pseudonyms_to_move_in_this_shard
 
       merge_data.add_more_data(pseudonyms_to_move)
-      handle_instructure_identity(pseudonyms_to_move, target_user)
+      handle_instructure_identity(pseudonyms_to_move)
       pseudonyms_to_move.update_all(["updated_at=NOW(), user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|

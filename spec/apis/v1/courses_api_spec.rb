@@ -508,12 +508,6 @@ describe CoursesController, type: :request do
       @user.pseudonym.update_attribute(:sis_user_id, "user1")
     end
 
-    before do
-      @course_dates_stubbed = true
-      allow_any_instance_of(Course).to(receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
-      allow_any_instance_of(Course).to(receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
-    end
-
     describe "observer viewing a course" do
       before :once do
         @observer_enrollment = course_with_observer(active_all: true)
@@ -1179,10 +1173,6 @@ describe CoursesController, type: :request do
           @resource_params = { controller: "courses", action: "create", format: "json", account_id: @account.id.to_s }
         end
 
-        before do
-          @course_dates_stubbed = false
-        end
-
         it "creates a new course" do
           term = @account.enrollment_terms.create
           post_params = {
@@ -1589,10 +1579,6 @@ describe CoursesController, type: :request do
                           "time_zone" => "Pacific/Honolulu"
                         },
                         "offer" => true }
-      end
-
-      before do
-        @course_dates_stubbed = false
       end
 
       context "an account admin" do
@@ -2158,6 +2144,17 @@ describe CoursesController, type: :request do
 
           @course.reload
           expect(@course.grading_standard_id).to eql gs.id
+        end
+
+        it "sets the grading standard id to 0 when concluding courses on assignments using the canvas default grading scheme to avoid grades changing after conclusion" do
+          expect(Auditors::Course).to receive(:record_concluded).once
+          @course.update!(grading_standard_id: nil)
+          @course.root_account.update!(grading_standard_id: nil)
+          letter_graded_assignment = @course.assignments.create!(name: "letter grade assignment", grading_type: "letter_grade", grading_standard_id: nil, points_possible: 10)
+          json = api_call(:delete, @path, @params, { event: "conclude" })
+          expect(json).to eq({ "conclude" => true })
+
+          expect(letter_graded_assignment.reload.grading_standard_id).to be 0
         end
 
         it "returns 400 if params[:event] is missing" do

@@ -141,7 +141,6 @@ class AuthenticationProvider
 
     def user_logout_redirect(controller, _current_user)
       return super unless end_session_endpoint.present?
-      return end_session_endpoint unless account.feature_enabled?(:oidc_rp_initiated_logout_params)
 
       uri = URI.parse(end_session_endpoint)
       params = post_logout_redirect_params(controller)
@@ -426,7 +425,7 @@ class AuthenticationProvider
 
         # we have a userinfo endpoint, and we don't have everything we want,
         # then request more
-        if userinfo_endpoint.present? && !(id_token.keys - requested_claims).empty?
+        if userinfo_endpoint.present? && !(requested_claims - id_token.keys).empty?
           userinfo = token.get(userinfo_endpoint).parsed
           debug_set(:userinfo, userinfo.to_json) if instance_debugging
           # but only use it if it's for the user we logged in as

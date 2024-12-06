@@ -85,6 +85,7 @@ QUnit.module('HideAssignmentGradesTray FormContent', suiteHooks => {
   }
 
   function mountComponent(props = {}) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<FormContent {...formContentProps(props)} />, $container)
   }
 

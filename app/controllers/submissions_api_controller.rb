@@ -945,6 +945,7 @@ class SubmissionsApiController < ApplicationController
           # new submission version on this request.
           previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
           previously_graded ? sub.save! : sub.with_versioning(explicit: true) { sub.save! }
+          original_sub.reload
         end
       end
 

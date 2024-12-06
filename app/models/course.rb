@@ -162,10 +162,16 @@ class Course < ActiveRecord::Base
   has_many :all_current_users, -> { distinct }, through: :all_current_enrollments, source: :user
   has_many :active_users, -> { distinct }, through: :participating_enrollments, source: :user
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
-  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
-  has_many :all_group_categories, class_name: "GroupCategory", as: :context, inverse_of: :context
-  has_many :groups, as: :context, inverse_of: :context
-  has_many :active_groups, -> { where("groups.workflow_state<>'deleted'") }, as: :context, inverse_of: :context, class_name: "Group"
+  has_many :group_categories, -> { collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :all_group_categories, -> { collaborative }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :groups, -> { collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :active_groups, -> { active.collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :differentiation_tag_categories, -> { non_collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :all_differentiation_tag_categories, -> { non_collaborative }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :differentiation_tags, -> { non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :active_differentiation_tags, -> { active.non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  # regardless of non_collaborative state, all active groups are included
+  has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
   has_many :assignment_groups, -> { order("assignment_groups.position", AssignmentGroup.best_unicode_collation_key("assignment_groups.name")) }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :assignments, -> { order("assignments.created_at") }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
@@ -2005,6 +2011,12 @@ class Course < ActiveRecord::Base
     completed? || soft_concluded?(enrollment_type)
   end
 
+  def set_concluded_assignments_grading_standard
+    ActiveRecord::Base.transaction do
+      assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.now)
+    end
+  end
+
   def account_chain(include_site_admin: false, include_federated_parent: false)
     @account_chain ||= Account.account_chain(account_id).freeze
 
@@ -2866,7 +2878,8 @@ class Course < ActiveRecord::Base
     [
       calendar_events.active.pluck(:start_at, :end_at),
       assignments.active.pluck(:due_at),
-      context_modules.not_deleted.pluck(:unlock_at)
+      context_modules.not_deleted.pluck(:unlock_at),
+      quizzes.active.pluck(:due_at),
     ].flatten.compact.map(&:to_date).uniq
   end
 
@@ -3076,12 +3089,6 @@ class Course < ActiveRecord::Base
                                       visibilities = section_visibilities_for(user),
                                       require_message_permission: false,
                                       check_full: true)
-    manage_perm = if root_account.feature_enabled? :granular_permissions_manage_users
-                    :allow_course_admin_actions
-                  else
-                    :manage_admin_users
-                  end
-
     return :restricted if require_message_permission && !grants_right?(user, :send_messages)
 
     has_read_roster = grants_right?(user, :read_roster) unless require_message_permission
@@ -3095,7 +3102,7 @@ class Course < ActiveRecord::Base
                                     :view_all_grades,
                                     :manage_grades,
                                     :manage_students,
-                                    manage_perm)
+                                    :allow_course_admin_actions)
     end
 
     # e.g. observer, can only see admins in the course
@@ -3300,6 +3307,12 @@ class Course < ActiveRecord::Base
     course_tabs.sort_by { |tab| COURSE_SUBJECT_TAB_IDS.index tab[:id] }
   end
 
+  def self.horizon_course_nav_tabs
+    tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+    tabs.find { |tab| tab[:id] == TAB_SYLLABUS }[:label] = t("Overview")
+    tabs
+  end
+
   def self.elementary_course_nav_tabs
     tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
     tabs.find { |tab| tab[:id] == TAB_SYLLABUS }[:label] = t("Important Info")
@@ -3337,6 +3350,8 @@ class Course < ActiveRecord::Base
                      Course.course_subject_tabs
                    elsif elementary_subject_course?
                      Course.elementary_course_nav_tabs
+                   elsif horizon_course?
+                     Course.horizon_course_nav_tabs
                    else
                      Course.default_tabs
                    end
@@ -3359,6 +3374,9 @@ class Course < ActiveRecord::Base
                             href: :course_course_pacing_path
                           })
     end
+
+    # Remove Home tab for Horizon courses
+    default_tabs.delete_at(0) if horizon_course?
 
     opts[:include_external] = false if elementary_homeroom_course?
 
@@ -3517,14 +3535,10 @@ class Course < ActiveRecord::Base
           TAB_SYLLABUS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
           TAB_QUIZZES => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
           TAB_GRADES => [:view_all_grades, :manage_grades],
-          TAB_PEOPLE => [:manage_students, :manage_admin_users],
           TAB_FILES => RoleOverride::GRANULAR_FILE_PERMISSIONS,
-          TAB_DISCUSSIONS => [:moderate_forum]
+          TAB_DISCUSSIONS => [:moderate_forum],
+          TAB_PEOPLE => RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
         }
-
-        if root_account.feature_enabled?(:granular_permissions_manage_users)
-          additional_checks[TAB_PEOPLE] = RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
-        end
 
         tabs.reject! do |t|
           # tab shouldn't be shown to non-admins
@@ -3981,6 +3995,8 @@ class Course < ActiveRecord::Base
         if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && grading_standard_id.nil? && root_account.grading_standard_id
           self.grading_standard_id = root_account.grading_standard_id
           save!
+        elsif grading_standard_id.nil? && root_account.grading_standard_id.nil?
+          set_concluded_assignments_grading_standard
         end
         Auditors::Course.record_concluded(self, user, options)
       end
@@ -4411,6 +4427,10 @@ class Course < ActiveRecord::Base
     return asset_string if attr_name == "asset_string"
 
     super
+  end
+
+  def horizon_course?
+    root_account.feature_enabled?(:horizon_course_setting) && horizon_course
   end
 
   private

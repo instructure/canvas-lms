@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -65,6 +64,7 @@ const PostGradesStore = (initialState: {
     type: string
   }
 }) => {
+  // @ts-expect-error
   const store = $.extend(createStore<State>(initialState), {
     reset() {
       const assignments = this.getAssignments()
@@ -81,8 +81,9 @@ const PostGradesStore = (initialState: {
       return assignmentsLength > 0
     },
 
-    getSISSectionId(section_id) {
+    getSISSectionId(section_id: string) {
       const sections = store.getState().sections
+      // @ts-expect-error
       return sections && sections[section_id] ? sections[section_id].sis_section_id : null
     },
 
@@ -93,11 +94,13 @@ const PostGradesStore = (initialState: {
     }) {
       const overrides: string[] = []
       each(a.overrides, o => {
+        // @ts-expect-error
         overrides.push(o.course_section_id)
       })
       return overrides
     },
 
+    // @ts-expect-error
     overrideForEveryone(a) {
       const overrides = this.allOverrideIds(a)
       const sections: string[] = keys(store.getState().sections)
@@ -105,6 +108,7 @@ const PostGradesStore = (initialState: {
       const section_ids_with_no_overrides = $(sections).not(overrides).get()
 
       const section_for_everyone = find(section_ids_with_no_overrides, o => {
+        // @ts-expect-error
         return initialState?.selected?.id === o
       })
       return section_for_everyone
@@ -114,6 +118,7 @@ const PostGradesStore = (initialState: {
       return store.getState().selected?.sis_id
     },
 
+    // @ts-expect-error
     setGradeBookAssignments(gradebookAssignments): void {
       const assignments: PartialAssignment[] = []
       for (const id in gradebookAssignments) {
@@ -127,11 +132,13 @@ const PostGradesStore = (initialState: {
       // A second loop is needed to ensure non-unique name errors are included
       // in hasError
       each(assignments, a => {
+        // @ts-expect-error
         a.original_error = assignmentUtils.hasError(assignments, a)
       })
       store.setState({assignments})
     },
 
+    // @ts-expect-error
     setSections(sections) {
       store.setState({sections})
       const sectionToShow = store.getState().sectionToShow
@@ -171,32 +178,46 @@ const PostGradesStore = (initialState: {
       const state = store.getState()
       if (state.selected?.type === 'section') {
         each(assignments, a => {
+          // @ts-expect-error
           a.recentlyUpdated = false
+          // @ts-expect-error
           a.currentlySelected = state.selected
+          // @ts-expect-error
           a.sectionCount = keys(state.sections).length
+          // @ts-expect-error
           a.overrideForThisSection = find(a.overrides, override => {
+            // @ts-expect-error
             return override.course_section_id === state.selected?.id
           })
 
           // Handle assignment with overrides and the 'Everyone Else' scenario with a section that does not have any overrides
           // cleanup overrideForThisSection logic
+          // @ts-expect-error
           if (typeof a.overrideForThisSection === 'undefined') {
+            // @ts-expect-error
             a.selectedSectionForEveryone = this.overrideForEveryone(a)
           }
         })
       } else {
         each(assignments, a => {
+          // @ts-expect-error
           a.recentlyUpdated = false
+          // @ts-expect-error
           a.currentlySelected = state.selected
+          // @ts-expect-error
           a.sectionCount = keys(state.sections).length
 
           // Course is currentlySlected with sections that have overrides AND are invalid
+          // @ts-expect-error
           a.overrideForThisSection = find(a.overrides, override => {
+            // @ts-expect-error
             return override.due_at == null || typeof override.due_at === 'object'
           })
 
           // Handle assignment with overrides and the 'Everyone Else' scenario with the course currentlySelected
+          // @ts-expect-error
           if (typeof a.overrideForThisSection === 'undefined') {
+            // @ts-expect-error
             a.selectedSectionForEveryone = this.overrideForEveryone(a)
           }
         })
@@ -217,6 +238,7 @@ const PostGradesStore = (initialState: {
         selected = {
           type: 'section',
           id: section_id,
+          // @ts-expect-error
           sis_id: this.getSISSectionId(section_id),
         }
       } else {
@@ -227,6 +249,7 @@ const PostGradesStore = (initialState: {
         }
       }
 
+      // @ts-expect-error
       store.setState({selected, sectionToShow: section})
     },
 
@@ -237,16 +260,22 @@ const PostGradesStore = (initialState: {
       store.setState({assignments})
     },
 
+    // @ts-expect-error
     updateAssignmentDate(assignment_id: string, date) {
       const assignments = store.getState().assignments
       const assignment = find(assignments, a => a.id === assignment_id)
       // the assignment has an override and the override being updated is for the section that is currentlySelected update it
       if (
+        // @ts-expect-error
         assignment.currentlySelected.id.toString() ===
+        // @ts-expect-error
         assignment.overrideForThisSection?.course_section_id
       ) {
+        // @ts-expect-error
         assignment.overrideForThisSection.due_at = date
+        // @ts-expect-error
         assignment.please_ignore = false
+        // @ts-expect-error
         assignment.hadOriginalErrors = true
 
         store.setState({assignments})
@@ -254,12 +283,18 @@ const PostGradesStore = (initialState: {
 
       // the section override being set from the course level of the sction dropdown
       else if (
+        // @ts-expect-error
         typeof assignment.overrideForThisSection !== 'undefined' &&
+        // @ts-expect-error
         assignment.currentlySelected.id.toString() !==
+          // @ts-expect-error
           assignment.overrideForThisSection?.course_section_id
       ) {
+        // @ts-expect-error
         assignment.overrideForThisSection.due_at = date
+        // @ts-expect-error
         assignment.please_ignore = false
+        // @ts-expect-error
         assignment.hadOriginalErrors = true
 
         store.setState({assignments})

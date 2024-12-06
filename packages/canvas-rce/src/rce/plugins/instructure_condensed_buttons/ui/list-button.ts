@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -121,6 +120,7 @@ function listStyleInfoForSelectionOfEditor(editor: Editor): ListStyleTypeInfo | 
 
   // Prefer to use `list-style-type`-based type infos.
   if (selectedStyleType.listStyleType) {
+    // @ts-expect-error
     const fromStyleType = listStyleInfos.byKey[selectedStyleType.listStyleType]
 
     if (fromStyleType) return fromStyleType
@@ -162,6 +162,7 @@ export default function register(editor: Editor) {
       ),
 
     onItemAction: (splitButtonApi, value) => {
+      // @ts-expect-error
       const desiredListStyleInfo = listStyleInfos.byKey[value] || defaultStyleInfoForListType.UL
 
       const currentListStyleInfo = listStyleInfoForSelectionOfEditor(editor)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
+import type {
   PaceContext,
   PaceContextsAsyncActionPayload,
   PaceContextsApiResponse,
@@ -61,6 +60,7 @@ export const getSelectedPaceContext = (state: StoreState): PaceContext | null =>
 
 export const paceContextsReducer = (
   state = paceContextsInitialState,
+  // @ts-expect-error
   action
 ): PaceContextsState => {
   switch (action.type) {
@@ -140,6 +140,7 @@ export const paceContextsReducer = (
     case PaceContextsConstants.UPDATE_PUBLISHING_PACE: {
       const contextsPublishing = state.contextsPublishing.map(contextPublishing => {
         const newPublishingContext = action.payload.find(
+          // @ts-expect-error
           updatedContextPublishing =>
             contextPublishing.progress_context_id === updatedContextPublishing.progress_context_id
         )
@@ -160,6 +161,7 @@ export const paceContextsReducer = (
     case PaceContextsConstants.REPLACE_PACE_CONTEXTS: {
       const newPaceContexts = state.entries.map(paceContext => {
         const newPaceContext = action.payload.find(
+          // @ts-expect-error
           updatedPaceContext => paceContext.item_id === updatedPaceContext.item_id
         )
         return newPaceContext || paceContext

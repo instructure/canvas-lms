@@ -25,10 +25,10 @@ export interface EnvAccountsAdminTools {
   ROOT_ACCOUNT_NAME: string
   ACCOUNT_ID: string
   PERMISSIONS: {
+    can_manage_user_details: boolean
     can_allow_course_admin_actions: boolean
     can_create_enrollments: boolean
     can_create_users: boolean
-    can_manage_admin_users: boolean
     can_manage_groups: boolean
     can_read_roster: boolean
     can_view_temporary_enrollments: boolean

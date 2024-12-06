@@ -1140,7 +1140,6 @@ describe "discussions" do
         get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
         # Expect certain field to be present
         expect(f("body")).to contain_jqcss "input[value='enable-participants-commenting']"
-        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
         expect(f("body")).to contain_jqcss "input[value='enable-podcast-feed']"
         expect(f("body")).to contain_jqcss "input[value='allow-liking']"
         expect(f("body")).to contain_jqcss "div[data-testid='non-graded-date-options']"
@@ -1150,6 +1149,15 @@ describe "discussions" do
         expect(f("body")).not_to contain_jqcss "input[value='graded']"
         expect(f("body")).not_to contain_jqcss "input[value='group-discussion']"
         expect(f("body")).not_to contain_jqcss "input[value='add-to-student-to-do']"
+      end
+
+      it "displays comment related fields when participants commenting is enabled" do
+        user_session(teacher)
+        get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
+
+        force_click_native("input[value='enable-participants-commenting']")
+        expect(f("body")).to contain_jqcss "input[value='must-respond-before-viewing-replies']"
+        expect(f("body")).to contain_jqcss "input[value='disallow-threaded-replies']"
       end
     end
 
@@ -2498,6 +2506,64 @@ describe "discussions" do
             force_click_native('input[type=checkbox][value="checkpoints"]')
 
             expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_falsey
+          end
+
+          it "successfully creates ADHOC overrides if a student is enrolled in multiple sections" do
+            course.enroll_student(@student_1, enrollment_state: "active", section: @section_2)
+            course.enroll_student(@student_1, enrollment_state: "active", section: @section_3)
+
+            get "/courses/#{course.id}/discussion_topics/new"
+
+            title = "Graded Discussion Topic with checkpoints and Student enrolled in multiple sections"
+            f("input[placeholder='Topic Title']").send_keys title
+            force_click_native('input[type=checkbox][value="graded"]')
+            wait_for_ajaximations
+            force_click_native('input[type=checkbox][value="checkpoints"]')
+
+            f("input[data-testid='points-possible-input-reply-to-topic']").send_keys 5
+            f("input[data-testid='reply-to-entry-required-count']").send_keys :backspace
+            f("input[data-testid='reply-to-entry-required-count']").send_keys 3
+            f("input[data-testid='points-possible-input-reply-to-entry']").send_keys 7
+
+            assign_to_element = Discussion.assignee_selector.first
+            assign_to_element.click
+            assign_to_element.send_keys :backspace
+            assign_to_element.send_keys "student 1"
+
+            f("button[data-testid='save-and-publish-button']").click
+            wait_for_ajaximations
+
+            Discussion.section_warning_continue_button.click
+
+            dt = DiscussionTopic.last
+            expect(dt.reply_to_entry_required_count).to eq 3
+
+            assignment = Assignment.last
+            expect(assignment.has_sub_assignments?).to be true
+
+            sub_assignments = SubAssignment.where(parent_assignment_id: assignment.id)
+            sub_assignment1 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+            sub_assignment2 = sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+            expect(sub_assignment1.sub_assignment_tag).to eq "reply_to_topic"
+            expect(sub_assignment1.points_possible).to eq 5
+            expect(sub_assignment2.sub_assignment_tag).to eq "reply_to_entry"
+            expect(sub_assignment2.points_possible).to eq 7
+
+            assignment_override1 = AssignmentOverride.find_by(assignment: sub_assignment1)
+            assignment_override2 = AssignmentOverride.find_by(assignment: sub_assignment2)
+
+            expect(assignment_override1).to be_present
+            expect(assignment_override2).to be_present
+
+            expect(assignment_override1.set_type).to eq "ADHOC"
+
+            student_ids = assignment_override1.assignment_override_students.map { |o| o.user.global_id }
+
+            expect(student_ids).to match_array [@student_1.global_id]
+
+            # Verify that the discussion topic redirected the page to the new discussion topic
+            expect(driver.current_url).to end_with("/courses/#{course.id}/discussion_topics/#{dt.id}")
           end
         end
       end

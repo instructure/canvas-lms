@@ -25,6 +25,7 @@ module Types
     value "grading"
     value "peer_review"
     value "provisional_grade"
+    value "self_assessment"
   end
 
   class RubricAssessmentType < ApplicationObjectType
@@ -40,6 +41,8 @@ module Types
     field :assessment_type, AssessmentType, null: false
 
     field :score, Float, null: true
+
+    field :updated_at, Types::DateTimeType, null: true
 
     field :user, UserType, null: true
     def user

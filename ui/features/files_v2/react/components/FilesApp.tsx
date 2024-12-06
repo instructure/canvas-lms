@@ -17,11 +17,10 @@
  */
 
 import React from 'react'
-import {useQuery} from '@tanstack/react-query'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
+import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {Flex} from '@instructure/ui-flex'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {Responsive} from '@instructure/ui-responsive'
@@ -29,28 +28,22 @@ import {Responsive} from '@instructure/ui-responsive'
 import TopLevelButtons from './TopLevelButtons'
 import FileFolderTable from './FileFolderTable'
 
-import {FAKE_FOLDERS_AND_FILES} from '../../data/FakeData'
 import FilesUsageBar from './FilesUsageBar'
 
 const I18n = useI18nScope('files_v2')
 
-const fetchFilesAndFolders = async (contextType: string, contextId: string) => {
-  // TODO fetch real data
-  return FAKE_FOLDERS_AND_FILES
-}
-
 interface FilesAppProps {
   isUserContext: boolean
   size: 'small' | 'medium' | 'large'
+  folderId: string
 }
 
-const FilesApp = ({isUserContext, size}: FilesAppProps) => {
-  const contextType = filesEnv.contextType
-  const contextId = filesEnv.contextId
+const FilesApp = ({isUserContext, size, folderId}: FilesAppProps) => {
+  const contextType = filesEnv.contextType ?? ''
+  const contextId = filesEnv.contextId ?? ''
 
   const canManageFilesForContext = (permission: string) => {
-    // @ts-expect-error
-    return filesEnv.userHasPermission({contextType, contextId}, permission)
+    return filesEnv.userHasPermission({contextType, contextId}, permission) ?? false
   }
 
   const userCanAddFilesForContext = canManageFilesForContext('manage_files_add')
@@ -58,8 +51,6 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
   const userCanManageFilesForContext =
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
-
-  const tableResult = useQuery(['files'], () => fetchFilesAndFolders(contextType, contextId))
 
   return (
     <View as="div">
@@ -89,8 +80,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
       </Flex>
       <FileFolderTable
         size={size}
-        rows={tableResult.isSuccess ? tableResult.data : undefined}
-        isLoading={tableResult.isLoading}
+        folderId={folderId}
         userCanEditFilesForContext={userCanEditFilesForContext}
       />
       {userCanManageFilesForContext && (
@@ -105,9 +95,10 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 }
 interface ResponsiveFilesAppProps {
   contextAssetString: string
+  folderId: string
 }
 
-const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
+const ResponsiveFilesApp = ({contextAssetString, folderId}: ResponsiveFilesAppProps) => {
   const isUserContext = contextAssetString.startsWith('user_')
 
   return (
@@ -121,6 +112,7 @@ const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
         <FilesApp
           isUserContext={isUserContext}
           size={(matches?.[0] as 'small' | 'medium') || 'large'}
+          folderId={folderId}
         />
       )}
     />

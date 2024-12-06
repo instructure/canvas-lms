@@ -19,11 +19,8 @@
 import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import CreateDSRModal from '../CreateDSRModal'
 import axios from '@canvas/axios'
-
-const I18n = useI18nScope('account_course_user_search')
 
 jest.mock('@canvas/axios')
 
@@ -40,11 +37,12 @@ describe('CreateDSRModal', () => {
   const renderComponent = (props = {}) =>
     render(
       <CreateDSRModal accountId={mockAccountId} user={mockUser} afterSave={afterSave} {...props}>
+        {/* eslint-disable-next-line react/button-has-type, jsx-a11y/control-has-associated-label */}
         <button title="Create DSR Request for John Doe" />
       </CreateDSRModal>
     )
 
-  it('uses the user\'s name in the default report name', () => {
+  it("uses the user's name in the default report name", () => {
     axios.get.mockResolvedValueOnce({status: 204, data: {}})
 
     const {getByTitle, getByTestId} = renderComponent()
@@ -99,6 +97,26 @@ describe('CreateDSRModal', () => {
     await waitFor(() => {
       expect(
         getByText((_, element) => element.textContent === 'Latest DSR: In progress')
+      ).toBeInTheDocument()
+      expect(queryByText('Download:')).not.toBeInTheDocument()
+    })
+  })
+
+  it('should not have a download link and show the status when failed', async () => {
+    axios.get.mockResolvedValueOnce({
+      status: 200,
+      data: {
+        request_name: 'Latest Request',
+        progress_status: 'failed',
+      },
+    })
+
+    const {getByText, queryByText, getByTitle} = renderComponent()
+    fireEvent.click(getByTitle('Create DSR Request for John Doe'))
+
+    await waitFor(() => {
+      expect(
+        getByText((_, element) => element.textContent === 'Latest DSR: Failed')
       ).toBeInTheDocument()
       expect(queryByText('Download:')).not.toBeInTheDocument()
     })

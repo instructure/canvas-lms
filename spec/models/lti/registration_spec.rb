@@ -64,7 +64,7 @@ RSpec.describe Lti::Registration do
     end
   end
 
-  describe "#configuration" do
+  describe "#internal_lti_configuration" do
     subject { registration.internal_lti_configuration(context: account) }
 
     let(:registration) { lti_registration_model(account:) }
@@ -174,7 +174,6 @@ RSpec.describe Lti::Registration do
       context "when an Lti::Overlay is present" do
         let(:data) do
           {
-            scopes: [TokenScopes::LTI_AGS_LINE_ITEM_SCOPE],
             title: "A Better Title",
             privacy_level: "anonymous",
             placements: {
@@ -205,7 +204,6 @@ RSpec.describe Lti::Registration do
 
           expect(subject["privacy_level"]).to eq("anonymous")
           expect(subject["title"]).to eq("A Better Title")
-          expect(subject["scopes"]).to eq([TokenScopes::LTI_AGS_LINE_ITEM_SCOPE])
           global_nav_config = subject["placements"].find { |p| p["placement"] == "global_navigation" }
           module_config = subject["placements"].find { |p| p["placement"] == "module_index_menu_modal" }
 
@@ -217,6 +215,17 @@ RSpec.describe Lti::Registration do
                                            "icon_url" => "https://example.com/icon.png",
                                            "title" => "A Better Title",
                                            "message_type" => "LtiDeepLinkingRequest")
+        end
+
+        context "with include_overlay: false" do
+          subject { registration.internal_lti_configuration(context: account, include_overlay: false) }
+
+          it "does not overlay fields on top of configuration" do
+            overlay
+
+            expect(subject["privacy_level"]).not_to eq("anonymous")
+            expect(subject["title"]).not_to eq("A Better Title")
+          end
         end
       end
     end
@@ -500,6 +509,12 @@ RSpec.describe Lti::Registration do
     let(:account) { account_model }
     let(:registrations) { [] }
 
+    def expect_preloaded_bindings(registrations)
+      registrations.each do |registration|
+        expect(registration.send(:preloaded_account_binding)).to be_present
+      end
+    end
+
     context "when account is nil" do
       let(:account) { nil }
 
@@ -516,7 +531,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads bindings for nearest root account" do
         subject
-        expect(registrations).to all(have_attributes(account_binding: be_present))
+        expect_preloaded_bindings(registrations)
       end
     end
 
@@ -530,7 +545,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads account_binding on registrations" do
         subject
-        expect(registrations).to all(have_attributes(account_binding: be_present))
+        expect_preloaded_bindings(registrations)
       end
     end
 
@@ -544,7 +559,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads bindings from site admin registrations" do
         subject
-        expect(registrations).to all(have_attributes(account_binding: be_present))
+        expect_preloaded_bindings(registrations)
       end
 
       context "with sharding" do
@@ -556,7 +571,7 @@ RSpec.describe Lti::Registration do
 
         it "preloads bindings from site admin registrations" do
           @shard2.activate { subject }
-          expect(registrations).to all(have_attributes(account_binding: be_present))
+          expect_preloaded_bindings(registrations)
         end
       end
     end
@@ -579,13 +594,13 @@ RSpec.describe Lti::Registration do
 
       it "associates bindings with registrations" do
         subject
-        expect(registrations.first.account_binding).to eq(account_bindings.first)
+        expect(registrations.first.send(:preloaded_account_binding)).to eq(account_bindings.first)
       end
     end
 
     it "associates bindings with registrations" do
       subject
-      expect(registrations.first.account_binding).to eq(account_bindings.first)
+      expect(registrations.first.send(:preloaded_account_binding)).to eq(account_bindings.first)
     end
   end
 
@@ -595,6 +610,12 @@ RSpec.describe Lti::Registration do
     let(:account) { account_model }
     let(:registrations) { [] }
     let(:overlay) { { title: "Test" } }
+
+    def expect_preloaded_overlays(registrations)
+      registrations.each do |registration|
+        expect(registration.send(:preloaded_overlay)).to be_present
+      end
+    end
 
     context "when account is nil" do
       let(:account) { nil }
@@ -612,7 +633,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads overlays for nearest root account" do
         subject
-        expect(registrations).to all(have_attributes(overlay: be_present))
+        expect_preloaded_overlays(registrations)
       end
     end
 
@@ -626,7 +647,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads overlays on registrations" do
         subject
-        expect(registrations).to all(have_attributes(overlay: be_present))
+        expect_preloaded_overlays(registrations)
       end
     end
 
@@ -640,7 +661,7 @@ RSpec.describe Lti::Registration do
 
       it "preloads overlays from site admin registrations" do
         subject
-        expect(registrations).to all(have_attributes(overlay: be_present))
+        expect_preloaded_overlays(registrations)
       end
 
       context "with sharding" do
@@ -652,7 +673,7 @@ RSpec.describe Lti::Registration do
 
         it "preloads overlays from site admin registrations" do
           @shard2.activate { subject }
-          expect(registrations).to all(have_attributes(overlay: be_present))
+          expect_preloaded_overlays(registrations)
         end
       end
     end
@@ -675,13 +696,13 @@ RSpec.describe Lti::Registration do
 
       it "associates overlays with registrations" do
         subject
-        expect(registrations.first.overlay).to eq(overlays.first)
+        expect(registrations.first.send(:preloaded_overlay)).to eq(overlays.first)
       end
     end
 
     it "associates overlays with registrations" do
       subject
-      expect(registrations.first.overlay).to eq(overlays.first)
+      expect(registrations.first.send(:preloaded_overlay)).to eq(overlays.first)
     end
   end
 

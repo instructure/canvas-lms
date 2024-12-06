@@ -21,18 +21,17 @@ import {connect} from 'react-redux'
 import {COURSE} from '@canvas/permissions/react/propTypes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {Component} from 'react'
+import React, {Component, createRef} from 'react'
 import {roleIsCourseBaseRole} from '@canvas/permissions/util'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {FormField} from '@instructure/ui-form-field'
-import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {IconXSolid} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = useI18nScope('permissions_v2_add_tray')
 
@@ -55,6 +54,8 @@ export default class AddTray extends Component {
       roleNameErrors: [],
     }
   }
+
+  roleNameInputRef = createRef()
 
   UNSAFE_componentWillReceiveProps(newProps) {
     if (!this.props.loading) {
@@ -80,8 +81,8 @@ export default class AddTray extends Component {
     })
   }
 
-  onChangeBaseType = event => {
-    const foundRole = this.props.allBaseRoles.find(element => element.label === event.target.value)
+  onChangeBaseType = selectedLabel => {
+    const foundRole = this.props.allBaseRoles.find(element => element.label === selectedLabel)
     this.setState({
       selectedBaseType: foundRole,
     })
@@ -97,11 +98,20 @@ export default class AddTray extends Component {
   }
 
   handleSaveButton = () => {
-    if (this.state.selectedRoleName.length === 0) {
-      const roleNameErrors = [{type: 'error', text: I18n.t('A role name is required')}]
-      this.setState({roleNameErrors})
+    const isRoleNameAlreadyInUse = this.state.roleNameErrors.length
+    if (isRoleNameAlreadyInUse) {
+      this.roleNameInputRef.current.focus()
       return
     }
+
+    const isRoleNameEmpty = this.state.selectedRoleName.length === 0
+    if (isRoleNameEmpty) {
+      const roleNameErrors = [{type: 'error', text: I18n.t('A role name is required')}]
+      this.setState({roleNameErrors})
+      this.roleNameInputRef.current.focus()
+      return
+    }
+
     const newRole = this.state.selectedBaseType
     newRole.base_role_type =
       this.props.tab === COURSE ? newRole.base_role_type : 'AccountMembership'
@@ -135,11 +145,12 @@ export default class AddTray extends Component {
   renderSelectRoleName = () => (
     <View display="block" margin="medium 0">
       <TextInput
+        ref={this.roleNameInputRef}
         isRequired={true}
         onChange={this.onChangeRoleName}
         id="add_role_input"
         value={this.state.selectedRoleName}
-        renderLabel={<Text weight="light">{`${I18n.t('Role Name')}:`}</Text>}
+        renderLabel={I18n.t('Role Name')}
         messages={this.state.roleNameErrors}
       />
     </View>
@@ -147,22 +158,18 @@ export default class AddTray extends Component {
 
   renderSelectBaseRole = () => (
     <View display="block" margin="medium 0">
-      <FormField id="add-tray" label={<Text weight="light">{`${I18n.t('Base Type')}:`}</Text>}>
-        <select
-          onChange={this.onChangeBaseType}
-          style={{
-            margin: '0',
-            width: '100%',
-          }}
-          value={this.state.selectedBaseType.label}
-        >
-          {this.props.allBaseRoles.map(item => (
-            <option key={item.label} value={item.label}>
-              {item.label}
-            </option>
-          ))}
-        </select>
-      </FormField>
+      <SimpleSelect
+        renderLabel={I18n.t('Base Type')}
+        assistiveText={I18n.t('Use arrow keys to navigate options.')}
+        value={this.state.selectedBaseType.label}
+        onChange={(_, {value}) => this.onChangeBaseType(value)}
+      >
+        {this.props.allBaseRoles.map(item => (
+          <SimpleSelect.Option id={item.label} key={item.label} value={item.label}>
+            {item.label}
+          </SimpleSelect.Option>
+        ))}
+      </SimpleSelect>
     </View>
   )
 
@@ -180,7 +187,6 @@ export default class AddTray extends Component {
           </Button>
           <Button
             id="permissions-add-tray-submit-button"
-            disabled={this.state.roleNameErrors.length !== 0}
             type="submit"
             color="primary"
             onClick={this.handleSaveButton}

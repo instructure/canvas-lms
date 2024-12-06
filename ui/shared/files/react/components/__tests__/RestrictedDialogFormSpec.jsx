@@ -24,7 +24,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
 import Folder from '@canvas/files/backbone/models/Folder'
-import { mergeTimeAndDate } from '@instructure/moment-utils'
+import {mergeTimeAndDate} from '@instructure/moment-utils'
 
 QUnit.module('RestrictedDialogForm Multiple Selected Items', {
   setup() {
@@ -40,6 +40,7 @@ QUnit.module('RestrictedDialogForm Multiple Selected Items', {
         }),
       ],
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedDialogForm = ReactDOM.render(
       <RestrictedDialogForm {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -73,6 +74,7 @@ QUnit.module('RestrictedDialogForm#handleSubmit', {
         }),
       ],
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedDialogForm = ReactDOM.render(
       <RestrictedDialogForm {...props} />,
       $('<div>').appendTo('#fixtures')[0]

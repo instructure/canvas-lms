@@ -175,7 +175,8 @@ describe "content migrations", :non_parallel do
       migration_types.each do |type|
         select_migration_type(type)
         expect(NewContentMigrationPage.add_import_queue_button).to be_displayed
-        select_migration_type("empty")
+        expect(NewContentMigrationPage.clear_button).to be_displayed
+        NewContentMigrationPage.clear_button.click
         expect(element_exists?(NewContentMigrationPage.add_import_queue_button_selector)).to be false
       end
 

@@ -101,6 +101,7 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
           {isSavedView && !assignment.hasSubmittedSubmissions && (
             <AssignmentPublishButton
               isPublished={assignment.state === 'published'}
+              // @ts-expect-error
               assignmentLid={assignment.lid}
               breakpoints={breakpoints}
             />
@@ -165,6 +166,7 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
         onDismiss={() => {
           setAssignToTray(false)
           if (returnFocusTo.current) {
+            // @ts-expect-error
             returnFocusTo.current.focus()
           }
         }}
@@ -173,6 +175,7 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
         locale={ENV.LOCALE || 'env'}
         timezone={ENV.TIMEZONE || 'UTC'}
         courseId={assignment.course?.lid}
+        // @ts-expect-error
         itemName={assignment.name}
         itemContentId={assignment?.lid}
         pointsPossible={assignment.pointsPossible as number}

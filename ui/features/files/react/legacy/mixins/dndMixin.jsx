@@ -32,6 +32,7 @@ export default {
       this.dragHolder = $('<div>').appendTo(document.body)
     }
     // This should be in JSX, but /o\
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DragFeedback pageX={pageX} pageY={pageY} itemsToDrag={this.itemsToDrag()} />,
       this.dragHolder[0]

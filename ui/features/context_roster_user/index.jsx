@@ -122,6 +122,7 @@ $(document).ready(() => {
 
   const container = document.querySelector('#pairing-code')
   if (container != null) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
       container

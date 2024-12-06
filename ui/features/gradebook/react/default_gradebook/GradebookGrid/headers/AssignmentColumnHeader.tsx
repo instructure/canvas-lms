@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -40,6 +39,7 @@ const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 function labelForPostGradesAction(postGradesAction) {
   if (postGradesAction.hasGradesOrCommentsToPost) {
     return I18n.t('Post grades')
@@ -146,10 +146,12 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     ...ColumnHeader.defaultProps,
   }
 
+  // @ts-expect-error
   bindAssignmentLink = ref => {
     this.assignmentLink = ref
   }
 
+  // @ts-expect-error
   bindEnterGradesAsMenuContent = ref => {
     this.enterGradesAsMenuContent = ref
   }
@@ -182,6 +184,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     this.invokeAndSkipFocus(this.props.showGradePostingPolicyAction)
   }
 
+  // @ts-expect-error
   invokeAndSkipFocus(action) {
     // this is because the onToggle handler in ColumnHeader.js is going to get
     // called synchronously, before the SetState takes effect, and it needs to
@@ -196,8 +199,10 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     this.assignmentLink?.focus()
   }
 
+  // @ts-expect-error
   handleKeyDown = (event: KeyboardEvent) => {
     if (event.which === 9) {
+      // @ts-expect-error
       if (this.assignmentLink.focused && !event.shiftKey) {
         event.preventDefault()
         this.optionsMenuTrigger.focus()
@@ -211,9 +216,11 @@ export default class AssignmentColumnHeader extends ColumnHeader<
       }
     }
 
+    // @ts-expect-error
     return ColumnHeader.prototype.handleKeyDown.call(this, event)
   }
 
+  // @ts-expect-error
   onEnterGradesAsSettingSelect = (_event, values) => {
     this.props.enterGradesAsSetting.onSelect(values[0])
   }
@@ -246,6 +253,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         onSend: this.handleSendMessageStudentsWho,
         messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
         userId: this.props.userId,
+        // @ts-expect-error
         pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
       }
 
@@ -290,6 +298,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
     return (
       <InstUISettingsProvider
+        // @ts-expect-error
         theme={{smallPaddingHorizontal: '0', smallFontSize: '0.75rem', smallHeight: '1rem'}}
       >
         <Link ref={this.bindAssignmentLink} href={assignment.htmlUrl} isWithinText={false}>
@@ -469,12 +478,12 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           </MenuItem>
         )}
 
-        {this.props.rubricAssessmentImportsExportsEnabled && (
+        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
           <MenuItem onSelect={() => this.selectBulkRubricExport()}>
             {I18n.t('Bulk Download Rubrics')}
           </MenuItem>
         )}
-        {this.props.rubricAssessmentImportsExportsEnabled && (
+        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
           <MenuItem
             onSelect={() => {
               const {toggleRubricAssessmentImportTray} = useStore.getState()

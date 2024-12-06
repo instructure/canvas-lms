@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -19,7 +18,6 @@
 
 import $ from 'jquery'
 import type JQuery from 'jquery'
-// @ts-expect-error
 import postGradesFrameDialog from '../jst/PostGradesFrameDialog.handlebars'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import 'jqueryui/dialog'
@@ -84,11 +82,14 @@ export default class PostGradesFrameDialog {
         const iframeWidth = this.$iframe.outerWidth(true)
         const iframeHeight = this.$iframe.outerHeight(true)
         this.$iframe.addClass('info_alert_outline')
+        // @ts-expect-error
         this.$iframe.data('height-with-alert', iframeHeight)
         $(e.target).children('div').first().removeClass('screenreader-only')
         const alertHeight = $(e.target).outerHeight(true) || 0
         this.$iframe
+          // @ts-expect-error
           .css('height', iframeHeight - alertHeight - 4 + 'px')
+          // @ts-expect-error
           .css('width', iframeWidth - 4 + 'px')
         return this.$dialog.scrollLeft(0).scrollTop(0)
       })
@@ -115,8 +116,10 @@ export default class PostGradesFrameDialog {
     this.$dialog.dialog('close')
   }
 
+  // @ts-expect-error
   onDialogOpen(_event) {}
 
+  // @ts-expect-error
   onDialogClose(_event) {
     this.$dialog.dialog('destroy').remove()
     if (this.returnFocusTo) {

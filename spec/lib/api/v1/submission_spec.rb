@@ -134,6 +134,20 @@ describe Api::V1::Submission do
         expect(json["has_sub_assignment_submissions"]).to be false
         expect(json["sub_assignment_submissions"]).to be_empty
       end
+
+      it "sets needs grading fields if a submission checkpoint needs grading" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
+        topic_sub_assignment = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
+        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
+        topic_sub_assignment.submit_homework(student, submission_type: "discussion_topic")
+
+        json = fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
+        # gradebook uses these fields to determine a submission needs grading
+        expect(json["workflow_state"]).to  eq("pending_review")
+        expect(json["submission_type"]).to eq("discussion_topic")
+      end
     end
 
     describe "anonymous_id" do

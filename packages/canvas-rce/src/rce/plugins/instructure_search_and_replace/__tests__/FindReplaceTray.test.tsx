@@ -65,7 +65,9 @@ describe('FindReplaceTray', () => {
     const findInput = screen.getByTestId('find-text-input')
     await type(user, findInput, 'a')
     const errorText = await screen.findByLabelText(/no results found/i)
+    const errorIcon = await screen.findAllByTestId('error-icon')
     expect(errorText).toBeInTheDocument()
+    expect(errorIcon[0]).toBeInTheDocument()
     expect(fakePlugin.find).toHaveBeenCalledTimes(1)
   })
 

@@ -64,6 +64,7 @@ export default function StickerModal({
                 <Button
                   data-testid="sticker-remove"
                   onClick={onRemoveSticker}
+                  // @ts-expect-error
                   renderIcon={IconTrashLine}
                 >
                   {I18n.t('Remove sticker')}

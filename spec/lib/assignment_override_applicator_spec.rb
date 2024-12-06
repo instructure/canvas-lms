@@ -374,6 +374,20 @@ describe AssignmentOverrideApplicator do
         expect(@teachers_assignment.due_at.to_i).to eq section_due_at.to_i
         expect(@students_assignment.due_at.to_i).to eq section_due_at.to_i
       end
+
+      it "uses course override if there is no assignment.due_at" do
+        course_override_due_at = 5.days.from_now
+
+        @course_override = assignment_override_model(assignment: @assignment, due_at: course_override_due_at)
+        @course_override.set = @course
+        @course_override.save!
+
+        @assignment.update_attribute(:due_at, nil)
+        @teachers_assignment = AssignmentOverrideApplicator
+                               .assignment_overridden_for(@assignment, @teacher)
+
+        expect(@teachers_assignment.due_at.to_i).to eq course_override_due_at.to_i
+      end
     end
   end
 

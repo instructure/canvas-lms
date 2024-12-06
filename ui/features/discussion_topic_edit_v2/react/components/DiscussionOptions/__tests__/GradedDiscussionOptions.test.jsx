@@ -51,20 +51,20 @@ const renderGradedDiscussionOptions = (props = {}) => {
 }
 describe('GradedDiscussionOptions', () => {
   it('renders', () => {
-    const {getByText} = renderGradedDiscussionOptions()
+    const {getAllByText, getByText} = renderGradedDiscussionOptions()
     expect(getByText('Points Possible')).toBeInTheDocument()
     expect(getByText('Display Grade As')).toBeInTheDocument()
     expect(getByText('Assignment Group')).toBeInTheDocument()
-    expect(getByText('Peer Reviews')).toBeInTheDocument()
+    expect(getAllByText('Peer Reviews')).toHaveLength(2)
     expect(getByText('Assignment Settings')).toBeInTheDocument()
   })
 
   it('renders with null points possible value', () => {
-    const {getByText} = renderGradedDiscussionOptions({pointsPossible: null})
+    const {getAllByText, getByText} = renderGradedDiscussionOptions({pointsPossible: null})
     expect(getByText('Points Possible')).toBeInTheDocument()
     expect(getByText('Display Grade As')).toBeInTheDocument()
     expect(getByText('Assignment Group')).toBeInTheDocument()
-    expect(getByText('Peer Reviews')).toBeInTheDocument()
+    expect(getAllByText('Peer Reviews')).toHaveLength(2)
     expect(getByText('Assignment Settings')).toBeInTheDocument()
   })
 

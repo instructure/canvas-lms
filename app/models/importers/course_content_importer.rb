@@ -591,6 +591,14 @@ module Importers
       result
     end
 
+    def self.shift_date_options_from_migration(migration)
+      result = shift_date_options(migration.course, migration.date_shift_options)
+      if any_shift_date_missing?(result) && Account.site_admin.feature_enabled?(:fill_missing_dates_from_source_course)
+        result = shift_date_options(migration.source_course, migration.date_shift_options)
+      end
+      result
+    end
+
     def self.remove_bad_end_dates!(options)
       old_start = DateTime.parse(options[:old_start_date]) rescue nil
       old_end   = DateTime.parse(options[:old_end_date]) rescue nil
@@ -637,6 +645,11 @@ module Importers
 
     def self.error_on_dates?(item, attributes)
       attributes.any? { |attribute| item.errors[attribute].present? }
+    end
+
+    def self.any_shift_date_missing?(date_shift_options_hash)
+      date_shift_options_hash[:old_start_date].blank? || date_shift_options_hash[:old_end_date].blank? ||
+        date_shift_options_hash[:new_start_date].blank? || date_shift_options_hash[:new_end_date].blank?
     end
   end
 end

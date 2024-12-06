@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -215,6 +214,7 @@ tinymce.PluginManager.add('instructure_links', function (ed) {
         }))
       ),
     onSetup(api) {
+      // @ts-expect-error
       function handleNodeChange(e) {
         if (e?.element) {
           api.setActive(!!getAnchorElement(ed, e.element))

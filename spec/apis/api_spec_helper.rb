@@ -141,14 +141,14 @@ end
 
 def check_document(html, course, attachment, include_verifiers)
   doc = Nokogiri::HTML5.fragment(html)
-  img1 = doc.at_css("img#1")
+  img1 = doc.at_css("img[data-testid='1']")
   expect(img1).to be_present
   params = include_verifiers ? "?verifier=#{attachment.uuid}" : ""
   expect(img1["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/preview#{params}"
-  img2 = doc.at_css("img#2")
+  img2 = doc.at_css("img[data-testid='2']")
   expect(img2).to be_present
   expect(img2["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
-  img3 = doc.at_css("img#3")
+  img3 = doc.at_css("img[data-testid='3']")
   expect(img3).to be_present
   expect(img3["src"]).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
   video = doc.at_css("video")
@@ -167,9 +167,9 @@ def should_translate_user_content(course, include_verifiers = true)
   content = <<~HTML
     <p>
       Hello, students.<br>
-      This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
-      This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
-      This might explain something:  <img id="3" src="/courses/#{course.id}/files/#{attachment.id}" alt="important">
+      This will explain everything: <img data-testid="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
+      This won't explain anything:  <img data-testid="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
+      This might explain something:  <img data-testid="3" src="/courses/#{course.id}/files/#{attachment.id}" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
       And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>

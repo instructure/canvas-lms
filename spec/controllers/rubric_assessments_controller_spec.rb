@@ -555,41 +555,61 @@ describe RubricAssessmentsController do
     end
   end
 
-  describe "POST 'import'" do
+  describe "student self assessments" do
     before do
-      course_with_teacher_logged_in(active_all: true)
-      @assignment = @course.assignments.create!(title: "Some Assignment")
-      rubric_association_model(user: @user, context: @course, association_object: @assignment, purpose: "grading")
-      assessor = User.create!
-      @course.enroll_student(assessor)
-      @attachment = fixture_file_upload("rubric/assessments.csv", "text/csv")
+      setup_assignmennt_self_assessment
+      @assignment.update(rubric_self_assessment_enabled: true)
     end
 
-    it "returns bad request if file attachment not passed in" do
-      post :import, params: { course_id: @course.id, assignment_id: @assignment.id }
-      expect(response).to be_bad_request
+    let(:base_request_params) { { course_id: @course.id, rubric_association_id: @rubric_association.id } }
+
+    it "does not allow students to self assess other students" do
+      user_session(@student2)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
     end
 
-    it "returns bad request if assignment does not exist" do
-      post :import, params: { course_id: @course.id, assignment_id: "some-bad-id", attachment: @attachment }
-      expect(response).to be_not_found
+    it "does not allow a student to modify their own self assessment" do
+      user_session(@student1)
+      rubric_assessment_model(user: @student1, context: @course, association_object: @assignment, assessment_type: "self_assessment")
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
     end
 
-    it "returns bad request if rubric association for assignment does not exist" do
-      assignment_2 = @course.assignments.create!(title: "Some Assignment")
-      post :import, params: { course_id: @course.id, assignment_id: assignment_2.id, attachment: @attachment }
-
-      expect(response).to be_bad_request
-      error_message = json_parse(response.body)["message"]
-      expect(error_message).to eq("Assignment not found or does not have a rubric association")
+    it "does not allow a student to self assess if the assignment is not set up as a self assessment" do
+      user_session(@student1)
+      @assignment.update(rubric_self_assessment_enabled: false)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
     end
 
-    it "returns the rubric assessment import job id" do
-      post :import, params: { course_id: @course.id, assignment_id: @assignment.id, attachment: @attachment }
+    it "does not allow a student to self assess if the assessment_type param is not 'self_assessment'" do
+      user_session(@student1)
+      assessment_params = { user_id: @student1.id, assessment_type: "grading" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      assert_status(401)
+    end
+
+    it "allows a student to create a self assessment" do
+      user_session(@student1)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
       expect(response).to be_successful
-      response_body = json_parse(response.body)
-      expect(response_body["assignment_id"]).to eq(@assignment.id)
-      expect(response_body["workflow_state"]).to eq("created")
+    end
+
+    it "allows for multiple students to submit a self assessment" do
+      user_session(@student1)
+      assessment_params = { user_id: @student1.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      expect(response).to be_successful
+
+      user_session(@student2)
+      assessment_params = { user_id: @student2.id, assessment_type: "self_assessment" }
+      post "create", params: base_request_params.merge(rubric_assessment: assessment_params)
+      expect(response).to be_successful
     end
   end
 
@@ -610,5 +630,15 @@ describe RubricAssessmentsController do
     student3_asset = @assignment.find_or_create_submission(@student3)
     @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student2, assessor_asset: student2_asset)
     @rubric_association.assessment_requests.create!(user: @student1, asset: student1_asset, assessor: @student3, assessor_asset: student3_asset)
+  end
+
+  def setup_assignmennt_self_assessment
+    course_with_teacher_logged_in(active_all: true)
+    @student1 = User.create!(name: "student 1", workflow_state: "registered")
+    @student2 = User.create!(name: "student 2", workflow_state: "registered")
+    @course.enroll_student(@student1).accept!
+    @course.enroll_student(@student2).accept!
+    @assignment = @course.assignments.create!(title: "Some Assignment", rubric_self_assessment_enabled: true)
+    rubric_assessment_model(user: @user, context: @course, association_object: @assignment, purpose: "grading")
   end
 end

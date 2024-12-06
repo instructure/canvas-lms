@@ -27,8 +27,8 @@ module Lti
 
     before_validation :normalize_configuration
     before_validation :transform_updated_settings
+    before_validation :set_redirect_uris
     before_save :update_privacy_level_from_extensions
-    before_save :set_redirect_uris
 
     after_update :update_external_tools!, if: :configuration_changed?
 

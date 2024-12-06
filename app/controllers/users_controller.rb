@@ -440,6 +440,8 @@ class UsersController < ApplicationController
 
     includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid ui_invoked]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
+    include_deleted_users = value_to_boolean(params[:include_deleted_users])
+    includes << "deleted_pseudonyms" if include_deleted_users
 
     search_term = params[:search_term].presence
     if search_term
@@ -452,7 +454,7 @@ class UsersController < ApplicationController
                                                sort: params[:sort],
                                                enrollment_role_id: params[:role_filter_id],
                                                enrollment_type: params[:enrollment_type],
-                                               include_deleted_users: value_to_boolean(params[:include_deleted_users])
+                                               include_deleted_users:
                                              })
     else
       users = UserSearch.scope_for(@context,
@@ -465,7 +467,7 @@ class UsersController < ApplicationController
                                      ui_invoked: includes.include?("ui_invoked"),
                                      temporary_enrollment_recipients: value_to_boolean(params[:temporary_enrollment_recipients]),
                                      temporary_enrollment_providers: value_to_boolean(params[:temporary_enrollment_providers]),
-                                     include_deleted_users: value_to_boolean(params[:include_deleted_users])
+                                     include_deleted_users:
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
@@ -477,6 +479,7 @@ class UsersController < ApplicationController
     end
 
     GuardRail.activate(:secondary) do
+      users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
       user_json_preloads(users, includes.include?("email"))
@@ -1364,13 +1367,9 @@ class UsersController < ApplicationController
       get_context(user_scope: User) if params[:account_id] || params[:course_id] || params[:group_id]
 
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      @user = api_find_all(@context&.all_users || User, [params[:id]]).first
-      if !@user && @context.is_a?(Account)
-        @user = api_find_all(@context&.deleted_users, [params[:id]]).first
-      end
-      allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
-
-      return render_unauthorized_action unless allowed
+      scope = (value_to_boolean(params[:include_deleted_users]) && @context.is_a?(Account)) ? @context.pseudonym_users : (@context&.all_users || User)
+      @user = api_find_all(scope, [params[:id]]).first
+      return render_unauthorized_action unless @user&.grants_right?(@current_user, session, :read_full_profile)
 
       @context ||= @user
 
@@ -1410,6 +1409,7 @@ class UsersController < ApplicationController
 
           js_permissions = {
             can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis),
+            can_manage_user_details: @user.grants_right?(@current_user, :manage_user_details)
           }
           if @context_account.root_account.feature_enabled?(:temporary_enrollments)
             js_permissions[:can_read_sis] = @context_account.grants_right?(@current_user, session, :read_sis)
@@ -1418,17 +1418,16 @@ class UsersController < ApplicationController
             js_permissions[:can_delete_temporary_enrollments] = @context_account.grants_right?(@current_user, session, :temporary_enrollments_delete)
             js_permissions[:can_view_temporary_enrollments] =
               @context_account.grants_any_right?(@current_user, session, *RoleOverride::MANAGE_TEMPORARY_ENROLLMENT_PERMISSIONS)
-            if @context_account.root_account.feature_enabled?(:granular_permissions_manage_users)
-              js_permissions[:can_allow_course_admin_actions] = @context_account.grants_right?(@current_user, session, :allow_course_admin_actions)
-              js_permissions[:can_add_ta] = @context_account.grants_right?(@current_user, session, :add_ta_to_course)
-              js_permissions[:can_add_student] = @context_account.grants_right?(@current_user, session, :add_student_to_course)
-              js_permissions[:can_add_teacher] = @context_account.grants_right?(@current_user, session, :add_teacher_to_course)
-              js_permissions[:can_add_designer] = @context_account.grants_right?(@current_user, session, :add_designer_to_course)
-              js_permissions[:can_add_observer] = @context_account.grants_right?(@current_user, session, :add_observer_to_course)
-            else
-              js_permissions[:can_manage_admin_users] = @context_account.grants_right?(@current_user, session, :manage_admin_users)
-            end
+            js_permissions[:can_allow_course_admin_actions] = @context_account.grants_right?(@current_user, session, :allow_course_admin_actions)
+            js_permissions[:can_add_ta] = @context_account.grants_right?(@current_user, session, :add_ta_to_course)
+            js_permissions[:can_add_student] = @context_account.grants_right?(@current_user, session, :add_student_to_course)
+            js_permissions[:can_add_teacher] = @context_account.grants_right?(@current_user, session, :add_teacher_to_course)
+            js_permissions[:can_add_designer] = @context_account.grants_right?(@current_user, session, :add_designer_to_course)
+            js_permissions[:can_add_observer] = @context_account.grants_right?(@current_user, session, :add_observer_to_course)
           end
+
+          timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
+          default_timezone_name = @domain_root_account.try(:default_time_zone)&.name || "Mountain Time (US & Canada)"
 
           js_env({
                    CONTEXT_USER_DISPLAY_NAME: @user.short_name,
@@ -1436,12 +1435,14 @@ class UsersController < ApplicationController
                    COURSE_ROLES: Role.course_role_data_for_account(@context_account, @current_user),
                    PERMISSIONS: js_permissions,
                    ROOT_ACCOUNT_ID: @context_account.root_account.id,
+                   TIMEZONES: timezones,
+                   DEFAULT_TIMEZONE_NAME: default_timezone_name
                  })
           render status:
         end
         format.json do
           includes = %w[locale avatar_url]
-          includes << "deleted_pseudonyms" if @context.is_a?(Account)
+          includes << "deleted_pseudonyms" if value_to_boolean(params[:include_deleted_users])
           render json: user_json(@user,
                                  @current_user,
                                  session,
@@ -2757,12 +2758,7 @@ class UsersController < ApplicationController
 
     # returns the original list in :invited_users (with ids) if successfully added, or in :errored_users if not
     get_context
-    manage_perm = if @context.root_account.feature_enabled? :granular_permissions_manage_users
-                    :allow_course_admin_actions
-                  else
-                    :manage_admin_users
-                  end
-    return unless authorized_action(@context, @current_user, [:manage_students, manage_perm])
+    return unless authorized_action(@context, @current_user, %i[manage_students allow_course_admin_actions])
 
     root_account = context.root_account
     unless root_account.open_registration? || root_account.grants_right?(@current_user, session, :manage_user_logins)

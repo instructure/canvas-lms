@@ -27,10 +27,7 @@ import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 import create from 'zustand'
-import type {
-  LtiConfigurationOverlay,
-  LtiPlacementOverlay,
-} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
+import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 
 type PlacementLabelOverride = string
 type IconUrlOverride = string
@@ -154,7 +151,7 @@ const updateMessageType = (placement: LtiPlacement, messageType: LtiMessageType)
           ...state.override_uris.placements,
           [placement]: {
             ...state.override_uris.placements[placement],
-            messageType,
+            message_type: messageType,
           },
         },
       },
@@ -180,9 +177,11 @@ export const convertToLtiConfigurationOverlay = (
     ? Object.fromEntries(
         state.launchSettings.customFields
           .split('\n')
+          .map(f => f.trim())
           .filter(f => !!f)
           .map(customField => {
-            const [key, value] = customField.split('=')
+            const key = customField.substring(0, customField.indexOf('='))
+            const value = customField.substring(customField.indexOf('=') + 1)
             return [key, value]
           })
       )
@@ -199,38 +198,39 @@ export const convertToLtiConfigurationOverlay = (
   const placements = state.placements.placements?.reduce((acc, placement) => {
     return {
       ...acc,
-      [placement]: {
-        text: state.naming.placements[placement],
-        target_link_uri: state.override_uris.placements[placement]?.uri,
-        message_type: state.override_uris.placements[placement]?.message_type,
-        // We don't currently let user's modify this setting in the UI
-        launch_height: undefined,
-        launch_wdith: undefined,
-        icon_url: state.icons.placements[placement as LtiPlacementWithIcon],
-        default:
-          placement === 'course_navigation' && state.placements.courseNavigationDefaultDisabled
-            ? 'disabled'
-            : 'enabled',
-      },
+      [placement]: Object.fromEntries(
+        Object.entries({
+          text: state.naming.placements[placement],
+          target_link_uri: state.override_uris.placements[placement]?.uri,
+          message_type: state.override_uris.placements[placement]?.message_type,
+          icon_url: state.icons.placements[placement as LtiPlacementWithIcon],
+          default:
+            placement === 'course_navigation' && state.placements.courseNavigationDefaultDisabled
+              ? 'disabled'
+              : undefined,
+        }).filter(([_, v]) => v !== undefined)
+      ),
     }
   }, {})
 
-  return {
-    title: state.naming.nickname,
-    description: state.naming.description,
-    custom_fields,
-    target_link_uri: state.launchSettings.targetLinkURI,
-    oidc_initiation_url: state.launchSettings.openIDConnectInitiationURL,
-    redirect_uris: state.launchSettings.redirectURIs?.split('\n'),
-    public_jwk: state.launchSettings.Jwk ? JSON.parse(state.launchSettings.Jwk) : undefined,
-    public_jwk_url: state.launchSettings.JwkURL,
-    disabled_scopes,
-    domain: state.launchSettings.domain,
-    privacy_level: state.data_sharing.privacy_level,
-    disabled_placements,
-    placements,
-    scopes: state.permissions.scopes,
-  }
+  return Object.fromEntries<LtiConfigurationOverlay>(
+    Object.entries({
+      title: state.naming.nickname,
+      description: state.naming.description,
+      custom_fields,
+      target_link_uri: state.launchSettings.targetLinkURI,
+      oidc_initiation_url: state.launchSettings.openIDConnectInitiationURL,
+      redirect_uris: state.launchSettings.redirectURIs?.split('\n'),
+      public_jwk: state.launchSettings.Jwk ? JSON.parse(state.launchSettings.Jwk) : undefined,
+      public_jwk_url: state.launchSettings.JwkURL,
+      disabled_scopes,
+      domain: state.launchSettings.domain,
+      privacy_level: state.data_sharing.privacy_level,
+      disabled_placements,
+      placements,
+      scopes: state.permissions.scopes,
+    } as const).filter(([_, v]) => v !== undefined)
+  )
 }
 
 export const createLti1p3RegistrationOverlayStore = (internalConfig: InternalLtiConfiguration) =>

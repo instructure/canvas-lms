@@ -31,13 +31,17 @@ module Lti
         Lti::Pns::NoticeTypes::HELLO_WORLD
       end
 
-      def custom_claims(_tool)
+      def custom_instructure_claims(_tool)
         {
-          "#{Lti::Messages::JwtMessage::EXTENSION_PREFIX}hello_world": {
+          hello_world: {
             title: "Hello World!",
             message: "Congratulations! You have successfully subscribed to LtiHelloWorldNotice in Canvas.",
-          }.merge(params)
-        }
+          }
+        }.merge(params)
+      end
+
+      def custom_ims_claims(_tool)
+        {}
       end
 
       # Only for LtiHelloWorldNotice and test purposes, otherwise fill in with real timestamp
@@ -45,6 +49,11 @@ module Lti
       # that prompted the notice (rather than, for example, the time when this notice's JWT was formed).
       def notice_event_timestamp
         Time.now.utc.iso8601
+      end
+
+      def user
+        # sub claim filled based on user's lti_context_id, but it is optional in pns messages
+        nil
       end
     end
   end

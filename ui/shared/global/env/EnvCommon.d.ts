@@ -202,6 +202,8 @@ export interface EnvCommon {
   K5_SUBJECT_COURSE: string
   LOCALE_TRANSLATION_FILE: string
   DEFAULT_DUE_TIME?: string
+  TIMEZONES: Array<{name: string; name_with_hour_offset: string}>
+  DEFAULT_TIMEZONE_NAME: string
 
   FEATURES: Partial<
     Record<
@@ -266,7 +268,6 @@ export type RootAccountFeatureId =
   | 'buttons_and_icons_root_account'
   | 'create_course_subaccount_picker'
   | 'extended_submission_state'
-  | 'granular_permissions_manage_users'
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'

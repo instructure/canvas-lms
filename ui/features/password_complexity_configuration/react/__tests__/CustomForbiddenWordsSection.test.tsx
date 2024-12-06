@@ -29,12 +29,14 @@ const mockedExecuteApiRequest = executeApiRequest as jest.MockedFunction<typeof 
 describe('CustomForbiddenWordsSection Component', () => {
   beforeAll(() => {
     if (!window.ENV) {
+      // @ts-expect-error
       window.ENV = {}
     }
     window.ENV.DOMAIN_ROOT_ACCOUNT_ID = '1'
   })
 
   afterAll(() => {
+    // @ts-expect-error
     delete window.ENV.DOMAIN_ROOT_ACCOUNT_ID
   })
 
@@ -68,6 +70,7 @@ describe('CustomForbiddenWordsSection Component', () => {
 
     it('shows “Upload” button but not “Current Custom List”', async () => {
       render(
+        // @ts-expect-error
         <CustomForbiddenWordsSection
           setNewlyUploadedAttachmentId={() => {}}
           onCustomForbiddenWordsEnabledChange={() => {}}

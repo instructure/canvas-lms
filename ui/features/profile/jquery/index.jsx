@@ -1,4 +1,4 @@
-/* eslint-disable eqeqeq, no-alert */
+/* eslint-disable eqeqeq */
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *

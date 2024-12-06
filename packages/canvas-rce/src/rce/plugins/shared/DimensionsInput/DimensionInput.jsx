@@ -22,7 +22,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
 
 export default function DimensionInput(props) {
-  const {dimensionState, label} = props
+  const {dimensionState, label, messages} = props
   const {addOffset, inputValue, setInputValue} = dimensionState
 
   function handleChange(_event, value) {
@@ -46,6 +46,7 @@ export default function DimensionInput(props) {
       isRequired={true}
       showArrows={false}
       value={inputValue}
+      messages={messages}
     />
   )
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -21,12 +20,12 @@ import {createSelector, createSelectorCreator, defaultMemoize} from 'reselect'
 import {deepEqual} from '@instructure/ui-utils'
 import moment from 'moment-timezone'
 
-import {Constants as CoursePaceConstants, CoursePaceAction} from '../actions/course_paces'
-import {CoursePaceItemAction} from '../actions/course_pace_items'
+import {Constants as CoursePaceConstants, type CoursePaceAction} from '../actions/course_paces'
+import type {CoursePaceItemAction} from '../actions/course_pace_items'
 import coursePaceItemsReducer from './course_pace_items'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
 import * as PaceDueDatesCalculator from '../utils/date_stuff/pace_due_dates_calculator'
-import {
+import type {
   CoursePacesState,
   CoursePace,
   PaceContextTypes,
@@ -41,17 +40,18 @@ import {
   Module,
   OptionalDate,
 } from '../types'
-import {BlackoutDate, Course} from '../shared/types'
-import {Constants as UIConstants, SetSelectedPaceType} from '../actions/ui'
+import type {BlackoutDate, Course} from '../shared/types'
+import {Constants as UIConstants, type SetSelectedPaceType} from '../actions/ui'
 import {getCourse} from './course'
 import {getEnrollments} from './enrollments'
 import {getSections} from './sections'
 import {getInitialCoursePace, getOriginalBlackoutDates, getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
-import {Change, summarizeChanges} from '../utils/change_tracking'
+import {type Change, summarizeChanges} from '../utils/change_tracking'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
+// @ts-expect-error
 export const initialState: CoursePacesState = ({
   ...getInitialCoursePace(),
   course: window.ENV.COURSE,
@@ -106,6 +106,7 @@ export const getPaceName = (state: StoreState): string => {
     case 'Course':
       return state.course.name
     case 'Section':
+      // @ts-expect-error
       return state.sections[state.coursePace.context_id].name
     case 'Enrollment':
       return Object.values(state.enrollments).find(
@@ -228,6 +229,7 @@ export const getUnappliedChangesExist = createDeepEqualSelector(
 
 export const getCoursePaceItemPosition = createDeepEqualSelector(
   getCoursePaceItems,
+  // @ts-expect-error
   (_, props): CoursePaceItem => props.coursePaceItem,
   (coursePaceItems: CoursePaceItem[], coursePaceItem: CoursePaceItem): number => {
     let position = 0
@@ -295,8 +297,10 @@ export const getUncompressedDueDates = createDeepEqualSelector(
 
 export const getDueDate = createSelector(
   getDueDates,
+  // @ts-expect-error
   (_, props): CoursePaceItem => props.coursePaceItem,
   (dueDates: CoursePaceItemDueDates, coursePaceItem: CoursePaceItem): string => {
+    // @ts-expect-error
     return dueDates[coursePaceItem.module_item_id]
   }
 )
@@ -313,6 +317,7 @@ export const getProjectedEndDate = createDeepEqualSelector(
     if (!startDate || !Object.keys(dueDates) || !items.length) return startDate
 
     // Get the due date associated with the last module item
+    // @ts-expect-error
     const lastDueDate = dueDates[items[items.length - 1].module_item_id]
     return lastDueDate && DateHelpers.formatDate(lastDueDate)
   }
@@ -323,6 +328,7 @@ export const getPlannedEndDate = createDeepEqualSelector(
   getCoursePaceItems,
   getDueDates,
   (items: CoursePaceItem[], dueDates: CoursePaceItemDueDates): OptionalDate => {
+    // @ts-expect-error
     return items.length ? dueDates[items[items.length - 1].module_item_id] : undefined
   }
 )
@@ -397,8 +403,10 @@ export const getActivePaceContext = createSelector(
   ): Course | Section | Enrollment => {
     switch (activeCoursePace.context_type) {
       case 'Section':
+        // @ts-expect-error
         return sections[activeCoursePace.context_id]
       case 'Enrollment':
+        // @ts-expect-error
         return enrollments[activeCoursePace.context_id]
       default:
         return course
@@ -421,6 +429,7 @@ export const getCompression = createSelector(
 
 // sort module items by position or date
 // (blackout date type items don't have a position)
+// @ts-expect-error
 function compareModuleItemOrder(a, b) {
   if ('position' in a && 'position' in b) {
     return a.position - b.position
@@ -448,8 +457,10 @@ export const mergeAssignmentsAndBlackoutDates = (
   const dueDateKeys = Object.keys(dueDates)
   let veryLastDueDate = moment('3000-01-01T00:00:00Z')
   if (dueDateKeys.length) {
+    // @ts-expect-error
     let lastDueDate = moment(dueDates[dueDateKeys[0]])
     dueDateKeys.forEach(key => {
+      // @ts-expect-error
       if (moment(dueDates[key]).isAfter(lastDueDate)) lastDueDate = moment(dueDates[key])
     })
     veryLastDueDate = lastDueDate
@@ -477,6 +488,7 @@ export const mergeAssignmentsAndBlackoutDates = (
       const assignmentDueDates: CoursePaceItemDueDates = dueDates
 
       const assignmentsWithDueDate = module.items.map(item => {
+        // @ts-expect-error
         const item_due = assignmentDueDates[item.module_item_id]
         const due_at = item_due ? moment(item_due).endOf('day') : undefined
         return {...item, date: due_at, type: 'assignment'}
@@ -544,9 +556,11 @@ export default (
       return {...state, ...action.payload}
     case CoursePaceConstants.SET_START_DATE:
       return {...state, start_date: DateHelpers.formatDate(action.payload)}
+    // @ts-expect-error
     case CoursePaceConstants.SET_END_DATE:
       return {
         ...state,
+        // @ts-expect-error
         end_date: action.payload ? DateHelpers.formatDate(action.payload) : undefined,
       }
     case CoursePaceConstants.PACE_CREATED:
@@ -582,6 +596,7 @@ export default (
     default:
       return {
         ...state,
+        // @ts-expect-error
         modules: coursePaceItemsReducer(state.modules, action as CoursePaceItemAction),
       }
   }

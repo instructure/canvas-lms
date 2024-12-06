@@ -454,6 +454,7 @@ class Notification < Switchman::UnshardedRecord
     t "names.upcoming_assignment_alert", "Upcoming Assignment Alert"
   end
 
+  # Category names should be producible by .titleize, eg due_date => Due Date
   # TODO: i18n ... show these anywhere we show the category today
   def category_names
     t "categories.all_submissions", "All Submissions"

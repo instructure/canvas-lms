@@ -71,6 +71,7 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
     target.parentNode.insertBefore(wrapper, target)
 
     await new Promise(resolve => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <>
           {[

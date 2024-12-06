@@ -490,7 +490,7 @@ pipeline {
                           done
 
                           docker exec -t general-build-container bash -c 'cat log/crystalball.log'
-                          docker cp \$(docker ps -qa -f name=general-build-container):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
+                          docker cp $(docker ps -qa -f name=general-build-container):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
 
@@ -568,8 +568,18 @@ pipeline {
 
                     extendedStage('Augment Manifest').waitsFor(BUILD_DOCKER_IMAGE_STAGE, 'Builder').execute {
                       sh """#!/bin/bash -ex
-                      docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
-                      docker manifest push $PATCHSET_TAG
+                      # Check if the tag is already a manifest list
+                      if docker manifest inspect $PATCHSET_TAG 2>/dev/null | grep -q "manifests"; then
+                        echo "Warning: $PATCHSET_TAG is already a manifest list. Skipping manifest creation."
+                        # Show current manifest for debugging
+                        echo "Current manifest:"
+                        docker manifest inspect $PATCHSET_TAG
+                        exit 0
+                      else
+                        echo "Creating manifest list for $PATCHSET_TAG..."
+                        docker manifest create --amend $PATCHSET_TAG $PATCHSET_TAG $PATCHSET_TAG-arm64
+                        docker manifest push $PATCHSET_TAG
+                      fi
                       """
                     }
                   }
@@ -611,7 +621,10 @@ pipeline {
                       def nestedStages = [:]
 
                       callableWithDelegate(lintersStage.bundleStage(nestedStages, buildConfig))()
-                      callableWithDelegate(lintersStage.codeStage(nestedStages))()
+                      callableWithDelegate(lintersStage.gergichLintersStage(nestedStages))()
+                      callableWithDelegate(lintersStage.miscJsChecksStage(nestedStages))()
+                      callableWithDelegate(lintersStage.eslintStage(nestedStages))()
+                      callableWithDelegate(lintersStage.typescriptStage(nestedStages))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 

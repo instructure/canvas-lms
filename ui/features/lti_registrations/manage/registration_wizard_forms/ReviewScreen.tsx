@@ -252,7 +252,7 @@ export const ReviewScreen = ({
   )
 }
 
-const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
+export const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
   return (
     <Flex margin="medium 0 medium 0" alignItems="start" justifyItems="space-between">
       {children}
@@ -260,7 +260,7 @@ const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
   )
 }
 
-const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
+export const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
   return (
     <h5
       style={{
@@ -274,9 +274,9 @@ const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
   )
 }
 
-type LaunchSettingsSectionProps = LaunchSettings & {onEditLaunchSettings: () => void}
+export type LaunchSettingsSectionProps = LaunchSettings & {onEditLaunchSettings: () => void}
 
-const LaunchSettingsSection = React.memo(
+export const LaunchSettingsSection = React.memo(
   ({
     jwkMethod,
     onEditLaunchSettings,

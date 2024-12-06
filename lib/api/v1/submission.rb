@@ -251,6 +251,11 @@ module Api::V1::Submission
       json_fields << "anonymous_id"
     end
 
+    if attempt.checkpoints_needs_grading? && attempt.root_account&.feature_enabled?(:discussion_checkpoints)
+      attempt.workflow_state = "pending_review"
+      attempt.submission_type = "discussion_topic"
+    end
+
     attempt.assignment = assignment
     hash = api_json(attempt, user, session, only: json_fields, methods: json_methods)
     hash["body"] = api_user_content(hash["body"], context, user) if hash["body"].present?

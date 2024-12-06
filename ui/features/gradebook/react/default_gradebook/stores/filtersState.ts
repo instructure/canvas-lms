@@ -332,27 +332,30 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   fetchFilters: async () => {
     set({isFiltersLoading: true})
     const path = `/api/v1/courses/${get().courseId}/gradebook_filters`
-    return doFetchApi({path})
-      .then((response: {json: GradebookFilterApiResponse[]}) => {
-        set({
-          filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
-          isFiltersLoading: false,
+    return (
+      doFetchApi({path})
+        // @ts-expect-error
+        .then((response: {json: GradebookFilterApiResponse[]}) => {
+          set({
+            filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
+            isFiltersLoading: false,
+          })
+          get().initializeStagedFilters()
         })
-        get().initializeStagedFilters()
-      })
-      .catch(() => {
-        set({
-          filterPresets: [],
-          isFiltersLoading: false,
-          flashMessages: get().flashMessages.concat([
-            {
-              key: `filter-presets-loading-error-${Date.now()}`,
-              message: I18n.t('There was an error fetching gradebook filters.'),
-              variant: 'error',
-            },
-          ]),
+        .catch(() => {
+          set({
+            filterPresets: [],
+            isFiltersLoading: false,
+            flashMessages: get().flashMessages.concat([
+              {
+                key: `filter-presets-loading-error-${Date.now()}`,
+                message: I18n.t('There was an error fetching gradebook filters.'),
+                variant: 'error',
+              },
+            ]),
+          })
         })
-      })
+    )
   },
 
   validateFilterPreset: (
@@ -429,28 +432,31 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       stagedFilters: [],
     })
 
-    return GradebookApi.createGradebookFilterPreset(get().courseId, stagedFilter)
-      .then((response: {json: GradebookFilterApiResponse}) => {
-        const newFilter = deserializeFilter(response.json)
-        set({
-          filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate),
+    return (
+      GradebookApi.createGradebookFilterPreset(get().courseId, stagedFilter)
+        // @ts-expect-error
+        .then((response: {json: GradebookFilterApiResponse}) => {
+          const newFilter = deserializeFilter(response.json)
+          set({
+            filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate),
+          })
+          return true
         })
-        return true
-      })
-      .catch(() => {
-        set({
-          stagedFilterPresetName: filterPreset.name,
-          stagedFilters: filterPreset.filters,
-          flashMessages: get().flashMessages.concat([
-            {
-              key: `filter-presets-create-error-${Date.now()}`,
-              message: I18n.t('There was an error creating a new filter.'),
-              variant: 'error',
-            },
-          ]),
+        .catch(() => {
+          set({
+            stagedFilterPresetName: filterPreset.name,
+            stagedFilters: filterPreset.filters,
+            flashMessages: get().flashMessages.concat([
+              {
+                key: `filter-presets-create-error-${Date.now()}`,
+                message: I18n.t('There was an error creating a new filter.'),
+                variant: 'error',
+              },
+            ]),
+          })
+          return false
         })
-        return false
-      })
+    )
   },
 
   updateFilterPreset: async (filterPreset: FilterPreset) => {
@@ -473,6 +479,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
 
     try {
       const response = await GradebookApi.updateGradebookFilterPreset(get().courseId, filterPreset)
+      // @ts-expect-error
       const updatedFilter = deserializeFilter(response.json)
       set({
         filterPresets: get()
@@ -508,6 +515,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
   },
 
+  // @ts-expect-error
   deleteFilterPreset: (filterPreset: FilterPreset) => {
     const appliedFilters = get().appliedFilters
     const isFilterApplied = doFiltersMatch(filterPreset.filters, get().appliedFilters)

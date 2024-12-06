@@ -26,6 +26,7 @@ import ready from '@instructure/ready'
 ready(() => {
   const container = document.getElementById('modules_homepage_user_create')
   if (container) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ModulesHomePage onCreateButtonClick={modules.addModule} />, container)
   }
 

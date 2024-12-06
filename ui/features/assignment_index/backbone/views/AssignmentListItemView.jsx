@@ -46,7 +46,7 @@ import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import CreateAssignmentView from './CreateAssignmentView'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {captureException} from '@sentry/browser'
-import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter.jsx'
+import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
 import {createRoot} from 'react-dom/client'
 
 const I18n = useI18nScope('AssignmentListItemView')
@@ -325,9 +325,10 @@ export default AssignmentListItemView = (function () {
       if (checkpoints && checkpoints.length && !this.canManage()) {
         try {
           const checkpointsElem =
-          this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
+            this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
           const mountPoint = checkpointsElem[0]
 
+          // eslint-disable-next-line no-restricted-properties
           ReactDOM.render(
             React.createElement(ListViewCheckpoints, {
               assignment: attributes,
@@ -340,11 +341,14 @@ export default AssignmentListItemView = (function () {
           console.error(errorMessage, error)
           captureException(new Error(errorMessage), error)
         }
-      } else if(checkpoints && checkpoints.length && this.canManage()) {
-        const checkpointsElem = this.$el.find(`#assignment_teacher_checkpoint_info_${this.model.id}`)
+      } else if (checkpoints && checkpoints.length && this.canManage()) {
+        const checkpointsElem = this.$el.find(
+          `#assignment_teacher_checkpoint_info_${this.model.id}`
+        )
         const mountPoint = checkpointsElem[0]
         if (mountPoint) {
           try {
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render(
               React.createElement(TeacherCheckpointsInfo, {
                 assignment: this.model.attributes,
@@ -364,6 +368,7 @@ export default AssignmentListItemView = (function () {
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []
         const mountPoint = peerReviewElem[0]
         if (mountPoint) {
+          // eslint-disable-next-line no-restricted-properties
           ReactDOM.render(
             React.createElement(StudentViewPeerReviews, {
               assignment: attributes,
@@ -474,10 +479,10 @@ export default AssignmentListItemView = (function () {
             tool.base_url +
             `&discussion_topics[]=${__guard__(this.model.get('discussion_topic'), x => x.id)}`)
         })
-        data.item_assignment_type = "discussion_topic"
+        data.item_assignment_type = 'discussion_topic'
       } else {
         const isNewQuizzes = this.model.isQuizLTIAssignment()
-        const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
+        const isShareToCommons = tool => tool.canvas_icon_class === 'icon-commons'
         const tools = ENV.assignment_menu_tools || []
 
         if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {
@@ -604,12 +609,7 @@ export default AssignmentListItemView = (function () {
         // Rerender the list item
         this.render()
       }
-      root.render(
-        <CreateAssignmentViewAdapter
-          assignment={this.model}
-          closeHandler={onClose}
-        />
-      )
+      root.render(<CreateAssignmentViewAdapter assignment={this.model} closeHandler={onClose} />)
     }
 
     renderItemAssignToTray(open, returnFocusTo, itemProps) {
@@ -618,6 +618,7 @@ export default AssignmentListItemView = (function () {
         ReactDOM.unmountComponentAtNode(mountPoint)
         mountPoint.innerHTML = ''
       }
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <ItemAssignToManager
           open={open}
@@ -684,6 +685,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           React.createElement(DirectShareUserModal, {
             open,
@@ -712,6 +714,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           React.createElement(DirectShareCourseTray, {
             open,

@@ -30,7 +30,6 @@ import type {BlackoutDate} from '../../shared/types'
 import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
 
 // until the icon gets into INSTUI
-// @ts-ignore
 import blackoutDatesIcon from '../../utils/blackout-dates-lined.svg'
 
 const I18n = useI18nScope('course_paces_blackout_date_row')

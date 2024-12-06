@@ -1717,15 +1717,7 @@ module Lti
             )
           end
 
-          context "when the resource_link_uuid_in_custom_substitution feature flag is on" do
-            before :once do
-              Account.site_admin.enable_feature!(:resource_link_uuid_in_custom_substitution)
-            end
-
-            it_expands("$ResourceLink.id") { resource_link_uuid }
-          end
-
-          it_expands "$ResourceLink.id", "abc"
+          it_expands("$ResourceLink.id") { resource_link_uuid }
           it_expands "$ResourceLink.description", "This is a super fun activity"
           it_expands "$ResourceLink.title", "Activity XYZ"
           it_expands("$ResourceLink.available.startDateTime") { right_now.iso8601(3) }
@@ -1857,6 +1849,23 @@ module Lti
           it "rounds if whole" do
             allow(assignment).to receive(:points_possible).and_return(9.0)
             expect(expand!("$Canvas.assignment.pointsPossible").to_s).to eq "9"
+          end
+        end
+
+        describe "$LineItem.resultValue.max" do
+          it "has substitution for $LineItem.resultValue.max" do
+            allow(assignment).to receive(:points_possible).and_return(10.0)
+            expect(expand!("$LineItem.resultValue.max")).to eq 10
+          end
+
+          it "does not round if not whole" do
+            allow(assignment).to receive(:points_possible).and_return(9.5)
+            expect(expand!("$LineItem.resultValue.max").to_s).to eq "9.5"
+          end
+
+          it "rounds if whole" do
+            allow(assignment).to receive(:points_possible).and_return(9.0)
+            expect(expand!("$LineItem.resultValue.max").to_s).to eq "9"
           end
         end
 

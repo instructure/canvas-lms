@@ -24,8 +24,8 @@ import {IconCloudDownloadLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
-import {FormFieldGroup} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 
 import update from 'immutability-helper'
 import {get, isEmpty} from 'lodash'
@@ -135,7 +135,7 @@ export default class CreateDSRModal extends React.Component {
         if (this.props.afterSave) this.props.afterSave(response)
       },
       () => {
-        $.flashError('Something went wrong creating the DSR request.')
+        $.flashError(I18n.t('Something went wrong creating the DSR request.'))
         this.setState({
           errors: {
             request_name: ['Invalid request name'],
@@ -143,6 +143,22 @@ export default class CreateDSRModal extends React.Component {
         })
       }
     )
+  }
+
+  renderPreviousReportStatus = () => {
+    switch (this.state.latestRequest.progress_status) {
+      case 'completed':
+        return (
+          <a href={this.state.latestRequest.download_url} target="_blank" rel="noopener noreferrer">
+            {this.state.latestRequest.request_name}{' '}
+            <IconCloudDownloadLine title={I18n.t('Download')} />
+          </a>
+        )
+      case 'failed':
+        return <Text>{I18n.t('Failed')}</Text>
+      default:
+        return <Text>{I18n.t('In progress')}</Text>
+    }
   }
 
   render = () => (
@@ -156,29 +172,31 @@ export default class CreateDSRModal extends React.Component {
         label={I18n.t('Create DSR Request')}
       >
         <Modal.Body>
-          <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-            <TextInput
-              key="request_name"
-              renderLabel={
-                <>
-                  {I18n.t('DSR Request Name')} <Text color="danger"> *</Text>
-                </>
-              }
-              label={I18n.t('DSR Request Name')}
-              data-testid={I18n.t('DSR Request Name')}
-              value={get(this.state.data, 'request_name')?.toString() ?? ''}
-              onChange={e => this.onChange('request_name', e.target.value)}
-              isRequired={true}
-              layout="inline"
-              messages={(this.state.errors.request_name || [])
-                .map(errMsg => ({type: 'error', text: errMsg}))
-                .concat({
-                  type: 'hint',
-                  text: I18n.t('This is a a common tracking ID for DSR requests.'),
-                })
-                .filter(Boolean)}
-            />
-            <View as="div" padding="0 0 0 medium">
+          <Flex direction="column">
+            <Flex.Item padding="small medium">
+              <TextInput
+                key="request_name"
+                renderLabel={
+                  <div style={{textAlign: 'left'}}>
+                    {I18n.t('DSR Request Name')} <Text color="danger"> *</Text>
+                  </div>
+                }
+                label={I18n.t('DSR Request Name')}
+                data-testid={I18n.t('DSR Request Name')}
+                value={get(this.state.data, 'request_name')?.toString() ?? ''}
+                onChange={e => this.onChange('request_name', e.target.value)}
+                isRequired={true}
+                layout="inline"
+                messages={(this.state.errors.request_name || [])
+                  .map(errMsg => ({type: 'error', text: errMsg}))
+                  .concat({
+                    type: 'hint',
+                    text: I18n.t('This is a a common tracking ID for DSR requests.'),
+                  })
+                  .filter(Boolean)}
+              />
+            </Flex.Item>
+            <Flex.Item as="div" padding="0 medium">
               <RadioInputGroup
                 name="request_output"
                 description="Output Format"
@@ -190,24 +208,13 @@ export default class CreateDSRModal extends React.Component {
                 {/* Enabled once we agree on a format for PDF */}
                 {/* <RadioInput value="pdf" label="PDF" /> */}
               </RadioInputGroup>
-            </View>
-          </FormFieldGroup>
+            </Flex.Item>
+          </Flex>
           {this.state.latestRequest && (
-            <View as="div" padding="small 0 0">
+            <View as="div" padding="small medium 0 medium">
               <hr />
               <Text weight="bold">{I18n.t('Latest DSR: ')}</Text>
-              {this.state.latestRequest.progress_status === 'completed' ? (
-                <a
-                  href={this.state.latestRequest.download_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {this.state.latestRequest.request_name}{' '}
-                  <IconCloudDownloadLine title={I18n.t('Download')} />
-                </a>
-              ) : (
-                <Text>{I18n.t('In progress')}</Text>
-              )}
+              {this.renderPreviousReportStatus()}
             </View>
           )}
         </Modal.Body>

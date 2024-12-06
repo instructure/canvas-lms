@@ -18,7 +18,7 @@
 
 import React from 'react'
 import FindOutcomesView from '../FindOutcomesView'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, fireEvent} from '@testing-library/react'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'

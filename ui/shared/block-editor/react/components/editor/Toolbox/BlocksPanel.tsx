@@ -189,6 +189,7 @@ const BlocksPanel = ({
         role="button"
         onClick={handleAddBlockTemplate.bind(null, template.id)}
         onKeyDown={handleAddBlockTemplateKey.bind(null, template.id)}
+        data-testid="blocks-panel-view-item-template-block"
       >
         <Flex
           direction="column"

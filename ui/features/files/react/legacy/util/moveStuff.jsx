@@ -33,6 +33,7 @@ function moveItem(item, destinationFolder, options = {}) {
     (jqXHR, _textStatus, _errorThrown) => {
       if (jqXHR.status === 409) {
         // file already exists: prompt and retry
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           React.createFactory(FileRenameForm)({
             onClose() {},

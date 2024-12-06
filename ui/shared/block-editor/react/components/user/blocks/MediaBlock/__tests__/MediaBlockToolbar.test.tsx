@@ -109,7 +109,9 @@ describe('MediaBlockToolbar', () => {
   })
 
   it.skip('changes the image size prop', async () => {
+    // @ts-expect-error
     props.width = 117
+    // @ts-expect-error
     props.height = 217
     render(<MediaBlockToolbar />)
 

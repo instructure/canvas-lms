@@ -72,6 +72,7 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
   }
 
   function renderTray() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <AssessmentAuditTray
         api={api}

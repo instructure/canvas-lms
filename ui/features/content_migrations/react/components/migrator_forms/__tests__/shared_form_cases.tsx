@@ -172,11 +172,11 @@ export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
     expect(screen.getByText('Uploading File')).toBeInTheDocument()
   })
 
-  it('disable Add and Cancel buttons while uploading', async () => {
+  it('disable Add and Clear buttons while uploading', async () => {
     renderComponent({isSubmitting: true})
     await waitFor(() => {
       expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
-      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
     })
   })
@@ -190,6 +190,38 @@ export const sharedFormTests = (InputComponent: React.ComponentType<any>) => {
         await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
         expect(screen.getByText(expectedFileMissingError)).toBeInTheDocument()
       })
+    })
+  })
+}
+
+export const sharedDateParsingTests = (InputComponent: React.ComponentType<any>) => {
+  const onSubmit = jest.fn()
+  const onCancel = jest.fn()
+
+  const renderComponent = (overrideProps?: any) =>
+    render(<InputComponent onSubmit={onSubmit} onCancel={onCancel} {...overrideProps} />)
+
+  const expectDateField = (label: string, value: string) => {
+    expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+  }
+
+  describe('target course adjust date field prefills', () => {
+    it('parse the date from ENV.OLD_END_DATE', async () => {
+      window.ENV.OLD_END_DATE = '15 Oct 2024 at 0:00'
+      const {getByRole} = renderComponent()
+
+      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+      expectDateField('Select new end date', 'Oct 15 at 8pm')
+    })
+
+    it('parse the date from ENV.OLD_START_DATE', async () => {
+      window.ENV.OLD_START_DATE = '15 Oct 2024 at 0:00'
+      const {getByRole} = renderComponent()
+
+      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+      expectDateField('Select new beginning date', 'Oct 15 at 8pm')
     })
   })
 }

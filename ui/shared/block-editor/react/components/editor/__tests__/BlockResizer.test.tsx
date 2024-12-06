@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {useNode} from '@craftjs/core'
 import {render} from '@testing-library/react'
+// @ts-expect-error
 import {BlockResizer, type Sz} from '../BlockResizer'
 
 const user = userEvent.setup()
@@ -29,7 +30,6 @@ let props: Sz = {width: 100, height: 125}
 let maintainAspectRatio = false
 
 const nodeDomNode = document.createElement('div')
-// @ts-expect-error
 nodeDomNode.getBoundingClientRect = jest.fn(() => {
   return {top: 0, left: 0, ...props}
 })
@@ -74,6 +74,8 @@ describe('BlockResizer', () => {
 
   it('renders', () => {
     const mountNode = document.getElementById('mountNode') as HTMLElement
+    // @ts-expect-error
+
     render(<BlockResizer mountPoint={mountNode} />)
     expect(document.querySelector('.block-resizer .moveable-nw')).toBeInTheDocument()
     expect(document.querySelector('.block-resizer .moveable-ne')).toBeInTheDocument()
@@ -94,6 +96,8 @@ describe('BlockResizer', () => {
 
   it('resizes using keyboard events', async () => {
     const mountNode = document.getElementById('mountNode') as HTMLElement
+    // @ts-expect-error
+
     render(<BlockResizer mountPoint={mountNode} />)
 
     await user.keyboard('{Shift>}{Alt>}{ArrowRight}')
@@ -104,6 +108,7 @@ describe('BlockResizer', () => {
   it('respects the aspect ratio', async () => {
     maintainAspectRatio = true
     const mountNode = document.getElementById('mountNode') as HTMLElement
+    // @ts-expect-error
     render(<BlockResizer mountPoint={mountNode} />)
 
     await user.keyboard('{Shift>}{Alt>}{ArrowRight}')

@@ -170,11 +170,8 @@ export default function UsersToolbar(props) {
 }
 
 function renderKabobMenu(accountId) {
-  const newCourseAdminGranulars = ENV.FEATURES.granular_permissions_manage_users
   // see accounts_controller#avatars for the showAvatarItem logic
-  const showAvatarItem = newCourseAdminGranulars
-    ? ENV.PERMISSIONS.can_allow_course_admin_actions
-    : ENV.PERMISSIONS.can_manage_admin_users
+  const showAvatarItem = ENV.PERMISSIONS.can_allow_course_admin_actions
   const showGroupsItem = ENV.PERMISSIONS.can_manage_groups // see groups_controller#context_index
   if (showAvatarItem || showGroupsItem) {
     return (

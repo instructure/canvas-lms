@@ -97,7 +97,10 @@ describe('SisValidationHelper', () => {
     const helper = new SisValidationHelper({
       model: new AssignmentStub(),
       postToSIS: true,
-      allDates: [{dueAt: 'Something'}, {dueAt: null}],
+      allDates: [
+        {dueAt: 'Something', dueFor: 'Someone'},
+        {dueAt: null, dueFor: 'Someone else'},
+      ],
       dueDateRequired: true,
     })
     expect(helper.dueDateMissing()).toBe(true)
@@ -153,5 +156,31 @@ describe('SisValidationHelper', () => {
       dueDateRequired: true,
     })
     expect(helper.dueDateMissing()).toBe(true)
+  })
+
+  test('dueDateMissing returns false if dueAt is valid with a course override AND postToSIS is true', () => {
+    const helper = new SisValidationHelper({
+      model: new AssignmentStub(),
+      postToSIS: true,
+      allDates: [
+        {dueAt: 'Something2', setType: 'Course'},
+        {dueAt: null, dueFor: 'Everyone else'},
+      ],
+      dueDateRequired: true,
+    })
+    expect(helper.dueDateMissing()).toBe(false)
+  })
+
+  test('dueDateMissing returns false if dueAt is null for section with duplicate overrides AND postToSIS is true', () => {
+    const helper = new SisValidationHelper({
+      model: new AssignmentStub(),
+      postToSIS: true,
+      allDates: [
+        {dueAt: 'Something', dueFor: 'Section1'},
+        {dueAt: null, dueFor: 'Section1'},
+      ],
+      dueDateRequired: true,
+    })
+    expect(helper.dueDateMissing()).toBe(false)
   })
 })

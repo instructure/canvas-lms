@@ -121,7 +121,6 @@ class GroupCategoriesController < ApplicationController
   #
   # @returns [GroupCategory]
   def index
-    scoped_categories = @context.group_categories.preload(:root_account, :progresses)
     respond_to do |format|
       format.json do
         if authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS + RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
@@ -136,14 +135,21 @@ class GroupCategoriesController < ApplicationController
             session,
             *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS
           )
-          if !can_view_groups
-            # If can_view_groups permission is not granted, allow only non-collaborative categories
-            scoped_categories = scoped_categories.non_collaborative
-          elsif !can_view_tags
-            # If can_view_tags permission is not granted, allow only collaborative categories
-            scoped_categories = scoped_categories.collaborative
-          end
 
+          scoped_categories = if can_view_groups && can_view_tags
+                                # User can view both collaborative and non-collaborative categories
+                                GroupCategory.where(context: @context).active
+                                             .preload(:root_account, :progresses)
+                              elsif can_view_groups
+                                # User can only view collaborative categories
+                                @context.group_categories.preload(:root_account, :progresses)
+                              elsif can_view_tags
+                                # User can only view non-collaborative categories
+                                @context.differentiation_tag_categories.preload(:root_account, :progresses)
+                              else
+                                # User has no permissions to view any categories
+                                GroupCategory.none
+                              end
           path = send(:"api_v1_#{@context.class.to_s.downcase}_group_categories_url")
           paginated_categories = Api.paginate(scoped_categories, self, path)
 

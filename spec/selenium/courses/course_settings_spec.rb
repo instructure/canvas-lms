@@ -421,6 +421,15 @@ describe "course settings" do
       expect(admin_cog("#nav_edit_tab_id_0")).to be_falsey
     end
 
+    it "does not show Home tab when in a horizon course" do
+      Account.site_admin.enable_feature!(:horizon_course_setting)
+      @course.update!(horizon_course: true)
+      @course.save!
+      get "/courses/#{@course.id}/settings#tab-navigation"
+      # The Home tab always has this ID
+      expect(element_exists?("#nav_edit_tab_id_0")).to be_falsey
+    end
+
     it "changes course details" do
       course_name = "new course name"
       course_code = "new course-101"

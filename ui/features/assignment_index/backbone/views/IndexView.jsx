@@ -123,6 +123,7 @@ IndexView.prototype.afterRender = function () {
     const contextId = parseInt(contextInfo[1], 10)
     const requestBulkEditFn = (!ENV.COURSE_HOME && this.requestBulkEdit) || void 0
     if (this.$settingsMountPoint.length) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         React.createElement(IndexMenu, {
           store: this.indexMenuStore,
@@ -147,6 +148,7 @@ IndexView.prototype.afterRender = function () {
     }
   }
   if (this.$indexCreateMountPoint.length) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       React.createElement(IndexCreate, {
         newAssignmentUrl: ENV.URLS.new_assignment_url,
@@ -157,6 +159,7 @@ IndexView.prototype.afterRender = function () {
     )
   }
   if (this.bulkEditMode && this.$bulkEditRoot.length) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       React.createElement(BulkEditIndex, {
         courseId: ENV.COURSE_ID,
@@ -176,6 +179,7 @@ IndexView.prototype.afterRender = function () {
     )
     window.onkeydown = this.focusOnAssignments
   }
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <TextInput
       onChange={e => {

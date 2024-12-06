@@ -46,7 +46,7 @@ class DeveloperKeysController < ApplicationController
       end
 
       format.json do
-        @keys = Api.paginate(index_scope, self, account_developer_keys_url(@context))
+        @keys = Api.paginate(index_scope, self, api_v1_account_developer_keys_url(@context))
         render json: developer_keys_json(
           @keys,
           @current_user,

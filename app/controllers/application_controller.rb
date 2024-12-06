@@ -46,7 +46,7 @@ class ApplicationController < ActionController::Base
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
 
-  if !Rails.env.production? && Canvas::Plugin.value_to_boolean(ENV["N_PLUS_ONE_DETECTION"])
+  if Rails.env.development? && !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
     around_action :n_plus_one_detection
 
     def n_plus_one_detection
@@ -324,7 +324,9 @@ class ApplicationController < ActionController::Base
         @js_env[:LOCALE_TRANSLATION_FILE] = ::Canvas::Cdn.registry.url_for("javascripts/translations/#{@js_env[:LOCALES].first}.json")
         @js_env[:ACCOUNT_ID] = effective_account_id(@context)
         @js_env[:user_cache_key] = Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_=HUpgraqe;njalkhpvoiulkimmaqewg") if @current_user&.workflow_state
+        @js_env[:horizon_course] = @context.is_a?(Course) && @context.account.feature_enabled?(:horizon_course_setting) && @context.horizon_course?
         @js_env[:top_navigation_tools] = external_tools_display_hashes(:top_navigation) if !!@domain_root_account&.feature_enabled?(:top_navigation_placement)
+        @js_env[:horizon_course] = @context.is_a?(Course) && @context.horizon_course?
         # partner context data
         if @context&.grants_right?(@current_user, session, :read)
           @js_env[:current_context] = {
@@ -376,7 +378,6 @@ class ApplicationController < ActionController::Base
     assignment_edit_placement_not_on_announcements
     instui_header
     rce_find_replace
-    rce_transform_iframe_sandbox_attributes
     courses_popout_sisid
     dashboard_graphql_integration
     discussion_checkpoints
@@ -386,7 +387,6 @@ class ApplicationController < ActionController::Base
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
-    granular_permissions_manage_users
     create_course_subaccount_picker
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal

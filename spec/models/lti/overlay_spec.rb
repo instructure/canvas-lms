@@ -123,8 +123,6 @@ describe Lti::Overlay do
         oidc_initiation_url: "https://example.com/initiate",
         domain: "example.com",
         privacy_level: "email_only",
-        redirect_uris: ["https://example.com/launch"],
-        public_jwk_url: "https://example.com/jwks",
         disabled_scopes: [TokenScopes::LTI_AGS_SCORE_SCOPE],
         disabled_placements: ["course_navigation"],
         placements: {

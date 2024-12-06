@@ -52,6 +52,7 @@ const DownloadSubmissionsModal = ({
   useEffect(() => {
     if (open && !fileSize) {
       ;(() => {
+        // @ts-expect-error
         setErrorFalse()
         setDownloadProgress(1)
         doFetchApi({
@@ -63,6 +64,7 @@ const DownloadSubmissionsModal = ({
             setDownloadProgress(100)
           })
           .catch((_err: Error) => {
+            // @ts-expect-error
             setErrorTrue()
           })
       })()
@@ -129,6 +131,7 @@ const DownloadSubmissionsModal = ({
         <CloseButton
           placement="end"
           offset="small"
+          // @ts-expect-error
           onClick={handleCloseModal}
           screenReaderLabel={I18n.t('Close')}
         />
@@ -156,6 +159,7 @@ const DownloadSubmissionsModal = ({
         {renderProgressText()}
       </Modal.Body>
       <Modal.Footer>
+        {/* @ts-expect-error */}
         <Button onClick={handleCloseModal} margin="0 x-small 0 0">
           {I18n.t('Cancel')}
         </Button>

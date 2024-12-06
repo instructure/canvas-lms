@@ -42,7 +42,7 @@ export const ReviewScreenWrapper = ({
   const defaultPlacementIconUrls = Object.fromEntries(
     internalConfig.placements.map(placement => [placement.placement, placement.icon_url])
   )
-  const name = internalConfig.title
+  const name = state.naming.nickname ?? internalConfig.title
 
   return (
     <ReviewScreen

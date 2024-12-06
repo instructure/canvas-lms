@@ -152,6 +152,7 @@ class AbstractAssignment < ActiveRecord::Base
            inverse_of: :context,
            class_name: "Lti::ResourceLink",
            dependent: :destroy
+  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor", dependent: :destroy, inverse_of: :assignment
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
@@ -374,12 +375,24 @@ class AbstractAssignment < ActiveRecord::Base
       # we have to save result here because we have to set it as a parent_assignment
       result.save!
       sub_assignments.each do |sub_assignment|
-        new_sa = sub_assignment.duplicate({
-                                            duplicate_wiki_page: false,
-                                            duplicate_discussion_topic: false,
-                                          })
-        new_sa.parent_assignment = result
-        new_sa.save!
+        new_sub_assignment = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: result.discussion_topic,
+          checkpoint_label: sub_assignment.sub_assignment_tag,
+          points_possible: sub_assignment.points_possible,
+          dates: if sub_assignment.due_at.nil?
+                   []
+                 else
+                   [{
+                     type: "everyone",
+                     due_at: sub_assignment.due_at,
+                     lock_at: sub_assignment.lock_at,
+                     unlock_at: sub_assignment.unlock_at
+                   }]
+                 end,
+          replies_required: result.discussion_topic.reply_to_entry_required_count || nil
+        )
+        new_sub_assignment.duplicate_of = sub_assignment
+        new_sub_assignment.save!
       end
     end
 
@@ -466,12 +479,45 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def self.clean_up_duplicating_assignments
-    duplicating_for_too_long.in_batches(of: 10_000).update_all(
+    should_report_to_sentry = Account.site_admin.feature_enabled?(:new_quizzes_report_failed_duplicates)
+    batch_size = 10_000
+    update_params = {
       duplication_started_at: nil,
       workflow_state: "failed_to_duplicate",
       updated_at: Time.zone.now
-    )
+    }
+
+    if should_report_to_sentry
+      duplicating_for_too_long.in_batches(of: batch_size) do |batch|
+        begin
+          report_failed_duplicates_to_sentry(batch)
+        rescue => e
+          Rails.logger.error("Failed to report failed duplicates to Sentry: #{e.message}")
+        end
+
+        ActiveRecord::Base.transaction do
+          batch.update_all(update_params)
+        end
+      end
+    else
+      duplicating_for_too_long.in_batches(of: batch_size).update_all(update_params)
+    end
   end
+
+  def self.report_failed_duplicates_to_sentry(batch)
+    assignment_count_by_root_account_id = batch.each_with_object({}) do |record, hash|
+      hash[record.root_account_id] ||= 0
+      hash[record.root_account_id] += 1
+    end
+    Sentry.with_scope do |scope|
+      scope.set_context(
+        "context",
+        assignment_count_by_root_account_id
+      )
+      Sentry.capture_message("Failed to duplicate assignments")
+    end
+  end
+  private_class_method :report_failed_duplicates_to_sentry
 
   def self.clean_up_cloning_alignments
     cloning_alignments_for_too_long.in_batches(of: 10_000).update_all(
@@ -1493,6 +1539,7 @@ class AbstractAssignment < ActiveRecord::Base
     # Assignment owns deletion of Lti::LineItem, Lti::ResourceLink
     # destroy_all removes associations, so avoid that
     lti_resource_links.find_each(&:destroy)
+    lti_asset_processors.find_each(&:destroy)
 
     ScheduledSmartAlert.where(context_type: "Assignment", context_id: id).destroy_all
     ScheduledSmartAlert.where(context_type: "AssignmentOverride", context_id: assignment_override_ids).destroy_all

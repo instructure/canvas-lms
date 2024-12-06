@@ -39,6 +39,7 @@ export const DiscussionSummaryDisableButton: React.FC<
       <Button
         display={props.isMobile ? 'block' : 'inline-block'}
         onClick={props.onClick}
+        // @ts-expect-error
         renderIcon={IconXSolid}
         data-testid="summary-disable-button"
         disabled={!props.isEnabled}

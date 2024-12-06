@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -26,6 +25,7 @@ export default {
   component: Errors,
 }
 
+// @ts-expect-error
 const Template = args => <Errors {...args} errors={{publish: 'TypeError: Failed to fetch'}} />
 
 export const FailedPublish = Template.bind({})

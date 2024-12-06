@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -40,6 +39,7 @@ const elementTreeHasAttribute = (
   value: string
 ): boolean => {
   while (target) {
+    // @ts-expect-error
     if (target?.attributes?.[attribute]?.value === value) {
       return true
     }

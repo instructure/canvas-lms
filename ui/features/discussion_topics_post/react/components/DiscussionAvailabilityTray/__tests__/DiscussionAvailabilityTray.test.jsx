@@ -35,26 +35,22 @@ beforeAll(() => {
   })
 })
 
+const mockLockAt = '2022-01-19T23:59:59-07:00'
+const mockDelayedPost = '2022-01-12T00:00:00-07:00'
+
 const mockAvailabilities = [
   {
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 99,
     name: 'section 2',
+    lockAt: mockLockAt,
+    delayedPostAt: mockDelayedPost,
   },
 ]
-const mockLockAt = '2022-01-19T23:59:59-07:00'
-const mockDelayedPost = '2022-01-12T00:00:00-07:00'
 
 const setup = props => {
-  return render(
-    <DiscussionAvailabilityTray
-      lockAt={mockLockAt}
-      delayedPostAt={mockDelayedPost}
-      availabilities={mockAvailabilities}
-      {...props}
-    />
-  )
+  return render(<DiscussionAvailabilityTray availabilities={mockAvailabilities} {...props} />)
 }
 
 describe('DiscussionAvailabilityTray', () => {
@@ -76,8 +72,13 @@ describe('DiscussionAvailabilityTray', () => {
 
     it('correct text is shown when a date is not set', () => {
       const {getByText} = setup({
-        lockAt: null,
-        delayedPostAt: null,
+        availabilities: [
+          {
+            ...mockAvailabilities[0],
+            lockAt: null,
+            delayedPostAt: null,
+          },
+        ],
       })
       expect(getByText('No Start Date')).toBeInTheDocument()
       expect(getByText('No End Date')).toBeInTheDocument()
@@ -102,8 +103,13 @@ describe('DiscussionAvailabilityTray', () => {
 
     it('correct text is shown when a date is not set', () => {
       const {getByText} = setup({
-        lockAt: null,
-        delayedPostAt: null,
+        availabilities: [
+          {
+            ...mockAvailabilities[0],
+            lockAt: null,
+            delayedPostAt: null,
+          },
+        ],
       })
       expect(getByText('No Start Date')).toBeInTheDocument()
       expect(getByText('No End Date')).toBeInTheDocument()

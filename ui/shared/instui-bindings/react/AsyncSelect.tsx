@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -18,7 +17,14 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useRef, ReactElement, ReactNode, ChangeEvent, useEffect} from 'react'
+import React, {
+  useState,
+  useRef,
+  type ReactElement,
+  type ReactNode,
+  type ChangeEvent,
+  useEffect,
+} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
@@ -37,10 +43,14 @@ export type CanvasAsyncSelectProps = {
   noOptionsLabel: string
   noOptionsValue?: string
   renderLabel?: string | ReactNode
+  // @ts-expect-error
   onOptionSelected: (event, optionId: string) => void
   onHighlightedOptionChange?: (optionId: string | null) => void
+  // @ts-expect-error
   onInputChange: (event, value) => void
+  // @ts-expect-error
   onBlur?: (event) => void
+  // @ts-expect-error
   onFocus?: (event) => void
   children?: ReactElement | ReactElement[]
   options?: any[]
@@ -84,6 +94,7 @@ export default function CanvasAsyncSelect({
     React.Children.forEach(children, (c: ReactElement) => {
       if (c?.props.id === id) option = c
     })
+    // @ts-expect-error
     return option
   }
 

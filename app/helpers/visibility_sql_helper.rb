@@ -142,7 +142,7 @@ module VisibilitySqlHelper
       <<~SQL.squish
         WHERE #{filter_condition_sql}
           AND o.workflow_state NOT IN ('deleted','unpublished')
-          AND COALESCE(o.only_visible_to_overrides, 'false') = 'false'
+          AND o.only_visible_to_overrides = 'false'
           AND (m.id IS NULL OR (ao.context_module_id IS NULL AND m.workflow_state <> 'deleted'))
       SQL
     end

@@ -23,6 +23,7 @@ import type {
   DeleteRubricQueryResponse,
   DuplicateRubricQueryResponse,
   archiveRubricResponse,
+  // @ts-expect-error
   RubricImport,
 } from '../types/Rubric'
 import getCookie from '@instructure/get-cookie'

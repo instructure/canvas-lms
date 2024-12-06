@@ -27,6 +27,13 @@ export const mockInternalConfiguration = (
     description: 'description',
     target_link_uri: 'https://example.com',
     oidc_initiation_url: 'https://example.com/oidc',
+    public_jwk_url: 'https://example.com/jwk',
+    launch_settings: {},
+    redirect_uris: [],
+    oidc_initiation_urls: {},
+    privacy_level: 'anonymous',
+    tool_id: 'tool_id',
+    domain: 'example.com',
     custom_fields: {
       foo: 'bar',
     },

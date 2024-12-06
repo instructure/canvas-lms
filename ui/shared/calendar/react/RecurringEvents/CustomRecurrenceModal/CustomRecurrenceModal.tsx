@@ -66,6 +66,7 @@ class CustomRecurrenceErrorBoundary extends React.Component {
         </div>
       )
     }
+    // @ts-expect-error
     return this.props.children
   }
 }

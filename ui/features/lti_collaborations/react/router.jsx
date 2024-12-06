@@ -74,6 +74,7 @@ function renderShowCollaborations(ctx) {
 
   const view = () => {
     const state = store.getState()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CollaborationsApp applicationState={state} actions={actions} />,
       document.getElementById('content')
@@ -85,6 +86,7 @@ function renderShowCollaborations(ctx) {
 
 function renderLaunchTool(ctx) {
   const view = () => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />,
       document.getElementById('content')

@@ -29,7 +29,11 @@ import {
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Menu, MenuItem} from '@instructure/ui-menu'
-import {Responsive, ResponsivePropsObject, QueriesMatching} from '@instructure/ui-responsive'
+import {
+  Responsive,
+  type ResponsivePropsObject,
+  type QueriesMatching,
+} from '@instructure/ui-responsive'
 
 import ContextModulesPublishMenu from './ContextModulesPublishMenu'
 import {
@@ -114,6 +118,7 @@ type MoreMenuProps = {
 }
 
 const ContextModulesHeaderMoreMenu = ({component, items}: MoreMenuProps) => {
+  // @ts-expect-error
   const onClickToolHandler = (e, tool) => {
     e.target.href = tool.href
     e.target.dataset.toolId = tool['data-tool-id']
@@ -203,6 +208,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                   as="div"
                   display={responsive.props.display}
                   maxHeight="2.375rem"
+                  // @ts-expect-error
                   className={
                     responsive.matches.includes('small')
                       ? 'context-modules-header-more-menu-responsive'
@@ -258,6 +264,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
             {!props.moreMenu.menuTools.visible && props.moreMenu.exportCourseContent.visible && (
               <Flex.Item overflowY="visible">
                 <Button
+                  // @ts-expect-error
                   renderIcon={IconExportLine}
                   href={props.moreMenu.exportCourseContent.url}
                   id="context-modules-header-export-course-button"
@@ -275,6 +282,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
                   as="div"
                   display={responsive.props.display}
                   maxHeight="2.375rem"
+                  // @ts-expect-error
                   className={
                     responsive.matches.includes('small')
                       ? 'context-modules-header-publish-menu-responsive'
@@ -290,9 +298,11 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
             {props.addModule.visible && (
               <Flex.Item overflowY="visible">
                 <Button
+                  // @ts-expect-error
                   onClick={e => document.add_module_link_handler(e)}
                   id="context-modules-header-add-module-button"
                   color="primary"
+                  // @ts-expect-error
                   renderIcon={IconAddLine}
                   display={responsive.props.display}
                 >
@@ -321,6 +331,7 @@ const ContextModulesHeader = (props: Props) => {
         large: {direction: 'row', display: 'inline-block'},
       }}
       render={(_props, matches) => (
+        // @ts-expect-error
         <ContextModulesHeaderContent {...props} responsive={{props: _props, matches}} />
       )}
     />

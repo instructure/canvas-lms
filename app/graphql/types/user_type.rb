@@ -409,14 +409,41 @@ module Types
       end
     end
 
-    field :favorite_groups_connection, Types::GroupType.connection_type, null: true
-    def favorite_groups_connection
+    def get_favorite_groups(scope)
+      favorite_group_ids = object.favorite_context_ids("Group")
+      favorite_groups = scope.where(id: favorite_group_ids)
+
+      # Return favorite groups if any exist; otherwise, return the provided scope
+      favorite_groups.exists? ? favorite_groups : scope
+    end
+
+    field :favorite_groups_connection, Types::GroupType.connection_type, null: true do
+      description "Favorite groups for the user."
+      argument :include_non_collaborative, Boolean, required: false, default_value: false
+    end
+    def favorite_groups_connection(include_non_collaborative: false)
+      # Ensure that the field is accessed by the current user
       return unless object == current_user
 
       load_association(:groups).then do |groups|
-        load_association(:favorites).then do
-          favorite_groups = groups.active.shard(object).where(id: object.favorite_context_ids("Group"))
-          favorite_groups.any? ? favorite_groups : object.groups.active.shard(object)
+        collaborative_scope = groups.active.shard(object)
+        final_scope = collaborative_scope
+
+        if include_non_collaborative
+          load_association(:differentiation_tags).then do |differentiation_tags|
+            non_collaborative_scope = differentiation_tags.active.shard(object)
+
+            # non_collaborative groups where the current user does not have read access
+            non_viewable_group_ids = non_collaborative_scope
+                                     .reject { |group| group.grants_right?(object, :read) }
+                                     .map(&:id)
+            non_collaborative_scope = non_collaborative_scope.where.not(id: non_viewable_group_ids)
+            final_scope = collaborative_scope.or(non_collaborative_scope)
+
+            get_favorite_groups(final_scope)
+          end
+        else
+          get_favorite_groups(final_scope)
         end
       end
     end

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -26,6 +25,7 @@ export default class Style {
 
   $styles: any
 
+  // @ts-expect-error
   constructor(grid, gridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport
@@ -36,6 +36,7 @@ export default class Style {
     this.$styles.id = `GridSupport__Styles--${this.grid.getUID()}`
     document.body.appendChild(this.$styles)
 
+    // @ts-expect-error
     this.gridSupport.events.onActiveLocationChanged.subscribe((_event, location) => {
       this.updateClassesForActiveLocation(location)
     })
@@ -48,6 +49,7 @@ export default class Style {
     }
   }
 
+  // @ts-expect-error
   updateClassesForActiveLocation(location) {
     if (location.region === 'header') {
       this.buildClassesForHeader(location)
@@ -58,6 +60,7 @@ export default class Style {
     }
   }
 
+  // @ts-expect-error
   buildClassesForHeader(location) {
     const {options} = this.gridSupport
     this.$styles.innerHTML = `
@@ -75,6 +78,7 @@ export default class Style {
     `
   }
 
+  // @ts-expect-error
   buildClassesForBody(location) {
     const {options} = this.gridSupport
     this.$styles.innerHTML = `

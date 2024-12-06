@@ -20,6 +20,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {IconWarningSolid} from '@instructure/ui-icons'
 import {getTrayHeight} from '../../shared/trayUtils'
 import {View} from '@instructure/ui-view'
 import {instuiPopupMountNode} from '../../../../util/fullscreenHelpers'
@@ -186,7 +187,14 @@ export default function FindReplaceTray({
     return <ScreenReaderContent>{alertText}</ScreenReaderContent>
   }
 
-  const errMsg = formatMessage('No results found')
+  const errMsg = (
+    <Flex gap="xx-small" alignItems="center">
+      <IconWarningSolid color="error" data-testid="error-icon" />
+      <Text color="danger" size="small">
+        {formatMessage('No results found')}
+      </Text>
+    </Flex>
+  )
   const messages = findText && max === 0 ? ([{text: errMsg, type: 'error'}] as FormMessage[]) : []
 
   const resultText = () => {

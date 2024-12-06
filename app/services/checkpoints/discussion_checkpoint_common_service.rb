@@ -118,7 +118,7 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
   def everyone_date
     # If there are no dates for everyone, return a hash with nil values.
     # This is important because the due_at, unlock_at, and lock_at fields, if not present, will not be updated accordingly.
-    dates_by_type("everyone").first || { due_at: nil, unlock_at: nil, lock_at: nil }
+    dates_by_set_type("Course").first || dates_by_type("everyone").first || { due_at: nil, unlock_at: nil, lock_at: nil }
   end
 
   def override_dates
@@ -132,9 +132,20 @@ class Checkpoints::DiscussionCheckpointCommonService < ApplicationService
     end
   end
 
+  def dates_by_set_type(type)
+    @dates.select do |date|
+      next unless date[:type] == "override" && date[:set_type]
+
+      set_type = date.fetch(:set_type)
+      set_type == type
+    end
+  end
+
   def compute_due_dates_and_create_submissions(checkpoint)
-    assignments = [checkpoint, checkpoint.parent_assignment]
-    AbstractAssignment.clear_cache_keys(assignments, :availability)
+    parent_assignment = checkpoint.parent_assignment
+    assignments = [checkpoint, parent_assignment]
+    Assignment.clear_cache_keys(parent_assignment, :availability)
+    SubAssignment.clear_cache_keys(checkpoint, :availability)
     SubmissionLifecycleManager.recompute_course(checkpoint.course, assignments:, update_grades: true, create_sub_assignment_submissions: false)
   end
 end

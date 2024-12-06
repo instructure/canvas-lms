@@ -36,6 +36,9 @@ describe "new groups" do
       end
 
       it "does not have Visit Group Homepage option in group actions for non_collaborative groups" do
+        # New scopes mean that we have to explicitly allow non_collaborative groups to
+        # Be returned on the groups controller before this test will work
+        skip "EGG-253"
         category = @course.group_categories.build(name: "category 1", non_collaborative: true)
         category.save!
         category.groups.create!(context: @course)

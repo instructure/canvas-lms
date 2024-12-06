@@ -45,6 +45,7 @@ QUnit.module('DueDateCalendars', {
       dateValue: this.someDate,
     }
     const DueDateCalendarsElement = <DueDateCalendars {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDateCalendars = ReactDOM.render(DueDateCalendarsElement, wrapper)
   },
   teardown() {

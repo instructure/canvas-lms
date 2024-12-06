@@ -123,15 +123,33 @@ export default function K5Announcement({
           .map(a => transformAnnouncement(a))
         // order of homeroomAnnouncements:
         // [most distant announcement, ..., most recent announcement, faux announcement (if present)]
-        setHomeroomAnnouncements(parsedAnnouncements.reverse().concat(homeroomAnnouncements))
+
+        const announcementsList = parsedAnnouncements.reverse()
+
+        // if when we don't receive a firstAnnouncement, we check if the loaded ones
+        // are recent enough to not show the faux announcement
+        if (homeroomAnnouncements[0].id === FAUX_ANNOUNCEMENT_ID && announcementsList.length > 0) {
+          const lastAnnouncement = announcementsList.slice(-1)[0]
+          const postedDate = new Date(lastAnnouncement.postedDate)
+          // compare postedDate within 15 days ago
+          const fifteenDaysAgo = new Date()
+          fifteenDaysAgo.setDate(fifteenDaysAgo.getDate() - 15)
+          if (postedDate >= fifteenDaysAgo) {
+            setHomeroomAnnouncements(announcementsList)
+            setCurrentAnnouncement(lastAnnouncement)
+            return
+          }
+        }
+        setHomeroomAnnouncements(announcementsList.concat(homeroomAnnouncements))
       } catch (ex) {
         showFlashAlert({
           message: I18n.t('Failed getting next batch of announcements.'),
           err: ex,
           type: 'error',
         })
+      } finally {
+        setLoadingMore(false)
       }
-      setLoadingMore(false)
     },
     [courseId, firstAnnouncement, homeroomAnnouncements, moreHomeroomAnnouncementsURL]
   )

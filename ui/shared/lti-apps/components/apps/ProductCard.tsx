@@ -26,6 +26,7 @@ import {View} from '@instructure/ui-view'
 import {Tag} from '@instructure/ui-tag'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import TruncateWithTooltip from '../common/TruncateWithTooltip'
+import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
 
 type ProductCardProps = {
   product: Product
@@ -35,15 +36,33 @@ const ProductCard = (props: ProductCardProps) => {
   const {product} = props
   const productUrl = `${window.location.origin}${window.location.pathname}/product_detail/${
     product.global_product_id
-  }${window.location.pathname.endsWith('configurations') ? '#tab-apps' : ''}`
+  }${window.location.pathname.endsWith(instructorAppsRoute) ? instructorAppsHash : ''}`
+
+  // const tagTheme = {
+  //   installed: {
+  //     defaultBackground: 'white',
+  //     defaultColor: 'green',
+  //     defaultBorderColor: 'green',
+  //   },
+  //   review: {
+  //     defaultBackground: 'white',
+  //     defaultColor: 'gray',
+  //     defaultBorderColor: 'gray',
+  //   },
+  //   denied: {
+  //     defaultBackground: 'white',
+  //     defaultColor: 'red',
+  //     defaultBorderColor: 'red',
+  //   },
+  // }
 
   return (
     <Flex.Item>
       <View
         key={product.id}
         as="div"
-        height={200}
-        width={350}
+        height={225}
+        width={390}
         borderColor="primary"
         borderRadius="medium"
         borderWidth="small"
@@ -94,6 +113,16 @@ const ProductCard = (props: ProductCardProps) => {
               <Tag key={tag.name} text={tag.name} size="small" margin="0 xx-small 0 0" />
             ))}
           </View>
+          {/* TODO: connect to api when its ready */}
+          {/* <View as="div" margin="auto 0 0 0">
+            <Tag
+              key="1"
+              text="Installed"
+              size="medium"
+              margin="0 xx-small 0 0"
+              themeOverride={tagTheme.installed}
+            />
+          </View> */}
         </Flex>
       </View>
     </Flex.Item>

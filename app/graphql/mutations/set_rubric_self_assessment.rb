@@ -27,7 +27,7 @@ module Mutations
       rubric_association = assignment.rubric_association
 
       unless Rubric.rubric_self_assessment_enabled?(assignment.course)
-        raise GraphQL::ExecutionError, "enhanced_rubrics and platform_service_speedgrader must be enabled"
+        raise GraphQL::ExecutionError, "enhanced_rubrics, rubric_self_assesment and platform_service_speedgrader must be enabled"
       end
 
       unless assignment.active_rubric_association?

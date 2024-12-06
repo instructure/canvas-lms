@@ -50,6 +50,7 @@ export default class ProfileShow extends Backbone.View {
   }
 
   renderAlert(message, container, variant) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Alert
         variant={variant}

@@ -40,16 +40,24 @@ export const Products = (props: {
   tools: Product[]
   displayGroups?: ToolsByDisplayGroup
   numberOfPages: number
+  isOrgTools?: boolean
 }) => {
-  const {isFilterApplied, isLoading, isLoadingDisplayGroups, tools, displayGroups, numberOfPages} =
-    props
+  const {
+    isFilterApplied,
+    isLoading,
+    isLoadingDisplayGroups,
+    tools,
+    displayGroups,
+    numberOfPages,
+    isOrgTools,
+  } = props
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
   const {isDesktop, isMobile} = useBreakpoints()
 
   const renderProducts = (products: Product[]) => {
     if (!isDesktop) {
       return (
-        <Flex gap="medium" wrap="wrap" alignItems="stretch">
+        <Flex gap="mediumSmall" wrap="wrap" alignItems="stretch">
           {products.map((product: Product) => (
             <Flex.Item key={product.id} width="100%">
               <ProductCard product={product} />
@@ -59,9 +67,10 @@ export const Products = (props: {
       )
     }
 
-    // Group products into chunks of 3
+    // Group products into chunks of rowLength
+    const rowLength = isOrgTools ? 2 : 3
     const productChunks = products.reduce((resultArray, item, index) => {
-      const chunkIndex = Math.floor(index / 3)
+      const chunkIndex = Math.floor(index / rowLength)
 
       if (!resultArray[chunkIndex]) {
         resultArray[chunkIndex] = [] // start a new chunk
@@ -72,7 +81,7 @@ export const Products = (props: {
     }, [] as Product[][])
 
     return (
-      <Grid vAlign="stretch">
+      <Grid colSpacing="small" rowSpacing="small">
         {productChunks.map(chunk => (
           <Grid.Row key={chunk[0].id}>
             {chunk.map((product: Product) => (
@@ -81,7 +90,7 @@ export const Products = (props: {
               </Grid.Col>
             ))}
             {/* Calculate and render empty Grid.Col components if needed */}
-            {Array(3 - chunk.length)
+            {Array(rowLength - chunk.length)
               .fill(null)
               .map(_ => (
                 <Grid.Col key={uniqueId('empty')} />

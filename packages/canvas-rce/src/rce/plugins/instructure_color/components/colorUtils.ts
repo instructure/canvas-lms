@@ -53,4 +53,12 @@ const getContrastStatus = (color1: string, color2: string): boolean => {
   return INSTUIcalcContrast(color1, color2) >= 4.5
 }
 
-export {getContrastStatus, isTransparent}
+const getDefaultColors = () => {
+  const fontcolor =
+    window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue('--ic-brand-font-color-dark') || '#000000'
+  return [fontcolor.toLowerCase(), '#ffffff']
+}
+
+export {getContrastStatus, isTransparent, getDefaultColors}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {RefObject, useCallback, useEffect, useRef, useState} from 'react'
-import {Alert, AlertProps} from '@instructure/ui-alerts'
+import React, {type RefObject, useCallback, useEffect, useRef, useState} from 'react'
+import {Alert, type AlertProps} from '@instructure/ui-alerts'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'

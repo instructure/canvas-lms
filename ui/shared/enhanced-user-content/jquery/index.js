@@ -334,8 +334,6 @@ function enhanceUserContentWhenAsked() {
         disableGooglePreviews: !!INST.disableGooglePreviews,
         new_math_equation_handling: !!ENV?.FEATURES?.new_math_equation_handling,
         explicit_latex_typesetting: !!ENV?.FEATURES?.explicit_latex_typesetting,
-        rce_transform_iframe_sandbox_attributes:
-          !!ENV?.FEATURES?.rce_transform_iframe_sandbox_attributes,
         locale: ENV?.LOCALE ?? 'en',
       }),
     50

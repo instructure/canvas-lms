@@ -69,6 +69,7 @@ ready(function () {
   const alertMount = () => document.getElementById('annotated-screenreader-alert')
 
   if (alertMount()) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Alert screenReaderOnly={true} liveRegion={alertMount} liveRegionPoliteness="assertive">
         {accessibilityAlert}
@@ -89,12 +90,14 @@ ready(function () {
 
       const $emojiPicker = $container.find('.emoji-picker-container')
       if ($emojiPicker.length) {
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
         $emojiPicker.show()
       }
 
       const $emojiQuickPicker = $container.find('.emoji-quick-picker-container')
       if ($emojiQuickPicker.length) {
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <EmojiQuickPicker insertEmoji={insertEmoji.bind(this)} />,
           $emojiQuickPicker[0]
@@ -184,6 +187,7 @@ ready(function () {
           const mountPoint = document.getElementById('progress_indicator')
 
           if (mountPoint) {
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render(
               <ProgressCircle
                 screenReaderLabel={I18n.t('Uploading Progress')}
@@ -414,6 +418,7 @@ ready(function () {
     const fileEl = $('#uploaded_files')
     if (fileEl.is(':hidden')) {
       $.screenReaderFlashMessage(I18n.t('File tree expanded'))
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(fileBrowser, document.getElementById('uploaded_files'))
     } else {
       $.screenReaderFlashMessage(I18n.t('File tree collapsed'))
@@ -433,6 +438,7 @@ ready(function () {
       const wrapperDom = clone.find('.attachment_wrapper')[0]
       if (wrapperDom) {
         const index = ++submissionAttachmentIndex
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <Attachment
             index={index}

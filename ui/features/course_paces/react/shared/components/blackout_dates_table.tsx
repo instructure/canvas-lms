@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {BlackoutDate} from '../types'
+import type {BlackoutDate} from '../types'
 import {coursePaceDateFormatter} from '../api/backend_serializer'
 
 const I18n = useI18nScope('course_paces_blackout_dates_table')

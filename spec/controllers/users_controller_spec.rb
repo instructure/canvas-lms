@@ -2261,6 +2261,7 @@ describe UsersController do
 
     context "rendering page views" do
       before do
+        allow(controller).to receive(:page_view_path).and_return("users/page_views/page_views")
         allow(PageView).to receive(:page_views_enabled?).and_return(true)
         course_with_teacher(active_all: 1)
       end
@@ -2400,13 +2401,23 @@ describe UsersController do
       expect(response).to have_http_status :ok
     end
 
-    it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+    it "does not show a deleted user from the account context if they have a deleted pseudonym for that account" do
       course_with_teacher(active_all: 1, user: user_with_pseudonym)
       account_admin_user(active_all: true)
       user_session(@admin)
       @teacher.remove_from_root_account(Account.default)
 
       get "show", params: { account_id: Account.default.id, id: @teacher.id }
+      expect(response).to have_http_status :unauthorized
+    end
+
+    it "shows a deleted user from the account context if they have a deleted pseudonym for that account and the include_deleted_users flag is set" do
+      course_with_teacher(active_all: 1, user: user_with_pseudonym)
+      account_admin_user(active_all: true)
+      user_session(@admin)
+      @teacher.remove_from_root_account(Account.default)
+
+      get "show", params: { account_id: Account.default.id, id: @teacher.id, include_deleted_users: true }
       expect(response).to have_http_status :ok
     end
 
@@ -2424,14 +2435,20 @@ describe UsersController do
         @teacher.remove_from_root_account(Account.default)
       end
 
-      it "shows a deleted user from the account context if they have a deleted pseudonym for that account" do
+      it "does not show a deleted user from the account context if they have a deleted pseudonym for that account" do
         get "show", params: { account_id: Account.default.id, id: @teacher.id }
+
+        expect(response).to have_http_status :unauthorized
+      end
+
+      it "shows a deleted user from the account context if they have a deleted pseudonym for that account and the include_deleted_users flag is set" do
+        get "show", params: { account_id: Account.default.id, id: @teacher.id, include_deleted_users: true }
 
         expect(response).to have_http_status :ok
       end
 
       it "does not give login ID for another account in json format" do
-        get "show", params: { account_id: Account.default.id, id: @teacher.id, format: :json }
+        get "show", params: { account_id: Account.default.id, id: @teacher.id, include_deleted_users: true, format: :json }
 
         expect(response).to have_http_status :ok
         expect(response.parsed_body["login_id"]).to be_nil

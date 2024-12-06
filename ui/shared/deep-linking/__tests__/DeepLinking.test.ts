@@ -19,19 +19,18 @@
 import {isValidDeepLinkingEvent, handleDeepLinking, type DeepLinkEvent} from '../DeepLinking'
 
 describe('isValidDeepLinkingEvent', () => {
-  let data: {
-      subject: 'LtiDeepLinkingResponse'
-    },
+  let data: {subject: 'LtiDeepLinkingResponse'},
     event: DeepLinkEvent,
     env: {
       DEEP_LINKING_POST_MESSAGE_ORIGIN: string
     }
 
   beforeEach(() => {
+    data = {subject: 'LtiDeepLinkingResponse'} // Initialize data
     event = {
       data: {subject: 'LtiDeepLinkingResponse', placement: 'not_editor_button'},
       origin: 'canvas.instructure.com',
-    } as unknown as DeepLinkEvent
+    } as unknown as DeepLinkEvent // Cast to unknown first, then to DeepLinkEvent
     env = {DEEP_LINKING_POST_MESSAGE_ORIGIN: 'canvas.instructure.com'}
   })
 
@@ -43,7 +42,7 @@ describe('isValidDeepLinkingEvent', () => {
 
   describe('when the message origin is incorrect', () => {
     beforeEach(() => {
-      event = {data, origin: 'wrong.origin.com'} as unknown as DeepLinkEvent
+      event = {data, origin: 'wrong.origin.com'} as DeepLinkEvent
     })
 
     it('return false', () => {
@@ -53,7 +52,7 @@ describe('isValidDeepLinkingEvent', () => {
 
   describe('when the event data is not present', () => {
     beforeEach(() => {
-      event = {origin: 'canvas.instructure.com'} as unknown as DeepLinkEvent
+      event = {origin: 'canvas.instructure.com'} as DeepLinkEvent
     })
 
     it('return false', () => {

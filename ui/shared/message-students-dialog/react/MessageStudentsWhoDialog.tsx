@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -140,8 +139,10 @@ const isScored = (assignment: CamelizedAssignment) =>
 const isReassignable = (assignment: CamelizedAssignment) =>
   assignment !== null &&
   (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
+  // @ts-expect-error
   assignment.dueDate != null &&
   !assignment.submissionTypes.includes(
+    // @ts-expect-error
     'on_paper' || 'external_tool' || 'none' || 'discussion_topic' || 'online_quiz'
   )
 
@@ -226,14 +227,18 @@ const filterCriteria: FilterCriterion[] = [
   },
 ]
 
+// @ts-expect-error
 function observerCount(students, observers) {
+  // @ts-expect-error
   return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
 }
 
+// @ts-expect-error
 function calculateObserverRecipientCount(selectedObservers) {
   return Object.values(selectedObservers).reduce((acc: number, array: any) => acc + array.length, 0)
 }
 
+// @ts-expect-error
 function filterStudents(criterion, students, cutoff) {
   const newfilteredStudents: Student[] = []
   for (const student of students) {
@@ -303,6 +308,7 @@ function filterStudents(criterion, students, cutoff) {
   return newfilteredStudents
 }
 
+// @ts-expect-error
 function cumulativeScoreDefaultSubject(criterion, launchContext, cutoff, assignmentGroupName = '') {
   const context =
     launchContext === MSWLaunchContext.ASSIGNMENT_GROUP_CONTEXT ? assignmentGroupName : 'course'
@@ -316,11 +322,17 @@ function cumulativeScoreDefaultSubject(criterion, launchContext, cutoff, assignm
 }
 
 function defaultSubject(
+  // @ts-expect-error
   criterion,
+  // @ts-expect-error
   assignment,
+  // @ts-expect-error
   launchContext,
+  // @ts-expect-error
   cutoff,
+  // @ts-expect-error
   pointsBasedGradingScheme,
+  // @ts-expect-error
   assignmentGroupName
 ) {
   if (cutoff === '') {
@@ -390,7 +402,9 @@ const MessageStudentsWhoDialog = ({
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState('')
 
+  // @ts-expect-error
   const initializeSelectedObservers = studentCollection =>
+    // @ts-expect-error
     studentCollection.reduce((map, student) => {
       map[student.id] = []
       return map
@@ -418,11 +432,13 @@ const MessageStudentsWhoDialog = ({
   })
 
   const observerEnrollments = data?.course?.enrollmentsConnection?.nodes || []
+  // @ts-expect-error
   const observersByStudentID = observerEnrollments.reduce((results, enrollment) => {
     const observeeId = enrollment.associatedUser._id
     results[observeeId] = results[observeeId] || []
     const existingObservers = results[observeeId]
 
+    // @ts-expect-error
     if (!existingObservers.some(user => user._id === enrollment.user._id)) {
       results[observeeId].push(enrollment.user)
     }
@@ -434,6 +450,7 @@ const MessageStudentsWhoDialog = ({
     subsetLength > 0 && subsetLength < totalLength
 
   const [cutoff, setCutoff] = useState(0.0)
+  // @ts-expect-error
   const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
   const [filteredStudents, setFilteredStudents] = useState(
@@ -522,6 +539,7 @@ const MessageStudentsWhoDialog = ({
     return <LoadingIndicator />
   }
 
+  // @ts-expect-error
   const handleCriterionSelected = (_e, {value}) => {
     const newCriterion = filterCriteria.find(criterion => criterion.value === value)
     if (newCriterion != null) {
@@ -593,6 +611,7 @@ const MessageStudentsWhoDialog = ({
     }
   }
 
+  // @ts-expect-error
   const onExcusedCheckBoxChange = event => {
     const criteriaValue = event.target.checked ? 'unsubmitted_skip_excused' : 'unsubmitted'
     const criterion = filterCriteria.find(c => c.value === criteriaValue)
@@ -610,6 +629,7 @@ const MessageStudentsWhoDialog = ({
     setOnSuccess
   )
   const onDeleteAttachment = removeAttachmentFn(setAttachments)
+  // @ts-expect-error
   const onReplaceAttachment = (id, e) => {
     onDeleteAttachment(id)
     onAddAttachment(e)
@@ -622,10 +642,12 @@ const MessageStudentsWhoDialog = ({
     setMediaUploadFile(null)
   }
 
+  // @ts-expect-error
   const onMediaUploadStart = file => {
     setMediaTitle(file.title)
   }
 
+  // @ts-expect-error
   const onMediaUploadComplete = (err, mediaData, captionData) => {
     if (err) {
       setOnFailure(I18n.t('There was an error uploading the media.'))
@@ -660,6 +682,7 @@ const MessageStudentsWhoDialog = ({
     setSelectedObservers({...selectedObservers, [studentId]: updatedObservers})
   }
 
+  // @ts-expect-error
   const onStudentsCheckboxChanged = event => {
     if (event.target.checked) {
       setSelectedStudents(filteredStudents.map(element => element.id))
@@ -668,11 +691,13 @@ const MessageStudentsWhoDialog = ({
     }
   }
 
+  // @ts-expect-error
   const onObserversCheckboxChanged = event => {
     if (event.target.checked) {
       setSelectedObservers(
         filteredStudents.reduce((map, student) => {
           const observers = observersByStudentID[student.id] || []
+          // @ts-expect-error
           map[student.id] = Object.keys(observers).map(key => observers[key]._id)
           return map
         }, {})
@@ -708,6 +733,7 @@ const MessageStudentsWhoDialog = ({
             <View as="div" padding="0 0 small 0">
               <SimpleSelect
                 renderLabel={I18n.t('For students who…')}
+                // @ts-expect-error
                 onChange={handleCriterionSelected}
                 value={selectedCriterion.value}
                 data-testid="criterion-dropdown"
@@ -729,6 +755,7 @@ const MessageStudentsWhoDialog = ({
                 <NumberInput
                   value={cutoff}
                   onChange={(_e, value) => {
+                    // @ts-expect-error
                     setCutoff(value)
                     if (value !== '') {
                       setFilteredStudents(filterStudents(selectedCriterion, sortedStudents, value))

@@ -497,6 +497,11 @@ module Types
           method: :grade_as_group?,
           null: false
 
+    field :rubric_self_assessment_enabled,
+          Boolean,
+          "specifies that students can self-assess using the assignment rubric.",
+          null: true
+
     field :group_set, GroupSetType, null: true
     def group_set
       load_association(:group_category)

@@ -32,12 +32,12 @@ module Lti::Messages
   # Canvas, please see the inline documentation of
   # app/models/lti/lti_advantage_adapter.rb.
   class PnsNotice < JwtMessage
-    def initialize(tool:, context:, notice:, opts: nil)
+    def initialize(tool:, context:, notice:, user: nil, opts: nil)
       opts ||= {
-        claim_group_whitelist: [:security],
+        claim_group_whitelist: %i[security platform_notification_service roles target_link_uri context],
         extension_blacklist: [:placement]
       }
-      super(tool:, context:, user: nil, expander: nil, return_url: nil, opts:)
+      super(tool:, context:, user:, expander: nil, return_url: nil, opts:)
       @notice = notice
       @message = LtiAdvantage::Messages::PnsNotice.new
     end

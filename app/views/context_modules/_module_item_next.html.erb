@@ -432,7 +432,7 @@
     <div class="context_module_item indent_<%= module_item.try_rescue(:indent) || '0' %>">
       <% checkpoints = [module_item.content.reply_to_topic_checkpoint, module_item.content.reply_to_entry_checkpoint] %>
       <% checkpoints.each do |checkpoint| %>
-        <div class="ig-row" data-testid="checkpoint" style="display: block;">
+        <div class="ig-row" data-testid="checkpoint" style="display: flex; align-items: center;">
           <% left_padding = case module_item.try_rescue(:indent)
             when 1 then "60px"
             when 2 then "80px"
@@ -441,9 +441,16 @@
             when 5 then "140px"
             else "40px"
           end %>
-          <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; font-size: 1.125rem; padding-left: <%= left_padding %>">
+          <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; max-width: 1.75rem; font-size: 1.125rem; padding-left: <%= left_padding %>">
             <i class='icon-arrow-nest'></i>
           </span>
+          <% status = checkpoint.submission_for_student(@current_user)&.submission_status %>
+          <% if status && [:submitted, :resubmitted].include?(status) %>
+            <span class="ig-type-icon" aria-hidden="true" style="display: inline-block; max-width: 1rem; font-size: 1.125rem;">
+              <i class='icon-complete'></i>
+            </span>
+            <span class="screenreader-only"><%= t("submitted")%></span>
+          <% end %>
           <div style="display: inline-block">
             <div class="module-item-title" style="display: block; margin-left: 10px;">
               <span class="item_name">

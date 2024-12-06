@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -35,6 +34,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     onHeaderKeyDown() {},
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
@@ -43,26 +43,34 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     this.handleKeyDown = this.handleKeyDown.bind(this)
 
     this.state = {
+      // @ts-expect-error
       hasFocus: false, // eslint-disable-line react/no-unused-state
       menuShown: false,
       skipFocusOnClose: false,
     }
   }
 
+  // @ts-expect-error
   bindFlyoutMenu = (ref, name: string) => {
     if (ref) {
+      // @ts-expect-error
       this[name] = ref
+      // @ts-expect-error
       this.props.addGradebookElement(ref)
       ref.addEventListener('keydown', this.handleMenuKeyDown)
+      // @ts-expect-error
     } else if (this[name]) {
+      // @ts-expect-error
       this.props.removeGradebookElement(this[name])
     }
   }
 
+  // @ts-expect-error
   bindSortByMenuContent = ref => {
     this.bindFlyoutMenu(ref, 'sortByMenuContent')
   }
 
+  // @ts-expect-error
   bindOptionsMenuContent = ref => {
     this.bindFlyoutMenu(ref, 'optionsMenuContent')
   }
@@ -80,10 +88,12 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
   }
 
   handleBlur() {
+    // @ts-expect-error
     this.setState({hasFocus: false}) // eslint-disable-line react/no-unused-state
   }
 
   handleFocus() {
+    // @ts-expect-error
     this.setState({hasFocus: true}) // eslint-disable-line react/no-unused-state
   }
 
@@ -91,25 +101,33 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     const newState = {menuShown}
     let callback
 
+    // @ts-expect-error
     if (this.state.menuShown && !menuShown) {
+      // @ts-expect-error
       if (this.state.skipFocusOnClose) {
+        // @ts-expect-error
         newState.skipMenuOnClose = false
       } else {
         callback = this.focusAtEnd
       }
     }
 
+    // @ts-expect-error
     if (!this.state.menuShown && menuShown) {
+      // @ts-expect-error
       newState.skipFocusOnClose = false
     }
 
+    // @ts-expect-error
     this.setState(newState, callback)
   }
 
   handleMenuKeyDown = (event: React.KeyboardEvent) => {
     if (event.which === 9) {
       // Tab
+      // @ts-expect-error
       this.setState({menuShown: false, skipFocusOnClose: true})
+      // @ts-expect-error
       this.props.onHeaderKeyDown(event)
       return false
     }

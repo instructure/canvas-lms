@@ -81,6 +81,7 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     component = ReactDOM.render(<StudentColumnHeader {...props} />, $container)
   }
 

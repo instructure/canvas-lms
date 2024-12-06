@@ -280,42 +280,11 @@ describe Role do
       end
     end
 
-    context "with granular_permissions_manage_users FF disabled" do
-      before do
-        course_with_ta
-        @course.root_account.disable_feature!(:granular_permissions_manage_users)
-      end
-
-      it "sets manageable_by_user correctly with manage_admin_users permission restricted" do
-        @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_admin_users)
-
-        roles = Role.role_data(@course, @ta)
-        [ta_role, teacher_role, designer_role].each do |role|
-          expect(roles.detect { |r| r[:id] == role.id }[:manageable_by_user]).to be_falsey
-        end
-        [student_role, observer_role].each do |role|
-          expect(roles.find { |r| r[:id] == role.id }[:manageable_by_user]).to be_truthy
-        end
-      end
-
-      it "sets manageable_by_user correctly with manage_students permission restricted" do
-        @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: :manage_admin_users)
-        @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
-
-        roles = Role.role_data(@course, @ta)
-        expect(roles.find { |r| r[:id] == student_role.id }[:manageable_by_user]).to be_falsey
-        [observer_role, ta_role, teacher_role, designer_role].each do |role|
-          expect(roles.find { |r| r[:id] == role.id }[:manageable_by_user]).to be_truthy
-        end
-      end
-    end
-
-    context "with granular_permissions_manage_users FF enabled" do
+    context "with granular permissions" do
       before do
         course_with_teacher
         @role = custom_account_role("EnrollmentManager", account: @course.account)
         @admin = account_admin_user(account: @course.account, role: @role)
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
       end
 
       describe "does all the addable/deleteable by user stuff right" do
@@ -368,7 +337,7 @@ describe Role do
       @shard1.activate do
         account = Account.create
         # should not get foreign key error
-        ro = account.role_overrides.create!(role: built_in_role, enabled: false, permission: :manage_admin_users)
+        ro = account.role_overrides.create!(role: built_in_role, enabled: false, permission: :allow_course_admin_actions)
         expect(ro.role).to eq Role.get_built_in_role("AccountAdmin", root_account_id: account.id)
       end
     end

@@ -92,9 +92,17 @@ describe "Wiki Pages" do
       keep_trying_until { expect(driver.current_url).to eq edit_url }
     end
 
-    it "alerts a teacher when accessing a non-existant page", priority: "1" do
+    it "alerts a teacher when accessing a non-existent page", priority: "1" do
       get "/courses/#{@course.id}/pages/fake"
       expect_flash_message :info
+    end
+
+    it "displays error if no title on submit", priority: "1" do
+      @course.wiki_pages.create!(title: "Page1")
+      get "/courses/#{@course.id}/pages/Page1/edit"
+      wiki_page_title_input.clear
+      f("form.edit-form button.submit").click
+      expect(f('[id*="TextInput"]')).to include_text "A page title is required"
     end
 
     it "updates with changes made in other window", custom_timeout: 40.seconds, priority: "1" do

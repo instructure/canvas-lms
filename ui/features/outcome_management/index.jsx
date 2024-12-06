@@ -22,5 +22,6 @@ import ready from '@instructure/ready'
 import OutcomeManagement from './react/OutcomeManagement'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<OutcomeManagement />, document.getElementById('outcome_management'))
 })

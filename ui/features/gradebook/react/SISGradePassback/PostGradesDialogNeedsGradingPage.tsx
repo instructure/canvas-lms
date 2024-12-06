@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -33,6 +32,7 @@ type Props = {
 }
 
 class PostGradesDialogNeedsGradingPage extends React.Component<Props> {
+  // @ts-expect-error
   onClickRow = assignment_id => {
     window.location.href = `gradebook/speed_grader?assignment_id=${assignment_id}`
   }

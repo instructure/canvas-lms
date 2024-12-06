@@ -97,6 +97,7 @@ ConferenceView.prototype.syncAttendees = function (e) {
     I18n.t(' Attendee sync in progress... ')
   )
   const spinnerDomEl = this.el.querySelector('.conference-loading-indicator')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render([spinner, spinnerText], spinnerDomEl)
   this.el.querySelector('.conference-loading-indicator').style.display = 'block'
   this.$(form).formSubmit({

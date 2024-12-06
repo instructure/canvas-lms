@@ -96,6 +96,7 @@ export async function showConfirmationDialog({
   }
 
   function renderDialog(parent) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ConfirmationDialog
         open={true}

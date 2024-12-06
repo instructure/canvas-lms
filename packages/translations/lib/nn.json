@@ -329,6 +329,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Skjul og lukk { types }"
     },
+    "color_a363e1b0": {
+        "message": "Farge"
+    },
     "color_picker_6b359edf": {
         "message": "Fargeveljar"
     },
@@ -1390,9 +1393,6 @@
     },
     "music_icon_4db5c972": {
         "message": "Musikk-ikon"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Må vere minst { width } x { height }px"
     },
     "my_files_2f621040": {
         "message": "Mine filer"

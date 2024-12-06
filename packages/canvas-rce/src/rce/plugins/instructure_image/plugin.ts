@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -32,6 +31,7 @@ const GROUP_PLUGIN_KEY = 'group_images'
 
 const trayController = new TrayController()
 
+// @ts-expect-error
 function getMenuItems(ed) {
   const contextType = ed.settings.canvas_rce_user_context?.type
   const items = [
@@ -58,6 +58,7 @@ function getMenuItems(ed) {
   return items
 }
 
+// @ts-expect-error
 function doMenuItem(ed, value) {
   switch (value) {
     case 'instructure_upload_image':
@@ -117,6 +118,7 @@ tinymce.PluginManager.add('instructure_image', function (editor) {
         }))
       ),
     onSetup(api) {
+      // @ts-expect-error
       function handleNodeChange(_e) {
         api.setDisabled(!isOKToLink(editor.selection.getContent()))
       }

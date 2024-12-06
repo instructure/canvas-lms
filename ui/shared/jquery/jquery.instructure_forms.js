@@ -631,7 +631,6 @@ $.toMultipartForm = function (params, callback) {
         'Content-Type: multipart/mixed; boundary=' +
         innerBoundary +
         '\r\n\r\n'
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const _jdx in value) {
         fileList.push(value)
       }
@@ -1014,7 +1013,6 @@ $.fn.validateForm = function (options) {
     })
   }
   let hasErrors = false
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const _err in errors) {
     hasErrors = true
     break

@@ -657,12 +657,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "マルチカラー画像" },
   "multiplication_sign_15f95c22": { "message": "乗算記号" },
   "music_icon_4db5c972": { "message": "音楽のアイコン" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "{ percentage }%以上でなければなりません"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "少なくとも { width } x { height }px でなければなりません"
-  },
   "my_files_2f621040": { "message": "マイ ファイル" },
   "n_th_root_9991a6e4": { "message": "N番目のルート" },
   "nabla_1e216d25": { "message": "ナブラ" },

@@ -75,7 +75,10 @@ describe('feature_flags::FeatureFlagButton', () => {
     fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
     const onStateChange = jest.fn()
     const {container, getByText} = render(
-      <FeatureFlagButton featureFlag={sampleData.allowedFeature.feature_flag} onStateChange={onStateChange} />
+      <FeatureFlagButton
+        featureFlag={sampleData.allowedFeature.feature_flag}
+        onStateChange={onStateChange}
+      />
     )
 
     expect(container.querySelector('svg[name="IconTrouble"]')).toBeInTheDocument()

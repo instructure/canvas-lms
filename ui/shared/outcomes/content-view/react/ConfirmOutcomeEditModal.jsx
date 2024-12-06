@@ -44,6 +44,7 @@ export function showConfirmOutcomeEdit(props) {
     if (modal) modal.show()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ConfirmOutcomeEditModal {...props} parent={() => parent} ref={showConfirmOutcomeEditRef} />,
     parent

@@ -23,6 +23,7 @@ import ready from '@instructure/ready'
 
 ready(() => {
   const linkValidatorWrapper = document.getElementById('link_validator_wrapper')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <LinkValidator
       pollTimeout={ENV.validation_poll_timeout}

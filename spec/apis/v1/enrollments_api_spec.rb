@@ -161,29 +161,7 @@ describe EnrollmentsApiController, type: :request do
         expect(new_enrollment.course_section).to eq @section
       end
 
-      it "is forbidden for users without manage_students permission (non-granular)" do
-        @course.root_account.disable_feature!(:granular_permissions_manage_users)
-        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
-        api_call :post,
-                 @path,
-                 @path_options,
-                 {
-                   enrollment: {
-                     user_id: @unenrolled_user.id,
-                     type: "StudentEnrollment",
-                     enrollment_state: "active",
-                     course_section_id: @section.id,
-                     limit_privileges_to_course_section: true,
-                     start_at: nil,
-                     end_at: nil
-                   }
-                 },
-                 {},
-                 { expected_status: 403 }
-      end
-
-      it "is forbidden for users without add_student_to_course permission (granular)" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      it "is forbidden for users without add_student_to_course permission" do
         @course.account.role_overrides.create!(role: admin_role, enabled: true, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
         api_call :post,
@@ -2756,6 +2734,27 @@ describe EnrollmentsApiController, type: :request do
           enrollment_ids = json.pluck("id")
           expect(enrollment_ids.sort).to eq(@cs_course.enrollments.map(&:id).sort)
           expect(json.length).to eq 2
+        end
+
+        it "deals with an orphaned shadow user" do
+          @shard1.activate do
+            account = Account.create!
+            @course.root_account.trust_links.create!(managing_account: account)
+            user = user_with_pseudonym(account:, name: "Homsar", sis_user_id: "homsar")
+            course_with_student(user:, course: @course, active_all: true)
+
+            @orphan_id = user.global_id
+            [CommunicationChannel, Pseudonym, UserAccountAssociation, UserShardAssociation].freeze.each do |model|
+              model.shard(@shard1).where(user_id: @orphan_id).delete_all
+            end
+            user.destroy_permanently!
+          end
+
+          account_admin_user
+          json = api_call(:get, @path, @params, { include: ["user"] })
+          json = json.find { |row| row["user_id"] == @orphan_id }
+          expect(json["sis_user_id"]).to be_nil
+          expect(json).not_to have_key("user")
         end
       end
 

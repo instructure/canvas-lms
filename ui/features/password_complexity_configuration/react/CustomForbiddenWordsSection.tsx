@@ -202,6 +202,7 @@ const CustomForbiddenWordsSection = ({
             <View as="div" margin="small 0">
               <Button
                 disabled={!customForbiddenWordsEnabled}
+                // @ts-expect-error
                 renderIcon={IconUploadSolid}
                 onClick={() => setFileModalOpen(true)}
                 data-testid="uploadButton"

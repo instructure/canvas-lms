@@ -301,6 +301,8 @@ module SIS
           when :concluded
             if Account.site_admin.feature_enabled?(:default_account_grading_scheme) && course.grading_standard_id.nil? && course.root_account.grading_standard_id
               course.update!(grading_standard_id: course.root_account.grading_standard_id)
+            elsif course.grading_standard_id.nil? && course.root_account.grading_standard_id.nil?
+              course.set_concluded_assignments_grading_standard
             end
             Auditors::Course.record_concluded(course, @batch_user, options)
           when :unconcluded

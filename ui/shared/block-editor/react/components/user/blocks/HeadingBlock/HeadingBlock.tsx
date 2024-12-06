@@ -49,6 +49,7 @@ export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) =>
   const [editable, setEditable] = useState(true) // editable when first added
 
   const handleChange = useCallback(
+    // @ts-expect-error
     e => {
       setProp((props: HeadingBlockProps) => {
         props.text = e.target.value.replace(/<\/?[^>]+(>|$)/g, '')
@@ -75,6 +76,7 @@ export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) =>
     [editable]
   )
 
+  // @ts-expect-error
   const handleClick = useCallback(_e => {
     setEditable(true)
   }, [])

@@ -167,6 +167,7 @@ function DiscussionTopicForm({
   const initialSelectedView = window.location.hash.includes('mastery-paths-editor')
     ? Views.MasteryPaths
     : Views.Details
+
   const [selectedView, setSelectedView] = useState(initialSelectedView)
 
   const [title, setTitle] = useState(currentDiscussionTopic?.title || '')
@@ -558,6 +559,20 @@ function DiscussionTopicForm({
           masteryPathsOption
         )
       )
+    } else if (
+      isGraded &&
+      ENV.FEATURES?.selective_release_ui_api &&
+      !isGroupDiscussion &&
+      ENV.context_type !== 'Group'
+    ) {
+      // Well, its fairly lame to call prepUngraded inside if isGraded, but availableUntil/From is ignored by selective release, so we need to fetch it somehow.
+      const {delayedPostAt, lockAt} = prepareUngradedDiscussionOverridesPayload(
+        assignedInfoList,
+        defaultEveryoneOption,
+        defaultEveryoneElseOption,
+        masteryPathsOption
+      )
+      Object.assign(payload, {delayedPostAt, lockAt})
     }
 
     const previousAnonymousState = !currentDiscussionTopic?.anonymousState
@@ -641,12 +656,19 @@ function DiscussionTopicForm({
       ENV.FEATURES.selective_release_ui_api &&
       ENV.FEATURES.selective_release_edit_page
     ) {
-      sectionViewRef = document.getElementById('manage-assign-to-container')?.reactComponentInstance
       const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
-      // Runs custom validation for all cards with the current post to sis selection without re-renders
-      formIsValid =
-        formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+
+      const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
+      if (!isPacedDiscussion) {
+        sectionViewRef = document.getElementById(
+          'manage-assign-to-container'
+        )?.reactComponentInstance
+        // Runs custom validation for all cards with the current post to sis selection without re-renders
+        formIsValid =
+          formIsValid && sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+      }
+
       // If hasAfterRenderIssue is true, a useEffect hook will be responsible to run the focus logic
       hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
     }
@@ -852,6 +874,37 @@ function DiscussionTopicForm({
     )
   }
 
+  const renderAllowParticipantsToComment = useCallback(() => {
+    if (!isAnnouncement) return
+    if (!shouldShowAllowParticipantsToCommentOption) {
+      return (
+        <Tooltip renderTip={I18n.t('This setting is locked in course settings')}>
+          <Checkbox
+            label={I18n.t('Allow Participants to Comment')}
+            value="enable-participants-commenting"
+            inline={true}
+            checked={false}
+            disabled={true}
+          />
+        </Tooltip>
+      )
+    } else {
+      return (
+        <Checkbox
+          label={I18n.t('Allow Participants to Comment')}
+          value="enable-participants-commenting"
+          inline={true}
+          checked={!locked}
+          onChange={e => {
+            setLocked(!locked)
+            setRequireInitialPost(false)
+            e.target.checked === false && setIsThreaded(true)
+          }}
+        />
+      )
+    }
+  }, [isAnnouncement, locked, shouldShowAllowParticipantsToCommentOption])
+
   return (
     <>
       {((shouldMasteryPathsBeVisible && instUINavEnabled()) || !instUINavEnabled()) &&
@@ -973,45 +1026,41 @@ function DiscussionTopicForm({
             />
           )}
           <FormFieldGroup description="" rowSpacing="small">
-            {shouldShowAllowParticipantsToCommentOption && (
-              <Checkbox
-                label={I18n.t('Allow Participants to Comment')}
-                value="enable-participants-commenting"
-                inline={true}
-                checked={!locked}
-                onChange={() => {
-                  setLocked(!locked)
-                  setRequireInitialPost(false)
-                }}
-              />
+            {renderAllowParticipantsToComment()}
+            {!isStudent && (!isAnnouncement || (isAnnouncement && !locked)) && (
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
+                <Checkbox
+                  data-testid="disallow_threaded_replies"
+                  label={I18n.t('Disallow threaded replies')}
+                  value="disallow-threaded-replies"
+                  inline={true}
+                  checked={!locked && !isThreaded}
+                  onChange={() => {
+                    setIsThreaded(!isThreaded)
+                  }}
+                  disabled={
+                    isCheckpoints ||
+                    ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies ||
+                    (!shouldShowAllowParticipantsToCommentOption && isAnnouncement) ||
+                    locked
+                  }
+                />
+              </View>
             )}
 
-            {!isStudent && (
-              <Checkbox
-                data-testid="disallow_threaded_replies"
-                label={I18n.t('Disallow threaded replies')}
-                value="disallow-threaded-replies"
-                inline={true}
-                checked={!isThreaded}
-                onChange={() => {
-                  setIsThreaded(!isThreaded)
-                }}
-                disabled={isCheckpoints || ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies}
-              />
-            )}
-
-            {!isGroupContext && (
-              <Checkbox
-                data-testid="require-initial-post-checkbox"
-                label={I18n.t(
-                  'Participants must respond to the topic before viewing other replies'
-                )}
-                value="must-respond-before-viewing-replies"
-                inline={true}
-                checked={requireInitialPost}
-                onChange={() => setRequireInitialPost(!requireInitialPost)}
-                disabled={isAnnouncement && locked}
-              />
+            {((!isGroupContext && !isAnnouncement) || (isAnnouncement && !locked)) && (
+              <View display="inline-block" padding={isAnnouncement ? '0 0 0 medium' : '0'}>
+                <Checkbox
+                  data-testid="require-initial-post-checkbox"
+                  label={I18n.t(
+                    'Participants must respond to the topic before viewing other replies'
+                  )}
+                  value="must-respond-before-viewing-replies"
+                  inline={true}
+                  checked={requireInitialPost}
+                  onChange={() => setRequireInitialPost(!requireInitialPost)}
+                />
+              </View>
             )}
 
             {shouldShowPodcastFeedOption && (

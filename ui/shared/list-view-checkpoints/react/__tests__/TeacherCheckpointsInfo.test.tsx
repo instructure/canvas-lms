@@ -71,6 +71,7 @@ const assignmentWithOverrides = {
 
 describe('TeacherCheckpointsInfo', () => {
   it('renders the component with correct checkpoint titles', () => {
+    // @ts-expect-error
     render(<TeacherCheckpointsInfo assignment={assignmentNoDueDates} />)
 
     expect(screen.getByText('Reply to Topic:')).toBeInTheDocument()
@@ -79,12 +80,14 @@ describe('TeacherCheckpointsInfo', () => {
 
   describe('due dates', () => {
     it('displays "No Due Date" when checkpoints have no due dates', () => {
+      // @ts-expect-error
       render(<TeacherCheckpointsInfo assignment={assignmentNoDueDates} />)
 
       expect(screen.getAllByText('No Due Date')).toHaveLength(2)
     })
 
     it('displays formatted due dates when checkpoints have due dates', () => {
+      // @ts-expect-error
       render(<TeacherCheckpointsInfo assignment={assignmentWithDueDates} />)
 
       expect(screen.getByText('Jun 2')).toBeInTheDocument()
@@ -92,6 +95,7 @@ describe('TeacherCheckpointsInfo', () => {
     })
 
     it('displays "Multiple Dates" when checkpoints have overrides', () => {
+      // @ts-expect-error
       render(<TeacherCheckpointsInfo assignment={assignmentWithOverrides} />)
 
       expect(screen.getAllByText('Multiple Dates')).toHaveLength(2)
@@ -100,6 +104,7 @@ describe('TeacherCheckpointsInfo', () => {
 
   describe('tooltip', () => {
     it('shows tooltip with correct dates on hover', async () => {
+      // @ts-expect-error
       render(<TeacherCheckpointsInfo assignment={assignmentWithOverrides} />)
 
       const multipleDatesLinks = screen.getAllByText('Multiple Dates')

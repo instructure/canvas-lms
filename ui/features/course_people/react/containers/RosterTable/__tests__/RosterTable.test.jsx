@@ -242,7 +242,6 @@ describe('RosterTable', () => {
       window.ENV.permissions = {
         ...window.ENV.permissions,
         can_allow_admin_actions: false,
-        manage_admin_users: false,
         manage_students: false,
       }
     })
@@ -276,12 +275,6 @@ describe('RosterTable', () => {
 
       it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', () => {
         window.ENV.permissions.can_allow_admin_actions = true
-        const container = setup(mockSettingsToProps({mockUsers: mockAdmin}))
-        checkContainerForButtons(container, mockAdmin)
-      })
-
-      it('should show the Administrative Link button for admin roles if the user has the manage_admin_users permission', () => {
-        window.ENV.permissions.manage_admin_users = true
         const container = setup(mockSettingsToProps({mockUsers: mockAdmin}))
         checkContainerForButtons(container, mockAdmin)
       })

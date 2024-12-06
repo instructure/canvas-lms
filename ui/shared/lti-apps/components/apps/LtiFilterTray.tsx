@@ -17,14 +17,15 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Tray} from '@instructure/ui-tray'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import type {FilterItem, LtiFilters} from '../../models/Filter'
-import FilterOptions from './FilterOptions'
+import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
+import {capitalize} from 'lodash'
+import FilterOptions from './FilterOptions'
+import type {FilterItem, LtiFilters, LpFilters} from '../../models/Filter'
 import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
 
 const I18n = useI18nScope('lti_registrations')
@@ -33,6 +34,7 @@ export type LtiFilterTrayProps = {
   isTrayOpen: boolean
   setIsTrayOpen: (isOpen: boolean) => void
   filterValues: LtiFilters
+  lpFilterValues: [LpFilters] | []
   setQueryParams: (params: Partial<DiscoverParams>) => void
   queryParams: DiscoverParams
 }
@@ -41,6 +43,7 @@ export default function LtiFilterTray({
   isTrayOpen,
   setIsTrayOpen,
   filterValues,
+  lpFilterValues,
   setQueryParams,
   queryParams,
 }: LtiFilterTrayProps) {
@@ -133,6 +136,35 @@ export default function LtiFilterTray({
               />
             )
           })}
+
+          {lpFilterValues &&
+            lpFilterValues.map(filter => {
+              return (
+                <View as="div">
+                  <Heading level="h4" as="h2">
+                    {capitalize(filter.name)}
+                  </Heading>
+                  <div style={{padding: '12px 0 0 16px'}}>
+                    {filter.tag_groups.map(tagGroup => {
+                      return (
+                        <FilterOptions
+                          key={tagGroup.id}
+                          categoryName={tagGroup.name}
+                          options={tagGroup.tags}
+                          filterIds={
+                            !!localFilters[tagGroup.name] &&
+                            localFilters[tagGroup.name].map(f => f.id)
+                          }
+                          setFilterValue={(filterItem: FilterItem, value: boolean) =>
+                            setFilterValue(filterItem, value, tagGroup.name)
+                          }
+                        />
+                      )
+                    })}
+                  </div>
+                </View>
+              )
+            })}
         </Flex.Item>
 
         <View background="secondary" borderWidth="small none none none" padding="small">

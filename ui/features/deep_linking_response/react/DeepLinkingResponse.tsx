@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useCallback, useState} from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
@@ -212,7 +212,11 @@ export default class DeepLinkingResponse {
 
   static mount() {
     const parentWindow = this.targetWindow(window)
-    const root = ReactDOM.createRoot(document.getElementById('deepLinkingContent'))
+    const node = document.getElementById('deepLinkingContent')
+    if (!node) {
+      throw new Error('Could not find node with id deepLinkingContent')
+    }
+    const root = ReactDOM.createRoot(node)
     root.render(<RetrievingContent environment={ENV} parentWindow={parentWindow} />)
   }
 }

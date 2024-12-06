@@ -148,6 +148,7 @@ describe('convertModuleSettingsForApi', () => {
 
 describe('requirementTypesForResource', () => {
   it('returns types for assignment', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'assignment'})).toEqual([
       'view',
       'mark',
@@ -157,18 +158,22 @@ describe('requirementTypesForResource', () => {
   })
 
   it('returns types for quiz', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'quiz'})).toEqual(['view', 'submit', 'score'])
   })
 
   it('returns types for file', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'file'})).toEqual(['view'])
   })
 
   it('returns types for page', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'page'})).toEqual(['view', 'mark', 'contribute'])
   })
 
   it('returns types for graded discussion', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'discussion', graded: true})).toEqual([
       'view',
       'contribute',
@@ -178,6 +183,7 @@ describe('requirementTypesForResource', () => {
   })
 
   it('returns types for ungraded discussion', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'discussion', graded: false})).toEqual([
       'view',
       'contribute',
@@ -185,10 +191,12 @@ describe('requirementTypesForResource', () => {
   })
 
   it('returns types for externalUrl', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'externalUrl'})).toEqual(['view'])
   })
 
   it('returns types for externalTool', () => {
+    // @ts-expect-error
     expect(requirementTypesForResource({resource: 'externalTool'})).toEqual(['view'])
   })
 })

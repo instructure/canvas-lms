@@ -673,12 +673,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Mehrfarbiges Bild" },
   "multiplication_sign_15f95c22": { "message": "Multiplikationszeichen" },
   "music_icon_4db5c972": { "message": "Musiksymbol" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Mindestens { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Mindestgröße ist { width } x { height } px."
-  },
   "my_files_2f621040": { "message": "Meine Dateien" },
   "n_th_root_9991a6e4": { "message": "Nte. Wurzel" },
   "nabla_1e216d25": { "message": "Nabla" },

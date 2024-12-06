@@ -8091,6 +8091,41 @@ describe Submission do
     end
   end
 
+  describe "#checkpoints_needs_grading?" do
+    before(:once) do
+      @course = course_model
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @student = student_in_course(course: @course, active_all: true).user
+      @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
+    end
+
+    it "returns true if one sub_assigment(REPLY_TO_ENTRY) needs grading" do
+      @topic.reply_to_topic_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be true
+    end
+
+    it "returns true if one sub_assigment(REPLY_TO_TOPIC) needs grading" do
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @topic.reply_to_entry_checkpoint.submit_homework(@student, submission_type: "discussion_topic")
+
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be true
+    end
+
+    it "returns false if one sub_assigments has been graded(other is unsubmitted)" do
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be false
+    end
+
+    it "returns false if both sub_assigments have been graded" do
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 3, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      @topic.assignment.grade_student(@student, grader: @teacher, score: 7, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+      expect(Submission.where(user_id: @student.id, assignment_id: @topic.assignment_id).first.checkpoints_needs_grading?).to be false
+    end
+  end
+
   describe "#plagiarism_service_to_use" do
     it "returns nil when no service is configured" do
       submission = @assignment.submit_homework(@student,
@@ -9256,40 +9291,8 @@ describe Submission do
   end
 
   describe "word_count" do
-    it "returns the word count" do
-      submission.update(body: "test submission")
-      expect(submission.word_count).to eq 2
-    end
-
-    it "returns the word count if body is split up by <br> tags" do
-      submission.update(body: "test<br>submission")
-      expect(submission.word_count).to eq 2
-    end
-
-    it "returns nil if there is no body" do
-      expect(submission.body).to be_nil
-      expect(submission.word_count).to be_nil
-    end
-
-    it "returns nil if it's a quiz submission" do
-      submission.update(submission_type: "online_quiz", body: "test submission")
-      expect(submission.submission_type).to eq "online_quiz"
-      expect(submission.body).not_to be_nil
-      expect(submission.word_count).to be_nil
-    end
-
-    it "returns 0 if the body is empty" do
-      submission.update(body: "")
-      expect(submission.word_count).to eq 0
-    end
-
-    it "ignores HTML tags" do
-      submission.update(body: "<span>test <div></div>submission</span> <p></p>")
-      expect(submission.word_count).to eq 2
-      submission.instance_variable_set :@word_count, nil
-      submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
-        <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
-      expect(submission.word_count).to eq 18
+    before do
+      @submission = @assignment.submissions.find_by(user: @student)
     end
 
     it "sums word counts of attachments if there are any" do
@@ -9299,7 +9302,106 @@ describe Submission do
       attachment2 = attachment_model(uploaded_data: stub_file_data("submission.txt", submission_text, "text/plain"), context: @student)
       sub = @assignment.submit_homework(@student, attachments: [attachment1, attachment2])
       run_jobs
-      expect(sub.word_count).to eq 12
+      expect(sub.reload.word_count).to eq 12
+    end
+
+    context "when calculating word count on-the-fly" do
+      before { Account.site_admin.disable_feature!(:use_body_word_count) }
+
+      it "returns the word count" do
+        @submission.update(body: "test submission")
+        expect(@submission.word_count).to eq 2
+      end
+
+      it "returns the word count if body is split up by <br> tags" do
+        @submission.update(body: "test<br>submission")
+        expect(@submission.word_count).to eq 2
+      end
+
+      it "returns nil if there is no body" do
+        expect(@submission.body).to be_nil
+        expect(@submission.word_count).to be_nil
+      end
+
+      it "returns nil if it's a quiz submission" do
+        @submission.update(submission_type: "online_quiz", body: "test submission")
+        expect(@submission.submission_type).to eq "online_quiz"
+        expect(@submission.body).not_to be_nil
+        expect(@submission.word_count).to be_nil
+      end
+
+      it "returns 0 if the body is empty" do
+        @submission.update(body: "")
+        expect(@submission.word_count).to eq 0
+      end
+
+      it "ignores HTML tags" do
+        @submission.update(body: "<span>test <div></div>submission</span> <p></p>")
+        expect(@submission.word_count).to eq 2
+        @submission.instance_variable_set :@word_count, nil
+        @submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
+          <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
+        expect(@submission.reload.word_count).to eq 18
+      end
+    end
+
+    context "when the use_body_word_count feature is enabled" do
+      let(:word_count) do
+        run_jobs
+        @submission.reload.word_count
+      end
+
+      it "falls back to calculating on-the-fly if body_word_count is nil" do
+        @submission.update_columns(body: "two words")
+        run_jobs
+        @submission.reload
+        expect(@submission.body_word_count).to be_nil
+        expect(@submission.word_count).to eq 2
+      end
+
+      it "sets the word_count to 0 if an exception is thrown when trying to calculate the count" do
+        # stubbing this way (instead of expect(submission)...) because the method is called on an object in a delayed job.
+        expect_any_instance_of(Submission).to receive(:calc_body_word_count).and_raise("Kaboom")
+        @submission.update(body: "submission body that can't be parsed for some reason (usually because it's too big)")
+        expect(word_count).to eq 0
+      end
+
+      it "returns the word count" do
+        @submission.update(body: "test submission")
+        expect(word_count).to eq 2
+      end
+
+      it "returns the word count if body is split up by <br> tags" do
+        @submission.update(body: "test<br>submission")
+        expect(word_count).to eq 2
+      end
+
+      it "returns nil if there is no body" do
+        expect(@submission.body).to be_nil
+        expect(word_count).to be_nil
+      end
+
+      it "returns nil if it's a quiz submission" do
+        @submission.update(submission_type: "online_quiz", body: "test submission")
+        expect(@submission.submission_type).to eq "online_quiz"
+        expect(@submission.body).not_to be_nil
+        expect(word_count).to be_nil
+      end
+
+      it "returns 0 if the body is empty" do
+        @submission.update(body: "")
+        expect(word_count).to eq 0
+      end
+
+      it "ignores HTML tags" do
+        @submission.update(body: "<span>test <div></div>submission</span> <p></p>")
+        expect(word_count).to eq 2
+        @submission.instance_variable_set :@word_count, nil
+        @submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
+          <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
+        run_jobs
+        expect(@submission.reload.word_count).to eq 18
+      end
     end
   end
 

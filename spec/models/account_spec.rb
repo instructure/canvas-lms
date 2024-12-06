@@ -854,6 +854,64 @@ describe Account do
     expect(account.group_categories.active.to_a).to eq [category2]
   end
 
+  describe "group and differentiation tag associations" do
+    before(:once) do
+      @account = Account.default
+      @collaborative_category = GroupCategory.create!(context: @account, name: "Collab Category")
+      @course = course_factory(account: @account)
+      @non_collab_category = GroupCategory.create!(context: @course, name: "Tag Category", non_collaborative: true)
+
+      @collaborative_group = Group.create!(context: @account, group_category: @collaborative_category, name: "Collab Group")
+      @differentiation_tag = Group.create!(context: @course, group_category: @non_collab_category, name: "Tag")
+
+      @deleted_collab_group = Group.create!(context: @account, group_category: @collaborative_category, name: "Deleted Collab")
+      @deleted_collab_group.destroy
+
+      @sub_account = @account.sub_accounts.create!
+      @sub_course = course_factory(account: @sub_account)
+      @sub_collab_group = Group.create!(context: @sub_account, group_category: @collaborative_category, name: "Sub Collab", root_account: @account)
+      @sub_tag = Group.create!(context: @sub_course, group_category: @non_collab_category, name: "Sub Tag", root_account: @account)
+    end
+
+    context "collaborative groups" do
+      it "filters group categories by collaborative flag" do
+        expect(@account.group_categories).to contain_exactly(@collaborative_category)
+        expect(@account.all_group_categories).to contain_exactly(@collaborative_category)
+      end
+
+      it "filters groups by collaborative flag" do
+        expect(@account.groups).to contain_exactly(@collaborative_group, @deleted_collab_group)
+        expect(@account.all_groups).to contain_exactly(@collaborative_group, @deleted_collab_group, @sub_collab_group)
+      end
+    end
+
+    context "differentiation tags" do
+      it "filters group categories by non-collaborative flag" do
+        expect(@account.differentiation_tag_categories).to be_empty
+        expect(@account.all_differentiation_tag_categories).to contain_exactly(@non_collab_category)
+      end
+
+      it "filters groups by non-collaborative flag" do
+        expect(@account.differentiation_tags).to be_empty
+        expect(@account.all_differentiation_tags).to contain_exactly(@differentiation_tag, @sub_tag)
+      end
+    end
+
+    describe "memberships" do
+      before(:once) do
+        @student2 = user_factory
+        @student = user_factory
+        @collaborative_group.add_user(@student)
+        @differentiation_tag.add_user(@student2)
+      end
+
+      it "accesses memberships through all_groups/all_differentiation_tags" do
+        expect(@account.all_group_memberships.map(&:user_id)).to contain_exactly(@student.id)
+        expect(@account.all_differentiation_tag_memberships.map(&:user_id)).to contain_exactly(@student2.id)
+      end
+    end
+  end
+
   it "returns correct values for login_handle_name_with_inference" do
     account = Account.default
     expect(account.login_handle_name_with_inference).to eq "Email"
@@ -2788,6 +2846,59 @@ describe Account do
         expect(Account.default.available_ip_filters(@course2.uuid).size).to eq(2)
         expect(Account.default.available_ip_filters(@course1.uuid).size).to eq(1)
       end
+    end
+  end
+
+  describe "#recompute_assignments_using_account_default" do
+    let_once(:data1) { [["A", 0.94], ["F", 0]] }
+    let_once(:data2) { [["A", 0.5], ["F", 0]] }
+
+    before do
+      Account.site_admin.enable_feature!(:archived_grading_schemes)
+      Account.site_admin.enable_feature!(:default_account_grading_scheme)
+      @root_account = Account.default
+      sub_account = @root_account.sub_accounts.create!
+      sub_sub_account = sub_account.sub_accounts.create!
+      admin = account_admin_user(account: @root_account)
+      user_session(admin)
+      grading_standard = GradingStandard.create!(context: @root_account, workflow_state: "active", data: data1, title: "current grading scheme")
+      @new_grading_standard = GradingStandard.create!(context: @root_account, workflow_state: "active", data: data2, title: "new grading scheme")
+      @root_account.update!(grading_standard_id: grading_standard.id)
+      course_inheriting_from_root = course_factory(account: @root_account)
+      course_not_inheriting_from_root = course_factory(account: @root_account)
+      course_not_inheriting_from_root.update!(grading_standard_id: grading_standard.id)
+      course_inheriting_from_sub = course_factory(account: sub_account)
+      course_inheriting_from_sub_sub = course_factory(account: sub_sub_account)
+      student1 = course_inheriting_from_root.enroll_user(user_factory(active_user: true), "StudentEnrollment", enrollment_state: "active").user
+      student2 = course_not_inheriting_from_root.enroll_user(user_factory(active_user: true), "StudentEnrollment", enrollment_state: "active").user
+      student3 = course_inheriting_from_sub.enroll_user(user_factory(active_user: true), "StudentEnrollment", enrollment_state: "active").user
+      student4 = course_inheriting_from_sub_sub.enroll_user(user_factory(active_user: true), "StudentEnrollment", enrollment_state: "active").user
+      assignment_root = course_inheriting_from_root.assignments.create!(title: "hi", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
+      assignment_not_inheriting = course_not_inheriting_from_root.assignments.create!(title: "hello", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
+      assignment_sub = course_inheriting_from_sub.assignments.create!(title: "hi2", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
+      assignment_sub_sub = course_inheriting_from_sub_sub.assignments.create!(title: "hi3", grading_standard_id: nil, points_possible: 10, grading_type: "letter_grade")
+      @submission_root = assignment_root.grade_student(student1, score: 6, grader: admin).first
+      @submission_not_inheriting = assignment_not_inheriting.grade_student(student2, score: 6, grader: admin).first
+      @submission_sub = assignment_sub.grade_student(student3, score: 6, grader: admin).first
+      @submission_sub_sub = assignment_sub_sub.grade_student(student4, score: 6, grader: admin).first
+    end
+
+    it "updates submission grades in account inheriting courses/assignments and all sub account courses/assignments" do
+      @root_account.recompute_assignments_using_account_default(@new_grading_standard)
+
+      expect(@submission_root.reload.grade).to eq "A"
+      expect(@submission_not_inheriting.reload.grade).to eq "F"
+      expect(@submission_sub.reload.grade).to eq "A"
+      expect(@submission_sub_sub.reload.grade).to eq "A"
+    end
+
+    it "updates the most recent submission version in all inheriting account and sub account courses" do
+      @root_account.recompute_assignments_using_account_default(@new_grading_standard)
+
+      expect(@submission_root.reload.versions.first.model.grade).to eq "A"
+      expect(@submission_not_inheriting.reload.versions.first.model.grade).to eq "F"
+      expect(@submission_sub.reload.versions.first.model.grade).to eq "A"
+      expect(@submission_sub_sub.reload.versions.first.model.grade).to eq "A"
     end
   end
 end

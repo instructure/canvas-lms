@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
-import {
+import type {
   ImageBlockProps,
   ImageConstraint,
 } from '@canvas/block-editor/react/components/user/blocks/ImageBlock/types'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import {changeSizeVariant} from '@canvas/block-editor/react/utils'
-import {SizeVariant} from '@canvas/block-editor/react/components/editor/types'
+import type {SizeVariant} from '@canvas/block-editor/react/components/editor/types'
 
 type SetPropFn = (updateFn: (props: ImageBlockProps) => void) => void
 

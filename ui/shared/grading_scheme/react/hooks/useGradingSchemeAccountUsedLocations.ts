@@ -53,6 +53,7 @@ export const useGradingSchemeAccountUsedLocations = (): {
 
         setGradingSchemeAccountUsedLocationsStatus(ApiCallStatus.COMPLETED)
         return {
+          // @ts-expect-error
           accountUsedLocations: result.json || [],
           isLastPage: result.link?.next === undefined,
           nextPage: result.link?.next?.url,

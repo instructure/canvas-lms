@@ -41,7 +41,6 @@ export const useDefaultGradingScheme = (): {
       try {
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.PENDING)
 
-        // @ts-expect-error
         const result = await doFetchApi<GradingScheme>({
           path: `${contextPath}/grading_schemes/default`,
           method: 'GET',
@@ -49,6 +48,7 @@ export const useDefaultGradingScheme = (): {
         if (!result.response.ok) {
           throw new Error(result.response.statusText)
         }
+        // @ts-expect-error
         const defaultGradingScheme: GradingScheme = result.json
         setLoadDefaultGradingSchemeStatus(ApiCallStatus.COMPLETED)
         return defaultGradingScheme

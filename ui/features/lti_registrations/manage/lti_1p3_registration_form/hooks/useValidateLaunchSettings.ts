@@ -100,7 +100,7 @@ export const useValidateLaunchSettings = (
         .split('\n')
         .map(s => s.trim())
         .filter(s => s.length > 0)
-        .every(s => s.match(/^\w+=\w+$/))
+        .every(s => s.match(/.+=.+$/))
     ) {
       return []
     } else {

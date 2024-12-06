@@ -42,7 +42,8 @@ jest.mock('@canvas/observer-picker/react/utils', () => ({
   fetchShowK5Dashboard: jest.fn(),
 }))
 
-const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+const render = children =>
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const currentUserId = defaultProps.currentUser.id
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`

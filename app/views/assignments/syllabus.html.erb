@@ -19,6 +19,8 @@
 <%
   if @context.elementary_enabled?
     page_title = t("Important Info for %{course}", :course => @context.name)
+  elsif @context.horizon_course?
+    page_title = t("Overview for %{course}", :course => @context.name)
   else
     page_title = t(:page_title, "Syllabus for %{course}", :course => @context.name)
   end

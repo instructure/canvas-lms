@@ -36,6 +36,7 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<DateLocked date="TEST" type="assignment" />, document.getElementById('fixtures'))
   const element = $('[data-testid="assignments-2-date-locked"]')
   expect(element).toHaveLength(1)

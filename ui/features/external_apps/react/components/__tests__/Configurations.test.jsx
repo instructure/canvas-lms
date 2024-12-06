@@ -30,6 +30,7 @@ document.body.appendChild(container)
 
 const wrapper = document.getElementById('fixtures')
 const createElement = (data = {}) => <Configurations {...data} />
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = (data = {}) => ReactDOM.render(createElement(data), wrapper)
 
 describe('ExternalApps.Configurations', () => {

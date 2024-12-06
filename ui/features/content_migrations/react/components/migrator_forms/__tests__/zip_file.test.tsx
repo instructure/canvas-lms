@@ -20,7 +20,6 @@ import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ZipFileImporter from '../zip_file'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -143,7 +142,7 @@ describe('ZipFileImporter', () => {
   it('calls onCancel', async () => {
     renderComponent()
 
-    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Clear'}))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -168,7 +167,7 @@ describe('ZipFileImporter', () => {
     renderComponent({isSubmitting: true})
     await waitFor(() => {
       expect(screen.getByTestId('migrationFileUpload')).toBeDisabled()
-      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
       expect(screen.queryByText('Search folders')).not.toBeInTheDocument()
       expect(screen.queryByText('course files')).not.toBeInTheDocument()

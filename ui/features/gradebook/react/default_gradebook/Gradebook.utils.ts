@@ -188,7 +188,7 @@ export function renderComponent(
     throw new Error('mountPoint is required')
   }
   const component = React.createElement(reactClass, props)
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(component, mountPoint)
 }
 

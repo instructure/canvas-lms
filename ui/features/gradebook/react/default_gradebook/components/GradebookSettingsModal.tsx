@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -46,16 +45,19 @@ import type {
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}): boolean {
   return !isEmpty(changes) && isEmpty(validationErrors)
 }
 
+// @ts-expect-error
 function haveCourseSettingsChanged({props, state}): boolean {
   return Object.keys(state.courseSettings).some(
     key => props.courseSettings[key] !== state.courseSettings[key]
   )
 }
 
+// @ts-expect-error
 function isPostPolicyChanged({props, state}) {
   if (props.postPolicies == null) {
     return false
@@ -67,6 +69,7 @@ function isPostPolicyChanged({props, state}) {
   return oldPostManually !== newPostManually
 }
 
+// @ts-expect-error
 function haveViewOptionsChanged({state: {viewOptions, viewOptionsLastSaved}}): boolean {
   return viewOptions != null && !isEqual(viewOptions, viewOptionsLastSaved)
 }
@@ -89,6 +92,7 @@ function onSaveViewOptionsFailure(_error: Error) {
   return Promise.reject(new Error(message))
 }
 
+// @ts-expect-error
 function onUpdateSuccess({close}) {
   const message = I18n.t('Gradebook Settings updated')
   showFlashAlert({err: null, message, type: 'success'})
@@ -233,7 +237,9 @@ export default class GradebookSettingsModal extends React.Component<
       courseId: this.props.courseId,
       postManually: this.state.coursePostPolicy.postManually,
     })
+      // @ts-expect-error
       .then(_response => getAssignmentPostPolicies({courseId: this.props.courseId}))
+      // @ts-expect-error
       .then(response => {
         const {postManually} = this.state.coursePostPolicy
         this.props.postPolicies.setCoursePostPolicy({postManually})
@@ -244,6 +250,7 @@ export default class GradebookSettingsModal extends React.Component<
       .catch(onSavePostPolicyFailure)
 
   saveViewOptions = () => {
+    // @ts-expect-error
     const savedOptions: GradebookViewOptions = cloneDeep(this.state.viewOptions)
     if (!this.props.onViewOptionsUpdated) {
       throw new Error('onViewOptionsUpdated is required to save view options')
@@ -295,10 +302,12 @@ export default class GradebookSettingsModal extends React.Component<
     this.setState({latePolicy})
   }
 
+  // @ts-expect-error
   changePostPolicy = coursePostPolicy => {
     this.setState({coursePostPolicy})
   }
 
+  // @ts-expect-error
   handleCourseSettingsChange = courseSettings => {
     this.setState(state => ({courseSettings: {...state, ...courseSettings}}))
   }

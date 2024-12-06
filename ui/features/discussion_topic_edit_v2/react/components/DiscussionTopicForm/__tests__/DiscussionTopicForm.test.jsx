@@ -137,8 +137,6 @@ describe('DiscussionTopicForm', () => {
     expect(document.queryByText('Attach')).toBeTruthy()
     expect(document.queryByTestId('section-select')).toBeTruthy()
     expect(document.queryByLabelText('Allow Participants to Comment')).toBeInTheDocument()
-    expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
-    expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
     expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
     expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
     expect(document.queryByTestId('non-graded-date-options')).toBeTruthy()
@@ -153,6 +151,22 @@ describe('DiscussionTopicForm', () => {
 
     // hides mastery paths
     expect(document.queryByText('Mastery Paths')).toBeFalsy()
+  })
+
+  it('renders comment related fields when participants commenting is enabled in an announcement', () => {
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
+    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+    window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+    window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = false
+
+    const {queryByTestId, queryByLabelText} = setup()
+
+    const allowCommentsCheckbox = queryByLabelText('Allow Participants to Comment')
+    allowCommentsCheckbox.click()
+    expect(allowCommentsCheckbox).toBeChecked()
+    expect(queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
+    expect(queryByTestId('require-initial-post-checkbox')).toBeInTheDocument()
   })
 
   it('renders reset buttons for availability dates when creating/editing an announcement', () => {
@@ -507,13 +521,15 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
 
-    it('does not display "Allow Participants to Comment" when the setting is turned off', () => {
+    it('displays disabled "Allow Participants to Comment" when the setting is turned off', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
       window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
 
-      const {queryByText} = setup()
+      const {queryByLabelText} = setup()
+      const component = queryByLabelText('Allow Participants to Comment')
 
-      expect(queryByText('Allow Participants to Comment')).not.toBeInTheDocument()
+      expect(component).toBeInTheDocument()
+      expect(component).toBeDisabled()
     })
 
     it('displays "Allow Participants to Comment" when the setting is turned on', () => {
@@ -541,6 +557,28 @@ describe('DiscussionTopicForm', () => {
 
       const checkbox = getByTestId('disallow_threaded_replies')
       expect(checkbox.disabled).toBe(true)
+      expect(checkbox.checked).toBe(false)
+    })
+
+    it('disallow threaded replies checkbox is not present in announcements if "Allow participants to comment" is disabled', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+
+      const {queryByTestId} = setup()
+
+      expect(queryByTestId('disallow_threaded_replies')).not.toBeInTheDocument()
+    })
+
+    it('disallow threaded replies checkbox is enabled in dicussions if "Allow participants to comment" is disabled', () => {
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.has_threaded_replies = false
+      window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+      window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
+
+      const {getByTestId} = setup({currentDiscussionTopic: {discussionType: 'threaded'}})
+
+      const checkbox = getByTestId('disallow_threaded_replies')
+      expect(checkbox.disabled).toBe(false)
       expect(checkbox.checked).toBe(false)
     })
   })
@@ -614,6 +652,32 @@ describe('DiscussionTopicForm', () => {
         }
 
         expect(isGuidDataValid(mockEvent)).toBe(false)
+      })
+    })
+
+    describe('Course Pacing', () => {
+      it('can successfully validate the form when course pacing is enabled (custom ItemAssignToTray validation is skipped, as there is no related input is expected)', () => {
+        window.ENV.CONTEXT_TYPE = 'Group'
+        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.in_paced_course = true
+        window.ENV.FEATURES.selective_release_ui_api = true
+        window.ENV.FEATURES.selective_release_edit_page = true
+
+        const onSubmit = jest.fn()
+        const {getByText, getByPlaceholderText} = setup({
+          onSubmit,
+          currentDiscussionTopic: DiscussionTopic.mock({
+            assignment: Assignment.mock({
+              hasSubAssignments: true,
+            }),
+            groupSet: GroupSet.mock(),
+            canGroup: true,
+          }),
+        })
+        const saveButton = getByText('Save')
+        fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+        saveButton.click()
+        expect(onSubmit).toHaveBeenCalled()
       })
     })
 

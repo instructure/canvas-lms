@@ -38,7 +38,9 @@ type QuizModalProps = {
 }
 
 const QuizModal = ({open, onClose, onSelect}: QuizModalProps) => {
+  // @ts-expect-error
   const [questions, setQuestions] = useState<QuestionProps | undefined>(null)
+  // @ts-expect-error
   const [question, setQuestion] = useState<QuestionProps | undefined>(null)
   const [quizId, setQuizId] = useState<string | null>(null)
   const [quizTitle, setQuizTitle] = useState<string | null>(null)
@@ -92,6 +94,7 @@ const QuizModal = ({open, onClose, onSelect}: QuizModalProps) => {
       </Modal.Header>
       <Modal.Body>
         {quizId ? (
+          // @ts-expect-error
           <QuestionSelect questions={questions} onSelect={handleQuestionSelect} />
         ) : (
           <QuizSelect onSelect={handleQuizSelect} />

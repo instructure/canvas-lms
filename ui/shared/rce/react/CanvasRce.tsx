@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,16 +18,16 @@
 
 import $ from 'jquery'
 
-import React, {forwardRef, MutableRefObject, useCallback, useEffect, useState} from 'react'
+import React, {forwardRef, type MutableRefObject, useCallback, useEffect, useState} from 'react'
 import {createChainedFunction} from '@instructure/ui-utils'
-import RCE, {RCEPropTypes} from '@instructure/canvas-rce/es/rce/RCE'
+import RCE, {type RCEPropTypes} from '@instructure/canvas-rce/es/rce/RCE'
 import RCEWrapper from '@instructure/canvas-rce/es/rce/RCEWrapper'
 import getRCSProps from '../getRCSProps'
 import EditorConfig from '../tinymce.config'
 import loadEventListeners from '../loadEventListeners'
 import shouldUseFeature, {Feature} from '../shouldUseFeature'
 import tinymce, {Editor} from 'tinymce'
-import {EditorOptionsPropType} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
+import type {EditorOptionsPropType} from '@instructure/canvas-rce/es/rce/RCEWrapperProps'
 
 // the ref you add via <CanvasRce ref={yourRef} /> will be a reference
 // to the underlying RCEWrapper. You probably shouldn't use it until
@@ -64,6 +62,7 @@ const CanvasRce = forwardRef(function CanvasRce(
     const editorConfig = new EditorConfig(tinymce, window.INST, textareaId)
     const config = {...editorConfig.defaultConfig(), ...editorOptions}
     if (editorOptions?.init_instance_callback) {
+      // @ts-expect-error
       config.init_instance_callback = createChainedFunction(
         config.init_instance_callback,
         editorOptions?.init_instance_callback
@@ -81,6 +80,7 @@ const CanvasRce = forwardRef(function CanvasRce(
   // will never trigger it to be rerun. This way any time the ref changes,
   // the function is called. rceRef as a dependency is to quiet eslint.
   const magicRef = useCallback(
+    // @ts-expect-error
     node => {
       rceRef.current = node
       if (node) {
@@ -108,6 +108,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       autosave={autosave_}
       canvasOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || ''}
       defaultContent={defaultContent}
+      // @ts-expect-error
       editorOptions={tinymceConfig}
       highContrastCSS={
         window.ENV?.url_for_high_contrast_tinymce_editor_css
@@ -116,8 +117,10 @@ const CanvasRce = forwardRef(function CanvasRce(
       }
       instRecordDisabled={window.ENV?.RICH_CONTENT_INST_RECORD_TAB_DISABLED}
       language={window.ENV?.LOCALES?.[0] || 'en'}
+      // @ts-expect-error
       userCacheKey={window.ENV?.user_cache_key}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
+      // @ts-expect-error
       ltiTools={window.INST?.editorButtons}
       maxInitRenderedRCEs={props.maxInitRenderedRCEs}
       mirroredAttrs={mirroredAttrs}
@@ -125,6 +128,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       textareaClassName={textareaClassName}
       textareaId={textareaId}
       height={height}
+      // @ts-expect-error
       rcsProps={RCSProps}
       onFocus={onFocus}
       onBlur={onBlur}
@@ -133,11 +137,15 @@ const CanvasRce = forwardRef(function CanvasRce(
       use_rce_icon_maker={shouldUseFeature(Feature.IconMaker, window.ENV)}
       resourceType={resourceType}
       resourceId={resourceId}
+      // @ts-expect-error
       ai_text_tools={window.ENV?.RICH_CONTENT_AI_TEXT_TOOLS}
       externalToolsConfig={{
         ltiIframeAllowances: window.ENV?.LTI_LAUNCH_FRAME_ALLOWANCES,
+        // @ts-expect-error
         isA2StudentView: window.ENV?.a2_student_view,
+        // @ts-expect-error
         maxMruTools: window.ENV?.MAX_MRU_LTI_TOOLS,
+        // @ts-expect-error
         resourceSelectionUrlOverride:
           $('#context_external_tool_resource_selection_url').attr('href') || null,
       }}
@@ -238,6 +246,7 @@ export interface CanvasRcePropTypes {
 
 const defaultProps: Partial<CanvasRcePropTypes> = {
   autosave: true,
+  // @ts-expect-error
   editorOptions: {},
   maxInitRenderedRCEs: -1,
   mirroredAttrs: {},

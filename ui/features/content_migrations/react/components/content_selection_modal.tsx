@@ -17,7 +17,6 @@
  */
 
 import React, {useCallback, useState} from 'react'
-// @ts-ignore
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -110,6 +109,7 @@ const mapSelectiveDataResponse = async (response: SelectiveDataResponse): Promis
     })
 
     if (sub_items_url && count) {
+      // @ts-expect-error
       // eslint-disable-next-line no-await-in-loop
       const {json}: {json: GenericItemResponse[]} = await doFetchApi({
         path: sub_items_url,
@@ -169,6 +169,7 @@ export const ContentSelectionModal = ({
       path: `/api/v1/courses/${courseId}/content_migrations/${migration.id}/selective_data`,
       method: 'GET',
     })
+      // @ts-expect-error
       .then(({json}: {json: SelectiveDataResponse}) => mapSelectiveDataResponse(json))
       .then((mappedItems: Item[]) => setItems(mappedItems))
       .catch(() => setHasErrors(true))
@@ -213,7 +214,6 @@ export const ContentSelectionModal = ({
 
   return (
     <>
-      {/* @ts-ignore */}
       <Button size="small" color="primary" onClick={() => setOpen(true)}>
         {I18n.t('Select content')}
       </Button>
@@ -236,14 +236,12 @@ export const ContentSelectionModal = ({
         </Modal.Header>
         <Modal.Body>{content}</Modal.Body>
         <Modal.Footer>
-          {/* @ts-ignore */}
           <Button onClick={() => setOpen(false)} margin="0 x-small 0 0">
             {I18n.t('Cancel')}
           </Button>
           <Button
             color="primary"
             interaction={selectedProperties.length > 0 ? 'enabled' : 'disabled'}
-            // @ts-ignore
             onClick={handleSubmit}
           >
             {I18n.t('Select Content')}

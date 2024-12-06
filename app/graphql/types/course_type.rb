@@ -339,6 +339,9 @@ module Types
       if filter[:updated_since]
         submissions = submissions.where("submissions.updated_at > ?", filter[:updated_since])
       end
+      if (due_between = filter[:due_between])
+        submissions = submissions.where(cached_due_date: (due_between[:start])..(due_between[:end]))
+      end
 
       (order_by || []).each do |order|
         direction = (order[:direction] == "descending") ? "DESC NULLS LAST" : "ASC"
@@ -348,26 +351,48 @@ module Types
       submissions
     end
 
-    field :groups_connection, GroupType.connection_type, null: true
-    def groups_connection
+    field :groups_connection, GroupType.connection_type, null: true do
+      argument :include_non_collaborative, Boolean, required: false, default_value: false
+    end
+    def groups_connection(include_non_collaborative: false)
+      show_non_collaborative = include_non_collaborative && course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+      groups_scope = show_non_collaborative ? course.combined_groups_and_differentiation_tags.active : course.active_groups
+
       # TODO: share this with accounts when groups are added there
       if course.grants_right?(current_user, session, :read_roster)
-        course.groups.active
-              .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-              .eager_load(:group_category)
+        groups_scope
+          .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+          .eager_load(:group_category)
       else
         nil
       end
     end
 
-    def get_group_sets(course, include_non_collaborative)
-      if course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
-        if include_non_collaborative && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
-          course.group_categories.where(role: nil)
-        else
-          course.group_categories.where(role: nil, non_collaborative: false)
-        end
+    def get_group_sets(course, include_non_collaborative: false)
+      return [] unless course
+
+      # Check user permissions
+      can_manage_groups = course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
+      can_manage_tags   = course&.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+
+      # Only return group sets if the user has permission to manage groups or tags
+      return [] unless can_manage_groups || can_manage_tags
+
+      # If a user only has permission to see tags but doesn't want them included, return early
+      return [] if can_manage_tags && !can_manage_groups && !include_non_collaborative
+
+      # Get all GroupCategory models for the context, this includes Tags AND Group Sets
+      group_sets = GroupCategory.where(context: course, role: nil).active
+
+      if can_manage_groups && can_manage_tags
+        group_sets = group_sets.collaborative unless include_non_collaborative
+      elsif can_manage_groups
+        group_sets = group_sets.collaborative
+      elsif can_manage_tags
+        group_sets = group_sets.non_collaborative
       end
+
+      group_sets
     end
 
     field :group_sets_connection, GroupSetType.connection_type, null: true do
@@ -375,7 +400,7 @@ module Types
       argument :include_non_collaborative, Boolean, required: false, default_value: false
     end
     def group_sets_connection(include_non_collaborative: false)
-      get_group_sets(course, include_non_collaborative)
+      get_group_sets(course, include_non_collaborative:)
     end
 
     # TODO: this is only temporary until the group_sets_connection gets paginated
@@ -384,7 +409,7 @@ module Types
       argument :include_non_collaborative, Boolean, required: false, default_value: false
     end
     def group_sets(include_non_collaborative: false)
-      get_group_sets(course, include_non_collaborative)
+      get_group_sets(course, include_non_collaborative:)
     end
 
     field :external_tools_connection, ExternalToolType.connection_type, null: true do

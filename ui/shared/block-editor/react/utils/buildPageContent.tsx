@@ -57,6 +57,7 @@ export const buildPageContent = (
         nodeTree = query.parseReactElement(<FooterSection />).toNodeTree()
         break
       case 'knowledgeCheck':
+        // @ts-expect-error
         nodeTree = query.parseReactElement(<KnowledgeCheckSection />).toNodeTree()
         break
       case 'announcement':

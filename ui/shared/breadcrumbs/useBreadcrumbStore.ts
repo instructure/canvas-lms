@@ -40,6 +40,7 @@ export interface BreadcrumbStoreActions {
  */
 const defaultBreadcrumbs = (): Breadcrumb[] => {
   if (window.ENV.breadcrumbs) {
+    // @ts-expect-error
     return window.ENV.breadcrumbs
   }
 
@@ -82,6 +83,7 @@ export const useBreadcrumbStore = create<{state: Breadcrumb[]} & BreadcrumbStore
   state: defaultBreadcrumbs() ?? [],
   appendBreadcrumbsToDefaults: breadcrumbs =>
     set({
+      // @ts-expect-error
       state: [
         ...(window.ENV.breadcrumbs ?? []),
         ...(Array.isArray(breadcrumbs) ? breadcrumbs : [breadcrumbs]),

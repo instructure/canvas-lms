@@ -162,6 +162,7 @@ export default class IndexView extends Backbone.View {
       returnFocusTo && returnFocusTo.focus()
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <QuizEngineModal onDismiss={handleDismiss} setOpen={setOpen} />,
       $('#quiz-modal-mount-point')[0]
@@ -174,6 +175,7 @@ export default class IndexView extends Backbone.View {
       .css('padding-left', '35rem')
       .css('display', 'block')
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Alert variant="success" timeout={4000} transition="fade">
         <Text>{I18n.t(`Your quiz engine choice has been reset!`)}</Text>
@@ -187,6 +189,7 @@ export default class IndexView extends Backbone.View {
       .css('width', '30rem')
       .css('padding-left', '35rem')
       .css('display', 'block')
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Alert variant="error" timeout={4000} transition="fade">
         <Text>{I18n.t(`There was a problem resetting your quiz engine choice`)}</Text>
@@ -216,6 +219,7 @@ export default class IndexView extends Backbone.View {
       }
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

@@ -96,6 +96,7 @@ const Tour = ({roles}: ITour) => {
 
   const handleSoftClose = React.useCallback(
     async (options = {}) => {
+      // @ts-expect-error
       const {forceClose} = options
       setHasOpened(true)
       if (softClose || forceClose) {

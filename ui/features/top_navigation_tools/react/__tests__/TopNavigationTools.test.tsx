@@ -42,15 +42,18 @@ describe('TopNavigationTools', () => {
     ]
     const handleToolLaunch = jest.fn()
     const wrapper = shallow(
+      // @ts-expect-error
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />
     )
     expect(wrapper).toMatchSnapshot()
   })
 
   it('renders with no tools', () => {
+    // @ts-expect-error
     const tools = []
     const handleToolLaunch = jest.fn()
     const wrapper = shallow(
+      // @ts-expect-error
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />
     )
     expect(wrapper).toMatchSnapshot()
@@ -73,6 +76,7 @@ describe('TopNavigationTools', () => {
     ]
     const handleToolLaunch = jest.fn()
     const wrapper = shallow(
+      // @ts-expect-error
       <TopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />
     )
     expect(wrapper).toMatchSnapshot()
@@ -97,6 +101,7 @@ describe('MobileTopNavigationTools', () => {
     ]
     const handleToolLaunch = jest.fn()
     const wrapper = shallow(
+      // @ts-expect-error
       <MobileTopNavigationTools tools={tools} handleToolLaunch={handleToolLaunch} />
     )
     expect(wrapper).toMatchSnapshot()
@@ -113,6 +118,7 @@ describe('handleToolClick', () => {
     }
     const handleToolLaunch = jest.fn()
     const wrapper = shallow(
+      // @ts-expect-error
       <TopNavigationTools tools={[tool]} handleToolLaunch={handleToolLaunch} />
     )
     wrapper.find('IconButton').simulate('click', {target: {dataset: {toolId: '1'}}})
@@ -133,6 +139,7 @@ describe('handleToolIconError', () => {
       },
     }
 
+    // @ts-expect-error
     handleToolIconError(tool)(event)
 
     expect(event.target.src).toBe('/lti/tool_default_icon?name=T')

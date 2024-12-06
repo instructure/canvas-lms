@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-// @ts-expect-error
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
@@ -337,6 +336,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
     return (
       <InstUISettingsProvider theme={{componentOverrides}}>
+        {/* @ts-expect-error */}
         <Table.Row
           data-testid="pp-module-item-row"
           onMouseEnter={() => this.setState({hovering: true})}

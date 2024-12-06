@@ -74,6 +74,7 @@ export default class GroupDetailView extends View {
 
   editGroup(e, open = true) {
     if (e) e.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GroupModal
         group={{

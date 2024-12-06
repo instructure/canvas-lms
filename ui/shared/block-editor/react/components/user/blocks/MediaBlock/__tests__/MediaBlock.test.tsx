@@ -47,7 +47,9 @@ describe('MediaBlock', () => {
     it.skip('should render auto width and height with default sizeVariant', () => {
       const {container} = renderBlock({
         src: 'https://example.com/image.jpg',
+        // @ts-expect-error
         width: 101,
+        // @ts-expect-error
         height: 201,
       })
       const iframe = container.querySelector('.media-block')
@@ -57,8 +59,11 @@ describe('MediaBlock', () => {
     it.skip('should render px width and height with pixel sizeVariant', () => {
       const {container} = renderBlock({
         src: 'https://example.com/image.jpg',
+        // @ts-expect-error
         sizeVariant: 'pixel',
+        // @ts-expect-error
         width: 101,
+        // @ts-expect-error
         height: 201,
       })
       const iframe = container.querySelector('.media-block')
@@ -68,8 +73,11 @@ describe('MediaBlock', () => {
     it.skip('should render % width and px height with "percent" sizeVariant', () => {
       const {container} = renderBlock({
         src: 'https://example.com/image.jpg',
+        // @ts-expect-error
         sizeVariant: 'percent',
+        // @ts-expect-error
         width: 101,
+        // @ts-expect-error
         height: 201,
       })
       const iframe = container.querySelector('.media-block') as HTMLElement
@@ -79,8 +87,11 @@ describe('MediaBlock', () => {
     it.skip('should render %width and auto height with "percent" sizeVariant and maintainAspectRatio', () => {
       const {container} = renderBlock({
         src: 'https://example.com/image.jpg',
+        // @ts-expect-error
         sizeVariant: 'percent',
+        // @ts-expect-error
         width: 101,
+        // @ts-expect-error
         height: 201,
         maintainAspectRatio: true,
       })

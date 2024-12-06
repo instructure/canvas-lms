@@ -32,7 +32,7 @@ import type {SettingsPanelState} from './settingsReducer'
 import {createModule, updateModule} from './SettingsPanel'
 import {type OptionValue, updateModuleAssignees} from './AssignToPanel'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
-import {AssigneeOption} from './Item/types'
+import type {AssigneeOption} from './Item/types'
 
 const I18n = useI18nScope('differentiated_modules')
 

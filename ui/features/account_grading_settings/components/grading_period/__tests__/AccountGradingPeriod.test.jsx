@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
-import { render, fireEvent, screen } from '@testing-library/react'
+import {render, fireEvent, screen} from '@testing-library/react'
 import axios from '@canvas/axios'
 import GradingPeriod from '../AccountGradingPeriod'
 import DateHelper from '@canvas/datetime/dateHelper'
 
 jest.mock('@canvas/datetime/dateHelper', () => ({
   formatDateForDisplay: jest.fn(date => {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    return date.toLocaleDateString('en-US', options);
-  })
+    const options = {year: 'numeric', month: '2-digit', day: '2-digit'}
+    return date.toLocaleDateString('en-US', options)
+  }),
 }))
 
 const allPermissions = {read: true, create: true, update: true, delete: true}

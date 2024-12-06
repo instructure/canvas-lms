@@ -83,26 +83,18 @@ class ContextController < ApplicationController
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(context: @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
-      manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-                        @context.grants_right?(@current_user, session, :allow_course_admin_actions)
-                      else
-                        @context.grants_right?(@current_user, session, :manage_admin_users)
-                      end
-      can_add_enrollments = @context.grants_any_right?(@current_user, session, *add_enrollment_permissions(@context))
+      can_add_enrollments = @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_COURSE_ENROLLMENT_PERMISSIONS)
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
         view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
         manage_students:,
         add_users_to_course: can_add_enrollments,
-        active_granular_enrollment_permissions: @context.root_account.feature_enabled?(:granular_permissions_manage_users) ? get_active_granular_enrollment_permissions(@context) : [],
+        active_granular_enrollment_permissions: get_active_granular_enrollment_permissions(@context),
         read_reports: @context.grants_right?(@current_user, session, :read_reports),
         can_add_groups: can_do(@context.groups.temp_record, @current_user, :create),
+        can_allow_course_admin_actions: @context.grants_right?(@current_user, session, :allow_course_admin_actions)
       }
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-        js_permissions[:can_allow_course_admin_actions] = manage_admins
-      else
-        js_permissions[:manage_admin_users] = manage_admins
-      end
+
       js_env({
                ALL_ROLES: all_roles,
                SECTIONS: sections.map { |s| { id: s.id.to_s, name: s.name } },
@@ -160,12 +152,8 @@ class ContextController < ApplicationController
 
   def prior_users
     page_has_instui_topnav
-    manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-                      :allow_course_admin_actions
-                    else
-                      :manage_admin_users
-                    end
-    if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
+
+    if authorized_action(@context, @current_user, %i[manage_students allow_course_admin_actions read_prior_roster])
       @prior_users = @context.prior_users
                              .by_top_enrollment.merge(Enrollment.not_fake)
                              .paginate(page: params[:page], per_page: 20)
@@ -245,12 +233,23 @@ class ContextController < ApplicationController
         @membership = scope.first
         if @membership
           @enrollments = scope.to_a
-          js_env(COURSE_ID: @context.id,
-                 USER_ID: user_id,
-                 LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
-                 course: {
-                   id: @context.id,
-                   hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+          user = @membership&.user
+          js_permissions = {
+            can_manage_user_details: user.grants_right?(@current_user, :manage_user_details)
+          }
+          timezones = I18nTimeZone.all.map { |tz| { name: tz.name, name_with_hour_offset: tz.to_s } }
+          default_timezone_name = @domain_root_account.try(:default_time_zone)&.name || "Mountain Time (US & Canada)"
+          js_env({
+                   COURSE_ID: @context.id,
+                   USER_ID: user_id,
+                   LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
+                   course: {
+                     id: @context.id,
+                     hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+                   },
+                   PERMISSIONS: js_permissions,
+                   TIMEZONES: timezones,
+                   DEFAULT_TIMEZONE_NAME: default_timezone_name
                  })
 
           log_asset_access(@membership, "roster", "roster")
@@ -391,22 +390,5 @@ class ContextController < ApplicationController
     enrollment_granular_permissions_map.select do |key, _|
       context.grants_right?(@current_user, session, key)
     end.values
-  end
-
-  def add_enrollment_permissions(context)
-    if context.root_account.feature_enabled?(:granular_permissions_manage_users)
-      %i[
-        add_teacher_to_course
-        add_ta_to_course
-        add_designer_to_course
-        add_student_to_course
-        add_observer_to_course
-      ]
-    else
-      [
-        :manage_students,
-        :manage_admin_users
-      ]
-    end
   end
 end

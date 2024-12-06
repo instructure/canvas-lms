@@ -91,6 +91,7 @@ const QuestionToggle: React.FC<QuestionToggleProps> = ({question, onSelect}) => 
         onToggle={handleToggle}
         data-testid={`question-toggle-${question.id}`}
       >
+        {/* @ts-expect-error */}
         <View as="div" padding="small" opacity="50%">
           {renderQuestion(question.entry)}
         </View>

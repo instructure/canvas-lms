@@ -199,6 +199,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         type: 'assignment_group',
       },
     ]
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

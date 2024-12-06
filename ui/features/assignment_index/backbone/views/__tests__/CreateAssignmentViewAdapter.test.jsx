@@ -24,7 +24,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import CreateAssignmentViewAdapter from '../CreateAssignmentViewAdapter'
 import Backbone from '@canvas/backbone'
-import { act } from 'react-dom/test-utils'
+import {act} from 'react-dom/test-utils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(() => jest.fn(() => {})),
@@ -55,7 +55,7 @@ const buildAssignmentOne = () =>
     position: 1,
   })
 
-const buildAssignmentGroup = (assignments) => {
+const buildAssignmentGroup = assignments => {
   const group = {
     id: 1,
     name: 'Assignments',
@@ -71,7 +71,7 @@ const buildAssignmentGroup = (assignments) => {
 describe('CreateAssignmentViewAdapter', () => {
   let closeHandlerMock
 
-  const getProps = (overrides) => ({
+  const getProps = overrides => ({
     assignment: new Assignment(buildAssignmentOne()),
     assignmentGroup: buildAssignmentGroup([]),
     closeHandler: closeHandlerMock,
@@ -100,7 +100,9 @@ describe('CreateAssignmentViewAdapter', () => {
     // Mock out the save method so we can test the assignment group
     jest.spyOn(Backbone.Model.prototype, 'save').mockImplementation(() => Promise.resolve())
 
-    const {getByTestId} = render(<CreateAssignmentViewAdapter {...getProps({assignment: null, assignmentGroup: ag})} />)
+    const {getByTestId} = render(
+      <CreateAssignmentViewAdapter {...getProps({assignment: null, assignmentGroup: ag})} />
+    )
 
     expect(ag.get('assignments').length).toBe(0)
 
@@ -116,7 +118,9 @@ describe('CreateAssignmentViewAdapter', () => {
   it('renders a FlashAlert when the assignment fails to save', async () => {
     const {getByTestId} = render(<CreateAssignmentViewAdapter {...getProps()} />)
 
-    jest.spyOn(Backbone.Model.prototype, 'save').mockImplementation(() => Promise.reject(new Error('Failed to save')))
+    jest
+      .spyOn(Backbone.Model.prototype, 'save')
+      .mockImplementation(() => Promise.reject(new Error('Failed to save')))
 
     await act(async () => {
       fireEvent.click(getByTestId('save-button'))

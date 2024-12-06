@@ -78,6 +78,7 @@ export const masteryScalesGraphqlMocks = [
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Account',
           outcomeProficiency,
         },
@@ -94,6 +95,7 @@ export const masteryScalesGraphqlMocks = [
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Course',
           outcomeProficiency,
         },
@@ -113,6 +115,7 @@ export const masteryCalculationGraphqlMocks = [
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Account',
           outcomeCalculationMethod,
         },
@@ -129,6 +132,7 @@ export const masteryCalculationGraphqlMocks = [
     result: {
       data: {
         context: {
+          _id: '1',
           __typename: 'Course',
           outcomeCalculationMethod,
         },

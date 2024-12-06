@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import moment, {Moment, MomentInput} from 'moment-timezone'
+import moment, {type Moment, type MomentInput} from 'moment-timezone'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {Flex} from '@instructure/ui-flex'
@@ -28,9 +27,10 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import {IconWarningLine} from '@instructure/ui-icons'
 
 import CanvasDateInput, {
+  // @ts-expect-error
   CanvasDateInputMessageType,
 } from '@canvas/datetime/react/components/DateInput'
-import {BlackoutDate, InputInteraction} from '../types'
+import type {BlackoutDate, InputInteraction} from '../types'
 import {coursePaceTimezone, weekendIntegers} from '../api/backend_serializer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'

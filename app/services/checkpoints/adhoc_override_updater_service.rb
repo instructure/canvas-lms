@@ -28,7 +28,7 @@ class Checkpoints::AdhocOverrideUpdaterService < Checkpoints::AdhocOverrideCommo
     desired_student_ids ||= override.set.map(&:id)
     raise Checkpoints::StudentIdsRequiredError, "student_ids is required, but was not provided" if desired_student_ids.blank?
 
-    valid_student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id)
+    valid_student_ids = @checkpoint.course.all_students.where(id: desired_student_ids).pluck(:id).uniq
     existing_student_ids = override.assignment_override_students.pluck(:user_id)
     student_ids_to_delete = existing_student_ids - valid_student_ids
 

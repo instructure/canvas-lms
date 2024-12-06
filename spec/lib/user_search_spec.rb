@@ -206,12 +206,37 @@ describe UserSearch do
           expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
         end
 
-        it "by integrtion id" do
+        it "by integration id" do
           expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
         end
 
         it "by user name" do
           expect(UserSearch.for_user_in_context("admin", course, user)).to eq [user]
+        end
+      end
+
+      describe "will match deleted users/pseudonyms if including deleted users" do
+        before do
+          pseudonym.update(workflow_state: "deleted")
+          user.update(workflow_state: "pre_registered")
+          account_admin_user
+          @account = Account.default
+        end
+
+        it "by sis id" do
+          expect(UserSearch.for_user_in_context("SOME_SIS", @account, @user, nil, { include_deleted_users: true })).to eq [user]
+        end
+
+        it "by integration id" do
+          expect(UserSearch.for_user_in_context("ACME", @account, @user, nil, { include_deleted_users: true })).to eq [user]
+        end
+
+        it "by user name" do
+          expect(UserSearch.for_user_in_context("admin", @account, @user, nil, { include_deleted_users: true })).to eq [user]
+        end
+
+        it "by user id" do
+          expect(UserSearch.for_user_in_context(user.id, @account, @user, nil, { include_deleted_users: true })).to eq [user]
         end
       end
 

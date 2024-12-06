@@ -1249,7 +1249,7 @@ describe "Accounts API", type: :request do
 
   describe "environment" do
     before_once do
-      Account.default.settings[:calendar_contexts_limit] = true
+      Account.default.settings[:calendar_contexts_limit] = 10
       Account.default.save!
     end
 
@@ -1260,7 +1260,7 @@ describe "Accounts API", type: :request do
                       {},
                       {},
                       { expected_status: 200 })
-      expect(json).to eq({ "calendar_contexts_limit" => true })
+      expect(json).to eq({ "calendar_contexts_limit" => 10 })
     end
 
     it "requires user session" do

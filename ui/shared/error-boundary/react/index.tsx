@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -17,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {PropsWithChildren, ReactElement} from 'react'
+import React, {type PropsWithChildren, type ReactElement} from 'react'
 import * as Sentry from '@sentry/react'
-import {FallbackRender} from '@sentry/react/types/errorboundary.d'
+import type {FallbackRender} from '@sentry/react/types/errorboundary.d'
 
 export type ErrorBoundaryProps = PropsWithChildren<{
   errorComponent: FallbackRender | ReactElement
@@ -34,6 +33,7 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
     return {error}
   }
 
+  // @ts-expect-error
   componentDidCatch(error, errorInfo) {
     // eslint-disable-next-line no-console
     console.error(error, errorInfo)
@@ -48,7 +48,9 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
         // `componentStack` and `eventId` are only used by Sentry's ErrorBoundary, but we need to pass in `null` to comply with the unnecessarily strict type
         return this.props.errorComponent({
           error: this.state.error,
+          // @ts-expect-error
           componentStack: null,
+          // @ts-expect-error
           eventId: null,
           resetError: () => this.setState({error: null}),
         })

@@ -76,7 +76,6 @@ export default class ConfigurationFormLti2 extends React.Component<
         <TextInput
           id="registrationUrl"
           type="url"
-          // @ts-ignore
           // The LTI 2 registration form is the _only_ form that actually submits values
           // using form.submit as opposed to XHR/fetch, so this name is required for it to work
           // properly. InstUI will propagate this value down to the input element. This is largely

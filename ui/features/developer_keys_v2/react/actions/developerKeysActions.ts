@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -19,11 +18,11 @@
 
 import axios from '@canvas/axios'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {LtiScope} from '@canvas/lti/model/LtiScope'
+import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import {AnyAction, Dispatch} from 'redux'
-import {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/api/DeveloperKey'
+import type {AnyAction, Dispatch} from 'redux'
+import type {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/api/DeveloperKey'
 import type {LtiToolConfiguration} from 'features/developer_keys_v2/model/api/LtiToolConfiguration'
 
 const I18n = useI18nScope('react_developer_keys')
@@ -40,6 +39,7 @@ export type LtiDeveloperKeyApiResponse = {
  * type Foo = ToActionCreatorName<'FOO_BAR'>
  * Foo // 'fooBar'
  */
+// @ts-expect-error
 export type ToActionCreatorName<K> = ToActionCreatorNameInner<K, true>
 export type ToActionCreatorNameInner<
   ActionType extends string,
@@ -293,10 +293,12 @@ export const actions = {
 
   editDeveloperKey:
     (payload?: DeveloperKey): AnyAction =>
+    // @ts-expect-error
     dispatch => {
       if (payload) {
         dispatch(actions.listDeveloperKeyScopesSet(payload.scopes))
       }
+      // @ts-expect-error
       dispatch(actions.setEditingDeveloperKey(payload))
     },
 
@@ -316,6 +318,7 @@ export const actions = {
   setBindingWorkflowStateStart: () => ({type: actions.SET_BINDING_WORKFLOW_STATE_START}),
 
   SET_BINDING_WORKFLOW_STATE_SUCCESSFUL: 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL',
+  // @ts-expect-error
   setBindingWorkflowStateSuccessful: response => ({
     type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL,
     payload: response,
@@ -377,6 +380,7 @@ export const actions = {
   },
 
   setBindingWorkflowState:
+    // @ts-expect-error
     (developerKey: DeveloperKey, accountId: string, workflowState: string) => dispatch => {
       dispatch(actions.setBindingWorkflowStateStart())
       const url = `/api/v1/accounts/${accountId}/developer_keys/${developerKey.id}/developer_key_account_bindings`
@@ -386,6 +390,7 @@ export const actions = {
       dispatch(
         actions.listDeveloperKeysReplaceBindingState({
           developerKeyId: developerKey.id,
+          // @ts-expect-error
           newAccountBinding: {...previousAccountBinding, workflow_state: workflowState},
         })
       )
@@ -402,6 +407,7 @@ export const actions = {
           dispatch(
             actions.setBindingWorkflowStateFailed({
               developerKeyId: developerKey.id,
+              // @ts-expect-error
               previousAccountBinding,
             })
           )
@@ -413,6 +419,7 @@ export const actions = {
     (formData: unknown, url: string, method: string) => (dispatch: Dispatch) => {
       dispatch(actions.createOrEditDeveloperKeyStart())
 
+      // @ts-expect-error
       return axios({
         method,
         url,
@@ -459,6 +466,7 @@ export const actions = {
       callback: (developerKeys: Array<DeveloperKey>) => void
     ) =>
     (dispatch: Function) => {
+      // @ts-expect-error
       dispatch(actions.listDeveloperKeysStart())
 
       return retrieveRemainingDevKeys({
@@ -479,6 +487,7 @@ export const actions = {
       callback: (developerKeys: Array<DeveloperKey>) => void
     ) =>
     (dispatch: Function) => {
+      // @ts-expect-error
       dispatch(actions.listInheritedDeveloperKeysStart())
 
       return retrieveRemainingDevKeys({
@@ -493,6 +502,7 @@ export const actions = {
     },
 
   deactivateDeveloperKey: (developerKey: DeveloperKey) => (dispatch: Function) => {
+    // @ts-expect-error
     dispatch(actions.deactivateDeveloperKeyStart())
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
@@ -502,12 +512,14 @@ export const actions = {
       })
       .then(response => {
         dispatch(actions.listDeveloperKeysReplace(response.data))
+        // @ts-expect-error
         dispatch(actions.deactivateDeveloperKeySuccessful())
       })
       .catch(err => dispatch(actions.deactivateDeveloperKeyFailed(err)))
   },
 
   activateDeveloperKey: (developerKey: DeveloperKey) => (dispatch: Function) => {
+    // @ts-expect-error
     dispatch(actions.activateDeveloperKeyStart())
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
@@ -517,6 +529,7 @@ export const actions = {
       })
       .then(response => {
         dispatch(actions.listDeveloperKeysReplace(response.data))
+        // @ts-expect-error
         dispatch(actions.activateDeveloperKeySuccessful())
       })
       .catch(err => dispatch(actions.activateDeveloperKeyFailed(err)))
@@ -553,6 +566,7 @@ export const actions = {
   },
 
   deleteDeveloperKey: (developerKey: DeveloperKey) => (dispatch: Function) => {
+    // @ts-expect-error
     dispatch(actions.deleteDeveloperKeyStart())
 
     const url = `/api/v1/developer_keys/${developerKey.id}`
@@ -560,6 +574,7 @@ export const actions = {
       .delete(url)
       .then(response => {
         dispatch(actions.listDeveloperKeysDelete(response.data))
+        // @ts-expect-error
         dispatch(actions.deleteDeveloperKeySuccessful())
       })
       .catch(err => dispatch(actions.deleteDeveloperKeyFailed(err)))
@@ -617,6 +632,7 @@ export const actions = {
               $.flashError(error.message)
             }
           }
+          // @ts-expect-error
           dispatch(actions.setEditingDeveloperKey(false))
           throw err
         })
@@ -680,6 +696,7 @@ function retrieveDevKeys({
   axios
     .get(url)
     .then(response => {
+      // @ts-expect-error
       const {next} = parseLinkHeader(response.headers.link)
       const payload = {next, developerKeys: response.data}
       dispatch(success(payload))
@@ -706,6 +723,7 @@ function retrieveRemainingDevKeys({
   return axios
     .get(url)
     .then(response => {
+      // @ts-expect-error
       const {next} = parseLinkHeader(response.headers.link)
       const developerKeys = developerKeysPassedIn.concat(response.data)
       if (next) {

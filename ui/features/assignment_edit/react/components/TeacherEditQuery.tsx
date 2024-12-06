@@ -37,6 +37,7 @@ const TeacherEditQuery: React.FC<TeacherEditQueryProps> = ({assignmentLid}) => {
     variables: {assignmentLid},
   })
 
+  // @ts-expect-error
   const ErrorPage = ({error}) => {
     return (
       <GenericErrorPage
@@ -57,6 +58,7 @@ const TeacherEditQuery: React.FC<TeacherEditQueryProps> = ({assignmentLid}) => {
   }
   if (error) return <ErrorPage error={error} />
 
+  // @ts-expect-error
   return <TeacherCreateEditView edit={true} assignment={data.assignment} />
 }
 

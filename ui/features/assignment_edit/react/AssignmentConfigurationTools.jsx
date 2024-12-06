@@ -281,6 +281,7 @@ const attach = function (
       visibilitySetting={visibilitySetting}
     />
   )
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(configTools, element)
 }
 

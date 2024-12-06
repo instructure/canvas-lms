@@ -123,7 +123,7 @@ context_modules_header_props = {
       <% end %>
       <% if @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
         <div class="inline-block module_index_tools">
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#" data-popup-collision="flip">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t("Modules Settings") %></span>
           </a>

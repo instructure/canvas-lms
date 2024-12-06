@@ -53,7 +53,7 @@ export default class MigrationOptions extends React.Component {
     includeCourseSettings: PropTypes.func.isRequired,
     enableItemNotifications: PropTypes.func.isRequired,
     setNotificationMessage: PropTypes.func.isRequired,
-    itemNotificationFeatureEnabled: PropTypes.bool.isRequired
+    itemNotificationFeatureEnabled: PropTypes.bool.isRequired,
   }
 
   UNSAFE_componentWillReceiveProps(newProps) {
@@ -123,7 +123,7 @@ export default class MigrationOptions extends React.Component {
           size="small"
           disabled={isDisabled}
         />
-        {this.props.itemNotificationFeatureEnabled ?
+        {this.props.itemNotificationFeatureEnabled ? (
           <Checkbox
             label={I18n.t('Enable New Item Notifications')}
             checked={this.props.willSendItemNotifications}
@@ -131,7 +131,7 @@ export default class MigrationOptions extends React.Component {
             size="small"
             disabled={isDisabled}
           />
-        : null}
+        ) : null}
         {this.props.willSendNotification ? (
           <div className="bcs__history-notification__add-message">
             <Checkbox
@@ -190,7 +190,7 @@ const connectState = state =>
     'notificationMessage',
     'willIncludeCourseSettings',
     'willSendItemNotifications',
-    'itemNotificationFeatureEnabled'
+    'itemNotificationFeatureEnabled',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedMigrationOptions = connect(connectState, connectActions)(MigrationOptions)

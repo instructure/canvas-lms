@@ -61,7 +61,7 @@ describe('ApiProgressBarSpec', () => {
     let ApiProgressBarElement = <ApiProgressBar />
     let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
     ok(
-      component.shouldComponentUpdate({progress_id: progress_id}, {}),
+      component.shouldComponentUpdate({progress_id}, {}),
       'should update when progress_id prop changes'
     )
     ok(
@@ -78,7 +78,7 @@ describe('ApiProgressBarSpec', () => {
     component.setState({workflow_state: 'running'})
     ok(
       !component.shouldComponentUpdate(
-        {progress_id: progress_id},
+        {progress_id},
         {
           completion: component.state.completion,
           workflow_state: component.state.workflow_state,

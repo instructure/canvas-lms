@@ -130,8 +130,9 @@ export const deleteRegistration: DeleteRegistration = (accountId, registrationId
 export type CreateRegistration = (
   accountId: AccountId,
   internalConfig: InternalLtiConfiguration,
-  overlay: LtiConfigurationOverlay,
-  unifiedToolId?: string
+  overlay?: LtiConfigurationOverlay,
+  unifiedToolId?: string,
+  adminNickname?: string
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -146,13 +147,24 @@ export const createRegistration: CreateRegistration = (
   accountId,
   internalConfig,
   overlay,
-  unifiedToolId
+  unifiedToolId,
+  adminNickname
 ) =>
-  /* TODO: Implement this once INTEROP-8767 is done */ parseFetchResult(z.unknown())(
-    new Promise(resolve => {
-      setTimeout(() => {
-        resolve(new Response('{}', {status: 200}))
-      }, Math.random() * 2000)
+  parseFetchResult(z.unknown())(
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations`, {
+      ...defaultFetchOptions({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      method: 'POST',
+      body: JSON.stringify({
+        admin_nickname: adminNickname,
+        configuration: internalConfig,
+        overlay,
+        unified_tool_id: unifiedToolId,
+        workflow_state: 'on',
+      }),
     })
   )
 
@@ -160,8 +172,8 @@ export type UpdateRegistration = (
   accountId: AccountId,
   registrationId: LtiRegistrationId,
   internalConfig: InternalLtiConfiguration,
-  overlay: LtiConfigurationOverlay,
-  unifiedToolId?: string
+  overlay?: LtiConfigurationOverlay,
+  adminNickname?: string
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -178,14 +190,21 @@ export const updateRegistration: UpdateRegistration = (
   registrationId,
   internalConfig,
   overlay,
-  unifiedToolId
+  adminNickname
 ) =>
-  /* TODO: Implement this once INTEROP-8768 is done */
   parseFetchResult(z.unknown())(
-    new Promise(resolve => {
-      setTimeout(() => {
-        resolve(new Response('{}', {status: 200}))
-      }, Math.random() * 2000)
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
+      ...defaultFetchOptions({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      method: 'PUT',
+      body: JSON.stringify({
+        configuration: internalConfig,
+        overlay,
+        admin_nickname: adminNickname,
+      }),
     })
   )
 

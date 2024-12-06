@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { ConversationMessage } from '../../../graphql/ConversationMessage'
-import { MessageBody } from '../../components/MessageBody/MessageBody'
-import { PastMessages } from '../../components/PastMessages/PastMessages'
+import {ConversationMessage} from '../../../graphql/ConversationMessage'
+import {MessageBody} from '../../components/MessageBody/MessageBody'
+import {PastMessages} from '../../components/PastMessages/PastMessages'
 import PropTypes from 'prop-types'
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 
-import { AttachmentDisplay, MediaAttachment } from '@canvas/message-attachments'
-import { Flex } from '@instructure/ui-flex'
-import { Modal } from '@instructure/ui-modal'
-import { View } from '@instructure/ui-view'
-import { Alert } from '@instructure/ui-alerts'
+import {AttachmentDisplay, MediaAttachment} from '@canvas/message-attachments'
+import {Flex} from '@instructure/ui-flex'
+import {Modal} from '@instructure/ui-modal'
+import {View} from '@instructure/ui-view'
+import {Alert} from '@instructure/ui-alerts'
 import TranslationControls from '../../components/TranslationControls/TranslationControls'
 
-const { Item } = Flex
+const {Item} = Flex
 
 const ModalBody = props => {
   const shouldTranslate = ENV?.inbox_translation_enabled
@@ -49,7 +49,12 @@ const ModalBody = props => {
             inboxSignatureBlock={props.inboxSignatureBlock}
             signature={props.signature}
           />
-          {shouldTranslate && <TranslationControls signature={props.signature} inboxSettingsFeature={props.inboxSettingsFeature} />}
+          {shouldTranslate && (
+            <TranslationControls
+              signature={props.signature}
+              inboxSettingsFeature={props.inboxSettingsFeature}
+            />
+          )}
         </View>
         {props.pastMessages?.length > 0 && <PastMessages messages={props.pastMessages} />}
         <Flex alignItems="start" borderWidth="small none none none" padding="small">
@@ -67,7 +72,8 @@ const ModalBody = props => {
                 }}
                 onRemoveMediaComment={props.onRemoveMediaComment}
               />
-            </Item>)}
+            </Item>
+          )}
 
           <Item shouldShrink={true}>
             <AttachmentDisplay
@@ -80,7 +86,6 @@ const ModalBody = props => {
       </Flex>
     </Modal.Body>
   )
-
 }
 
 ModalBody.propTypes = {

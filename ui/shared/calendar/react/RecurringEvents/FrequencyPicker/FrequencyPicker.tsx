@@ -66,6 +66,7 @@ export class FrequencyPickerErrorBoundary extends React.Component {
         </div>
       )
     }
+    // @ts-expect-error
     return this.props.children
   }
 }

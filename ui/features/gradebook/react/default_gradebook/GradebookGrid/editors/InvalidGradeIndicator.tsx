@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -26,6 +25,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 export default function InvalidGradeIndicator(props) {
   return (
     <div className="Grid__GradeCell__InvalidGrade">

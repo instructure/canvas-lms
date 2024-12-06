@@ -18,7 +18,7 @@
 
 import React from 'react'
 import useCourseAlignments from '../useCourseAlignments'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {courseAlignmentMocks} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'

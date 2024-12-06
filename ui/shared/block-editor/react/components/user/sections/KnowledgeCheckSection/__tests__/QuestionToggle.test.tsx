@@ -62,6 +62,7 @@ describe('QuestionToggle', () => {
   })
 
   it('disables interaction for unsupported question types', () => {
+    // @ts-expect-error
     const {getByText} = renderComponent(testUnsupportedQuestion)
     fireEvent.click(getByText('Why should we categorize things?'))
     expect(mockOnSelect).toHaveBeenCalledWith(null)

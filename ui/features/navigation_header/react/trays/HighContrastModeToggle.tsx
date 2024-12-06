@@ -152,8 +152,11 @@ export default function HighContrastModeToggle({isMobile}: HighContrastModeToggl
         method: 'PUT',
         body: {feature: 'high_contrast', state: newState},
       })
+      // @ts-expect-error
       if (json.feature !== 'high_contrast') throw new Error('Unexpected response from API call')
+      // @ts-expect-error
       setEnabled(json.state === 'on')
+      // @ts-expect-error
       ENV.use_high_contrast = json.state === 'on'
     } catch (err) {
       if (err instanceof Error) {

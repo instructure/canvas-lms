@@ -1030,6 +1030,51 @@ describe Types::UserType do
       result = type.resolve("favoriteGroupsConnection { nodes { _id } }")
       expect(result).to match_array([@group.id.to_s])
     end
+
+    it "includes non_collaborative group when asked for by someone with permissions" do
+      Account.default.enable_feature!(:differentiation_tags)
+      allow_any_instance_of(Course).to receive(:grants_any_right?).with(@student, anything, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
+
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
+      group_with_user(user: @student, active_all: true)
+      favorite_group = @group
+      @student.favorites.create!(context: favorite_group)
+
+      hidden_group_membership = group_with_user(user: @student, active_all: true, group_category: @non_collaborative_category, context: @course)
+      hidden_group = hidden_group_membership.group
+      @student.favorites.create!(context: hidden_group)
+      allow(hidden_group).to receive(:grants_any_right?).and_return(true)
+
+      result = type.resolve("favoriteGroupsConnection(includeNonCollaborative: true) { nodes { _id } }")
+      expect(result).to match_array([favorite_group.id.to_s, hidden_group.id.to_s])
+    end
+
+    it "excludes non_collaborative groups when asked for by someone without permissions" do
+      Account.default.enable_feature!(:differentiation_tags)
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
+      group_with_user(user: @student, active_all: true)
+      favorite_group = @group
+      @student.favorites.create!(context: favorite_group)
+
+      hidden_group_membership = group_with_user(user: @student, active_all: true, group_category: @non_collaborative_category, context: @course)
+      hidden_group = hidden_group_membership.group
+      @student.favorites.create!(context: hidden_group)
+
+      result = type.resolve("favoriteGroupsConnection { nodes { _id } }")
+      expect(result).to match_array([favorite_group.id.to_s])
+    end
+
+    it "excludes non_collaborative groups when asked for by someone without permissions and no favorite groups" do
+      Account.default.enable_feature!(:differentiation_tags)
+      @non_collaborative_category = @course.group_categories.create!(name: "Non-Collaborative Groups", non_collaborative: true)
+
+      hidden_group_membership = group_with_user(user: @student, active_all: true, group_category: @non_collaborative_category, context: @course)
+      hidden_group = hidden_group_membership.group
+      @student.favorites.create!(context: hidden_group)
+
+      result = type.resolve("favoriteGroupsConnection { nodes { _id } }")
+      expect(result).to be_empty
+    end
   end
 
   context "CommentBankItemsConnection" do

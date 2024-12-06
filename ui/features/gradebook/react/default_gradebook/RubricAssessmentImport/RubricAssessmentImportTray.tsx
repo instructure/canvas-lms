@@ -27,13 +27,13 @@ import SVGWrapper from '@canvas/svg-wrapper'
 import useStore from '../stores'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {ImportTable} from '@canvas/rubrics/react/RubricImport'
-import {type RubricImport} from '@canvas/rubrics/react/types/rubric'
+import type {RubricAssessmentImportResponse} from '../queries/Queries'
+import {RubricAssessmentImportTable} from './RubricAssessmentImportTable'
 
 const I18n = useI18nScope('rubrics-import')
 
 type RubricAssessmentImportTrayProps = {
-  currentImports: RubricImport[]
+  currentImports: RubricAssessmentImportResponse[]
   onClickImport: (rubricImport: any) => void
   onImport: (file: File) => void
 }
@@ -117,7 +117,10 @@ export const RubricAssessmentImportTray = ({
       </View>
       {currentImports.length > 0 && (
         <View as="div" margin="medium xx-small 0">
-          <ImportTable importsInProgress={currentImports} onClickImport={onClickImport} />
+          <RubricAssessmentImportTable
+            importsInProgress={currentImports}
+            onClickImport={onClickImport}
+          />
         </View>
       )}
     </Tray>

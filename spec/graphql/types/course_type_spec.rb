@@ -576,6 +576,74 @@ describe Types::CourseType do
           GQL
         ).to eq [@student2a1_submission.id.to_s]
       end
+
+      describe "due_between" do
+        it "accepts a full range" do
+          @student2a1_submission.assignment.update(due_at: 3.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    start: "#{1.week.ago.iso8601}",
+                    end: "#{1.day.ago.iso8601}"
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to include @student2a1_submission.id.to_s
+        end
+
+        it "does not include submissions out of the range" do
+          @student2a1_submission.assignment.update(due_at: 8.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    start: "#{1.week.ago.iso8601}",
+                    end: "#{1.day.ago.iso8601}"
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to_not include @student2a1_submission.id.to_s
+        end
+
+        it "accepts a start-open range" do
+          @student2a1_submission.assignment.update(due_at: 3.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    end: "#{1.day.ago.iso8601}"
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to include @student2a1_submission.id.to_s
+        end
+
+        it "accepts a end-open range" do
+          @student2a1_submission.assignment.update(due_at: 3.days.ago)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @teacher)
+              submissionsConnection(
+                filter: {
+                  dueBetween: {
+                    start: "#{1.week.ago.iso8601}",
+                  }
+                }
+              ) { nodes { _id } }
+            GQL
+          ).to include @student2a1_submission.id.to_s
+        end
+      end
     end
   end
 
@@ -882,13 +950,57 @@ describe Types::CourseType do
 
   describe "GroupsConnection" do
     before(:once) do
-      course.groups.create! name: "A Group"
+      @cg = course.groups.create! name: "A Group"
+      ncc = course.group_categories.create! name: "Non-Collaborative Category", non_collaborative: true
+      @ncg = course.groups.create! name: "Non-Collaborative Group", non_collaborative: true, group_category: ncc
     end
 
     it "returns student groups" do
       expect(
         course_type.resolve("groupsConnection { edges { node { _id } } }")
-      ).to eq course.groups.map(&:to_param)
+      ).to eq [@cg.to_param]
+    end
+
+    context "differentiation_tags" do
+      before :once do
+        Account.site_admin.enable_feature!(:differentiation_tags)
+        @teacher = course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: false).user
+      end
+
+      it "returns combined student groups and non-collaborative groups for users with sufficient permission" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: true
+          )
+        end
+
+        tester = GraphQLTypeTester.new(course, current_user: @teacher)
+        res = tester.resolve("groupsConnection(includeNonCollaborative: true) { edges { node { _id } } }")
+        expect(res).to match_array([@cg.id.to_param, @ncg.id.to_param])
+      end
+
+      it "returns only collaborative groups if includeNonCollaborative is not provided" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: true
+          )
+        end
+
+        tester = GraphQLTypeTester.new(course, current_user: @teacher)
+        res = tester.resolve("groupsConnection { edges { node { _id } } }")
+        expect(res).to match_array([@cg.id.to_param])
+      end
+
+      it "returns only collaborative groups if the user does not have sufficient permissions" do
+        # course_type is student, keep in mind, the feature flag for :differentiation_tags is enabled
+        expect(
+          course_type.resolve("groupsConnection(includeNonCollaborative: true) { edges { node { _id } } }")
+        ).to eq [@cg.to_param]
+      end
     end
   end
 

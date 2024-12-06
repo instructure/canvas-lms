@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -26,10 +25,10 @@ import {View} from '@instructure/ui-view'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {SummarizedChange} from '../utils/change_tracking'
+import type {SummarizedChange} from '../utils/change_tracking'
 import {ResetPaceWarningModal} from './reset_pace_warning_modal'
 import {coursePaceActions} from '../actions/course_paces'
-import {StoreState} from '../types'
+import type {StoreState} from '../types'
 import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
 import {getSummarizedChanges} from '../reducers/course_paces'
 

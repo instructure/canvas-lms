@@ -28,11 +28,11 @@ import {Modal} from '@instructure/ui-modal'
 import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 
-import { migrateDiscussionDisallowThreadedReplies } from '../apiClient'
+import {migrateDiscussionDisallowThreadedReplies} from '../apiClient'
 
 const I18n = useI18nScope('discussions_v2')
 
-function UpdateButton({ onUpdateComplete }) {
+function UpdateButton({onUpdateComplete}) {
   const [modalOpen, setModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -42,62 +42,87 @@ function UpdateButton({ onUpdateComplete }) {
   const onUpdateAll = async () => {
     try {
       setIsLoading(true)
-      await migrateDiscussionDisallowThreadedReplies({ contextId: ENV.COURSE_ID })
+      await migrateDiscussionDisallowThreadedReplies({contextId: ENV.COURSE_ID})
       closeModal()
       setOnSuccess(I18n.t('All discussions have successfully been updated to threaded.'), false)
       onUpdateComplete()
     } catch (error) {
-      setOnFailure(I18n.t('We’ve run into a problem while updating all discussions. Please try again or contact us to resolve this issue.'))
+      setOnFailure(
+        I18n.t(
+          'We’ve run into a problem while updating all discussions. Please try again or contact us to resolve this issue.'
+        )
+      )
     } finally {
       setIsLoading(false)
     }
   }
 
-  return <>
-    <Button
-      onClick={() => setModalOpen(true)}
-      color='primary'
-      id="disallow_threaded_fix_alert_update_all"
-      data-testid="disallow_threaded_fix_alert_update_all">
+  return (
+    <>
+      <Button
+        onClick={() => setModalOpen(true)}
+        color="primary"
+        id="disallow_threaded_fix_alert_update_all"
+        data-testid="disallow_threaded_fix_alert_update_all"
+      >
         {I18n.t('Make All Discussions Threaded')}
-    </Button>
-    <Modal open={modalOpen} size='medium' label={I18n.t('Confirm update')}>
-      <Modal.Header>
-        <Flex justifyItems='space-between' alignItems='center'>
-          <Flex.Item shouldGrow shouldShrink>
-            <Text size='x-large'>{I18n.t('Make All Discussions Threaded')}</Text>
-          </Flex.Item>
-          <Flex.Item>
-            <CloseButton onClick={closeModal} screenReaderLabel={I18n.t('Close')} />
-          </Flex.Item>
-        </Flex>
-      </Modal.Header>
-      <Modal.Body>
-        {isLoading ? <LoadingIndicator /> : <Flex direction='column' gap='large'>
-          <Text>{I18n.t("By selecting 'Make All Discussions Threaded,' you will update all non-threaded discussions in the course to threaded. This action will uncheck the 'Disallow Threaded Replies' option, enabling threaded replies for all discussions.")}</Text>
-          <Text>{I18n.t('This change is irreversible and will affect all discussions in your course.')}</Text>
-        </Flex>
-      }
-
-      </Modal.Body>
-      <Modal.Footer>
-        <Flex gap="small">
-          <Button disabled={isLoading} onClick={closeModal}>{I18n.t('Cancel')}</Button>
-          <Button disabled={isLoading} onClick={onUpdateAll} color="primary">{I18n.t('Make All Discussions Threaded')}</Button>
-        </Flex>
-      </Modal.Footer>
-    </Modal>
-  </>
+      </Button>
+      <Modal open={modalOpen} size="medium" label={I18n.t('Confirm update')}>
+        <Modal.Header>
+          <Flex justifyItems="space-between" alignItems="center">
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
+              <Text size="x-large">{I18n.t('Make All Discussions Threaded')}</Text>
+            </Flex.Item>
+            <Flex.Item>
+              <CloseButton onClick={closeModal} screenReaderLabel={I18n.t('Close')} />
+            </Flex.Item>
+          </Flex>
+        </Modal.Header>
+        <Modal.Body>
+          {isLoading ? (
+            <LoadingIndicator />
+          ) : (
+            <Flex direction="column" gap="large">
+              <Text>
+                {I18n.t(
+                  "By selecting 'Make All Discussions Threaded,' you will update all non-threaded discussions in the course to threaded. This action will uncheck the 'Disallow Threaded Replies' option, enabling threaded replies for all discussions."
+                )}
+              </Text>
+              <Text>
+                {I18n.t(
+                  'This change is irreversible and will affect all discussions in your course.'
+                )}
+              </Text>
+            </Flex>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Flex gap="small">
+            <Button disabled={isLoading} onClick={closeModal}>
+              {I18n.t('Cancel')}
+            </Button>
+            <Button disabled={isLoading} onClick={onUpdateAll} color="primary">
+              {I18n.t('Make All Discussions Threaded')}
+            </Button>
+          </Flex>
+        </Modal.Footer>
+      </Modal>
+    </>
+  )
 }
 
-function DisallowThreadedFixAlertBase({ breakpoints }) {
-const localStorageBaseKey = 'disallow_threaded_fix_alert_dismissed'
-const localStorageKey = `${localStorageBaseKey}_${ENV.COURSE_ID}`
+function DisallowThreadedFixAlertBase({breakpoints}) {
+  const localStorageBaseKey = 'disallow_threaded_fix_alert_dismissed'
+  const localStorageKey = `${localStorageBaseKey}_${ENV.COURSE_ID}`
 
   // We have 2 different states to preserve the fade out transition, shouldShow triggers the animation
   // and shouldMount removes the component from the DOM once the animation is done
-  const [shouldMount, setShouldMount] = useState(() => localStorage.getItem(localStorageKey) !== 'true');
-  const [shouldShow, setShouldShow] = useState(() => localStorage.getItem(localStorageKey) !== 'true');
+  const [shouldMount, setShouldMount] = useState(
+    () => localStorage.getItem(localStorageKey) !== 'true'
+  )
+  const [shouldShow, setShouldShow] = useState(
+    () => localStorage.getItem(localStorageKey) !== 'true'
+  )
 
   const onDismiss = () => {
     localStorage.setItem(localStorageKey, 'true')
@@ -119,38 +144,47 @@ const localStorageKey = `${localStorageBaseKey}_${ENV.COURSE_ID}`
     return null
   }
 
-  const linkHref = 'https://community.canvaslms.com/t5/The-Product-Blog/Temporary-button-to-uncheck-the-Disallow-Threaded-Replies-option/ba-p/615349'
+  const linkHref =
+    'https://community.canvaslms.com/t5/The-Product-Blog/Temporary-button-to-uncheck-the-Disallow-Threaded-Replies-option/ba-p/615349'
   const alertText = I18n.t(
     'Following the *recent issues* around disallowing threaded replies, we provide a quick and easy way to update all of your discussions to be threaded.',
     {
-      wrappers: [
-        `<a target="_blank" href="${linkHref}">$1</a>`,
-      ],
+      wrappers: [`<a target="_blank" href="${linkHref}">$1</a>`],
     }
   )
 
-  return <Alert variant="warning" margin="mediumSmall 0" open={shouldShow} onDismiss={() => setShouldMount(false)}>
-    <Flex gap='x-small' direction='column'>
-      <Text dangerouslySetInnerHTML={{__html: alertText}} />
-      <Flex gap='small' direction={breakpoints.mobileOnly ? 'column' : 'row'}>
-        {/* We cannot use reverse wrap because that messes up tab order, so we show one of the buttons on mobile and on the other above */}
-        {breakpoints.mobileOnly && <UpdateButton onUpdateComplete={onUpdateComplete} />}
-        <Button
-          onClick={onDismiss}
-          id="disallow_threaded_fix_alert_dismiss"
-          data-testid="disallow_threaded_fix_alert_dismiss">
+  return (
+    <Alert
+      variant="warning"
+      margin="mediumSmall 0"
+      open={shouldShow}
+      onDismiss={() => setShouldMount(false)}
+    >
+      <Flex gap="x-small" direction="column">
+        <Text dangerouslySetInnerHTML={{__html: alertText}} />
+        <Flex gap="small" direction={breakpoints.mobileOnly ? 'column' : 'row'}>
+          {/* We cannot use reverse wrap because that messes up tab order, so we show one of the buttons on mobile and on the other above */}
+          {breakpoints.mobileOnly && <UpdateButton onUpdateComplete={onUpdateComplete} />}
+          <Button
+            onClick={onDismiss}
+            id="disallow_threaded_fix_alert_dismiss"
+            data-testid="disallow_threaded_fix_alert_dismiss"
+          >
             {I18n.t('Dismiss')}
-        </Button>
-        {!breakpoints.mobileOnly && <UpdateButton onUpdateComplete={onUpdateComplete} />}
+          </Button>
+          {!breakpoints.mobileOnly && <UpdateButton onUpdateComplete={onUpdateComplete} />}
+        </Flex>
       </Flex>
-    </Flex>
-  </Alert>
+    </Alert>
+  )
 }
 
 const DisallowThreadedFixAlertWithBreakpoints = WithBreakpoints(DisallowThreadedFixAlertBase)
 
 export default function DisallowThreadedFixAlert() {
-  return <AlertManager>
-    <DisallowThreadedFixAlertWithBreakpoints />
-  </AlertManager>
+  return (
+    <AlertManager>
+      <DisallowThreadedFixAlertWithBreakpoints />
+    </AlertManager>
+  )
 }

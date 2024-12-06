@@ -60,12 +60,10 @@ to use %{backchannel_logout_uri}, and preferably set
 <div class="ic-Form-control">
   <%= f.label :end_session_endpoint, 'End Session Endpoint', class: 'ic-Label', for: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
   <%= f.text_field :end_session_endpoint, class: 'ic-Input', id: "end_session_endpoint_#{presenter.id_suffix(aac)}" %>
-  <% if @domain_root_account.feature_enabled?(:oidc_rp_initiated_logout_params) %>
-    <p><%= mt(<<~TEXT, post_logout_redirect_uri: AuthenticationProvider::OpenIDConnect.post_logout_redirect_uri(self))
-      If the provider can configure valid `post_logout_redirect_uris`, use %{post_logout_redirect_uri}.
-    TEXT
-    %></p>
-  <% end %>
+  <p><%= mt(<<~TEXT, post_logout_redirect_uri: AuthenticationProvider::OpenIDConnect.post_logout_redirect_uri(self))
+    If the provider can configure valid `post_logout_redirect_uris`, use %{post_logout_redirect_uri}.
+  TEXT
+  %></p>
 </div>
 <div class="ic-Form-control">
   <%= f.label :userinfo_endpoint, 'UserInfo Endpoint', class: 'ic-Label', for: "userinfo_endpoint_#{presenter.id_suffix(aac)}" %>

@@ -53,7 +53,9 @@ import '@canvas/context-cards/react/StudentContextCardTrigger'
 
 import assignmentRubricDialog from '@canvas/discussions/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
-import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import TopNavPortalWithDefaults, {
+  addCrumbs,
+} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
 const I18n = useI18nScope('discussion_posts')
 
@@ -216,11 +218,12 @@ export const DiscussionTopicContainer = ({
       : I18n.t('Discussions')
     const discussionOrAnnouncementUrl = isAnnouncement ? 'announcements' : 'discussion_topics'
     const crumbs = getCrumbs()
-    const baseUrl = `${crumbs[0].url}/${discussionOrAnnouncementUrl}`
-
-    crumbs.push({name: discussionOrAnnouncement, url: baseUrl})
-    crumbs.push({name: props.discussionTopic.title || '', url: ''})
-    setCrumbs(crumbs)
+    setCrumbs(
+      addCrumbs([
+        {name: discussionOrAnnouncement, url: `${crumbs[0].url}/${discussionOrAnnouncementUrl}`},
+        {name: props.discussionTopic.title || '', url: ''},
+      ])
+    )
   }
 
   return (
@@ -283,11 +286,12 @@ export const DiscussionTopicContainer = ({
           },
         },
       }}
-
-
       render={(responsiveProps, matches) => (
         <>
-          <TopNavPortalWithDefaults getBreadCrumbSetter={handleBreadCrumbSetter} />
+          <TopNavPortalWithDefaults
+            getBreadCrumbSetter={handleBreadCrumbSetter}
+            useStudentView={true}
+          />
           <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
@@ -299,8 +303,8 @@ export const DiscussionTopicContainer = ({
                     borderRadius={responsiveProps?.border?.radius}
                     borderStyle="solid"
                     borderColor="primary"
-                    padding={matches.includes('mobile') ? "small 0 medium 0" : "small"}
-                    margin={matches.includes('mobile') ? "0 0 medium 0" : "0 0 small 0"}
+                    padding={matches.includes('mobile') ? 'small 0 medium 0' : 'small'}
+                    margin={matches.includes('mobile') ? '0 0 medium 0' : '0 0 small 0'}
                   >
                     {!props.discussionTopic.availableForUser ? (
                       <LockedDiscussion title={props.discussionTopic.title} />
@@ -336,7 +340,7 @@ export const DiscussionTopicContainer = ({
                             )
                           )}
                         </Flex.Item>
-                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY='visible'>
+                        <Flex.Item shouldShrink={true} shouldGrow={true} overflowY="visible">
                           <DiscussionEntryContainer
                             isTopic={true}
                             postUtilities={
@@ -536,13 +540,13 @@ export const DiscussionTopicContainer = ({
                       borderRadius={responsiveProps?.border?.radius}
                       borderStyle="solid"
                       borderColor="primary"
-                      padding={matches.includes('mobile') ? "0" : "small"}
+                      padding={matches.includes('mobile') ? '0' : 'small'}
                       margin="0 0 small 0"
                     >
                       <Flex direction="column" padding={responsiveProps?.container?.padding}>
                         <DiscussionSummary
                           onDisableSummaryClick={() => props.setIsSummaryEnabled(false)}
-                          isMobile={matches.includes('mobile') ? true : false}
+                          isMobile={!!matches.includes('mobile')}
                         />
                       </Flex>
                     </View>

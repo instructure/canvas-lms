@@ -27,7 +27,7 @@ describe('LoadingIndicator', () => {
   })
 
   test('if props supplied for loading', () => {
-    const {container} = render(<LoadingIndicator isLoading />)
+    const {container} = render(<LoadingIndicator isLoading={true} />)
     expect(container.firstChild).not.toHaveStyle('display: none')
   })
 })

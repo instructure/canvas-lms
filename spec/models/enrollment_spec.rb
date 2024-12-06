@@ -3165,13 +3165,12 @@ describe Enrollment do
   end
 
   describe "#can_be_deleted_by" do
-    describe "on a student enrollment with granular_permissions_manage_users" do
+    describe "on a student enrollment" do
       let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
         course_with_student
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
@@ -3202,13 +3201,12 @@ describe Enrollment do
       end
     end
 
-    describe "on an observer enrollment with granular_permission_manage_users" do
+    describe "on an observer enrollment" do
       let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
         course_with_observer
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
@@ -3230,13 +3228,12 @@ describe Enrollment do
       end
     end
 
-    describe "on a teacher enrollment with granular_permission_manage_users" do
+    describe "on a teacher enrollment" do
       let(:user) { double(id: 42) }
       let(:session) { double }
 
       before do
         course_with_teacher
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 

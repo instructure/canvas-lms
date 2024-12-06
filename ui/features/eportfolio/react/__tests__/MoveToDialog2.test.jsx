@@ -44,7 +44,7 @@ const mountDialog = (opts = {}) => {
   }
 
   const element = <MoveToDialog {...opts} />
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   const dialog = ReactDOM.render(element, root)
   return dialog
 }

@@ -137,6 +137,7 @@ const integrationIdEl = document.querySelector(
   '[data-external-placeholder="integration-id"]'
 ) as HTMLElement
 
+// eslint-disable-next-line no-restricted-properties
 ReactDOM.render(
   <ExternalIds
     jqInterface={window.canvas_pseudonyms.jqInterface}

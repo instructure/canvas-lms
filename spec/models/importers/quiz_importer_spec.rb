@@ -480,7 +480,7 @@ describe "Importers::QuizImporter" do
       end
 
       it "should early return" do
-        expect(Importers::CourseContentImporter).not_to receive(:shift_date_options)
+        expect(Importers::CourseContentImporter).not_to receive(:shift_date_options_from_migration)
         subject
       end
     end

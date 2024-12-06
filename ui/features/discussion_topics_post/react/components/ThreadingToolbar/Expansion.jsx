@@ -21,49 +21,45 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { IconArrowOpenEndLine, IconArrowOpenDownLine } from '@instructure/ui-icons'
+import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import { Flex } from '@instructure/ui-flex'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('discussion_posts')
 
 export function Expansion({...props}) {
   return (
-        <span className="discussion-expand-btn">
-          <Link
-            isWithinText={false}
-            as="button"
-            onClick={props.onClick}
-            data-testid="expand-button"
-            interaction={props.isReadOnly ? 'disabled' : 'enabled'}
-            aria-expanded={props.isExpanded}
-            ref={props.expansionButtonRef}
-          >
-            <ScreenReaderContent
-              data-testid={
-                props.isExpanded ? 'reply-expansion-btn-collapse' : 'reply-expansion-btn-expand'
-              }
-            >
-              {props.isExpanded
-                ? I18n.t('Collapse discussion thread from %{author}', {
-                    author: props.authorName,
-                  })
-                : I18n.t('Expand discussion thread from %{author}', {
-                    author: props.authorName,
-                  })}
-            </ScreenReaderContent>
-            <Flex gap='x-small'>
-              { props.isExpanded ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine /> }
-              <Text
-                weight="bold"
-                size="medium"
-                data-testid={`text-medium`}
-                >
-                {props.expandText}
-              </Text>
-            </Flex>
-          </Link>
-        </span>
+    <span className="discussion-expand-btn">
+      <Link
+        isWithinText={false}
+        as="button"
+        onClick={props.onClick}
+        data-testid="expand-button"
+        interaction={props.isReadOnly ? 'disabled' : 'enabled'}
+        aria-expanded={props.isExpanded}
+        ref={props.expansionButtonRef}
+      >
+        <ScreenReaderContent
+          data-testid={
+            props.isExpanded ? 'reply-expansion-btn-collapse' : 'reply-expansion-btn-expand'
+          }
+        >
+          {props.isExpanded
+            ? I18n.t('Collapse discussion thread from %{author}', {
+                author: props.authorName,
+              })
+            : I18n.t('Expand discussion thread from %{author}', {
+                author: props.authorName,
+              })}
+        </ScreenReaderContent>
+        <Flex gap="x-small">
+          {props.isExpanded ? <IconArrowOpenDownLine /> : <IconArrowOpenEndLine />}
+          <Text weight="bold" size="medium" data-testid="text-medium">
+            {props.expandText}
+          </Text>
+        </Flex>
+      </Link>
+    </span>
   )
 }
 

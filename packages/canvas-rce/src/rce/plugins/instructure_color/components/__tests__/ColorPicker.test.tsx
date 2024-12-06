@@ -34,8 +34,8 @@ const renderComponent = (props = {}) => {
         foreground: '#000000',
         background: '#ffffff',
       }}
-      onCancel={() => {}}
-      onSave={() => {}}
+      onCancel={jest.fn()}
+      onSave={jest.fn()}
       {...props}
     />
   )
@@ -120,46 +120,21 @@ describe('ColorPicker', () => {
     expect(queryByTestId('color-contrast-summary')).not.toBeInTheDocument()
   })
 
-  it('adds selected colors to the presets', async () => {
-    const {getByTestId, getByText, rerender} = renderComponent({
+  it('uses colors on the page for presets', async () => {
+    const {getByTestId} = renderComponent({
       tabs: {
         background: '#ffffff',
         border: '#000000',
       },
+      colorsInUse: {background: ['#ababab', '#cdcdcd']},
     })
 
-    let presets = getByTestId('color-preset').querySelectorAll('button')
-    expect(presets).toHaveLength(2)
+    const presets = getByTestId('color-preset').querySelectorAll('button')
+    expect(presets).toHaveLength(4)
     expect(getPresetTooltip(presets[0])?.textContent).toEqual('#000000')
-    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#FFFFFF')
-
-    const mixer = getByTestId('color-mixer')
-    const rgb = mixer.querySelectorAll('input')
-    // #B82828
-    await user.click(rgb[0])
-    await user.keyboard('{Control>}a{/Control}184')
-    await user.click(rgb[1])
-    await user.keyboard('{Control>}a{/Control}40')
-    await user.click(rgb[2])
-    await user.keyboard('{Control>}a{/Control}40')
-    getByText('Apply').closest('button')?.click()
-
-    rerender(
-      <ColorPicker
-        tabs={{
-          background: '#ffffff',
-          border: '#000000',
-        }}
-        onCancel={() => {}}
-        onSave={() => {}}
-      />
-    )
-
-    presets = getByTestId('color-preset').querySelectorAll('button')
-    expect(presets).toHaveLength(3)
-    expect(getPresetTooltip(presets[0])?.textContent).toEqual('#000000')
-    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#FFFFFF')
-    expect(getPresetTooltip(presets[2])?.textContent).toEqual('#b82828')
+    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#ffffff')
+    expect(getPresetTooltip(presets[2])?.textContent).toEqual('#ababab')
+    expect(getPresetTooltip(presets[3])?.textContent).toEqual('#cdcdcd')
   })
 
   it('calls onCancel when the cancel button is clicked', () => {

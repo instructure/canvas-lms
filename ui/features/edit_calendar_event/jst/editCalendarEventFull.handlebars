@@ -1,7 +1,12 @@
 <div id="header_component_root"></div>
 <form id="editCalendarEventFull" class="{{#if use_section_dates}}use_section_dates{{/if}}">
     <fieldset>
-      <label for="calendar_event_title"><strong>{{#t}}Event Title{{/t}}</strong></label>
+      <label for="calendar_event_title" class="required">
+        <strong>
+          {{#t}}Event Title{{/t}}
+          <span class="error-text" aria-hidden="true">*</span>
+        </strong>
+      </label>
       <input type="text"
              name="title"
              id="calendar_event_title"
@@ -31,7 +36,7 @@
       {{#each course_sections}}
       <label class="row_header" for="section_{{id}}_start_date">{{name}}</label>
       <div class="date_start_end_row">
-        <div class="date_field_container"
+        <div class="date_field_container date_field_responsive"
              {{#unless this.permissions.manage_calendar}}
                 data-tooltip
                 title="{{#t}}You don't have permission to edit this section.{{/t}}"
@@ -86,7 +91,7 @@
   {{/if}}
 
   <div class="hide_if_using_sections date_start_end_row">
-    <div class="date_field_container">
+    <div class="date_field_container date_field_responsive">
       <label class='screenreader-only' id='calendar_event_date_accessible_label'>
         {{#t}}Event Date{{/t}}
         {{datepickerScreenreaderPrompt 'date'}}
@@ -182,10 +187,10 @@
       {{#t "repeat"}}Duplicate{{/t}}
     </label>
 
-    <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <div class="duplicate_event_row duplicate_fields spacer-top" style="display: none">
       <label for="duplicate_interval">
         <div class="duplicate_label">{{#t}}Every{{/t}}</div>
-        <input value="1" disabled="true" type="number" id="duplicate_interval" name="duplicate_interval" min="1" />
+        <input value="1" disabled="true" type="number" id="duplicate_interval" name="duplicate_interval" />
         <select id="duplicate_frequency" name="duplicate_frequency">
           <option value="daily">{{#t}}Day(s){{/t}}</option>
           <option value="weekly" selected>{{#t}}Week(s){{/t}}</option>
@@ -194,10 +199,10 @@
       </label>
     </div>
 
-    <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <div class="duplicate_event_row duplicate_fields spacer-top" style="display: none">
       <label for="duplicate_count">
         <div class="duplicate_label" >{{#t}}For{{/t}}</div>
-        <input value="1" disabled="true" type="number" id="duplicate_count" name="duplicate_count" min="1" max="{{recurringEventLimit}}" />
+        <input value="1" disabled="true" type="number" id="duplicate_count" name="duplicate_count" />
         <span class="occurences_div">{{#t}}additional occurrence(s){{/t}}</span>
       </label>
     </div>

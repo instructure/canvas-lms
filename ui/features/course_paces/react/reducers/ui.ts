@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -19,11 +18,12 @@
 
 import {createSelector} from 'reselect'
 
-import {StoreState, UIState} from '../types'
-import {Constants as UIConstants, UIAction} from '../actions/ui'
+import type {StoreState, UIState} from '../types'
+import {Constants as UIConstants, type UIAction} from '../actions/ui'
 import {getCoursePaceType, getPacePublishing} from './course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 
+// @ts-expect-error
 export const initialState: UIState = {
   autoSaving: false,
   syncing: 0,
@@ -37,6 +37,7 @@ export const initialState: UIState = {
   showPaceModal: false,
   responsiveSize: 'large',
   showProjections: true,
+  // @ts-expect-error
   blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
 }
 
@@ -97,8 +98,10 @@ export default (state = initialState, action: UIAction): UIState => {
       delete new_errors[action.payload]
       return {...state, errors: new_errors}
     }
+    // @ts-expect-error
     case UIConstants.TOGGLE_DIVIDE_INTO_WEEKS:
       return {...state, divideIntoWeeks: !state.divideIntoWeeks}
+    // @ts-expect-error
     case UIConstants.TOGGLE_SHOW_PROJECTIONS:
       return {...state, showProjections: !state.showProjections}
     case UIConstants.SET_SELECTED_PACE_CONTEXT:

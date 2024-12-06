@@ -358,6 +358,7 @@ window.rubricAssessment = {
       rubricAssessment.currentAssociation = association
 
       const render = currentAssessment => {
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <Rubric
             allowExtraCredit={ENV.outcome_extra_credit_enabled}
@@ -502,6 +503,7 @@ window.rubricAssessment = {
           assessment || {},
           ENV.RUBRIC_ASSESSMENT
         )
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <Rubric
             customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}

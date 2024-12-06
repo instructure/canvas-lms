@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -40,12 +39,14 @@ const UNGRADED = '–'
 const QUANTITATIVE_GRADING_TYPES = [POINTS, PERCENT, GPA_SCALE]
 const QUALITATIVE_GRADING_TYPES = ['pass_fail', 'letter_grade']
 
+// @ts-expect-error
 function replaceDashWithMinus(grade) {
   if (typeof grade !== 'string') return grade
 
   return grade.replace(/(.+)-$/, '$1−')
 }
 
+// @ts-expect-error
 function isPassFail(grade, gradeType: null | string = null) {
   if (gradeType) {
     return gradeType === PASS_FAIL
@@ -54,6 +55,7 @@ function isPassFail(grade, gradeType: null | string = null) {
   return PASS_GRADES.includes(grade) || FAIL_GRADES.includes(grade)
 }
 
+// @ts-expect-error
 function isPercent(grade, gradeType) {
   if (gradeType) {
     return gradeType === PERCENT
@@ -62,10 +64,12 @@ function isPercent(grade, gradeType) {
   return /%/g.test(grade)
 }
 
+// @ts-expect-error
 function isExcused(grade) {
   return grade === 'EX'
 }
 
+// @ts-expect-error
 function formatPointsOutOf(grade, pointsPossible) {
   if (grade == null || grade === '') {
     return grade
@@ -84,6 +88,7 @@ function formatPointsOutOf(grade, pointsPossible) {
   return I18n.t('%{score}/%{pointsPossibleTranslated}', {pointsPossibleTranslated, score})
 }
 
+// @ts-expect-error
 function normalizeCompleteIncompleteGrade(grade) {
   if (PASS_GRADES.includes(grade)) {
     return 'complete'
@@ -94,6 +99,7 @@ function normalizeCompleteIncompleteGrade(grade) {
   return null
 }
 
+// @ts-expect-error
 function shouldFormatGradingType(gradingType) {
   return (
     gradingType === POINTS ||
@@ -103,6 +109,7 @@ function shouldFormatGradingType(gradingType) {
   )
 }
 
+// @ts-expect-error
 function shouldFormatGrade(grade, gradingType) {
   if (gradingType) {
     return shouldFormatGradingType(gradingType)
@@ -115,10 +122,12 @@ function excused() {
   return I18n.t('Excused')
 }
 
+// @ts-expect-error
 function formatPointsGrade(score) {
   return I18n.n(round(score, 2), {precision: 2, strip_insignificant_zeros: true})
 }
 
+// @ts-expect-error
 function formatPercentageGrade(score, options) {
   const percent = options.pointsPossible ? scoreToPercentage(score, options.pointsPossible) : score
   return I18n.n(round(percent, 2), {
@@ -128,21 +137,31 @@ function formatPercentageGrade(score, options) {
   })
 }
 
+// @ts-expect-error
 function formatGradingSchemeGrade(score, grade, options = {}) {
   let formattedGrade
+  // @ts-expect-error
   if (options?.restrict_quantitative_data && options.pointsPossible === 0 && score >= 0) {
     formattedGrade = scoreToGrade(
       100,
+      // @ts-expect-error
       options.gradingScheme,
+      // @ts-expect-error
       options.pointsBasedGradingScheme,
+      // @ts-expect-error
       options.scalingFactor
     )
+    // @ts-expect-error
   } else if (options.pointsPossible) {
+    // @ts-expect-error
     const percent = scoreToPercentage(score, options.pointsPossible)
     formattedGrade = scoreToGrade(
       percent,
+      // @ts-expect-error
       options.gradingScheme,
+      // @ts-expect-error
       options.pointsBasedGradingScheme,
+      // @ts-expect-error
       options.scalingFactor
     )
   } else if (grade != null) {
@@ -150,8 +169,11 @@ function formatGradingSchemeGrade(score, grade, options = {}) {
   } else {
     formattedGrade = scoreToGrade(
       score,
+      // @ts-expect-error
       options.gradingScheme,
+      // @ts-expect-error
       options.pointsBasedGradingScheme,
+      // @ts-expect-error
       options.scalingFactor
     )
   }
@@ -159,6 +181,7 @@ function formatGradingSchemeGrade(score, grade, options = {}) {
   return replaceDashWithMinus(formattedGrade)
 }
 
+// @ts-expect-error
 function formatCompleteIncompleteGrade(score, grade, options) {
   let passed = false
   if (options.pointsPossible) {
@@ -169,6 +192,7 @@ function formatCompleteIncompleteGrade(score, grade, options) {
   return passed ? I18n.t('Complete') : I18n.t('Incomplete')
 }
 
+// @ts-expect-error
 function formatGradeInfo(gradeInfo, options: {defaultValue?: string} = {}) {
   if (gradeInfo.excused) {
     return excused()
@@ -207,6 +231,7 @@ const GradeFormatHelper = {
    * @return {string} Given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
    */
+  // @ts-expect-error
   formatGrade(grade, options: FormatGradeOptions = {}) {
     let formattedGrade = grade
 
@@ -288,6 +313,7 @@ const GradeFormatHelper = {
    * returns delocalized point or percentage string.
    * Otherwise, returns input.
    */
+  // @ts-expect-error
   delocalizeGrade(localizedGrade) {
     if (
       localizedGrade === undefined ||
@@ -306,6 +332,7 @@ const GradeFormatHelper = {
     return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '')
   },
 
+  // @ts-expect-error
   parseGrade(grade, options: FormatGradeOptions = {}) {
     let parsedGrade
 

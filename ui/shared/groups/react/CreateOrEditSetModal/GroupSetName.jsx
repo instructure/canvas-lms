@@ -34,7 +34,7 @@ export const GroupSetName = ({onChange, errormsg, elementRef, direction}) => {
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Group Set Name*')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow={true} overflowY='hidden' overflowX='hidden'>
+      <Flex.Item shouldGrow={true} overflowY="hidden" overflowX="hidden">
         <TextInput
           id="new-group-set-name"
           placeholder={I18n.t('Enter Group Set Name')}

@@ -434,6 +434,7 @@ export default forwardRef(function ItemAssignToCard(
           size="medium"
           messages={showValidations ? error : []}
           disabledOptionIds={disabledOptionIdsRef?.current}
+          // @ts-expect-error
           disableFetch={!isOpenRef?.current ?? false}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}
@@ -444,6 +445,7 @@ export default forwardRef(function ItemAssignToCard(
           disabledOptionIdsRef={disabledOptionIdsRef}
           itemType={itemType}
         />
+        {/* @ts-expect-error */}
         {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (
           <DueDateTimeInput
             {...{
@@ -462,6 +464,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
+        {/* @ts-expect-error */}
         {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
           <ReplyToTopicDueDateTimeInput
             {...{
@@ -482,6 +485,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
+        {/* @ts-expect-error */}
         {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
           <RequiredRepliesDueDateTimeInput
             {...{

@@ -26,6 +26,7 @@ import {AlignmentWidget} from '@instructure/outcomes-ui'
 ready(() => {
   const container = document.getElementById('canvas_outcomes_alignment_widget')
   if (ENV.canvas_outcomes && ENV.canvas_outcomes.host) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <View as="div" borderWidth="small none none none" padding="medium none">
         <AlignmentWidget

@@ -44,6 +44,7 @@ QUnit.module('AssessmentAuditTray AuditEvent', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<AuditEvent {...props} />, $container)
   }
 

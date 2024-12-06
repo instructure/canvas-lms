@@ -95,6 +95,7 @@ ready(() => {
   new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
   if (!window.ENV.disable_keyboard_shortcuts) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DiscussionTopicKeyboardShortcutModal />,
       document.getElementById('keyboard-shortcut-modal')
@@ -112,6 +113,7 @@ ready(() => {
     !ENV.DISCUSSION.IS_ASSIGNMENT &&
     !ENV.DISCUSSION.IS_GROUP
   ) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SectionsTooltip
         totalUserCount={ENV.TOTAL_USER_COUNT}

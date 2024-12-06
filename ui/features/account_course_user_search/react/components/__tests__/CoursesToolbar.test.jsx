@@ -69,33 +69,33 @@ const props = {
     loading: false,
   },
   filteredTerms: [
-      {
-        id: '1',
-        name: 'Future Term 1',
-        start_at: '2099-01-01',
-        end_at: '3099-01-01',
-      },
-      {
-        id: '2',
-        name: 'Future Term 2',
-        start_at: '2099-01-01',
-      },
-      {
-        id: '3',
-        name: 'Active Term 1',
-        start_at: '1999-01-01',
-        end_at: '3099-01-01',
-      },
-      {
-        id: '4',
-        name: 'Term With No Start Or End 1',
-      },
-      {
-        id: '5',
-        name: 'Past Term 1',
-        end_at: '1999-01-01',
-      },
-    ],
+    {
+      id: '1',
+      name: 'Future Term 1',
+      start_at: '2099-01-01',
+      end_at: '3099-01-01',
+    },
+    {
+      id: '2',
+      name: 'Future Term 2',
+      start_at: '2099-01-01',
+    },
+    {
+      id: '3',
+      name: 'Active Term 1',
+      start_at: '1999-01-01',
+      end_at: '3099-01-01',
+    },
+    {
+      id: '4',
+      name: 'Term With No Start Or End 1',
+    },
+    {
+      id: '5',
+      name: 'Past Term 1',
+      end_at: '1999-01-01',
+    },
+  ],
 }
 
 describe('CoursesToolbar', () => {

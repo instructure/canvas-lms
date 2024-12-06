@@ -73,6 +73,13 @@ describe DeveloperKeysController do
           expect(expected_id).to eq(dk.global_id)
         end
 
+        it "references the API endpoint in the Link (pagination) header" do
+          get "index", params: { account_id: Account.site_admin.id }, format: :json
+          route = Rails.application.routes.url_helpers.api_v1_account_developer_keys_path(Account.site_admin)
+          expect(response.headers["Link"]).to include(route)
+          expect(response.headers["Link"]).to include("http")
+        end
+
         it "does not include non-siteadmin keys" do
           site_admin_key = DeveloperKey.create!
           DeveloperKey.create!(account: Account.default)

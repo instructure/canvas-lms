@@ -20,12 +20,16 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {getDiscussionSubentriesQueryMock, updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
+import {
+  getDiscussionSubentriesQueryMock,
+  updateDiscussionEntryParticipantMock,
+} from '../../../../graphql/Mocks'
 import {SplitScreenViewContainer} from '../SplitScreenViewContainer'
 import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+
 injectGlobalAlertContainers()
 
 jest.mock('@canvas/rce/react/CanvasRce')
@@ -518,21 +522,21 @@ describe('SplitScreenViewContainer', () => {
   })
 
   describe('rating', () => {
-    it('should react on liked', async() => {
+    it('should react on liked', async () => {
       const mocks = [
-          ...updateDiscussionEntryParticipantMock({
+        ...updateDiscussionEntryParticipantMock({
           rating: 'liked',
         }),
         ...getDiscussionSubentriesQueryMock({
           last: split_screen_view_initial_page_size,
           includeRelativeEntry: false,
-        })
+        }),
       ]
 
-      const {findAllByTestId,queryByTestId} = setup(defaultProps(), mocks)
+      const {findAllByTestId, queryByTestId} = setup(defaultProps(), mocks)
       const likeButtons = await findAllByTestId('like-button')
 
-      expect(likeButtons.length).toBe(2);
+      expect(likeButtons.length).toBe(2)
       expect(queryByTestId('liked-icon')).toBeFalsy()
       fireEvent.click(likeButtons[0])
       await waitFor(() => {
@@ -542,7 +546,7 @@ describe('SplitScreenViewContainer', () => {
       expect(queryByTestId('liked-icon')).toBeTruthy()
     })
 
-    it('should react on not_liked', async() => {
+    it('should react on not_liked', async () => {
       const mocks = [
         ...updateDiscussionEntryParticipantMock({
           rating: 'not_liked',
@@ -559,12 +563,12 @@ describe('SplitScreenViewContainer', () => {
           relativeEntryId: '10',
         }),
       ]
-      mocks[2].result.data.legacyNode.entryParticipant.rating=true
+      mocks[2].result.data.legacyNode.entryParticipant.rating = true
 
-      const {findAllByTestId,queryByTestId} = setup(defaultProps({relativeEntryId: '10'}), mocks)
+      const {findAllByTestId, queryByTestId} = setup(defaultProps({relativeEntryId: '10'}), mocks)
       const likeButtons = await findAllByTestId('like-button')
 
-      expect(likeButtons.length).toBe(2);
+      expect(likeButtons.length).toBe(2)
       expect(queryByTestId('liked-icon')).toBeTruthy()
       fireEvent.click(queryByTestId('liked-icon'))
       await waitFor(() => {
@@ -573,6 +577,5 @@ describe('SplitScreenViewContainer', () => {
       })
       expect(queryByTestId('liked-icon')).toBeFalsy()
     })
-
   })
 })

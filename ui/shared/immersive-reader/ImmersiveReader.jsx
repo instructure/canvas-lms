@@ -111,5 +111,6 @@ export function ImmersiveReaderButton({content, readerSDK, breakpoints}) {
 const ImmersiveReaderButtonWithBreakpoints = WithBreakpoints(ImmersiveReaderButton)
 
 export function initializeReaderButton(mountPoint, content) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<ImmersiveReaderButtonWithBreakpoints content={content} />, mountPoint)
 }

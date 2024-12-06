@@ -28,7 +28,7 @@ class UserListsController < ApplicationController
   # POST /accounts/:account_id/user_lists.json
   def create
     perms = if @context.is_a?(Course)
-              add_enrollment_permissions
+              RoleOverride::GRANULAR_COURSE_ENROLLMENT_PERMISSIONS
             else
               [:manage_account_memberships, *add_temporary_enrollment_permissions]
             end
@@ -59,23 +59,6 @@ class UserListsController < ApplicationController
   end
 
   private
-
-  def add_enrollment_permissions
-    if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
-      %i[
-        add_teacher_to_course
-        add_ta_to_course
-        add_designer_to_course
-        add_student_to_course
-        add_observer_to_course
-      ]
-    else
-      [
-        :manage_students,
-        :manage_admin_users
-      ]
-    end
-  end
 
   def add_temporary_enrollment_permissions
     if @domain_root_account.feature_enabled?(:temporary_enrollments)

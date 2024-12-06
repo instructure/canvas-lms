@@ -69,6 +69,7 @@ export async function fetchTemporaryEnrollments(
     throw new Error(errorMessage)
   }
 
+  // @ts-expect-error
   return {enrollments: json, link}
 }
 
@@ -91,6 +92,7 @@ export async function createTemporaryEnrollmentPairing(
         ending_enrollment_state: endingEnrollmentState,
       },
     })
+    // @ts-expect-error
     return response.json.temporary_enrollment_pairing
   } catch (error) {
     if (error instanceof Error) {
@@ -120,6 +122,7 @@ export async function getTemporaryEnrollmentPairing(
       method: 'GET',
     })
 
+    // @ts-expect-error
     return response.json.temporary_enrollment_pairing
   } catch (error) {
     if (error instanceof Error) {

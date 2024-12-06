@@ -32,7 +32,7 @@ export type Product = {
   terms_of_service_url: string
   privacy_policy_url: string
   accessibility_url: string
-  support_link: string
+  support_url: string
   tags: Tag[]
   integration_resources: IntegrationResources
 }
@@ -44,13 +44,24 @@ export type Company = {
 }
 
 export type Lti = {
-  lti_13?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
+  lti_13?: Array<{
+    id: number
+    integration_type: string
+    url?: string
+    global_inherited_key?: string
+    unified_tool_id: string
+  }>
   lti_11?: {id: number; integration_type: string; url: string; unified_tool_id: string}[]
 }
 
+export type LtiDetailProps = {
+  services: string[]
+  placements: string[]
+}
+
 export type LtiDetail = {
-  lti_13?: {services: string[]; placements: string[]}
-  lti_11?: {services: string[]; placements: string[]}
+  lti_13?: LtiDetailProps
+  lti_11?: LtiDetailProps
 }
 
 export type Badges = {

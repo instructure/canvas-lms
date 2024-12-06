@@ -53,6 +53,7 @@ export const mount = function (node, options) {
   container = node
 
   return initialize().then(function () {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<Layout {...controller.getState()} />, container)
     return controller.start(update)
   })
@@ -63,6 +64,7 @@ export const isMounted = function () {
 }
 
 export const update = function (props) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<Layout {...props} />, container)
 }
 

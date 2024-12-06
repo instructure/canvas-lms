@@ -26,7 +26,7 @@ import {
   groupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import OutcomeMoveModal from '../OutcomeMoveModal'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 

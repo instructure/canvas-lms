@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import { render, cleanup, waitFor, fireEvent } from '@testing-library/react'
+import {render, cleanup, waitFor, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import sinon from 'sinon';
+import sinon from 'sinon'
 
 import AsyncComponents from '../../../AsyncComponents'
 import AssignmentColumnHeader from '../AssignmentColumnHeader'
@@ -32,7 +32,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
   let gradebookElements
   let props
   let students
-  let menuContent;
+  let menuContent
 
   beforeEach(() => {
     container = document.body.appendChild(document.createElement('div'))
@@ -167,7 +167,7 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
   })
 
   function mountComponent() {
-    component = render(<AssignmentColumnHeader {...props} />, { container })
+    component = render(<AssignmentColumnHeader {...props} />, {container})
   }
 
   function getAssignmentLink() {
@@ -175,9 +175,11 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
   }
 
   function getOptionsMenuTrigger() {
-    return [...container.querySelectorAll('button')].find(
-      button => button.textContent === 'Math 1.1 Options'
-    ) || null;
+    return (
+      [...container.querySelectorAll('button')].find(
+        button => button.textContent === 'Math 1.1 Options'
+      ) || null
+    )
   }
 
   function getOptionsMenuContent() {
@@ -186,21 +188,21 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
   }
 
   function openOptionsMenu() {
-    const trigger = getOptionsMenuTrigger();
+    const trigger = getOptionsMenuTrigger()
     if (trigger) {
-      fireEvent.click(trigger);
-      menuContent = getOptionsMenuContent();
+      fireEvent.click(trigger)
+      menuContent = getOptionsMenuContent()
     }
   }
 
   function mountAndOpenOptionsMenu() {
-    mountComponent();
-    openOptionsMenu();
+    mountComponent()
+    openOptionsMenu()
   }
 
   function closeOptionsMenu() {
-    const trigger = getOptionsMenuTrigger();
-    fireEvent.click(trigger);
+    const trigger = getOptionsMenuTrigger()
+    fireEvent.click(trigger)
   }
 
   describe('assignment name', () => {
@@ -331,645 +333,653 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
 
   describe('"Options" menu trigger', () => {
     test('is present for a published assignment', () => {
-      mountComponent();
-      expect(getOptionsMenuTrigger()).toBeInTheDocument();
-    });
+      mountComponent()
+      expect(getOptionsMenuTrigger()).toBeInTheDocument()
+    })
 
     test('is not present for an unpublished assignment', () => {
-      props.assignment.published = false;
-      mountComponent();
-      expect(getOptionsMenuTrigger()).not.toBeInTheDocument();
-    });
+      props.assignment.published = false
+      mountComponent()
+      expect(getOptionsMenuTrigger()).not.toBeInTheDocument()
+    })
 
     test('is labeled with the assignment name', () => {
-      mountComponent();
-      const trigger = getOptionsMenuTrigger();
-      expect(trigger.textContent).toContain('Math 1.1 Options');
-    });
+      mountComponent()
+      const trigger = getOptionsMenuTrigger()
+      expect(trigger.textContent).toContain('Math 1.1 Options')
+    })
 
     test('opens the options menu when clicked', () => {
-      mountComponent();
-      fireEvent.click(getOptionsMenuTrigger());
-      expect(getOptionsMenuContent()).toBeInTheDocument();
-    });
+      mountComponent()
+      fireEvent.click(getOptionsMenuTrigger())
+      expect(getOptionsMenuContent()).toBeInTheDocument()
+    })
 
     test('closes the options menu when clicked', () => {
-      mountAndOpenOptionsMenu();
-      fireEvent.click(getOptionsMenuTrigger());
-      expect(getOptionsMenuContent()).not.toBeInTheDocument();
-    });
-  });
+      mountAndOpenOptionsMenu()
+      fireEvent.click(getOptionsMenuTrigger())
+      expect(getOptionsMenuContent()).not.toBeInTheDocument()
+    })
+  })
 
   describe('"Options" menu', () => {
     describe('when opened', () => {
       beforeEach(() => {
-        mountAndOpenOptionsMenu();
-      });
+        mountAndOpenOptionsMenu()
+      })
 
       test('is added as a Gradebook element', () => {
-        expect(gradebookElements.indexOf(menuContent)).not.toBe(-1);
-      });
+        expect(gradebookElements.indexOf(menuContent)).not.toBe(-1)
+      })
 
       test('adds the "menuShown" class to the action container', () => {
-        const actionContainer = container.querySelector('.Gradebook__ColumnHeaderAction');
-        expect(actionContainer.classList).toContain('menuShown');
-      });
-    });
+        const actionContainer = container.querySelector('.Gradebook__ColumnHeaderAction')
+        expect(actionContainer.classList).toContain('menuShown')
+      })
+    })
 
     describe('when closed', () => {
       beforeEach(() => {
-        props.onMenuDismiss = jest.fn();
-        mountAndOpenOptionsMenu();
-        closeOptionsMenu();
-      });
+        props.onMenuDismiss = jest.fn()
+        mountAndOpenOptionsMenu()
+        closeOptionsMenu()
+      })
 
       test('is removed as a Gradebook element', () => {
-        expect(gradebookElements.indexOf(menuContent)).toBe(-1);
-      });
+        expect(gradebookElements.indexOf(menuContent)).toBe(-1)
+      })
 
       test('calls the onMenuDismiss callback', () => {
-        expect(props.onMenuDismiss).toHaveBeenCalledTimes(1);
-      });
+        expect(props.onMenuDismiss).toHaveBeenCalledTimes(1)
+      })
 
       test('removes the "menuShown" class from the action container', () => {
-        const actionContainer = container.querySelector('.Gradebook__ColumnHeaderAction');
-        expect(actionContainer.classList).not.toContain('menuShown');
-      });
-    });
+        const actionContainer = container.querySelector('.Gradebook__ColumnHeaderAction')
+        expect(actionContainer.classList).not.toContain('menuShown')
+      })
+    })
   })
 
   describe('"Options" > "Sort by" setting', () => {
     function getSortByOption(label) {
-      return getMenuItem(menuContent, 'Sort by', label);
+      return getMenuItem(menuContent, 'Sort by', label)
     }
 
     test('is added as a Gradebook element when opened', () => {
-      mountAndOpenOptionsMenu();
-      const sortByMenuContent = getMenuContent(menuContent, 'Sort by');
-      expect(gradebookElements.indexOf(sortByMenuContent)).not.toBe(-1);
-    });
+      mountAndOpenOptionsMenu()
+      const sortByMenuContent = getMenuContent(menuContent, 'Sort by')
+      expect(gradebookElements.indexOf(sortByMenuContent)).not.toBe(-1)
+    })
 
     test('is removed as a Gradebook element when closed', () => {
-      mountAndOpenOptionsMenu();
-      const sortByMenuContent = getMenuContent(menuContent, 'Sort by');
-      closeOptionsMenu();
-      expect(gradebookElements.indexOf(sortByMenuContent)).toBe(-1);
-    });
+      mountAndOpenOptionsMenu()
+      const sortByMenuContent = getMenuContent(menuContent, 'Sort by')
+      closeOptionsMenu()
+      expect(gradebookElements.indexOf(sortByMenuContent)).toBe(-1)
+    })
 
     describe('"Grade - Low to High" option', () => {
       test('is selected when sorting by grade ascending', () => {
-        props.sortBySetting.settingKey = 'grade';
-        props.sortBySetting.direction = 'ascending';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('true');
-      });
+        props.sortBySetting.settingKey = 'grade'
+        props.sortBySetting.direction = 'ascending'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('true')
+      })
 
       test('is not selected when sorting by grade descending', () => {
-        props.sortBySetting.settingKey = 'grade';
-        props.sortBySetting.direction = 'descending';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.settingKey = 'grade'
+        props.sortBySetting.direction = 'descending'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is not selected when sorting by a different setting', () => {
-        props.sortBySetting.settingKey = 'missing';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.settingKey = 'missing'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is not selected when isSortColumn is false', () => {
-        props.sortBySetting.isSortColumn = false;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.isSortColumn = false
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - Low to High').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is optionally disabled', () => {
-        props.sortBySetting.disabled = true;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - Low to High').getAttribute('aria-disabled')).toBe('true');
-      });
+        props.sortBySetting.disabled = true
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - Low to High').getAttribute('aria-disabled')).toBe('true')
+      })
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.sortBySetting.onSortByGradeAscending = jest.fn();
-        });
+          props.sortBySetting.onSortByGradeAscending = jest.fn()
+        })
 
         test('calls the .sortBySetting.onSortByGradeAscending callback', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Grade - Low to High').click();
-          expect(props.sortBySetting.onSortByGradeAscending).toHaveBeenCalledTimes(1);
-        });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Grade - Low to High').click()
+          expect(props.sortBySetting.onSortByGradeAscending).toHaveBeenCalledTimes(1)
+        })
 
         test('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Grade - Low to High').focus();
-          getSortByOption('Grade - Low to High').click();
-          expect(document.activeElement).toBe(getOptionsMenuTrigger());
-        });
-      });
-    });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Grade - Low to High').focus()
+          getSortByOption('Grade - Low to High').click()
+          expect(document.activeElement).toBe(getOptionsMenuTrigger())
+        })
+      })
+    })
 
     describe('"Grade - High to Low" option', () => {
       test('is selected when sorting by grade descending', () => {
-        props.sortBySetting.settingKey = 'grade';
-        props.sortBySetting.direction = 'descending';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('true');
-      });
+        props.sortBySetting.settingKey = 'grade'
+        props.sortBySetting.direction = 'descending'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('true')
+      })
 
       test('is not selected when sorting by grade ascending', () => {
-        props.sortBySetting.settingKey = 'grade';
-        props.sortBySetting.direction = 'ascending';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.settingKey = 'grade'
+        props.sortBySetting.direction = 'ascending'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is not selected when sorting by a different setting', () => {
-        props.sortBySetting.settingKey = 'missing';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.settingKey = 'missing'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is not selected when isSortColumn is false', () => {
-        props.sortBySetting.isSortColumn = false;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.isSortColumn = false
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - High to Low').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is optionally disabled', () => {
-        props.sortBySetting.disabled = true;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Grade - High to Low').getAttribute('aria-disabled')).toBe('true');
-      });
+        props.sortBySetting.disabled = true
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Grade - High to Low').getAttribute('aria-disabled')).toBe('true')
+      })
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.sortBySetting.onSortByGradeDescending = jest.fn();
-        });
+          props.sortBySetting.onSortByGradeDescending = jest.fn()
+        })
 
         test('calls the .sortBySetting.onSortByGradeDescending callback', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Grade - High to Low').click();
-          expect(props.sortBySetting.onSortByGradeDescending).toHaveBeenCalledTimes(1);
-        });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Grade - High to Low').click()
+          expect(props.sortBySetting.onSortByGradeDescending).toHaveBeenCalledTimes(1)
+        })
 
         test('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Grade - High to Low').focus();
-          getSortByOption('Grade - High to Low').click();
-          expect(document.activeElement).toBe(getOptionsMenuTrigger());
-        });
-      });
-    });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Grade - High to Low').focus()
+          getSortByOption('Grade - High to Low').click()
+          expect(document.activeElement).toBe(getOptionsMenuTrigger())
+        })
+      })
+    })
 
     describe('"Missing" option', () => {
       test('is selected when sorting by missing', () => {
-        props.sortBySetting.settingKey = 'missing';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Missing').getAttribute('aria-checked')).toBe('true');
-      });
+        props.sortBySetting.settingKey = 'missing'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Missing').getAttribute('aria-checked')).toBe('true')
+      })
 
       test('is not selected when sorting by a different setting', () => {
-        props.sortBySetting.settingKey = 'grade';
-        props.sortBySetting.direction = 'ascending';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Missing').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.settingKey = 'grade'
+        props.sortBySetting.direction = 'ascending'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Missing').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is not selected when isSortColumn is false', () => {
-        props.sortBySetting.isSortColumn = false;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Missing').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.isSortColumn = false
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Missing').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is optionally disabled', () => {
-        props.sortBySetting.disabled = true;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Missing').getAttribute('aria-disabled')).toBe('true');
-      });
+        props.sortBySetting.disabled = true
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Missing').getAttribute('aria-disabled')).toBe('true')
+      })
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.sortBySetting.onSortByMissing = jest.fn();
-        });
+          props.sortBySetting.onSortByMissing = jest.fn()
+        })
 
         test('calls the .sortBySetting.onSortByMissing callback', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Missing').click();
-          expect(props.sortBySetting.onSortByMissing).toHaveBeenCalledTimes(1);
-        });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Missing').click()
+          expect(props.sortBySetting.onSortByMissing).toHaveBeenCalledTimes(1)
+        })
 
         test('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Missing').focus();
-          getSortByOption('Missing').click();
-          expect(document.activeElement).toBe(getOptionsMenuTrigger());
-        });
-      });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Missing').focus()
+          getSortByOption('Missing').click()
+          expect(document.activeElement).toBe(getOptionsMenuTrigger())
+        })
+      })
     })
 
     describe('"Late" option', () => {
       test('is selected when sorting by late', () => {
-        props.sortBySetting.settingKey = 'late';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Late').getAttribute('aria-checked')).toBe('true');
-      });
+        props.sortBySetting.settingKey = 'late'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Late').getAttribute('aria-checked')).toBe('true')
+      })
 
       test('is not selected when sorting by a different setting', () => {
-        props.sortBySetting.settingKey = 'grade';
-        props.sortBySetting.direction = 'ascending';
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Late').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.settingKey = 'grade'
+        props.sortBySetting.direction = 'ascending'
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Late').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is not selected when isSortColumn is false', () => {
-        props.sortBySetting.isSortColumn = false;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Late').getAttribute('aria-checked')).toBe('false');
-      });
+        props.sortBySetting.isSortColumn = false
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Late').getAttribute('aria-checked')).toBe('false')
+      })
 
       test('is optionally disabled', () => {
-        props.sortBySetting.disabled = true;
-        mountAndOpenOptionsMenu();
-        expect(getSortByOption('Late').getAttribute('aria-disabled')).toBe('true');
-      });
+        props.sortBySetting.disabled = true
+        mountAndOpenOptionsMenu()
+        expect(getSortByOption('Late').getAttribute('aria-disabled')).toBe('true')
+      })
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.sortBySetting.onSortByLate = jest.fn();
-        });
+          props.sortBySetting.onSortByLate = jest.fn()
+        })
 
         test('calls the .sortBySetting.onSortByLate callback', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Late').click();
-          expect(props.sortBySetting.onSortByLate).toHaveBeenCalledTimes(1);
-        });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Late').click()
+          expect(props.sortBySetting.onSortByLate).toHaveBeenCalledTimes(1)
+        })
 
         test('returns focus to the "Options" menu trigger', () => {
-          mountAndOpenOptionsMenu();
-          getSortByOption('Late').focus();
-          getSortByOption('Late').click();
-          expect(document.activeElement).toBe(getOptionsMenuTrigger());
-        });
-      });
+          mountAndOpenOptionsMenu()
+          getSortByOption('Late').focus()
+          getSortByOption('Late').click()
+          expect(document.activeElement).toBe(getOptionsMenuTrigger())
+        })
+      })
     })
   })
 
   describe('"Options" > "SpeedGrader" action', () => {
     beforeEach(() => {
-      mountAndOpenOptionsMenu();
-    });
+      mountAndOpenOptionsMenu()
+    })
 
     test('is present', () => {
-      const menuItem = getMenuItem(menuContent, 'SpeedGrader');
-      expect(menuItem).toBeInTheDocument();
-    });
+      const menuItem = getMenuItem(menuContent, 'SpeedGrader')
+      expect(menuItem).toBeInTheDocument()
+    })
 
     test('links to SpeedGrader for the current assignment', () => {
-      const menuItem = getMenuItem(menuContent, 'SpeedGrader');
-      expect(menuItem.href).toContain('/courses/1201/gradebook/speed_grader?assignment_id=2301');
-    });
-  });
+      const menuItem = getMenuItem(menuContent, 'SpeedGrader')
+      expect(menuItem.href).toContain('/courses/1201/gradebook/speed_grader?assignment_id=2301')
+    })
+  })
 
   describe('"Options" > "Message Students Who" action', () => {
-    let loadMessageStudentsWhoDialogPromise;
+    let loadMessageStudentsWhoDialogPromise
 
     beforeEach(() => {
-      loadMessageStudentsWhoDialogPromise = Promise.resolve(MessageStudentsWhoDialog);
-      sinon.stub(AsyncComponents, 'loadMessageStudentsWhoDialog').returns(loadMessageStudentsWhoDialogPromise);
-      sinon.stub(MessageStudentsWhoDialog, 'show');
-      mountAndOpenOptionsMenu();
-    });
+      loadMessageStudentsWhoDialogPromise = Promise.resolve(MessageStudentsWhoDialog)
+      sinon
+        .stub(AsyncComponents, 'loadMessageStudentsWhoDialog')
+        .returns(loadMessageStudentsWhoDialogPromise)
+      sinon.stub(MessageStudentsWhoDialog, 'show')
+      mountAndOpenOptionsMenu()
+    })
 
     afterEach(() => {
-      sinon.restore();
-    });
+      sinon.restore()
+    })
 
     test('is always present', () => {
-      expect(menuContent).not.toBeNull();
-      const menuItem = getMenuItem(menuContent, 'Message Students Who');
-      expect(menuItem).toBeInTheDocument();
-    });
+      expect(menuContent).not.toBeNull()
+      const menuItem = getMenuItem(menuContent, 'Message Students Who')
+      expect(menuItem).toBeInTheDocument()
+    })
 
     test('is disabled when anonymizing students', async () => {
-      props.assignment.anonymizeStudents = true;
-      expect(menuContent).not.toBeNull();
-      const menuItem = getMenuItem(menuContent, 'Message Students Who');
+      props.assignment.anonymizeStudents = true
+      expect(menuContent).not.toBeNull()
+      const menuItem = getMenuItem(menuContent, 'Message Students Who')
       await waitFor(() => {
-        expect(menuItem).toHaveAttribute('aria-disabled', 'true');
-      });
-    });
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
 
     test('is not disabled when submissions are loaded', () => {
-      expect(menuContent).not.toBeNull();
-      const menuItem = getMenuItem(menuContent, 'Message Students Who');
-      expect(menuItem).not.toHaveAttribute('aria-disabled');
-    });
+      expect(menuContent).not.toBeNull()
+      const menuItem = getMenuItem(menuContent, 'Message Students Who')
+      expect(menuItem).not.toHaveAttribute('aria-disabled')
+    })
 
     describe('when clicked', () => {
       test('does not restore focus to the "Options" menu trigger', () => {
-        expect(menuContent).not.toBeNull();
-        const menuItem = getMenuItem(menuContent, 'Message Students Who');
-        fireEvent.click(menuItem);
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        expect(menuContent).not.toBeNull()
+        const menuItem = getMenuItem(menuContent, 'Message Students Who')
+        fireEvent.click(menuItem)
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('includes a callback for restoring focus upon dialog close', async () => {
-        expect(menuContent).not.toBeNull();
-        const menuItem = getMenuItem(menuContent, 'Message Students Who');
-        fireEvent.click(menuItem);
-        await loadMessageStudentsWhoDialogPromise;
-        const [, onClose] = MessageStudentsWhoDialog.show.lastCall.args;
-        onClose();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
+        expect(menuContent).not.toBeNull()
+        const menuItem = getMenuItem(menuContent, 'Message Students Who')
+        fireEvent.click(menuItem)
+        await loadMessageStudentsWhoDialogPromise
+        const [, onClose] = MessageStudentsWhoDialog.show.lastCall.args
+        onClose()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
 
       test('includes non-test students in the "settings" hash', async () => {
-        expect(menuContent).not.toBeNull();
-        const menuItem = getMenuItem(menuContent, 'Message Students Who');
-        fireEvent.click(menuItem);
-        await loadMessageStudentsWhoDialogPromise;
-        const [settings] = MessageStudentsWhoDialog.show.lastCall.args;
-        expect(settings.students.length).toBe(2);
-      });
+        expect(menuContent).not.toBeNull()
+        const menuItem = getMenuItem(menuContent, 'Message Students Who')
+        fireEvent.click(menuItem)
+        await loadMessageStudentsWhoDialogPromise
+        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        expect(settings.students.length).toBe(2)
+      })
 
       test('excludes test students from the "settings" hash', async () => {
-        students[0].isTestStudent = true;
-        expect(menuContent).not.toBeNull();
-        const menuItem = getMenuItem(menuContent, 'Message Students Who');
-        fireEvent.click(menuItem);
-        await loadMessageStudentsWhoDialogPromise;
-        const [settings] = MessageStudentsWhoDialog.show.lastCall.args;
-        expect(settings.students.map(student => student.name)).toEqual(['Betty Ford']);
-      });
-    });
-  });
+        students[0].isTestStudent = true
+        expect(menuContent).not.toBeNull()
+        const menuItem = getMenuItem(menuContent, 'Message Students Who')
+        fireEvent.click(menuItem)
+        await loadMessageStudentsWhoDialogPromise
+        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        expect(settings.students.map(student => student.name)).toEqual(['Betty Ford'])
+      })
+    })
+  })
 
   describe('"Options" > "Curve Grades" action', () => {
     beforeEach(() => {
-      mountAndOpenOptionsMenu();
-    });
+      mountAndOpenOptionsMenu()
+    })
 
     test('is always present', () => {
-      const menuItem = getMenuItem(menuContent, 'Curve Grades');
-      expect(menuItem).toBeInTheDocument();
-    });
+      const menuItem = getMenuItem(menuContent, 'Curve Grades')
+      expect(menuItem).toBeInTheDocument()
+    })
 
     test('is disabled when .curveGradesAction.isDisabled is true', async () => {
-      props.curveGradesAction.isDisabled = true;
-      const menuItem = getMenuItem(menuContent, 'Curve Grades');
+      props.curveGradesAction.isDisabled = true
+      const menuItem = getMenuItem(menuContent, 'Curve Grades')
       await waitFor(() => {
-        expect(menuItem).toHaveAttribute('aria-disabled', 'true');
-      });
-    });
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
 
     test('is not disabled when .curveGradesAction.isDisabled is false', () => {
-      const menuItem = getMenuItem(menuContent, 'Curve Grades');
-      expect(menuItem).not.toHaveAttribute('aria-disabled');
-    });
+      const menuItem = getMenuItem(menuContent, 'Curve Grades')
+      expect(menuItem).not.toHaveAttribute('aria-disabled')
+    })
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.curveGradesAction.onSelect = sinon.stub();
-      });
+        props.curveGradesAction.onSelect = sinon.stub()
+      })
 
       test('does not restore focus to the "Options" menu trigger', () => {
-        const menuItem = getMenuItem(menuContent, 'Curve Grades');
-        fireEvent.click(menuItem);
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        const menuItem = getMenuItem(menuContent, 'Curve Grades')
+        fireEvent.click(menuItem)
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('calls the .curveGradesAction.onSelect callback', () => {
-        const menuItem = getMenuItem(menuContent, 'Curve Grades');
-        fireEvent.click(menuItem);
-        expect(props.curveGradesAction.onSelect.callCount).toBe(1);
-      });
+        const menuItem = getMenuItem(menuContent, 'Curve Grades')
+        fireEvent.click(menuItem)
+        expect(props.curveGradesAction.onSelect.callCount).toBe(1)
+      })
 
       test('includes a callback for restoring focus upon dialog close', () => {
-        const menuItem = getMenuItem(menuContent, 'Curve Grades');
-        fireEvent.click(menuItem);
-        const [callback] = props.curveGradesAction.onSelect.lastCall.args;
-        callback();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
-    });
-  });
+        const menuItem = getMenuItem(menuContent, 'Curve Grades')
+        fireEvent.click(menuItem)
+        const [callback] = props.curveGradesAction.onSelect.lastCall.args
+        callback()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
+    })
+  })
 
   describe('"Options" > "Set Default Grade" action', () => {
     beforeEach(() => {
-      mountAndOpenOptionsMenu();
-    });
+      mountAndOpenOptionsMenu()
+    })
 
     test('is always present', () => {
-      const menuItem = getMenuItem(menuContent, 'Set Default Grade');
-      expect(menuItem).toBeInTheDocument();
-    });
+      const menuItem = getMenuItem(menuContent, 'Set Default Grade')
+      expect(menuItem).toBeInTheDocument()
+    })
 
     test('is disabled when .setDefaultGradeAction.disabled is true', async () => {
-      props.setDefaultGradeAction.disabled = true;
-      const menuItem = getMenuItem(menuContent, 'Set Default Grade');
+      props.setDefaultGradeAction.disabled = true
+      const menuItem = getMenuItem(menuContent, 'Set Default Grade')
       await waitFor(() => {
-        expect(menuItem).toHaveAttribute('aria-disabled', 'true');
-      });
-    });
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true')
+      })
+    })
 
     test('is not disabled when .setDefaultGradeAction.disabled is false', () => {
-      const menuItem = getMenuItem(menuContent, 'Set Default Grade');
-      expect(menuItem).not.toHaveAttribute('aria-disabled');
-    });
+      const menuItem = getMenuItem(menuContent, 'Set Default Grade')
+      expect(menuItem).not.toHaveAttribute('aria-disabled')
+    })
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.setDefaultGradeAction.onSelect = sinon.stub();
-      });
+        props.setDefaultGradeAction.onSelect = sinon.stub()
+      })
 
       test('does not restore focus to the "Options" menu trigger', () => {
-        const menuItem = getMenuItem(menuContent, 'Set Default Grade');
-        fireEvent.click(menuItem);
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        const menuItem = getMenuItem(menuContent, 'Set Default Grade')
+        fireEvent.click(menuItem)
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('calls the .setDefaultGradeAction.onSelect callback', () => {
-        const menuItem = getMenuItem(menuContent, 'Set Default Grade');
-        fireEvent.click(menuItem);
-        expect(props.setDefaultGradeAction.onSelect.callCount).toBe(1);
-      });
+        const menuItem = getMenuItem(menuContent, 'Set Default Grade')
+        fireEvent.click(menuItem)
+        expect(props.setDefaultGradeAction.onSelect.callCount).toBe(1)
+      })
 
       test('includes a callback for restoring focus upon dialog close', () => {
-        const menuItem = getMenuItem(menuContent, 'Set Default Grade');
-        fireEvent.click(menuItem);
-        const [callback] = props.setDefaultGradeAction.onSelect.lastCall.args;
-        callback();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
-    });
-  });
+        const menuItem = getMenuItem(menuContent, 'Set Default Grade')
+        fireEvent.click(menuItem)
+        const [callback] = props.setDefaultGradeAction.onSelect.lastCall.args
+        callback()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
+    })
+  })
 
   describe('"Options" > "Post grades" action', () => {
     beforeEach(() => {
-      props.postGradesAction.enabledForUser = true;
-      props.postGradesAction.hasGradesOrCommentsToPost = true;
-      mountAndOpenOptionsMenu();
-    });
+      props.postGradesAction.enabledForUser = true
+      props.postGradesAction.hasGradesOrCommentsToPost = true
+      mountAndOpenOptionsMenu()
+    })
 
     describe('when the current user can edit grades', () => {
       test('has the default text when submissions can be posted', () => {
-        expect(getMenuItem(menuContent, 'Post grades')).toBeInTheDocument();
-      });
+        expect(getMenuItem(menuContent, 'Post grades')).toBeInTheDocument()
+      })
 
       test('is enabled when submissions can be posted', () => {
-        expect(getMenuItem(menuContent, 'Post grades')).not.toHaveAttribute('aria-disabled');
-      });
+        expect(getMenuItem(menuContent, 'Post grades')).not.toHaveAttribute('aria-disabled')
+      })
 
       test('has the text "All grades posted" when no submissions can be posted', async () => {
-        props.postGradesAction.hasGradesOrCommentsToPost = false;
+        props.postGradesAction.hasGradesOrCommentsToPost = false
         await waitFor(() => {
-          expect(getMenuItem(menuContent, 'All grades posted')).toBeInTheDocument();
-        });
-      });
+          expect(getMenuItem(menuContent, 'All grades posted')).toBeInTheDocument()
+        })
+      })
 
       test('has the text "No grades to post" when no submissions are graded or have comments', async () => {
-        props.postGradesAction.hasGradesOrCommentsToPost = false;
-        props.postGradesAction.hasGradesOrPostableComments = false;
+        props.postGradesAction.hasGradesOrCommentsToPost = false
+        props.postGradesAction.hasGradesOrPostableComments = false
         await waitFor(() => {
-          expect(getMenuItem(menuContent, 'No grades to post')).toBeInTheDocument();
-        });
-      });
+          expect(getMenuItem(menuContent, 'No grades to post')).toBeInTheDocument()
+        })
+      })
 
       test('is disabled when no submissions can be posted', async () => {
-        props.postGradesAction.hasGradesOrCommentsToPost = false;
+        props.postGradesAction.hasGradesOrCommentsToPost = false
         await waitFor(() => {
-          expect(getMenuItem(menuContent, 'All grades posted')).toHaveAttribute('aria-disabled', 'true');
-        });
-      });
-    });
+          expect(getMenuItem(menuContent, 'All grades posted')).toHaveAttribute(
+            'aria-disabled',
+            'true'
+          )
+        })
+      })
+    })
 
     test('does not appear when posting is not enabled for this user', async () => {
-      props.postGradesAction.enabledForUser = false;
+      props.postGradesAction.enabledForUser = false
       await waitFor(() => {
-        expect(getMenuItem(menuContent, 'Post grades')).toBeUndefined();
-      });
-    });
+        expect(getMenuItem(menuContent, 'Post grades')).toBeUndefined()
+      })
+    })
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.postGradesAction.onSelect = sinon.stub();
-      });
+        props.postGradesAction.onSelect = sinon.stub()
+      })
 
       test('does not restore focus to the "Options" menu trigger', () => {
-        getMenuItem(menuContent, 'Post grades').click();
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        getMenuItem(menuContent, 'Post grades').click()
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('calls the .postGradesAction.onSelect callback', () => {
-        getMenuItem(menuContent, 'Post grades').click();
-        expect(props.postGradesAction.onSelect.callCount).toBe(1);
-      });
+        getMenuItem(menuContent, 'Post grades').click()
+        expect(props.postGradesAction.onSelect.callCount).toBe(1)
+      })
 
       test('includes a callback for restoring focus upon dialog close', () => {
-        getMenuItem(menuContent, 'Post grades').click();
-        const [callback] = props.postGradesAction.onSelect.lastCall.args;
-        callback();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
-    });
-  });
+        getMenuItem(menuContent, 'Post grades').click()
+        const [callback] = props.postGradesAction.onSelect.lastCall.args
+        callback()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
+    })
+  })
 
   describe('"Options" > "Hide grades" action', () => {
     beforeEach(() => {
-      props.postGradesAction.enabledForUser = true;
-      props.hideGradesAction.hasGradesOrCommentsToHide = true;
-      mountAndOpenOptionsMenu();
-    });
+      props.postGradesAction.enabledForUser = true
+      props.hideGradesAction.hasGradesOrCommentsToHide = true
+      mountAndOpenOptionsMenu()
+    })
 
     describe('when post policies is enabled', () => {
       test('has the default text when submissions can be hidden', () => {
-        expect(getMenuItem(menuContent, 'Hide grades')).toBeInTheDocument();
-      });
+        expect(getMenuItem(menuContent, 'Hide grades')).toBeInTheDocument()
+      })
 
       test('is enabled when submissions can be hidden', () => {
-        expect(getMenuItem(menuContent, 'Hide grades')).not.toHaveAttribute('aria-disabled');
-      });
+        expect(getMenuItem(menuContent, 'Hide grades')).not.toHaveAttribute('aria-disabled')
+      })
 
       test('has the text "All grades hidden" when no submissions can be hidden', async () => {
-        props.hideGradesAction.hasGradesOrCommentsToHide = false;
+        props.hideGradesAction.hasGradesOrCommentsToHide = false
         await waitFor(() => {
-          expect(getMenuItem(menuContent, 'All grades hidden')).toBeInTheDocument();
-        });
-      });
+          expect(getMenuItem(menuContent, 'All grades hidden')).toBeInTheDocument()
+        })
+      })
 
       test('has the text "No grades to hide" when no submissions are graded or have comments', async () => {
-        props.hideGradesAction.hasGradesOrCommentsToHide = false;
-        props.hideGradesAction.hasGradesOrPostableComments = false;
+        props.hideGradesAction.hasGradesOrCommentsToHide = false
+        props.hideGradesAction.hasGradesOrPostableComments = false
         await waitFor(() => {
-          expect(getMenuItem(menuContent, 'No grades to hide')).toBeInTheDocument();
-        });
-      });
+          expect(getMenuItem(menuContent, 'No grades to hide')).toBeInTheDocument()
+        })
+      })
 
       test('is disabled when no submissions can be hidden', async () => {
-        props.hideGradesAction.hasGradesOrCommentsToHide = false;
+        props.hideGradesAction.hasGradesOrCommentsToHide = false
         await waitFor(() => {
-          expect(getMenuItem(menuContent, 'All grades hidden')).toHaveAttribute('aria-disabled', 'true');
-        });
-      });
-    });
+          expect(getMenuItem(menuContent, 'All grades hidden')).toHaveAttribute(
+            'aria-disabled',
+            'true'
+          )
+        })
+      })
+    })
 
     test('is present when the current user can post grades', () => {
-      expect(getMenuItem(menuContent, 'Hide grades')).toBeInTheDocument();
-    });
+      expect(getMenuItem(menuContent, 'Hide grades')).toBeInTheDocument()
+    })
 
     test('is not present when the current user cannot post grades', async () => {
-      props.postGradesAction.enabledForUser = false;
+      props.postGradesAction.enabledForUser = false
       await waitFor(() => {
-        expect(getMenuItem(menuContent, 'Hide grades')).toBeUndefined();
-      });
-    });
+        expect(getMenuItem(menuContent, 'Hide grades')).toBeUndefined()
+      })
+    })
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.hideGradesAction.onSelect = sinon.stub();
-      });
+        props.hideGradesAction.onSelect = sinon.stub()
+      })
 
       test('does not restore focus to the "Options" menu trigger', () => {
-        getMenuItem(menuContent, 'Hide grades').click();
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        getMenuItem(menuContent, 'Hide grades').click()
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('calls the .hideGradesAction.onSelect callback', () => {
-        getMenuItem(menuContent, 'Hide grades').click();
-        expect(props.hideGradesAction.onSelect.callCount).toBe(1);
-      });
+        getMenuItem(menuContent, 'Hide grades').click()
+        expect(props.hideGradesAction.onSelect.callCount).toBe(1)
+      })
 
       test('includes a callback for restoring focus upon dialog close', () => {
-        getMenuItem(menuContent, 'Hide grades').click();
-        const [callback] = props.hideGradesAction.onSelect.lastCall.args;
-        callback();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
-    });
-  });
+        getMenuItem(menuContent, 'Hide grades').click()
+        const [callback] = props.hideGradesAction.onSelect.lastCall.args
+        callback()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
+    })
+  })
 
   describe('"Options" > "Grade Posting Policy" action', () => {
     beforeEach(() => {
-      props.postGradesAction.enabledForUser = true;
-      mountAndOpenOptionsMenu();
-    });
+      props.postGradesAction.enabledForUser = true
+      mountAndOpenOptionsMenu()
+    })
 
     test('is present when the current user can post grades', () => {
-      expect(getMenuItem(menuContent, 'Grade Posting Policy')).toBeInTheDocument();
-    });
+      expect(getMenuItem(menuContent, 'Grade Posting Policy')).toBeInTheDocument()
+    })
 
     test('is not present when the current user cannot post grades', async () => {
-      props.postGradesAction.enabledForUser = false;
+      props.postGradesAction.enabledForUser = false
       await waitFor(() => {
-        expect(getMenuItem(menuContent, 'Grade Posting Policy')).toBeUndefined();
-      });
-    });
-  });
+        expect(getMenuItem(menuContent, 'Grade Posting Policy')).toBeUndefined()
+      })
+    })
+  })
 
   describe('"Options" > "Enter Grades as" setting', () => {
     function getEnterGradesAsOption(label) {
-      return getMenuItem(menuContent, 'Enter Grades as', label);
+      return getMenuItem(menuContent, 'Enter Grades as', label)
     }
 
     beforeEach(() => {
@@ -978,188 +988,188 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         selected: 'points',
         showGradingSchemeOption: false,
         onSelect: jest.fn(),
-      };
-    });
+      }
+    })
 
     test('is present when .enterGradesAsSetting.hidden is false', () => {
-      mountAndOpenOptionsMenu();
-      expect(getMenuItem(menuContent, 'Enter Grades as')).toBeInTheDocument();
-    });
+      mountAndOpenOptionsMenu()
+      expect(getMenuItem(menuContent, 'Enter Grades as')).toBeInTheDocument()
+    })
 
     test('is not present when .enterGradesAsSetting.hidden is true', () => {
-      props.enterGradesAsSetting.hidden = true;
-      mountAndOpenOptionsMenu();
-      expect(getMenuItem(menuContent, 'Enter Grades as')).toBeUndefined();
-    });
+      props.enterGradesAsSetting.hidden = true
+      mountAndOpenOptionsMenu()
+      expect(getMenuItem(menuContent, 'Enter Grades as')).toBeUndefined()
+    })
 
     describe('"Points" option', () => {
       test('is always present', () => {
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Points')).toBeInTheDocument();
-      });
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Points')).toBeInTheDocument()
+      })
 
       test('is optionally selected', () => {
-        props.enterGradesAsSetting.selected = 'points';
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Points').getAttribute('aria-checked')).toBe('true');
-      });
+        props.enterGradesAsSetting.selected = 'points'
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Points').getAttribute('aria-checked')).toBe('true')
+      })
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.enterGradesAsSetting.selected = 'percent';
-          props.enterGradesAsSetting.onSelect = jest.fn();
-        });
+          props.enterGradesAsSetting.selected = 'percent'
+          props.enterGradesAsSetting.onSelect = jest.fn()
+        })
 
         test('calls the onSelect callback', () => {
-          mountAndOpenOptionsMenu();
-          getEnterGradesAsOption('Points').click();
-          expect(props.enterGradesAsSetting.onSelect).toHaveBeenCalledTimes(1);
-        });
+          mountAndOpenOptionsMenu()
+          getEnterGradesAsOption('Points').click()
+          expect(props.enterGradesAsSetting.onSelect).toHaveBeenCalledTimes(1)
+        })
 
         test('calls the onSelect callback with "points"', () => {
-          mountAndOpenOptionsMenu();
-          getEnterGradesAsOption('Points').click();
-          const [selected] = props.enterGradesAsSetting.onSelect.mock.calls[0];
-          expect(selected).toBe('points');
-        });
-      });
-    });
+          mountAndOpenOptionsMenu()
+          getEnterGradesAsOption('Points').click()
+          const [selected] = props.enterGradesAsSetting.onSelect.mock.calls[0]
+          expect(selected).toBe('points')
+        })
+      })
+    })
 
     describe('"Percentage" option', () => {
       test('is always present', () => {
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Percentage')).toBeInTheDocument();
-      });
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Percentage')).toBeInTheDocument()
+      })
 
       test('is optionally selected', () => {
-        props.enterGradesAsSetting.selected = 'percent';
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Percentage').getAttribute('aria-checked')).toBe('true');
-      });
+        props.enterGradesAsSetting.selected = 'percent'
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Percentage').getAttribute('aria-checked')).toBe('true')
+      })
 
       describe('when clicked', () => {
         beforeEach(() => {
-          props.enterGradesAsSetting.selected = 'points';
-          props.enterGradesAsSetting.onSelect = jest.fn();
-          mountAndOpenOptionsMenu();
-        });
+          props.enterGradesAsSetting.selected = 'points'
+          props.enterGradesAsSetting.onSelect = jest.fn()
+          mountAndOpenOptionsMenu()
+        })
 
         test('calls the onSelect callback', () => {
-          getEnterGradesAsOption('Percentage').click();
-          expect(props.enterGradesAsSetting.onSelect).toHaveBeenCalledTimes(1);
-        });
+          getEnterGradesAsOption('Percentage').click()
+          expect(props.enterGradesAsSetting.onSelect).toHaveBeenCalledTimes(1)
+        })
 
         test('calls the onSelect callback with "percent"', () => {
-          getEnterGradesAsOption('Percentage').click();
-          const [selected] = props.enterGradesAsSetting.onSelect.mock.calls[0];
-          expect(selected).toBe('percent');
-        });
-      });
-    });
+          getEnterGradesAsOption('Percentage').click()
+          const [selected] = props.enterGradesAsSetting.onSelect.mock.calls[0]
+          expect(selected).toBe('percent')
+        })
+      })
+    })
 
     describe('"Grading Scheme" option', () => {
       test('is present when "showGradingSchemeOption" is true', () => {
-        props.enterGradesAsSetting.showGradingSchemeOption = true;
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Grading Scheme')).toBeInTheDocument();
-      });
+        props.enterGradesAsSetting.showGradingSchemeOption = true
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Grading Scheme')).toBeInTheDocument()
+      })
 
       test('is not present when "showGradingSchemeOption" is false', () => {
-        props.enterGradesAsSetting.showGradingSchemeOption = false;
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Grading Scheme')).toBeUndefined();
-      });
+        props.enterGradesAsSetting.showGradingSchemeOption = false
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Grading Scheme')).toBeUndefined()
+      })
 
       test('is optionally selected', () => {
-        props.enterGradesAsSetting.showGradingSchemeOption = true;
-        props.enterGradesAsSetting.selected = 'gradingScheme';
-        mountAndOpenOptionsMenu();
-        expect(getEnterGradesAsOption('Grading Scheme').getAttribute('aria-checked')).toBe('true');
-      });
-    });
-  });
+        props.enterGradesAsSetting.showGradingSchemeOption = true
+        props.enterGradesAsSetting.selected = 'gradingScheme'
+        mountAndOpenOptionsMenu()
+        expect(getEnterGradesAsOption('Grading Scheme').getAttribute('aria-checked')).toBe('true')
+      })
+    })
+  })
 
   describe('"Options" > "Download Submissions" action', () => {
     test('is present when .downloadSubmissionsAction.hidden is false', () => {
-      mountAndOpenOptionsMenu();
-      expect(getMenuItem(menuContent, 'Download Submissions')).toBeTruthy();
-    });
+      mountAndOpenOptionsMenu()
+      expect(getMenuItem(menuContent, 'Download Submissions')).toBeTruthy()
+    })
 
     test('is not present when .downloadSubmissionsAction.hidden is true', () => {
-      props.downloadSubmissionsAction.hidden = true;
-      mountAndOpenOptionsMenu();
-      expect(getMenuItem(menuContent, 'Download Submissions')).toBeUndefined();
-    });
+      props.downloadSubmissionsAction.hidden = true
+      mountAndOpenOptionsMenu()
+      expect(getMenuItem(menuContent, 'Download Submissions')).toBeUndefined()
+    })
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.downloadSubmissionsAction.onSelect = jest.fn();
-        mountAndOpenOptionsMenu();
-      });
+        props.downloadSubmissionsAction.onSelect = jest.fn()
+        mountAndOpenOptionsMenu()
+      })
 
       test('does not restore focus to the "Options" menu trigger', () => {
-        getMenuItem(menuContent, 'Download Submissions').click();
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        getMenuItem(menuContent, 'Download Submissions').click()
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('calls the .downloadSubmissionsAction.onSelect callback', () => {
-        getMenuItem(menuContent, 'Download Submissions').click();
-        expect(props.downloadSubmissionsAction.onSelect).toHaveBeenCalledTimes(1);
-      });
+        getMenuItem(menuContent, 'Download Submissions').click()
+        expect(props.downloadSubmissionsAction.onSelect).toHaveBeenCalledTimes(1)
+      })
 
       test('includes a callback for restoring focus upon dialog close', () => {
-        getMenuItem(menuContent, 'Download Submissions').click();
-        const [callback] = props.downloadSubmissionsAction.onSelect.mock.calls[0];
-        callback();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
-    });
-  });
+        getMenuItem(menuContent, 'Download Submissions').click()
+        const [callback] = props.downloadSubmissionsAction.onSelect.mock.calls[0]
+        callback()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
+    })
+  })
 
   describe('"Options" > "Re-Upload Submissions" action', () => {
     test('is present when .reuploadSubmissionsAction.hidden is false', () => {
-      mountAndOpenOptionsMenu();
-      expect(getMenuItem(menuContent, 'Re-Upload Submissions')).toBeTruthy();
-    });
+      mountAndOpenOptionsMenu()
+      expect(getMenuItem(menuContent, 'Re-Upload Submissions')).toBeTruthy()
+    })
 
     test('is not present when .reuploadSubmissionsAction.hidden is true', () => {
-      props.reuploadSubmissionsAction.hidden = true;
-      mountAndOpenOptionsMenu();
-      expect(getMenuItem(menuContent, 'Re-Upload Submissions')).toBeUndefined();
-    });
+      props.reuploadSubmissionsAction.hidden = true
+      mountAndOpenOptionsMenu()
+      expect(getMenuItem(menuContent, 'Re-Upload Submissions')).toBeUndefined()
+    })
 
     describe('when clicked', () => {
       beforeEach(() => {
-        props.reuploadSubmissionsAction.onSelect = jest.fn();
-        mountAndOpenOptionsMenu();
-      });
+        props.reuploadSubmissionsAction.onSelect = jest.fn()
+        mountAndOpenOptionsMenu()
+      })
 
       test('does not restore focus to the "Options" menu trigger', () => {
-        getMenuItem(menuContent, 'Re-Upload Submissions').click();
-        expect(document.activeElement).not.toBe(getOptionsMenuTrigger());
-      });
+        getMenuItem(menuContent, 'Re-Upload Submissions').click()
+        expect(document.activeElement).not.toBe(getOptionsMenuTrigger())
+      })
 
       test('calls the .reuploadSubmissionsAction.onSelect callback', () => {
-        getMenuItem(menuContent, 'Re-Upload Submissions').click();
-        expect(props.reuploadSubmissionsAction.onSelect).toHaveBeenCalledTimes(1);
-      });
+        getMenuItem(menuContent, 'Re-Upload Submissions').click()
+        expect(props.reuploadSubmissionsAction.onSelect).toHaveBeenCalledTimes(1)
+      })
 
       test('includes a callback for restoring focus upon dialog close', () => {
-        getMenuItem(menuContent, 'Re-Upload Submissions').click();
-        const [callback] = props.reuploadSubmissionsAction.onSelect.mock.calls[0];
-        callback();
-        expect(document.activeElement).toBe(getOptionsMenuTrigger());
-      });
-    });
-  });
+        getMenuItem(menuContent, 'Re-Upload Submissions').click()
+        const [callback] = props.reuploadSubmissionsAction.onSelect.mock.calls[0]
+        callback()
+        expect(document.activeElement).toBe(getOptionsMenuTrigger())
+      })
+    })
+  })
 
   describe('#handleKeyDown()', () => {
-    let preventDefault;
+    let preventDefault
 
     beforeEach(() => {
-      preventDefault = jest.fn();
-      mountComponent();
-    });
+      preventDefault = jest.fn()
+      mountComponent()
+    })
 
     function triggerKeyDown(element, key, shiftKey = false) {
       fireEvent.keyDown(element, {
@@ -1167,79 +1177,79 @@ describe('GradebookGrid AssignmentColumnHeader', () => {
         keyCode: key === 'Tab' ? 9 : 13,
         shiftKey,
         preventDefault,
-      });
+      })
     }
 
     describe('when the assignment link has focus', () => {
       beforeEach(() => {
-        const assignmentLink = getAssignmentLink();
-        assignmentLink.focus();
-      });
+        const assignmentLink = getAssignmentLink()
+        assignmentLink.focus()
+      })
 
       test('does not handle Shift+Tab', () => {
-        triggerKeyDown(getAssignmentLink(), 'Tab', true);
-        expect(preventDefault).not.toHaveBeenCalled();
-      });
-    });
+        triggerKeyDown(getAssignmentLink(), 'Tab', true)
+        expect(preventDefault).not.toHaveBeenCalled()
+      })
+    })
 
     describe('when the "Options" menu trigger has focus', () => {
       beforeEach(() => {
-        const optionsTrigger = getOptionsMenuTrigger();
-        optionsTrigger.focus();
-      });
+        const optionsTrigger = getOptionsMenuTrigger()
+        optionsTrigger.focus()
+      })
 
       test('does not handle Tab', () => {
-        triggerKeyDown(getOptionsMenuTrigger(), 'Tab', false);
-        expect(preventDefault).not.toHaveBeenCalled();
-      });
+        triggerKeyDown(getOptionsMenuTrigger(), 'Tab', false)
+        expect(preventDefault).not.toHaveBeenCalled()
+      })
 
       test('Enter opens the "Options" menu', () => {
-        triggerKeyDown(getOptionsMenuTrigger(), 'Enter');
-        expect(menuContent).toBeTruthy();
-      });
-    });
+        triggerKeyDown(getOptionsMenuTrigger(), 'Enter')
+        expect(menuContent).toBeTruthy()
+      })
+    })
 
     describe('when the header does not have focus', () => {
       test('does not handle Tab', () => {
-        triggerKeyDown(document.body, 'Tab', false);
-        expect(preventDefault).not.toHaveBeenCalled();
-      });
+        triggerKeyDown(document.body, 'Tab', false)
+        expect(preventDefault).not.toHaveBeenCalled()
+      })
 
       test('does not handle Shift+Tab', () => {
-        triggerKeyDown(document.body, 'Tab', true);
-        expect(preventDefault).not.toHaveBeenCalled();
-      });
+        triggerKeyDown(document.body, 'Tab', true)
+        expect(preventDefault).not.toHaveBeenCalled()
+      })
 
       test('does not handle Enter', () => {
-        triggerKeyDown(document.body, 'Enter');
-        expect(preventDefault).not.toHaveBeenCalled();
-      });
-    });
-  });
+        triggerKeyDown(document.body, 'Enter')
+        expect(preventDefault).not.toHaveBeenCalled()
+      })
+    })
+  })
 
   describe('focus', () => {
     beforeEach(() => {
-      mountComponent();
-    });
+      mountComponent()
+    })
 
     afterEach(() => {
-      document.body.removeChild(container);
-    });
+      document.body.removeChild(container)
+    })
 
     function focusElement(element) {
-      const event = new Event('focus', { bubbles: true, cancelable: true });
-      element.dispatchEvent(event);
+      const event = new Event('focus', {bubbles: true, cancelable: true})
+      element.dispatchEvent(event)
     }
 
     function blurElement(element) {
-      const event = new Event('blur', { bubbles: true, cancelable: true });
-      element.dispatchEvent(event);
+      const event = new Event('blur', {bubbles: true, cancelable: true})
+      element.dispatchEvent(event)
     }
 
     test('removes the "focused" class from the header when focus leaves', () => {
-      focusElement(getOptionsMenuTrigger());
-      blurElement(getOptionsMenuTrigger());
-      expect(container.firstChild.classList.contains('focused')).toBe(false);
-    });
-  });
+      focusElement(getOptionsMenuTrigger())
+      blurElement(getOptionsMenuTrigger())
+      expect(container.firstChild.classList.contains('focused')).toBe(false)
+    })
+  })
 })

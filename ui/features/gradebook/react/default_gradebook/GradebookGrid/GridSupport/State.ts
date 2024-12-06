@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -19,6 +18,7 @@
 
 import GridHelper from './GridHelper'
 
+// @ts-expect-error
 function getItemMetadata(data, rowIndex) {
   const classes: string[] = []
 
@@ -50,6 +50,7 @@ export default class State {
 
   previousLocation: any = null
 
+  // @ts-expect-error
   constructor(grid, gridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport
@@ -57,6 +58,7 @@ export default class State {
   }
 
   initialize() {
+    // @ts-expect-error
     this.grid.onActiveCellChanged.subscribe((_event, activeCell) => {
       if (activeCell && activeCell.row != null) {
         this.setActiveLocationInternal('body', {row: activeCell.row, cell: activeCell.cell})
@@ -65,6 +67,7 @@ export default class State {
     })
 
     const data = this.grid.getData()
+    // @ts-expect-error
     data.getItemMetadata = rowIndex => getItemMetadata(data, rowIndex)
   }
 
@@ -72,6 +75,7 @@ export default class State {
     return this.activeLocation
   }
 
+  // @ts-expect-error
   setActiveLocation(region, attr: {row?: any; cell?: any} = {}) {
     this.helper.commitCurrentEdit()
     this.setActiveLocationInternal(region, attr)
@@ -109,6 +113,7 @@ export default class State {
 
     let rowIndex
     if (region === 'body' && columnIndex != null) {
+      // @ts-expect-error
       rowIndex = this.grid.getData().findIndex(row => row.id === this.previousLocation.rowId)
     }
 
@@ -124,6 +129,7 @@ export default class State {
     this.previousLocation = null
   }
 
+  // @ts-expect-error
   setActiveLocationInternal(region, attr: {cell?: any; row?: any; columnId?: any} = {}) {
     this.activeLocation = {region, ...attr}
 
@@ -168,6 +174,7 @@ export default class State {
     return null
   }
 
+  // @ts-expect-error
   getColumnHeaderNode(cell) {
     const $gridContainer = this.grid.getContainerNode()
     const $headers = $gridContainer.querySelectorAll('.slick-header-column')

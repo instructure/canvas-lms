@@ -230,6 +230,7 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             color="secondary"
             margin="small"
             onClick={() => open(state.dynamicRegistrationUrl)}
+            // @ts-expect-error
             renderIcon={IconArrowOpenStartLine}
           >
             Back

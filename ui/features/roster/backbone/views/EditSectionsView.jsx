@@ -67,6 +67,7 @@ export default class EditSectionsView extends DialogBaseView {
       }
     })
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <QueryClientProvider client={new QueryClient()}>
         <SectionSelector courseId={ENV.current_context.id} initialSections={excludeSections} />
@@ -74,7 +75,6 @@ export default class EditSectionsView extends DialogBaseView {
       document.getElementById('react_section_input')
     )
   }
-
 
   update(e) {
     let url

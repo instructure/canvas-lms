@@ -139,12 +139,15 @@ class User < ActiveRecord::Base
 
   has_many :all_courses, source: :course, through: :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, source: :course, through: :enrollments
-  has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
-  has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'") }, through: :group_memberships
   has_many :polls, class_name: "Polling::Poll"
-
-  has_many :current_group_memberships, -> { eager_load(:group).where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'") }, class_name: "GroupMembership"
-  has_many :current_groups, through: :current_group_memberships, source: :group
+  has_many :group_memberships, -> { GroupMembership.for_collaborative_groups }, class_name: "GroupMembership", dependent: :destroy
+  has_many :current_group_memberships, -> { GroupMembership.for_collaborative_groups.where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'") }, class_name: "GroupMembership"
+  has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'").merge(Group.collaborative) }, class_name: "Group", through: :group_memberships
+  has_many :current_groups, -> { merge(Group.collaborative).where("groups.workflow_state <> 'deleted'") }, class_name: "Group", through: :current_group_memberships, source: :group
+  has_many :differentiation_tag_memberships, -> { GroupMembership.for_non_collaborative_groups }, class_name: "GroupMembership", dependent: :destroy
+  has_many :current_differentiation_tag_memberships, -> { GroupMembership.for_non_collaborative_groups.where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state <> 'deleted'") }, class_name: "GroupMembership"
+  has_many :differentiation_tags, -> { where("group_memberships.workflow_state<>'deleted'").merge(Group.non_collaborative) }, class_name: "Group", through: :differentiation_tag_memberships, source: :group
+  has_many :current_differentiation_tags, -> { merge(Group.non_collaborative).where("groups.workflow_state <> 'deleted'") }, class_name: "Group", through: :current_differentiation_tag_memberships, source: :group
   has_many :user_account_associations
   has_many :unordered_associated_accounts, source: :account, through: :user_account_associations
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
@@ -1019,16 +1022,6 @@ class User < ActiveRecord::Base
                          User.last_name_first(self.name, likely_already_surname_first: false)
   end
 
-  def primary_pseudonym
-    pseudonyms.active.first
-  end
-
-  def primary_pseudonym=(p)
-    p = Pseudonym.find(p)
-    p.move_to_top
-    reload
-  end
-
   def email_channel
     # It's already ordered, so find the first one, if there's one.
     if communication_channels.loaded?
@@ -1286,10 +1279,6 @@ class User < ActiveRecord::Base
 
   def students
     [self]
-  end
-
-  def latest_pseudonym
-    Pseudonym.order(:created_at).where(user_id: id).active.last
   end
 
   def used_feature(feature)
@@ -1557,7 +1546,7 @@ class User < ActiveRecord::Base
     check_pseudonym ||= Pseudonym.new(account:, user: self) if associated_accounts.exists?
     check_pseudonym&.grants_right?(other_user, :delete) &&
       (check_pseudonym&.grants_right?(other_user, :manage_sis) ||
-       account.pseudonyms.active.where(user_id: other_user).where.not(sis_user_id: nil).none?)
+       account.pseudonyms.active.where(user_id: other_user).sis.none?)
   end
 
   def self.infer_id(obj)
@@ -3056,20 +3045,12 @@ class User < ActiveRecord::Base
     return false if %w[StudentEnrollment ObserverEnrollment].include?(type) && MasterCourses::MasterTemplate.is_master_course?(course)
     return false if course.template?
 
-    if course.root_account.feature_enabled?(:granular_permissions_manage_users)
-      return true if type == "TeacherEnrollment" && course.grants_right?(self, session, :add_teacher_to_course)
-      return true if type == "TaEnrollment" && course.grants_right?(self, session, :add_ta_to_course)
-      return true if type == "DesignerEnrollment" && course.grants_right?(self, session, :add_designer_to_course)
-      return true if type == "StudentEnrollment" && course.grants_right?(self, session, :add_student_to_course)
-      return true if type == "ObserverEnrollment" && course.grants_right?(self, session, :add_observer_to_course)
-    else
-      if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
-        return true
-      end
-      if %w[StudentEnrollment ObserverEnrollment].include?(type) && course.grants_right?(self, session, :manage_students)
-        return true
-      end
-    end
+    return true if type == "TeacherEnrollment" && course.grants_right?(self, session, :add_teacher_to_course)
+    return true if type == "TaEnrollment" && course.grants_right?(self, session, :add_ta_to_course)
+    return true if type == "DesignerEnrollment" && course.grants_right?(self, session, :add_designer_to_course)
+    return true if type == "StudentEnrollment" && course.grants_right?(self, session, :add_student_to_course)
+    return true if type == "ObserverEnrollment" && course.grants_right?(self, session, :add_observer_to_course)
+
     false
   end
 

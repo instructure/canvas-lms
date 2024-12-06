@@ -670,12 +670,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "बहुरंगी छवि" },
   "multiplication_sign_15f95c22": { "message": "गुणन चिह्न" },
   "music_icon_4db5c972": { "message": "संगीत आइकन" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "कम से कम { percentage }% होना चाहिए"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "कम से कम { width } x { height }px होना चाहिए"
-  },
   "my_files_2f621040": { "message": "मेरी फ़ाइलें" },
   "n_th_root_9991a6e4": { "message": "Nवां मूल" },
   "nabla_1e216d25": { "message": "नाबला" },

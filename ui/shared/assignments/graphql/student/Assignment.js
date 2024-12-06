@@ -57,6 +57,7 @@ export const Assignment = {
       pointsPossible
       submissionTypes
       unlockAt
+      rubricSelfAssessmentEnabled
     }
     ${AssignmentGroup.fragment}
     ${GroupSet.fragment}

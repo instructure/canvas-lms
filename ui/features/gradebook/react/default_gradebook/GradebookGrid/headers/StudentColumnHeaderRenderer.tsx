@@ -39,6 +39,7 @@ export default class StudentColumnHeaderRenderer {
   render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const Element = this.element
     const props = getProps(this.gradebook, options, this.columnName)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<Element {...props} />, $container)
   }
 

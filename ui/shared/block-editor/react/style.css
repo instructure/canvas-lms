@@ -751,6 +751,14 @@
   background-repeat: no-repeat;
   background-size: 100% auto;
   cursor: pointer;
+  &.grid {
+    width: 341px;
+    height: 241px;
+  }
+  &.rows {
+    width: calc(50% - 2.25rem);
+    height: 40vh;
+  }
 
   > * { background-color: rgba(255, 255, 255, 0.7) }
 

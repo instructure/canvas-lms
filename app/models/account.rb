@@ -42,11 +42,16 @@ class Account < ActiveRecord::Base
   has_many :all_courses, class_name: "Course", foreign_key: "root_account_id", inverse_of: :root_account
   has_one :terms_of_service, dependent: :destroy
   has_one :terms_of_service_content, dependent: :destroy
-  has_many :group_categories, -> { where(deleted_at: nil) }, as: :context, inverse_of: :context
-  has_many :all_group_categories, class_name: "GroupCategory", foreign_key: "root_account_id", inverse_of: :root_account
-  has_many :groups, as: :context, inverse_of: :context
-  has_many :all_groups, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :group_categories, -> { collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :all_group_categories, -> { collaborative }, class_name: "GroupCategory", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :groups, -> { collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :all_groups, -> { collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_group_memberships, source: "group_memberships", through: :all_groups
+  has_many :differentiation_tag_categories, -> { non_collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :all_differentiation_tag_categories, -> { non_collaborative }, class_name: "GroupCategory", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :differentiation_tags, -> { non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
+  has_many :all_differentiation_tags, -> { non_collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
+  has_many :all_differentiation_tag_memberships, source: "group_memberships", through: :all_differentiation_tags
   has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
@@ -67,7 +72,7 @@ class Account < ActiveRecord::Base
   has_many :users, through: :active_account_users
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :pseudonyms, -> { preload(:user) }, inverse_of: :account
-  has_many :deleted_users, -> { where(pseudonyms: { workflow_state: "deleted" }) }, through: :pseudonyms, source: :user
+  has_many :pseudonym_users, through: :pseudonyms, source: :user
   has_many :role_overrides, as: :context, inverse_of: :context
   has_many :course_account_associations
   has_many :child_courses, -> { where(course_account_associations: { depth: 0 }) }, through: :course_account_associations, source: :course
@@ -2548,5 +2553,72 @@ class Account < ActiveRecord::Base
     end
 
     filters.sort_by { |filter| filter[:name] }
+  end
+
+  def regrade_affected_assignments(assignment_ids, grading_standard_id)
+    regrade_affected_submissions(assignment_ids, grading_standard_id)
+    regrade_affected_submission_versions(assignment_ids, grading_standard_id)
+  end
+
+  def regrade_affected_submissions(assignment_ids, grading_standard_id)
+    submissions_with_grades = Submission.where.not(grade: nil).where(assignment_id: assignment_ids)
+    submissions_with_grades.preload(assignment: [:grading_standard, { context: :grading_standard }]).find_in_batches(batch_size: 1000) do |submissions_batch|
+      batched_updates = submissions_batch.each_with_object([]) do |submission, acc|
+        next if submission.assignment.points_possible.zero?
+
+        score = BigDecimal(submission.score.to_s.presence || "0.0") / BigDecimal(submission.assignment.points_possible.to_s)
+        grading_standard = grading_standard_id ? GradingStandard.find(grading_standard_id) : GradingStandard.default_instance
+        new_grade = grading_standard.score_to_grade((score * 100).to_f)
+        grade_has_changed = new_grade != submission.grade || new_grade != submission.published_grade
+        if grade_has_changed
+          acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => Time.now)
+        end
+      end
+
+      Submission.upsert_all(
+        batched_updates,
+        unique_by: :id,
+        update_only: %i[grade published_grade updated_at],
+        record_timestamps: false,
+        returning: false
+      )
+    end
+  end
+
+  def regrade_affected_submission_versions(assignment_ids, grading_standard_id)
+    current_versions_for_submissions = Version
+                                       .where(versionable: Submission.where(assignment_id: assignment_ids))
+                                       .order(versionable_id: :asc, number: :desc)
+                                       .distinct_on(:versionable_id) # we only want the _most recent_ version associated with each submission
+    ActiveRecord::Base.transaction do
+      current_versions_for_submissions.preload(versionable: { assignment: [:grading_standard, { context: :grading_standard }] }).find_each do |version|
+        model = version.model
+        next unless model.grade.present? && version.versionable.assignment.points_possible.positive?
+
+        score = BigDecimal(model.score.to_s.presence || "0.0") / BigDecimal(model.assignment.points_possible.to_s)
+        grading_standard = grading_standard_id ? GradingStandard.find(grading_standard_id) : GradingStandard.default_instance
+        new_grade = grading_standard.score_to_grade((score * 100).to_f)
+        grade_has_changed = new_grade != model.grade || new_grade != model.published_grade
+        next unless grade_has_changed
+
+        model.grade = new_grade
+        model.published_grade = new_grade
+        yaml = model.attributes.to_yaml
+        # We can't use the same upsert_all approach that we used in regrade_affected_submissions
+        # because the versions table is partitioned.
+        version.update_columns(yaml:)
+      end
+    end
+  end
+
+  def recompute_assignments_using_account_default(grading_standard)
+    courses.where(grading_standard_id: nil).where.not(workflow_state: "completed").where.not(workflow_state: "deleted").find_each do |course|
+      affected_assignment_ids = course.assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).pluck(:id)
+      delay_if_production(priority: Delayed::LOWER_PRIORITY, strand: ["recalc_account_default", Shard.current.database_server.id], singleton: "recalc_account_default:#{course.global_id}").regrade_affected_assignments(affected_assignment_ids, grading_standard.id)
+    end
+
+    sub_accounts.where(grading_standard: nil).find_each do |sub_account|
+      sub_account.recompute_assignments_using_account_default(grading_standard)
+    end
   end
 end

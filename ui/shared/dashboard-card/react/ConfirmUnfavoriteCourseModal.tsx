@@ -36,6 +36,7 @@ export function showConfirmUnfavorite(props: Props) {
     if (modal) modal.show()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />,
     parent
@@ -52,6 +53,7 @@ export function showNoFavoritesAlert() {
   parent.setAttribute('class', 'no-favorites-alert-container')
   document.querySelector('.ic-DashboardCard__box')?.appendChild(parent)
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <Alert variant="info" renderCloseButtonLabel="Close" margin="small">
       {I18n.t(`You have no courses favorited. Reloading this page will show all

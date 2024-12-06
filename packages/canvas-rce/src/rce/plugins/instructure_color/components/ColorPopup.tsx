@@ -35,8 +35,9 @@ const ColorPopup = ({tabs, open, positionTarget, onCancel, onChange}: ColorPopup
   const [recreateKey, setRecreateKey] = useState(0)
 
   const handleHideContent = useCallback(() => {
+    onCancel()
     setRecreateKey(Date.now())
-  }, [])
+  }, [onCancel])
 
   const handleSubmit = useCallback(
     (newcolors: ColorSpec) => {

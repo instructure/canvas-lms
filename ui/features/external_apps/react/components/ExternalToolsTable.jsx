@@ -95,15 +95,14 @@ export class ExternalToolsTable extends React.Component {
     if (store.getState().externalTools.length === 0) {
       return null
     }
-    let t = null
+    const t = null
     const externalTools = store.getState().externalTools
     const rceFavCount = countFavorites(externalTools)
     const topNavFavCount = externalTools.reduce(
       (accum, current) => accum + (current.is_top_nav_favorite ? 1 : 0),
       0
     )
-    return externalTools.map(tool =>
-    (
+    return externalTools.map(tool => (
       <ExternalToolsTableRow
         key={tool.app_id}
         ref={this.setToolRowRef(tool)}
@@ -206,7 +205,12 @@ export class ExternalToolsTable extends React.Component {
 export function countFavorites(tools) {
   return tools.reduce(
     // On_by_default apps don't count towards the limit
-    (accum, current) => accum + (current.is_rce_favorite && !INST.editorButtons?.find(b => b.id === current.app_id)?.on_by_default ? 1 : 0),
+    (accum, current) =>
+      accum +
+      (current.is_rce_favorite &&
+      !INST.editorButtons?.find(b => b.id === current.app_id)?.on_by_default
+        ? 1
+        : 0),
     0
   )
 }

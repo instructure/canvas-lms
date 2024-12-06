@@ -228,9 +228,12 @@ export default function ItemAssignToTray({
   const [blueprintDateLocks, setBlueprintDateLocks] = useState<DateLockTypes[] | undefined>(
     // On the edit pages, the ENV will contain this data, so we can initialize the lock info here. We'll fall back to
     // fetching it via the date details API in other cases.
+    // @ts-expect-error
     ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
+      // @ts-expect-error
       ENV.MASTER_COURSE_DATA?.restricted_by_master_course
-      ? (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
+      ? // @ts-expect-error
+        (Object.entries(ENV.MASTER_COURSE_DATA?.master_course_restrictions ?? {})
           .filter(([_lockType, locked]) => locked)
           .filter(([lockType]) => ['due_dates', 'availability_dates'].includes(lockType))
           .map(([lockType]) => lockType) as DateLockTypes[])
@@ -401,7 +404,7 @@ export default function ItemAssignToTray({
 
   useEffect(() => {
     if (!isTray && sectionViewRef.current?.ref) {
-      // @ts-ignore: Property 'reactComponentInstance' does not exist on type 'Element'
+      // @ts-expect-error: Property 'reactComponentInstance' does not exist on type 'Element'
       sectionViewRef.current.ref.reactComponentInstance = {
         focusErrors,
         allCardsValid,

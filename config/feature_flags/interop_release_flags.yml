@@ -1,14 +1,4 @@
 ---
-ags_improved_course_concluded_response_codes:
-  state: hidden
-  display_name: Better LTI AGS Response Codes for Concluded Courses
-  description: |-
-    If enabled, the AGS API will return a more helpful response code whenever an LTI
-    tool attempts to access or modify data in a course that has already concluded.
-    Rather than returning a generic 404 Not Found, the API will instead return a 422
-    along with a helpful message indicating that the tool cannot access concluded
-    courses.
-  applies_to: RootAccount
 ags_scores_multiple_files:
   state: hidden
   display_name: Allow multiple file AGS submissions to count as only one submission
@@ -424,13 +414,6 @@ require_permission_for_app_center_token:
       state: allowed_on
     ci:
       state: allowed_on
-resource_link_uuid_in_custom_substitution:
-  state: hidden
-  display_name: Use a Resource link's resource_link_uuid in the $ResourceLink.id substitution parameter
-  description: |-
-    Changes the $ResourceLink.id substitution parameter's behavior
-    to include the resource_link_uuid, instead of the resource_id for the line item
-  applies_to: RootAccount
 top_navigation_placement:
   state: hidden
   applies_to: RootAccount

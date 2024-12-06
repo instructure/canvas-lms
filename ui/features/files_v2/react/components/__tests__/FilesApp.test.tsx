@@ -22,13 +22,13 @@ import FilesApp from '../FilesApp'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import fetchMock from 'fetch-mock'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
+import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 
 describe('FilesApp', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    fetchMock.get(/.*\/folders/, [])
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000})
-    // @ts-expect-error
     filesEnv.userHasPermission = jest.fn().mockReturnValue(true)
   })
 
@@ -40,7 +40,7 @@ describe('FilesApp', () => {
     const queryClient = new QueryClient()
     return render(
       <MockedQueryClientProvider client={queryClient}>
-        <FilesApp contextAssetString={contextAssetString} />
+        <FilesApp contextAssetString={contextAssetString} folderId="" />
       </MockedQueryClientProvider>
     )
   }
@@ -60,10 +60,10 @@ describe('FilesApp', () => {
   })
 
   it('does not render progress bar without permission', () => {
-    // @ts-expect-error
     filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
     renderComponent('course_12345')
 
-    expect(fetchMock.calls()).toHaveLength(0)
+    expect(fetchMock.calls().length).toBe(1)
+    expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
   })
 })

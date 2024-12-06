@@ -51,6 +51,7 @@ const HeroTextHalf = ({
           src="/images/block_editor/canvas_logo_black.svg"
           width={113}
           height={28}
+          // @ts-expect-error
           sizeVariant="fixed"
         />
         <Element

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -55,53 +54,61 @@ export function setCoursePostPolicy({
   courseId: string
   postManually: boolean
 }) {
-  return createClient()
-    .mutate({
-      mutation: SET_COURSE_POST_POLICY_MUTATION,
-      variables: {
-        courseId,
-        postManually,
-      },
-    })
-    .then(response => {
-      const queryResponse = response && response.data && response.data.setCoursePostPolicy
-      if (queryResponse) {
-        if (queryResponse.postPolicy) {
-          return {
-            postManually: queryResponse.postPolicy.postManually,
+  return (
+    createClient()
+      .mutate({
+        mutation: SET_COURSE_POST_POLICY_MUTATION,
+        variables: {
+          courseId,
+          postManually,
+        },
+      })
+      // @ts-expect-error
+      .then(response => {
+        const queryResponse = response && response.data && response.data.setCoursePostPolicy
+        if (queryResponse) {
+          if (queryResponse.postPolicy) {
+            return {
+              postManually: queryResponse.postPolicy.postManually,
+            }
+          } else if (queryResponse.errors && queryResponse.errors.length > 0) {
+            throw new Error(queryResponse.errors[0].message)
           }
-        } else if (queryResponse.errors && queryResponse.errors.length > 0) {
-          throw new Error(queryResponse.errors[0].message)
         }
-      }
 
-      throw new Error('no postPolicy or error provided in response')
-    })
+        throw new Error('no postPolicy or error provided in response')
+      })
+  )
 }
 
 export function getAssignmentPostPolicies({courseId}: {courseId: string}) {
-  return createClient()
-    .query({
-      query: COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-      variables: {courseId},
-    })
-    .then(response => {
-      const queryResponse = response && response.data && response.data.course
-      if (queryResponse) {
-        const assignments = queryResponse.assignmentsConnection.nodes
-        if (assignments != null) {
-          const assignmentPostPoliciesById = {}
-          assignments.forEach(assignment => {
-            if (assignment.postPolicy) {
-              const {postManually} = assignment.postPolicy
-              assignmentPostPoliciesById[assignment._id] = {postManually}
-            }
-          })
+  return (
+    createClient()
+      .query({
+        query: COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
+        variables: {courseId},
+      })
+      // @ts-expect-error
+      .then(response => {
+        const queryResponse = response && response.data && response.data.course
+        if (queryResponse) {
+          const assignments = queryResponse.assignmentsConnection.nodes
+          if (assignments != null) {
+            const assignmentPostPoliciesById = {}
+            // @ts-expect-error
+            assignments.forEach(assignment => {
+              if (assignment.postPolicy) {
+                const {postManually} = assignment.postPolicy
+                // @ts-expect-error
+                assignmentPostPoliciesById[assignment._id] = {postManually}
+              }
+            })
 
-          return {assignmentPostPoliciesById}
+            return {assignmentPostPoliciesById}
+          }
         }
-      }
 
-      throw new Error('no course provided in response')
-    })
+        throw new Error('no course provided in response')
+      })
+  )
 }

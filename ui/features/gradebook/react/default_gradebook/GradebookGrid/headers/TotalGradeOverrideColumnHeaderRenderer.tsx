@@ -39,6 +39,7 @@ export default class TotalGradeOverrideColumnHeaderRenderer {
 
   render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(options)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
   }
 

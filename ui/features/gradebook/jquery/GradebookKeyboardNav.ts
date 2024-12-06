@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -114,18 +113,22 @@ export default class GradebookKeyboardNav {
       ref = this.keyBindings
       for (i = 0, len = ref.length; i < len; i++) {
         binding = ref[i]
+        // @ts-expect-error
         if (binding.handler != null && binding.key != null && this[binding.handler] != null) {
+          // @ts-expect-error
           $(document.body).keycodes(binding.key, this[binding.handler])
         }
       }
     }
   }
 
+  // @ts-expect-error
   shouldHandleEvent(e) {
     let element, i, len
     const ref = this.gradebookElements
     for (i = 0, len = ref.length; i < len; i++) {
       element = ref[i]
+      // @ts-expect-error
       if (element.contains(e.target)) {
         return true
       }

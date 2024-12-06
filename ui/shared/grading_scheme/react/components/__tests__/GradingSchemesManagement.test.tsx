@@ -29,11 +29,14 @@ jest.mock('@canvas/do-fetch-api-effect')
 
 describe('Grading Schemes Management Tests', () => {
   beforeEach(() => {
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: AccountGradingSchemes})
+    // @ts-expect-error
     doFetchApi.mockResolvedValueOnce({response: {ok: true}, json: DefaultGradingScheme})
   })
 
   afterEach(() => {
+    // @ts-expect-error
     doFetchApi.mockClear()
   })
 

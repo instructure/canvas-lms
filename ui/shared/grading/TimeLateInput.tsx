@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -29,7 +28,7 @@ import NumberHelper from '@canvas/i18n/numberHelper'
 
 const I18n = useI18nScope('speed_grader')
 
-function defaultDurationLate(interval, secondsLate): number {
+function defaultDurationLate(interval: string, secondsLate: number): number {
   let durationLate = secondsLate / 3600
 
   if (interval === 'day') {
@@ -77,6 +76,7 @@ export default function TimeLateInput({
     return null
   }
 
+  // @ts-expect-error
   const handleNumberInputBlur = ({target: {value}}) => {
     if (!NumberHelper.validate(value)) {
       return
@@ -98,6 +98,7 @@ export default function TimeLateInput({
     }
 
     onSecondsLateUpdated({
+      // @ts-expect-error
       latePolicyStatus: 'late',
       secondsLateOverride: Math.trunc(secondsLateOverride),
     })
@@ -112,6 +113,7 @@ export default function TimeLateInput({
             interaction={disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+            // @ts-expect-error
             locale={locale}
             min="0"
             onBlur={handleNumberInputBlur}

@@ -97,3 +97,8 @@ new_quizzes_unattached_bank_migrations:
   description: Enable migrating all question banks to New Quizzes during course import/copy
   applies_to: SiteAdmin
   state: hidden
+new_quizzes_report_failed_duplicates:
+  state: hidden
+  display_name: Report failed duplicates to Sentry when importing New Quizzes
+  description: If enabled, Canvas will report failed duplicates to Sentry
+  applies_to: SiteAdmin

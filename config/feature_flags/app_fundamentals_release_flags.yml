@@ -10,11 +10,6 @@ granular_permissions_manage_course_content:
   applies_to: RootAccount
   display_name: Granular permissions for managing course content
   description: Add granularity to permissions around managing all other course content
-granular_permissions_manage_users:
-  state: allowed_on
-  applies_to: RootAccount
-  display_name: Granular permissions for Add/Remove roles from Course
-  description: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
 granular_permissions_manage_lti:
   state: allowed_on
   applies_to: RootAccount
@@ -81,4 +76,4 @@ migrate_assignment_group_categories:
   state: hidden
   applies_to: Course
   display_name: Preserve Group Set During Assignment Copy
-  description: Include group categories when copying group assignments in course copies or blueprint syncs
+  description: When copying a group assignment to another course, a group set set with the same name is created in the destination course if no matching group set exists

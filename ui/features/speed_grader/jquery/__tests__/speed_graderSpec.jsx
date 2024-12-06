@@ -3894,7 +3894,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('RCE Lite is not used when rce_lite_enabled_speedgrader_comments FF is disabled', async () => {
-        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: false }
+        ENV.FEATURES = {rce_lite_enabled_speedgrader_comments: false}
         ENV.can_comment_on_submission = true
         SpeedGrader.setup()
         await awhile()
@@ -3904,7 +3904,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('RCE Lite is used when rce_lite_enabled_speedgrader_comments FF is enabled', async () => {
-        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: true }
+        ENV.FEATURES = {rce_lite_enabled_speedgrader_comments: true}
         ENV.can_comment_on_submission = true
         SpeedGrader.setup()
         await awhile()
@@ -4186,7 +4186,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('renderComment displays the edit button only for draft comments when rce_lite_enabled_speedgrader_comments FF is enabled', () => {
-        ENV.FEATURES = { rce_lite_enabled_speedgrader_comments: true }
+        ENV.FEATURES = {rce_lite_enabled_speedgrader_comments: true}
         commentToRender.publishable = true
         const renderedComment = SpeedGrader.EG.renderComment(
           commentToRender,
@@ -4204,10 +4204,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           author_id: 1,
           author_name: 'an author',
         }
-        const renderedComment = SpeedGrader.EG.renderComment(
-          comment,
-          commentRenderingOptions
-        )
+        const renderedComment = SpeedGrader.EG.renderComment(comment, commentRenderingOptions)
         const commentText = renderedComment.find('span.comment').html()
         equal(commentText, 'a comment<br>\nwith<br>\nparagraphs')
       })
@@ -4948,6 +4945,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
         QUnit.module('Post Grades Menu', hooks => {
           const findRenderCall = () =>
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render.args.find(
               argsForCall => argsForCall[1].id === 'speed_grader_post_grades_menu_mount_point'
             )
@@ -4958,11 +4956,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
 
           hooks.afterEach(() => {
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render.restore()
           })
 
           test('renders the Post Grades" menu once', () => {
             SpeedGrader.EG.jsonReady()
+            // eslint-disable-next-line no-restricted-properties
             const renderCalls = ReactDOM.render.args.filter(
               argsForCall => argsForCall[1].id === 'speed_grader_post_grades_menu_mount_point'
             )
@@ -6314,6 +6314,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       hooks.afterEach(() => {
         ReactDOM.unmountComponentAtNode.restore()
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render.restore()
         EG.setupProvisionalGraderDisplayNames.restore()
 
@@ -6322,6 +6323,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       test('displays the component if at least one provisional grade is present', () => {
         EG.renderProvisionalGradeSelector()
+        // eslint-disable-next-line no-restricted-properties
         strictEqual(ReactDOM.render.callCount, 1)
       })
 
@@ -6334,6 +6336,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the final grader id to the component', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(SpeedGraderProvisionalGradeSelector.props.finalGraderId, '1101')
       })
@@ -6342,6 +6345,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         window.jsonData.points_possible = 12
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(SpeedGraderProvisionalGradeSelector.props.pointsPossible, 12)
       })
@@ -6349,6 +6353,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the assignment grading type to the component as gradingType', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(SpeedGraderProvisionalGradeSelector.props.gradingType, 'gpa_scale')
       })
@@ -6356,6 +6361,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the list of provisional grades to the component', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         deepEqual(
           SpeedGraderProvisionalGradeSelector.props.provisionalGrades,
@@ -6366,6 +6372,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes "Custom" as the display name for the final grader', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         strictEqual(
           SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames['1'],
@@ -6376,6 +6383,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       test('passes the hash of grader display names to the component', () => {
         EG.renderProvisionalGradeSelector()
 
+        // eslint-disable-next-line no-restricted-properties
         const [SpeedGraderProvisionalGradeSelector] = ReactDOM.render.firstCall.args
         deepEqual(SpeedGraderProvisionalGradeSelector.props.provisionalGraderDisplayNames, {
           1: 'Custom',

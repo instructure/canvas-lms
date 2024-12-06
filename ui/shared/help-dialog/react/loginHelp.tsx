@@ -86,6 +86,7 @@ export function renderLoginHelp(loginLink: Element): void {
   const wrapper = document.createElement('span')
   anchorElement.replaceWith(wrapper)
   wrapper.appendChild(anchorElement)
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <QueryProvider>
       <LoginHelp linkText={anchorElement.innerText} />

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -104,18 +103,22 @@ class StatusesModal extends React.Component<Props, State> {
     })
   }
 
+  // @ts-expect-error
   bindColorPickerButton = (status: string) => button => {
     this.colorPickerButtons[status] = button
   }
 
+  // @ts-expect-error
   bindColorPickerContent = (status: string) => content => {
     this.colorPickerContents[status] = content
   }
 
+  // @ts-expect-error
   bindDoneButton = button => {
     this.doneButton = button
   }
 
+  // @ts-expect-error
   bindContentRef = content => {
     this.modalContentRef = content
   }
@@ -125,6 +128,7 @@ class StatusesModal extends React.Component<Props, State> {
       <StatusColorListItem
         key={status}
         status={status}
+        // @ts-expect-error
         color={this.state.colors[status]}
         isColorPickerShown={this.isPopoverShown(status)}
         colorPickerOnToggle={this.handleOnToggle(status)}

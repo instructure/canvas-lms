@@ -42,6 +42,7 @@ GroupSubmissionAlert.propTypes = {
 
 ready(() => {
   $('.group_submission_alert').each((idx, alertContainer) => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
       alertContainer

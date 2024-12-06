@@ -82,6 +82,7 @@ export default function GradebookScoreExport({
       <Button
         data-testid="gradebook-export-button"
         color="secondary"
+        // @ts-expect-error
         renderIcon={IconDownloadLine}
         id="gradebook-export"
         interaction={attachmentStatus === ApiCallStatus.PENDING ? 'disabled' : 'enabled'}

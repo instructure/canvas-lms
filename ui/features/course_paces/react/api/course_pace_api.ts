@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CoursePace, OptionalDate, PaceContextTypes, Progress, WorkflowStates} from '../types'
+import type {CoursePace, OptionalDate, PaceContextTypes, Progress, WorkflowStates} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 enum ApiMode {
@@ -40,7 +39,9 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
     const staller = (
       actionInProgress: () => boolean,
       waitTime: number,
+      // @ts-expect-error
       innerResolve,
+      // @ts-expect-error
       innerReject
     ) => {
       if (actionInProgress()) {

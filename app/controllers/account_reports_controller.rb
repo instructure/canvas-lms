@@ -374,4 +374,27 @@ class AccountReportsController < ApplicationController
       end
     end
   end
+
+  # @API Abort a Report
+  #
+  # Abort a report in progress
+  #
+  # @example_request
+  #     curl -H 'Authorization: Bearer <token>' \
+  #          -X PUT \
+  #          https://<canvas>/api/v1/accounts/<account_id>/reports/<report_type>/<id>/abort
+  #
+  # @returns Report
+  #
+  def abort
+    if authorized_action(@context, @current_user, :read_reports)
+      report = type_scope.running.find(params[:id])
+
+      if report.update(workflow_state: "aborted")
+        render json: account_report_json(report, @current_user)
+      else
+        render json: report.errors, status: :bad_request
+      end
+    end
+  end
 end

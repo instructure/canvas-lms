@@ -986,6 +986,7 @@ describe Mutations::CreateDiscussionTopic do
       published = true
       student = @course.enroll_student(User.create!, enrollment_state: "active").user
       group_category = @course.group_categories.create! name: "foo"
+      lock_at = 5.days.from_now.iso8601
 
       query = <<~GQL
         contextId: "#{@course.id}"
@@ -994,9 +995,11 @@ describe Mutations::CreateDiscussionTopic do
         message: "#{message}"
         published: #{published}
         groupCategoryId: "#{group_category.id}"
+        lockAt: null
         assignment: {
           courseId: "#{@course.id}",
           name: "#{title}",
+          lockAt: "#{lock_at}",
           pointsPossible: 15,
           gradingType: percent,
           postToSis: true,
@@ -1032,6 +1035,7 @@ describe Mutations::CreateDiscussionTopic do
         expect(discussion_topic["_id"]).to eq assignment.discussion_topic.id.to_s
         expect(DiscussionTopic.count).to eq 1
         expect(DiscussionTopic.last.assignment.post_to_sis).to be true
+        expect(DiscussionTopic.last.lock_at).to eq(lock_at)
       end
     end
 

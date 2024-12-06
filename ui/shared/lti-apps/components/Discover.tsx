@@ -92,6 +92,7 @@ export const Discover = () => {
       <Disclaimer />
 
       {filterData && (
+        // @ts-expect-error
         <LtiFilterTray
           isTrayOpen={isTrayOpen}
           setIsTrayOpen={setIsTrayOpen}

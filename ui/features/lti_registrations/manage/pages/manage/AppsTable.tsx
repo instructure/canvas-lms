@@ -163,7 +163,9 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('On/Off'),
     width: '96px',
     sortable: true,
-    render: r => <div>{r.workflow_state === 'active' ? I18n.t('On') : I18n.t('Off')}</div>,
+    render: r => (
+      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
+    ),
   },
   {
     id: 'actions',

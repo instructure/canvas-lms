@@ -175,6 +175,7 @@ export default class ItemView extends Backbone.View {
 
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
     const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -245,6 +246,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentSelection = isOldQuiz ? {quizzes: [quizId]} : {assignments: [quizId]}
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -268,6 +270,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentType = isOldQuiz ? 'quiz' : 'assignment'
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -390,7 +393,7 @@ export default class ItemView extends Backbone.View {
     const isNewQuizzes = this.model.get('quiz_type') === 'quizzes.next'
     const modelId = this.model.get('id')
     const resourceQueryString = isNewQuizzes ? `assignments[]=${modelId}` : `quizzes[]=${modelId}`
-    const isShareToCommons = (tool) => tool.canvas_icon_class === 'icon-commons'
+    const isShareToCommons = tool => tool.canvas_icon_class === 'icon-commons'
     const tools = ENV.quiz_menu_tools || []
 
     if (!isNewQuizzes || ENV.FEATURES.commons_new_quizzes) {

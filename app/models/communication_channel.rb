@@ -298,7 +298,7 @@ class CommunicationChannel < ActiveRecord::Base
     account = dsr_request.account
     download_url = dsr_request.access_url
     tz = dsr_request.requestor.time_zone || "UTC"
-    request_time = dsr_request.updated_at.in_time_zone(tz).strftime("%B%e, %Y at%l:%M %p")
+    request_time = dsr_request.updated_at.in_time_zone(tz)
 
     m = messages.temp_record
     m.to = path
@@ -307,7 +307,7 @@ class CommunicationChannel < ActiveRecord::Base
     m.notification = Notification.new(name: "dsr_request", category: "Registration")
     m.data = { download_url:, request_time: }
     m.parse!("email")
-    m.subject = "Canvas DSR Code"
+    m.subject = I18n.t("Canvas DSR Code")
     Mailer.deliver(Mailer.create_message(m))
   end
 

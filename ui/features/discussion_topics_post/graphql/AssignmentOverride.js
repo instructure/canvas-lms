@@ -17,8 +17,9 @@
  */
 
 import {AdhocStudents} from './AdhocStudents'
+import {Group} from './Group'
 import gql from 'graphql-tag'
-import {shape, string} from 'prop-types'
+import {shape, string, oneOfType} from 'prop-types'
 
 export const AssignmentOverride = {
   fragment: gql`
@@ -33,9 +34,13 @@ export const AssignmentOverride = {
         ... on AdhocStudents {
           ...AdhocStudents
         }
+        ... on Group {
+          ...Group
+        }
       }
     }
-    ${AdhocStudents.fragment}
+    ${AdhocStudents.fragment},
+    ${Group.fragment}
   `,
 
   shape: shape({
@@ -45,7 +50,7 @@ export const AssignmentOverride = {
     lockAt: string,
     unlockAt: string,
     title: string,
-    set: AdhocStudents.shape,
+    set: oneOfType([AdhocStudents.shape, Group.shape]),
   }),
 
   mock: ({
@@ -55,7 +60,7 @@ export const AssignmentOverride = {
     lockAt = '2021-04-03T23:59:59-06:00',
     unlockAt = '2021-03-24T00:00:00-06:00',
     title = 'assignment override title',
-    adhocStudents = AdhocStudents.mock(),
+    set = AdhocStudents.mock(),
   } = {}) => ({
     id,
     _id,
@@ -63,7 +68,7 @@ export const AssignmentOverride = {
     lockAt,
     unlockAt,
     title,
-    set: adhocStudents,
+    set,
     __typename: 'AssignmentOverride',
   }),
 }

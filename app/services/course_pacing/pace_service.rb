@@ -80,17 +80,14 @@ class CoursePacing::PaceService
           pace.course_pace_module_items.create(module_item:, duration: 0)
         end
       end
-      if pace.save
-        pace.create_publish_progress(run_at: Time.now)
-      end
 
+      pace.save
       pace
     end
 
     def update_pace(pace, update_params)
       return false unless pace.update(update_params)
 
-      pace.create_publish_progress(run_at: Time.now)
       # Force the updated_at to be updated, because if the update just changed the items the course pace's
       # updated_at doesn't get modified
       pace.touch

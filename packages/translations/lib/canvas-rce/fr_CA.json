@@ -682,12 +682,6 @@
   "multi_color_image_63d7372f": { "message": "Image multicolore" },
   "multiplication_sign_15f95c22": { "message": "Signe de multiplication" },
   "music_icon_4db5c972": { "message": "Icône Musique" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Doit être au moins { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Doit être au moins { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "Mes fichiers" },
   "n_th_root_9991a6e4": { "message": "N-ième racine" },
   "nabla_1e216d25": { "message": "Nabla" },

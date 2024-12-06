@@ -24,6 +24,7 @@ import fetchMock from 'fetch-mock'
 import BlockEditor, {type BlockEditorProps} from '../BlockEditor'
 import {blank_page, blank_section_with_text} from './test-content'
 import {dispatchTemplateEvent, SaveTemplateEvent, DeleteTemplateEvent} from '../types'
+import {LATEST_BLOCK_DATA_VERSION} from '../utils'
 
 const user = userEvent.setup()
 
@@ -38,7 +39,7 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
       course_id="1"
       container={container}
       enableResizer={false} // jsdom doesn't render enough for BlockResizer to work
-      content={{version: '0.2', blocks: blank_page}}
+      content={{version: LATEST_BLOCK_DATA_VERSION, blocks: JSON.parse(blank_page)}}
       {...props}
     />,
     {container}

@@ -144,6 +144,7 @@ export function initPublishButton($el, data) {
     const fileFauxView = {
       render: () => {
         const model = $el.data('view').model
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
           $el[0]
@@ -554,6 +555,7 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
     }
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ContentTypeExternalToolTray
       tool={tool}
@@ -597,6 +599,7 @@ function setExternalToolModal({
     returnFocusTo.focus()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ExternalToolModalLauncher
       tool={tool}

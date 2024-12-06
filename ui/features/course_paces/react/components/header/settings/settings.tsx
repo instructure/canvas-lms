@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -29,8 +28,8 @@ import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
-import {CoursePace, ResponsiveSizes, StoreState} from '../../../types'
-import {BlackoutDate} from '../../../shared/types'
+import type {CoursePace, ResponsiveSizes, StoreState} from '../../../types'
+import type {BlackoutDate} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
 import {getCoursePace, getExcludeWeekends} from '../../../reducers/course_paces'
 import {coursePaceActions} from '../../../actions/course_paces'
@@ -38,7 +37,7 @@ import {actions as uiActions} from '../../../actions/ui'
 import {actions as blackoutDateActions} from '../../../shared/actions/blackout_dates'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {getResponsiveSize, getSyncing} from '../../../reducers/ui'
-import {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
+import type {EnvCoursePaces} from '@canvas/global/env/EnvCoursePaces'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 import type {ButtonProps} from '@instructure/ui-buttons'
@@ -125,6 +124,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
         <Button
           data-testid="course-pace-settings"
           margin={this.props.margin}
+          // @ts-expect-error
           renderIcon={IconSettingsLine}
         >
           {I18n.t('Settings')}
@@ -223,6 +223,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     responsiveSize: getResponsiveSize(state),
     blackoutDates: getBlackoutDates(state),
+    // @ts-expect-error
     course: getCourse(state),
     courseId: getCourse(state).id,
     excludeWeekends: getExcludeWeekends(state),

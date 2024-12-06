@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import OutcomesContext from '../contexts/OutcomesContext'
 import {useManageOutcomes} from '../treeBrowser'
 import {smallOutcomeTree} from '../../mocks/Management'

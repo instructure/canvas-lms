@@ -53,6 +53,7 @@ ready(() => {
     '[data-component="AnonymousSpeedGraderAlert"]'
   ) as HTMLSpanElement
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <GradebookData
       actionMenuNode={actionMenuNode}
