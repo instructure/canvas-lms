@@ -2726,6 +2726,7 @@ hy:
     upload_error_too_many_redirects: "Չափազանց շատ են վերահասցեագրումները"
     upload_error_unexpected: "%{url} -ից բեռնման ժամանակ անհայտ սխալ տեղի ունեցավ:"
   attachment_deffe5a9: Ներդիր
+  attachments_694cf227: Ներդիրներ
   attempt_3dd42b18: Փորձ
   attempt_f2691284: Փորձ
   attendance: 
@@ -5474,6 +5475,7 @@ hy:
   create_users_view: 
     required: "Մուտքագրեք որոշ էլ.փոստի հասցեներ"
   created_6ee36dff: "Ստեղծվել է՝"
+  created_at_e607b3f5: "Ստեղծվել է"
   created_by_b39b9c8b: "Ստեղծվել է ___________կողմից"
   created_group_group_name_2097306b: "Ստեղծված %{group_name} խումբ"
   creating_261dbb7a: "Ստեղծվում է..."
@@ -5883,6 +5885,7 @@ hy:
       vp: VP
   department_6abddd98: Բաժին
   description_436c48d7: Նկարագրություն
+  description_709b38db: Նկարագրություն
   designer_c458392: Դիզայներ
   developer_key: 
     api_key: "*%{api_key}* բանալի"
@@ -16111,6 +16114,7 @@ hy:
   status_e7fdbe06: Կարգավիճակ
   stay_signed_in_1853e9b6: "Պահպանել գաղտնաբառը"
   step: Քայլ
+  storage_quota_9187910a: "Պահոցի քվոտան"
   strand_955969b1: կոնֆլիկտ
   stream_items_api: 
     assessment_request_title: "%{title} համար կարծիքի ներկայացում "
@@ -16123,6 +16127,7 @@ hy:
       Սա թույլ  է տալիս հաշվի համար բացել նոր ուսանողական խմբի էջ: Նոր էջը կառուցված է խմբի  գրանցման ավելի դինամիկ
       փոխգործողությունների ապահովման համար:
   student_id: "Ունկնդրի նույնականացուցիչ"
+  student_id_9d73580f: "Ունկնդրի նույնականացուցիչ"
   student_information_8715d0c7: "Տեղեկություններ ունկնդրի մասին"
   student_interactions_report_7717b685: "Ունկնդիրների փոխգործողությունների մասին հաշվետվություն"
   student_must_complete_all_of_these_requirements_656771d6: "Ուսանողը պետք է լրացնել բոլոր այս նախապահանջները"
@@ -17020,6 +17025,7 @@ hy:
   update_settings_9b422d0f: "Թարմացնել կարգաբերումները"
   update_tool_7d48ef2a: "Թարմացնել %{tool}"
   update_your_notification_settings_ed9564f3: "Թարմացնել ծանուցման ձեր կարգաբերումները"
+  updated_at_2eeb6a42: "Թարմացվել է"
   updated_group_group_name_727b1d98: "%{group_name} թարմացված խումբ"
   updating_6edbab78: "Թարմացվում է"
   updating_user_details_b8520b3e: "Օգտատիրոջ տվյալների թարմացում..."
@@ -17068,6 +17074,7 @@ hy:
       agree_to_terms_with_code_of_conduct: "Դուք համաձայն եք *օգտագործման պայմաններին* և  **վարվելակերպի նորմերին**:"
   user_696f4d6a: օգտատեր
   user_access_tokens_title: "Օգտատիրոջ հասանելության token-ներ"
+  user_agent_585ccbc7: "Օգտատիրոջ ներկայացուցիչ"
   user_avatars_e4fc4ed3: "Օգտատերերի ավատարներ"
   user_c95de254: Օգտատեր
   user_date_range_search: 
@@ -17141,6 +17148,7 @@ hy:
       updating_user_details: "Օգտատիրոջ տվյալների թարմացում..."
     notices: 
       image_reported: "Այս պատկերի մասին զեկուցվել է"
+  user_name_dc9baa66: "Օգտատիրոջ անուն"
   user_name_fe5887fb: "օգտատիրոջ անուն"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name}-ը այս պահին գտնվում է %{course_name} դասընթացի %{assignment_name} հանձնարարության հետ կապված աշխատանքի ուշացած ուղարկման էջում"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name}-ը այս պահին Ձեզ ավելացրել է Canvas համակարգում խոսակցությանը: Խոսակցությունը տեսնելու համար սեղմեք այս հղումը. %{link}"
@@ -17748,6 +17756,7 @@ hy:
   windows_tile_color_2b786bd9: "Windows սալիկի գույն"
   windows_tile_square_b91d2b33: "Windows սալիկ. քառակուսի"
   windows_tile_wide_4d40910: "Windows սալիկ. լայնություն"
+  workflow_state_cc8d711a: "Աշխատանքային գործընթացի վիճակը"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Դուք ցանկանում եք այս թարմացումը ընդունել թե՞ մերժել: "
   would_you_like_to_enable_this_app_ccdf735d: "Կցանկանայի՞ք միացնել այս հավելվածը:"
   would_you_like_to_go_back_to_include_1d279044: "Կցանկանայի՞ք վերադառնալ ինչ-որ բան ներառելու համար"
