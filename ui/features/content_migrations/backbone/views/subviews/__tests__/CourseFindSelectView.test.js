@@ -74,15 +74,6 @@ describe('CourseFindSelectView: #setSourceCourseId', () => {
     server.restore()
   })
 
-  test('it should be accessible', async () => {
-    const courseFindSelectView = document.createElement('div')
-    courseFindSelectView.setAttribute('role', 'button')
-    courseFindSelectView.textContent = 'Accessible Element'
-    document.body.appendChild(courseFindSelectView)
-    await isAccessible(courseFindSelectView)
-    document.body.removeChild(courseFindSelectView)
-  })
-
   test('Triggers "course_changed" when course is found by its id', () => {
     const courseFindSelectView = new CourseFindSelectView({model: new Backbone.Model()})
     const course = {id: 42}

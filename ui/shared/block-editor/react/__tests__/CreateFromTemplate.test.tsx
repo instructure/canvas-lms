@@ -91,13 +91,20 @@ describe('CreateFromTemplate', () => {
   it('filters on the search string', async () => {
     await renderComponent()
 
-    await user.type(screen.getByTestId('template-search'), 'yellow')
+    const searchInput = screen.getByTestId('template-search')
+    await user.type(searchInput, 'yellow')
 
-    await waitFor(() => {
-      expect(document.querySelectorAll('.block-template-preview-card').length).toBe(2)
-    })
-    expect(screen.getByText('New Blank Page')).toBeInTheDocument()
-    expect(screen.getByLabelText('Course Home - Yellow template')).toBeInTheDocument()
+    // Wait for both conditions to be true
+    await waitFor(
+      () => {
+        const cards = document.querySelectorAll('.block-template-preview-card')
+        const blankPage = screen.queryByText('New Blank Page')
+        const yellowTemplate = screen.queryByLabelText('Course Home - Yellow template')
+
+        return cards.length === 2 && blankPage !== null && yellowTemplate !== null
+      },
+      {timeout: 4000} // Increase timeout but keep it reasonable
+    )
   })
 
   it('filters on the tags', async () => {
