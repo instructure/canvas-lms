@@ -19,7 +19,7 @@ import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '@canvas/assignments/graphql/student/Mutations'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,

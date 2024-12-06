@@ -41,6 +41,7 @@ export default function RubricsQuery(props) {
       submissionAttempt: props.submission.attempt,
     },
     fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
     onCompleted: data => {
       const allAssessments = data.submission?.rubricAssessmentsConnection?.nodes ?? []
 

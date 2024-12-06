@@ -188,7 +188,7 @@ export default function CommentContent(props) {
           {peerReviewCompleteText}
         </Alert>
       )}
-      {props.comments
+      {[...props.comments]
         .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
         .map(comment => (
           <View as="div" key={comment._id} padding="0 medium 0 x-small">
