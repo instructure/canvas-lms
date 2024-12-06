@@ -174,7 +174,7 @@ describe('CourseCopy', () => {
 
     const {getByRole} = render(<CourseCopy {...defaultProps} />)
 
-    fireEvent.click(getByRole('button', {name: 'Clear'}))
+    fireEvent.click(getByRole('button', {name: 'Cancel'}))
     expect(window.location.href).toBe(`/courses/${defaultProps.courseId}/settings`)
   })
 

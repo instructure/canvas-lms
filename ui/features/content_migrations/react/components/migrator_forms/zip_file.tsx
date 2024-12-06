@@ -39,6 +39,7 @@ import MigrationFileInput from './file_input'
 import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
 import {ImportLabel} from './import_label'
 import {ImportInProgressLabel} from './import_in_progress_label'
+import {ImportClearLabel} from './import_clear_label'
 
 type Collection = TreeBrowserProps['collections'][0]
 type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
@@ -285,6 +286,7 @@ const ZipFileImporter = ({
         onCancel={onCancel}
         SubmitLabel={ImportLabel}
         SubmittingLabel={ImportInProgressLabel}
+        CancelLabel={ImportClearLabel}
       />
     </>
   )

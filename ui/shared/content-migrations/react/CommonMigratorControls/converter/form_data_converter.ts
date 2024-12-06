@@ -34,9 +34,9 @@ const convertDaySubstitutions = (dateShiftOptions: DateShifts): Record<string, s
 }
 
 const convertDateOperation = (
-  adjustDates: AdjustDates
+  adjustDates?: AdjustDates
 ): {} | {shift_dates: boolean} | {remove_dates: boolean} => {
-  if (!adjustDates.enabled) {
+  if (!adjustDates || !adjustDates.enabled) {
     return {}
   }
   const operation = adjustDates.operation
@@ -52,12 +52,21 @@ const convertDateOperation = (
 const convertDateShiftOptions = (
   formDateShiftOptions: submitMigrationFormData
 ): DateShiftsRequestBody => {
+  const dateShiftOptions = formDateShiftOptions.date_shift_options
+  let convertedDateShiftOptions = {}
+
+  if (dateShiftOptions) {
+    convertedDateShiftOptions = {
+      old_start_date: dateShiftOptions?.old_start_date,
+      new_start_date: dateShiftOptions?.new_start_date,
+      old_end_date: dateShiftOptions?.old_end_date,
+      new_end_date: dateShiftOptions?.new_end_date,
+      day_substitutions: dateShiftOptions ? convertDaySubstitutions(dateShiftOptions) : {},
+    }
+  }
+
   return {
-    old_start_date: formDateShiftOptions.date_shift_options.old_start_date,
-    new_start_date: formDateShiftOptions.date_shift_options.new_start_date,
-    old_end_date: formDateShiftOptions.date_shift_options.old_end_date,
-    new_end_date: formDateShiftOptions.date_shift_options.new_end_date,
-    day_substitutions: convertDaySubstitutions(formDateShiftOptions.date_shift_options),
+    ...convertedDateShiftOptions,
     ...convertDateOperation(formDateShiftOptions.adjust_dates),
   }
 }
@@ -71,7 +80,7 @@ export const convertFormDataToMigrationCreateRequest = (
     course_id: courseId,
     migration_type: chosenMigrator,
     date_shift_options: convertDateShiftOptions(formData),
-    selective_import: formData.selective_import,
+    selective_import: formData.selective_import || false,
     settings: formData.settings,
     pre_attachment: formData.pre_attachment,
   }

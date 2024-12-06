@@ -33,12 +33,14 @@ const renderComponent = (overrideProps?: any) =>
       onCancel={onCancel}
       {...overrideProps}
       SubmitLabel={TextLabel}
+      CancelLabel={TextCancelLabel}
       SubmittingLabel={TextSubmittingLabel}
     />
   )
 
 const TextLabel = () => <Text>Add to Import Queue</Text>
 const TextSubmittingLabel = () => <Text>Submitting test</Text>
+const TextCancelLabel = () => <Text>Clear</Text>
 
 describe('CommonMigratorControls', () => {
   afterEach(() => jest.clearAllMocks())
@@ -190,6 +192,7 @@ describe('CommonMigratorControls', () => {
         fileUploadProgress={10}
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
+        CancelLabel={TextCancelLabel}
       />
     )
     expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
@@ -225,6 +228,7 @@ describe('CommonMigratorControls', () => {
         fileUploadProgress={10}
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
+        CancelLabel={TextCancelLabel}
       />
     )
     expect(getByRole('checkbox', {name: 'Import Blueprint Course settings'})).toBeDisabled()

@@ -23,6 +23,7 @@ import {
   type DateShiftsCommon,
   type DateAdjustmentConfig,
   type MigrationCreateRequestBody,
+  type onSubmitMigrationFormCallback,
 } from '@canvas/content-migrations'
 
 export type ContentMigrationItemSettings = {
@@ -70,25 +71,6 @@ export type ContentMigrationItem = {
   created_at: string
 }
 
-export type submitMigrationFormData = {
-  errored?: boolean
-  adjust_dates: AdjustDates
-  selective_import: boolean
-  date_shift_options: DateShifts
-  settings: {[key: string]: any}
-  daySubCollection?: object
-  pre_attachment?: {
-    name: string
-    size: number
-    no_redirect: boolean
-  }
-}
-
-export type onSubmitMigrationFormCallback = (
-  formData: submitMigrationFormData,
-  preAttachmentFile?: File
-) => void
-
 export type AttachmentProgressResponse = ContentMigrationItem & {
   type: string
   total: number
@@ -114,4 +96,5 @@ export type {
   DateShiftsCommon,
   DateAdjustmentConfig,
   MigrationCreateRequestBody,
+  onSubmitMigrationFormCallback,
 }
