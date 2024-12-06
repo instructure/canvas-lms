@@ -346,7 +346,7 @@ module DatesOverridable
       else
         all_due_dates
       end
-    elsif ObserverEnrollment.observed_students(context, user).any?
+    elsif ObserverEnrollment.observed_students(context, user).any? && !(context.user_has_been_admin?(user) || context.user_has_been_instructor?(user))
       observed_student_due_dates(user)
     elsif context.user_has_been_student?(user) ||
           context.user_has_been_admin?(user) ||

@@ -558,5 +558,21 @@ describe "assignments show page assign to" do
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
       expect(element_exists?(AssignmentPage.assign_to_button_selector)).to be_truthy
     end
+
+    it "shows all overrides for teachers when they are also observers in the course" do
+      @assignment1.update!(only_visible_to_overrides: true)
+      @student3 = student_in_course(course: @course, active_all: true, name: "Student 3").user
+      @assignment1.assignment_overrides.create!(set_type: "ADHOC", due_at: Time.parse("2024-04-12"))
+      @assignment1.assignment_overrides.last.assignment_override_students.create!(user: @student3)
+
+      get "/courses/#{@course.id}/assignments/#{@assignment1.id}"
+
+      expect(AssignmentPage.retrieve_overrides_count).to eq(2)
+      overrides = AssignmentPage.retrieve_all_overrides_formatted
+      expect(overrides[0][:due_at]).to eq("Apr 12")
+      expect(overrides[0][:due_for]).to eq("1 Student")
+      expect(overrides[1][:due_at]).to eq("-")
+      expect(overrides[1][:due_for]).to eq("1 Student")
+    end
   end
 end
