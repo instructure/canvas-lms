@@ -753,9 +753,6 @@
   },
   "outline_color_3ef2cea7": { "message": "Umrissfarbe" },
   "outline_size_a6059a21": { "message": "Umrissgröße" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } Ist kein gültiges Protokoll. Es muss ftp, http, https, mailto, skype oder tel sein oder weggelassen werden."
-  },
   "page_50c4823d": { "message": "Seite" },
   "pages_e5414c2c": { "message": "Seiten" },
   "paragraph_5e5ad8eb": { "message": "Absatz" },

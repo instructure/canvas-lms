@@ -1634,9 +1634,6 @@
     "outline_size_a6059a21": {
         "message": "Maint Amlinell"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
-    },
     "page_50c4823d": {
         "message": "Tudalen"
     },

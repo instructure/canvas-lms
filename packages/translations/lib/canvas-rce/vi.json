@@ -749,9 +749,6 @@
   },
   "outline_color_3ef2cea7": { "message": "Màu Viền" },
   "outline_size_a6059a21": { "message": "Kích Thước Viền" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } không phải là giao thức hợp lệ, vốn phải là ftp, http, https, mailto, skype, tel hoặc có thể lược bỏ"
-  },
   "page_50c4823d": { "message": "Trang" },
   "pages_e5414c2c": { "message": "Trang" },
   "paragraph_5e5ad8eb": { "message": "Đoạn" },
