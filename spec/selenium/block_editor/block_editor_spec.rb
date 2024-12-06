@@ -26,7 +26,10 @@
 #
 require_relative "../common"
 require_relative "pages/block_editor_page"
-describe "Block Editor" do
+
+# chrome complains about "Blocked aria-hidden on an element because its descendant retained focus."
+# this is a transient condition that resolves itself and does not cause a problem (that I know of)
+describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
@@ -56,7 +59,7 @@ describe "Block Editor" do
     end
 
     context "Load template" do
-      it "loads the clicked template to the editor", :ignore_js_errors do
+      it "loads the clicked template to the editor" do
         expect(template_chooser).to be_displayed
         wait_for_ajax_requests
         # I don't know why this expectation succeeds locally and fails in jenkins,

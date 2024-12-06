@@ -92,7 +92,7 @@ module BlockEditorPage
   end
 
   def template_quick_look_header_selector
-    'h3:contains("Template: Quick Look")'
+    'h3:contains(": Quick Look")'
   end
 
   def template_quick_look_header
