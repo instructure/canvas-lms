@@ -165,7 +165,7 @@ export const computeCourseNavDefaultValue = (
 
 export const createLti1p3RegistrationOverlayStore = (
   internalConfig: InternalLtiConfiguration,
-  adminNickname: string,
+  adminNickname?: string,
   existingOverlay?: LtiConfigurationOverlay
 ) =>
   create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({

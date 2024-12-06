@@ -74,7 +74,7 @@ export type Lti1p3RegistrationWizardStore = {
 
 type CreateStoreProps = {
   internalConfig: InternalLtiConfiguration
-  adminNickname: string
+  adminNickname?: string
   existingOverlay?: LtiConfigurationOverlay
   service: Lti1p3RegistrationWizardService
   reviewing?: boolean

@@ -72,7 +72,7 @@ export const Lti1p3RegistrationWizard = ({
 
   const useLti1p3RegistrationWizardStore = React.useMemo(() => {
     return createLti1p3RegistrationWizardState({
-      adminNickname: existingAdminNickname ?? '',
+      adminNickname: toUndefined(existingAdminNickname),
       internalConfig: internalConfiguration,
       service,
       existingOverlay: toUndefined(existingOverlayData),

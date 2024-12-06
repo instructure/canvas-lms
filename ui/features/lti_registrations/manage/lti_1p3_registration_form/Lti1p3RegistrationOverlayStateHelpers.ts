@@ -34,7 +34,7 @@ import {
 
 export const initialOverlayStateFromInternalConfig = (
   internalConfig: InternalLtiConfiguration,
-  adminNickname: string,
+  adminNickname?: string,
   existingOverlay?: LtiConfigurationOverlay
 ): Lti1p3RegistrationOverlayState => {
   const placements = internalConfig.placements
