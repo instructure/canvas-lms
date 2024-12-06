@@ -49,6 +49,12 @@ describe('Common file url utils', () => {
         'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
       )
     })
+
+    it('returns original if no url given', () => {
+      expect(absoluteToRelativeUrl('', canvasOrigin)).toEqual('')
+      expect(absoluteToRelativeUrl(null, canvasOrigin)).toEqual(null)
+      expect(absoluteToRelativeUrl(undefined, canvasOrigin)).toEqual(undefined)
+    })
   })
 
   describe('downloadToWrap', () => {
@@ -90,6 +96,18 @@ describe('Common file url utils', () => {
       url = downloadToWrap(testurl)
       expect(url).toEqual('/some/path?wrap=1')
     })
+
+    it('preserves other query parameters', () => {
+      const testurl = '/some/path/download?download_frd=1&foo=bar'
+      url = downloadToWrap(testurl)
+      expect(url).toEqual('/some/path?foo=bar&wrap=1')
+    })
+
+    it('adds wrap=1 if no query parameters present', () => {
+      const testurl = '/some/path/download'
+      url = downloadToWrap(testurl)
+      expect(url).toEqual('/some/path?wrap=1')
+    })
   })
 
   describe('fixupFileUrl', () => {
@@ -118,9 +136,7 @@ describe('Common file url utils', () => {
         RCEGlobals.getFeatures = jest.fn().mockReturnValue({file_verifiers_for_quiz_links: false})
         fileInfo.href = 'http://instructure.com/files/17/download?download_frd=1'
         const result = fixupFileUrl('course', 2, fileInfo, 'http://instructure.com')
-        expect(result.href).toEqual(
-          'http://instructure.com/courses/2/files/17?wrap=1'
-        )
+        expect(result.href).toEqual('http://instructure.com/courses/2/files/17?wrap=1')
       })
 
       it('adds file verifiers to all Canvas file URLs if the origin is not Canvas and the feature flag is on', () => {
@@ -141,6 +157,12 @@ describe('Common file url utils', () => {
         // while removing download_frd
         const result = fixupFileUrl('user', 2, fileInfo)
         expect(result.href).toEqual('/users/2/files/17?verifier=xyzzy&wrap=1')
+      })
+
+      it('does nothing if there is no href/url property', () => {
+        const emptyInfo = {}
+        const result = fixupFileUrl('course', 2, emptyInfo)
+        expect(result).toEqual(emptyInfo)
       })
     })
 
@@ -168,6 +190,12 @@ describe('Common file url utils', () => {
         // while removing download_frd and does not add wrap
         const result = fixupFileUrl('user', 2, fileInfo)
         expect(result.url).toEqual('/users/2/files/17?wrap=1&verifier=xyzzy')
+      })
+
+      it('removes download_frd but preserves other query params', () => {
+        fileInfo.url = '/files/17/download?download_frd=1&foo=bar'
+        const result = fixupFileUrl('course', 2, fileInfo)
+        expect(result.url).toEqual('/courses/2/files/17?foo=bar&wrap=1')
       })
     })
   })
@@ -204,6 +232,16 @@ describe('Common file url utils', () => {
       const url = '/please/preview/me'
       expect(prepEmbedSrc(url)).toEqual('/please/preview/me/preview')
     })
+
+    it('adds /preview if the URL ends with the file id but no download or preview', () => {
+      const url = '/users/2/files/17'
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview')
+    })
+
+    it('removes wrap=1 if present', () => {
+      const url = '/users/2/files/17/download?wrap=1&foo=bar'
+      expect(prepEmbedSrc(url)).toEqual('/users/2/files/17/preview?foo=bar')
+    })
   })
 
   describe('prepLinkedSrc', () => {
@@ -221,6 +259,11 @@ describe('Common file url utils', () => {
     it('does not indiscriminately replace /download in a url', () => {
       const url = '/please/download/me'
       expect(prepLinkedSrc(url)).toEqual(url)
+    })
+
+    it('preserves query parameters and hash after removing /preview', () => {
+      const url = '/users/2/files/17/preview?foo=bar#section'
+      expect(prepLinkedSrc(url)).toEqual('/users/2/files/17?foo=bar#section')
     })
   })
 })
