@@ -66,7 +66,7 @@ describe('RceLti11ContentItem LTI Link', () => {
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="{&quot;displayHeight&quot;:600,&quot;displayWidth&quot;:800,&quot;presentationDocumentTarget&quot;:&quot;iframe&quot;}" class="lti-thumbnail-launch"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail iframe"></a>'
+      '<a href="/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="{&quot;displayHeight&quot;:600,&quot;displayWidth&quot;:800,&quot;presentationDocumentTarget&quot;:&quot;iframe&quot;}" class="lti-thumbnail-launch"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail iframe"></a>'
     )
   })
 
@@ -117,9 +117,16 @@ describe('RceLti11ContentItem LTI Link', () => {
   })
 
   it("Handles LTI link with presentation target of 'window' and thumbnail is *NOT* set", () => {
-    const iframe = $('.mce-tinymce').find('iframe')[0]
-    const tinymce_element = $(iframe).find('body').append('<p>&nbsp;</p>')
-    tinymce_element.click()
+    const iframe = document.querySelector('.mce-tinymce iframe')
+    if (iframe instanceof HTMLIFrameElement) {
+      const iframeBody = iframe.contentDocument?.body
+      if (iframeBody) {
+        const paragraph = document.createElement('p')
+        paragraph.innerHTML = '&nbsp;'
+        iframeBody.appendChild(paragraph)
+        iframeBody.click()
+      }
+    }
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_window)
     expect(contentItem.text).toEqual('Arch Linux plain window')
     expect(contentItem.url).toEqual(
