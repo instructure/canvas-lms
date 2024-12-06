@@ -3404,6 +3404,7 @@ fa:
   assignment_groups_weight_2f1a5a7c: "وزن گروه‌های تکلیف"
   assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "تکلیف دارای تاریخ قفل شده است. تاریخ مهلت نمی تواند خارج از محدوده تاریخ قفل شده تنظیم شود."
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} برای %{name} نمره گذاری شده است."
+  assignment_id_8b2eee28: "شناسه تکلیف"
   assignment_id_96baa1b7: "شناسه تکلیف"
   assignment_id_b040cee0: "شناسه تکلیف"
   assignment_information_e871d0e0: "اطلاعات تکلیف"
@@ -4175,6 +4176,7 @@ fa:
     upload_error_too_many_redirects: "تغییر مسیرهای زیادی برای %{url}"
     upload_error_unexpected: "در هنگام بارگیری از %{url} یک خطای ناشناس رخ داد"
   attachment_deffe5a9: پیوست
+  attachments_694cf227: "پیوست ها"
   attempt_1_7ba3c30f: "تلاش 1"
   attempt_3dd42b18: تلاش
   attempt_attempt_d3911720: "تلاش %{attempt}"
@@ -8122,6 +8124,7 @@ fa:
   created_ascending_cff48774: "ایجاد شده: صعودی"
   created_at_6373bbea: "درست شده_در"
   created_at_73839757: "ایجاد شده در"
+  created_at_e607b3f5: "ایجاد شده در"
   created_by_b39b9c8b: "ایجاد شده توسط"
   created_by_sis_93fbb66b: "ایجاد شده_توسط_سامانه اطلاعات دانشجو"
   created_by_sis_b590894c: "ایجاد شده توسط سامانه اطلاعات دانشجو;"
@@ -8717,6 +8720,7 @@ fa:
   descending_b7828162: نزولی
   description_436c48d7: شرح
   description_61f4296: "* شرح"
+  description_709b38db: "شرح:"
   description_for_mastery_level_position_description_cc17114b: " توضیحات برای سطح تسلط %{position}:%{description}"
   descriptivename_was_changed_from_formattedoldvalue_47623537: " %{descriptiveName} تغییر یافت از %{formattedOldValue} به %{formattedNewValue}"
   descriptivename_was_set_to_formattednewvalue_cd78b357: " %{descriptiveName} تنظیم شد به %{formattedNewValue}"
@@ -22731,6 +22735,7 @@ fa:
   step: مرحله
   still_having_difficulty_get_more_help_here_3cdc8de1: "هنوز مشکل دارید؟ از اینجا کمک بیشتری دریافت کنید:"
   stop_acting_as_user_8809a97f: "متوقف کردن فعالیت به عنوان کاربر"
+  storage_quota_9187910a: "سهمیه ذخیره"
   storage_quotas_manage_6ca14bbb: "سهمیه ذخایر - مدیریت"
   storage_used_in_mb_c75fbd9c: "ذخیره استفاده شده بر حسب مگابایت"
   store_and_share_course_assets_82a9967c: "منابع دوره را ذخیره و به اشتراک بگذارید"
@@ -22782,6 +22787,7 @@ fa:
   student_id: "شناسه دانشجو"
   student_id_236970d8: شناسه_دانشجو
   student_id_7cc45fb5: "شناسه دانشجو"
+  student_id_9d73580f: "شناسه دانشجو"
   student_id_a61d78c7: "شناسه دانشجو"
   student_information_8715d0c7: "اطلاعات دانشجو"
   student_integration_id_b9e6ede: "شناسه یکپارچگی دانشجو"
@@ -24736,6 +24742,7 @@ fa:
   update_your_notification_settings_ed9564f3: "بهنگام سازی تنظیمات اطلاعیه شما"
   updated_2c1e8615: "به روزرسانی شده"
   updated_after_3a81825c: "روز رسانی شده بعد از"
+  updated_at_2eeb6a42: "بهنگام سازی شده در"
   updated_at_ab9f625d: بروزشده_در
   updated_group_group_name_727b1d98: "گروه %{group_name} بهنگام سازی شد"
   updated_terms_of_service_82f34148: "ضوابط استفاده از سرویس به‌روزرسانی شد"
@@ -24846,6 +24853,7 @@ fa:
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user} دعوت برای درس %{course} را پذیرفت."
   user_access_report_ddbedbfe: "گزارش دسترسی کاربر"
   user_access_tokens_title: "نشانه های دسترسی کاربر"
+  user_agent_585ccbc7: "نماینده کاربر"
   user_avatars_e4fc4ed3: "آواتارهای کاربر"
   user_c95de254: کاربر
   user_content_aaf0fb5a: "محتوای کاربر"
@@ -24935,6 +24943,7 @@ fa:
       updating_user_details: "در حال بهنگام سازی اطلاعات کاربر..."
     notices: 
       image_reported: "این تصویر گزارش شده است"
+  user_name_dc9baa66: "نام کاربری"
   user_name_fe5887fb: "نام کاربری"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} یک  هم اکنون مورد ارسالی دارای تأخیر را برای %{assignment_name} در درس %{course_name} تحویل داده است"
   user_name_has_just_turned_in_a_re_submission_for_a_bcd6a6a5: "%{user_name} هم اکنون  اقدام به ارسال مجدد%{assignment_title}در درس %{course_name}کرده است."
@@ -25776,6 +25785,7 @@ fa:
   word_count_c77fe3a6: "تعداد کلمه"
   work_and_create_together_c65f358b: "کار و ایجاد با هم"
   workflow_state_3a5c99d2: "وضعیت_گردش کار"
+  workflow_state_cc8d711a: "وضعیت گردش کار"
   working_b1f63edf: "در حال کارکردن..."
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "مایلید این بهنگام سازی قبول یا رد شود؟"
   would_you_like_to_enable_this_app_ccdf735d: "مایلید این برنامه فعال شود؟"
