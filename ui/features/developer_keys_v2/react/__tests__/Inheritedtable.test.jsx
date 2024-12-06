@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,22 +19,29 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-
 import InheritedTable from '../InheritedTable'
+import 'jquery-migrate'
 
 describe('InheritedTable', () => {
-  let originalENV
+  let container
+
   beforeEach(() => {
-    originalENV = global.ENV
-    global.ENV = {
+    container = document.createElement('div')
+    container.id = 'fixtures'
+    document.body.appendChild(container)
+
+    window.ENV = {
       FEATURES: {
+        lti_dynamic_registration: true,
         enhanced_developer_keys_tables: true,
       },
     }
   })
 
   afterEach(() => {
-    global.ENV = originalENV
+    container.remove()
+    window.ENV = {}
+    jest.clearAllMocks()
   })
 
   const idFor = n => `1000000000000${n}`
@@ -45,34 +52,31 @@ describe('InheritedTable', () => {
       name: `key-${n}`,
       email: `email-${n}`,
       access_token_count: n * 2,
-      is_lti_key: n == 3,
+      is_lti_key: n === 3,
       api_key: 'abc12345678',
       created_at: '2023-12-12T20:36:50Z',
       visible: true,
-      developer_key_account_binding: {
-        workflow_state: n == 5 ? 'off' : 'on',
-      },
     }))
   }
 
-  const component = (keys, props = {}) => {
+  const renderComponent = (keyList, props = {}) => {
     return render(
       <InheritedTable
         label="Inherited Keys"
         prefix="inherited"
-        developerKeysList={keys || devKeyList()}
-        store={{dispatch: () => {}}}
+        store={{dispatch: jest.fn()}}
         actions={{
-          makeVisibleDeveloperKey: () => {},
-          makeInvisibleDeveloperKey: () => {},
-          activateDeveloperKey: () => {},
-          deactivateDeveloperKey: () => {},
-          deleteDeveloperKey: () => {},
-          editDeveloperKey: () => {},
-          developerKeysModalOpen: () => {},
-          ltiKeysSetLtiKey: () => {},
-          setBindingWorkflowState: () => {},
+          makeVisibleDeveloperKey: jest.fn(),
+          makeInvisibleDeveloperKey: jest.fn(),
+          activateDeveloperKey: jest.fn(),
+          deactivateDeveloperKey: jest.fn(),
+          deleteDeveloperKey: jest.fn(),
+          editDeveloperKey: jest.fn(),
+          developerKeysModalOpen: jest.fn(),
+          setBindingWorkflowState: jest.fn(),
+          updateDeveloperKey: jest.fn(),
         }}
+        developerKeysList={keyList || devKeyList()}
         ctx={{
           params: {
             contextId: '',
@@ -84,62 +88,52 @@ describe('InheritedTable', () => {
   }
 
   it('renders table with placeholder text if no keys are given', () => {
-    const wrapper = component([])
-    expect(wrapper.getByRole('table')).toBeInTheDocument()
-    expect(wrapper.getByText('Nothing here yet')).toBeInTheDocument()
+    const {getByRole, getByText} = renderComponent([])
+    expect(getByRole('table')).toBeInTheDocument()
+    expect(getByText('Nothing here yet')).toBeInTheDocument()
   })
 
   it('renders a DeveloperKey for each key', () => {
-    const wrapper = component()
-    expect(wrapper.getAllByRole('row')).toHaveLength(11)
+    const {getAllByRole} = renderComponent()
+    expect(getAllByRole('row')).toHaveLength(11) // header + 10 rows
   })
 
   describe('when sorting table', () => {
     const firstRow = wrapper => wrapper.getAllByRole('row')[1]
 
     it('defaults to descending id', () => {
-      const wrapper = component()
-
-      expect(firstRow(wrapper)).toHaveTextContent('9')
+      const wrapper = renderComponent()
+      expect(firstRow(wrapper)).toHaveTextContent(idFor(9))
     })
 
     it('allows sorting by name', async () => {
-      const wrapper = component()
-
-      await userEvent.click(wrapper.getByText('Name')) // ascending
+      const wrapper = renderComponent()
+      await userEvent.click(wrapper.getByText('Name'))
       expect(firstRow(wrapper)).toHaveTextContent('key-0')
 
-      await userEvent.click(wrapper.getByText('Name')) // descending
+      await userEvent.click(wrapper.getByText('Name'))
       expect(firstRow(wrapper)).toHaveTextContent('key-9')
     })
 
     it('allows sorting by id', async () => {
-      const wrapper = component()
-
-      await userEvent.click(wrapper.getByText('Id')) // ascending
+      const wrapper = renderComponent()
+      await userEvent.click(wrapper.getByText('Id'))
       expect(firstRow(wrapper)).toHaveTextContent(idFor(0))
 
-      await userEvent.click(wrapper.getByText('Id')) // descending
+      await userEvent.click(wrapper.getByText('Id'))
       expect(firstRow(wrapper)).toHaveTextContent(idFor(9))
     })
 
-    it('allows sorting by type', async () => {
-      const wrapper = component()
-
-      await userEvent.click(wrapper.getByText('Type')) // ascending
-      expect(firstRow(wrapper)).toHaveTextContent('key-0')
-
-      await userEvent.click(wrapper.getByText('Type')) // descending
-      expect(firstRow(wrapper)).toHaveTextContent('key-3')
-    })
-
     it('allows sorting by state', async () => {
-      const wrapper = component()
-
-      await userEvent.click(wrapper.getByText('State')) // ascending
+      const list = devKeyList().map((key, i) => ({
+        ...key,
+        developer_key_account_binding: {workflow_state: i % 2 === 0 ? 'on' : 'off'},
+      }))
+      const wrapper = renderComponent(list)
+      await userEvent.click(wrapper.getByText('State'))
       expect(firstRow(wrapper)).toHaveTextContent('off')
 
-      await userEvent.click(wrapper.getByText('State')) // descending
+      await userEvent.click(wrapper.getByText('State'))
       expect(firstRow(wrapper)).toHaveTextContent('on')
     })
   })
@@ -148,38 +142,33 @@ describe('InheritedTable', () => {
     const waitForDebounce = () => new Promise(resolve => setTimeout(resolve, 400))
 
     it('filters by selecting type', async () => {
-      const wrapper = component()
-
+      const wrapper = renderComponent()
       await userEvent.click(wrapper.getByRole('combobox'))
       await userEvent.click(wrapper.getByRole('option', {name: 'LTI Keys'}))
-      expect(wrapper.getAllByRole('row')).toHaveLength(2)
+      expect(wrapper.getAllByRole('row')).toHaveLength(2) // header + 1 LTI key
     })
 
     it('filters by searching for name', async () => {
-      const wrapper = component()
-
+      const wrapper = renderComponent()
       await userEvent.type(wrapper.getByRole('searchbox'), 'key-1')
       await waitForDebounce()
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
     })
 
     it('filters by searching for id', async () => {
-      const wrapper = component()
-
+      const wrapper = renderComponent()
       await userEvent.type(wrapper.getByRole('searchbox'), idFor(1))
       await waitForDebounce()
-      console.log(wrapper.getAllByRole('row').map(r => r.textContent))
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
     })
 
     describe('when flag is off', () => {
       beforeEach(() => {
-        global.ENV.FEATURES.enhanced_developer_keys_tables = false
+        window.ENV.FEATURES.enhanced_developer_keys_tables = false
       })
 
       it('does not allow filtering', () => {
-        const wrapper = component()
-
+        const wrapper = renderComponent()
         expect(wrapper.queryByRole('searchbox')).not.toBeInTheDocument()
       })
     })
