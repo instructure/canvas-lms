@@ -63,6 +63,17 @@ describe('RetrievingContent', () => {
     })
   })
 
+  describe('with no content items', () => {
+    beforeEach(() => {
+      content_items = []
+      component = renderComponent()
+    })
+
+    it('shows a message about no content items', () => {
+      expect(component.getAllByText('The external app returned with no content.').length).toBe(1)
+    })
+  })
+
   describe('with errored content items', () => {
     beforeEach(() => {
       content_items = [
