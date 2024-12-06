@@ -52,7 +52,9 @@ export function onExternalContentReady({contentItems, service_id, tool_id}) {
 export const handleDeepLinking = async event => {
   try {
     const item = processSingleContentItem(event)
-    if (typeof item !== 'object') {
+    if (item === undefined || item === null) {
+      $.flashWarning(I18n.t('Tool returned with no content'))
+    } else if (typeof item !== 'object') {
       $.flashError(I18n.t('Error retrieving content from tool (bad content item)'))
     } else {
       onExternalContentReady({
