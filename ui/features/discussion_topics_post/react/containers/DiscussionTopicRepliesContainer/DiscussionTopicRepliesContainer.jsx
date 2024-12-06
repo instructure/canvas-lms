@@ -51,7 +51,7 @@ export const DiscussionTopicRepliesContainer = props => {
     // update each root discussionEntry in cache
     result?.data?.updateDiscussionEntriesReadState?.discussionEntries?.forEach(discussionEntry => {
       const discussionEntryOptions = {
-        id: `DiscussionEntry:${btoa('DiscussionEntry-' + discussionEntry._id)}`,
+        id: btoa('DiscussionEntry-' + discussionEntry._id),
         fragment: DiscussionEntry.fragment,
         fragmentName: 'DiscussionEntry',
       }
