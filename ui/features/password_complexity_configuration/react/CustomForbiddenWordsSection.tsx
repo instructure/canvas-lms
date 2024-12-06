@@ -179,7 +179,7 @@ const CustomForbiddenWordsSection = ({
           <Flex.Item>
             (
             <Link
-              href="https://github.com/instructure/canvas-lms/blob/master/lib/canvas/security/password_policy.rb#L83"
+              href="https://github.com/instructure/canvas-lms/blob/master/lib/canvas/security/password_policy.rb#:~:text=DEFAULT_COMMON_PASSWORDS%20%3D%20%25w%5B"
               target="_blank"
             >
               {I18n.t('see default list here')}
