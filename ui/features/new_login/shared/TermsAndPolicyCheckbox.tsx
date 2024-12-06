@@ -32,10 +32,10 @@ interface Props {
   privacyPolicyUrl?: string
   messages?: FormMessage[]
   onFocus?: () => void
-  className?: string
+  id: string
 }
 
-const TermsAndPolicyCheckbox: React.FC<Props> = ({
+const TermsAndPolicyCheckbox = ({
   onChange,
   checked,
   isDisabled,
@@ -43,8 +43,8 @@ const TermsAndPolicyCheckbox: React.FC<Props> = ({
   privacyPolicyUrl,
   messages,
   onFocus,
-  className,
-}) => {
+  id,
+}: Props) => {
   if (!termsOfUseUrl && !privacyPolicyUrl) {
     return null
   }
@@ -71,7 +71,7 @@ const TermsAndPolicyCheckbox: React.FC<Props> = ({
 
   return (
     <Checkbox
-      className={className}
+      id={id}
       label={
         <>
           {splitText[0]}
