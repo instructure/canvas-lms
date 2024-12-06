@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line import/no-nodejs-modules
-import {format, parse} from 'url'
 import {absoluteToRelativeUrl} from '../../../common/fileUrl'
 import {
   IconAudioLine,
@@ -28,7 +26,7 @@ import {
   IconPdfLine,
   IconVideoLine,
 } from '@instructure/ui-icons'
-import RCEGlobals from '../../RCEGlobals'
+import RCEGlobals, {type Features} from '../../RCEGlobals'
 
 type FileType = {
   'content-type'?: string
@@ -101,8 +99,8 @@ export function isIWork(filename: string) {
 export function getIWorkType(filename: string) {
   const tokens = filename.split('.')
   if (tokens.length <= 1) return ''
-  const lastToken = tokens[tokens.length - 1]
-  switch (lastToken.toLowerCase()) {
+  const lastToken = tokens[tokens.length - 1].toLowerCase()
+  switch (lastToken) {
     case 'pages':
       return 'application/vnd.apple.pages'
     case 'key':
@@ -118,53 +116,53 @@ export function mediaPlayerURLFromFile(file: FileType, canvasOrigin?: string) {
   // why oh why aren't we consistent?
   const content_type = file['content-type'] || file.content_type || file.type
   if (typeof content_type !== 'string') throw new Error('Invalid content type')
+
   const type = content_type.replace(/\/.*$/, '')
+  const baseOrigin = canvasOrigin ?? window.location.origin
 
   if (
-    // @ts-expect-error
     RCEGlobals.getFeatures()?.media_links_use_attachment_id &&
     isAudioOrVideo(content_type) &&
     file.id
   ) {
-    const url = parse(`/media_attachments_iframe/${file.id}`, true)
-    url.query.type = type
-    // @ts-expect-error
-    url.query.embedded = true
+    const url = new URL(`/media_attachments_iframe/${file.id}`, baseOrigin)
+    url.searchParams.set('type', type)
+    url.searchParams.set('embedded', 'true')
+
     if (
       file.uuid &&
-      (file.contextType == 'User' ||
-        (!!canvasOrigin &&
+      (file.contextType === 'User' ||
+        (canvasOrigin &&
           canvasOrigin !== window.location.origin &&
-          // @ts-expect-error
           RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
     ) {
-      url.query.verifier = file.uuid
+      url.searchParams.set('verifier', file.uuid)
     } else if (file.url || file.href) {
       const href = file.url || file.href
       if (typeof href !== 'string') {
         throw new Error('Invalid URL')
       }
-      const parsed_url = parse(href, true)
-      if (parsed_url.query.verifier) {
-        url.query.verifier = parsed_url.query.verifier
+      const parsedUrl = new URL(href, baseOrigin)
+      const verifier = parsedUrl.searchParams.get('verifier')
+      if (verifier) {
+        url.searchParams.set('verifier', verifier)
       }
     }
-    return format(url)
+
+    return url.toString().replace(baseOrigin, '')
   }
 
   if (file.embedded_iframe_url) {
-    const url = new URL(file.embedded_iframe_url, canvasOrigin)
-
-    if (url.searchParams.has('type')) {
-      return `${absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)}`
+    const embedUrl = new URL(file.embedded_iframe_url, baseOrigin)
+    if (embedUrl.searchParams.has('type')) {
+      return absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)
     }
-
-    return `${absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)}?type=${type}`
+    const relative = absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)
+    return `${relative}?type=${type}`
   }
 
   if (isAudioOrVideo(content_type)) {
     const mediaEntryId = file.media_entry_id || file.embed?.id || file.mediaEntryId
-
     if (mediaEntryId && mediaEntryId !== 'maybe') {
       return `/media_objects_iframe/${mediaEntryId}?type=${type}`
     }
@@ -173,9 +171,11 @@ export function mediaPlayerURLFromFile(file: FileType, canvasOrigin?: string) {
     if (typeof href !== 'string') {
       throw new Error('Invalid URL')
     }
-    const parsed_url = parse(href, true)
-    const verifier = parsed_url.query.verifier ? `&verifier=${parsed_url.query.verifier}` : ''
-    return `/media_objects_iframe?mediahref=${parsed_url.pathname}${verifier}&type=${type}`
+    const parsedUrl = new URL(href, baseOrigin)
+    const verifier = parsedUrl.searchParams.get('verifier')
+    const verifierParam = verifier ? `&verifier=${verifier}` : ''
+    return `/media_objects_iframe?mediahref=${parsedUrl.pathname}${verifierParam}&type=${type}`
   }
+
   return undefined
 }

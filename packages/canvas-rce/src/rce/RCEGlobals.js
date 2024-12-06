@@ -18,6 +18,12 @@
 
 const isEmpty = obj => Object.keys(obj).length === 0
 
+/**
+ * @typedef {Object} Features
+ * @property {boolean} media_links_use_attachment_id
+ * @property {boolean} file_verifiers_for_quiz_links
+ */
+
 class RCEGlobals {
   constructor() {
     if (!RCEGlobals.instance) {
@@ -32,7 +38,7 @@ class RCEGlobals {
   }
 
   getFeatures() {
-    return this._data.features
+    return /** @type {Features} */ (this._data.features)
   }
 
   setFeatures(features) {
