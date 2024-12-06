@@ -682,9 +682,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "輪廓顏色" },
   "outline_size_a6059a21": { "message": "輪廓大小" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p }並非有效協議，必須使用 ftp、http、https、mailto、skype、tel 或忽略此項"
-  },
   "page_50c4823d": { "message": "頁面" },
   "pages_e5414c2c": { "message": "頁面" },
   "paragraph_5e5ad8eb": { "message": "段落" },

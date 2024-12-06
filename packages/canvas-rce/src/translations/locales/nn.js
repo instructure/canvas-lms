@@ -717,9 +717,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Farge på omriss" },
   "outline_size_a6059a21": { "message": "Storleik på omriss" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } er ikkje ein gyldig protokoll. Den må vere anten ftp, http, https, mailto, skype, tel, eller utelatast"
-  },
   "page_50c4823d": { "message": "Side" },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Avsnitt" },

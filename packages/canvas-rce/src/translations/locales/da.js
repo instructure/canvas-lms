@@ -766,9 +766,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Konturfarve" },
   "outline_size_a6059a21": { "message": "Konturstørrelse" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } er ikke en gyldig protokol. Den skal være ftp, http, https, mailto, skype, tel eller kan udelades"
-  },
   "page_50c4823d": { "message": "Side" },
   "pages_e5414c2c": { "message": "Sider" },
   "paragraph_5e5ad8eb": { "message": "Afsnit" },

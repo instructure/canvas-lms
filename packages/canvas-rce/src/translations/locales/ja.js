@@ -756,9 +756,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "輪郭の色" },
   "outline_size_a6059a21": { "message": "外形寸法" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p }は、ftp, http, https, mailto, skype, telであるか、省略可能である有効なプロトコルではありません。"
-  },
   "page_50c4823d": { "message": "ページ" },
   "pages_e5414c2c": { "message": "ページ" },
   "paragraph_5e5ad8eb": { "message": "段落" },

@@ -804,9 +804,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Color de contorno" },
   "outline_size_a6059a21": { "message": "Tamaño de contorno" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } no es un protocolo válido, que debe ser ftp, http, https, mailto, skype, tel, o puede omitirse"
-  },
   "page_50c4823d": { "message": "Página" },
   "pages_e5414c2c": { "message": "Páginas" },
   "paragraph_5e5ad8eb": { "message": "Párrafo" },
