@@ -17,10 +17,12 @@
  */
 
 import React, {useRef, useState} from 'react'
-import {ActionPrompt, EMAIL_REGEX, ReCaptcha, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
+import type {ReCaptchaSectionRef} from '../../shared/recaptcha/ReCaptchaSection'
+import {ActionPrompt, EMAIL_REGEX, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {ReCaptchaSection} from '../../shared/recaptcha'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {
@@ -50,21 +52,19 @@ const Student = () => {
   const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [email, setEmail] = useState('')
-  const [joinCode, setJoinCode] = useState('')
-  const [name, setName] = useState('')
-  const [password, setPassword] = useState('')
-  const [termsAccepted, setTermsAccepted] = useState(false)
-  const [username, setUsername] = useState('')
-
   const [confirmPasswordError, setConfirmPasswordError] = useState('')
+  const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [joinCode, setJoinCode] = useState('')
   const [joinCodeError, setJoinCodeError] = useState('')
+  const [name, setName] = useState('')
   const [nameError, setNameError] = useState('')
+  const [password, setPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const [termsError, setTermsError] = useState('')
+  const [username, setUsername] = useState('')
   const [usernameError, setUsernameError] = useState('')
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
@@ -72,6 +72,9 @@ const Student = () => {
   const nameInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
   const usernameInputRef = useRef<HTMLInputElement | null>(null)
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
   const validateForm = (): boolean => {
     if (name.trim() === '') {
@@ -138,12 +141,9 @@ const Student = () => {
       setTermsError('')
     }
 
-    if (recaptchaKey && !captchaToken) {
-      showFlashAlert({
-        message: I18n.t('Please complete the reCAPTCHA verification.'),
-        type: 'error',
-      })
-      return false
+    if (recaptchaKey) {
+      const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
+      if (!recaptchaValid) return false
     }
 
     return true
@@ -275,6 +275,12 @@ const Student = () => {
     navigate(ROUTES.SIGN_IN)
   }
 
+  const handleReCaptchaVerify = (token: string | null) => {
+    // eslint-disable-next-line no-console
+    if (!token) console.error('Failed to get a valid reCAPTCHA token')
+    setCaptchaToken(token)
+  }
+
   return (
     <Flex direction="column" gap="large">
       <Flex direction="column" gap="small">
@@ -376,8 +382,12 @@ const Student = () => {
           )}
 
           {recaptchaKey && (
-            <Flex justifyItems="center" alignItems="center">
-              <ReCaptcha siteKey={recaptchaKey} onVerify={token => setCaptchaToken(token)} />
+            <Flex justifyItems="center">
+              <ReCaptchaSection
+                ref={recaptchaSectionRef}
+                recaptchaKey={recaptchaKey}
+                onVerify={handleReCaptchaVerify}
+              />
             </Flex>
           )}
 

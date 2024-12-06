@@ -17,10 +17,12 @@
  */
 
 import React, {useRef, useState} from 'react'
-import {ActionPrompt, EMAIL_REGEX, ReCaptcha, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
+import type {ReCaptchaSectionRef} from '../../shared/recaptcha/ReCaptchaSection'
+import {ActionPrompt, EMAIL_REGEX, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {ReCaptchaSection} from '../../shared/recaptcha'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {createErrorMessage, handleRegistrationRedirect} from '../../shared/helpers'
@@ -49,10 +51,12 @@ const Teacher = () => {
   const [nameError, setNameError] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [termsError, setTermsError] = useState('')
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const nameInputRef = useRef<HTMLInputElement | null>(null)
+
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
   const validateForm = (): boolean => {
     if (!EMAIL_REGEX.test(email)) {
@@ -80,12 +84,9 @@ const Teacher = () => {
       setTermsError('')
     }
 
-    if (recaptchaKey && !captchaToken) {
-      showFlashAlert({
-        message: I18n.t('Please complete the reCAPTCHA verification.'),
-        type: 'error',
-      })
-      return false
+    if (recaptchaKey) {
+      const recaptchaValid = recaptchaSectionRef.current?.validate() ?? true
+      if (!recaptchaValid) return false
     }
 
     return true
@@ -153,6 +154,12 @@ const Teacher = () => {
     navigate(ROUTES.SIGN_IN)
   }
 
+  const handleReCaptchaVerify = (token: string | null) => {
+    // eslint-disable-next-line no-console
+    if (!token) console.error('Failed to get a valid reCAPTCHA token')
+    setCaptchaToken(token)
+  }
+
   return (
     <Flex direction="column" gap="large">
       <Flex direction="column" gap="small">
@@ -204,8 +211,12 @@ const Teacher = () => {
           )}
 
           {recaptchaKey && (
-            <Flex justifyItems="center" alignItems="center">
-              <ReCaptcha siteKey={recaptchaKey} onVerify={token => setCaptchaToken(token)} />
+            <Flex justifyItems="center">
+              <ReCaptchaSection
+                ref={recaptchaSectionRef}
+                recaptchaKey={recaptchaKey}
+                onVerify={handleReCaptchaVerify}
+              />
             </Flex>
           )}
 

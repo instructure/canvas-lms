@@ -62,6 +62,9 @@ const ReCaptcha = ({siteKey, onVerify}: Props) => {
           size,
           theme: 'light',
           callback: onVerify,
+          'expired-callback': () => {
+            onVerify(null)
+          },
         })
         captchaRenderedRef.current = true
       }
@@ -71,7 +74,6 @@ const ReCaptcha = ({siteKey, onVerify}: Props) => {
   return (
     <View
       as="div"
-      role="presentation"
       elementRef={element => {
         containerRef.current = element as HTMLDivElement
       }}
