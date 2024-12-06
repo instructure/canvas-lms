@@ -82,6 +82,10 @@ Pseudonym.prototype.errorMap = function (policy) {
       no_digits: I18n.t('errors.no_digits', 'Must include at least one number'),
       no_symbols: I18n.t('errors.no_symbols', 'Must include at least one symbol'),
       confirmation: I18n.t('errors.mismatch', "Doesn't match"),
+      unexpected: I18n.t(
+        'errors.unexpected',
+        'An unexpected error occurred. Please try again later.'
+      ),
     },
     password_confirmation: {
       confirmation: I18n.t('errors.mismatch', "Doesn't match"),
