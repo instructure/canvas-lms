@@ -144,6 +144,22 @@ describe('Review Screen Wrapper', () => {
     expect(screen.getByText('Naming')).toBeInTheDocument()
   })
 
+  it('renders appropriate text when no nickname is defined', () => {
+    renderComponent(
+      {},
+      {
+        naming: {
+          nickname: undefined,
+          placements: {},
+        },
+      }
+    )
+
+    screen.debug(undefined, 100000)
+
+    expect(screen.getByText(/no nickname provided/i)).toBeInTheDocument()
+  })
+
   it('renders the icon URLs section', () => {
     renderComponent()
 

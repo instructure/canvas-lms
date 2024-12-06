@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
@@ -25,6 +25,15 @@ import {ZPublicJwk} from '../../model/internal_lti_configuration/PublicJwk'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 
 const I18n = useI18nScope('lti_registrations')
+
+export type LaunchSettingsValidationMessages = {
+  redirectUrisMessages: FormMessage[]
+  targetLinkURIMessages: FormMessage[]
+  openIDConnectInitiationURLMessages: FormMessage[]
+  jwkMessages: FormMessage[]
+  domainMessages: FormMessage[]
+  customFieldsMessages: FormMessage[]
+}
 
 export const useValidateLaunchSettings = (
   launchSettings: Partial<{
@@ -38,8 +47,8 @@ export const useValidateLaunchSettings = (
     customFields: string
   }>,
   internalConfig: InternalLtiConfiguration
-) => {
-  const redirectUrisMessages: FormMessage[] = React.useMemo(() => {
+): LaunchSettingsValidationMessages => {
+  const redirectUrisMessages: FormMessage[] = useMemo(() => {
     const uris = launchSettings.redirectURIs?.trim().split('\n') ?? []
     if (uris.length < 1) {
       return [{text: I18n.t('At least one required'), type: 'error'}]
@@ -50,7 +59,7 @@ export const useValidateLaunchSettings = (
     }
   }, [launchSettings.redirectURIs])
 
-  const targetLinkURIMessages: FormMessage[] = React.useMemo(() => {
+  const targetLinkURIMessages: FormMessage[] = useMemo(() => {
     const value = launchSettings.targetLinkURI ?? internalConfig.target_link_uri
     if (!value) {
       return [{text: I18n.t('Required'), type: 'error'}]
@@ -61,14 +70,14 @@ export const useValidateLaunchSettings = (
     }
   }, [launchSettings.targetLinkURI, internalConfig.target_link_uri])
 
-  const openIDConnectInitiationURLMessages: FormMessage[] = React.useMemo(() => {
+  const openIDConnectInitiationURLMessages: FormMessage[] = useMemo(() => {
     if (isValidHttpUrl(launchSettings.openIDConnectInitiationURL || '')) {
       return []
     }
     return [{text: I18n.t('Invalid URL'), type: 'error'}]
   }, [launchSettings.openIDConnectInitiationURL])
 
-  const jwkMessages: FormMessage[] = React.useMemo(() => {
+  const jwkMessages: FormMessage[] = useMemo(() => {
     if (launchSettings.JwkMethod === 'public_jwk') {
       const jwk =
         launchSettings.Jwk ??
@@ -103,12 +112,17 @@ export const useValidateLaunchSettings = (
     launchSettings.JwkURL,
   ])
 
-  const domainMessages: FormMessage[] = React.useMemo(() => {
+  const domainMessages: FormMessage[] = useMemo(() => {
     const value = launchSettings.domain ?? internalConfig.domain
-    if (!value || value.length === 0) {
-      return []
-    } else if (!isValidDomainName(value)) {
-      return [{text: I18n.t('Invalid Domain'), type: 'error'}]
+    if (value && !isValidDomainName(value)) {
+      return [
+        {
+          text: I18n.t(
+            'Invalid Domain. Please ensure the domain does not start with http:// or https://.'
+          ),
+          type: 'error',
+        },
+      ]
     } else {
       return []
     }

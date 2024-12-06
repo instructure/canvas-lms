@@ -22,7 +22,6 @@ import type {InternalLtiConfiguration} from '../../model/internal_lti_configurat
 import type {Lti1p3RegistrationWizardStep} from '../Lti1p3RegistrationWizardState'
 import {toUndefined} from '../../../common/lib/toUndefined'
 import {getDefaultPlacementTextFromConfig} from './helpers'
-import type {LtiPlacement} from '../../model/LtiPlacement'
 
 export type ReviewScreenWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -52,7 +51,7 @@ export const ReviewScreenWrapper = ({
   const defaultPlacementIconUrls = Object.fromEntries(
     internalConfig.placements.map(placement => [placement.placement, placement.icon_url])
   )
-  const name = state.naming.nickname ?? internalConfig.title
+  const name = state.naming.nickname
 
   const description = state.naming.description ?? toUndefined(internalConfig.description)
 

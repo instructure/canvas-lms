@@ -37,7 +37,6 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {toUndefined} from '../../../common/lib/toUndefined'
-import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -120,7 +119,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
             name="jwkMethod"
             description={I18n.t('JWK Method')}
             value={launchSettings.JwkMethod}
-            onChange={(e, value) => actions.setJwkMethod(value as 'public_jwk_url' | 'public_jwk')}
+            onChange={(_, value) => actions.setJwkMethod(value as 'public_jwk_url' | 'public_jwk')}
             layout="columns"
           >
             <RadioInput value="public_jwk_url" label={I18n.t('Public JWK URL')} />

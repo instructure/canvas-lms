@@ -161,7 +161,12 @@ describe('useValidateLaunchSettings', () => {
 
     const {result} = renderHook(() => useValidateLaunchSettings(launchSettings, internalConfig))
 
-    expect(result.current.domainMessages).toEqual([{text: 'Invalid Domain', type: 'error'}])
+    expect(result.current.domainMessages).toEqual([
+      {
+        text: 'Invalid Domain. Please ensure the domain does not start with http:// or https://.',
+        type: 'error',
+      },
+    ])
   })
 
   it('should return error for invalid custom fields format', () => {
