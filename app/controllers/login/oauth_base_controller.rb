@@ -72,8 +72,9 @@ class Login::OAuthBaseController < ApplicationController
     end
 
     pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(unique_ids, @aac)
-    unless pseudonym
-      return if need_email_verification?(unique_ids, @aac)
+    if !pseudonym && need_email_verification?(unique_ids, @aac)
+      increment_statsd(:failure, reason: :need_email_verification)
+      return
     end
 
     if pseudonym
@@ -94,6 +95,7 @@ class Login::OAuthBaseController < ApplicationController
     else
       logger.warn "Received OAuth2 login for unknown user: #{unique_ids.inspect}"
       redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: unique_id))
+      increment_statsd(:failure, reason: :unknown_user)
     end
   end
 end

@@ -34,6 +34,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       aac.debug_set(:authorize_url, authorize_url)
     end
 
+    increment_statsd(:attempts)
     redirect_to authorize_url
   end
 
@@ -41,6 +42,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     return unless validate_request
 
     @aac = AuthenticationProvider.find(jwt["aac_id"])
+    increment_statsd(:attempts)
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::OAuth2)
 
     debugging = @aac.debugging? && jwt["nonce"] == @aac.debug_get(:nonce)
@@ -58,6 +60,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         token.options[:nonce] = jwt["nonce"]
       rescue => e
         @aac.debug_set(:get_token_response, e) if debugging
+        increment_statsd(:failure, reason: :get_token)
         raise
       end
       begin
@@ -83,11 +86,13 @@ class Login::OAuth2Controller < Login::OAuthBaseController
 
   def handle_expired_token
     flash[:delegated_message] = t("It took too long to login. Please try again")
+    increment_statsd(:failure, reason: :stale_session)
     redirect_to login_url
   end
 
   def handle_external_timeout
     flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
+    increment_statsd(:failure, reason: :timeout)
     redirect_to login_url
     false
   end
@@ -101,6 +106,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
 
     begin
       if jwt["nonce"].blank? || jwt["nonce"] != session.delete(:oauth2_nonce)
+        increment_statsd(:failure, reason: :invalid_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
     rescue Canvas::Security::TokenExpired
@@ -118,5 +124,9 @@ class Login::OAuth2Controller < Login::OAuthBaseController
              else
                {}
              end
+  end
+
+  def auth_type
+    "oauth2"
   end
 end

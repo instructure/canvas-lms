@@ -498,6 +498,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     path.exist? ? path.to_s : nil
   end
 
+  def slo?
+    idp = idp_metadata.identity_providers.first
+    !idp.single_logout_services.empty?
+  end
+
   def user_logout_redirect(controller, current_user)
     session = controller.session
 

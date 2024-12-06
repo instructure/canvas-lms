@@ -32,8 +32,13 @@ class Login::CasController < ApplicationController
 
   def new
     # CAS sends a GET with a ticket when it's doing a login
-    return create if params[:ticket]
+    if params[:ticket]
+      params[:action] = :create
+      return create
+    end
 
+    aac
+    increment_statsd(:attempts)
     redirect_to client.add_service_to_login_url(cas_login_url)
   end
 
@@ -41,6 +46,7 @@ class Login::CasController < ApplicationController
     logger.info "Attempting CAS login with ticket #{params[:ticket]} in account #{@domain_root_account.id}"
     # only record further information if we're the first incoming ticket to fill out debugging info
     debugging = aac.debug_set(:ticket_received, params[:ticket], overwrite: false) if aac.debugging?
+    increment_statsd(:attempts)
 
     st = CASClient::ServiceTicket.new(params[:ticket], cas_login_url)
     begin
@@ -53,13 +59,13 @@ class Login::CasController < ApplicationController
       logger.warn "Failed to validate CAS ticket: #{e.inspect}"
 
       if e.is_a?(Timeout::Error)
-        tags = { auth_type: aac.auth_type, auth_provider_id: aac.global_id, domain: request.host }
         if e.respond_to?(:error_count)
-          tags[:error_count] = e.error_count
-          InstStatsd::Statsd.increment(statsd_timeout_cutoff, tags:)
+          increment_statsd(:failure, reason: :timeout, tags: { error_count: e.error_count })
         else
-          InstStatsd::Statsd.increment(statsd_timeout_error, tags:)
+          increment_statsd(:failure, reason: :timeout)
         end
+      else
+        increment_statsd(:failure, reason: :validation_error)
       end
 
       aac.debug_set(:validate_service_ticket, t("Failed to validate CAS ticket: %{error}", error: e)) if debugging
@@ -93,6 +99,7 @@ class Login::CasController < ApplicationController
       else
         logger.warn "Received CAS login for unknown user: #{st.user}"
         redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}", user: st.user))
+        increment_statsd(:failure, reason: :unknown_user)
       end
     else
       if debugging
@@ -106,6 +113,7 @@ class Login::CasController < ApplicationController
       flash[:delegated_message] = t("There was a problem logging in at %{institution}",
                                     institution: @domain_root_account.display_name)
       redirect_to login_url
+      increment_statsd(:failure, reason: :invalid_ticket)
     end
   end
 
@@ -117,9 +125,15 @@ class Login::CasController < ApplicationController
       return render plain: "NOT SUPPORTED", status: :method_not_allowed
     elsif params["logoutRequest"] &&
           (match = params["logoutRequest"].match(CAS_SAML_LOGOUT_REQUEST))
+      increment_statsd(:attempts)
       # we *could* validate the timestamp here, but the whole request is easily spoofed anyway, so there's no
       # point. all the security is in the ticket being secret and non-predictable
-      return render plain: "OK", status: :ok if Pseudonym.expire_cas_ticket(match[:session_index])
+      if Pseudonym.expire_cas_ticket(match[:session_index])
+        increment_statsd(:success)
+        return render plain: "OK", status: :ok
+      else
+        increment_statsd(:failure, reason: :no_session)
+      end
     end
 
     render plain: "NO SESSION FOUND", status: :not_found
@@ -136,5 +150,9 @@ class Login::CasController < ApplicationController
 
   def cas_login_url
     url_for({ controller: "login/cas", action: :new }.merge(params.permit(:id).to_unsafe_h))
+  end
+
+  def auth_type
+    AuthenticationProvider::CAS.sti_name
   end
 end

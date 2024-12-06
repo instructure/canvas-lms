@@ -25,6 +25,7 @@ class OAuth2ProviderController < ApplicationController
   skip_before_action :require_reacceptance_of_terms, only: %i[token destroy]
 
   include Lti::Concerns::ParentFrame # allow_trusted_tools_to_embed_this_page!
+  include Login::Shared
 
   def auth
     if params[:code] || params[:error]
@@ -183,8 +184,9 @@ class OAuth2ProviderController < ApplicationController
     if params[:expire_sessions]
       if session[:login_aac]
         # The AAC could have been deleted since the user logged in
-        aac = AuthenticationProvider.where(id: session[:login_aac]).first
-        redirect = aac.try(:user_logout_redirect, self, @current_user)
+        @aac = AuthenticationProvider.where(id: session[:login_aac]).first
+        redirect = @aac.try(:user_logout_redirect, self, @current_user)
+        increment_statsd(:attempts, action: :slo) if @aac&.slo?
       end
       logout_current_user
     end
