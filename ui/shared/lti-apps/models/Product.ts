@@ -37,6 +37,20 @@ export type Product = {
   integration_resources: IntegrationResources
 }
 
+export type ToolStatus = {
+  id: number
+  name: string
+  description: string
+  color: string
+}
+
+export type OrganizationProduct = Product & {
+  organization_tool: {
+    privacy_status: ToolStatus
+    product_status: ToolStatus
+  }
+}
+
 export type Company = {
   id: number
   name: string
