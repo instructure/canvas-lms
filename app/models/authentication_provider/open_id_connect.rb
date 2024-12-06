@@ -139,6 +139,10 @@ class AuthenticationProvider
       session[:oidc_id_token_sid] = id_token["sid"] if id_token["sid"]
     end
 
+    def slo?
+      end_session_endpoint.present?
+    end
+
     def user_logout_redirect(controller, _current_user)
       return super unless end_session_endpoint.present?
 

@@ -91,8 +91,9 @@ class LoginController < ApplicationController
 
     if session[:login_aac]
       # The AAC could have been deleted since the user logged in
-      aac = AuthenticationProvider.where(id: session[:login_aac]).first
-      redirect = aac.try(:user_logout_redirect, self, @current_user)
+      @aac = AuthenticationProvider.where(id: session[:login_aac]).first
+      redirect = @aac.try(:user_logout_redirect, self, @current_user)
+      increment_statsd(:attempts, action: :slo) if @aac&.slo?
     end
 
     flash[:logged_out] = true if redirect.nil?
@@ -163,6 +164,7 @@ class LoginController < ApplicationController
         auth_discovery_url << "message=#{URI::DEFAULT_PARSER.escape(flash[:delegated_message])}"
       end
       redirect_to auth_discovery_url, @domain_root_account.auth_discovery_url_options(request)
+      increment_statsd(:discovery_redirect)
     end
   end
 
