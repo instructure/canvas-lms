@@ -19,10 +19,15 @@
 // I really want to use the native URL api, but it's requirement of an absolute URL
 // or a base URL makes testing difficult, esp since window.location is "about:blank"
 // in mocha tests.
-import {parse, format} from 'url'
+
+// eslint-disable-next-line import/no-nodejs-modules
+import {parse, format, UrlWithParsedQuery} from 'url'
 import RCEGlobals from '../rce/RCEGlobals'
 
-function parseCanvasUrl(url, canvasOrigin = window.location.origin) {
+function parseCanvasUrl(
+  url: string | undefined | null,
+  canvasOrigin: string = window.location.origin
+): UrlWithParsedQuery | null {
   if (!url) {
     return null
   }
@@ -34,8 +39,8 @@ function parseCanvasUrl(url, canvasOrigin = window.location.origin) {
   return parsed
 }
 
-export function absoluteToRelativeUrl(url, canvasOrigin) {
-  const parsed = parseCanvasUrl(url, canvasOrigin)
+export function absoluteToRelativeUrl(url: string, canvasOrigin?: string): string {
+  const parsed = parseCanvasUrl(url, canvasOrigin || window.location.origin)
   if (!parsed) {
     return url
   }
@@ -47,17 +52,31 @@ export function absoluteToRelativeUrl(url, canvasOrigin) {
   return newUrl
 }
 
-function changeDownloadToWrapParams(parsedUrl) {
-  delete parsedUrl.search
-  delete parsedUrl.query.download_frd
+function changeDownloadToWrapParams(parsedUrl: UrlWithParsedQuery): UrlWithParsedQuery {
+  if (parsedUrl.search) {
+    // @ts-expect-error
+    delete parsedUrl.search
+  }
+  if (parsedUrl.query && parsedUrl.query.download_frd !== undefined) {
+    delete parsedUrl.query.download_frd
+  }
+  if (!parsedUrl.query) {
+    parsedUrl.query = {}
+  }
   parsedUrl.query.wrap = '1'
-  parsedUrl.pathname = parsedUrl.pathname.replace(/\/(?:download|preview)\/?$/, '')
+  if (parsedUrl.pathname) {
+    parsedUrl.pathname = parsedUrl.pathname.replace(/\/(?:download|preview)\/?$/, '')
+  }
   return parsedUrl
 }
 
-function addContext(parsedUrl, contextType, contextId) {
+function addContext(
+  parsedUrl: UrlWithParsedQuery,
+  contextType: string,
+  contextId: string | number
+): UrlWithParsedQuery {
   // if this is a http://canvas/files... url. change it to be contextual
-  if (/^\/files/.test(parsedUrl.pathname)) {
+  if (parsedUrl.pathname && /^\/files/.test(parsedUrl.pathname)) {
     const context = contextType.replace(/([^s])$/, '$1s') // canvas contexts are plural
     parsedUrl.pathname = `/${context}/${contextId}${parsedUrl.pathname}`
   }
@@ -67,7 +86,7 @@ function addContext(parsedUrl, contextType, contextId) {
 // simply replaces the download_frd url param with wrap
 // wrap=1 will (often) cause the resource to be loaded
 // in an iframe on canvas' files page
-export function downloadToWrap(url) {
+export function downloadToWrap(url: string): string {
   const parsed = parseCanvasUrl(url)
   if (!parsed) {
     return url
@@ -81,12 +100,17 @@ export function downloadToWrap(url) {
 // If it is a user file or being referenced from a different origin, add the verifier
 // NOTE: this can be removed once canvas-rce-api is updated
 //       to normalize the file URLs it returns.
-export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
+export function fixupFileUrl(
   // it's annoying, but depending on how we got here
   // the file may have an href or a url
+  contextType: string,
+  contextId: string | number,
+  fileInfo: {href?: string; url?: string; uuid?: string},
+  canvasOrigin?: string
+): {href?: string; url?: string; uuid?: string} {
   const key = fileInfo.href ? 'href' : 'url'
   if (fileInfo[key]) {
-    let parsed = parseCanvasUrl(fileInfo[key], canvasOrigin)
+    let parsed = parseCanvasUrl(fileInfo[key], canvasOrigin || window.location.origin)
     if (!parsed) {
       return fileInfo
     }
@@ -101,6 +125,7 @@ export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
           canvasOrigin !== window.location.origin &&
           RCEGlobals.getFeatures()?.file_verifiers_for_quiz_links))
     ) {
+      // @ts-expect-error
       delete parsed.search
       parsed.query.verifier = fileInfo.uuid
     } else {
@@ -116,14 +141,15 @@ export function fixupFileUrl(contextType, contextId, fileInfo, canvasOrigin) {
 // This is appropriate for images in some rce content.
 // Remove wrap=1 to indicate we want the file downloaded
 // (which is necessary to show in an <img> tag), not viewed
-export function prepEmbedSrc(url, canvasOrigin = window.location.origin) {
+export function prepEmbedSrc(url: string, canvasOrigin: string = window.location.origin): string {
   const parsed = parseCanvasUrl(url, canvasOrigin)
   if (!parsed) {
     return url
   }
-  if (!/\/preview(?:\?|$)/.test(parsed.pathname)) {
+  if (parsed.pathname && !/\/preview(?:\?|$)/.test(parsed.pathname)) {
     parsed.pathname = parsed.pathname.replace(/(?:\/download)?\/?(\?|$)/, '/preview$1')
   }
+  // @ts-expect-error
   delete parsed.search
   delete parsed.query.wrap
   return format(parsed)
@@ -131,12 +157,15 @@ export function prepEmbedSrc(url, canvasOrigin = window.location.origin) {
 
 // when the user opens a link to a resource, we want its view
 // logged, so remove /preview
-export function prepLinkedSrc(url) {
+export function prepLinkedSrc(url: string): string {
   const parsed = parseCanvasUrl(url)
   if (!parsed) {
     return url
   }
+  // @ts-expect-error
   delete parsed.search
-  parsed.pathname = parsed.pathname.replace(/\/preview(\?|$)/, '$1')
+  if (parsed.pathname) {
+    parsed.pathname = parsed.pathname.replace(/\/preview(\?|$)/, '$1')
+  }
   return format(parsed)
 }
