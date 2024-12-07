@@ -42,32 +42,38 @@ class FilePreviewInfoPanel extends React.Component {
           <tbody>
             <tr>
               <th scope="row">{I18n.t('Name')}</th>
-              <td ref="displayName">{this.props.displayedItem.displayName()}</td>
+              <td data-testid="display-name" ref="displayName">
+                {this.props.displayedItem.displayName()}
+              </td>
             </tr>
             <tr>
               <th scope="row">{I18n.t('Status')}</th>
-              <td ref="status">{getFileStatus(this.props.displayedItem)}</td>
+              <td data-testid="status" ref="status">
+                {getFileStatus(this.props.displayedItem)}
+              </td>
             </tr>
             <tr>
               <th scope="row">{I18n.t('Kind')}</th>
-              <td ref="contentType">
+              <td data-testid="content-type" ref="contentType">
                 {mimeClass.displayName(this.props.displayedItem.get('content-type'))}
               </td>
             </tr>
             <tr>
               <th scope="row">{I18n.t('Size')}</th>
-              <td ref="size">{friendlyBytes(this.props.displayedItem.get('size'))}</td>
+              <td data-testid="size" ref="size">
+                {friendlyBytes(this.props.displayedItem.get('size'))}
+              </td>
             </tr>
             <tr>
               <th scope="row">{I18n.t('Date Modified')}</th>
-              <td id="dateModified" ref="dateModified">
+              <td id="dateModified" data-testid="date-modified" ref="dateModified">
                 <FriendlyDatetime dateTime={this.props.displayedItem.get('updated_at')} />
               </td>
             </tr>
             {this.props.displayedItem.get('user') && (
               <tr>
                 <th scope="row">{I18n.t('Last Modified By')}</th>
-                <td ref="modifedBy">
+                <td data-testid="modified-by" ref="modifedBy">
                   <a href={this.props.displayedItem.get('user').html_url}>
                     {this.props.displayedItem.get('user').display_name}
                   </a>
@@ -76,7 +82,7 @@ class FilePreviewInfoPanel extends React.Component {
             )}
             <tr>
               <th scope="row">{I18n.t('Date Created')}</th>
-              <td id="dateCreated">
+              <td id="dateCreated" data-testid="date-created">
                 <FriendlyDatetime dateTime={this.props.displayedItem.get('created_at')} />
               </td>
             </tr>
@@ -87,14 +93,14 @@ class FilePreviewInfoPanel extends React.Component {
                   {this.props.displayedItem &&
                     this.props.displayedItem.get('usage_rights') &&
                     this.props.displayedItem.get('usage_rights').license_name && (
-                      <div ref="licenseName">
+                      <div data-testid="license-name" ref="licenseName">
                         {this.props.displayedItem.get('usage_rights').license_name}
                       </div>
                     )}
                   {this.props.displayedItem &&
                     this.props.displayedItem.get('usage_rights') &&
                     this.props.displayedItem.get('usage_rights').legal_copyright && (
-                      <div ref="legalCopyright">
+                      <div data-testid="legal-copyright" ref="legalCopyright">
                         {this.props.displayedItem.get('usage_rights').legal_copyright}
                       </div>
                     )}
