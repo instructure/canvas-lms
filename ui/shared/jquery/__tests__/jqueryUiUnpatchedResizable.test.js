@@ -19,34 +19,31 @@
 import $ from 'jquery'
 import 'jqueryui/resizable'
 
-QUnit.module('Resizable Widget', {
-  beforeEach() {
-    // Setup code that runs before each test
+describe('Resizable Widget', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="fixtures"></div>'
     $('#fixtures').append(
       '<div id="resizable-element" style="width: 100px; height: 100px;">Resizable Element</div>'
     )
-    $('#resizable-element').resizable() // Initialize resizable widget
-  },
-  afterEach() {
-    // Teardown code that runs after each test
-    $('#fixtures').empty()
-  },
-})
-
-QUnit.test('Resizable widget is initialized', function (assert) {
-  const $resizableElement = $('#resizable-element')
-
-  assert.ok($resizableElement.hasClass('ui-resizable'), 'Resizable element has class ui-resizable')
-})
-
-QUnit.test('Resize event is triggered', function (assert) {
-  const $resizableElement = $('#resizable-element')
-  let resizeTriggered = false
-
-  $resizableElement.on('resize', function () {
-    resizeTriggered = true
+    $('#resizable-element').resizable()
   })
-  $resizableElement.trigger('resize') // Trigger resize event
 
-  assert.ok(resizeTriggered, 'Resize event is triggered')
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  it('initializes with resizable class', () => {
+    const $resizableElement = $('#resizable-element')
+    expect($resizableElement.hasClass('ui-resizable')).toBe(true)
+  })
+
+  it('triggers resize event', () => {
+    const $resizableElement = $('#resizable-element')
+    const resizeHandler = jest.fn()
+
+    $resizableElement.on('resize', resizeHandler)
+    $resizableElement.trigger('resize')
+
+    expect(resizeHandler).toHaveBeenCalled()
+  })
 })
