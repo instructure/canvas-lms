@@ -64,6 +64,7 @@ PublishCloud.render = function () {
     if (this.state.published && this.state.restricted) {
       return (
         <button
+          data-testid="restricted-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -82,6 +83,7 @@ PublishCloud.render = function () {
     } else if (this.state.published && this.state.hidden) {
       return (
         <button
+          data-testid="hidden-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -102,6 +104,7 @@ PublishCloud.render = function () {
     } else if (this.state.published) {
       return (
         <button
+          data-testid="published-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -117,6 +120,7 @@ PublishCloud.render = function () {
     } else {
       return (
         <button
+          data-testid="unpublished-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -133,6 +137,7 @@ PublishCloud.render = function () {
   } else if (this.state.published && this.state.restricted) {
     return (
       <div
+        data-testid="restricted-status"
         style={{marginRight: '12px'}}
         data-tooltip="left"
         ref="publishCloud"
