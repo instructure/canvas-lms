@@ -64,7 +64,7 @@ export default class StudentDetailsView extends React.Component {
       return null
     }
     return (
-      <header className="crs-student-details__header">
+      <header className="crs-student-details__header" data-testid="student-details-header">
         {/* TODO: use InstUI button */}
         <button
           type="button"
@@ -89,7 +89,10 @@ export default class StudentDetailsView extends React.Component {
     const conversationUrl = `/conversations?context_id=course_${assignment.course_id}&user_id=${student.id}&user_name=${student.name}`
 
     return (
-      <section className="crs-student-details__profile-content">
+      <section
+        className="crs-student-details__profile-content"
+        data-testid="student-details-profile"
+      >
         <button
           className="Button Button--icon-action student-details__prev-student"
           aria-label={I18n.t('view previous student')}
@@ -143,7 +146,7 @@ export default class StudentDetailsView extends React.Component {
     }
 
     return (
-      <section className="crs-student-details__score-content">
+      <section className="crs-student-details__score-content" data-testid="student-details-scores">
         <h3 className="crs-student-details__score-number">
           {i18nGrade(submission.grade, assignment)}
         </h3>
@@ -211,7 +214,7 @@ export default class StudentDetailsView extends React.Component {
     })
 
     return (
-      <div className={studentDetailsClasses}>
+      <div className={studentDetailsClasses} data-testid="student-details">
         {this.renderHeader()}
         {this.renderContent()}
       </div>
