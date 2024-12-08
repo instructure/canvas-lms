@@ -28,6 +28,8 @@ development:
         use_for_mml: 'false'
       rich-content-service:
         app-host: 'http://rce.canvas.docker:3000'
+      horizon:
+        redirect_url: 'https://cd.canvashorizon.com/redirect'
     # another service
     pandata:
       ios-pandata-key: IOS_pandata_key
