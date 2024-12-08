@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,12 +18,14 @@
 
 import moment from 'moment'
 
-QUnit.module('moment module test')
+describe('moment module', () => {
+  describe('locales', () => {
+    it('includes the mi-nz locale', () => {
+      // webpack does not load up all locales by default.
+      // we have to ask for it specifically
+      require('../../../ext/custom_moment_locales/mi_nz')
 
-test('moment should include the locale mi-nz', () => {
-  // webpack does not load up all locales by default.
-  // we have to ask for it specifically
-  require('ui/ext/custom_moment_locales/mi_nz')
-
-  notEqual(moment.localeData('mi-nz'), null, 'locale data for mi-nz is not null')
+      expect(moment.localeData('mi-nz')).not.toBeNull()
+    })
+  })
 })
