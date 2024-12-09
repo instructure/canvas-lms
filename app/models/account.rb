@@ -52,6 +52,8 @@ class Account < ActiveRecord::Base
   has_many :differentiation_tags, -> { non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :all_differentiation_tags, -> { non_collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_differentiation_tag_memberships, source: "group_memberships", through: :all_differentiation_tags
+  has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
+  has_many :active_combined_group_and_differentiation_tag_categories, -> { active }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy

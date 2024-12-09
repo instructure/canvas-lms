@@ -1125,4 +1125,95 @@ describe GroupsController do
       end
     end
   end
+
+  context "Differentiation Tags" do
+    before do
+      Account.default.enable_feature!(:differentiation_tags)
+      course_with_teacher(active_all: true, user: @user)
+      @non_collaborative_group_category = @course.group_categories.create!(name: "Test non collaborative", non_collaborative: true)
+      @non_collaborative_group = @course.groups.create!(name: "Non Collaborative group", group_category: @non_collaborative_group_category)
+      @collaborative_group_category = @course.group_categories.create!(name: "Test collaborative", non_collaborative: false)
+      @collaborative_group = @course.groups.create!(name: "Collaborative group", group_category: @collaborative_group_category)
+      user_session(@teacher)
+    end
+
+    describe "POST create" do
+      it "denies access for users without manage_tags_add permission" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        post "create", params: { course_id: @course.id, group: { name: "some group", group_category_id: @non_collaborative_group_category.id } }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(Group.count).to eq(2)
+      end
+
+      it "does not deny access for users without manage_tags_add permission from creating normal group" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        expect(Group.count).to eq(2)
+
+        post "create", params: { course_id: @course.id, group: { name: "some group", group_category_id: @collaborative_group_category.id } }
+        expect(response).to be_redirect
+        expect(Group.count).to eq(3)
+      end
+
+      it "works correctly for users with manage_tags_add permission" do
+        expect(Group.count).to eq(2)
+        post "create", params: { course_id: @course.id, group: { name: "some group", group_category_id: @non_collaborative_group_category.id } }
+
+        expect(response).to be_redirect
+        expect(Group.count).to eq(3)
+      end
+    end
+
+    describe "DELETE destroy" do
+      it "denies access for users without manage_tags_delete permission" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_group.id }
+
+        expect(response).to have_http_status(:unauthorized)
+        expect(Group.exists?(@non_collaborative_group.id)).to be(true) # Group is not deleted
+      end
+
+      it "does noy deny access for users without manage_tags_delete permission from deleting normal group" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission:,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        delete "destroy", params: { course_id: @course.id, id: @collaborative_group.id }
+
+        expect(@course.groups).to include(@collaborative_group)
+        expect(@course.groups.active).not_to include(@collaborative_group)
+      end
+
+      it "works correctly for users with manage_tags_delete permission" do
+        delete "destroy", params: { course_id: @course.id, id: @non_collaborative_group.id }
+
+        expect(@course.differentiation_tags).to include(@non_collaborative_group)
+        expect(@course.differentiation_tags.active).not_to include(@non_collaborative_group)
+      end
+    end
+  end
 end
