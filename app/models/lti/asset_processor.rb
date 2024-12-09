@@ -28,12 +28,21 @@ class Lti::AssetProcessor < ApplicationRecord
   validates :url, length: { maximum: 4.kilobytes }
   validates :title, :workflow_state, length: { maximum: 255 }
   validates :text, length: { maximum: 255 }
-  validates :root_account, presence: true
   validate :validate_associations
 
+  has_many :asset_reports,
+           inverse_of: :asset_processor,
+           class_name: "Lti::AssetReport",
+           foreign_key: :lti_asset_processor_id,
+           dependent: :destroy
+
   def validate_associations
-    if context_external_tool&.root_account&.id != root_account&.id
-      errors.add(:context_external_tool, "context external tool's root account is not the same as root account")
+    if context_external_tool&.root_account&.id != assignment&.root_account&.id
+      errors.add(:context_external_tool, "context external tool's root account is not the same as assignment's root account")
     end
+  end
+
+  def supported_types
+    report.is_a?(Hash) ? report["supportedTypes"] : nil
   end
 end
