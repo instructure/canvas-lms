@@ -21,7 +21,7 @@
 describe Attachment do
   context "validation" do
     it "creates a new instance given valid attributes" do
-      attachment_model
+      expect { attachment_model }.not_to raise_error
     end
 
     it "requires a context" do
@@ -2816,7 +2816,7 @@ describe Attachment do
 
   describe "#process_s3_details!" do
     before :once do
-      attachment_model(filename: "new filename")
+      attachment_model(filename: "new_filename")
     end
 
     before do
@@ -2877,7 +2877,7 @@ describe Attachment do
 
         it "does not retire the new attachment's filename" do
           @attachment.process_s3_details!({})
-          @attachment.reload.filename == "new filename"
+          expect(@attachment.reload.filename).to eq("new_filename")
         end
 
         it "puts the existing attachment under the new attachment" do
