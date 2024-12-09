@@ -213,7 +213,7 @@ const AssigneeSelector = ({
         selectedOptionIds={selectedOptionIds}
         onChange={handleChange}
         renderAfterInput={
-          isLoading ? (
+          isLoading && !ENV.FEATURES?.assign_to_improved_search ? (
             <Spinner
               renderTitle={
                 <ScreenReaderContent>
@@ -225,6 +225,11 @@ const AssigneeSelector = ({
           ) : (
             <></>
           )
+        }
+        placeholder={
+          ENV.FEATURES?.assign_to_improved_search && selectedOptionIds.length <= 2
+            ? I18n.t('Start typing to search...')
+            : undefined
         }
         customOnInputChange={handleInputChange}
         visibleOptionsCount={10}
