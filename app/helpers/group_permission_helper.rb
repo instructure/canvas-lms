@@ -77,6 +77,12 @@ module GroupPermissionHelper
     authorized_action(context, current_user, rights)
   end
 
+  def check_group_context_rights(context:, current_user:, action_category:, non_collaborative: nil)
+    rights = determine_rights_for_type(action_category, non_collaborative)
+
+    context.grants_any_right?(current_user, *rights)
+  end
+
   private
 
   def determine_rights_for_type(action_category, is_non_collaborative)
