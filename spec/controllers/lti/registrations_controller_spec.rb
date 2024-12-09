@@ -1033,6 +1033,32 @@ RSpec.describe Lti::RegistrationsController do
       it { is_expected.to have_http_status(:unprocessable_entity) }
     end
 
+    context "with overlay containing nil attribute" do
+      let(:params) do
+        super().tap do |p|
+          p[:overlay] = { "domain" => nil }
+        end
+      end
+
+      it "is successful" do
+        expect(subject).to be_successful
+        expect(registration.overlay_for(account).data[:domain]).to be_nil
+      end
+    end
+
+    context "with configuration containing nil attribute" do
+      let(:params) do
+        super().tap do |p|
+          p[:configuration] = { **internal_configuration, "domain" => nil }
+        end
+      end
+
+      it "is successful" do
+        expect(subject).to be_successful
+        expect(tool_configuration.reload.domain).to be_nil
+      end
+    end
+
     context "without user session" do
       before { remove_user_session }
 
