@@ -82,7 +82,16 @@ class EditPage extends React.Component {
         context_codes: [],
         sub_context_codes: [],
       },
-      formValues: {},
+      formValues: {
+        title: '',
+        description: '',
+        location: '',
+        limitUsersPerSlot: '',
+        limitSlotsPerUser: '',
+        allowStudentsToView: false,
+        allowObserverSignup: false,
+        timeblocks: [],
+      },
       contexts: [],
       isDeleting: false,
       eventDataSource: null,
@@ -259,7 +268,7 @@ class EditPage extends React.Component {
 
   render() {
     return (
-      <div className="EditPage">
+      <div className="EditPage" data-testid="edit-page">
         <Breadcrumb label={I18n.t('You are here:')}>
           <Breadcrumb.Link href="/calendar">{I18n.t('Calendar')}</Breadcrumb.Link>
           {this.state.appointmentGroup.title && (
