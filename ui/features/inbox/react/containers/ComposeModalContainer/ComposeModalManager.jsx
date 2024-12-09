@@ -239,7 +239,7 @@ const ComposeModalManager = props => {
     }
   }
 
-  const onConversationCreateComplete = data => {
+  const onConversationCreateComplete = (data, fullData) => {
     setSendingMessage(false)
     // success is true if there is no error message or if data === true
     const errorMessage = data?.errors
@@ -255,7 +255,8 @@ const ComposeModalManager = props => {
       } else if (props.isReply || props.isReplyAll || props.isForward) {
         setModalError(I18n.t('Error occurred while adding message to conversation'))
       } else {
-        captureException(new Error(`Error occurred while creating conversation message: ${data}`))
+        console.error(fullData)
+        captureException(new Error('Error occurred while creating conversation message'))
         setModalError(I18n.t('Error occurred while creating conversation message'))
       }
 
@@ -267,8 +268,8 @@ const ComposeModalManager = props => {
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data?.createConversation),
-    onError: () => onConversationCreateComplete(false),
+    onCompleted: data => onConversationCreateComplete(data?.createConversation, data),
+    onError: data => onConversationCreateComplete(false, data),
   })
 
   const [addConversationMessage] = useMutation(ADD_CONVERSATION_MESSAGE, {
