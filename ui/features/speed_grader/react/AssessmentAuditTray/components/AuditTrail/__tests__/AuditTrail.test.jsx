@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,19 +17,14 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render, screen} from '@testing-library/react'
 
 import AuditTrail from '../index'
 import {buildEvent} from '../../../__tests__/AuditTrailSpecHelpers'
 import buildAuditTrail from '../../../buildAuditTrail'
 
-QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
-  let $container
-  let props
-
-  suiteHooks.beforeEach(() => {
-    $container = document.body.appendChild(document.createElement('div'))
-
+describe('AssessmentAuditTray AuditTrail', () => {
+  const defaultProps = () => {
     const auditEvents = [
       buildEvent({id: '4901', userId: '1103'}),
       buildEvent({id: '4902', userId: '1101'}),
@@ -40,6 +35,7 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
         {grade: [null, 'A']}
       ),
     ]
+
     const users = [
       {id: '1101', name: 'A sedulous pupil', role: 'student'},
       {id: '1102', name: 'A quizzical administrator', role: 'administrator'},
@@ -49,53 +45,40 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
     const externalTools = []
     const quizzes = []
 
-    props = {
+    return {
       auditTrail: buildAuditTrail({auditEvents, users, externalTools, quizzes}),
     }
-  })
-
-  suiteHooks.afterEach(() => {
-    ReactDOM.unmountComponentAtNode($container)
-    $container.remove()
-  })
-
-  function mountComponent() {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(<AuditTrail {...props} />, $container)
   }
 
-  function getCreatorEventGroups() {
-    return [...$container.querySelector('#assessment-audit-trail').children]
-  }
-
-  function getHeaderContents() {
-    return getCreatorEventGroups().map($group => $group.querySelector('h3').textContent)
-  }
-
-  test('displays a creator event group for each distinct creator', () => {
-    mountComponent()
-    strictEqual(getCreatorEventGroups().length, 4)
+  it('displays a creator event group for each distinct creator', () => {
+    render(<AuditTrail {...defaultProps()} />)
+    const creatorGroups = screen.getAllByRole('button', {
+      name: /Assessment audit events for/,
+    })
+    expect(creatorGroups).toHaveLength(4)
   })
 
-  test('displays the name of the creator in the header', () => {
-    mountComponent()
-
-    const firstHeader = getHeaderContents()[0]
-    ok(firstHeader.includes('A sedulous pupil'))
+  it('displays the name of the creator in the header', () => {
+    render(<AuditTrail {...defaultProps()} />)
+    const heading = screen.getByRole('heading', {
+      name: /A sedulous pupil \(Student\)/,
+    })
+    expect(heading).toBeInTheDocument()
   })
 
-  test('displays the role of the creator in the header', () => {
-    mountComponent()
-
-    const firstHeader = getHeaderContents()[0]
-    ok(firstHeader.includes('Student'))
+  it('displays the role of the creator in the header', () => {
+    render(<AuditTrail {...defaultProps()} />)
+    const heading = screen.getByRole('heading', {
+      name: /\(Student\)/,
+    })
+    expect(heading).toBeInTheDocument()
   })
 
-  test('displays "Unknown User" when the related user is not loaded', () => {
-    // This should never happen in practice. However, better safe than sorry.
-    mountComponent()
-
-    const names = getHeaderContents()
-    ok(names[names.length - 1].includes('Unknown User'))
+  it('displays "Unknown User" when the related user is not loaded', () => {
+    render(<AuditTrail {...defaultProps()} />)
+    const heading = screen.getByRole('heading', {
+      name: /Unknown User \(Unknown Role\)/,
+    })
+    expect(heading).toBeInTheDocument()
   })
 })
