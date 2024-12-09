@@ -220,9 +220,10 @@ export const fetchRegistrationByClientId = (accountId: AccountId, clientId: Deve
     })
   )
 
-export const bindGlobalLtiRegistration = (
+export const setGlobalLtiRegistrationWorkflowState = (
   accountId: AccountId,
-  ltiRegistrationId: LtiRegistrationId
+  ltiRegistrationId: LtiRegistrationId,
+  workflowState: 'on' | 'off'
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
@@ -233,10 +234,20 @@ export const bindGlobalLtiRegistration = (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        workflow_state: 'on',
+        workflow_state: workflowState,
       }),
     })
   )
+
+export const bindGlobalLtiRegistration = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId
+) => setGlobalLtiRegistrationWorkflowState(accountId, ltiRegistrationId, 'on')
+
+export const unbindGlobalLtiRegistration = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId
+) => setGlobalLtiRegistrationWorkflowState(accountId, ltiRegistrationId, 'off')
 
 export type FetchLtiRegistration = (
   accountId: AccountId,
