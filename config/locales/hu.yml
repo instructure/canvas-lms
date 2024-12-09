@@ -6211,6 +6211,7 @@ hu:
   confirm_email_address_9072dd3c: "E-mail cím megerősítése"
   confirm_mastery_calculation_19ad19f9: "Erősítse meg a Jártassági számítást"
   confirm_mastery_scale_9a779252: "Erősítse meg a Jártassági szintet"
+  confirm_password_aaf07824: "Jelszó megerősítése"
   confirm_qr_code_display_49664fa3: "Erősítse meg a QR-kód megjelenítését"
   confirm_reactivation_ec0f30c6: "Erősítse meg az újraaktiválást"
   confirm_removal_a9bb889: "Eltávolítás jóváhagyása"
@@ -13379,6 +13380,7 @@ hu:
   jobs_v2_b20a83f7: "Jobok v2"
   join_6cafecca: Csatlakozás
   join_active_online_meeting_d9d892b2: "Csatlakozzon aktív online találkozóhoz"
+  join_code_1e74e5a8: "Csatlakozási kód"
   join_course_511e6cb3: "Csatlakozzon a %{course} kurzushoz"
   join_group_group_name_871a5e3f: "Csatlakozás a %{group_name} csoporthoz"
   join_online_meeting_b1725843: "Csatlakozzon online találkozóhoz"
@@ -23544,6 +23546,7 @@ hu:
   student_pace_2200bf85: "Hallgatói ütemezés"
   student_page_history_ce86b3c2: "Hallgatói oldal története"
   student_paired_successfully_a88def61: "A Hallgató sikeresen párosítva lett"
+  student_pairing_code_a28d8442: "Hallgató párosítási kód"
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
   student_position_6d3b7750: "Hallgató %{position}"
   student_progress_custom_report_bc7593d4: "Hallgató előrehaladás egyéni jelentés"
@@ -27015,6 +27018,7 @@ hu:
   what_if_score_change_operation_failed_b81afd6d: "Mi történik, ha a pontszámváltási művelet sikertelen"
   what_if_score_input_for_assignmentname_d4092efe: "Mi lenne, ha pontszám a %{assignmentName} feladathoz"
   what_if_score_updated_7565581d: "Mi lenne, ha pontszám frissítve"
+  what_is_a_pairing_code_e312bd48: "Mi az a párosítási kód?"
   what_is_smart_search_9446374d: "Mi az az intelligens keresés?"
   what_it_does_74ec1339: "Mit csinál"
   what_layout_options_are_available_in_the_course_ho_5d364ce3: "Milyen elrendezési lehetőségek állnak rendelkezésre oktatóként a kurzus kezdőlapján?\n\
