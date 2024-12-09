@@ -91,6 +91,19 @@ describe Lti::Overlay do
       end
     end
 
+    context "with a nil attribute" do
+      let(:data) { { domain: nil } }
+
+      it "succeeds" do
+        expect { Lti::Overlay.create!(registration:, account:, updated_by:, data:) }.not_to raise_error
+      end
+
+      it "does not store it" do
+        overlay = Lti::Overlay.create!(registration:, account:, updated_by:, data:)
+        expect(overlay.data).not_to have_key("domain")
+      end
+    end
+
     context "with all valid attributes" do
       it "succeeds" do
         expect { Lti::Overlay.create!(registration:, account:, updated_by:, data:) }.not_to raise_error
@@ -113,7 +126,7 @@ describe Lti::Overlay do
   describe "self.apply_to" do
     subject { Lti::Overlay.apply_to(data, internal_config) }
 
-    let(:internal_config) { tool_configuration.reload.internal_lti_configuration }
+    let(:internal_config) { tool_configuration.reload.internal_lti_configuration.with_indifferent_access }
     let(:data) do
       {
         title: "Hello world!",
@@ -261,6 +274,10 @@ describe Lti::Overlay do
         course = subject[:placements].find { |p| p[:placement] == "course_navigation" }
         expect(course[:default]).to eq("disabled")
         expect(course[:icon_url]).to eq("https://example.com/totally_different")
+      end
+
+      it "doesn't modify the original placement config" do
+        expect { subject }.not_to change { internal_config[:placements].find { |p| p[:placement] == "course_navigation" } }
       end
     end
 

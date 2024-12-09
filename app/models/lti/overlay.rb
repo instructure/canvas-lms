@@ -98,11 +98,11 @@ class Lti::Overlay < ActiveRecord::Base
   end
 
   def data=(data)
-    write_attribute(:data, data&.deep_sort_values) if data.is_a?(Hash)
+    write_attribute(:data, data&.deep_sort_values&.compact) if data.is_a?(Hash)
   end
 
   def validate_data
-    schema_errors = Schemas::Lti::Overlay.validation_errors(data)
+    schema_errors = Schemas::Lti::Overlay.validation_errors(data.compact)
     return if schema_errors.blank?
 
     errors.add(:data, schema_errors.to_json)

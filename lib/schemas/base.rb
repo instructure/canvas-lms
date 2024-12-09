@@ -36,7 +36,7 @@ module Schemas
       end
 
       def validation_errors(json_hash)
-        new.validate(json_hash.compact).pluck("error")
+        new.validate(json_hash).pluck("error")
       end
 
       private
