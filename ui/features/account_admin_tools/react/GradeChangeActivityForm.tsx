@@ -24,7 +24,6 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {
-  focusFiled,
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
@@ -93,6 +92,7 @@ const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormP
     control,
     formState: {errors},
     handleSubmit,
+    setFocus,
   } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
   const startDateInputRef = useRef<DateTimeInput>(null)
   const endDateInputRef = useRef<DateTimeInput>(null)
@@ -100,12 +100,12 @@ const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormP
 
   const handleFormSubmit: SubmitHandler<FormValues> = async data => {
     if (isDateTimeInputInvalid(startDateInputRef)) {
-      focusFiled(control, 'start_time')
+      setFocus('start_time')
       return
     }
 
     if (isDateTimeInputInvalid(endDateInputRef)) {
-      focusFiled(control, 'end_time')
+      setFocus('end_time')
       return
     }
 

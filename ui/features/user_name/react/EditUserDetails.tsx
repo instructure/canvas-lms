@@ -27,7 +27,7 @@ import * as z from 'zod'
 import {Controller, useForm} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {TextInput} from '@instructure/ui-text-input'
-import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -80,6 +80,7 @@ const EditUserDetails = ({
     getValues,
     setValue,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues: userDetails,
     resolver: zodResolver(createValidationSchema(canManageUserDetails)),
@@ -102,8 +103,8 @@ const EditUserDetails = ({
   }
 
   useEffect(() => {
-    focusFiled(control, 'name')
-  }, [control])
+    setFocus('name')
+  }, [setFocus])
 
   return (
     <Modal

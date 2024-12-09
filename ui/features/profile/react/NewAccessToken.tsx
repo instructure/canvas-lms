@@ -29,7 +29,6 @@ import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {
-  focusFiled,
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
@@ -73,6 +72,7 @@ const NewAccessToken = ({onSubmit, onClose}: NewAccessTokenProps) => {
     formState: {errors, isSubmitting},
     control,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues,
     resolver: zodResolver(validationSchema),
@@ -85,7 +85,7 @@ const NewAccessToken = ({onSubmit, onClose}: NewAccessTokenProps) => {
   const handleFormSubmit: SubmitHandler<FormValues> = async token => {
     try {
       if (isDateTimeInputInvalid(expiresAtInputRef)) {
-        focusFiled(control, 'expires_at')
+        setFocus('expires_at')
         return
       }
 

@@ -29,7 +29,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 
 const I18n = useI18nScope('profile')
 
@@ -96,6 +96,7 @@ const RegisterCommunication = ({
     control,
     reset,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues,
     resolver: zodResolver(currentConfig.validationSchema),
@@ -117,7 +118,7 @@ const RegisterCommunication = ({
         selectedTab === Tab.EMAIL ? values.enableEmailLogin : undefined
       )
     } catch {
-      focusFiled(control, selectedTab)
+      setFocus(selectedTab)
     }
   }
 
