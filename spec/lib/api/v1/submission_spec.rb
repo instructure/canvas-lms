@@ -137,16 +137,25 @@ describe Api::V1::Submission do
 
       it "sets needs grading fields if a submission checkpoint needs grading" do
         student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
-        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        parent_assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true, submission_types: "discussion_topics")
         parent_submission = parent_assignment.submissions.find_by(user_id: student.id)
-        topic_sub_assignment = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now)
-        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now)
-        topic_sub_assignment.submit_homework(student, submission_type: "discussion_topic")
+        topic_sub_assignment = parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC, points_possible: 5, due_at: 3.days.from_now, submission_types: "discussion_topics")
+        parent_assignment.sub_assignments.create!(context: parent_assignment.context, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY, points_possible: 10, due_at: 5.days.from_now, submission_types: "discussion_topics")
+        topic_sub_assignment.submit_homework(student, submission_type: "discussion_topics")
 
         json = fake_controller.submission_json(parent_submission, parent_assignment, teacher, session, parent_assignment.context, field, params)
         # gradebook uses these fields to determine a submission needs grading
         expect(json["workflow_state"]).to  eq("pending_review")
-        expect(json["submission_type"]).to eq("discussion_topic")
+        expect(json["submission_type"]).to eq("discussion_topics")
+      end
+
+      it "respects submission_type if submission.needs_grading" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+        assignment = course.assignments.create!(title: "Assignment 1", has_sub_assignments: true)
+        submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "pay attention to me")
+
+        json = fake_controller.submission_json(submission, assignment, teacher, session, assignment.context, field, params)
+        expect(json["submission_type"]).to eq("online_text_entry")
       end
     end
 
