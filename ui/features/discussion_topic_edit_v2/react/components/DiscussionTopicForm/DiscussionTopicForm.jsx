@@ -1295,7 +1295,9 @@ function DiscussionTopicForm({
                       setShowGroupCategoryModal(false)
                       if (!newGroupCategory) return
                       addNewGroupCategoryToCache(apolloClient.cache, newGroupCategory)
-                      setGroupCategoryId(newGroupCategory.id)
+                      setTimeout(() => {
+                        setGroupCategoryId(newGroupCategory.id)
+                      })
                     }}
                     studentSectionCount={sections.length}
                     context={ENV.context_type.toLocaleLowerCase()}

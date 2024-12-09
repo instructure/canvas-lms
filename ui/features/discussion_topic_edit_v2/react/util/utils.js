@@ -43,15 +43,17 @@ export const addNewGroupCategoryToCache = (cache, newCategory) => {
     ENV.context_is_not_group ? 'Course' : 'Group'
   )
 
-  const data = cache.readQuery({
+  const data = JSON.parse(JSON.stringify(cache.readQuery({
     query: contextQueryToUse,
     variables: contextQueryVariables,
-  })
+  })))
 
   const relevantGroupCategoryData = {
     _id: newCategory.id,
+    id: null,
     name: newCategory.name,
     __typename: 'GroupSet',
+    groups: null,
   }
 
   if (data) {
