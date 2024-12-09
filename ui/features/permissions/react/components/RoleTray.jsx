@@ -104,7 +104,7 @@ export default class RoleTray extends Component {
       const message = I18n.t('Cannot change role name to %{label}: already in use', {
         label: trimmedValue,
       })
-      errorMessages = [{text: message, type: 'error'}]
+      errorMessages = [{text: message, type: 'newError'}]
     }
     this.setState({
       editRoleLabelInput: event.target.value,

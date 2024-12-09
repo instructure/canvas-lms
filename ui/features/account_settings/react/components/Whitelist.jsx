@@ -102,7 +102,7 @@ export class Whitelist extends Component {
         errors: [
           {
             text: I18n.t('Invalid domain'),
-            type: 'error',
+            type: 'newError',
           },
         ],
       })

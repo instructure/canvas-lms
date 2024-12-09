@@ -23,7 +23,7 @@ import type {Control, FieldErrors} from 'react-hook-form'
 export const getFormErrorMessage = <T extends {}>(errors: FieldErrors<T>, fieldName: keyof T) => {
   const errorMessage = errors[fieldName]?.message
 
-  return errorMessage ? [{text: errorMessage, type: 'error'} as const] : []
+  return errorMessage ? [{text: errorMessage, type: 'newError'} as const] : []
 }
 
 export const focusFiled = <T extends {}>(control: Control<T, any>, fieldName: keyof T) => {

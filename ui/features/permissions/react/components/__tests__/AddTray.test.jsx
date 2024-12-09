@@ -276,7 +276,7 @@ it('onChangeRoleLabel sets error if role is used', () => {
   const expectedErrorState = [
     {
       text: 'Cannot add role name teacher: already in use',
-      type: 'error',
+      type: 'newError',
     },
   ]
   expect(tree.state().roleNameErrors).toEqual(expectedErrorState)
