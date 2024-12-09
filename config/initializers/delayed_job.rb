@@ -152,6 +152,8 @@ Delayed::Worker.lifecycle.before(:loop) do |worker|
 
     # log the age in seconds of the oldest job
     age = (DateTime.now.utc - (Delayed::Job.where(attempts: 0)
+                                           .where(locked_at: nil)
+                                           .where(next_in_strand: false)
                         .where('run_at <= ?', DateTime.now.utc)
                         .minimum(:run_at)&.to_datetime || DateTime.now.utc)).to_i
 
