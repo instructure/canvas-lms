@@ -36,6 +36,21 @@ class BlockEditor < ActiveRecord::Base
   end
 
   def viewer_iframe_html
-    "<iframe class='block_editor_view' src='#{Rails.application.routes.url_helpers.block_editor_path(id)}' />".html_safe # rubocop:disable Rails/OutputSafety
+    html = <<-HTML
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      iframe.block_editor_view {
+        height: 100%;
+      }
+    </style>
+    <iframe class='block_editor_view' src='#{Rails.application.routes.url_helpers.block_editor_path(id)}' />
+    HTML
+    html.html_safe # rubocop:disable Rails/OutputSafety
   end
 end
