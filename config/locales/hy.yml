@@ -3799,6 +3799,7 @@ hy:
   confirm_dialog_component: 
     ok: OK
   confirm_email_address_9072dd3c: "Հաստատել էլեկտրոնային փոստի հասցեն"
+  confirm_password_aaf07824: "Հաստատել գաղտնաբառը"
   confirm_unenrollment_64333263: "Հաստատել գրանցման չեղյալացումը"
   confirmation_code_required_22984955: "Հաստատման ծածկագիր (պարտադիր է)"
   confirmation_failed_please_try_again_ae566d37: "Չհաջողվեց հաստատել: Փորձեք կրկին:"
@@ -8722,6 +8723,7 @@ hy:
       last_error: "Վերջին սխալ"
   jobs_ec5d59d8: Առաջադրանքներ
   join_6cafecca: Միանալ
+  join_code_1e74e5a8: "Միացնել կոդը"
   join_group_group_name_871a5e3f: "Միանալ %{group_name} խմբին"
   joined_group_group_name_e3802c04: "Միացել է %{group_name} խմբին"
   joining_81f8b6c9: "Միանում է"
