@@ -1390,6 +1390,10 @@ class Lti::RegistrationsController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
+    unless @context == registration.account
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
     registration.destroy
     render json: lti_registration_json(registration, @current_user, session, @context, includes: %i[account_binding configuration overlay])
   rescue => e
