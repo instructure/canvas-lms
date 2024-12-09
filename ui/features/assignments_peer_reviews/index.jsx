@@ -33,6 +33,9 @@ import FilterPeerReview from './react/FilterPeerReview'
 import ReviewsPerUserInput from './react/ReviewsPerUserInput'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments.peer_reviews')
 
@@ -139,9 +142,74 @@ $(document).ready(() => {
     }
   })
 
+  $('#reviewee_id').change(function () {
+    const reviewee_id = $(this).val()
+    const form = $(this).closest('form')
+    const errorsContainer = form.find('#reviewee_errors')[0]
+
+    if (!reviewee_id) {
+      const container = $(this)
+      if (container) {
+        container.css({
+          outline: '1px solid red',
+          borderRadius: '3px',
+        })
+      }
+
+      const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
+      errorRoots[form.attr('action')] = root
+      root.render(
+        <Flex as="div" alignItems="start" margin="0 0 0 0">
+          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+            <IconWarningSolid color="error" />
+          </Flex.Item>
+          <Text size="small" color="danger">
+            {I18n.t('Please select a student')}
+          </Text>
+        </Flex>
+      )
+      return false
+    } else {
+      const container = $(this)
+      if (container) {
+        container.css({
+          outline: '',
+          borderRadius: '',
+        })
+      }
+      errorRoots[form.attr('action')]?.unmount()
+      errorRoots[form.attr('action')] = null
+    }
+  })
+
   $('#assign_peer_review_form').formSubmit({
     beforeSubmit(data) {
-      if (!data.reviewee_id) return false
+      if (!data.reviewee_id) {
+        const form = $(this)
+        const errorsContainer = form.find('#reviewee_errors')[0]
+        const container = form.find('#reviewee_id')
+        if (container) {
+          container.css({
+            outline: '1px solid red',
+            borderRadius: '3px',
+          })
+          container.focus()
+        }
+        const root = errorRoots[form.attr('action')] ?? createRoot(errorsContainer)
+        errorRoots[form.attr('action')] = root
+
+        root.render(
+          <Flex as="div" alignItems="start" margin="0 0 0 0">
+            <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+              <IconWarningSolid color="error" />
+            </Flex.Item>
+            <Text size="small" color="danger">
+              {I18n.t('Please select a student')}
+            </Text>
+          </Flex>
+        )
+        return false
+      }
       $(this).loadingImage()
     },
     success(data) {
@@ -224,6 +292,8 @@ $(document).ready(() => {
     event.preventDefault()
     $('.peer_review.assigned .remind_peer_review_link').click()
   })
+
+  const errorRoots = {}
 
   ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

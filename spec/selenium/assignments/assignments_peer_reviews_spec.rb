@@ -82,6 +82,24 @@ describe "assignments" do
       expect(list_items.count).to eq(1)
     end
 
+    describe "validations" do
+      it "renders validation seleect a student" do
+        course_with_teacher_logged_in
+        create_users_in_course(@course, 11)
+        @assignment = assignment_model({
+                                         course: @course,
+                                         peer_reviews: true,
+                                         automatic_peer_reviews: false,
+                                       })
+
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews?page=2"
+
+        f(".assign_peer_review_link").click
+        find_button("Add").click
+        expect(f("#reviewee_errors")).to be_displayed
+      end
+    end
+
     it "displays the intra-group review toggle for group assignments" do
       course_with_teacher_logged_in
       student = student_in_course.user
