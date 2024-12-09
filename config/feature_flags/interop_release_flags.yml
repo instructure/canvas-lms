@@ -215,13 +215,6 @@ lti_oidc_missing_cookie_retry:
       state: allowed_on
     ci:
       state: allowed_on
-lti_overwrite_user_url_input_select_content_dialog:
-  state: on
-  applies_to: RootAccount
-  display_name: Overwrite user LTI URL input on select content dialog
-  description: |-
-    If enabled, the user's LTI URL input on the select content dialog will be overwritten
-    if the tool responds with a valid LTI URL.
 lti_placement_restrictions:
   state: hidden
   applies_to: RootAccount
