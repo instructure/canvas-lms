@@ -181,6 +181,6 @@ module Login::Shared
     tags = tags.reverse_merge({ auth_type:, domain: request.host })
     tags[:auth_provider_id] = authentication_provider.global_id if authentication_provider
     tags[:reason] = reason if reason
-    InstStatsd::Statsd.increment("auth.#{action}.#{counter}", tags:)
+    InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}", tags:)
   end
 end

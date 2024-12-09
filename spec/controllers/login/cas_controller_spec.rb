@@ -235,7 +235,7 @@ describe Login::CasController do
     allow(controller).to receive(:client).and_return(cas_client)
     start = Time.now.utc
     allow(Canvas::Errors).to receive(:capture_exception).and_return(true)
-    allow(InstStatsd::Statsd).to receive(:increment)
+    allow(InstStatsd::Statsd).to receive(:distributed_increment)
     expect(cas_client).to receive(:validate_service_ticket) { sleep 5 }
     session[:sentinel] = true
     get "new", params: { ticket: "ST-abcd" }
@@ -243,7 +243,7 @@ describe Login::CasController do
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
     expect(session[:sentinel]).to be true
-    expect(InstStatsd::Statsd).to have_received(:increment).with(
+    expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
       "auth.create.failure", tags: { auth_type: ap.auth_type.to_s, auth_provider_id: ap.global_id, domain: request.host, reason: :timeout }
     )
   end
