@@ -102,7 +102,8 @@ const setup = () => {
 
   const useManagePageState = mkUseManagePageState(
     mockFetchRegistrations(req1.promise, req2.promise),
-    () => deleteReq.promise
+    () => deleteReq.promise,
+    jest.fn()
   )
 
   const {result, rerender} = renderHook<
@@ -323,7 +324,10 @@ describe('deleteRegistration', () => {
       expect(state.items.data.length).toBe(3)
     })
 
-    const deletionPromise = result.current[1].deleteRegistration(mockRegistration('Foo', 0))
+    const deletionPromise = result.current[1].deleteRegistration(
+      mockRegistration('Foo', 0),
+      ZAccountId.parse('0')
+    )
     deleteReq.resolve()
 
     await awaitState(result, 'reloading', state => {
@@ -348,7 +352,10 @@ describe('deleteRegistration', () => {
       expect(state.items.data.length).toBe(3)
     })
 
-    const deletionPromise = result.current[1].deleteRegistration(mockRegistration('Foo', 0))
+    const deletionPromise = result.current[1].deleteRegistration(
+      mockRegistration('Foo', 0),
+      ZAccountId.parse('0')
+    )
 
     deleteReq.reject()
 
