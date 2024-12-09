@@ -1113,6 +1113,22 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "with registration for different account" do
+      subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{other_reg.id}" }
+
+      let_once(:other_reg) { lti_registration_model(account: Account.site_admin) }
+      let_once(:other_ims_registration) { lti_ims_registration_model(lti_registration: other_reg) }
+
+      it "returns 400" do
+        subject
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "does not delete the registration" do
+        expect { subject }.not_to change { registration.reload.workflow_state }
+      end
+    end
+
     it "is successful" do
       subject
       expect(response).to be_successful
