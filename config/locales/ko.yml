@@ -3258,6 +3258,7 @@ ko:
   confirm_dialog_component: 
     ok: 확인
   confirm_email_address_9072dd3c: "이메일 주소 확인"
+  confirm_password_aaf07824: "암호 확인"
   confirm_unenrollment_64333263: "등록 취소 확인"
   confirming_2df4b68f: "확인 중..."
   consumer_key_6f94ba11: "소비자 키"
@@ -7282,6 +7283,7 @@ ko:
       last_error: "마지막 오류"
   jobs_ec5d59d8: 작업
   join_6cafecca: 참여
+  join_code_1e74e5a8: "참가 코드"
   joining_81f8b6c9: 참여하기
   jquery: 
     module_sequence_footer: 
