@@ -28,7 +28,6 @@ import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
-  focusFiled,
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
@@ -72,6 +71,7 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
     formState: {errors},
     control,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues,
     resolver: zodResolver(validationSchema),
@@ -83,12 +83,12 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
 
   const handleFormSubmit: SubmitHandler<FormValues> = async data => {
     if (isDateTimeInputInvalid(fromInputRef)) {
-      focusFiled(control, 'from')
+      setFocus('from')
       return
     }
 
     if (isDateTimeInputInvalid(toInputRef)) {
-      focusFiled(control, 'to')
+      setFocus('to')
       return
     }
 
