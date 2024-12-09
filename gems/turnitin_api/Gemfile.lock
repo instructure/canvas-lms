@@ -55,7 +55,7 @@ GEM
     hashdiff (1.1.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    inst_statsd (3.1.0)
+    inst_statsd (3.3.0)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)

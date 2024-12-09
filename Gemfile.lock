@@ -659,7 +659,7 @@ GEM
       json-jwt (~> 1.13)
     inst_llm (0.2.4)
       aws-sdk-bedrockruntime (~> 1.5)
-    inst_statsd (3.1.0)
+    inst_statsd (3.3.0)
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
