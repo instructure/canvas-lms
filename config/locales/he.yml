@@ -4651,6 +4651,7 @@ he:
   confirm_dialog_component: 
     ok: OK
   confirm_email_address_9072dd3c: "אישור כתובת דוא\"ל"
+  confirm_password_aaf07824: "אישור סיסמה"
   confirm_removal_a9bb889: "אישור הסרה"
   confirm_reservation_removal_e6350e7c: "אישור הסרת רישום"
   confirm_unenrollment_64333263: "אישור הסרת הרשמה"
@@ -10518,6 +10519,7 @@ he:
       last_error: "השגיאה האחרונה "
   jobs_ec5d59d8: "תהליכי עיבוד"
   join_6cafecca: הצטרפות
+  join_code_1e74e5a8: "קוד הצטרפות"
   join_course_511e6cb3: "הצטרף/י ל %{course}"
   join_group_group_name_871a5e3f: "הצטרפות לקבוצה %{group_name}"
   join_the_conversation_using_the_link_below_54ab1f0e: "הצטרפות לדיון בעזרת הקישור שלהלן:."
