@@ -253,7 +253,7 @@ module Api::V1::Submission
 
     if attempt.checkpoints_needs_grading? && attempt.root_account&.feature_enabled?(:discussion_checkpoints)
       attempt.workflow_state = "pending_review"
-      attempt.submission_type = "discussion_topic"
+      attempt.submission_type = attempt.submission_type || attempt.assignment&.submission_types
     end
 
     attempt.assignment = assignment

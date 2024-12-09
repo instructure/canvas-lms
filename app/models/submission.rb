@@ -368,7 +368,6 @@ class Submission < ActiveRecord::Base
   end
 
   def checkpoints_needs_grading?
-    return true if needs_grading?
     return false if assignment.nil?
     return false unless assignment.checkpoints_parent?
 
