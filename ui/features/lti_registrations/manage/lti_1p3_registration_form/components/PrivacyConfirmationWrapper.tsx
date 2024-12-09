@@ -17,29 +17,34 @@
  */
 
 import React from 'react'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
 import {LtiPrivacyLevels} from '../../model/LtiPrivacyLevel'
 import {PrivacyConfirmation} from '../../registration_wizard_forms/PrivacyConfirmation'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
+import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 
 export type PrivacyConfirmationWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
+  internalConfig: InternalLtiConfiguration
   appName: string
 }
 
 export const PrivacyConfirmationWrapper = ({
   overlayStore,
+  internalConfig,
   appName,
 }: PrivacyConfirmationWrapperProps) => {
-  const [state, actions] = useOverlayStore(overlayStore)
+  const {state, ...actions} = overlayStore()
+
+  const value =
+    state.data_sharing.privacy_level ?? internalConfig.privacy_level ?? LtiPrivacyLevels.Anonymous
 
   return (
     <RegistrationModalBody>
       <PrivacyConfirmation
         appName={appName}
         privacyLevelOnChange={actions.setPrivacyLevel}
-        selectedPrivacyLevel={state.data_sharing.privacy_level ?? LtiPrivacyLevels.Anonymous}
+        selectedPrivacyLevel={value}
       />
     </RegistrationModalBody>
   )

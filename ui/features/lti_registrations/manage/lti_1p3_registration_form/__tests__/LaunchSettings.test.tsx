@@ -34,9 +34,10 @@ describe('LaunchSettings', () => {
       domain: 'example.com',
       public_jwk_url: 'https://example.com/jwks',
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
     render(
       <LaunchSettings
+        internalConfig={config}
         overlayStore={overlayStore}
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
@@ -54,15 +55,16 @@ describe('LaunchSettings', () => {
     expect(redirectUris).toBeInTheDocument()
     expect(redirectUris).toHaveValue(config.redirect_uris!.join('\n'))
     expect(defaultTargetLinkUri).toBeInTheDocument()
-    expect(defaultTargetLinkUri).toHaveValue(config.target_link_uri)
+    expect(defaultTargetLinkUri).toHaveAttribute('placeholder', config.target_link_uri)
     expect(oidcInitiationUrl).toBeInTheDocument()
     expect(oidcInitiationUrl).toHaveValue(config.oidc_initiation_url)
     expect(jwkUrl).toBeInTheDocument()
     expect(jwkUrl).toHaveValue(config.public_jwk_url)
     expect(domain).toBeInTheDocument()
-    expect(domain).toHaveValue(config.domain)
+    expect(domain).toHaveAttribute('placeholder', config.domain)
     expect(customFields).toBeInTheDocument()
-    expect(customFields).toHaveValue(
+    expect(customFields).toHaveAttribute(
+      'placeholder',
       Object.entries(config.custom_fields!).reduce((acc, [key, value]) => {
         return acc + `${key}=${value}\n`
       }, '')
@@ -75,9 +77,10 @@ describe('LaunchSettings', () => {
       domain: 'example.com',
       public_jwk_url: 'https://example.com/jwks',
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
     render(
       <LaunchSettings
+        internalConfig={config}
         overlayStore={overlayStore}
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
@@ -129,9 +132,10 @@ describe('LaunchSettings', () => {
       domain: 'example.com',
       public_jwk_url: 'https://example.com/jwks',
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
     render(
       <LaunchSettings
+        internalConfig={config}
         overlayStore={overlayStore}
         unregister={jest.fn()}
         onNextClicked={jest.fn()}

@@ -15,14 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import type {
-  CreateRegistration,
-  FetchLtiRegistration,
-  UpdateRegistration,
-} from '../api/registrations'
+import z from 'zod'
 
-export interface Lti1p3RegistrationWizardService {
-  createLtiRegistration: CreateRegistration
-  updateLtiRegistration: UpdateRegistration
-  fetchLtiRegistration: FetchLtiRegistration
-}
+export const ZLtiToolConfigurationId = z.string().brand('LtiToolConfigurationId')
+export type LtiToolConfigurationId = z.infer<typeof ZLtiToolConfigurationId>

@@ -35,8 +35,9 @@ export type NamingConfirmationProps = {
   adminNickname?: string
   onUpdateAdminNickname: (value: string) => void
   description?: string
+  descriptionPlaceholder?: string
   onUpdateDescription: (value: string) => void
-  placements: {placement: LtiPlacement; label: string}[]
+  placements: {placement: LtiPlacement; label: string; defaultValue?: string}[]
   onUpdatePlacementLabel: (placement: LtiPlacement, value: string) => void
 }
 
@@ -45,6 +46,7 @@ export const NamingConfirmation = ({
   adminNickname,
   onUpdateAdminNickname,
   description,
+  descriptionPlaceholder,
   onUpdateDescription,
   placements,
   onUpdatePlacementLabel,
@@ -87,6 +89,7 @@ export const NamingConfirmation = ({
             </Text>
           }
           value={description}
+          placeholder={descriptionPlaceholder}
           onChange={e => {
             onUpdateDescription(e.target.value)
           }}
@@ -105,6 +108,7 @@ export const NamingConfirmation = ({
                   key={placement.placement}
                   placement={placement.placement}
                   label={placement.label}
+                  defaultValue={placement.defaultValue}
                   onChange={onUpdatePlacementLabel}
                 />
               )
@@ -121,13 +125,16 @@ const MemoPlacementLabelInput = React.memo(
     placement,
     label,
     onChange,
+    defaultValue,
   }: {
     placement: LtiPlacement
     label: string
     onChange: (placement: LtiPlacement, value: string) => void
+    defaultValue?: string
   }) => {
     return (
       <TextInput
+        placeholder={defaultValue}
         renderLabel={i18nLtiPlacement(placement)}
         value={label}
         onChange={(_, value) => onChange(placement, value)}

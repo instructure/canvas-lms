@@ -54,7 +54,7 @@ type LaunchSettings = {
 
 export type ReviewScreenProps = {
   scopes: LtiScope[]
-  privacyLevel?: LtiPrivacyLevel
+  privacyLevel: LtiPrivacyLevel
   placements: LtiPlacement[]
   nickname: string
   description?: string
@@ -74,7 +74,7 @@ export type ReviewScreenProps = {
 export const ReviewScreen = ({
   launchSettings,
   scopes,
-  privacyLevel = 'anonymous',
+  privacyLevel,
   placements,
   nickname,
   description,
@@ -185,7 +185,7 @@ export const ReviewScreen = ({
                     dangerouslySetInnerHTML={{
                       __html: labels[placement]
                         ? htmlEscape(labels[placement])
-                        : I18n.t('**No label provided.**', {wrappers: ['<i>$1</i>']}),
+                        : I18n.t('*No label provided.*', {wrappers: ['<i>$1</i>']}),
                     }}
                   />
                 </div>

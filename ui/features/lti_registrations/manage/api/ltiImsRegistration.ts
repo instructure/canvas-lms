@@ -79,7 +79,10 @@ export const getRegistrationByUUID = (
  * @param registrationId ID of the registration
  * @returns
  */
-export const getRegistrationById = (accountId: AccountId, registrationId: LtiImsRegistrationId) =>
+export const getLtiImsRegistrationById = (
+  accountId: AccountId,
+  registrationId: LtiImsRegistrationId
+) =>
   parseFetchResult(ZLtiImsRegistration)(
     fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}`, defaultFetchOptions())
   )
