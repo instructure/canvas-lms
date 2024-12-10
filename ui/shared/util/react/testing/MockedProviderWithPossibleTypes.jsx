@@ -16,16 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
-import {InMemoryCache, IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
-import introspectionQueryResultData from '@canvas/apollo/fragmentTypes.json'
+import {InMemoryCache} from '@apollo/client'
+import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 
-export function MockedProviderWithIntrospectionMatching({cache, ...props}) {
+export function MockedProviderWithPossibleTypes({cache, ...props}) {
   const defaultedCache =
     cache ||
     new InMemoryCache({
-      fragmentMatcher: new IntrospectionFragmentMatcher({
-        introspectionQueryResultData,
-      }),
+      possibleTypes: possibleTypes,
     })
   return <MockedProvider cache={defaultedCache} {...props} />
 }

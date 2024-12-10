@@ -330,7 +330,7 @@ const SubmissionManager = ({
   }
 
   const updateCachedSubmissionDraft = (cache, newDraft) => {
-    const {assignment: cachedAssignment, submission: cachedSubmission} = JSON.parse(
+    const queryResult = JSON.parse(
       JSON.stringify(
         cache.readQuery({
           query: STUDENT_VIEW_QUERY,
@@ -341,6 +341,12 @@ const SubmissionManager = ({
         })
       )
     )
+
+    if (!queryResult) {
+      return
+    }
+
+    const {assignment: cachedAssignment, submission: cachedSubmission} = queryResult
 
     cachedSubmission.submissionDraft = newDraft
     cache.writeQuery({
