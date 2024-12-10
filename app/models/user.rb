@@ -59,7 +59,7 @@ class User < ActiveRecord::Base
   include UserLearningObjectScopes
   include PermissionsHelper
 
-  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock
+  attr_accessor :previous_id, :gradebook_importer_submissions, :prior_enrollment, :override_lti_id_lock, :trusted_account
 
   before_save :infer_defaults
   before_validation :ensure_lti_id, on: :update
@@ -1466,6 +1466,9 @@ class User < ActiveRecord::Base
 
     given { |user| check_accounts_right?(user, :moderate_user_content) }
     can :moderate_user_content
+
+    given { |user| trusted_account&.grants_right?(user, :manage_user_logins) }
+    can :read
   end
 
   def can_change_pronunciation?(account)
