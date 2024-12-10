@@ -31,6 +31,7 @@ export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
   account_id: ZAccountId,
   icon_url: z.string().nullable(),
+  inherited: z.boolean().optional(),
   name: z.string(),
   admin_nickname: z.string().nullable(),
   workflow_state: z.string(),
@@ -54,3 +55,8 @@ export const ZLtiRegistrationWithConfiguration = ZLtiRegistration.extend({
 })
 
 export type LtiRegistrationWithConfiguration = z.infer<typeof ZLtiRegistrationWithConfiguration>
+
+export const isForcedOn = (reg: LtiRegistration) =>
+  reg.inherited &&
+  reg.account_binding?.account_id === reg.account_id &&
+  reg.account_binding?.workflow_state == 'on'

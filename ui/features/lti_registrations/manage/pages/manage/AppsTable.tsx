@@ -30,7 +30,7 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
-import type {LtiRegistration} from '../../model/LtiRegistration'
+import {isForcedOn, type LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -41,7 +41,7 @@ import {
   openEditDynamicRegistrationWizard,
   openEditManualRegistrationWizard,
 } from '../../registration_wizard/RegistrationWizardModalState'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {alert} from '@canvas/instui-bindings/react/Alert'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -233,15 +233,34 @@ const Columns: ReadonlyArray<Column> = [
               {I18n.t('Edit App')}
             </Menu.Item>
           ) : null}
-          <Menu.Item
-            themeOverride={{
-              labelColor: colors.textDanger,
-              activeBackground: colors.backgroundDanger,
-            }}
-            onClick={() => deleteApp(r)}
-          >
-            {I18n.t('Delete App')}
-          </Menu.Item>
+          {isForcedOn(r) ? (
+            <Menu.Item
+              themeOverride={{
+                labelColor: colors.textDanger,
+                activeBackground: colors.backgroundDanger,
+              }}
+              onClick={() => {
+                alert({
+                  message: I18n.t('This App is locked on, and cannot be deleted.'),
+                  title: I18n.t('Delete App'),
+                  okButtonLabel: I18n.t('Ok'),
+                })
+              }}
+            >
+              {I18n.t('Delete App')}
+            </Menu.Item>
+          ) : (
+            <Menu.Item
+              themeOverride={{
+                labelColor: colors.textDanger,
+                activeBackground: colors.backgroundDanger,
+              }}
+              onClick={() => deleteApp(r)}
+            >
+              {I18n.t('Delete App')}
+            </Menu.Item>
+          )}
+
           {/* <Menu.Item
             onClick={() => {
               confirm({
