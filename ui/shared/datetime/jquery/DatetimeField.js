@@ -510,11 +510,11 @@ export default class DatetimeField {
   }
 
   get parseError() {
-    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
     if (this.$options.newSuggestionDesign) {
       if (this.$options.dateOnly) return I18n.t('Not a valid date format')
       if (this.$options.timeOnly) return I18n.t('Not a valid time format')
     }
+    if (this.valid === PARSE_RESULTS.BAD_YEAR) return I18n.t('Year is too far in the past.')
     return I18n.t('errors.not_a_date', "That's not a date!")
   }
 }

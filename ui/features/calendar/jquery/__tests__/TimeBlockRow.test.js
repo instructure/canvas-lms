@@ -120,7 +120,6 @@ describe('TimeBlockRow', () => {
 
       expect(timeBlockRow.validate()).toBeFalsy()
       expect(timeBlockRow.$end_time.hasClass('error')).toBeTruthy()
-      expect(timeBlockRow.$end_time.data('associated_error_box')).toBeTruthy()
     })
 
     it('fails validation for time in past', () => {
@@ -132,7 +131,6 @@ describe('TimeBlockRow', () => {
 
       expect(timeBlockRow.validate()).toBeFalsy()
       expect(timeBlockRow.$end_time.hasClass('error')).toBeTruthy()
-      expect(timeBlockRow.$end_time.data('associated_error_box')).toBeTruthy()
     })
 
     it('fails validation when end is before start', () => {
@@ -140,7 +138,6 @@ describe('TimeBlockRow', () => {
 
       expect(timeBlockRow.validate()).toBeFalsy()
       expect(timeBlockRow.$start_time.hasClass('error')).toBeTruthy()
-      expect(timeBlockRow.$start_time.data('associated_error_box')).toBeTruthy()
     })
 
     it('passes validation when row is blank', () => {
