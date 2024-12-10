@@ -272,6 +272,55 @@ describe('RceLti11ContentItem File Item', () => {
   })
 })
 
+describe('RceLti11ContentItem image content', () => {
+  it('handles missing dimensions gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'Test Image',
+      url: 'http://example.com/test.jpg',
+      mediaType: 'image/jpeg',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+      },
+    })
+
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<img')
+    expect(payload).toContain('src="http://example.com/test.jpg"')
+    expect(payload).not.toContain('style=')
+  })
+
+  it('handles empty text gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      url: 'http://example.com/test.jpg',
+      mediaType: 'image/jpeg',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+      },
+    })
+
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<img')
+    expect(payload).toContain('src="http://example.com/test.jpg"')
+    expect(payload).not.toContain('alt=')
+  })
+
+  it('handles non-image media types with embed target', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'PDF Document',
+      url: 'http://example.com/document.pdf',
+      mediaType: 'application/pdf',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+        displayWidth: '800',
+        displayHeight: '600',
+      },
+    })
+
+    const payload = contentItem.codePayload
+    expect(payload).toBe('PDF Document')
+  })
+})
+
 describe('Studio LTI content items', () => {
   it('with custom params set to false', () => {
     const itemData = {
