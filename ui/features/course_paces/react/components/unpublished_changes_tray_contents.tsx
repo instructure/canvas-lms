@@ -117,7 +117,7 @@ export const UnpublishedChangesTrayContents = ({
       />
       <View as="header" margin="0 0 medium">
         <h4>
-          <Text weight="bold">{I18n.t('Unpublished Changes')}</Text>
+          <Text weight="bold">{I18n.t('Unsaved Changes')}</Text>
         </h4>
       </View>
       <ol className="course_pace_changes">

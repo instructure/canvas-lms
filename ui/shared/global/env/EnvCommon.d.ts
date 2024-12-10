@@ -284,6 +284,7 @@ export type RootAccountFeatureId =
   | 'login_registration_ui_identity'
   | 'course_paces_skip_selected_days'
   | 'course_pace_download_document'
+  | 'course_pace_draft_state'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

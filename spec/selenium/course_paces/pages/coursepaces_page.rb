@@ -346,6 +346,18 @@ module CoursePacesPageObject
     "[data-testid='reset-changes-modal'] [data-testid='instui-modal-close'] button"
   end
 
+  def save_draft_button_selector
+    "[data-testid='save-pace-draft-button']"
+  end
+
+  def draft_pace_status_pill_selector
+    "[data-testid='draft-pace-status-pill']"
+  end
+
+  def direct_publish_draft_button_selector
+    "[data-testid='direct-publish-draft-pace-button']"
+  end
+
   #------------------------- Elements --------------------------------
 
   def assignment_due_date

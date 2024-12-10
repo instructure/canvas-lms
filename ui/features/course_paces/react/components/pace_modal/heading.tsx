@@ -24,8 +24,10 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import type {CoursePace, PaceContext, Section, StoreState} from '../../types'
 import {Text} from '@instructure/ui-text'
+import {Pill} from '@instructure/ui-pill'
 import {IconUserSolid} from '@instructure/ui-icons'
 import {getBlueprintLocked} from '../../reducers/ui'
+import {getIsDraftPace} from '../../reducers/course_paces'
 import Settings from '../header/settings/settings'
 import BlueprintLock from '../header/blueprint_lock'
 
@@ -40,6 +42,7 @@ interface Props {
 
 interface StoreProps {
   readonly blueprintLocked: boolean | undefined
+  readonly isDraftPace: boolean
 }
 
 const PaceModalHeading = ({
@@ -48,6 +51,7 @@ const PaceModalHeading = ({
   paceContext,
   enrolledSection,
   blueprintLocked,
+  isDraftPace,
 }: Props & StoreProps) => {
   const renderPaceInfo = () => {
     if (['Section', 'Course'].includes(coursePace.context_type)) {
@@ -95,6 +99,7 @@ const PaceModalHeading = ({
         <Text data-testid="section-name" as="div" size="x-large" weight="bold">
           {getPaceName()}
         </Text>
+        {isDraftPace ? <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">Draft</Pill> : null}
         <Flex as="div" margin="medium none">
           <IconUserSolid size="medium" />
           <View data-testid="pace-info" as="div" margin="none small">
@@ -119,6 +124,7 @@ const PaceModalHeading = ({
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     blueprintLocked: getBlueprintLocked(state),
+    isDraftPace: getIsDraftPace(state),
   }
 }
 

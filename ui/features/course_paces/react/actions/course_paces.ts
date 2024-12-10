@@ -89,27 +89,40 @@ const thunkActions = {
       return dispatch(regularActions.resetPace(originalPace))
     }
   },
-  publishPace: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+  publishPace: (saveAsDraft: boolean | undefined): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, getState) => {
-      dispatch(uiActions.startSyncing())
       dispatch(uiActions.clearCategoryError('publish'))
 
-      return Api.publish(getState().coursePace)
+      const pace = getState().coursePace
+      if (saveAsDraft) {
+        pace.workflow_state = 'unpublished'
+        dispatch(uiActions.toggleSavingDraft())
+      } else {
+        pace.workflow_state = 'active'
+        dispatch(uiActions.startSyncing())
+      }
+
+      return Api.publish(pace)
         .then(responseBody => {
           if (!responseBody) throw new Error(I18n.t('Response body was empty'))
           const {course_pace: updatedPace, progress} = responseBody
           dispatch(coursePaceActions.saveCoursePace(updatedPace))
-          dispatch(coursePaceActions.setProgress(progress))
-          dispatch(coursePaceActions.pollForPublishStatus())
-          dispatch(
-            paceContextsActions.addPublishingPace({
-              // @ts-expect-error
-              progress_context_id: progress.context_id,
-              pace_context: getState().paceContexts.selectedContext!,
-              polling: true,
-            })
-          )
-          dispatch(uiActions.syncingCompleted())
+
+          if (saveAsDraft && !progress) {
+            dispatch(coursePaceActions.coursePaceSaved(updatedPace))
+            dispatch(uiActions.toggleSavingDraft())
+          } else {
+            dispatch(coursePaceActions.setProgress(progress))
+            dispatch(coursePaceActions.pollForPublishStatus())
+            dispatch(
+              paceContextsActions.addPublishingPace({
+                progress_context_id: progress.context_id,
+                pace_context: getState().paceContexts.selectedContext!,
+                polling: true,
+              })
+            )
+            dispatch(uiActions.syncingCompleted())
+          }
         })
         .catch(error => {
           dispatch(uiActions.setCategoryError('publish', error?.toString()))
@@ -119,24 +132,23 @@ const thunkActions = {
   },
   // TODO: when blackout dates are changed we have to possibly publish changes
   // to the pace in the UI + save all existing paces
-  publishPaceAndSaveAll: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+  publishPaceAndSaveAll: (saveAsDraft: boolean | undefined): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, _getState) => {
-      return dispatch(coursePaceActions.publishPace())
+      return dispatch(coursePaceActions.publishPace(saveAsDraft))
     }
   },
   // I have no idea how to declare the return type of this function
   // an error message said: ThunkDispatch<StoreState, void, Action>
   // but that just moved the error
-  syncUnpublishedChanges: () => {
-    // @ts-expect-error
-    return (dispatch, getState) => {
+  syncUnpublishedChanges: (saveAsDraft?: boolean) => {
+    return (dispatch: any, getState: any) => {
       dispatch(uiActions.clearCategoryError('publish'))
 
       if (getBlackoutDatesUnsynced(getState())) {
         dispatch(uiActions.startSyncing())
         return dispatch(blackoutDateActions.syncBlackoutDates())
           .then(() => {
-            return dispatch(coursePaceActions.publishPaceAndSaveAll()).then(() => {
+            return dispatch(coursePaceActions.publishPaceAndSaveAll(saveAsDraft)).then(() => {
               dispatch(uiActions.syncingCompleted())
             })
           })
@@ -144,7 +156,7 @@ const thunkActions = {
             dispatch(uiActions.syncingCompleted())
           })
       } else {
-        return dispatch(coursePaceActions.publishPace())
+        return dispatch(coursePaceActions.publishPace(saveAsDraft))
       }
     }
   },
@@ -161,8 +173,7 @@ const thunkActions = {
           .then(updatedProgress => {
             if (!updatedProgress) throw new Error(I18n.t('Response body was empty'))
             const paceContext = getState().paceContexts.contextsPublishing.find(
-              // @ts-expect-error
-              ({progress_context_id}) => updatedProgress.context_id === progress_context_id
+              ({progress_context_id}: any) => updatedProgress.context_id === progress_context_id
             )?.pace_context
             const paceName = paceContext?.name || ''
             dispatch(
@@ -181,7 +192,6 @@ const thunkActions = {
                 type: 'success',
               })
               dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
-              // @ts-expect-error
               dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
             } else if (updatedProgress.workflow_state === 'failed') {
               showFlashAlert({
@@ -190,7 +200,6 @@ const thunkActions = {
                 type: 'error',
               })
               dispatch(uiActions.setCategoryError('publish'))
-              // @ts-expect-error
               dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
               console.log(`Error publishing pace: ${updatedProgress.message}`)  
             } else {
