@@ -385,6 +385,10 @@ class MediaObject < ActiveRecord::Base
     return if current_attachment || attachment_id || Attachment.find_by(media_entry_id: media_id)
     return unless %w[Account Course Group User].include?(context_type)
 
+    if context.is_a?(Course) && context.usage_rights_required && Account.site_admin.feature_enabled?(:default_copyright_on_attachments)
+      usage_rights = context.usage_rights.find_or_create_by!(context:, use_justification: "own_copyright")
+    end
+
     self.attachment = Folder.media_folder(context).attachments
                             .create!(
                               context:,
@@ -394,7 +398,8 @@ class MediaObject < ActiveRecord::Base
                               media_entry_id: media_id,
                               # in case teachers don't mean for this to be visible to students in the files section
                               file_state: "hidden",
-                              workflow_state: "pending_upload"
+                              workflow_state: "pending_upload",
+                              usage_rights:
                             )
     attachment.handle_duplicates(:rename)
     media_tracks.update_all(attachment_id: attachment.id)
