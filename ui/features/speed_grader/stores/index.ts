@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import create from 'zustand'
+import {create} from 'zustand'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {RubricAssessmentSelect} from '@canvas/rubrics/react/types/rubric'
 // @ts-expect-error

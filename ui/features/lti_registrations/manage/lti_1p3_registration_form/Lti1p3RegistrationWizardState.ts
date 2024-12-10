@@ -28,7 +28,7 @@ import {
 import {convertToLtiConfigurationOverlay} from './Lti1p3RegistrationOverlayStateHelpers'
 
 import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
-import create from 'zustand'
+import {create} from 'zustand'
 
 export type Lti1p3RegistrationWizardState = {
   overlayStore: Lti1p3RegistrationOverlayStore

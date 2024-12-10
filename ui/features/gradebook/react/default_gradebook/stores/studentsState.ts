@@ -17,7 +17,7 @@
  */
 
 import {difference, chunk} from 'lodash'
-import type {SetState, GetState} from 'zustand'
+import type {StoreApi} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
 import {getContentForStudentIdChunk} from './studentsState.utils'
@@ -48,7 +48,10 @@ export type StudentsState = {
   totalStudentsToLoad: number
 }
 
-export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): StudentsState => ({
+export default (
+  set: StoreApi<GradebookStore>['setState'],
+  get: StoreApi<GradebookStore>['getState']
+): StudentsState => ({
   studentIds: [],
 
   isStudentIdsLoading: false,

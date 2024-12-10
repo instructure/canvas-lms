@@ -159,6 +159,7 @@ import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/Spe
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import {createRoot} from 'react-dom/client'
 
 declare global {
   interface Window {
@@ -1479,9 +1480,9 @@ EG = {
   },
 
   setupGradeLoadingSpinner() {
-    ReactDOM.render(
-      <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />,
-      document.getElementById('grades-loading-spinner')
+    const root = createRoot(document.getElementById('grades-loading-spinner')!)
+    root.render(
+      <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />
     )
   },
 

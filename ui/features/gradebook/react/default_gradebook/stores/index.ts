@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import create from 'zustand'
+import {create} from 'zustand'
 import filters, {type FiltersState} from './filtersState'
 import modules, {type ModulesState} from './modulesState'
 import students, {type StudentsState} from './studentsState'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {SetState, GetState} from 'zustand'
+import type {StoreApi} from 'zustand'
 import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -88,7 +88,10 @@ export type InitialRowFilterSettings = {
   student_group_ids?: null | string[]
 }
 
-export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): FiltersState => ({
+export default (
+  set: StoreApi<GradebookStore>['setState'],
+  get: StoreApi<GradebookStore>['getState']
+): FiltersState => ({
   appliedFilters: [],
 
   filterPresets: [],

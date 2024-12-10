@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import GradebookData from './react/default_gradebook/GradebookData'
 import type {GradebookOptions} from './react/default_gradebook/gradebook.d'
 import ready from '@instructure/ready'
@@ -53,8 +53,9 @@ ready(() => {
     '[data-component="AnonymousSpeedGraderAlert"]'
   ) as HTMLSpanElement
 
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(
+  const root = createRoot(mountPoint)
+
+  root.render(
     <GradebookData
       actionMenuNode={actionMenuNode}
       anonymousSpeedGraderAlertNode={anonymousSpeedGraderAlertNode}
@@ -70,7 +71,6 @@ ready(() => {
       locale={ENV.LOCALE}
       settingsModalButtonContainer={settingsModalButtonContainer}
       viewOptionsMenuNode={viewOptionsMenuNode}
-    />,
-    mountPoint
+    />
   )
 })
