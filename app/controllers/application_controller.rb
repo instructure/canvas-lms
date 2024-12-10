@@ -388,6 +388,7 @@ class ApplicationController < ActionController::Base
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
     lti_registrations_next
+    lti_asset_processor
     buttons_and_icons_root_account
     extended_submission_state
     scheduled_page_publication

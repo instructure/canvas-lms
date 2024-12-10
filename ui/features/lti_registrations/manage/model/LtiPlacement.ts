@@ -131,6 +131,7 @@ export const LtiPlacements = {
   UserNavigation: 'user_navigation',
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',
+  ActivityAssetProcessor: 'ActivityAssetProcessor',
 } as const
 
 export const AllLtiPlacements = [
@@ -173,6 +174,7 @@ export const AllLtiPlacements = [
   LtiPlacements.UserNavigation,
   LtiPlacements.WikiPageMenu,
   LtiPlacements.WikiIndexMenu,
+  LtiPlacements.ActivityAssetProcessor,
 ] as const
 
 export const InternalOnlyLtiPlacements = [
@@ -254,6 +256,7 @@ export const LtiPlacementsByMessageType = {
     LtiPlacements.ModuleIndexMenuModal,
     LtiPlacements.ModuleMenuModal,
     LtiPlacements.SubmissionTypeSelection,
+    LtiPlacements.ActivityAssetProcessor,
   ],
 } as const
 

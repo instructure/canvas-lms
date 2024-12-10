@@ -71,6 +71,7 @@ const ALL_PLACEMENTS = {
   wiki_page_menu: I18n.t('Page Menu'),
   wiki_index_menu: I18n.t('Pages Index Menu'),
   default_placements: I18n.t('Assignment and Link Selection'), // for 1.1 display only
+  ActivityAssetProcessor: I18n.t('Activity Asset Processor'),
 }
 
 const DEFAULT_1_1_PLACEMENTS = ['assignment_selection', 'link_selection', 'resource_selection']

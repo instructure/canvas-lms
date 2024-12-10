@@ -50,6 +50,7 @@ export default class Placement extends React.Component {
     'homework_submission',
     'conference_selection',
     'submission_type_selection',
+    'ActivityAssetProcessor',
   ]
 
   canBeEither = [

@@ -52,6 +52,9 @@ module Lti
     # These placements require tools to be on an allow list
     RESTRICTED_PLACEMENTS = %i[submission_type_selection top_navigation].freeze
 
+    # These placements doesn't need the CANVAS_PLACEMENT_EXTENSION_PREFIX
+    STANDARD_PLACEMENTS = %i[ActivityAssetProcessor].freeze
+
     PLACEMENTS_BY_MESSAGE_TYPE = {
       LtiAdvantage::Messages::ResourceLinkRequest::MESSAGE_TYPE => %i[
         account_navigation
@@ -96,6 +99,7 @@ module Lti
       ],
       LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE => %i[
         assignment_selection
+        ActivityAssetProcessor
         collaboration
         conference_selection
         course_assignments_menu
@@ -134,9 +138,10 @@ module Lti
       "#{CANVAS_PLACEMENT_EXTENSION_PREFIX}#{placement}"
     end
 
-    def self.valid_placements(_root_account)
+    def self.valid_placements(root_account)
       PLACEMENTS.dup.tap do |p|
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
+        p.delete(:ActivityAssetProcessor) unless root_account&.feature_enabled?(:lti_asset_processor)
       end
     end
 
