@@ -50,14 +50,17 @@ export default class TimeBlockRow {
     renderDatetimeField(this.$date, {
       dateOnly: true,
       datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))},
+      newSuggestionDesign: true,
     })
     this.$date.change(this.validate)
     renderDatetimeField($(this.$start_time), {
       timeOnly: true,
+      newSuggestionDesign: true,
     })
     this.$start_time.change(this.validate)
     renderDatetimeField($(this.$end_time), {
       timeOnly: true,
+      newSuggestionDesign: true,
     })
     this.$end_time.change(this.validate)
 
@@ -85,18 +88,25 @@ export default class TimeBlockRow {
     }
   }
 
-  validate = () => {
-    // clear previous errors
-    const remove = el => el && el.remove()
-    remove(this.$date.data('associated_error_box'))
-    this.$date.toggleClass('error', false)
-    remove(this.$start_time.data('associated_error_box'))
-    this.$start_time.toggleClass('error', false)
-    remove(this.$end_time.data('associated_error_box'))
-    this.$end_time.toggleClass('error', false)
+  showInlineError = ($el, message) => {
+    const error_box = $el.next('.datetime_suggest')
+    error_box.addClass('invalid_datetime')
+    error_box.children('.error-message').children('span').text(message)
+    error_box.show()
+  }
 
+  clearInlineError = $el => {
+    const error_box = $el.next('.datetime_suggest')
+    error_box.removeClass('invalid_datetime')
+    error_box.hide()
+  }
+
+  validate = () => {
     // for locked row, all values are valid, regardless of actual value
     if (this.locked) {
+      this.$date.toggleClass('error', false)
+      this.$start_time.toggleClass('error', false)
+      this.$end_time.toggleClass('error', false)
       return true
     }
 
@@ -109,18 +119,24 @@ export default class TimeBlockRow {
     const start = this.startAt()
     const end = this.endAt()
     if (start && end && end <= start) {
-      this.$start_time.errorBox(
+      this.showInlineError(
+        this.$start_time,
         I18n.t('end_before_start_error', 'Start time must be before end time')
       )
       startValid = false
+    } else {
+      this.clearInlineError(this.$start_time)
     }
 
     // and end is in the future
     if (end && end < fcUtil.now()) {
-      this.$end_time.errorBox(
+      this.showInlineError(
+        this.$end_time,
         I18n.t('ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
       )
       endValid = false
+    } else {
+      this.clearInlineError(this.$end_time)
     }
 
     // toggle error class on each as appropriate
