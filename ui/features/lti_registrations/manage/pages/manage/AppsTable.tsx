@@ -71,6 +71,38 @@ type Column = {
 
 const ellispsisStyles = {overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
 
+const renderEditButton = (r: LtiRegistration) => {
+  const imsRegistrationId = r.ims_registration_id
+  const manualConfigurationId = r.manual_configuration_id
+  if (r.inherited) {
+    return null
+  } else if (imsRegistrationId) {
+    return (
+      <Menu.Item
+        onClick={() => {
+          openEditDynamicRegistrationWizard(imsRegistrationId)
+        }}
+      >
+        {I18n.t('Edit App')}
+      </Menu.Item>
+    )
+  } else if (manualConfigurationId && !r.inherited && window.ENV.FEATURES.lti_registrations_next) {
+    return (
+      <Menu.Item
+        onClick={() => {
+          openEditManualRegistrationWizard(r.id, () => {
+            refreshRegistrations()
+          })
+        }}
+      >
+        {I18n.t('Edit App')}
+      </Menu.Item>
+    )
+  } else {
+    return null
+  }
+}
+
 const Columns: ReadonlyArray<Column> = [
   {
     id: 'name',
@@ -176,13 +208,13 @@ const Columns: ReadonlyArray<Column> = [
     width: '80px',
     render: (r, {deleteApp}) => {
       const developerKeyId = r.developer_key_id
-      const imsRegistrationId = r.ims_registration_id
-      const manualConfigurationId = r.manual_configuration_id
 
       return (
         <Menu
+          data-testid={`actions-menu-${r.id}`}
           trigger={
             <IconButton
+              data-testid={`actions-menu-${r.id}`}
               withBackground={false}
               withBorder={false}
               screenReaderLabel={I18n.t('More Registration Options')}
@@ -213,26 +245,7 @@ const Columns: ReadonlyArray<Column> = [
               {I18n.t('Copy Client ID')}
             </Menu.Item>
           ) : null}
-          {imsRegistrationId ? (
-            <Menu.Item
-              onClick={() => {
-                openEditDynamicRegistrationWizard(imsRegistrationId)
-              }}
-            >
-              {I18n.t('Edit App')}
-            </Menu.Item>
-          ) : null}
-          {manualConfigurationId && window.ENV.FEATURES.lti_registrations_next ? (
-            <Menu.Item
-              onClick={() => {
-                openEditManualRegistrationWizard(r.id, () => {
-                  refreshRegistrations()
-                })
-              }}
-            >
-              {I18n.t('Edit App')}
-            </Menu.Item>
-          ) : null}
+          {renderEditButton(r)}
           {isForcedOn(r) ? (
             <Menu.Item
               themeOverride={{
