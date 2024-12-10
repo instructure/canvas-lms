@@ -72,7 +72,7 @@ $.fn.fixDialogButtons = function () {
 const group = (opts = {}) => new AssignmentGroup({group_weight: 50, ...opts})
 
 const assignmentGroups = () =>
-  new AssignmentGroupCollection([group({name: 'G1'}), group({name: 'G2'})])
+  new AssignmentGroupCollection([group({id: '1', name: 'G1'}), group({id: '2', name: 'G2'})])
 
 const createView = function (opts = {}) {
   document.body.innerHTML = '<div id="main"></div>'

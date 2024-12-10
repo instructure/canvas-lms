@@ -18,6 +18,8 @@
 
 /* eslint-disable no-void */
 
+import React from 'react'
+import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -27,12 +29,16 @@ import {each, some, extend as lodashExtend} from 'lodash'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSettingsTemplate from '../../jst/AssignmentSettings.handlebars'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('AssignmentSettingsView')
 
 extend(AssignmentSettingsView, DialogFormView)
 
 function AssignmentSettingsView() {
+  this.errorRoots = {}
   return AssignmentSettingsView.__super__.constructor.apply(this, arguments)
 }
 
@@ -75,7 +81,7 @@ AssignmentSettingsView.prototype.validateFormData = function () {
     (function (_this) {
       return function (weight) {
         const weight_value = $(weight).val()
-        const field_selector = weight.getAttribute('name')
+        const field_selector = weight.getAttribute('groupId')
         // eslint-disable-next-line no-restricted-globals
         if (weight_value && isNaN(numberHelper.parse(weight_value))) {
           return (errors[field_selector] = [
@@ -89,6 +95,49 @@ AssignmentSettingsView.prototype.validateFormData = function () {
     })(this)
   )
   return errors
+}
+
+AssignmentSettingsView.prototype.showErrors = function (errors) {
+  if (Object.keys(errors).length > 0) {
+    let shouldFocus = true
+    Object.entries(errors).forEach(([groupId, errors]) => {
+      const container = document.getElementById(`assignment_group_${groupId}_weight`)
+      if (container) {
+        container.style.outline = '1px solid red'
+        container.style.borderRadius = '3px'
+        // focus the first error
+        if (shouldFocus) {
+          container.querySelector(`input[groupId="${groupId}"]`)?.focus()
+          shouldFocus = false
+        }
+      }
+      const errorsContainer = document.getElementById(`group_${groupId}_weight_errors`)
+      if (errorsContainer) {
+        const root = this.errorRoots[groupId] ?? createRoot(errorsContainer)
+        root.render(
+          <Flex as="div" alignItems="center" justifyItems="end" margin="x-small 0 0 0">
+            <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+              <IconWarningSolid color="error" />
+            </Flex.Item>
+            <Text size="small" color="danger">
+              {errors[0].message}
+            </Text>
+          </Flex>
+        )
+        this.errorRoots[groupId] = root
+      }
+    })
+  }
+}
+
+AssignmentSettingsView.prototype.hideErrors = function (groupId) {
+  const container = document.getElementById(`assignment_group_${groupId}_weight`)
+  if (container) {
+    container.style.outline = ''
+    container.style.borderRadius = ''
+  }
+  this.errorRoots[groupId]?.unmount()
+  delete this.errorRoots[groupId]
 }
 
 AssignmentSettingsView.prototype.openAgain = function () {
@@ -197,7 +246,11 @@ AssignmentSettingsView.prototype.clearWeights = function () {
   return this.$el.find('#assignment_groups_weights tbody').empty()
 }
 
-AssignmentSettingsView.prototype.updateTotalWeight = function () {
+AssignmentSettingsView.prototype.updateTotalWeight = function (event) {
+  const groupId = event.currentTarget.getAttribute('groupId')
+  if (this.errorRoots[groupId] && event.key !== 'Enter') {
+    this.hideErrors(groupId)
+  }
   let i, len, total_weight, v
   total_weight = 0
   const ref = this.weights
