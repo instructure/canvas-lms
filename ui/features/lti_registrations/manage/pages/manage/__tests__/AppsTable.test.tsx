@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {AppsTableInner} from '../AppsTable'
-import {mockPageOfRegistrations} from './helpers'
+import {mockPageOfRegistrations, mockRegistration} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
 
 // Need to use AppsTableInner because AppsTable uses Responsive
@@ -90,5 +90,31 @@ describe('AppsTableInner', () => {
     await waitFor(() => {
       expect(wrapper.getByText('16 - 17 of 17 displayed')).toBeInTheDocument()
     })
+  })
+
+  it('does not show the edit button for inherited registrations', async () => {
+    const wrapper = render(
+      <BrowserRouter>
+        <AppsTableInner
+          tableProps={{
+            apps: {
+              data: [mockRegistration('ExampleApp', 1, {}, {inherited: true})],
+              total: 1,
+            },
+            dir: 'asc',
+            sort: 'name',
+            updateSearchParams: () => {},
+            deleteApp: () => {},
+            page: 1,
+          }}
+          responsiveProps={undefined}
+        />
+      </BrowserRouter>
+    )
+
+    expect(wrapper.getByTestId(`actions-menu-1`)).toBeInTheDocument()
+    wrapper.getByTestId(`actions-menu-1`).click()
+    expect(wrapper.queryByText('Edit App')).not.toBeInTheDocument()
+    expect(wrapper.queryByText('Copy Client ID')).toBeInTheDocument()
   })
 })
