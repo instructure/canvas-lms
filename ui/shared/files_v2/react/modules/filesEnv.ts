@@ -30,6 +30,7 @@ interface FileContext {
   contextId: string
   root_folder_id: string
   permissions: Permissions
+  name: string
 }
 
 declare const ENV: {

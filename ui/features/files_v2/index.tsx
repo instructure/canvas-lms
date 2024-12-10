@@ -23,15 +23,23 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {createRoot} from 'react-dom/client'
 import {generateFolderByPathUrl} from './utils/apiUtils'
+import AllMyFilesTable from './react/components/AllMyFilesTable'
 
 const contextAssetString = window.ENV.context_asset_string
+const showingAllContexts = filesEnv.showingAllContexts
 
 const router = createBrowserRouter(
   [
     {
       path: '/',
-      element: <FilesApp contextAssetString={contextAssetString} />,
+      element: showingAllContexts ? (
+        <AllMyFilesTable />
+      ) : (
+        <FilesApp contextAssetString={contextAssetString} />
+      ),
       loader: async () => {
+        if (showingAllContexts) return null
+
         const url = generateFolderByPathUrl('')
         return fetch(url)
       },

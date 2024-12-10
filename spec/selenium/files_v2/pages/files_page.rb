@@ -29,15 +29,19 @@ module FilesPage
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
   end
 
-  def folder_link(folder_name)
-    f("[data-testid='#{folder_name}']")
-  end
-
   def files_usage_text_selector
     "[data-testid='files-usage-text']"
   end
 
   def files_usage_text
     f(files_usage_text_selector)
+  end
+
+  def table_item_by_name(name)
+    f("[data-testid='#{name}']")
+  end
+
+  def table_rows
+    ff("tbody tr")
   end
 end
