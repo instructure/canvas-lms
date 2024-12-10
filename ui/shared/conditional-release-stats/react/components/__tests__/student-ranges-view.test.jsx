@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,19 +17,23 @@
  */
 
 import React from 'react'
+import {render, screen} from '@testing-library/react'
+import StudentRangesView from '../student-ranges-view'
 
-import ReactDOM from 'react-dom'
-import RangesView from '../student-ranges-view'
-
-const container = document.getElementById('fixtures')
-
-QUnit.module('Student Ranges View', {
-  teardown() {
-    ReactDOM.unmountComponentAtNode(container)
-  },
+// Suppress React key warning since we're not testing that functionality
+const originalError = console.error
+beforeAll(() => {
+  console.error = (...args) => {
+    if (args[0].includes('unique "key" prop')) return
+    originalError.call(console, ...args)
+  }
 })
 
-const defaultProps = () => ({
+afterAll(() => {
+  console.error = originalError
+})
+
+const defaultProps = {
   ranges: [
     {
       scoring_range: {
@@ -77,36 +81,42 @@ const defaultProps = () => ({
     description: '',
     points_possible: 15,
     grading_type: 'points',
-    submission_types: 'on_paper',
+    submission_types: ['on_paper'],
     grading_scheme: null,
   },
   selectedPath: {
     range: 0,
     student: null,
   },
-  loadStudent: () => {},
-  selectRange: () => {},
-  selectStudent: () => {},
-})
-
-// using ReactDOM instead of TestUtils to render because of InstUI
-// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-const renderComponent = props => ReactDOM.render(<RangesView {...props} />, container)
-
-// skip if webpack: CNVS-33473
-if (window.hasOwnProperty('define')) {
-  test('renders three ranges components correctly', () => {
-    renderComponent(defaultProps())
-
-    const tabs = document.querySelectorAll('[role="tab"]')
-    equal(tabs.length, 3, 'renders full component')
-
-    const tabPanels = document.querySelectorAll('[role="tabpanel"]')
-    equal(tabPanels.length, 3, 'renders full component')
-
-    // Accordion only renders the currently open tab, so we only check for the first tab's content
-    ok(document.querySelector('[role="tabpanel"] .crs-student-range'))
-  })
-} else {
-  QUnit.skip('renders three ranges components correctly')
+  selectStudent: jest.fn(),
 }
+
+describe('StudentRangesView', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('renders three range components correctly', () => {
+    render(<StudentRangesView {...defaultProps} />)
+
+    // Verify header
+    expect(screen.getByText('Mastery Paths Breakdown')).toBeInTheDocument()
+
+    // Verify range toggle buttons
+    const toggleButtons = screen.getAllByRole('button')
+    expect(toggleButtons).toHaveLength(3)
+
+    // Verify range labels
+    expect(screen.getByText('> 10.5 pts - 15 pts')).toBeInTheDocument()
+    expect(screen.getByText('> 6 pts - 10.5 pts')).toBeInTheDocument()
+    expect(screen.getByText('> 0 pts - 6 pts')).toBeInTheDocument()
+
+    // Verify first range is expanded by default
+    const firstButton = screen.getByRole('button', {name: '> 10.5 pts - 15 pts'})
+    expect(firstButton).toHaveAttribute('aria-expanded', 'true')
+
+    // Verify first range content is visible
+    const firstRangeContent = document.getElementById('Expandable_0')
+    expect(firstRangeContent).toHaveClass('css-2yuqo3-toggleDetails__details')
+  })
+})
