@@ -112,6 +112,9 @@ class HistoryController < ApplicationController
     render json: page_views
       .select { |pv| auas.key?(pv.asset_user_access_id) }
       .map { |pv| history_entry_json(pv, auas[pv.asset_user_access_id], @current_user, session) }
+  rescue PageView::Pv4Client::Pv4EmptyResponse => e
+    Canvas::Errors.capture_exception(:pv4, e, :warn)
+    render json: { error: t("Page view data is not available at this time") }, status: :service_unavailable
   rescue PageView::Pv4Client::Pv4Timeout => e
     Canvas::Errors.capture_exception(:pv4, e, :warn)
     render json: { error: t("Page Views service is temporarily unavailable") }, status: :bad_gateway
