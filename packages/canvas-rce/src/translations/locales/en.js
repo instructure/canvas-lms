@@ -248,6 +248,7 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Decorative { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Decrease Indent" },
   "deep_purple_bb3e2907": { "message": "Deep Purple" },
+  "default_9db103d": { "message": "Default" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "default bulleted unordered list"
   },
