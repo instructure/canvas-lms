@@ -3653,6 +3653,7 @@ el:
   confirm_contact_method_29d6fe4b: "Επιβεβαίωση τρόπου επικοινωνίας"
   confirm_delete_6febeafb: "Επικύρωση Αφαίρεσης"
   confirm_email_address_9072dd3c: "Επικύρωση Ηλεκτρονικής Διεύθυνσης"
+  confirm_password_aaf07824: "Επικύρωση Συνθηματικού"
   confirm_unenrollment_64333263: "Επιβεβαίωση απεγγραφής"
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
   confirmation_failed_please_try_again_ae566d37: "<mrk mid=\"5637\" mtype=\"seg\">Απέτυχε η επιβεβαίωση.</mrk>  <mrk mid=\"5638\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
