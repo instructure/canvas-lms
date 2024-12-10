@@ -17,19 +17,26 @@
 
 import I18n from '@canvas/i18n'
 
-const units = ['byte', 'bytes', 'KB', 'MB', 'GB', 'TB']
+const decimalUnits = ['byte', 'bytes', 'KB', 'MB', 'GB', 'TB']
+const binaryUnits = ['byte', 'bytes', 'KiB', 'MiB', 'GiB', 'TiB']
 
-// converts bytes into a nice representation with unit. e.g. 13661855 -> 13.7 MB, 825399 -> 825 KB, 1396 -> 1 KB
+// converts bytes into a nice representation with unit according to user's OS
+// for Mac OS users, 13661855 -> 13.7 MB, 825399 -> 825 KB, 1396 -> 1 KB
+// for other users, 13661855 -> 13 MiB, 825399 -> 806 KiB, 1396 -> 1KiB
 export default function friendlyBytes(value) {
   let resInt, resValue
   const bytes = parseInt(value, 10)
   if (bytes.toString() === 'NaN') return '--'
 
+  const isMac = navigator.userAgent.includes('Mac OS')
+  const frac = isMac ? 1000 : 1024
+  const units = isMac ? decimalUnits : binaryUnits
+
   if (bytes === 0) {
     resInt = resValue = 0
   } else {
-    resInt = Math.floor(Math.log(bytes) / Math.log(1000)) // base 10 (rather than 1024) matches Mac OS X
-    resValue = (bytes / Math.pow(1000, Math.floor(resInt))).toFixed(resInt < 2 ? 0 : 1) // no decimals for anything smaller than 1 MB
+    resInt = Math.floor(Math.log(bytes) / Math.log(frac))
+    resValue = (bytes / Math.pow(frac, Math.floor(resInt))).toFixed(resInt < 2 ? 0 : 1) // no decimals for anything smaller than 1 MB
     if (bytes === 1) resInt = -1 // 1 byte special case
   }
 
