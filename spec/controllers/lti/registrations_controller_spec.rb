@@ -1543,6 +1543,18 @@ RSpec.describe Lti::RegistrationsController do
       expect(Lti::RegistrationAccountBinding.last.workflow_state).to eq("off")
     end
 
+    context "without nickname" do
+      before do
+        params.delete(:admin_nickname)
+      end
+
+      it "leaves nickname empty" do
+        subject
+        expect(response).to be_successful
+        expect(response_json[:admin_nickname]).to be_nil
+      end
+    end
+
     context "setting the unified_tool_id" do
       let(:params) do
         super().tap do |p|
