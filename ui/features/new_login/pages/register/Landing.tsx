@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {ActionPrompt, Card, ROUTES} from '../../shared'
+import {ActionPrompt, Card} from '../../shared'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {ROUTES} from '../../routes/routes'
 import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {type ViewOwnProps} from '@instructure/ui-view'

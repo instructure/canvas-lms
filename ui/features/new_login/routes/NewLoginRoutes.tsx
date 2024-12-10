@@ -20,7 +20,7 @@ import React, {lazy} from 'react'
 import RegistrationRoutesMiddleware from './RegistrationRoutesMiddleware'
 import {LoginLayout} from '../layouts/LoginLayout'
 import {NewLoginProvider} from '../context/NewLoginContext'
-import {ROUTES} from '../shared'
+import {ROUTES} from './routes'
 import {Route} from 'react-router-dom'
 
 const SignIn = lazy(() => import('../pages/SignIn'))

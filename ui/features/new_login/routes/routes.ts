@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 export const ROUTES = {
   FORGOT_PASSWORD: '/login/canvas/forgot-password',
   REGISTER: '/login/canvas/register',

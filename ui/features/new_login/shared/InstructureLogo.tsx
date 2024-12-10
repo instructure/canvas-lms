@@ -19,7 +19,7 @@
 import React from 'react'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
-import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {type ViewOwnProps} from '@instructure/ui-view'
 import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 

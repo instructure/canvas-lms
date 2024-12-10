@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {GlobalStyle} from '..'
-import {css} from '@emotion/react'
 import {render} from '@testing-library/react'
 
 const getGlobalStyle = () => {
