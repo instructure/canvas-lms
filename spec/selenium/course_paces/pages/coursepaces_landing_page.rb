@@ -109,6 +109,10 @@ module CoursePacesLandingPageObject
     "[data-testid='download-pace']"
   end
 
+  def draft_pace_confused_panda_div_selector
+    "[data-testid='draft-pace-confused-panda-div']"
+  end
+
   #------------------------- Elements --------------------------------
 
   def community_info_text

@@ -107,6 +107,28 @@ describe "course pace landing page" do
       expect(number_of_sections.text).to include("2")
       expect(default_duration.text).to include("3 days")
     end
+
+    it "does not show direct publish draft pace button for published paces" do
+      visit_course_paces_page
+
+      expect(element_exists?(direct_publish_draft_button_selector)).to be_falsey
+    end
+  end
+
+  context "draft course pace landing page" do
+    before :once do
+      @course.root_account.enable_feature!(:course_pace_draft_state)
+      @course.root_account.reload
+      create_draft_course_pace
+    end
+
+    it "shows publish pace button and draft status pill" do
+      visit_course_paces_page
+
+      expect(element_exists?(draft_pace_status_pill_selector)).to be_truthy
+      expect(element_exists?(direct_publish_draft_button_selector)).to be_truthy
+      expect(element_exists?(draft_pace_confused_panda_div_selector)).to be_truthy
+    end
   end
 
   context "course pace table for sections" do

@@ -52,14 +52,14 @@ const text = (changeCount: number) => {
   if (changeCount < 0) throw Error(`changeCount cannot be negative (${changeCount})`)
   if (changeCount === 0) {
     return window.ENV.FEATURES.course_paces_redesign
-      ? I18n.t('No pending changes to apply')
+      ? I18n.t('No pending changes')
       : I18n.t('All changes published')
   }
 
   return I18n.t(
     {
-      one: '1 unpublished change',
-      other: '%{count} unpublished changes',
+      one: '1 unsaved change',
+      other: '%{count} unsaved changes',
     },
     {count: changeCount}
   )

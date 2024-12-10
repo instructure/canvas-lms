@@ -61,7 +61,7 @@ describe('UnpublishedChangesTrayContents', () => {
     const {getByText} = render(
       <UnpublishedChangesTrayContents {...defaultProps} unpublishedChanges={[]} />
     )
-    expect(getByText('Unpublished Changes')).toBeInTheDocument()
+    expect(getByText('Unsaved Changes')).toBeInTheDocument()
   })
 
   it('calls the handleTrayDismiss when the close button is clicked', async () => {
@@ -117,7 +117,7 @@ describe('UnpublishedChangesTrayContents', () => {
   it('does not render the reset all button if the course_paces_redesign flag is disabled', () => {
     window.ENV.FEATURES.course_paces_redesign = false
     const {getByText, queryByText} = render(<UnpublishedChangesTrayContents {...defaultProps} />)
-    expect(getByText('Unpublished Changes')).toBeInTheDocument()
+    expect(getByText('Unsaved Changes')).toBeInTheDocument()
     expect(queryByText('Reset all')).not.toBeInTheDocument()
   })
 })

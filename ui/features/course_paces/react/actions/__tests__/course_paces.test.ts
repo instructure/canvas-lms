@@ -88,8 +88,8 @@ describe('Course paces actions', () => {
       })
       const thunkedAction = coursePaceActions.publishPace()
       await thunkedAction(dispatch, getState)
-      expect(dispatch.mock.calls[0]).toEqual([uiActions.startSyncing()])
-      expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('publish')])
+      expect(dispatch.mock.calls[0]).toEqual([uiActions.clearCategoryError('publish')])
+      expect(dispatch.mock.calls[1]).toEqual([uiActions.startSyncing()])
       expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.saveCoursePace(updatedPace)])
       expect(dispatch.mock.calls[3]).toEqual([coursePaceActions.setProgress(PROGRESS_RUNNING)])
       // Compare dispatched functions by name since they won't be directly equal
@@ -130,8 +130,8 @@ describe('Course paces actions', () => {
       await thunkedAction(dispatch, getState)
 
       expect(dispatch.mock.calls).toEqual([
-        [uiActions.startSyncing()],
         [uiActions.clearCategoryError('publish')],
+        [uiActions.startSyncing()],
         [uiActions.setCategoryError('publish', error.toString())],
         [uiActions.syncingCompleted()],
       ])

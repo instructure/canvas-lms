@@ -99,7 +99,7 @@ export interface CoursePace {
   readonly start_date_context: ContextTypes
   readonly end_date: OptionalDate
   readonly end_date_context: ContextTypes
-  readonly workflow_state: WorkflowStates
+  workflow_state: WorkflowStates
   readonly modules: Module[]
   readonly exclude_weekends: boolean
   readonly selected_days_to_skip: string[]
@@ -123,6 +123,7 @@ export interface Progress {
   readonly updated_at: string
   readonly workflow_state: ProgressStates
   readonly url: string
+  readonly context_id: string
 }
 
 /* Redux state types */
@@ -142,6 +143,7 @@ export type OriginalState = {
 export interface UIState {
   readonly autoSaving: boolean
   readonly syncing: number
+  readonly savingDraft: boolean
   readonly errors: CategoryErrors
   readonly divideIntoWeeks: boolean
   readonly selectedContextType: PaceContextTypes
