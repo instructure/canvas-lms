@@ -238,33 +238,6 @@ Object.defineProperty(window, 'scrollTo', {
   value: () => {},
 })
 
-const locationProperties = Object.getOwnPropertyDescriptors(window.location)
-Object.defineProperty(window, 'location', {
-  configurable: true,
-  enumerable: true,
-  get: () =>
-    Object.defineProperties(
-      {},
-      {
-        ...locationProperties,
-        href: {
-          ...locationProperties.href,
-          // Prevents JSDOM errors from doing window.location.href = ...
-          set: () => {},
-        },
-        reload: {
-          configurable: true,
-          enumerable: true,
-          writeable: true,
-          // Prevents JSDOM errors from doing window.location.reload()
-          value: () => {},
-        },
-      }
-    ),
-  // Prevents JSDOM errors from doing window.location = ...
-  set: () => {},
-})
-
 if (!('structuredClone' in window)) {
   Object.defineProperty(window, 'structuredClone', {
     value: obj => JSON.parse(JSON.stringify(obj)),
