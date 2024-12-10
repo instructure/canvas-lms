@@ -1182,7 +1182,7 @@ class Lti::RegistrationsController < ApplicationController
     registration = Lti::Registration.transaction do
       vendor = params[:vendor]
       name = params[:name] || configuration_params[:title]
-      admin_nickname = params[:admin_nickname] || configuration_params[:title]
+      admin_nickname = params[:admin_nickname]
       scopes = configuration_params[:scopes]
 
       registration = Lti::Registration.create!(
@@ -1499,10 +1499,6 @@ class Lti::RegistrationsController < ApplicationController
     errors = configuration_errors + overlay_errors
 
     render_configuration_errors(errors) if errors.present?
-  end
-
-  def update_params
-    params.permit(:admin_nickname).merge({ updated_by: @current_user })
   end
 
   # At the model level, setting an invalid workflow_state will silently change it to the
