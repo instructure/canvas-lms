@@ -61,6 +61,18 @@ consolidated_media_player:
     development:
       state: allowed_on
 
+default_copyright_on_attachments:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Default Copyright on Attachments
+  description: |-
+    Sets the default copyright for new attachments if the course requires copyright on files.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
+
 docviewer_enable_iwork_files:
   state: hidden
   applies_to: RootAccount
