@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import type {GetState, SetState} from 'zustand'
+import type {StoreApi} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import type {CustomColumn, CustomColumnData, ColumnOrderSettings} from '../gradebook.d'
@@ -43,8 +43,8 @@ export type CustomColumnsState = {
 }
 
 export default (
-  set: SetState<GradebookStore>,
-  get: GetState<GradebookStore>
+  set: StoreApi<GradebookStore>['setState'],
+  get: StoreApi<GradebookStore>['getState']
 ): CustomColumnsState => ({
   reorderCustomColumnsUrl: '',
 

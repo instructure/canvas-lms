@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {SetState, GetState} from 'zustand'
+import type {StoreApi} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import {maxAssignmentCount, otherGradingPeriodAssignmentIds} from '../Gradebook.utils'
@@ -66,8 +66,8 @@ type AssignmentLoaderParams = {
 export const normalizeGradingPeriodId = (id?: string) => (id === '0' ? null : id)
 
 export default (
-  set: SetState<GradebookStore>,
-  get: GetState<GradebookStore>
+  set: StoreApi<GradebookStore>['setState'],
+  get: StoreApi<GradebookStore>['getState']
 ): AssignmentsState => ({
   gradingPeriodAssignments: {},
 

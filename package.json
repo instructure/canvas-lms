@@ -223,7 +223,7 @@
     "webpack-retry-chunk-load-plugin": "^3.1.1",
     "yarn-deduplicate": "^3.0.1",
     "zod": "^3.22.4",
-    "zustand": "3.7.2"
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@apollo/react-common": "~3.1.3",

@@ -19,6 +19,7 @@
 import React, {useEffect} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useStoreWithEqualityFn} from 'zustand/traditional'
 import useStore from '../stores/index'
 import type {GradeLoadingData} from '../jquery/speed_grader.d'
 
@@ -33,8 +34,12 @@ type Props = {
 }
 
 export default function GradeLoadingSpinner({onLoadingChange}: Props) {
-  const {currentStudentId, gradesLoading} = useStore(
-    state => ({currentStudentId: state.currentStudentId, gradesLoading: state.gradesLoading}),
+  const {currentStudentId, gradesLoading} = useStoreWithEqualityFn(
+    useStore,
+    state => ({
+      currentStudentId: state.currentStudentId,
+      gradesLoading: state.gradesLoading,
+    }),
     loadingStateChanged
   )
 

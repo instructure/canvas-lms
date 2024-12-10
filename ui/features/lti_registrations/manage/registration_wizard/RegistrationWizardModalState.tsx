@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import create from 'zustand'
+import {create} from 'zustand'
 import {isSuccessful, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
