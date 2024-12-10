@@ -883,3 +883,51 @@ export const FAKE_FOLDERS: Folder[] = [
 ]
 
 export const FAKE_FOLDERS_AND_FILES: (File | Folder)[] = [...FAKE_FOLDERS, ...FAKE_FILES]
+
+export const FAKE_COURSE_FOLDER = {
+  id: '1',
+  name: 'A Fake Course folder',
+  full_name: 'course files/2nd Folder/A Fake Course Folder',
+  context_id: '1',
+  context_type: 'Course',
+  parent_folder_id: '42',
+  created_at: '2024-11-11T18:32:45Z',
+  updated_at: '2024-11-11T18:32:45Z',
+  lock_at: null,
+  unlock_at: null,
+  position: 2,
+  locked: false,
+  folders_url: 'http://canvas-web.inseng.test/api/v1/folders/44/folders',
+  files_url: 'http://canvas-web.inseng.test/api/v1/folders/44/files',
+  files_count: 0,
+  folders_count: 0,
+  hidden: null,
+  locked_for_user: false,
+  hidden_for_user: false,
+  for_submissions: false,
+  can_upload: true,
+}
+
+export const FAKE_USER_FOLDER = {
+  id: '1',
+  name: 'A Fake Course folder',
+  full_name: 'my files/2nd Folder/A Fake Course Folder',
+  context_id: '1',
+  context_type: 'User',
+  parent_folder_id: '42',
+  created_at: '2024-11-11T18:32:45Z',
+  updated_at: '2024-11-11T18:32:45Z',
+  lock_at: null,
+  unlock_at: null,
+  position: 2,
+  locked: false,
+  folders_url: 'http://canvas-web.inseng.test/api/v1/folders/44/folders',
+  files_url: 'http://canvas-web.inseng.test/api/v1/folders/44/files',
+  files_count: 0,
+  folders_count: 0,
+  hidden: null,
+  locked_for_user: false,
+  hidden_for_user: false,
+  for_submissions: false,
+  can_upload: true,
+}

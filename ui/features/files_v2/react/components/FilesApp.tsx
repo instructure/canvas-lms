@@ -25,9 +25,8 @@ import {Flex} from '@instructure/ui-flex'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {Responsive} from '@instructure/ui-responsive'
 
-import TopLevelButtons from './TopLevelButtons'
+import FilesHeader from './FilesHeader'
 import FileFolderTable from './FileFolderTable'
-
 import FilesUsageBar from './FilesUsageBar'
 import {useLoaderData} from 'react-router-dom'
 import {type Folder} from '../../interfaces/File'
@@ -61,30 +60,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
 
   return (
     <View as="div">
-      <Flex justifyItems="center" padding="medium none none none">
-        <Flex.Item shouldShrink={true} shouldGrow={true} textAlign="center">
-          <Flex
-            wrap="wrap"
-            margin="0 0 medium"
-            justifyItems="space-between"
-            direction={size === 'large' ? 'row' : 'column'}
-          >
-            <Flex.Item padding="small small small none" align="start">
-              <Heading level="h1">
-                {isUserContext ? I18n.t('All My Files') : I18n.t('Files')}
-              </Heading>
-            </Flex.Item>
-            <Flex.Item
-              padding="xx-small"
-              direction={size === 'small' ? 'column' : 'row'}
-              align={size === 'medium' ? 'start' : undefined}
-              overflowX="hidden"
-            >
-              <TopLevelButtons size={size} isUserContext={isUserContext} />
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-      </Flex>
+      <FilesHeader size={size} isUserContext={isUserContext} />
       <FileFolderTable
         size={size}
         folderId={folderId}

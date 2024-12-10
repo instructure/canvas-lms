@@ -25,9 +25,10 @@ const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
   size: string
+  isDisabled: boolean
 }
 
-const TopLevelButtons = ({isUserContext, size}: TopLevelButtonsProps) => {
+const TopLevelButtons = ({isUserContext, size, isDisabled}: TopLevelButtonsProps) => {
   const buttonDisplay = size === 'small' ? 'block' : 'inline-block'
 
   const uploadButton = () => {
@@ -37,6 +38,7 @@ const TopLevelButtons = ({isUserContext, size}: TopLevelButtonsProps) => {
         margin="none none small none"
         renderIcon={<IconUploadLine />}
         display={buttonDisplay}
+        disabled={isDisabled}
       >
         {I18n.t('Upload')}
       </Button>
@@ -50,6 +52,7 @@ const TopLevelButtons = ({isUserContext, size}: TopLevelButtonsProps) => {
         margin="none x-small small none"
         renderIcon={<IconAddLine />}
         display={buttonDisplay}
+        disabled={isDisabled}
       >
         {I18n.t('Folder')}
       </Button>
@@ -60,7 +63,12 @@ const TopLevelButtons = ({isUserContext, size}: TopLevelButtonsProps) => {
     if (isUserContext) return null
     return (
       <a href="/files" tabIndex={-1}>
-        <Button color="secondary" margin="none x-small small none" display={buttonDisplay}>
+        <Button
+          color="secondary"
+          margin="none x-small small none"
+          display={buttonDisplay}
+          disabled={isDisabled}
+        >
           {I18n.t('All My Files')}
         </Button>
       </a>

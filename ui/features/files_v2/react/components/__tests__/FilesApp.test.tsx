@@ -61,20 +61,6 @@ describe('FilesApp', () => {
     )
   }
 
-  it('renders "Files" when contextAssetString starts with "course_"', async () => {
-    renderComponent('course_12345')
-
-    const headingElement = await screen.findByText('Files', {exact: true})
-    expect(headingElement).toBeInTheDocument()
-  })
-
-  it('renders "All My Files" when contextAssetString starts with "user_"', async () => {
-    renderComponent('user_67890')
-
-    const headingElement = await screen.findByText(/All My Files/i)
-    expect(headingElement).toBeInTheDocument()
-  })
-
   it('does not render progress bar without permission', async () => {
     filesEnv.userHasPermission = jest.fn().mockReturnValue(false)
     renderComponent('course_12345')
