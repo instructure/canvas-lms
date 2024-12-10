@@ -113,6 +113,7 @@ export function addModuleElement(
         courseId={ENV.course_id}
         moduleId={data.context_module.id}
         contextModules={contextModules}
+        moduleName={data.context_module.name}
       />,
       module_dnd
     )

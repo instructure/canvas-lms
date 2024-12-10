@@ -1339,6 +1339,7 @@ modules.initModuleManagement = async function (duplicate) {
       const newModuleId = response.data.context_module.id
       // This is terrible but then so is the whole file so it fits in
       const contextId = response.data.context_module.context_id
+      const moduleName = response.data.context_module.name
       const modulesPage = `/courses/${contextId}/modules`
       axios
         .get(modulesPage)
@@ -1356,6 +1357,7 @@ modules.initModuleManagement = async function (duplicate) {
                 courseId={ENV.course_id}
                 moduleId={newModuleId}
                 contextModules={contextModules}
+                moduleName={moduleName}
               />,
               module_dnd
             )

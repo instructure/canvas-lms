@@ -30,6 +30,9 @@ import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import UploadForm from '@canvas/files/react/components/UploadForm'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {Heading} from '@instructure/ui-heading'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('modules')
 
@@ -38,10 +41,12 @@ export default class ModuleFileDrop extends React.Component {
     courseId: string.isRequired,
     moduleId: string.isRequired,
     contextModules: instanceOf(Element),
+    moduleName: string,
   }
 
   static defaultProps = {
     contextModules: null,
+    moduleName: null,
   }
 
   static folderState = {}
@@ -156,16 +161,36 @@ export default class ModuleFileDrop extends React.Component {
   }
 
   renderBillboard() {
+    const {moduleName} = this.props
     const {folder} = this.state
+
+    let a11yMessage = I18n.t('Loading...')
+    if (folder) {
+      if (moduleName) {
+        a11yMessage = I18n.t('Drop files here to add to %{moduleName} module or choose files', {
+          moduleName,
+        })
+      } else {
+        a11yMessage = I18n.t('Drop files here to add to module or choose files')
+      }
+    }
     return (
       <Billboard
-        heading={folder ? I18n.t('Drop files here to add to module') : I18n.t('Loading...')}
-        headingLevel="h4"
         hero={size => this.renderHero(size)}
         message={
-          <Text size="small" color="brand">
-            {folder ? I18n.t('or choose files') : ''}
-          </Text>
+          <AccessibleContent alt={a11yMessage}>
+            <View as="span" display="block" margin="medium 0 0">
+              <Heading level="h4" as="span" color="primary">
+                {folder ? I18n.t('Drop files here to add to module') : I18n.t('Loading...')}
+              </Heading>
+            </View>
+
+            <View as="span" display="block" margin="small 0 0">
+              <Text size="small" color="brand">
+                {folder ? I18n.t('or choose files') : ''}
+              </Text>
+            </View>
+          </AccessibleContent>
         }
       />
     )
