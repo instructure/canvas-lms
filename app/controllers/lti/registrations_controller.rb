@@ -1096,7 +1096,8 @@ class Lti::RegistrationsController < ApplicationController
     # as doing so might cause the actual redirect_uris on existing tool configurations
     # to be overwritten. We need to include them here so that the UI can display
     # them properly.
-    configuration[:redirect_uris] = [configuration[:target_link_uri]] unless configuration.key?(:redirect_uris)
+    configuration[:redirect_uris] ||= [configuration[:target_link_uri]]
+    configuration[:redirect_uris] = Array(configuration[:redirect_uris])
 
     render json: { configuration: }
   end
