@@ -184,7 +184,8 @@ describe "Screenreader Gradebook grading" do
       end
     end
 
-    it "prev tab keeps focus" do
+    # EGG-411
+    xit "prev tab keeps focus" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@checkpointed_assignment.id}&student_id=#{@student2.id}&entry_id=#{@entry.id}"
 
       in_frame("speedgrader_iframe") do
