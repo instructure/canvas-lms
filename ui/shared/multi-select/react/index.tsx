@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef, useMemo} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import React, {useState, useEffect, useRef, useMemo, type PropsWithChildren} from 'react'
 import keycode from 'keycode'
-import {Select} from '@instructure/ui-select'
+import {Select, type SelectProps} from '@instructure/ui-select'
 import type {ViewProps} from '@instructure/ui-view'
 import {Tag} from '@instructure/ui-tag'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
@@ -35,11 +35,12 @@ type OptionProps = {
   value: string
   label: React.ReactNode
   tagText?: string
+  isSelected?: boolean
 }
 
 export type Size = 'small' | 'medium' | 'large'
 
-const CanvasMultiSelectOption: React.FC = _props => <div />
+const CanvasMultiSelectOption: React.FC<PropsWithChildren<OptionProps>> = _props => <div />
 
 function liveRegion(): HTMLElement {
   const div = document.getElementById('flash_screenreader_holder')
@@ -79,6 +80,11 @@ type Props = {
   messages?: FormMessage[]
   onUpdateHighlightedOption?: (id: string) => void
   setInputRef?: (ref: HTMLInputElement | null) => void
+} & {
+  // All the original select props should be available
+  // as we allow to overrite everthing with the spread operator
+  inputValue?: SelectProps['inputValue']
+  onInputChange?: SelectProps['onInputChange']
 }
 
 function CanvasMultiSelect(props: Props) {
