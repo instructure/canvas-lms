@@ -27,18 +27,27 @@ const getPresetTooltip = (preset: HTMLElement) => {
   return document.getElementById(preset.getAttribute('aria-describedby')!)
 }
 
+const DEFAULT_FONT_COLOR = '#2d3b45'
+
+const baseTabs = {
+  foreground: {
+    color: DEFAULT_FONT_COLOR,
+    default: DEFAULT_FONT_COLOR,
+  },
+  background: {
+    color: '#aaaaaa',
+    default: '#00000000',
+  },
+  border: {
+    color: DEFAULT_FONT_COLOR,
+    default: DEFAULT_FONT_COLOR,
+  },
+  effectiveBgColor: '#ffffff',
+}
+const cloneBaseTabs = () => JSON.parse(JSON.stringify(baseTabs))
+
 const renderComponent = (props = {}) => {
-  return render(
-    <ColorPicker
-      tabs={{
-        foreground: '#111111',
-        background: '#ff0000',
-      }}
-      onCancel={jest.fn()}
-      onSave={jest.fn()}
-      {...props}
-    />
-  )
+  return render(<ColorPicker tabs={baseTabs} onCancel={jest.fn()} onSave={jest.fn()} {...props} />)
 }
 
 describe('ColorPicker', () => {
@@ -46,9 +55,10 @@ describe('ColorPicker', () => {
     const {getAllByRole, getByText, queryByTestId} = renderComponent()
 
     const tabs = getAllByRole('tab')
-    expect(tabs).toHaveLength(2)
+    expect(tabs).toHaveLength(3)
     expect(tabs[0]).toHaveTextContent('Color')
     expect(tabs[1]).toHaveTextContent('Background')
+    expect(tabs[2]).toHaveTextContent('Border')
     expect(queryByTestId('color-contrast-summary')).toBeInTheDocument()
     expect(queryByTestId('color-contrast')).not.toBeInTheDocument()
     expect(getByText('Cancel')).toBeInTheDocument()
@@ -56,41 +66,20 @@ describe('ColorPicker', () => {
   })
 
   it('renders the given tabs', () => {
-    const {getAllByRole} = renderComponent({
-      tabs: {
-        background: '#ffffff',
-        border: '#000000',
-      },
-    })
+    const tabs = cloneBaseTabs()
+    delete tabs.foreground
+    const {getAllByRole} = renderComponent({tabs})
 
-    const tabs = getAllByRole('tab')
-    expect(tabs).toHaveLength(2)
-    expect(tabs[0]).toHaveTextContent('Background')
-    expect(tabs[1]).toHaveTextContent('Border')
-  })
-
-  it('considers a transparent background not a custom color', () => {
-    const {getAllByRole, getByTestId} = renderComponent({
-      tabs: {
-        background: 'transparent',
-        border: '#000000',
-      },
-    })
-
-    const radioButtons = getAllByRole('radio')
-    expect(radioButtons[0]).toBeChecked()
-    expect(getByTestId('color-mixer')).toHaveAttribute('aria-disabled', 'true')
-    // black and white
-    expect(getByTestId('color-preset').querySelectorAll('[disabled]')).toHaveLength(2)
+    const tabelems = getAllByRole('tab')
+    expect(tabelems).toHaveLength(2)
+    expect(tabelems[0]).toHaveTextContent('Background')
+    expect(tabelems[1]).toHaveTextContent('Border')
   })
 
   it('enables the UI when a custom color is selected', () => {
-    const {getAllByRole, getByTestId} = renderComponent({
-      tabs: {
-        background: 'transparent',
-        border: '#000000',
-      },
-    })
+    const tabs = cloneBaseTabs()
+    delete tabs.foreground
+    const {getAllByRole, getByTestId} = renderComponent({tabs})
 
     const radioButtons = getAllByRole('radio')
     radioButtons[1].click()
@@ -98,38 +87,16 @@ describe('ColorPicker', () => {
     expect(getByTestId('color-preset').querySelectorAll('[disabled]')).toHaveLength(0)
   })
 
-  it('does not show color contrast when the background is transparent', () => {
-    const {queryByTestId} = renderComponent({
-      tabs: {
-        background: 'transparent',
-        foreground: '#000000',
-      },
-    })
-
-    expect(queryByTestId('color-contrast-summary')).not.toBeInTheDocument()
-  })
-
-  it('does not show the color contrast when the border is transparent', () => {
-    const {queryByTestId} = renderComponent({
-      tabs: {
-        background: '#ffffff',
-        border: '#00000000',
-      },
-    })
-
-    expect(queryByTestId('color-contrast-summary')).not.toBeInTheDocument()
-  })
-
   it('does show color contrast when given a foreground and effective background color', () => {
-    const {getAllByRole, getByTestId} = renderComponent({
-      tabs: {
-        effectiveBgColor: '#ff0000',
-        foreground: '#000000',
-      },
-    })
+    const tabs = cloneBaseTabs()
+    delete tabs.background
+    delete tabs.border
+    tabs.effectiveBgColor = '#ff0000'
+    tabs.foreground.color = '#000000'
+    const {getAllByRole, getByTestId} = renderComponent({tabs})
 
-    const tabs = getAllByRole('tab')
-    expect(tabs).toHaveLength(1)
+    const tabelems = getAllByRole('tab')
+    expect(tabelems).toHaveLength(1)
     const contrastSummary = getByTestId('color-contrast-summary')
     expect(contrastSummary.textContent).toContain('PASS')
     contrastSummary.click()
@@ -138,15 +105,14 @@ describe('ColorPicker', () => {
   })
 
   it('does show color contrast when given a background and border color', () => {
-    const {getAllByRole, getByTestId} = renderComponent({
-      tabs: {
-        background: '#ffffff',
-        border: '#000000',
-      },
-    })
+    const tabs = cloneBaseTabs()
+    delete tabs.foreground
+    tabs.background.color = '#ffffff'
+    tabs.border.color = '#000000'
+    const {getAllByRole, getByTestId} = renderComponent({tabs})
 
-    const tabs = getAllByRole('tab')
-    expect(tabs).toHaveLength(2)
+    const tabelems = getAllByRole('tab')
+    expect(tabelems).toHaveLength(2)
     const contrastSummary = getByTestId('color-contrast-summary')
     expect(contrastSummary.textContent).toContain('PASS')
     contrastSummary.click()
@@ -155,20 +121,17 @@ describe('ColorPicker', () => {
   })
 
   it('uses colors on the page for presets', async () => {
-    const {getByTestId} = renderComponent({
-      tabs: {
-        background: '#ff0000',
-        border: '#000000',
-      },
-      colorsInUse: {background: ['#ababab', '#cdcdcd']},
-    })
+    const tabs = cloneBaseTabs()
+    delete tabs.foreground
+    delete tabs.border
+    tabs.background.color = '#ff0000'
+    const {getByTestId} = renderComponent({tabs, colorsInUse: {background: ['#ababab', '#cdcdcd']}})
 
     const presets = getByTestId('color-preset').querySelectorAll('button')
-    expect(presets).toHaveLength(4)
-    expect(getPresetTooltip(presets[0])?.textContent).toEqual('#000000')
-    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#ffffff')
-    expect(getPresetTooltip(presets[2])?.textContent).toEqual('#ababab')
-    expect(getPresetTooltip(presets[3])?.textContent).toEqual('#cdcdcd')
+    expect(presets).toHaveLength(3)
+    expect(getPresetTooltip(presets[0])?.textContent).toEqual('#ffffff')
+    expect(getPresetTooltip(presets[1])?.textContent).toEqual('#ababab')
+    expect(getPresetTooltip(presets[2])?.textContent).toEqual('#cdcdcd')
   })
 
   it('calls onCancel when the cancel button is clicked', () => {
@@ -180,8 +143,12 @@ describe('ColorPicker', () => {
   })
 
   it('calls onSave with the new colors when the apply button is clicked', async () => {
+    const tabs = cloneBaseTabs()
+    delete tabs.border
+    tabs.foreground.color = '#111111'
+    tabs.background.color = '#ff0000'
     const onSave = jest.fn()
-    const {getByText, getByTestId} = renderComponent({onSave})
+    const {getByText, getByTestId} = renderComponent({tabs, onSave})
 
     const mixer = getByTestId('color-mixer')
     const rgb = mixer.querySelectorAll('input')

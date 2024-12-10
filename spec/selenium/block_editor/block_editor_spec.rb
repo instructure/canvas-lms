@@ -82,7 +82,7 @@ describe "Block Editor", :ignore_js_errors do
   end
 
   context "Edit a page" do
-    it "edits an rce page with the rce" do
+    it "edits an rce page with the rce", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@rce_page.url}/edit"
       wait_for_rce
       expect(f("textarea.body").attribute("value")).to eq("<p>RCE Page Body</p>")
@@ -102,7 +102,7 @@ describe "Block Editor", :ignore_js_errors do
       open_block_toolbox_to_tab("blocks")
       expect(block_toolbox).to be_displayed
       drop_new_block("button", group_block_dropzone)
-      expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
+      expect(fj("#{group_block_inner_selector}:contains('Click me')")).to be_displayed
     end
 
     it "cannot resize an image with no src" do

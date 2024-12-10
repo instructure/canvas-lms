@@ -34,7 +34,7 @@ jest.mock('@craftjs/core', () => {
       return {
         query: {
           getSerializedNodes: jest.fn(() => {
-            return []
+            return {}
           }),
         },
       }
@@ -42,6 +42,9 @@ jest.mock('@craftjs/core', () => {
     useNode: jest.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
+        node: {
+          dom: undefined,
+        },
         props: GroupBlock.craft.defaultProps,
       }
     }),
