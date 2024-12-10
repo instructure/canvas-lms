@@ -173,7 +173,7 @@ const Columns: ReadonlyArray<Column> = [
       ) : (
         <div>
           <Tooltip renderTip={I18n.t('Historical data lacks records for "installed by."')}>
-            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
           </Tooltip>
         </div>
       ),
@@ -189,7 +189,7 @@ const Columns: ReadonlyArray<Column> = [
       ) : (
         <div>
           <Tooltip renderTip={I18n.t('Historical data lacks records for "updated by."')}>
-            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
           </Tooltip>
         </div>
       ),
