@@ -19,12 +19,15 @@
 // safari implements only the webkit prefixed version of the fullscreen api
 const FS_ELEMENT =
   document.fullscreenElement === undefined ? 'webkitFullscreenElement' : 'fullscreenElement'
+// @ts-expect-error
 const FS_REQUEST = document.body.requestFullscreen ? 'requestFullscreen' : 'webkitRequestFullscreen'
+// @ts-expect-error
 const FS_EXIT = document.exitFullscreen ? 'exitFullscreen' : 'webkitExitFullscreen'
 const FS_CHANGEEVENT =
   FS_ELEMENT === 'webkitFullscreenElement' ? 'webkitfullscreenchange' : 'fullscreenchange'
 const FS_ENABLED = document.fullscreenEnabled ? 'fullscreenEnabled' : 'webkitFullscreenEnabled'
 
+// @ts-expect-error
 const instuiPopupMountNode = () => document[FS_ELEMENT]
 
 export {FS_ELEMENT, FS_REQUEST, FS_EXIT, FS_CHANGEEVENT, FS_ENABLED, instuiPopupMountNode}
