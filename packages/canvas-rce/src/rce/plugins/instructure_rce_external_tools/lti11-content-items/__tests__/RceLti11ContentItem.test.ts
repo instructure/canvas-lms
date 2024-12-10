@@ -365,6 +365,183 @@ describe('Studio LTI content items', () => {
   })
 })
 
+describe('Additional RceLti11ContentItem Tests', () => {
+  it('Handles missing url gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'No URL item',
+      mediaType: 'application/pdf',
+      placementAdvice: {presentationDocumentTarget: 'embed'},
+    })
+    expect(contentItem.url).toBeUndefined()
+    equalHtmlIgnoringAttributeOrder(contentItem.codePayload, 'No URL item')
+  })
+
+  it('Handles null properties gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: null,
+      url: null,
+      mediaType: null,
+      placementAdvice: {presentationDocumentTarget: 'embed'},
+    })
+    equalHtmlIgnoringAttributeOrder(contentItem.codePayload, '')
+  })
+
+  it('Handles no mediaType gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'No Media',
+      url: 'http://example.com/',
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/">No Media</a>'
+    )
+  })
+
+  it('Handles custom attributes without Studio (no custom property)', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/vnd.ims.lti.v1.launch+json',
+      url: 'http://example.com/lti',
+      text: 'No Custom',
+      placementAdvice: {presentationDocumentTarget: 'iframe'},
+    })
+    // Should still produce an iframe without studio attributes
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<iframe')
+    expect(payload).not.toContain('data-studio-')
+  })
+
+  it('Falls back gracefully for unknown docTarget', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'Unknown Target',
+      url: 'http://example.com/',
+      mediaType: 'text/html',
+      placementAdvice: {presentationDocumentTarget: 'unknown'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/">Unknown Target</a>'
+    )
+  })
+
+  it('Handles undefined ltiIframeAllowPolicy', () => {
+    const contentItem = RceLti11ContentItem.fromJSON(
+      {
+        mediaType: 'application/vnd.ims.lti.v1.launch+json',
+        url: 'http://example.com/lti',
+        text: 'No Policy',
+        placementAdvice: {presentationDocumentTarget: 'iframe'},
+      },
+      createDeepMockProxy<ExternalToolsEnv>({}, {ltiIframeAllowPolicy: undefined})
+    )
+    expect(contentItem.codePayload).toContain('allowfullscreen="true"')
+    expect(contentItem.codePayload).not.toContain('allow="undefined"')
+  })
+
+  it('Sanitizes javascript: URLs', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/pdf',
+      // eslint-disable-next-line no-script-url
+      url: 'javascript:alert(1)',
+      text: 'Injected',
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="#javascript:alert(1)">Injected</a>'
+    )
+  })
+
+  it('Preserves complex selection HTML', () => {
+    const contentItem = RceLti11ContentItem.fromJSON(
+      {
+        mediaType: 'application/pdf',
+        url: 'http://example.com/doc.pdf',
+        title: 'Complex Selection',
+        placementAdvice: {presentationDocumentTarget: 'frame'},
+      },
+      createDeepMockProxy<ExternalToolsEnv>(
+        {},
+        {editorSelection: '<strong><em>BoldItalic</em></strong>'}
+      )
+    )
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/doc.pdf" title="Complex Selection"><strong><em>BoldItalic</em></strong></a>'
+    )
+  })
+
+  it('Handles thumbnail missing @id', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/pdf',
+      url: 'http://example.com/doc.pdf',
+      text: 'No Thumbnail ID',
+      thumbnail: {height: 128, width: 128},
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/doc.pdf">No Thumbnail ID</a>'
+    )
+  })
+
+  it('Handles invalid displayWidth/Height', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'image/jpeg',
+      url: 'http://example.com/image.jpg',
+      text: 'Invalid Dimensions',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+        displayWidth: 'abc',
+        displayHeight: 'xyz',
+      },
+    })
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<img')
+    expect(payload).not.toContain('width="abc"')
+    expect(payload).not.toContain('height="xyz"')
+  })
+
+  it('Handles numeric width/height for images correctly', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'image/png',
+      url: 'http://example.com/image.png',
+      text: 'Numeric Dimensions',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+        displayWidth: 200,
+        displayHeight: 300,
+      },
+    })
+    const payload = contentItem.codePayload
+    expect(payload).toContain('style="width: 200px; height: 300px;"')
+  })
+
+  it('Non-image embed target falls back to text', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/pdf',
+      url: 'http://example.com/doc.pdf',
+      text: 'Non-image embed',
+      placementAdvice: {presentationDocumentTarget: 'embed'},
+    })
+    equalHtmlIgnoringAttributeOrder(contentItem.codePayload, 'Non-image embed')
+  })
+
+  it('Correctly identifies non-LTI content', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'text/html',
+      url: 'http://example.com',
+      text: 'Not LTI',
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    expect(contentItem.isLTI).toBe(false)
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com">Not LTI</a>'
+    )
+  })
+})
+
 function normalizeAttributeOrder(html: string) {
   const container = document.createElement('div')
   container.innerHTML = html
