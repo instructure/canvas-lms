@@ -21,11 +21,15 @@ import {merge, cloneDeep} from 'lodash'
 
 // The running theme is the running theme for this page load, and it never
 // changes, so there's no point in doing the work more than once.
-let memoizedVariables
+let memoizedVariables: {
+  variables: Record<string, unknown>
+  key: string
+}
 
 function getThemeVars() {
   if (memoizedVariables) return memoizedVariables
 
+  // @ts-expect-error
   const {currentThemeKey, overrides, themes} = getRegistry()
   // Just assume the "canvas" theme if the default key is null. This will
   // never happen in the live app because one way or another a theme gets

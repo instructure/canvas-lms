@@ -21,15 +21,16 @@ import {getLocaleList} from '../getTranslations'
 // keys = "qualified" locales old canvas sent, values = corresponding standard
 // locales that canvas now sends. old locales absent from this mapping (e.g.
 // pt-BR) didn't change.
-const mapping = {
+const mapping: {[key: string]: string} = {
   fa: 'fa-IR',
   uk: 'uk-UA',
   'zh-CN': 'zh-Hans',
   'zh-HK': 'zh-Hant',
 }
 
-export default function normalizeLocale(locale) {
+export default function normalizeLocale(locale?: string): string {
   const recognized = getLocaleList()
+
   if (!locale) {
     // default to english
     return 'en'
@@ -44,6 +45,7 @@ export default function normalizeLocale(locale) {
     locale = locale.split('-x-')[0]
     return normalizeLocale(locale)
   } else if (recognized.indexOf(locale.split('-')[0]) >= 0) {
+    // pass through base locale if recognized
     return locale.split('-')[0]
   } else {
     // default to english for unrecognized locales

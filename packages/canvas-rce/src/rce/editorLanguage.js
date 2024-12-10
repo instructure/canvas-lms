@@ -18,6 +18,14 @@
 
 // if a locale is absent, we don't expect to receive it from canvas, but we'll
 // treat it the same as how we explicitly use english for Maori.
+
+/**
+ * Mapping of locales to their corresponding TinyMCE language codes.
+ * If a locale is absent, we don't expect to receive it from Canvas,
+ * but we'll treat it the same as how we explicitly use English for Maori.
+ *
+ * @type {Object<string, string | undefined>}
+ */
 const mapping = {
   ar: 'ar_SA',
   bg: 'bg_BG',
@@ -27,7 +35,7 @@ const mapping = {
   da: 'da',
   de: 'de',
   el: 'el',
-  // returning undefined tell tinymce to use it's default (en) strings
+  // returning undefined tells tinymce to use its default (en) strings
   en: undefined,
   // tinymce doesn't have Australian strings, so just pretend it's en-GB
   'en-AU': 'en_GB',
@@ -74,8 +82,15 @@ const mapping = {
   'zh-Hant': 'zh_TW',
 }
 
-// still expose it as a method for consistent usage and in case we ever have to
-// add special casing or null interpretation in the future
+/**
+ * Function to return the corresponding TinyMCE language code for a given locale.
+ * If the locale is not provided, it will return the default language (English).
+ * If the locale contains underscores, they are replaced with hyphens for compatibility.
+ * If the locale contains a custom variant (e.g., -x-), the base language is used for mapping.
+ *
+ * @param {string} [locale] - The locale string.
+ * @returns {string | undefined} The corresponding TinyMCE language code, or undefined if not found.
+ */
 function editorLanguage(locale) {
   if (!locale) {
     return mapping.en
