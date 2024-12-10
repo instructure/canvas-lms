@@ -18,7 +18,7 @@
 
 import React, {useMemo} from 'react'
 import {Navigate, Outlet, useLocation} from 'react-router-dom'
-import {ROUTES} from '../shared'
+import {ROUTES} from './routes'
 import {SelfRegistrationType} from '../types'
 import {useNewLogin} from '../context/NewLoginContext'
 

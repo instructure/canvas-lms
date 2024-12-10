@@ -159,7 +159,7 @@ export const useNewLoginData = (): NewLoginDataResult => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // TODO: replace with doFetchApi
+        // TODO: replace with new endpoint and a doFetchApi() call
         const data = fetchLoginDataFromAttributes()
         setNewLoginData(data)
       } catch (error) {

@@ -23,6 +23,18 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('new_login')
 
 /**
+ * Regular expression to validate email addresses
+ * Ensures the email format includes a local part, an "@" symbol, and a domain.
+ * Examples of valid emails:
+ * - example@domain.com
+ * - user.name@sub.domain.org
+ * Examples of invalid emails:
+ * - example@domain (missing TLD)
+ * - @domain.com (missing local part)
+ */
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/**
  * Create a FormMessage array with a single error message
  * @param text Error message text
  * @returns FormMessage[]

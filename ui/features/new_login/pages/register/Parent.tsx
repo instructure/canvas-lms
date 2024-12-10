@@ -18,16 +18,18 @@
 
 import React, {useRef, useState} from 'react'
 import type {ReCaptchaSectionRef} from '../../shared/recaptcha/ReCaptchaSection'
-import {ActionPrompt, EMAIL_REGEX, ROUTES, TermsAndPolicyCheckbox} from '../../shared'
+import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
+import {ROUTES} from '../../routes/routes'
 import {ReCaptchaSection} from '../../shared/recaptcha'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {
   createErrorMessage,
+  EMAIL_REGEX,
   handleRegistrationRedirect,
   validatePassword,
 } from '../../shared/helpers'
