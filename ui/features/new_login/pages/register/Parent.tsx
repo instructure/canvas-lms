@@ -27,30 +27,38 @@ import {ROUTES} from '../../routes/routes'
 import {ReCaptchaSection} from '../../shared/recaptcha'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {
-  createErrorMessage,
-  EMAIL_REGEX,
-  handleRegistrationRedirect,
-  validatePassword,
-} from '../../shared/helpers'
+import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {createParentAccount} from '../../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../../context/NewLoginContext'
+import {usePasswordValidator} from '../../hooks/usePasswordValidator'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useServerErrorsMap} from '../../hooks/useServerErrorsMap'
 
 const I18n = useI18nScope('new_login')
+
+const ERROR_MESSAGES = {
+  invalidEmail: I18n.t('Please enter a valid email address.'),
+  passwordRequired: I18n.t('Password is required.'),
+  passwordsNotMatch: I18n.t('Passwords do not match.'),
+  nameRequired: I18n.t('Name is required.'),
+  pairingCodeRequired: I18n.t('Pairing code is required.'),
+  termsRequired: I18n.t('You must accept the terms to create an account.'),
+}
 
 const Parent = () => {
   const {
     isUiActionPending,
+    setIsUiActionPending,
+    passwordPolicy,
     privacyPolicyUrl,
     recaptchaKey,
-    setIsUiActionPending,
     termsOfUseUrl,
     termsRequired,
-    passwordPolicy,
   } = useNewLogin()
+  const validatePassword = usePasswordValidator(passwordPolicy)
+  const serverErrorsMap = useServerErrorsMap(passwordPolicy)
   const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -66,6 +74,7 @@ const Parent = () => {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [termsError, setTermsError] = useState('')
 
+  const isRedirectingRef = useRef(false)
   const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const nameInputRef = useRef<HTMLInputElement | null>(null)
@@ -76,61 +85,58 @@ const Parent = () => {
   const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
   const validateForm = (): boolean => {
+    setEmailError('')
+    setPasswordError('')
+    setConfirmPasswordError('')
+    setNameError('')
+    setPairingCodeError('')
+    setTermsError('')
+
     if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid email address.'))
+      setEmailError(ERROR_MESSAGES.invalidEmail)
       emailInputRef.current?.focus()
       return false
-    } else {
-      setEmailError('')
     }
 
     if (!password) {
-      setPasswordError(I18n.t('Password is required.'))
+      setPasswordError(ERROR_MESSAGES.passwordRequired)
       passwordInputRef.current?.focus()
       return false
     } else if (passwordPolicy) {
-      const passwordValidationError = validatePassword(password, passwordPolicy)
-      if (passwordValidationError) {
-        setPasswordError(passwordValidationError)
+      const errorKey = validatePassword(password)
+      if (errorKey) {
+        setPasswordError(
+          // using server error messaging here to avoid duplication
+          serverErrorsMap[`pseudonym.password.${errorKey}`] || I18n.t('An unknown error occurred.')
+        )
         passwordInputRef.current?.focus()
         return false
-      } else {
-        setPasswordError('')
       }
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError(I18n.t('Passwords do not match.'))
+      setConfirmPasswordError(ERROR_MESSAGES.passwordsNotMatch)
       confirmPasswordInputRef.current?.focus()
       return false
-    } else {
-      setConfirmPasswordError('')
     }
 
     if (name.trim() === '') {
-      setNameError(I18n.t('Name is required.'))
+      setNameError(ERROR_MESSAGES.nameRequired)
       nameInputRef.current?.focus()
       return false
-    } else {
-      setNameError('')
     }
 
-    const pairingCodeRegex = /^[a-zA-Z0-9]{6}$/
-    if (!pairingCodeRegex.test(pairingCode)) {
-      setPairingCodeError(I18n.t('Pairing code must be 6 alphanumeric characters.'))
+    if (pairingCode.trim() === '') {
+      setPairingCodeError(ERROR_MESSAGES.pairingCodeRequired)
       pairingCodeInputRef.current?.focus()
       return false
-    } else {
-      setPairingCodeError('')
     }
 
     if (termsRequired && !termsAccepted) {
-      setTermsError(I18n.t('You must accept the terms to create an account.'))
+      setTermsError(ERROR_MESSAGES.termsRequired)
       const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
       checkbox?.focus()
       return false
-    } else {
-      setTermsError('')
     }
 
     if (recaptchaKey) {
@@ -141,9 +147,95 @@ const Parent = () => {
     return true
   }
 
+  const handleServerErrors = (errors: any) => {
+    let hasFocusedError = false
+
+    setEmailError('')
+    setPasswordError('')
+    setConfirmPasswordError('')
+    setNameError('')
+    setPairingCodeError('')
+    setTermsError('')
+
+    // email address
+    if (errors.pseudonym?.unique_id?.length) {
+      const errorKey = `pseudonym.unique_id.${errors.pseudonym.unique_id[0]?.type}`
+      setEmailError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        emailInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // password
+    if (errors.pseudonym?.password?.length) {
+      const errorKey = `pseudonym.password.${errors.pseudonym.password[0]?.type}`
+      setPasswordError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        passwordInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // confirm password
+    if (errors.pseudonym?.password_confirmation?.length) {
+      const errorKey = `pseudonym.password_confirmation.${errors.pseudonym.password_confirmation[0]?.type}`
+      setConfirmPasswordError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        confirmPasswordInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // full name
+    if (errors.user?.name?.length) {
+      const errorKey = `user.name.${errors.user.name[0]?.type}`
+      setNameError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        nameInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // student pairing code
+    if (errors.pairing_code?.code?.length) {
+      const errorKey = `pairing_code.code.${errors.pairing_code.code[0]?.type}`
+      setPairingCodeError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        pairingCodeInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // terms of use
+    if (errors.user?.terms_of_use?.length) {
+      const errorKey = `user.terms_of_use.${errors.user.terms_of_use[0]?.type}`
+      setTermsError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
+        checkbox?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // reCAPTCHA
+    if (recaptchaKey && errors.recaptcha) {
+      recaptchaSectionRef.current?.validate()
+      if (!hasFocusedError) {
+        // TODO: handle reCAPTCHA errors …
+      }
+    }
+  }
+
   const handleCreateParent = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    // comment out if you want to test server errors
     if (isUiActionPending || !validateForm()) return
 
     setIsUiActionPending(true)
@@ -159,6 +251,7 @@ const Parent = () => {
         captchaToken: captchaToken ?? undefined,
       })
       if (response.status === 200) {
+        isRedirectingRef.current = true
         handleRegistrationRedirect(response.data)
       } else {
         showFlashAlert({
@@ -166,8 +259,27 @@ const Parent = () => {
           type: 'error',
         })
       }
+    } catch (error: any) {
+      if (error.response) {
+        const errorJson = await error.response.json()
+        if (errorJson.errors) {
+          setIsUiActionPending(false)
+          // allow fields to re-enable before processing server errors
+          setTimeout(() => handleServerErrors(errorJson.errors), 0)
+        } else {
+          showFlashAlert({
+            message: I18n.t('Something went wrong. Please try again later.'),
+            type: 'error',
+          })
+        }
+      } else {
+        showFlashAlert({
+          message: I18n.t('Something went wrong. Please try again later.'),
+          type: 'error',
+        })
+      }
     } finally {
-      setIsUiActionPending(false)
+      if (!isRedirectingRef.current) setIsUiActionPending(false)
     }
   }
 
@@ -180,75 +292,22 @@ const Parent = () => {
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setEmail(value.trim())
-    if (emailError) {
-      setEmailError('')
-    }
-  }
-
-  const handleEmailBlur = () => {
-    if (!email) {
-      setEmailError('')
-    } else if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid email address.'))
-    } else {
-      setEmailError('')
-    }
   }
 
   const handlePasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setPassword(value)
-    if (passwordError) {
-      setPasswordError('')
-    }
-  }
-
-  const handlePasswordBlur = () => {
-    if (!password) {
-      setPasswordError('')
-    } else if (passwordPolicy) {
-      const passwordValidationError = validatePassword(password, passwordPolicy)
-      if (passwordValidationError) {
-        setPasswordError(passwordValidationError)
-      } else {
-        setPasswordError('')
-      }
-    }
   }
 
   const handleConfirmPasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setConfirmPassword(value)
-    if (confirmPasswordError) {
-      setConfirmPasswordError('')
-    }
-  }
-
-  const handleConfirmPasswordBlur = () => {
-    if (confirmPassword && confirmPassword !== password) {
-      setConfirmPasswordError(I18n.t('Passwords do not match.'))
-    }
   }
 
   const handlePairingCodeChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setPairingCode(value.trim())
-    if (pairingCodeError) {
-      setPairingCodeError('')
-    }
-  }
-
-  const handlePairingCodeBlur = () => {
-    if (pairingCode) {
-      const pairingCodeRegex = /^[a-zA-Z0-9]{6}$/
-      if (!pairingCodeRegex.test(pairingCode)) {
-        setPairingCodeError(I18n.t('Pairing code must be 6 alphanumeric characters.'))
-      } else {
-        setPairingCodeError('')
-      }
-    }
   }
 
   const handleTermsChange = (checked: boolean) => {
     setTermsAccepted(checked)
-    if (termsError) setTermsError('')
   }
 
   const handleCancel = () => {
@@ -281,7 +340,6 @@ const Parent = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (emailInputRef.current = inputElement)}
               messages={createErrorMessage(emailError)}
-              onBlur={handleEmailBlur}
               onChange={handleEmailChange}
               renderLabel={I18n.t('Email Address')}
               value={email}
@@ -292,7 +350,6 @@ const Parent = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (passwordInputRef.current = inputElement)}
               messages={createErrorMessage(passwordError)}
-              onBlur={handlePasswordBlur}
               onChange={handlePasswordChange}
               renderLabel={I18n.t('Password')}
               type="password"
@@ -304,7 +361,6 @@ const Parent = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (confirmPasswordInputRef.current = inputElement)}
               messages={createErrorMessage(confirmPasswordError)}
-              onBlur={handleConfirmPasswordBlur}
               onChange={handleConfirmPasswordChange}
               renderLabel={I18n.t('Confirm Password')}
               type="password"
@@ -327,7 +383,6 @@ const Parent = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (pairingCodeInputRef.current = inputElement)}
               messages={createErrorMessage(pairingCodeError)}
-              onBlur={handlePairingCodeBlur}
               onChange={handlePairingCodeChange}
               renderLabel={I18n.t('Student Pairing Code')}
               value={pairingCode}

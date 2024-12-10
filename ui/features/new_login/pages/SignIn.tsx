@@ -50,8 +50,8 @@ const SignIn = () => {
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
-  const isRedirectingRef = useRef(false)
 
+  const isRedirectingRef = useRef(false)
   const usernameInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -105,7 +105,6 @@ const SignIn = () => {
         } else if (response.data?.pseudonym) {
           isRedirectingRef.current = true
           window.location.replace(response.data.location || '/dashboard')
-          return
         } else {
           handleFailedLogin()
         }
@@ -126,12 +125,10 @@ const SignIn = () => {
 
   const handleUsernameChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setUsername(value.trim())
-    if (usernameError) setUsernameError('')
   }
 
   const handlePasswordChange = (_event: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setPassword(value.trim())
-    if (passwordError) setPasswordError('')
   }
 
   if (otpRequired && !isPreviewMode) {

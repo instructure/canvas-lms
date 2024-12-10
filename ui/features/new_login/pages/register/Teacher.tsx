@@ -32,18 +32,27 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../../context/NewLoginContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useServerErrorsMap} from '../../hooks/useServerErrorsMap'
 
 const I18n = useI18nScope('new_login')
+
+const ERROR_MESSAGES = {
+  invalidEmail: I18n.t('Please enter a valid email address.'),
+  nameRequired: I18n.t('Name is required.'),
+  termsRequired: I18n.t('You must accept the terms to create an account.'),
+}
 
 const Teacher = () => {
   const {
     isUiActionPending,
+    setIsUiActionPending,
+    passwordPolicy,
     privacyPolicyUrl,
     recaptchaKey,
-    setIsUiActionPending,
     termsOfUseUrl,
     termsRequired,
   } = useNewLogin()
+  const serverErrorsMap = useServerErrorsMap(passwordPolicy)
   const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
@@ -53,6 +62,7 @@ const Teacher = () => {
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [termsError, setTermsError] = useState('')
 
+  const isRedirectingRef = useRef(false)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const nameInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -60,29 +70,27 @@ const Teacher = () => {
   const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
   const validateForm = (): boolean => {
+    setEmailError('')
+    setNameError('')
+    setTermsError('')
+
     if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid email address.'))
+      setEmailError(ERROR_MESSAGES.invalidEmail)
       emailInputRef.current?.focus()
       return false
-    } else {
-      setEmailError('')
     }
 
     if (name.trim() === '') {
-      setNameError(I18n.t('Name is required.'))
+      setNameError(ERROR_MESSAGES.nameRequired)
       nameInputRef.current?.focus()
       return false
-    } else {
-      setNameError('')
     }
 
     if (termsRequired && !termsAccepted) {
-      setTermsError(I18n.t('You must accept the terms to create an account.'))
+      setTermsError(ERROR_MESSAGES.termsRequired)
       const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
       checkbox?.focus()
       return false
-    } else {
-      setTermsError('')
     }
 
     if (recaptchaKey) {
@@ -93,9 +101,60 @@ const Teacher = () => {
     return true
   }
 
+  const handleServerErrors = (errors: any) => {
+    let hasFocusedError = false
+
+    setEmailError('')
+    setNameError('')
+    setTermsError('')
+
+    // email address
+    if (errors.pseudonym?.unique_id?.length) {
+      const errorKey = `pseudonym.unique_id.${errors.pseudonym.unique_id[0]?.type}`
+      setEmailError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        emailInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // full name
+    if (errors.user?.name?.length) {
+      const errorKey = `user.name.${errors.user.name[0]?.type}`
+      setNameError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        nameInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // terms of use
+    if (errors.user?.terms_of_use?.length) {
+      const errorKey = `user.terms_of_use.${errors.user.terms_of_use[0]?.type}`
+      setTermsError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+
+      if (!hasFocusedError) {
+        const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
+        checkbox?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // reCAPTCHA
+    if (recaptchaKey && errors.recaptcha) {
+      recaptchaSectionRef.current?.validate()
+      if (!hasFocusedError) {
+        // TODO: handle reCAPTCHA errors …
+      }
+    }
+  }
+
   const handleCreateTeacher = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    // comment out if you want to test server errors
     if (isUiActionPending || !validateForm()) return
 
     setIsUiActionPending(true)
@@ -109,6 +168,7 @@ const Teacher = () => {
       })
 
       if (response.status === 200) {
+        isRedirectingRef.current = true
         handleRegistrationRedirect(response.data)
       } else {
         showFlashAlert({
@@ -116,39 +176,40 @@ const Teacher = () => {
           type: 'error',
         })
       }
+    } catch (error: any) {
+      if (error.response) {
+        const errorJson = await error.response.json()
+        if (errorJson.errors) {
+          setIsUiActionPending(false)
+          // allow fields to re-enable before processing server errors
+          setTimeout(() => handleServerErrors(errorJson.errors), 0)
+        } else {
+          showFlashAlert({
+            message: I18n.t('Something went wrong. Please try again later.'),
+            type: 'error',
+          })
+        }
+      } else {
+        showFlashAlert({
+          message: I18n.t('Something went wrong. Please try again later.'),
+          type: 'error',
+        })
+      }
     } finally {
-      setIsUiActionPending(false)
-    }
-  }
-
-  const handleNameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    setName(value)
-    if (value.trim() !== '' && nameError) {
-      setNameError('')
+      if (!isRedirectingRef.current) setIsUiActionPending(false)
     }
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    const trimmedValue = value.trim()
-    setEmail(trimmedValue)
-    if (emailError) {
-      setEmailError('')
-    }
+    setEmail(value.trim())
   }
 
-  const handleEmailBlur = () => {
-    if (!email) {
-      setEmailError('')
-    } else if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid email address.'))
-    } else {
-      setEmailError('')
-    }
+  const handleNameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
+    setName(value)
   }
 
   const handleTermsChange = (checked: boolean) => {
     setTermsAccepted(checked)
-    if (termsError) setTermsError('')
   }
 
   const handleCancel = () => {
@@ -180,7 +241,6 @@ const Teacher = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (emailInputRef.current = inputElement)}
               messages={createErrorMessage(emailError)}
-              onBlur={handleEmailBlur}
               onChange={handleEmailChange}
               renderLabel={I18n.t('Email Address')}
               value={email}
