@@ -21,6 +21,7 @@
 class PageView
   class Pv4Client
     class Pv4Timeout < StandardError; end
+    class Pv4EmptyResponse < StandardError; end
 
     def initialize(uri, access_token)
       uri = URI.parse(uri) if uri.is_a?(String)
@@ -46,9 +47,13 @@ class PageView
         @uri.merge("users/#{user.global_id}/page_views?#{params}").to_s,
         { "Authorization" => "Bearer #{@access_token}" }
       )
-
-      json = JSON.parse(response.body)
-      raise response.body unless json["page_views"]
+      json =
+        begin
+          response.body.empty? ? {} : JSON.parse(response.body)
+        rescue JSON::ParserError
+          {}
+        end
+      raise Pv4EmptyResponse, "the response is empty or does not contain expected keys" unless json["page_views"]
 
       json["page_views"].map! do |pv|
         pv["session_id"] = pv.delete("sessionid")
