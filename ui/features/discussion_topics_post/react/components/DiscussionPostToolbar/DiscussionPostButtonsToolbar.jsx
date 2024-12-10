@@ -53,21 +53,17 @@ const I18n = createI18nScope('discussions_posts')
 const DiscussionPostButtonsToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const [moreOpened, setMoreOpened] = useState(false)
-  const {translationLanguages, setShowTranslationControl} = useContext(
+  const {translationLanguages, showTranslationControl, setShowTranslationControl} = useContext(
     DiscussionManagerUtilityContext
   )
-  const [showTranslate, setShowTranslate] = useState(false)
 
   const handleClose = () => setShowAssignToTray(false)
 
   const toggleTranslateText = () => {
-    // Update local state
-    setShowTranslate(!showTranslate)
-    // Update context
-    setShowTranslationControl(!showTranslate)
+    setShowTranslationControl(!showTranslationControl)
   }
 
-  const translationOptionText = showTranslate
+  const translationOptionText = showTranslationControl
     ? I18n.t('Turn off Translation')
     : I18n.t('Translate Discussion')
 
