@@ -1363,6 +1363,35 @@ RSpec.describe Lti::RegistrationsController do
         subject
         expect(response_json["configuration"]["redirect_uris"]).to eq internal_configuration[:redirect_uris]
       end
+
+      context "with redirect_uris" do
+        let(:lti_configuration) { settings.merge(redirect_uris:) }
+        let(:redirect_uris) { ["http://example.com"] }
+
+        it "is successful" do
+          subject
+          expect(response).to be_successful
+        end
+
+        it "includes redirect_uris" do
+          subject
+          expect(response_json["configuration"]["redirect_uris"]).to eq redirect_uris
+        end
+
+        context "with string redirect_uris" do
+          let(:redirect_uris) { "http://example.com" }
+
+          it "is successful" do
+            subject
+            expect(response).to be_successful
+          end
+
+          it "coerces redirect_uris to an array" do
+            subject
+            expect(response_json["configuration"]["redirect_uris"]).to eq [redirect_uris]
+          end
+        end
+      end
     end
 
     context "with url" do
