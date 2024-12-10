@@ -71,6 +71,9 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
         | React.MouseEvent<ViewProps>
     ) => {
       e.stopPropagation()
+      // The RCE may open popups (e.g. ColorPopup) that need to know to close
+      const evt = new CustomEvent('rce-text-block-popup-close', {})
+      document.dispatchEvent(evt)
       onClose()
     },
     [onClose]
@@ -111,8 +114,8 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
     [handleFullscreen, isFullscreen, mountNode]
   )
 
-  const handleContentChange = useCallback((content: string) => {
-    setCurrentContent(content)
+  const handleContentChange = useCallback((newcontent: string) => {
+    setCurrentContent(newcontent)
   }, [])
 
   const renderFullscreenButton = () => {

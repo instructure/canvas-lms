@@ -27,6 +27,7 @@ import {GroupBlock} from '../../blocks/GroupBlock'
 import {ToolbarColor, type ColorSpec} from '../../common/ToolbarColor'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {getEffectiveBackgroundColor} from '@canvas/block-editor/react/utils'
 
 const I18n = useI18nScope('block-editor')
 
@@ -102,7 +103,11 @@ const ColumnsSectionToolbar = () => {
     <Flex gap="small">
       <ToolbarColor
         tabs={{
-          background: props.background,
+          background: {
+            color: props.background,
+            default: '#00000000',
+          },
+          effectiveBgColor: getEffectiveBackgroundColor(node.dom),
         }}
         onChange={handleChangeColors}
       />

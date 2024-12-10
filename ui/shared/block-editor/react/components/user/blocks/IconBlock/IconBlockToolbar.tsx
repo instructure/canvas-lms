@@ -98,7 +98,13 @@ const IconBlockToolbar = () => {
         </Menu.Item>
       </Menu>
       <ToolbarColor
-        tabs={{foreground: props.color || effectiveColor, effectiveBgColor}}
+        tabs={{
+          foreground: {
+            color: props.color || effectiveColor,
+            default: effectiveColor,
+          },
+          effectiveBgColor,
+        }}
         onChange={handleColorChange}
       />
       <IconPopup iconName={props.iconName} />

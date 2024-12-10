@@ -21,7 +21,7 @@ import {useEditor} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
-import {ColorPicker, type ColorSpec, type TabSpec} from '@instructure/canvas-rce'
+import {ColorPicker, type ColorSpec, type TabsSpec} from '@instructure/canvas-rce'
 import {getColorsInUse, type ColorsInUse} from '../../../utils'
 
 import {useScope} from '@canvas/i18n'
@@ -29,7 +29,7 @@ import {useScope} from '@canvas/i18n'
 const I18n = useScope('block-editor')
 
 type ToolbarColorProps = {
-  tabs: TabSpec
+  tabs: TabsSpec
   onChange: (newcolors: ColorSpec) => void
 }
 
@@ -86,7 +86,7 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
       shouldCloseOnDocumentClick={true}
     >
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
-      <div onKeyDown={handleKey}>
+      <div style={{maxHeight: '80vh', overflowY: 'auto'}} onKeyDown={handleKey}>
         <ColorPicker
           tabs={tabs}
           colorsInUse={colorsInUse}
