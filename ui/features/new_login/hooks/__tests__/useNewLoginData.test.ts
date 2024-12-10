@@ -143,15 +143,20 @@ describe('useNewLoginData', () => {
       'true',
       JSON.stringify({
         minimum_character_length: 8,
+        maximum_character_length: 50,
+        max_repeats: 3,
+        max_sequence: 4,
         maximum_login_attempts: 10,
         allow_login_suspension: 'false',
         require_number_characters: 'false',
         require_symbol_characters: 'false',
-        common_passwords_folder_id: '1234',
+        disallow_common_passwords: 'true',
       }),
       'https://example.com/privacy'
     )
+
     const {result} = renderHook(() => useNewLoginData())
+
     expect(result.current.data).toEqual({
       enableCourseCatalog: true,
       authProviders: [{id: '1', name: 'Google', auth_type: 'google'}],
@@ -169,8 +174,13 @@ describe('useNewLoginData', () => {
       requireEmail: true,
       passwordPolicy: {
         minimumCharacterLength: 8,
+        maximumCharacterLength: 50,
+        maxRepeats: 3,
+        maxSequence: 4,
+        maximumLoginAttempts: 10,
         requireNumberCharacters: false,
         requireSymbolCharacters: false,
+        disallowCommonPasswords: true,
       },
       forgotPasswordUrl: 'https://example.com/privacy',
     })

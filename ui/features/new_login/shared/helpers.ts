@@ -17,10 +17,6 @@
  */
 
 import type {FormMessage} from '@instructure/ui-form-field'
-import type {PasswordPolicy} from '../types'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('new_login')
 
 /**
  * Regular expression to validate email addresses
@@ -41,37 +37,6 @@ export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
  */
 export const createErrorMessage = (text: string): FormMessage[] =>
   text ? [{type: 'error', text}] : []
-
-/**
- * Validate a password based on a given password policy
- * @param password Password string to validate
- * @param policy Password policy to validate against
- * @returns Error message string if validation fails, or null if valid
- */
-export const validatePassword = (
-  password: string | undefined,
-  policy: PasswordPolicy
-): string | null => {
-  if (!password) return null
-
-  const {minimumCharacterLength = 0, requireNumberCharacters, requireSymbolCharacters} = policy
-
-  if (password.length < minimumCharacterLength) {
-    return I18n.t(`Password must be at least %{minimumCharacterLength} characters long.`, {
-      minimumCharacterLength,
-    })
-  }
-
-  if (requireNumberCharacters && !/\d/.test(password)) {
-    return I18n.t('Password must include at least one numeric character.')
-  }
-
-  if (requireSymbolCharacters && !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    return I18n.t('Password must include at least one special character.')
-  }
-
-  return null
-}
 
 /**
  * Handle possible redirects after successful registration

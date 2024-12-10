@@ -44,13 +44,30 @@ interface NewLoginDataResult {
 }
 
 // transform raw password policy data into a typed object
-const transformPasswordPolicy = (rawPolicy: any): PasswordPolicy => ({
-  minimumCharacterLength: rawPolicy.minimum_character_length
-    ? parseInt(rawPolicy.minimum_character_length, 10)
-    : undefined,
-  requireNumberCharacters: rawPolicy.require_number_characters === 'true',
-  requireSymbolCharacters: rawPolicy.require_symbol_characters === 'true',
-})
+const transformPasswordPolicy = (rawPolicy: any): PasswordPolicy => {
+  if (typeof rawPolicy !== 'object' || rawPolicy === null) {
+    // eslint-disable-next-line no-console
+    console.error('Invalid password policy data:', rawPolicy)
+    return {}
+  }
+
+  return {
+    disallowCommonPasswords: rawPolicy.disallow_common_passwords === 'true',
+    maxRepeats: rawPolicy.max_repeats ? parseInt(rawPolicy.max_repeats, 10) : undefined,
+    maxSequence: rawPolicy.max_sequence ? parseInt(rawPolicy.max_sequence, 10) : undefined,
+    maximumCharacterLength: rawPolicy.maximum_character_length
+      ? parseInt(rawPolicy.maximum_character_length, 10)
+      : undefined,
+    maximumLoginAttempts: rawPolicy.maximum_login_attempts
+      ? parseInt(rawPolicy.maximum_login_attempts, 10)
+      : undefined,
+    minimumCharacterLength: rawPolicy.minimum_character_length
+      ? parseInt(rawPolicy.minimum_character_length, 10)
+      : undefined,
+    requireNumberCharacters: rawPolicy.require_number_characters === 'true',
+    requireSymbolCharacters: rawPolicy.require_symbol_characters === 'true',
+  }
+}
 
 // transform a string into a typed SelfRegistrationType, if valid
 const transformSelfRegistrationType = (

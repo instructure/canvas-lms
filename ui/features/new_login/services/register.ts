@@ -30,6 +30,7 @@ export const createTeacherAccount = async (payload: {
     method: 'POST',
     body: {
       user: {
+        initial_enrollment_type: 'teacher',
         name: payload.name,
         terms_of_use: payload.termsAccepted ? '1' : '0',
       },
@@ -57,15 +58,15 @@ export const createParentAccount = async (payload: {
     method: 'POST',
     body: {
       user: {
-        name: payload.name,
-        terms_of_use: payload.termsAccepted ? '1' : '0',
         initial_enrollment_type: 'observer',
+        name: payload.name,
         skip_registration: '1',
+        terms_of_use: payload.termsAccepted ? '1' : '0',
       },
       pseudonym: {
-        unique_id: payload.email,
         password: payload.password,
         password_confirmation: payload.confirmPassword,
+        unique_id: payload.email,
       },
       pairing_code: {
         code: payload.pairingCode,
@@ -95,16 +96,16 @@ export const createStudentAccount = async (payload: {
     method: 'POST',
     body: {
       user: {
-        self_enrollment_code: payload.joinCode,
-        name: payload.name,
-        terms_of_use: payload.termsAccepted ? '1' : '0',
         initial_enrollment_type: 'student',
+        name: payload.name,
+        self_enrollment_code: payload.joinCode,
+        terms_of_use: payload.termsAccepted ? '1' : '0',
       },
       pseudonym: {
-        unique_id: payload.username,
         password: payload.password,
         password_confirmation: payload.confirmPassword,
         ...(payload.email && {path: payload.email}),
+        unique_id: payload.username,
       },
       self_enrollment: '1',
       pseudonym_type: 'username',

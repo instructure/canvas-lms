@@ -44,12 +44,12 @@ const ForgotPassword = () => {
   const emailInputRef = useRef<HTMLInputElement | null>(null)
 
   const validateForm = (): boolean => {
+    setEmailError('')
+
     if (!EMAIL_REGEX.test(email)) {
       setEmailError(I18n.t('Please enter a valid %{loginHandleName} address.', {loginHandleName}))
       emailInputRef.current?.focus()
       return false
-    } else {
-      setEmailError('')
     }
 
     return true
@@ -85,19 +85,6 @@ const ForgotPassword = () => {
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setEmail(value.trim())
-    if (emailError) {
-      setEmailError('')
-    }
-  }
-
-  const handleEmailBlur = () => {
-    if (!email) {
-      setEmailError('')
-    } else if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid %{loginHandleName}', {loginHandleName}))
-    } else {
-      setEmailError('')
-    }
   }
 
   const handleCancel = () => {
@@ -128,7 +115,6 @@ const ForgotPassword = () => {
             id="email"
             inputRef={inputElement => (emailInputRef.current = inputElement)}
             messages={createErrorMessage(emailError)}
-            onBlur={handleEmailBlur}
             onChange={handleEmailChange}
             renderLabel={loginHandleName}
             type="email"

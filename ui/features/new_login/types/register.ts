@@ -17,6 +17,11 @@
  */
 
 export interface PasswordPolicy {
+  disallowCommonPasswords?: boolean
+  maxRepeats?: number
+  maxSequence?: number
+  maximumCharacterLength?: number
+  maximumLoginAttempts?: number
   minimumCharacterLength?: number
   requireNumberCharacters?: boolean
   requireSymbolCharacters?: boolean

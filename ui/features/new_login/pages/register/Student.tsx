@@ -26,31 +26,38 @@ import {ROUTES} from '../../routes/routes'
 import {ReCaptchaSection} from '../../shared/recaptcha'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {
-  createErrorMessage,
-  EMAIL_REGEX,
-  handleRegistrationRedirect,
-  validatePassword,
-} from '../../shared/helpers'
+import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {createStudentAccount} from '../../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../../context/NewLoginContext'
+import {usePasswordValidator} from '../../hooks/usePasswordValidator'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {useServerErrorsMap} from '../../hooks/useServerErrorsMap'
 
 const I18n = useI18nScope('new_login')
+
+const ERROR_MESSAGES = {
+  passwordRequired: I18n.t('Password is required.'),
+  passwordsNotMatch: I18n.t('Passwords do not match.'),
+  joinCodeRequired: I18n.t('Join code is required.'),
+  invalidEmail: I18n.t('Please enter a valid email address.'),
+  termsRequired: I18n.t('You must accept the terms to create an account.'),
+}
 
 const Student = () => {
   const {
     isUiActionPending,
+    setIsUiActionPending,
     passwordPolicy,
     privacyPolicyUrl,
     recaptchaKey,
     requireEmail,
-    setIsUiActionPending,
     termsOfUseUrl,
     termsRequired,
   } = useNewLogin()
+  const validatePassword = usePasswordValidator(passwordPolicy)
+  const serverErrorsMap = useServerErrorsMap(passwordPolicy)
   const navigate = useNavigate()
 
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -68,6 +75,7 @@ const Student = () => {
   const [username, setUsername] = useState('')
   const [usernameError, setUsernameError] = useState('')
 
+  const isRedirectingRef = useRef(false)
   const confirmPasswordInputRef = useRef<HTMLInputElement | null>(null)
   const emailInputRef = useRef<HTMLInputElement | null>(null)
   const joinCodeInputRef = useRef<HTMLInputElement | null>(null)
@@ -79,68 +87,65 @@ const Student = () => {
   const recaptchaSectionRef = useRef<ReCaptchaSectionRef>(null)
 
   const validateForm = (): boolean => {
+    setNameError('')
+    setUsernameError('')
+    setPasswordError('')
+    setConfirmPasswordError('')
+    setJoinCodeError('')
+    setEmailError('')
+    setTermsError('')
+
     if (name.trim() === '') {
       setNameError(I18n.t('Name is required.'))
       nameInputRef.current?.focus()
       return false
-    } else {
-      setNameError('')
     }
 
     if (username.trim() === '') {
       setUsernameError(I18n.t('Username is required.'))
       usernameInputRef.current?.focus()
       return false
-    } else {
-      setUsernameError('')
     }
 
     if (!password) {
-      setPasswordError(I18n.t('Password is required.'))
+      setPasswordError(ERROR_MESSAGES.passwordRequired)
       passwordInputRef.current?.focus()
       return false
     } else if (passwordPolicy) {
-      const passwordValidationError = validatePassword(password, passwordPolicy)
-      if (passwordValidationError) {
-        setPasswordError(passwordValidationError)
+      const errorKey = validatePassword(password)
+      if (errorKey) {
+        setPasswordError(
+          // using server error messaging here to avoid duplication
+          serverErrorsMap[`pseudonym.password.${errorKey}`] || I18n.t('An unknown error occurred.')
+        )
         passwordInputRef.current?.focus()
         return false
-      } else {
-        setPasswordError('')
       }
     }
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError(I18n.t('Passwords do not match.'))
+      setConfirmPasswordError(ERROR_MESSAGES.passwordsNotMatch)
       confirmPasswordInputRef.current?.focus()
       return false
-    } else {
-      setConfirmPasswordError('')
     }
 
     if (joinCode.trim() === '') {
-      setJoinCodeError(I18n.t('Join code is required.'))
+      setJoinCodeError(ERROR_MESSAGES.joinCodeRequired)
       joinCodeInputRef.current?.focus()
       return false
-    } else {
-      setJoinCodeError('')
     }
 
     if (requireEmail && !EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid email address.'))
+      setEmailError(ERROR_MESSAGES.invalidEmail)
       emailInputRef.current?.focus()
       return false
-    } else {
-      setEmailError('')
     }
 
     if (termsRequired && !termsAccepted) {
-      setTermsError(I18n.t('You must accept the terms to create an account.'))
+      setTermsError(ERROR_MESSAGES.termsRequired)
       const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
       checkbox?.focus()
       return false
-    } else {
-      setTermsError('')
     }
 
     if (recaptchaKey) {
@@ -151,9 +156,90 @@ const Student = () => {
     return true
   }
 
+  const handleServerErrors = (errors: any) => {
+    let hasFocusedError = false
+
+    setNameError('')
+    setUsernameError('')
+    setPasswordError('')
+    setConfirmPasswordError('')
+    setJoinCodeError('')
+    setTermsError('')
+
+    // full name
+    if (errors.user?.name?.length) {
+      const errorKey = `user.name.${errors.user.name[0]?.type}`
+      setNameError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        nameInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // username
+    if (errors.pseudonym?.unique_id?.length) {
+      const errorKey = `pseudonym.unique_id.${errors.pseudonym.unique_id[0]?.type}`
+      setUsernameError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        usernameInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // password
+    if (errors.pseudonym?.password?.length) {
+      const errorKey = `pseudonym.password.${errors.pseudonym.password[0]?.type}`
+      setPasswordError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        passwordInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // confirm password
+    if (errors.pseudonym?.password_confirmation?.length) {
+      const errorKey = `pseudonym.password_confirmation.${errors.pseudonym.password_confirmation[0]?.type}`
+      setConfirmPasswordError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        confirmPasswordInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // join code
+    if (errors.user?.self_enrollment_code?.length) {
+      const errorKey = `user.self_enrollment_code.${errors.user.self_enrollment_code[0]?.type}`
+      setJoinCodeError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        joinCodeInputRef.current?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // terms of use
+    if (errors.user?.terms_of_use?.length) {
+      const errorKey = `user.terms_of_use.${errors.user.terms_of_use[0]?.type}`
+      setTermsError(serverErrorsMap[errorKey] || I18n.t('An unknown error occurred.'))
+      if (!hasFocusedError) {
+        const checkbox = document.getElementById('terms-checkbox') as HTMLInputElement
+        checkbox?.focus()
+        hasFocusedError = true
+      }
+    }
+
+    // reCAPTCHA
+    if (recaptchaKey && errors.recaptcha) {
+      recaptchaSectionRef.current?.validate()
+      if (!hasFocusedError) {
+        // TODO: handle reCAPTCHA errors …
+      }
+    }
+  }
+
   const handleCreateStudent = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    // comment out if you want to test server errors
     if (isUiActionPending || !validateForm()) return
 
     setIsUiActionPending(true)
@@ -171,6 +257,7 @@ const Student = () => {
       })
 
       if (response.status === 200) {
+        isRedirectingRef.current = true
         handleRegistrationRedirect(response.data)
       } else {
         showFlashAlert({
@@ -178,99 +265,52 @@ const Student = () => {
           type: 'error',
         })
       }
+    } catch (error: any) {
+      if (error.response) {
+        const errorJson = await error.response.json()
+        if (errorJson.errors) {
+          setIsUiActionPending(false)
+          // allow fields to re-enable before processing server errors
+          setTimeout(() => handleServerErrors(errorJson.errors), 0)
+        } else {
+          showFlashAlert({
+            message: I18n.t('Something went wrong. Please try again later.'),
+            type: 'error',
+          })
+        }
+      } else {
+        showFlashAlert({
+          message: I18n.t('Something went wrong. Please try again later.'),
+          type: 'error',
+        })
+      }
     } finally {
-      setIsUiActionPending(false)
+      if (!isRedirectingRef.current) setIsUiActionPending(false)
     }
   }
 
   const handleUsernameChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    const trimmedValue = value.trim()
-    setUsername(trimmedValue)
-    if (usernameError) {
-      setUsernameError('')
-    }
-  }
-
-  const handleUsernameBlur = () => {
-    if (!EMAIL_REGEX.test(username)) {
-      setUsernameError(I18n.t('Please enter a valid email address.'))
-    } else {
-      setUsernameError('')
-    }
+    setUsername(value.trim())
   }
 
   const handlePasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setPassword(value)
-    if (passwordError) {
-      setPasswordError('')
-    }
-  }
-
-  const handlePasswordBlur = () => {
-    if (!password) {
-      setPasswordError('')
-    } else if (passwordPolicy) {
-      const passwordValidationError = validatePassword(password, passwordPolicy)
-      if (passwordValidationError) {
-        setPasswordError(passwordValidationError)
-      } else {
-        setPasswordError('')
-      }
-    }
   }
 
   const handleConfirmPasswordChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setConfirmPassword(value)
-    if (confirmPasswordError) {
-      setConfirmPasswordError('')
-    }
-  }
-
-  const handleConfirmPasswordBlur = () => {
-    if (confirmPassword && confirmPassword !== password) {
-      setConfirmPasswordError(I18n.t('Passwords do not match.'))
-    }
   }
 
   const handleJoinCodeChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
     setJoinCode(value.trim())
-    if (joinCodeError) {
-      setJoinCodeError('')
-    }
-  }
-
-  const handleJoinCodeBlur = () => {
-    if (joinCode) {
-      const pairingCodeRegex = /^[a-zA-Z0-9]{6}$/
-      if (!pairingCodeRegex.test(joinCode)) {
-        setJoinCodeError(I18n.t('Join code must be 6 alphanumeric characters.'))
-      } else {
-        setJoinCodeError('')
-      }
-    }
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    const trimmedValue = value.trim()
-    setEmail(trimmedValue)
-    if (emailError) {
-      setEmailError('')
-    }
-  }
-
-  const handleEmailBlur = () => {
-    if (!email) {
-      setEmailError('')
-    } else if (!EMAIL_REGEX.test(email)) {
-      setEmailError(I18n.t('Please enter a valid email address.'))
-    } else {
-      setEmailError('')
-    }
+    setEmail(value.trim())
   }
 
   const handleTermsChange = (checked: boolean) => {
     setTermsAccepted(checked)
-    if (termsError) setTermsError('')
   }
 
   const handleCancel = () => {
@@ -312,7 +352,6 @@ const Student = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (usernameInputRef.current = inputElement)}
               messages={createErrorMessage(usernameError)}
-              onBlur={handleUsernameBlur}
               onChange={handleUsernameChange}
               renderLabel={I18n.t('Username')}
               value={username}
@@ -323,7 +362,6 @@ const Student = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (passwordInputRef.current = inputElement)}
               messages={createErrorMessage(passwordError)}
-              onBlur={handlePasswordBlur}
               onChange={handlePasswordChange}
               renderLabel={I18n.t('Password')}
               type="password"
@@ -335,7 +373,6 @@ const Student = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (confirmPasswordInputRef.current = inputElement)}
               messages={createErrorMessage(confirmPasswordError)}
-              onBlur={handleConfirmPasswordBlur}
               onChange={handleConfirmPasswordChange}
               renderLabel={I18n.t('Confirm Password')}
               type="password"
@@ -348,7 +385,6 @@ const Student = () => {
               disabled={isUiActionPending}
               inputRef={inputElement => (joinCodeInputRef.current = inputElement)}
               messages={createErrorMessage(joinCodeError)}
-              onBlur={handleJoinCodeBlur}
               onChange={handleJoinCodeChange}
               renderLabel={I18n.t('Join Code')}
               value={joinCode}
@@ -361,7 +397,6 @@ const Student = () => {
                 disabled={isUiActionPending}
                 inputRef={inputElement => (emailInputRef.current = inputElement)}
                 messages={createErrorMessage(emailError)}
-                onBlur={handleEmailBlur}
                 onChange={handleEmailChange}
                 renderLabel={I18n.t('Email Address')}
                 value={email}

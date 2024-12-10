@@ -46,6 +46,7 @@ describe('Register Service', () => {
       method: 'POST',
       body: {
         user: {
+          initial_enrollment_type: 'teacher',
           name: 'Test Teacher',
           terms_of_use: '1',
         },
