@@ -64,7 +64,7 @@ const DiscussionTopicToolbarContainer = props => {
   const onSortClick = () => {
     let newOrder = null
     if (sort === null) {
-      newOrder = props.discussionTopic.sortOrder === 'asc' ? 'desc' : 'asc'
+      newOrder = props.discussionTopic.participant.sortOrder === 'asc' ? 'desc' : 'asc'
     } else {
       newOrder = sort === 'asc' ? 'desc' : 'asc'
     }
@@ -130,8 +130,8 @@ const DiscussionTopicToolbarContainer = props => {
                 canEdit={props.discussionTopic.permissions.update}
                 childTopics={getGroupsMenuTopics()}
                 selectedView={filter}
-                sortDirection={props.discussionTopic.sortOrder}
-                isExpanded={props.discussionTopic.expanded}
+                sortDirection={props.discussionTopic.participant.sortOrder}
+                isExpanded={props.discussionTopic.participant.expanded}
                 onSearchChange={value => setCurrentSearchValue(value)}
                 onViewFilter={onViewFilter}
                 onSortClick={onSortClick}
@@ -177,11 +177,11 @@ const DiscussionTopicToolbarContainer = props => {
           canEdit={props.discussionTopic.permissions.update}
           childTopics={getGroupsMenuTopics()}
           selectedView={filter}
-          sortDirection={props.discussionTopic.sortOrder}
+          sortDirection={props.discussionTopic.participant.sortOrder}
           searchTerm={currentSearchValue}
           discussionAnonymousState={props.discussionTopic.anonymousState}
           canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
-          isExpanded={props.discussionTopic.expanded}
+          isExpanded={props.discussionTopic.participant.expanded}
           onSearchChange={value => setCurrentSearchValue(value)}
           onViewFilter={onViewFilter}
           onSortClick={onSortClick}
