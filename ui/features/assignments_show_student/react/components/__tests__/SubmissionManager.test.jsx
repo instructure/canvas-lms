@@ -31,7 +31,7 @@ import {
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {MockedProviderWithIntrospectionMatching as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithIntrospectionMatching'
+import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import React from 'react'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
