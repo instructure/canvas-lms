@@ -10,7 +10,8 @@ Placement configuration and definition is currently somewhat scattered across a 
 
 The definitive list of all supported placements in Canvas is currently found in the [`Lti::ResourcePlacement`](/app/models/lti/resource_placement.rb) class.
 
-As far as the front end goes, a list of placements with user-friendly names is also found in [`ExternalToolPlacementList`](/ui/features/external_apps//react/components/ExternalToolPlacementList.js), used by the External Apps UI to display a list of enabled placements for a tool, and the Developer Keys UI constructs the user-friendly name dynamically (and sadly not-i18n-ed either) in [`Placements.js`](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placements.js). As part of the LIME project, we also have some duplicated code that offers similar functionality in [LtiPlacement.ts](/ui/features/lti_registrations/manage/model/LtiPlacement.ts) and [i18nLtiPlacement.ts](/ui/features/lti_registrations/manage/model/i18nLtiPlacement.ts)
+As far as the front end goes, a list of placements with user-friendly names is also found in [`ExternalToolPlacementList`](/ui/features/external_apps/react/components/ExternalToolPlacementList.jsx), used by the External Apps UI to display a list of enabled placements for a tool, and the Developer Keys UI constructs the user-friendly name dynamically (and sadly not-i18n-ed either) in [`Placements.jsx`](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placements.jsx). 
+As part of the LIME project, we also have some duplicated code that offers similar functionality in [LtiPlacement.ts](/ui/features/lti_registrations/manage/model/LtiPlacement.ts) and [i18nLtiPlacement.ts](/ui/features/lti_registrations/manage/model/i18nLtiPlacement.ts)
 
 Placements that support [deep linking](./12_deep_linking.md) are listed and have configuration in [`Lti::Messages::DeepLinkingRequest`](/lib/lti/messages/deep_linking_request.rb).
 

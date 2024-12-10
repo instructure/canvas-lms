@@ -85,14 +85,14 @@ When this process is complete, Canvas now knows about and is displaying the sele
    [example: adding support to homework_submission](https://gerrit.instructure.com/c/canvas-lms/+/190167)
    [example: adding support to collaborations](https://gerrit.instructure.com/c/canvas-lms/+/256594)
 
-4. Add this placement to the Developer Key UI's [list of placements](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placement.js) that can handle deep linking, so that users manually configuring a tool can choose to configure this placement with deep linking. Some placements _only_ accept deep linking messages, and there is a relevant list for that as well.
+4. Add this placement to the Developer Key UI's [list of placements](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placement.jsx) that can handle deep linking, so that users manually configuring a tool can choose to configure this placement with deep linking. Some placements _only_ accept deep linking messages, and there is a relevant list for that as well.
 
 5. If needed, add the backend work to create database objects to the deep linking controller. This is already done for module items and all resource links (links to tool content), and possibly could be helpful for the placement and records you are adding.
 
 ### Relevant Code
 
 [`Lti::Messages::DeepLinkingRequest`](/lib/lti/messages/deep_linking_request.rb) builds the LTI message that gets sent during a deep linking request, and also houses the per-placement configuration for allowing deep linking.
-[`Placement` (UI)](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placement.js) contains a list of placements that can handle deep linking.
+[`Placement` (UI)](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placement.jsx) contains a list of placements that can handle deep linking.
 [Deep Linking Shared Code (UI)](/ui/shared/deep-linking/) contains a few shared modules for interpreting deep linking postMessages in the UI. These are mostly used piecemeal by pages and placements that support deep linking.
 [`Lti::IMS::DeepLinkingController`](/app/controllers/lti/ims/deep_linking_controller.rb) controller for deep linking return url that creates Canvas records based on the content items from the deep linking response message.
 [`Lti::IMS::Concerns::DeepLinkingServices`](/app/controllers/lti/ims/concerns/deep_linking_services.rb) verifies JWT from deep linking response message, handles support functionality for the controller above.

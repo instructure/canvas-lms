@@ -44,7 +44,12 @@ export const PlacementsConfirmationWrapper = ({
     <RegistrationModalBody>
       <PlacementsConfirmation
         appName={internalConfig.title}
-        availablePlacements={availablePlacements}
+        availablePlacements={availablePlacements.filter(p => {
+          if (!window.ENV.FEATURES.lti_asset_processor) {
+            return p !== 'ActivityAssetProcessor'
+          }
+          return true
+        })}
         enabledPlacements={state.placements.placements ?? []}
         courseNavigationDefaultHidden={state.placements.courseNavigationDefaultDisabled ?? false}
         onToggleDefaultDisabled={actions.toggleCourseNavigationDefaultDisabled}

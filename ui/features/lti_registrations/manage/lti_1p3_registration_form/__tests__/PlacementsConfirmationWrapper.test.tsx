@@ -30,6 +30,7 @@ describe('PlacementsConfirmationWrapper', () => {
   it('renders a checkbox for every available placement, minus internal-only placements', () => {
     const internalConfig = mockInternalConfiguration({placements: []})
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
+    window.ENV.FEATURES.lti_asset_processor = true
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,

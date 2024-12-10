@@ -46,6 +46,16 @@ module Lti
       it "includes submission_type_selection when FF enabled" do
         expect(described_class.valid_placements(Account.default)).to include(:submission_type_selection)
       end
+
+      it "does not include ActivityAssetProcessor when FF disabled" do
+        Account.default.disable_feature! :lti_asset_processor
+        expect(described_class.valid_placements(Account.default)).not_to include(:ActivityAssetProcessor)
+      end
+
+      it "includes ActivityAssetProcessor when FF enabled" do
+        Account.default.enable_feature! :lti_asset_processor
+        expect(described_class.valid_placements(Account.default)).to include(:ActivityAssetProcessor)
+      end
     end
 
     describe ".public_placements" do
@@ -143,6 +153,14 @@ module Lti
         tabs = tabs_without_item_banks
         described_class.update_tabs_and_return_item_banks_tab(tabs)
         expect(tabs).to eq tabs_without_item_banks
+      end
+    end
+
+    describe ".add_extension_prefix" do
+      it "is returning a valid extension" do
+        placement = "assignment_edit"
+        expected_placement_name_with_prefix = "https://canvas.instructure.com/lti/assignment_edit"
+        expect(described_class.add_extension_prefix(placement)).to eq(expected_placement_name_with_prefix)
       end
     end
   end
