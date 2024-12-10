@@ -63,13 +63,19 @@ export default function (editor: Editor) {
 
   if (container?._reactRoot) {
     handleDismiss()
+    document.removeEventListener('rce-text-block-popup-close', handleDismiss)
     return
   }
 
+  document.addEventListener('rce-text-block-popup-close', handleDismiss)
+
+  const defaultTextColor = window
+    .getComputedStyle(editor.getBody())
+    .getPropertyValue('--ic-brand-font-color-dark')
+    .toLowerCase()
+
   const styl = window.getComputedStyle(editor.selection.getNode())
-  const textColor_ = tinycolor(styl.getPropertyValue('color'))
-  const textColor =
-    textColor_.getAlpha() === 1 ? textColor_.toHexString() : textColor_.toHex8String()
+  const textColor = tinycolor(styl.getPropertyValue('color')).toHexString()
 
   const bgColor_ = tinycolor(styl.getPropertyValue('background-color'))
   const bgColor = bgColor_.getAlpha() === 1 ? bgColor_.toHexString() : bgColor_.toHex8String()
@@ -80,8 +86,15 @@ export default function (editor: Editor) {
   root.render(
     <ColorPopup
       tabs={{
-        foreground: textColor,
-        background: bgColor,
+        foreground: {
+          color: textColor,
+          default: defaultTextColor,
+        },
+        background: {
+          color: bgColor,
+          default: '#ffffff',
+        },
+        effectiveBgColor: '#ffffff',
       }}
       open={true}
       positionTarget={target}

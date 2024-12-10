@@ -15,31 +15,30 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback} from 'react'
+import React, {useCallback, useRef} from 'react'
 import {useEditor, useNode, type Node} from '@craftjs/core'
 import {ButtonBlockToolbar} from './ButtonBlockToolbar'
 
 import {getIcon} from '../../../../assets/user-icons'
-import {Button, CondensedButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {type ViewProps} from '@instructure/ui-view'
 import {darken, lighten} from '@instructure/ui-color-utils'
-import {getContrastingColor, white} from '../../../../utils/colorUtils'
-import {isInstuiButtonColor} from './types'
-import type {
-  InstuiButtonColor,
-  ButtonSize,
-  ButtonVariant,
-  ButtonBlockProps,
-  InstuiCondensedButtonColor,
-} from './types'
+import {
+  getContrastingColor,
+  getEffectiveBackgroundColor,
+  white,
+  black,
+} from '../../../../utils/colorUtils'
+import type {ButtonSize, ButtonVariant, ButtonBlockProps} from './types'
 
 const ButtonBlock = ({
   text,
   size,
   variant,
   color,
+  background,
+  borderColor,
   iconName,
-  iconSize = 'x-small',
   href,
 }: ButtonBlockProps) => {
   const {enabled} = useEditor(state => {
@@ -49,12 +48,11 @@ const ButtonBlock = ({
   })
   const {
     connectors: {connect, drag},
-    customThemeOverride,
     node,
   } = useNode((n: Node) => ({
-    customThemeOverride: n.data.custom.themeOverride || {},
     node: n,
   }))
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
 
   const handleClick = useCallback(
     (event: React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>) => {
@@ -65,81 +63,78 @@ const ButtonBlock = ({
     [enabled]
   )
 
+  const getThemeOverride = () => {
+    let themeOverride = {}
+    let bg, clr, hovercolor
+    switch (variant) {
+      case 'text':
+        bg = getEffectiveBackgroundColor(buttonRef.current)
+        clr = getContrastingColor(bg)
+        hovercolor = clr === white ? lighten(bg, 10) : darken(bg, 10)
+
+        themeOverride = {
+          secondaryColor: color || clr,
+          secondaryBackground: 'transparent',
+          secondaryBorderColor: 'transparent',
+          secondaryHoverBackground: hovercolor,
+        }
+        break
+      case 'outlined':
+        bg = getEffectiveBackgroundColor(buttonRef.current)
+        clr = getContrastingColor(bg)
+        hovercolor = clr === white ? lighten(bg, 10) : darken(bg, 10)
+
+        themeOverride = {
+          secondaryColor: color || clr,
+          secondaryBackground: 'transparent',
+          secondaryBorderColor: borderColor || clr,
+          secondaryHoverBackground: hovercolor,
+        }
+        break
+      case 'filled':
+        bg = background || black
+        clr = getContrastingColor(bg)
+        hovercolor = clr === white ? lighten(bg, 10) : darken(bg, 10)
+
+        themeOverride = {
+          secondaryColor: color || clr,
+          secondaryBackground: background || black,
+          secondaryBorderColor: borderColor || black,
+          secondaryHoverBackground: background ? hovercolor : lighten(black, 10),
+        }
+        break
+    }
+    return themeOverride
+  }
+
   const renderIcon = useCallback(() => {
     const Icon = iconName ? getIcon(iconName) : null
-    return Icon ? <Icon size={iconSize} /> : null
-  }, [iconName, iconSize])
+    return Icon ? <Icon size="x-small" /> : null
+  }, [iconName])
 
-  const withBackground = variant !== 'outlined'
-
-  // TODO: probably none of this if the theme is high contrast
-  let colorProp: InstuiButtonColor | 'undefined' = 'primary'
-  const themeOverride = {...customThemeOverride}
-  if (isInstuiButtonColor(color)) {
-    colorProp = color
-  } else if (color) {
-    if (!themeOverride.primaryColor) {
-      themeOverride.primaryBackground = color
-      const primaryColor = getContrastingColor(color)
-      themeOverride.primaryColor = primaryColor
-      if (themeOverride.primaryBackground) {
-        const hoverColor =
-          primaryColor === white
-            ? lighten(themeOverride.primaryBackground, 10)
-            : darken(themeOverride.primaryBackground, 10)
-        themeOverride.primaryHoverBackground = hoverColor
-      }
-    }
-  }
-
-  if (variant === 'condensed') {
-    return (
-      <div
-        role="treeitem"
-        aria-label={node.data.displayName}
-        aria-selected={node.events.selected}
-        className="block button-block"
-        ref={el => el && connect(drag(el as HTMLElement))}
-        tabIndex={-1}
+  return (
+    <div
+      role="treeitem"
+      aria-label={node.data.displayName}
+      aria-selected={node.events.selected}
+      className="block button-block"
+      ref={el => el && connect(drag(el as HTMLElement))}
+      tabIndex={-1}
+    >
+      <Button
+        data-testid="button-block"
+        elementRef={el => (buttonRef.current = el as HTMLButtonElement)}
+        color="secondary"
+        href={href}
+        renderIcon={iconName ? renderIcon : undefined}
+        size={size}
+        themeOverride={getThemeOverride()}
+        onClick={handleClick}
       >
-        <CondensedButton
-          data-testid="button-block"
-          size={size}
-          color={color as InstuiCondensedButtonColor}
-          href={href?.trim() || '#'}
-          renderIcon={iconName ? renderIcon : undefined}
-          themeOverride={themeOverride}
-          onClick={handleClick}
-        >
-          <span style={{whiteSpace: 'nowrap'}}>{text.trim()}</span>
-        </CondensedButton>
-      </div>
-    )
-  } else {
-    return (
-      <div
-        role="treeitem"
-        aria-label={node.data.displayName}
-        aria-selected={node.events.selected}
-        className="block button-block"
-        ref={el => el && connect(drag(el as HTMLElement))}
-        tabIndex={-1}
-      >
-        <Button
-          data-testid="button-block"
-          themeOverride={themeOverride}
-          size={size}
-          color={colorProp}
-          withBackground={withBackground}
-          href={href?.trim() || '#'}
-          renderIcon={iconName ? renderIcon : undefined}
-          onClick={handleClick}
-        >
-          <span style={{whiteSpace: 'nowrap'}}>{text.trim()}</span>
-        </Button>
-      </div>
-    )
-  }
+        {text.trim()}
+      </Button>
+    </div>
+  )
 }
 
 ButtonBlock.craft = {
@@ -149,7 +144,6 @@ ButtonBlock.craft = {
     href: '',
     size: 'medium',
     variant: 'filled',
-    color: 'primary',
     iconName: '',
   },
   related: {
@@ -160,5 +154,5 @@ ButtonBlock.craft = {
   },
 }
 
-export {ButtonBlock, isInstuiButtonColor}
-export type {ButtonBlockProps, ButtonSize, ButtonVariant, InstuiButtonColor}
+export {ButtonBlock}
+export type {ButtonBlockProps, ButtonSize, ButtonVariant}

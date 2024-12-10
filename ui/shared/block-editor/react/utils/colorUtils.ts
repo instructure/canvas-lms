@@ -39,7 +39,7 @@ const getContrastingButtonColor = (color1: string) => {
   return buttonColor
 }
 
-const getEffectiveBackgroundColor = (elem: HTMLElement | null) => {
+const getEffectiveBackgroundColor = (elem: HTMLElement | null): string => {
   if (!elem) return '#ffffff'
   let bgcolor = window.getComputedStyle(elem).backgroundColor
   while (isTransparent(bgcolor) && elem.parentElement) {

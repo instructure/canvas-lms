@@ -59,10 +59,9 @@ const FooterSection = ({background}: FooterSectionProps) => {
           id={`footer-canvas-to-to-${id}`}
           is={ButtonBlock}
           text="Back to top"
-          variant="condensed"
-          color={buttonColor}
+          variant="text"
+          background={buttonColor}
           iconName="arrow_up"
-          iconSize="x-small"
           href="#page-top"
         />
       </Element>

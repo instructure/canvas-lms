@@ -233,7 +233,7 @@
 
 .block {
   position: relative;
-  min-height: 2rem;
+  min-height: 1rem;
   min-width: 2rem;
   &.page-block {
     background-color: transparent;
@@ -249,10 +249,6 @@
   }
 
   &.button-block {
-    a {
-      text-decoration: none;
-
-    }
   }
 }
 

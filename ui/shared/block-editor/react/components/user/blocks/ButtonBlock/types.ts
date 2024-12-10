@@ -16,30 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const instuiButtonColors = [
-  'primary',
-  'secondary',
-  'success',
-  'danger',
-  'primary-inverse',
-] as const
-export type InstuiButtonColor = (typeof instuiButtonColors)[number]
-export type InstuiCondensedButtonColor = 'primary-inverse' | 'primary'
-
-export const isInstuiButtonColor = (value: any): value is InstuiButtonColor => {
-  return (instuiButtonColors as readonly string[]).includes(value)
-}
-
-export type IconSize = 'x-small' | 'small'
 export type ButtonSize = 'small' | 'medium' | 'large'
-export type ButtonVariant = 'condensed' | 'outlined' | 'filled'
+export type ButtonVariant = 'text' | 'outlined' | 'filled'
 
 export type ButtonBlockProps = {
   text: string
   size?: ButtonSize
   variant?: ButtonVariant
-  color?: InstuiCondensedButtonColor | InstuiButtonColor | string
+  color?: string
+  background?: string
+  borderColor?: string
   iconName?: string
-  iconSize?: IconSize
   href?: string
 }

@@ -23,9 +23,22 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
-import {isInstuiButtonColor} from '../blocks/ButtonBlock/types'
 import {ColorPicker} from '../../editor/ColorPicker'
 import {FormFieldGroup} from '@instructure/ui-form-field'
+
+export const instuiButtonColors = [
+  'primary',
+  'secondary',
+  'success',
+  'danger',
+  'primary-inverse',
+] as const
+export type InstuiButtonColor = (typeof instuiButtonColors)[number]
+export type InstuiCondensedButtonColor = 'primary-inverse' | 'primary'
+
+export const isInstuiButtonColor = (value: any): value is InstuiButtonColor => {
+  return (instuiButtonColors as readonly string[]).includes(value)
+}
 
 export type ColorModalVariant = 'background' | 'button' | 'textcolor'
 type ColorModalProps = {
