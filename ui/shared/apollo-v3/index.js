@@ -21,7 +21,7 @@ import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 import {ApolloClient, InMemoryCache, HttpLink, ApolloLink, gql} from '@apollo/client'
 import {ApolloProvider} from '@apollo/react-common'
 import {Query} from '@apollo/react-components'
-import {persistCache} from 'apollo-cache-persist'
+import {persistCache} from 'apollo3-cache-persist'
 import {onError} from '@apollo/client/link/error'
 
 import EncryptedForage from '../encrypted-forage'
