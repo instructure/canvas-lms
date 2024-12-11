@@ -83,7 +83,7 @@ RSpec.describe Lti::AssetReport, type: :model do
         expect(lti_asset_report_model(extensions: { "https://valid.url" => "value" })).to be_valid
         expect do
           lti_asset_report_model(extensions: { "invalid.url" => "value" })
-        end.to raise_error(ActiveRecord::RecordInvalid, /extensions property keys must be namespaced \(URIs\)/)
+        end.to raise_error(ActiveRecord::RecordInvalid, /invalid.url.*extensions property keys must be namespaced \(URIs\)/)
 
         expect do
           lti_asset_report_model(extensions: { "invalid.url" => "value", "https://valid.url" => "value" })

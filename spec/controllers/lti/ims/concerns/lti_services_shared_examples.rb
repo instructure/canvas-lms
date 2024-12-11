@@ -24,7 +24,7 @@ shared_examples "mime_type check" do
   end
 end
 
-shared_examples_for "lti services" do
+shared_examples_for "lti services" do |skip_mime_type_checks_on_error: false|
   let(:extra_tool_context) { raise "Override in spec" }
 
   shared_examples "extra developer key and account tool check" do
@@ -58,7 +58,7 @@ shared_examples_for "lti services" do
       context "and that developer key is the only developer key" do
         let(:before_send_request) { -> { developer_key.destroy! } }
 
-        it_behaves_like "mime_type check"
+        it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
         it "returns 401 unauthorized and complains about missing developer key" do
           expect(response).to have_http_status :unauthorized
@@ -131,7 +131,7 @@ shared_examples_for "lti services" do
         end
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 500 not found" do
         expect(response).to have_http_status :internal_server_error
@@ -141,7 +141,7 @@ shared_examples_for "lti services" do
     context "with no access token" do
       let(:access_token_jwt_hash) { nil }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing access token" do
         expect(response).to have_http_status :unauthorized
@@ -152,7 +152,7 @@ shared_examples_for "lti services" do
     context "with malformed access token" do
       let(:access_token_jwt) { "gibberish" }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing access token" do
         expect(response).to have_http_status :unauthorized
@@ -165,7 +165,7 @@ shared_examples_for "lti services" do
         remove_access_token_scope(super(), scope_to_remove)
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing scope" do
         expect(response).to have_http_status :unauthorized
@@ -176,7 +176,7 @@ shared_examples_for "lti services" do
     context "with invalid access token signature" do
       let(:access_token_signing_key) { CanvasSlug.generate(nil, 64) }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about an incorrect signature" do
         expect(response).to have_http_status :unauthorized
@@ -187,7 +187,7 @@ shared_examples_for "lti services" do
     context "with missing access token claims" do
       let(:access_token_jwt_hash) { super().delete_if { |k| %i[sub aud exp iat jti iss].include?(k) } }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing assertions" do
         expect(response).to have_http_status :unauthorized
@@ -201,7 +201,7 @@ shared_examples_for "lti services" do
     context "with invalid access token audience ('aud')" do
       let(:access_token_jwt_hash) { super().merge(aud: "https://wont/match/anything") }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about an invalid aud field" do
         expect(response).to have_http_status :unauthorized
@@ -212,7 +212,7 @@ shared_examples_for "lti services" do
     context "with expired access token" do
       let(:access_token_jwt_hash) { super().merge(exp: (Time.zone.now.to_i - 1.hour.to_i)) }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about an expired access token" do
         expect(response).to have_http_status :unauthorized
@@ -246,7 +246,7 @@ shared_examples_for "lti services" do
         end
       end
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing developer key" do
         expect(response).to have_http_status :unauthorized
@@ -257,7 +257,7 @@ shared_examples_for "lti services" do
     context "with deleted developer key" do
       let(:before_send_request) { -> { developer_key.destroy! } }
 
-      it_behaves_like "mime_type check"
+      it_behaves_like "mime_type check" unless skip_mime_type_checks_on_error
 
       it "returns 401 unauthorized and complains about missing developer key" do
         expect(response).to have_http_status :unauthorized

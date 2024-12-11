@@ -110,8 +110,9 @@ class Lti::AssetReport < ApplicationRecord
       errors.add(:extensions, "size limit exceeded")
     end
 
-    unless extensions.keys.all? { |k| k.start_with?("http://", "https://") }
-      errors.add(:extensions, "extensions property keys must be namespaced (URIs)")
+    bad_extensions = extensions.keys.reject { |k| k.start_with?("http://", "https://") }
+    if bad_extensions.present?
+      errors.add(:extensions, "unrecognized fields #{bad_extensions.to_json} -- extensions property keys must be namespaced (URIs)")
     end
   end
 
