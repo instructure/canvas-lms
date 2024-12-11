@@ -70,9 +70,14 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
     return <div>{I18n.t('No questions found.')}</div>
   }
 
-  const filteredQuestions = questions.filter(question =>
-    question.entry.title.toLowerCase().includes(value.toLowerCase())
-  )
+  const filteredQuestions =
+    value.length > 0
+      ? questions.filter(
+          question =>
+            question.entry.title?.toLowerCase().includes(value.toLowerCase()) ||
+            question.entry.item_body?.toLowerCase().includes(value.toLowerCase())
+        )
+      : questions
 
   return (
     <View as="div">
