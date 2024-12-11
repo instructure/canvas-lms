@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
