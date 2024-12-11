@@ -40,6 +40,7 @@ function constructRelativeUrl({
 // https://fetch.spec.whatwg.org/#requestinit
 interface RequestInit {
   signal?: AbortSignal
+  cache?: RequestCache
 }
 
 export type DoFetchApiOpts = {

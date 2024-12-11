@@ -37,11 +37,13 @@ import type {
   StoreState,
 } from '../types'
 import ConfusedPanda from '@canvas/images/ConfusedPanda.svg'
+import type {Course} from '../shared/types'
 import PaceContextsTable from './pace_contexts_table'
 import {getResponsiveSize} from '../reducers/ui'
 import {getIsDraftPace} from '../reducers/course_paces'
 import Search from './search'
 import {API_CONTEXT_TYPE_MAP} from '../utils/utils'
+import { show as showCourseReport, getLast as getLastCourseReport, create as createCourseReport } from '../api/course_reports_api'
 
 const I18n = createI18nScope('course_paces_app')
 
@@ -67,6 +69,7 @@ interface PaceContextsContentProps {
   contextsPublishing: PaceContextProgress[]
   syncPublishingPaces: typeof paceContextsActions.syncPublishingPaces
   isDraftPace: boolean
+  course: Course
 }
 
 export const PaceContent = ({
@@ -89,6 +92,7 @@ export const PaceContent = ({
   contextsPublishing,
   syncPublishingPaces,
   isDraftPace,
+  course,
 }: PaceContextsContentProps) => {
   const selectedTab = `tab-${selectedContextType}`
   const currentTypeRef = useRef<string | null>(null)
@@ -196,6 +200,10 @@ export const PaceContent = ({
             isLoading={isLoading}
             responsiveSize={responsiveSize}
             contextsPublishing={contextsPublishing}
+            course={course}
+            createCourseReport={createCourseReport}
+            getLastCourseReport={getLastCourseReport}
+            showCourseReport={showCourseReport}
           />
         </TabPanel>
         <TabPanel
@@ -227,6 +235,10 @@ export const PaceContent = ({
             isLoading={isLoading}
             responsiveSize={responsiveSize}
             contextsPublishing={contextsPublishing}
+            course={course}
+            createCourseReport={createCourseReport}
+            getLastCourseReport={getLastCourseReport}
+            showCourseReport={showCourseReport}
           />
         </TabPanel>
       </Tabs>
@@ -246,6 +258,7 @@ const mapStateToProps = (state: StoreState) => ({
   contextsPublishing: state.paceContexts.contextsPublishing,
   responsiveSize: getResponsiveSize(state),
   isDraftPace: getIsDraftPace(state),
+  course: state.course,
 })
 
 export default connect(mapStateToProps, {

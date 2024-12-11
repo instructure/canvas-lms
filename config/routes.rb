@@ -1774,6 +1774,12 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/reports/:report/:id/abort", action: :abort
     end
 
+    scope(controller: :course_reports) do
+      get "courses/:course_id/reports/:report_type", action: :last
+      get "courses/:course_id/reports/:report_type/:id", action: :show
+      post "courses/:course_id/reports/:report_type", action: :create
+    end
+
     scope(controller: :admins) do
       post "accounts/:account_id/admins", action: :create
       delete "accounts/:account_id/admins/:user_id", action: :destroy

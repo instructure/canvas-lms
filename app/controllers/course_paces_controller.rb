@@ -405,17 +405,8 @@ class CoursePacesController < ApplicationController
   def new
     return unless authorized_action(@course, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    @course_pace = case @context
-                   when Course
-                     @context.course_paces.primary.published.take ||
-                     @context.course_paces.primary.not_deleted.take
-                   when CourseSection
-                     @course.course_paces.for_section(@context).published.take ||
-                     @course.course_paces.for_section(@context).not_deleted.take
-                   when Enrollment
-                     @course.course_paces.for_user(@context.user).published.take ||
-                     @course.course_paces.for_user(@context.user).not_deleted.take
-                   end
+    @course_pace = CoursePace.pace_for_context(@course, @context, exact: true)
+
     load_and_run_progress
     if @course_pace.nil?
       pace_params = case @context
