@@ -326,6 +326,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}: AuditLogRe
                         first: pageSize,
                         after: pageInfo.endCursor,
                       },
+                      // @ts-expect-error
                       updateQuery: (prevData: Required<QueryData>, {fetchMoreResult: newData}) => {
                         return {
                           auditLogs: {

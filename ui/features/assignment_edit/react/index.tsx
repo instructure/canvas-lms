@@ -19,11 +19,10 @@
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {QueryProvider} from '@canvas/query'
-import {ApolloProvider} from '@apollo/react-common'
+import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherEditQuery from './components/TeacherEditQuery'
 import TeacherCreateQuery from './components/TeacherCreateQuery'
 import {createClient} from '@canvas/apollo-v3'
-import {ApolloClient} from '@apollo/client'
 import type {InMemoryCache} from '@apollo/client'
 
 export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
@@ -32,18 +31,15 @@ export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
   const root = createRoot(elt)
   root.render(
     <QueryProvider>
-      {
-        // @ts-expect-error
-        <ApolloProvider client={client}>
-          {ENV.ASSIGNMENT_ID ? (
-            // @ts-expect-error
-            <TeacherEditQuery assignmentLid={ENV.ASSIGNMENT_ID} />
-          ) : (
-            // @ts-expect-error
-            <TeacherCreateQuery courseId={ENV.COURSE_ID} />
-          )}
-        </ApolloProvider>
-      }
+      <ApolloProvider client={client}>
+        {ENV.ASSIGNMENT_ID ? (
+          // @ts-expect-error
+          <TeacherEditQuery assignmentLid={ENV.ASSIGNMENT_ID} />
+        ) : (
+          // @ts-expect-error
+          <TeacherCreateQuery courseId={ENV.COURSE_ID} />
+        )}
+      </ApolloProvider>
     </QueryProvider>
   )
 }

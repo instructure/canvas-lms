@@ -33,10 +33,14 @@ const I18n = useI18nScope('assignments_2')
 
 export default function CommentRow(props) {
   const {author, mediaObject, read, htmlComment} = props.comment
+  let mediaSources = null
   let mediaTracks = null
   if (mediaObject) {
-    mediaObject.mediaSources.forEach(mediaSource => {
-      mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
+    mediaSources = mediaObject.mediaSources.map(mediaSource => {
+      return {
+        ...mediaSource,
+        label: `${mediaSource.width}x${mediaSource.height}`,
+      }
     })
     mediaTracks = mediaObject?.mediaTracks.map(track => {
       return {
@@ -97,7 +101,7 @@ export default function CommentRow(props) {
             {attachment.displayName}
           </Link>
         ))}
-        {mediaObject && <MediaPlayer tracks={mediaTracks} sources={mediaObject.mediaSources} />}
+        {mediaObject && <MediaPlayer tracks={mediaTracks} sources={mediaSources} />}
       </div>
     </div>
   )

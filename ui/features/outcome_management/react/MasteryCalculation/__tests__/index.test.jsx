@@ -100,7 +100,10 @@ describe('MasteryCalculation', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(<MasteryCalculation />, {mocks: []})
+    const mocks = [...masteryCalculationGraphqlMocks]
+    mocks[0] = { ...mocks[0], result: { errors: new Error('aw shucks') } }
+
+    const {getByText} = render(<MasteryCalculation />, {mocks: mocks})
     await act(async () => jest.runAllTimers())
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })

@@ -18,10 +18,9 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {ApolloProvider} from '@apollo/react-common'
+import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherQuery from './components/TeacherQuery'
 import {createClient} from '@canvas/apollo-v3'
-import {ApolloClient} from '@apollo/client'
 import type {InMemoryCache} from '@apollo/client'
 
 export default function renderAssignmentsApp(elt: HTMLElement | null) {
@@ -29,7 +28,6 @@ export default function renderAssignmentsApp(elt: HTMLElement | null) {
   if (ENV.ASSIGNMENT_ID) {
     // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
-      // @ts-expect-error
       <ApolloProvider client={client}>
         <TeacherQuery assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
       </ApolloProvider>,

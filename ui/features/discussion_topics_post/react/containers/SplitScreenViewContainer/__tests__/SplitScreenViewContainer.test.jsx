@@ -569,6 +569,7 @@ describe('SplitScreenViewContainer', () => {
       const likeButtons = await findAllByTestId('like-button')
 
       expect(likeButtons.length).toBe(2)
+      await new Promise(resolve => setTimeout(resolve, 0))
       expect(queryByTestId('liked-icon')).toBeTruthy()
       fireEvent.click(queryByTestId('liked-icon'))
       await waitFor(() => {
