@@ -27,13 +27,14 @@ describe CalendarEventsApiController, type: :request do
     @me = @user
   end
 
-  def create_checkpoint(topic:, type: "reply_to_topic", due_at: nil, points_possible: 5)
+  def create_checkpoint(topic:, type: "reply_to_topic", due_at: nil, points_possible: 5, replies_required: 3)
     checkpoint_label = (type == "reply_to_topic") ? CheckpointLabels::REPLY_TO_TOPIC : CheckpointLabels::REPLY_TO_ENTRY
     Checkpoints::DiscussionCheckpointCreatorService.call(
       discussion_topic: topic,
       checkpoint_label:,
       dates: due_at.nil? ? [] : [{ type: "everyone", due_at: }],
-      points_possible:
+      points_possible:,
+      replies_required:
     )
   end
 
@@ -4584,6 +4585,34 @@ describe CalendarEventsApiController, type: :request do
         expect(json.first.keys).to match_array expected_sub_assignment_fields
       end
 
+      it "returns the full title for reply to topic sub_assignment/checkpoint" do
+        json = api_call(:get, "/api/v1/calendar_events", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "sub_assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2024-08-01",
+                          end_date: "2024-08-01"
+                        })
+        expect(json.size).to be 1
+        expect(json.first["title"]).to eq "#{@checkpoint_1.title} Reply to Topic"
+      end
+
+      it "returns the full title for reply to entry sub_assignment/checkpoint" do
+        json = api_call(:get, "/api/v1/calendar_events", {
+                          controller: "calendar_events_api",
+                          action: "index",
+                          format: "json",
+                          type: "sub_assignment",
+                          context_codes: ["course_#{@course.id}"],
+                          start_date: "2024-08-02",
+                          end_date: "2024-08-02"
+                        })
+        expect(json.size).to be 1
+        expect(json.first["title"]).to eq "#{@checkpoint_2.title} Required Replies (3)"
+      end
+
       it "returns calendar event url and html url for the parent assignment" do
         json = api_call(:get, "/api/v1/calendar_events", {
                           controller: "calendar_events_api",
@@ -4626,8 +4655,8 @@ describe CalendarEventsApiController, type: :request do
                         end_date: "2024-08-02"
                       })
       expect(json.size).to be 2
-      expect(json.first.slice("title", "start_at", "id")).to eql({ "id" => "sub_assignment_#{@checkpoint_1.id}", "title" => "graded topic with checkpoints", "start_at" => "2024-08-01T12:00:00Z" })
-      expect(json.second.slice("title", "start_at", "id")).to eql({ "id" => "sub_assignment_#{@checkpoint_2.id}", "title" => "graded topic with checkpoints", "start_at" => "2024-08-02T12:00:00Z" })
+      expect(json.first.slice("title", "start_at", "id")).to eql({ "id" => "sub_assignment_#{@checkpoint_1.id}", "title" => "#{@checkpoint_1.title} Reply to Topic", "start_at" => "2024-08-01T12:00:00Z" })
+      expect(json.second.slice("title", "start_at", "id")).to eql({ "id" => "sub_assignment_#{@checkpoint_2.id}", "title" => "#{@checkpoint_2.title} Required Replies (3)", "start_at" => "2024-08-02T12:00:00Z" })
     end
 
     it "orders result set by base due_at" do

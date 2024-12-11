@@ -46,18 +46,10 @@ Object.assign(SubAssignmentOverride.prototype, {
     } else {
       this.copyDataFromSubAssignmentOverride(data)
     }
-    const numReplies = data?.sub_assignment?.discussion_topic?.reply_to_entry_required_count || 1
-    this.title =
-      data?.sub_assignment?.sub_assignment_tag === 'reply_to_topic'
-        ? I18n.t('%{title} Reply to Topic (%{overrideTitle})', {
-            title: this.assignment.name,
-            overrideTitle: this.override.title,
-          })
-        : I18n.t('%{title} Required Replies (%{numReplies}) (%{overrideTitle})', {
-            title: this.assignment.name,
-            overrideTitle: this.override.title,
-            numReplies,
-          })
+    this.title = I18n.t('%{title} (%{overrideTitle})', {
+      title: this.assignment.name || I18n.t('Untitled'),
+      overrideTitle: this.override.title,
+    })
     this.object = this.override
     this.addClass(`group_${this.contextCode()}`)
     return SubAssignmentOverride.__super__.copyDataFromObject.apply(this, arguments)

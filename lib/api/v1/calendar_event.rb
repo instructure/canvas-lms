@@ -249,11 +249,13 @@ module Api::V1::CalendarEvent
     parent_assignment_hash = assignment_json(parent_assignment, user, session, override_dates: false, submission: options[:submission])
     hash = api_json(sub_assignment, user, session, only: target_fields)
 
+    hash["title"] = sub_assignment.title_with_required_replies
     hash["description"] = api_user_content(hash["description"], sub_assignment.context) unless excludes.include?("description")
     hash["id"] = "sub_assignment_#{sub_assignment.id}"
     hash["type"] = "sub_assignment"
 
     hash["sub_assignment"] = assignment_json(sub_assignment, user, session, override_dates: false, submission: options[:submission])
+    hash["sub_assignment"]["name"] = sub_assignment.title_with_required_replies
     hash["sub_assignment"]["sub_assignment_tag"] = sub_assignment.sub_assignment_tag
     hash["sub_assignment"]["parent_assignment_id"] = sub_assignment.parent_assignment_id
     hash["sub_assignment"]["discussion_topic"] = parent_assignment_hash["discussion_topic"]

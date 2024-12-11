@@ -367,6 +367,46 @@ describe "calendar2" do
         expect(find("h1")).to include_text(title)
       end
 
+      context "discussion checkpoint titles" do
+        before do
+          @course.root_account.enable_feature!(:discussion_checkpoints)
+        end
+
+        it "displays the full title for reply to topic checkpoint in info modal" do
+          due_date_reply_to_topic = 1.day.from_now
+          due_date_reply_to_entry = 60.days.from_now
+          reply_to_topic, = graded_discussion_topic_with_checkpoints(
+            context: @course,
+            due_date_reply_to_topic:,
+            due_date_reply_to_entry:
+          )
+
+          get "/calendar2"
+          quick_jump_to_date(format_date_for_view(due_date_reply_to_topic))
+          f(".fc-event").click
+          reply_to_topic_title = find(".event-details-header h2.details_title.title a").text
+          expect(reply_to_topic_title).to eq "#{reply_to_topic.title} Reply to Topic"
+        end
+
+        it "displays the full title for reply to entry checkpoint in info modal" do
+          due_date_reply_to_entry = 1.day.from_now
+          due_date_reply_to_topic = 60.days.from_now
+          required_replies = 2
+          _, reply_to_entry = graded_discussion_topic_with_checkpoints(
+            context: @course,
+            due_date_reply_to_topic:,
+            due_date_reply_to_entry:,
+            reply_to_entry_required_count: required_replies
+          )
+
+          get "/calendar2"
+          quick_jump_to_date(format_date_for_view(due_date_reply_to_entry))
+          f(".fc-event").click
+          reply_to_entry_title = find(".event-details-header h2.details_title.title a").text
+          expect(reply_to_entry_title).to eq "#{reply_to_entry.title} Required Replies (#{required_replies})"
+        end
+      end
+
       it "deletes an event" do
         create_middle_day_event("doomed event")
         f(".fc-event").click
