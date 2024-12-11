@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,23 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pageviews {
-  height: 600px;
-  width: 100%;
-  table {
-    width: 100%;
-    td {
-      white-space: nowrap;
-    }
-  }
-  overflow-y: scroll;
-}
+import React from 'react'
+import {useParams} from 'react-router-dom'
+import {Portal} from '@instructure/ui-portal'
+import PageViews from './PageViews'
 
-#pageviews_datefilter {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 8px;
-  input {
-    display: inline;
-  }
+export function Component(): React.JSX.Element | null {
+  const {userId} = useParams<{userId: string}>()
+  const mountPoint = document.getElementById('page_views_table')
+  if (mountPoint === null || typeof userId === 'undefined') return null
+
+  return (
+    <Portal open={true} mountNode={mountPoint}>
+      <PageViews userId={userId} />
+    </Portal>
+  )
 }
