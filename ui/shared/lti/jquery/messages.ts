@@ -27,47 +27,18 @@ import {
 import type {LtiMessageHandler} from './lti_message_handler'
 import buildResponseMessages from './response_messages'
 import {getKey, hasKey, deleteKey} from './util'
+import {
+  SUBJECT_ALLOW_LIST,
+  SUBJECT_IGNORE_LIST,
+  type SubjectId,
+  SCOPE_REQUIRED_SUBJECTS,
+} from './constants'
 
 // page-global storage for data relevant to LTI postMessage events
 const ltiState: {
   tray?: {refreshOnClose?: boolean}
   fullWindowProxy?: Window | null
 } = {}
-
-const SUBJECT_ALLOW_LIST = [
-  'lti.enableScrollEvents',
-  'lti.fetchWindowSize',
-  'lti.frameResize',
-  'lti.hideRightSideWrapper',
-  'lti.removeUnloadMessage',
-  'lti.resourceImported',
-  'lti.screenReaderAlert',
-  'lti.scrollToTop',
-  'lti.setUnloadMessage',
-  'lti.showAlert',
-  'lti.showModuleNavigation',
-  'lti.capabilities',
-  'lti.get_data',
-  'lti.put_data',
-  'lti.getPageContent',
-  'lti.getPageSettings',
-  'requestFullWindowLaunch',
-  'toggleCourseNavigationMenu',
-  'showNavigationMenu',
-  'hideNavigationMenu',
-] as const
-
-/**
- * A mapping of message subject to a list of scopes that grant permission
- * for that subject.
- * A tool only needs one of the scopes listed to be granted access.
- * If a subject is not listed here, it is assumed to be allowed for all tools.
- */
-const SCOPE_REQUIRED_SUBJECTS: {[key: string]: string[]} = {
-  'lti.getPageContent': ['https://canvas.instructure.com/lti/page_content/show'],
-}
-
-type SubjectId = (typeof SUBJECT_ALLOW_LIST)[number]
 
 const isAllowedSubject = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (SUBJECT_ALLOW_LIST as ReadonlyArray<string>).includes(subject)
@@ -76,7 +47,8 @@ const isIgnoredSubject = (subject: unknown): subject is SubjectId =>
   typeof subject === 'string' && (SUBJECT_IGNORE_LIST as ReadonlyArray<string>).includes(subject)
 
 const isUnsupportedInRCE = (subject: unknown): subject is SubjectId =>
-  typeof subject === 'string' && (UNSUPPORTED_IN_RCE as ReadonlyArray<string>).includes(subject)
+  typeof subject === 'string' &&
+  (['lti.enableScrollEvents', 'lti.scrollToTop'] as ReadonlyArray<string>).includes(subject)
 
 /**
  * Checks that the tool for the given tool_id has the required
@@ -92,22 +64,6 @@ const toolIsAuthorized = (subject: string, tool_id: string) => {
     return true
   }
 }
-
-// These are handled elsewhere so ignore them
-const SUBJECT_IGNORE_LIST = [
-  'A2ExternalContentReady',
-  'LtiDeepLinkingResponse',
-  'externalContentReady',
-  'externalContentCancel',
-  MENTIONS_NAVIGATION_MESSAGE,
-  MENTIONS_INPUT_CHANGE_MESSAGE,
-  MENTIONS_SELECTION_MESSAGE,
-  'betterchat.is_mini_chat',
-  'defaultToolContentReady',
-  'assignment.set_ab_guid',
-] as const
-
-const UNSUPPORTED_IN_RCE = ['lti.enableScrollEvents', 'lti.scrollToTop'] as const
 
 const isObject = (u: unknown): u is object => {
   return typeof u === 'object'
@@ -276,4 +232,4 @@ function monitorLtiMessages() {
   }
 }
 
-export {ltiState, SUBJECT_ALLOW_LIST, SUBJECT_IGNORE_LIST, ltiMessageHandler, monitorLtiMessages}
+export {ltiState, ltiMessageHandler, monitorLtiMessages}
