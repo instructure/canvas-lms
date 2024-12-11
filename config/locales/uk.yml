@@ -16913,6 +16913,10 @@ uk:
       other: "%{count} додаткових облікових записів"
     titles: 
       sub_accounts: "Додаткові облікові записи"
+  sub_assignment: 
+    atom_no_author: "Немає автора"
+    labels: 
+      due: Очікується
   subaccount_91f4c279: "Додатковий обліковий запис"
   subdomain_url_1e43b6f0: "Субдомен URL"
   subject_114b2e98: Тема
