@@ -61,6 +61,7 @@ class SelectMenuGroup extends React.Component {
       PropTypes.shape({
         id: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
+        sortable_name: PropTypes.string.isRequired,
       })
     ).isRequired,
     breakpoints: breakpointsShape,
@@ -163,6 +164,10 @@ class SelectMenuGroup extends React.Component {
     this.props.goToURL(`${baseURL}${studentURL}${params}`)
   }
 
+  sortedStudents = () => {
+    return this.props.students.sort((a, b) => a.sortable_name.localeCompare(b.sortable_name))
+  }
+
   render() {
     const isVertical = !this.props.breakpoints.miniTablet
     return (
@@ -177,7 +182,7 @@ class SelectMenuGroup extends React.Component {
                   id="student_select_menu"
                   label={I18n.t('Student')}
                   onChange={this.onSelectStudent}
-                  options={this.props.students}
+                  options={this.sortedStudents()}
                   textAttribute="name"
                   valueAttribute="id"
                 />

@@ -54,8 +54,8 @@ describe('SelectMenuGroup', () => {
     ]
 
     const students = [
-      {id: '7', name: 'Bob Smith'},
-      {id: '11', name: 'Jane Doe'},
+      {id: '7', name: 'Bob Smith', sortable_name: 'Z, Smith, Bob'},
+      {id: '11', name: 'Jane Doe', sortable_name: 'A, Doe, Jane'},
     ]
 
     props = {
@@ -85,7 +85,12 @@ describe('SelectMenuGroup', () => {
   })
 
   test('does not render a student select menu if the students prop has only 1 student', () => {
-    wrapper = render(<SelectMenuGroup {...props} students={[{id: '11', name: 'Jane Doe'}]} />)
+    wrapper = render(
+      <SelectMenuGroup
+        {...props}
+        students={[{id: '11', name: 'Jane Doe', sortable_name: 'Doe, Jane'}]}
+      />
+    )
     expect(wrapper.container.querySelector('#student_select_menu')).not.toBeInTheDocument()
   })
 
@@ -218,6 +223,15 @@ describe('SelectMenuGroup', () => {
     const submitButton = wrapper.container.querySelector('button#apply_select_menus')
     await user.click(submitButton)
     expect(props.saveAssignmentOrder).toHaveBeenCalledTimes(0)
+  })
+
+  test('sorts by sortable name', async () => {
+    const user = userEvent.setup()
+    wrapper = render(<SelectMenuGroup {...props} />)
+    await user.click(wrapper.container.querySelector('#student_select_menu'))
+    const options = screen.getAllByTestId('select-menu-option')
+    expect(options[0]).toHaveTextContent('Jane Doe')
+    expect(options[1]).toHaveTextContent('Bob Smith')
   })
 
   describe('clicking the submit button', () => {
