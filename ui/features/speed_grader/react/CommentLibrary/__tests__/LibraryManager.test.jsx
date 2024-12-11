@@ -31,6 +31,15 @@ import {
 } from './mocks'
 import LibraryManager from '../LibraryManager'
 
+const flushAllTimersAndPromises = async () => {
+  while (jest.getTimerCount() > 0) {
+    // eslint-disable-next-line no-await-in-loop
+    await act(async () => {
+      jest.runAllTimers()
+    })
+  }
+}
+
 jest.useFakeTimers()
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -235,14 +244,14 @@ describe('LibraryManager', () => {
   })
 
   describe('search', () => {
-    it('loads search results when commentAreaText is provided', () => {
+    it('loads search results when commentAreaText is provided', async () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
       const {getByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
         mocks,
       })
 
-      jest.advanceTimersByTime(1000)
+      await flushAllTimersAndPromises()
       expect(getByText('search result 0')).toBeInTheDocument()
     })
 
@@ -256,7 +265,7 @@ describe('LibraryManager', () => {
       expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
 
-    it('debounces the commentAreaText when displaying results', () => {
+    it('debounces the commentAreaText when displaying results', async () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
       const {getByText, queryByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
@@ -265,11 +274,11 @@ describe('LibraryManager', () => {
 
       jest.advanceTimersByTime(50)
       expect(queryByText('search result 0')).not.toBeInTheDocument()
-      jest.advanceTimersByTime(1000)
+      await flushAllTimersAndPromises()
       expect(getByText('search result 0')).toBeInTheDocument()
     })
 
-    it('doesnt rerender the suggestions after clicking on a suggested comment', () => {
+    it('doesnt rerender the suggestions after clicking on a suggested comment', async () => {
       const mocks = [
         ...commentBankItemMocks(),
         ...searchMocks({query: 'search'}),
@@ -277,16 +286,16 @@ describe('LibraryManager', () => {
       ]
       const props = defaultProps({commentAreaText: 'search'})
       const {getByText, queryByText, rerender} = render({props, mocks})
-      jest.advanceTimersByTime(1000)
+      await flushAllTimersAndPromises()
       fireEvent.click(getByText('search result 0'))
-      jest.advanceTimersByTime(1000)
+      await flushAllTimersAndPromises()
 
       render({
         props: defaultProps({commentAreaText: 'search result 0'}),
         mocks,
         func: rerender,
       })
-      jest.advanceTimersByTime(1000)
+      await flushAllTimersAndPromises()
       expect(queryByText('search result 0')).not.toBeInTheDocument()
     })
 

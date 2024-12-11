@@ -181,7 +181,7 @@ describe('CommentsTrayBody', () => {
       const mockMutation = jest.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
       const mocks = [
         await mockSubmissionCommentQuery(overrides),
-        await mockMarkSubmissionCommentsRead({newData: mockMutation}),
+        await mockMarkSubmissionCommentsRead({newData: () => mockMutation()}),
       ]
 
       render(mockContext(<CommentsTrayBody {...props} />, mocks))
@@ -207,7 +207,7 @@ describe('CommentsTrayBody', () => {
       const mockMutation = jest.fn().mockResolvedValue({data: {markSubmissionCommentsRead: {}}})
       const mocks = [
         await mockSubmissionCommentQuery(overrides),
-        await mockMarkSubmissionCommentsRead({newData: mockMutation}),
+        await mockMarkSubmissionCommentsRead({newData: () => mockMutation()}),
       ]
 
       render(
@@ -506,10 +506,11 @@ describe('CommentsTrayBody', () => {
     }
 
     const cursorMock = await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'})
+    const cursorMockWrapper = jest.fn().mockReturnValue(cursorMock.result)
 
     const mocks = [
       await mockSubmissionCommentQuery(overrides),
-      {...cursorMock, result: undefined, newData: jest.fn().mockResolvedValue(cursorMock.result)},
+      {...cursorMock, result: cursorMockWrapper},
     ]
     const props = await mockAssignmentAndSubmission()
 
@@ -521,7 +522,9 @@ describe('CommentsTrayBody', () => {
 
     const loadMoreButton = await waitFor(() => getByText('Load Previous Comments'))
     fireEvent.click(loadMoreButton)
-    expect(mocks[1].newData).toHaveBeenCalled()
+    await waitFor(() =>
+      expect(cursorMockWrapper).toHaveBeenCalled()
+    )
   })
 
   it('renders CommentTextArea when the student can make changes to the submission', async () => {
@@ -619,7 +622,7 @@ describe('CommentsTrayBody', () => {
   it('renders error when query errors', async () => {
     const mocks = [await mockSubmissionCommentQuery()]
     // @ts-ignore
-    mocks[0].error = new Error('aw shucks')
+    mocks[0].result = { errors: new Error('aw shucks') }
     const props = await mockAssignmentAndSubmission()
     const {getByText} = render(mockContext(<CommentsTrayBody {...props} />, mocks))
 

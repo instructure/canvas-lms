@@ -45,7 +45,6 @@ describe('InternalSettingsView', () => {
     const internalSettingMocks = await mockInternalSettingsQuery()
 
     const {findAllByText} = render(
-      // @ts-expect-error
       <MockedProvider mocks={internalSettingMocks} cache={createCache()}>
         <InternalSettingsView />
       </MockedProvider>

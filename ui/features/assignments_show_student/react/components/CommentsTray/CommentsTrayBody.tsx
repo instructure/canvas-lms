@@ -71,7 +71,6 @@ export default function CommentsTrayBody(props) {
     setIsFetchingMoreComments(true)
     await fetchMore({
       variables: {
-        // @ts-expect-error
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
         ...queryVariables,
       },

@@ -283,7 +283,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
-        message: 'An error occurred while importing these outcomes: GraphQL error: Network error.',
+        message: 'An error occurred while importing these outcomes: Network error.',
         type: 'error',
       })
     })
@@ -448,7 +448,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
-        message: 'An error occurred while importing this outcome: GraphQL error: Network error.',
+        message: 'An error occurred while importing this outcome: Network error.',
         type: 'error',
       })
     })

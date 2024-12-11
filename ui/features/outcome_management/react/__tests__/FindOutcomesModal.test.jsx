@@ -874,7 +874,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Import Anyway'))
         expect(
           getAllByText(
-            'An error occurred while importing these outcomes: GraphQL error: Network error.'
+            'An error occurred while importing these outcomes: Network error.'
           )[0]
         ).toBeInTheDocument()
       })
@@ -1122,7 +1122,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getAllByText('Add')[0].closest('button'))
         expect(
           getAllByText(
-            'An error occurred while importing this outcome: GraphQL error: Network error.'
+            'An error occurred while importing this outcome: Network error.'
           )[0]
         ).toBeInTheDocument()
       })

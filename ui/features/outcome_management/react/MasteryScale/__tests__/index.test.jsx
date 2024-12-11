@@ -98,7 +98,10 @@ describe('MasteryScale', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(<MasteryScale />, {mocks: []})
+    const mocks = [...masteryScalesGraphqlMocks]
+    mocks[0] = { ...mocks[0], result: { errors: new Error('aw shucks') } }
+
+    const {getByText} = render(<MasteryScale />, {mocks: mocks})
     await waitFor(() => expect(getByText(/An error occurred/)).toBeInTheDocument())
   })
 

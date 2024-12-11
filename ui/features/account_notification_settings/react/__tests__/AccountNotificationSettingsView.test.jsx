@@ -70,6 +70,7 @@ async function mockAccountNotificationsQuery(queryOverrides) {
         },
       },
       result: queryResult,
+      maxUsageCount: 2,
     },
   ]
 }

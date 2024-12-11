@@ -69,6 +69,7 @@ describe('useManageOutcomes', () => {
 
     expect(result.current.collections['100']).toBeDefined()
     act(() => result.current.removeGroup('100'))
+    await act(async () => jest.runAllTimers())
     expect(result.current.collections['100']).toBeUndefined()
 
     const {result: result2} = renderHook(() => useManageOutcomes(), {wrapper})

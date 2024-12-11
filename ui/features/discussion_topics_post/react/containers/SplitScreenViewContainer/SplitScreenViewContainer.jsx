@@ -50,7 +50,7 @@ import {SplitScreenThreadsContainer} from '../SplitScreenThreadsContainer/SplitS
 import {SplitScreenParent} from './SplitScreenParent'
 import PropTypes from 'prop-types'
 import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react'
-import {useMutation, useQuery} from '@apollo/react-hooks'
+import {useApolloClient, useMutation, useQuery} from '@apollo/react-hooks'
 import {View} from '@instructure/ui-view'
 import * as ReactDOMServer from 'react-dom/server'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
@@ -59,6 +59,7 @@ import {LoadingSpinner} from '../../components/LoadingSpinner/LoadingSpinner'
 const I18n = useI18nScope('discussion_topics_post')
 
 export const SplitScreenViewContainer = props => {
+  const client = useApolloClient()
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
@@ -278,17 +279,18 @@ export const SplitScreenViewContainer = props => {
     return mentionsValue
   }
 
+  const splitScreenEntryOlderDirectionVariables = {
+    discussionEntryID: props.discussionEntryId,
+    last: ENV.split_screen_view_initial_page_size,
+    sort: 'asc',
+    ...(props.relativeEntryId &&
+      props.relativeEntryId !== props.discussionEntryId && {
+        relativeEntryId: props.relativeEntryId,
+      }),
+    includeRelativeEntry: !!props.relativeEntryId,
+  }
   const splitScreenEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
-    variables: {
-      discussionEntryID: props.discussionEntryId,
-      last: ENV.split_screen_view_initial_page_size,
-      sort: 'asc',
-      ...(props.relativeEntryId &&
-        props.relativeEntryId !== props.discussionEntryId && {
-          relativeEntryId: props.relativeEntryId,
-        }),
-      includeRelativeEntry: !!props.relativeEntryId,
-    },
+    variables: splitScreenEntryOlderDirectionVariables,
   })
 
   const splitScreenEntryNewerDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
@@ -345,10 +347,24 @@ export const SplitScreenViewContainer = props => {
         includeRelativeEntry: false,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
-        splitScreenEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes = [
-          ...splitScreenEntryOlderDirection.data.legacyNode.discussionSubentriesConnection?.nodes,
+        const queryResult = JSON.parse(
+          JSON.stringify(client.readQuery({
+            query: DISCUSSION_SUBENTRIES_QUERY,
+            variables: splitScreenEntryOlderDirectionVariables
+          }))
+        )
+
+        queryResult.legacyNode.discussionSubentriesConnection.nodes = [
+          ...queryResult.legacyNode.discussionSubentriesConnection?.nodes,
           ...fetchMoreResult.legacyNode.discussionSubentriesConnection?.nodes,
         ]
+
+        client.writeQuery({
+          query: DISCUSSION_SUBENTRIES_QUERY,
+          variables: splitScreenEntryOlderDirectionVariables,
+          data: queryResult,
+        })
+
         setFetchingMoreNewerReplies(false)
         return {
           legacyNode: {
