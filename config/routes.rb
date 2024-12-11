@@ -2902,6 +2902,11 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/progress/:id", action: :show, as: :lti_progress_show
     end
 
+    # Asset Service & Asset Report Service (LTI Asset Processor Specs)
+    scope(controller: "lti/ims/asset_processor") do
+      post "asset_processor/:asset_processor_id/report", action: :create_report, as: :lti_asset_processor_create_report
+    end
+
     # Dynamic Registration Service
     scope(controller: "lti/ims/dynamic_registration") do
       get "accounts/:account_id/registration_token", action: :registration_token

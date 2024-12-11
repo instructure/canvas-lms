@@ -81,7 +81,6 @@ module Lti::IMS
   #
   class NoticeHandlersController < ApplicationController
     include Concerns::AdvantageServices
-    include Api::V1::DeveloperKey
 
     before_action :require_feature_enabled
     before_action :validate_tool_id

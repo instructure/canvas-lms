@@ -28,8 +28,8 @@ describe Lti::IMS::NoticeHandlersController do
 
   let(:cet) { developer_key.context_external_tools.first }
   let(:tool_id) { cet.global_id.to_s }
-  let(:body_overrides) { "{}" }
-  let(:params_overrides) { { context_external_tool_id: tool_id }.merge(JSON.parse(body_overrides)) }
+  let(:body_overrides) { {} }
+  let(:params_overrides) { { context_external_tool_id: tool_id } }
   let(:client_id) { developer_key.global_id }
   let(:lti_context_id) { Account.default.lti_context_id }
   let(:deployment_id) { cet.id.to_s + ":" + lti_context_id }
@@ -61,7 +61,7 @@ describe Lti::IMS::NoticeHandlersController do
 
     describe "with a valid handler url" do
       let(:handler_object) { { notice_type:, handler: handler_url } }
-      let(:body_overrides) { handler_object.to_json }
+      let(:body_overrides) { handler_object }
 
       before do
         allow(Lti::PlatformNotificationService).to receive(:list_handlers).with(tool: cet).and_return(handlers)
@@ -73,8 +73,8 @@ describe Lti::IMS::NoticeHandlersController do
           .with(tool: cet, notice_type:, handler_url:, max_batch_size: nil)
           .and_return(handler_object)
         send_request
-        expect(response).to have_http_status(:ok)
         expect(response.parsed_body).to eq(JSON.parse(handler_object.to_json))
+        expect(response).to have_http_status(:ok)
       end
 
       context "with max_batch_size" do
@@ -94,7 +94,7 @@ describe Lti::IMS::NoticeHandlersController do
     end
 
     describe "with empty handler url" do
-      let(:body_overrides) { { notice_type:, handler: handler_url }.to_json }
+      let(:body_overrides) { { notice_type:, handler: handler_url } }
       let(:handler_url) { "" }
 
       before do
@@ -113,7 +113,7 @@ describe Lti::IMS::NoticeHandlersController do
     end
 
     describe "with a missing handler url" do
-      let(:body_overrides) { { notice_type: }.to_json }
+      let(:body_overrides) { { notice_type: } }
 
       it "returns a 400" do
         send_request
@@ -123,7 +123,7 @@ describe Lti::IMS::NoticeHandlersController do
     end
 
     describe "with a tool_id not related to devkey" do
-      let(:body_overrides) { { notice_type:, handler: handler_url }.to_json }
+      let(:body_overrides) { { notice_type:, handler: handler_url } }
       let(:tool_id) do
         ContextExternalTool.create!(
           context: tool_context,
@@ -144,7 +144,7 @@ describe Lti::IMS::NoticeHandlersController do
     end
 
     describe "with a tool_id not in db" do
-      let(:body_overrides) { { notice_type:, handler: handler_url }.to_json }
+      let(:body_overrides) { { notice_type:, handler: handler_url } }
       let(:tool_id) { "11223344" }
 
       it "rejected with 404" do
@@ -155,7 +155,7 @@ describe Lti::IMS::NoticeHandlersController do
 
     describe "with devkey turned off" do
       let(:handler_object) { { notice_type:, handler: handler_url } }
-      let(:body_overrides) { handler_object.to_json }
+      let(:body_overrides) { handler_object }
 
       before do
         developer_key.account_binding_for(Account.default).update!(workflow_state: "off")
