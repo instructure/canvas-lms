@@ -23663,6 +23663,10 @@ hu:
       other: "%{count} alfiók"
     titles: 
       sub_accounts: Alfiókok
+  sub_assignment: 
+    atom_no_author: "Nincs szerző"
+    labels: 
+      due: Határidő
   subaccount_91f4c279: Alfiók
   subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Az alfiók-adminisztrátorok csak akkor tekinthetik meg a SIS-információkat, ha oktatói szerepet is kaptak egy kurzusban."
   subaccount_admins_cannot_view_sis_information_with_15a41444: "Az alfiók-adminisztrátorok nem tekinthetik meg a SIS-információkat a kurzus társítása nélkül, mivel az oktatói szerepkörnek van jogosultsága a SIS-adatok olvasására fiókszinten."
