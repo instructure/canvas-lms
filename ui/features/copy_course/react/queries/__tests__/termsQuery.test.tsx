@@ -164,10 +164,15 @@ describe('termsQuery', () => {
 })
 
 describe('getTermsNextPage', () => {
+  const exampleTerm = {id: '1', name: 'Term 1', start_at: '2024-01-01', end_at: '2024-01-02'}
+  const next = {page: '2', per_page: '10'}
+
   it('should return the next page link if it exists', () => {
     const expectedNext = {page: '2', per_page: '10'}
     const lastPage: DoFetchApiResults<EnrollmentTerms> = {
-      json: undefined,
+      json: {
+        enrollment_terms: [exampleTerm],
+      },
       response: new Response(),
       text: '',
       link: {next: expectedNext},
@@ -178,10 +183,44 @@ describe('getTermsNextPage', () => {
 
   it('should return undefined if there is no next page link', () => {
     const lastPage: DoFetchApiResults<EnrollmentTerms> = {
-      json: undefined,
+      json: {
+        enrollment_terms: [exampleTerm],
+      },
       response: new Response(),
       text: '',
       link: {},
+    }
+    const result = getTermsNextPage(lastPage)
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined if there is empty result with next page link', () => {
+    const lastPage: DoFetchApiResults<EnrollmentTerms> = {
+      json: {enrollment_terms: []},
+      response: new Response(),
+      text: '',
+      link: {next},
+    }
+    const result = getTermsNextPage(lastPage)
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined if the return json is undefined and we have next page link', () => {
+    const lastPage: DoFetchApiResults<EnrollmentTerms> = {
+      json: undefined,
+      response: new Response(),
+      text: '',
+      link: {next},
+    }
+    const result = getTermsNextPage(lastPage)
+    expect(result).toBeUndefined()
+  })
+
+  it('should return undefined if the return json is missing and we have next page link', () => {
+    const lastPage: DoFetchApiResults<EnrollmentTerms> = {
+      response: new Response(),
+      text: '',
+      link: {next},
     }
     const result = getTermsNextPage(lastPage)
     expect(result).toBeUndefined()
