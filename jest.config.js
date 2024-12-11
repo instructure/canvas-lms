@@ -57,7 +57,6 @@ module.exports = {
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: [
     '@testing-library/jest-dom',
-    './packages/validated-apollo/src/ValidatedApolloCleanup.js',
     '<rootDir>/jest/stubInstUi.js',
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
