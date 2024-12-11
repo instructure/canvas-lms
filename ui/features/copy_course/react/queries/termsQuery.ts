@@ -27,6 +27,10 @@ import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 export const getTermsNextPage = (
   lastPage: DoFetchApiResults<EnrollmentTerms>
 ): NextPageTerms | undefined => {
+  const isResultEmpty = !lastPage.json?.enrollment_terms.length
+  if (isResultEmpty) {
+    return
+  }
   return lastPage.link?.next
 }
 
