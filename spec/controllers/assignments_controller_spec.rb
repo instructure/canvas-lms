@@ -1513,6 +1513,34 @@ describe AssignmentsController do
             get :show, params: { course_id: @course.id, id: @assignment.id }
             expect(assigns[:js_env]).to have_key(:selected_student_group_id)
           end
+
+          context "differentiation tags" do
+            before do
+              Account.default.enable_feature!(:differentiation_tags)
+              @non_collab_category = GroupCategory.create!(context: @course, name: "Tag Category", non_collaborative: true)
+            end
+
+            it "returns non collaborative group categories if the user has the correct permissions" do
+              get :show, params: { course_id: @course.id, id: @assignment.id }
+              group_category_ids = assigns[:js_env][:group_categories].pluck("id")
+              expect(group_category_ids).to eq @course.active_combined_group_and_differentiation_tag_categories.map(&:id)
+              expect(group_category_ids).to include(@non_collab_category.id)
+            end
+
+            it "returns only the normal group categories if the user does not have the correct manage tag permissions" do
+              RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+                @course.account.role_overrides.create!(
+                  permission:,
+                  role: teacher_role,
+                  enabled: false
+                )
+              end
+              get :show, params: { course_id: @course.id, id: @assignment.id }
+              group_category_ids = assigns[:js_env][:group_categories].pluck("id")
+              expect(group_category_ids).to eq @course.group_categories.map(&:id)
+              expect(group_category_ids).not_to include(@non_collab_category.id)
+            end
+          end
         end
 
         context "when filter_speed_grader_by_student_group? is false" do
