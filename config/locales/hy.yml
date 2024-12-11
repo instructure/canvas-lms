@@ -16203,6 +16203,10 @@ hy:
       other: "%{count} ենթահաշիվ"
     titles: 
       sub_accounts: Ենթահաշիվներ
+  sub_assignment: 
+    atom_no_author: "Հեղինակ չկա"
+    labels: 
+      due: Մինչև
   subject_reply_to: "Re: %{subject}"
   submission: 
     atom_no_author: "Հեղինակ չկա"
