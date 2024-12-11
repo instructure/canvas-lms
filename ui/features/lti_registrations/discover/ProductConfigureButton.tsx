@@ -40,7 +40,7 @@ import {
 
 export type ConfigureButtonProps = {
   buttonWidth: 'block' | 'inline-block'
-  ltiConfiguration: Lti
+  ltiConfiguration: Lti[]
   accountId: AccountId
 }
 
@@ -57,8 +57,9 @@ export const ProductConfigureButton = ({
     navigate('/manage')
   }, [navigate])
 
-  const integration = ltiConfiguration.lti_13
-    ? pickPreferredIntegration(ltiConfiguration.lti_13)
+
+  const integration = ltiConfiguration
+    ? pickPreferredIntegration(ltiConfiguration)
     : undefined
 
   const [jsonFetchStatus, setJsonFetchStatus] = React.useState<JsonFetchStatus>({_tag: 'initial'})

@@ -35,14 +35,17 @@ describe('isError, isLoading, and product return as expected', () => {
       tagline: 'Product Tagline',
       description: 'Product Description',
       updated_at: '2021-01-01',
-      tool_integration_configurations: {
-        lti_13: [
-          {id: 1, integration_type: 'lti13', url: 'http://lti13.com', unified_tool_id: 'lti13'},
-        ],
-      },
-      lti_configurations: {
-        lti_13: {services: ['service1'], placements: ['placement1']},
-      },
+      canvas_lti_configurations: [
+        {
+          id: 12,
+          integration_type: 'lti_13_dynamic_registration',
+          description: 'description',
+          lti_placements: ['dr'],
+          lti_services: ['gk'],
+          url: 'google.com',
+          unified_tool_id: '1234',
+        },
+      ],
       badges: [{name: 'badge1', image_url: 'http://badge1.com', link: 'http://badge1.com'}],
       screenshots: ['http://screenshot1.com'],
       terms_of_service_url: 'http://tos.com',

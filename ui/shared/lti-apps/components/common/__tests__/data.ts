@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Product, Company, LtiDetail, Lti, Badges, Tag} from '../../../models/Product'
+import type {Product, Company, Lti, Badges, Tag} from '../../../models/Product'
 
 const company: Company = {
   id: 2,
@@ -24,15 +24,17 @@ const company: Company = {
   company_url: 'google.com',
 }
 
-const lti_configurations: LtiDetail = {
-  lti_13: {services: ['gk'], placements: ['dr']},
-  lti_11: {services: ['gk'], placements: ['dr']},
-}
-
-const tool_integration_configurations: Lti = {
-  lti_13: [{id: 3, integration_type: 'dr', url: 'google.com', unified_tool_id: '5'}],
-  lti_11: [{id: 4, integration_type: 'gk', url: 'google.com', unified_tool_id: '6'}],
-}
+const canvas_lti_configurations: Lti[] = [
+  {
+    id: 12,
+    integration_type: 'lti_13_dynamic_registration',
+    description: 'great product!',
+    lti_placements: ['this is a piece of placement data'],
+    lti_services: ['this is a piece of service data'],
+    url: 'google.com',
+    unified_tool_id: '1234',
+  },
+]
 
 const badges: Badges[] = [{name: 'badge1', image_url: 'google.com', link: 'google.com'}]
 
@@ -48,8 +50,7 @@ const product: Product[] = [
     tagline: 'Product 1 tagline',
     description: 'Product 1 description',
     updated_at: '2024-01-01',
-    tool_integration_configurations,
-    lti_configurations,
+    canvas_lti_configurations,
     integration_resources: {comments: null, resources: []},
     badges,
     screenshots: ['greatimage'],
@@ -61,4 +62,4 @@ const product: Product[] = [
   },
 ]
 
-export {company, product, lti_configurations, tool_integration_configurations, badges, tags}
+export {company, product, canvas_lti_configurations, badges, tags}
