@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import CanvasValidatedMockedProvider from '@canvas/validated-apollo-mocked-provider'
+import {MockedProvider} from '@apollo/react-testing'
 import {STUDENT_SEARCH_QUERY} from '../../../assignmentData'
 import {mockAssignment, mockSubmission, mockUser, closest} from '../../../test-utils'
 import StudentsSearcher from '../StudentsSearcher'
@@ -51,9 +51,9 @@ function renderStudentsSearcher(usersAndVariables, useAssignment) {
   const requests = usersAndVariables.map(uav => mockRequest(uav))
   const assignment = useAssignment || mockAssignment()
   const fns = render(
-    <CanvasValidatedMockedProvider mocks={requests} addTypename={false}>
+    <MockedProvider mocks={requests} addTypename={false}>
       <StudentsSearcher assignment={assignment} />
-    </CanvasValidatedMockedProvider>
+    </MockedProvider>
   )
   return fns
 }

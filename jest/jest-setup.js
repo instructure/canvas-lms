@@ -75,6 +75,7 @@ const globalWarn = global.console.warn
 const ignoredWarnings = [
   /JQMIGRATE:/, // ignore warnings about jquery migrate; these are muted globally when not in a jest test
   /componentWillReceiveProps/, // ignore warnings about componentWillReceiveProps; this method is deprecated and will be removed with react upgrades
+  /Found @client directives in a query but no ApolloClient resolvers were specified/, // ignore warnings about missing ApolloClient resolvers
 ]
 
 global.console = {
