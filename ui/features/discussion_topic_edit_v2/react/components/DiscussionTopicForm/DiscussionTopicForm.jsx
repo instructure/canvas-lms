@@ -406,6 +406,13 @@ function DiscussionTopicForm({
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
 
+  useEffect(() => {
+    if (isGraded) {
+      setAddToTodo(false)
+      setTodoDate(null)
+    }
+  }, [isGraded])
+
   const setAbGuidPostMessageListener = event => {
     const validatedAbGuid = isGuidDataValid(event)
     if (validatedAbGuid) {
@@ -905,6 +912,20 @@ function DiscussionTopicForm({
     }
   }, [isAnnouncement, locked, shouldShowAllowParticipantsToCommentOption])
 
+  const handleGradedCheckboxChange = () => {
+    setIsGraded(!isGraded)
+    if (!isGraded) {
+      // When switching to ungraded, clear assignment-related fields
+      setPointsPossible(0)
+      setDisplayGradeAs('points')
+      setAssignmentGroup(null)
+      setAddToTodo(false)
+      setTodoDate(null)
+    } else {
+      setIsCheckpoints(false)
+    }
+  }
+
   return (
     <>
       {((shouldMasteryPathsBeVisible && instUINavEnabled()) || !instUINavEnabled()) &&
@@ -1093,12 +1114,7 @@ function DiscussionTopicForm({
                 value="graded"
                 inline={true}
                 checked={isGraded}
-                onChange={() => {
-                  if (isGraded) {
-                    setIsCheckpoints(false)
-                  }
-                  setIsGraded(!isGraded)
-                }}
+                onChange={handleGradedCheckboxChange}
                 // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
               />
             )}
