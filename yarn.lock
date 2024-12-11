@@ -15,10 +15,10 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@apollo/client@~3.11.8":
-  version "3.11.8"
-  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.11.8.tgz#f6bacdc7e1b243807c1387113e1d445a53471a9c"
-  integrity sha512-CgG1wbtMjsV2pRGe/eYITmV5B8lXUCYljB2gB/6jWTFQcrvirUVvKg7qtFdjYkQSFbIffU1IDyxgeaN81eTjbA==
+"@apollo/client@~3.12.2":
+  version "3.12.2"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.12.2.tgz#28cf4a0c07c42ace566dc17e2647ff011424ece8"
+  integrity sha512-dkacsdMgVsrrQhLpN4JqZTIEfnNsPVwny+4vccSRqheWZElzUz1Xi0h39p2+TieS1f+wwvyzwpoJEV57vwzT9Q==
   dependencies:
     "@graphql-typed-document-node/core" "^3.1.1"
     "@wry/caches" "^1.0.0"
@@ -7692,9 +7692,9 @@
     "@types/react" "^17"
 
 "@types/react-dom@>=16.9.0", "@types/react-dom@^18":
-  version "18.3.3"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.3.3.tgz#3654138d0da1b0c7916f6ed0dc1cc2b576d47650"
-  integrity sha512-uTYkxTLkYp41nq/ULXyXMtkNT1vu5fXJoqad6uTNCOGat5t9cLgF4vMNLBXsTOXpdOI44XzKPY1M5RRm0bQHuw==
+  version "18.3.5"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.3.5.tgz#45f9f87398c5dcea085b715c58ddcf1faf65f716"
+  integrity sha512-P4t6saawp+b/dFrUr2cvkVsfvPguwsxtH6dNIYRllMsefqFzkZk5UIjzyDOv5g1dXIPdG4Sp1yCR4Z6RCUsG/Q==
 
 "@types/react-redux@^7.1.20":
   version "7.1.33"
