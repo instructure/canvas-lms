@@ -18711,6 +18711,10 @@ tr:
       other: "%{count} Alt Hesap"
     titles: 
       sub_accounts: "Alt Hesaplar"
+  sub_assignment: 
+    atom_no_author: "Yazar Yok"
+    labels: 
+      due: Bitiş
   subaccount_91f4c279: "Alt hesap"
   subject_114b2e98: Konu
   subject_reply_to: "Ynt: %{subject}"
