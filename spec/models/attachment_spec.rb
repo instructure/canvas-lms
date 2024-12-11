@@ -1384,6 +1384,33 @@ describe Attachment do
         expect(@attachment.grants_right?(@student2, :download)).to be false
       end
 
+      context "with observer" do
+        let(:observer) do
+          observer = user_model
+          observer_enrollment = @course.enroll_user(observer, "ObserverEnrollment")
+          observer_enrollment.update!(associated_user_id: student.id)
+          observer
+        end
+
+        it "allows observers to access attachments on submission comments associated to their observees submissions" do
+          @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+
+          @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+        end
+
+        it "allows observers to access attachments on submission comments associated to their concluded observees submissions" do
+          @course.enrollments.find_by(user_id: student.id).conclude
+
+          @submission.add_comment(author: @teacher, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+
+          @submission.add_comment(author: student, comment: "comment", attachments: [attachment_model(context: @assignment)])
+          expect(@attachment.grants_right?(observer, :download)).to be true
+        end
+      end
+
       it "allows students to access attachments on submissions" do
         attachment_model(context: @assignment)
         @assignment.submit_homework(student, attachments: [@attachment])
