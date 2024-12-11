@@ -29,6 +29,7 @@ import type {
   OrderType,
   SortableColumn,
   PaceContextProgress,
+  CourseReport,
 } from '../types'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -49,6 +50,9 @@ import type {SpinnerProps} from '@instructure/ui-spinner'
 import type {ViewProps} from '@instructure/ui-view'
 import type {TableColHeaderProps} from '@instructure/ui-table'
 import NoResults from './no_results'
+import type {Course} from '../shared/types'
+import {POLL_DOCX_DELAY} from '../utils/constants'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 type SortingProps = {
   onRequestSort: () => void
@@ -71,6 +75,10 @@ export interface PaceContextsTableProps {
   setOrderType: typeof paceContextsActions.setOrderType
   handleContextSelect: (paceContext: PaceContext) => void
   contextsPublishing: PaceContextProgress[]
+  course: Course,
+  createCourseReport: (courseReport: CourseReport) => Promise<CourseReport | undefined>,
+  showCourseReport: (courseReport: CourseReport) => Promise<CourseReport | undefined>,
+  getLastCourseReport: (courseId: string, reportType: string) => Promise<CourseReport | undefined>
 }
 
 interface Header {
@@ -111,28 +119,34 @@ const PaceContextsTable = ({
   isLoading,
   responsiveSize,
   contextsPublishing,
+  course,
+  createCourseReport,
+  showCourseReport,
+  getLastCourseReport
 }: PaceContextsTableProps) => {
   const [headers, setHeaders] = useState<Header[]>([])
   const [newOrderType, setNewOrderType] = useState(currentOrderType)
-  const [selectedPacesIds, setSelectedPacesIds] = useState(new Set())
+  const [selectedPaceContexts, setSelectedPaceContexts] = useState(new Set<PaceContext>())
+  const [report, setReport] = useState<CourseReport>()
 
-  const handleSelectAllPacesIds = (allSelected: boolean) => {
-    setSelectedPacesIds(allSelected ? new Set() : new Set(paceContexts.map(({item_id}) => item_id)))
+  const handleSelectAllPaceContexts = (allSelected: boolean) => {
+    setSelectedPaceContexts(allSelected ? new Set() : new Set(paceContexts))
   }
 
-  const handleSelectPaceId = (rowSelected: boolean, rowId: string) => {
-    const copy = new Set(selectedPacesIds)
+  const handleSelectPaceContext = (rowSelected: boolean, paceContext: PaceContext) => {
+    const copy = new Set(selectedPaceContexts)
     if (rowSelected) {
-      copy.delete(rowId)
+      copy.delete(paceContext)
     } else {
-      copy.add(rowId)
+      copy.add(paceContext)
     }
-    setSelectedPacesIds(copy)
+    setSelectedPaceContexts(copy)
   }
 
   const allPacesSelected =
-    selectedPacesIds.size > 0 && paceContexts.every(({item_id}) => selectedPacesIds.has(item_id))
-  const somePacesSelected = selectedPacesIds.size > 0 && !allPacesSelected
+    selectedPaceContexts.size > 0 &&
+    paceContexts.every(paceContext => selectedPaceContexts.has(paceContext))
+  const somePacesSelected = selectedPaceContexts.size > 0 && !allPacesSelected
 
   const tableRef = useRef<HTMLElement | null>(null)
   const paceType = contextType === 'student_enrollment' ? 'student' : 'section'
@@ -163,6 +177,58 @@ const PaceContextsTable = ({
       sortingButton?.setAttribute('aria-label', buttonHeaderLabel ?? '???')
     })
   }, [newOrderType])
+
+  useEffect(() => {
+    (async () => {
+      if (!window.ENV.FEATURES.course_pace_download_document) {
+        return
+      }
+
+      const lastReport = await getLastCourseReport(course.id, "course_pace_docx")
+      if (lastReport?.status == "running") {
+        setReport(lastReport)
+      }
+    })()
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (report?.id && !report?.file_url) {
+        const updatedReport = await showCourseReport(report)
+        setReport(updatedReport)
+      }
+    }, POLL_DOCX_DELAY)
+
+    return () => clearInterval(interval)
+  }, [report, course])
+
+  useEffect(() => {
+    if (report?.file_url) {
+      window.location.href = report.file_url
+
+      showFlashAlert({
+        message: I18n.t('The Course Pace download is complete.'),
+        type: 'success',
+      })
+      setReport(undefined)
+    } else if (report) {
+      if (report.status == "running") {
+        showFlashAlert({
+          message: I18n.t('A Course Pace download is in progress.'),
+        })
+      } else if (report.status == "error") {
+        showFlashAlert({
+          message: I18n.t('The course pace download encountered an error.'),
+          type: 'error',
+        })
+        setReport(undefined);
+      }
+    }
+  }, [report, report?.status, report?.file_url])
+
+  useEffect(() => {
+    setSelectedPaceContexts(new Set<PaceContext>())
+  }, [currentPage])
 
   const formatDate = (date: string) => {
     if (!date) return '--'
@@ -371,23 +437,59 @@ const PaceContextsTable = ({
     )
   }
 
-  const selectPaceRowOption = (row_item_id: string) => {
-    const rowSelected = selectedPacesIds.has(row_item_id)
+  const selectPaceRowOption = (paceContext: PaceContext) => {
+    const rowSelected = selectedPaceContexts.has(paceContext)
     return (
       <Checkbox
         label=""
-        key={`select-pace-row-${row_item_id}`}
-        onChange={() => handleSelectPaceId(rowSelected, row_item_id)}
+        key={`select-pace-row-${paceContext.type}-${paceContext.item_id}`}
+        onChange={() => handleSelectPaceContext(rowSelected, paceContext)}
         checked={rowSelected}
       />
     )
   }
 
-  const downloadPaceDocxOption = (
-    <Menu.Item data-testid="download-pace">
-      <IconDownloadLine /> Download
-    </Menu.Item>
-  )
+  const onDownloadPace = (paceContext: PaceContext) => {
+    return async () => {
+      const parameters = {
+        enrollment_ids: Array<string>(),
+        section_ids: Array<string>(),
+        report_type: 'course_pace_docx'
+      }
+      if (paceContext.type == 'StudentEnrollment') {
+        parameters.enrollment_ids = [paceContext.item_id]
+      } else {
+        parameters.section_ids = [paceContext.item_id]
+      }
+      const value = await createCourseReport({ course_id: course.id, report_type: 'course_pace_docx', parameters })
+      setReport(value)
+    }
+  }
+
+  const onDownloadPaces = async () => {
+    const parameters = {
+      enrollment_ids: Array<string>(),
+      section_ids: Array<string>()
+    }
+
+    selectedPaceContexts.forEach((paceContext) => {
+      if (paceContext.type == 'StudentEnrollment') {
+        parameters.enrollment_ids.push(paceContext.item_id)
+      } else {
+        parameters.section_ids.push(paceContext.item_id)
+      }
+    })
+    const value = await createCourseReport({ course_id: course.id, report_type: 'course_pace_docx', parameters })
+    setReport(value)
+  }
+
+  const downloadPaceDocxOption = (paceContext: PaceContext) => {
+    return (
+      <Menu.Item data-testid="download-pace" onClick={onDownloadPace(paceContext)}>
+        <IconDownloadLine /> Download
+      </Menu.Item>
+    )
+  }
 
   const renderRow = (paceContext: PaceContext) => {
     const cells = getValuesByContextType(paceContext).map((cell, index) => (
@@ -403,7 +505,7 @@ const PaceContextsTable = ({
     const rowCells = window.ENV.FEATURES.course_pace_download_document
       ? [
           <Table.Cell key="select-pace-row" themeOverride={{padding: '0.7rem'}}>
-            {selectPaceRowOption(paceContext.item_id)}
+            {selectPaceRowOption(paceContext)}
           </Table.Cell>,
           ...cells,
           <Table.Cell key="more-menu" themeOverride={{padding: '0.7rem'}}>
@@ -421,7 +523,7 @@ const PaceContextsTable = ({
               offsetX={100}
               withArrow={false}
             >
-              {downloadPaceDocxOption}
+              {downloadPaceDocxOption(paceContext)}
             </Menu>
           </Table.Cell>,
         ]
@@ -440,7 +542,7 @@ const PaceContextsTable = ({
 
     return (
       <View
-        key={`context-row-${paceContext.item_id}`}
+        key={`context-row-${paceContext.type}-${paceContext.item_id}`}
         as="div"
         background="secondary"
         padding="xx-small small"
@@ -448,7 +550,7 @@ const PaceContextsTable = ({
       >
         {window.ENV.FEATURES.course_pace_download_document && (
           <Flex key="mobile-context-row-checkbox" as="div" width="3,8rem" margin="medium 0">
-            {selectPaceRowOption(paceContext.item_id)}
+            {selectPaceRowOption(paceContext)}
           </Flex>
         )}
         {headers.map(({content: title}, index) => (
@@ -475,7 +577,7 @@ const PaceContextsTable = ({
                 withArrow={false}
                 placement="bottom start"
               >
-                {downloadPaceDocxOption}
+                {downloadPaceDocxOption(paceContext)}
               </Menu>
             </Flex.Item>
           </Flex>
@@ -488,7 +590,7 @@ const PaceContextsTable = ({
     <Checkbox
       label=""
       data-testid="select-all-paces-checkbox"
-      onChange={() => handleSelectAllPacesIds(allPacesSelected)}
+      onChange={() => handleSelectAllPaceContexts(allPacesSelected)}
       checked={allPacesSelected}
       indeterminate={somePacesSelected}
     />
@@ -505,7 +607,7 @@ const PaceContextsTable = ({
   )
 
   const downloadDocxRow = () => {
-    const interactionValue = selectedPacesIds.size > 0 ? 'enabled' : 'disabled'
+    const interactionValue = selectedPaceContexts.size > 0 ? 'enabled' : 'disabled'
 
     return window.ENV.FEATURES.course_pace_download_document ? (
       <View as="div" padding="small" background="transparent" display="block">
@@ -516,7 +618,7 @@ const PaceContextsTable = ({
 
           <Flex justifyItems="end" direction="row" gap="small">
             <Flex.Item width="4.5rem">
-              <Text> {`${selectedPacesIds.size} selected`}</Text>
+              <Text> {`${selectedPaceContexts.size} selected`}</Text>
             </Flex.Item>
 
             <Flex.Item width="2.375rem">
@@ -525,6 +627,7 @@ const PaceContextsTable = ({
                 screenReaderLabel="Download selected paces"
                 renderIcon={IconDownloadLine}
                 interaction={interactionValue}
+                onClick={onDownloadPaces}
               />
             </Flex.Item>
           </Flex>

@@ -222,6 +222,7 @@ class Course < ActiveRecord::Base
   has_many :content_migrations, as: :context, inverse_of: :context
   has_many :content_exports, as: :context, inverse_of: :context
   has_many :epub_exports, -> { where(type: nil).order("created_at DESC") }
+  has_many :course_reports, dependent: :destroy
 
   has_many :gradebook_filters, inverse_of: :course, dependent: :destroy
   attr_accessor :latest_epub_export

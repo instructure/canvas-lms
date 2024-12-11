@@ -87,6 +87,7 @@ class Attachment < ActiveRecord::Base
        :content_export,
        :content_migration,
        :course,
+       :course_report,
        :eportfolio,
        :epub_export,
        :gradebook_upload,
@@ -104,6 +105,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :folder
   belongs_to :user
   has_one :account_report, inverse_of: :attachment
+  has_one :course_report, inverse_of: :attachment
   has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   belongs_to :media_object_by_media_id, class_name: "MediaObject", primary_key: :media_id, foreign_key: :media_entry_id, inverse_of: :attachments_by_media_id
