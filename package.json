@@ -16,7 +16,7 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "~3.11.8",
+    "@apollo/client": "~3.12.2",
     "@hookform/resolvers": "^3.9.0",
     "@instructure/brandable_css": "^3",
     "@instructure/canvas-media": "*",
