@@ -1495,7 +1495,6 @@ describe ExternalToolsController do
 
       before do
         user_session(@student)
-        Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
       end
 
       it "renders the sibling forwarder frame once" do
