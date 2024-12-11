@@ -25331,6 +25331,10 @@ nn:
       other: "%{count} underkontoar"
     titles: 
       sub_accounts: Underkontoar
+  sub_assignment: 
+    atom_no_author: "Utan forfattar"
+    labels: 
+      due: Frist
   subaccount_91f4c279: Underkonto
   subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Administratorar på underkontonivå kan ikkje sjå SIS informasjon med mindre dei også har ein status som faglærar i eit emne"
   subaccount_admins_cannot_view_sis_information_with_15a41444: "Administratorar på underkontonivå kan ikkje sjå SIS informasjon utan emnetilknytning, då rollen som faglærar har løyve til å lese SIS data på kontonivå"
