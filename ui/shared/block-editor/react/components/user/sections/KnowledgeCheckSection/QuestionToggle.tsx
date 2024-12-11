@@ -72,7 +72,9 @@ const QuestionToggle: React.FC<QuestionToggleProps> = ({question, onSelect}) => 
           {questionType()}
         </Text>
         <br />
-        <Text>{question.entry.title}</Text>
+        <Text>
+          {question.entry.title || I18n.t('Question %{position}', {position: question.position})}
+        </Text>
       </View>
     )
   }

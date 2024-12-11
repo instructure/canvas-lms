@@ -20,7 +20,12 @@ import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import QuestionSelect from '../QuestionSelect'
-import {testQuestions} from './testQuestions'
+import {
+  testUnsupportedQuestion,
+  testSupportedQuestion,
+  testMissingValuesQuestion,
+  testQuestions,
+} from './testQuestions'
 
 describe('QuestionSelect', () => {
   const mockOnSelect = jest.fn()
@@ -38,7 +43,7 @@ describe('QuestionSelect', () => {
   it('calls onSelect when a QuestionToggle is clicked', async () => {
     // @ts-expect-error
     render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
-    const toggle = screen.getByText(testQuestions[0].entry.title)
+    const toggle = screen.getByText(testQuestions[0].entry.title ?? '')
     fireEvent.click(toggle)
     await waitFor(() => expect(mockOnSelect).toHaveBeenCalled())
   })
@@ -46,21 +51,26 @@ describe('QuestionSelect', () => {
   it('renders the correct question titles', () => {
     // @ts-expect-error
     render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
-    testQuestions.forEach(question => {
-      expect(screen.getByText(question.entry.title)).toBeInTheDocument()
-    })
+    expect(screen.getByText(testUnsupportedQuestion.entry.title)).toBeInTheDocument()
+    expect(screen.getByText(testSupportedQuestion.entry.title)).toBeInTheDocument()
+    expect(screen.getByText(`Question ${testMissingValuesQuestion.position}`)).toBeInTheDocument()
   })
 
-  it('filters questions based on search input', () => {
+  it('filters questions based on title', () => {
     // @ts-expect-error
     render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
     const input = screen.getByPlaceholderText('Search questions...')
-    fireEvent.change(input, {target: {value: 'test'}})
-    const filteredQuestions = testQuestions.filter(question =>
-      question.entry.title.toLowerCase().includes('blue')
-    )
-    filteredQuestions.forEach(question => {
-      expect(screen.getByText(question.entry.title)).toBeInTheDocument()
-    })
+    fireEvent.change(input, {target: {value: 'true or false?'}})
+    expect(screen.queryByText(testUnsupportedQuestion.entry.title)).not.toBeInTheDocument()
+    expect(screen.getByText(testSupportedQuestion.entry.title)).toBeInTheDocument()
+  })
+
+  it('filters questions based on body', () => {
+    // @ts-expect-error
+    render(<QuestionSelect onSelect={mockOnSelect} questions={testQuestions} />)
+    const input = screen.getByPlaceholderText('Search questions...')
+    fireEvent.change(input, {target: {value: 'blue'}})
+    expect(screen.queryByText(testUnsupportedQuestion.entry.title)).not.toBeInTheDocument()
+    expect(screen.getByText(testSupportedQuestion.entry.title)).toBeInTheDocument()
   })
 })
