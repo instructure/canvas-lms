@@ -22922,6 +22922,10 @@ fa:
       other: "%{count} زیر حساب"
     titles: 
       sub_accounts: "زیر حساب ها"
+  sub_assignment: 
+    atom_no_author: "نویسنده موجود نیست"
+    labels: 
+      due: مهلت
   subaccount_91f4c279: زیرحساب
   subaccount_navigation_account_settings_add9eff9: "پیمایش زیر حساب (تنظیمات حساب)"
   subaccount_settings_8549eff7: "تنظیمات زیر حساب"
