@@ -18802,6 +18802,10 @@ he:
       two: "%{count} חשבונות משנה"
     titles: 
       sub_accounts: "חשבונות משנה"
+  sub_assignment: 
+    atom_no_author: "אין עורכ/ת"
+    labels: 
+      due: "תאריך יעד"
   subaccount_91f4c279: "חשבון משנה"
   subdomain_url_1e43b6f0: "כתובת דף של דומיין משנה"
   subject_114b2e98: נושא
