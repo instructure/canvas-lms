@@ -160,6 +160,7 @@ export const openRegistrationWizard = (
       jsonUrlFetch: {_tag: 'initial'},
       lti_version: '1p3',
       method: 'dynamic_registration',
+      existingRegistrationId: undefined,
       ...initialState,
       open: true,
     }
