@@ -13358,6 +13358,10 @@ ko:
       other: "하위 계정 %{count}개"
     titles: 
       sub_accounts: "하위 계정"
+  sub_assignment: 
+    atom_no_author: "작성자 없음"
+    labels: 
+      due: 기한
   subject_reply_to: "Re: %{subject}"
   submission: 
     atom_no_author: "작성자 없음"
