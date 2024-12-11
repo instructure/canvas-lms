@@ -94,6 +94,7 @@ const locale = {
   "decorative_image_fde98579": { "message": "Декоративне зображення" },
   "decrease_indent_d9cf469d": { "message": "Зменшити відступ" },
   "deep_purple_bb3e2907": { "message": "Темно-фіолетовий" },
+  "default_9db103d": { "message": "За замовчуванням" },
   "delimiters_4db4840d": { "message": "Розділювачі" },
   "description_436c48d7": { "message": "Опис" },
   "details_98a31b68": { "message": "Подробиці" },

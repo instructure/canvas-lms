@@ -118,6 +118,7 @@ const locale = {
   "date_added_ed5ad465": { "message": "Eklendiği Tarih" },
   "decrease_indent_d9cf469d": { "message": "İçerden başlatma sınırını azalt" },
   "deep_purple_bb3e2907": { "message": "Koyu Mor" },
+  "default_9db103d": { "message": "Varsayılan" },
   "delimiters_4db4840d": { "message": "Ayıraçlar" },
   "description_436c48d7": { "message": "Açıklama" },
   "details_98a31b68": { "message": "Ayrıntılar" },

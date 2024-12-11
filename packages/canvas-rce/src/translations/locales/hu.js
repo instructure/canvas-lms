@@ -247,6 +247,7 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Dekoratív { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Behúzás csökkentése" },
   "deep_purple_bb3e2907": { "message": "Sötétlila" },
+  "default_9db103d": { "message": "Alapértelmezett" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "alapértelmezett nem rendezett lista"
   },
