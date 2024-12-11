@@ -1432,19 +1432,23 @@ class Attachment < ActiveRecord::Base
     # grader
     return true if assignment.grants_right?(user, session, :grade)
 
-    # submitter
+    # submitter (or observer of submitter)
     assignment.shard.activate do
-      student_submission = assignment.submissions.active.where(user_id: user)
-      student_submission.where("#{id}=any(regexp_split_to_array(nullif(submissions.attachment_ids,''), ',')::INT8[])")
-                        .union(
-                          student_submission.joins(:versions)
-                            .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
-                        )
-                        .union(
-                          student_submission.joins(:submission_comments)
-                            .merge(SubmissionComment.published.visible)
-                            .where("#{id}=any(regexp_split_to_array(nullif(submission_comments.attachment_ids,''), ',')::INT8[])")
-                        ).exists?
+      # Search submissions for the user, or any user they are observing
+      search_users = [user].concat(
+        ObserverEnrollment.observed_students(assignment.context, user, grade_summary: true).keys
+      )
+      student_submissions = assignment.submissions.active.where(user_id: search_users)
+      student_submissions.where("#{id}=any(regexp_split_to_array(nullif(submissions.attachment_ids,''), ',')::INT8[])")
+                         .union(
+                           student_submissions.joins(:versions)
+                             .where(%(#{id}=any(regexp_split_to_array((regexp_match(versions.yaml,'attachment_ids: [''"]([0-9,]+)[''"]'))[1], ',')::INT8[])))
+                         )
+                         .union(
+                           student_submissions.joins(:submission_comments)
+                             .merge(SubmissionComment.published.visible)
+                             .where("#{id}=any(regexp_split_to_array(nullif(submission_comments.attachment_ids,''), ',')::INT8[])")
+                         ).exists?
     end
   end
 
