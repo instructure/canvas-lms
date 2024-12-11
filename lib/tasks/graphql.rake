@@ -24,10 +24,6 @@ namespace :graphql do
     GQL
     types["data"]["__schema"]["types"].reject! { |t| t["possibleTypes"].nil? }
 
-    Rails.root.join("ui/shared/apollo/fragmentTypes.json").open("w") do |f|
-      f.puts JSON.pretty_generate(types["data"])
-    end
-
     Rails.root.join("ui/shared/apollo-v3/possibleTypes.json").open("w") do |f|
       possible_types = {}
 
