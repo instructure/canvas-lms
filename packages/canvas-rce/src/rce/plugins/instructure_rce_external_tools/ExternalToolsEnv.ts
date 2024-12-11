@@ -17,8 +17,8 @@
  */
 
 import {Editor} from 'tinymce'
+import {RCEWrapperInterface, RCEWrapperProps} from '../../types'
 import RCEWrapper from '../../RCEWrapper'
-import {RCEWrapperProps} from '../../RCEWrapperProps'
 
 /**
  * Fallback iframe allowances used when they aren't provided to the editor.
@@ -60,7 +60,7 @@ export interface ExternalToolsEditor {
 
 export interface ExternalToolsEnv {
   editor: ExternalToolsEditor | null
-  rceWrapper: RCEWrapper | null
+  rceWrapper: RCEWrapperInterface | null
 
   availableRceLtiTools: RceLtiToolInfo[]
   contextAssetInfo: {
@@ -188,11 +188,15 @@ export function externalToolsEnvFor(
     },
 
     insertCode(code: string) {
-      this.rceWrapper?.insertCode(code)
+      if (this.rceWrapper?.insertCode) {
+        this.rceWrapper.insertCode(code)
+      }
     },
 
     replaceCode(code: string) {
-      this.rceWrapper?.replaceCode(code)
+      if (this.rceWrapper?.replaceCode) {
+        this.rceWrapper.replaceCode(code)
+      }
     },
   }
 }
