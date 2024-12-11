@@ -529,7 +529,7 @@ class PseudonymsController < ApplicationController
       :workflow_state,
       :declared_user_type
     ).blank?
-      render json: nil, status: :bad_request
+      render json: { message: "missing required parameter" }, status: :bad_request
       return false
     end
 
