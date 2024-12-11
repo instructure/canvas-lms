@@ -161,13 +161,18 @@ class ContextModulesController < ApplicationController
       @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
       if @feature_student_module_selection || @feature_teacher_module_selection
-        @module_show_setting = if @is_student && @feature_student_module_selection
-                                 @context.show_student_only_module_id
-                               elsif !@is_student && @feature_teacher_module_selection
+        # if the feature is enabled, and you can edit course content, you get the teacher version
+        # everyone else, if the feature is enabled gets the student limited version (so students and unenrolled)
+        # default is show all the things
+        @module_show_setting = if @can_edit && @feature_teacher_module_selection
                                  @context.show_teacher_only_module_id
+                               elsif @feature_student_module_selection
+                                 @context.show_student_only_module_id
+                               else
+                                 0
                                end&.to_i
         @module_show_setting = nil if @module_show_setting&.zero?
-        unless @is_student
+        if @can_edit
           hash[:MODULE_FEATURES] = {}
           hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
           hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
