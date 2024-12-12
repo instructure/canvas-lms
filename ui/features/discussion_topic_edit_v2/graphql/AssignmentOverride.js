@@ -38,6 +38,7 @@ export const AssignmentOverride = {
           students {
             _id
             id
+            name
           }
         }
         ... on Course {

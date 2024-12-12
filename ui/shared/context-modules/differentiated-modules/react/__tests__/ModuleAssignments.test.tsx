@@ -112,7 +112,9 @@ describe('ModuleAssignments', () => {
 
   it('shows SIS ID on existing options', async () => {
     const {findByTestId, findByText, getByTitle} = renderComponent({
-      defaultValues: [{id: 'student-2', group: 'Students', overrideId: '1234', value: 'Peter'}],
+      defaultValues: [
+        {id: 'student-2', sisID: 'peter002', group: 'Students', overrideId: '1234', value: 'Peter'},
+      ],
     })
     const moduleAssignments = await findByTestId('assignee_selector')
     act(() => moduleAssignments.click())

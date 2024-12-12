@@ -88,14 +88,17 @@ const CardActions = {
     const existingStudentIds = existingOverride.student_ids
     const newStudentIds = existingStudentIds.concat(assignee.id)
 
-    const newOverride = {...existingOverride, student_ids: newStudentIds}
+    const existingStudents = existingOverride.students
+    const newStudents = existingStudents.concat(assignee)
+
+    const newOverride = {...existingOverride, student_ids: newStudentIds, students: newStudents}
     delete newOverride.title
 
     return chain(overridesFromRow).difference([existingOverride]).union([newOverride]).value()
   },
 
   createNewAdhocOverrideForRow(assignee, overridesFromRow) {
-    const freshOverride = this.newOverrideForCard({student_ids: []})
+    const freshOverride = this.newOverrideForCard({student_ids: [], students: []})
     return this.addStudentToExistingAdhocOverride(assignee, freshOverride, overridesFromRow)
   },
 
@@ -169,7 +172,13 @@ const CardActions = {
       return difference(overridesFromRow, [adhocOverride])
     }
 
-    const newOverride = {...adhocOverride, student_ids: newStudentIds}
+    const newOverride = {
+      ...adhocOverride,
+      student_ids: newStudentIds,
+      students: adhocOverride.students.filter(
+        student => student.id !== assigneeToRemove.student_id
+      ),
+    }
     delete newOverride.title
 
     return chain(overridesFromRow).difference([adhocOverride]).union([newOverride]).value()
