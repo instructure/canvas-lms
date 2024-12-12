@@ -39,7 +39,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DownloadSubmissionsModal from '@canvas/download-submissions-modal'
 import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'

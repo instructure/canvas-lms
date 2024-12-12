@@ -20,7 +20,7 @@ import {useState, useCallback, useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {IMPORT_OUTCOMES} from '../../graphql/Management'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useCanvasContext from './useCanvasContext'
 

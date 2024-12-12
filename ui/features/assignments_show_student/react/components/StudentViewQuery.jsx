@@ -25,7 +25,7 @@ import {
   STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
 } from '@canvas/assignments/graphql/student/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import React from 'react'
 import {string} from 'prop-types'
 import StudentContent from './StudentContent'

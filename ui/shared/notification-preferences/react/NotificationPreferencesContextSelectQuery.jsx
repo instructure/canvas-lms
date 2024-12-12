@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useContext, useEffect} from 'react'
 import {func, string, object} from 'prop-types'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import NotificationPreferencesContextSelect from './NotificationPreferencesContextSelect'
 import {NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY} from '../graphql/Queries'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'

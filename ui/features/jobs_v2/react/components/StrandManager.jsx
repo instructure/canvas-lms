@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useMemo} from 'react'
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation} from '@apollo/client'
 import {GET_SETTING_QUERY, SET_SETTING_MUTATION} from '../../graphql/Queries'
 import {Modal} from '@instructure/ui-modal'
 import {Button, IconButton, CloseButton} from '@instructure/ui-buttons'

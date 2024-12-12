@@ -31,7 +31,7 @@ import React, {useContext, useEffect, useState} from 'react'
 import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('discussion_topics_post')

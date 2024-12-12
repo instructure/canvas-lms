@@ -33,7 +33,7 @@ const mockedEditor = {
 
 jest.mock('../getPosition')
 
-jest.mock('@apollo/react-hooks', () => {
+jest.mock('@apollo/client', () => {
   const data = {
     legacyNode: {
       id: 'Vxb',

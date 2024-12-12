@@ -37,7 +37,7 @@ import {
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
 } from '@canvas/outcomes/graphql/Management'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import OutcomesRceField from '../shared/OutcomesRceField'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
 import useRatings from '@canvas/outcomes/react/hooks/useRatings'

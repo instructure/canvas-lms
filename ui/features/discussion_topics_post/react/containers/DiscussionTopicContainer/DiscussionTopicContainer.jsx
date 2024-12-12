@@ -40,7 +40,7 @@ import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
-import {useApolloClient, useMutation} from '@apollo/react-hooks'
+import {useApolloClient, useMutation} from '@apollo/client'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'

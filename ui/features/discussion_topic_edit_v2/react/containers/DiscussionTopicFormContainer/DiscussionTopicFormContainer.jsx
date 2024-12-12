@@ -18,7 +18,7 @@
 
 import React, {useCallback, useContext, useEffect, useState} from 'react'
 
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation} from '@apollo/client'
 import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC, UPDATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 import LoadingIndicator from '@canvas/loading-indicator'

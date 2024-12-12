@@ -36,7 +36,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect} from 'react'
-import {useMutation, useQuery} from '@apollo/react-hooks'
+import {useMutation, useQuery} from '@apollo/client'
 import {ConversationContext} from '../../../util/constants'
 import {captureException} from '@sentry/react'
 

@@ -21,7 +21,7 @@ import {
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_THREAD_READ_STATE,
 } from '../../graphql/Mutations'
-import {useMutation, useApolloClient} from '@apollo/react-hooks'
+import {useMutation, useApolloClient} from '@apollo/client'
 import {useCallback, useContext} from 'react'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'

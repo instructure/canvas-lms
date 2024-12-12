@@ -219,7 +219,6 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
-    "@apollo/react-hooks": "~4.0.0",
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/parser": "^7",
@@ -443,7 +442,6 @@
   },
   "resolutions": {
     "graphael": "https://github.com/instructure/graphael.git",
-    "@apollo/react-hooks": "4.0.0",
     "@storybook/react-docgen-typescript-plugin": "1.0.6--canary.9.cd77847.0",
     "@instructure/emotion": "9.10.0",
     "@instructure/ui-a11y-content": "9.10.0",

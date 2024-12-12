@@ -18,7 +18,7 @@
 
 import React, {useState, useContext, useEffect} from 'react'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {UPDATE_SUBMISSION_STUDENT_ENTERED_SCORE} from '../../graphql/Mutations'

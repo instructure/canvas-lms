@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'

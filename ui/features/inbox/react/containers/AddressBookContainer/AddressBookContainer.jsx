@@ -23,7 +23,7 @@ import {
   ADDRESS_BOOK_RECIPIENTS,
   ADDRESS_BOOK_RECIPIENTS_WITH_COMMON_COURSES,
 } from '../../../graphql/Queries'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
