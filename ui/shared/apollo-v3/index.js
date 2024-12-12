@@ -19,7 +19,7 @@
 import getCookie from '@instructure/get-cookie'
 import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 import {ApolloClient, ApolloProvider, InMemoryCache, HttpLink, ApolloLink, gql} from '@apollo/client'
-import {Query} from '@apollo/react-components'
+import {Query} from '@apollo/client/react/components'
 import {persistCache} from 'apollo3-cache-persist'
 import {onError} from '@apollo/client/link/error'
 

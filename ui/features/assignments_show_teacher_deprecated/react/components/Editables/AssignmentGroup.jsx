@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import {Query} from '@apollo/react-components'
+import {Query} from '@apollo/client/react/components'
 import {Text} from '@instructure/ui-text'
 import SelectableText from './SelectableText'
 import {

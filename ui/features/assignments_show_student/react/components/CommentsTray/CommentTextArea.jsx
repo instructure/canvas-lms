@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
-import {Mutation} from '@apollo/react-components'
+import {Mutation} from '@apollo/client/react/components'
 import React, {Component} from 'react'
 import {bool} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
