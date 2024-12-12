@@ -17,8 +17,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import template from './jst/UploadMediaTrackForm.handlebars'
-// eslint-disable-next-line import/no-cycle
-import mejs from './index'
+import {languageCodes} from './mediaLanguageCodes'
 import $ from 'jquery'
 import {map} from 'lodash'
 
@@ -36,7 +35,7 @@ export default class UploadMediaTrackForm {
     this.attachmentId = attachmentId
     this.lockedMediaAttachment = lockedMediaAttachment
     const templateVars = {
-      languages: map(mejs.language.codes, (name, code) => ({name, code})),
+      languages: map(languageCodes, (name, code) => ({name, code})),
       video_url: this.video_url,
       is_amazon_url: this.video_url.search(/.mp4/) !== -1,
     }
