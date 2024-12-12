@@ -353,7 +353,7 @@ module SpeedGrader
           end
 
           if quizzes_next_submission?
-            quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user)
+            quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user, submission: sub)
             json["submission_history"] =
               quiz_lti_submission.grade_history.map { |submission| { submission: } }
           elsif json["submission_history"] && (assignment.quiz.nil? || too_many)
