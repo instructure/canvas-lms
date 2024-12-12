@@ -25,20 +25,6 @@ import AdminTable from '../AdminTable'
 const USER_EVENT_OPTIONS = {delay: null}
 
 describe('AdminTable', () => {
-  let originalENV
-  beforeEach(() => {
-    originalENV = global.ENV
-    global.ENV = {
-      FEATURES: {
-        enhanced_developer_keys_tables: true,
-      },
-    }
-  })
-
-  afterEach(() => {
-    global.ENV = originalENV
-  })
-
   const idFor = n => `1000000000000${n}`
 
   const devKeyList = (numKeys = 10) => {
@@ -181,23 +167,6 @@ describe('AdminTable', () => {
       await user.click(wrapper.getByText('Actions')) // descending
       expect(firstRow(wrapper)).toHaveTextContent('key-9')
     })
-
-    describe('when flag is off', () => {
-      beforeEach(() => {
-        global.ENV.FEATURES.enhanced_developer_keys_tables = false
-      })
-
-      it('does not allow sorting', async () => {
-        const user = userEvent.setup(USER_EVENT_OPTIONS)
-        const wrapper = component()
-
-        await user.click(wrapper.getByText('Name')) // "ascending"
-        expect(firstRow(wrapper)).toHaveTextContent('9')
-
-        await user.click(wrapper.getByText('Name')) // descending
-        expect(firstRow(wrapper)).toHaveTextContent('9')
-      })
-    })
   })
 
   describe('when filtering table', () => {
@@ -237,18 +206,6 @@ describe('AdminTable', () => {
       await user.type(wrapper.getByRole('searchbox'), idFor(1))
       await waitForDebounce()
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
-    })
-
-    describe('when flag is off', () => {
-      beforeEach(() => {
-        global.ENV.FEATURES.enhanced_developer_keys_tables = false
-      })
-
-      it('does not allow filtering', () => {
-        const wrapper = component()
-
-        expect(wrapper.queryByRole('searchbox')).not.toBeInTheDocument()
-      })
     })
   })
 

@@ -29,12 +29,6 @@ describe('InheritedTable', () => {
     container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
-
-    window.ENV = {
-      FEATURES: {
-        enhanced_developer_keys_tables: true,
-      },
-    }
   })
 
   afterEach(() => {
@@ -159,17 +153,6 @@ describe('InheritedTable', () => {
       await userEvent.type(wrapper.getByRole('searchbox'), idFor(1))
       await waitForDebounce()
       expect(wrapper.getAllByRole('row')).toHaveLength(2)
-    })
-
-    describe('when flag is off', () => {
-      beforeEach(() => {
-        window.ENV.FEATURES.enhanced_developer_keys_tables = false
-      })
-
-      it('does not allow filtering', () => {
-        const wrapper = renderComponent()
-        expect(wrapper.queryByRole('searchbox')).not.toBeInTheDocument()
-      })
     })
   })
 })

@@ -401,7 +401,6 @@ class ApplicationController < ActionController::Base
     mobile_offline_mode
     react_discussions_post
     instui_nav
-    enhanced_developer_keys_tables
     lti_registrations_discover_page
     account_level_mastery_scales
     non_scoring_rubrics
