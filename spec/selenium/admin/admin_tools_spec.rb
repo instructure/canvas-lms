@@ -411,7 +411,7 @@ describe "admin_tools" do
     it "searches by grader name and show history" do
       form = f('[aria-label="Grade Change Activity Form"]')
       perform_autocomplete_search(form.find("[name='grader_id'][aria-autocomplete='both']"), @teacher.name)
-      form.find("button[aria-label='Find']").click
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
 
@@ -430,7 +430,7 @@ describe "admin_tools" do
     it "displays 'y' if graded anonymously" do
       form = f('[aria-label="Grade Change Activity Form"]')
       perform_autocomplete_search(form.find("[name='grader_id'][aria-autocomplete='both']"), @teacher.name)
-      form.find("button[aria-label='Find']").click
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
 
       cols = ffj("#gradeChangeLoggingSearchResults table tbody tr:first td")
@@ -440,7 +440,7 @@ describe "admin_tools" do
     it "searches by student name" do
       form = f('[aria-label="Grade Change Activity Form"]')
       perform_autocomplete_search(form.find("[name='student_id'][aria-autocomplete='both']"), @student.name)
-      form.find("button[aria-label='Find']").click
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
@@ -448,7 +448,7 @@ describe "admin_tools" do
     it "searches by course id" do
       form = f('[aria-label="Grade Change Activity Form"]')
       form.find("[name='course_id']").send_keys(@course.id)
-      form.find("button[aria-label='Find']").click
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
     end
@@ -456,7 +456,7 @@ describe "admin_tools" do
     it "searches by assignment id" do
       form = f('[aria-label="Grade Change Activity Form"]')
       form.find("[name='assignment_id']").send_keys(@assignment.id)
-      form.find("button[aria-label='Find']").click
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       scroll_page_to_bottom
       expect(ff("#gradeChangeLoggingSearchResults table tbody tr").length).to eq 3
@@ -465,7 +465,7 @@ describe "admin_tools" do
     it "fails gracefully with invalid ids" do
       form = f('[aria-label="Grade Change Activity Form"]')
       form.find("[name='assignment_id']").send_keys("notarealid")
-      form.find("button[aria-label='Find']").click
+      form.find("button[aria-label='Search Logs']").click
       wait_for_ajaximations
       expect(f("#gradeChangeLoggingSearchResults").text).to eq "No items found"
     end

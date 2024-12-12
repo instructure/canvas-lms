@@ -40,6 +40,7 @@ export interface AutoCompleteSelectProps<T> extends ComponentProps<typeof Select
   renderOptionLabel: (option: T) => string
   fetchParams?: QueryParameterRecord
   overrideSelectProps?: Partial<ComponentProps<typeof Select>>
+  overrideSelectOptionProps?: Partial<ComponentProps<typeof Select.Option>>
 }
 
 const AutoCompleteSelect = <T extends {id: string}>({
@@ -47,6 +48,7 @@ const AutoCompleteSelect = <T extends {id: string}>({
   renderOptionLabel,
   fetchParams,
   overrideSelectProps,
+  overrideSelectOptionProps,
   ...selectProps
 }: AutoCompleteSelectProps<T>) => {
   const [selectState, setSelectState] = useState<SelectState<T>>({
@@ -69,6 +71,7 @@ const AutoCompleteSelect = <T extends {id: string}>({
         key={option.id}
         isHighlighted={selectState.highlightedOptionId === option.id}
         isSelected={selectState.selectedOptionId === option.id}
+        {...overrideSelectOptionProps}
       >
         {renderOptionLabel(option)}
       </Select.Option>

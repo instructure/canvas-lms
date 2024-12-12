@@ -32,9 +32,9 @@ describe('GradeChangeActivityForm', () => {
   afterEach(() => jest.resetAllMocks())
 
   it.each([
-    {inputLabel: 'Grader ID', fieldName: 'grader_id'},
-    {inputLabel: 'Student ID', fieldName: 'student_id'},
-    {inputLabel: 'Course ID', fieldName: 'course_id'},
+    {inputLabel: 'Grader', fieldName: 'grader_id'},
+    {inputLabel: 'Student', fieldName: 'student_id'},
+    {inputLabel: 'Course', fieldName: 'course_id'},
     {inputLabel: 'Assignment ID', fieldName: 'assignment_id'},
   ])(
     'should be able to submit the form if only "$inputLabel" is provided',
@@ -42,7 +42,7 @@ describe('GradeChangeActivityForm', () => {
       render(<GradeChangeActivityForm {...props} />)
       const inputValue = '1'
       const input = screen.getByLabelText(inputLabel)
-      const submit = screen.getByLabelText('Find')
+      const submit = screen.getByLabelText('Search Logs')
 
       fireEvent.change(input, {target: {value: inputValue}})
       fireEvent.click(submit)
@@ -62,9 +62,9 @@ describe('GradeChangeActivityForm', () => {
   )
 
   it.each([
-    {inputLabel: 'Grader ID', fieldName: 'grader_id'},
-    {inputLabel: 'Student ID', fieldName: 'student_id'},
-    {inputLabel: 'Course ID', fieldName: 'course_id'},
+    {inputLabel: 'Grader', fieldName: 'grader_id'},
+    {inputLabel: 'Student', fieldName: 'student_id'},
+    {inputLabel: 'Course', fieldName: 'course_id'},
     {inputLabel: 'Assignment ID', fieldName: 'assignment_id'},
   ])(
     'should be able to submit the form with "$inputLabel" and dates',
@@ -81,7 +81,7 @@ describe('GradeChangeActivityForm', () => {
       const timeValue = '12:00 AM'
       const expectedFromDate = new Date(`${fromDateValue}, ${timeValue}`).toISOString()
       const expectedToDate = new Date(`${toDateValue}, ${timeValue}`).toISOString()
-      const submit = screen.getByLabelText('Find')
+      const submit = screen.getByLabelText('Search Logs')
 
       fireEvent.change(input, {target: {value: inputValue}})
       fireEvent.input(fromDate, {target: {value: fromDateValue}})
@@ -110,13 +110,11 @@ describe('GradeChangeActivityForm', () => {
 
   it('should show an error if the form is empty', async () => {
     render(<GradeChangeActivityForm {...props} />)
-    const submit = screen.getByLabelText('Find')
+    const submit = screen.getByLabelText('Search Logs')
 
     fireEvent.click(submit)
 
-    const errorText = await screen.findAllByText(
-      'One of Grader, Student, Course, or Assignment ID is required.'
-    )
+    const errorText = await screen.findAllByText('Please enter at least one field.')
     expect(errorText).toBeTruthy()
   })
 
@@ -125,7 +123,7 @@ describe('GradeChangeActivityForm', () => {
     const invalidDate = 'invalid date'
     const fromDate = screen.getByLabelText('From Date')
     const toDate = screen.getByLabelText('To Date')
-    const submit = screen.getByLabelText('Find')
+    const submit = screen.getByLabelText('Search Logs')
 
     fireEvent.input(fromDate, {target: {value: invalidDate}})
     fireEvent.blur(fromDate)
@@ -142,7 +140,7 @@ describe('GradeChangeActivityForm', () => {
   it('should show an error message if "From" date is after "To" date', async () => {
     render(<GradeChangeActivityForm {...props} />)
     const courseIdValue = '123'
-    const courseId = screen.getByLabelText('Course ID')
+    const courseId = screen.getByLabelText('Course')
     const fromDateValue = 'November 15, 2024'
     const toDateValue = 'November 14, 2024'
     const timeValue = '12:00 AM'
@@ -150,7 +148,7 @@ describe('GradeChangeActivityForm', () => {
     const fromTime = screen.getByLabelText('From Time')
     const toDate = screen.getByLabelText('To Date')
     const toTime = screen.getByLabelText('To Time')
-    const submit = screen.getByLabelText('Find')
+    const submit = screen.getByLabelText('Search Logs')
 
     fireEvent.input(courseId, {target: {value: courseIdValue}})
     fireEvent.input(fromDate, {target: {value: fromDateValue}})
