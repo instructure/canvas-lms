@@ -30,7 +30,7 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
-import type {LtiRegistration} from '../../model/LtiRegistration'
+import {isForcedOn, type LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -41,7 +41,7 @@ import {
   openEditDynamicRegistrationWizard,
   openEditManualRegistrationWizard,
 } from '../../registration_wizard/RegistrationWizardModalState'
-import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {alert} from '@canvas/instui-bindings/react/Alert'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -70,6 +70,38 @@ type Column = {
 }
 
 const ellispsisStyles = {overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
+
+const renderEditButton = (r: LtiRegistration) => {
+  const imsRegistrationId = r.ims_registration_id
+  const manualConfigurationId = r.manual_configuration_id
+  if (r.inherited) {
+    return null
+  } else if (imsRegistrationId) {
+    return (
+      <Menu.Item
+        onClick={() => {
+          openEditDynamicRegistrationWizard(imsRegistrationId)
+        }}
+      >
+        {I18n.t('Edit App')}
+      </Menu.Item>
+    )
+  } else if (manualConfigurationId && !r.inherited && window.ENV.FEATURES.lti_registrations_next) {
+    return (
+      <Menu.Item
+        onClick={() => {
+          openEditManualRegistrationWizard(r.id, () => {
+            refreshRegistrations()
+          })
+        }}
+      >
+        {I18n.t('Edit App')}
+      </Menu.Item>
+    )
+  } else {
+    return null
+  }
+}
 
 const Columns: ReadonlyArray<Column> = [
   {
@@ -141,7 +173,7 @@ const Columns: ReadonlyArray<Column> = [
       ) : (
         <div>
           <Tooltip renderTip={I18n.t('Historical data lacks records for "installed by."')}>
-            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
           </Tooltip>
         </div>
       ),
@@ -157,7 +189,7 @@ const Columns: ReadonlyArray<Column> = [
       ) : (
         <div>
           <Tooltip renderTip={I18n.t('Historical data lacks records for "updated by."')}>
-            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
           </Tooltip>
         </div>
       ),
@@ -176,13 +208,13 @@ const Columns: ReadonlyArray<Column> = [
     width: '80px',
     render: (r, {deleteApp}) => {
       const developerKeyId = r.developer_key_id
-      const imsRegistrationId = r.ims_registration_id
-      const manualConfigurationId = r.manual_configuration_id
 
       return (
         <Menu
+          data-testid={`actions-menu-${r.id}`}
           trigger={
             <IconButton
+              data-testid={`actions-menu-${r.id}`}
               withBackground={false}
               withBorder={false}
               screenReaderLabel={I18n.t('More Registration Options')}
@@ -213,35 +245,35 @@ const Columns: ReadonlyArray<Column> = [
               {I18n.t('Copy Client ID')}
             </Menu.Item>
           ) : null}
-          {imsRegistrationId ? (
+          {renderEditButton(r)}
+          {isForcedOn(r) ? (
             <Menu.Item
-              onClick={() => {
-                openEditDynamicRegistrationWizard(imsRegistrationId)
+              themeOverride={{
+                labelColor: colors.textDanger,
+                activeBackground: colors.backgroundDanger,
               }}
-            >
-              {I18n.t('Edit App')}
-            </Menu.Item>
-          ) : null}
-          {manualConfigurationId && window.ENV.FEATURES.lti_registrations_next ? (
-            <Menu.Item
               onClick={() => {
-                openEditManualRegistrationWizard(r.id, () => {
-                  refreshRegistrations()
+                alert({
+                  message: I18n.t('This App is locked on, and cannot be deleted.'),
+                  title: I18n.t('Delete App'),
+                  okButtonLabel: I18n.t('Ok'),
                 })
               }}
             >
-              {I18n.t('Edit App')}
+              {I18n.t('Delete App')}
             </Menu.Item>
-          ) : null}
-          <Menu.Item
-            themeOverride={{
-              labelColor: colors.textDanger,
-              activeBackground: colors.backgroundDanger,
-            }}
-            onClick={() => deleteApp(r)}
-          >
-            {I18n.t('Delete App')}
-          </Menu.Item>
+          ) : (
+            <Menu.Item
+              themeOverride={{
+                labelColor: colors.textDanger,
+                activeBackground: colors.backgroundDanger,
+              }}
+              onClick={() => deleteApp(r)}
+            >
+              {I18n.t('Delete App')}
+            </Menu.Item>
+          )}
+
           {/* <Menu.Item
             onClick={() => {
               confirm({

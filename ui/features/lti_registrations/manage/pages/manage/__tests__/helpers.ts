@@ -44,7 +44,8 @@ const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> =>
 export const mockRegistration = (
   n: string,
   i: number,
-  configuration: Partial<InternalLtiConfiguration> = {}
+  configuration: Partial<InternalLtiConfiguration> = {},
+  registration: Partial<LtiRegistration> = {}
 ): LtiRegistrationWithConfiguration => {
   const id = i.toString()
   const date = new Date()
@@ -97,5 +98,6 @@ export const mockRegistration = (
       target_link_uri: 'https://example.com',
       ...configuration,
     },
+    ...registration,
   }
 }

@@ -1961,7 +1961,8 @@ class Submission < ActiveRecord::Base
   end
 
   def self.originality_reports_by_submission_id_submission_time_attachment_id(submissions)
-    reports = OriginalityReport.where(submission_id: submissions)
+    unique_ids = submissions.map(&:id).uniq
+    reports = OriginalityReport.where(submission_id: unique_ids)
     reports.each_with_object({}) do |report, hash|
       report_submission_time = report.submission_time&.iso8601(6)
       hash[report.submission_id] ||= { by_time: {}, by_attachment: {} }

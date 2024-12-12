@@ -877,7 +877,6 @@ class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
   before_action :require_manage_lti_registrations
-  before_action :require_dynamic_registration, only: %i[destroy]
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
   before_action :validate_registration_params, only: %i[create update]
@@ -1097,7 +1096,8 @@ class Lti::RegistrationsController < ApplicationController
     # as doing so might cause the actual redirect_uris on existing tool configurations
     # to be overwritten. We need to include them here so that the UI can display
     # them properly.
-    configuration[:redirect_uris] = [configuration[:target_link_uri]] unless configuration.key?(:redirect_uris)
+    configuration[:redirect_uris] ||= [configuration[:target_link_uri]]
+    configuration[:redirect_uris] = Array(configuration[:redirect_uris])
 
     render json: { configuration: }
   end
@@ -1183,7 +1183,7 @@ class Lti::RegistrationsController < ApplicationController
     registration = Lti::Registration.transaction do
       vendor = params[:vendor]
       name = params[:name] || configuration_params[:title]
-      admin_nickname = params[:admin_nickname] || configuration_params[:title]
+      admin_nickname = params[:admin_nickname]
       scopes = configuration_params[:scopes]
 
       registration = Lti::Registration.create!(
@@ -1391,6 +1391,10 @@ class Lti::RegistrationsController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>' \
   #        -H "Authorization: Bearer <token>"
   def destroy
+    unless @context == registration.account
+      return render json: { errors: "registration does not belong to account" }, status: :bad_request
+    end
+
     registration.destroy
     render json: lti_registration_json(registration, @current_user, session, @context, includes: %i[account_binding configuration overlay])
   rescue => e
@@ -1485,21 +1489,17 @@ class Lti::RegistrationsController < ApplicationController
     end
 
     configuration_errors = if configuration&.dig(:extensions).present?
-                             Schemas::LtiConfiguration.validation_errors(configuration)
+                             Schemas::LtiConfiguration.validation_errors(configuration.compact)
                            elsif configuration.present?
-                             Schemas::InternalLtiConfiguration.validation_errors(configuration)
+                             Schemas::InternalLtiConfiguration.validation_errors(configuration.compact)
                            end
-    overlay_errors = Schemas::Lti::Overlay.validation_errors(overlay) if overlay.present?
+    overlay_errors = Schemas::Lti::Overlay.validation_errors(overlay.compact) if overlay.present?
 
     configuration_errors ||= []
     overlay_errors ||= []
     errors = configuration_errors + overlay_errors
 
     render_configuration_errors(errors) if errors.present?
-  end
-
-  def update_params
-    params.permit(:admin_nickname).merge({ updated_by: @current_user })
   end
 
   # At the model level, setting an invalid workflow_state will silently change it to the
@@ -1521,12 +1521,6 @@ class Lti::RegistrationsController < ApplicationController
 
   def require_registration_params
     params.require(:configuration)
-  end
-
-  def require_dynamic_registration
-    return if registration.dynamic_registration?
-
-    render_error(:dynamic_registration_required, "Temporarily, only Registrations created using LTI Dynamic Registration can be modified")
   end
 
   def restrict_dynamic_registration_updates

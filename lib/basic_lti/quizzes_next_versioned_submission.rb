@@ -41,11 +41,12 @@ module BasicLTI
       url
     ].freeze
 
-    def initialize(assignment, user, prioritize_non_tool_grade: false, needs_additional_review: false)
+    def initialize(assignment, user, prioritize_non_tool_grade: false, needs_additional_review: false, submission: nil)
       @assignment = assignment
       @user = user
       @prioritize_non_tool_grade = prioritize_non_tool_grade
       @needs_additional_review = needs_additional_review
+      @_submission = submission
     end
 
     def active?
@@ -225,10 +226,11 @@ module BasicLTI
     def attempts_hash
       @_attempts_hash ||= begin
         attempts = submission.versions.sort_by(&:created_at).each_with_object({}) do |v, a|
-          h = YAML.safe_load(v.yaml).with_indifferent_access
-          url = v.model.url
+          sub = v.model
+          url = sub.url
           next if url.blank? # exclude invalid versions (url is actual attempt identifier)
 
+          h = sub.attributes.with_indifferent_access
           h[:url] = url
           (a[url] = (a[url] || [])) << h.slice(*JSON_FIELDS)
         end

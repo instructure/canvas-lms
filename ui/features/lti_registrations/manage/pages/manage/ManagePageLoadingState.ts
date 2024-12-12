@@ -20,7 +20,11 @@ import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
-import type {FetchRegistrations, DeleteRegistration} from '../../api/registrations'
+import type {
+  FetchRegistrations,
+  DeleteRegistration,
+  unbindGlobalLtiRegistration,
+} from '../../api/registrations'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   genericError,
@@ -90,7 +94,11 @@ const LIMIT = 15
  * @returns
  */
 export const mkUseManagePageState =
-  (apiFetchRegistrations: FetchRegistrations, apiDeleteRegistration: DeleteRegistration) =>
+  (
+    apiFetchRegistrations: FetchRegistrations,
+    apiDeleteRegistration: DeleteRegistration,
+    apiUnbindGlobalRegistration: typeof unbindGlobalLtiRegistration
+  ) =>
   (params: ManageSearchParams & {accountId: AccountId}) => {
     const {accountId, q, sort, dir, page} = params
     const [state, setState] = React.useState<ManagePageLoadingState>({
@@ -185,10 +193,17 @@ export const mkUseManagePageState =
      * @returns Promise On error, the promise will resolve to an error result.
      */
     const deleteRegistration = React.useCallback(
-      (registration: LtiRegistration) => {
+      (registration: LtiRegistration, accountId: AccountId) => {
         setStale()
+        const isInheritedKey = registration.account_binding
+          ? registration.account_binding.account_id !== registration.account_id
+          : false
 
-        return apiDeleteRegistration(registration.account_id, registration.id)
+        return (
+          isInheritedKey
+            ? apiUnbindGlobalRegistration(accountId, registration.id)
+            : apiDeleteRegistration(accountId, registration.id)
+        )
           .catch(() =>
             genericError(
               // TODO: log more info about the error? send to Sentry?

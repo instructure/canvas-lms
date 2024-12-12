@@ -1033,6 +1033,32 @@ RSpec.describe Lti::RegistrationsController do
       it { is_expected.to have_http_status(:unprocessable_entity) }
     end
 
+    context "with overlay containing nil attribute" do
+      let(:params) do
+        super().tap do |p|
+          p[:overlay] = { "domain" => nil }
+        end
+      end
+
+      it "is successful" do
+        expect(subject).to be_successful
+        expect(registration.overlay_for(account).data[:domain]).to be_nil
+      end
+    end
+
+    context "with configuration containing nil attribute" do
+      let(:params) do
+        super().tap do |p|
+          p[:configuration] = { **internal_configuration, "domain" => nil }
+        end
+      end
+
+      it "is successful" do
+        expect(subject).to be_successful
+        expect(tool_configuration.reload.domain).to be_nil
+      end
+    end
+
     context "without user session" do
       before { remove_user_session }
 
@@ -1102,14 +1128,30 @@ RSpec.describe Lti::RegistrationsController do
     context "with non-dynamic registration" do
       before { ims_registration.update!(lti_registration: nil) }
 
-      it "returns 422" do
+      it "is successful" do
         subject
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to be_successful
+      end
+
+      it "deletes the registration" do
+        subject
+        expect(registration.reload).to be_deleted
+      end
+    end
+
+    context "with registration for different account" do
+      subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{other_reg.id}" }
+
+      let_once(:other_reg) { lti_registration_model(account: Account.site_admin) }
+      let_once(:other_ims_registration) { lti_ims_registration_model(lti_registration: other_reg) }
+
+      it "returns 400" do
+        subject
+        expect(response).to have_http_status(:bad_request)
       end
 
       it "does not delete the registration" do
-        subject
-        expect(registration.reload).not_to be_deleted
+        expect { subject }.not_to change { registration.reload.workflow_state }
       end
     end
 
@@ -1321,6 +1363,35 @@ RSpec.describe Lti::RegistrationsController do
         subject
         expect(response_json["configuration"]["redirect_uris"]).to eq internal_configuration[:redirect_uris]
       end
+
+      context "with redirect_uris" do
+        let(:lti_configuration) { settings.merge(redirect_uris:) }
+        let(:redirect_uris) { ["http://example.com"] }
+
+        it "is successful" do
+          subject
+          expect(response).to be_successful
+        end
+
+        it "includes redirect_uris" do
+          subject
+          expect(response_json["configuration"]["redirect_uris"]).to eq redirect_uris
+        end
+
+        context "with string redirect_uris" do
+          let(:redirect_uris) { "http://example.com" }
+
+          it "is successful" do
+            subject
+            expect(response).to be_successful
+          end
+
+          it "coerces redirect_uris to an array" do
+            subject
+            expect(response_json["configuration"]["redirect_uris"]).to eq [redirect_uris]
+          end
+        end
+      end
     end
 
     context "with url" do
@@ -1499,6 +1570,18 @@ RSpec.describe Lti::RegistrationsController do
       expect(Lti::RegistrationAccountBinding.last.registration).to eq(Lti::Registration.last)
       expect(Lti::RegistrationAccountBinding.last.account).to eq(account)
       expect(Lti::RegistrationAccountBinding.last.workflow_state).to eq("off")
+    end
+
+    context "without nickname" do
+      before do
+        params.delete(:admin_nickname)
+      end
+
+      it "leaves nickname empty" do
+        subject
+        expect(response).to be_successful
+        expect(response_json[:admin_nickname]).to be_nil
+      end
     end
 
     context "setting the unified_tool_id" do
