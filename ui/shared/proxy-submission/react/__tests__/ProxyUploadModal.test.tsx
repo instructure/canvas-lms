@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ProxyUploadModal, {type ProxyUploadModalProps} from '../ProxyUploadModal'

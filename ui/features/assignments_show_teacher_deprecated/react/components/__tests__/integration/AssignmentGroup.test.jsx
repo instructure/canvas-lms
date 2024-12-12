@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentGroup from '../../Editables/AssignmentGroup'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {COURSE_ASSIGNMENT_GROUPS_QUERY} from '../../../assignmentData'
 import {waitForNoElement} from '../../../test-utils'
 

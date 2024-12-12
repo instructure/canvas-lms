@@ -23,7 +23,7 @@ import TeacherView from '../../TeacherView'
 
 import {mockAssignment, initialTeacherViewGQLMocks} from '../../../test-utils'
 
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {TEACHER_QUERY} from '../../../assignmentData'
 
 export function renderTeacherQuery(assignment, additionalApolloMocks = []) {

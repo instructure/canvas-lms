@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentModules from '../../Editables/AssignmentModules'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {COURSE_MODULES_QUERY} from '../../../assignmentData'
 import {waitForNoElement} from '../../../test-utils'
 

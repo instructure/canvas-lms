@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render as realRender, fireEvent, act} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'
 import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'

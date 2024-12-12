@@ -24,7 +24,7 @@ import useOutcomesImport, {
   IMPORT_COMPLETED,
 } from '../useOutcomesImport'
 import {createCache} from '@canvas/apollo-v3'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks, importOutcomeMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
