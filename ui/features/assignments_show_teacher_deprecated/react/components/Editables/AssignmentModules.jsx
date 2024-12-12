@@ -23,7 +23,7 @@ import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
 import {Query} from '@apollo/react-components'
-import {withApollo} from '@apollo/react-hoc'
+import {withApollo} from '@apollo/client/react/hoc'
 
 import {Text} from '@instructure/ui-text'
 
