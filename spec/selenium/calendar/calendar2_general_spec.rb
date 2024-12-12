@@ -343,6 +343,7 @@ describe "calendar2" do
     end
 
     it "assignment appears on all calendars", priority: "1" do
+      skip("LS-3626 -- flaky about 20% of the time -- probably related to the others above")
       title = "Zak McKracken"
       due_time = 5.minutes.from_now
       @assignment = @course.assignments.create!(name: title, due_at: due_time)
