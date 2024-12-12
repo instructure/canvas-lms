@@ -897,4 +897,43 @@ describe('DiscussionTopicForm', () => {
       )
     })
   })
+
+  it('applies fancy midnight to assign reviews when needed', () => {
+    const {getByTestId, getByLabelText, getByText} = setup()
+
+    getByLabelText('Graded').click()
+    getByLabelText('Automatically assign').click()
+
+    const dueDate = getByTestId('reviews-due-date')
+    const dueTime = getByTestId('reviews-due-time')
+
+    expect(dueDate).toBeInTheDocument()
+    expect(dueTime).toBeInTheDocument()
+
+    fireEvent.change(dueDate, {target: {value: 'Nov 9, 2020'}})
+    fireEvent.click(getByText('10 November 2020'))
+
+    expect(dueTime).toHaveValue('11:59 PM')
+  })
+
+  it('does not apply fancy midnight to assign reviews when the user have other time set', () => {
+    const {getByTestId, getByLabelText, getByText} = setup()
+
+    getByLabelText('Graded').click()
+    getByLabelText('Automatically assign').click()
+
+    const dueDate = getByTestId('reviews-due-date')
+    const dueTime = getByTestId('reviews-due-time')
+
+    expect(dueDate).toBeInTheDocument()
+    expect(dueTime).toBeInTheDocument()
+
+    fireEvent.change(dueTime, {target: {value: '10:00 AM'}})
+    fireEvent.click(getByText('10:00 AM'))
+
+    fireEvent.change(dueDate, {target: {value: 'Nov 9, 2020'}})
+    fireEvent.click(getByText('10 November 2020'))
+
+    expect(dueTime).toHaveValue('10:00 AM')
+  })
 })
