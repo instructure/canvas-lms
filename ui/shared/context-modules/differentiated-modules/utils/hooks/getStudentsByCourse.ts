@@ -18,7 +18,7 @@
 
 import {executeQuery} from '@canvas/query/graphql'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 const I18n = useI18nScope('differentiated_modules')
 

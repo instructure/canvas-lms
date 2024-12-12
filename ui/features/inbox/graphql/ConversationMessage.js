@@ -18,7 +18,7 @@
 
 import {arrayOf, shape, string} from 'prop-types'
 import {Attachment} from './Attachment'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {MediaComment} from './MediaComment'
 import {User} from './User'
 

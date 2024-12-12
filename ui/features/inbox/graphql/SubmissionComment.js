@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {shape, string, bool, number} from 'prop-types'
 import {User} from './User'
 import {Assignment} from './Assignment'

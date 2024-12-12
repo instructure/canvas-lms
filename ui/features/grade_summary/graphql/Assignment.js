@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {arrayOf, bool, string, number} from 'prop-types'
 
 import {GradingStandard} from './GradingStandard'
