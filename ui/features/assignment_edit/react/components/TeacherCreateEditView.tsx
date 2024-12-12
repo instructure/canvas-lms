@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import AssignmentHeader, {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentHeader'
+import AssignmentHeader from '@canvas/assignments/react/AssignmentHeader'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/src'
 import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
+import {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentTypes'
 
 interface TeacherCreateEditViewProps {
   edit: boolean

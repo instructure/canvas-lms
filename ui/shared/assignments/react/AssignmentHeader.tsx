@@ -36,14 +36,9 @@ import OptionsMenu from './OptionsMenu'
 import {type Breakpoints} from '@canvas/with-breakpoints'
 import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
 
 const I18n = useI18nScope('assignment_teacher_header')
-
-export const ASSIGNMENT_VIEW_TYPES = {
-  SAVED: 'saved',
-  EDIT: 'edit',
-  CREATE: 'create',
-}
 
 interface HeaderProps {
   type: string
