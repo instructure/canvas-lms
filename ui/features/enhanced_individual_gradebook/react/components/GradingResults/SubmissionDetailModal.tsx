@@ -42,13 +42,6 @@ import {
   type GradebookStudentDetails,
   type GradebookUserSubmissionDetails,
 } from '../../../types'
-import {
-  submitterPreviewText,
-  disableGrading,
-  passFailStatusOptions,
-  assignmentHasCheckpoints,
-  getCorrectSubmission,
-} from '../../../utils/gradebookUtils'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {usePostComment} from '../../hooks/useComments'
@@ -58,6 +51,13 @@ import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 import {CheckpointGradeInputs} from './CheckpointGradeInputs'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from './index'
+import {
+  assignmentHasCheckpoints,
+  disableGrading,
+  getCorrectSubmission,
+  passFailStatusOptions,
+  submitterPreviewText,
+} from '../../../utils/gradeInputUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 

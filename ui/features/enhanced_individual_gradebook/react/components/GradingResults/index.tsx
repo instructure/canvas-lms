@@ -41,7 +41,7 @@ import {
   passFailStatusOptions,
   assignmentHasCheckpoints,
   getCorrectSubmission,
-} from '../../../utils/gradebookUtils'
+} from '../../../utils/gradeInputUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
 import {CheckpointGradeInputs} from './CheckpointGradeInputs'
