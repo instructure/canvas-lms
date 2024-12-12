@@ -85,12 +85,16 @@ export default class CreateDSRModal extends React.Component {
 
   creationDisabled = () => {
     const {expires_at, progress_status} = this.state.latestRequest || {}
-    return progress_status === 'running' || expires_at > new Date().toISOString()
+    return (
+      progress_status === 'running' ||
+      progress_status === 'queued' ||
+      expires_at > new Date().toISOString()
+    )
   }
 
   disabledText = () => {
     const {expires_at, progress_status} = this.state.latestRequest || {}
-    if (progress_status === 'running') {
+    if (progress_status === 'running' || progress_status === 'queued') {
       return I18n.t('A request is already in progress')
     } else {
       return I18n.t('The previous request expires %{expires_at}', {
@@ -187,37 +191,28 @@ export default class CreateDSRModal extends React.Component {
         open={this.state.open}
         onDismiss={this.close}
         size="medium"
-        label={I18n.t('Create DSR Request')}
+        label={I18n.t('Create Data Subject Request (DSR)')}
       >
         <Modal.Body>
           <Flex direction="column">
             <Flex.Item padding="small medium">
               <TextInput
                 key="request_name"
-                renderLabel={
-                  <div style={{textAlign: 'left'}}>
-                    {I18n.t('DSR Request Name')} <Text color="danger"> *</Text>
-                  </div>
-                }
+                renderLabel={I18n.t('DSR Request Name')}
                 label={I18n.t('DSR Request Name')}
                 data-testid={I18n.t('DSR Request Name')}
                 value={get(this.state.data, 'request_name')?.toString() ?? ''}
                 onChange={e => this.onChange('request_name', e.target.value)}
                 isRequired={true}
-                layout="inline"
                 messages={(this.state.errors.request_name || [])
                   .map(errMsg => ({type: 'error', text: errMsg}))
-                  .concat({
-                    type: 'hint',
-                    text: I18n.t('This is a a common tracking ID for DSR requests.'),
-                  })
                   .filter(Boolean)}
               />
             </Flex.Item>
-            <Flex.Item as="div" padding="0 medium">
+            <Flex.Item as="div" padding="medium medium 0 medium">
               <RadioInputGroup
                 name="request_output"
-                description="Output Format"
+                description={I18n.t('Output Format')}
                 layout="columns"
                 value={get(this.state.data, 'request_output')?.toString() ?? ''}
                 onChange={e => this.onChange('request_output', e.target.value)}
