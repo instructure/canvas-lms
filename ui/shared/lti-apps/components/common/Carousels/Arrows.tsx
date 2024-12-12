@@ -32,21 +32,23 @@ type NextArrowProps = {
   currentSlideNumber: number
   slider: React.RefObject<Slider>
   updatedArrowDisableIndex: number
+  screenReaderLabel?: string
 }
 
 type PreviousArrowProps = {
   currentSlideNumber: number
   slider: React.RefObject<Slider>
+  screenReaderLabel?: string
 }
 
 export const NextArrow = (props: NextArrowProps) => {
-  const {currentSlideNumber, slider, updatedArrowDisableIndex} = props
+  const {currentSlideNumber, slider, updatedArrowDisableIndex, screenReaderLabel} = props
 
   return (
     <Flex.Item>
       <div>
         <IconButton
-          screenReaderLabel={I18n.t('Carousel Next Item Button')}
+          screenReaderLabel={screenReaderLabel || I18n.t('Carousel Next Item Button')}
           withBackground={false}
           withBorder={false}
           color="secondary"
@@ -61,13 +63,13 @@ export const NextArrow = (props: NextArrowProps) => {
 }
 
 export const PreviousArrow = (props: PreviousArrowProps) => {
-  const {currentSlideNumber, slider} = props
+  const {currentSlideNumber, slider, screenReaderLabel} = props
 
   return (
     <Flex.Item>
       <div style={{marginRight: '0.8rem'}}>
         <IconButton
-          screenReaderLabel={I18n.t('Carousel Previous Item Button')}
+          screenReaderLabel={screenReaderLabel || I18n.t('Carousel Previous Item Button')}
           withBackground={false}
           withBorder={false}
           color="secondary"

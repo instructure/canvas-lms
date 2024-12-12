@@ -41,7 +41,7 @@ type ProductCarouselProps = {
 }
 
 function ProductCarousel(props: ProductCarouselProps) {
-  const {products} = props
+  const {products, companyName} = props
   const slider = React.useRef<Slider>(null)
   const updatedSettings = settings(products)
   const {isDesktop, isTablet, isMobile} = useBreakpoints()
@@ -67,16 +67,21 @@ function ProductCarousel(props: ProductCarouselProps) {
       <Flex margin="small 0 small 0">
         <Flex.Item shouldGrow={true} shouldShrink={true}>
           <Text weight="bold" size="x-large">
-            {I18n.t('More Tools by ')} {props.companyName}
+            {I18n.t('More Tools by ')} {companyName}
           </Text>
         </Flex.Item>
         {(products?.length ?? 0) > 1 && (
           <Flex direction="row">
-            <PreviousArrow currentSlideNumber={currentSlideNumber} slider={slider} />
+            <PreviousArrow
+              currentSlideNumber={currentSlideNumber}
+              slider={slider}
+              screenReaderLabel={I18n.t('More Tools by %{companyName} previous button', {companyName: companyName})}
+            />
             <NextArrow
               currentSlideNumber={currentSlideNumber}
               slider={slider}
               updatedArrowDisableIndex={updatedArrowDisableIndex.type}
+              screenReaderLabel={I18n.t('More Tools by %{companyName} next button', {companyName: companyName})}
             />
           </Flex>
         )}
