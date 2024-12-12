@@ -1310,7 +1310,7 @@ EG = {
           return $width_resizer.clone().addClass('clone')
         },
         snapTolerance: 200,
-        drag(event: Event, ui) {
+        drag(_event: Event, ui) {
           const offset = ui.offset
           const windowWidth = $window.width() as number
           $left_side.width(`${(offset.left / windowWidth) * 100}%`)
@@ -1782,7 +1782,11 @@ EG = {
       window.jsonData.studentMap[selectMenuValue] ||
       values(window.jsonData.studentsWithSubmissions)[0]
 
-    useStore.setState({currentStudentId: this.currentStudent[anonymizableId]})
+    useStore.setState({
+      currentStudentId: this.currentStudent[anonymizableId],
+      currentStudentAvatarPath: this.currentStudent.avatar_path,
+      currentStudentName: this.currentStudent.name,
+    })
     EG.resetReassignButton()
 
     if (historyBehavior) {
@@ -2517,7 +2521,7 @@ EG = {
     $submission_files_list.empty()
     $turnitinInfoContainer = $('#submission_files_container .turnitin_info_container').empty()
     $vericiteInfoContainer = $('#submission_files_container .turnitin_info_container').empty()
-    $.each(submission.versioned_attachments || [], (i, a) => {
+    $.each(submission.versioned_attachments || [], (_i, a) => {
       const attachment: Attachment = a.attachment
       if (
         (attachment.crocodoc_url || attachment.canvadoc_url) &&
@@ -3159,9 +3163,31 @@ EG = {
         selectMenuOptions.push({id: '', name: customProvisionalGraderLabel})
       }
 
-      const assessmentsByOthers = EG.currentStudent.rubric_assessments.filter(
-        assessment => !assessmentBelongsToCurrentUser(assessment)
+      const {assessmentsByOthers, selfAssessment} = EG.currentStudent.rubric_assessments.reduce(
+        (prev, assessment) => {
+          if (assessment.assessment_type === 'self_assessment') {
+            prev.selfAssessment = assessment
+            return prev
+          }
+
+          if (!assessmentBelongsToCurrentUser(assessment)) {
+            return {
+              assessmentsByOthers: [...prev.assessmentsByOthers, assessment],
+              selfAssessment: prev.selfAssessment,
+            }
+          }
+
+          return prev
+        },
+        {
+          assessmentsByOthers: [] as RubricAssessment[],
+          selfAssessment: null as RubricAssessment | null,
+        }
       )
+
+      useStore.setState({
+        selfAssessment,
+      })
 
       assessmentsByOthers.forEach(assessment => {
         // Display anonymous graders as "Grader 1 Rubric" (but don't use the
@@ -3477,7 +3503,7 @@ EG = {
 
     const submission = EG.currentDisplayedSubmission()
     if (this.currentStudent.submission && this.currentStudent.submission.submission_comments) {
-      $.each(this.currentStudent.submission.submission_comments, (i, comment) => {
+      $.each(this.currentStudent.submission.submission_comments, (_i, comment) => {
         if (ENV.group_comments_per_attempt) {
           // Due to the fact that the unsubmitted attempt 0 submission is no longer viewable
           // from the submission histories after the attempt 1 submission has been submitted,
@@ -3764,7 +3790,7 @@ EG = {
   // be the existing score from the previous submission.  This
   // should only be called from the anonymous function attached so
   // #submit_same_score.
-  handleGradeSubmit(e, use_existing_score: boolean) {
+  handleGradeSubmit(_e, use_existing_score: boolean) {
     if (
       isStudentConcluded(
         window.jsonData.studentMap,

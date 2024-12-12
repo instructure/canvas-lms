@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
@@ -27,6 +27,7 @@ import {Text} from '@instructure/ui-text'
 import type {
   RubricAssessmentData,
   RubricCriterion,
+  RubricSubmissionUser,
   RubricRating,
   UpdateAssessmentData,
 } from '../types/rubric'
@@ -36,12 +37,13 @@ import {InstructorScore} from './InstructorScore'
 import {findCriterionMatchingRatingIndex} from './utils/rubricUtils'
 import {SelfAssessmentInstructorScore} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructorScore'
 import {SelfAssessmentInstructions} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentInstructions'
+import {Checkbox} from '@instructure/ui-checkbox'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type ViewMode = 'horizontal' | 'vertical' | 'traditional'
 
-type RubricAssessmentContainerProps = {
+export type RubricAssessmentContainerProps = {
   criteria: RubricCriterion[]
   hidePoints: boolean
   isPreviewMode: boolean
@@ -54,6 +56,9 @@ type RubricAssessmentContainerProps = {
   pointsPossible?: number
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
+  selfAssessment?: RubricAssessmentData[] | null
+  selfAssessmentDate?: string
+  submissionUser?: RubricSubmissionUser
   viewModeOverride?: ViewMode
   onViewModeChange?: (viewMode: ViewMode) => void
   onDismiss: () => void
@@ -72,6 +77,9 @@ export const RubricAssessmentContainer = ({
   rubricTitle,
   rubricAssessmentData,
   rubricSavedComments = {},
+  selfAssessment,
+  selfAssessmentDate,
+  submissionUser,
   viewModeOverride,
   onDismiss,
   onSubmit,
@@ -81,6 +89,7 @@ export const RubricAssessmentContainer = ({
   const [rubricAssessmentDraftData, setRubricAssessmentDraftData] = useState<
     RubricAssessmentData[]
   >([])
+  const [showSelfAssessment, setShowSelfAssessment] = useState<boolean>(false)
   const viewMode = viewModeOverride ?? viewModeSelect
   const isTraditionalView = viewMode === 'traditional'
   const instructorPoints = rubricAssessmentDraftData.reduce(
@@ -89,6 +98,24 @@ export const RubricAssessmentContainer = ({
   )
 
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  
+  const selfAssessmentData: RubricAssessmentData[] = useMemo(() => {
+    if (!showSelfAssessment) {
+      return []
+    }
+
+    return (
+      selfAssessment?.map(entry => ({
+        id: entry.id,
+        points: entry.points,
+        criterionId: entry.criterionId,
+        comments: entry.comments,
+        commentsEnabled: entry.commentsEnabled,
+        description: entry.description,
+        updatedAt: selfAssessmentDate,
+      })) ?? []
+    )
+  }, [selfAssessment, showSelfAssessment, selfAssessmentDate])
 
   useEffect(() => {
     const updatedRubricAssessmentData = rubricAssessmentData.map(rubricAssessment => {
@@ -149,6 +176,8 @@ export const RubricAssessmentContainer = ({
           isPreviewMode={isPreviewMode}
           isPeerReview={isPeerReview}
           isFreeFormCriterionComments={isFreeFormCriterionComments}
+          selfAssessment={selfAssessmentData}
+          submissionUser={submissionUser}
           onUpdateAssessmentData={onUpdateAssessmentData}
           validationErrors={validationErrors}
         />
@@ -166,18 +195,20 @@ export const RubricAssessmentContainer = ({
         rubricSavedComments={rubricSavedComments}
         rubricAssessmentData={rubricAssessmentDraftData}
         selectedViewMode={viewMode as ModernViewModes}
-        onUpdateAssessmentData={onUpdateAssessmentData}
         isFreeFormCriterionComments={isFreeFormCriterionComments}
         validationErrors={validationErrors}
+        selfAssessment={selfAssessmentData}
+        onUpdateAssessmentData={onUpdateAssessmentData}
+        submissionUser={submissionUser}
       />
     )
   }
 
   const rubricHeader = isPeerReview ? I18n.t('Peer Review') : I18n.t('Rubric')
 
-  const handleViewModeChange = (viewMode: ViewMode) => {
-    setViewModeSelect(viewMode)
-    onViewModeChange?.(viewMode)
+  const handleViewModeChange = (newViewMode: ViewMode) => {
+    setViewModeSelect(newViewMode)
+    onViewModeChange?.(newViewMode)
   }
 
   const onUpdateAssessmentData = (params: UpdateAssessmentData) => {
@@ -252,6 +283,8 @@ export const RubricAssessmentContainer = ({
             onViewModeChange={handleViewModeChange}
             rubricHeader={rubricHeader}
             selectedViewMode={viewMode}
+            selfAssessmentEnabled={!!selfAssessment}
+            toggleSelfAssessment={() => setShowSelfAssessment(!showSelfAssessment)}
           />
         </Flex.Item>
         <Flex.Item shouldGrow={true} shouldShrink={true} as="main">
@@ -332,6 +365,8 @@ type AssessmentHeaderProps = {
   onViewModeChange: (viewMode: ViewMode) => void
   rubricHeader: string
   selectedViewMode: ViewMode
+  selfAssessmentEnabled?: boolean
+  toggleSelfAssessment: () => void
 }
 const AssessmentHeader = ({
   hidePoints,
@@ -347,6 +382,8 @@ const AssessmentHeader = ({
   onViewModeChange,
   rubricHeader,
   selectedViewMode,
+  selfAssessmentEnabled,
+  toggleSelfAssessment,
 }: AssessmentHeaderProps) => {
   const showTraditionalView = () => isTraditionalView && !isSelfAssessment
 
@@ -426,6 +463,18 @@ const AssessmentHeader = ({
 
           <View as="hr" margin="medium 0 medium 0" aria-hidden={true} />
         </>
+      )}
+
+      {selfAssessmentEnabled && (
+        <View as="div" margin="small 0 0">
+          <Checkbox
+            label="View Student Self-Assessment"
+            data-testid="self-assessment-toggle"
+            variant="toggle"
+            size="medium"
+            onClick={toggleSelfAssessment}
+          />
+        </View>
       )}
     </View>
   )

@@ -35,6 +35,7 @@ type HorizontalButtonDisplayProps = {
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingId?: string
+  selectedSelfAssessmentRatingId?: string
   onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
   shouldFocusFirstRating?: boolean
@@ -45,6 +46,7 @@ export const HorizontalButtonDisplay = ({
   isSelfAssessment,
   ratingOrder,
   selectedRatingId,
+  selectedSelfAssessmentRatingId,
   onSelectRating,
   criterionUseRange,
   shouldFocusFirstRating = false,
@@ -52,6 +54,12 @@ export const HorizontalButtonDisplay = ({
   const firstRatingRef = useRef<Element | null>(null)
   const selectedRating = ratings.find(rating => rating.id && rating.id === selectedRatingId)
   const selectedRatingIndex = selectedRating ? ratings.indexOf(selectedRating) : -1
+  const selectedSelfAssessmentRating = ratings.find(
+    rating => rating.id && rating.id === selectedSelfAssessmentRatingId
+  )
+  const selectedSelfAssessmentRatingIndex = selectedSelfAssessmentRating
+    ? ratings.indexOf(selectedSelfAssessmentRating)
+    : -1
   const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
 
   useEffect(() => {
@@ -65,9 +73,14 @@ export const HorizontalButtonDisplay = ({
     return min != null ? possibleStringRange(min, points) : possibleString(points)
   }
 
+  const ratingDescriptionIndex =
+    selectedRatingIndex >= 0 ? selectedRatingIndex : selectedSelfAssessmentRatingIndex
+
+  const selectedRatingDescription = selectedRating ?? selectedSelfAssessmentRating
+
   return (
     <View as="div" data-testid="rubric-assessment-horizontal-display">
-      {selectedRatingIndex >= 0 && (
+      {ratingDescriptionIndex >= 0 && (
         <View
           as="div"
           borderColor="brand"
@@ -75,24 +88,26 @@ export const HorizontalButtonDisplay = ({
           borderRadius="medium"
           padding="xx-small"
           margin="0 xx-small small xx-small"
-          data-testid={`rating-details-${selectedRating?.id}`}
+          data-testid={`rating-details-${selectedRatingDescription?.id}`}
           themeOverride={{borderColorBrand: shamrock, borderWidthMedium: '0.188rem'}}
         >
           <View as="div">
             <Text size="x-small" weight="bold">
-              {selectedRating?.description}
+              {selectedRatingDescription?.description}
             </Text>
           </View>
           <View as="div" display="block">
             <Text
               size="x-small"
               themeOverride={{paragraphMargin: 0}}
-              dangerouslySetInnerHTML={escapeNewLineText(selectedRating?.longDescription)}
+              dangerouslySetInnerHTML={escapeNewLineText(
+                selectedRatingDescription?.longDescription
+              )}
             />
           </View>
           <View as="div" textAlign="end">
             <Text size="x-small" weight="bold">
-              {getPossibleText(selectedRating?.points)}
+              {getPossibleText(selectedRatingDescription?.points)}
             </Text>
           </View>
         </View>
@@ -126,12 +141,12 @@ export const HorizontalButtonDisplay = ({
                 <RatingButton
                   buttonDisplay={buttonDisplay}
                   isSelected={selectedRatingIndex === index}
+                  isSelfAssessmentSelected={selectedSelfAssessmentRatingIndex === index}
                   isPreviewMode={isPreviewMode}
                   selectedArrowDirection="up"
                   onClick={() => onSelectRating(rating)}
                 />
               )}
-
             </Flex.Item>
           )
         })}

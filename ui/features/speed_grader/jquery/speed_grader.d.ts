@@ -71,12 +71,24 @@ export const ZVersionedAttachment = z.object({
 
 export type VersionedAttachment = z.infer<typeof ZVersionedAttachment>
 
+export const ZRubricAssessmentData = z.object({
+  id: z.string(),
+  points: z.number(),
+  criterion_id: z.string(),
+  learning_outcome_id: z.string(),
+  comments: z.string(),
+  comments_enabled: z.boolean(),
+  description: z.string(),
+})
+
 export const ZRubricAssessment = z.object({
   id: z.string(),
   assessor_id: z.string(),
   anonymous_assessor_id: z.string(),
   assessment_type: z.string(),
   assessor_name: z.string().nullable(),
+  updated_at: z.string(),
+  data: z.array(ZRubricAssessmentData),
 })
 
 export type RubricAssessment = z.infer<typeof ZRubricAssessment>

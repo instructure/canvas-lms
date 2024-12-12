@@ -30,6 +30,7 @@ type RatingButtonProps = {
   buttonDisplay: string
   isPreviewMode: boolean
   isSelected: boolean
+  isSelfAssessmentSelected: boolean
   selectedArrowDirection: 'up' | 'right'
   onClick: () => void
 }
@@ -37,6 +38,7 @@ export const RatingButton = ({
   buttonDisplay,
   isPreviewMode,
   isSelected,
+  isSelfAssessmentSelected,
   selectedArrowDirection,
   onClick,
 }: RatingButtonProps) => {
@@ -72,6 +74,7 @@ export const RatingButton = ({
           }}
         >
           <Text size="medium">{buttonDisplay}</Text>
+          {isSelfAssessmentSelected && <SelectedSelfAssessment buttonDisplay={buttonDisplay} />}
         </IconButton>
         {isSelected && <SelectedRatingArrow direction={selectedArrowDirection} />}
       </View>
@@ -128,5 +131,21 @@ const SelectedRatingArrow = ({direction}: SelectedRatingArrowProps) => {
       <div style={outerTriangleStyle} data-testid="rubric-rating-button-selected" />
       <div style={innerTriangleSmallStyle} />
     </>
+  )
+}
+
+const SelectedSelfAssessment = ({buttonDisplay}: {buttonDisplay: string}) => {
+  return (
+    <div
+      data-testid={`rubric-rating-button-self-assessment-selected-${buttonDisplay}`}
+      style={{
+        position: 'absolute',
+        inset: '6px',
+        backgroundColor: 'transparent',
+        border: `2px dashed ${shamrock}`,
+        borderRadius: '4px',
+        pointerEvents: 'none',
+      }}
+    />
   )
 }

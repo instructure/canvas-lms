@@ -25,7 +25,12 @@ import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
 import {possibleString, possibleStringRange} from '../Points'
-import type {RubricAssessmentData, RubricCriterion, UpdateAssessmentData} from '../types/rubric'
+import type {
+  RubricAssessmentData,
+  RubricCriterion,
+  RubricSubmissionUser,
+  UpdateAssessmentData,
+} from '../types/rubric'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {CommentLibrary} from './CommentLibrary'
@@ -35,6 +40,7 @@ import {escapeNewLineText, rangingFrom, findCriterionMatchingRatingId} from './u
 import {OutcomeTag} from './OutcomeTag'
 import {LongDescriptionModal} from './LongDescriptionModal'
 import {Link} from '@instructure/ui-link'
+import {SelfAssessmentComment} from './SelfAssessmentComment'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 const {shamrock, tiara} = colors
@@ -49,6 +55,8 @@ export type TraditionalViewProps = {
   rubricAssessmentData: RubricAssessmentData[]
   rubricTitle: string
   rubricSavedComments?: Record<string, string[]>
+  selfAssessment?: RubricAssessmentData[]
+  submissionUser?: RubricSubmissionUser
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
   validationErrors?: string[]
 }
@@ -63,6 +71,8 @@ export const TraditionalView = ({
   rubricAssessmentData,
   rubricTitle,
   rubricSavedComments,
+  selfAssessment,
+  submissionUser,
   onUpdateAssessmentData,
   validationErrors,
 }: TraditionalViewProps) => {
@@ -134,6 +144,9 @@ export const TraditionalView = ({
         const criterionAssessment = rubricAssessmentData.find(
           data => data.criterionId === criterion.id
         )
+        const criterionSelfAssessment = selfAssessment?.find(
+          data => data.criterionId === criterion.id
+        )
 
         const isLastIndex = criteria.length - 1 === index
 
@@ -144,6 +157,7 @@ export const TraditionalView = ({
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
+            criterionSelfAssessment={criterionSelfAssessment}
             ratingOrder={ratingOrder}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             isLastIndex={isLastIndex}
@@ -155,6 +169,7 @@ export const TraditionalView = ({
             ratingsColumnMinWidth={ratingsColumnMinWidth}
             validationErrors={validationErrors}
             shouldFocusFirstRating={validationErrors?.[0] === criterion.id}
+            submissionUser={submissionUser}
           />
         )
       })}
@@ -165,6 +180,7 @@ export const TraditionalView = ({
 type CriterionRowProps = {
   criterion: RubricCriterion
   criterionAssessment?: RubricAssessmentData
+  criterionSelfAssessment?: RubricAssessmentData
   hidePoints: boolean
   isPreviewMode: boolean
   isPeerReview?: boolean
@@ -176,6 +192,7 @@ type CriterionRowProps = {
   rubricSavedComments: string[]
   validationErrors?: string[]
   shouldFocusFirstRating?: boolean
+  submissionUser?: RubricSubmissionUser
 }
 const CriterionRow = ({
   criterion,
@@ -191,6 +208,8 @@ const CriterionRow = ({
   rubricSavedComments,
   validationErrors,
   shouldFocusFirstRating = false,
+  criterionSelfAssessment,
+  submissionUser,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
@@ -247,6 +266,11 @@ const CriterionRow = ({
     criterion.ratings,
     criterion.criterionUseRange,
     criterionAssessment
+  )
+  const selectedSelfAssessmentRatingId = findCriterionMatchingRatingId(
+    criterion.ratings,
+    criterion.criterionUseRange,
+    criterionSelfAssessment
   )
 
   return (
@@ -376,6 +400,8 @@ const CriterionRow = ({
                 {criterionRatings.map((rating, index) => {
                   const isHovered = hoveredRatingIndex === index
                   const isSelected = rating.id && selectedRatingId === rating.id
+                  const isSelfAssessmentSelected =
+                    rating.id && selectedSelfAssessmentRatingId === rating.id
                   const isLastRatingIndex = criterionRatings.length - 1 === index
 
                   const borderColor = isHovered || isSelected ? 'brand' : 'primary'
@@ -438,8 +464,10 @@ const CriterionRow = ({
                           borderWidth="small"
                           borderColor={borderColor}
                           overflowX="hidden"
+                          overflowY="hidden"
                           cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
                           padding="xxx-small x-small 0 x-small"
+                          position="relative"
                           onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
                           onMouseOut={() => setHoveredRatingIndex(undefined)}
                           onClick={() => onClickRating(rating.id)}
@@ -450,6 +478,19 @@ const CriterionRow = ({
                           }}
                           data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
                         >
+                          {isSelfAssessmentSelected && (
+                            <div
+                              style={{
+                                position: 'absolute',
+                                inset: '2px',
+                                backgroundColor: 'transparent',
+                                color: shamrock,
+                                border: '2px dashed #0B874B',
+                                borderRadius: '4px',
+                                pointerEvents: 'none',
+                              }}
+                            />
+                          )}
                           <Flex direction="column" height="100%" alignItems="stretch">
                             <Flex.Item>
                               <Text weight="bold">{rating.description}</Text>
@@ -576,6 +617,12 @@ const CriterionRow = ({
           borderWidth={`0 small ${isLastIndex ? 'small' : '0'} small`}
           themeOverride={{paddingMedium: '1.125rem'}}
         >
+          <SelfAssessmentComment
+            margin="0 0 small 0"
+            selfAssessment={criterionSelfAssessment}
+            user={submissionUser}
+            submittedAtAlignment="start"
+          />
           <Flex>
             {isPreviewMode ? (
               <Flex.Item shouldGrow={true}>

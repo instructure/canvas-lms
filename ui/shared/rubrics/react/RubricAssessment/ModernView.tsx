@@ -29,6 +29,7 @@ import type {
   RubricAssessmentData,
   RubricCriterion,
   RubricRating,
+  RubricSubmissionUser,
   UpdateAssessmentData,
 } from '../types/rubric'
 import {TextArea} from '@instructure/ui-text-area'
@@ -38,6 +39,7 @@ import {CriteriaReadonlyComment} from './CriteriaReadonlyComment'
 import {findCriterionMatchingRatingId, htmlEscapeCriteriaLongDescription} from './utils/rubricUtils'
 import {possibleString} from '../Points'
 import {OutcomeTag} from './OutcomeTag'
+import {SelfAssessmentComment} from './SelfAssessmentComment'
 
 const I18n = createI18nScope('rubrics-assessment-tray')
 
@@ -54,6 +56,8 @@ type ModernViewProps = {
   rubricAssessmentData: RubricAssessmentData[]
   selectedViewMode: ModernViewModes
   rubricSavedComments?: Record<string, string[]>
+  selfAssessment?: RubricAssessmentData[]
+  submissionUser?: RubricSubmissionUser
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
   validationErrors?: string[]
 }
@@ -68,6 +72,8 @@ export const ModernView = ({
   rubricAssessmentData,
   selectedViewMode,
   rubricSavedComments,
+  selfAssessment,
+  submissionUser,
   onUpdateAssessmentData,
   validationErrors,
 }: ModernViewProps) => {
@@ -75,6 +81,9 @@ export const ModernView = ({
     <View as="div" margin="0" overflowX="hidden">
       {criteria.map((criterion, index) => {
         const criterionAssessment = rubricAssessmentData.find(
+          data => data.criterionId === criterion.id
+        )
+        const criterionSelfAssessment = selfAssessment?.find(
           data => data.criterionId === criterion.id
         )
 
@@ -90,11 +99,13 @@ export const ModernView = ({
             ratingOrder={ratingOrder}
             criterionUseRange={criterion.criterionUseRange}
             criterionAssessment={criterionAssessment}
+            criterionSelfAssessment={criterionSelfAssessment}
             selectedViewMode={selectedViewMode}
             rubricSavedComments={rubricSavedComments?.[criterion.id] ?? []}
             onUpdateAssessmentData={onUpdateAssessmentData}
             isFreeFormCriterionComments={isFreeFormCriterionComments}
             validationErrors={validationErrors}
+            submissionUser={submissionUser}
           />
         )
       })}
@@ -113,8 +124,10 @@ type CriterionRowProps = {
   ratingOrder: string
   criterionUseRange: boolean
   criterionAssessment?: RubricAssessmentData
+  criterionSelfAssessment?: RubricAssessmentData
   selectedViewMode: ModernViewModes
   rubricSavedComments: string[]
+  submissionUser?: RubricSubmissionUser
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
   validationErrors?: string[]
 }
@@ -129,8 +142,10 @@ export const CriterionRow = ({
   ratingOrder,
   criterionUseRange,
   criterionAssessment,
+  criterionSelfAssessment,
   selectedViewMode,
   rubricSavedComments,
+  submissionUser,
   onUpdateAssessmentData,
   validationErrors,
 }: CriterionRowProps) => {
@@ -149,6 +164,11 @@ export const CriterionRow = ({
     criterion.ratings,
     criterion.criterionUseRange,
     criterionAssessment
+  )
+  const selectedSelfAssessmentRatingId = findCriterionMatchingRatingId(
+    criterion.ratings,
+    criterion.criterionUseRange,
+    criterionSelfAssessment
   )
 
   useEffect(() => {
@@ -213,6 +233,7 @@ export const CriterionRow = ({
           ratings={ratings}
           ratingOrder={ratingOrder}
           selectedRatingId={selectedRatingId}
+          selectedSelfAssessmentRatingId={selectedSelfAssessmentRatingId}
           onSelectRating={selectRating}
           criterionUseRange={criterionUseRange}
           shouldFocusFirstRating={
@@ -229,6 +250,7 @@ export const CriterionRow = ({
         ratings={ratings}
         ratingOrder={ratingOrder}
         selectedRatingId={selectedRatingId}
+        selectedSelfAssessmentRatingId={selectedSelfAssessmentRatingId}
         onSelectRating={selectRating}
         criterionUseRange={criterionUseRange}
         shouldFocusFirstRating={hasRatingValidationError && validationErrors?.[0] === criterion.id}
@@ -343,6 +365,7 @@ export const CriterionRow = ({
           {grabFailedValidationMessage()}
         </Text>
       ) : null}
+      <SelfAssessmentComment selfAssessment={criterionSelfAssessment} user={submissionUser} />
       <View as="div" margin="small 0 0 0" overflowX="hidden" overflowY="hidden">
         {isFreeFormCriterionComments ? (
           <Flex direction="column">
