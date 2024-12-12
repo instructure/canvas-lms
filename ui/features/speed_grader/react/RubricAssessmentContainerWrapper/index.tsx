@@ -68,10 +68,13 @@ export default ({
   onSave,
 }: RubricAssessmentContainerWrapperProps) => {
   const {
+    currentStudentAvatarPath,
+    currentStudentName,
     rubricAssessmentTrayOpen,
-    studentAssessment,
     rubricHidePoints,
     rubricSavedComments = {},
+    selfAssessment,
+    studentAssessment,
   } = useStore()
 
   const handleSubmit = (assessmentData: RubricAssessmentData[]) => {
@@ -83,6 +86,10 @@ export default ({
   const mappedAssessmentData = mapRubricAssessmentDataUnderscoredKeysToCamelCase(
     studentAssessment?.data ?? []
   )
+
+  const mappedSelfAssessment = selfAssessment
+    ? mapRubricAssessmentDataUnderscoredKeysToCamelCase(selfAssessment.data)
+    : undefined
 
   const isPeerReview = studentAssessment?.assessment_type === 'peer_review'
   const rubricAssessmentData = isPeerReview ? [] : mappedAssessmentData
@@ -106,6 +113,9 @@ export default ({
           rubricTitle={rubric.title}
           rubricAssessmentData={rubricAssessmentData}
           rubricSavedComments={rubricSavedComments}
+          selfAssessment={mappedSelfAssessment}
+          selfAssessmentDate={selfAssessment?.updated_at}
+          submissionUser={{name: currentStudentName, avatarUrl: currentStudentAvatarPath}}
           onDismiss={onDismiss}
           onSubmit={handleSubmit}
         />

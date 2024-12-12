@@ -19,22 +19,26 @@
 import {create} from 'zustand'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {RubricAssessmentSelect} from '@canvas/rubrics/react/types/rubric'
-// @ts-expect-error
-import type {RubricAssessmentUnderscore} from '../react/RubricAssessmentTrayWrapper/utils'
+import type {RubricAssessmentUnderscore} from '@canvas/rubrics/react/utils'
 
 type SpeedGraderStore = {
   currentStudentId: string
+  currentStudentName?: string
+  currentStudentAvatarPath?: string
   gradesLoading: Record<string, boolean>
   rubricAssessmentTrayOpen: boolean
   rubricAssessors: RubricAssessmentSelect
   rubricHidePoints: boolean
   studentAssessment?: RubricAssessmentUnderscore
+  selfAssessment?: RubricAssessmentUnderscore | null
   rubricSavedComments?: Record<string, string[]>
 }
 
 const useStore = create(
   subscribeWithSelector<SpeedGraderStore>(() => ({
     currentStudentId: '',
+    currentStudentName: '',
+    currentStudentAvatarPath: '',
     gradesLoading: {},
     rubricAssessmentTrayOpen: false,
     rubricAssessors: [],

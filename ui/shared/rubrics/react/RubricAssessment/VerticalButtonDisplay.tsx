@@ -35,6 +35,7 @@ type VerticalButtonDisplayProps = {
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingId?: string
+  selectedSelfAssessmentRatingId?: string
   onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
   shouldFocusFirstRating?: boolean
@@ -45,6 +46,7 @@ export const VerticalButtonDisplay = ({
   ratings,
   ratingOrder,
   selectedRatingId,
+  selectedSelfAssessmentRatingId,
   onSelectRating,
   criterionUseRange,
   shouldFocusFirstRating = false,
@@ -67,6 +69,8 @@ export const VerticalButtonDisplay = ({
       {ratings.map((rating, index) => {
         const buttonDisplay = (ratings.length - (index + 1)).toString()
         const isSelected = rating.id != null && rating.id === selectedRatingId
+        const isSelfAssessmentSelected =
+          rating.id != null && rating.id === selectedSelfAssessmentRatingId
 
         const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
 
@@ -103,6 +107,7 @@ export const VerticalButtonDisplay = ({
                     buttonDisplay={buttonDisplay}
                     isPreviewMode={isPreviewMode}
                     isSelected={isSelected}
+                    isSelfAssessmentSelected={isSelfAssessmentSelected}
                     selectedArrowDirection="right"
                     onClick={() => onSelectRating(rating)}
                   />
@@ -114,7 +119,7 @@ export const VerticalButtonDisplay = ({
                 shouldGrow={true}
                 shouldShrink={true}
               >
-                {isSelected ? (
+                {isSelected || (!selectedRatingId && isSelfAssessmentSelected) ? (
                   <View
                     as="div"
                     borderColor="brand"
