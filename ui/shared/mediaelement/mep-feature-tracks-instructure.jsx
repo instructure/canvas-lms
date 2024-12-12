@@ -28,13 +28,13 @@
 //
 
 /* eslint-disable no-undef, eqeqeq, prefer-const, promise/catch-or-return */
-/* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
+/* eslint-disable @typescript-eslint/no-unused-vars, no-var, vars-on-top */
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 import InheritedCaptionTooltip from './InheritedCaptionTooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {closedCaptionLanguages} from '@instructure/canvas-media'
+import {languageCodes} from './mediaLanguageCodes'
 
 const I18n = useI18nScope('mepfeaturetracksinstructure')
 
@@ -800,7 +800,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
   })
 
   mejs.language = {
-    codes: closedCaptionLanguages.reduce((result, {id, label}) => ({...result, [id]: label}), {}),
+    codes: languageCodes,
   }
 
   /*
