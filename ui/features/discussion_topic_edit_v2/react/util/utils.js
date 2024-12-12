@@ -43,10 +43,14 @@ export const addNewGroupCategoryToCache = (cache, newCategory) => {
     ENV.context_is_not_group ? 'Course' : 'Group'
   )
 
-  const data = JSON.parse(JSON.stringify(cache.readQuery({
-    query: contextQueryToUse,
-    variables: contextQueryVariables,
-  })))
+  const data = JSON.parse(
+    JSON.stringify(
+      cache.readQuery({
+        query: contextQueryToUse,
+        variables: contextQueryVariables,
+      })
+    )
+  )
 
   const relevantGroupCategoryData = {
     _id: newCategory.id,
@@ -110,6 +114,8 @@ export const buildAssignmentOverrides = discussion => {
       availableFrom: override.unlockAt,
       availableUntil: override.lockAt,
       unassignItem: override.unassignItem,
+      students: override.set.students,
+      title: override.set.name,
       ...(override.contextModule && {
         context_module_id: override.contextModule._id,
         context_module_name: override.contextModule.name,

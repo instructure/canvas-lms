@@ -107,11 +107,14 @@ const AssigneeSelector = ({
   ]
 
   const filteredOptions = useCallback(() => {
-    const unfilteredOptions = isLoading && loadedOptions.length > 0 ? loadedOptions : allOptions
+    const unfilteredOptions =
+      isLoading && loadedOptions.length > 0
+        ? loadedOptions
+        : [...new Map([...allOptions, ...defaultValues].map(item => [item.id, item])).values()]
     return unfilteredOptions.filter(
       option => selectedOptionIds.includes(option.id) || !disabledOptions.includes(option.id)
     )
-  }, [allOptions, disabledOptions, isLoading, loadedOptions, selectedOptionIds])
+  }, [allOptions, defaultValues, disabledOptions, isLoading, loadedOptions, selectedOptionIds])
 
   useEffect(() => {
     setOptions(filteredOptions())
@@ -141,6 +144,7 @@ const AssigneeSelector = ({
           const combinedLoadedOptions = [
             ...(loadedOptions.length === 0 ? allOptions : []),
             ...loadedOptions,
+            ...defaultValues,
             ...(json as any[]).map((user: any) => ({
               id: `student-${user.id}`,
               value: user.name,
