@@ -526,8 +526,7 @@
           "text": "Announcements",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "announcement"
         },
         "displayName": "Button",
@@ -548,8 +547,7 @@
           "text": "Modules",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "resume"
         },
         "displayName": "Button",
@@ -570,8 +568,7 @@
           "text": "Resources",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "notebook"
         },
         "displayName": "Button",
@@ -592,8 +589,7 @@
           "text": "Support",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "briefcase"
         },
         "displayName": "Button",
