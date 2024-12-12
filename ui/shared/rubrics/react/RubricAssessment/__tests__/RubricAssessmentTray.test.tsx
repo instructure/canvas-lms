@@ -410,7 +410,7 @@ describe('RubricAssessmentTray Tests', () => {
       })
 
       it('should not select a rating when user entered points do not match a rating points value', () => {
-        const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
+        const {getByTestId} = renderComponentModern('Horizontal')
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
         const input = getByTestId('criterion-score-2') as HTMLInputElement
         fireEvent.change(input, {target: {value: '20'}})
