@@ -19,20 +19,7 @@
 import {Editor} from 'tinymce'
 import {RCEWrapperInterface, RCEWrapperProps} from '../../types'
 import RCEWrapper from '../../RCEWrapper'
-
-/**
- * Fallback iframe allowances used when they aren't provided to the editor.
- */
-export const fallbackIframeAllowances = [
-  'geolocation *',
-  'microphone *',
-  'camera *',
-  'midi *',
-  'encrypted-media *',
-  'autoplay *',
-  'clipboard-write *',
-  'display-capture *',
-]
+import {fallbackIframeAllowances} from './constants'
 
 /**
  * Type of the "editor buttons" that come from Canvas.
@@ -200,9 +187,3 @@ export function externalToolsEnvFor(
     },
   }
 }
-
-/**
- * Name of the parameter used to indicate to Canvas that it is being loaded in an iframe inside of an
- * LTI tool. It should be set to the global id of the containing tool.
- */
-export const PARENT_FRAME_CONTEXT_PARAM = 'parent_frame_context'
