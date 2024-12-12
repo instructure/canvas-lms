@@ -44,7 +44,7 @@ import {AddressBookItem} from './AddressBookItem'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useMemo, useState, useRef, useCallback, useContext} from 'react'
 import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 

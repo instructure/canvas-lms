@@ -31,7 +31,7 @@ import {
   KEY_CODES,
 } from '../../constants'
 import {MENTIONABLE_USERS_QUERY} from './graphql/Queries'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'

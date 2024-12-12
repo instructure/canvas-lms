@@ -26,7 +26,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TargetGroupSelector from '../shared/TargetGroupSelector'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 
 const I18n = useI18nScope('MoveOutcomesModal')
 

@@ -17,7 +17,7 @@
  */
 
 import React, {useContext, useState, useEffect} from 'react'
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation} from '@apollo/client'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
