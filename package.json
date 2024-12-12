@@ -415,6 +415,7 @@
     "build:js": "yarn run webpack-development",
     "build:js:watch": "yarn run webpack",
     "build:packages": "wsrun --fast-exit --exclude-missing --report -c build",
+    "check": "yarn check:ts && yarn lint --quiet",
     "check:js": "tsc --checkJs -p tsconfig.json",
     "check:ts": "tsc -p tsconfig.json",
     "check:ts:watch": "tsc --watch -p tsconfig.json",
