@@ -17,7 +17,7 @@
  */
 
 import {Error} from '../../../shared/graphql/Error'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {Attachment} from './Attachment'
 
 export const CREATE_DISCUSSION_TOPIC = gql`

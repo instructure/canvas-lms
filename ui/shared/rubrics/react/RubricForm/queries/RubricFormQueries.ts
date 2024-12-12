@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import qs from 'qs'
 import {executeQuery} from '@canvas/query/graphql'
 import type {RubricFormProps} from '../types/RubricForm'

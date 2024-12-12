@@ -106,8 +106,11 @@ jest.mock('@apollo/client', () => {
     },
   }
 
+  const originalGql = jest.requireActual('@apollo/client').gql
+
   return {
     __esModule: true,
+    gql: originalGql,
     useQuery: () => ({data}),
   }
 })

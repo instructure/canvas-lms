@@ -18,7 +18,7 @@
 
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const UPDATE_SUBMISSION_GRADE_STATUS = gql`
   mutation updateSubmissionGradeStatus(

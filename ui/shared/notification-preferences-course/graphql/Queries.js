@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const COURSE_NOTIFICATIONS_QUERY = gql`
   query GetNotificationPreferences($courseId: ID!, $userId: ID!) {

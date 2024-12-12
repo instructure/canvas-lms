@@ -20,7 +20,7 @@ import {AnonymousUser} from './AnonymousUser'
 import {DiscussionEntry} from './DiscussionEntry'
 import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {User} from './User'
 import {Submission} from './Submission'
 

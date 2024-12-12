@@ -17,8 +17,7 @@
  */
 
 import {useState} from 'react'
-import {useMutation} from '@apollo/client'
-import gql from 'graphql-tag'
+import {gql, useMutation} from '@apollo/client'
 import {ApiCallStatus} from '@canvas/do-fetch-api-effect/apiRequest'
 
 const SET_OVERRIDE_STATUS_MUTATION = gql`
