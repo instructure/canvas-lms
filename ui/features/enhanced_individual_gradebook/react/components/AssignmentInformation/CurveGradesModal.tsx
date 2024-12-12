@@ -28,8 +28,8 @@ import type {
 import {
   mapToSubmissionGradeChange,
   isInPastGradingPeriodAndNotAdmin,
-  assignmentHasCheckpoints,
 } from '../../../utils/gradebookUtils'
+import {assignmentHasCheckpoints} from '../../../utils/gradeInputUtils'
 import type {Submission} from '../../../../../api.d'
 
 async function loadCurveGradesDialog() {
@@ -80,8 +80,8 @@ export function CurveGradesModal({assignment, contextUrl, submissions, handleGra
     dialog.show(() => {})
   }
 
-  $.subscribe('submissions_updated', submissions => {
-    const mappedSubmissions: SubmissionGradeChange[] = submissions.map((submission: Submission) =>
+  $.subscribe('submissions_updated', submissions_ => {
+    const mappedSubmissions: SubmissionGradeChange[] = submissions_.map((submission: Submission) =>
       mapToSubmissionGradeChange(submission)
     )
     handleGradeChange(mappedSubmissions)

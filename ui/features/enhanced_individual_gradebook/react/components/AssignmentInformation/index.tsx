@@ -33,7 +33,6 @@ import type {
 } from '../../../types'
 import {
   computeAssignmentDetailText,
-  disableGrading,
   isInPastGradingPeriodAndNotAdmin,
 } from '../../../utils/gradebookUtils'
 import MessageStudentsWhoModal from './MessageStudentsWhoModal'
@@ -42,6 +41,7 @@ import {CurveGradesModal} from './CurveGradesModal'
 import SubmissionDownloadModal from './SubmissionDownloadModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
+import {disableGrading} from '../../../utils/gradeInputUtils'
 
 const I18n = useI18nScope('enhanced_individual_gradebook')
 

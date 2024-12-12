@@ -22,7 +22,7 @@ import {
   passFailStatusOptions,
   disableGrading,
   assignmentHasCheckpoints,
-} from '../../../utils/gradebookUtils'
+} from '../../../utils/gradeInputUtils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
