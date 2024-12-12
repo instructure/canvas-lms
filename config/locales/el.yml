@@ -14430,6 +14430,10 @@ el:
       other: "%{count} Υπο-λογαριασμοί"
     titles: 
       sub_accounts: Υπο-λογαρισμοί
+  sub_assignment: 
+    atom_no_author: "Δεν υπάρχει Συγγραφέας"
+    labels: 
+      due: "Καταληκτική Ημερομηνία"
   subaccount_91f4c279: Υπο-λογαριασμός
   subdomain_url_1e43b6f0: "URL υποτομέα"
   subject_reply_to: "<mrk mid=\"3085\" mtype=\"seg\">Απ:</mrk> <mrk mid=\"3086\" mtype=\"seg\">%{subject}</mrk>"
