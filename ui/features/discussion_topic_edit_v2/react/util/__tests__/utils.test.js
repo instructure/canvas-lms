@@ -61,6 +61,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Section Name',
           unassignItem: false,
         },
       ])
@@ -81,6 +83,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Section Name',
           unassignItem: false,
         },
       ])
@@ -112,6 +116,41 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Course Name',
+          unassignItem: false,
+        },
+      ])
+    })
+
+    it('returns overrides for students', () => {
+      const assignment = Assignment.mock({visibleToEveryone: false})
+      const discussion = DiscussionTopic.mock()
+
+      assignment.assignmentOverrides = {
+        nodes: [
+          AssignmentOverride.mock({
+            set: {
+              __typename: 'AdhocStudents',
+              id: '1',
+              _id: '1',
+              students: [{id: '1', name: 'Student Name', _id: '1', __typename: 'User'}],
+            },
+          }),
+        ],
+      }
+      discussion.assignment = assignment
+
+      const overrides = buildAssignmentOverrides(discussion)
+      expect(overrides).toEqual([
+        {
+          assignedList: ['user_1'],
+          availableFrom: '2020-01-01',
+          availableUntil: '2020-01-01',
+          dueDate: '2020-01-01',
+          dueDateId: expect.any(String),
+          students: [{id: '1', name: 'Student Name', _id: '1', __typename: 'User'}],
+          title: undefined,
           unassignItem: false,
         },
       ])
@@ -157,6 +196,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Section Name',
           unassignItem: false,
         },
         {
@@ -222,6 +263,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Section Name',
           unassignItem: false,
         },
       ])
@@ -240,6 +283,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Section Name',
           unassignItem: false,
         },
       ])
@@ -269,6 +314,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Course Name',
           unassignItem: false,
         },
       ])
@@ -310,6 +357,8 @@ describe('buildAssignmentOverrides', () => {
           availableUntil: '2020-01-01',
           dueDate: '2020-01-01',
           dueDateId: expect.any(String),
+          students: undefined,
+          title: 'Section Name',
           unassignItem: false,
         },
         {

@@ -106,6 +106,7 @@ const ItemAssignToCardMemo = memo(
       nextProps.persistEveryoneOption &&
       JSON.stringify(prevProps.customAllOptions) === JSON.stringify(nextProps.customAllOptions) &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
+      prevProps.initialAssigneeOptions?.length === nextProps.initialAssigneeOptions?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.due_at === nextProps.due_at &&
       prevProps.original_due_at === nextProps.original_due_at &&
@@ -416,29 +417,45 @@ const ItemAssignToTrayContent = ({
               }
             }
             let removeCard = false
-            let filteredStudents = override.student_ids
+            let filteredStudents = override.students
             if (override.context_module_id && override.student_ids) {
               filteredStudents = filteredStudents?.filter(
                 // @ts-expect-error
-                id => !overriddenTargets?.students?.includes(id)
+                student => !overriddenTargets?.students?.includes(student.id)
               )
               removeCard = override.student_ids?.length > 0 && filteredStudents?.length === 0
             }
             const studentOverrides =
               // @ts-expect-error
-              filteredStudents?.map(studentId => `student-${studentId}`) ?? []
-            const defaultOptions = studentOverrides
+              filteredStudents?.map(student => ({
+                id: `student-${student.id}`,
+                value: student.name,
+                group: 'Students',
+              })) ?? []
+            const initialAssigneeOptions = studentOverrides
+            const defaultOptions = studentOverrides.map((option: {id: any}) => option.id)
             if (override.noop_id) {
               defaultOptions.push('mastery_paths')
             }
             if (override.course_section_id) {
               defaultOptions.push(`section-${override.course_section_id}`)
+              initialAssigneeOptions.push({
+                id: `section-${override.course_section_id}`,
+                value: override.title,
+                group: 'Sections',
+              })
             }
             if (override.course_id) {
               defaultOptions.push('everyone')
             }
             if (override.group_id) {
               defaultOptions.push(`group-${override.group_id}`)
+              initialAssigneeOptions.push({
+                id: `group-${override.group_id}`,
+                value: override.title,
+                groupCategoryId: override.group_category_id,
+                group: 'Groups',
+              })
             }
             removeCard = removeCard || override.student_ids?.length === 0
             if (
@@ -465,6 +482,7 @@ const ItemAssignToTrayContent = ({
               lock_at: override.lock_at,
               selectedAssigneeIds: defaultOptions,
               defaultOptions,
+              initialAssigneeOptions,
               overrideId: override.id,
               contextModuleId: override.context_module_id,
               contextModuleName: override.context_module_name,
@@ -747,6 +765,7 @@ const ItemAssignToTrayContent = ({
             disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
+            initialAssigneeOptions={card.initialAssigneeOptions}
             customAllOptions={allOptions}
             customIsLoading={isLoadingAssignees}
             customSetSearchTerm={setSearchTerm}

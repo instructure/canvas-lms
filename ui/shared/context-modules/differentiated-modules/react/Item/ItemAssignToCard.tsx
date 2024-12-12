@@ -89,6 +89,7 @@ export type ItemAssignToCardProps = {
   ) => void
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
   selectedAssigneeIds: string[]
+  initialAssigneeOptions?: AssigneeOption[]
   everyoneOption?: AssigneeOption
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
@@ -127,6 +128,7 @@ export default forwardRef(function ItemAssignToCard(
     onValidityChange,
     onCardAssignmentChange,
     selectedAssigneeIds,
+    initialAssigneeOptions,
     everyoneOption,
     customAllOptions,
     customIsLoading,
@@ -429,7 +431,7 @@ export default forwardRef(function ItemAssignToCard(
           selectedOptionIds={selectedAssigneeIds}
           everyoneOption={everyoneOption}
           courseId={courseId}
-          defaultValues={[]}
+          defaultValues={initialAssigneeOptions || []}
           clearAllDisabled={true}
           size="medium"
           messages={showValidations ? error : []}
