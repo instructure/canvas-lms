@@ -215,7 +215,7 @@
           "href": "",
           "size": "small",
           "variant": "filled",
-          "color": "#35423F",
+          "background": "#35423F",
           "iconName": ""
         },
         "displayName": "Button",
@@ -237,7 +237,7 @@
           "href": "",
           "size": "small",
           "variant": "filled",
-          "color": "#35423FFF",
+          "background": "#35423FFF",
           "iconName": ""
         },
         "displayName": "Button",
@@ -259,7 +259,7 @@
           "href": "",
           "size": "small",
           "variant": "filled",
-          "color": "#35423FFF",
+          "background": "#35423FFF",
           "iconName": ""
         },
         "displayName": "Button",

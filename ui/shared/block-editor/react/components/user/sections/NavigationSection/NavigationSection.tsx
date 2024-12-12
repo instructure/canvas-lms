@@ -80,7 +80,6 @@ const NavigationSection = ({background}: NavigationSectionProps) => {
           text="Announcements"
           iconName="announcement"
           variant="text"
-          color="primary-inverse"
           href="../announcements"
           custom={{themeOverride: {fontWeight: 'bold'}}}
         />

@@ -214,7 +214,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#FCB8A399",
+          "background": "#FED4C8",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1111,7 +1111,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1180,7 +1179,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#FCB8A3FF",
+          "background": "#FCB8A3",
           "iconName": ""
         },
         "displayName": "Button",

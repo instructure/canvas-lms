@@ -211,7 +211,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -340,7 +339,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -469,7 +467,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",

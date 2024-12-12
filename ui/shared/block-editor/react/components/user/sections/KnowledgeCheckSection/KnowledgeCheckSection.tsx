@@ -107,7 +107,7 @@ const KnowledgeCheckSection = ({id, entry}: KnowledgeCheckSectionProps) => {
     return (
       <div className="quiz-section__empty">
         {enabled ? (
-          <Button onClick={showModal} color="primary">
+          <Button onClick={showModal} color="secondary">
             {I18n.t('Select Quiz')}
           </Button>
         ) : (

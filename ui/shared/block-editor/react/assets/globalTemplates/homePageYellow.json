@@ -186,7 +186,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#85A9FF33",
+          "background": "#E6EBF9",
           "iconName": ""
         },
         "displayName": "Button",
@@ -474,7 +474,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -603,7 +602,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -732,7 +730,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1104,8 +1101,7 @@
           "text": "Back to Top",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "arrow_up"
         },
         "displayName": "Button",

@@ -144,7 +144,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#3B006AFF",
+          "background": "#3B006A",
           "iconName": ""
         },
         "displayName": "Button",
@@ -326,8 +326,7 @@
           "text": "Home",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "globe"
         },
         "displayName": "Button",
@@ -348,8 +347,7 @@
           "text": "Schedule",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "schedule"
         },
         "displayName": "Button",
@@ -370,8 +368,7 @@
           "text": "Modules",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "video"
         },
         "displayName": "Button",
@@ -392,8 +389,7 @@
           "text": "Grades",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "module"
         },
         "displayName": "Button",
@@ -789,7 +785,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -919,7 +914,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1049,7 +1043,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
