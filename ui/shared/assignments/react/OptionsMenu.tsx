@@ -42,7 +42,7 @@ import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/rea
 import {useMutation} from '@apollo/react-hooks'
 import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {ASSIGNMENT_VIEW_TYPES} from './AssignmentHeader'
+import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
 
 const I18n = useI18nScope('assignment_more_button')
 
