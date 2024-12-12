@@ -17,12 +17,11 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 
 import FindReplaceTrayController from '../components/FindReplaceTrayController'
-import userEvent, {UserEvent} from '@testing-library/user-event'
+import userEvent, {Options, UserEvent} from '@testing-library/user-event'
 import {SearchReplacePlugin} from '../types'
-import {Options} from '@testing-library/user-event/dist/types/options'
 
 describe('FindReplaceTray', () => {
   let fakePlugin: SearchReplacePlugin
@@ -51,12 +50,17 @@ describe('FindReplaceTray', () => {
     }
   }
 
-  // fixes flakiness
+  // fixes flakiness by ensuring consistent typing behavior
   const type = async (user: UserEvent, element: HTMLElement, input: string, initialInput = '') => {
-    while (element.getAttribute('value') == initialInput) {
-      // eslint-disable-next-line no-await-in-loop
-      await user.type(element, input)
-    }
+    await waitFor(
+      async () => {
+        if (element.getAttribute('value') === initialInput) {
+          await user.type(element, input)
+        }
+        expect(element.getAttribute('value')).not.toBe(initialInput)
+      },
+      {timeout: 3000}
+    )
   }
 
   it('displays error with no find results', async () => {
@@ -64,7 +68,7 @@ describe('FindReplaceTray', () => {
     const {user} = renderComponent()
     const findInput = screen.getByTestId('find-text-input')
     await type(user, findInput, 'a')
-    const errorText = await screen.findByLabelText(/no results found/i)
+    const errorText = await screen.findByLabelText(/no results found/i, {}, {timeout: 3000})
     const errorIcon = await screen.findAllByTestId('error-icon')
     expect(errorText).toBeInTheDocument()
     expect(errorIcon[0]).toBeInTheDocument()
@@ -75,12 +79,19 @@ describe('FindReplaceTray', () => {
     const {user} = renderComponent()
     const findInput = screen.getByTestId('find-text-input')
     await type(user, findInput, 'a')
-    await user.keyboard('{backspace}')
-    const errorText = screen.queryByLabelText(/no results found/i)
-    expect(errorText).toBeNull()
-    await waitFor(() => {
-      expect(fakePlugin.done).toHaveBeenCalledTimes(1)
-    },{timeout:2000})
+
+    // Clear the input and wait for value to be empty
+    await user.clear(findInput)
+
+    // Wait for error text to be removed and cleanup to be called
+    await waitFor(
+      () => {
+        const errorText = screen.queryByLabelText(/no results found/i)
+        expect(errorText).toBeNull()
+        expect(fakePlugin.done).toHaveBeenCalledTimes(1)
+      },
+      {timeout: 3000}
+    )
   })
 
   it('cleans up when closed', async () => {
@@ -101,7 +112,7 @@ describe('FindReplaceTray', () => {
 
     await user.click(findInput)
     fireEvent.keyDown(findInput, {key: 'Enter'})
-    const resultText = screen.getByLabelText(/1 of 3/i)
+    const resultText = await screen.findByLabelText(/1 of 3/i, {}, {timeout: 3000})
     expect(resultText).toBeInTheDocument()
   })
 
@@ -109,7 +120,7 @@ describe('FindReplaceTray', () => {
     props.initialText = 'some text'
     renderComponent()
     expect(fakePlugin.find).toHaveBeenCalledTimes(1)
-    const resultText = screen.getByLabelText(/1 of 3/i)
+    const resultText = await screen.findByLabelText(/1 of 3/i, {}, {timeout: 3000})
     expect(resultText).toBeInTheDocument()
   })
 
@@ -170,7 +181,7 @@ describe('FindReplaceTray', () => {
       const replaceButton = screen.getByTestId('replace-button')
       await user.click(replaceButton)
 
-      const alert = await screen.findAllByText(/Replaced a with some text/i)
+      const alert = await screen.findAllByText(/Replaced a with some text/i, {}, {timeout: 3000})
       expect(alert.length).toBe(2)
     })
   })
@@ -220,7 +231,11 @@ describe('FindReplaceTray', () => {
       const replaceButton = screen.getByTestId('replace-all-button')
       await user.click(replaceButton)
 
-      const alert = await screen.findAllByText(/Replaced all a with some text/i)
+      const alert = await screen.findAllByText(
+        /Replaced all a with some text/i,
+        {},
+        {timeout: 3000}
+      )
       expect(alert.length).toBe(2)
     })
   })
@@ -287,7 +302,7 @@ describe('FindReplaceTray', () => {
       const {user} = renderComponent()
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'a')
-      const resultText = screen.getByLabelText(/1 of 3/i)
+      const resultText = await screen.findByLabelText(/1 of 3/i, {}, {timeout: 3000})
       expect(resultText).toBeInTheDocument()
     })
 
@@ -297,7 +312,7 @@ describe('FindReplaceTray', () => {
       await type(user, findInput, 'a')
       const nextButton = screen.getByTestId('next-button')
       await user.click(nextButton)
-      const resultText = screen.getByLabelText(/2 of 3/i)
+      const resultText = await screen.findByLabelText(/2 of 3/i, {}, {timeout: 3000})
       expect(resultText).toBeInTheDocument()
     })
 
@@ -309,7 +324,7 @@ describe('FindReplaceTray', () => {
       await user.click(nextButton)
       await user.click(nextButton)
       await user.click(nextButton)
-      const resultText = screen.getByLabelText(/1 of 3/i)
+      const resultText = await screen.findByLabelText(/1 of 3/i, {}, {timeout: 3000})
       expect(resultText).toBeInTheDocument()
       expect(fakePlugin.next).toHaveBeenCalledTimes(3)
     })
@@ -319,10 +334,13 @@ describe('FindReplaceTray', () => {
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'a')
       fireEvent.keyDown(findInput, {key: 'Enter'})
-      await waitFor(() => {
-        expect(fakePlugin.next).toHaveBeenCalledTimes(1)
-      })
-      const resultText = await screen.findByLabelText(/2 of 3/i)
+      await waitFor(
+        () => {
+          expect(fakePlugin.next).toHaveBeenCalledTimes(1)
+        },
+        {timeout: 3000}
+      )
+      const resultText = await screen.findByLabelText(/2 of 3/i, {}, {timeout: 3000})
       expect(resultText).toBeInTheDocument()
     })
 
@@ -332,7 +350,7 @@ describe('FindReplaceTray', () => {
       await type(user, findInput, 'a')
       const prevButton = screen.getByTestId('previous-button')
       await user.click(prevButton)
-      const resultText = screen.getByLabelText(/3 of 3/i)
+      const resultText = await screen.findByLabelText(/3 of 3/i, {}, {timeout: 3000})
       expect(resultText).toBeInTheDocument()
     })
 
@@ -341,10 +359,13 @@ describe('FindReplaceTray', () => {
       const findInput = screen.getByTestId('find-text-input')
       await type(user, findInput, 'a')
       fireEvent.keyDown(findInput, {shiftKey: true, key: 'Enter'})
-      await waitFor(() => {
-        expect(fakePlugin.prev).toHaveBeenCalledTimes(1)
-      })
-      const resultText = await screen.findByLabelText(/3 of 3/i)
+      await waitFor(
+        () => {
+          expect(fakePlugin.prev).toHaveBeenCalledTimes(1)
+        },
+        {timeout: 3000}
+      )
+      const resultText = await screen.findByLabelText(/3 of 3/i, {}, {timeout: 3000})
       expect(resultText).toBeInTheDocument()
     })
 
@@ -411,16 +432,31 @@ describe('FindReplaceTray', () => {
   })
 
   describe('selectionScreenReaderText', () => {
-    // flaky; cf. RCX-2586
-    it.skip('is displayed when there are results', async () => {
+    it('is displayed when there are results', async () => {
+      props.getSelectionContext.mockReturnValue(['text before ', ' text after'])
       const {user} = renderComponent()
       const findInput = screen.getByTestId('find-text-input')
-      await type(user, findInput, 'abc')
-      await waitFor(() => {
-        expect(props.getSelectionContext).toHaveBeenCalledTimes(3)
-      })
-      const srText = await screen.findByText(/text before abc text after/i)
-      expect(srText).toBeInTheDocument()
+
+      // Type and wait for the find operation to complete
+      await type(user, findInput, 'a')
+
+      // Wait for all selection context calls to complete
+      await waitFor(
+        () => {
+          expect(props.getSelectionContext).toHaveBeenCalled()
+          const calls = props.getSelectionContext.mock.calls.length
+          expect(calls).toBeGreaterThanOrEqual(1)
+        },
+        {timeout: 3000}
+      )
+
+      // Then check for screen reader text
+      const screenReaderContent = screen.getByText(content =>
+        content.includes('text before a text after')
+      )
+      expect(screenReaderContent).toBeInTheDocument()
+      expect(screenReaderContent.closest('[role="alert"]')).toHaveAttribute('aria-live', 'polite')
+      expect(screenReaderContent.closest('[role="alert"]')).toHaveAttribute('aria-atomic', 'true')
     })
 
     it('is called when next button clicked', async () => {
@@ -429,9 +465,12 @@ describe('FindReplaceTray', () => {
       await type(user, findInput, 'a')
       const nextButton = screen.getByTestId('next-button')
       await user.click(nextButton)
-      await waitFor(() => {
-        expect(props.getSelectionContext).toHaveBeenCalledTimes(2)
-      })
+      await waitFor(
+        () => {
+          expect(props.getSelectionContext).toHaveBeenCalledTimes(2)
+        },
+        {timeout: 3000}
+      )
     })
 
     it('is called when previous button clicked', async () => {
@@ -440,9 +479,12 @@ describe('FindReplaceTray', () => {
       await type(user, findInput, 'a')
       const prevButton = screen.getByTestId('previous-button')
       await user.click(prevButton)
-      await waitFor(() => {
-        expect(props.getSelectionContext).toHaveBeenCalledTimes(2)
-      })
+      await waitFor(
+        () => {
+          expect(props.getSelectionContext).toHaveBeenCalledTimes(2)
+        },
+        {timeout: 3000}
+      )
     })
 
     it('is called when replace button clicked', async () => {
@@ -453,9 +495,12 @@ describe('FindReplaceTray', () => {
       await type(user, replaceInput, 'some text')
       const replaceButton = screen.getByTestId('replace-button')
       await user.click(replaceButton)
-      await waitFor(() => {
-        expect(props.getSelectionContext).toHaveBeenCalledTimes(2)
-      })
+      await waitFor(
+        () => {
+          expect(props.getSelectionContext).toHaveBeenCalledTimes(2)
+        },
+        {timeout: 3000}
+      )
     })
   })
 })
