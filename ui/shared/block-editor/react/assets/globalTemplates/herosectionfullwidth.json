@@ -166,7 +166,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#FFFFFFB0",
+          "background": "#F7FDFD",
           "iconName": "calendar"
         },
         "displayName": "Button",

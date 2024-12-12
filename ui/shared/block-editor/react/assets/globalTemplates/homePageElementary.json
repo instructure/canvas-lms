@@ -140,7 +140,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0A0189FF",
+          "background": "#0A0189",
           "iconName": ""
         },
         "displayName": "Button",
@@ -323,7 +323,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0A0189FF",
+          "background": "#0A0189",
           "iconName": "globe"
         },
         "displayName": "Button",
@@ -345,7 +345,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0A0189FF",
+          "background": "#0A0189",
           "iconName": "schedule"
         },
         "displayName": "Button",
@@ -367,7 +367,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0A0189FF",
+          "background": "#0A0189",
           "iconName": "video"
         },
         "displayName": "Button",
@@ -389,7 +389,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0A0189FF",
+          "background": "#0A0189",
           "iconName": "module"
         },
         "displayName": "Button",

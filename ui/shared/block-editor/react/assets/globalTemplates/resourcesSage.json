@@ -321,8 +321,7 @@
           "text": "Library Services",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -343,8 +342,7 @@
           "text": "Career Development",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -365,8 +363,7 @@
           "text": "Counseling Center",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -387,8 +384,7 @@
           "text": "Advising",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -409,8 +405,7 @@
           "text": "IT Support",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -672,7 +667,6 @@
           "href": "",
           "size": "small",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -764,7 +758,6 @@
           "href": "",
           "size": "small",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -856,7 +849,6 @@
           "href": "",
           "size": "small",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1119,7 +1111,6 @@
           "href": "",
           "size": "small",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1211,7 +1202,6 @@
           "href": "",
           "size": "small",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1303,7 +1293,6 @@
           "href": "",
           "size": "small",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",

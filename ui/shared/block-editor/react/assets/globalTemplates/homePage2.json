@@ -236,7 +236,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0B3866FF",
+          "background": "#0B3866",
           "iconName": ""
         },
         "displayName": "Button",
@@ -258,7 +258,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0B3866FF",
+          "background": "#0B3866",
           "iconName": ""
         },
         "displayName": "Button",
@@ -280,7 +280,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0B3866FF",
+          "background": "#0B3866",
           "iconName": ""
         },
         "displayName": "Button",
@@ -302,7 +302,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#0B3866FF",
+          "background": "#0B3866",
           "iconName": ""
         },
         "displayName": "Button",
@@ -740,7 +740,7 @@
           "href": "",
           "size": "large",
           "variant": "filled",
-          "color": "#0B3866FF",
+          "background": "#0B3866",
           "iconName": ""
         },
         "displayName": "Button",

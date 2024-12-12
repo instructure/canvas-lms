@@ -169,7 +169,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "primary-inverse",
           "iconName": ""
         },
         "displayName": "Button",
@@ -350,7 +349,7 @@
           "text": "Announcements",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
+          "variant": "text",
           "color": "primary-inverse",
           "iconName": ""
         },
@@ -372,7 +371,7 @@
           "text": "Virtual Classroom",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
+          "variant": "text",
           "color": "primary-inverse",
           "iconName": ""
         },
@@ -394,7 +393,7 @@
           "text": "Modules",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
+          "variant": "text",
           "color": "primary-inverse",
           "iconName": ""
         },
@@ -416,7 +415,7 @@
           "text": "Grades",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
+          "variant": "text",
           "color": "primary-inverse",
           "iconName": ""
         },
@@ -635,7 +634,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -765,7 +763,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -895,7 +892,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
