@@ -328,7 +328,8 @@ class SisBatch < ActiveRecord::Base
 
     # require a remaster if too many consecutive batches exceeded the threshold
     return :too_many_over_threshold_batches if previous_batch && account.sis_batches
-                                                                        .where(diffing_data_set_identifier:)
+                                                                        .succeeded
+                                                                        .where(diffing_data_set_identifier:, diffing_threshold_exceeded: true)
                                                                         .where("id > ? AND id < ?", previous_batch.id, id)
                                                                         .count > Setting.get("sis_diffing_max_skip", "5").to_i
 
