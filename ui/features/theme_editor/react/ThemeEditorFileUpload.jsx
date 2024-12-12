@@ -66,7 +66,7 @@ export default class ThemeEditorFileUpload extends Component {
     this.props.handleThemeStateChange(this.props.name, null, {
       customFileUpload: true,
       resetValue: true,
-      useDefault: !this.hasUserInput() && this.props.currentValue,
+      useDefault: !this.hasUserInput() && !!this.props.currentValue,
     })
     this.props.onChange(!this.hasUserInput() ? '' : null)
   }
@@ -132,7 +132,7 @@ export default class ThemeEditorFileUpload extends Component {
           </button>
           <input
             type="hidden"
-            name={!this.props.userInput.val && this.props.name}
+            name={!this.props.userInput.val ? this.props.name : undefined}
             value={this.props.userInput.val === '' ? '' : this.props.currentValue}
           />
           {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
@@ -140,7 +140,7 @@ export default class ThemeEditorFileUpload extends Component {
             <span className="screenreader-only">{this.props.label}</span>
             <input
               type="file"
-              name={this.props.userInput.val && this.props.name}
+              name={this.props.userInput.val ? this.props.name : undefined}
               accept={this.props.accept}
               onChange={this.handleFileChanged}
               ref={c => (this.fileInput = c)}
