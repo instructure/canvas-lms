@@ -28,7 +28,7 @@ import {
   SUBMISSION_HISTORIES_QUERY,
   USER_GROUPS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'

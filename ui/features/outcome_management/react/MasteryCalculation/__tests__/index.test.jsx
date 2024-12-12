@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act, render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   ACCOUNT_OUTCOME_CALCULATION_QUERY,

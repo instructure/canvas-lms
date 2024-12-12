@@ -23,7 +23,7 @@ import React from 'react'
 import {InternalSettingsView} from '../InternalSettingsView'
 import {render} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 // @ts-expect-error
 import type {ExecutionResult} from '@apollo/client'
 

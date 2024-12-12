@@ -25,7 +25,7 @@
  */
 
 import {createClient} from '@canvas/apollo-v3'
-import {MockLink} from '@apollo/react-testing'
+import {MockLink} from '@apollo/client/testing'
 
 /*
  * React components should use Apollo's MockProvider instead of MockCanvasClient.

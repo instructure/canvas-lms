@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import React from 'react'

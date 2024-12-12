@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {mockAssignment, mockSubmission} from '../../test-utils'
 import Toolbox from '../Toolbox'
 

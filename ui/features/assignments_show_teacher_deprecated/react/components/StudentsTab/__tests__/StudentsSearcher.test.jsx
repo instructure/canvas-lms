@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {STUDENT_SEARCH_QUERY} from '../../../assignmentData'
 import {mockAssignment, mockSubmission, mockUser, closest} from '../../../test-utils'
 import StudentsSearcher from '../StudentsSearcher'

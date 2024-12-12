@@ -24,7 +24,7 @@ import {DiscussionManagerUtilityContext} from '../../../utils/constants'
 import {updateUserDiscussionsSplitscreenViewMock} from '../../../../graphql/Mocks'
 import {ChildTopic} from '../../../../graphql/ChildTopic'
 import {waitFor} from '@testing-library/dom'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 
 import * as constants from '../../../utils/constants'
 

@@ -22,7 +22,7 @@ import OutcomesContext from '../contexts/OutcomesContext'
 import {useManageOutcomes} from '../treeBrowser'
 import {smallOutcomeTree} from '../../mocks/Management'
 import {renderHook, act} from '@testing-library/react-hooks'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.useFakeTimers()

@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {InMemoryCache} from '@apollo/client'
 import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
 

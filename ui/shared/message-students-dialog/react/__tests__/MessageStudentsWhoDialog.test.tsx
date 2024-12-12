@@ -25,7 +25,7 @@ import MessageStudentsWhoDialog, {
   Props as ComponentProps,
   Student,
 } from '../MessageStudentsWhoDialog'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import {createCache} from '@canvas/apollo-v3'
 import {OBSERVER_ENROLLMENTS_QUERY} from '../../graphql/Queries'

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {
