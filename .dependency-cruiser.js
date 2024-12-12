@@ -46,6 +46,7 @@ module.exports = {
           'ui/features/enhanced_individual_gradebook/react/components/OutcomeInformation/index.tsx',
           'ui/features/enhanced_individual_gradebook/react/hooks/useSubmitScore.tsx',
           'ui/features/enhanced_individual_gradebook/utils/gradebookUtils.ts',
+          'ui/features/enhanced_individual_gradebook/utils/gradeInputUtils.ts',
           'ui/features/gradebook/react/default_gradebook/components/GradebookGrid.tsx',
           'ui/features/gradebook/react/default_gradebook/components/InputsForCheckpoints.tsx',
           'ui/features/gradebook/react/default_gradebook/components/SubmissionTray.tsx',
