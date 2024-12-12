@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useEditor, useNode} from '@craftjs/core'
 import {MediaBlockToolbar} from './MediaBlockToolbar'
 import {MediaBlockPreviewThumbnail} from './MediaBlockPreviewThumbnail'
 import {useClassNames} from '../../../../utils'
-import {type MediaBlockProps, type MediaVariant, type MediaConstraint} from './types'
+import {type MediaBlockProps} from './types'
 import {BlockResizer} from '../../../editor/BlockResizer'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block-editor')
 
-const MediaBlock = ({src, title, attachmentId}: MediaBlockProps) => {
+const MediaBlock = ({src, title, height = '50', width = '50', attachmentId}: MediaBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -36,6 +36,16 @@ const MediaBlock = ({src, title, attachmentId}: MediaBlockProps) => {
     connectors: {connect, drag},
   } = useNode()
   const clazz = useClassNames(enabled, {empty: !src}, ['block', 'media-block'])
+  const [dynamicHeight, setDynamicHeight] = useState<string>(height)
+  const [dynamicWidth, setDynamicWidth] = useState(width)
+  const [blockRef, setBlockRef] = useState<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!blockRef) return
+
+    setDynamicWidth(`${width}px`)
+    setDynamicHeight(`${height}px`)
+  }, [width, height, blockRef])
 
   if (!src) {
     return (
@@ -44,7 +54,15 @@ const MediaBlock = ({src, title, attachmentId}: MediaBlockProps) => {
         aria-label={MediaBlock.craft.displayName}
         tabIndex={-1}
         className={clazz}
-        ref={el => el && connect(drag(el as HTMLDivElement))}
+        ref={el => {
+          el && connect(drag(el as HTMLDivElement))
+          setBlockRef(el)
+        }}
+        style={{
+          width: dynamicWidth,
+          height: dynamicHeight,
+          position: 'relative',
+        }}
       />
     )
   } else {
@@ -54,9 +72,14 @@ const MediaBlock = ({src, title, attachmentId}: MediaBlockProps) => {
         aria-label={MediaBlock.craft.displayName}
         tabIndex={-1}
         className={clazz}
-        style={{position: 'relative'}}
+        style={{
+          width: dynamicWidth,
+          height: dynamicHeight,
+          position: 'relative',
+        }}
         ref={el => {
           el && connect(drag(el as HTMLDivElement))
+          setBlockRef(el)
         }}
       >
         {enabled ? (
@@ -64,13 +87,21 @@ const MediaBlock = ({src, title, attachmentId}: MediaBlockProps) => {
             src={src || MediaBlock.craft.defaultProps.src}
             attachmentId={attachmentId}
             title={title || ''}
+            onThumbnailLoad={() => {
+              if (blockRef && blockRef.querySelector('img.media_thumbnail')) {
+                const thumbnail = blockRef.querySelector('img.media_thumbnail') as HTMLImageElement
+                setDynamicHeight(`${thumbnail.naturalHeight.toString()}px`)
+                setDynamicWidth(`${thumbnail.naturalWidth.toString()}px`)
+              }
+            }}
           />
         ) : (
           <iframe
             style={{
-              width: '320px',
-              height: '14.25rem',
+              width: '100%',
+              height: '100%',
               display: 'inline-block',
+              objectFit: 'cover',
             }}
             title={title || ''}
             src={src || MediaBlock.craft.defaultProps.src}
@@ -85,12 +116,11 @@ MediaBlock.craft = {
   displayName: I18n.t('Media'),
   defaultProps: {
     src: '',
-    variant: 'default' as MediaVariant,
-    constraint: 'cover' as MediaConstraint,
-    maintainAspectRatio: false,
-    sizeVariant: 'auto',
+    height: 150,
+    width: 200,
     title: '',
     attachmentId: '',
+    maintainAspectRatio: true,
   },
   related: {
     toolbar: MediaBlockToolbar,
