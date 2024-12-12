@@ -46,86 +46,11 @@ jest.mock('@craftjs/core', () => {
 
 describe('MediaBlockToolbar', () => {
   beforeEach(() => {
-    props = {...(MediaBlock.craft.defaultProps as Partial<MediaBlockProps>)}
+    props = {...(MediaBlock.craft.defaultProps as unknown as Partial<MediaBlockProps>)}
   })
 
   it('should render the "Add Media button"', () => {
     render(<MediaBlockToolbar />)
     expect(screen.getByText('Add Media')).toBeInTheDocument()
-  })
-
-  it.skip('checks the right constraint', async () => {
-    render(<MediaBlockToolbar />)
-
-    const btn = screen.getByText('Constraint').closest('button') as HTMLButtonElement
-    fireEvent.click(btn)
-
-    const coverMenuItem = screen.getByText('Cover')
-    const containMenuItem = screen.getByText('Contain')
-    const aspectRatioMenuItem = screen.getByText('Match Aspect Ratio')
-
-    expect(coverMenuItem).toBeInTheDocument()
-    expect(containMenuItem).toBeInTheDocument()
-    expect(aspectRatioMenuItem).toBeInTheDocument()
-
-    const li = coverMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
-  })
-
-  it.skip('changes the constraint prop', async () => {
-    render(<MediaBlockToolbar />)
-
-    const btn = screen.getByText('Constraint').closest('button') as HTMLButtonElement
-    fireEvent.click(btn)
-
-    const containMenuItem = screen.getByText('Contain')
-    fireEvent.click(containMenuItem)
-
-    expect(mockSetProp).toHaveBeenCalled()
-    expect(props.constraint).toBe('contain')
-    expect(props.maintainAspectRatio).toBe(false)
-  })
-
-  it.skip('changes the maintainAspectRatio prop', async () => {
-    props.maintainAspectRatio = false
-    render(<MediaBlockToolbar />)
-
-    const btn = screen.getByText('Constraint').closest('button') as HTMLButtonElement
-    fireEvent.click(btn)
-
-    const coverMenuItem = screen.getByText('Cover')
-    let li = coverMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).toBeInTheDocument()
-
-    const aspectRatioMenuItem = screen.getByText('Match Aspect Ratio')
-    li = aspectRatioMenuItem.closest('li') as HTMLLIElement
-    expect(li.querySelector('svg[name="IconCheck"]')).not.toBeInTheDocument()
-
-    fireEvent.click(aspectRatioMenuItem)
-
-    expect(mockSetProp).toHaveBeenCalled()
-    expect(props.maintainAspectRatio).toBe(true)
-    expect(props.constraint).toBe('cover')
-  })
-
-  it.skip('changes the image size prop', async () => {
-    // @ts-expect-error
-    props.width = 117
-    // @ts-expect-error
-    props.height = 217
-    render(<MediaBlockToolbar />)
-
-    const btn = screen.getByText('Media Size').closest('button') as HTMLButtonElement
-    fireEvent.click(btn)
-
-    expect(screen.getByText('Auto')).toBeInTheDocument()
-    expect(screen.getByText('Fixed size')).toBeInTheDocument()
-    expect(screen.getByText('Percent size')).toBeInTheDocument()
-    expect(
-      screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"')
-    ).toBeInTheDocument()
-
-    fireEvent.click(screen.getByText('Fixed size'))
-    expect(props.sizeVariant).toBe('pixel')
   })
 })
