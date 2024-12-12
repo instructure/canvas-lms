@@ -226,10 +226,11 @@ module BasicLTI
     def attempts_hash
       @_attempts_hash ||= begin
         attempts = submission.versions.sort_by(&:created_at).each_with_object({}) do |v, a|
-          h = YAML.safe_load(v.yaml).with_indifferent_access
-          url = v.model.url
+          sub = v.model
+          url = sub.url
           next if url.blank? # exclude invalid versions (url is actual attempt identifier)
 
+          h = sub.attributes.with_indifferent_access
           h[:url] = url
           (a[url] = (a[url] || [])) << h.slice(*JSON_FIELDS)
         end
