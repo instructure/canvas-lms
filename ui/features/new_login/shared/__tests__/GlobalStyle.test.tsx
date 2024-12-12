@@ -17,24 +17,28 @@
  */
 
 import React from 'react'
-import {GlobalStyle} from '..'
 import {render} from '@testing-library/react'
-
-const getGlobalStyle = () => {
-  const styleTags = document.querySelectorAll('style[data-emotion]')
-  return Array.from(styleTags)
-    .map(tag => tag.textContent)
-    .join('')
-}
+import GlobalStyle from '../GlobalStyle'
 
 describe('GlobalStyle', () => {
-  // skipped for InstUI 9 upgrade, should be fixed or removed
-  // see FOO-4979
-  it.skip('applies the correct global styles FOO-4979', () => {
+  it('applies global styles to html and body', () => {
+    const html = document.documentElement
+    const body = document.body
+    // before
+    const htmlBefore = window.getComputedStyle(html)
+    expect(htmlBefore.overflowX).not.toBe('hidden')
+    expect(htmlBefore.height).not.toBe('100%')
+    const bodyBefore = window.getComputedStyle(body)
+    expect(bodyBefore.minHeight).not.toBe('100%')
+    expect(bodyBefore.margin).not.toBe('0px')
+    // apply styles
     render(<GlobalStyle />)
-    const globalCSS = getGlobalStyle()
-    expect(globalCSS).toContain('html,body{overflow-x:hidden;}')
-    expect(globalCSS).toContain('html{height:100%;}')
-    expect(globalCSS).toContain('body{min-height:100%;margin:0;}')
+    // after
+    const htmlAfter = window.getComputedStyle(html)
+    expect(htmlAfter.overflowX).toBe('hidden')
+    expect(htmlAfter.height).toBe('100%')
+    const bodyAfter = window.getComputedStyle(body)
+    expect(bodyAfter.minHeight).toBe('100%')
+    expect(bodyAfter.margin).toBe('0px')
   })
 })
