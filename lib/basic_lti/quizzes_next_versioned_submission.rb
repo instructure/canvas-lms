@@ -41,11 +41,12 @@ module BasicLTI
       url
     ].freeze
 
-    def initialize(assignment, user, prioritize_non_tool_grade: false, needs_additional_review: false)
+    def initialize(assignment, user, prioritize_non_tool_grade: false, needs_additional_review: false, submission: nil)
       @assignment = assignment
       @user = user
       @prioritize_non_tool_grade = prioritize_non_tool_grade
       @needs_additional_review = needs_additional_review
+      @_submission = submission
     end
 
     def active?
