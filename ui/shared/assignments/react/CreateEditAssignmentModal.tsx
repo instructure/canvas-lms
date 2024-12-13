@@ -36,17 +36,6 @@ import useInputFocus from '@canvas/outcomes/react/hooks/useInputFocus'
 
 const I18n = useI18nScope('CreateEditAssignmentModal')
 
-const setInitialAssignmentType = (isEditMode: boolean, type: string): string => {
-  if (isEditMode) {
-    if (type === 'assignment') {
-      return 'none'
-    } else {
-      return type
-    }
-  }
-  return 'none'
-}
-
 export type ModalAssignment = {
   type: string
   name: string
@@ -121,7 +110,7 @@ const CreateEditAssignmentModal = ({
 
   // Modal state values
   const [assignmentType, setAssignmentType] = useState<string>(
-    setInitialAssignmentType(isEditMode, assignment?.type || '')
+    isEditMode ? assignment.type : 'none'
   )
   const [name, setName] = useState<string>(isEditMode ? assignment.name : '')
   const [dueAt, setDueAt] = useState<string>(isEditMode && assignment.dueAt ? assignment.dueAt : '')

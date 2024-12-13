@@ -382,6 +382,20 @@ describe "assignments" do
       expect(@assignment.due_at.strftime("%b %d")).to eq expected_date
     end
 
+    it "preserves assignment submission type when editing an assignment" do
+      @assignment = @course.assignments.create!(
+        title: "Test Assignment",
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      get "/courses/#{@course.id}/assignments"
+      wait_for_ajaximations
+      edit_assignment(@assignment.id, submit: true)
+
+      expect(@assignment.reload.submission_types).to eq "online_text_entry"
+    end
+
     it "creates a simple assignment and defaults post_to_sis" do
       a = @course.account
       a.settings[:sis_default_grade_export] = { locked: false, value: true }
