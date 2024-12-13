@@ -102,7 +102,7 @@ class Lti::Overlay < ActiveRecord::Base
   end
 
   def validate_data
-    schema_errors = Schemas::Lti::Overlay.validation_errors(data.compact)
+    schema_errors = Schemas::Lti::Overlay.validation_errors(data, allow_nil: true)
     return if schema_errors.blank?
 
     errors.add(:data, schema_errors.to_json)

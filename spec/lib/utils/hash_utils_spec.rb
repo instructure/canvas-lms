@@ -138,4 +138,50 @@ describe Utils::HashUtils do
       expect(Utils::HashUtils.sort_nested_data(hash1)).to eq(Utils::HashUtils.sort_nested_data(hash2))
     end
   end
+
+  describe "#nested_compact" do
+    subject { Utils::HashUtils.nested_compact(hash) }
+
+    context "with simple hash" do
+      let(:hash) { { a: 1, b: 2, c: nil } }
+
+      it "compacts hash" do
+        expect(subject).to eq({ a: 1, b: 2 })
+      end
+    end
+
+    context "with array of hashes" do
+      let(:hash) { [{ a: 1, b: 2, c: nil }, { d: 3, e: nil }] }
+
+      it "compacts inner hashes" do
+        expect(subject).to eq([{ a: 1, b: 2 }, { d: 3 }])
+      end
+    end
+
+    context "with nested hash" do
+      let(:hash) { { a: 1, b: { c: 2, d: nil } } }
+
+      it "compacts nested hash" do
+        expect(subject).to eq({ a: 1, b: { c: 2 } })
+      end
+    end
+
+    context "with hash containing array of hashes" do
+      let(:hash) { { a: 1, b: [{ c: 2, d: nil }, { e: 3, f: nil }] } }
+
+      it "compacts inner hashes" do
+        expect(subject).to eq({ a: 1, b: [{ c: 2 }, { e: 3 }] })
+      end
+    end
+
+    context "with complex nested hash" do
+      let(:hash) do
+        { a: 1, b: { c: 2, d: nil, e: [{ f: 3, g: nil, h: [{ i: 4, j: nil }] }] } }
+      end
+
+      it "compacts all hashes" do
+        expect(subject).to eq({ a: 1, b: { c: 2, e: [{ f: 3, h: [{ i: 4 }] }] } })
+      end
+    end
+  end
 end
