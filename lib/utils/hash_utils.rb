@@ -37,5 +37,23 @@ module Utils
         data.to_s
       end
     end
+
+    def self.nested_compact(hash)
+      recurse = lambda do |v|
+        if v.is_a?(Array) || v.is_a?(Hash)
+          nested_compact(v)
+        else
+          v
+        end
+      end
+
+      if hash.is_a?(Array)
+        hash.filter_map { |v| recurse.call(v) }
+      elsif hash.is_a?(Hash)
+        hash.transform_values { |v| recurse.call(v) }.compact
+      else
+        hash
+      end
+    end
   end
 end
