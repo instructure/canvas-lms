@@ -473,11 +473,20 @@ describe TabsController, type: :request do
           "type" => "internal"
         },
         {
+          "id" => "apps",
+          "html_url" => "/accounts/#{@account.id}/apps",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/apps",
+          "label" => "Apps",
+          "position" => 17,
+          "visibility" => "public",
+          "type" => "internal"
+        },
+        {
           "id" => "admin_tools",
           "html_url" => "/accounts/#{@account.id}/admin_tools",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/admin_tools",
           "label" => "Admin Tools",
-          "position" => 17,
+          "position" => 18,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -486,7 +495,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/eportfolio_moderation",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/eportfolio_moderation",
           "label" => "ePortfolio Moderation",
-          "position" => 18,
+          "position" => 19,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -495,7 +504,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/settings",
           "label" => "Settings",
-          "position" => 19,
+          "position" => 20,
           "visibility" => "admins",
           "type" => "internal"
         }
