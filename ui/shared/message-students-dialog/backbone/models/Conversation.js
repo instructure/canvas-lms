@@ -45,7 +45,7 @@ const NO_RECIPIENTS_ERR = I18n.t(
   'No recipients are in this group. Please choose another group.'
 )
 
-Conversation.prototype.validate = function (attrs, _options) {
+Conversation.prototype.validate = function (attrs, options) {
   const errors = {}
   if (!attrs.body || !$.trim(attrs.body.toString())) {
     errors.body = [

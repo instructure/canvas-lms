@@ -35,16 +35,18 @@ import {
   createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import * as api from '@canvas/outcomes/graphql/Management'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import * as useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 jest.mock('@canvas/rce/RichContentEditor')
 jest.useFakeTimers({legacyFakeTimers: true})
 
 // FOO-3827
 describe.skip('OutcomeManagementPanel', () => {
   let cache
-  let showFlashAlertSpy
   let defaultMocks
   let groupDetailDefaultProps
   let isMobileView = false
@@ -66,7 +68,6 @@ describe.skip('OutcomeManagementPanel', () => {
 
   beforeEach(() => {
     cache = createCache()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     onLhsSelectedGroupIdChangedMock = jest.fn()
     handleFileDropMock = jest.fn()
     setTargetGroupIdsToRefetchMock = jest.fn()
@@ -202,7 +203,7 @@ describe.skip('OutcomeManagementPanel', () => {
       mocks: [],
     })
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading course learning outcome groups.',
       srOnly: true,
       type: 'error',
@@ -215,7 +216,7 @@ describe.skip('OutcomeManagementPanel', () => {
       mocks: [],
     })
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       srOnly: true,
       type: 'error',
@@ -230,7 +231,7 @@ describe.skip('OutcomeManagementPanel', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 0'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading account learning outcome groups.',
       type: 'error',
       srOnly: false,

@@ -18,7 +18,7 @@
 
 import actions from '../actions'
 import FlashNotifications from '../flashNotifications'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const createMockStore = state => ({
   subs: [],
@@ -43,7 +43,6 @@ describe('Blueprint Course FlashNotifications', () => {
   })
 
   test('subscribes to a store and calls showFlashAlert for each notification in state', done => {
-    const flashAlertSpy = FlashAlert.showFlashAlert
     const mockStore = createMockStore({
       notifications: [
         {id: '1', message: 'hello'},
@@ -55,9 +54,9 @@ describe('Blueprint Course FlashNotifications', () => {
     mockStore.mockStateChange()
 
     setTimeout(() => {
-      expect(flashAlertSpy).toHaveBeenCalledTimes(2)
-      expect(flashAlertSpy).toHaveBeenCalledWith({id: '1', message: 'hello'})
-      expect(flashAlertSpy).toHaveBeenCalledWith({id: '2', message: 'world'})
+      expect(showFlashAlert).toHaveBeenCalledTimes(2)
+      expect(showFlashAlert).toHaveBeenCalledWith({id: '1', message: 'hello'})
+      expect(showFlashAlert).toHaveBeenCalledWith({id: '2', message: 'world'})
       done()
     }, 1)
   })

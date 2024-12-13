@@ -259,7 +259,6 @@ describe('SubmissionManager', () => {
   })
 
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
-    // eslint-disable-next-line jest/valid-describe
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {
       beforeEach(() => {
         window.ENV = {

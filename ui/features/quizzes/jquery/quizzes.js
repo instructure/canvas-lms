@@ -18,10 +18,11 @@
 
 // Ignored rules can be removed incrementally
 // Resolving all these up-front is untenable and unlikely
-/* eslint-disable eqeqeq,@typescript-eslint/no-redeclare,@typescript-eslint/no-shadow */
-/* eslint-disable block-scoped-var,no-var,prefer-const,no-restricted-globals,vars-on-top */
-/* eslint-disable promise/catch-or-return,@typescript-eslint/no-unused-vars,no-empty */
-/* eslint-disable no-loop-func,no-constant-condition,no-alert */
+ 
+/* eslint-disable prefer-const */
+/* eslint-disable no-empty */
+/* eslint-disable no-redeclare */
+/* eslint-disable no-constant-condition */
 // xsslint jqueryObject.function makeFormAnswer makeDisplayAnswer
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text

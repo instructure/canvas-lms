@@ -22,13 +22,15 @@ import {createCache} from '@canvas/apollo-v3'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {courseAlignmentStatsMocks} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/client/testing'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '../../contexts/OutcomesContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 describe('useCourseAlignmentStats', () => {
-  let cache, showFlashAlertSpy
+  let cache
   const refetchMocks = [...courseAlignmentStatsMocks(), ...courseAlignmentStatsMocks({id: '2'})]
   const getStats = result => {
     const {
@@ -52,7 +54,6 @@ describe('useCourseAlignmentStats', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     cache = createCache()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -91,7 +92,7 @@ describe('useCourseAlignmentStats', () => {
       },
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading course alignment statistics.',
       type: 'error',
     })

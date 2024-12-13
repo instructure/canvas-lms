@@ -37,6 +37,7 @@ import {
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
 import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/progress/resolve_progress')
 jest.useFakeTimers({legacyFakeTimers: true})
@@ -83,7 +84,6 @@ describe.skip('FindOutcomesModal', () => {
   let onCloseHandlerMock
   let setTargetGroupIdsToRefetchMock
   let setImportsTargetGroupMock
-  let showFlashAlertSpy
   let isMobileView
   const withFindGroupRefetch = true
   const courseImportMocks = [
@@ -111,7 +111,6 @@ describe.skip('FindOutcomesModal', () => {
     setTargetGroupIdsToRefetchMock = jest.fn()
     setImportsTargetGroupMock = jest.fn()
     cache = createCache()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     window.ENV = {}
   })
 
@@ -204,7 +203,7 @@ describe.skip('FindOutcomesModal', () => {
         it('displays a screen reader error and text error on failed request', async () => {
           const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {mocks: []})
           await act(async () => jest.runAllTimers())
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while loading account learning outcome groups.',
             srOnly: true,
             type: 'error',
@@ -220,7 +219,7 @@ describe.skip('FindOutcomesModal', () => {
             mocks: [],
           })
           await act(async () => jest.runAllTimers())
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+          expect(showFlashAlert).toHaveBeenCalledWith({
             message: 'An error occurred while loading course learning outcome groups.',
             srOnly: true,
             type: 'error',
@@ -311,7 +310,7 @@ describe.skip('FindOutcomesModal', () => {
       await clickWithinMobileSelect(queryByText('Groups'))
       await clickEl(getByText('Account Standards'))
       await clickEl(getByText('Course Account Outcome Group'))
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while loading course learning outcome groups.',
         type: 'error',
         srOnly: false,
@@ -873,9 +872,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
         expect(
-          getAllByText(
-            'An error occurred while importing these outcomes: Network error.'
-          )[0]
+          getAllByText('An error occurred while importing these outcomes: Network error.')[0]
         ).toBeInTheDocument()
       })
 
@@ -1121,9 +1118,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getAllByText('Add')[0].closest('button'))
         expect(
-          getAllByText(
-            'An error occurred while importing this outcome: Network error.'
-          )[0]
+          getAllByText('An error occurred while importing this outcome: Network error.')[0]
         ).toBeInTheDocument()
       })
 

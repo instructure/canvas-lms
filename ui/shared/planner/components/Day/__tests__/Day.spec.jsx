@@ -32,7 +32,6 @@ for (const [timeZoneDesc, timeZoneName] of [
   ['In current timezone', currentTimeZoneName],
   ['In other timezone', otherTimeZoneName],
 ]) {
-  // eslint-disable-next-line jest/valid-describe
   describe(timeZoneDesc, () => {
     beforeAll(() => {
       moment.tz.setDefault(timeZoneName)

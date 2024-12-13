@@ -22,11 +22,13 @@ import {createCache} from '@canvas/apollo-v3'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {groupDetailMocks, groupDetailMocksFetchMore} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/client/testing'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext, {ACCOUNT_GROUP_ID} from '../../contexts/OutcomesContext'
 import {FIND_GROUP_OUTCOMES} from '../../../graphql/Management'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
@@ -42,7 +44,7 @@ const outcomeFriendlyDescriptions = result =>
   result.current.group.outcomes.edges.map(edge => edge.node.friendlyDescription?.description || '')
 
 describe('groupDetailHook', () => {
-  let cache, mocks, showFlashAlertSpy
+  let cache, mocks
   const searchMocks = [
     ...groupDetailMocks(),
     ...groupDetailMocks({
@@ -55,7 +57,6 @@ describe('groupDetailHook', () => {
     jest.useFakeTimers()
     cache = createCache()
     mocks = groupDetailMocks()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -125,7 +126,7 @@ describe('groupDetailHook', () => {
       wrapper,
     })
     await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while loading selected group.',
       type: 'error',
     })
@@ -137,7 +138,7 @@ describe('groupDetailHook', () => {
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
       await act(async () => jest.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing 2 outcomes for Group 1.',
         srOnly: true,
       })
@@ -148,7 +149,7 @@ describe('groupDetailHook', () => {
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
       await act(async () => jest.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing 1 outcome for Group 1.',
         srOnly: true,
       })

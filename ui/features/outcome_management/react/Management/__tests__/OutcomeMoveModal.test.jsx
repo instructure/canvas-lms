@@ -28,16 +28,17 @@ import {
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo-v3'
 import OutcomeMoveModal from '../OutcomeMoveModal'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 jest.useFakeTimers()
 
 describe('OutcomeMoveModal', () => {
   let cache
   let onCloseHandlerMock
   let onCleanupHandlerMock
-  let showFlashAlertSpy
   let defaultMocks
   const generateOutcomes = (num, parentGroupId = '100') =>
     new Array(num).fill(0).reduce(
@@ -70,7 +71,6 @@ describe('OutcomeMoveModal', () => {
     cache = createCache()
     onCloseHandlerMock = jest.fn()
     onCleanupHandlerMock = jest.fn()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     defaultMocks = [
       ...accountMocks({childGroupsCount: 0}),
       ...groupMocks({
@@ -182,7 +182,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: '"Outcome 101" has been moved to "Account folder 1".',
       type: 'success',
     })
@@ -209,7 +209,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving this outcome. Please try again.',
       type: 'error',
     })
@@ -260,7 +260,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: '2 outcomes have been moved to "Account folder 1".',
       type: 'success',
     })
@@ -289,7 +289,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
       type: 'error',
     })
@@ -313,7 +313,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
       type: 'error',
     })
@@ -337,7 +337,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
       type: 'error',
     })
@@ -361,7 +361,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
+    expect(showFlashAlert).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
       type: 'error',
     })

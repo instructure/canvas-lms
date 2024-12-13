@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-/* eslint-disable jest/valid-describe */
 // our own imported describe function confuses eslint
 
 import React from 'react'

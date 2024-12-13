@@ -65,7 +65,6 @@ describe('FrequencyPicker', () => {
 
   describe('renders', () => {
     for (const TZ of ['Asia/Tokyo', 'Europe/Budapest', 'America/New_York']) {
-      // eslint-disable-next-line jest/valid-describe
       describe(`in timezone ${TZ}`, () => {
         it('with the given initial frequency', () => {
           const props = defaultProps({timezone: TZ})

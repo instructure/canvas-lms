@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ActionButton} from '../action_button'
@@ -66,10 +66,10 @@ describe('ActionButton', () => {
   })
 
   describe('modal', () => {
-    beforeEach(() =>
+    beforeEach(() => {
       // @ts-expect-error
       doFetchApi.mockReturnValue(Promise.resolve({json: generateMigrationIssues(1)}))
-    )
+    })
 
     afterEach(() => {
       jest.clearAllMocks()
@@ -201,9 +201,11 @@ describe('ActionButton', () => {
       const xButton = screen.queryAllByText('Close')[0]
       await user.click(xButton)
 
-      expect(
-        screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
-      ).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        ).not.toBeInTheDocument()
+      })
     })
 
     it('closes with close button', async () => {
@@ -213,9 +215,11 @@ describe('ActionButton', () => {
       const closeButton = screen.queryAllByText('Close')[1]
       await user.click(closeButton)
 
-      expect(
-        screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
-      ).not.toBeInTheDocument()
+      await waitFor(() => {
+        expect(
+          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        ).not.toBeInTheDocument()
+      })
     })
   })
 })

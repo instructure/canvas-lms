@@ -1,8 +1,5 @@
-/* eslint-disable new-cap */
+/* eslint-disable no-redeclare */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-redeclare */
-/* eslint-disable no-var */
-/* eslint-disable object-shorthand */
 /*
  * Copyright (C) 2012 - present Instructure, Inc.
  *
