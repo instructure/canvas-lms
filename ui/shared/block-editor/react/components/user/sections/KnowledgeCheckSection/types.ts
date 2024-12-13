@@ -27,7 +27,7 @@ export type QuestionProps = {
   stimulus_quiz_entry_id: string
   entry: {
     id: string
-    title: string
+    title: string | null
     answer_feedback: object
     calculator_type: string
     feedback: {
@@ -40,7 +40,7 @@ export type QuestionProps = {
       false_choice: string
     }
     interaction_type_slug: string
-    item_body: string
+    item_body: string | null
     properties: object
     scoring_algorithm: string
     scoring_data: {
@@ -61,10 +61,10 @@ export type KnowledgeCheckSectionProps = {
     }
     interaction_data: any
     interaction_type_slug: string
-    item_body: string
+    item_body: string | null
     properties: any
     scoring_algorithm: string
     scoring_data: any
-    title: string
+    title: string | null
   }
 }

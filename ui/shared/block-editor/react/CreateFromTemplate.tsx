@@ -51,7 +51,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
   const [quickLookTemplate, setQuickLookTemplate] = useState<BlockTemplate | undefined>(undefined)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
   const [blankPageTemplate, setBlankPageTemplate] = useState<BlockTemplate>(() => {
-    return {node_tree: {}} as BlockTemplate
+    return {id: 'tmp_blank_page', name: 'blankpage', node_tree: {}} as BlockTemplate
   })
   const close = () => {
     setIsOpen(false)
@@ -212,7 +212,7 @@ export default function CreateFromTemplate(props: {course_id: string}) {
             <CondensedButton onClick={handleClearAllFilters} interaction={interaction}>
               {I18n.t('Clear All Filters')}
             </CondensedButton>
-            <View as="div" margin="0 0 0 small">
+            <View as="div" margin="0 0 0 small" data-testid="active-tags">
               {selectedTags.sort().map(tag => (
                 <CondensedButton
                   onClick={() => handleRemovePill(tag)}
@@ -245,6 +245,9 @@ export default function CreateFromTemplate(props: {course_id: string}) {
             .filter(
               template => foundTemplateIds.length > 0 && foundTemplateIds.includes(template.id)
             )
+            .sort((a, b) => {
+              return a.name.localeCompare(b.name)
+            })
             .map(blockTemplate => {
               return (
                 <TemplateCardSkeleton

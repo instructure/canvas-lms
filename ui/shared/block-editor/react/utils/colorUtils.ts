@@ -39,13 +39,22 @@ const getContrastingButtonColor = (color1: string) => {
   return buttonColor
 }
 
-const getEffectiveBackgroundColor = (elem: HTMLElement) => {
+const getEffectiveBackgroundColor = (elem: HTMLElement | null): string => {
+  if (!elem) return '#ffffff'
   let bgcolor = window.getComputedStyle(elem).backgroundColor
   while (isTransparent(bgcolor) && elem.parentElement) {
     elem = elem.parentElement
     bgcolor = window.getComputedStyle(elem).backgroundColor
   }
-  return bgcolor
+  return tinycolor(bgcolor).toHexString().toLowerCase()
+}
+
+const getEffectiveColor = (elem: HTMLElement) => {
+  if (!elem) return '#000000'
+  // getComputedStyle returns the effective color.
+  // we don't have to walk up the tree
+  const color = window.getComputedStyle(elem).color
+  return tinycolor(color).toHexString().toLowerCase()
 }
 
 const sortByBrightness = (a: string, b: string) => {
@@ -102,6 +111,7 @@ export {
   getContrastStatus,
   isTransparent,
   getEffectiveBackgroundColor,
+  getEffectiveColor,
   getColorsInUse,
   getDefaultColors,
   white,

@@ -20,6 +20,8 @@ import {
   getContrastingColor,
   getContrastingButtonColor,
   getColorsInUse,
+  getEffectiveBackgroundColor,
+  getEffectiveColor,
   white,
   black,
 } from '../colorUtils'
@@ -66,6 +68,42 @@ describe('colorUtils', () => {
         background: ['#ababab'],
         border: [],
       })
+    })
+  })
+
+  describe('getEffectiveBackgroundColor', () => {
+    it('returns white if given no element', () => {
+      expect(getEffectiveBackgroundColor(null)).toBe('#ffffff')
+    })
+
+    it('returns the elements background color', () => {
+      const elem = document.createElement('div')
+      elem.style.backgroundColor = 'rgb(255, 0, 0)'
+      expect(getEffectiveBackgroundColor(elem)).toBe('#ff0000')
+    })
+
+    it('returns the first ancestor with a non-transparent background color', () => {
+      const elem = document.createElement('div')
+      const parent = document.createElement('div')
+      parent.style.backgroundColor = 'transparent'
+      parent.appendChild(elem)
+      const grandparent = document.createElement('div')
+      grandparent.style.backgroundColor = 'rgb(255, 0, 0)'
+      grandparent.appendChild(parent)
+      expect(getEffectiveBackgroundColor(elem)).toBe('#ff0000')
+    })
+  })
+
+  describe('getEffectiveColor', () => {
+    it('returns black if given no element', () => {
+      // @ts-expect-error
+      expect(getEffectiveColor(null)).toBe('#000000')
+    })
+
+    it('returns the elements color', () => {
+      const elem = document.createElement('div')
+      elem.style.color = 'rgb(255, 0, 0)'
+      expect(getEffectiveColor(elem)).toBe('#ff0000')
     })
   })
 })

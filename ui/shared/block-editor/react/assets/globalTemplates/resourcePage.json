@@ -192,7 +192,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#FFFFFF8F",
+          "background": "#ECF2FE",
           "iconName": ""
         },
         "displayName": "Button",
@@ -373,8 +373,7 @@
           "text": "Academic Success",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -395,8 +394,7 @@
           "text": "Student Services",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -417,8 +415,7 @@
           "text": "Enrollment Support",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -439,8 +436,7 @@
           "text": "Contact",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": ""
         },
         "displayName": "Button",
@@ -855,7 +851,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#454545FF",
+          "background": "#454545",
           "iconName": ""
         },
         "displayName": "Button",
@@ -988,7 +984,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#454545FF",
+          "background": "#454545",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1121,7 +1117,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#454545FF",
+          "background": "#454545",
           "iconName": ""
         },
         "displayName": "Button",
@@ -1300,8 +1296,7 @@
           "text": "Back to Top",
           "href": "",
           "size": "medium",
-          "variant": "condensed",
-          "color": "primary-inverse",
+          "variant": "text",
           "iconName": "arrow_up"
         },
         "displayName": "Button",

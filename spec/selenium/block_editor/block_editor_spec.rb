@@ -26,7 +26,10 @@
 #
 require_relative "../common"
 require_relative "pages/block_editor_page"
-describe "Block Editor" do
+
+# chrome complains about "Blocked aria-hidden on an element because its descendant retained focus."
+# this is a transient condition that resolves itself and does not cause a problem (that I know of)
+describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
@@ -56,7 +59,7 @@ describe "Block Editor" do
     end
 
     context "Load template" do
-      it "loads the clicked template to the editor", :ignore_js_errors do
+      it "loads the clicked template to the editor" do
         expect(template_chooser).to be_displayed
         wait_for_ajax_requests
         # I don't know why this expectation succeeds locally and fails in jenkins,
@@ -83,7 +86,7 @@ describe "Block Editor" do
   end
 
   context "Edit a page" do
-    it "edits an rce page with the rce" do
+    it "edits an rce page with the rce", :ignore_js_errors do
       get "/courses/#{@course.id}/pages/#{@rce_page.url}/edit"
       wait_for_rce
       expect(f("textarea.body").attribute("value")).to eq("<p>RCE Page Body</p>")
@@ -103,7 +106,7 @@ describe "Block Editor" do
       open_block_toolbox_to_tab("blocks")
       expect(block_toolbox).to be_displayed
       drop_new_block("button", group_block_dropzone)
-      expect(fj("#{group_block_inner_selector} a:contains('Click me')")).to be_displayed
+      expect(fj("#{group_block_inner_selector}:contains('Click me')")).to be_displayed
     end
 
     it "cannot resize an image with no src" do

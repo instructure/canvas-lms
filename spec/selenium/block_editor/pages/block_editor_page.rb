@@ -92,7 +92,7 @@ module BlockEditorPage
   end
 
   def template_quick_look_header_selector
-    'h3:contains("Template: Quick Look")'
+    'h3:contains(": Quick Look")'
   end
 
   def template_quick_look_header
@@ -313,7 +313,7 @@ module BlockEditorPage
 
   def block_toolbar_menus
     {
-      icon: ["Go up", "Icon", "Size", "Select Icon", "Drag to move", "Delete"],
+      icon: ["Go up", "Icon", "Size", "Color", "Select Icon", "Drag to move", "Delete"],
       column: ["Go up", "Column", "Color", "Rouned corners", "Alignment Options", "Drag to move"],
       columns: ["Columns", "Go down", "Color", "Section Columns", "Columns 1-4", "Drag to move"],
     }
@@ -346,17 +346,11 @@ module BlockEditorPage
   end
 
   def block_toolbar_menu_string(menu_items)
-    separators = {
-      "Color" => "\n\n\n\n\n\n\n\n\n",
-      "Drag to move" => "\n\n\n",
-      "Rouned corners" => "\n  \n"
-    }
-
-    menu_items.map { |item| "#{separators[item] || ""}#{item}" }.join
+    menu_items.join
   end
 
   def expect_block_toolbar_menu(menu_items)
-    expect(block_toolbar.attribute("textContent")).to eq(block_toolbar_menu_string(menu_items))
+    expect(block_toolbar.attribute("textContent").gsub(/\s+/, "")).to eq(block_toolbar_menu_string(menu_items).gsub(/\s+/, ""))
   end
 
   def element_visible?(selector)

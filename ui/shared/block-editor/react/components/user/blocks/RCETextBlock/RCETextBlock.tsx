@@ -24,7 +24,7 @@ import {RCETextBlockPopup} from './RCETextBlockPopup'
 import {RCETextBlockToolbar} from './RCETextBlockToolbar'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/rce-block')
+const I18n = useI18nScope('block-editor')
 
 export const RCETextBlock = ({text, width, height, sizeVariant = 'auto'}: RCETextBlockProps) => {
   const {enabled} = useEditor(state => ({

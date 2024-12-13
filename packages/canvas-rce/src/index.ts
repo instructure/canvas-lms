@@ -33,7 +33,7 @@ export {
   ColorPicker,
   type ColorTab,
   type ColorSpec,
-  type TabSpec,
+  type TabsSpec,
   type ColorsInUse,
 } from './rce/plugins/instructure_color/components/ColorPicker'
 

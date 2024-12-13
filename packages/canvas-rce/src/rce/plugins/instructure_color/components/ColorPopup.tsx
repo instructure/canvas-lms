@@ -18,13 +18,13 @@
 
 import React, {useCallback, useState} from 'react'
 import {Popover} from '@instructure/ui-popover'
-import {ColorPicker, type ColorSpec, type TabSpec} from './ColorPicker'
+import {ColorPicker, type ColorSpec, type TabsSpec} from './ColorPicker'
 import formatMessage from '../../../../format-message'
 
 export {type ColorSpec, type TabSpec} from './ColorPicker'
 
 export type ColorPopupProps = {
-  tabs: TabSpec
+  tabs: TabsSpec
   open: boolean
   positionTarget?: HTMLElement
   onCancel: () => void
