@@ -72,6 +72,10 @@ class AuthenticationProvider < ActiveRecord::Base
     false
   end
 
+  def self.restorable?
+    false
+  end
+
   def self.enabled?(_account = nil, _user = nil)
     true
   end
@@ -142,6 +146,16 @@ class AuthenticationProvider < ActiveRecord::Base
     Rails.root.join("app/views/shared/svg/_svg_icon_#{sti_name}.svg").exist?
   end
 
+  def self.find_restorable_provider(root_account:, auth_type:)
+    provider_class = find_sti_class(auth_type)
+
+    # To be a restore candidate, an authentication provider must be
+    # singleton and explicitly marked as restorable
+    return unless provider_class.singleton? && provider_class.restorable?
+
+    root_account.authentication_providers.where.not(workflow_state: :active).find_by(auth_type:)
+  end
+
   def visible_to?(_user)
     true
   end
@@ -155,7 +169,7 @@ class AuthenticationProvider < ActiveRecord::Base
     self.workflow_state = "deleted"
     save!
     enable_canvas_authentication
-    delay_if_production.soft_delete_pseudonyms
+    delay_if_production.soft_delete_pseudonyms unless self.class.restorable?
     true
   end
   alias_method :destroy_permanently!, :destroy
@@ -411,6 +425,12 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def debug_set(key, value, overwrite: true)
     ::Canvas.redis.set(debug_key(key), value, ex: DEBUG_EXPIRE.to_i, nx: overwrite ? nil : true)
+  end
+
+  def duplicated_in_account?
+    return false unless self.class.singleton?
+
+    account.authentication_providers.active.where(auth_type:).where.not(id:).exists?
   end
 
   protected
