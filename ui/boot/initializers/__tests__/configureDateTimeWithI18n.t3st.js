@@ -32,9 +32,9 @@ import '../../../ext/custom_moment_locales/de'
 import '../../../ext/custom_moment_locales/he'
 import '../../../ext/custom_moment_locales/pl'
 import '../../../ext/custom_moment_locales/fa'
-// eslint-disable-next-line import/extensions
+ 
 import '../../../ext/custom_moment_locales/fr'
-// eslint-disable-next-line import/extensions
+ 
 import '../../../ext/custom_moment_locales/fr_ca'
 import '../../../ext/custom_moment_locales/ht_ht'
 import '../../../ext/custom_moment_locales/mi_nz'
@@ -104,7 +104,6 @@ const tzLocaleData = tzLocales.reduce((acc, locale) => {
 const dates = createDateSamples()
 
 for (const locale of locales) {
-  // eslint-disable-next-line jest/valid-describe
   describe(locale.key, () => {
     beforeAll(() => {
       I18n.locale = locale.key

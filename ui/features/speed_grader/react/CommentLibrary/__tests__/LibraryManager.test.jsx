@@ -20,7 +20,6 @@ import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
 import {createCache} from '@canvas/apollo-v3'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   commentBankItemMocks,
@@ -30,6 +29,11 @@ import {
   makeUpdateMutationMock,
 } from './mocks'
 import LibraryManager from '../LibraryManager'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
@@ -87,12 +91,10 @@ describe('LibraryManager', () => {
       expect(getByText('Loading comment library')).toBeInTheDocument()
     })
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('displays an error if the comments couldnt be fetched', async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('displays an error if the comments couldnt be fetched', async () => {
       render({mocks: []})
       await act(async () => jest.advanceTimersByTime(1000))
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error loading comment library',
         type: 'error',
       })
@@ -137,9 +139,7 @@ describe('LibraryManager', () => {
       expect(getByText('Adding to Library').closest('button')).toBeDisabled()
     })
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('displays an error if the create mutation failed', async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('displays an error if the create mutation failed', async () => {
       const {getByText, getByLabelText} = render()
       await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
@@ -147,7 +147,7 @@ describe('LibraryManager', () => {
       fireEvent.change(input, {target: {value: 'test comment'}})
       fireEvent.click(getByText('Add to Library'))
       await act(async () => jest.advanceTimersByTime(1000))
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error creating comment',
         type: 'error',
       })
@@ -181,16 +181,14 @@ describe('LibraryManager', () => {
       expect(queryByText('Comment item 0')).not.toBeInTheDocument()
     })
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('displays an error if the delete mutation failed', async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('displays an error if the delete mutation failed', async () => {
       const {getByText} = render()
       await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
       fireEvent.click(getByText('Delete comment: Comment item 0'))
 
       await act(async () => jest.advanceTimersByTime(1000))
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error deleting comment',
         type: 'error',
       })
@@ -335,9 +333,7 @@ describe('LibraryManager', () => {
       expect(ENV.comment_library_suggestions_enabled).toBe(false)
     })
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('does not write to ENV if the request fails', async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('does not write to ENV if the request fails', async () => {
       doFetchApi.mockImplementationOnce(() => Promise.reject(new Error('Network error')))
       const {getByText, getByLabelText} = render()
       await act(async () => jest.advanceTimersByTime(1000))
@@ -346,7 +342,7 @@ describe('LibraryManager', () => {
       expect(doFetchApi).toHaveBeenCalledTimes(1)
       await act(async () => jest.advanceTimersByTime(1000))
       expect(ENV.comment_library_suggestions_enabled).toBe(true)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error saving suggestion preference',
         type: 'error',
       })
@@ -357,9 +353,7 @@ describe('LibraryManager', () => {
     const variables = {comment: 'updated comment!', id: '0'}
     const overrides = {CommentBankItem: {comment: 'updated comment!'}}
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('updates the comment and rerenders', async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('updates the comment and rerenders', async () => {
       const mutationMock = await makeUpdateMutationMock({variables, overrides})
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, getByLabelText} = render({mocks})
@@ -372,15 +366,13 @@ describe('LibraryManager', () => {
       fireEvent.click(getByText('Save'))
       expect(getByText('updated comment!')).toBeInTheDocument()
       await act(async () => jest.advanceTimersByTime(1000))
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Comment updated',
         type: 'success',
       })
     })
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('displays an error if the update mutation failed', async () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('displays an error if the update mutation failed', async () => {
       const {getByText, getByLabelText} = render()
       await act(async () => jest.advanceTimersByTime(1000))
       fireEvent.click(getByText('Open Comment Library'))
@@ -389,7 +381,7 @@ describe('LibraryManager', () => {
       fireEvent.change(input, {target: {value: 'not mocked!'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.advanceTimersByTime(1000))
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Error updating comment',
         type: 'error',
       })

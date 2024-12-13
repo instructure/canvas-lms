@@ -28,7 +28,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 jest.useFakeTimers()
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+  showFlashAlert: jest.fn(),
 }))
 
 describe('useManageOutcomes', () => {

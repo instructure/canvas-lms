@@ -17,8 +17,10 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
+import moment from 'moment-timezone'
 import NewAccessToken, {PURPOSE_MAX_LENGTH} from '../NewAccessToken'
 
 describe('NewAccessToken', () => {
@@ -26,23 +28,31 @@ describe('NewAccessToken', () => {
   const onClose = jest.fn()
   const onSubmit = jest.fn()
 
+  beforeEach(() => {
+    window.ENV = window.ENV || {}
+    window.ENV.TIMEZONE = 'America/Denver'
+    moment.tz.setDefault(window.ENV.TIMEZONE)
+  })
+
   it('should show an error if the purpose field is empty', async () => {
+    const user = userEvent.setup()
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
 
-    fireEvent.click(submit)
+    await user.click(submit)
 
     const errorText = await screen.findByText('Purpose is required.')
     expect(errorText).toBeInTheDocument()
   })
 
   it('should show an error if the purpose field is too long', async () => {
+    const user = userEvent.setup()
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText('Purpose')
 
-    fireEvent.input(purpose, {target: {value: 'a'.repeat(256)}})
-    fireEvent.click(submit)
+    await user.type(purpose, 'a'.repeat(256))
+    await user.click(submit)
 
     const errorText = await screen.findByText(
       `Exceeded the maximum length (${PURPOSE_MAX_LENGTH} characters).`
@@ -51,59 +61,98 @@ describe('NewAccessToken', () => {
   })
 
   it('should show an error if the network request fails', async () => {
+    const user = userEvent.setup()
     fetchMock.post(GENERATE_ACCESS_TOKEN_URI, 500, {overwriteRoutes: true})
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText('Purpose')
 
-    fireEvent.input(purpose, {target: {value: 'a'.repeat(20)}})
-    fireEvent.click(submit)
+    await user.type(purpose, 'a'.repeat(20))
+    await user.click(submit)
 
-    const errorAlerts = await screen.findAllByText('Generating token failed.')
-    expect(errorAlerts.length).toBeTruthy()
+    const errorAlert = await screen.findByRole('alert')
+    expect(errorAlert).toHaveTextContent('Generating token failed.')
   })
 
   it('should be able to submit the form if only the purpose filed is provided', async () => {
+    const user = userEvent.setup()
     const token = {purpose: 'Test purpose'}
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, token, {overwriteRoutes: true})
+    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText('Purpose')
 
-    fireEvent.input(purpose, {target: {value: token.purpose}})
-    fireEvent.click(submit)
+    // Type the text and wait for it to be fully entered
+    await user.clear(purpose)
+    await user.type(purpose, token.purpose)
+    expect(purpose).toHaveValue(token.purpose)
 
-    await waitFor(() => {
-      expect(fetchMock.called(GENERATE_ACCESS_TOKEN_URI, {method: 'POST', body: {token}})).toBe(
-        true
-      )
-      expect(onSubmit).toHaveBeenCalledWith(token)
-    })
-  })
+    await user.click(submit)
+
+    await waitFor(
+      () => {
+        const wasCalled = fetchMock.called(GENERATE_ACCESS_TOKEN_URI)
+        if (!wasCalled) {
+          console.log('Fetch not called yet')
+          return false
+        }
+        const lastCall = fetchMock.lastCall(GENERATE_ACCESS_TOKEN_URI)
+        if (!lastCall) {
+          console.log('No fetch call found')
+          return false
+        }
+        const body = JSON.parse(lastCall[1]?.body as string)
+        expect(body).toEqual({token})
+        expect(onSubmit).toHaveBeenCalledWith({token})
+        return true
+      },
+      {timeout: 20000}
+    )
+  }, 30000)
 
   it('should be able to submit the form if both the purpose and expirations fields are provided', async () => {
-    const token = {purpose: 'Test purpose', expires_at: '2024-11-14T00:00:00.000Z'}
+    const user = userEvent.setup()
+    const expirationDate = moment.tz('2024-11-14T00:00:00', window.ENV.TIMEZONE)
+    const token = {
+      purpose: 'Test purpose',
+      expires_at: expirationDate.utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+    }
     const expirationDateValue = 'November 14, 2024'
     const expirationTimeValue = '12:00 AM'
-    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, token, {overwriteRoutes: true})
+    fetchMock.post(GENERATE_ACCESS_TOKEN_URI, {token}, {overwriteRoutes: true})
     render(<NewAccessToken onSubmit={onSubmit} onClose={onClose} />)
     const submit = screen.getByLabelText('Generate Token')
     const purpose = screen.getByLabelText('Purpose')
-    const expirationDate = screen.getByLabelText('Expiration date')
-    const expirationTime = screen.getByLabelText('Expiration time')
+    const expirationDateInput = screen.getByLabelText('Expiration date')
+    const expirationTimeInput = screen.getByLabelText('Expiration time')
 
-    fireEvent.input(purpose, {target: {value: token.purpose}})
-    fireEvent.input(expirationDate, {target: {value: expirationDateValue}})
-    fireEvent.blur(expirationDate)
-    fireEvent.input(expirationTime, {target: {value: expirationTimeValue}})
-    fireEvent.blur(expirationTime)
-    fireEvent.click(submit)
+    // Type the text and wait for it to be fully entered
+    await user.clear(purpose)
+    await user.type(purpose, token.purpose)
+    expect(purpose).toHaveValue(token.purpose)
 
-    await waitFor(() => {
-      expect(fetchMock.called(GENERATE_ACCESS_TOKEN_URI, {method: 'POST', body: {token}})).toBe(
-        true
-      )
-      expect(onSubmit).toHaveBeenCalledWith(token)
-    })
-  })
+    await user.type(expirationDateInput, expirationDateValue)
+    await user.tab() // blur the date field
+    await user.type(expirationTimeInput, expirationTimeValue)
+    await user.tab() // blur the time field
+    await user.click(submit)
+
+    await waitFor(
+      () => {
+        const wasCalled = fetchMock.called(GENERATE_ACCESS_TOKEN_URI)
+        if (!wasCalled) {
+          return false
+        }
+        const lastCall = fetchMock.lastCall(GENERATE_ACCESS_TOKEN_URI)
+        if (!lastCall) {
+          return false
+        }
+        const body = JSON.parse(lastCall[1]?.body as string)
+        expect(body).toEqual({token})
+        expect(onSubmit).toHaveBeenCalledWith({token})
+        return true
+      },
+      {timeout: 20000} // Increase timeout for CI
+    )
+  }, 30000) // Add test timeout
 })

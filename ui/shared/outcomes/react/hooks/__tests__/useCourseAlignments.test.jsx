@@ -22,8 +22,12 @@ import {createCache} from '@canvas/apollo-v3'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {courseAlignmentMocks} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/client/testing'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '../../contexts/OutcomesContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
@@ -34,20 +38,17 @@ const flushAllTimersAndPromises = async () => {
   }
 }
 
-jest.mock('@canvas/alerts/react/FlashAlert')
-
 const outcomeTitles = result =>
   (result?.current?.rootGroup?.outcomes?.edges || []).map(edge => edge.node.title)
 
 describe('useCourseAlignments', () => {
-  let cache, mocks, searchMocks, showFlashAlertSpy
+  let cache, mocks, searchMocks
 
   beforeEach(() => {
     jest.useFakeTimers()
     cache = createCache()
     mocks = courseAlignmentMocks()
     searchMocks = [...courseAlignmentMocks(), ...courseAlignmentMocks({searchQuery: 'TEST'})]
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -146,7 +147,7 @@ describe('useCourseAlignments', () => {
       })
 
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while loading outcome alignments.',
         type: 'error',
       })
@@ -160,7 +161,7 @@ describe('useCourseAlignments', () => {
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing Search Results Below',
         type: 'info',
         srOnly: true,
@@ -175,7 +176,7 @@ describe('useCourseAlignments', () => {
       await flushAllTimersAndPromises()
       act(() => hook.result.current.loadMore())
       await flushAllTimersAndPromises()
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'More Search Results Have Been Loaded',
         type: 'info',
         srOnly: true,
@@ -189,7 +190,7 @@ describe('useCourseAlignments', () => {
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'No Search Results Found',
         type: 'info',
         srOnly: true,

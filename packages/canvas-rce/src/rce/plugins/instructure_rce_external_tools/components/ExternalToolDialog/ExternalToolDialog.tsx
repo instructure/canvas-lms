@@ -1,4 +1,3 @@
-/* eslint-disable  */
 // @ts-nocheck
 // TODO: we get complaints about <Overlay> because it can be either a Modal or a Tray
 // and they have different props. I don't have time to fix this the right way now.
@@ -221,7 +220,7 @@ export default class ExternalToolDialog extends React.Component<
     const modalMaxHeight = '95'
     const modalHeaderHeightWithPadding = '5.5rem'
     const complexHeightWithDVH = `min(${iFrameHeight}px, calc(${modalMaxHeight}dvh - ${modalHeaderHeightWithPadding}))`
-    if(CSS.supports('height', complexHeightWithDVH)) {
+    if (CSS.supports('height', complexHeightWithDVH)) {
       return complexHeightWithDVH
     } else {
       return `${iFrameHeight}px`
@@ -324,7 +323,9 @@ export default class ExternalToolDialog extends React.Component<
             onBlur={this.handleInfoAlertBlur}
             style={
               this.afterInfoAlertRef.current != null &&
-              state.infoAlert === this.afterInfoAlertRef.current ? {} : {bottom: '0'}
+              state.infoAlert === this.afterInfoAlertRef.current
+                ? {}
+                : {bottom: '0'}
             }
             className={
               this.afterInfoAlertRef.current != null &&
@@ -341,7 +342,7 @@ export default class ExternalToolDialog extends React.Component<
       </>
     )
   }
-} 
+}
 
 interface ExternalToolDialogState {
   open: boolean
