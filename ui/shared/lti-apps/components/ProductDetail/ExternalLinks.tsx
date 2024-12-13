@@ -19,6 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
@@ -38,9 +39,9 @@ const ExternalLinks = (props: ExternalLinksProps) => {
       <Flex direction="column" gap="medium">
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
-            <Text weight="bold" size="x-large">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Privacy')}
-            </Text>
+            </Heading>
           </Flex.Item>
           {product.privacy_policy_url ? (
             <Flex direction="column">
@@ -60,9 +61,9 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         </Flex>
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
-            <Text weight="bold" size="x-large">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Terms of Service')}
-            </Text>
+            </Heading>
           </Flex.Item>
           {product.terms_of_service_url ? (
             <Flex direction="column">
@@ -84,9 +85,9 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         </Flex>
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
-            <Text weight="bold" size="x-large">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Accessibility')}
-            </Text>
+            </Heading>
           </Flex.Item>
           {product.accessibility_url ? (
             <Flex direction="column">
