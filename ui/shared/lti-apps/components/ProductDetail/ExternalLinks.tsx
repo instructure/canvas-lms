@@ -45,7 +45,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
           {product.privacy_policy_url ? (
             <Flex direction="column">
               <Flex.Item>
-                <Link href={product.privacy_policy_url} isWithinText={false}>
+                <Link href={product.privacy_policy_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
                     {I18n.t('Partner Privacy Policy')} <IconExternalLinkLine />
                   </Text>
@@ -67,7 +67,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
           {product.terms_of_service_url ? (
             <Flex direction="column">
               <Flex.Item>
-                <Link href={product.terms_of_service_url} isWithinText={false}>
+                <Link href={product.terms_of_service_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
                     {I18n.t('Terms of Service')} <IconExternalLinkLine />
                   </Text>
@@ -91,7 +91,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
           {product.accessibility_url ? (
             <Flex direction="column">
               <Flex.Item>
-                <Link href={product.accessibility_url} isWithinText={false}>
+                <Link href={product.accessibility_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
                     {I18n.t('Accessibility Documentation')} <IconExternalLinkLine />
                   </Text>
