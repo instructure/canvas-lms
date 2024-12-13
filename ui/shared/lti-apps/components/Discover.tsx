@@ -16,31 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useState} from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
+import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LtiFilterTray from './apps/LtiFilterTray'
 import FilterTags from './apps/FilterTags'
 import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
 import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
+import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFilterMessage'
 import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBreadcrumbsToDefaults'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {ZAccountId} from '../models/AccountId'
 import Disclaimer from './common/Disclaimer'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
 
+
 const I18n = createI18nScope('lti_registrations')
 
 export const Discover = () => {
   const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
-  useAppendBreadcrumbsToDefaults(
-    [
-      {
-        name: I18n.t('Discover'),
-        url: `/accounts/${accountId}/apps`,
-      },
-    ]
-  )
+  useAppendBreadcrumbsToDefaults([
+    {
+      name: I18n.t('Discover'),
+      url: `/accounts/${accountId}/apps`,
+    },
+  ])
 
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
@@ -56,6 +58,12 @@ export const Discover = () => {
     queryKey: ['lti_product_info', queryParams],
     queryFn: () => fetchProducts(queryParams),
     enabled: isFilterApplied,
+  })
+
+  const screenReaderFilterMessage = useCreateScreenReaderFilterMessage({
+    queryParams,
+    isFilterApplied,
+    isLoading,
   })
 
   const {data: displayGroups, isLoading: isLoadingDisplayGroups} = useQuery({
@@ -79,6 +87,15 @@ export const Discover = () => {
           updateQueryParams={updateQueryParams}
         />
       )}
+      <Alert
+        variant="info"
+        screenReaderOnly={true}
+        liveRegionPoliteness="polite"
+        isLiveRegionAtomic={true}
+        liveRegion={getLiveRegion}
+      >
+        {screenReaderFilterMessage}
+      </Alert>
 
       <Products
         displayGroups={displayGroups || []}
