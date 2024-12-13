@@ -297,6 +297,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                     href={product.company.company_url}
                     isWithinText={false}
                     renderIcon={<IconExpandStartLine />}
+                    target="_blank"
                   >
                     <Text weight="bold">{I18n.t('Website')}</Text>
                   </Link>
@@ -308,6 +309,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                     href={product.support_url}
                     isWithinText={false}
                     renderIcon={<IconMessageLine />}
+                    target="_blank"
                   >
                     <Text weight="bold">{I18n.t('Contact')}</Text>
                   </Link>
