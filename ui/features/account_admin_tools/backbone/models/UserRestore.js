@@ -24,7 +24,9 @@ const I18n = useI18nScope('user_restore')
 
 export default class UserRestore extends CourseRestore {
   searchUrl() {
-    return `/accounts/${this.get('account_id')}/users/${this.get('id')}.json`
+    return `/accounts/${this.get('account_id')}/users/${this.get(
+      'id'
+    )}.json?include_deleted_users=true`
   }
 
   // @api public

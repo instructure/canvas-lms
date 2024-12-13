@@ -79,6 +79,11 @@ describe('UserRestore', () => {
     expect(userRestore.get('status')).toBe(404)
   })
 
+  test('includes deleted users in search', function () {
+    userRestore.search(user_id)
+    expect(userRestore.searchUrl()).toMatch(/\?include_deleted_users=true/)
+  })
+
   test('responds with a deferred object', function () {
     const dfd = userRestore.restore()
     expect($.isFunction(dfd.done)).toBeTruthy()
