@@ -27,7 +27,7 @@ import 'slick-carousel/slick/slick.css'
 
 import ProductCard from '../../apps/ProductCard'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 
 import type {Product} from '../../../models/Product'
 import type {Settings} from 'react-slick'
@@ -65,10 +65,10 @@ function ProductCarousel(props: ProductCarouselProps) {
   return (
     <div>
       <Flex margin="small 0 small 0">
-        <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <Text weight="bold" size="x-large">
-            {I18n.t('More Tools by ')} {companyName}
-          </Text>
+        <Flex.Item shouldGrow={true} shouldShrink={true} margin="0 0 small 0">
+          <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
+            {I18n.t('More Tools by ')} {props.companyName}
+          </Heading>
         </Flex.Item>
         {(products?.length ?? 0) > 1 && (
           <Flex direction="row">

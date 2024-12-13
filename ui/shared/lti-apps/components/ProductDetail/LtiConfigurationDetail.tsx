@@ -19,7 +19,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {Text} from '@instructure/ui-text'
+import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import type {LtiDetailProps} from '../../models/Product'
 
@@ -52,24 +52,28 @@ const LtiConfigurationDetail = (props: LtiConfigurationDetailProps) => {
     return (
       <div>
         <Flex>
-          <Flex.Item margin="medium 0 small 0">
-            <Text weight="bold" size="x-large">
+          <Flex.Item margin="medium 0 0 0">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Integration Details')}
-            </Text>
+            </Heading>
           </Flex.Item>
         </Flex>
         <Flex direction="column">
           <div>
             <Flex.Item margin="0 0 0 x-small">
-              <Text weight="bold">{placements}</Text>
+              <Heading level="h4" as="h3">
+                {placements}
+              </Heading>
             </Flex.Item>
-            <List margin="x-small 0 small 0">
+            <List margin="x-small 0 0 0">
               {placementsArray.length === 0 ? emptyPlacements : renderPlacements()}
             </List>
           </div>
           <div>
             <Flex.Item margin="0 0 0 x-small">
-              <Text weight="bold">{services}</Text>
+              <Heading level="h4" as="h3">
+                {services}
+              </Heading>
             </Flex.Item>
             <List margin="x-small 0 small 0">
               {servicesArray.length === 0 ? emptyServices : renderServices()}
