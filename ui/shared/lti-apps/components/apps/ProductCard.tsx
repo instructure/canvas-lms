@@ -50,6 +50,8 @@ const ProductCard = (props: ProductCardProps) => {
           window.location.href = productRoute(product.global_product_id)
         }}
         cursor="pointer"
+        role="group"
+        aria-label={product.name}
       >
         <Flex direction="column" height="100%">
           <Flex gap="small" margin="0 0 medium 0">
