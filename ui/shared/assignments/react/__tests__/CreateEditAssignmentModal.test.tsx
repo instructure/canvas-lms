@@ -355,6 +355,24 @@ describe('CreateEditAssignmentModal', () => {
       })
     })
 
+    it('preserves submission type when editing an assignment', () => {
+      const assignment = {...assignmentData, type: 'online_upload'}
+      const {getByTestId} = render(
+        <CreateEditAssignmentModal {...defaultProps({assignment, isEditMode: true})} />
+      )
+
+      fireEvent.click(getByTestId('save-button'))
+
+      expect(onSaveHandlerMock).toHaveBeenCalledWith({
+        type: 'online_upload',
+        name: 'Test Assignment',
+        dueAt: '2024-01-14T00:00:00Z',
+        points: 100,
+        publish: false,
+        syncToSIS: false,
+      })
+    })
+
     describe('Due Date Validation', () => {
       const termDates = {
         start_at: {date: '2024-01-12T00:00:00Z', date_context: 'term'},
