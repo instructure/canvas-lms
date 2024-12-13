@@ -35,7 +35,10 @@ module Schemas
         new.validate(json_hash).to_a.presence&.map { simple_validation_error _1, error_format: }
       end
 
-      def validation_errors(json_hash)
+      def validation_errors(json_hash, allow_nil: false)
+        if allow_nil
+          json_hash = Utils::HashUtils.nested_compact(json_hash)
+        end
         new.validate(json_hash).pluck("error")
       end
 
