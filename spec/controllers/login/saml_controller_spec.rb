@@ -423,6 +423,30 @@ describe Login::SamlController do
       saml_response
     end
 
+    it "works for the local account" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "http://test.host/courses/2"]
+      )
+
+      expect(Account).to receive(:find_by_domain).and_return(@pseudonym.account)
+
+      post :create, params: { SAMLResponse: "foo", RelayState: "http://test.host/courses/2" }
+      expect(response).to be_redirect
+      expect(response.location).to eql "http://test.host/courses/2"
+    end
+
+    it "appends a session token if we're redirecting to a different domain for the same account" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "https://sameaccount/courses/2"]
+      )
+
+      expect(Account).to receive(:find_by_domain).and_return(@pseudonym.account)
+
+      post :create, params: { SAMLResponse: "foo", RelayState: "https://sameaccount/courses/2" }
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{^https://sameaccount/courses/2\?session_token=})
+    end
+
     it "appends a session token if we're redirecting to a trusted account" do
       allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
         [saml_response, "https://otheraccount/courses/1"]

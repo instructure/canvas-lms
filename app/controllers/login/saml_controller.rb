@@ -175,9 +175,12 @@ class Login::SamlController < ApplicationController
           if uri.host
             # allow relay_state's to other (trusted) domains, by tacking on a session token
             target_account = Account.find_by_domain(uri.host)
-            if target_account &&
-               target_account != @domain_root_account &&
-               pseudonym.works_for_account?(target_account, true)
+            if uri.host == request.host_with_port
+              # full URLs on the same domain are okay
+              session[:return_to] = relay_state
+            elsif (target_account == @domain_root_account) ||
+                  (target_account && target_account != @domain_root_account &&
+                  pseudonym.works_for_account?(target_account, true))
               token = SessionToken.new(pseudonym.global_id,
                                        current_user_id: pseudonym.global_user_id).to_s
               uri.query&.concat("&")
