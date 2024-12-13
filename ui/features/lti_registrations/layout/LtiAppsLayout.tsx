@@ -30,6 +30,7 @@ import {openRegistrationWizard} from '../manage/registration_wizard/Registration
 import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import {useMedia} from 'react-use'
 import {View} from '@instructure/ui-view'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -66,7 +67,16 @@ export const LtiAppsLayout = React.memo(() => {
     <>
       <Flex alignItems="start" justifyItems="space-between" margin="0 0 small 0">
         <Flex.Item>
-          <Heading level="h1">{I18n.t('Apps')}</Heading>
+          <Flex alignItems="center">
+            <Flex.Item>
+              <Heading level="h1">{I18n.t('Apps')}</Heading>
+            </Flex.Item>
+            <Flex.Item>
+              <Pill margin="0 0 0 x-small" color="info">
+                {I18n.t('Feature Preview')}
+              </Pill>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
         {isManage ? (
           <Flex.Item>
