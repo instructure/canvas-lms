@@ -464,7 +464,11 @@ class OutcomeResultsController < ApplicationController
     #   app/controllers/quizzes/quizzes_controller.rb
     #   app/controllers/quizzes_next/quizzes_api_controller.rb
     #   app/controllers/application_controller.rb
-    [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid]
+
+    # If there are outcome ids in the params we need to take them into consideration when caching
+    outcome_ids_key = params[:outcome_ids].split(",").sort.join("|") if params[:outcome_ids].present?
+
+    [results_type, "context_uuid", @context.uuid, "current_user_uuid", @current_user.uuid, "account_uuid", @domain_root_account.uuid, outcome_ids_key].compact
   end
 
   # used in sLMGB/LMGB
