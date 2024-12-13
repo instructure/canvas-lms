@@ -661,8 +661,15 @@ class AuthenticationProvidersController < ApplicationController
     # mfa_required might be set, and ruby maintains insertion order in hashes
     data = { account: @account }.merge(filter_data(aac_data))
     deselect_parent_registration(data)
-    account_config = @account.authentication_providers.build(data)
-    if account_config.class.singleton? && @account.authentication_providers.active.where(auth_type: account_config.auth_type).exists?
+
+    account_config = AuthenticationProvider.find_restorable_provider(
+      root_account: @account,
+      auth_type: data["auth_type"]
+    )
+    account_config ||= @account.authentication_providers.build(data)
+    account_config.workflow_state = "active"
+
+    if account_config.duplicated_in_account?
       respond_to do |format|
         format.html do
           flash[:error] = t(
@@ -677,6 +684,7 @@ class AuthenticationProvidersController < ApplicationController
       end
       return
     end
+
     update_deprecated_account_settings_data(aac_data, account_config)
 
     unless account_config.save
