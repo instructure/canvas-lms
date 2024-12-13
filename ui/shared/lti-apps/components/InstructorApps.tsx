@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo, useState} from 'react'
+import React, {useMemo, useState, useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
+import {Alert} from '@instructure/ui-alerts'
 import FilterTags from './apps/FilterTags'
 import LtiFilterTray from './apps/LtiFilterTray'
 import {Products} from './apps/Products'
@@ -33,12 +34,15 @@ import {Header} from './apps/Header'
 import type {Product} from '../models/Product'
 import {View} from '@instructure/ui-view'
 import useBreakpoints from '../hooks/useBreakpoints'
+import useCreateScreenReaderFilterMessage from '../hooks/useCreateScreenReaderFilterMessage'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 export const InstructorApps = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
+
   const isFilterApplied = useMemo(
     () => Object.values(queryParams.filters).flat().length > 0 || queryParams.search.length > 0,
     [queryParams],
@@ -61,6 +65,11 @@ export const InstructorApps = () => {
     onError: (err: Error) => {
       showFlashError(I18n.t("Couldn't load apps"))(err)
     },
+  })
+  const screenReaderFilterMessage = useCreateScreenReaderFilterMessage({
+    queryParams,
+    isFilterApplied,
+    isLoading,
   })
 
   const {data: filterData} = useQuery({
@@ -85,6 +94,16 @@ export const InstructorApps = () => {
           updateQueryParams={updateQueryParams}
         />
       )}
+
+      <Alert
+        variant="info"
+        screenReaderOnly={true}
+        liveRegionPoliteness="polite"
+        isLiveRegionAtomic={true}
+        liveRegion={getLiveRegion}
+      >
+        {screenReaderFilterMessage}
+      </Alert>
 
       <Products
         isFilterApplied={true}
