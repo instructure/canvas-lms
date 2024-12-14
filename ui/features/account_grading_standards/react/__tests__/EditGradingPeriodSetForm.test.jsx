@@ -37,29 +37,6 @@ jest.mock('@canvas/rails-flash-notifications', () => ({
   },
 }))
 
-// Suppress React 18.x warnings about deprecated lifecycle methods
-const consoleWarn = console.warn
-const consoleError = console.error
-beforeAll(() => {
-  console.warn = (...args) => {
-    if (args[0]?.includes('componentWillMount has been renamed')) {
-      return
-    }
-    consoleWarn.call(console, ...args)
-  }
-  console.error = (...args) => {
-    if (args[0]?.includes('Warning: React does not recognize')) {
-      return
-    }
-    consoleError.call(console, ...args)
-  }
-})
-
-afterAll(() => {
-  console.warn = consoleWarn
-  console.error = consoleError
-})
-
 const exampleSet = {
   id: '1',
   title: 'Fall 2015',
