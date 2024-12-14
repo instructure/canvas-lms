@@ -16,35 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {map, filter, sortBy} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('EnrollmentTermsDropdown')
 
-class EnrollmentTermsDropdown extends React.Component {
-  static propTypes = {
-    terms: PropTypes.array.isRequired,
-    changeSelectedEnrollmentTerm: PropTypes.func.isRequired,
-  }
+const EnrollmentTermsDropdown = ({terms, changeSelectedEnrollmentTerm}) => {
+  const termsDropdownRef = useRef(null)
 
-  sortedTerms = terms => {
-    const dated = filter(terms, term => term.startAt)
+  const sortedTerms = termsList => {
+    const dated = filter(termsList, term => term.startAt)
     const datedTermsSortedByStart = sortBy(dated, term => term.startAt).reverse()
 
-    const undated = filter(terms, term => !term.startAt)
+    const undated = filter(termsList, term => !term.startAt)
     const undatedTermsSortedByCreate = sortBy(undated, term => term.createdAt).reverse()
     return datedTermsSortedByStart.concat(undatedTermsSortedByCreate)
   }
 
-  termOptions = terms => {
+  const termOptions = termsList => {
     const allTermsOption = (
       <option key={0} value={0}>
         {I18n.t('All Terms')}
       </option>
     )
-    const options = map(this.sortedTerms(terms), term => (
+    const options = map(sortedTerms(termsList), term => (
       <option key={term.id} value={term.id}>
         {term.displayName}
       </option>
@@ -54,20 +51,24 @@ class EnrollmentTermsDropdown extends React.Component {
     return options
   }
 
-  render() {
-    return (
-      <select
-        className="EnrollmentTerms__dropdown ic-Input"
-        name="enrollment_term"
-        data-view="termSelect"
-        aria-label="Enrollment Term"
-        ref="termsDropdown"
-        onChange={this.props.changeSelectedEnrollmentTerm}
-      >
-        {this.termOptions(this.props.terms)}
-      </select>
-    )
-  }
+  return (
+    <select
+      className="EnrollmentTerms__dropdown ic-Input"
+      name="enrollment_term"
+      data-view="termSelect"
+      data-testid="enrollment-terms-dropdown"
+      aria-label="Enrollment Term"
+      ref={termsDropdownRef}
+      onChange={changeSelectedEnrollmentTerm}
+    >
+      {termOptions(terms)}
+    </select>
+  )
+}
+
+EnrollmentTermsDropdown.propTypes = {
+  terms: PropTypes.array.isRequired,
+  changeSelectedEnrollmentTerm: PropTypes.func.isRequired,
 }
 
 export default EnrollmentTermsDropdown

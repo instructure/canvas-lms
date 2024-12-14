@@ -45,8 +45,15 @@ export default class NewGradingPeriodSetForm extends React.Component {
     selectedEnrollmentTermIDs: [],
   }
 
+  constructor(props) {
+    super(props)
+    this.inputRef = React.createRef()
+    this.cancelButtonRef = React.createRef()
+    this.createButtonRef = React.createRef()
+  }
+
   componentDidMount() {
-    this.refs.titleInput.focus()
+    this.inputRef.current.focus()
   }
 
   setSelectedEnrollmentTermIDs = termIDs => {
@@ -121,7 +128,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
                   id="set-name"
                   className="ic-Input"
                   placeholder={I18n.t('Set name...')}
-                  ref="titleInput"
+                  ref={this.inputRef}
                 />
               </div>
               <EnrollmentTermInput
@@ -159,7 +166,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
                 <Button
                   disabled={this.state.buttonsDisabled}
                   onClick={this.props.closeForm}
-                  ref="cancelButton"
+                  ref={this.cancelButtonRef}
                 >
                   {I18n.t('Cancel')}
                 </Button>
@@ -168,7 +175,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
                   disabled={this.state.buttonsDisabled}
                   color="primary"
                   onClick={this.submit}
-                  ref="createButton"
+                  ref={this.createButtonRef}
                 >
                   {I18n.t('Create')}
                 </Button>

@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState, useRef} from 'react'
 import PropTypes from 'prop-types'
-import {map, find, groupBy, includes, uniq, isEmpty, some, union, reject, isDate} from 'lodash'
+import {groupBy, isDate} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
+import {Select} from '@instructure/ui-select'
+import {Tag} from '@instructure/ui-tag'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('EnrollmentTermInput')
 
@@ -43,124 +46,178 @@ const groupByTagType = function (options) {
   })
 }
 
-class EnrollmentTermInput extends React.Component {
-  static propTypes = {
-    enrollmentTerms: PropTypes.array.isRequired,
-    setSelectedEnrollmentTermIDs: PropTypes.func.isRequired,
-    selectedIDs: PropTypes.array.isRequired,
+const EnrollmentTermInput = ({enrollmentTerms, setSelectedEnrollmentTermIDs, selectedIDs}) => {
+  const [inputValue, setInputValue] = useState('')
+  const [isShowingOptions, setIsShowingOptions] = useState(false)
+  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
+  // use later for proper use of <Alert> alongside <Select>
+  const [_announcement, setAnnouncement] = useState(null)
+  const inputRef = useRef(null)
+
+  const handleChange = termIDs => {
+    setSelectedEnrollmentTermIDs(termIDs)
   }
 
-  handleChange = termIDs => {
-    this.props.setSelectedEnrollmentTermIDs(termIDs)
+  const selectableTerms = () => {
+    const unselectedTerms = enrollmentTerms.filter(term => !selectedIDs.includes(term.id))
+    if (!inputValue) return unselectedTerms
+
+    return unselectedTerms.filter(term =>
+      term.displayName.toLowerCase().includes(inputValue.toLowerCase())
+    )
   }
 
-  handleSelect = (value, _combobox) => {
-    const termIDs = map(this.props.enrollmentTerms, 'id')
-    if (includes(termIDs, value)) {
-      const selectedIDs = uniq(this.props.selectedIDs.concat([value]))
-      this.handleChange(selectedIDs)
-    }
-  }
-
-  handleRemove = termToRemove => {
-    const selectedTermIDs = reject(this.props.selectedIDs, termID => termToRemove.id === termID)
-    this.handleChange(selectedTermIDs)
-  }
-
-  selectableTerms = () =>
-    reject(this.props.enrollmentTerms, term => includes(this.props.selectedIDs, term.id))
-
-  filteredTagsForType = type => {
-    const groupedTags = groupByTagType(this.selectableTerms())
+  const filteredTagsForType = type => {
+    const groupedTags = groupByTagType(selectableTerms())
     return (groupedTags && groupedTags[type]) || []
   }
 
-  selectableOptions = type =>
-    map(this.filteredTagsForType(type), term => this.selectableOption(term))
+  const headerText = {
+    active: I18n.t('Active'),
+    undated: I18n.t('Undated'),
+    future: I18n.t('Future'),
+    past: I18n.t('Past'),
+    none: I18n.t('No unassigned terms'),
+  }
 
-  selectableOption = term => (
-    <ComboboxOption key={term.id} value={term.id}>
-      {term.displayName}
-    </ComboboxOption>
-  )
+  const getOptionsByType = type => {
+    const terms = filteredTagsForType(type)
+    if (terms.length === 0) return []
 
-  optionsForAllTypes = () => {
-    if (isEmpty(this.selectableTerms())) {
-      return [this.headerOption('none')]
-    } else {
-      return union(
-        this.optionsForType('active'),
-        this.optionsForType('undated'),
-        this.optionsForType('future'),
-        this.optionsForType('past')
+    const options = [
+      <Select.Group key={`group-${type}`} renderLabel={headerText[type]}>
+        {terms.map(term => (
+          <Select.Option
+            id={term.id}
+            key={term.id}
+            isHighlighted={term.id === highlightedOptionId}
+            value={term.id}
+            data-testid={`enrollment-term-option-${term.id}`}
+          >
+            {term.displayName}
+          </Select.Option>
+        ))}
+      </Select.Group>,
+    ]
+
+    return options
+  }
+
+  const getAllOptions = () => {
+    const terms = selectableTerms()
+    if (terms.length === 0) {
+      return [
+        <Select.Option id="none" key="none" data-testid="enrollment-term-no-options">
+          {headerText.none}
+        </Select.Option>,
+      ]
+    }
+
+    return [
+      ...getOptionsByType('active'),
+      ...getOptionsByType('undated'),
+      ...getOptionsByType('future'),
+      ...getOptionsByType('past'),
+    ]
+  }
+
+  const handleShowOptions = () => {
+    setIsShowingOptions(true)
+  }
+
+  const handleHideOptions = () => {
+    setIsShowingOptions(false)
+    setInputValue('')
+  }
+
+  const handleHighlightOption = (_event, {id}) => {
+    setHighlightedOptionId(id)
+  }
+
+  const handleSelectOption = (_event, {id}) => {
+    const newSelectedIds = [...selectedIDs]
+    if (!newSelectedIds.includes(id)) {
+      newSelectedIds.push(id)
+    }
+    handleChange(newSelectedIds)
+    setHighlightedOptionId(null)
+    setInputValue('')
+    setIsShowingOptions(false)
+    const term = enrollmentTerms.find(term_ => term_.id === id)
+    setAnnouncement(`${term.displayName} selected`)
+  }
+
+  const handleInputChange = event => {
+    const value = event.target.value
+    setInputValue(value)
+  }
+
+  const handleKeyDown = event => {
+    if (event.keyCode === 8 && inputValue === '' && selectedIDs.length > 0) {
+      const newSelectedIds = selectedIDs.slice(0, -1)
+      handleChange(newSelectedIds)
+    }
+  }
+
+  const dismissTag = (e, termId) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const newSelectedIds = selectedIDs.filter(id => id !== termId)
+    handleChange(newSelectedIds)
+    const term = enrollmentTerms.find(term_ => term_.id === termId)
+    setAnnouncement(`${term.displayName} removed`)
+    inputRef.current?.focus()
+  }
+
+  const renderTags = () => {
+    return selectedIDs.map((id, index) => {
+      const term = enrollmentTerms.find(term_ => term_.id === id)
+      return (
+        <Tag
+          dismissible={true}
+          key={id}
+          data-testid={`enrollment-term-tag-${id}`}
+          text={
+            <AccessibleContent alt={`Remove ${term.displayName}`}>
+              {term.displayName}
+            </AccessibleContent>
+          }
+          margin={index > 0 ? 'xxx-small xx-small xxx-small 0' : '0 xx-small 0 0'}
+          onClick={e => dismissTag(e, id)}
+        />
       )
-    }
-  }
-
-  optionsForType = optionType => {
-    const header = this.headerOption(optionType)
-    const options = this.selectableOptions(optionType)
-    return some(options) ? union([header], options) : []
-  }
-
-  headerOption = heading => {
-    const headerText = {
-      active: I18n.t('Active'),
-      undated: I18n.t('Undated'),
-      future: I18n.t('Future'),
-      past: I18n.t('Past'),
-      none: I18n.t('No unassigned terms'),
-    }[heading]
-    return (
-      <ComboboxOption className="ic-tokeninput-header" value={heading} key={heading}>
-        {headerText}
-      </ComboboxOption>
-    )
-  }
-
-  suppressKeys = event => {
-    const code = event.keyCode || event.which
-    if (code === 13) {
-      event.preventDefault()
-    }
-  }
-
-  selectedEnrollmentTerms = () =>
-    map(this.props.selectedIDs, id => {
-      const term = find(this.props.enrollmentTerms, {id})
-      const termForDisplay = {...term}
-      termForDisplay.name = term.displayName
-      return termForDisplay
     })
-
-  render() {
-    return (
-      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-      <div className="ic-Form-control" onKeyDown={this.suppressKeys}>
-        { }
-        <label
-          className="ic-Label"
-          title={I18n.t('Attach terms')}
-          aria-label={I18n.t('Attach terms')}
-        >
-          {I18n.t('Attach terms')}
-        </label>
-        <div className="ic-Input">
-          <TokenInput
-            menuContent={this.optionsForAllTypes()}
-            selected={this.selectedEnrollmentTerms()}
-            onChange={this.handleChange}
-            onSelect={this.handleSelect}
-            onRemove={this.handleRemove}
-            onInput={function () {}}
-            value={true}
-            showListOnFocus={true}
-            ref="input"
-          />
-        </div>
-      </div>
-    )
   }
+
+  return (
+    <View as="div" className="ic-Form-control">
+      <Select
+        data-testid="enrollment-term-select"
+        renderLabel={I18n.t('Attach terms')}
+        assistiveText={I18n.t(
+          'Type or use arrow keys to navigate options. Multiple selections allowed.'
+        )}
+        inputValue={inputValue}
+        isShowingOptions={isShowingOptions}
+        inputRef={el => (inputRef.current = el)}
+        onInputChange={handleInputChange}
+        onRequestShowOptions={handleShowOptions}
+        onRequestHideOptions={handleHideOptions}
+        onRequestHighlightOption={handleHighlightOption}
+        onRequestSelectOption={handleSelectOption}
+        onKeyDown={handleKeyDown}
+        renderBeforeInput={selectedIDs.length > 0 ? renderTags() : null}
+      >
+        {getAllOptions()}
+      </Select>
+    </View>
+  )
+}
+
+EnrollmentTermInput.propTypes = {
+  enrollmentTerms: PropTypes.array.isRequired,
+  setSelectedEnrollmentTermIDs: PropTypes.func.isRequired,
+  selectedIDs: PropTypes.array.isRequired,
 }
 
 export default EnrollmentTermInput
