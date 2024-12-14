@@ -16,38 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {useRef} from 'react'
 import {debounce} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('SearchGradingPeriodsField')
 
-export default class SearchGradingPeriodsField extends React.Component {
-  static propTypes = {
-    changeSearchText: PropTypes.func.isRequired,
-  }
+const SearchGradingPeriodsField = ({changeSearchText}) => {
+  const inputRef = useRef(null)
 
-  onChange = event => {
-    const trimmedText = event.target.value.trim()
-    this.search(trimmedText)
-  }
-
-  search = debounce(function (trimmedText) {
-    this.props.changeSearchText(trimmedText)
+  const search = debounce(trimmedText => {
+    changeSearchText(trimmedText)
   }, 200)
 
-  render() {
-    return (
-      <div className="GradingPeriodSearchField ic-Form-control">
-        <input
-          type="text"
-          ref="input"
-          className="ic-Input"
-          placeholder={I18n.t('Search grading periods...')}
-          onChange={this.onChange}
-        />
-      </div>
-    )
+  const onChange = event => {
+    const trimmedText = event.target.value.trim()
+    search(trimmedText)
   }
+
+  return (
+    <div className="GradingPeriodSearchField ic-Form-control">
+      <input
+        type="text"
+        ref={inputRef}
+        className="ic-Input"
+        placeholder={I18n.t('Search grading periods...')}
+        onChange={onChange}
+      />
+    </div>
+  )
 }
+
+export default SearchGradingPeriodsField
