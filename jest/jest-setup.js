@@ -17,7 +17,8 @@
  */
 
 import 'cross-fetch/polyfill'
-import {TextDecoder, TextEncoder} from 'util'
+// eslint-disable-next-line import/no-nodejs-modules, no-redeclare
+import {TextDecoder, TextEncoder} from 'node:util'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
@@ -27,12 +28,12 @@ import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
 import {loadErrorMessages, loadDevMessages} from '@apollo/client/dev'
-import {useTranslations} from '@canvas/i18n'
+import {registerTranslations} from '@canvas/i18n'
 import MockBroadcastChannel from './MockBroadcastChannel'
 
 loadDevMessages()
 loadErrorMessages()
-useTranslations('en', CoreTranslations)
+registerTranslations('en', CoreTranslations)
 
 rceFormatMessage.setup({
   locale: 'en',
@@ -132,7 +133,7 @@ if (!Array.prototype.flat) {
     configurable: true,
     value: function flat(depth = 1) {
       if (depth === 0) return this.slice()
-      return this.reduce(function (acc, cur) {
+      return this.reduce((acc, cur) => {
         if (Array.isArray(cur)) {
           acc.push(...flat.call(cur, depth - 1))
         } else {
@@ -150,6 +151,7 @@ if (!Array.prototype.flatMap) {
   Object.defineProperty(Array.prototype, 'flatMap', {
     configurable: true,
     value: function flatMap(_cb) {
+      // biome-ignore lint/style/noArguments: <explanation>
       return Array.prototype.map.apply(this, arguments).flat()
     },
     writable: true,
@@ -259,22 +261,20 @@ global.fetch =
 
 Document.prototype.createRange =
   Document.prototype.createRange ||
-  function () {
-    return {
-      setEnd() {},
-      setStart() {},
-      getBoundingClientRect() {
-        return {right: 0}
-      },
-      getClientRects() {
-        return {
-          length: 0,
-          left: 0,
-          right: 0,
-        }
-      },
-    }
-  }
+  (() => ({
+    setEnd() {},
+    setStart() {},
+    getBoundingClientRect() {
+      return {right: 0}
+    },
+    getClientRects() {
+      return {
+        length: 0,
+        left: 0,
+        right: 0,
+      }
+    },
+  }))
 
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder

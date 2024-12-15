@@ -8,6 +8,7 @@ module.exports = {
     '**/testHelpers.js',
     '**/__tests__/*',
     '**/__mocks__/*',
+    'jest/**',
     'ui/shared/stub-env/index.js',
     'ui/boot/initializers/__tests__/configureDateTimeWithI18n.t3st.js',
   ],

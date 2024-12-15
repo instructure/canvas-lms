@@ -14,7 +14,14 @@ const comments = require('@eslint-community/eslint-plugin-eslint-comments/config
 module.exports = [
   {
     files: ['ui/**/*.{js,mjs,ts,jsx,tsx}', 'ui-build/**/*.{js,mjs,ts,jsx,tsx}'],
-    ignores: ['**/doc/*', '**/es/*', 'Jenkinsfile.js', 'ui/shared/jquery/**', '*.config.*'],
+    ignores: [
+      '**/doc/*',
+      '**/es/*',
+      'Jenkinsfile.js',
+      'ui/shared/jquery/**',
+      '*.config.*',
+      'jest/**',
+    ],
   },
 
   // Globals
@@ -136,6 +143,7 @@ module.exports = [
     files: [
       'ui/**/*.{js,mjs,ts,jsx,tsx}',
       'ui-build/**/*.{js,mjs,ts,jsx,tsx}',
+      'jest/**/*.{js,mjs,ts,jsx,tsx}',
       'packages/**/*.{js,mjs,ts,jsx,tsx}',
     ],
     languageOptions: {

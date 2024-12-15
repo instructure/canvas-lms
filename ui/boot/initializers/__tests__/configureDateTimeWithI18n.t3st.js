@@ -46,7 +46,7 @@ import * as configureDateTime from '@canvas/datetime/configureDateTime'
 import * as configureDateTimeMomentParser from '@canvas/datetime/configureDateTimeMomentParser'
 // eslint-disable-next-line import/no-nodejs-modules
 import fs from 'fs'
-import I18n, {useTranslations} from '@canvas/i18n'
+import I18n, {registerTranslations} from '@canvas/i18n'
 // eslint-disable-next-line import/no-nodejs-modules
 import path from 'path'
 import YAML from 'yaml'
@@ -93,7 +93,7 @@ const tzLocales = [
   uk_UA,
 ]
 
-useTranslations(CoreTranslations)
+registerTranslations(CoreTranslations)
 
 const locales = loadAvailableLocales()
 const tzLocaleData = tzLocales.reduce((acc, locale) => {
