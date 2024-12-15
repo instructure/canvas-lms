@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState, useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -36,7 +36,7 @@ import {OutcomeTag} from './OutcomeTag'
 import {LongDescriptionModal} from './LongDescriptionModal'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 const {shamrock, tiara} = colors
 
 export type TraditionalViewProps = {
@@ -140,7 +140,7 @@ export const TraditionalView = ({
         return (
           <CriterionRow
             // we use the array index because rating may not have an id
-            /* eslint-disable-next-line react/no-array-index-key */
+             
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
@@ -407,7 +407,7 @@ const CriterionRow = ({
                       align="stretch"
                       shouldGrow={true}
                       // we use the array index because rating may not have an id
-                      /* eslint-disable-next-line react/no-array-index-key */
+                       
                       key={`criterion-${criterion.id}-ratings-${index}`}
                       width={ratingsColumnMinWidth / criterionRatings.length + 'rem'}
                     >

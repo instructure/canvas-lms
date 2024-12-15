@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
@@ -43,7 +43,7 @@ import Disclaimer from '../common/Disclaimer'
 import type {Lti, Product} from '../../models/Product'
 import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 type ProductDetailProps = {
   renderConfigureButton?: (buttonWidth: 'block' | 'inline-block', lti: Lti) => JSX.Element

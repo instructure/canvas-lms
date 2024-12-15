@@ -19,7 +19,7 @@
 
 import React, {useCallback, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import authenticity_token from '@canvas/authenticity-token'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -34,7 +34,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Event, Which} from './types'
 import {subAssignmentOrOverride} from '@canvas/calendar/jquery/CommonEvent/SubAssignment'
 
-const I18n = useI18nScope('calendar_event')
+const I18n = createI18nScope('calendar_event')
 
 type Props = {
   readonly isOpen: boolean
@@ -189,7 +189,7 @@ const DeleteCalendarEventDialog = ({
 }
 
 function renderDeleteCalendarEventDialog(element: Element, props: Props): void {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<DeleteCalendarEventDialog {...props} />, element)
 }
 

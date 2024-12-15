@@ -34,13 +34,13 @@ import React, {useContext, useState, useMemo} from 'react'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Heading} from '@instructure/ui-heading'
 import {stripHtmlTags} from '@canvas/util/TextHelper'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)

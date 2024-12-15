@@ -23,10 +23,10 @@ import DashboardCard from './react/DashboardCard'
 import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {asJson, checkStatus, getPrefetchedXHR} from '@canvas/util/xhr'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Card} from './types'
 
-const I18n = useI18nScope('load_card_dashboard')
+const I18n = createI18nScope('load_card_dashboard')
 
 export function createDashboardCards(
   dashboardCards: Card[],
@@ -59,7 +59,7 @@ export class CardDashboardLoader {
 
   renderIntoDOM = (dashboardCards: Card[]) => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       createDashboardCards(dashboardCards, DashboardCard, {observedUserId: this.observedUserId}),
       dashboardContainer

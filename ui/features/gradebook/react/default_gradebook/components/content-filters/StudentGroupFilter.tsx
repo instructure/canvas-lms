@@ -20,11 +20,11 @@ import React from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 
 import natcompare from '@canvas/util/natcompare'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
-const I18n = useI18nScope(
+const I18n = createI18nScope(
   'gradebook_default_gradebook_components_content_filters_student_group_filter'
 )
 

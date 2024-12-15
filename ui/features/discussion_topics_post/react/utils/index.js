@@ -23,11 +23,11 @@ import {
 } from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from '@canvas/rails-flash-notifications'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const getSpeedGraderUrl = (authorId = null, entryId = null) => {
   let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE

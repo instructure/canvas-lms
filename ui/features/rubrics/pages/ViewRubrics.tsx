@@ -18,7 +18,7 @@
 
 import React, {useRef, useState} from 'react'
 import {useParams} from 'react-router-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ProficiencyTable from '@canvas/rubrics/react/components/ProficiencyTable'
 import {Portal} from '@instructure/ui-portal'
 import {Tabs} from '@instructure/ui-tabs'
@@ -28,7 +28,7 @@ import {RubricBreadcrumbs} from '../components/RubricBreadcrumbs'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('ViewRubrics')
+const I18n = createI18nScope('ViewRubrics')
 
 export const Component = () => {
   const [breadcrumbMountPoint] = React.useState(

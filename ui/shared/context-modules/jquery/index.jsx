@@ -25,7 +25,7 @@ import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import ContextModulesView from '../backbone/views/context_modules' /* handles the publish/unpublish state */
@@ -81,7 +81,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 if (!('INST' in window)) window.INST = {}
 
-const I18n = useI18nScope('context_modulespublic')
+const I18n = createI18nScope('context_modulespublic')
 
 // TODO: AMD don't export global, use as module
 /* global modules */
@@ -135,7 +135,7 @@ window.modules = (function () {
             $moduleElement.css('display', 'block')
           },
         }
-        // eslint-disable-next-line no-restricted-globals
+         
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
         modules.editModule($module)
@@ -244,7 +244,7 @@ window.modules = (function () {
               return
             }
             const progression = data.context_module_progression
-            // eslint-disable-next-line eqeqeq
+             
             if (progression.user_id == window.ENV.current_user_id) {
               let $user_progression = $user_progression_list.find(
                 '.progression_' + progression.context_module_id
@@ -948,7 +948,7 @@ const updateOtherPrerequisites = function (id, name) {
   $('div.context_module .prerequisite_criterion .id').each(function (_, idNode) {
     const $id = $(idNode)
     const prereq_id = $id.text()
-    // eslint-disable-next-line eqeqeq
+     
     if (prereq_id == id) {
       const $crit = $id.closest('.prerequisite_criterion')
       $crit.find('.name').text(name)
@@ -987,7 +987,7 @@ const updatePublishMenuDisabledState = function (disabled) {
     if (publishMenu) {
       const $publishMenu = $(publishMenu)
       $publishMenu.data('disabled', disabled)
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <ContextModulesPublishMenu
           courseId={$publishMenu.data('courseId')}
@@ -1329,7 +1329,7 @@ modules.initModuleManagement = async function (duplicate) {
     const spinner = <ModuleDuplicationSpinner />
     const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
     $tempElement.insertAfter(duplicatedModuleElement)
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(spinner, $('#temporary-spinner')[0])
     $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
     const renderDuplicatedModule = function (response) {
@@ -1350,7 +1350,7 @@ modules.initModuleManagement = async function (duplicate) {
           const module_dnd = $newModule.find('.module_dnd')[0]
           if (module_dnd) {
             const contextModules = document.getElementById('context_modules')
-            // eslint-disable-next-line no-restricted-properties
+             
             ReactDOM.render(
               <ModuleFileDrop
                 courseId={ENV.course_id}
@@ -2468,7 +2468,7 @@ $(document).ready(function () {
   }
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -2484,7 +2484,7 @@ $(document).ready(function () {
   }
 
   function renderSendToTray(open, contentSelection, returnFocusTo) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -2502,7 +2502,7 @@ $(document).ready(function () {
   function renderHeaderComponent() {
     const root = $('#context-modules-header-root')
     if (root[0]) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<ContextModulesHeader {...root.data('props')} />, root[0])
     }
   }
@@ -2641,7 +2641,7 @@ $(document).ready(function () {
   function parseModuleItemElement(element) {
     const pointsPossibleElem = element?.querySelector('.points_possible_display')
     const points = parseFloat(pointsPossibleElem?.textContent)
-    // eslint-disable-next-line no-restricted-globals
+     
     return {pointsPossible: isNaN(points) ? undefined : points}
   }
 

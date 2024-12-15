@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {isEmpty, pick} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/SelectContent.handlebars'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import checkboxCollectionTemplate from '../../jst/ContentCheckboxCollection.handlebars'
@@ -34,7 +34,7 @@ import ExpandCollapseContentSelectTreeItems from './ExpandCollapseContentSelectT
 import CheckingCheckboxesForTree from './CheckingCheckboxesForTree'
 import ScrollPositionForTree from './ScrollPositionForTree'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(SelectContentView, DialogFormView)
 

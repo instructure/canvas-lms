@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Pagination} from '@instructure/ui-pagination'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('account_manage')
+const I18n = createI18nScope('account_manage')
 const {Page} = Pagination as any
 
 interface Props {

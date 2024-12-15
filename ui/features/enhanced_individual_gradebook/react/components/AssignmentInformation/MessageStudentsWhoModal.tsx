@@ -18,7 +18,7 @@
 
 import React, {useMemo} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MessageStudentsWhoDialog, {
   MSWLaunchContext,
   type SendMessageArgs,
@@ -33,7 +33,7 @@ import type {
 } from '../../../types'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type MessageStudentsWhoModalProps = {
   assignment: AssignmentConnection

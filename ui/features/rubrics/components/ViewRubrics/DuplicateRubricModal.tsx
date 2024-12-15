@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
@@ -30,7 +30,7 @@ import {Text} from '@instructure/ui-text'
 import {duplicateRubric} from '../../queries/ViewRubricQueries'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 
-const I18n = useI18nScope('rubrics-duplicate-modal')
+const I18n = createI18nScope('rubrics-duplicate-modal')
 
 export type DuplicateRubricModalProps = {
   id?: string

@@ -32,13 +32,13 @@ import {Text} from '@instructure/ui-text'
 import {ConversationContext} from '../../../util/constants'
 import {MediaAttachment} from '@canvas/message-attachments'
 import {formatMessage, containsHtmlTags} from '@canvas/util/TextHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {translationSeparator} from '../../utils/constants'
 import {translateInboxMessage} from '../../utils/inbox_translator'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)

@@ -29,10 +29,10 @@ import {IconCalendarMonthLine, IconQuestionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
-const I18n = useI18nScope('account_calendars_results_area')
+const I18n = createI18nScope('account_calendars_results_area')
 
 const accountCalendarsType = arrayOf(
   shape({

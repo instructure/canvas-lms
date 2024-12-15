@@ -20,7 +20,7 @@ import React, {useRef} from 'react'
 import {GradingStatusListItem} from '@canvas/grading-status-list-item'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {EditStatusPopover} from './EditStatusPopover'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('account_grading_status')
+const I18n = createI18nScope('account_grading_status')
 
 type CustomStatusItemProps = {
   editable: boolean

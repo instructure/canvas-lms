@@ -41,7 +41,7 @@ import {
   getPeerReviewSubHeaderText,
   getPeerReviewButtonText,
 } from '../helpers/PeerReviewHelpers'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
@@ -67,7 +67,7 @@ import qs from 'qs'
 import useStore from './stores/index'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
-const I18n = useI18nScope('assignments_2_file_upload')
+const I18n = createI18nScope('assignments_2_file_upload')
 
 function DraftStatus({status}) {
   const statusConfigs = {

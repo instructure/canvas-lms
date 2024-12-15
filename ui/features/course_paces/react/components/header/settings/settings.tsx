@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
@@ -44,7 +44,7 @@ import type {ButtonProps} from '@instructure/ui-buttons'
 // Allow unchecked access to module-specific ENV variables
 declare const ENV: GlobalEnv & EnvCoursePaces
 
-const I18n = useI18nScope('course_paces_settings')
+const I18n = createI18nScope('course_paces_settings')
 
 const {Item: MenuItem} = Menu as any
 interface StoreProps {

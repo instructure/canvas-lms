@@ -17,14 +17,14 @@
 
 import $ from 'jquery'
 import {some} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from '../../jst/randomlyAssignMembers.handlebars'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import groupHasSubmissions from '../../groupHasSubmissions'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 export default class RandomlyAssignMembersView extends DialogFormView {
   static initClass() {

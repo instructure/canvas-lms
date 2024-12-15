@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {Modal} from '@instructure/ui-modal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {
   useRegistrationModalWizardState,
@@ -47,7 +47,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import type {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {EditLti1p3RegistrationWizard} from '../lti_1p3_registration_form/EditLti1p3RegistrationWizard'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const MODAL_BODY_HEIGHT = '50vh'
 
@@ -227,7 +227,7 @@ const renderDebugMessage = (jsonUrlFetch: JsonFetchStatus) => {
   if (jsonUrlFetch._tag === 'loaded' && jsonUrlFetch.result._type === 'ApiError') {
     const result = z.object({errors: z.array(z.string())}).safeParse(jsonUrlFetch.result.body)
     if (result.success) {
-      // eslint-disable-next-line react/no-array-index-key
+       
       return result.data.errors.map((err, i) => <div key={i}>{err}</div>)
     }
   }
@@ -258,7 +258,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
               if (value === '1p3' || value === '1p1') {
                 props.state.updateLtiVersion(value)
               } else {
-                // eslint-disable-next-line no-console
+                 
                 console.warn(`Invalid value for lti_version: ${value}`)
               }
             }}
@@ -383,7 +383,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                       lti_configuration: JSON.parse(props.state.jsonCode),
                     }
                   : {url: props.state.jsonUrl}
-              // eslint-disable-next-line promise/catch-or-return
+               
               props.jsonUrlWizardService
                 .fetchThirdPartyToolConfiguration(body, props.accountId)
                 .then(result => {

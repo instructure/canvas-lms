@@ -19,7 +19,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {coursePaceActions} from '../../../actions/course_paces'
 import {getExcludeWeekends} from '../../../reducers/course_paces'
@@ -30,7 +30,7 @@ import SkipSelectedDaysMenu from './SkipSelectedDaysMenu'
 import MainMenu from './MainMenu'
 import {renderManageBlackoutDates} from './helpers'
 
-const I18n = useI18nScope('course_paces_settings')
+const I18n = createI18nScope('course_paces_settings')
 
 interface StoreProps {
   readonly excludeWeekends: boolean

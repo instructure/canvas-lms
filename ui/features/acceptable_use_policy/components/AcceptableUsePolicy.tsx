@@ -24,12 +24,12 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useAUPContent} from '../hooks/useAUPContent'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 // @ts-expect-error
 import styles from './AcceptableUsePolicy.module.css'
 
-const I18n = useI18nScope('acceptable_use_policy')
+const I18n = createI18nScope('acceptable_use_policy')
 
 const AcceptableUsePolicy = () => {
   const {content, loading, error} = useAUPContent()

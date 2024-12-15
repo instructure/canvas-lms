@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AssignmentConnection, GradebookUserSubmissionDetails} from '../types'
 import {ApiCallStatus} from '../types'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../react/components/GradingResults'
 import {isInPastGradingPeriodAndNotAdmin} from './gradebookUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export const passFailStatusOptions = [
   {

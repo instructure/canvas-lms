@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {paceContextsActions} from '../actions/pace_contexts'
 
 import {Flex} from '@instructure/ui-flex'
@@ -31,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {getSearchTerm} from '../reducers/course_paces'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('course_paces_search')
+const I18n = createI18nScope('course_paces_search')
 
 interface StoreProps {
   readonly searchTerm: string

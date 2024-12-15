@@ -21,11 +21,11 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {each, isUndefined} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('gradingPeriodTemplate')
+const I18n = createI18nScope('gradingPeriodTemplate')
 
 const postfixId = (text, {props}) => text + props.id
 
@@ -67,7 +67,7 @@ class GradingPeriodTemplate extends React.Component {
 
       const invalidProps = []
       each(requiredProps, (propType, propName) => {
-        // eslint-disable-next-line valid-typeof
+         
         const invalidProp = isUndefined(props[propName]) || typeof props[propName] !== propType
         if (invalidProp) invalidProps.push(propName)
       })
@@ -245,7 +245,7 @@ class GradingPeriodTemplate extends React.Component {
               {this.renderEndDate()}
             </div>
             <div className="col-xs-12 col-md-8 col-lg-2">
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              { }
               <label className="ic-Label" id={postfixId('period_close_date_', this)}>
                 {I18n.t('Close Date')}
               </label>

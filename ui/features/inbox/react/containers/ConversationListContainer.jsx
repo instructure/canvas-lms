@@ -18,7 +18,7 @@
 
 import {ConversationContext} from '../../util/constants'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo, useState} from 'react'
@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 import {inboxConversationsWrapper, responsiveQuerySizes} from '../../util/utils'
 import {Responsive} from '@instructure/ui-responsive'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const ConversationListContainer = ({
   scope,

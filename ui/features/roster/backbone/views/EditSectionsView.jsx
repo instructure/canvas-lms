@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import SectionSelector from '../../react/SectionSelector'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, reject, difference, filter, includes, extend as lodashExtend} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
@@ -29,7 +29,7 @@ import editSectionsViewTemplate from '../../jst/EditSectionsView.handlebars'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 export default class EditSectionsView extends DialogBaseView {
   static initClass() {
@@ -67,7 +67,7 @@ export default class EditSectionsView extends DialogBaseView {
       }
     })
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <QueryClientProvider client={new QueryClient()}>
         <SectionSelector courseId={ENV.current_context.id} initialSections={excludeSections} />

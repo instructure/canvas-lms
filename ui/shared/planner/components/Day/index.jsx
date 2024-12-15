@@ -26,14 +26,14 @@ import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {itemShape, sizeShape, userShape} from '../plannerPropTypes'
 import {getDynamicFullDate, getFriendlyDate, isToday} from '../../utilities/dateUtils'
 import buildStyle from './style'
-// eslint-disable-next-line import/no-named-as-default
+ 
 import MissingAssignments from '../MissingAssignments'
-// eslint-disable-next-line import/no-named-as-default
+ 
 import Grouping from '../Grouping'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class Day extends Component {
   static componentId = 'Day'

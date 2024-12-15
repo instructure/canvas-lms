@@ -25,7 +25,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import iconApple from '../assets/images/apple.svg'
 import iconClasslink from '../assets/images/classlink.svg'
@@ -37,7 +37,7 @@ import iconLinkedin from '../assets/images/linkedin.svg'
 import iconMicrosoft from '../assets/images/microsoft.svg'
 import iconX from '../assets/images/x.svg'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const providerIcons: Record<string, string> = {
   apple: iconApple,

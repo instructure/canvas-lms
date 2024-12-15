@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {outcomeShape} from './shapes'
@@ -27,7 +27,7 @@ import useLMGBContext from '@canvas/outcomes/react/hooks/useLMGBContext'
 import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 
-const I18n = useI18nScope('OutcomeDescriptionModal')
+const I18n = createI18nScope('OutcomeDescriptionModal')
 
 const getCalculationMethod = outcome => {
   const calc_int = outcome.calculation_int

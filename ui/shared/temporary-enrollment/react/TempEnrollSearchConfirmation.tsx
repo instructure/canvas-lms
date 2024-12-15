@@ -19,7 +19,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import type {ChangeEvent} from 'react'
 import {Table} from '@instructure/ui-table'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
@@ -29,7 +29,7 @@ import {Alert} from '@instructure/ui-alerts'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {TempEnrollAvatar} from './TempEnrollAvatar'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 interface Props {
   foundUsers: User[]
@@ -178,7 +178,9 @@ export function TempEnrollSearchConfirmation(props: Props) {
               <Table.ColHeader id="dupesection-loginid">{I18n.t('Login ID')}</Table.ColHeader>
               {props.canReadSIS ? (
                 <Table.ColHeader id="dupesection-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
-              ) : <></>}
+              ) : (
+                <></>
+              )}
               <Table.ColHeader id="dupesection-inst">{I18n.t('Institution')}</Table.ColHeader>
             </Table.Row>
           </Table.Head>
@@ -265,7 +267,9 @@ export function TempEnrollSearchConfirmation(props: Props) {
               <Table.ColHeader id="usertable-loginid">{I18n.t('Login ID')}</Table.ColHeader>
               {props.canReadSIS ? (
                 <Table.ColHeader id="usertable-sisid">{I18n.t('SIS ID')}</Table.ColHeader>
-              ) : <></>}
+              ) : (
+                <></>
+              )}
             </Table.Row>
           </Table.Head>
           <Table.Body>{renderFoundRows()}</Table.Body>

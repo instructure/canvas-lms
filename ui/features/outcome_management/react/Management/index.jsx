@@ -23,7 +23,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
 import TreeBrowser from './TreeBrowser'
@@ -50,7 +50,7 @@ import {getOutcomeGroupAncestorsWithSelf} from '../../helpers/getOutcomeGroupAnc
 import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {Heading} from '@instructure/ui-heading'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const OutcomeManagementPanel = ({
   importNumber,

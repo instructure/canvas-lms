@@ -17,7 +17,7 @@
  */
 
 import React, {useContext, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
@@ -30,7 +30,7 @@ import {func, string} from 'prop-types'
 import {GroupContext, formatMessages, SPLIT} from './context'
 import {handleKeyPress} from './utils'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 const options = [
   {id: '0', label: I18n.t('Create groups later'), dataTestid: 'group-structure-create-later'},
@@ -267,7 +267,7 @@ export const GroupStructure = ({onChange, errormsg, direction}) => {
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Group Structure')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow={true} overflowY='hidden'>
+      <Flex.Item shouldGrow={true} overflowY="hidden">
         {selfSignup ? (
           <GroupStructureSelfSignup onChange={handleChange} errormsg={errormsg} />
         ) : (

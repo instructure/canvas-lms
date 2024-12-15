@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
 import moment from 'moment-timezone'
 
@@ -59,7 +59,7 @@ import {
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 import type {Change} from '../../utils/change_tracking'
 
-const I18n = useI18nScope('course_paces_assignment_row')
+const I18n = createI18nScope('course_paces_assignment_row')
 
 interface PassedProps {
   readonly datesVisible: boolean
@@ -182,7 +182,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   onDecrementOrIncrement = (_e: React.FormEvent<HTMLInputElement>, direction: number) => {
     // it's either this error or a typescript typing error using the function version of setState
-    // eslint-disable-next-line react/no-access-state-in-setstate
+     
     const newValue = (this.parsePositiveNumber(this.state.duration) || 0) + direction
     if (newValue < 0) return
     this.setState({duration: newValue.toString()})
@@ -355,7 +355,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               {this.renderDurationInput()}
             </View>
           </Table.Cell>
-          {(this.props.showProjections || this.props.datesVisible)? (
+          {this.props.showProjections || this.props.datesVisible ? (
             <Table.Cell data-testid="pp-due-date-cell" textAlign="center">
               <View data-testid="assignment-due-date" margin={labelMargin}>
                 <span style={{whiteSpace: this.props.isStacked ? 'normal' : 'nowrap'}}>
@@ -363,7 +363,9 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
                 </span>
               </View>
             </Table.Cell>
-          ):<></>}
+          ) : (
+            <></>
+          )}
           <Table.Cell
             data-testid="pp-status-cell"
             textAlign={this.props.isStacked ? 'start' : 'center'}

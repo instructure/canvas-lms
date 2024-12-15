@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as tz from '@instructure/moment-utils'
 import htmlEscape from '@instructure/html-escape'
@@ -31,7 +31,7 @@ import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import '../../fcMomentHandlebarsHelpers'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 export default class EditPlannerNoteDetails extends ValidatedFormView {
   events = {

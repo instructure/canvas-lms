@@ -19,10 +19,10 @@
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 
-const I18n = useI18nScope('discussions_v2')
+const I18n = createI18nScope('discussions_v2')
 
 const getFilters = title => ({
   all: {name: I18n.t('All Replies'), title},

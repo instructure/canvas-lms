@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -28,7 +28,7 @@ import {Table} from '@instructure/ui-table'
 import {useParams} from 'react-router-dom'
 import {RubricPopover} from './RubricPopover'
 
-const I18n = useI18nScope('rubrics-list-table')
+const I18n = createI18nScope('rubrics-list-table')
 
 const {Head, Row, Cell, ColHeader, Body} = Table
 

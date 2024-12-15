@@ -22,12 +22,12 @@ import $ from 'jquery'
 import _ from 'lodash'
 import Backbone from '@canvas/backbone'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('calendar.edit')
+const I18n = createI18nScope('calendar.edit')
 
 const LOADING_STATE = {
   PRE_SPINNER: 0,
@@ -137,7 +137,7 @@ export default class CalendarEvent extends Backbone.Model {
       if (this.view?.el) {
         if (this.loadingState === LOADING_STATE.LOADED) return
         this.loadingState = LOADING_STATE.SPINNER_UP
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <div>
             <Spinner renderTitle={I18n.t('Loading')} size="medium" />

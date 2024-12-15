@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
@@ -38,7 +38,7 @@ import AssignmentRow from './assignment_row'
 import BlackoutDateRow from './blackout_date_row'
 import type {ModuleWithDueDates, ResponsiveSizes} from '../../types'
 
-const I18n = useI18nScope('course_paces_module')
+const I18n = createI18nScope('course_paces_module')
 
 const componentOverrides = {
   Button: {

@@ -23,7 +23,7 @@ import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {SummarizedChange} from '../utils/change_tracking'
 import {ResetPaceWarningModal} from './reset_pace_warning_modal'
@@ -32,7 +32,7 @@ import type {StoreState} from '../types'
 import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
 import {getSummarizedChanges} from '../reducers/course_paces'
 
-const I18n = useI18nScope('unpublished_changes_tray_contents')
+const I18n = createI18nScope('unpublished_changes_tray_contents')
 
 // the INSTUI <List as="ol"> has a bug where the item numbering
 // is not in a hanging indent, so when list items wrap they

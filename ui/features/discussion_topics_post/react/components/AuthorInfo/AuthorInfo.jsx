@@ -18,7 +18,7 @@
 
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {AnonymousUser} from '../../../graphql/AnonymousUser'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
 import {
@@ -47,7 +47,7 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {parse} from '@instructure/moment-utils'
 import DateHelper from '@canvas/datetime/dateHelper'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 const AuthorInfoBase = ({breakpoints, ...props}) => {
   const {searchTerm} = useContext(SearchContext)

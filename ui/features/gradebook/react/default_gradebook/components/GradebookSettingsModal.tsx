@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {Tray} from '@instructure/ui-tray'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import AdvancedTabPanel from './AdvancedTabPanel'
 import {
   fetchLatePolicy,
@@ -43,7 +43,7 @@ import type {
   LatePolicyValidationErrors,
 } from '../gradebook.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 // @ts-expect-error
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}): boolean {
@@ -130,7 +130,7 @@ export type GradebookSettingsModalProps = {
     }) => void
     setCoursePostPolicy: (coursePostPolicy: {courseId?: string; postManually: boolean}) => void
   }
-  // eslint-disable-next-line react/no-unused-prop-types
+   
   ref: React.RefObject<any>
 }
 

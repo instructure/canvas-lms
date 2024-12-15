@@ -23,7 +23,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddSolid, IconXSolid} from '@instructure/ui-icons'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
 const componentOverrides = {
@@ -32,7 +32,7 @@ const componentOverrides = {
   },
 }
 
-const I18n = useI18nScope('pill')
+const I18n = createI18nScope('pill')
 const ellipsis = () => I18n.t('…')
 // @ts-expect-error
 const truncate = text => (text.length > 14 ? text.slice(0, 13) + ellipsis() : text)

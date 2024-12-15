@@ -17,7 +17,7 @@
  */
 
 import React, {Component, createRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string, number} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -37,7 +37,7 @@ import EmptyDesert from '@canvas/images/react/EmptyDesert'
 
 import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
 
-const I18n = useI18nScope('security_panel')
+const I18n = createI18nScope('security_panel')
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
 

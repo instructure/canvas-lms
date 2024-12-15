@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {Text} from '@instructure/ui-text'
@@ -27,7 +27,7 @@ import ColorPicker from '@canvas/color-picker'
 import {statusesTitleMap} from '../constants/statuses'
 import {defaultColors} from '../constants/colors'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type Color = {
   name: string

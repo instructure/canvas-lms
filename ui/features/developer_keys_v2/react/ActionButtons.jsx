@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import page from 'page'
@@ -26,7 +26,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 class DeveloperKeyActionButtons extends React.Component {
   makeVisibleLinkHandler = event => {

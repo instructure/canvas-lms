@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -25,7 +25,7 @@ import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import type {RubricAssessmentImportResponse} from '../queries/Queries'
 
-const I18n = useI18nScope('rubrics-import')
+const I18n = createI18nScope('rubrics-import')
 
 type RubricAssessmentImportTableProps = {
   importsInProgress: RubricAssessmentImportResponse[]

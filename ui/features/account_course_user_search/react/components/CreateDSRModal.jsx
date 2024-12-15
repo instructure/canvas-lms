@@ -33,12 +33,12 @@ import {get, isEmpty} from 'lodash'
 import axios from '@canvas/axios'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 const initialState = {
   open: false,
@@ -137,7 +137,7 @@ export default class CreateDSRModal extends React.Component {
     if (!isEmpty(this.state.errors)) return
     const url = `/api/v1/accounts/${this.props.accountId}/users/${this.props.user.id}/dsr_request`
     const method = 'POST'
-    // eslint-disable-next-line promise/catch-or-return
+     
     axios({url, method, data: this.state.data}).then(
       response => {
         const dsr_request = response.data

@@ -17,7 +17,7 @@
  */
 
 import {IconButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -26,7 +26,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {breakpointsShape} from '@canvas/with-breakpoints'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('discussions_posts')
+const I18n = createI18nScope('discussions_posts')
 
 const getClearButton = buttonProperties => {
   if (!buttonProperties.searchTerm?.length) return

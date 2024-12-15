@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +29,7 @@ import useMicrosoftSettings from './microsoft_sync/useSettings'
 import MicrosoftSyncButton from './microsoft_sync/MicrosoftSyncButton'
 import MicrosoftSyncDebugInfo from './microsoft_sync/MicrosoftSyncDebugInfo'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 const Integrations = () => {
   const anyIntegrationsAvailable = ENV.MSFT_SYNC_ENABLED
@@ -47,12 +47,12 @@ const Integrations = () => {
   }
 
   const [msGroup, msEnabled, msLoading, msError, msToggleEnabled, setMSError, setMSGroup] =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+     
     useMicrosoftSettings(ENV.COURSE_ID)
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+   
   const [msExpanded, setMSExpanded] = useState(!!msError)
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+   
   const [msInfo, setMSInfo] = useState()
 
   return (

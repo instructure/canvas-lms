@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
@@ -35,7 +35,7 @@ import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 declare const ENV: GlobalEnv & EditorPrefEnv
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(true)

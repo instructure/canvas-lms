@@ -20,11 +20,11 @@ import React, {useEffect, useState} from 'react'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {CamelizedSubmission} from '@canvas/grading/grading.d'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type SubmissionPartialProp = Pick<
   CamelizedSubmission,

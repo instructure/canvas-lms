@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconSyllabusLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -28,7 +28,7 @@ interface DiscussionSummaryGenerateButtonProps {
   isMobile: boolean
 }
 
-const I18n = useI18nScope('discussions_posts')
+const I18n = createI18nScope('discussions_posts')
 
 export const DiscussionSummaryGenerateButton: React.FC<
   DiscussionSummaryGenerateButtonProps

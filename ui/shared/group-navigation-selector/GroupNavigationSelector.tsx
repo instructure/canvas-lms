@@ -25,11 +25,11 @@
 import React, {useState} from 'react'
 import {Select} from '@instructure/ui-select'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {SelectProps} from '@instructure/ui-select'
 
-const I18n = useI18nScope('groupNavigationSelector')
+const I18n = createI18nScope('groupNavigationSelector')
 
 type GroupOption = {
   id: string

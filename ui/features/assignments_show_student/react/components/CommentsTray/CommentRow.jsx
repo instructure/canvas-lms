@@ -21,7 +21,7 @@ import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionHtmlComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
@@ -29,7 +29,7 @@ import {Link} from '@instructure/ui-link'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function CommentRow(props) {
   const {author, mediaObject, read, htmlComment} = props.comment

@@ -19,7 +19,7 @@
 import $ from 'jquery'
 // @ts-expect-error
 import {where, isEmpty} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import assignmentUtils from './assignmentUtils'
@@ -27,7 +27,7 @@ import classnames from 'classnames'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
 type Props = {
   onDateChanged: (date: string) => void

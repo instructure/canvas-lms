@@ -31,9 +31,9 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
 import Round from '@canvas/round'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const MIN_PERCENTAGE_INPUT = 0
 const MAX_PERCENTAGE_INPUT = 100

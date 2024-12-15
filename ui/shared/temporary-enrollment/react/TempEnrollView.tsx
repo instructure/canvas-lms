@@ -22,7 +22,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import type {Bookmark, Enrollment, EnrollmentType, User, ModifyPermissions} from './types'
@@ -38,7 +38,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {captureException} from '@sentry/browser'
 import {useQuery, queryClient, useMutation} from '@canvas/query'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
@@ -77,7 +77,7 @@ export function groupEnrollmentsByPairingId(enrollments: Enrollment[]) {
  */
 async function handleConfirmAndDeleteEnrollment(tempEnrollments: Enrollment[]): Promise<void> {
   // TODO is there a good inst ui component for confirmation dialog?
-  // eslint-disable-next-line no-alert
+   
   const userConfirmed = window.confirm(I18n.t('Are you sure you want to delete this enrollment?'))
   if (userConfirmed) {
     const results = await Promise.allSettled(
@@ -162,7 +162,7 @@ export function TempEnrollView(props: Props) {
     if (canEdit) {
       props.onEdit?.(getRelevantUserFromEnrollment(enrollments[0]), enrollments)
     } else {
-      // eslint-disable-next-line no-console
+       
       console.error('User does not have permission to edit enrollment')
     }
   }
@@ -171,7 +171,7 @@ export function TempEnrollView(props: Props) {
     if (canDelete) {
       mutate(enrollments)
     } else {
-      // eslint-disable-next-line no-console
+       
       console.error('User does not have permission to delete enrollment')
     }
   }
@@ -180,7 +180,7 @@ export function TempEnrollView(props: Props) {
     if (canAdd) {
       props.onAddNew?.()
     } else {
-      // eslint-disable-next-line no-console
+       
       console.error('User does not have permission to add enrollment')
     }
   }
@@ -258,7 +258,7 @@ export function TempEnrollView(props: Props) {
             </Table.Cell>
             <Table.Cell>{firstEnrollment.type}</Table.Cell>
             <Table.Cell>{renderEnrollmentPairingStatus(group)}</Table.Cell>
-            {canEditOrDelete ? <Table.Cell>{renderActionIcons(group)}</Table.Cell>: <></>}
+            {canEditOrDelete ? <Table.Cell>{renderActionIcons(group)}</Table.Cell> : <></>}
           </Table.Row>
         )
         usedKeys.push(pairingId)
@@ -270,7 +270,7 @@ export function TempEnrollView(props: Props) {
   if (error) {
     // @ts-expect-error
     const errorMsg = error.message
-    // eslint-disable-next-line no-console
+     
     console.error(`Failed to fetch enrollments for user ${props.user.id}:`, errorMsg)
     captureException(errorMsg)
     return (
@@ -330,14 +330,16 @@ export function TempEnrollView(props: Props) {
                     {I18n.t('Recipient Enrollment Type')}
                   </Table.ColHeader>
                   <Table.ColHeader id="usertable-status">{I18n.t('Status')}</Table.ColHeader>
-                 
-                  {(canEdit || canDelete)? (
+
+                  {canEdit || canDelete ? (
                     <Table.ColHeader id="header-user-option-links">
                       <ScreenReaderContent>
                         {I18n.t('Temporary enrollment option links')}
                       </ScreenReaderContent>
                     </Table.ColHeader>
-                  ):<></>}
+                  ) : (
+                    <></>
+                  )}
                 </Table.Row>
               </Table.Head>
               <Table.Body>{renderRows(data.enrollments)}</Table.Body>

@@ -26,11 +26,11 @@ import ConfirmationModal from './ConfirmationModal'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {VisibilityChange} from '../types'
 
-const I18n = useI18nScope('account_calendar_settings_footer')
+const I18n = createI18nScope('account_calendar_settings_footer')
 
 type ComponentProps = {
   readonly originAccountId: number

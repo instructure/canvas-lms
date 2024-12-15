@@ -24,7 +24,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import DeveloperKey from './DeveloperKey'
 import DeveloperKeyModalTrigger from './NewKeyTrigger'
@@ -33,7 +33,7 @@ import '@canvas/rails-flash-notifications'
 import FilterBar from '@canvas/filter-bar'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 // extracted for shared use by InheritedTable
 const createSetFocusCallback =

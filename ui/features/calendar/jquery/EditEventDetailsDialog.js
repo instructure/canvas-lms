@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {some, filter} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import EditCalendarEventDetails from './EditCalendarEventDetails'
 import EditAssignmentDetails from '../backbone/views/EditAssignmentDetails'
 import EditApptCalendarEventDialog from './EditApptCalendarEventDialog'
@@ -29,7 +29,7 @@ import editEventTemplate from '../jst/editEvent.handlebars'
 import 'jqueryui/dialog'
 import 'jqueryui/tabs'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 const dialog = $('<div id="edit_event"><div /></div>')
   .appendTo('body')

@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from '@instructure/grading-utils'
 import type {FormatGradeOptions, SubmissionData} from './grading.d'
 
-const I18n = useI18nScope('sharedGradeFormatHelper')
+const I18n = createI18nScope('sharedGradeFormatHelper')
 
 const LETTER_GRADE = 'letter_grade'
 const POINTS = 'points'

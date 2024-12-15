@@ -29,11 +29,11 @@ import WikiPageRevision from './WikiPageRevision'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import splitAssetString from '@canvas/util/splitAssetString'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 let WikiPage
 
-const I18n = useI18nScope('pages')
+const I18n = createI18nScope('pages')
 
 const pageOptions = ['contextAssetString', 'revision']
 

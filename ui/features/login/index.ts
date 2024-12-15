@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import {loadSignupDialog} from '@canvas/signup-dialog'
 import 'jquery-fancy-placeholder' /* fancyPlaceholder */
@@ -26,7 +26,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, getFormData, for
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('pseudonyms.login')
+const I18n = createI18nScope('pseudonyms.login')
 
 $('#coenrollment_link').click(function (event) {
   event.preventDefault()

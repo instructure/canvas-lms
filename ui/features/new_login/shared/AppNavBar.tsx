@@ -22,12 +22,12 @@ import {Responsive} from '@instructure/ui-responsive'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import CanvasLmsLogoIcon from '../assets/images/canvas-small.svg'
 import CanvasLmsLogo from '../assets/images/canvas.svg'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const AppNavBar = () => {
   const {enableCourseCatalog} = useNewLogin()

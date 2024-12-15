@@ -40,7 +40,7 @@ import {
   IconQuestionLine,
   IconXLine,
 } from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import HelpDialog from '@canvas/help-dialog'
 import {Link} from '@instructure/ui-link'
 import CoursesList from './lists/CoursesList'
@@ -54,7 +54,7 @@ import {filterAndProcessTools, getExternalApps, type ProcessedTool} from './util
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {Img} from '@instructure/ui-img'
 
-const I18n = useI18nScope('MobileGlobalMenu')
+const I18n = createI18nScope('MobileGlobalMenu')
 
 type Props = {
   onDismiss: () => void

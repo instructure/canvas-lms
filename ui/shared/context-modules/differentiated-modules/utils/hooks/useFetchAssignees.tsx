@@ -22,11 +22,11 @@ import {useGetAssigneeOptions} from './useGetAssigneeOptions'
 import {getCourseSettings} from './queryFn'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {uniqBy} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {type AssigneeOption} from '../../react/Item/types'
 import {useQuery} from '@canvas/query'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 interface Props {
   courseId: string

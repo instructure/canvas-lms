@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEndSolid, IconFilterLine, IconSearchLine} from '@instructure/ui-icons'
 import useDebouncedSearch from '../../hooks/useDebouncedSearch'
@@ -29,7 +29,7 @@ import useDiscoverQueryParams from '../../hooks/useDiscoverQueryParams'
 import useBreakpoints from '../../hooks/useBreakpoints'
 import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void}) => {
   const disableQueryParams =

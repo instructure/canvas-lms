@@ -31,9 +31,9 @@ import {ToolbarColor} from '../../common/ToolbarColor'
 import type {ButtonBlockProps, ButtonSize, ButtonVariant} from './types'
 import {white, black, getContrastingColor, getEffectiveBackgroundColor} from '../../../../utils'
 import {IconPopup} from '../../common/IconPopup'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const ButtonBlockToolbar = () => {
   const {

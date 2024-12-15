@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {
   uniq,
@@ -50,7 +50,7 @@ import studentCellTemplate from './jst/outcome_gradebook_student_cell.handlebars
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('gradebookOutcomeGradebookGrid')
+const I18n = createI18nScope('gradebookOutcomeGradebookGrid')
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -499,7 +499,7 @@ const Grid = {
         },
         null
       )
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
@@ -512,7 +512,7 @@ const Grid = {
         },
         null
       )
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {

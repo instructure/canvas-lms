@@ -17,7 +17,7 @@
  */
 
 import {DiscussionEdit} from '../DiscussionEdit/DiscussionEdit'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {
@@ -37,14 +37,14 @@ import {Spinner} from '@instructure/ui-spinner'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function PostMessage({...props}) {
   const {searchTerm} = useContext(SearchContext)
 
   useEffect(() => {
     if (ENV.SEQUENCE !== undefined && props.isTopic) {
-      // eslint-disable-next-line promise/catch-or-return
+       
       import('@canvas/modules/jquery/prerequisites_lookup').then(() => {
         INST.lookupPrerequisites()
       })

@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {FormFieldGroup, type FormMessageType} from '@instructure/ui-form-field'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
@@ -25,7 +25,7 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {validateAvailability} from '../../util/formValidation'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 type Props = {
   availableFrom: string

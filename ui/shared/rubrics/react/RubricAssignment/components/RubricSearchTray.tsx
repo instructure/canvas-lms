@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconAddLine, IconArrowOpenEndLine, IconSearchLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -36,7 +36,7 @@ import type {Rubric, RubricAssociation} from '../../types/rubric'
 import {possibleString} from '../../Points'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('enhanced-rubrics-assignment-search')
+const I18n = createI18nScope('enhanced-rubrics-assignment-search')
 
 type RubricSearchTrayProps = {
   courseId: string

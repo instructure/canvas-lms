@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState, useRef, useCallback} from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -28,7 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 interface ComponentProps {
   letterGrade: string

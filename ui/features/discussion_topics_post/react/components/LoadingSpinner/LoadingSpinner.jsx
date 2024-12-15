@@ -20,9 +20,9 @@ import React from 'react'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 const LoadingSpinnerBase = props => {
   let size = 'medium'

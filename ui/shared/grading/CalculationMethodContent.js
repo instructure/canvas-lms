@@ -15,10 +15,10 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {mixin, reduce, each, max, last, filter, sum} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
-const I18n = useI18nScope('CalculationMethodContent')
+const I18n = createI18nScope('CalculationMethodContent')
 
 mixin({
   sum(array, accessor = null, start = 0) {

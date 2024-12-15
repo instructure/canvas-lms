@@ -27,14 +27,14 @@ import {
   IconMessageLine,
   IconExportLine,
 } from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import CreateDSRModal from './CreateDSRModal'
 import UserLink from './UserLink'
 import TempEnrollUsersListRow from '@canvas/temporary-enrollment/react/TempEnrollUsersListRow'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 export default function UsersListRow({
   accountId,

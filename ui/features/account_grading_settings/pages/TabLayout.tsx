@@ -19,11 +19,11 @@
 import React from 'react'
 import {Outlet, useNavigate, useMatch} from 'react-router-dom'
 import {Tabs} from '@instructure/ui-tabs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Portal} from '@instructure/ui-portal'
 import {TabLayoutPanel} from '../types/tabLayout'
 
-const I18n = useI18nScope('gradingCourseTabContainer')
+const I18n = createI18nScope('gradingCourseTabContainer')
 
 export const Component = () => {
   const navigate = useNavigate()

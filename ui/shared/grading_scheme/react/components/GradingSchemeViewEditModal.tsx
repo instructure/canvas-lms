@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -41,7 +41,7 @@ import {defaultPointsGradingScheme} from '../../defaultPointsGradingScheme'
 import {useDefaultGradingScheme} from '../hooks/useDefaultGradingScheme'
 import {canManageAccountGradingSchemes} from '../helpers/gradingSchemePermissions'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 export interface GradingSchemeViewEditModalProps {
   contextType: 'Account' | 'Course'
@@ -135,7 +135,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
 
     // TODO: is there a good inst ui component for confirmation dialog?
     if (
-      // eslint-disable-next-line no-alert
+       
       !window.confirm(
         I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?')
       )

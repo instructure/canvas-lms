@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -35,7 +35,7 @@ import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('MasteryScale')
+const I18n = createI18nScope('MasteryScale')
 
 const defaultCalculationMethod = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
   ? 'weighted_average'

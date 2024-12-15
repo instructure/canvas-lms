@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {changeTimezone} from '@instructure/moment-utils/changeTimezone'
@@ -24,7 +24,7 @@ import 'jqueryui/datepicker'
 import '@canvas/jquery-keycodes'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
 
-const I18n = useI18nScope('instructure_date_and_time')
+const I18n = createI18nScope('instructure_date_and_time')
 
 $.datepicker.oldParseDate = $.datepicker.parseDate
 $.datepicker.parseDate = function (format, value, settings) {

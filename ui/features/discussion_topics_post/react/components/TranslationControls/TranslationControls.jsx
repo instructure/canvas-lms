@@ -20,9 +20,9 @@ import React, {useContext, useMemo, useState} from 'react'
 import CanvasMultiSelect from '@canvas/multi-select/react'
 import {View} from '@instructure/ui-view'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 // TODO: Translate the language co> ntrols into the canvas target locale.
 export const TranslationControls = () => {

@@ -23,7 +23,7 @@ import type {
   CamelizedGradingPeriodSet,
   SubmissionGradeCriteria,
 } from '@canvas/grading/grading.d'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import * as tz from '@instructure/moment-utils'
 import userSettings from '@canvas/user-settings'
@@ -52,7 +52,7 @@ import {scoreToGrade, type GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../react/components/GradingResults'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export function mapAssignmentGroupQueryResults(
   assignmentGroup: AssignmentGroupConnection[],

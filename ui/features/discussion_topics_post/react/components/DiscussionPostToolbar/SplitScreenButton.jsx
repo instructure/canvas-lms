@@ -23,12 +23,12 @@ import React, {useContext} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {UPDATE_USER_DISCUSSION_SPLITSCREEN_PREFERENCE} from '../../../graphql/Mutations'
 import {useMutation} from '@apollo/client'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AllThreadsState, SearchContext} from '../../utils/constants'
 import {IconAddLine} from '@instructure/ui-icons'
 import {LineViewIcon, SplitViewIcon} from '@canvas/split-and-line-icon'
 
-const I18n = useI18nScope('discussions_posts')
+const I18n = createI18nScope('discussions_posts')
 
 export const SplitScreenButton = ({
   setUserSplitScreenPreference,

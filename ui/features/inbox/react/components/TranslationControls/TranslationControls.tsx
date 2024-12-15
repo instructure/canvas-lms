@@ -24,9 +24,9 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import React, {useContext, useState, useRef, useEffect, useMemo} from 'react'
 import {ModalBodyContext, signatureSeparator, translationSeparator} from '../../utils/constants'
 import {stripSignature} from '../../utils/inbox_translator'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 interface TranslationControlsProps {
   inboxSettingsFeature: boolean

@@ -25,9 +25,9 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
 import {publishModule, unpublishModule} from '../utils/publishOneModuleHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('context_modules_publish_icon')
+const I18n = createI18nScope('context_modules_publish_icon')
 
 interface Props {
   readonly courseId: CanvasId

@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
@@ -42,7 +42,7 @@ import {generateModalLauncherId} from '../../utils/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 
-const I18n = useI18nScope('course_paces_header')
+const I18n = createI18nScope('course_paces_header')
 
 interface DispatchProps {
   readonly fetchDefaultPaceContext: () => void

@@ -17,9 +17,9 @@
 
 import User from '@canvas/users/backbone/models/User'
 import secondsToTime from '../../util/secondsToTime'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('user')
+const I18n = createI18nScope('user')
 
 class RosterUser extends User {
   html_url() {

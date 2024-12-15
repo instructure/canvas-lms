@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
@@ -27,7 +27,7 @@ import {Tray} from '@instructure/ui-tray'
 import SubmissionAttempts from './SubmissionAttempts'
 import useStore, {updateState} from './stores'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 type SubmissionCommentsTrayProps = {
   onDismiss?: () => void

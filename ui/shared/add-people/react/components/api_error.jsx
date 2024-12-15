@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('add_peopleApiError')
+const I18n = createI18nScope('add_peopleApiError')
 
 class ApiError extends React.Component {
   static propTypes = {
@@ -40,7 +40,7 @@ class ApiError extends React.Component {
             // keys rather than determine a better distinquisher. If you happen upon this
             // and would like to improve this, please do!
             //
-            // eslint-disable-next-line react/no-array-index-key
+             
             <li key={`${timestamp}-${i}`}>{e}</li>
           ))}
         </ul>

@@ -27,10 +27,10 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
 
-const I18n = useI18nScope('download_submissions_modal')
+const I18n = createI18nScope('download_submissions_modal')
 
 const DownloadSubmissionsModal = ({
   open,

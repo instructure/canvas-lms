@@ -18,7 +18,7 @@
 // @ts-expect-error
 import type {Card, ActivityStreamSummary} from './types'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 interface HasPosition {
   position: number | undefined
@@ -78,7 +78,7 @@ export function processDashboardCards(data: any): Card[] {
   return mapped.sort(sortByPosition)
 }
 
-const dashboard_I18n = useI18nScope('load_card_dashboard')
+const dashboard_I18n = createI18nScope('load_card_dashboard')
 
 export const handleDashboardCardError = (e: Error) => {
   showFlashAlert({message: dashboard_I18n.t('Failed loading course cards'), err: e, type: 'error'})

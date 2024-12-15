@@ -23,10 +23,10 @@ import {TEACHER_EDIT_QUERY} from '@canvas/assignments/graphql/teacher/Queries'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useQuery} from '@apollo/client'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
-const I18n = useI18nScope('assignment_edit')
+const I18n = createI18nScope('assignment_edit')
 
 interface TeacherEditQueryProps {
   assignmentLid: string

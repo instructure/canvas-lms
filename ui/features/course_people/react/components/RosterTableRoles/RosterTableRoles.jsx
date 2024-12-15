@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {arrayOf, string, shape} from 'prop-types'
 import {readableRoleName} from '@canvas/k5/react/utils'
 import {Text} from '@instructure/ui-text'
 import {OBSERVER_ENROLLMENT} from '../../../util/constants'
 
-const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 const DEFAULT_ROLES = ['student', 'ta', 'observer', 'designer', 'teacher']
 
 export const getRoleName = ({sisRole, type}) => {

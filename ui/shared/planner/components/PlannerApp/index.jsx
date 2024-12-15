@@ -31,7 +31,7 @@ import ShowOnFocusButton from '../ShowOnFocusButton'
 import LoadingFutureIndicator from '../LoadingFutureIndicator'
 import LoadingPastIndicator from '../LoadingPastIndicator'
 import PlannerEmptyState from '../PlannerEmptyState'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   loadFutureItems,
   loadPastButtonClicked,
@@ -47,7 +47,7 @@ import {Animator} from '../../dynamic-ui/animator'
 import responsiviser from '../responsiviser'
 import {observedUserId, observedUserContextCodes} from '../../utilities/apiUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class PlannerApp extends Component {
   static propTypes = {

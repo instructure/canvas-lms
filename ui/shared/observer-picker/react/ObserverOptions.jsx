@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
@@ -34,7 +34,7 @@ import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
 import AddStudentModal from './AddStudentModal'
 import {parseObservedUsersList, parseObservedUsersResponse} from './utils'
 
-const I18n = useI18nScope('observer_options')
+const I18n = createI18nScope('observer_options')
 const ADD_STUDENT_OPTION_ID = 'new-student-option'
 
 const ObserverOptions = ({

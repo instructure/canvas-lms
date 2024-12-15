@@ -24,10 +24,10 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import GenerateLink from '../GenerateLink'
 import CourseEpubExportStore from '../CourseStore'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import sinon from 'sinon'
 
-const I18n = useI18nScope('epub_exports')
+const I18n = createI18nScope('epub_exports')
 
 const ok = x => expect(x).toBeTruthy()
 const notOk = x => expect(x).toBeFalsy()

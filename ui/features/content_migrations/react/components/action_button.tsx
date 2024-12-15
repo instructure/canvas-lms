@@ -26,12 +26,12 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Alert} from '@instructure/ui-alerts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const {Item: ListItem} = List as any
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 export type MigrationIssue = {
   id: number

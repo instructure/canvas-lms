@@ -19,7 +19,7 @@
 import type {Action} from 'redux'
 import type {ThunkAction} from 'redux-thunk'
 import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/browser'
 
 import type {
@@ -39,7 +39,7 @@ import {transformBlackoutDatesForApi} from '../api/blackout_dates_api'
 import {getPaceName, getIsUnpublishedNewPace} from '../reducers/course_paces'
 import {paceContextsActions} from './pace_contexts'
 
-const I18n = useI18nScope('course_paces_actions')
+const I18n = createI18nScope('course_paces_actions')
 
 export const PUBLISH_STATUS_POLLING_MS = 3000
 const TERMINAL_PROGRESS_STATUSES = ['completed', 'failed']
@@ -192,14 +192,14 @@ const thunkActions = {
               dispatch(uiActions.setCategoryError('publish'))
               // @ts-expect-error
               dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
-              console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console
+              console.log(`Error publishing pace: ${updatedProgress.message}`)  
             } else {
               setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
             }
           })
           .catch(error => {
             dispatch(uiActions.setCategoryError('checkPublishStatus', error?.toString()))
-            console.log(error) // eslint-disable-line no-console
+            console.log(error)  
           })
       return pollingLoop()
     }
@@ -223,7 +223,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('resetToLastPublished', error?.toString()))
-          console.error(error) // eslint-disable-line no-console
+          console.error(error)  
           captureException(error)
         })
     }
@@ -260,7 +260,7 @@ const thunkActions = {
           .catch(error => {
             dispatch(uiActions.hideLoadingOverlay())
             dispatch(uiActions.setCategoryError('loading', error?.toString()))
-            console.error(error) // eslint-disable-line no-console
+            console.error(error)  
             captureException(error)
           })
       )
@@ -285,7 +285,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('relinkToParent', error?.toString()))
-          console.error(error) // eslint-disable-line no-console
+          console.error(error)  
           captureException(error)
         })
     }
@@ -308,7 +308,7 @@ const thunkActions = {
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('compress', error?.toString()))
-          console.log(error) // eslint-disable-line no-console
+          console.log(error)  
         })
     }
   },

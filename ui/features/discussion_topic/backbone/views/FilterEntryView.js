@@ -19,11 +19,11 @@
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
 import {View} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import template from '../../jst/results_entry.handlebars'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 extend(FilterEntryView, View)
 

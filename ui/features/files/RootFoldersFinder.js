@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Folder from '@canvas/files/backbone/models/Folder'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('rootFoldersFinder')
+const I18n = createI18nScope('rootFoldersFinder')
 
 function RootFoldersFinder(opts) {
   this.rootFoldersToShow = opts.rootFoldersToShow

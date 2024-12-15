@@ -38,9 +38,9 @@ import React from 'react'
 import {string} from 'prop-types'
 import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 
 // Value returned from GraphQL
 export const ACTIVE_STATE = 'active'

@@ -18,7 +18,7 @@
 
 import React, {useEffect} from 'react'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 import type {StoreState} from '../types'
@@ -29,7 +29,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('unpublished_changes_button_props')
+const I18n = createI18nScope('unpublished_changes_button_props')
 
 type StateProps = {
   readonly changeCount: number

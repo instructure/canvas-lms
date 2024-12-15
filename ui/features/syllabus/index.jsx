@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map} from 'lodash'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
@@ -32,7 +32,7 @@ import ready from '@instructure/ready'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 
-const I18n = useI18nScope('syllabus')
+const I18n = createI18nScope('syllabus')
 
 const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
 const immersive_reader_mobile_mount_point = () =>
@@ -137,7 +137,7 @@ ready(() => {
   // Add the loading indicator now that the collections are fetching
   const node = document.querySelector('#loading_indicator')
   if (node instanceof HTMLElement) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
@@ -164,7 +164,7 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, courseId)
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Falied loading CoursePacingNotice', ex)
       })
   }

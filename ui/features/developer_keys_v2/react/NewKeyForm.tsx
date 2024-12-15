@@ -25,7 +25,7 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Grid} from '@instructure/ui-grid'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {FormMessageChild, FormMessageType} from '@instructure/ui-form-field/src/FormPropTypes'
 
@@ -60,7 +60,7 @@ export type NewKeyFormProps = {
   syncRedirectUris: Function
 }
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 const validationMessage: {
   text: FormMessageChild

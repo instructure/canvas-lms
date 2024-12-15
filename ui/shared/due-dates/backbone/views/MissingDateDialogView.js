@@ -19,13 +19,13 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/missingDueDateDialog.handlebars'
 import htmlEscape from '@instructure/html-escape'
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 
-const I18n = useI18nScope('calendar.edit')
+const I18n = createI18nScope('calendar.edit')
 
 extend(MissingDateDialogView, View)
 

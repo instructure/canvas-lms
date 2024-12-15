@@ -19,11 +19,11 @@
 import React, {useRef, useState, type ComponentProps} from 'react'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {QueryParameterRecord} from '@instructure/query-string-encoding'
 
-const I18n = useI18nScope('course_logging_content')
+const I18n = createI18nScope('course_logging_content')
 
 interface SelectState<T> {
   value: string

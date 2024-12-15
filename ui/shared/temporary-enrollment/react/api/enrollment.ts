@@ -19,9 +19,9 @@
 import type {Enrollment, FetchedEnrollments, TemporaryEnrollmentPairing} from '../types'
 import {ITEMS_PER_PAGE} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 /**
  * Fetches temporary enrollment data for a user

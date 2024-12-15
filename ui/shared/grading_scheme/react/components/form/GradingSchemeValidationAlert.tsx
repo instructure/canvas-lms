@@ -19,7 +19,7 @@
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {
   gradingSchemeIsValid,
@@ -29,7 +29,7 @@ import {
 } from './validations/gradingSchemeValidations'
 import type {GradingSchemeDataRow} from '@instructure/grading-utils'
 
-const I18n = useI18nScope('GradingSchemes')
+const I18n = createI18nScope('GradingSchemes')
 
 export interface ComponentProps {
   formData: {

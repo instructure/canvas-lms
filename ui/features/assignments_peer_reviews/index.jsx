@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -30,7 +30,7 @@ import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import FilterPeerReview from './react/FilterPeerReview'
 
-const I18n = useI18nScope('assignments.peer_reviews')
+const I18n = createI18nScope('assignments.peer_reviews')
 
 $(document).ready(() => {
   $('.peer_review').hover(
@@ -173,6 +173,6 @@ $(document).ready(() => {
     $('.peer_review.assigned .remind_peer_review_link').click()
   })
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<FilterPeerReview />, document.getElementById('filter_peer_review'))
 })

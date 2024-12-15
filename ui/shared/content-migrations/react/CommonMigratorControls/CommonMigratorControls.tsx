@@ -20,7 +20,7 @@ import React, {type ComponentType, useCallback, useEffect, useState} from 'react
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
@@ -31,7 +31,7 @@ import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from './types'
 import {RequiredFormLabel} from './FormLabel'
 import {ErrorFormMessage} from '../errorFormMessage'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type CommonMigratorControlsProps = {
   canSelectContent?: boolean

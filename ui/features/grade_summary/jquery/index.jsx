@@ -30,7 +30,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import htmlEscape from '@instructure/html-escape'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
@@ -46,7 +46,7 @@ import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalcu
 import useStore from '../react/stores'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('gradingGradeSummary')
+const I18n = createI18nScope('gradingGradeSummary')
 
 const SUBMISSION_UNREAD_PREFIX = 'submission_unread_dot_'
 
@@ -136,7 +136,7 @@ const GradeSummary = {
     }
 
     // set 'isChanged' to true if the user entered the score already on the submission
-    const isChanged = score.numericalValue != originalScore.numericalValue // eslint-disable-line eqeqeq
+    const isChanged = score.numericalValue != originalScore.numericalValue  
 
     // update '.what_if_score' with the parsed value from '#grade_entry'
     $assignment.find('.what_if_score').text(score.formattedValue)
@@ -719,7 +719,7 @@ function getCourseId() {
 }
 
 function renderSelectMenuGroup() {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />,
     document.getElementById('GradeSummarySelectMenuGroup')
@@ -727,7 +727,7 @@ function renderSelectMenuGroup() {
 }
 
 function renderGradeSummaryTable() {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<GradeSummaryManager />, document.getElementById('grade-summary-react'))
 }
 
@@ -775,7 +775,7 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 
 function renderSubmissionCommentsTray() {
   ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SubmissionCommentsTray
       onDismiss={() => {
@@ -792,7 +792,7 @@ function renderClearBadgeCountsButton() {
   ReactDOM.unmountComponentAtNode(document.getElementById('ClearBadgeCountsButton'))
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ClearBadgeCountsButton userId={userId} courseId={courseId} />,
     document.getElementById('ClearBadgeCountsButton')

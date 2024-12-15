@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -50,7 +50,7 @@ import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reduc
 import UnpublishedChangesIndicator from './unpublished_changes_indicator'
 import {RemovePaceWarningModal} from './remove_pace_warning_modal'
 
-const I18n = useI18nScope('course_paces_footer')
+const I18n = createI18nScope('course_paces_footer')
 
 interface StoreProps {
   readonly autoSaving: boolean

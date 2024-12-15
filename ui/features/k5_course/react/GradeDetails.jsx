@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -40,7 +40,7 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {GradeRow} from './GradeRow'
 import GradesEmptyPage from './GradesEmptyPage'
 
-const I18n = useI18nScope('grade_details')
+const I18n = createI18nScope('grade_details')
 
 const NUM_GRADE_SKELETONS = 10
 

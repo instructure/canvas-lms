@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect, useCallback} from 'react'
 import moment from 'moment'
 import {Responsive} from '@instructure/ui-responsive'
@@ -41,7 +41,7 @@ import useInboxSettingsValidate from '../../hooks/useInboxSettingsValidate'
 import type {InboxSettings, InboxSettingsData} from '../../../inboxModel'
 import type {FormMessage} from '@instructure/ui-form-field'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export interface Props {
   inboxSignatureBlock: boolean
@@ -172,7 +172,7 @@ const InboxSettingsModalContainer = ({
     }
   }
 
-  const filterState = (state: Object = defaultInboxSettings): InboxSettings => {
+  const filterState = (state: object = defaultInboxSettings): InboxSettings => {
     const allowedKeys = new Set([
       'useSignature',
       'signature',

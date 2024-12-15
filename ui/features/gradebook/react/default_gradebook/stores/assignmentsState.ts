@@ -17,14 +17,14 @@
  */
 
 import type {StoreApi} from 'zustand'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
 import {maxAssignmentCount, otherGradingPeriodAssignmentIds} from '../Gradebook.utils'
 import type {GradebookStore} from './index'
 import type {GradingPeriodAssignmentMap} from '../gradebook.d'
 import type {AssignmentGroup, Assignment, AssignmentMap, SubmissionType} from '../../../../../api.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type AssignmentsState = {
   gradingPeriodAssignments: GradingPeriodAssignmentMap

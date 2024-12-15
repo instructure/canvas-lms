@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {ProgressBar} from '@instructure/ui-progress'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {ContentMigrationWorkflowState} from './types'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 export const CompletionProgressBar = ({
   workflowState,

@@ -27,9 +27,9 @@ import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../service
 import {createErrorMessage} from '../shared/helpers'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const OtpForm = () => {
   const {
@@ -148,7 +148,7 @@ const OtpForm = () => {
     setOtpRequired(false)
 
     cancelOtpRequest().catch(_error => {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to cancel OTP process due to a network or server issue')
     })
   }

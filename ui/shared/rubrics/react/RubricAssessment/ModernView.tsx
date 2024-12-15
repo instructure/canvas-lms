@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState, useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -39,7 +39,7 @@ import {findCriterionMatchingRatingId, htmlEscapeCriteriaLongDescription} from '
 import {possibleString} from '../Points'
 import {OutcomeTag} from './OutcomeTag'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type ModernViewModes = 'horizontal' | 'vertical'
 

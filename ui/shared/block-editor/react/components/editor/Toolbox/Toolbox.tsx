@@ -38,9 +38,9 @@ import {EditTemplateModal, type OnSaveTemplateCallback} from '../EditTemplateMod
 import {BlocksPanel} from './BlocksPanel'
 import {SectionsPanel} from './SectionsPanel'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export const Toolbox = ({open, container, templateEditor, templates, onClose}: ToolboxProps) => {
   const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
@@ -84,7 +84,7 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
   }, [onClose])
 
   const handleDeleteTemplate = useCallback((templateId: string) => {
-    // eslint-disable-next-line no-alert
+     
     if (window.confirm(I18n.t('Are you sure you want to delete this template?'))) {
       const event = new CustomEvent(DeleteTemplateEvent, {
         detail: templateId,

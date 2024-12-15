@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {RocketSVG} from '@instructure/canvas-media'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -34,7 +34,7 @@ import './ForbiddenWordsFileUpload.css'
 import type {PasswordSettingsResponse} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('password_complexity_configuration')
+const I18n = createI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 

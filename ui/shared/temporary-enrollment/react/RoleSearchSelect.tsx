@@ -17,7 +17,7 @@
  */
 
 import React, {Children, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -27,7 +27,7 @@ import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import {createAnalyticPropsGenerator} from './util/analytics'
 import {MODULE_NAME} from './types'
 
-const I18n = useI18nScope('managed_course_selector')
+const I18n = createI18nScope('managed_course_selector')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
@@ -39,14 +39,14 @@ const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = (str: string) => str.replace(reEscapeMatcher, '\\$1')
 
 const SearchableSelectOption = () => <div />
-/* eslint-disable react/no-unused-prop-types */
+ 
 SearchableSelectOption.propTypes = {
   id: string,
   value: string,
   children: string,
   label: string,
 }
-/* eslint-enable react/no-unused-prop-types */
+ 
 SearchableSelectOption.displayName = 'Option'
 
 interface Props {

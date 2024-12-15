@@ -21,7 +21,7 @@ import {render} from 'react-dom'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {InstUISettingsProvider} from '@instructure/emotion'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
@@ -33,7 +33,7 @@ import ZoomIcon from '../images/zoom.svg'
 import MeetIcon from '../images/meet.svg'
 import TeamsIcon from '../images/teams.svg'
 
-const I18n = useI18nScope('conferences_alternatives')
+const I18n = createI18nScope('conferences_alternatives')
 
 const componentOverrides = {
   [Alert.componentId]: {
@@ -66,7 +66,7 @@ function ConferenceProvider({imageSource, title, text, responsiveSize}) {
         </Text>
         <Text size="small">
           {text.map((content, i) => (
-            // eslint-disable-next-line react/no-array-index-key
+             
             <View key={i} as="div" padding="x-small 0">
               {content}
             </View>

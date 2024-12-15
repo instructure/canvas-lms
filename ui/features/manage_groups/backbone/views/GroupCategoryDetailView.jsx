@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import RandomlyAssignMembersView from './RandomlyAssignMembersView'
@@ -28,7 +28,7 @@ import GroupCategoryCloneModal from '../../react/GroupCategoryCloneModal'
 import GroupCategoryMessageAllUnassignedModal from '../../react/GroupCategoryMessageAllUnassignedModal'
 import GroupImportModal from '../../react/GroupImportModal'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 export default class GroupCategoryDetailView extends View {
   static initClass() {
@@ -93,7 +93,7 @@ export default class GroupCategoryDetailView extends View {
 
   deleteCategory(e) {
     e.preventDefault()
-    // eslint-disable-next-line no-restricted-globals
+     
     if (!confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group set?'))) {
       this.$groupCategoryActions.focus()
       return
@@ -112,7 +112,7 @@ export default class GroupCategoryDetailView extends View {
 
   addGroup(e, open = true) {
     if (e) e.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <GroupModal
         groupCategory={{id: this.model.get('id')}}
@@ -140,7 +140,7 @@ export default class GroupCategoryDetailView extends View {
   importGroups(e) {
     if (e) e.preventDefault()
     const parent = document.getElementById('group-import-modal-mount-point')
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <GroupImportModal
         setProgress={this.setProgress.bind(this)}
@@ -163,7 +163,7 @@ export default class GroupCategoryDetailView extends View {
 
   cloneCategory(e, open = true) {
     if (e) e.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <GroupCategoryCloneModal
         // implicitly rendered with openedFromCaution: false
@@ -192,7 +192,7 @@ export default class GroupCategoryDetailView extends View {
         .unassignedUsers()
         .map(user => ({id: user.get('id'), short_name: user.get('short_name')}))
       const dialog = () => {
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <GroupCategoryMessageAllUnassignedModal
             groupCategory={{name: this.model.get('name')}}

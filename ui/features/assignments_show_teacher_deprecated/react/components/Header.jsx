@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, func} from 'prop-types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Grid} from '@instructure/ui-grid'
@@ -32,7 +32,7 @@ import AssignmentModules from './Editables/AssignmentModules'
 import AssignmentType from './Editables/AssignmentType'
 import AssignmentGroup from './Editables/AssignmentGroup'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 // TODO: the assignment type and module selection need to be factored out into
 // their own components. too much logic to cram in here
@@ -96,7 +96,7 @@ export default class Header extends React.Component {
     this.setState({assignmentTypeMode: mode})
   }
 
-  /* eslint-disable no-alert */
+   
   handleTypeChange = selectedType => {
     switch (selectedType) {
       case 'assignment':
@@ -136,7 +136,7 @@ export default class Header extends React.Component {
       })
     })
   }
-  /* eslint-enable no-alert */
+   
 
   handleModulesChange = selectedModules => {
     this.props.onChangeAssignment('modules', selectedModules)

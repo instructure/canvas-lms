@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('manage_avatars')
+const I18n = createI18nScope('manage_avatars')
 /* showIf */
 
 $(document).ready(function () {
@@ -29,7 +29,7 @@ $(document).ready(function () {
     event.preventDefault()
     const $link = $(this)
     if ($link.attr('data-state') === 'none') {
-      // eslint-disable-next-line no-alert
+       
       const result = window.confirm(
         I18n.t('prompts.delete_avatar', "Are you sure you want to delete this user's profile pic?")
       )
@@ -37,7 +37,7 @@ $(document).ready(function () {
         return
       }
     } else if ($link.attr('data-state') === 'locked') {
-      // eslint-disable-next-line no-alert
+       
       const result = window.confirm(
         I18n.t(
           'prompts.lock_avatar',

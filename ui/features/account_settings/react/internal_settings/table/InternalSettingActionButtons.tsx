@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
 import React from 'react'
 import {IconInfoLine, IconPublishSolid, IconResetSolid, IconTrashLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('internal-settings')
+const I18n = createI18nScope('internal-settings')
 
 export type InternalSettingActionButtonsProps = {
   name: string

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {CoursePaceItem} from '../types'
 import type {BlackoutDate} from '../shared/types'
 
-const I18n = useI18nScope('course_paces_change_tracking')
+const I18n = createI18nScope('course_paces_change_tracking')
 
 export type Change<T = unknown> = {
   id: string

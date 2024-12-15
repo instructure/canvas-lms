@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -24,7 +24,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export default class DeveloperKeyStateControl extends React.Component {
   confirmStateChange = (developerKey, newState) => {

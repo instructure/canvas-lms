@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as pubsub from 'jquery-tinypubsub'
 import $ from 'jquery'
 import fileSize from '@canvas/util/fileSize'
@@ -29,7 +29,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
 import {each} from 'lodash'
 
-const I18n = useI18nScope('media_comments_publicjs')
+const I18n = createI18nScope('media_comments_publicjs')
 
 const getDefaultExport = mod => (mod.default ? mod.default : mod)
 
@@ -774,7 +774,7 @@ window.beforeAddEntry = function () {
   const attemptId = Math.random()
   $.mediaComment.lastAddAttemptId = attemptId
   setTimeout(() => {
-    // eslint-disable-next-line eqeqeq
+     
     if ($.mediaComment.lastAddAttemptId == attemptId) {
       $(document).triggerHandler('media_recording_error')
     }
@@ -797,10 +797,10 @@ window.addEntryComplete = function (entries) {
     }
     for (let idx = 0; idx < entries.length; idx++) {
       const entry = entries[idx]
-      // eslint-disable-next-line eqeqeq
+       
       if ($('#media_record_tabs').tabs('option', 'selected') == 0) {
         userTitle = $('#video_record_title,#audio_record_title').filter(':visible:first').val()
-        // eslint-disable-next-line eqeqeq
+         
       } else if ($('#media_record_tabs').tabs('option', 'selected') == 1) {
         // no-op
       }
@@ -811,9 +811,9 @@ window.addEntryComplete = function (entries) {
       $('#media_comment_dialog').dialog('close')
     }
   } catch (e) {
-    // eslint-disable-next-line no-console
+     
     console.log(e)
-    // eslint-disable-next-line no-alert
+     
     window.alert(I18n.t('errors.save_failed_try_again', 'Entry failed to save.  Please try again.'))
   }
 }

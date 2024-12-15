@@ -23,9 +23,9 @@ import {ROUTES} from '../routes/routes'
 import {Text} from '@instructure/ui-text'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 type Prompt = {
   text: string

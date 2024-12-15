@@ -46,7 +46,7 @@ import {
 } from '@instructure/ui-icons'
 import {arrayOf, bool, number, string, func, shape, object} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
-// eslint-disable-next-line import/no-named-as-default
+ 
 import NotificationBadge, {MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import BadgeList from '../BadgeList'
 import CalendarEventModal from '../CalendarEventModal'
@@ -54,12 +54,12 @@ import {badgeShape, userShape, statusShape, sizeShape, feedbackShape} from '../p
 import {getDynamicFullDateAndTime} from '../../utilities/dateUtils'
 import {showPillForOverdueStatus} from '../../utilities/statusUtils'
 import {assignmentType as getAssignmentType} from '../../utilities/contentUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 import buildStyle from './style'
 import {stripHtmlTags} from '@canvas/util/TextHelper'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class PlannerItem_raw extends Component {
   static componentId = 'PlannerItem'

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 import {Table} from '@instructure/ui-table'
 import {possibleString} from '@canvas/rubrics/react/Points'
 
-const I18n = useI18nScope('rubrics-criterion-modal')
+const I18n = createI18nScope('rubrics-criterion-modal')
 
 export type OutcomeCriterionModalProps = {
   criterion?: RubricCriterion

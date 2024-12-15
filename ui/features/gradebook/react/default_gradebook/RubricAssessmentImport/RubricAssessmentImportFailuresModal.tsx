@@ -18,7 +18,7 @@
 
 import React from 'react'
 import _ from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import type {RubricAssessmentImportResponse} from '../queries/Queries'
 
-const I18n = useI18nScope('rubrics-import-failure-modal')
+const I18n = createI18nScope('rubrics-import-failure-modal')
 
 type RubircAssessmentImportFailuresModalProps = {
   isOpen: boolean
@@ -66,7 +66,7 @@ export const RubircAssessmentImportFailuresModal = ({
           {I18n.t('The import failed for the following file(s):')}
         </View>
         {fileNames.map((fileName, i) => (
-          /* eslint-disable-next-line react/no-array-index-key */
+           
           <View as="div" margin="x-small 0 0" key={`${fileName}-${i}`}>
             <Text weight="bold">{fileName}</Text>
           </View>

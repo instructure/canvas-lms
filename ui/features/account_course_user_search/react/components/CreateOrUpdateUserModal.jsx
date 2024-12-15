@@ -29,7 +29,7 @@ import update from 'immutability-helper'
 import {get, isEmpty} from 'lodash'
 import axios from '@canvas/axios'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   firstNameFirst,
   lastNameFirst,
@@ -41,7 +41,7 @@ import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TimeZoneSelect from '@canvas/datetime/react/components/TimeZoneSelect'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 const trim = (str = '') => str.trim()
 
@@ -92,7 +92,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         const key = name.match(/user\[(.*)\]/)[1] // extracts 'short_name' from 'user[short_name]'
         return {...memo, [key]: this.props.user[key]}
       }, {})
-      // eslint-disable-next-line react/no-access-state-in-setstate
+       
       this.setState(update(this.state, {data: {user: {$set: userDataFromProps}}}))
     }
   }
@@ -126,7 +126,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
   onSubmit = () => {
     if (!isEmpty(this.state.errors)) return
     const method = {create: 'POST', update: 'PUT'}[this.props.createOrUpdate]
-    // eslint-disable-next-line promise/catch-or-return
+     
     axios({url: this.props.url, method, data: this.state.data}).then(
       response => {
         const getUserObj = o => (o.user ? getUserObj(o.user) : o)

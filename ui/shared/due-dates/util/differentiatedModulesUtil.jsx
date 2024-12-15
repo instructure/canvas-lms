@@ -23,10 +23,10 @@ import {getOverriddenAssignees} from '@canvas/context-modules/differentiated-mod
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconEditLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('DueDateOverrideView')
+const I18n = createI18nScope('DueDateOverrideView')
 
 export const cloneObject = object => JSON.parse(JSON.stringify(object))
 

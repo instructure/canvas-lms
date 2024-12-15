@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, some, every, find, filter, reject, isEmpty} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -31,7 +31,7 @@ import {nanoid} from 'nanoid'
 import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('RosterUserView')
+const I18n = createI18nScope('RosterUserView')
 
 let editSectionsDialog = null
 let editRolesDialog = null
@@ -206,7 +206,7 @@ export default class RosterUserView extends Backbone.View {
 
   deactivateUser() {
     if (
-      // eslint-disable-next-line no-alert
+       
       !window.confirm(
         I18n.t(
           'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.'
@@ -261,7 +261,7 @@ export default class RosterUserView extends Backbone.View {
   }
 
   removeFromCourse(_e) {
-    // eslint-disable-next-line no-alert
+     
     if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
       return
     }
@@ -309,7 +309,7 @@ export default class RosterUserView extends Backbone.View {
   }
 
   afterRender() {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <a href={`users/${this.model.id}`}>
         <Avatar

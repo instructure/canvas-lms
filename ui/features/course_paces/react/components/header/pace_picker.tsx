@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import keycode from 'keycode'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
@@ -41,7 +41,7 @@ import {getCourse} from '../../reducers/course'
 import {actions} from '../../actions/ui'
 import {getSelectedContextId, getSelectedContextType, getResponsiveSize} from '../../reducers/ui'
 
-const I18n = useI18nScope('course_paces_pace_picker')
+const I18n = createI18nScope('course_paces_pace_picker')
 
 const PICKER_WIDTH = '20rem'
 

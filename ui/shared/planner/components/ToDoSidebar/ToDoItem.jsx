@@ -35,9 +35,9 @@ import {
 
 import {func, shape, object, arrayOf, number, string, bool} from 'prop-types'
 import {dateTimeString} from '../../utilities/dateUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 const getAriaLabel = (itemType, itemTitle) => {
   switch (itemType) {

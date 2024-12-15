@@ -20,9 +20,9 @@ import React, {useContext, useState} from 'react'
 // @ts-expect-error
 import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {RCSPropsContext} from '../../../Contexts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const handleMediaSubmit = async (uploadData: UploadData) => {
   if (uploadData?.fileUrl) {

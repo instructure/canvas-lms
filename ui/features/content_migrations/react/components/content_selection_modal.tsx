@@ -23,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   IconSettingsLine,
   IconSyllabusLine,
@@ -48,7 +48,7 @@ import {CollapsableList, type Item} from '@canvas/content-migrations'
 import type {ContentMigrationItem, ContentMigrationWorkflowState} from './types'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 const ICONS: {[key: string]: any} = {
   course_settings: IconSettingsLine,
@@ -110,7 +110,7 @@ const mapSelectiveDataResponse = async (response: SelectiveDataResponse): Promis
 
     if (sub_items_url && count) {
       // @ts-expect-error
-      // eslint-disable-next-line no-await-in-loop
+       
       const {json}: {json: GenericItemResponse[]} = await doFetchApi({
         path: sub_items_url,
         method: 'GET',

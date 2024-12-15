@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import htmlEscape from '@instructure/html-escape'
 import template from '../../jst/Quotas.handlebars'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('accounts')
+const I18n = createI18nScope('accounts')
 
 extend(QuotasView, ValidatedFormView)
 

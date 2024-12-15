@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import type {Which, CalendarEvent} from './types'
 
-const I18n = useI18nScope('calendar_event')
+const I18n = createI18nScope('calendar_event')
 
 type Props = {
   readonly event: CalendarEvent
@@ -103,7 +103,7 @@ const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
   }
 
   const whichPromise = new Promise(resolve => {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <UpdateCalendarEventDialog
         event={selectedEvent}

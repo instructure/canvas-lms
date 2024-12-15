@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import type {MomentInput} from 'moment-timezone'
@@ -35,7 +35,7 @@ import type {
 } from '../../../../../api.d'
 import natcompare from '@canvas/util/natcompare'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const {Option, Group: OptionGroup} = SimpleSelect as any
 const formatDate = (date: Date) => tz.format(date, 'date.formats.medium') as string

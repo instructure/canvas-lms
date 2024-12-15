@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Header from './Header'
@@ -26,7 +26,7 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import page from 'page'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class Configurations extends React.Component {
   static propTypes = {

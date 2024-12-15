@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import {Grid} from '@instructure/ui-grid'
 import {Pill} from '@instructure/ui-pill'
@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {IconCalendarAddLine, IconCalendarReservedLine} from '@instructure/ui-icons'
 import {dateString, timeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('appointment_groups')
+const I18n = createI18nScope('appointment_groups')
 
 const renderAppointment = (appointment, participantList = '') => {
   const timeLabel = I18n.t('%{start_date}, %{start_time} to %{end_time}', {

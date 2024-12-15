@@ -18,7 +18,7 @@
 
 import React, {useState, forwardRef} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {InstUISettingsProvider} from '@instructure/emotion'
@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {outcomeShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const componentOverrides = {
   Heading: {

@@ -17,10 +17,10 @@
  */
 
 import {executeQuery} from '@canvas/query/graphql'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {gql} from '@apollo/client'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 const QUERY = gql`
   query Selective_Release_GetStudentsQuery($courseId: ID!, $cursor: String) {

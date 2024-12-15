@@ -17,11 +17,11 @@
  */
 
 import type {StoreApi} from 'zustand'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Module} from '../../../../../api.d'
 import type {GradebookStore} from './index'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type ModulesState = {
   modules: Module[]

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
@@ -35,7 +35,7 @@ import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 import {View} from '@instructure/ui-view'
 import DateHelper from '@canvas/datetime/dateHelper'
 
-const I18n = useI18nScope('video_conference')
+const I18n = createI18nScope('video_conference')
 
 const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
   const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit')) // match options.no_time_limit default
@@ -134,7 +134,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                       'Checking Add to Calendar will invite all course members.'
                     )
                     if (event.target.checked) {
-                      // eslint-disable-next-line no-alert
+                       
                       if (window.confirm(confirmMessage)) {
                         setAddToCalendar(event.target.checked)
                         // due to calendar api, it sends invite to full course, thus invite_all must be checked

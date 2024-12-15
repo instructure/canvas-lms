@@ -24,9 +24,9 @@ import {Text} from '@instructure/ui-text'
 import {IconUploadLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface SubTableContentProps {
   isLoading: boolean

@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useContext} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import WithBreakpoints from '@canvas/with-breakpoints'
 import LoadingIndicator from '@canvas/loading-indicator'
 import AlertManager, {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -30,7 +30,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {migrateDiscussionDisallowThreadedReplies} from '../apiClient'
 
-const I18n = useI18nScope('discussions_v2')
+const I18n = createI18nScope('discussions_v2')
 
 function UpdateButton({onUpdateComplete}) {
   const [modalOpen, setModalOpen] = useState(false)

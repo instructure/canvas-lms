@@ -18,7 +18,7 @@
 
 import React, {useContext, useState, useEffect} from 'react'
 import {useQuery, useMutation} from '@apollo/client'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
@@ -40,7 +40,7 @@ import AssignmentTable from './AssignmentTable'
 import {getGradingPeriodID} from './utils'
 import {GradeSummaryContext} from './context'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const GradeSummaryContainer = () => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

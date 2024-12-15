@@ -31,7 +31,7 @@ import {
   REPLY_TO_ENTRY,
   isSpeedGraderInTopUrl,
 } from './utils/constants'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
 import React, {useEffect, useRef, useState} from 'react'
@@ -49,7 +49,7 @@ import useNavigateEntries from './hooks/useNavigateEntries'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')

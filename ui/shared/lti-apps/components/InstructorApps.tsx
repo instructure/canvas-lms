@@ -34,7 +34,7 @@ import type {Product} from '../models/Product'
 import {View} from '@instructure/ui-view'
 import useBreakpoints from '../hooks/useBreakpoints'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 export const InstructorApps = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -44,7 +44,7 @@ export const InstructorApps = () => {
     [queryParams]
   )
   const {isDesktop} = useBreakpoints()
-  const I18n = useI18nScope('lti_registrations')
+  const I18n = createI18nScope('lti_registrations')
 
   const {
     data: {tools, meta, description},

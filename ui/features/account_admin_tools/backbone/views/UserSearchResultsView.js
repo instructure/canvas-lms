@@ -18,10 +18,10 @@
 import $ from 'jquery'
 import CourseSearchResultsView from './CourseSearchResultsView'
 import template from '../../jst/UserSearchResults.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('user_search_results')
+const I18n = createI18nScope('user_search_results')
 
 export default class UserSearchResultsView extends CourseSearchResultsView {
   static initClass() {
