@@ -375,7 +375,9 @@ Scope.prototype.p = Scope.prototype.pluralize
 
 export default I18n
 export const useScope = scope => new Scope(scope)
-export const useTranslations = (locale, translations) => {
+export const registerTranslations = (locale, translations) => {
   I18n.translations[locale] = I18n.translations[locale] || {}
   Object.assign(I18n.translations[locale], translations)
 }
+
+export const useTranslations = registerTranslations
