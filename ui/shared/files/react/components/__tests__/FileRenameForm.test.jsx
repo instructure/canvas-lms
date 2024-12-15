@@ -139,6 +139,49 @@ describe('FileRenameForm', () => {
     )
   })
 
+  it('preserves expandZip option when renaming', () => {
+    const onNameConflictResolved = jest.fn()
+    const props = {
+      fileOptions: {
+        file: {name: 'file_name.zip'},
+        expandZip: true,
+      },
+      onNameConflictResolved,
+    }
+    renderFileRenameForm(props)
+    const modal = getModalContent()
+
+    fireEvent.click(within(modal).getByText('Change Name'))
+    fireEvent.click(within(modal).getByText('Change'))
+
+    expect(onNameConflictResolved).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expandZip: true,
+      })
+    )
+  })
+
+  it('preserves expandZip option when replacing', () => {
+    const onNameConflictResolved = jest.fn()
+    const props = {
+      fileOptions: {
+        file: {name: 'file_name.zip'},
+        expandZip: true,
+      },
+      onNameConflictResolved,
+    }
+    renderFileRenameForm(props)
+    const modal = getModalContent()
+
+    fireEvent.click(within(modal).getByText('Replace'))
+
+    expect(onNameConflictResolved).toHaveBeenCalledWith(
+      expect.objectContaining({
+        expandZip: true,
+      })
+    )
+  })
+
   it('renders default rename file message', () => {
     const {getByText} = renderFileRenameForm()
 
@@ -153,5 +196,38 @@ describe('FileRenameForm', () => {
     const {getByText} = renderFileRenameForm(props)
 
     expect(getByText(customMessage)).toBeInTheDocument()
+  })
+
+  it('renders default lock file message when file cannot be overwritten', () => {
+    const props = {
+      fileOptions: {
+        file: {
+          id: 999,
+          name: 'original_name.txt',
+        },
+        name: 'options_name.txt',
+        cannotOverwrite: true,
+      },
+    }
+    const {getByText} = renderFileRenameForm(props)
+
+    expect(getByText(/A locked item named "options_name.txt" already exists/)).toBeInTheDocument()
+  })
+
+  it('renders custom lock file message when provided', () => {
+    const props = {
+      fileOptions: {
+        file: {
+          id: 999,
+          name: 'original_name.txt',
+        },
+        name: 'options_name.txt',
+        cannotOverwrite: true,
+      },
+      onLockFileMessage: name => `Custom lock message for ${name}`,
+    }
+    const {getByText} = renderFileRenameForm(props)
+
+    expect(getByText('Custom lock message for options_name.txt')).toBeInTheDocument()
   })
 })
