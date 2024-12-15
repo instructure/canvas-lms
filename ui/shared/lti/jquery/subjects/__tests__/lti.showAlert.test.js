@@ -62,7 +62,6 @@ describe('lti.showAlert handler', () => {
     warning: 'flashWarningSafe',
     error: 'flashErrorSafe',
   }).forEach(([alertType, method]) => {
-    // eslint-disable-next-line jest/valid-describe
     describe(`when alertType is ${alertType}`, () => {
       beforeEach(() => {
         message = {body, alertType}

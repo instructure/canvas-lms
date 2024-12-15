@@ -30,13 +30,13 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 
 import type {RRULEDayValue, SelectedDaysArray} from '../types'
 
-const I18n = useScope('calendar_custom_recurring_event_weekday_picker')
+const I18n = createI18nScope('calendar_custom_recurring_event_weekday_picker')
 
 export type WeekArray = [string, string, string, string, string, string, string]
 export type WeekDaysSpec = {

@@ -128,7 +128,8 @@ export const CreateCourseModal = ({
   if (window.ENV.FEATURES?.enhanced_course_creation_account_fetching) {
     fetchOpts = {
       path: '/api/v1/course_creation_accounts',
-       
+
+      // eslint-disable-next-line react-hooks/rules-of-hooks
       success: useCallback(accounts => {
         setAllAccounts(
           accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
