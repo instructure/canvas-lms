@@ -123,7 +123,7 @@ export const getPlannerTheme = () => {
   }
 }
 
-export const useK5Theme = (
+export const registerK5Theme = (
   options: {
     fontOnly?: boolean
   } = {}

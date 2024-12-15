@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import moment from 'moment-timezone'
 import WeekdayPicker from '../WeekdayPicker/WeekdayPicker'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
 import {px} from '@instructure/ui-utils'
@@ -41,7 +41,7 @@ import {
   weekdaysFromMoment,
 } from '../utils'
 
-const I18n = useScope('calendar_custom_recurring_event_repeat_picker')
+const I18n = createI18nScope('calendar_custom_recurring_event_repeat_picker')
 
 const {Option: SimpleSelectOption} = SimpleSelect as any
 

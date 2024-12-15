@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import React, {useCallback, useRef, useEffect, useState} from 'react'
 import moment, {type Moment} from 'moment-timezone'
@@ -30,7 +30,7 @@ import {getSelectTextWidth} from '../utils'
 import type {FrequencyOptionValue} from '../types'
 
 const {Option} = SimpleSelect as any
-const I18n = useScope('calendar_frequency_picker')
+const I18n = createI18nScope('calendar_frequency_picker')
 
 export type FrequencyOption = {id: FrequencyOptionValue; label: string}
 

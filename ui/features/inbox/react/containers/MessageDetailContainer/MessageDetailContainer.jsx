@@ -98,7 +98,7 @@ export const MessageDetailContainer = props => {
       'Are you sure you want to delete your copy of this message? This action cannot be undone.'
     )
 
-    const confirmResult = window.confirm(delMsg)  
+    const confirmResult = window.confirm(delMsg)
     if (confirmResult) {
       deleteConversationMessages({variables: {ids: [conversationMessageId]}})
     }
@@ -329,7 +329,8 @@ export const MessageDetailContainer = props => {
   )
 
   // Memo which returns array of ConversationListItem's
-   
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const renderedItems = useMemo(() => {
     const menuData = inboxMessageData?.inboxMessages
 

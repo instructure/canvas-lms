@@ -45,6 +45,8 @@ export type InheritedKeyRegistrationReviewProps = {
 const I18n = createI18nScope('lti_registration.wizard')
 
 export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationReviewProps) => {
+  const [expandCustomFields, setExpandCustomFields] = React.useState(false)
+
   if (props.result._type === 'Success' && props.result.data.configuration) {
     const toolConfiguration = props.result.data.configuration
     const placements = toolConfiguration.placements ?? []
@@ -62,9 +64,6 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
         }
         return acc
       }, {} as Partial<Record<LtiPlacement, string>>) ?? {}
-
-     
-    const [expandCustomFields, setExpandCustomFields] = React.useState(false)
 
     const customFields = toolConfiguration.custom_fields ?? {}
 

@@ -41,9 +41,9 @@ import {
   defaultAlignment,
 } from '../types'
 
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type ToolbarAlignmentProps = {
   layout?: GroupLayout

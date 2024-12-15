@@ -185,7 +185,7 @@ module.exports = [
   {
     plugins: {'react-hooks': pluginReactHooks},
     rules: {
-      'react-hooks/rules-of-hooks': 'off', // until useI18nScope is renamed
+      'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
