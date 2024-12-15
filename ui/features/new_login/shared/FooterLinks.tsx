@@ -21,9 +21,9 @@ import {InlineList} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const FooterLinks = () => {
   const {isUiActionPending, isPreviewMode} = useNewLogin()

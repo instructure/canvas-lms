@@ -24,12 +24,12 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type JQuery from 'jquery'
 import type WikiPageEditView from '../backbone/views/WikiPageEditView'
 import {checkForTitleConflictDebounced} from '../utils/titleConflicts'
 
-const I18n = useI18nScope('pages_edit_title')
+const I18n = createI18nScope('pages_edit_title')
 
 interface ComponentProps {
   canEdit: boolean

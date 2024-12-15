@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownSolid, IconArrowOpenEndSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {EnrollmentTreeItem} from './EnrollmentTreeItem'
@@ -31,7 +31,7 @@ import type {Spacing} from '@instructure/emotion'
 import ToolTipWrapper from './ToolTipWrapper'
 import RoleMismatchToolTip from './RoleMismatchToolTip'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)

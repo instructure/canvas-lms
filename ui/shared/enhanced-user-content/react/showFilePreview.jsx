@@ -19,13 +19,13 @@
 import React, {useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {instanceOf} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import File from '@canvas/files/backbone/models/File'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 
-const I18n = useI18nScope('standalone_file_preview')
+const I18n = createI18nScope('standalone_file_preview')
 
 // showFilePreview repurposes the file preview overlay from the Files
 // pages to show a single file in an arbitrary context. First use
@@ -47,7 +47,7 @@ export function showFilePreview(file_id, verifier = '', access_token = '', instf
   asJson(fetch(url, defaultFetchOptions()))
     .then(file => {
       const backboneFile = new File(file)
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<StandaloneFilePreview preview_file={backboneFile} />, container)
     })
     .catch(err => {

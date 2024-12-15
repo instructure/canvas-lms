@@ -24,7 +24,7 @@ import useToggleCourseNav from './hooks/useToggleCourseNav'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {setSetting} from '@canvas/settings-query/react/settingsQuery'
 import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 
 // @ts-expect-error
@@ -51,7 +51,7 @@ const TopNav: React.FC<ITopNavProps> = ({actionItems, getBreadCrumbSetter}) => {
   // @ts-expect-error
   const [breadCrumbs, setBreadCrumbs] = useState<Crumb[]>(window.ENV.breadcrumbs)
   const queryClient = useQueryClient()
-  const I18n = useI18nScope('react_top_nav')
+  const I18n = createI18nScope('react_top_nav')
 
   const {toggle} = useToggleCourseNav()
 

@@ -23,11 +23,11 @@ import {
   MediaCaptureStrings,
   SelectStrings,
 } from '@canvas/upload-media-translations'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 declare const ENV: GlobalEnv
 

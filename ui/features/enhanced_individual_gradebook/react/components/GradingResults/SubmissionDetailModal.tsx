@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -59,7 +59,7 @@ import {
   submitterPreviewText,
 } from '../../../utils/gradeInputUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type GradeChangeApiUpdate = {
   status: ApiCallStatus

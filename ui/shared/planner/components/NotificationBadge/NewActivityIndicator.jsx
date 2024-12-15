@@ -18,11 +18,11 @@
 
 import React, {Component} from 'react'
 import {arrayOf, string, number, func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
 import Indicator from './Indicator'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class NewActivityIndicator extends Component {
   static propTypes = {

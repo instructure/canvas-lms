@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import PropTypes, {arrayOf} from 'prop-types'
 
 import {Select} from '@instructure/ui-select'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('video_conference')
+const I18n = createI18nScope('video_conference')
 
 const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType, isEditing}) => {
   const [isShowingOptions, setIsShowingOptions] = useState(false)

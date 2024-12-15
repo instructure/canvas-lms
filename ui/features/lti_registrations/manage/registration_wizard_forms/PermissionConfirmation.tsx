@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -26,7 +26,7 @@ import React from 'react'
 import {type LtiScope} from '@canvas/lti/model/LtiScope'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 export type PermissionConfirmationProps = {
   /**

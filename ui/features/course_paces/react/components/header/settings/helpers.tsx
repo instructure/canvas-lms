@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 
-const I18n = useI18nScope('course_paces_settings')
+const I18n = createI18nScope('course_paces_settings')
 
 export const renderManageBlackoutDates = (
   isSyncing: boolean,

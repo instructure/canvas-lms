@@ -20,7 +20,7 @@ import React, {useEffect, useRef} from 'react'
 import {connect} from 'react-redux'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {paceContextsActions} from '../actions/pace_contexts'
 import {actions as uiActions} from '../actions/ui'
 import type {
@@ -38,7 +38,7 @@ import {getResponsiveSize} from '../reducers/ui'
 import Search from './search'
 import {API_CONTEXT_TYPE_MAP} from '../utils/utils'
 
-const I18n = useI18nScope('course_paces_app')
+const I18n = createI18nScope('course_paces_app')
 
 const {Panel: TabPanel} = Tabs as any
 

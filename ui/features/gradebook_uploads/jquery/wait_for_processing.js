@@ -17,11 +17,11 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'spin.js/jquery.spin'
 
-const I18n = useI18nScope('gradebook_uploads')
+const I18n = createI18nScope('gradebook_uploads')
 
 async function sleep(milliseconds) {
   return new Promise(resolve => {
@@ -38,10 +38,10 @@ async function sleep(milliseconds) {
 export async function waitForProcessing(progress, sleep_time = 2000) {
   const spinner = $('#spinner').spin()
   while (!['completed', 'failed'].includes(progress.workflow_state)) {
-    /* eslint-disable no-await-in-loop */
+     
     await sleep(sleep_time)
     progress = await $.ajaxJSON(`/api/v1/progress/${progress.id}`, 'GET').promise()
-    /* eslint-enable no-await-in-loop */
+     
   }
 
   if (progress.workflow_state === 'completed') {

@@ -24,9 +24,9 @@ import {Menu} from '@instructure/ui-menu'
 import {uid} from '@instructure/uid'
 import {type TabsBlockProps, type TabsBlockTab} from './types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const TabsBlockToolbar = () => {
   const {

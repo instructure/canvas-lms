@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, flatten, filter, difference} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -30,7 +30,7 @@ import {View} from '@instructure/ui-view'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('assignmentsToggleShowByView')
+const I18n = createI18nScope('assignmentsToggleShowByView')
 
 export default class ToggleShowByView extends Backbone.View {
   initialize(...args) {
@@ -149,7 +149,7 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   renderToggle() {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>

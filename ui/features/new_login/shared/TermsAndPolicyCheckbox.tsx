@@ -20,9 +20,9 @@ import React from 'react'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 interface Props {
   onChange: (checked: boolean) => void

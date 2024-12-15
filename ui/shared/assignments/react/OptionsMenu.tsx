@@ -31,7 +31,7 @@ import {
   IconTrashLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {BREAKPOINTS, type Breakpoints} from '@canvas/with-breakpoints'
 import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
 import {View} from '@instructure/ui-view'
@@ -44,7 +44,7 @@ import {SET_WORKFLOW} from '@canvas/assignments/graphql/teacher/Mutations'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
 
-const I18n = useI18nScope('assignment_more_button')
+const I18n = createI18nScope('assignment_more_button')
 
 const OptionsMenu = ({
   type,

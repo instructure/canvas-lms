@@ -25,7 +25,7 @@ import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {DiscussionSummary} from '../../components/DiscussionSummary/DiscussionSummary'
 import {getReviewLinkUrl, getSpeedGraderUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
@@ -57,7 +57,7 @@ import TopNavPortalWithDefaults, {
   addCrumbs,
 } from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 import('@canvas/rubrics/jquery/rubricEditBinding')
 
@@ -151,7 +151,7 @@ export const DiscussionTopicContainer = ({
     const message = isAnnouncement
       ? I18n.t('Are you sure you want to delete this announcement?')
       : I18n.t('Are you sure you want to delete this topic?')
-    // eslint-disable-next-line no-alert
+     
     if (window.confirm(message)) {
       deleteDiscussionTopic({
         variables: {
@@ -575,7 +575,7 @@ export const DiscussionTopicContainer = ({
             /*
               HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it
             */
-            // eslint-disable-next-line jsx-a11y/control-has-associated-label, jsx-a11y/anchor-has-content
+            // eslint-disable-next-line jsx-a11y/anchor-has-content
             <a
               href={ENV.DISCUSSION?.CONTEXT_RUBRICS_URL}
               id="add_rubric_url"

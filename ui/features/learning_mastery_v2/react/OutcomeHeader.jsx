@@ -25,12 +25,12 @@ import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
 import {outcomeShape} from './shapes'
 import OutcomeDescriptionModal from './OutcomeDescriptionModal'
 
-const I18n = useI18nScope('learning_mastery_gradebook')
+const I18n = createI18nScope('learning_mastery_gradebook')
 
 const OutcomeHeader = ({outcome}) => {
   // OD => OutcomeDescription

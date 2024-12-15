@@ -21,13 +21,13 @@ import {forEach} from 'lodash'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import {completeUpload} from '@canvas/upload-file'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {ProgressBar} from '@instructure/ui-progress'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(ContentMigration, Backbone.Model)
 
@@ -209,7 +209,7 @@ ContentMigration.prototype.onProgress = function (event) {
   if (event.lengthComputable) {
     mountPoint = document.getElementById('migration_upload_progress_bar')
     if (mountPoint) {
-      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+      // eslint-disable-next-line react/no-render-return-value
       return ReactDOM.render(
         React.createElement(ProgressBar, {
           screenReaderLabel: I18n.t('Uploading progress'),

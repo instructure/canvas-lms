@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -41,7 +41,7 @@ import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
   internalConfig?: InternalLtiConfiguration
   name: string

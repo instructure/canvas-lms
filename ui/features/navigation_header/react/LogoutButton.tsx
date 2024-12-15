@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {Button, type ButtonProps} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import getCookie from '@instructure/get-cookie'
 
-const I18n = useI18nScope('LogoutButton')
+const I18n = createI18nScope('LogoutButton')
 
 export default function LogoutButton(props: ButtonProps) {
   return (

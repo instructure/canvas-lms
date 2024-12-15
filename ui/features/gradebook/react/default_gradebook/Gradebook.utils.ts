@@ -22,7 +22,7 @@ import assignmentHelper from '../shared/helpers/assignmentHelper'
 import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import getTextWidth from '../shared/helpers/TextMeasure'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import htmlEscape, {unescape} from '@instructure/html-escape'
 import filterTypes from './constants/filterTypes'
@@ -62,7 +62,7 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const createDateTimeFormatter = (timeZone: string) => {
   return Intl.DateTimeFormat(I18n.currentLocale(), {
@@ -188,7 +188,7 @@ export function renderComponent(
     throw new Error('mountPoint is required')
   }
   const component = React.createElement(reactClass, props)
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, mountPoint)
 }
 
@@ -460,7 +460,7 @@ export function buildStudentColumn(
     : defaultWidth
   if (Number.isNaN(studentColumnWidth)) {
     studentColumnWidth = defaultWidth
-    // eslint-disable-next-line no-console
+     
     console.warn('invalid student column width')
   }
   return {

@@ -19,7 +19,7 @@
 import React, {useRef} from 'react'
 import {zodResolver} from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import {
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
 
-const I18n = useI18nScope('user_date_range_search')
+const I18n = createI18nScope('user_date_range_search')
 
 const defaultValues = {
   from: undefined,

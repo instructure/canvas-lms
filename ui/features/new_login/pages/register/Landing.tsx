@@ -26,13 +26,13 @@ import {canvas} from '@instructure/ui-theme-tokens'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import iconTeacher from '../../assets/images/teacher.svg'
 import iconStudent from '../../assets/images/student.svg'
 import iconParent from '../../assets/images/parent.svg'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const Landing = () => {
   const navigate = useNavigate()

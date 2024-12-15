@@ -17,14 +17,14 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Tray} from '@instructure/ui-tray'
 import {RubricAssessmentContainer, type ViewMode} from './RubricAssessmentContainer'
 import type {Rubric, RubricAssessmentData} from '../types/rubric'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type RubricAssessmentTrayProps = {
   hidePoints?: boolean

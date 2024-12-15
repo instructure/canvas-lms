@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {debounce} from 'lodash'
 import './datepicker'
@@ -28,7 +28,7 @@ import {isRTL} from '@canvas/i18n/rtlHelper'
 import moment from 'moment'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('datepicker')
+const I18n = createI18nScope('datepicker')
 
 const TIME_FORMAT_OPTIONS = {
   hour: 'numeric',
@@ -91,7 +91,7 @@ function computeDatepickerDefaults() {
       try {
         return I18n.lookup('date.formats.medium_month').slice(0, 2) === '%Y'
       } catch {
-        // eslint-disable-next-line no-console
+         
         console.warn('WARNING Missing required datepicker keys in locale file')
         return false // Assume English
       }
@@ -109,7 +109,7 @@ function computeDatepickerDefaults() {
     datepickerDefaults.dayNamesShort = I18n.lookup('date.abbr_day_names') // title text for column headings
     datepickerDefaults.dayNamesMin = I18n.lookup('date.datepicker.column_headings') // column headings for days (Sunday = 0)
   } catch {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       'WARNING Missing required datepicker keys in locale file, using US English datepicker'
     )
@@ -186,13 +186,13 @@ export default class DatetimeField {
     // showDate || showTime will always be true; i.e. not showDate implies
     // showTime, and vice versa. that's a nice property, so let's enforce it
     // (treating the provision as both as the provision of neither)
-    /* eslint-disable no-console */
+     
     if (timeOnly && dateOnly) {
       console.warn('DatetimeField instantiated with both timeOnly and dateOnly true.')
       console.warn('Treating both as false instead.')
       timeOnly = dateOnly = false
     }
-    /* eslint-enable no-console */
+     
 
     this.showDate = !timeOnly
     this.allowTime = !dateOnly

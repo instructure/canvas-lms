@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
@@ -28,7 +28,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('RosterView')
+const I18n = createI18nScope('RosterView')
 
 export default class RosterView extends Backbone.View {
   static initClass() {
@@ -68,7 +68,7 @@ export default class RosterView extends Backbone.View {
   }
 
   afterRender() {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <TextInput
         onChange={e => {

@@ -18,10 +18,10 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
 
-const I18n = useI18nScope('theme_editor')
+const I18n = createI18nScope('theme_editor')
 
 export default class ThemeEditorFileUpload extends Component {
   static propTypes = {
@@ -135,7 +135,7 @@ export default class ThemeEditorFileUpload extends Component {
             name={!this.props.userInput.val ? this.props.name : undefined}
             value={this.props.userInput.val === '' ? '' : this.props.currentValue}
           />
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          { }
           <label className="ThemeEditorFileUpload__file-chooser">
             <span className="screenreader-only">{this.props.label}</span>
             <input

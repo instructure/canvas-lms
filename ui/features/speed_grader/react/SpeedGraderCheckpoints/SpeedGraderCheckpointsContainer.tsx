@@ -20,7 +20,7 @@ import React, {useContext, useEffect, useState, useCallback} from 'react'
 import {useQuery} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SpeedGraderCheckpoint, EXCUSED} from './SpeedGraderCheckpoint'
 import type {GradeStatusUnderscore} from '@canvas/grading/accountGradingStatus'
 import AssessmentGradeInput from './AssessmentGradeInput'
@@ -30,7 +30,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('SpeedGraderCheckpoints')
+const I18n = createI18nScope('SpeedGraderCheckpoints')
 
 type Props = {
   courseId: string
@@ -313,9 +313,9 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
   }
 
   const getAssignmentWithPropsFromCheckpoints = (
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+     
     assignment: Assignment,
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+     
     submission: SubAssignmentSubmission
   ) => {
     return {

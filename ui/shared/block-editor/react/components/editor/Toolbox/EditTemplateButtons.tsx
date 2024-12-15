@@ -21,9 +21,9 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconXLine} from '@instructure/ui-icons'
 import {type KeyboardOrMouseEvent} from './types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type EditTemplateButtonsProps = {
   templateId: string

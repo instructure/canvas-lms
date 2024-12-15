@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
@@ -35,7 +35,7 @@ import ConfirmCommunicationChannel from '../react/ConfirmCommunicationChannel'
 import ConfirmEmailAddress from '../react/ConfirmEmailAddress'
 import ResendConfirmation from '../react/ResendConfirmation'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 $(document).ready(function () {
   $('.channel_list tr').hover(

@@ -19,7 +19,7 @@
 import React from 'react'
 import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -37,7 +37,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 import {clearObservedId, savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
-const I18n = useI18nScope('pairing_code_user_observees')
+const I18n = createI18nScope('pairing_code_user_observees')
 
 const defaultValues = {
   pairing_code: '',
@@ -94,7 +94,7 @@ function UserObservees({userId}: UserObserveesProps) {
     },
     onSuccess: observee => {
       if (observee?.redirect) {
-        // eslint-disable-next-line no-alert
+         
         const isConfirmed = window.confirm(
           I18n.t(
             "In order to complete the process you will be redirected to a login page where you will need to log in with your child's credentials."
@@ -139,7 +139,7 @@ function UserObservees({userId}: UserObserveesProps) {
   const buttonText = I18n.t('Student')
 
   const handleRemoveObservee = ({observeeId, name}: {observeeId: string; name: string}) => {
-    // eslint-disable-next-line no-alert
+     
     const isConfirmed = window.confirm(
       I18n.t('Are you sure you want to stop observing %{name}?', {
         name,

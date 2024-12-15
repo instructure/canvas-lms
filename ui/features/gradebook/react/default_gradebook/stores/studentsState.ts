@@ -18,7 +18,7 @@
 
 import {difference, chunk} from 'lodash'
 import type {StoreApi} from 'zustand'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GradebookStore} from './index'
 import {getContentForStudentIdChunk} from './studentsState.utils'
 import {asJson, consumePrefetchedXHR} from '@canvas/util/xhr'
@@ -30,7 +30,7 @@ import type {
   UserSubmissionGroup,
 } from '../../../../../api.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type StudentsState = {
   assignmentUserSubmissionMap: AssignmentUserSubmissionMap
@@ -209,7 +209,7 @@ export default (
           )
 
           // when the current chunk requests are all enqueued
-          // eslint-disable-next-line promise/catch-or-return
+           
           chunkRequestDatum.allEnqueued.then(() => {
             submissionRequests.push(...chunkRequestDatum.submissionRequests)
             studentRequests.push(chunkRequestDatum.studentRequest)

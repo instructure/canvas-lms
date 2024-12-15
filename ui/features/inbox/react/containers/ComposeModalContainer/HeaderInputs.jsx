@@ -18,7 +18,7 @@
 
 import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
 import CourseSelect from '../../components/CourseSelect/CourseSelect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {Button} from '@instructure/ui-buttons'
 import PropTypes from 'prop-types'
@@ -33,7 +33,7 @@ import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const HeaderInputs = props => {
   let moreCourses
@@ -44,7 +44,9 @@ const HeaderInputs = props => {
     )
   }
 
-  const [modalContextCourseFilter, setModalContextCourseFilter] = React.useState(props.activeCourseFilter)
+  const [modalContextCourseFilter, setModalContextCourseFilter] = React.useState(
+    props.activeCourseFilter
+  )
 
   const canIncludeObservers = useMemo(() => {
     if (ENV?.CONVERSATIONS?.CAN_MESSAGE_ACCOUNT_CONTEXT) {

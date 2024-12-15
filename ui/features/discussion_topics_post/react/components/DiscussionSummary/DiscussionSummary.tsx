@@ -26,14 +26,14 @@ import {DiscussionSummaryGenerateButton} from './DiscussionSummaryGenerateButton
 import {DiscussionSummaryDisableButton} from './DiscussionSummaryDisableButton'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 interface DiscussionSummaryProps {
   onDisableSummaryClick: () => void
   isMobile: boolean
 }
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
@@ -180,7 +180,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
       </Flex>
     )
   } else {
-    /* eslint-disable react/no-array-index-key */
+     
     content = (
       <>
         <Flex.Item margin={props.isMobile ? '0 0 mediumSmall 0' : '0 0 small 0'}>
@@ -204,7 +204,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
         </Flex.Item>
       </>
     )
-    /* eslint-enable react/no-array-index-key */
+     
   }
 
   return (

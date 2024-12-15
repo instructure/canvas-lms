@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {sendMessageStudentsWho} from '../api'
 import {hasSubmitted, hasSubmission, hasGraded} from '@canvas/grading/messageStudentsWhoHelper'
@@ -27,7 +27,7 @@ import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWhoForm from './MessageStudentsWhoForm'
 import {captureException} from '@sentry/browser'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default class MessageStudentsWhoDialog extends React.Component {
   static propTypes = {
@@ -82,7 +82,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
     else if (selectedFilter === 'more-than') this.handleMoreThan()
     else {
       const errorMessage = 'MessageStudentsWhoDialog error: unrecognized filter'
-      // eslint-disable-next-line no-console
+       
       console.error(errorMessage, selectedFilter)
       captureException(new Error(errorMessage))
     }

@@ -18,7 +18,7 @@
 
 import React from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -31,7 +31,7 @@ import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingStat
 import {useMedia} from 'react-use'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const LtiAppsLayout = React.memo(() => {
   const isManage = useMatch('/manage/*')

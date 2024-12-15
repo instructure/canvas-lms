@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, sizeMediaPlayer} from '@instructure/canvas-media'
 import {StudioPlayer} from '@instructure/studio-player'
 import {Alert} from '@instructure/ui-alerts'
@@ -31,7 +31,7 @@ declare const ENV: GlobalEnv & {
   SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS?: number
 }
 
-const I18n = useI18nScope('CanvasMediaPlayer')
+const I18n = createI18nScope('CanvasMediaPlayer')
 
 const byBitrate = (a: {bitrate: string}, b: {bitrate: string}) =>
   parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
@@ -141,7 +141,7 @@ export default function CanvasStudioPlayer({
         setMediaObjNetworkErr(null)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e: any) {
-        // eslint-disable-next-line no-console
+         
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
         return

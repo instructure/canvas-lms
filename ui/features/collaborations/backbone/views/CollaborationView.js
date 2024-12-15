@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import CollaboratorPickerView from './CollaboratorPickerView'
@@ -25,7 +25,7 @@ import editForm from '../../jst/edit.handlebars'
 import editIframe from '../../jst/EditIframe.handlebars'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
-const I18n = useI18nScope('collaborations')
+const I18n = createI18nScope('collaborations')
 
 extend(CollaborationView, View)
 

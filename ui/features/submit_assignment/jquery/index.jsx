@@ -18,7 +18,7 @@
 
 // xsslint safeString.method I18n.t
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import axios from '@canvas/axios'
 import HomeworkSubmissionLtiContainer from '../backbone/HomeworkSubmissionLtiContainer'
@@ -44,7 +44,7 @@ import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import {captureException} from '@sentry/react'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('submit_assignment')
+const I18n = createI18nScope('submit_assignment')
 
 let submissionAttachmentIndex = -1
 
@@ -69,7 +69,7 @@ ready(function () {
   const alertMount = () => document.getElementById('annotated-screenreader-alert')
 
   if (alertMount()) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Alert screenReaderOnly={true} liveRegion={alertMount} liveRegionPoliteness="assertive">
         {accessibilityAlert}
@@ -90,14 +90,14 @@ ready(function () {
 
       const $emojiPicker = $container.find('.emoji-picker-container')
       if ($emojiPicker.length) {
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
         $emojiPicker.show()
       }
 
       const $emojiQuickPicker = $container.find('.emoji-quick-picker-container')
       if ($emojiQuickPicker.length) {
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <EmojiQuickPicker insertEmoji={insertEmoji.bind(this)} />,
           $emojiQuickPicker[0]
@@ -187,7 +187,7 @@ ready(function () {
           const mountPoint = document.getElementById('progress_indicator')
 
           if (mountPoint) {
-            // eslint-disable-next-line no-restricted-properties
+             
             ReactDOM.render(
               <ProgressCircle
                 screenReaderLabel={I18n.t('Uploading Progress')}
@@ -325,7 +325,7 @@ ready(function () {
     if (late && !skipConfirmation) {
       let result
       if ($('.resubmit_link').length > 0) {
-        // eslint-disable-next-line no-alert
+         
         result = window.confirm(
           I18n.t(
             'messages.now_overdue',
@@ -333,7 +333,7 @@ ready(function () {
           )
         )
       } else {
-        // eslint-disable-next-line no-alert
+         
         result = window.confirm(
           I18n.t('messages.overdue', 'This assignment is overdue.  Do you still want to submit it?')
         )
@@ -418,7 +418,7 @@ ready(function () {
     const fileEl = $('#uploaded_files')
     if (fileEl.is(':hidden')) {
       $.screenReaderFlashMessage(I18n.t('File tree expanded'))
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(fileBrowser, document.getElementById('uploaded_files'))
     } else {
       $.screenReaderFlashMessage(I18n.t('File tree collapsed'))
@@ -438,7 +438,7 @@ ready(function () {
       const wrapperDom = clone.find('.attachment_wrapper')[0]
       if (wrapperDom) {
         const index = ++submissionAttachmentIndex
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <Attachment
             index={index}
@@ -471,7 +471,7 @@ ready(function () {
         window.opener.location.toString()
       )
     } catch (e) {
-      // eslint-disable-next-line no-console
+       
       console.error(e)
       captureException(e)
     }

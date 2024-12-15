@@ -20,12 +20,12 @@ import React, {useState, useEffect} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Modal} from '@instructure/ui-modal'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {IconHourGlassLine} from '@instructure/ui-icons'
 import {ProgressBar} from '@instructure/ui-progress'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 let apiTimeout
 
 export default function ExternalToolMigrationInfo(props) {

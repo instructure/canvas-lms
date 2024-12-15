@@ -20,9 +20,9 @@ import $ from 'jquery'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog'
 import AsyncComponents from '../AsyncComponents'
 import CurveGradesDialogManager from '../CurveGradesDialogManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const {createCurveGradesAction} = CurveGradesDialogManager
 

@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 if (!('INST' in window)) window.INST = {}
 
-const I18n = useI18nScope('loadEventListeners')
+const I18n = createI18nScope('loadEventListeners')
 
 export default function loadEventListeners(callbacks = {}) {
   const validCallbacks = ['equellaCB', 'externalToolCB']

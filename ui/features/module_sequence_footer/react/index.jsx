@@ -17,14 +17,14 @@
  */
 
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 
 import SpeedGraderLink from '@canvas/speed-grader-link'
 import StudentGroupFilter from '@canvas/student-group-filter'
 
-const I18n = useI18nScope('module_sequence_footer')
+const I18n = createI18nScope('module_sequence_footer')
 
 class ModuleSequenceFooter extends Component {
   constructor(props) {
@@ -76,7 +76,7 @@ function renderModuleSequenceFooter() {
   if (ENV.speed_grader_url) {
     const $container = document.getElementById('speed_grader_link_container')
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ModuleSequenceFooter
         courseId={ENV.COURSE_ID}

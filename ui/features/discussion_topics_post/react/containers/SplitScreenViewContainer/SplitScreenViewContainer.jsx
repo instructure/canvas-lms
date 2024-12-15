@@ -45,7 +45,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SplitScreenThreadsContainer} from '../SplitScreenThreadsContainer/SplitScreenThreadsContainer'
 import {SplitScreenParent} from './SplitScreenParent'
 import PropTypes from 'prop-types'
@@ -56,7 +56,7 @@ import * as ReactDOMServer from 'react-dom/server'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 import {LoadingSpinner} from '../../components/LoadingSpinner/LoadingSpinner'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const SplitScreenViewContainer = props => {
   const client = useApolloClient()
@@ -189,7 +189,7 @@ export const SplitScreenViewContainer = props => {
   }
 
   const onDelete = discussionEntry => {
-    // eslint-disable-next-line no-alert
+     
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
@@ -348,10 +348,12 @@ export const SplitScreenViewContainer = props => {
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         const queryResult = JSON.parse(
-          JSON.stringify(client.readQuery({
-            query: DISCUSSION_SUBENTRIES_QUERY,
-            variables: splitScreenEntryOlderDirectionVariables
-          }))
+          JSON.stringify(
+            client.readQuery({
+              query: DISCUSSION_SUBENTRIES_QUERY,
+              variables: splitScreenEntryOlderDirectionVariables,
+            })
+          )
         )
 
         queryResult.legacyNode.discussionSubentriesConnection.nodes = [

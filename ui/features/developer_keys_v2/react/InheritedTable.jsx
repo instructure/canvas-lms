@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FilterBar from '@canvas/filter-bar'
 
 import DeveloperKey from './DeveloperKey'
@@ -31,7 +31,7 @@ import {createSetFocusCallback} from './AdminTable'
 
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 class InheritedTable extends React.Component {
   constructor(props) {

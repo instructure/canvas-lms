@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -26,9 +26,9 @@ import {Spinner} from '@instructure/ui-spinner'
 import CollectionView from '@canvas/backbone-collection-view'
 import template from '../../jst/paginatedCollection.handlebars'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('pagination')
+const I18n = createI18nScope('pagination')
 
 extend(PaginatedCollectionView, CollectionView)
 
@@ -213,7 +213,7 @@ PaginatedCollectionView.prototype.showLoadingIndicator = function () {
   const ref = this.$loadingIndicator
   const node = ref?.get(0)
   if (node instanceof HTMLElement) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />

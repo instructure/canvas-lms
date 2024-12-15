@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {arrayOf, bool, func, oneOf, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
@@ -30,7 +30,7 @@ import {
   COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL,
 } from '../../assignmentData'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 const AssignmentGroupPropTypes = {
   mode: oneOf(['edit', 'view']).isRequired,
@@ -42,12 +42,12 @@ const AssignmentGroupPropTypes = {
   readOnly: bool,
 }
 // eslint doesn't deal with the prop types being defined this way
-/* eslint-disable react/default-props-match-prop-types */
+ 
 const AssignmentGroupDefaultProps = {
   assignmentGroupList: [],
   readOnly: false,
 }
-/* eslint-enable react/default-props-match-prop-types */
+ 
 const assignmentGroupPlaceholder = I18n.t('No Assignment Group Assigned')
 
 class AssignmentGroupUI extends React.Component {

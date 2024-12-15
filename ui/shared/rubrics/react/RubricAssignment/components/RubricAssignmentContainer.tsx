@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
 import type {SaveRubricResponse} from '@canvas/rubrics/react/RubricForm/queries/RubricFormQueries'
 import {View} from '@instructure/ui-view'
@@ -40,7 +40,7 @@ import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {CopyEditConfirmModal} from './CopyEditConfirmModal'
 import {RubricSelfAssessmentSettings} from './RubricSelfAssessmentSettings'
 
-const I18n = useI18nScope('enhanced-rubrics-assignment-container')
+const I18n = createI18nScope('enhanced-rubrics-assignment-container')
 
 export type RubricAssignmentContainerProps = {
   accountMasterScalesEnabled: boolean

@@ -32,7 +32,7 @@ import {
   SUBMISSION_COMMENTS_QUERY,
   VIEWABLE_SUBMISSIONS_QUERY,
 } from '../../../graphql/Queries'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect} from 'react'
@@ -40,7 +40,7 @@ import {useMutation, useQuery} from '@apollo/client'
 import {ConversationContext} from '../../../util/constants'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const ComposeModalManager = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

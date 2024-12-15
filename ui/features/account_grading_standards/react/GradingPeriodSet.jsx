@@ -24,13 +24,13 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine, IconPlusLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriod from './AccountGradingPeriod'
 import GradingPeriodForm from './GradingPeriodForm'
 import gradingPeriodsApi from '@canvas/grading/jquery/gradingPeriodsApi'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const I18n = useI18nScope('GradingPeriodSet')
+const I18n = createI18nScope('GradingPeriodSet')
 
 const sortPeriods = function (periods) {
   return sortBy(periods, 'startDate')

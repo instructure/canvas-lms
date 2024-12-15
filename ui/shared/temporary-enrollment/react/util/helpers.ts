@@ -20,11 +20,11 @@ import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 import moment from 'moment'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {captureException} from '@sentry/browser'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 declare const ENV: GlobalEnv & EnvCommon
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 /**
  * Remove prefix or suffix (default) from input string
@@ -129,12 +129,12 @@ export function getFromLocalStorage<T extends object>(storageKey: string): T | u
     if (typeof parsedValue === 'object' && parsedValue !== null) {
       return parsedValue as T
     } else {
-      // eslint-disable-next-line no-console
+       
       console.warn(`Stored value for ${storageKey} is not an object.`)
       return
     }
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error(`Error fetching/parsing ${storageKey} from localStorage:`, error)
     captureException(error)
   }
@@ -154,7 +154,7 @@ export function setToLocalStorage<T>(storageKey: string, value: T): void {
     const serializedValue = JSON.stringify(value)
     localStorage.setItem(storageKey, serializedValue)
   } catch (error) {
-    // eslint-disable-next-line no-console
+     
     console.error(`Error serializing/saving ${storageKey} to localStorage:`, error)
     captureException(error)
   }

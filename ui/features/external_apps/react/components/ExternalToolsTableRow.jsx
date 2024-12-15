@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func, number, object} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -35,7 +35,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import ExternalToolMigrationInfo from './ExternalToolMigrationInfo'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 const MAX_FAVS = 2 // RCE and Top Navigation share this value
 export default class ExternalToolsTableRow extends React.Component {
@@ -170,8 +170,7 @@ export default class ExternalToolsTableRow extends React.Component {
   }
 
   renderButtons = () => {
-    const permsToRenderSettingsCog =
-      this.props.canEdit || this.props.canDelete
+    const permsToRenderSettingsCog = this.props.canEdit || this.props.canDelete
     const {tool} = this.props
     if (tool.installed_locally && !tool.restricted_by_master_course && permsToRenderSettingsCog) {
       let configureButton = null

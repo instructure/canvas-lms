@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import template from '../../jst/ProgressingContentMigration.handlebars'
 
@@ -38,7 +38,7 @@ import SelectContentView from './SelectContentView'
 
 import SourceLinkView from './SourceLinkView'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(ProgressingContentMigrationView, Backbone.View)
 

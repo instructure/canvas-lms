@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useRef, useMemo} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
 import type {ViewProps} from '@instructure/ui-view'
@@ -28,7 +28,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import type {FormMessage} from '@instructure/ui-form-field'
 
-const I18n = useI18nScope('app_shared_components')
+const I18n = createI18nScope('app_shared_components')
 
 type OptionProps = {
   id: string
@@ -156,7 +156,7 @@ function CanvasMultiSelect(props: Props) {
       key: React.Key
       props: {id: string; children: React.ReactNode; key?: string; group: string; tagText?: string}
     }) {
-      // eslint-disable-next-line @typescript-eslint/no-shadow
+       
       const {id, children, ...optionProps} = child.props
       delete optionProps.tagText
       return (
@@ -211,7 +211,7 @@ function CanvasMultiSelect(props: Props) {
         ...groupsToRender.map(group => (
           <Select.Group key={group} renderLabel={group}>
             {filteredChildren
-              // eslint-disable-next-line @typescript-eslint/no-shadow, react/prop-types
+              // eslint-disable-next-line react/prop-types
               .filter(({props}) => props.group === group)
               .map(option =>
                 renderOption({

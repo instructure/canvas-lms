@@ -20,7 +20,7 @@ import $ from 'jquery'
 import {intersection} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import decodeFromHex from '@canvas/util/decodeFromHex'
 import ColorPicker from '@canvas/color-picker'
 import userSettings from '@canvas/user-settings'
@@ -32,7 +32,7 @@ import 'jquery-tinypubsub'
 import AccountCalendarsModal from '../react/AccountCalendarsModal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('calendar_sidebar')
+const I18n = createI18nScope('calendar_sidebar')
 
 class VisibleContextManager {
   constructor(contexts, selectedContexts, $holder) {
@@ -203,7 +203,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
 function setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange) {
   ReactDOM.unmountComponentAtNode($(`#manage-accounts-btn`)[0])
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <AccountCalendarsModal
       getSelectedOtherCalendars={getSelectedOtherCalendars}
@@ -346,7 +346,7 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     // ensures previously picked color clears
     ReactDOM.unmountComponentAtNode($(`#calendars_color_picker_holder`)[0])
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ColorPicker
         isOpen={true}

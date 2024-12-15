@@ -18,7 +18,7 @@
 
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {useCallback, useState} from 'react'
 
@@ -30,7 +30,7 @@ import {
 import {mapUnderscoreSubmission} from '../../utils/gradebookUtils'
 import type {Submission} from '../../../../api.d'
 
-const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
+const I18n = createI18nScope('enhanced_individual_gradebook_submit_score')
 
 type SubmitScoreRequestBody = {
   originator?: string

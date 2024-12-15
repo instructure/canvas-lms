@@ -19,7 +19,7 @@
 import React, {useState, useReducer} from 'react'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {CommonMigratorControls, parseDateToISOString} from '@canvas/content-migrations'
 import {CreateCourseLabel} from './formComponents/CreateCourseLabel'
@@ -44,7 +44,7 @@ type InvalidForm = {
   isInvalid: boolean
 }
 
-const I18n = useI18nScope('content_copy_redesign')
+const I18n = createI18nScope('content_copy_redesign')
 const dateOrNull = (dateString: string | undefined) => (dateString ? new Date(dateString) : null)
 const defaultInvalidForm = {elements: {}, isInvalid: false}
 

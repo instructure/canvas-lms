@@ -21,13 +21,13 @@ import addLinkRow from '../../jst/addLinkRow.handlebars'
 import AvatarWidget from '@canvas/avatar-dialog-view'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.instructure_forms'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('user_profile')
+const I18n = createI18nScope('user_profile')
 
 export default class ProfileShow extends Backbone.View {
   static initClass() {
@@ -50,7 +50,7 @@ export default class ProfileShow extends Backbone.View {
   }
 
   renderAlert(message, container, variant) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Alert
         variant={variant}

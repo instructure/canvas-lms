@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation} from '@apollo/client'
 import React, {useContext, useEffect, useState} from 'react'
 import type {
@@ -42,7 +42,7 @@ import {
   CREATE_INTERNAL_SETTING_MUTATION,
 } from './graphql/Mutations'
 
-const I18n = useI18nScope('internal-settings')
+const I18n = createI18nScope('internal-settings')
 
 const preventNavigationHandler = (e: BeforeUnloadEvent) => {
   e.preventDefault()

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import progressingMigrationCollectionTemplate from './jst/ProgressingContentMigrationCollection.handlebars'
 import daySubCollectionTemplate from '@canvas/day-substitution/jst/DaySubstitutionCollection.handlebars'
@@ -51,7 +51,7 @@ import extensions from '@canvas/bundles/extensions'
 import processMigrationContentItem from './processMigrationContentItem'
 import {subscribe} from 'jquery-tinypubsub'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 const daySubCollection = new DaySubstitutionCollection()
 

@@ -22,7 +22,7 @@ import {useQuery, useMutation} from '@canvas/query'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {coursesQuery} from '../queries/courseQuery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useTermsQuery} from '../queries/termsQuery'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {
@@ -36,7 +36,7 @@ import {createCourseCopyMutation} from '../mutations/createCourseCopyMutation'
 // @ts-ignore
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 
-const I18n = useI18nScope('content_copy_redesign')
+const I18n = createI18nScope('content_copy_redesign')
 
 export const onSuccessCallback = (newCourseId: string) => {
   window.location.href = `/courses/${newCourseId}/content_migrations`

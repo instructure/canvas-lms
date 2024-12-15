@@ -17,9 +17,9 @@
  */
 
 import {find} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignment_categories')
+const I18n = createI18nScope('assignment_categories')
 
 const OTHER = {
   label: I18n.t('Other'),

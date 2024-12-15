@@ -17,9 +17,9 @@
  */
 
 import type {PasswordPolicy} from '../types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 export const useServerErrorsMap = (passwordPolicy?: PasswordPolicy): Record<string, string> => {
   return {

@@ -34,7 +34,7 @@ import {
   IconUploadLine,
   IconTextLine,
 } from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component} from 'react'
@@ -48,7 +48,7 @@ import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
 import {isOriginalityReportVisible} from '@canvas/grading/originalityReportHelper'
 
-const I18n = useI18nScope('assignments_2_attempt_tab')
+const I18n = createI18nScope('assignments_2_attempt_tab')
 
 const ExternalToolSubmission = lazy(() =>
   import(

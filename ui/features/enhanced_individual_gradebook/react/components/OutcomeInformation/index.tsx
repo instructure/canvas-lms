@@ -19,11 +19,11 @@
 import React from 'react'
 import {type Outcome} from '../../../types'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {type OutcomeScore} from '../LearningMasteryTabsView'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type OutcomeInformationProps = {
   outcome?: Outcome

@@ -34,9 +34,9 @@ import {useClassNames, getContrastingColor, getEffectiveBackgroundColor} from '.
 import type {TabsBlockTab, TabsBlockProps} from './types'
 import {TabsBlockToolbar} from './TabsBlockToolbar'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   const {actions, enabled} = useEditor(state => ({

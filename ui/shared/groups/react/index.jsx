@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable react/prefer-es6-class */
+ 
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -22,7 +22,7 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
@@ -37,7 +37,7 @@ import ManageGroupDialog from './ManageGroupDialog'
 import 'jqueryui/dialog'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
 const StudentView = createReactClass({
   displayName: 'StudentView',
@@ -82,7 +82,7 @@ const StudentView = createReactClass({
       $dialog.dialog('close')
     }
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ManageGroupDialog
         userCollection={this.state.userCollection}

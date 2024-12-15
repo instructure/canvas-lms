@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import Modal from './InstuiModal'
@@ -77,7 +77,7 @@ export function confirm(confirmProps: ConfirmProps): Promise<boolean> {
       alertContainer.removeChild(container)
       resolve(false)
     }
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ConfirmationModal {...confirmProps} onConfirm={handleConfirm} onCancel={handleCancel} />,
       container
@@ -85,7 +85,7 @@ export function confirm(confirmProps: ConfirmProps): Promise<boolean> {
   })
 }
 
-const I18n = useI18nScope('modal')
+const I18n = createI18nScope('modal')
 
 type ConfirmationModalProps = ConfirmProps & {
   onConfirm: () => void

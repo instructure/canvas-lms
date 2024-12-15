@@ -18,9 +18,9 @@
 
 import React from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const ScoreDistributionGraph = props => {
   const {assignment} = props

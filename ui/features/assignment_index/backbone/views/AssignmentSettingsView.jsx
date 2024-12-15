@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {each, some, extend as lodashExtend} from 'lodash'
@@ -33,7 +33,7 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('AssignmentSettingsView')
+const I18n = createI18nScope('AssignmentSettingsView')
 
 extend(AssignmentSettingsView, DialogFormView)
 
@@ -82,7 +82,7 @@ AssignmentSettingsView.prototype.validateFormData = function () {
       return function (weight) {
         const weight_value = $(weight).val()
         const field_selector = weight.getAttribute('groupId')
-        // eslint-disable-next-line no-restricted-globals
+         
         if (weight_value && isNaN(numberHelper.parse(weight_value))) {
           return (errors[field_selector] = [
             {
@@ -223,7 +223,7 @@ AssignmentSettingsView.prototype.addAssignmentGroups = function () {
   const ref = this.assignmentGroups.models
   for (let i = 0, len = ref.length; i < len; i++) {
     const model = ref[i]
-    // eslint-disable-next-line new-cap
+     
     const v = new this.weightsView({
       model,
       canChangeWeights,

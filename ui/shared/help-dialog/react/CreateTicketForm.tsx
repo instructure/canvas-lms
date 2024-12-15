@@ -17,12 +17,12 @@
  */
 
 import React, {useEffect, useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('createTicketForm')
+const I18n = createI18nScope('createTicketForm')
 
 type Props = {
   onCancel: () => void
@@ -90,7 +90,7 @@ function CreateTicketForm({onSubmit, onCancel}: Props) {
           }}
         />
 
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        { }
         <label className="ic-Form-control">
           <span className="ic-Label">{I18n.t('Subject')}</span>
           <input
@@ -104,7 +104,7 @@ function CreateTicketForm({onSubmit, onCancel}: Props) {
           />
         </label>
 
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        { }
         <label className="ic-Form-control">
           <span className="ic-Label">{I18n.t('Description')}</span>
           <textarea
@@ -121,7 +121,7 @@ function CreateTicketForm({onSubmit, onCancel}: Props) {
           />
         </label>
 
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        { }
         <label className="ic-Form-control">
           <span className="ic-Label">{I18n.t('How is this affecting you?')}</span>
           <select
@@ -148,7 +148,7 @@ function CreateTicketForm({onSubmit, onCancel}: Props) {
         </label>
 
         {!window.ENV.current_user_id ? (
-          // eslint-disable-next-line jsx-a11y/label-has-associated-control
+           
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Your email address')}</span>
             <input className="ic-Input" type="email" name="error[email]" />

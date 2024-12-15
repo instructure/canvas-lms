@@ -19,7 +19,7 @@ import React, {useState} from 'react'
 import {arrayOf, bool, func} from 'prop-types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ProficiencyRating} from '@canvas/assignments/graphql/student/ProficiencyRating'
 import {Rubric} from '@canvas/assignments/graphql/student/Rubric'
 import {RubricAssessment} from '@canvas/assignments/graphql/student/RubricAssessment'
@@ -33,7 +33,7 @@ import useStore from './stores/index'
 import {RubricAssessmentTray, TraditionalView} from '@canvas/rubrics/react/RubricAssessment'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 const ENROLLMENT_STRINGS = {
   StudentEnrollment: I18n.t('Student'),

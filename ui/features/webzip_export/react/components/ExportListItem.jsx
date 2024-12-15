@@ -18,13 +18,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('webzip_exports')
+const I18n = createI18nScope('webzip_exports')
 
-// eslint-disable-next-line react/prefer-stateless-function
+ 
 class ExportListItem extends React.Component {
   static propTypes = {
     date: PropTypes.string.isRequired,

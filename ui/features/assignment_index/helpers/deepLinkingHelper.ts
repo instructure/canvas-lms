@@ -19,9 +19,9 @@
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {reloadPage} from '@canvas/deep-linking/DeepLinking'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignment_index_deep_linking_handlers')
+const I18n = createI18nScope('assignment_index_deep_linking_handlers')
 
 export const alertUserModuleCreatedKey = 'alertUserModuleCreatedByDeepLinking'
 

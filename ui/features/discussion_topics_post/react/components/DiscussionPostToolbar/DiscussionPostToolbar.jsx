@@ -20,7 +20,7 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {Flex} from '@instructure/ui-flex'
 import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   IconArrowDownLine,
   IconArrowUpLine,
@@ -50,7 +50,7 @@ import {SummarizeButton} from './SummarizeButton'
 import MoreMenuButton from './MoreMenuButton'
 import AiIcon from '@canvas/ai-icon'
 
-const I18n = useI18nScope('discussions_posts')
+const I18n = createI18nScope('discussions_posts')
 
 export const getMenuConfig = props => {
   const options = {

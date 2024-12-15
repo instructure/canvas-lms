@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {string} from 'prop-types'
 
@@ -31,7 +31,7 @@ import closedForCommentsUrl from '../../images/closed-comments.svg'
 
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('discussions_v2')
+const I18n = createI18nScope('discussions_v2')
 
 const BackgroundSVG = props => (
   <View margin="small auto" maxWidth="16rem" display="block">

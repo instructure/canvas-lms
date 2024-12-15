@@ -32,10 +32,10 @@ import CanvasDateInput, {
 } from '@canvas/datetime/react/components/DateInput'
 import type {BlackoutDate, InputInteraction} from '../types'
 import {coursePaceTimezone, weekendIntegers} from '../api/backend_serializer'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 
-const I18n = useI18nScope('course_pace_date_input')
+const I18n = createI18nScope('course_pace_date_input')
 
 export type CoursePacesDateInputProps = {
   readonly id?: string

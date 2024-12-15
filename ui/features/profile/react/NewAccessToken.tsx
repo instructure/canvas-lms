@@ -19,7 +19,7 @@
 import React, {useRef} from 'react'
 import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -38,7 +38,7 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import type {Token} from './types'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 const defaultValues = {
   purpose: '',

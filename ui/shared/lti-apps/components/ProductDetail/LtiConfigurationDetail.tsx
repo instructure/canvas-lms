@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import type {LtiDetailProps} from '../../models/Product'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 interface LtiConfigurationDetailProps {
   integrationData: LtiDetailProps | undefined
 }

@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
 import OutcomeView from './OutcomeView'
 import template from '../../jst/group.handlebars'
 
-const I18n = useI18nScope('grade_summaryGroupView')
+const I18n = createI18nScope('grade_summaryGroupView')
 
 class GroupView extends View {
   render() {

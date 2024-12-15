@@ -17,7 +17,7 @@
  */
 
 import React, {useMemo} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -34,7 +34,7 @@ import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface ColumnHeader {
   id: string

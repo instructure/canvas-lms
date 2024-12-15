@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
@@ -26,7 +26,7 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 
-const I18n = useI18nScope('video_conference')
+const I18n = createI18nScope('video_conference')
 
 const BaseModalOptions = props => {
   const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit'))

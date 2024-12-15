@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import setDefaultGradeDialogTemplate from '../jst/SetDefaultGradeDialog.handlebars'
 import {isString, values, filter, chain, includes} from 'lodash'
@@ -35,7 +35,7 @@ import '../jst/_grading_box.handlebars'
 import CheckpointsGradeInputs from '@canvas/grading/react/CheckpointsGradeInputs'
 import {CheckpointsDefaultGradeInfo} from '@canvas/grading/react/CheckpointsDefaultGradeInfo'
 
-const I18n = useI18nScope('sharedSetDefaultGradeDialog')
+const I18n = createI18nScope('sharedSetDefaultGradeDialog')
 
 const REPLY_TO_TOPIC = 'reply_to_topic'
 const REPLY_TO_ENTRY = 'reply_to_entry'
@@ -47,7 +47,7 @@ const noop = function () {}
 const slice = [].slice
 
 const alertProxy = function (message) {
-  // eslint-disable-next-line no-alert
+   
   return window.alert(message)
 }
 
@@ -155,7 +155,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
             postDfds = makeRequests(defaultGrade)
           }
 
-          // eslint-disable-next-line prefer-spread
+           
           return $.when.apply($, postDfds).then(function () {
             let responses = arguments.length >= 1 ? slice.call(arguments, 0) : []
             if (postDfds.length === 1) {
@@ -284,7 +284,7 @@ SetDefaultGradeDialog.prototype.gradeIsExcused = function (grade) {
 }
 
 SetDefaultGradeDialog.prototype.gradeIsMissingShortcut = function (grade) {
-  // eslint-disable-next-line no-void
+   
   return this.missing_shortcut_enabled && (grade != null ? grade.toUpperCase() : void 0) === 'MI'
 }
 

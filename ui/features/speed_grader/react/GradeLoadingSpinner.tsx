@@ -18,12 +18,12 @@
 
 import React, {useEffect} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useStoreWithEqualityFn} from 'zustand/traditional'
 import useStore from '../stores/index'
 import type {GradeLoadingData} from '../jquery/speed_grader.d'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 const loadingForStudent = (state: GradeLoadingData) => !!state.gradesLoading[state.currentStudentId]
 const loadingStateChanged = (oldState: GradeLoadingData, newState: GradeLoadingData) =>

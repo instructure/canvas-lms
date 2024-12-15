@@ -19,12 +19,12 @@
 import axios from '@canvas/axios'
 import $ from 'jquery'
 import qs from 'qs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Helpers from './helpers'
 import {uploadFile as rawUploadFile} from '@canvas/upload-file'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('actions')
+const I18n = createI18nScope('actions')
 /* $.flashWarning */
 
 const Actions = {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import FolderChild from '../legacy/components/FolderChild'
@@ -32,7 +32,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 FolderChild.isFolder = function () {
   return this.props.model instanceof Folder
@@ -220,7 +220,7 @@ FolderChild.render = function () {
   return (
     <div {...this.getAttributesForRootNode()}>
       <div className="ef-select-col" role="gridcell">
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        { }
         <label className={keyboardCheckboxClass}>
           <input
             type="checkbox"

@@ -25,10 +25,10 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Link} from '@instructure/ui-link'
 import {courseShape} from '../plannerPropTypes'
 import buildStyle from './style'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ErrorAlert from '../ErrorAlert'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default class GradesDisplay extends Component {
   constructor(props) {
@@ -48,7 +48,7 @@ export default class GradesDisplay extends Component {
 
   scoreString = (score, useThisCoercedLetterGradeInstead = null) => {
     const fixedScore = parseFloat(score)
-    // eslint-disable-next-line no-restricted-globals
+     
     if (isNaN(fixedScore)) return I18n.t('No Grade')
     return useThisCoercedLetterGradeInstead || `${fixedScore.toFixed(2)}%`
   }

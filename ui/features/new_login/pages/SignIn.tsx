@@ -29,9 +29,9 @@ import {createErrorMessage} from '../shared/helpers'
 import {performSignIn} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const SignIn = () => {
   const {

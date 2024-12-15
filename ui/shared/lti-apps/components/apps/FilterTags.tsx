@@ -18,12 +18,12 @@
 
 import React from 'react'
 import type {FilterItem} from '../../models/Filter'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
 import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export default function FilterTags(props: {
   numberOfResults: number

@@ -20,7 +20,7 @@ import React, {useEffect, useState, useRef} from 'react'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.simulate'
 import '@canvas/rails-flash-notifications'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import type {
   PaceContext,
@@ -56,7 +56,7 @@ type SortingProps = {
   'data-button-label': string
 }
 
-const I18n = useI18nScope('course_paces_app')
+const I18n = createI18nScope('course_paces_app')
 
 export interface PaceContextsTableProps {
   paceContexts: PaceContext[]
@@ -374,7 +374,7 @@ const PaceContextsTable = ({
     const cells = getValuesByContextType(paceContext).map((cell, index) => (
       <Table.Cell
         data-testid="course-pace-item"
-        // eslint-disable-next-line react/no-array-index-key
+         
         key={`contexts-table-cell-${index}`}
         themeOverride={{padding: '0.7rem'}}
       >
@@ -434,7 +434,7 @@ const PaceContextsTable = ({
           </Flex>
         )}
         {headers.map(({content: title}, index) => (
-          // eslint-disable-next-line react/no-array-index-key
+           
           <Flex key={`mobile-context-row-${index}`} as="div" width="100%" margin="medium 0">
             <Flex.Item size="50%">
               <Text weight="bold">{title}</Text>

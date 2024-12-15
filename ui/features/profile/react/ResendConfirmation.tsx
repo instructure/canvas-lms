@@ -18,10 +18,10 @@
 
 import React, {useEffect, useState} from 'react'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 enum ConfirmationState {
   HIDDEN = 'hidden',

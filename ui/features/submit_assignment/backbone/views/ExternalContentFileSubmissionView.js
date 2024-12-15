@@ -17,11 +17,11 @@
 
 import $ from 'jquery'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/ExternalContentHomeworkFileSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
 
-const I18n = useI18nScope('ExternalContentFileSubmissionView')
+const I18n = createI18nScope('ExternalContentFileSubmissionView')
 
 class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissionView {
   constructor(...args) {
@@ -39,7 +39,7 @@ class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissio
 
   reloadSuccessfulAssignment(_responseData) {
     $(window).off('beforeunload') // remove alert message from being triggered
-    // eslint-disable-next-line no-alert
+     
     window.alert(
       I18n.t(
         'processing_submission',

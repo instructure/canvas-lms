@@ -18,10 +18,10 @@
 
 import {filter, find, map, some} from 'lodash'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Student} from '../../api.d'
 
-const I18n = useI18nScope('gradebooksharedMessageStudentsWhoHelper')
+const I18n = createI18nScope('gradebooksharedMessageStudentsWhoHelper')
 
 type MessageStudentParams = {
   recipients: string[]

@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {RubricAssessmentImportTray} from './RubricAssessmentImportTray'
 import {useMutation} from '@canvas/query'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
@@ -29,7 +29,7 @@ import {
 import useStore from '../stores'
 import {RubircAssessmentImportFailuresModal} from './RubricAssessmentImportFailuresModal'
 
-const I18n = useI18nScope('rubrics-import')
+const I18n = createI18nScope('rubrics-import')
 
 export const RubricAssessmentImport = () => {
   const [importFile, setImportFile] = useState<File | undefined>()

@@ -23,11 +23,11 @@ import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {type QuestionProps} from './types'
 import QuestionToggle from './QuestionToggle'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 interface QuestionSelectProps {
   onSelect: (question: QuestionProps) => void

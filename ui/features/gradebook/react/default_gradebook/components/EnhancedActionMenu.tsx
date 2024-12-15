@@ -35,10 +35,10 @@ import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import * as tz from '@instructure/moment-utils'
 import DateHelper from '@canvas/datetime/dateHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('gradebookActionMenu')
+const I18n = createI18nScope('gradebookActionMenu')
 
 const {Item: MenuItem, Separator: MenuSeparator} = Menu as any
 

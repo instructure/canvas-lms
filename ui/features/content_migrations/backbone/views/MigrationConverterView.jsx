@@ -21,14 +21,14 @@ import $ from 'jquery'
 import {extend as lodashExtend, defer} from 'lodash'
 import template from '../../jst/MigrationConverter.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import 'jquery-tinypubsub'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {Alert} from '@instructure/ui-alerts'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(MigrationConverterView, ValidatedFormView)
 
@@ -199,7 +199,7 @@ MigrationConverterView.prototype.afterRender = function () {
     margin: '0 0 medium 0',
   })
   if (this.$overwriteWarning[0]) {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render(alert, this.$overwriteWarning[0])
   }
 }

@@ -19,7 +19,7 @@
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as React from 'react'
 import {
   useInheritedKeyWizardState,
@@ -33,7 +33,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {formatApiResultError} from '../../common/lib/apiResult/ApiResult'
 import {flashError} from 'jquery'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export type InheritedKeyRegistrationWizardProps = {
   service: InheritedKeyService
@@ -47,7 +47,7 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
 
   React.useEffect(() => {
     if (state._type === 'RequestingRegistration') {
-      // eslint-disable-next-line promise/catch-or-return
+       
       fetchRegistrationByClientId(props.accountId, state.developerKeyId).then(result => {
         loaded(result)
       })
@@ -89,7 +89,7 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
             // then install the app???
             if (state._type === 'RegistrationLoaded' && state.result._type === 'Success') {
               install()
-              // eslint-disable-next-line promise/catch-or-return
+               
               props.service
                 .bindGlobalLtiRegistration(props.accountId, state.result.data.id)
                 .then(result => {
@@ -102,7 +102,7 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
                       state.onSuccessfulInstallation?.()
                     })
                   } else {
-                    // eslint-disable-next-line no-console
+                     
                     console.error('Failed to install app', formatApiResultError(result))
                     close()
                     flashError(I18n.t('Failed to install app'))

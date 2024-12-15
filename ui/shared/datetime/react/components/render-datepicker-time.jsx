@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('renderDatepickerTime')
+const I18n = createI18nScope('renderDatepickerTime')
 
 const STRINGS = {
   get timeLabel() {
@@ -100,7 +100,7 @@ function renderDatepickerTime($input) {
 
   const containingDiv = document.createElement('div')
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <div className="ui-datepicker-time ui-corner-bottom">
       {label}{' '}

@@ -19,7 +19,7 @@
 
 import React, {useState, useEffect} from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
@@ -33,7 +33,7 @@ import {renderManageBlackoutDates} from './helpers'
 import {WORK_WEEK_DAYS_MENU_OPTIONS} from '../../../../constants'
 import MainMenu from './MainMenu'
 
-const I18n = useI18nScope('course_paces_settings')
+const I18n = createI18nScope('course_paces_settings')
 
 interface StoreProps {
   readonly excludeWeekends: boolean

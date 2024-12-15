@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {LtiPlacements, type LtiPlacement} from '../model/LtiPlacement'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import {Heading} from '@instructure/ui-heading'
@@ -64,7 +64,7 @@ export type PlacementsConfirmationProps = {
   onToggleDefaultDisabled: () => void
 }
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 /**
  * These placements don't have images in the API docs, so we don't show the tooltip.

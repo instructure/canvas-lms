@@ -28,9 +28,9 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import type {Requirement, ModuleItem} from './types'
 import {requirementTypesForResource} from '../utils/miscHelpers'
 import {groupBy} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 // @ts-expect-error
 const resourceLabelMap: Record<ModuleItem['resource'], string> = {

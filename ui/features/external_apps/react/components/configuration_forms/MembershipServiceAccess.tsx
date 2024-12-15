@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
 import type {I18nType} from './types'
 
-const I18n: I18nType = useI18nScope('external_tools')
+const I18n: I18nType = createI18nScope('external_tools')
 
 export interface MembershipServiceAccessProps {
   checked: boolean

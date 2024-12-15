@@ -18,12 +18,12 @@
 
 import $ from 'jquery'
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryClone.handlebars'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 extend(GroupCategoryCloneView, DialogFormView)
 

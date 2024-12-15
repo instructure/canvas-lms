@@ -26,9 +26,9 @@ import buildStyle from './style'
 import {NotificationBadge, MissingIndicator, NewActivityIndicator} from '../NotificationBadge'
 import {badgeShape, sizeShape} from '../plannerPropTypes'
 import {animatable} from '../../dynamic-ui'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class CompletedItemsFacade extends Component {
   constructor(props) {
@@ -52,7 +52,7 @@ export class CompletedItemsFacade extends Component {
     registerAnimatable: func,
     deregisterAnimatable: func,
     notificationBadge: oneOf(['none', 'newActivity', 'missing']),
-    // eslint-disable-next-line react/no-unused-prop-types
+     
     date: momentObj, // the scroll-to-today animation requires a date on each component in the planner
     responsiveSize: sizeShape,
     simplifiedControls: bool,

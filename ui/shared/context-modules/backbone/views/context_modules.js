@@ -19,10 +19,10 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/loading-image'
 
-const I18n = useI18nScope('viewsContextModules')
+const I18n = createI18nScope('viewsContextModules')
 
 /* global modules */
 
@@ -93,7 +93,7 @@ ContextModules.prototype.success = function (response) {
 //   if there was an error.
 // @api private
 ContextModules.prototype.error = function (_response) {
-  // eslint-disable-next-line no-alert
+   
   window.alert('This module could not be published')
   return this.$context_module.loadingImage('remove')
 }

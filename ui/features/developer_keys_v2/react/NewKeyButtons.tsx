@@ -17,14 +17,14 @@
  */
 
 import * as React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {useDynamicRegistrationState} from './dynamic_registration/DynamicRegistrationState'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 const developerKeyMenuItem = (title: string, onClick: () => void) => {
   const buttonIdTitle = title.toLowerCase().replace(' ', '-')

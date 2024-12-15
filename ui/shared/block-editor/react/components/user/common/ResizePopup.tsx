@@ -29,9 +29,9 @@ import {getAspectRatio} from '../../../utils'
 // @ts-expect-error
 import type {ImageSizeVariant} from '../blocks/ImageBlock/types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type ResizePopupProps = {
   width: number

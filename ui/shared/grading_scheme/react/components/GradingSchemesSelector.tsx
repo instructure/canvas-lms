@@ -17,7 +17,7 @@
  */
 import React, {useEffect, useState} from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import shortid from '@canvas/shortid'
 import {Button, CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
@@ -52,7 +52,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useGradingScheme} from '../hooks/useGradingScheme'
 
-const I18n = useI18nScope('assignments.grading_type_selector')
+const I18n = createI18nScope('assignments.grading_type_selector')
 
 export type GradingSchemesSelectorProps = {
   canManage: boolean

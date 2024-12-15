@@ -19,10 +19,12 @@
 import React from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentFilter from './ContentFilter'
 
-const I18n = useI18nScope('gradebook_default_gradebook_components_content_filters_section_filter')
+const I18n = createI18nScope(
+  'gradebook_default_gradebook_components_content_filters_section_filter'
+)
 
 export default function SectionFilter(props) {
   const {sections, selectedSectionId, ...filterProps} = props

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {pick} from 'lodash'
 
 import {InstUISettingsProvider} from '@instructure/emotion'
@@ -32,7 +32,7 @@ import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
 // until the icon gets into INSTUI
 import blackoutDatesIcon from '../../utils/blackout-dates-lined.svg'
 
-const I18n = useI18nScope('course_paces_blackout_date_row')
+const I18n = createI18nScope('course_paces_blackout_date_row')
 
 const componentOverrides = {
   'Table.Cell': {

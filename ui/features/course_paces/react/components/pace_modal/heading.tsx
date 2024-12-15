@@ -20,7 +20,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import type {CoursePace, PaceContext, Section, StoreState} from '../../types'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +29,7 @@ import {getBlueprintLocked} from '../../reducers/ui'
 import Settings from '../header/settings/settings'
 import BlueprintLock from '../header/blueprint_lock'
 
-const I18n = useI18nScope('course_paces_modal')
+const I18n = createI18nScope('course_paces_modal')
 
 interface Props {
   readonly coursePace: CoursePace

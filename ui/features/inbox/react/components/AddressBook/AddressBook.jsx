@@ -41,14 +41,14 @@ import {Text} from '@instructure/ui-text'
 import {Tag} from '@instructure/ui-tag'
 import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useMemo, useState, useRef, useCallback, useContext} from 'react'
 import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from '@apollo/client'
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'

@@ -21,9 +21,9 @@ import ReCaptcha from './ReCaptcha'
 import ReCaptchaWrapper, {type ReCaptchaWrapperRef} from './ReCaptchaWrapper'
 import {ErrorBoundary} from '..'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 interface Props {
   recaptchaKey: string
@@ -64,7 +64,7 @@ const ReCaptchaSection = forwardRef<ReCaptchaSectionRef, Props>(({recaptchaKey, 
     if (onVerify) {
       onVerify(token)
     } else {
-      // eslint-disable-next-line no-console
+       
       console.warn('No onVerify callback provided for ReCaptchaSection.')
     }
   }

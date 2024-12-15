@@ -25,7 +25,7 @@ import {
   type SubmissionGradeParams,
   type SubmissionStatusParams,
 } from './SpeedGraderCheckpointsContainer'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
@@ -36,7 +36,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import AssessmentGradeInput from './AssessmentGradeInput'
 import {UseSameGrade} from '../Shared/UseSameGrade'
 
-const I18n = useI18nScope('SpeedGraderCheckpoints')
+const I18n = createI18nScope('SpeedGraderCheckpoints')
 
 export const NONE = 'none'
 export const LATE = 'late'
@@ -151,7 +151,7 @@ export const SpeedGraderCheckpoint = (props: Props) => {
   }
 
   const updateTimeLate = (value: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+     
     const timeLate = parseInt(value, 10)
     const secondsLate =
       props.lateSubmissionInterval === 'hour' ? timeLate * 3600 : timeLate * 24 * 3600

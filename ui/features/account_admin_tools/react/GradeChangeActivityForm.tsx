@@ -19,7 +19,7 @@
 import React, {useRef} from 'react'
 import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -35,7 +35,7 @@ import FieldGroup from '@canvas/forms/react/field-group/FieldGroup'
 import {Grid} from '@instructure/ui-grid'
 import {IconCoursesSolid, IconUserSolid} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('grade_change_logging_content')
+const I18n = createI18nScope('grade_change_logging_content')
 
 const defaultValues = {
   grader_id: '',

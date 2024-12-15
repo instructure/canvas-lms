@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState, type FormEventHandler, type ReactNode} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -31,7 +31,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Spinner} from '@instructure/ui-spinner'
 import type {Token} from './types'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 type NetworkState = 'loaded' | 'loading' | 'error' | 'submitting'
 
@@ -87,7 +87,7 @@ const AccessTokenDetails = ({
   const handleSubmit: FormEventHandler = async event => {
     event.preventDefault()
 
-    // eslint-disable-next-line no-alert
+     
     const isConfirmed = window.confirm(
       I18n.t(
         'Are you sure you want to regenerate this token?  Anything using this token will have to be updated.'

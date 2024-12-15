@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.Wh
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
 import {QueryProvider} from '@canvas/query'
@@ -27,7 +27,7 @@ import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import type {ViewOwnProps} from '@instructure/ui-view'
 
-const I18n = useI18nScope('HelpLinks')
+const I18n = createI18nScope('HelpLinks')
 
 interface LoginHelpProps {
   linkText: string
@@ -86,7 +86,7 @@ export function renderLoginHelp(loginLink: Element): void {
   const wrapper = document.createElement('span')
   anchorElement.replaceWith(wrapper)
   wrapper.appendChild(anchorElement)
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <QueryProvider>
       <LoginHelp linkText={anchorElement.innerText} />

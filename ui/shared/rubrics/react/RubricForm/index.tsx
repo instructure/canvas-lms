@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator/react'
 import {useQuery, useMutation, queryClient} from '@canvas/query'
@@ -51,7 +51,7 @@ import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {reorder, stripPTags, translateRubricData, translateRubricQueryResponse} from './utils'
 import {Checkbox} from '@instructure/ui-checkbox'
 
-const I18n = useI18nScope('rubrics-form')
+const I18n = createI18nScope('rubrics-form')
 
 const {Option: SimpleSelectOption} = SimpleSelect
 

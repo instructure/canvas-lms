@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -29,7 +29,7 @@ import {MOVE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {useMutation} from '@apollo/client'
 import {outcomeShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeMoveModal')
+const I18n = createI18nScope('OutcomeMoveModal')
 
 const OutcomeMoveModal = ({
   outcomes,
@@ -134,7 +134,7 @@ const OutcomeMoveModal = ({
             )}
           </Text>
           <TargetGroupSelector
-            // eslint-disable-next-line @typescript-eslint/no-shadow
+             
             setTargetGroup={({targetGroup, targetAncestorsIds}) => {
               setTargetGroup(targetGroup)
               setTargetAncestorsIds(targetAncestorsIds)

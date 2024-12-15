@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useMemo} from 'react'
 import {useQuery, useMutation} from '@apollo/client'
 import {GET_SETTING_QUERY, SET_SETTING_MUTATION} from '../../graphql/Queries'
@@ -31,7 +31,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 function boundMaxConcurrent(value) {
   if (value < 1) return 1

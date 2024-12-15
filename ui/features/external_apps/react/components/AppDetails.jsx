@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import page from 'page'
@@ -25,7 +25,7 @@ import Header from './Header'
 import AddApp from './AddApp'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class AppDetails extends React.Component {
   static propTypes = {

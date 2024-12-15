@@ -21,12 +21,12 @@ import PropTypes from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {Popover} from '@instructure/ui-popover'
 import {InstUISettingsProvider} from '@instructure/emotion'
 
-const I18n = useI18nScope('CommentLibrary')
+const I18n = createI18nScope('CommentLibrary')
 
 const componentOverrides = {
   [Menu.componentId]: {

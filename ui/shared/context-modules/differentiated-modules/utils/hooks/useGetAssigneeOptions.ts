@@ -20,11 +20,11 @@ import {useMemo} from 'react'
 import {useQuery} from '@canvas/query'
 import {getSections, getStudents, getGroups} from './queryFn'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {AssigneeOption} from '../../react/Item/types'
 import {uniqBy} from 'lodash'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 type Props = {
   allOptions: AssigneeOption[]

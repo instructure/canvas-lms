@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {type ReactElement} from 'react'
 
 import {CloseButton} from '@instructure/ui-buttons'
@@ -28,7 +28,7 @@ import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
-const I18n = useI18nScope('canvas_modal')
+const I18n = createI18nScope('canvas_modal')
 
 type Props = {
   children: ReactElement | ReactElement[]

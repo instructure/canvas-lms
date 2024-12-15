@@ -21,7 +21,7 @@ import type JQuery from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SpeedGraderSettingsMenu from '../react/SpeedGraderSettingsMenu'
 import htmlEscape from '@instructure/html-escape'
 import {Pill} from '@instructure/ui-pill'
@@ -41,7 +41,7 @@ import '@canvas/jquery-keycodes'
 
 const selectors = new JQuerySelectorCache()
 
-const I18n = useI18nScope('speed_grader_helpers')
+const I18n = createI18nScope('speed_grader_helpers')
 
 const {Alert} = Alerts as any
 
@@ -234,9 +234,9 @@ export function renderStatusMenu(component: React.ReactElement | null, mountPoin
       ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
       : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<></>, document.getElementById(unmountPoint))
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(component || <></>, mountPoint)
 }
 
@@ -312,7 +312,7 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
     onPostGrades,
   }
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SpeedGraderPostGradesMenu {...props} />,
     document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
@@ -328,7 +328,7 @@ export function renderHiddenSubmissionPill(submission: Submission) {
   if (!mountPoint) throw new Error('hidden submission pill mount point not found')
 
   if (isPostable(submission)) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Pill color="warning" margin="0 0 small">
         {I18n.t('Hidden')}
@@ -379,7 +379,7 @@ export function renderDeleteAttachmentLink(
       const url = $(this).attr('href')
       if (!url) throw new Error('submission-file-delete href not found')
       if (
-        // eslint-disable-next-line no-alert
+         
         window.confirm(
           I18n.t(
             'Deleting a submission file is typically done only when a student posts inappropriate or private material.\n\nThis action is irreversible. Are you sure you wish to delete %{file}?',
@@ -459,7 +459,7 @@ export function renderSettingsMenu(header) {
   }
 
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
 }
 
@@ -475,7 +475,7 @@ export function speedGraderJSONErrorFn(
       dismissible: false,
     }
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Alert {...alertProps}>
         <span dangerouslySetInnerHTML={buildAlertMessage()} />

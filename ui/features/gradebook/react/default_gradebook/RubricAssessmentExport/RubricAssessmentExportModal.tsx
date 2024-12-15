@@ -22,14 +22,14 @@ import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import useStore from '../stores'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useAssignmentRubricAssessments} from './useAssignmentRubricAssessments'
 
-const I18n = useI18nScope('rubrics-export')
+const I18n = createI18nScope('rubrics-export')
 
 export const RubricAssessmentExportModal = () => {
   const {rubricAssessmentExportModalProps, toggleRubricAssessmentExportModal} = useStore()

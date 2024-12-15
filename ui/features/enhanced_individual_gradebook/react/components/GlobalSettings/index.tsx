@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {
   type CustomColumn,
@@ -38,7 +38,7 @@ import ShowNotesColumnCheckbox from './ShowNotesColumnCheckbox'
 import ShowTotalGradesAsPointsCheckbox from './ShowTotalGradeAsPointsCheckbox'
 import AllowFinalGradeOverrideCheckbox from './AllowFinalGradeOverrideCheckbox'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type DropDownOption<T> = {
   value: T

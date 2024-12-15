@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {string, bool} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import AnimatableDay from '../Day'
 import KinderPanda from './KinderPanda'
 import {MULTI_COURSE_ITEMS, SINGLE_COURSE_ITEMS} from './mock-items'
@@ -37,7 +37,7 @@ const mediumMediaQuery = window.matchMedia(MEDIUM_MEDIA_QUERY)
 
 const noOp = () => {}
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default function PlannerPreview({timeZone, singleCourse}) {
   let responsiveSize = 'large'

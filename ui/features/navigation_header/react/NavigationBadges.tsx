@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Portal} from '@instructure/ui-portal'
 import {useQuery} from '@canvas/query'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {getSetting} from '@canvas/settings-query/react/settingsQuery'
 
-const I18n = useI18nScope('Navigation')
+const I18n = createI18nScope('Navigation')
 
 const unreadReleaseNotesCountElement = document.querySelector(
   '#global_nav_help_link .menu-item__badge'

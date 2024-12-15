@@ -40,7 +40,7 @@ import {DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {
   SearchContext,
@@ -64,7 +64,7 @@ import {Text} from '@instructure/ui-text'
 import useCreateDiscussionEntry from '../../hooks/useCreateDiscussionEntry'
 import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 const defaultExpandedReplies = id => {
   if (
@@ -314,7 +314,7 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onDelete = () => {
-    // eslint-disable-next-line no-alert
+     
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {

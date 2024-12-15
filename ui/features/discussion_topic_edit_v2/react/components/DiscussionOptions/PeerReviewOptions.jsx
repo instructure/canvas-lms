@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -27,7 +27,7 @@ import {View} from '@instructure/ui-view'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 const peerReviewOptions = [
   {value: 'off', label: I18n.t('Off'), testid: 'peer_review_off'},

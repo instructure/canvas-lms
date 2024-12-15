@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as React from 'react'
 import type {AccountId} from '../model/AccountId'
 import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
@@ -46,7 +46,7 @@ import {Heading} from '@instructure/ui-heading'
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {toUndefined} from '../../common/lib/toUndefined'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
   existingRegistration?: LtiRegistrationWithConfiguration

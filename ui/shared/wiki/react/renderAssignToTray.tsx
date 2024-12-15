@@ -21,7 +21,7 @@ import {Link} from '@instructure/ui-link'
 import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
 import {IconEditLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import ReactDOM from 'react-dom'
 import type {
@@ -33,7 +33,7 @@ import {
   generateDefaultCard,
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
-const I18n = useI18nScope('pages_edit')
+const I18n = createI18nScope('pages_edit')
 
 interface Props {
   pageName?: string
@@ -224,7 +224,7 @@ const AssignToOption = (props: Props) => {
 
 export const renderAssignToTray = (el: HTMLElement, props: Props) => {
   if (el) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<AssignToOption {...props} />, el)
   }
   return <AssignToOption {...props} />

@@ -20,10 +20,10 @@ import React, {useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Button} from '@instructure/ui-buttons'
 import {IconAlertsSolid} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 type ClearBadgeCountsButtonProps = {
   userId: string
   courseId: string

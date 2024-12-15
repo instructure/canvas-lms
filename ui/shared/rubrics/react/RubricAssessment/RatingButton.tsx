@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 
 const {shamrock, tiara} = colors
 type RatingButtonProps = {

@@ -20,7 +20,7 @@ import React, {useRef, useState} from 'react'
 import {useMutation} from '@apollo/client'
 import {CREATE_SUBMISSION} from '@canvas/assignments/graphql/student/Mutations'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 import {getFileThumbnail} from '@canvas/util/fileHelper'
 import {uploadFile} from '@canvas/upload-file'
@@ -41,7 +41,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import UploadFileSVG from '../../../features/assignments_show_student/images/UploadFile.svg'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 type AlertType = {
   text: string

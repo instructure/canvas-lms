@@ -19,7 +19,7 @@
 import React, {useState, useRef, useEffect, useContext, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -83,7 +83,7 @@ import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewS
 import {MasteryPathsReactWrapper} from '@canvas/conditional-release-editor/react/MasteryPathsReactWrapper'
 import {showPostToSisFlashAlert} from '@canvas/due-dates/util/differentiatedModulesUtil'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 

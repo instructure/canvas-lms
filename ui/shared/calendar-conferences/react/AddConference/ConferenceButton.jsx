@@ -22,11 +22,11 @@ import {Button} from '@instructure/ui-buttons'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ConferenceSelect from './ConferenceSelect'
 import webConferenceType from '../proptypes/webConferenceType'
 
-const I18n = useI18nScope('conferences')
+const I18n = createI18nScope('conferences')
 
 const ConferenceButton = ({
   conferenceTypes,

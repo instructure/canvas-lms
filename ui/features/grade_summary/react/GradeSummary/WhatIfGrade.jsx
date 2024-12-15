@@ -19,7 +19,7 @@
 import React, {useState, useContext, useEffect} from 'react'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useMutation} from '@apollo/client'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {UPDATE_SUBMISSION_STUDENT_ENTERED_SCORE} from '../../graphql/Mutations'
 
@@ -34,7 +34,7 @@ import {View} from '@instructure/ui-view'
 
 import {formatNumber} from './utils'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const updateCache = (cache, {data}) => {
   const options = {

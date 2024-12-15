@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Mask, Overlay} from '@instructure/ui-overlays'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 type Props = {
   open: boolean

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import EditorToggle from '@canvas/editor-toggle'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
-const I18n = useI18nScope('EntryEditor')
+const I18n = createI18nScope('EntryEditor')
 
 /*
 xsslint safeString.property content
@@ -84,7 +84,7 @@ export default class EntryEditor extends EditorToggle {
       $('<a/>')
         .text(I18n.t('Cancel'))
         .css({marginLeft: '5px'})
-        // eslint-disable-next-line no-script-url
+         
         .attr('href', 'javascript:')
         .addClass('cancel_button')
         .click(() => {
@@ -97,7 +97,7 @@ export default class EntryEditor extends EditorToggle {
   createDeleteAttachmentButton() {
     return (
       $('<a/>')
-        // eslint-disable-next-line no-script-url
+         
         .attr('href', 'javascript:')
         .text('x')
         .addClass('cancel_button')

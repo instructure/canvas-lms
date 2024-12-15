@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import {filter, uniq, reject, range, extend as lodashExtend} from 'lodash'
@@ -36,7 +36,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('gradebookOutcomeGradebookView')
+const I18n = createI18nScope('gradebookOutcomeGradebookView')
 
 const Dictionary = {
   exceedsMastery: {
@@ -255,7 +255,7 @@ OutcomeGradebookView.prototype._rerender = function () {
   this.grid.setData([])
   this.grid.invalidate()
   this.hasOutcomes = $.Deferred()
-  // eslint-disable-next-line promise/catch-or-return
+   
   $.when(this.hasOutcomes).then(this.renderGrid)
   return this._loadOutcomes()
 }
@@ -312,7 +312,7 @@ OutcomeGradebookView.prototype._loadFilterSettings = function () {
 OutcomeGradebookView.prototype.render = function () {
   OutcomeGradebookView.__super__.render.call(this)
   this.renderSectionMenu()
-  // eslint-disable-next-line promise/catch-or-return
+   
   $.when(this.hasOutcomes).then(this.renderGrid)
   return this
 }
@@ -413,7 +413,7 @@ OutcomeGradebookView.prototype.onShow = function () {
 // Returns nothing.
 OutcomeGradebookView.prototype.loadPage = function (page) {
   this.hasOutcomes = $.Deferred()
-  // eslint-disable-next-line promise/catch-or-return
+   
   $.when(this.hasOutcomes).then(this.renderGrid)
   return this._loadOutcomes(page)
 }
@@ -433,7 +433,7 @@ OutcomeGradebookView.prototype.renderSectionMenu = function () {
       disabled: false,
     }
     const component = React.createElement(SectionFilter, props)
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     return (this.sectionFilterMenu = ReactDOM.render(component, mountPoint))
   }
 }

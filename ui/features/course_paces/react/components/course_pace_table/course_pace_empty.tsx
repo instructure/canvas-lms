@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowEndSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,7 +30,7 @@ import {actions} from '../../actions/ui'
 import PandaShowingPaces from '../../../images/PandaShowingPaces.svg'
 import PandaUsingPaces from '../../../images/PandaUsingPaces.svg'
 
-const I18n = useI18nScope('course_paces_empty_state')
+const I18n = createI18nScope('course_paces_empty_state')
 
 interface DispatchProps {
   readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext

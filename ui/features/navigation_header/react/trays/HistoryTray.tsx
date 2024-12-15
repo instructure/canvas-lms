@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import HistoryList from '../lists/HistoryList'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 
-const I18n = useI18nScope('new_nav')
+const I18n = createI18nScope('new_nav')
 
 export default function HistoryTray() {
   return (

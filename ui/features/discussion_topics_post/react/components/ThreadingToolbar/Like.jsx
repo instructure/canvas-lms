@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {View} from '@instructure/ui-view'
@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function Like({...props}) {
   function icon() {

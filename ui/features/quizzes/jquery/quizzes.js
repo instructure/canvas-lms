@@ -18,7 +18,7 @@
 
 // Ignored rules can be removed incrementally
 // Resolving all these up-front is untenable and unlikely
- 
+
 /* eslint-disable prefer-const */
 /* eslint-disable no-empty */
 /* eslint-disable no-redeclare */
@@ -27,7 +27,7 @@
 // xsslint jqueryObject.property sortable placeholder
 // xsslint safeString.property question_text
 import regradeTemplate from '../jst/regrade.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {find, forEach, keys, difference} from 'lodash'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
@@ -72,7 +72,7 @@ import {underscoreString} from '@canvas/convert-case'
 import replaceTags from '@canvas/util/replaceTags'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 
-const I18n = useI18nScope('quizzes_public')
+const I18n = createI18nScope('quizzes_public')
 
 let dueDateList, overrideView, quizModel, sectionList, correctAnswerVisibility, scoreValidation
 

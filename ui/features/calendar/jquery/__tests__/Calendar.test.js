@@ -18,7 +18,7 @@
 
 import Calendar from '../index'
 import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import moment from 'moment'
 import tzInTest from '@instructure/moment-utils/specHelpers'
@@ -30,7 +30,7 @@ import 'jquery-migrate'
 import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 const makeMockDataSource = () => ({
   getAppointmentGroups: jest.fn(),
@@ -89,7 +89,7 @@ describe('Calendar', () => {
     const cal = makeCal()
     // Wait for fullcalendar to initialize
     jest.advanceTimersByTime(0)
-    expect($('#fixtures .fc').length).toBe(1)
+    expect($('#fixtures .fc')).toHaveLength(1)
   })
 
   it('returns correct format for 24 hour times', () => {
@@ -158,7 +158,7 @@ describe('Calendar', () => {
     cal.eventRender(event, $eventDiv, 'month')
     // Wait for render
     jest.advanceTimersByTime(0)
-    expect($('#fixtures .icon-someicon').length).toBe(1)
+    expect($('#fixtures .icon-someicon')).toHaveLength(1)
   })
 
   describe('isSameWeek', () => {

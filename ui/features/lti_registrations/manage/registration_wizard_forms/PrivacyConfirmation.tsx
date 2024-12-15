@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -30,7 +30,7 @@ import {
 } from '../model/LtiPrivacyLevel'
 import {i18nLtiPrivacyLevel, i18nLtiPrivacyLevelDescription} from '../model/i18nLtiPrivacyLevel'
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 export type PrivacyConfirmationProps = {
   /**

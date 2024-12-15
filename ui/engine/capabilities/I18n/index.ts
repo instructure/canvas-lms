@@ -51,12 +51,14 @@ const LocaleBackfill: Capability = {
 const Translations: Capability = {
   up: oncePerPage('translations', async () => {
     if (ENV.RAILS_ENVIRONMENT === 'test') {
-      registerTranslations(ENV.LOCALE, fallbacks)
+      registerTranslations(ENV.LOCALE || navigator.language || 'en', fallbacks)
       return
     }
     try {
       const {json} = await doFetchApi({path: ENV.LOCALE_TRANSLATION_FILE})
-      registerTranslations(ENV.LOCALE, json)
+      if (typeof json === 'object' && json !== null) {
+        registerTranslations(ENV.LOCALE || navigator.language || 'en', json)
+      }
     } catch {
       // We need to fall back to the bare bones English fallbacks so that things
       // like dates and times and community links can still translate; without
@@ -65,7 +67,7 @@ const Translations: Capability = {
       // the Rails-rendered stuff) and English (from JS-rendered stuff), but
       // loading Canvas this way is better than just rendering a blank page
       // because none of the front-end code could start.
-      registerTranslations(ENV.LOCALE, fallbacks)
+      registerTranslations(ENV.LOCALE || navigator.language || 'en', fallbacks)
       // eslint-disable-next-line no-console
       console.error(
         `CAUTION could not load translations for "${ENV.LOCALE}", falling back to US English`

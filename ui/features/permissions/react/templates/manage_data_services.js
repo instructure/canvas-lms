@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {generateActionTemplates} from '../generateActionTemplates'
 
-const I18n = useI18nScope('manage_data_services')
+const I18n = createI18nScope('manage_data_services')
 
 export const template = generateActionTemplates([
   {

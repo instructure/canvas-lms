@@ -17,13 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('LockButton')
+const I18n = createI18nScope('LockButton')
 
 extend(LockButton, Backbone.View)
 

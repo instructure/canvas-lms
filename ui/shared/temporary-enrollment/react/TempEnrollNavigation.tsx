@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import type {Bookmark} from './types'
 import {IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 interface Props {
   readonly prev?: Bookmark

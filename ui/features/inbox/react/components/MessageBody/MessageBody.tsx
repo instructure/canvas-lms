@@ -19,10 +19,10 @@
 import React, {useContext, useEffect} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextArea} from '@instructure/ui-text-area'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModalBodyContext, signatureSeparator} from '../../utils/constants'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 type Message = {
   text: string

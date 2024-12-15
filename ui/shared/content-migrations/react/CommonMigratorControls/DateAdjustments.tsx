@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -32,7 +32,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import type {DateAdjustmentConfig, DaySub} from './types'
 import {timeZonedFormMessages} from './timeZonedFormMessages'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 let subs_id = 1
 
 const formatDate = (date: Date) => {

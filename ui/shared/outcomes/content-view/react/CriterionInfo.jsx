@@ -22,9 +22,9 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('outcomesCriterionInfo')
+const I18n = createI18nScope('outcomesCriterionInfo')
 
 const spiel = () =>
   I18n.t(`
@@ -101,6 +101,6 @@ export default class CriterionInfo extends React.Component {
 }
 
 export const addCriterionInfoButton = element => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<CriterionInfo />, element)
 }

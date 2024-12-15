@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {IconSettingsLine} from '@instructure/ui-icons'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -25,7 +25,7 @@ import type {ResponsiveSizes} from 'features/course_paces/react/types'
 
 import type {ButtonProps} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('course_paces_settings')
+const I18n = createI18nScope('course_paces_settings')
 
 interface MainMenuProps {
   readonly children: any

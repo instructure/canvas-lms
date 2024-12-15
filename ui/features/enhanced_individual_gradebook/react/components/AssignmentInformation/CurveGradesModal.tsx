@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import type {
   AssignmentConnection,
@@ -36,7 +36,7 @@ async function loadCurveGradesDialog() {
   return (await import('@canvas/grading/jquery/CurveGradesDialog')).default
 }
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type StudentAssignmentMap = {
   [userId: string]: {

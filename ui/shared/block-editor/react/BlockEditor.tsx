@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {type NodeId, DefaultEventHandlers, Editor, Frame} from '@craftjs/core'
 import uuid from 'uuid'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
@@ -50,7 +50,7 @@ import {
 import './style.css'
 import CreateFromTemplate from '@canvas/block-editor/react/CreateFromTemplate'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 declare global {
   interface Window {
@@ -296,7 +296,7 @@ export default function BlockEditor({
 
   useEffect(() => {
     if (data.version !== LATEST_BLOCK_DATA_VERSION) {
-      // eslint-disable-next-line no-alert
+       
       alert(I18n.t('Unknown block data version "%{v}", mayhem may ensue', {v: data.version}))
     }
   }, [data.version])

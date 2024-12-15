@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -28,7 +28,7 @@ import FilterOptions from './FilterOptions'
 import type {FilterItem, LtiFilters, LpFilters} from '../../models/Filter'
 import type {DiscoverParams} from '../../hooks/useDiscoverQueryParams'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export type LtiFilterTrayProps = {
   isTrayOpen: boolean

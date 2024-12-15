@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import splitAssetString from '@canvas/util/splitAssetString'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export class ExternalToolsTable extends React.Component {
   static propTypes = {

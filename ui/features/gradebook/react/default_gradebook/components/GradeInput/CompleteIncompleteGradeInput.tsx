@@ -19,10 +19,10 @@
 import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {Select} from '@instructure/ui-select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 // @ts-expect-error
 function optionIdForGradeInfo(gradeInfo) {

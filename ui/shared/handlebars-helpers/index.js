@@ -19,7 +19,7 @@
 import * as tz from '@instructure/moment-utils'
 import enrollmentName from './enrollmentName'
 import _Handlebars from 'handlebars/runtime'
-import I18nObj, {useScope as useI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
+import I18nObj, {useScope as createI18nScope} from '@canvas/i18n' //  'i18nObj' gets the extended I18n object with all the extra functions (interpolate, strftime, ...)
 import $ from 'jquery'
 import {chain, defaults, isDate, map, reduce} from 'lodash'
 import htmlEscape, {raw} from '@instructure/html-escape'
@@ -39,7 +39,7 @@ import {
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('handlebars_helpers')
+const I18n = createI18nScope('handlebars_helpers')
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -76,8 +76,7 @@ const object = {
       }
     }
     if (options.i18n_scope) {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useI18nScope(options.i18n_scope)
+      createI18nScope(options.i18n_scope)
     }
     return new Handlebars.SafeString(htmlEscape(I18nObj.t(...Array.from(args), options)))
   },

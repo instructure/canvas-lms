@@ -19,14 +19,14 @@
 import React from 'react'
 import {type ITopNavProps} from '@canvas/top-navigation/react/TopNav'
 import {IconStudentViewLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from 'axios'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {createRoot} from 'react-dom/client'
 import {TopNavPortalBase, type WithProps, type Crumb, getMountPoint} from './TopNavPortalBase'
 import type {ItemChild} from '@instructure/ui-top-nav-bar/types/TopNavBar/props'
 
-const I18n = useI18nScope('discussions_v2')
+const I18n = createI18nScope('discussions_v2')
 const STUDENT_VIEW_URL_TEMPLATE = '/courses/{courseId}/student_view?redirect_to_referer=1'
 type EnvCommon = import('@canvas/global/env/EnvCommon').EnvCommon
 const isStudent = () => {
@@ -41,7 +41,7 @@ const handleStudentViewClick = (studentViewUrl: string) => {
       window.location.reload()
     })
     .catch(error => {
-      // eslint-disable-next-line no-console
+       
       console.error('Error loading student view', error)
     })
 }

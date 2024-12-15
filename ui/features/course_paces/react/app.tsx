@@ -39,7 +39,7 @@ import {
   getIsSyncing,
 } from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getSummarizedChanges, getCoursePace, getPacePublishing} from './reducers/course_paces'
 import {coursePaceActions} from './actions/course_paces'
 import type {SummarizedChange} from './utils/change_tracking'
@@ -47,7 +47,7 @@ import {Tray} from '@instructure/ui-tray'
 import Errors from './components/errors'
 import PaceModal from './components/pace_modal'
 
-const I18n = useI18nScope('course_paces_app')
+const I18n = createI18nScope('course_paces_app')
 
 interface StoreProps {
   readonly loadingMessage: string

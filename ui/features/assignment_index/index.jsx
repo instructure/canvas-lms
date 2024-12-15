@@ -37,9 +37,9 @@ import {
 } from './helpers/deepLinkingHelper'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignment_index')
+const I18n = createI18nScope('assignment_index')
 
 const course = new Course({
   id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
@@ -116,7 +116,7 @@ ready(() => {
 
   const node = document.querySelector('.loadingIndicator')
   if (node instanceof HTMLElement) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
@@ -124,7 +124,7 @@ ready(() => {
       node
     )
   }
-  // eslint-disable-next-line promise/catch-or-return
+   
   getPrefetchedXHR('assignment_groups_url')
     .then(res =>
       res.json().then(data => {

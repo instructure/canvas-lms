@@ -31,10 +31,10 @@ import LockManager from '@canvas/blueprint-courses/react/components/LockManager/
 import SectionsAutocomplete from './react/SectionsAutocomplete'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AnonymousPostSelector} from './react/AnonymousPostSelector/AnonymousPostSelector'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 const isAnnouncement =
   ENV.DISCUSSION_TOPIC.ATTRIBUTES != null
@@ -77,7 +77,7 @@ function renderSectionsAutocomplete(view) {
       }
 
       const sectionsAreDisabled = isGradedDiscussion || isGroupDiscussion
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <SectionsAutocomplete
           selectedSections={ENV.SELECTED_SECTION_LIST}
@@ -166,7 +166,7 @@ ready(() => {
             'Users do not receive updated notifications when editing an announcement. If you wish to have users notified of this update via their notification settings, you will need to create a new announcement.'
           ),
         }
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <View display="block" id={alertProps.id} key={alertProps.key}>
         <Alert variant={alertProps.variant}>{alertProps.text}</Alert>
@@ -207,7 +207,7 @@ ready(() => {
       })
     })
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <View width="580px" display="block" data-testid="groups_grading_not_allowed">
         <Alert variant="info" margin="small">
@@ -218,7 +218,7 @@ ready(() => {
     )
 
     if (anonymousPostSelector) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<AnonymousPostSelector />, anonymousPostSelector)
     }
   })

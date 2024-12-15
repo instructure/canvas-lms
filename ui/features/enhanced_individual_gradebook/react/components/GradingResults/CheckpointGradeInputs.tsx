@@ -24,11 +24,11 @@ import {
 } from '../../../types'
 import {Flex} from '@instructure/ui-flex'
 import DefaultGradeInput from './DefaultGradeInput'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from './index'
 import type {Spacing} from '@instructure/emotion'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   parentAssignment: AssignmentConnection

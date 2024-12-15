@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {Menu} from '@instructure/ui-menu'
 import type {FilterDrilldownMenuItem, FilterType} from '../gradebook.d'
@@ -26,7 +26,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type FilterNavPopoverProps = {
   filterType?: FilterType

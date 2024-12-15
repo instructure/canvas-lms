@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import DateHelper from '@canvas/datetime/dateHelper'
 import React from 'react'
@@ -27,7 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function AssignmentDueDate({...props}) {
   let assignmentDueDate = null

@@ -19,14 +19,14 @@
 import React, {useState, useEffect} from 'react'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import DiscussionTopicFormContainer from './containers/DiscussionTopicFormContainer/DiscussionTopicFormContainer'
 
-const I18n = useI18nScope('discussion_topics_edit')
+const I18n = createI18nScope('discussion_topics_edit')
 
 export const DiscussionTopicEdit = _props => {
   const [client, setClient] = useState(null)

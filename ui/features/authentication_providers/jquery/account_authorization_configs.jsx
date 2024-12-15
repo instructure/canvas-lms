@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -28,7 +28,7 @@ import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
 import '@canvas/jquery-keycodes'
 import '@canvas/loading-image'
 
-const I18n = useI18nScope('authentication_providers')
+const I18n = createI18nScope('authentication_providers')
 
 ready(() => {
   const selectorNode = document.getElementById('add-authentication-provider')
@@ -39,7 +39,7 @@ ready(() => {
     value: 'default',
   })
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <AuthTypePicker
       authTypes={authTypeOptions}

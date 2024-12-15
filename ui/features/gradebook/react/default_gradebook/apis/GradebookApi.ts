@@ -17,13 +17,13 @@
  */
 
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {underscoreProperties} from '@canvas/convert-case'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {serializeFilter} from '../Gradebook.utils'
 import type {CustomColumn, FilterPreset, GradebookSettings} from '../gradebook.d'
 
-const I18n = useI18nScope('gradebookGradebookApi')
+const I18n = createI18nScope('gradebookGradebookApi')
 
 function applyScoreToUngradedSubmissions(courseId?: string, params: any = {}) {
   const url = `/api/v1/courses/${courseId}/apply_score_to_ungraded_submissions`

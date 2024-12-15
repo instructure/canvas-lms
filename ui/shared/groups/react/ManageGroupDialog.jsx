@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {without} from 'lodash'
 import React from 'react'
@@ -26,9 +26,9 @@ import PaginatedUserCheckList from './PaginatedUserCheckList'
 import InfiniteScroll from './mixins/InfiniteScroll'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
-// eslint-disable-next-line react/prefer-es6-class
+ 
 const ManageGroupDialog = createReactClass({
   displayName: 'ManageGroupDialog',
   mixins: [BackboneState, InfiniteScroll],
@@ -113,7 +113,7 @@ const ManageGroupDialog = createReactClass({
               </tr>
               <tr>
                 <td>
-                  {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+                  { }
                   <label aria-live="polite" aria-atomic="true">
                     {I18n.t('Members')} {inviteLimit}
                   </label>

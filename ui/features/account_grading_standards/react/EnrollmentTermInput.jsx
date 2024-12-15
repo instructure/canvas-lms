@@ -19,10 +19,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {map, find, groupBy, includes, uniq, isEmpty, some, union, reject, isDate} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
-const I18n = useI18nScope('EnrollmentTermInput')
+const I18n = createI18nScope('EnrollmentTermInput')
 
 const groupByTagType = function (options) {
   const now = new Date()
@@ -137,7 +137,7 @@ class EnrollmentTermInput extends React.Component {
     return (
       // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div className="ic-Form-control" onKeyDown={this.suppressKeys}>
-        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+        { }
         <label
           className="ic-Label"
           title={I18n.t('Attach terms')}

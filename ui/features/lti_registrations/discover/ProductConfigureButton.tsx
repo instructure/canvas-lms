@@ -23,7 +23,7 @@ import {openDynamicRegistrationWizard} from '../manage/registration_wizard/Regis
 import {useNavigate} from 'react-router-dom'
 import {openInheritedKeyWizard} from '../manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizardState'
 import {ZDeveloperKeyId} from '../manage/model/developer_key/DeveloperKeyId'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ZUnifiedToolId} from '../manage/model/UnifiedToolId'
 
 export type ConfigureButtonProps = {
@@ -31,7 +31,7 @@ export type ConfigureButtonProps = {
   ltiConfiguration: Lti
 }
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const ProductConfigureButton = ({buttonWidth, ltiConfiguration}: ConfigureButtonProps) => {
   const navigate = useNavigate()

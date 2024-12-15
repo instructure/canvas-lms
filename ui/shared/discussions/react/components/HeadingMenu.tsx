@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useCallback} from 'react'
 import {Menu} from '@instructure/ui-menu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -26,7 +26,7 @@ import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {debounce} from 'lodash'
 import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 interface SelectedObject {
   value: string

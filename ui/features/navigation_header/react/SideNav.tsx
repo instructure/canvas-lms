@@ -42,7 +42,7 @@ import {
   IconSettingsLine,
 } from '@instructure/ui-icons'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useQuery} from '@canvas/query'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {getUnreadCount} from './queries/unreadCountQuery'
@@ -57,7 +57,7 @@ import {
 import {getSettingAsync, setSetting} from '@canvas/settings-query/react/settingsQuery'
 import {SVGIcon} from '@instructure/ui-svg-images'
 
-const I18n = useI18nScope('sidenav')
+const I18n = createI18nScope('sidenav')
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))

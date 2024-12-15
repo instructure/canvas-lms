@@ -24,10 +24,10 @@ import type {Moment, MomentInput} from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
 import {View} from '@instructure/ui-view'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {isoDateFromInput} from '../../../util/DateUtils'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const formatDate = (date: Date) => tz.format(date, 'date.formats.medium')
 

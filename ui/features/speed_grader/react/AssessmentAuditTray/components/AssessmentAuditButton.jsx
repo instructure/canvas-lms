@@ -21,9 +21,9 @@ import {func} from 'prop-types'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Link} from '@instructure/ui-link'
 import {IconClockLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 const componentOverrides = {
   [Link.componentId]: {

@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect, useState, useLayoutEffect} from 'react'
 import {connect, Provider} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {responsiviser, store} from '@canvas/planner'
@@ -68,7 +68,7 @@ import {handleDashboardCardError} from '@canvas/dashboard-card/util/dashboardUti
 
 const componentOverrides = getK5ThemeOverrides()
 
-const I18n = useI18nScope('k5_dashboard')
+const I18n = createI18nScope('k5_dashboard')
 
 const DASHBOARD_TABS = [
   {

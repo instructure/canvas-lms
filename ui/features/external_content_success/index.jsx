@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/rails-flash-notifications'
@@ -27,7 +27,7 @@ import {Alert} from '@instructure/ui-alerts'
 import replaceTags from '@canvas/util/replaceTags'
 import {postMessageExternalContentReady} from '@canvas/external-tools/messages'
 
-const I18n = useI18nScope('external_content.success')
+const I18n = createI18nScope('external_content.success')
 
 const ExternalContentSuccess = {}
 
@@ -71,7 +71,7 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
     target.parentNode.insertBefore(wrapper, target)
 
     await new Promise(resolve => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <>
           {[
@@ -82,7 +82,7 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
             .map(([msg, isError], index) => {
               return (
                 <Alert
-                  // eslint-disable-next-line react/no-array-index-key
+                   
                   key={index}
                   variant={isError ? 'error' : 'info'}
                   renderCloseButtonLabel="Close"

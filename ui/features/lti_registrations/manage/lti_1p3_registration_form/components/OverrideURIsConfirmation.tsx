@@ -24,7 +24,7 @@ import {
   supportsDeepLinkingRequest,
   supportsResourceLinkRequest,
 } from '../../model/LtiPlacement'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
@@ -42,7 +42,7 @@ import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
 import {Modal} from '@instructure/ui-modal'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 export type OverrideURIsConfirmationProps = {
   overlayStore: Lti1p3RegistrationOverlayStore

@@ -17,9 +17,9 @@
  */
 
 import {type LtiPrivacyLevel, LtiPrivacyLevels} from './LtiPrivacyLevel'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export const LtiPrivacyLevelTranslations: Record<LtiPrivacyLevel, string> = {
   [LtiPrivacyLevels.Public]: I18n.t('All user data'),

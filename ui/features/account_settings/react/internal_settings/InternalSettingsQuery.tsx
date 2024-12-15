@@ -18,7 +18,7 @@
 
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import React from 'react'
 import {useQuery} from '@apollo/client'
@@ -26,7 +26,7 @@ import {INTERNAL_SETTINGS_QUERY} from './graphql/Queries'
 import type {InternalSettingsData} from './types'
 import {InternalSettingsManager} from './InternalSettingsManager'
 
-const I18n = useI18nScope('internal-settings')
+const I18n = createI18nScope('internal-settings')
 
 export const InternalSettingsQuery = () => {
   const {loading, error, data} = useQuery<InternalSettingsData>(INTERNAL_SETTINGS_QUERY)

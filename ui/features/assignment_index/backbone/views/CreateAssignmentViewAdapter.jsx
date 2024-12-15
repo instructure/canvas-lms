@@ -22,10 +22,10 @@ import CreateEditAssignmentModal from '@canvas/assignments/react/CreateEditAssig
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('CreateEditAssignmentModalAdapter')
+const I18n = createI18nScope('CreateEditAssignmentModalAdapter')
 
 const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}) => {
   const maxNameLength = ENV.MAX_NAME_LENGTH || 255

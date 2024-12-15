@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -32,7 +32,7 @@ import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExterna
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 export default class TopicView extends Backbone.View {
   static initClass() {
@@ -269,7 +269,7 @@ export default class TopicView extends Backbone.View {
 
   openSendTo(event, open = true) {
     if (event) event.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -286,7 +286,7 @@ export default class TopicView extends Backbone.View {
 
   openCopyTo(event, open = true) {
     if (event) event.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}

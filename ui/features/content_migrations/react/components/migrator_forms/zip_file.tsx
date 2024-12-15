@@ -26,7 +26,7 @@ import {
 } from '@canvas/content-migrations'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEndLine, IconFolderLine, IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
@@ -46,7 +46,7 @@ import {Flex} from '@instructure/ui-flex'
 type Collection = TreeBrowserProps['collections'][0]
 type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type ZipFileImporterProps = {
   onSubmit: onSubmitMigrationFormCallback

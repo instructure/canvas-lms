@@ -18,7 +18,7 @@
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import React from 'react'
 import RubricTab from './RubricTab'
@@ -30,7 +30,7 @@ import useStore from './stores/index'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {bool, func} from 'prop-types'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function RubricsQuery(props) {
   const {loading, error, data} = useQuery(RUBRIC_QUERY, {

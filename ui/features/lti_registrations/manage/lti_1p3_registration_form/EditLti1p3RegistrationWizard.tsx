@@ -17,7 +17,7 @@
  */
 
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -31,7 +31,7 @@ import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBod
 import {Lti1p3RegistrationWizard} from './Lti1p3RegistrationWizard'
 import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export type Lti1p3RegistrationWizardProps = {
   registrationId: LtiRegistrationId

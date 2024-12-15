@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useCallback} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -27,7 +27,7 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function DateOptionsModal({open, startDate, endDate, timeZone, onSave, onClose}) {
   const title = I18n.t('Date/Time Options')

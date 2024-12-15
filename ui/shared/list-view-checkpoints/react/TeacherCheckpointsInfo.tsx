@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Assignment, Checkpoint} from '../../../api'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('assignment')
+const I18n = createI18nScope('assignment')
 
 const REPLY_TO_TOPIC = 'reply_to_topic'
 

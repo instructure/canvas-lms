@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
@@ -46,7 +46,7 @@ import {
   stripSignature,
 } from '../../utils/inbox_translator'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

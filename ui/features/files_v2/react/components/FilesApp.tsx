@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {Flex} from '@instructure/ui-flex'
@@ -33,7 +33,7 @@ import {useLoaderData} from 'react-router-dom'
 import {type Folder} from '../../interfaces/File'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface FilesAppProps {
   isUserContext: boolean

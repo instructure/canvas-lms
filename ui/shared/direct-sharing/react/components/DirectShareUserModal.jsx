@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Suspense, lazy, useState, useRef} from 'react'
 import {oneOf, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
@@ -29,7 +29,7 @@ import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('direct_share_user_modal')
+const I18n = createI18nScope('direct_share_user_modal')
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 
@@ -77,8 +77,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
     startSendOperation()
       .then(sendSuccessful)
       .catch(err => {
-        console.error(err) // eslint-disable-line no-console
-        if (err.response) console.error(err.response) // eslint-disable-line no-console
+        console.error(err)  
+        if (err.response) console.error(err.response)  
         setPostStatus('error')
         captureException(err)
       })

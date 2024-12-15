@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import type {Rubric} from '../../types/rubric'
 
-const I18n = useI18nScope('enhanced-rubrics-copy-edit-modal')
+const I18n = createI18nScope('enhanced-rubrics-copy-edit-modal')
 
 type CopyEditConfirmModalProps = {
   accountMasterScalesEnabled: boolean

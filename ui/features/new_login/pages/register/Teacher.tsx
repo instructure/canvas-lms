@@ -31,10 +31,10 @@ import {createTeacherAccount} from '../../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useServerErrorsMap} from '../../hooks/useServerErrorsMap'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const ERROR_MESSAGES = {
   invalidEmail: I18n.t('Please enter a valid email address.'),
@@ -217,7 +217,7 @@ const Teacher = () => {
   }
 
   const handleReCaptchaVerify = (token: string | null) => {
-    // eslint-disable-next-line no-console
+     
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
     setCaptchaToken(token)
   }

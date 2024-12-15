@@ -18,9 +18,9 @@
 
 import React, {type SyntheticEvent, useState} from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('content_copy_redesign')
+const I18n = createI18nScope('content_copy_redesign')
 
 type Option = {id: string; name: string}
 

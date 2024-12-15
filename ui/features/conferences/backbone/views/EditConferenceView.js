@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, filter, intersection, includes, without} from 'lodash'
 import * as tz from '@instructure/moment-utils'
@@ -33,7 +33,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('conferences')
+const I18n = createI18nScope('conferences')
 
 extend(EditConferenceView, DialogBaseView)
 

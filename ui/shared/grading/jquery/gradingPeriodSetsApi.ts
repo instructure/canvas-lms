@@ -17,7 +17,7 @@
 
 import axios from '@canvas/axios'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
@@ -30,7 +30,7 @@ import replaceTags from '@canvas/util/replaceTags'
 // Allow unchecked access to ENV variables that should exist in this context
 declare const ENV: GlobalEnv & EnvGradingStandardsCommon
 
-const I18n = useI18nScope('gradingPeriodSetsApi')
+const I18n = createI18nScope('gradingPeriodSetsApi')
 
 const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
@@ -88,14 +88,14 @@ export default {
   list() {
     return new Promise((resolve, reject) => {
       const dispatch = new NaiveRequestDispatch()
-      /* eslint-disable promise/catch-or-return */
+       
       dispatch
         .getDepaginated(listUrl())
         // @ts-expect-error
         .then(response => resolve(deserializeSets(response)))
         // @ts-expect-error
         .fail(error => reject(error))
-      /* eslint-enable promise/catch-or-return */
+       
     })
   },
 

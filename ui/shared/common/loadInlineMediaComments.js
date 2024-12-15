@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/media-comments/jquery/mediaComment'
 
-const I18n = useI18nScope('instructure_inline_media_comment')
+const I18n = createI18nScope('instructure_inline_media_comment')
 
 const inlineMediaComment = {
   buildMinimizerLink: () =>
@@ -77,7 +77,7 @@ const resizeContainingTd = $link => {
 $(document).on('click', 'a.instructure_inline_media_comment', function (event) {
   event.preventDefault()
   if (!INST.kalturaSettings) {
-    // eslint-disable-next-line no-alert
+     
     window.alert(
       I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site')
     )

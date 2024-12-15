@@ -20,11 +20,11 @@ import {InPlaceEdit} from '@instructure/ui-editable'
 import React, {useEffect, useState} from 'react'
 import type {ChangeEvent, LegacyRef, ReactNode} from 'react'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {type ButtonProps, IconButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('internal-settings')
+const I18n = createI18nScope('internal-settings')
 
 export type EditableCodeValueProps = {
   value: string

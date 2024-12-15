@@ -19,7 +19,7 @@
 import type JQuery from 'jquery'
 import $ from 'jquery'
 import {each} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import replaceTags from '@canvas/util/replaceTags'
@@ -30,7 +30,7 @@ import type {
   SubmissionState,
 } from './speed_grader.d'
 
-const I18n = useI18nScope('speed_grader_helpers')
+const I18n = createI18nScope('speed_grader_helpers')
 
 const speedGraderHelpers = {
   getHistory() {

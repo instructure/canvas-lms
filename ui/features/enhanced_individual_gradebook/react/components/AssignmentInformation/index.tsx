@@ -18,7 +18,7 @@
 
 import React, {useCallback, useMemo, useState} from 'react'
 import {intersection, some} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
@@ -43,7 +43,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {MSWLaunchContext} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 import {disableGrading} from '../../../utils/gradeInputUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type AssignmentInformationComponentProps = {
   assignment?: AssignmentConnection

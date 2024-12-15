@@ -18,14 +18,14 @@
 
 import React from 'react'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
 
 import {LtiToolIcon} from '../../../shared/lti/react/LtiToolIcon'
 
-const I18n = useI18nScope('assignment_editview_external_tool')
+const I18n = createI18nScope('assignment_editview_external_tool')
 
 export type CardProps = {
   resourceTitle?: string
