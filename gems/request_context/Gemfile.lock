@@ -216,7 +216,7 @@ GEM
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
     sorbet-runtime (0.5.11519)
-    stringio (3.1.1)
+    stringio (3.1.2)
     thor (1.3.2)
     timecop (0.9.10)
     timeout (0.4.1)

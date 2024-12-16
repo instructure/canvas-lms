@@ -235,7 +235,7 @@ GEM
       nokogiri (>= 1.12.0)
     sorbet-runtime (0.5.11519)
     statsd-ruby (1.5.0)
-    stringio (3.1.1)
+    stringio (3.1.2)
     thor (1.3.2)
     timecop (0.9.10)
     timeout (0.4.1)
