@@ -242,7 +242,7 @@ describe AuthenticationProvider::OpenIDConnect do
       }.freeze
 
       it "passes a valid token" do
-        id_token = Canvas::Security.create_jwt(base_payload.dup, nil, subject.client_secret)
+        id_token = Canvas::Security.create_jwt(base_payload, nil, subject.client_secret)
         expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.not_to raise_error
       end
 
@@ -266,12 +266,12 @@ describe AuthenticationProvider::OpenIDConnect do
       bad_token_spec("nonce is valid", base_payload.merge(nonce: "wrong"))
 
       it "validates the signature" do
-        id_token = Canvas::Security.create_jwt(base_payload.dup, nil, "wrong_key")
+        id_token = Canvas::Security.create_jwt(base_payload, nil, "wrong_key")
         expect { subject.unique_id(double(params: { "id_token" => id_token }, options: { nonce: "nonce" })) }.to raise_error(OAuthValidationError)
       end
 
       it "refreshes the keys if the kid is not found. once" do
-        id_token = Canvas::Security.create_jwt(base_payload.dup, nil, subject.client_secret)
+        id_token = Canvas::Security.create_jwt(base_payload, nil, subject.client_secret)
         tries = 1
         parsed_token = Canvas::Security.decode_jwt(id_token, [:skip_verification])
         allow(parsed_token).to receive(:verify!) do
@@ -287,7 +287,7 @@ describe AuthenticationProvider::OpenIDConnect do
       end
 
       it "fails if the key is still wrong" do
-        id_token = Canvas::Security.create_jwt(base_payload.dup, nil, subject.client_secret)
+        id_token = Canvas::Security.create_jwt(base_payload, nil, subject.client_secret)
         parsed_token = Canvas::Security.decode_jwt(id_token, [:skip_verification])
         allow(parsed_token).to receive(:verify!).and_raise(JSON::JWK::Set::KidNotFound)
         allow(Canvas::Security).to receive(:decode_jwt).and_return(parsed_token)
