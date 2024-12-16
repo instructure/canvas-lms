@@ -1065,7 +1065,7 @@ GEM
     sentry-ruby (5.22.1)
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
-    sexp_processor (4.17.2)
+    sexp_processor (4.17.3)
     shoulda-matchers (6.4.0)
       activesupport (>= 5.2.0)
     signet (0.19.0)
