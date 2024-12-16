@@ -91,9 +91,17 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
     }
   }
 
+  const getAssignmentType = assignment => {
+    const submissionTypes = assignment.submissionTypes()
+    if (submissionTypes.length === 0) {
+      return 'online'
+    }
+    return submissionTypes[0]
+  }
+
   const adaptAssignment = () => ({
     assignmentGroupId: assignmentGroup ? assignmentGroup.id : null,
-    type: assignment.assignmentType(),
+    type: getAssignmentType(assignment),
     name: assignment.name(),
     dueAt: assignment.dueAt(),
     lockAt: assignment.lockAt(),
