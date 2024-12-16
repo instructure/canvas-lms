@@ -13727,6 +13727,7 @@ ko:
       same_day: "%{date} %{start_time}부터 %{end_time}까지"
       times: "%{start_time}부터 %{end_time}까지"
     with_ago: "%{time} 전"
+  time_range_4ae01737: "시간 범위"
   time_zones: 
     abu_dhabi: 아부다비
     adelaide: 애들레이드
