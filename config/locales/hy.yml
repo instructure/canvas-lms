@@ -13018,6 +13018,7 @@ hy:
       show_details: "Ցույց տալ հարցերի մանրամասները"
   question_banks_45bdf347: "Հարցերի շտեմարաններ"
   question_group_837b8014: "Հարցերի խումբ"
+  question_position_45eba089: " %{position} հարց "
   question_unanswered: "Դեռևս պատասխան չի տրվել"
   questions_a955145c: Հարցեր
   quiz: 
@@ -16719,6 +16720,7 @@ hy:
       times: "%{start_time} մինչև %{end_time}"
     with_ago: "%{time} առաջ"
   time_2b5aac58: Ժամ
+  time_range_4ae01737: "Ժամանակային տիրույթ"
   time_zones: 
     abu_dhabi: "Աբու Դաբի"
     adelaide: Ադելաիդա
