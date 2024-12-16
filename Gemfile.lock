@@ -844,8 +844,8 @@ GEM
       ruby-rc4
       ttfunk
     pg (1.5.9)
-    pg_query (5.1.0)
-      google-protobuf (>= 3.22.3)
+    pg_query (6.0.0)
+      google-protobuf (>= 3.25.3)
     pragmatic_segmenter (0.3.24)
     prawn (2.5.0)
       matrix (~> 0.4)
@@ -1328,7 +1328,7 @@ DEPENDENCIES
   parallel (~> 1.23)
   pdf-reader (~> 2.11)
   pg (~> 1.5)
-  pg_query (~> 5.1)
+  pg_query (~> 6.0)
   pragmatic_segmenter (~> 0.3)
   prawn-emoji (~> 5.3)
   prawn-rails (~> 1.4)

@@ -91,7 +91,7 @@ gem "oj", "~> 3.16"
 gem "outrigger", "~> 3.0"
 gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
-gem "pg_query", "~> 5.1", require: false
+gem "pg_query", "~> 6.0", require: false
 gem "pragmatic_segmenter", "~> 0.3"
 gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
