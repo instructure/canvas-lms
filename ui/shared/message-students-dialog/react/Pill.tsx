@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Tag} from '@instructure/ui-tag'
-import {Text} from '@instructure/ui-text'
+import {Text, type TextProps} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddSolid, IconXSolid} from '@instructure/ui-icons'
@@ -34,11 +34,13 @@ const componentOverrides = {
 
 const I18n = createI18nScope('pill')
 const ellipsis = () => I18n.t('…')
-// @ts-expect-error
-const truncate = text => (text.length > 14 ? text.slice(0, 13) + ellipsis() : text)
+const truncate = (text: string) => (text.length > 14 ? text.slice(0, 13) + ellipsis() : text)
 
-// @ts-expect-error
-function renderText(text, truncatedText, textColor) {
+function renderText(
+  text: string,
+  truncatedText: string,
+  textColor: TextProps['color']
+): JSX.Element {
   const isTruncated = text.length > truncatedText.length
   if (isTruncated) {
     return (
@@ -65,8 +67,25 @@ function renderIcon(selected: boolean) {
   }
 }
 
-// @ts-expect-error
-const Pill = ({studentId, observerId = null, text, onClick, selected = false}) => {
+type PillPropsBase = {
+  studentId: string
+  text: string
+  selected?: boolean
+}
+
+type PillPropsWithObserver = PillPropsBase & {
+  observerId: string
+  onClick: (studentId: string, observerId: string) => void
+}
+
+type PillPropsWithoutObserver = PillPropsBase & {
+  observerId?: undefined
+  onClick: (studentId: string) => void
+}
+
+export type PillProps = PillPropsWithoutObserver | PillPropsWithObserver
+
+const Pill = ({studentId, observerId, text, onClick, selected = false}: PillProps) => {
   const textColor = selected ? 'primary' : 'secondary'
   const truncatedText = truncate(text)
   const testId = observerId ? 'observer-pill' : 'student-pill'
@@ -90,7 +109,17 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
 
   return (
     <InstUISettingsProvider theme={{componentOverrides}}>
-      <Tag text={contents} data-testid={testId} onClick={() => onClick(studentId, observerId)} />
+      <Tag
+        text={contents}
+        data-testid={testId}
+        onClick={() => {
+          if (observerId !== undefined) {
+            onClick(studentId, observerId)
+          } else {
+            onClick(studentId)
+          }
+        }}
+      />
     </InstUISettingsProvider>
   )
 }

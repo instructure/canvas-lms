@@ -47,7 +47,11 @@ import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import _ from 'lodash'
-import {OBSERVER_ENROLLMENTS_QUERY} from '../graphql/Queries'
+import {
+  OBSERVER_ENROLLMENTS_QUERY,
+  type ObserverEnrollmentQueryResult,
+  type ObserverEnrollmentConnectionUser,
+} from '../graphql/Queries'
 import Pill from './Pill'
 import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
@@ -59,8 +63,9 @@ import {
   addAttachmentsFn,
   removeAttachmentFn,
 } from '@canvas/message-attachments'
-import type {CamelizedAssignment} from '@canvas/grading/grading.d'
+import type {CamelizedAssignment, CamelizedStudent} from '@canvas/grading/grading.d'
 import {View} from '@instructure/ui-view'
+import type {AxiosResponse} from 'axios'
 
 export enum MSWLaunchContext {
   ASSIGNMENT_CONTEXT,
@@ -87,6 +92,7 @@ export type Student = {
   name: string
   redoRequest?: boolean
   score?: number | null
+  currentScore?: number
   sortableName: string
   submittedAt: null | Date
   excused?: boolean
@@ -94,7 +100,7 @@ export type Student = {
 }
 
 export type Props = {
-  assignment?: CamelizedAssignment
+  assignment: CamelizedAssignment
   launchContext: MSWLaunchContext
   assignmentGroupName?: string
   onClose: () => void
@@ -129,8 +135,22 @@ type FilterCriterion = {
   readonly requiresCutoff: boolean
   readonly shouldShow: (assignment: CamelizedAssignment) => boolean
   readonly title: string
-  readonly value: string
+  readonly value: FilterCriterionValue
 }
+
+type FilterCriterionValue =
+  | 'submitted_and_graded'
+  | 'submitted_and_not_graded'
+  | 'unsubmitted'
+  | 'submitted'
+  | 'unsubmitted_skip_excused'
+  | 'ungraded'
+  | 'scored_more_than'
+  | 'scored_less_than'
+  | 'marked_incomplete'
+  | 'reassigned'
+  | 'total_grade_higher_than'
+  | 'total_grade_lower_than'
 
 const isScored = (assignment: CamelizedAssignment) =>
   assignment !== null &&
@@ -139,17 +159,15 @@ const isScored = (assignment: CamelizedAssignment) =>
 const isReassignable = (assignment: CamelizedAssignment) =>
   assignment !== null &&
   (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
-  // @ts-expect-error
-  assignment.dueDate != null &&
-  !assignment.submissionTypes.includes(
-    // @ts-expect-error
-    'on_paper' || 'external_tool' || 'none' || 'discussion_topic' || 'online_quiz'
+  assignment.dueAt !== null &&
+  new Set(assignment.submissionTypes).isDisjointFrom(
+    new Set(['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz'])
   )
 
 const isSubmittableAssignment = (assignment: CamelizedAssignment) =>
   !!assignment &&
-  !assignment.submissionTypes.some(submissionType =>
-    ['on_paper', 'none', 'not_graded', ''].includes(submissionType)
+  new Set(assignment.submissionTypes).isDisjointFrom(
+    new Set(['on_paper', 'none', 'not_graded', ''])
   )
 
 const filterCriteria: FilterCriterion[] = [
@@ -225,21 +243,20 @@ const filterCriteria: FilterCriterion[] = [
     title: I18n.t('Have total grade lower than'),
     value: 'total_grade_lower_than',
   },
-]
+] as const
 
-// @ts-expect-error
-function observerCount(students, observers) {
-  // @ts-expect-error
+function observerCount(
+  students: Student[],
+  observers: Record<string, ObserverEnrollmentConnectionUser[]>
+) {
   return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
 }
 
-// @ts-expect-error
-function calculateObserverRecipientCount(selectedObservers) {
-  return Object.values(selectedObservers).reduce((acc: number, array: any) => acc + array.length, 0)
+function calculateObserverRecipientCount(selectedObservers: Record<string, string[]>) {
+  return Object.values(selectedObservers).reduce((acc, array) => acc + array.length, 0)
 }
 
-// @ts-expect-error
-function filterStudents(criterion, students, cutoff) {
+function filterStudents(criterion: FilterCriterion, students: Student[], cutoff: number) {
   const newfilteredStudents: Student[] = []
   for (const student of students) {
     switch (criterion?.value) {
@@ -274,12 +291,12 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'scored_more_than':
-        if (parseFloat(student.score) > cutoff) {
+        if (student.score && student.score > cutoff) {
           newfilteredStudents.push(student)
         }
         break
       case 'scored_less_than':
-        if (parseFloat(student.score) < cutoff) {
+        if (student.score && student.score < cutoff) {
           newfilteredStudents.push(student)
         }
         break
@@ -294,12 +311,12 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'total_grade_higher_than':
-        if (parseFloat(student.currentScore) > cutoff) {
+        if (student.currentScore && student.currentScore > cutoff) {
           newfilteredStudents.push(student)
         }
         break
       case 'total_grade_lower_than':
-        if (parseFloat(student.currentScore) < cutoff) {
+        if (student.currentScore && student.currentScore < cutoff) {
           newfilteredStudents.push(student)
         }
         break
@@ -308,8 +325,12 @@ function filterStudents(criterion, students, cutoff) {
   return newfilteredStudents
 }
 
-// @ts-expect-error
-function cumulativeScoreDefaultSubject(criterion, launchContext, cutoff, assignmentGroupName = '') {
+function cumulativeScoreDefaultSubject(
+  criterion: 'total_grade_higher_than' | 'total_grade_lower_than',
+  launchContext: MSWLaunchContext,
+  cutoff: number,
+  assignmentGroupName = ''
+) {
   const context =
     launchContext === MSWLaunchContext.ASSIGNMENT_GROUP_CONTEXT ? assignmentGroupName : 'course'
 
@@ -322,23 +343,18 @@ function cumulativeScoreDefaultSubject(criterion, launchContext, cutoff, assignm
 }
 
 function defaultSubject(
-  // @ts-expect-error
-  criterion,
-  // @ts-expect-error
-  assignment,
-  // @ts-expect-error
-  launchContext,
-  // @ts-expect-error
-  cutoff,
-  // @ts-expect-error
-  pointsBasedGradingScheme,
-  // @ts-expect-error
-  assignmentGroupName
-) {
-  if (cutoff === '') {
-    cutoff = 0
-  }
+  criterion: FilterCriterionValue,
 
+  assignment: CamelizedAssignment,
+
+  launchContext: MSWLaunchContext,
+
+  cutoff: number,
+
+  pointsBasedGradingScheme: boolean,
+
+  assignmentGroupName?: string
+) {
   if (assignment) {
     switch (criterion) {
       case 'unsubmitted':
@@ -349,8 +365,6 @@ function defaultSubject(
         return I18n.t('Submission and grade for %{assignment}', {assignment: assignment.name})
       case 'submitted_and_not_graded':
         return I18n.t('Submission and no grade for %{assignment}', {assignment: assignment.name})
-      case 'graded':
-        return I18n.t('Grade for %{assignment}', {assignment: assignment.name})
       case 'ungraded':
         return I18n.t('No grade for %{assignment}', {assignment: assignment.name})
       case 'scored_more_than':
@@ -370,7 +384,7 @@ function defaultSubject(
     }
   } else {
     let defaultSubjectStr = cumulativeScoreDefaultSubject(
-      criterion,
+      criterion as 'total_grade_higher_than' | 'total_grade_lower_than',
       launchContext,
       cutoff,
       assignmentGroupName
@@ -402,13 +416,11 @@ const MessageStudentsWhoDialog = ({
   const [sending, setSending] = useState(false)
   const [message, setMessage] = useState('')
 
-  // @ts-expect-error
-  const initializeSelectedObservers = studentCollection =>
-    // @ts-expect-error
+  const initializeSelectedObservers = (studentCollection: Student[]) =>
     studentCollection.reduce((map, student) => {
       map[student.id] = []
       return map
-    }, {})
+    }, {} as Record<string, string[]>)
 
   const [selectedObservers, setSelectedObservers] = useState(initializeSelectedObservers(students))
   const [selectedStudents, setSelectedStudents] = useState(Object.keys(selectedObservers))
@@ -424,7 +436,7 @@ const MessageStudentsWhoDialog = ({
   const [mediaTitle, setMediaTitle] = useState<string>('')
   const close = () => setOpen(false)
 
-  const {loading, data} = useQuery(OBSERVER_ENROLLMENTS_QUERY, {
+  const {loading, data} = useQuery<ObserverEnrollmentQueryResult>(OBSERVER_ENROLLMENTS_QUERY, {
     variables: {
       courseId: assignment?.courseId || courseId,
       studentIds: students.map(student => student.id),
@@ -432,25 +444,24 @@ const MessageStudentsWhoDialog = ({
   })
 
   const observerEnrollments = data?.course?.enrollmentsConnection?.nodes || []
-  // @ts-expect-error
+
   const observersByStudentID = observerEnrollments.reduce((results, enrollment) => {
     const observeeId = enrollment.associatedUser._id
     results[observeeId] = results[observeeId] || []
     const existingObservers = results[observeeId]
 
-    // @ts-expect-error
     if (!existingObservers.some(user => user._id === enrollment.user._id)) {
       results[observeeId].push(enrollment.user)
     }
 
     return results
-  }, {})
+  }, {} as Record<string, ObserverEnrollmentConnectionUser[]>)
 
   const isLengthBetweenBoundaries = (subsetLength: number, totalLength: number) =>
     subsetLength > 0 && subsetLength < totalLength
 
   const [cutoff, setCutoff] = useState(0.0)
-  // @ts-expect-error
+
   const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
   const [filteredStudents, setFilteredStudents] = useState(
@@ -539,8 +550,10 @@ const MessageStudentsWhoDialog = ({
     return <LoadingIndicator />
   }
 
-  // @ts-expect-error
-  const handleCriterionSelected = (_e, {value}) => {
+  const handleCriterionSelected = (
+    _e: React.SyntheticEvent,
+    {value}: {value?: string | number}
+  ) => {
     const newCriterion = filterCriteria.find(criterion => criterion.value === value)
     if (newCriterion != null) {
       setSelectedCriterion(newCriterion)
@@ -611,8 +624,7 @@ const MessageStudentsWhoDialog = ({
     }
   }
 
-  // @ts-expect-error
-  const onExcusedCheckBoxChange = event => {
+  const onExcusedCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const criteriaValue = event.target.checked ? 'unsubmitted_skip_excused' : 'unsubmitted'
     const criterion = filterCriteria.find(c => c.value === criteriaValue)
     if (criterion) {
@@ -629,8 +641,8 @@ const MessageStudentsWhoDialog = ({
     setOnSuccess
   )
   const onDeleteAttachment = removeAttachmentFn(setAttachments)
-  // @ts-expect-error
-  const onReplaceAttachment = (id, e) => {
+
+  const onReplaceAttachment = (id: string, e: React.ChangeEvent) => {
     onDeleteAttachment(id)
     onAddAttachment(e)
   }
@@ -642,13 +654,15 @@ const MessageStudentsWhoDialog = ({
     setMediaUploadFile(null)
   }
 
-  // @ts-expect-error
-  const onMediaUploadStart = file => {
+  const onMediaUploadStart = (file: (DataTransferItem | File) & {title: string}) => {
     setMediaTitle(file.title)
   }
 
-  // @ts-expect-error
-  const onMediaUploadComplete = (err, mediaData, captionData) => {
+  const onMediaUploadComplete = (
+    err: unknown | null,
+    mediaData: {mediaObject?: any; uploadedFile: File},
+    captionData?: null
+  ) => {
     if (err) {
       setOnFailure(I18n.t('There was an error uploading the media.'))
     } else {
@@ -682,8 +696,7 @@ const MessageStudentsWhoDialog = ({
     setSelectedObservers({...selectedObservers, [studentId]: updatedObservers})
   }
 
-  // @ts-expect-error
-  const onStudentsCheckboxChanged = event => {
+  const onStudentsCheckboxChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setSelectedStudents(filteredStudents.map(element => element.id))
     } else {
@@ -691,16 +704,14 @@ const MessageStudentsWhoDialog = ({
     }
   }
 
-  // @ts-expect-error
-  const onObserversCheckboxChanged = event => {
+  const onObserversCheckboxChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setSelectedObservers(
         filteredStudents.reduce((map, student) => {
-          const observers = observersByStudentID[student.id] || []
-          // @ts-expect-error
-          map[student.id] = Object.keys(observers).map(key => observers[key]._id)
+          map[student.id] = [...observersByStudentID[student.id].map(observer => observer._id)]
+
           return map
-        }, {})
+        }, {} as Record<string, string[]>)
       )
     } else {
       setSelectedObservers(initializeSelectedObservers(students))
@@ -733,7 +744,6 @@ const MessageStudentsWhoDialog = ({
             <View as="div" padding="0 0 small 0">
               <SimpleSelect
                 renderLabel={I18n.t('For students who…')}
-                // @ts-expect-error
                 onChange={handleCriterionSelected}
                 value={selectedCriterion.value}
                 data-testid="criterion-dropdown"
@@ -756,16 +766,18 @@ const MessageStudentsWhoDialog = ({
                   allowStringValue={true}
                   value={cutoff}
                   onChange={(_e, value) => {
-                    // @ts-expect-error
-                    setCutoff(value)
-                    if (value !== '') {
-                      setFilteredStudents(filterStudents(selectedCriterion, sortedStudents, value))
+                    const actualValue = value === '' ? 0 : parseFloat(value)
+                    setCutoff(actualValue)
+                    if (actualValue !== 0) {
+                      setFilteredStudents(
+                        filterStudents(selectedCriterion, sortedStudents, actualValue)
+                      )
                       setSubject(
                         defaultSubject(
                           selectedCriterion.value,
                           assignment,
                           launchContext,
-                          value,
+                          actualValue,
                           pointsBasedGradingScheme,
                           assignmentGroupName
                         )

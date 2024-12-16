@@ -44,7 +44,6 @@ rceFormatMessage.setup({
  * have an unintended consequence from your changes. If you expect
  * the warning/error, add it to the ignore list below.
  */
-
 const globalLog = global.console.log
 const globalError = global.console.error
 const ignoredLogs = [
@@ -108,7 +107,6 @@ global.console = {
   info: console.info,
   debug: console.debug,
 }
-
 filterUselessConsoleMessages(global.console)
 
 window.scroll = () => {}
@@ -153,6 +151,16 @@ if (!Array.prototype.flatMap) {
     value: function flatMap(_cb) {
       // biome-ignore lint/style/noArguments: <explanation>
       return Array.prototype.map.apply(this, arguments).flat()
+    },
+    writable: true,
+  })
+}
+
+if (!Set.prototype.isDisjointFrom) {
+  Object.defineProperty(Set.prototype, 'isDisjointFrom', {
+    configurable: true,
+    value: function isDisjointFrom(otherSet) {
+      return Array.from(this).every(value => !otherSet.has(value))
     },
     writable: true,
   })
