@@ -53,7 +53,7 @@ GEM
     connection_pool (2.4.1)
     crass (1.0.6)
     csv (3.3.0)
-    date (3.3.4)
+    date (3.4.1)
     drb (2.2.1)
     erubi (1.13.0)
     gergich (2.2.1)
