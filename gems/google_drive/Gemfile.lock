@@ -55,7 +55,7 @@ GEM
     mini_mime (1.1.5)
     multi_json (1.15.0)
     mutex_m (0.2.0)
-    net-http (0.4.1)
+    net-http (0.6.0)
       uri
     os (1.1.4)
     psych (5.1.2)

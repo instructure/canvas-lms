@@ -47,7 +47,7 @@ GEM
     logger (1.6.1)
     minitest (5.25.1)
     mutex_m (0.2.0)
-    net-http (0.4.1)
+    net-http (0.6.0)
       uri
     rake (13.2.1)
     redcarpet (3.6.0)
