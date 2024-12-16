@@ -3278,18 +3278,20 @@ class UsersController < ApplicationController
         PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       end
 
-      @user.save!
+      message_sent = User.transaction do
+        @user.save!
 
-      if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
-        UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
-        @pairing_code&.destroy
-      end
+        if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
+          UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
+          @pairing_code&.destroy
+        end
 
-      if notify_policy.is_self_registration?
-        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies:)
-        @user.new_registration(registration_params)
+        if notify_policy.is_self_registration?
+          registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies:)
+          @user.new_registration(registration_params)
+        end
+        notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
       end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
 
       data = if api_request?
                user_json(@user, @current_user, session, includes)
