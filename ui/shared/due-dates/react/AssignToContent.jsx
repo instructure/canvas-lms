@@ -219,6 +219,7 @@ const AssignToContent = ({
     const everyoneOptionKey = getEveryoneOption(stagedCards?.length > 1).id
     const mappedCards = map(sortedRowKeys(stagedCards), cardId => {
       const defaultOptions = []
+      const initialAssigneeOptions = []
       const card = stagedCards[cardId]
       const cardOverrides = card.overrides || []
       const dates = card.dates || {}
@@ -234,13 +235,23 @@ const AssignToContent = ({
           selectedOptionIds.push(...defaultOptions)
         } else {
           const studentOverrides =
-            override?.student_ids?.map(studentId => `student-${studentId}`) ?? []
-          defaultOptions.push(...studentOverrides)
+            override?.students?.map(student => ({
+              id: `student-${student.id}`,
+              value: student.name,
+              group: 'Students',
+            })) ?? []
+          defaultOptions.push(...studentOverrides.map(student => student.id))
+          initialAssigneeOptions.push(...studentOverrides)
           if (override?.course_section_id) {
             defaultOptions.push(`section-${override?.course_section_id}`)
+            initialAssigneeOptions.push({
+              id: `section-${override?.course_section_id}`,
+              value: override?.title,
+            })
           }
           if (override?.group_id) {
             defaultOptions.push(`group-${override?.group_id}`)
+            initialAssigneeOptions.push({id: `group-${override?.group_id}`, value: override?.title})
           }
           selectedOptionIds.push(...defaultOptions)
         }
@@ -267,6 +278,7 @@ const AssignToContent = ({
         required_replies_due_at: dates.required_replies_due_at,
         lock_at: dates.lock_at,
         selectedAssigneeIds: uniqueIds,
+        initialAssigneeOptions,
         defaultOptions: uniqueIds,
         overrideId: card.id,
         index: card.index,
@@ -284,6 +296,7 @@ const AssignToContent = ({
   const generateCard = cardId => {
     const newCard = CardActions.handleAssigneeAdd({}, [], cardId, {})[0]
     delete newCard.student_ids
+    delete newCard.students
     newCard.draft = true
     newCard.index = cardId
     const oldOverrides = getAllOverridesFromCards(stagedCardsRef.current).filter(

@@ -110,6 +110,7 @@ export const ItemAssignToTrayWrapper = () => {
         studentIds.push(id)
       } else if (type === 'group') {
         outputObj.group_id = id
+        outputObj.title = inputObj.title
       } else if (type === 'course') {
         outputObj.course_id = id
       }
@@ -117,9 +118,11 @@ export const ItemAssignToTrayWrapper = () => {
 
     if (courseSectionId) {
       outputObj.course_section_id = courseSectionId
+      outputObj.title = inputObj.title
     }
     if (studentIds.length > 0) {
       outputObj.student_ids = studentIds
+      outputObj.students = inputObj.students?.map(student => ({...student, id: student._id}))
     }
 
     return outputObj
@@ -150,15 +153,18 @@ export const ItemAssignToTrayWrapper = () => {
         outputObj.assignedList.push('everyone')
       } else {
         outputObj.assignedList.push('course_section_' + inputObj.course_section_id)
+        outputObj.title = inputObj.title
       }
     } else if (inputObj.student_ids) {
       inputObj.student_ids.forEach(id => {
         outputObj.assignedList.push('user_' + id)
       })
+      outputObj.students = inputObj.students?.map(student => ({...student, id: student._id}))
     } else if (inputObj.course_id) {
       outputObj.assignedList.push('course_' + inputObj.course_id)
     } else if (inputObj.group_id) {
       outputObj.assignedList.push('group_' + inputObj.group_id)
+      outputObj.title = inputObj.title
     }
 
     if (
