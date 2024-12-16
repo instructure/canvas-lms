@@ -129,7 +129,7 @@ GEM
     rdoc (6.7.0)
       psych (>= 4.0.0)
     regexp_parser (2.9.2)
-    reline (0.5.10)
+    reline (0.6.0)
       io-console (~> 0.5)
     rubocop (1.66.1)
       json (~> 2.3)
