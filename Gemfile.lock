@@ -920,7 +920,7 @@ GEM
     rake (13.2.1)
     rchardet (1.8.0)
     rdiscount (2.2.7.3)
-    rdoc (6.7.0)
+    rdoc (6.9.1)
       psych (>= 4.0.0)
     redcarpet (3.6.0)
     redis (5.3.0)
