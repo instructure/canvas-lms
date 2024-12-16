@@ -1085,7 +1085,7 @@ class Lti::RegistrationsController < ApplicationController
       end
     end
 
-    errors = Schemas::LtiConfiguration.validation_errors(config)
+    errors = Schemas::LtiConfiguration.validation_errors(config, allow_nil: true)
     if errors.present?
       return render_configuration_errors(errors)
     end
@@ -1489,11 +1489,11 @@ class Lti::RegistrationsController < ApplicationController
     end
 
     configuration_errors = if configuration&.dig(:extensions).present?
-                             Schemas::LtiConfiguration.validation_errors(configuration.compact)
+                             Schemas::LtiConfiguration.validation_errors(configuration, allow_nil: true)
                            elsif configuration.present?
-                             Schemas::InternalLtiConfiguration.validation_errors(configuration.compact)
+                             Schemas::InternalLtiConfiguration.validation_errors(configuration, allow_nil: true)
                            end
-    overlay_errors = Schemas::Lti::Overlay.validation_errors(overlay.compact) if overlay.present?
+    overlay_errors = Schemas::Lti::Overlay.validation_errors(overlay, allow_nil: true) if overlay.present?
 
     configuration_errors ||= []
     overlay_errors ||= []

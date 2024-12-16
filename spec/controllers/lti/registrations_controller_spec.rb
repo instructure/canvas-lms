@@ -1392,6 +1392,28 @@ RSpec.describe Lti::RegistrationsController do
           end
         end
       end
+
+      context "with null config values" do
+        before do
+          lti_configuration["extensions"][0]["tool_id"] = nil
+        end
+
+        it "is successful" do
+          subject
+          expect(response).to be_successful
+        end
+      end
+
+      context "with null required values" do
+        before do
+          lti_configuration["title"] = nil
+        end
+
+        it "returns 422" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
     end
 
     context "with url" do

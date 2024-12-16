@@ -183,6 +183,8 @@ const ModalBodyWrapper = ({
           accountId={accountId}
           service={lti1p3RegistrationWizardService}
           internalConfiguration={{
+            description: '',
+            launch_settings: {},
             title: state.manualAppName.trim(),
             target_link_uri: '',
             scopes: [],
