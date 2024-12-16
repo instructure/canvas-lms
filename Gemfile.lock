@@ -947,7 +947,7 @@ GEM
     request_store (1.7.0)
       rack (>= 1.4)
     retriable (3.1.2)
-    rexml (3.3.8)
+    rexml (3.4.0)
     ritex (1.0.1)
     rotp (6.3.0)
     rqrcode (2.2.0)

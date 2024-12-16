@@ -163,7 +163,7 @@ GEM
       redis (>= 3.0)
     reline (0.6.0)
       io-console (~> 0.5)
-    rexml (3.3.8)
+    rexml (3.4.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
