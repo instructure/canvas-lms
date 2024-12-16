@@ -1596,8 +1596,10 @@ class AccountsController < ApplicationController
     end
 
     # this is a no-op if the user was deleted from the account profile page
-    user.update!(workflow_state: "registered") if user.deleted?
-    pseudonym.update!(workflow_state: "active")
+    User.transaction do
+      user.update!(workflow_state: "registered") if user.deleted?
+      pseudonym.update!(workflow_state: "active")
+    end
     pseudonym.clear_permissions_cache(user)
     user.update_account_associations
     user.clear_caches
