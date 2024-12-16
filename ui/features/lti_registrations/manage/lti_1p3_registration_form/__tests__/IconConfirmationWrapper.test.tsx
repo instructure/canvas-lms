@@ -302,7 +302,7 @@ describe('IconConfirmationWrapper', () => {
 
     expect(input).toHaveValue('https://new-icon-url.com')
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
-      undefined
+      'https://example.com/icon/first'
     )
 
     jest.runAllTimers()

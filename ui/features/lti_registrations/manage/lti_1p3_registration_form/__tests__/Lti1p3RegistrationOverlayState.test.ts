@@ -124,14 +124,14 @@ describe('Lti1p3RegistrationOverlayState', () => {
     })
 
     it('handles domain properly', () => {
-      state.getState().setDomain('example.com')
+      state.getState().setDomain('example2.com')
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
         internalConfig
       )
 
-      expect(result.domain).toBe('example.com')
+      expect(result.domain).toBe('example2.com')
     })
 
     it('handles privacy level properly', () => {
@@ -202,8 +202,8 @@ describe('Lti1p3RegistrationOverlayState', () => {
     })
 
     it('removes any undefined properties', () => {
-      state.getState().setDefaultTargetLinkURI('https://example.com')
-      state.getState().setPrivacyLevel('anonymous')
+      state.getState().setDefaultTargetLinkURI('https://example.com/edited')
+      state.getState().setPrivacyLevel('email_only')
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
@@ -223,8 +223,35 @@ describe('Lti1p3RegistrationOverlayState', () => {
         'scopes',
       ] as const
 
-      expect(result.target_link_uri).toBe('https://example.com')
-      expect(result.privacy_level).toBe('anonymous')
+      expect(result.target_link_uri).toBe('https://example.com/edited')
+      expect(result.privacy_level).toBe('email_only')
+
+      expectedNonExistentProperties.forEach(property => {
+        expect(Object.hasOwn(result, property as string)).toBeFalsy()
+      })
+    })
+
+    it('does not include values that are the same as the internal configuration', () => {
+      state.getState().setDefaultTargetLinkURI('https://example.com')
+      state.getState().setDescription('description')
+      state.getState().setDomain('example.com')
+      state.getState().setPrivacyLevel('anonymous')
+      state.getState().setCustomFields('foo=bar')
+      state.getState().setRedirectURIs('https://example.com/redirect')
+
+      const {overlay: result} = convertToLtiConfigurationOverlay(
+        state.getState().state,
+        internalConfig
+      )
+
+      const expectedNonExistentProperties: Omit<keyof LtiConfigurationOverlay, 'title'>[] = [
+        'description',
+        'custom_fields',
+        'target_link_uri',
+        'redirect_uris',
+        'domain',
+        'placements',
+      ] as const
 
       expectedNonExistentProperties.forEach(property => {
         expect(Object.hasOwn(result, property as string)).toBeFalsy()
