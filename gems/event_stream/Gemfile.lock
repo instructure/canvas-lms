@@ -84,7 +84,7 @@ GEM
     crass (1.0.6)
     diff-lcs (1.5.1)
     docile (1.4.1)
-    dogstatsd-ruby (5.6.2)
+    dogstatsd-ruby (5.6.3)
     drb (2.2.1)
     erubi (1.13.0)
     folio-pagination (0.0.12)

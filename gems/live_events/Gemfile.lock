@@ -48,7 +48,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
-    dogstatsd-ruby (5.6.2)
+    dogstatsd-ruby (5.6.3)
     drb (2.2.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
