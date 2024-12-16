@@ -59,7 +59,7 @@ GEM
       aroi (>= 0.0.7)
       dogstatsd-ruby (>= 4.2, < 6.0, != 5.0.0)
       statsd-ruby (~> 1.0)
-    logger (1.6.1)
+    logger (1.6.3)
     minitest (5.25.4)
     multipart-post (2.4.1)
     mutex_m (0.3.0)

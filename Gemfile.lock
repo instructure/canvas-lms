@@ -707,7 +707,7 @@ GEM
     libddwaf (1.18.0.0.0-x86_64-linux)
       ffi (~> 1.0)
     link_header (0.0.8)
-    logger (1.6.1)
+    logger (1.6.3)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)

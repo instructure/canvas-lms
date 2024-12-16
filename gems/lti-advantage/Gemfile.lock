@@ -44,7 +44,7 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    logger (1.6.1)
+    logger (1.6.3)
     minitest (5.25.4)
     mutex_m (0.3.0)
     net-http (0.6.0)
