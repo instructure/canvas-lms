@@ -424,7 +424,7 @@ GEM
     brakeman (6.2.2)
       racc
     brotli (0.6.0)
-    browser (6.0.0)
+    browser (6.2.0)
     builder (3.3.0)
     business_time (0.13.0)
       activesupport (>= 3.2.0)
