@@ -498,7 +498,7 @@ GEM
       nokogiri (~> 1.13, >= 1.13.0)
       rubyzip (~> 2.0)
     dogstatsd-ruby (5.6.3)
-    dotenv (3.1.4)
+    dotenv (3.1.6)
     drb (2.2.1)
     dress_code (1.2.1)
       colored
