@@ -51,21 +51,23 @@ export const initialOverlayStateFromInternalConfig = (
   return {
     launchSettings: {
       redirectURIs: internalConfig.redirect_uris?.join('\n'),
-      targetLinkURI: existingOverlay?.target_link_uri,
+      targetLinkURI: existingOverlay?.target_link_uri || internalConfig.target_link_uri,
       openIDConnectInitiationURL: internalConfig.oidc_initiation_url,
       JwkMethod: internalConfig.public_jwk_url ? 'public_jwk_url' : 'public_jwk',
       JwkURL: toUndefined(internalConfig.public_jwk_url),
       Jwk: toUndefined(
         internalConfig.public_jwk ? JSON.stringify(internalConfig.public_jwk, null, 2) : undefined
       ),
-      domain: existingOverlay?.domain,
-      customFields: formatCustomFields(existingOverlay?.custom_fields),
+      domain: existingOverlay?.domain || toUndefined(internalConfig.domain),
+      customFields: formatCustomFields(
+        existingOverlay?.custom_fields || internalConfig.custom_fields
+      ),
     },
     permissions: {
       scopes: internalConfig.scopes.filter(s => !existingOverlay?.disabled_scopes?.includes(s)),
     },
     data_sharing: {
-      privacy_level: existingOverlay?.privacy_level,
+      privacy_level: existingOverlay?.privacy_level || toUndefined(internalConfig.privacy_level),
     },
     placements: {
       placements,
@@ -74,26 +76,33 @@ export const initialOverlayStateFromInternalConfig = (
     override_uris: {
       placements: placements.reduce((acc, p) => {
         acc[p] = {
-          message_type: existingOverlay?.placements?.[p]?.message_type,
-          uri: existingOverlay?.placements?.[p]?.target_link_uri,
+          message_type:
+            existingOverlay?.placements?.[p]?.message_type ||
+            internalConfig?.placements.find(i => i.placement === p)?.message_type,
+          uri:
+            existingOverlay?.placements?.[p]?.target_link_uri ||
+            internalConfig?.placements.find(i => i.placement === p)?.target_link_uri,
         }
         return acc
       }, {} as Record<LtiPlacement, {message_type?: LtiMessageType; uri?: string}>),
     },
     naming: {
       nickname: adminNickname,
-      description: existingOverlay?.description,
-      notes: '', // wtf?
+      description: existingOverlay?.description || toUndefined(internalConfig.description),
       placements:
         placements.reduce((acc, p) => {
-          acc[p] = existingOverlay?.placements?.[p]?.text
+          acc[p] =
+            existingOverlay?.placements?.[p]?.text ||
+            internalConfig?.placements.find(i => i.placement === p)?.text
           return acc
         }, {} as Record<LtiPlacement, string | undefined>) ?? [],
     },
     icons: {
       placements: placements.reduce((acc, p) => {
         if (isLtiPlacementWithIcon(p)) {
-          acc[p] = existingOverlay?.placements?.[p]?.icon_url
+          acc[p] =
+            existingOverlay?.placements?.[p]?.icon_url ||
+            internalConfig.placements.find(i => i.placement === p)?.icon_url
           return acc
         }
         return acc
@@ -116,30 +125,32 @@ export const convertToLtiConfigurationOverlay = (
   state: Lti1p3RegistrationOverlayState,
   internalConfig: InternalLtiConfiguration
 ): {overlay: LtiConfigurationOverlay; config: InternalLtiConfiguration} => {
-  const custom_fields = state.launchSettings.customFields
-    ? Object.fromEntries(
-        state.launchSettings.customFields
-          .split('\n')
-          .filter(f => !!f)
-          .map(customField => {
-            const [key, value] = customField.split('=')
-            return [key, value]
-          })
-      )
-    : undefined
-
   const placements = state.placements.placements?.reduce((acc, placement) => {
+    const internalPlacement = internalConfig.placements.find(p => p.placement === placement)
     const courseNavDefaultValue =
       placement === 'course_navigation'
         ? computeCourseNavDefaultValue(state, internalConfig)
         : undefined
 
     const placementConfig = compact({
-      text: state.naming.placements[placement],
-      target_link_uri: state.override_uris.placements[placement]?.uri,
-      message_type: state.override_uris.placements[placement]?.message_type,
-      icon_url: state.icons.placements[placement as LtiPlacementWithIcon],
-      default: courseNavDefaultValue,
+      text:
+        state.naming.placements[placement] === internalPlacement?.text
+          ? undefined
+          : state.naming.placements[placement],
+      target_link_uri:
+        state.override_uris.placements[placement]?.uri === internalPlacement?.target_link_uri
+          ? undefined
+          : state.override_uris.placements[placement]?.uri,
+      message_type:
+        state.override_uris.placements[placement]?.message_type === internalPlacement?.message_type
+          ? undefined
+          : state.override_uris.placements[placement]?.message_type,
+      icon_url:
+        state.icons.placements[placement as LtiPlacementWithIcon] === internalPlacement?.icon_url
+          ? undefined
+          : state.icons.placements[placement as LtiPlacementWithIcon],
+      default:
+        courseNavDefaultValue === internalPlacement?.default ? undefined : courseNavDefaultValue,
     })
     return {
       ...acc,
@@ -170,14 +181,26 @@ export const convertToLtiConfigurationOverlay = (
   return {
     overlay: compact({
       title: undefined,
-      description: state.naming.description,
-      custom_fields,
-      target_link_uri: state.launchSettings.targetLinkURI,
+      description:
+        state.naming.description === internalConfig.description
+          ? undefined
+          : state.naming.description,
+      custom_fields: computeOverlayedCustomFields(state, internalConfig),
+      target_link_uri:
+        state.launchSettings.targetLinkURI === internalConfig.target_link_uri
+          ? undefined
+          : state.launchSettings.targetLinkURI,
       disabled_scopes: [],
-      privacy_level: state.data_sharing.privacy_level,
+      privacy_level:
+        state.data_sharing.privacy_level === internalConfig.privacy_level
+          ? undefined
+          : state.data_sharing.privacy_level,
       disabled_placements,
       placements,
-      domain: state.launchSettings.domain,
+      domain:
+        state.launchSettings.domain === internalConfig.domain
+          ? undefined
+          : state.launchSettings.domain,
       // todo: these undefined fields will all be removed
       oidc_initiation_url: undefined,
       redirect_uris: undefined,
@@ -186,4 +209,35 @@ export const convertToLtiConfigurationOverlay = (
     }),
     config: newInternalConfig,
   }
+}
+
+const computeOverlayedCustomFields = (
+  state: Lti1p3RegistrationOverlayState,
+  internalConfig: InternalLtiConfiguration
+) => {
+  const customFieldsState = state.launchSettings.customFields
+    ? Object.fromEntries(
+        state.launchSettings.customFields
+          .split('\n')
+          .filter(f => !!f)
+          .map(customField => {
+            const [key, value] = customField.split('=')
+            return [key, value]
+          })
+      )
+    : undefined
+
+  return customFieldsState &&
+    internalConfig.custom_fields &&
+    recordsAreEqual(customFieldsState, internalConfig.custom_fields)
+    ? undefined
+    : customFieldsState
+}
+
+const recordsAreEqual = (a: Record<string, string>, b: Record<string, string>) => {
+  const keys = Object.keys(a)
+  if (keys.length !== Object.keys(b).length) {
+    return false
+  }
+  return keys.every(key => a[key] === b[key])
 }

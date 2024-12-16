@@ -187,7 +187,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
               onChange={e => actions.setCustomFields(e.target.value)}
               aria-describedby="custom_fields_hint"
               placeholder={
-                config.custom_fields ? formatCustomFields(config.custom_fields) : 'name=value'
+                config.custom_fields ? formatCustomFields(config.custom_fields) : undefined
               }
               messages={customFieldsMessages}
               data-testid="custom-fields"
