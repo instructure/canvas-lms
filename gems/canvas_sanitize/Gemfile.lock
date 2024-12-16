@@ -18,7 +18,7 @@ GEM
     irb (1.14.2)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    mini_portile2 (2.8.7)
+    mini_portile2 (2.8.8)
     nokogiri (1.16.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)

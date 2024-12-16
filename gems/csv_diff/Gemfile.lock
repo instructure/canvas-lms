@@ -8,7 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.1)
-    mini_portile2 (2.8.7)
+    mini_portile2 (2.8.8)
     rake (13.2.1)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
