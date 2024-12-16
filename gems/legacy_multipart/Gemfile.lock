@@ -15,7 +15,9 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.5.1)
-    mime-types (3.5.2)
+    logger (1.6.3)
+    mime-types (3.6.0)
+      logger
       mime-types-data (~> 3.2015)
     mime-types-data (3.2024.0903)
     rack (2.2.9)
