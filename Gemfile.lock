@@ -677,8 +677,9 @@ GEM
       bindata
       faraday (~> 2.0)
       faraday-follow_redirects
-    json-schema (5.0.1)
+    json-schema (5.1.1)
       addressable (~> 2.8)
+      bigdecimal (~> 3.1)
     json_schemer (2.3.0)
       bigdecimal
       hana (~> 1.3)
