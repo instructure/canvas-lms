@@ -53,7 +53,7 @@ GEM
     sqlite3 (1.7.3-arm64-darwin)
     sqlite3 (1.7.3-x86_64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
-    stringio (3.1.1)
+    stringio (3.1.2)
 
 PLATFORMS
   aarch64-linux

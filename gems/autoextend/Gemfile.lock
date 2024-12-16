@@ -33,7 +33,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    stringio (3.1.1)
+    stringio (3.1.2)
 
 PLATFORMS
   aarch64-linux
