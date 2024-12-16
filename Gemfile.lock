@@ -444,7 +444,7 @@ GEM
     chunky_png (1.4.0)
     cld (0.13.0)
       ffi
-    code_ownership (1.37.0)
+    code_ownership (1.38.1)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.5.11249)
