@@ -51,7 +51,7 @@ GEM
       reline (>= 0.4.2)
     jwt (2.9.3)
       base64
-    logger (1.6.1)
+    logger (1.6.3)
     mini_mime (1.1.5)
     multi_json (1.15.0)
     mutex_m (0.3.0)
