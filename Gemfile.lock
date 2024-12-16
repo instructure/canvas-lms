@@ -1132,7 +1132,7 @@ GEM
     thor (1.3.2)
     thread_safe (0.3.6)
     timecop (0.9.10)
-    timeout (0.4.1)
+    timeout (0.4.3)
     tins (1.36.1)
       bigdecimal
       sync
