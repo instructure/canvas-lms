@@ -670,7 +670,7 @@ GEM
     jira_ref_parser (1.0.1)
     jmespath (1.6.2)
     json (2.9.0)
-    json-jwt (1.16.6)
+    json-jwt (1.16.7)
       activesupport (>= 4.2)
       aes_key_wrap
       base64
