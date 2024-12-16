@@ -46,7 +46,7 @@ GEM
     hashdiff (1.1.2)
     httpclient (2.8.3)
     io-console (0.8.0)
-    irb (1.14.1)
+    irb (1.14.2)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jwt (2.9.3)
