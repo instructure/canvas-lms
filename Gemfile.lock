@@ -731,7 +731,7 @@ GEM
     mini_magick (5.0.1)
     mini_mime (1.1.5)
     mini_portile2 (2.8.7)
-    minitest (5.25.1)
+    minitest (5.25.4)
     moodle2cc (0.2.46)
       builder
       instructure-happymapper (~> 0.5.10)
