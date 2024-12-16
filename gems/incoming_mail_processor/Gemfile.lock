@@ -185,7 +185,8 @@ GEM
       racc (~> 1.4)
     packs-specification (0.0.10)
       sorbet-runtime
-    psych (5.1.2)
+    psych (5.2.1)
+      date
       stringio
     raabro (1.4.0)
     racc (1.8.1)

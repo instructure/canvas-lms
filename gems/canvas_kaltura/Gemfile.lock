@@ -97,6 +97,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    date (3.4.1)
     diff-lcs (1.5.1)
     digest-murmurhash (1.1.1)
     drb (2.2.1)
@@ -131,7 +132,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
-    psych (5.1.2)
+    psych (5.2.1)
+      date
       stringio
     public_suffix (6.0.1)
     racc (1.8.1)
