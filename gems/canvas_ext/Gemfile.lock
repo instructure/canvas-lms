@@ -26,7 +26,7 @@ GEM
     drb (2.2.1)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
-    minitest (5.25.1)
+    minitest (5.25.4)
     mutex_m (0.3.0)
     rake (13.2.1)
     rspec (3.13.0)
