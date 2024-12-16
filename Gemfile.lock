@@ -1156,7 +1156,7 @@ GEM
     unicode-emoji (3.5.0)
       unicode-version (~> 1.0)
     unicode-version (1.4.0)
-    uri (0.13.1)
+    uri (1.0.2)
     vault (0.18.2)
       aws-sigv4
     vericite_api (1.5.3)

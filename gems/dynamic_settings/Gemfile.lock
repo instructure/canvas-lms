@@ -138,7 +138,7 @@ GEM
     timecop (0.9.10)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uri (0.13.1)
+    uri (1.0.2)
     webrick (1.8.1)
     zeitwerk (2.6.18)
 
