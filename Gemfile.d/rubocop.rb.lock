@@ -53,6 +53,7 @@ GEM
     connection_pool (2.4.1)
     crass (1.0.6)
     csv (3.3.0)
+    date (3.4.1)
     drb (2.2.1)
     erubi (1.13.0)
     gergich (2.2.1)
@@ -98,7 +99,8 @@ GEM
     parser (3.3.5.0)
       ast (~> 2.4.1)
       racc
-    psych (5.1.2)
+    psych (5.2.1)
+      date
       stringio
     racc (1.8.1)
     rack (3.0.11)

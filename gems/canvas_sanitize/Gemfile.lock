@@ -8,6 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     crass (1.0.6)
+    date (3.4.1)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -29,7 +30,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
-    psych (5.1.2)
+    psych (5.2.1)
+      date
       stringio
     racc (1.8.1)
     rake (13.2.1)
