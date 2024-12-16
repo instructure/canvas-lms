@@ -18795,6 +18795,7 @@ fa:
   question_f06476d1: پرسش
   question_group_837b8014: "گروه پرسش"
   question_mark_icon_d2bbd204: "نماد علامت سؤال"
+  question_position_45eba089: "پرسش %{position}"
   question_unanswered: "هنوز پاسخ داده نشده است"
   questions_a955145c: "پرسش ها"
   queued_d0e45c4b: "صف شده"
@@ -23986,6 +23987,7 @@ fa:
   time_left_in_your_instant_trial_5dd0392b: "%{time} در نمونه آزمایشی شما باقیمانده"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} در نمونه آزمایشی فوری شما باقیمانده *(همین حالا تمدید کنید)*"
   time_limit_a6f1a51e: "محدودیت زمانی"
+  time_range_4ae01737: "بازه زمانی"
   time_zone_f56f5183: "منطقه زمانی"
   time_zones: 
     abu_dhabi: "ابو ذبی"
