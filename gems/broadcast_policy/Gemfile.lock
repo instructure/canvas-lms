@@ -42,7 +42,7 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     minitest (5.25.1)
-    mutex_m (0.2.0)
+    mutex_m (0.3.0)
     psych (5.1.2)
       stringio
     rdoc (6.7.0)

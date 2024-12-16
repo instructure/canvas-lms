@@ -79,7 +79,7 @@ GEM
     minitest (5.25.1)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
-    mutex_m (0.2.0)
+    mutex_m (0.3.0)
     nokogiri (1.16.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
