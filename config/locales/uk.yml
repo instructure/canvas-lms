@@ -13738,6 +13738,7 @@ uk:
   question_f06476d1: питання
   question_group_837b8014: "Група питань"
   question_mark_icon_d2bbd204: "Іконка питання"
+  question_position_45eba089: "Питання %{position}"
   question_unanswered: "Ще не відповів"
   questions_a955145c: Питання
   queued_d0e45c4b: "В черзі"
@@ -17619,6 +17620,7 @@ uk:
   time_left_in_your_instant_trial_5dd0392b: "%{time} залишилося в вашому поточному пробному періоді"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} залишилося в вашому поточному пробному періоді *(продовжити зараз)*"
   time_limit_a6f1a51e: "Часовий ліміт"
+  time_range_4ae01737: "Діапазон часу"
   time_zone_f56f5183: "Часовий пояс"
   time_zones: 
     abu_dhabi: "Абу Дабі"

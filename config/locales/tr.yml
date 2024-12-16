@@ -15379,6 +15379,7 @@ tr:
   question_banks_view_and_link_e6d9cde2: "Soru bankaları - göster ve bağlantı oluştur"
   question_f06476d1: soru
   question_group_837b8014: "Soru Grubu"
+  question_position_45eba089: "Soru %{position}"
   question_unanswered: "Henüz Cevaplanmadı"
   questions_a955145c: Sorular
   quiz: 
@@ -19242,6 +19243,7 @@ tr:
     with_ago: "%{time} önce"
   time_2b5aac58: Süre
   time_limit_a6f1a51e: "Süre Sınırı"
+  time_range_4ae01737: "Saat Aralığı"
   time_zone_f56f5183: "Zaman Dilimi"
   time_zones: 
     abu_dhabi: "Abu Dhabi"

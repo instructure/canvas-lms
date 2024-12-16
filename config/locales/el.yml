@@ -14925,6 +14925,7 @@ el:
       same_day: "%{date} από %{start_time} έως %{end_time}"
     with_ago: "πρίν από %{time}"
   time_2b5aac58: Χρόνος
+  time_range_4ae01737: "Χρονική Περίοδος"
   time_zones: 
     abu_dhabi: "Άμπου Ντάμπι"
     adelaide: Αδελαϊδα

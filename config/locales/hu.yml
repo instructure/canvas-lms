@@ -19473,6 +19473,7 @@ hu:
   question_f06476d1: kérdés
   question_group_837b8014: Kérdéscsoport
   question_mark_icon_d2bbd204: "Kérdőjel ikon"
+  question_position_45eba089: "%{position} kérdés"
   question_unanswered: "Még nem válaszolta meg"
   questions_a955145c: Kérdések
   queued_d0e45c4b: Várakozó
@@ -25154,6 +25155,7 @@ hu:
   time_2b5aac58: Idő
   time_block_5a7cda5c: Időblokk
   time_limit_a6f1a51e: Időkorlát
+  time_range_4ae01737: Időtartomány
   time_to_complete_9d264097: "A befejezés ideje"
   time_zone_f56f5183: Időzóna
   time_zones: 

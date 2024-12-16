@@ -20888,6 +20888,7 @@ nn:
   question_f06476d1: spørsmål
   question_group_837b8014: Spørsmålsgruppe
   question_mark_icon_d2bbd204: Spørsmålsteiknikon
+  question_position_45eba089: "Spørsmål %{position}"
   question_unanswered: "Har ikkje svart enno"
   questions_a955145c: Spørsmål
   queued_d0e45c4b: "Lagt i kø"
@@ -26844,6 +26845,7 @@ nn:
   time_left_in_your_instant_trial_5dd0392b: "%{time} er attende av prøvetida"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} er attende av prøvetida *(utvid no)*"
   time_limit_a6f1a51e: Tidsgrense
+  time_range_4ae01737: Tidsintervall
   time_to_complete_9d264097: "Tid for å fullføre"
   time_zone_f56f5183: Tidssone
   time_zones: 
