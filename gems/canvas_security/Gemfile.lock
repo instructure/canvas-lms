@@ -76,7 +76,7 @@ GEM
     bigdecimal (3.1.8)
     bindata (2.5.0)
     builder (3.3.0)
-    code_ownership (1.37.0)
+    code_ownership (1.38.1)
       code_teams (~> 1.0)
       packs-specification
       sorbet-runtime (>= 0.5.11249)
