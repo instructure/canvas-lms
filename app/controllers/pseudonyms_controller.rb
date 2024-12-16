@@ -189,15 +189,22 @@ class PseudonymsController < ApplicationController
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
-      if @pseudonym.save_without_session_maintenance
-        # If they changed the password (and we subsequently log them in) then
-        # we're pretty confident this is the right user, and the communication
-        # channel is valid, so register the user and approve the channel.
-        @cc.set_confirmation_code(true)
-        @cc.confirm
-        @cc.save
-        @pseudonym.user.register
 
+      pseudo_saved = User.transaction do
+        saved = @pseudonym.save_without_session_maintenance
+        if saved
+          # If they changed the password (and we subsequently log them in) then
+          # we're pretty confident this is the right user, and the communication
+          # channel is valid, so register the user and approve the channel.
+          @cc.set_confirmation_code(true)
+          @cc.confirm
+          @cc.save
+          @pseudonym.user.register
+        end
+        saved
+      end
+
+      if pseudo_saved
         # reset the session id cookie to prevent session fixation.
         reset_session
 
