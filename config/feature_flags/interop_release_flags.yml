@@ -237,12 +237,15 @@ lti_rce_postmessage_support:
       state: allowed_on
 lti_registrations_discover_page:
   state: hidden
+  shadow: true
   applies_to: RootAccount
   display_name: LTI Apps Discover Page
   description: When enabled, the LTI Apps Discover page will be available in the Apps page.
   environments:
     development:
-      state: hidden
+      state: allowed_on
+    ci:
+      state: allowed_on
   custom_transition_proc: lti_registrations_discover_page_hook
 lti_apps_page_instructors:
   state: hidden
@@ -254,6 +257,7 @@ lti_apps_page_instructors:
       state: hidden
 lti_registrations_next:
   state: hidden
+  shadow: true
   applies_to: RootAccount
   display_name: LTI Apps Page Features In-Development
   description: When enabled, the LTI Apps page will have features that are currently in-development.
@@ -264,12 +268,15 @@ lti_registrations_next:
       state: allowed_on
 lti_registrations_page:
   state: hidden
+  beta: true
   applies_to: RootAccount
   display_name: LTI Apps Page
   description: When enabled, the LTI Apps page will be available in the Account navigation sidebar..
   environments:
     development:
-      state: hidden
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_resource_link_id_speedgrader_launches_reference_assignment:
   state: hidden
   applies_to: RootAccount
