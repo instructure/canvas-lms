@@ -40,7 +40,7 @@ GEM
     idn-ruby (0.1.5)
     mini_portile2 (2.8.7)
     minitest (5.25.1)
-    mutex_m (0.2.0)
+    mutex_m (0.3.0)
     nokogiri (1.16.7)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)

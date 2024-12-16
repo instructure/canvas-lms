@@ -31,7 +31,7 @@ GEM
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     minitest (5.25.1)
-    mutex_m (0.2.0)
+    mutex_m (0.3.0)
     rake (13.2.1)
     timeout (0.4.3)
     tzinfo (2.0.6)

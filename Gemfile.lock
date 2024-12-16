@@ -745,7 +745,7 @@ GEM
       bigdecimal (~> 3.1)
     multipart-post (2.4.1)
     mustache (1.1.1)
-    mutex_m (0.2.0)
+    mutex_m (0.3.0)
     net-http (0.6.0)
       uri
     net-imap (0.4.17)
