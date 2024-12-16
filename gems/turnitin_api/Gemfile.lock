@@ -41,7 +41,7 @@ GEM
       bigdecimal
       rexml
     diff-lcs (1.5.1)
-    dogstatsd-ruby (5.6.2)
+    dogstatsd-ruby (5.6.3)
     drb (2.2.1)
     faraday (2.10.1)
       faraday-net_http (>= 2.0, < 3.2)
