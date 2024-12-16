@@ -121,7 +121,7 @@ GEM
     rdoc (6.7.0)
       psych (>= 4.0.0)
     regexp_parser (2.9.2)
-    reline (0.5.10)
+    reline (0.6.0)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
