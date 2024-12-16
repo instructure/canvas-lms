@@ -825,6 +825,28 @@ describe "as a student" do
         expect(StudentAssignmentPageV2.comment_container).to include_text("great job!")
       end
 
+      it "allows peer reviewer to complete a review even if reviewee has been excused" do
+        @peer_review_assignment.submit_homework(
+          @student3,
+          body: "student 3 attempt",
+          submission_type: "online_text_entry"
+        )
+        @peer_review_assignment.grade_student(@student3, excused: true, grader: @teacher)
+        StudentAssignmentPageV2.visit(@course, @peer_review_assignment)
+        wait_for_ajaximations
+
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.create_text_entry_draft("hello")
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
+        StudentAssignmentPageV2.submit_button_enabled
+        StudentAssignmentPageV2.submit_assignment
+        StudentAssignmentPageV2.peer_review_next_button.click
+        StudentAssignmentPageV2.leave_a_comment("great job!")
+
+        expect(StudentAssignmentPageV2.comment_container).to include_text("Your peer review is complete!")
+        expect(StudentAssignmentPageV2.comment_container).to include_text("great job!")
+      end
+
       it "after completing a peer review the student is reminded that they still have one more to complete but it is not availible yet" do
         @peer_review_assignment.assign_peer_review(@student1, @student2)
         @peer_review_assignment.submit_homework(

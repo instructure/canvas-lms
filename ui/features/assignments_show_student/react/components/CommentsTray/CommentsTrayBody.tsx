@@ -106,7 +106,7 @@ export default function CommentsTrayBody(props) {
     setPeerReviewModalOpen(true)
   }
 
-  const {allowChangesToSubmission} = useContext(StudentViewContext)
+  const {allowPeerReviewComments} = useContext(StudentViewContext)
 
   const gradeAsGroup =
     props.assignment.groupCategoryId && !props.assignment.gradeGroupStudentsIndividually
@@ -170,7 +170,7 @@ export default function CommentsTrayBody(props) {
           />
         </Flex.Item>
 
-        {allowChangesToSubmission && (
+        {allowPeerReviewComments && (
           <Flex as="div" direction="column">
             {gradeAsGroup && (
               <Flex.Item padding="x-small medium">
@@ -180,6 +180,7 @@ export default function CommentsTrayBody(props) {
 
             <Flex.Item padding="x-small medium">
               <CommentTextArea
+                data-testid="peer-review-comment-text-area"
                 assignment={props.assignment}
                 submission={props.submission}
                 reviewerSubmission={props.reviewerSubmission}
