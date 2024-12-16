@@ -347,6 +347,7 @@ export type SectionMap = {
 }
 
 export type GradingType =
+  | 'no_submission'
   | 'points'
   | 'percent'
   | 'letter_grade'
@@ -356,6 +357,8 @@ export type GradingType =
 
 export type SubmissionType =
   | null
+  | ''
+  | 'none'
   | 'basic_lti_launch'
   | 'discussion_topic'
   | 'external_tool'

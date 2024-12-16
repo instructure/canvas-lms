@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -21,15 +20,15 @@ import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {within} from '@testing-library/dom'
 import MessageStudentsWhoDialog, {
-  Assignment,
-  Props as ComponentProps,
-  Student,
+  type Student,
+  type Props as ComponentProps,
+  MSWLaunchContext,
 } from '../MessageStudentsWhoDialog'
 import {MockedProvider} from '@apollo/client/testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import {createCache} from '@canvas/apollo-v3'
-import {OBSERVER_ENROLLMENTS_QUERY} from '../../graphql/Queries'
-
+import {OBSERVER_ENROLLMENTS_QUERY, type ObserverEnrollmentQueryResult} from '../../graphql/Queries'
+import type {CamelizedAssignment} from '@canvas/grading/grading'
 const students: Student[] = [
   {
     id: '100',
@@ -38,8 +37,9 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Ford, Betty',
     score: undefined,
-    submittedAt: Date.now(),
+    submittedAt: new Date(Date.now()),
     excused: false,
+    workflowState: 'submitted',
   },
   {
     id: '101',
@@ -48,8 +48,9 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Jones, Adam',
     score: undefined,
-    submittedAt: Date.now(),
+    submittedAt: new Date(Date.now()),
     excused: false,
+    workflowState: 'submitted',
   },
   {
     id: '102',
@@ -58,8 +59,9 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Xi, Charlie',
     score: undefined,
-    submittedAt: Date.now(),
+    submittedAt: new Date(Date.now()),
     excused: false,
+    workflowState: 'submitted',
   },
   {
     id: '103',
@@ -68,49 +70,90 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Smith, Dana',
     score: undefined,
-    submittedAt: Date.now(),
+    submittedAt: new Date(Date.now()),
     excused: false,
+    workflowState: 'submitted',
   },
 ]
 
-const scoredAssignment: Assignment = {
+const scoredAssignment: CamelizedAssignment = {
   allowedAttempts: 3,
   courseId: '1',
-  dueDate: new Date(),
+  dueAt: new Date().toISOString(),
   gradingType: 'points',
   id: '100',
   name: 'A pointed assignment',
   submissionTypes: ['online_text_entry'],
+  anonymizeStudents: false,
+  anonymousGrading: false,
+  gradesPublished: true,
+  htmlUrl: 'http://example.com',
+  hasRubric: false,
+  moderatedGrading: false,
+  muted: false,
+  pointsPossible: 10,
+  postManually: false,
+  published: true,
 }
 
-const ungradedAssignment: Assignment = {
+const ungradedAssignment: CamelizedAssignment = {
   allowedAttempts: 1,
   courseId: '1',
   gradingType: 'not_graded',
-  dueDate: null,
+  dueAt: null,
   id: '200',
   name: 'A pointless assignment',
   submissionTypes: ['online_text_entry'],
+  anonymizeStudents: false,
+  anonymousGrading: false,
+  gradesPublished: true,
+  htmlUrl: 'http://example.com',
+  hasRubric: false,
+  moderatedGrading: false,
+  muted: false,
+  pointsPossible: 10,
+  postManually: false,
+  published: true,
 }
 
-const passFailAssignment: Assignment = {
+const passFailAssignment: CamelizedAssignment = {
   allowedAttempts: -1,
   courseId: '1',
-  dueDate: null,
+  dueAt: null,
   gradingType: 'pass_fail',
   id: '300',
   name: 'A pass-fail assignment',
   submissionTypes: ['online_text_entry'],
+  anonymizeStudents: false,
+  anonymousGrading: false,
+  gradesPublished: true,
+  htmlUrl: 'http://example.com',
+  hasRubric: false,
+  moderatedGrading: false,
+  muted: false,
+  pointsPossible: 10,
+  postManually: false,
+  published: true,
 }
 
-const unsubmittableAssignment: Assignment = {
+const unsubmittableAssignment: CamelizedAssignment = {
   allowedAttempts: 3,
   courseId: '1',
-  dueDate: new Date(),
+  dueAt: new Date().toISOString(),
   gradingType: 'no_submission',
   id: '400',
   name: 'An unsubmittable assignment',
   submissionTypes: ['on_paper'],
+  anonymizeStudents: false,
+  anonymousGrading: false,
+  gradesPublished: true,
+  htmlUrl: 'http://example.com',
+  hasRubric: false,
+  moderatedGrading: false,
+  muted: false,
+  pointsPossible: 10,
+  postManually: false,
+  published: true,
 }
 
 function makeProps(overrides: object = {}): ComponentProps {
@@ -121,6 +164,7 @@ function makeProps(overrides: object = {}): ComponentProps {
     onSend: () => {},
     messageAttachmentUploadFolderId: '1',
     userId: '345',
+    launchContext: MSWLaunchContext.ASSIGNMENT_CONTEXT,
     ...overrides,
   }
 }
@@ -129,7 +173,11 @@ async function makeMocks(overrides = [], sameStudent = false) {
   const variables = {courseId: '1', studentIds: ['100', '101', '102', '103']}
   const allOverrides = [...overrides, {EnrollmentType: 'ObserverEnrollment'}]
 
-  const resultQuery = await mockGraphqlQuery(OBSERVER_ENROLLMENTS_QUERY, allOverrides, variables)
+  const resultQuery = (await mockGraphqlQuery(
+    OBSERVER_ENROLLMENTS_QUERY,
+    allOverrides,
+    variables
+  )) as {data: ObserverEnrollmentQueryResult}
 
   const nodes = resultQuery.data?.course.enrollmentsConnection.nodes
 
@@ -160,14 +208,14 @@ function allObserverNames() {
   return ['Observer0', 'Observer1']
 }
 
-function expectToBeSelected(cell) {
+function expectToBeSelected(cell: HTMLElement) {
   const selectedElement = within(cell).getByTestId('item-selected')
   const unselectedElement = within(cell).queryByTestId('item-unselected')
   expect(selectedElement).toBeInTheDocument()
   expect(unselectedElement).not.toBeInTheDocument()
 }
 
-function expectToBeUnselected(cell) {
+function expectToBeUnselected(cell: HTMLElement) {
   const selectedElement = within(cell).queryByTestId('item-selected')
   const unselectedElement = within(cell).getByTestId('item-unselected')
   expect(selectedElement).not.toBeInTheDocument()
@@ -521,7 +569,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
   describe('selected criteria', () => {
     beforeEach(() => {
       students.forEach(student => {
-        student.submittedAt = undefined
+        student.submittedAt = null
         student.excused = undefined
         student.grade = undefined
         student.score = undefined
@@ -1126,10 +1174,10 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
   describe('students selection', () => {
     beforeEach(() => {
-      students[0].submittedAt = undefined
-      students[1].submittedAt = undefined
-      students[2].submittedAt = undefined
-      students[3].submittedAt = undefined
+      students[0].submittedAt = null
+      students[1].submittedAt = null
+      students[2].submittedAt = null
+      students[3].submittedAt = null
     })
 
     it('selects all students by default', async () => {
@@ -1283,10 +1331,10 @@ describe.skip('MessageStudentsWhoDialog', () => {
 
   describe('observers selection', () => {
     beforeEach(() => {
-      students[0].submittedAt = undefined
-      students[1].submittedAt = undefined
-      students[2].submittedAt = undefined
-      students[3].submittedAt = undefined
+      students[0].submittedAt = null
+      students[1].submittedAt = null
+      students[2].submittedAt = null
+      students[3].submittedAt = null
     })
 
     it('unselects all observers by default', async () => {

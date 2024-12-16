@@ -17,6 +17,34 @@
  */
 import {gql} from '@apollo/client'
 
+export type ObserverEnrollmentQueryResult = {
+  course: {
+    enrollmentsConnection: {
+      nodes: ObserverEnrollmentConnectionNode[]
+    }
+  }
+}
+
+export type ObserverEnrollmentConnectionNode = {
+  _id: string
+  type: string
+  user: ObserverEnrollmentConnectionUser
+  associatedUser: {
+    _id: string
+  }
+}
+
+export type ObserverEnrollmentConnectionUser = {
+  _id: string
+  name: string
+  sortableName: string
+}
+
+export type ObserverEnrollmentQueryVariables = {
+  courseId: string
+  studentIds: string[]
+}
+
 export const OBSERVER_ENROLLMENTS_QUERY = gql`
   query ObserversForStudents($courseId: ID!, $studentIds: [ID!]) {
     course(id: $courseId) {

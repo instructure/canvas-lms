@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -96,7 +95,6 @@ function showStudentsMessageSentTo() {
   })
 }
 
-/* global messageStudents */
 window.messageStudents = function (settings) {
   const $message_students_dialog = messageStudentsDialog()
   currentSettings = settings
@@ -242,4 +240,4 @@ $(document).ready(() => {
   $message_students_dialog.find('#body').bind('change blur keyup', checkSendable)
 })
 
-export default messageStudents
+export default window.messageStudents
