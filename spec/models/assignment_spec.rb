@@ -2505,6 +2505,21 @@ describe Assignment do
     end
   end
 
+  describe "show_in_search_for_user?" do
+    let(:user) { User.create }
+    let(:assignment) { Assignment.create }
+
+    it "returns true if the user can see the description" do
+      expect(assignment).to receive(:include_description?).with(user).and_return(true)
+      expect(assignment.show_in_search_for_user?(user)).to be true
+    end
+
+    it "returns false if the user cannot see the description" do
+      expect(assignment).to receive(:include_description?).with(user).and_return(false)
+      expect(assignment.show_in_search_for_user?(user)).to be false
+    end
+  end
+
   describe "#grade_to_score" do
     before(:once) { setup_assignment_without_submission }
 

@@ -95,6 +95,10 @@ class Assignment < AbstractAssignment
                    index_scope: ->(course) { course.assignments.active },
                    search_scope: ->(course, user) { Assignments::ScopedToUser.new(course, user, course.assignments.active).scope }
 
+  def show_in_search_for_user?(user)
+    include_description?(user)
+  end
+
   def checkpoints_parent?
     has_sub_assignments? && root_account&.feature_enabled?(:discussion_checkpoints)
   end
