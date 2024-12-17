@@ -148,7 +148,7 @@ GEM
       rubocop (~> 1.61)
     rubocop-graphql (1.5.4)
       rubocop (>= 1.50, < 2)
-    rubocop-inst (1.0.4)
+    rubocop-inst (1.1.0)
       rubocop (~> 1.50)
       rubocop-performance (~> 1.17)
     rubocop-performance (1.23.0)
