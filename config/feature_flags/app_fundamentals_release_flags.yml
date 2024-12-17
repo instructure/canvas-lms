@@ -70,5 +70,5 @@ blueprint_item_notifications:
 migrate_assignment_group_categories:
   state: hidden
   applies_to: Course
-  display_name: Preserve Group Set During Assignment Copy
-  description: When copying a group assignment to another course, a group set set with the same name is created in the destination course if no matching group set exists
+  display_name: Preserve Group Set During Assignment or Discussion Copy
+  description: When copying a group assignment or discussion topic to another course, a group set set with the same name is created in the destination course if no matching group set exists
