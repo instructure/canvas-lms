@@ -432,6 +432,18 @@ describe "ZipPackage" do
       expect(module_item_data[:requiredPoints]).to eq 7
     end
 
+    it "parses required points if module item requirement is min_percentage" do
+      assign = @course.assignments.create!(title: "Assignment 1", points_possible: 10)
+      assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
+      @module.content_tags.create!(content: assign, context: @course)
+      @module.completion_requirements = [{ id: assign_item.id, type: "min_percentage", min_percentage: 60 }]
+      @module.save!
+
+      zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
+      module_item_data = zip_package.parse_module_item_data(@module).first
+      expect(module_item_data[:requiredPoints]).to eq 6
+    end
+
     it "parses export id for assignments, quizzes, discussions and wiki pages" do
       assign = @course.assignments.create!(title: "Assignment 1", points_possible: 10)
       @module.content_tags.create!(content: assign, context: @course)

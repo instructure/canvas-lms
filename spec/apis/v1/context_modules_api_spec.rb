@@ -1232,6 +1232,64 @@ describe "Modules API", type: :request do
       expect(json["completed_at"]).not_to be_nil
     end
 
+    it "considers score as percentage completion" do
+      teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+      @module1.completion_requirements = {
+        @assignment_tag.id => { type: "min_percentage", min_percentage: 60 },
+      }
+      @module1.save!
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      controller: "context_modules_api",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @module1.id.to_s)
+      expect(json["state"]).to eq "unlocked"
+
+      @assignment.grade_student(@user, score: 30, grader: teacher)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      controller: "context_modules_api",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @module1.id.to_s)
+      expect(json["state"]).to eq "completed"
+      expect(json["completed_at"]).not_to be_nil
+    end
+
+    it "considers score as percentage not completion" do
+      teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+      @module1.completion_requirements = {
+        @assignment_tag.id => { type: "min_percentage", min_percentage: 60 },
+      }
+      @module1.save!
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      controller: "context_modules_api",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @module1.id.to_s)
+      expect(json["state"]).to eq "unlocked"
+
+      @assignment.grade_student(@user, score: 10, grader: teacher)
+
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                      controller: "context_modules_api",
+                      action: "show",
+                      format: "json",
+                      course_id: @course.id.to_s,
+                      id: @module1.id.to_s)
+      expect(json["state"]).to eq "started"
+      expect(json["completed_at"]).to be_nil
+    end
+
     context "show including content details" do
       let(:module1_json) do
         api_call(:get,
