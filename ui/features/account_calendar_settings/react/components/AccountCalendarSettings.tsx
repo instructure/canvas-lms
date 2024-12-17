@@ -32,12 +32,7 @@ import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
 import {FilterControls, FilterType} from './FilterControls'
 import {Footer} from './Footer'
-import type {
-  VisibilityChange,
-  SubscriptionChange,
-  ExpandedAccounts,
-  UpdateAccountDataResponse,
-} from '../types'
+import type {VisibilityChange, SubscriptionChange, ExpandedAccounts} from '../types'
 
 const I18n = createI18nScope('account_calendar_settings')
 
@@ -173,17 +168,16 @@ export const AccountCalendarSettings = ({accountId}: ComponentProps) => {
         .values(),
     ]
     setSaving(true)
-    doFetchApi({
+    doFetchApi<{message: string}>({
       path: `/api/v1/accounts/${accountId}/account_calendars`,
       method: 'PUT',
       body: accountCalendarChanges,
     })
-      // @ts-expect-error
-      .then((response: UpdateAccountDataResponse) => {
-        const json = response.json
+      .then(response => {
+        const {json} = response
         setVisibilityChanges([])
         setSubscriptionChanges([])
-        showFlashSuccess(json?.message)()
+        showFlashSuccess(json!.message)()
       })
       .catch((err: Error) => {
         showFlashError(I18n.t("Couldn't save account calendar visibilities"))(err)

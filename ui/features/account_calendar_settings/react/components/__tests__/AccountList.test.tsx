@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,7 +20,7 @@ import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
-import {AccountList} from '../AccountList'
+import {AccountList, type ComponentProps} from '../AccountList'
 import {FilterType} from '../FilterControls'
 import {RESPONSE_ACCOUNT_3, RESPONSE_ACCOUNT_4} from './fixtures'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
@@ -32,12 +31,14 @@ jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   }
 })
 
-const defaultProps = {
+const defaultProps: ComponentProps = {
   originAccountId: 1,
   searchValue: 'elemen',
   filterValue: FilterType.SHOW_ALL,
   visibilityChanges: [],
   onAccountToggled: jest.fn(),
+  onAccountSubscriptionToggled: jest.fn(),
+  subscriptionChanges: [],
 }
 
 const accountListUrl = (searchTerm = '', filter = '') =>
