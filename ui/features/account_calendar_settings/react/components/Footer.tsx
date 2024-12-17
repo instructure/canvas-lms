@@ -52,10 +52,12 @@ export const Footer = ({
     number | undefined
   >(undefined)
 
-  // @ts-ignore - this hook isn't ts-ified
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/visible_calendars_count`,
-    success: useCallback(response => setInitialEnabledCalendarsCount(response.count), []),
+    success: useCallback(
+      (response: {count: number}) => setInitialEnabledCalendarsCount(response.count),
+      []
+    ),
     error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), []),
   })
 
