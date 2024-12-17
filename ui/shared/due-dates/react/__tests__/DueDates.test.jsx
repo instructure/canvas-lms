@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import DueDates from '../DueDates'
 import StudentGroupStore from '../StudentGroupStore'
+import OverrideStudentStore from '../OverrideStudentStore'
 import AssignmentOverride from '@canvas/assignments/backbone/models/AssignmentOverride'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -213,5 +214,295 @@ describe('DueDates', () => {
     render(<DueDates {...props} />)
     const dateInputs = screen.getAllByRole('textbox', {name: /due/i})
     expect(dateInputs.length).toBeGreaterThan(0)
+  })
+
+  it('includes the persisted state on the overrides', () => {
+    render(<DueDates {...props} />)
+    expect(props.overrides[0].attributes).toHaveProperty('persisted')
+  })
+})
+
+describe('DueDates with grading periods', () => {
+  let props
+
+  beforeEach(() => {
+    fakeENV.setup()
+    ENV.context_asset_string = 'course_1'
+    ENV.current_user_roles = ['teacher']
+
+    const overrides = [
+      new AssignmentOverride({
+        id: '70',
+        assignment_id: '64',
+        title: 'Section 1',
+        due_at: '2014-07-16T05:59:59Z',
+        all_day: true,
+        all_day_date: '2014-07-16',
+        unlock_at: null,
+        lock_at: null,
+        course_section_id: '19',
+        due_at_overridden: true,
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+      }),
+      new AssignmentOverride({
+        id: '71',
+        assignment_id: '64',
+        title: '1 student',
+        due_at: '2014-07-17T05:59:59Z',
+        all_day: true,
+        all_day_date: '2014-07-17',
+        unlock_at: null,
+        lock_at: null,
+        student_ids: ['2'],
+        due_at_overridden: true,
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+      }),
+      new AssignmentOverride({
+        id: '72',
+        assignment_id: '64',
+        title: '1 student',
+        due_at: '2014-07-18T05:59:59Z',
+        all_day: true,
+        all_day_date: '2014-07-18',
+        unlock_at: null,
+        lock_at: null,
+        student_ids: ['4'],
+        due_at_overridden: true,
+        unlock_at_overridden: true,
+        lock_at_overridden: true,
+      }),
+    ]
+
+    const sections = [
+      {attributes: {id: '0', name: 'Everyone'}},
+      {
+        attributes: {
+          id: '19',
+          name: 'Section 1',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null,
+        },
+      },
+      {
+        attributes: {
+          id: '4',
+          name: 'Section 2',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null,
+        },
+      },
+      {
+        attributes: {
+          id: '7',
+          name: 'Section 3',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null,
+        },
+      },
+      {
+        attributes: {
+          id: '8',
+          name: 'Section 4',
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null,
+        },
+      },
+    ]
+
+    const gradingPeriods = [
+      {
+        id: '101',
+        title: 'Account Closed Period',
+        startDate: new Date('2014-07-01T06:00:00.000Z'),
+        endDate: new Date('2014-08-31T06:00:00.000Z'),
+        closeDate: new Date('2014-08-31T06:00:00.000Z'),
+        isLast: false,
+        isClosed: true,
+      },
+      {
+        id: '127',
+        title: 'Account Open Period',
+        startDate: new Date('2014-09-01T06:00:00.000Z'),
+        endDate: new Date('2014-12-15T07:00:00.000Z'),
+        closeDate: new Date('2014-12-15T07:00:00.000Z'),
+        isLast: true,
+        isClosed: false,
+      },
+    ]
+
+    const students = {
+      1: {id: '1', name: 'Scipio Africanus', sections: ['19'], group_ids: []},
+      2: {id: '2', name: 'Cato The Elder', sections: ['4'], group_ids: []},
+      3: {id: '3', name: 'Publius Publicoa', sections: ['4'], group_ids: []},
+      4: {id: '4', name: 'Louie Anderson', sections: ['8'], group_ids: []},
+    }
+
+    jest.spyOn(OverrideStudentStore, 'getStudents').mockReturnValue(students)
+    jest.spyOn(OverrideStudentStore, 'currentlySearching').mockReturnValue(false)
+    jest.spyOn(OverrideStudentStore, 'allStudentsFetched').mockReturnValue(true)
+
+    props = {
+      overrides,
+      overrideModel: AssignmentOverride,
+      defaultSectionId: '0',
+      sections,
+      groups: {
+        1: {id: '1', name: 'Reading Group One'},
+        2: {id: '2', name: 'Reading Group Two'},
+      },
+      syncWithBackbone: jest.fn(),
+      hasGradingPeriods: true,
+      gradingPeriods,
+      isOnlyVisibleToOverrides: true,
+      dueAt: null,
+    }
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  it('excludes sections assigned in closed periods from dropdown options', () => {
+    render(<DueDates {...props} />)
+    const comboboxes = screen.getAllByRole('combobox')
+    const options = screen.getAllByRole('option')
+    expect(options.map(opt => opt.textContent)).not.toContain('Section 1')
+  })
+
+  it('excludes students assigned in closed periods from dropdown options', () => {
+    render(<DueDates {...props} />)
+    const options = screen.getAllByRole('option')
+    expect(options.map(opt => opt.textContent)).not.toContain('Cato The Elder')
+  })
+
+  it('includes sections not assigned in closed periods without students assigned in closed periods', () => {
+    render(<DueDates {...props} />)
+    const options = screen.getAllByRole('option')
+    expect(options.map(opt => opt.textContent.trim())).toContain('Section 3')
+  })
+})
+
+describe('DueDates render callbacks', () => {
+  let props
+
+  beforeEach(() => {
+    fakeENV.setup()
+    ENV.context_asset_string = 'course_1'
+
+    const override = new AssignmentOverride({
+      name: 'Students',
+      student_ids: ['1', '3'],
+      due_at: null,
+    })
+
+    props = {
+      overrides: [override],
+      defaultSectionId: '0',
+      sections: [],
+      students: {
+        1: {id: '1', name: 'Scipio Africanus'},
+        3: {id: 3, name: 'Publius Publicoa'},
+      },
+      overrideModel: AssignmentOverride,
+      syncWithBackbone: jest.fn(),
+      hasGradingPeriods: false,
+      gradingPeriods: [],
+      isOnlyVisibleToOverrides: false,
+      dueAt: null,
+    }
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  it('does not fetch adhoc students until state is set', () => {
+    const fetchAdhocStudentsStub = jest.spyOn(OverrideStudentStore, 'fetchStudentsByID')
+    render(<DueDates {...props} />)
+    expect(fetchAdhocStudentsStub).not.toHaveBeenCalledWith(['18', '22'])
+    expect(fetchAdhocStudentsStub).toHaveBeenCalledWith(['1', '3'])
+  })
+})
+
+describe('DueDates important dates', () => {
+  let props
+
+  beforeEach(() => {
+    fakeENV.setup()
+    ENV.K5_SUBJECT_COURSE = true
+    ENV.context_asset_string = 'course_1'
+
+    const override1 = new AssignmentOverride({
+      name: 'Plebs',
+      course_section_id: '1',
+      due_at: null,
+    })
+
+    props = {
+      overrides: [override1],
+      defaultSectionId: '0',
+      sections: [{attributes: {id: 1, name: 'Plebs'}}],
+      students: {
+        1: {id: '1', name: 'Scipio Africanus'},
+        2: {id: '2', name: 'Cato The Elder'},
+        3: {id: 3, name: 'Publius Publicoa'},
+      },
+      groups: {
+        1: {id: '1', name: 'Reading Group One'},
+        2: {id: '2', name: 'Reading Group Two'},
+      },
+      overrideModel: AssignmentOverride,
+      syncWithBackbone: jest.fn(),
+      hasGradingPeriods: false,
+      gradingPeriods: [],
+      isOnlyVisibleToOverrides: false,
+      dueAt: null,
+      importantDates: false,
+    }
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  it('enables important dates checkbox when a date is added', async () => {
+    const user = userEvent.setup()
+    const {container} = render(<DueDates {...props} />)
+
+    const checkbox = screen.getByRole('checkbox', {name: /mark as important date/i})
+    expect(checkbox).toBeDisabled()
+    expect(checkbox).not.toBeChecked()
+
+    // Add a date
+    const dateInput = container.querySelector('input[type="text"]')
+    await user.type(dateInput, '2015-04-05')
+    await user.tab()
+
+    expect(checkbox).toBeEnabled()
+    expect(checkbox).not.toBeChecked()
+  })
+
+  it('is checked if enabled and important dates is true', async () => {
+    const user = userEvent.setup()
+    props.importantDates = true
+    const {container} = render(<DueDates {...props} />)
+
+    const checkbox = screen.getByRole('checkbox', {name: /mark as important date/i})
+    expect(checkbox).toBeDisabled()
+    expect(checkbox).not.toBeChecked()
+
+    // Add a date
+    const dateInput = container.querySelector('input[type="text"]')
+    await user.type(dateInput, '2015-04-05')
+    await user.tab()
+
+    expect(checkbox).toBeEnabled()
+    expect(checkbox).toBeChecked()
   })
 })
