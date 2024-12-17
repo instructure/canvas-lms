@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,24 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import ContextModulesPublishMenu from '@canvas/context-modules/react/ContextModulesPublishMenu'
 import ready from '@instructure/ready'
+import {createRoot} from 'react-dom/client'
 
 ready(() => {
   const menuElement = document.getElementById('context-modules-publish-menu')
   if (menuElement) {
-    const $menuElement = $(menuElement)
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(
+    const root = createRoot(menuElement)
+    root.render(
       <ContextModulesPublishMenu
-        courseId={$menuElement.data('courseId')}
-        runningProgressId={$menuElement.data('progressId')}
-        disabled={$menuElement.data('disabled')}
-      />,
-      menuElement
+        courseId={menuElement.dataset['courseId']!}
+        runningProgressId={menuElement.dataset['progressId']!}
+        disabled={menuElement.dataset['disabled'] === 'true'}
+      />
     )
   }
 })
