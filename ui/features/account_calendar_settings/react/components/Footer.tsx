@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -28,7 +27,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {VisibilityChange} from '../types'
+import type {VisibilityChange} from '../types'
 
 const I18n = createI18nScope('account_calendar_settings_footer')
 
@@ -58,7 +57,10 @@ export const Footer = ({
       (response: {count: number}) => setInitialEnabledCalendarsCount(response.count),
       []
     ),
-    error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), []),
+    error: useCallback(
+      (error: Error) => showFlashError(I18n.t('Unable to load calendar count'))(error),
+      []
+    ),
   })
 
   const handleApply = () => {
