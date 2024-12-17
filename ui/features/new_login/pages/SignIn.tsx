@@ -55,6 +55,8 @@ const SignIn = () => {
   const usernameInputRef = useRef<HTMLInputElement | null>(null)
   const passwordInputRef = useRef<HTMLInputElement | null>(null)
 
+  const isDisabled = isPreviewMode || isUiActionPending
+
   useEffect(() => {
     setUsername('')
     setPassword('')
@@ -90,7 +92,7 @@ const SignIn = () => {
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (isPreviewMode || isUiActionPending) return
+    if (isDisabled) return
 
     if (!validateForm()) return
 

@@ -52,6 +52,8 @@ const providerIcons: Record<string, string> = {
 const SSOButtons = () => {
   const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
 
+  const isDisabled = isPreviewMode || isUiActionPending
+
   if (!authProviders || authProviders.length === 0) {
     return null
   }
@@ -59,7 +61,7 @@ const SSOButtons = () => {
   const handleClick = (
     event: React.KeyboardEvent<ViewOwnProps> | React.MouseEvent<ViewOwnProps>
   ) => {
-    if (isPreviewMode || isUiActionPending) {
+    if (isDisabled) {
       event.preventDefault()
     }
   }

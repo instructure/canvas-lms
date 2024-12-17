@@ -28,8 +28,10 @@ const I18n = createI18nScope('new_login')
 const InstructureLogo = () => {
   const {isPreviewMode, isUiActionPending} = useNewLogin()
 
+  const isDisabled = isPreviewMode || isUiActionPending
+
   const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
-    if (isPreviewMode || isUiActionPending) {
+    if (isDisabled) {
       event.preventDefault()
     }
   }

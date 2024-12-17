@@ -33,16 +33,18 @@ const SignInLinks = () => {
   const isSignIn = useMatch(ROUTES.SIGN_IN)
   const isForgotPassword = useMatch(ROUTES.FORGOT_PASSWORD)
 
+  const isDisabled = isPreviewMode || isUiActionPending
+
   const handleNavigate = (path: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
-    if (!(isPreviewMode || isUiActionPending)) {
+    if (!isDisabled) {
       navigate(path)
     }
   }
 
   const handleForgotPasswordUrl = (url: string) => (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
-    if (!(isPreviewMode || isUiActionPending)) {
+    if (!isDisabled) {
       window.location.href = url
     }
   }
