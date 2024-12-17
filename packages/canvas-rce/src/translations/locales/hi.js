@@ -99,6 +99,7 @@ const locale = {
     "message": "स्वत: सहेजी गई सामग्री मौजूद है। क्या आप इसके बजाय स्वतः सहेजी गई सामग्री को लोड करना चाहेंगे?"
   },
   "available_folders_694d0436": { "message": "उपलब्ध फ़ोल्डर" },
+  "background_1bc88842": { "message": "पृष्ठभूमि" },
   "backslash_b2d5442d": { "message": "बैकस्लैश" },
   "bar_ec63ed6": { "message": "बार" },
   "basic_554cdc0a": { "message": "मूलभूत" },
@@ -109,6 +110,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "द्विपद गुणांक" },
   "black_4cb01371": { "message": "काला" },
   "blue_daf8fea9": { "message": "नीला" },
+  "border_5b08b06d": { "message": "बॉर्डर" },
   "bottom_15a2a9be": { "message": "तल" },
   "bottom_third_5f5fec1d": { "message": "नीचे से तीसरा" },
   "bowtie_5f9629e4": { "message": "बोटाई" },
@@ -182,10 +184,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "{ types } छिपाने के लिए संक्षिप्त करें"
   },
+  "color_a363e1b0": { "message": "रंग" },
+  "color_contrast_4c418add": { "message": "कलर कंट्रास्ट" },
+  "color_contrast_ratio_687782f0": { "message": "कलर कंट्रास्ट अनुपात" },
   "color_picker_6b359edf": { "message": "कलर पिकर" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "कलर पिकर ({ colorName } चयनित)"
   },
+  "color_popup_af39810f": { "message": "कलर पॉपअप" },
   "column_e1ae5c64": { "message": "स्तंभ" },
   "column_group_1c062368": { "message": "स्तंभ ग्रुप" },
   "complex_numbers_a543d004": { "message": "सम्मिश्र संख्याएं" },
@@ -361,6 +367,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "ज़्यादा छोटा" },
   "extracurricular_icon_67c8ca42": { "message": "पाठ्येतर आइकन" },
   "f_function_fe422d65": { "message": "F (फ़ंक्शन)" },
+  "fail_544e5dde": { "message": "विफल" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "फ़ाइल की सामग्री पाने में विफल"
   },
@@ -420,6 +427,7 @@ const locale = {
     "message": "संपादक की उपकरण पट्टी पर जाएं"
   },
   "grades_a61eba0a": { "message": "ग्रेड" },
+  "graphics_text_bc9568bc": { "message": "ग्राफ़िक पाठ" },
   "greater_than_e98af662": { "message": "इससे अधिक:" },
   "greater_than_or_equal_b911949a": { "message": "इससे अधिक या बराबर:" },
   "greek_65c5b3f7": { "message": "ग्रीक" },
@@ -519,6 +527,12 @@ const locale = {
   "indigo_2035fc55": { "message": "इंडिगो" },
   "inference_fed5c960": { "message": "अनुमान" },
   "infinity_7a10f206": { "message": "अनंत" },
+  "input_field_for_alpha_678265fd": {
+    "message": "अल्फ़ा के लिए फ़ील्ड दर्ज करें"
+  },
+  "input_field_for_blue_561e020a": { "message": "नीले के लिए फ़ील्ड दर्ज करें" },
+  "input_field_for_green_67f8b2b6": { "message": "हरे के लिए फ़ील्ड दर्ज करें" },
+  "input_field_for_red_86a84615": { "message": "लाल के लिए फ़ील्ड दर्ज करें" },
   "insert_593145ef": { "message": "डालें" },
   "insert_link_6dc23cae": { "message": "लिंक डालें" },
   "insert_math_equation_57c6e767": { "message": "गणित का समीकरण डालें" },
@@ -540,6 +554,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "भाषा कला आइकन" },
   "languages_icon_9d20539": { "message": "भाषाएं आइकन" },
   "large_9c5e80e7": { "message": "बड़ा" },
+  "large_text_e7ba08cd": { "message": "बड़ा पाठ" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "निकटवर्ती लिंक के बारे में और जानें"
   },
@@ -728,6 +743,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "कोई वीडियो नहीं" },
   "none_3b5e34d2": { "message": "कोई नहीं" },
   "none_selected_b93d56d2": { "message": "कोई भी चयनित नहीं" },
+  "normal_text_7b03da48": { "message": "सामान्य पाठ" },
   "not_equal_6e2980e6": { "message": "समान नहीं" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "इसमें में नहीं (इसका एक तत्व नहीं)"
@@ -771,6 +787,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "समानांतर" },
   "partial_derivative_4a9159df": { "message": "आंशिक (यौगिक)" },
+  "pass_1c19a2b3": { "message": "पास" },
   "paste_5963d1c1": { "message": "पेस्ट करें" },
   "pause_12af3bb4": { "message": "पॉज़ करें" },
   "pentagon_17d82ea3": { "message": "पंचकोण" },
@@ -779,6 +796,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "प्रतिशत संख्या होनी चाहिए"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "प्रतिशत कम से कम { percentage }% होना चाहिए"
+  },
   "performing_arts_icon_f3497486": { "message": "प्रदर्शन कला आइकन" },
   "perpendicular_7c48ede4": { "message": "लंबवत" },
   "phi_4ac33b6d": { "message": "फ़ाई" },
@@ -786,8 +806,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "शारीरिक शिक्षा आइकन" },
   "pi_dc4f0bd8": { "message": "पाई" },
   "pi_variant_10f5f520": { "message": "पाई (प्रकार)" },
+  "pick_a_color_557abfb0": { "message": "कोई रंग चुनें" },
   "pink_68ad45cb": { "message": "गुलाबी" },
   "pixels_52ece7d1": { "message": "पिक्सल" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "पिक्सल कम से कम { width } x { height }px होने चाहिए"
+  },
   "play_1a47eaa7": { "message": "चलाएं" },
   "play_media_comment_35257210": { "message": "मीडिया टिप्पणी चलाएं।" },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -816,6 +840,7 @@ const locale = {
   "preview_inline_9787330": { "message": "इनलाइन पूर्वावलोकन करें" },
   "previous_bd2ac015": { "message": "पिछला" },
   "previous_findtext_8dfbfd30": { "message": "पिछला { findText }" },
+  "previously_chosen_colors_f1338315": { "message": "पहले चुने गए रंग" },
   "prime_917ea60e": { "message": "अभाज्य" },
   "prime_numbers_13464f61": { "message": "अभाज्य संख्याएं" },
   "product_39cf144f": { "message": "उत्पाद" },
@@ -1268,6 +1293,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "लेखन सहायक" },
   "xi_149681d0": { "message": "शी" },
   "yes_dde87d5": { "message": "हां" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "आप कलर पैलेट पर हैं। पैलेट पर ऊपर, बाएं, नीचे या दाएं नेविगेट करने के लिए क्रमशः ''W'', ''A'', ''S'' और ''D'' बटन का उपयोग करें"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "आप कलर स्लाइडर पर हैं। स्लाइडर को बाएं या दाएं नेविगेट करने के लिए, क्रमशः ''A'' और ''D'' बटन का उपयोग करें"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "आप अल्फ़ा स्लाइडर पर हैं। स्लाइडर को बाएं या दाएं नेविगेट करने के लिए, क्रमशः ''A'' और ''D'' बटन का उपयोग करें"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "आपके पास Icon Maker ट्रे में असहेजे गए परिवर्तन हैं। क्या आप इन परिवर्तनों को सहेजे बिना जारी रखना चाहते हैं?"
   },

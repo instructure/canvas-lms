@@ -98,6 +98,7 @@ const locale = {
     "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
   },
   "available_folders_694d0436": { "message": "المجلدات المتاحة" },
+  "background_1bc88842": { "message": "الخلفية" },
   "backslash_b2d5442d": { "message": "شرطة مائلة للخلف" },
   "bar_ec63ed6": { "message": "شريط" },
   "basic_554cdc0a": { "message": "أساسي" },
@@ -108,6 +109,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "معامل ثنائي الحد" },
   "black_4cb01371": { "message": "أسود" },
   "blue_daf8fea9": { "message": "أزرق" },
+  "border_5b08b06d": { "message": "الحد" },
   "bottom_15a2a9be": { "message": "أسفل" },
   "bottom_third_5f5fec1d": { "message": "الثالث من الأسفل" },
   "bowtie_5f9629e4": { "message": "ربطة قوسية" },
@@ -173,10 +175,14 @@ const locale = {
   "clubs_suit_c1ffedff": { "message": "Clubs (Suit)" },
   "collaborations_5c56c15f": { "message": "الأعمال الجماعية" },
   "collapse_to_hide_types_1ab46d2e": { "message": "الطي لإخفاء { types }" },
+  "color_a363e1b0": { "message": "اللون" },
+  "color_contrast_4c418add": { "message": "تباين الألوان" },
+  "color_contrast_ratio_687782f0": { "message": "نسبة تباين الألوان" },
   "color_picker_6b359edf": { "message": "أداة انتقاء اللون" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "أداة انتقاء اللون (تم تحديد { colorName })"
   },
+  "color_popup_af39810f": { "message": "نافذة منبثقة ملونة" },
   "column_e1ae5c64": { "message": "عمود" },
   "column_group_1c062368": { "message": "مجموعة العمود" },
   "complex_numbers_a543d004": { "message": "أعداد مركبة" },
@@ -354,6 +360,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "صغير للغاية" },
   "extracurricular_icon_67c8ca42": { "message": "أيقونة الأنشطة غير الصفية" },
   "f_function_fe422d65": { "message": "F (دالة)" },
+  "fail_544e5dde": { "message": "فشل" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "تعذر الحصول على محتويات الملف"
   },
@@ -407,6 +414,7 @@ const locale = {
     "message": "الانتقال إلى شريط الأدوات الخاص بالمحرر"
   },
   "grades_a61eba0a": { "message": "الدرجات" },
+  "graphics_text_bc9568bc": { "message": "نص الرسومات" },
   "greater_than_e98af662": { "message": "أكبر من" },
   "greater_than_or_equal_b911949a": { "message": "أكثر من أو يساوي" },
   "greek_65c5b3f7": { "message": "اليونانية" },
@@ -506,6 +514,10 @@ const locale = {
   "indigo_2035fc55": { "message": "نيلي" },
   "inference_fed5c960": { "message": "الاستنتاج" },
   "infinity_7a10f206": { "message": "ما لا نهاية" },
+  "input_field_for_alpha_678265fd": { "message": "حقل الإدخال لألفا" },
+  "input_field_for_blue_561e020a": { "message": "حقل الإدخال للون الأزرق" },
+  "input_field_for_green_67f8b2b6": { "message": "حقل الإدخال للون الأخضر" },
+  "input_field_for_red_86a84615": { "message": "حقل الإدخال للون الأحمر" },
   "insert_593145ef": { "message": "إدخال" },
   "insert_link_6dc23cae": { "message": "إدراج ارتباط" },
   "insert_math_equation_57c6e767": { "message": "إدخال معادلة رياضية" },
@@ -527,6 +539,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "أيقونة آداب اللغة" },
   "languages_icon_9d20539": { "message": "أيقونة اللغات" },
   "large_9c5e80e7": { "message": "كبير" },
+  "large_text_e7ba08cd": { "message": "نص كبير" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "معرفة المزيد عن الارتباطات المتجاورة"
   },
@@ -711,6 +724,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "لا يوجد مقطع فيديو" },
   "none_3b5e34d2": { "message": "بلا" },
   "none_selected_b93d56d2": { "message": "لم يتم تحديد شيء" },
+  "normal_text_7b03da48": { "message": "نص عادي" },
   "not_equal_6e2980e6": { "message": "لا يساوي" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Not In (Not An Element Of)"
@@ -754,6 +768,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "موازي" },
   "partial_derivative_4a9159df": { "message": "جزئي (مشتق)" },
+  "pass_1c19a2b3": { "message": "نجاح" },
   "paste_5963d1c1": { "message": "لصق" },
   "pause_12af3bb4": { "message": "إيقاف مؤقت" },
   "pentagon_17d82ea3": { "message": "خماسي" },
@@ -762,6 +777,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "يجب أن تكون النسبة المئوية رقمًا"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "يجب أن تكون النسبة المئوية { percentage }% بحد أدنى"
+  },
   "performing_arts_icon_f3497486": { "message": "أيقونة الفنون التعبيرية" },
   "perpendicular_7c48ede4": { "message": "عمودي" },
   "phi_4ac33b6d": { "message": "Phi" },
@@ -769,8 +787,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "أيقونة التربية البدنية" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (متغير)" },
+  "pick_a_color_557abfb0": { "message": "اختر لونًا" },
   "pink_68ad45cb": { "message": "وردي" },
   "pixels_52ece7d1": { "message": "بكسل" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "يجب أن تكون البكسلات { width } x { height } بكسل بحد أدنى"
+  },
   "play_1a47eaa7": { "message": "تشغيل" },
   "play_media_comment_35257210": { "message": "تشغيل تعليق الوسائط." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -799,6 +821,7 @@ const locale = {
   "preview_inline_9787330": { "message": "معاينة مضمّنة" },
   "previous_bd2ac015": { "message": "السابق" },
   "previous_findtext_8dfbfd30": { "message": "{ findText } السابق" },
+  "previously_chosen_colors_f1338315": { "message": "الألوان المختار سابقًا" },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "منتج" },
@@ -1245,6 +1268,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "مساعد الكتابة" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "نعم" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "أنت على لوحة ألوان. للتنقل في اللوحة لأعلى ويسارًا ولأسفل ويمينًا، استخدام الأزرار \"W\" و\"A\" و\"S\" و\"D\" بالترتيب"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "أنت على شريط تمرير ألوان. للتنقل يسار ويمين شريط التمرير، استخدم الزرين \"A\" و\"D\" بالترتيب"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "أنت على شريط تمرير ألفا. للتنقل يسار ويمين شريط التمرير، استخدم الزرين \"A\" و\"D\" بالترتيب"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "لديك تغييرات غير محفوظة في علبة صانع الأيقونات. هل ترغب في المتابعة بدون حفظ هذه التغييرات؟"
   },

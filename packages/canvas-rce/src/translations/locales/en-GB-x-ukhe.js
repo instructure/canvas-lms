@@ -100,6 +100,7 @@ const locale = {
     "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
   },
   "available_folders_694d0436": { "message": "Available folders" },
+  "background_1bc88842": { "message": "Background" },
   "backslash_b2d5442d": { "message": "Backslash" },
   "bar_ec63ed6": { "message": "Bar" },
   "basic_554cdc0a": { "message": "Basic" },
@@ -110,6 +111,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Binomial Coefficient" },
   "black_4cb01371": { "message": "Black" },
   "blue_daf8fea9": { "message": "Blue" },
+  "border_5b08b06d": { "message": "Border" },
   "bottom_15a2a9be": { "message": "Bottom" },
   "bottom_third_5f5fec1d": { "message": "Bottom Third" },
   "bowtie_5f9629e4": { "message": "Bowtie" },
@@ -177,10 +179,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Collapse to hide { types }"
   },
+  "color_a363e1b0": { "message": "Colour" },
+  "color_contrast_4c418add": { "message": "Colour Contrast" },
+  "color_contrast_ratio_687782f0": { "message": "Colour Contrast Ratio" },
   "color_picker_6b359edf": { "message": "Colour Picker" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Colour Picker ({ colorName } selected)"
   },
+  "color_popup_af39810f": { "message": "Colour popup" },
   "column_e1ae5c64": { "message": "Column" },
   "column_group_1c062368": { "message": "Column group" },
   "complex_numbers_a543d004": { "message": "Complex Numbers" },
@@ -358,6 +364,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "Extra Small" },
   "extracurricular_icon_67c8ca42": { "message": "Extracurricular Icon" },
   "f_function_fe422d65": { "message": "F (function)" },
+  "fail_544e5dde": { "message": "FAIL" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Failed getting file contents"
   },
@@ -411,6 +418,7 @@ const locale = {
     "message": "Go to the editor''s toolbar"
   },
   "grades_a61eba0a": { "message": "Grades" },
+  "graphics_text_bc9568bc": { "message": "Graphics text" },
   "greater_than_e98af662": { "message": "Greater Than" },
   "greater_than_or_equal_b911949a": { "message": "Greater Than Or Equal" },
   "greek_65c5b3f7": { "message": "Greek" },
@@ -512,6 +520,10 @@ const locale = {
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inference" },
   "infinity_7a10f206": { "message": "Infinity" },
+  "input_field_for_alpha_678265fd": { "message": "Input field for alpha" },
+  "input_field_for_blue_561e020a": { "message": "Input field for blue" },
+  "input_field_for_green_67f8b2b6": { "message": "Input field for green" },
+  "input_field_for_red_86a84615": { "message": "Input field for red" },
   "insert_593145ef": { "message": "Insert" },
   "insert_link_6dc23cae": { "message": "Insert link" },
   "insert_math_equation_57c6e767": { "message": "Insert Math Equation" },
@@ -533,6 +545,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Language Arts Icon" },
   "languages_icon_9d20539": { "message": "Languages Icon" },
   "large_9c5e80e7": { "message": "Large" },
+  "large_text_e7ba08cd": { "message": "Large text" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Learn more about adjacent links"
   },
@@ -711,6 +724,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "No Video" },
   "none_3b5e34d2": { "message": "None" },
   "none_selected_b93d56d2": { "message": "None Selected" },
+  "normal_text_7b03da48": { "message": "Normal text" },
   "not_equal_6e2980e6": { "message": "Not Equal" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Not In (Not An Element Of)"
@@ -756,6 +770,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partial (Derivative)" },
+  "pass_1c19a2b3": { "message": "PASS" },
   "paste_5963d1c1": { "message": "Paste" },
   "pause_12af3bb4": { "message": "Pause" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
@@ -764,6 +779,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Percentage must be a number"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Percentage must be at least { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Performing Arts Icon" },
   "perpendicular_7c48ede4": { "message": "Perpendicular" },
   "phi_4ac33b6d": { "message": "Phi" },
@@ -771,8 +789,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Physical Education Icon" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Variant)" },
+  "pick_a_color_557abfb0": { "message": "Pick a colour" },
   "pink_68ad45cb": { "message": "Pink" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Pixels must be at least { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Play" },
   "play_media_comment_35257210": { "message": "Play media comment." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -801,6 +823,9 @@ const locale = {
   "preview_inline_9787330": { "message": "Preview inline" },
   "previous_bd2ac015": { "message": "Previous" },
   "previous_findtext_8dfbfd30": { "message": "Previous { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Previously chosen colours"
+  },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Prime Numbers" },
   "product_39cf144f": { "message": "Product" },
@@ -1259,6 +1284,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Writing Assistant" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Yes" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "You are on a colour palette. To navigate on the palette up, left, down or right, use the ''W'', ''A'', ''S'' and ''D'' buttons respectively"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "You are on a colour slider. To navigate the slider left or right, use the ''A'' and ''D'' buttons respectively"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "You are on an alpha slider. To navigate the slider left or right, use the ''A'' and ''D'' buttons respectively"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?"
   },

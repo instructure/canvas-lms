@@ -99,6 +99,7 @@ const locale = {
     "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
   },
   "available_folders_694d0436": { "message": "Tiltækar möppur" },
+  "background_1bc88842": { "message": "Bakgrunnur" },
   "backslash_b2d5442d": { "message": "Öfugt skástrik" },
   "bar_ec63ed6": { "message": "Stika" },
   "basic_554cdc0a": { "message": "Grunnur" },
@@ -109,6 +110,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Tvíliða stuðull" },
   "black_4cb01371": { "message": "Svartur" },
   "blue_daf8fea9": { "message": "Blár" },
+  "border_5b08b06d": { "message": "Rammi" },
   "bottom_15a2a9be": { "message": "Neðst" },
   "bottom_third_5f5fec1d": { "message": "Neðsti þriðjungur" },
   "bowtie_5f9629e4": { "message": "Slaufa" },
@@ -180,10 +182,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Fella saman til að fela { types }"
   },
+  "color_a363e1b0": { "message": "Litur" },
+  "color_contrast_4c418add": { "message": "Birtuhlutfall litar" },
+  "color_contrast_ratio_687782f0": { "message": "Birtuhlutfall litar" },
   "color_picker_6b359edf": { "message": "Litaval" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Litaval ({ colorName } valið)"
   },
+  "color_popup_af39810f": { "message": "Litasprettigluggi" },
   "column_e1ae5c64": { "message": "Dálkur" },
   "column_group_1c062368": { "message": "Dálkahópur" },
   "complex_numbers_a543d004": { "message": "Tvinntölur" },
@@ -359,6 +365,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "Sérstaklega smátt" },
   "extracurricular_icon_67c8ca42": { "message": "Utanskóla tákn" },
   "f_function_fe422d65": { "message": "F (virkni)" },
+  "fail_544e5dde": { "message": "FALL" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Gat ekki sótt skráarinnihald"
   },
@@ -416,6 +423,7 @@ const locale = {
     "message": "Fara í verkfæraslá ritilsins"
   },
   "grades_a61eba0a": { "message": "Einkunnir" },
+  "graphics_text_bc9568bc": { "message": "Grafískur texti" },
   "greater_than_e98af662": { "message": "Stærra en" },
   "greater_than_or_equal_b911949a": { "message": "Stærra en eða jafnt og" },
   "greek_65c5b3f7": { "message": "Gríska" },
@@ -515,6 +523,10 @@ const locale = {
   "indigo_2035fc55": { "message": "Dimmfjólublár" },
   "inference_fed5c960": { "message": "Ályktun" },
   "infinity_7a10f206": { "message": "Óendanleiki" },
+  "input_field_for_alpha_678265fd": { "message": "Inntaksreitur fyrir alfa" },
+  "input_field_for_blue_561e020a": { "message": "Inntaksreitur fyrir bláan" },
+  "input_field_for_green_67f8b2b6": { "message": "Inntaksreitur fyrir grænan" },
+  "input_field_for_red_86a84615": { "message": "Inntaksreitur fyrir rauðan" },
   "insert_593145ef": { "message": "Setja inn" },
   "insert_link_6dc23cae": { "message": "Setja inn tengil" },
   "insert_math_equation_57c6e767": { "message": "Setja inn stærðfræðijöfnu" },
@@ -536,6 +548,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Tungumálalistar tákn" },
   "languages_icon_9d20539": { "message": "Tungumála tákn" },
   "large_9c5e80e7": { "message": "Stór" },
+  "large_text_e7ba08cd": { "message": "Stór texti" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Fá að vita meira um samliggjandi tengla"
   },
@@ -722,6 +735,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "Ekkert myndband" },
   "none_3b5e34d2": { "message": "Ekkert" },
   "none_selected_b93d56d2": { "message": "Ekkert valið" },
+  "normal_text_7b03da48": { "message": "Venjulegur texti" },
   "not_equal_6e2980e6": { "message": "Ekki jafnt" },
   "not_in_not_an_element_of_fb1ffb54": { "message": "Ekki í (ekki hluti af)" },
   "not_negation_1418ebb8": { "message": "Ekki (neitun)" },
@@ -763,6 +777,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Samsíða" },
   "partial_derivative_4a9159df": { "message": "Hluti (afleitt)" },
+  "pass_1c19a2b3": { "message": "STAÐIÐ" },
   "paste_5963d1c1": { "message": "Líma" },
   "pause_12af3bb4": { "message": "Gera hlé" },
   "pentagon_17d82ea3": { "message": "fimmhyrningur" },
@@ -771,6 +786,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Prósenta verður að vera tala"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Prósenta verður að vera að minnsta kosti { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Sviðslista tákn" },
   "perpendicular_7c48ede4": { "message": "Hornréttur" },
   "phi_4ac33b6d": { "message": "Fí" },
@@ -778,8 +796,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Íþrótta tákn" },
   "pi_dc4f0bd8": { "message": "Pí" },
   "pi_variant_10f5f520": { "message": "Pí (afbrigði)" },
+  "pick_a_color_557abfb0": { "message": "Veldu lit" },
   "pink_68ad45cb": { "message": "Bleikur" },
   "pixels_52ece7d1": { "message": "Punktar" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Punktar verða að vera að minnsta kosti { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Spila" },
   "play_media_comment_35257210": { "message": "Spila miðilsathugasemd." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -808,6 +830,7 @@ const locale = {
   "preview_inline_9787330": { "message": "Forskoðun í línu" },
   "previous_bd2ac015": { "message": "Fyrri" },
   "previous_findtext_8dfbfd30": { "message": "Fyrri { findText }" },
+  "previously_chosen_colors_f1338315": { "message": "Áður valdir litir" },
   "prime_917ea60e": { "message": "Frum" },
   "prime_numbers_13464f61": { "message": "Frumtölur" },
   "product_39cf144f": { "message": "Feldi" },
@@ -1266,6 +1289,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Ritráðgjafi" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Já" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Þú ert á litaspjaldi. Til að fletta á spjaldinu upp, til vinstri, niður eða hægri skaltu nota „W“, „A“, „S“ og „D“ hnappana í sömu röð"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Þú ert á litasleða. Til að vafra um sleðann til vinstri eða hægri skaltu nota „A“ og „D“ hnappana í sömu röð"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Þú ert á alfasleða. Til að vafra um sleðann til vinstri eða hægri skaltu nota „A“ og „D“ hnappana í sömu röð"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Þú ert með óvistaðar breytingar í Tákngerðar bakkanum. Viltu halda áfram án þess að vista þessar breytingar?"
   },

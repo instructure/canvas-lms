@@ -104,6 +104,7 @@ const locale = {
     "message": "Obstaja samodejno shranjena vsebina. Ali želite namesto tega naložiti samodejno shranjeno vsebino?"
   },
   "available_folders_694d0436": { "message": "Razpoložljive mape" },
+  "background_1bc88842": { "message": "Ozadje" },
   "backslash_b2d5442d": { "message": "Poševnica nazaj" },
   "bar_ec63ed6": { "message": "Vrstica" },
   "basic_554cdc0a": { "message": "Osnovno" },
@@ -114,6 +115,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Binomni koeficient" },
   "black_4cb01371": { "message": "Črna" },
   "blue_daf8fea9": { "message": "Modra" },
+  "border_5b08b06d": { "message": "Obroba" },
   "bottom_15a2a9be": { "message": "Dno" },
   "bottom_third_5f5fec1d": { "message": "Tretja spodaj" },
   "bowtie_5f9629e4": { "message": "Metuljček" },
@@ -191,10 +193,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Strni za skrivanje { types }"
   },
+  "color_a363e1b0": { "message": "Barva" },
+  "color_contrast_4c418add": { "message": "Barvni kontrast" },
+  "color_contrast_ratio_687782f0": { "message": "Razmerje barvnega kontrasta" },
   "color_picker_6b359edf": { "message": "Orodje za izbiranje barv" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Izbirnik barv ({ colorName } izbranih)"
   },
+  "color_popup_af39810f": { "message": "Barvno pojavno okno" },
   "column_e1ae5c64": { "message": "Stolpec" },
   "column_group_1c062368": { "message": "Skupina stolpcev" },
   "complex_numbers_a543d004": { "message": "Kompleksna števila" },
@@ -376,6 +382,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "Zelo majhen" },
   "extracurricular_icon_67c8ca42": { "message": "Zunajštudijska ikona" },
   "f_function_fe422d65": { "message": "F (funkcija)" },
+  "fail_544e5dde": { "message": "NEOPRAVLJENO" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Pridobivanje vsebine datoteke ni uspelo"
   },
@@ -435,6 +442,7 @@ const locale = {
     "message": "Pojdi orodno vrstico urejevalnika"
   },
   "grades_a61eba0a": { "message": "Ocene" },
+  "graphics_text_bc9568bc": { "message": "Besedilo grafike" },
   "greater_than_e98af662": { "message": "Večje od" },
   "greater_than_or_equal_b911949a": { "message": "Večje ali enako" },
   "greek_65c5b3f7": { "message": "grške" },
@@ -534,6 +542,10 @@ const locale = {
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Sklepanje" },
   "infinity_7a10f206": { "message": "Neskončnost" },
+  "input_field_for_alpha_678265fd": { "message": "Vnosno polje za alfa" },
+  "input_field_for_blue_561e020a": { "message": "Vnosno polje za modro" },
+  "input_field_for_green_67f8b2b6": { "message": "Vnosno polje za zeleno" },
+  "input_field_for_red_86a84615": { "message": "Vnosno polje za rdečo" },
   "insert_593145ef": { "message": "Vstavi" },
   "insert_link_6dc23cae": { "message": "Vstavi povezavo" },
   "insert_math_equation_57c6e767": { "message": "Vstavi matematično enačbo" },
@@ -555,6 +567,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Ikona za jezikovni predmet" },
   "languages_icon_9d20539": { "message": "Ikona za jezike" },
   "large_9c5e80e7": { "message": "Velika" },
+  "large_text_e7ba08cd": { "message": "Veliko besedilo" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Več o sosednjih povezavah"
   },
@@ -751,6 +764,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "Ni videoposnetek" },
   "none_3b5e34d2": { "message": "Brez" },
   "none_selected_b93d56d2": { "message": "Nobena ni izbrana" },
+  "normal_text_7b03da48": { "message": "Običajno besedilo" },
   "not_equal_6e2980e6": { "message": "Ni enako" },
   "not_in_not_an_element_of_fb1ffb54": { "message": "Ni del (ni element)" },
   "not_negation_1418ebb8": { "message": "Ne (negacija)" },
@@ -794,6 +808,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Vzporedno" },
   "partial_derivative_4a9159df": { "message": "Delno (izpeljanka)" },
+  "pass_1c19a2b3": { "message": "OPRAVLJENO" },
   "paste_5963d1c1": { "message": "Prilepi" },
   "pause_12af3bb4": { "message": "Začasna zaustavitev" },
   "pentagon_17d82ea3": { "message": "Peterokotnik" },
@@ -802,6 +817,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Odstotek mora biti številka"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Odstotek mora biti najmanj { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Ikona odrskih umetnosti" },
   "perpendicular_7c48ede4": { "message": "Pravokotno" },
   "phi_4ac33b6d": { "message": "Fi" },
@@ -809,8 +827,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Ikona športne vzgoje" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (različica)" },
+  "pick_a_color_557abfb0": { "message": "Izberite barvo" },
   "pink_68ad45cb": { "message": "Rožnato" },
   "pixels_52ece7d1": { "message": "Slikovne pike" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Slikovne pike morajo biti najmanj { width } x { height } px"
+  },
   "play_1a47eaa7": { "message": "Predvajaj" },
   "play_media_comment_35257210": {
     "message": "Predvajaj komentar v obliki medija."
@@ -843,6 +865,7 @@ const locale = {
   "preview_inline_9787330": { "message": "Vstavljen predogled" },
   "previous_bd2ac015": { "message": "Nazaj" },
   "previous_findtext_8dfbfd30": { "message": "Prejšnji { findText }" },
+  "previously_chosen_colors_f1338315": { "message": "Prej izbrane barve" },
   "prime_917ea60e": { "message": "Pra" },
   "prime_numbers_13464f61": { "message": "Praštevila" },
   "product_39cf144f": { "message": "Zmnožek" },
@@ -1317,6 +1340,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Pomočnik za pisanje" },
   "xi_149681d0": { "message": "Ksi" },
   "yes_dde87d5": { "message": "Da" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Ste na barvni paleti. Za krmarjenje po paleti gor, levo, dol ali desno uporabite tipke W, A, S oziroma D."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Ste na barvnem drsniku. Za krmarjenje po drsniku levo ali desno uporabite tipko A oziroma D."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Ste na drsniku alfa. Za krmarjenje po drsniku levo ali desno uporabite tipko A oziroma D."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "V pladnju ustvarjalnika ikon imate neshranjene spremembe. Ali želite nadaljevati brez shranjevanja teh sprememb?"
   },
