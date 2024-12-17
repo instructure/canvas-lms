@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -23,16 +22,14 @@ import ContextModulesPublishIcon from '@canvas/context-modules/react/ContextModu
 import ready from '@instructure/ready'
 
 ready(() => {
-  const menuElements = document.getElementsByClassName(
-    'module-publish-icon'
-  ) as HTMLCollectionOf<HTMLElement> // eslint-disable-line no-undef
+  const menuElements = document.getElementsByClassName('module-publish-icon')
   Array.from(menuElements).forEach(el => {
-    const courseId = el.getAttribute('data-course-id')
-    const moduleId = el.getAttribute('data-module-id')
-    const moduleName = el.closest('.context_module').querySelector('.ig-header-title').textContent
+    const courseId = el.getAttribute('data-course-id')!
+    const moduleId = el.getAttribute('data-module-id')!
+    const moduleName = el.closest('.context_module')!.querySelector('.ig-header-title')!
+      .textContent!
     const published = el.getAttribute('data-published') === 'true'
     const root = ReactDOM.createRoot(el)
-    el.reactRoot = root
     root.render(
       <ContextModulesPublishIcon
         courseId={courseId}
@@ -40,7 +37,6 @@ ready(() => {
         moduleName={moduleName}
         published={published}
         isPublishing={false}
-        disabled={false}
       />
     )
   })
