@@ -293,6 +293,9 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     })
   }
 
+  rubricAssessmentImportExportDisplayed = () =>
+    this.props.assignment.hasRubric && !this.props.assignment.anonymizeStudents && this.props.rubricAssessmentImportsExportsEnabled
+
   renderAssignmentLink() {
     const assignment = this.props.assignment
 
@@ -478,12 +481,13 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           </MenuItem>
         )}
 
-        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
+        {this.rubricAssessmentImportExportDisplayed() && (
           <MenuItem onSelect={() => this.selectBulkRubricExport()}>
             {I18n.t('Bulk Download Rubrics')}
           </MenuItem>
         )}
-        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
+
+        {this.rubricAssessmentImportExportDisplayed() && (
           <MenuItem
             onSelect={() => {
               const {toggleRubricAssessmentImportTray} = useStore.getState()
