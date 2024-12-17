@@ -9,6 +9,7 @@ GEM
   specs:
     bigdecimal (3.1.8)
     csv (3.3.0)
+    date (3.3.4)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -28,7 +29,8 @@ GEM
     mini_portile2 (2.8.7)
     multi_xml (0.7.1)
       bigdecimal (~> 3.1)
-    psych (5.1.2)
+    psych (5.2.1)
+      date
       stringio
     rdoc (6.7.0)
       psych (>= 4.0.0)
@@ -53,7 +55,7 @@ GEM
     sqlite3 (1.7.3-arm64-darwin)
     sqlite3 (1.7.3-x86_64-darwin)
     sqlite3 (1.7.3-x86_64-linux)
-    stringio (3.1.1)
+    stringio (3.1.2)
 
 PLATFORMS
   aarch64-linux
