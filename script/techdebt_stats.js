@@ -231,6 +231,33 @@ async function countTestFiles() {
   }
 }
 
+async function countReactDomRenderFiles() {
+  try {
+    // Find files containing ReactDOM.render
+    const {stdout} = await execAsync(
+      `git ls-files "ui/" "packages/" | xargs grep -l "ReactDOM.render"`,
+      {cwd: projectRoot}
+    )
+    const files = stdout.trim().split('\n').filter(Boolean)
+    const fileCount = files.length
+
+    if (fileCount > 0) {
+      console.log(colorize('yellow', `- Total files with ReactDOM.render: ${bold(fileCount)}`))
+      const randomFile = normalizePath(files[Math.floor(Math.random() * fileCount)])
+      console.log(colorize('gray', `  Example: ${randomFile}`))
+    } else {
+      console.log(colorize('yellow', `- Total files with ReactDOM.render: ${colorize('green', 'None')}`))
+    }
+  } catch (error) {
+    if (error.code === 1 && !error.stdout) {
+      // grep returns exit code 1 when no matches are found
+      console.log(colorize('yellow', `- Total files with ReactDOM.render: ${colorize('green', 'None')}`))
+    } else {
+      console.error(colorize('red', `Error counting ReactDOM.render files: ${error.message}`))
+    }
+  }
+}
+
 async function printDashboard() {
   console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
@@ -250,6 +277,12 @@ async function printDashboard() {
     `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`
   )
   await countTestFiles()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'ReactDOM.render Files'))} ${colorize('gray', '(convert to createRoot)')}`
+  )
+  await countReactDomRenderFiles()
   console.log('')
 
   console.log(
