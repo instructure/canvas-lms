@@ -422,6 +422,7 @@
                         <xs:all minOccurs="0">
                           <xs:element name="identifierref" type="xs:string" minOccurs="1"/>
                           <xs:element name="min_score" type="optional_float" minOccurs="0"/>
+                          <xs:element name="min_percentage" type="optional_integer" minOccurs="0"/>
                           <xs:element name="max_score" type="optional_float" minOccurs="0"/>
                         </xs:all>
                         <xs:attribute name="type" type="xs:string" use="required"/>

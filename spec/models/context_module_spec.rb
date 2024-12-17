@@ -1012,6 +1012,40 @@ describe ContextModule do
       expect(@module.evaluate_for(@user)).to be_completed
     end
 
+    it "updates progression status to started if submitted for a min_percentage" do
+      course_module
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_text_entry", points_possible: 180)
+      @tag = @module.add_item({ id: @assignment.id, type: "assignment" })
+      @module.completion_requirements = { @tag.id => { type: "min_percentage", min_percentage: 50 } }
+      @module.save!
+      @teacher = User.create!(name: "some teacher")
+      @course.enroll_teacher(@teacher)
+      @user = User.create!(name: "some name")
+      @course.enroll_student(@user).accept!
+
+      expect(@module.evaluate_for(@user)).to be_unlocked
+      expect(@assignment.locked_for?(@user)).to be(false)
+
+      @assignment.submit_homework @user, submission_type: "online_text_entry", body: "stuff"
+
+      prog = @module.evaluate_for(@user)
+      expect(prog).to be_started
+      incomplete_req = prog.incomplete_requirements.detect { |r| r[:id] == @tag.id }
+      expect(incomplete_req).to be_present
+      expect(incomplete_req[:score]).to be_nil
+
+      @assignment.grade_student(@user, grade: 40.0, grader: @teacher)
+
+      prog = @module.evaluate_for(@user)
+      expect(prog).to be_started
+      incomplete_req = prog.incomplete_requirements.detect { |r| r[:id] == @tag.id }
+      expect(incomplete_req).to be_present
+      expect(incomplete_req[:score]).to eq 40.0
+
+      @assignment.grade_student(@user, grade: 90.0, grader: @teacher)
+      expect(@module.evaluate_for(@user)).to be_completed
+    end
+
     it "updates progression status on grading and view events" do
       course_module
       @assignment = @course.assignments.create!(title: "some assignment")
@@ -1210,6 +1244,32 @@ describe ContextModule do
       expect(p).to be_completed
     end
 
+    it "marks progression completed for min_percentage on discussion topic assignment" do
+      asmnt = assignment_model(submission_types: "discussion_topic", points_possible: 100)
+      asmnt.ensure_post_policy(post_manually: false)
+      topic = asmnt.discussion_topic
+      @course.offer
+      course_with_student(active_all: true, course: @course)
+      mod = @course.context_modules.create!(name: "some module")
+
+      tag = mod.add_item({ id: topic.id, type: "discussion_topic" })
+      mod.completion_requirements = { tag.id => { type: "min_percentage", min_percentage: 50 } }
+      mod.save!
+
+      p = mod.evaluate_for(@student)
+      expect(p.requirements_met).to be_empty
+      expect(p).to be_unlocked
+
+      topic.discussion_entries.create!(message: "hi", user: @student)
+
+      asmnt.reload.submissions.first
+      asmnt.grade_student(@student, grader: @teacher, score: 50)
+
+      p = mod.evaluate_for(@student)
+      expect(p.requirements_met).to eq [{ type: "min_percentage", min_percentage: 50, id: tag.id }]
+      expect(p).to be_completed
+    end
+
     it "does not fulfill 'must_submit' requirement with 'untaken' quiz submission" do
       course_module
       student_in_course course: @course, active_all: true
@@ -1373,6 +1433,31 @@ describe ContextModule do
       @course.enroll_student(@user).accept!
 
       @quiz.assignment.grade_student(@user, grade: 100, grader: @teacher)
+
+      @progression = @module.evaluate_for(@user)
+      expect(@progression).to be_completed
+    end
+
+    it "updates quiz progression status on assignment manual grading - min_percentage" do
+      course_module
+      @module.require_sequential_progress = true
+      @module.save!
+
+      @quiz = @course.quizzes.build(title: "some quiz", quiz_type: "assignment", scoring_policy: "keep_highest")
+
+      @quiz.workflow_state = "available"
+      @quiz.save!
+      @quiz.update points_possible: 100.0
+
+      @tag = @module.add_item({ id: @quiz.id, type: "quiz" })
+      @module.completion_requirements = { @tag.id => { type: "min_percentage", min_percentage: 90 } }
+      @module.save!
+
+      @teacher = User.create!(name: "some teacher")
+      @course.enroll_teacher(@teacher)
+      @user = User.create!(name: "some name")
+      @course.enroll_student(@user).accept!
+      @quiz.assignment.grade_student(@user, grade: 92, grader: @teacher)
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_completed

@@ -1264,7 +1264,9 @@ class AbstractAssignment < ActiveRecord::Base
     return unless tags.any?
 
     modules = ContextModule.where(id: tags.map(&:context_module_id)).ordered.to_a.select do |mod|
-      mod.completion_requirements&.any? { |req| req[:type] == "min_score" && tags.map(&:id).include?(req[:id]) }
+      mod.completion_requirements&.any? do |req|
+        %w[min_score min_percentage].include?(req[:type]) && tags.map(&:id).include?(req[:id])
+      end
     end
     return unless modules.any?
 

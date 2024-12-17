@@ -495,9 +495,12 @@ describe "Canvas Cartridge importing" do
       mod2.save!
 
       asmnt1 = @copy_from.assignments.create!(title: "some assignment")
+      asmnt1_2 = @copy_from.assignments.create!(title: "some assignment by percentage")
       tag = mod1.add_item({ id: asmnt1.id, type: "assignment", indent: 1 })
+      tag_percentage = mod1.add_item({ id: asmnt1_2.id, type: "assignment", indent: 1 })
       c_reqs = []
       c_reqs << { type: "min_score", min_score: 5, id: tag.id }
+      c_reqs << { type: "min_percentage", min_percentage: 50, id: tag_percentage.id }
       page = @copy_from.wiki_pages.create!(title: "some page")
       tag = mod1.add_item({ id: page.id, type: "wiki_page" })
       c_reqs << { type: "must_view", id: tag.id }
@@ -508,6 +511,9 @@ describe "Canvas Cartridge importing" do
       asmnt2 = @copy_to.assignments.create(title: "some assignment")
       asmnt2.migration_id = CC::CCHelper.create_key(asmnt1)
       asmnt2.save!
+      asmnt3 = @copy_to.assignments.create(title: "some assignment by percentage")
+      asmnt3.migration_id = CC::CCHelper.create_key(asmnt1_2)
+      asmnt3.save!
       page2 = @copy_to.wiki_pages.create(title: "some page")
       page2.migration_id = CC::CCHelper.create_key(page)
       page2.save!
@@ -563,6 +569,10 @@ describe "Canvas Cartridge importing" do
       cr1 = mod1_2.completion_requirements.find { |cr| cr[:id] == tag.id }
       expect(cr1[:type]).to eq "min_score"
       expect(cr1[:min_score]).to eq 5
+      tag = mod1_2.content_tags[1]
+      cr2 = mod1_2.completion_requirements.find { |cr| cr[:id] == tag.id }
+      expect(cr2[:type]).to eq "min_percentage"
+      expect(cr2[:min_percentage]).to eq 50
       tag = mod1_2.content_tags.last
       expect(tag.content_id).to eq page2.id
       expect(tag.content_type).to eq "WikiPage"

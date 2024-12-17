@@ -563,15 +563,17 @@ class ContextModule < ActiveRecord::Base
         type: req[:type],
       }
       new_req[:min_score] = req[:min_score].to_f if req[:type] == "min_score" && req[:min_score]
+      new_req[:min_percentage] = req[:min_percentage].to_f if req[:type] == "min_percentage" && req[:min_percentage]
       new_req
     end
 
     tags = content_tags.not_deleted.index_by(&:id)
+    scoreable_types = %w[must_submit min_score min_percentage]
     validated_reqs = requirements.select do |req|
       if req[:id] && (tag = tags[req[:id]])
         if %w[must_view must_mark_done must_contribute].include?(req[:type])
           true
-        elsif %w[must_submit min_score].include?(req[:type])
+        elsif scoreable_types.include?(req[:type])
           true if tag.scoreable?
         end
       end
@@ -865,7 +867,7 @@ class ContextModule < ActiveRecord::Base
         action == :done
       when "must_contribute"
         action == :contributed
-      when "must_submit", "min_score"
+      when "must_submit", "min_score", "min_percentage"
         action == :scored || # rubocop:disable Style/MultipleComparison
           action == :submitted # to mark progress in the incomplete_requirements (moves from 'unlocked' to 'started')
       else
@@ -886,6 +888,8 @@ class ContextModule < ActiveRecord::Base
       t("requirements.must_submit", "must submit the assignment")
     when "min_score"
       t("requirements.min_score", "must score at least a %{score}", score: req[:min_score])
+    when "min_percentage"
+      t("requirements.min_percentage", "must score at least a %{percentage}%", percentage: req[:min_score])
     else
       nil
     end
