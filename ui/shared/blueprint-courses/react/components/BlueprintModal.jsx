@@ -115,6 +115,7 @@ export default class BlueprintModal extends Component {
               {this.props.canAutoPublishCourses && this.props.willAddAssociations && (
                 <Flex.Item margin="0 x-small 0 0">
                   <Checkbox
+                    data-testid="publish-courses-checkbox"
                     label={I18n.t('Publish upon association')}
                     checked={this.props.willPublishCourses}
                     onChange={this.publishCoursesChange}
@@ -122,20 +123,20 @@ export default class BlueprintModal extends Component {
                 </Flex.Item>
               )}
               <Flex.Item margin="0 x-small 0 0">
-                <Button onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>
+                <Button data-testid="cancel-button" onClick={this.props.onCancel}>{I18n.t('Cancel')}</Button>
               </Flex.Item>
               {this.props.saveButton ? (
                 this.props.saveButton
               ) : (
                 <Flex.Item margin="0 x-small 0 0">
-                  <Button onClick={this.props.onSave} color="primary">
+                  <Button data-testid="save-button" onClick={this.props.onSave} color="primary">
                     {I18n.t('Save')}
                   </Button>
                 </Flex.Item>
               )}
             </Flex>
           ) : (
-            <Button ref={c => (this.doneBtn = c)} onClick={this.props.onCancel} color="primary">
+            <Button data-testid="done-button" ref={c => (this.doneBtn = c)} onClick={this.props.onCancel} color="primary">
               {I18n.t('Done')}
             </Button>
           )}
