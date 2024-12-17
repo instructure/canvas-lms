@@ -83,6 +83,7 @@
     "message": "Hay contenido guardado automáticamente. ¿Desea cargar el contenido guardado automáticamente?"
   },
   "available_folders_694d0436": { "message": "Carpetas disponibles" },
+  "background_1bc88842": { "message": "Fondo" },
   "backslash_b2d5442d": { "message": "Barra invertida" },
   "bar_ec63ed6": { "message": "Barra" },
   "basic_554cdc0a": { "message": "Básico" },
@@ -93,6 +94,7 @@
   "binomial_coefficient_ea5b9bb7": { "message": "Coeficiente binomial" },
   "black_4cb01371": { "message": "Negro" },
   "blue_daf8fea9": { "message": "Azul" },
+  "border_5b08b06d": { "message": "Borde" },
   "bottom_15a2a9be": { "message": "Abajo" },
   "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
   "bowtie_5f9629e4": { "message": "Pajarita" },
@@ -168,10 +170,14 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Colapsar para ocultar { types }"
   },
+  "color_a363e1b0": { "message": "Color" },
+  "color_contrast_4c418add": { "message": "Contraste de color" },
+  "color_contrast_ratio_687782f0": { "message": "Ratio de contraste de color" },
   "color_picker_6b359edf": { "message": "Selector de color" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Selector de color ({ colorName } seleccionado)"
   },
+  "color_popup_af39810f": { "message": "Ventana emergente de color" },
   "column_e1ae5c64": { "message": "Columna" },
   "column_group_1c062368": { "message": "Grupo de columnas" },
   "complex_numbers_a543d004": { "message": "Números complejos" },
@@ -357,6 +363,7 @@
   "extra_small_9ae33252": { "message": "Extra pequeño" },
   "extracurricular_icon_67c8ca42": { "message": "Ícono extracurricular" },
   "f_function_fe422d65": { "message": "F (función)" },
+  "fail_544e5dde": { "message": "FALLA" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Error al obtener el contenido del archivo"
   },
@@ -416,6 +423,7 @@
     "message": "Ir a la barra de herramientas del editor"
   },
   "grades_a61eba0a": { "message": "Calificaciones" },
+  "graphics_text_bc9568bc": { "message": "Texto gráfico" },
   "greater_than_e98af662": { "message": "Mayor a" },
   "greater_than_or_equal_b911949a": { "message": "Mayor o igual a" },
   "greek_65c5b3f7": { "message": "Griego" },
@@ -521,6 +529,12 @@
   "indigo_2035fc55": { "message": "Índigo" },
   "inference_fed5c960": { "message": "Inferencia" },
   "infinity_7a10f206": { "message": "Infinito" },
+  "input_field_for_alpha_678265fd": { "message": "Campo de entrada para alfa" },
+  "input_field_for_blue_561e020a": { "message": "Campo de entrada para azul" },
+  "input_field_for_green_67f8b2b6": {
+    "message": "Campo de entrada para verde"
+  },
+  "input_field_for_red_86a84615": { "message": "Campo de entrada para rojo" },
   "insert_593145ef": { "message": "Insertar" },
   "insert_link_6dc23cae": { "message": "Insertar enlace" },
   "insert_math_equation_57c6e767": {
@@ -544,6 +558,7 @@
   "language_arts_icon_a798b0f8": { "message": "Ícono de artes del lenguaje" },
   "languages_icon_9d20539": { "message": "Ícono de idiomas" },
   "large_9c5e80e7": { "message": "Grande" },
+  "large_text_e7ba08cd": { "message": "Texto grande" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Obtenga más información sobre los enlaces adyacentes"
   },
@@ -742,6 +757,7 @@
   "no_video_1ed00b26": { "message": "No hay video" },
   "none_3b5e34d2": { "message": "Ninguno" },
   "none_selected_b93d56d2": { "message": "Nada seleccionado" },
+  "normal_text_7b03da48": { "message": "Texto normal" },
   "not_equal_6e2980e6": { "message": "No igual" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "No en (no es un elemento de)"
@@ -791,6 +807,7 @@
   },
   "parallel_d55d6e38": { "message": "Paralelo" },
   "partial_derivative_4a9159df": { "message": "Parcial (derivada)" },
+  "pass_1c19a2b3": { "message": "APROBADO" },
   "paste_5963d1c1": { "message": "Pegar" },
   "pause_12af3bb4": { "message": "Pausar" },
   "pentagon_17d82ea3": { "message": "Pentágono" },
@@ -798,6 +815,9 @@
   "percentage_34ab7c2c": { "message": "Porcentaje" },
   "percentage_must_be_a_number_8033c341": {
     "message": "El porcentaje debe ser un número"
+  },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "El porcentaje debe ser de al menos { percentage }%"
   },
   "performing_arts_icon_f3497486": { "message": "Ícono de artes escénicas" },
   "perpendicular_7c48ede4": { "message": "Perpendicular" },
@@ -808,8 +828,12 @@
   },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (variante)" },
+  "pick_a_color_557abfb0": { "message": "Elija un color" },
   "pink_68ad45cb": { "message": "Rosado" },
   "pixels_52ece7d1": { "message": "Pixeles" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Los píxeles deben ser al menos { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Reproducir" },
   "play_media_comment_35257210": {
     "message": "Reproducir comentario de multimedia."
@@ -840,6 +864,9 @@
   "preview_inline_9787330": { "message": "Vista previa en línea" },
   "previous_bd2ac015": { "message": "Anterior" },
   "previous_findtext_8dfbfd30": { "message": "Anterior { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Colores seleccionados previamente"
+  },
   "prime_917ea60e": { "message": "Primo" },
   "prime_numbers_13464f61": { "message": "Números primos" },
   "product_39cf144f": { "message": "Producto" },
@@ -1328,6 +1355,15 @@
   "writing_assistant_a30ac16a": { "message": "Asistente de redacción" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Sí" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Se encuentra en una paleta de colores. Para navegar en la paleta hacia arriba, a la izquierda, hacia abajo o a la ''W'', ''A'', ''S'' y ''D'', respectivamente"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Está en un deslizador de color. Para navegar el deslizador a la izquierda o a la derecha, use los botones ''A'', y ''D'', respectivamente"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Está en un deslizador alfa. Para navegar el deslizador a la izquierda o a la derecha, use los botones ''A'', y ''D'', respectivamente"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Tiene cambios sin guardar en la bandeja de Icon Maker. ¿Desea continuar sin guardar esos cambios?"
   },

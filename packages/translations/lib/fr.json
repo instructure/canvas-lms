@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Dossiers disponibles"
     },
+    "background_1bc88842": {
+        "message": "Arrière-plan"
+    },
     "backslash_b2d5442d": {
         "message": "Barre oblique inverse"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Bleu"
+    },
+    "border_5b08b06d": {
+        "message": "Bordure"
     },
     "bottom_15a2a9be": {
         "message": "Bas"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Réduisez pour masquer { types }"
     },
+    "color_a363e1b0": {
+        "message": "Couleur"
+    },
+    "color_contrast_4c418add": {
+        "message": "Contraste de couleurs"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Bouton radio Contraste de couleurs"
+    },
     "color_picker_6b359edf": {
         "message": "Nuancier"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Nuancier ({ colorName } sélectionné)"
+    },
+    "color_popup_af39810f": {
+        "message": "Fenêtre contextuelle Couleurs"
     },
     "column_e1ae5c64": {
         "message": "Colonne"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (fonction)"
     },
+    "fail_544e5dde": {
+        "message": "ÉCHEC"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Échec de la récupération des contenus de fichiers"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Notes"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Texte des éléments graphiques"
     },
     "greater_than_e98af662": {
         "message": "Supérieur à"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Infini"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Champ de saisie pour alpha"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Champ de saisie pour bleu"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Champ de saisie pour vert"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Champ de saisie pour rouge"
+    },
     "insert_593145ef": {
         "message": "Insérer"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Grand"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Texte de grande taille"
     },
     "latvian_2bbb6aab": {
         "message": "Letton"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Aucun sélectionné"
     },
+    "normal_text_7b03da48": {
+        "message": "Texte normal"
+    },
     "norwegian_53f391ec": {
         "message": "Norvégien"
     },
@@ -1652,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Dérivée partielle"
     },
+    "pass_1c19a2b3": {
+        "message": "RÉUSSITE"
+    },
     "paste_5963d1c1": {
         "message": "Coller"
     },
@@ -1669,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Le pourcentage doit être un nombre"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Le pourcentage doit être d’au moins { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Icône arts du spectacle"
@@ -1694,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (variante)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Choisissez une couleur"
+    },
     "pink_68ad45cb": {
         "message": "Rose"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Le nombre de pixels doit être d’au moins { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Lecture"
@@ -1765,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Occurrence précédente de { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Couleurs précédemment choisies"
     },
     "prime_917ea60e": {
         "message": "Prime"
@@ -2665,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Yiddish"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Vous utilisez une palette de couleurs. Pour naviguer vers le haut, la gauche, le bas ou la droite de la palette, utilisez les boutons « W », « A », « S » et « D » respectivement."
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Vous utilisez un curseur de couleurs. Pour déplacer le curseur vers la gauche ou la droite, utilisez les boutons « A » et « D» respectivement."
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Vous utilisez un curseur alpha. Pour déplacer le curseur vers la gauche ou la droite, utilisez les boutons « A » et « D» respectivement."
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Pour effectuer un remplacement, téléchargez un nouveau fichier de sous-titres."

@@ -81,6 +81,7 @@
     "message": "Nội dung tự động lưu tồn tại. Bạn có muốn tải nội dung tự động lưu để thay thế không?"
   },
   "available_folders_694d0436": { "message": "Thư Mục Khả Dụng" },
+  "background_1bc88842": { "message": "Nền" },
   "backslash_b2d5442d": { "message": "Dấu Chéo Ngược" },
   "bar_ec63ed6": { "message": "Bar" },
   "basic_554cdc0a": { "message": "Cơ Bản" },
@@ -91,6 +92,7 @@
   "binomial_coefficient_ea5b9bb7": { "message": "Hệ Số Nhị Thức" },
   "black_4cb01371": { "message": "Đen" },
   "blue_daf8fea9": { "message": "Xanh Dương" },
+  "border_5b08b06d": { "message": "Viền" },
   "bottom_15a2a9be": { "message": "Đáy" },
   "bottom_third_5f5fec1d": { "message": "Một Phần Ba Dưới" },
   "bowtie_5f9629e4": { "message": "Nơ" },
@@ -162,10 +164,14 @@
   "clubs_suit_c1ffedff": { "message": "Nhép (Hoa)" },
   "collaborations_5c56c15f": { "message": "Cộng Tác" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Thu gọn để ẩn { types }" },
+  "color_a363e1b0": { "message": "Màu" },
+  "color_contrast_4c418add": { "message": "Tương Phản Màu" },
+  "color_contrast_ratio_687782f0": { "message": "Tỷ Lệ Tương Phản Màu" },
   "color_picker_6b359edf": { "message": "Trình Chọn Màu" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Trình Chọn Màu (đã chọn { colorName })"
   },
+  "color_popup_af39810f": { "message": "Cửa sổ bật lên màu" },
   "column_e1ae5c64": { "message": "Cột" },
   "column_group_1c062368": { "message": "Nhóm cột" },
   "complex_numbers_a543d004": { "message": "Số Phức" },
@@ -347,6 +353,7 @@
   "extra_small_9ae33252": { "message": "Cực Nhỏ" },
   "extracurricular_icon_67c8ca42": { "message": "Biểu Tượng Ngoại Khóa" },
   "f_function_fe422d65": { "message": "F (hàm số)" },
+  "fail_544e5dde": { "message": "KHÔNG ĐẠT" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Lấy nội dung tệp không thành công"
   },
@@ -408,6 +415,7 @@
     "message": "Đi đến thanh công cụ của trình chỉnh sửa"
   },
   "grades_a61eba0a": { "message": "Điểm" },
+  "graphics_text_bc9568bc": { "message": "Văn bản đồ họa" },
   "greater_than_e98af662": { "message": "Lớn Hơn" },
   "greater_than_or_equal_b911949a": { "message": "Lớn Hơn Hoặc Bằng" },
   "greek_65c5b3f7": { "message": "Hy Lạp" },
@@ -507,6 +515,14 @@
   "indigo_2035fc55": { "message": "Chàm" },
   "inference_fed5c960": { "message": "Kết Luận" },
   "infinity_7a10f206": { "message": "Vô Hạn" },
+  "input_field_for_alpha_678265fd": { "message": "Trường đầu vào cho alpha" },
+  "input_field_for_blue_561e020a": {
+    "message": "Trường đầu vào cho màu xanh dương"
+  },
+  "input_field_for_green_67f8b2b6": {
+    "message": "Trường đầu vào cho màu xanh lá cây"
+  },
+  "input_field_for_red_86a84615": { "message": "Trường đầu vào cho màu đỏ" },
   "insert_593145ef": { "message": "Chèn" },
   "insert_link_6dc23cae": { "message": "Chèn Liên Kết" },
   "insert_math_equation_57c6e767": { "message": "Chèn Phương Trình Toán" },
@@ -530,6 +546,7 @@
   },
   "languages_icon_9d20539": { "message": "Biểu Tượng Ngôn Ngữ" },
   "large_9c5e80e7": { "message": "Lớn" },
+  "large_text_e7ba08cd": { "message": "Văn bản khổ lớn" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Tìm hiểu thêm về các liên kết liền kề"
   },
@@ -714,6 +731,7 @@
   "no_video_1ed00b26": { "message": "Không Có Video" },
   "none_3b5e34d2": { "message": "Không Có" },
   "none_selected_b93d56d2": { "message": "Chưa Chọn Gì" },
+  "normal_text_7b03da48": { "message": "Văn bản khổ bình thường" },
   "not_equal_6e2980e6": { "message": "Không Bằng Nhau" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Không Thuộc (Không Phải Phần Tử Của)"
@@ -757,12 +775,16 @@
   },
   "parallel_d55d6e38": { "message": "Song Song" },
   "partial_derivative_4a9159df": { "message": "Riêng (Đạo Hàm)" },
+  "pass_1c19a2b3": { "message": "ĐẠT" },
   "paste_5963d1c1": { "message": "Dán" },
   "pause_12af3bb4": { "message": "Tạm Dừng" },
   "pentagon_17d82ea3": { "message": "Hình Ngũ Giác" },
   "people_b4ebb13c": { "message": "Mọi Người" },
   "percentage_34ab7c2c": { "message": "Phần Trăm" },
   "percentage_must_be_a_number_8033c341": { "message": "Phần trăm phải là số" },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Phần trăm ít nhất phải bằng { percentage }%"
+  },
   "performing_arts_icon_f3497486": {
     "message": "Biểu Tượng Nghệ Thuật Biểu Diễn"
   },
@@ -774,8 +796,12 @@
   },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Biến)" },
+  "pick_a_color_557abfb0": { "message": "Chọn một màu" },
   "pink_68ad45cb": { "message": "Hồng" },
   "pixels_52ece7d1": { "message": "Pixel" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Pixel ít nhất phải bằng { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Phát" },
   "play_media_comment_35257210": { "message": "Phát bình luận phương tiện." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -804,6 +830,9 @@
   "preview_inline_9787330": { "message": "Xem trước trong dòng" },
   "previous_bd2ac015": { "message": "Trước" },
   "previous_findtext_8dfbfd30": { "message": "{ findText } Trước" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Các màu đã chọn trước đây"
+  },
   "prime_917ea60e": { "message": "Nguyên Tố" },
   "prime_numbers_13464f61": { "message": "Số Nguyên Tố" },
   "product_39cf144f": { "message": "Sản Phẩm" },
@@ -1268,6 +1297,15 @@
   "writing_assistant_a30ac16a": { "message": "Trợ Lý Viết" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Có" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Bạn đang ở bảng màu. Để điều hướng bảng màu lên, sang trái, xuống hoặc sang phải, hãy sử dụng lần lượt các nút “W”, “A”, “S” và “D”"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Bạn đang ở thanh trượt màu. Để điều hướng thanh trượt sang trái hoặc phải, hãy sử dụng lần lượt các nút “A” và “D”"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Bạn đang ở thanh trượt alpha. Để điều hướng thanh trượt sang trái hoặc phải, hãy sử dụng lần lượt các nút “A” và “D”"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Bạn có các thay đổi chưa lưu trên khay Tạo Biểu Tượng. Bạn có muốn tiếp tục mà không lưu thay đổi?"
   },
