@@ -6,6 +6,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    date (3.3.4)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -14,7 +15,8 @@ GEM
     irb (1.14.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
-    psych (5.1.2)
+    psych (5.2.1)
+      date
       stringio
     rdoc (6.7.0)
       psych (>= 4.0.0)
@@ -33,7 +35,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.1)
-    stringio (3.1.1)
+    stringio (3.1.2)
 
 PLATFORMS
   aarch64-linux
