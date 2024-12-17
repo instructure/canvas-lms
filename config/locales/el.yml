@@ -11686,6 +11686,7 @@ el:
   question_banks_45bdf347: "Τράπεζες Ερωτημάτων"
   question_f06476d1: ερώτημα
   question_group_837b8014: "Ομάδα Ερωτήσεων"
+  question_position_45eba089: "%{position} ερώτησης"
   question_unanswered: "Δεν έχει Απαντηθεί Ακόμη"
   questions_a955145c: Ερωτήσεις
   quiz: 
