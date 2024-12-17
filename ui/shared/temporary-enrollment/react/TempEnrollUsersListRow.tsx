@@ -115,7 +115,6 @@ export default function TempEnrollUsersListRow(props: Props) {
   }
 
   useFetchApi(
-    // @ts-expect-error - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
       ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {params: {account_id: ENV.ACCOUNT_ID}}),

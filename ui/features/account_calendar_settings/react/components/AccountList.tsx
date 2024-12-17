@@ -80,7 +80,6 @@ export const AccountList = ({
     }
   }, [isLoading, accounts, debouncedSearchTerm])
 
-  // @ts-expect-error - this hook isn't ts-ified
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/account_calendars`,
     params: {

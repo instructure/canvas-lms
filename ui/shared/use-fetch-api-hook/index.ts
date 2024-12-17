@@ -17,23 +17,44 @@
  */
 
 import useImmediate from '@canvas/use-immediate-hook'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiOpts} from '@canvas/do-fetch-api-effect'
+import type {QueryParameterRecord} from '@instructure/query-string-encoding'
+import type {Links} from '@canvas/parse-link-header/parseLinkHeader'
+
+type AnyFunction = (...args: any[]) => any
+
+type AbortableArgs<
+  S extends AnyFunction,
+  E extends AnyFunction,
+  L extends AnyFunction,
+  M extends AnyFunction
+> = {
+  success?: S
+  error?: E
+  loading?: L
+  meta?: M
+}
 
 // utility for making it easy to abort the fetch
-function abortable({success, error, loading, meta}) {
+function abortable<
+  S extends AnyFunction,
+  E extends AnyFunction,
+  L extends AnyFunction,
+  M extends AnyFunction
+>({success, error, loading, meta}: AbortableArgs<S, E, L, M>) {
   const aborter = new AbortController()
   let active = true
   return {
-    activeSuccess: (...p) => {
+    activeSuccess: (...p: Parameters<S>) => {
       if (active && success) success(...p)
     },
-    activeError: (...p) => {
+    activeError: (...p: Parameters<E>) => {
       if (active && error) error(...p)
     },
-    activeLoading: (...p) => {
+    activeLoading: (...p: Parameters<L>) => {
       if (active && loading) loading(...p)
     },
-    activeMeta: (...p) => {
+    activeMeta: (...p: Parameters<M>) => {
       if (active && meta) meta(...p)
     },
     abort: () => {
@@ -42,6 +63,21 @@ function abortable({success, error, loading, meta}) {
     },
     signal: aborter.signal,
   }
+}
+
+export type UseFetchApiArgs<R, T = any> = {
+  success: (result: T | R) => void
+  error?: (err: Error) => void
+  loading?: (loading: boolean) => void
+  meta?: (meta: {link?: Links; response: Response}) => void
+  path: string
+  convert?: (result: T) => R
+  forceResult?: T
+  params?: DoFetchApiOpts['params']
+  headers?: DoFetchApiOpts['headers']
+  fetchAllPages?: boolean
+  fetchNumPages?: number
+  fetchOpts?: DoFetchApiOpts['fetchOpts']
 }
 
 // NOTE: if identity of any of the output functions changes, the prior fetch will be aborted and a
@@ -60,7 +96,7 @@ function abortable({success, error, loading, meta}) {
 //
 // You can optionally pass an array of additional dependencies as a second argument. If any of
 // these change, the fetch will be repeated.
-export default function useFetchApi(
+export default function useFetchApi<R, T>(
   {
     // data output callbacks
     success, // (parsed json object of the response body) => {}
@@ -89,8 +125,8 @@ export default function useFetchApi(
     fetchNumPages = 0,
 
     fetchOpts = {}, // other options to pass to fetch
-  },
-  additionalDependencies = []
+  }: UseFetchApiArgs<R, T>,
+  additionalDependencies: readonly unknown[] = []
 ) {
   // useImmediate for deep comparisons and may help avoid browser flickering
   useImmediate(
@@ -111,17 +147,17 @@ export default function useFetchApi(
       async function fetchLoop() {
         try {
           activeLoading(true)
-          let nextPage = false
-          let accummulatedResults = []
+          let nextPage: string | boolean = false
+          let accummulatedResults: (R | T)[] = []
           let pagesRemaining = fetchNumPages
           do {
-            const paramsWithPage = {...params}
+            const paramsWithPage: QueryParameterRecord & {page?: boolean | string} = {...params}
             if (nextPage) paramsWithPage.page = nextPage
             // we don't want to flood the server with parallel requests, and we need to wait for the
             // "next" link header before we know what the next page url is, so we actually want to
             // await in the loop.
-            // eslint-disable-next-line no-await-in-loop
-            const {json, response, link} = await doFetchApi({
+
+            const {json, response, link} = await doFetchApi<T>({
               path,
               headers,
               params: paramsWithPage,
@@ -129,18 +165,18 @@ export default function useFetchApi(
               signal,
             })
             const result = convert && json ? convert(json) : json
-            accummulatedResults = accummulatedResults.concat(result)
+            accummulatedResults = accummulatedResults.concat(result!)
 
             activeMeta({response, link})
             if (fetchAllPages || pagesRemaining) {
-              activeSuccess(accummulatedResults)
-              nextPage = fetchAllPages || --pagesRemaining ? link?.next?.page : false
+              activeSuccess(accummulatedResults! as T | R)
+              nextPage = fetchAllPages || --pagesRemaining ? link?.next?.page! : false
             } else {
-              activeSuccess(result)
+              activeSuccess(result!)
             }
           } while (nextPage)
         } catch (err) {
-          activeError(err)
+          activeError(err as Error)
         } finally {
           activeLoading(false)
         }
