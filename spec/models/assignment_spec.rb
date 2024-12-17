@@ -1481,21 +1481,35 @@ describe Assignment do
   end
 
   describe "#tool_settings_tool=" do
+    subject(:assign_tool) { assignment.update!(tool_settings_tool: new_value) }
+
+    let(:assignment) { setup_assignment_with_homework }
+    let(:tool) {  @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret") }
+
+    context "when a tool settings tool is currently set" do
+      before { assignment.update!(tool_settings_tool: tool) }
+
+      context "and the tool settings tool is re-assigned to `nil`" do
+        let(:new_value) { nil }
+
+        it "deletes the assignment configuration tool lookups" do
+          expect { assign_tool }.to change { assignment.assignment_configuration_tool_lookups.count }.from(1).to(0)
+        end
+
+        it "does not destroy the tool" do
+          expect(tool).to be_active
+
+          expect { assign_tool }.not_to change { tool.reload.workflow_state }
+        end
+      end
+    end
+
     it "allows ContextExternalTools through polymorphic association" do
       setup_assignment_with_homework
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @assignment.tool_settings_tool = tool
       @assignment.save
       expect(@assignment.tool_settings_tool).to eq(tool)
-    end
-
-    it "destroys tool unless tool is 'ContextExternalTool'" do
-      setup_assignment_with_homework
-      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @assignment.tool_settings_tool = tool
-      @assignment.save!
-      @assignment.tool_settings_tool = nil
-      @assignment.save!
     end
 
     context "when the tool proxy is account-level" do
