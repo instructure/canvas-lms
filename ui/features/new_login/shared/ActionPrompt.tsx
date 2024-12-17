@@ -58,11 +58,13 @@ const prompts: Record<ActionPromptProps['variant'], Prompt> = {
 const ActionPrompt = ({variant}: ActionPromptProps) => {
   const navigate = useNavigate()
   const {isPreviewMode, isUiActionPending} = useNewLogin()
+
   const {text, linkText, linkHref} = prompts[variant]
+  const isDisabled = isPreviewMode || isUiActionPending
 
   const handleNavigate = (event: React.MouseEvent<ViewOwnProps>) => {
     event.preventDefault()
-    if (!(isPreviewMode || isUiActionPending)) {
+    if (!isDisabled) {
       navigate(linkHref)
     }
   }
