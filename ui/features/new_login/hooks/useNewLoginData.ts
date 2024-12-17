@@ -36,6 +36,7 @@ interface NewLoginData {
   requireEmail?: boolean
   passwordPolicy?: PasswordPolicy
   forgotPasswordUrl?: string
+  invalidLoginFaqUrl?: string
 }
 
 interface NewLoginDataResult {
@@ -145,6 +146,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
           transformPasswordPolicy
         ),
         forgotPasswordUrl: getStringAttribute(container, 'data-forgot-password-url'),
+        invalidLoginFaqUrl: getStringAttribute(container, 'data-invalid-login-faq-url'),
       }
     : {}
 }
@@ -168,6 +170,7 @@ export const useNewLoginData = (): NewLoginDataResult => {
     requireEmail: undefined,
     passwordPolicy: undefined,
     forgotPasswordUrl: undefined,
+    invalidLoginFaqUrl: undefined,
   })
   const [isDataLoading, setIsDataLoading] = useState(true)
 

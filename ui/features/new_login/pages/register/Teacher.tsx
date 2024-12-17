@@ -217,7 +217,6 @@ const Teacher = () => {
   }
 
   const handleReCaptchaVerify = (token: string | null) => {
-     
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
     setCaptchaToken(token)
   }
