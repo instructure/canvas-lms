@@ -79,6 +79,7 @@
     "message": "Kandungan yang disimpan secara automatik wujud. Adakah anda ingin memuat naik kandungan yang disimpan secara automatik sebagai ganti?"
   },
   "available_folders_694d0436": { "message": "Folder tersedia" },
+  "background_1bc88842": { "message": "Latar Belakang" },
   "backslash_b2d5442d": { "message": "Garis miring balik" },
   "bar_ec63ed6": { "message": "Bar" },
   "basic_554cdc0a": { "message": "Asas" },
@@ -89,6 +90,7 @@
   "binomial_coefficient_ea5b9bb7": { "message": "Pekali Binomial" },
   "black_4cb01371": { "message": "Hitam" },
   "blue_daf8fea9": { "message": "Biru" },
+  "border_5b08b06d": { "message": "Sempadan" },
   "bottom_15a2a9be": { "message": "Bawah" },
   "bottom_third_5f5fec1d": { "message": "Bawah Ketiga" },
   "bowtie_5f9629e4": { "message": "Tali leher kupu-kupu" },
@@ -164,10 +166,14 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kuncupkan untuk menyembunyikan { types }"
   },
+  "color_a363e1b0": { "message": "Warna" },
+  "color_contrast_4c418add": { "message": "Kontras Warna" },
+  "color_contrast_ratio_687782f0": { "message": "Nisbah Kontras Warna" },
   "color_picker_6b359edf": { "message": "Pemilih Warna" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Pemilih Warna ({ colorName } dipilih)"
   },
+  "color_popup_af39810f": { "message": "Pop timbul warna" },
   "column_e1ae5c64": { "message": "Lajur" },
   "column_group_1c062368": { "message": "Kumpulan lajur" },
   "complex_numbers_a543d004": { "message": "Nombor Kompleks" },
@@ -343,6 +349,7 @@
   "extra_small_9ae33252": { "message": "Amat Kecil" },
   "extracurricular_icon_67c8ca42": { "message": "Ikon Kurikulum Tambahan" },
   "f_function_fe422d65": { "message": "F (fungsi)" },
+  "fail_544e5dde": { "message": "GAGAL" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Gagal mendapatkan kandungan fail"
   },
@@ -400,6 +407,7 @@
     "message": "Terus ke bar alat editor"
   },
   "grades_a61eba0a": { "message": "Gred" },
+  "graphics_text_bc9568bc": { "message": "Teks grafik" },
   "greater_than_e98af662": { "message": "Lebih Besar Daripada" },
   "greater_than_or_equal_b911949a": {
     "message": "Lebih Besar Daripada atau Sama Dengan"
@@ -503,6 +511,10 @@
   "indigo_2035fc55": { "message": "Biru Nila" },
   "inference_fed5c960": { "message": "Inferens" },
   "infinity_7a10f206": { "message": "Infiniti" },
+  "input_field_for_alpha_678265fd": { "message": "Medan input untuk alfa" },
+  "input_field_for_blue_561e020a": { "message": "Medan input untuk biru" },
+  "input_field_for_green_67f8b2b6": { "message": "Medan input untuk hijau" },
+  "input_field_for_red_86a84615": { "message": "Medan input untuk merah" },
   "insert_593145ef": { "message": "Sisipkan" },
   "insert_link_6dc23cae": { "message": "Sisipkan Pautan" },
   "insert_math_equation_57c6e767": {
@@ -526,6 +538,7 @@
   "language_arts_icon_a798b0f8": { "message": "Ikon Seni Bahasa" },
   "languages_icon_9d20539": { "message": "Ikon Bahasa" },
   "large_9c5e80e7": { "message": "Besar" },
+  "large_text_e7ba08cd": { "message": "Teks besar" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Ketahui lebih lanjut tentang pautan berhampiran"
   },
@@ -704,6 +717,7 @@
   "no_video_1ed00b26": { "message": "Tiada Video" },
   "none_3b5e34d2": { "message": "Tiada" },
   "none_selected_b93d56d2": { "message": "Tiada Yang Dipilih" },
+  "normal_text_7b03da48": { "message": "Teks biasa" },
   "not_equal_6e2980e6": { "message": "Tidak Sama Dengan" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Bukan Dalam (Bukan Unsur Dalam)"
@@ -747,6 +761,7 @@
   },
   "parallel_d55d6e38": { "message": "Selari" },
   "partial_derivative_4a9159df": { "message": "Separa (Terbitan)" },
+  "pass_1c19a2b3": { "message": "LULUS" },
   "paste_5963d1c1": { "message": "Tampal" },
   "pause_12af3bb4": { "message": "Jedakan" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
@@ -755,6 +770,9 @@
   "percentage_must_be_a_number_8033c341": {
     "message": "Peratusan mesti suatu nombor"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Peratusan mestilah sekurang-kurangnya { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Ikon Seni Persembahan" },
   "perpendicular_7c48ede4": { "message": "Serenjang" },
   "phi_4ac33b6d": { "message": "Fi" },
@@ -762,8 +780,12 @@
   "physical_education_icon_d7dffd3e": { "message": "Ikon Pendidikan Jasmani" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Varian)" },
+  "pick_a_color_557abfb0": { "message": "Pilih warna" },
   "pink_68ad45cb": { "message": "Merah jambu" },
   "pixels_52ece7d1": { "message": "Piksel" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Piksel mestilah sekurang-kurangnya { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Mainkan" },
   "play_media_comment_35257210": { "message": "Mainkan komen main." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -792,6 +814,9 @@
   "preview_inline_9787330": { "message": "Pratonton dalam sebaris" },
   "previous_bd2ac015": { "message": "Sebelumnya" },
   "previous_findtext_8dfbfd30": { "message": "Sebelumnya { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Warna yang dipilih sebelum ini"
+  },
   "prime_917ea60e": { "message": "Perdana" },
   "prime_numbers_13464f61": { "message": "Nombor Perdana" },
   "product_39cf144f": { "message": "Produk" },
@@ -1256,6 +1281,15 @@
   "writing_assistant_a30ac16a": { "message": "Pembantu Penulisan" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ya" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Anda sedang menggunakan pelet warna. Gunakan butang ''W'', ''A'', ''S'' dan ''D''’ , masing-masing untuk menavigasi pelet ke atas, ke kiri, ke bawah dan ke kanan."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Anda sedang menggunakan peluncur warna. Gunakan butang  ''A'' and ''D'', masing-masing untuk menavigasi peluncur ke kiri atau ke kanan."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Anda sedang menggunakan peluncur alfa. Gunakan butang  ''A'' and ''D'', masing-masing untuk menavigasi peluncur ke kiri atau ke kanan."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Anda mempunyai perubahan tidak disimpan dalam dulang Pembuat Ikon. Adakah anda ingin menerukan tanpa menyimpan perubahan ini?"
   },

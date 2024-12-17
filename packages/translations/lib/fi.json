@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Saatavissa olevat kansiot"
     },
+    "background_1bc88842": {
+        "message": "Tausta"
+    },
     "backslash_b2d5442d": {
         "message": "Takakenoviiva"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Sininen"
+    },
+    "border_5b08b06d": {
+        "message": "Reunus"
     },
     "bottom_15a2a9be": {
         "message": "Ala"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Piilota kutistamalla { types }"
     },
+    "color_a363e1b0": {
+        "message": "Väri"
+    },
+    "color_contrast_4c418add": {
+        "message": "Värin kontrasti"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Värikontrastin suhde"
+    },
     "color_picker_6b359edf": {
         "message": "Värivalitsin"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Värivalitsin ({ colorName } valittu)"
+    },
+    "color_popup_af39810f": {
+        "message": "Värin ponnahdusvalikko"
     },
     "column_e1ae5c64": {
         "message": "Sarake"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (funktio)"
     },
+    "fail_544e5dde": {
+        "message": "VIKA"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Tiedoston sisällön haku epäonnistui"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Arvosanat"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Graafinen teksti"
     },
     "greater_than_e98af662": {
         "message": "Suurempi kuin"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "ÄÄRETÖN"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Datan syöttökenttä"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Alphan syöttökenttä"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Vihreän syöttökenttä"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Punaisen syöttökenttä"
+    },
     "insert_593145ef": {
         "message": "Aseta"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Suuri"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Suuri teksti"
     },
     "latvian_2bbb6aab": {
         "message": "latvia"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Ei valintoja"
     },
+    "normal_text_7b03da48": {
+        "message": "Normaali teksti"
+    },
     "norwegian_53f391ec": {
         "message": "norja"
     },
@@ -1652,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Osittainen (johdannainen)"
     },
+    "pass_1c19a2b3": {
+        "message": "LÄPÄISTY"
+    },
     "paste_5963d1c1": {
         "message": "Liitä"
     },
@@ -1669,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Prosenttiosuuden täytyy olla numero"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Prosenttiosuuden täytyy olla vähintään { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Esittävien taiteiden kuvake"
@@ -1694,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Muuttuja)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Valitse väri"
+    },
     "pink_68ad45cb": {
         "message": "Vaaleanpunainen"
     },
     "pixels_52ece7d1": {
         "message": "Pikselit"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pikseleiden täytyy olla vähintään { width } x { height }px."
     },
     "play_1a47eaa7": {
         "message": "Toista"
@@ -1765,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Edellinen { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Aikaisemmin valitut värit"
     },
     "prime_917ea60e": {
         "message": "Alku"
@@ -2665,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "jiddish"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Olet väripaletissa. Jos haluat navigoida palettia ylös, vasermmalle, alas tai oikealle, käytä painikkeita ”W”, ”A”, ”S” ja ”D” vastaavassa järjestyksessä."
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Olet väriliu´ittimessa. Jos haluat siirtyä vasemmalle tai oikealle, käytä painikkeita ”A” ja ”D” vastaavassa järjestyksessä."
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Olet alphaliu´ittimessa. Jos haluat siirtyä vasemmalle tai oikealle, käytä painikkeita ”A” ja ”D” vastaavassa järjestyksessä."
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Voit korvata lataamalla uuden tekstitystiedoston."

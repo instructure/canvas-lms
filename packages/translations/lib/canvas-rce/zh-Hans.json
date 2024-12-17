@@ -73,6 +73,7 @@
     "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
   },
   "available_folders_694d0436": { "message": "可用文件夹" },
+  "background_1bc88842": { "message": "背景" },
   "backslash_b2d5442d": { "message": "反斜线" },
   "bar_ec63ed6": { "message": "横线" },
   "basic_554cdc0a": { "message": "基本" },
@@ -83,6 +84,7 @@
   "binomial_coefficient_ea5b9bb7": { "message": "二项式系数" },
   "black_4cb01371": { "message": "黑色" },
   "blue_daf8fea9": { "message": "蓝色" },
+  "border_5b08b06d": { "message": "边框" },
   "bottom_15a2a9be": { "message": "底部" },
   "bottom_third_5f5fec1d": { "message": "倒数第三" },
   "bowtie_5f9629e4": { "message": "领结" },
@@ -142,10 +144,14 @@
   "clubs_suit_c1ffedff": { "message": "梅花（花色）" },
   "collaborations_5c56c15f": { "message": "协作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "折叠以隐藏 { types }" },
+  "color_a363e1b0": { "message": "颜色" },
+  "color_contrast_4c418add": { "message": "色彩对比度" },
+  "color_contrast_ratio_687782f0": { "message": "色彩对比度" },
   "color_picker_6b359edf": { "message": "颜色选取器" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "颜色选取器（已选择 { colorName }）"
   },
+  "color_popup_af39810f": { "message": "色彩弹窗" },
   "column_e1ae5c64": { "message": "列" },
   "column_group_1c062368": { "message": "列组" },
   "complex_numbers_a543d004": { "message": "复数" },
@@ -313,6 +319,7 @@
   "extra_small_9ae33252": { "message": "特小" },
   "extracurricular_icon_67c8ca42": { "message": "课外图标" },
   "f_function_fe422d65": { "message": "F（函数）" },
+  "fail_544e5dde": { "message": "失败" },
   "failed_getting_file_contents_e9ea19f4": { "message": "文件内容获取失败" },
   "failed_to_copy_response_d3def551": { "message": "无法复制响应" },
   "failed_to_retrieve_content_from_external_tool_5899c213": {
@@ -352,6 +359,7 @@
   "go_to_the_editor_s_menubar_e6674c81": { "message": "前往编辑器的菜单栏" },
   "go_to_the_editor_s_toolbar_a5cb875f": { "message": "前往编辑器的工具栏" },
   "grades_a61eba0a": { "message": "评分" },
+  "graphics_text_bc9568bc": { "message": "图形文本" },
   "greater_than_e98af662": { "message": "大于" },
   "greater_than_or_equal_b911949a": { "message": "大于等于" },
   "greek_65c5b3f7": { "message": "希腊语" },
@@ -447,6 +455,10 @@
   "indigo_2035fc55": { "message": "靛蓝色" },
   "inference_fed5c960": { "message": "推断" },
   "infinity_7a10f206": { "message": "无穷" },
+  "input_field_for_alpha_678265fd": { "message": "α 输入字段" },
+  "input_field_for_blue_561e020a": { "message": "蓝色输入字段" },
+  "input_field_for_green_67f8b2b6": { "message": "绿色输入字段" },
+  "input_field_for_red_86a84615": { "message": "红色输入字段" },
   "insert_593145ef": { "message": "插入" },
   "insert_link_6dc23cae": { "message": "插入链接" },
   "insert_math_equation_57c6e767": { "message": "插入数学公式" },
@@ -468,6 +480,7 @@
   "language_arts_icon_a798b0f8": { "message": "语言艺术图标" },
   "languages_icon_9d20539": { "message": "语言图标" },
   "large_9c5e80e7": { "message": "大" },
+  "large_text_e7ba08cd": { "message": "大文本" },
   "learn_more_about_adjacent_links_2cb9762c": { "message": "详细了解相邻链接" },
   "learn_more_about_color_contrast_c019dfb9": {
     "message": "详细了解色彩对比度"
@@ -622,6 +635,7 @@
   "no_video_1ed00b26": { "message": "无视频" },
   "none_3b5e34d2": { "message": "无" },
   "none_selected_b93d56d2": { "message": "未选中任何项" },
+  "normal_text_7b03da48": { "message": "常规文本" },
   "not_equal_6e2980e6": { "message": "不相等" },
   "not_in_not_an_element_of_fb1ffb54": { "message": "不包含（不是元素）" },
   "not_negation_1418ebb8": { "message": "非（否定）" },
@@ -661,12 +675,16 @@
   },
   "parallel_d55d6e38": { "message": "平行" },
   "partial_derivative_4a9159df": { "message": "偏（导数）" },
+  "pass_1c19a2b3": { "message": "合格" },
   "paste_5963d1c1": { "message": "粘贴" },
   "pause_12af3bb4": { "message": "暂停" },
   "pentagon_17d82ea3": { "message": "五角形" },
   "people_b4ebb13c": { "message": "人员" },
   "percentage_34ab7c2c": { "message": "百分数" },
   "percentage_must_be_a_number_8033c341": { "message": "百分比必须是数字" },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "百分数至少必须为 { percentage }%。"
+  },
   "performing_arts_icon_f3497486": { "message": "表演艺术图标" },
   "perpendicular_7c48ede4": { "message": "正交" },
   "phi_4ac33b6d": { "message": "Phi" },
@@ -674,8 +692,12 @@
   "physical_education_icon_d7dffd3e": { "message": "体育图标" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi（变体）" },
+  "pick_a_color_557abfb0": { "message": "选择颜色" },
   "pink_68ad45cb": { "message": "粉红色" },
   "pixels_52ece7d1": { "message": "像素" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "像素必须至少为 { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "播放" },
   "play_media_comment_35257210": { "message": "播放媒体评论。" },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -704,6 +726,7 @@
   "preview_inline_9787330": { "message": "嵌入式预览" },
   "previous_bd2ac015": { "message": "上一个" },
   "previous_findtext_8dfbfd30": { "message": "上一步{ findText }" },
+  "previously_chosen_colors_f1338315": { "message": "之前选择的颜色" },
   "prime_917ea60e": { "message": "质" },
   "prime_numbers_13464f61": { "message": "质数" },
   "product_39cf144f": { "message": "乘积" },
@@ -1124,6 +1147,15 @@
   "writing_assistant_a30ac16a": { "message": "写作助手" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "是" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "您正在使用调色盘。请分别使用“W”、“A”、“S”和“D”在调色盘上向上、左、下或右浏览"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "您正在使用颜色滑块。请分别使用“A”和“D”在滑块上向左或向右浏览"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "您正在使用 α 滑块。请分别使用“A”和“D”在滑块上向左或向右浏览"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "“图标编辑器”托盘中有未保存的更改。是否要继续操作而不保存这些更改？"
   },

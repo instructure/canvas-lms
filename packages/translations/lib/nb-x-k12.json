@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Tilgjengelige mapper"
     },
+    "background_1bc88842": {
+        "message": "Bakgrunn"
+    },
     "backslash_b2d5442d": {
         "message": "Bakstrek"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Blå"
+    },
+    "border_5b08b06d": {
+        "message": "Ramme"
     },
     "bottom_15a2a9be": {
         "message": "Bunn"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Kollaps for å skjule { types }"
     },
+    "color_a363e1b0": {
+        "message": "Farge"
+    },
+    "color_contrast_4c418add": {
+        "message": "Fargekontrast"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Fargekontrastforhold"
+    },
     "color_picker_6b359edf": {
         "message": "Fargevelger"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Fargevelger ({ colorName } valgt)"
+    },
+    "color_popup_af39810f": {
+        "message": "Farge-popup"
     },
     "column_e1ae5c64": {
         "message": "Kolonne"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (funksjon)"
     },
+    "fail_544e5dde": {
+        "message": "IKKE BESTÅTT"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Kunne ikke hente filinnhold"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Vurderinger"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Bildetekst"
     },
     "greater_than_e98af662": {
         "message": "Større enn"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Uendelig"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Inndatafelt for alfa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Inndatafelt for blå"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Inndatafelt for grønn"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Inndatafelt for rød"
+    },
     "insert_593145ef": {
         "message": "Sett inn"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Stor"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Stor tekst"
     },
     "latvian_2bbb6aab": {
         "message": "Latvisk"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Ingen valgt"
     },
+    "normal_text_7b03da48": {
+        "message": "Normal tekst"
+    },
     "norwegian_53f391ec": {
         "message": "Norsk"
     },
@@ -1652,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Delvis (derivat)"
     },
+    "pass_1c19a2b3": {
+        "message": "BESTÅTT"
+    },
     "paste_5963d1c1": {
         "message": "Lim inn"
     },
@@ -1669,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Prosent må være et tall"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Prosent må være minst { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Scenekunst-ikon"
@@ -1694,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (variant)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Velg en farge"
+    },
     "pink_68ad45cb": {
         "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Piksler"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Piksler må være minst { width } x { height } px"
     },
     "play_1a47eaa7": {
         "message": "Spill av"
@@ -1765,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Forrige { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Tidligere valgte farger"
     },
     "prime_917ea60e": {
         "message": "Prim"
@@ -2665,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisk"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Du er på en fargepalett For å navigere opp, venstre, ned eller høyre på paletten, bruk henholdsvis «W»-, «A»-, «S»- og «D»-knappene"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Du er på en fargeglidebryter. For å navigere til venstre eller høyre på glidebryteren, bruk henholdsvis «A»- og «D»-knappene"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Du er på en alfaglidebryter. For å navigere til venstre eller høyre på glidebryteren, bruk henholdsvis «A»- og «D»-knappene"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Du kan erstatte den ved å laste opp en ny bildetekstfil."

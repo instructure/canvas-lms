@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Available folders"
     },
+    "background_1bc88842": {
+        "message": "Background"
+    },
     "backslash_b2d5442d": {
         "message": "Backslash"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Blue"
+    },
+    "border_5b08b06d": {
+        "message": "Border"
     },
     "bottom_15a2a9be": {
         "message": "Bottom"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Collapse to hide { types }"
     },
+    "color_a363e1b0": {
+        "message": "Color"
+    },
+    "color_contrast_4c418add": {
+        "message": "Color Contrast"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Color Contrast Ratio"
+    },
     "color_picker_6b359edf": {
         "message": "Color Picker"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Color Picker ({ colorName } selected)"
+    },
+    "color_popup_af39810f": {
+        "message": "Color popup"
     },
     "column_e1ae5c64": {
         "message": "Column"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (function)"
     },
+    "fail_544e5dde": {
+        "message": "FAIL"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Failed getting file contents"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Grades"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Graphics text"
     },
     "greater_than_e98af662": {
         "message": "Greater Than"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Infinity"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Input field for alpha"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Input field for blue"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Input field for green"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Input field for red"
+    },
     "insert_593145ef": {
         "message": "Insert"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Large"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Large text"
     },
     "latvian_2bbb6aab": {
         "message": "Latvian"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "None Selected"
     },
+    "normal_text_7b03da48": {
+        "message": "Normal text"
+    },
     "norwegian_53f391ec": {
         "message": "Norwegian"
     },
@@ -1652,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Partial (Derivative)"
     },
+    "pass_1c19a2b3": {
+        "message": "PASS"
+    },
     "paste_5963d1c1": {
         "message": "Paste"
     },
@@ -1669,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Percentage must be a number"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Percentage must be at least { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Performing Arts Icon"
@@ -1694,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Variant)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Pick a color"
+    },
     "pink_68ad45cb": {
         "message": "Pink"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pixels must be at least { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Play"
@@ -1765,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Previous { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Previously chosen colors"
     },
     "prime_917ea60e": {
         "message": "Prime"
@@ -2665,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Yiddish"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "You are on a color palette. To navigate on the palette up, left, down or right, use the ''W'', ''A'', ''S'' and ''D'' buttons respectively"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "You are on a color slider. To navigate the slider left or right, use the ''A'' and ''D'' buttons respectively"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "You are on an alpha slider. To navigate the slider left or right, use the ''A'' and ''D'' buttons respectively"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "You can replace by uploading a new caption file."

@@ -79,6 +79,7 @@
     "message": "Automatiskt sparat innehåll finns. Vill du läsa in det automatiskt sparade innehållet istället?"
   },
   "available_folders_694d0436": { "message": "Tillgängliga mappar" },
+  "background_1bc88842": { "message": "Bakgrund" },
   "backslash_b2d5442d": { "message": "Omvänt snedstreck" },
   "bar_ec63ed6": { "message": "Fält" },
   "basic_554cdc0a": { "message": "Grundläggande" },
@@ -89,6 +90,7 @@
   "binomial_coefficient_ea5b9bb7": { "message": "Binomialkoefficient" },
   "black_4cb01371": { "message": "Svart" },
   "blue_daf8fea9": { "message": "Blå" },
+  "border_5b08b06d": { "message": "Gräns" },
   "bottom_15a2a9be": { "message": "Nederst" },
   "bottom_third_5f5fec1d": { "message": "Tredje nerifrån" },
   "bowtie_5f9629e4": { "message": "Rosett" },
@@ -164,10 +166,14 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Minimera för att dölja { types }"
   },
+  "color_a363e1b0": { "message": "Färg" },
+  "color_contrast_4c418add": { "message": "Färgkontrast" },
+  "color_contrast_ratio_687782f0": { "message": "Färgkontrastförhållande" },
   "color_picker_6b359edf": { "message": "Färgväljaren" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Färgväljaren ({ colorName } valda)"
   },
+  "color_popup_af39810f": { "message": "Färg-popup" },
   "column_e1ae5c64": { "message": "Kolumn" },
   "column_group_1c062368": { "message": "Kolumngrupp" },
   "complex_numbers_a543d004": { "message": "Komplexa nummer" },
@@ -347,6 +353,7 @@
   "extra_small_9ae33252": { "message": "Extra liten" },
   "extracurricular_icon_67c8ca42": { "message": "Fritidsikon" },
   "f_function_fe422d65": { "message": "F (funktion)" },
+  "fail_544e5dde": { "message": "MISSLYCKADES" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Det gick inte att hämta filinnehåll"
   },
@@ -404,6 +411,7 @@
     "message": "Gå till redigerarens verktygsfält"
   },
   "grades_a61eba0a": { "message": "Omdömen" },
+  "graphics_text_bc9568bc": { "message": "Bildtext" },
   "greater_than_e98af662": { "message": "Större än" },
   "greater_than_or_equal_b911949a": { "message": "Större än eller lika med" },
   "greek_65c5b3f7": { "message": "Grekiska" },
@@ -507,6 +515,10 @@
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Slutsats" },
   "infinity_7a10f206": { "message": "Oändlighet" },
+  "input_field_for_alpha_678265fd": { "message": "Inmatningsfält för alfa" },
+  "input_field_for_blue_561e020a": { "message": "Inmatningsfält för blått" },
+  "input_field_for_green_67f8b2b6": { "message": "Inmatningsfält för grönt" },
+  "input_field_for_red_86a84615": { "message": "Inmatningsfält för rött" },
   "insert_593145ef": { "message": "Infoga" },
   "insert_link_6dc23cae": { "message": "Infoga länk" },
   "insert_math_equation_57c6e767": {
@@ -530,6 +542,7 @@
   "language_arts_icon_a798b0f8": { "message": "Språkvetenskapsikon" },
   "languages_icon_9d20539": { "message": "Språkikon" },
   "large_9c5e80e7": { "message": "Stor" },
+  "large_text_e7ba08cd": { "message": "Stor text" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Läs mer om intilliggande länkar"
   },
@@ -712,6 +725,7 @@
   "no_video_1ed00b26": { "message": "Ingen video" },
   "none_3b5e34d2": { "message": "Inga" },
   "none_selected_b93d56d2": { "message": "Inga valda" },
+  "normal_text_7b03da48": { "message": "Normal text" },
   "not_equal_6e2980e6": { "message": "Är inte lika med" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Inte i (inte ett element av)"
@@ -757,6 +771,7 @@
   },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Partiell (derivat)" },
+  "pass_1c19a2b3": { "message": "GODKÄND" },
   "paste_5963d1c1": { "message": "Klistra in" },
   "pause_12af3bb4": { "message": "Pausa" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
@@ -764,6 +779,9 @@
   "percentage_34ab7c2c": { "message": "Procent" },
   "percentage_must_be_a_number_8033c341": {
     "message": "Procenttalet måste vara ett tal"
+  },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Procenttalet måste vara minst { percentage }%"
   },
   "performing_arts_icon_f3497486": { "message": "Underhållningsikon" },
   "perpendicular_7c48ede4": { "message": "Lodrät" },
@@ -774,8 +792,12 @@
   },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (variant)" },
+  "pick_a_color_557abfb0": { "message": "Välj en färg" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixlar" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Antalet pixlar måste vara minst { width } x { height } pixlar"
+  },
   "play_1a47eaa7": { "message": "Spela upp" },
   "play_media_comment_35257210": { "message": "Spela upp mediekommentar." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -804,6 +826,7 @@
   "preview_inline_9787330": { "message": "Inbäddad förhandsgranskning" },
   "previous_bd2ac015": { "message": "Föregående" },
   "previous_findtext_8dfbfd30": { "message": "Föregående { findText }" },
+  "previously_chosen_colors_f1338315": { "message": "Tidigare valda färger" },
   "prime_917ea60e": { "message": "Prim" },
   "prime_numbers_13464f61": { "message": "Primtal" },
   "product_39cf144f": { "message": "Produkt" },
@@ -1270,6 +1293,15 @@
   "writing_assistant_a30ac16a": { "message": "Skrivassistent" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ja" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Du är på en färgpalett. För att navigera upp, till vänster/höger eller ned på paletten, använd knapparna W, A, S och D."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Du är på ett färgreglage. För att navigera upp, till vänster/höger eller ned i skjutreglaget, använd knapparna A och D."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Du är på ett alfareglage. För att navigera upp, till vänster/höger eller ned i skjutreglaget, använd knapparna A och D."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Du har ändringar som inte har sparats i facket för ikonverktyget. Vill du fortsätta utan att spara dessa ändringar?"
   },
