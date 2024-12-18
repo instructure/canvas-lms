@@ -1802,12 +1802,12 @@ class ApplicationController < ActionController::Base
         pseudonym = Pseudonym.active.find_by(id: token.pseudonym_id)
 
         if pseudonym
-          unless pseudonym.works_for_account?(@domain_root_account, true)
+          unless pseudonym.works_for_account?(@domain_root_account, allow_implicit: true)
             # if the logged in pseudonym doesn't work, we can only switch to another pseudonym
             # that does work if it's the same password, and it's not a managed pseudonym
             alternates = pseudonym.user.all_active_pseudonyms.select do |p|
               !p.managed_password? &&
-                p.works_for_account?(@domain_root_account, true) &&
+                p.works_for_account?(@domain_root_account, allow_implicit: true) &&
                 p.password_salt == pseudonym.password_salt &&
                 p.crypted_password == pseudonym.crypted_password
             end

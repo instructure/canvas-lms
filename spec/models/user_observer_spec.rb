@@ -186,7 +186,9 @@ describe UserObservationLink do
 
     observer = user_with_pseudonym(account: a2)
     allow(@pseudonym).to receive(:works_for_account?).and_return(false)
-    allow(@pseudonym).to receive(:works_for_account?).with(a2, true).and_return(true)
+    allow(@pseudonym).to receive(:works_for_account?)
+      .with(a2, allow_implicit: true)
+      .and_return(true)
     [a1, a2].each do |account|
       UserObservationLink.create_or_restore(observer:, student:, root_account: account)
     end
