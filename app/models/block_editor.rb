@@ -27,7 +27,7 @@ class BlockEditor < ActiveRecord::Base
   LATEST_VERSION = "0.2"
 
   def self.blank_page
-    file_contents = File.read(File.join("ui", "shared", "block-editor", "react", "assets", "globalTemplates", "blankPage.json"))
+    file_contents = File.read(File.dirname(__FILE__) + "/../../ui/shared/block-editor/react/assets/globalTemplates/blankPage.json")
     JSON.parse(file_contents)["node_tree"]["nodes"].to_json
   end
 
