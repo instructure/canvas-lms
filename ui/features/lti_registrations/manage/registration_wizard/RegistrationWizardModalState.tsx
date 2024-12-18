@@ -131,10 +131,15 @@ export const useRegistrationModalWizardState = create<
     // todo: if we've already returned from the tool,
     // we need to delete the registration we created
     set(prev => {
-      return {
-        open: !prev.exitOnCancel,
-        ltiImsRegistrationId: undefined,
-        registering: false,
+      if (prev.exitOnCancel) {
+        return {
+          open: false,
+        }
+      } else {
+        return {
+          ltiImsRegistrationId: undefined,
+          registering: false,
+        }
       }
     })
   },
@@ -145,7 +150,7 @@ export const useRegistrationModalWizardState = create<
       set({jsonFetch: status})
     }
   },
-  close: () => set({open: false, ltiImsRegistrationId: undefined, registering: false}),
+  close: () => set({open: false}),
 }))
 
 export const openRegistrationWizard = (
