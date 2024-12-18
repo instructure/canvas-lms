@@ -480,11 +480,18 @@ describe RoleOverride do
       let(:admin_user) { site_admin_user(role:) }
 
       before(:once) do
-        Setting.set("allowed_custom_site_admin_roles", "OnTheList")
+        Setting.set("allowed_custom_site_admin_roles", "OnTheList,Also on The - List")
       end
 
       it "permissions are default enabled for descendant non site admin root accounts" do
         expect(root_account.grants_right?(admin_user, :become_user)).to be_truthy
+        expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to eq [:self, :descendants]
+      end
+
+      it "works for role names with spaces and special characters" do
+        role = custom_account_role("Also on The - List", account: site_admin_account)
+        user = site_admin_user(role:)
+        expect(root_account.grants_right?(user, :become_user)).to be_truthy
         expect(RoleOverride.permission_for(root_account, :become_user, role)[:enabled]).to eq [:self, :descendants]
       end
 
