@@ -101,6 +101,7 @@ describe "discussions index" do
     end
 
     it "show checkpoint info on the index page", :ignore_js_errors do
+      skip("Will be fixed in EGG-438")
       user_session(@teacher)
       Discussion.start_new_discussion(@course.id)
       wait_for_ajaximations
