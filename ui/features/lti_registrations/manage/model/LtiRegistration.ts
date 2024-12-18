@@ -18,17 +18,20 @@
 
 import {z} from 'zod'
 import {ZAccountId} from './AccountId'
-import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZDeveloperKeyId} from './developer_key/DeveloperKeyId'
-import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
-import {ZUser} from './User'
-import {ZLtiImsRegistrationId} from './lti_ims_registration/LtiImsRegistrationId'
 import {ZInternalLtiConfiguration} from './internal_lti_configuration/InternalLtiConfiguration'
+import {ZLtiImsRegistrationId} from './lti_ims_registration/LtiImsRegistrationId'
+import {ZLtiToolConfigurationId} from './lti_tool_configuration/LtiToolConfigurationId'
+import {ZLtiOverlay} from './LtiOverlay'
+import {ZLtiRegistrationAccountBinding} from './LtiRegistrationAccountBinding'
+import {ZLtiRegistrationId} from './LtiRegistrationId'
+import {ZUser} from './User'
 
 export const ZLtiRegistration = z.object({
   id: ZLtiRegistrationId,
   account_id: ZAccountId,
   icon_url: z.string().nullable(),
+  inherited: z.boolean().optional(),
   name: z.string(),
   admin_nickname: z.string().nullable(),
   workflow_state: z.string(),
@@ -40,8 +43,20 @@ export const ZLtiRegistration = z.object({
   internal_service: z.boolean(),
   developer_key_id: ZDeveloperKeyId.nullable(),
   ims_registration_id: ZLtiImsRegistrationId.nullable(),
+  manual_configuration_id: ZLtiToolConfigurationId.nullable(),
   account_binding: ZLtiRegistrationAccountBinding.nullable().optional(),
-  configuration: ZInternalLtiConfiguration.optional(),
+  overlay: ZLtiOverlay.nullable().optional(),
 })
 
 export type LtiRegistration = z.infer<typeof ZLtiRegistration>
+
+export const ZLtiRegistrationWithConfiguration = ZLtiRegistration.extend({
+  configuration: ZInternalLtiConfiguration,
+})
+
+export type LtiRegistrationWithConfiguration = z.infer<typeof ZLtiRegistrationWithConfiguration>
+
+export const isForcedOn = (reg: LtiRegistration) =>
+  reg.inherited &&
+  reg.account_binding?.account_id === reg.account_id &&
+  reg.account_binding?.workflow_state == 'on'

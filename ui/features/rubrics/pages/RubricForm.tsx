@@ -51,6 +51,7 @@ export const Component = () => {
     return null
   }
 
+  // @ts-expect-error
   const breadCrumbs = [...ENV.breadcrumbs]
   breadCrumbs.push({name: rubricTitle, url: ''})
 
@@ -64,9 +65,12 @@ export const Component = () => {
           rubricId={rubricId}
           accountId={accountId}
           courseId={courseId}
+          // @ts-expect-error
           canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
+          // @ts-expect-error
           criterionUseRangeEnabled={ENV.FEATURES.rubric_criterion_range}
           rootOutcomeGroup={ENV.ROOT_OUTCOME_GROUP}
+          // @ts-expect-error
           showAdditionalOptions={ENV.enhanced_rubric_assignments_enabled}
           onLoadRubric={title => setRubricTitle(title)}
           onCancel={() => navigate(navigateUrl)}

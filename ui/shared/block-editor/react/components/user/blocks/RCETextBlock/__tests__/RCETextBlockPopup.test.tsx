@@ -67,6 +67,17 @@ describe('RCETextBlockPopup', () => {
     expect(onClose).toHaveBeenCalled()
   })
 
+  it('fires the close event when the modal is closed', async () => {
+    const handleClose = jest.fn()
+    render(
+      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={() => {}} />
+    )
+    document.addEventListener('rce-text-block-popup-close', handleClose)
+    const cancelButton = screen.getByText('Cancel')
+    cancelButton.click()
+    expect(handleClose).toHaveBeenCalled()
+  })
+
   it('toggles the fullscreen button', async () => {
     // we can't test fullscreen since tinymce is never actually rendered
     render(

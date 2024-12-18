@@ -33,6 +33,7 @@ export const SpeedGraderCheckpointsWrapper = ({courseId, assignmentId, studentId
 
   return (
     <QueryProvider>
+      {/* @ts-expect-error */}
       <AlertManager>
         <SpeedGraderCheckpointsContainer
           courseId={courseId}

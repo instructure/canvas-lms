@@ -37,6 +37,7 @@ export default function ShowTotalGradesAsPointsCheckbox({
     const checked = event.target.checked
     doFetchApi({
       method: 'PUT',
+      // @ts-expect-error
       path: settingUpdateUrl,
       body: {
         show_total_grade_as_points: checked,

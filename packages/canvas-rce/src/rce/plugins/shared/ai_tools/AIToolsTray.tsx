@@ -268,7 +268,6 @@ export const AIToolsTray = ({
 
   const handleCopyResponse = useCallback(async (responseText: string) => {
     try {
-      // @ts-expect-error ClipboardItem.supports really does exist
       if (ClipboardItem.supports('text/html')) {
         const htmlBlob = new Blob([responseText], {type: 'text/html'})
         await navigator.clipboard.write([new ClipboardItem({'text/html': htmlBlob})])

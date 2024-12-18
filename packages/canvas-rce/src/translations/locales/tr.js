@@ -92,6 +92,7 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "{ types } gizlemek için daraltın"
   },
+  "color_a363e1b0": { "message": "Renk" },
   "computer_1d7dfa6f": { "message": "Bilgisayar" },
   "content_1440204b": { "message": "İçerik" },
   "content_subtype_5ce35e88": { "message": "İçerik Alt Türü" },

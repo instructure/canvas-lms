@@ -341,6 +341,7 @@ QUnit.module('scheduled publish', hooks => {
 
   hooks.afterEach(() => {
     fakeENV.teardown()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render.restore()
     ReactDOM.unmountComponentAtNode.restore()
   })
@@ -354,6 +355,7 @@ QUnit.module('scheduled publish', hooks => {
   test('supplies correct props to DelayedPublishDialog for page', () => {
     const buttonView = new PublishButtonView({model: page_item}).render()
     buttonView.$el.trigger('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.lastCall.args[0]
     equal(args.type, DelayedPublishDialog)
     equal(args.props.name, 'A page')
@@ -364,6 +366,7 @@ QUnit.module('scheduled publish', hooks => {
   test('supplies correct props to DelayedPublishDialog for module item', () => {
     const buttonView = new PublishButtonView({model: module_item}).render()
     buttonView.$el.trigger('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.lastCall.args[0]
     equal(args.type, DelayedPublishDialog)
     equal(args.props.name, 'A page')
@@ -374,6 +377,7 @@ QUnit.module('scheduled publish', hooks => {
   test('supplies correct props to DelayedPublishDialog for dynamic module item', () => {
     const buttonView = new PublishButtonView({model: dynamic_module_item}).render()
     buttonView.$el.trigger('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.lastCall.args[0]
     equal(args.type, DelayedPublishDialog)
     equal(args.props.name, 'A page')
@@ -384,6 +388,7 @@ QUnit.module('scheduled publish', hooks => {
   test('switches from scheduled to published state', () => {
     const buttonView = new PublishButtonView({model: page_item}).render()
     buttonView.$el.trigger('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.lastCall.args[0]
     args.props.onPublish()
     ok(buttonView.isPublished())
@@ -392,6 +397,7 @@ QUnit.module('scheduled publish', hooks => {
   test('updates scheduled date', () => {
     const buttonView = new PublishButtonView({model: page_item}).render()
     buttonView.$el.trigger('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.lastCall.args[0]
     args.props.onUpdatePublishAt('2021-12-25T00:00:00Z')
     equal(buttonView.$text.html(), '&nbsp;Will publish on Dec 25')

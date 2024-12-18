@@ -19,6 +19,7 @@
 import getRCSProps from '@canvas/rce/getRCSProps'
 import {createContext} from 'react'
 
+// @ts-expect-error
 const RCSProps = {...getRCSProps(), canvasOrigin: window.location?.origin} || undefined
 
 export const RCSPropsContext = createContext(RCSProps)

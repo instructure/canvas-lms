@@ -319,8 +319,8 @@ CanvasRails::Application.routes.draw do
       resource :rubric_association, path: :rubric do
         resources :rubric_assessments, path: :assessments do
           collection do
+            resources :rubric_assessment_imports, path: :imports, only: %i[create show], defaults: { format: :json }
             get :export
-            post :import
           end
         end
       end
@@ -1763,6 +1763,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/reports/:report/:id", action: :show
       post "accounts/:account_id/reports/:report", action: :create, as: "account_create_report"
       delete "accounts/:account_id/reports/:report/:id", action: :destroy
+      put "accounts/:account_id/reports/:report/:id/abort", action: :abort
     end
 
     scope(controller: :admins) do
@@ -1923,6 +1924,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: "lti/registrations") do
       get "accounts/:account_id/lti_registrations", action: :list
+      post "accounts/:account_id/lti_registrations", action: :create
       post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
       get "accounts/:account_id/lti_registrations/:id", action: :show
@@ -1994,6 +1996,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :folders) do
       get "folders/:id", action: :show
       get "folders/:id/folders", action: :api_index, as: "list_folders"
+      get "folders/:id/all", action: :list_folders_and_files, as: "list_folders_and_files"
       get "folders/:id/files", controller: :files, action: :api_index, as: "list_files"
       delete "folders/:id", action: :api_destroy
       put "folders/:id", action: :update
@@ -2322,6 +2325,7 @@ CanvasRails::Application.routes.draw do
       get  "#{prefix}/products/:id", action: :show
       get  "#{prefix}/filters", action: :filters
       get  "#{prefix}/organizations/:organization_salesforce_id/products", action: :index_by_organization
+      get  "#{prefix}/custom_filters", action: :custom_filters
     end
 
     scope(controller: :feature_flags) do

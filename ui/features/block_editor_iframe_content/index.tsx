@@ -32,6 +32,7 @@ ready(() => {
 
   const block_editor_attributes: BlockEditorDataTypes = JSON.parse(ENV.block_editor_attributes)
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <BlockEditorView content={block_editor_attributes} />,
     document.getElementById('block_editor_viewer_container') as HTMLElement

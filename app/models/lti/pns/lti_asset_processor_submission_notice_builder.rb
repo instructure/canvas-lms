@@ -1,0 +1,83 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2024 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+module Lti
+  module Pns
+    class LtiAssetProcessorSubmissionNoticeBuilder < NoticeBuilder
+      attr_reader :params
+
+      REQUIRED_PARAMS = %i[activity_id for_user_id assets notice_event_timestamp].freeze
+      REQUIRED_ASSETS_PARAMS = %i[asset_id url sha256_checksum timestamp size content_type].freeze
+
+      def initialize(params)
+        validate_params!(params)
+        @params = params
+        super()
+      end
+
+      def validate_params!(params)
+        REQUIRED_PARAMS.each do |param_name|
+          raise ArgumentError, "Missing required parameter: #{param_name}" unless params[param_name]
+        end
+        params[:assets].each do |asset|
+          REQUIRED_ASSETS_PARAMS.each do |asset_param_name|
+            raise ArgumentError, "Missing required asset parameter #{asset_param_name}" unless asset[asset_param_name]
+          end
+        end
+      end
+
+      def notice_type
+        Lti::Pns::NoticeTypes::ASSET_PROCESSOR_SUBMISSION
+      end
+
+      def custom_ims_claims(_tool)
+        {
+          for_user: {
+            user_id: params[:for_user_id],
+          },
+          assetservice: {
+            scope: [
+              params[:scopes] || "https://purl.imsglobal.org/spec/lti-ap/scope/asset.readonly"
+            ],
+            assets: params[:assets].map { |asset| asset_claim(asset) }
+          },
+          activity: {
+            id: params[:activity_id],
+          }
+        }
+      end
+
+      def custom_instructure_claims(_tool)
+        {}
+      end
+
+      def asset_claim(asset)
+        asset.slice(*REQUIRED_ASSETS_PARAMS, :title, :filename).compact
+      end
+
+      def notice_event_timestamp
+        params[:notice_event_timestamp]
+      end
+
+      def user
+        params[:user]
+      end
+    end
+  end
+end

@@ -370,6 +370,7 @@ const mediaCommentActions = {
 
             const studioMediaEnabled = ENV.studio_media_capture_enabled
             if (studioMediaEnabled) {
+              // eslint-disable-next-line no-restricted-properties
               ReactDOM.render(mediaPlayer, $dialog[0])
             } else {
               $mediaTag.appendTo($dialog.html(''))

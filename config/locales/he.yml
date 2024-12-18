@@ -4651,6 +4651,7 @@ he:
   confirm_dialog_component: 
     ok: OK
   confirm_email_address_9072dd3c: "אישור כתובת דוא\"ל"
+  confirm_password_aaf07824: "אישור סיסמה"
   confirm_removal_a9bb889: "אישור הסרה"
   confirm_reservation_removal_e6350e7c: "אישור הסרת רישום"
   confirm_unenrollment_64333263: "אישור הסרת הרשמה"
@@ -10518,6 +10519,7 @@ he:
       last_error: "השגיאה האחרונה "
   jobs_ec5d59d8: "תהליכי עיבוד"
   join_6cafecca: הצטרפות
+  join_code_1e74e5a8: "קוד הצטרפות"
   join_course_511e6cb3: "הצטרף/י ל %{course}"
   join_group_group_name_871a5e3f: "הצטרפות לקבוצה %{group_name}"
   join_the_conversation_using_the_link_below_54ab1f0e: "הצטרפות לדיון בעזרת הקישור שלהלן:."
@@ -15292,6 +15294,7 @@ he:
   question_f06476d1: שאלה
   question_group_837b8014: "קבוצת שאלות"
   question_mark_icon_d2bbd204: "צלמית סימן שאלה"
+  question_position_45eba089: "שאלה %{position} "
   question_unanswered: "טרם נתקבלה תשובה"
   questions_a955145c: שאלות
   quiz: 
@@ -18800,6 +18803,10 @@ he:
       two: "%{count} חשבונות משנה"
     titles: 
       sub_accounts: "חשבונות משנה"
+  sub_assignment: 
+    atom_no_author: "אין עורכ/ת"
+    labels: 
+      due: "תאריך יעד"
   subaccount_91f4c279: "חשבון משנה"
   subdomain_url_1e43b6f0: "כתובת דף של דומיין משנה"
   subject_114b2e98: נושא
@@ -19480,6 +19487,7 @@ he:
   time_left_in_your_instant_trial_5dd0392b: "%{time} נותר עבור תקופת הניסיון המיידי שלך"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} נותר עבור תקופת הנסיון המיידי שלך *(הארך כעת)*"
   time_limit_a6f1a51e: "מגבלת זמן"
+  time_range_4ae01737: "טווח זמן"
   time_zone_f56f5183: "איזור זמן"
   time_zones: 
     abu_dhabi: "אבו דאבי"

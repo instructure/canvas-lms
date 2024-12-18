@@ -35,7 +35,7 @@ describe('TempEnrollUsersListRow', () => {
       can_add_observer: true,
       can_add_designer: true,
       can_read_sis: true,
-      can_manage_admin_users: true,
+      can_allow_course_admin_actions: true,
       can_add_temporary_enrollments: true,
       can_edit_temporary_enrollments: true,
       can_delete_temporary_enrollments: true,
@@ -159,7 +159,7 @@ describe('TempEnrollUsersListRow', () => {
         permissions: {
           ...defaultProps.permissions,
           can_edit_users: false,
-          can_manage_admin_users: false,
+          can_allow_course_admin_actions: false,
           can_masquerade: false,
           can_message_users: false,
         },

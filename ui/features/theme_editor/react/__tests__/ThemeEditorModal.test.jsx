@@ -34,22 +34,22 @@ describe('ThemeEditorModal Component', () => {
 
     // Test when modal is open due to `showProgressModal`
     expect(
-      shallow(<ThemeEditorModal {...defaultProps} showProgressModal />).prop('open')
+      shallow(<ThemeEditorModal {...defaultProps} showProgressModal={true} />).prop('open')
     ).toBeTruthy()
 
     // Test when modal is open due to `showSubAccountProgress`
     expect(
-      shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress />).prop('open')
+      shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />).prop('open')
     ).toBeTruthy()
   })
 
   test('modalContent', () => {
     // Test for ProgressBar when `showProgressModal` is true
-    let wrapper = shallow(<ThemeEditorModal {...defaultProps} showProgressModal />)
+    let wrapper = shallow(<ThemeEditorModal {...defaultProps} showProgressModal={true} />)
     expect(wrapper.find('ProgressBar').prop('title')).toBe('1% complete')
 
     // Test for text content when `showSubAccountProgress` is true
-    wrapper = shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress />)
+    wrapper = shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />)
     expect(wrapper.find('p').text()).toBe('Changes will still apply if you leave this page.')
   })
 })

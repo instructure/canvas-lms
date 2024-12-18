@@ -153,5 +153,5 @@ class AlertManager extends React.Component<AlertManagerProps, AlertManagerState>
   }
 }
 
-// @ts-ignore
+// @ts-expect-error
 export default WithBreakpoints<AlertManagerProps>(AlertManager)

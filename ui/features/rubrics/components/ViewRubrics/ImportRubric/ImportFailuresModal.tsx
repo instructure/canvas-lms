@@ -25,6 +25,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+// @ts-expect-error
 import type {RubricImport} from '../../../types/Rubric'
 
 const I18n = useI18nScope('rubrics-import-failure-modal')
@@ -42,6 +43,7 @@ export const ImportFailuresModal = ({
   const {fileNames, messages} = rubricImports.reduce(
     (prev, curr) => {
       prev.fileNames.push(curr.attachment.filename)
+      // @ts-expect-error
       prev.messages.push(...curr.errorData.map(x => x.message))
 
       return prev
@@ -65,6 +67,7 @@ export const ImportFailuresModal = ({
         <View as="div" data-testid="import-rubric-failure-header">
           {I18n.t('The import failed for the following file(s):')}
         </View>
+        {/* @ts-expect-error */}
         {fileNames.map((fileName, i) => (
           /* eslint-disable-next-line react/no-array-index-key */
           <View as="div" margin="x-small 0 0" key={`${fileName}-${i}`}>
@@ -78,6 +81,7 @@ export const ImportFailuresModal = ({
           <List margin="0 0 medium">
             {_.uniq(messages).map(message => (
               <List.Item data-testid="import-failure-message" key={`${message}`}>
+                {/* @ts-expect-error */}
                 {message}
               </List.Item>
             ))}

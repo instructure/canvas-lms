@@ -47,6 +47,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor ReadOnlyCell', suiteHoo
   })
 
   function mountComponent() {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     component = ReactDOM.render(<ReadOnlyCell {...props} />, $container)
   }
 

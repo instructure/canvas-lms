@@ -58,6 +58,7 @@ QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<DateEventGroup {...props} />, $container)
   }
 

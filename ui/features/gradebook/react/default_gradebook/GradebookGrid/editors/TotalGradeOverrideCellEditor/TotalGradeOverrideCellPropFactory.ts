@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -30,6 +29,7 @@ export default class TotalGradeOverrideCellPropFactory {
     this._gradebook = gradebook
   }
 
+  // @ts-expect-error
   getProps(editorOptions) {
     const {finalGradeOverrides} = this._gradebook
     const {item: student, activeRow} = editorOptions
@@ -40,6 +40,7 @@ export default class TotalGradeOverrideCellPropFactory {
 
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: this._gradebook.getCourseGradingScheme(),
+      // @ts-expect-error
       restrictPointsBasedInput: true,
     })
 
@@ -65,6 +66,7 @@ export default class TotalGradeOverrideCellPropFactory {
         gradeEntry,
         isFirstStudent,
         isLastStudent,
+        // @ts-expect-error
         studentInfo,
       },
     })
@@ -84,6 +86,7 @@ export default class TotalGradeOverrideCellPropFactory {
       gradeInfo,
       gradeIsUpdating: pendingGradeInfo != null && pendingGradeInfo.valid,
 
+      // @ts-expect-error
       onGradeUpdate: updatedGradeInfo => {
         finalGradeOverrides?.updateGrade(userId, updatedGradeInfo)
       },

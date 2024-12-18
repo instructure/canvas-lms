@@ -54,7 +54,10 @@ const StudentView = createReactClass({
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'},
       }),
-      groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id, disableCache: true}),
+      groupCollection: new ContextGroupCollection([], {
+        course_id: ENV.course_id,
+        disableCache: true,
+      }),
     }
   },
 
@@ -79,6 +82,7 @@ const StudentView = createReactClass({
       $dialog.dialog('close')
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ManageGroupDialog
         userCollection={this.state.userCollection}
@@ -268,7 +272,7 @@ const StudentView = createReactClass({
     $groupTabs.find('a').off()
     const oldTab = $tabs.find('li.ui-state-active')
     const newTab = $groupTabs.not('li.ui-state-active')
-    $groupTabs.on('click keyup', function(event) {
+    $groupTabs.on('click keyup', function (event) {
       event.stopPropagation()
       const $activeItemHref = $(this).find('a').attr('href')
       window.history.replaceState({}, document.title, $activeItemHref)

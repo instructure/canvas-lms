@@ -20,7 +20,8 @@ import {ReviewScreen} from '../../registration_wizard_forms/ReviewScreen'
 import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {Lti1p3RegistrationWizardStep} from '../Lti1p3RegistrationWizardState'
-import {useOverlayStore} from '../hooks/useOverlayStore'
+import {toUndefined} from '../../../common/lib/toUndefined'
+import {getDefaultPlacementTextFromConfig} from './helpers'
 
 export type ReviewScreenWrapperProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
@@ -33,29 +34,55 @@ export const ReviewScreenWrapper = ({
   internalConfig,
   transitionTo,
 }: ReviewScreenWrapperProps) => {
-  const [state] = useOverlayStore(overlayStore)
+  const {state} = overlayStore()
   const placements = state.placements.placements ?? []
   const scopes = state.permissions.scopes ?? []
-  const privacyLevel = state.data_sharing.privacy_level
-  const labels = state.naming.placements
+  const privacyLevel =
+    state.data_sharing.privacy_level ?? internalConfig.privacy_level ?? 'anonymous'
+
+  const labels = Object.fromEntries(
+    (state.placements.placements || []).map(placement => [
+      placement,
+      state.naming.placements[placement] ??
+        getDefaultPlacementTextFromConfig(placement, internalConfig),
+    ])
+  )
   const iconUrls = state.icons.placements
   const defaultPlacementIconUrls = Object.fromEntries(
     internalConfig.placements.map(placement => [placement.placement, placement.icon_url])
   )
-  const name = internalConfig.title
+  const name = state.naming.nickname
+
+  const description = state.naming.description ?? toUndefined(internalConfig.description)
+
+  const jwkValue =
+    state.launchSettings.Jwk ??
+    (internalConfig.public_jwk ? JSON.stringify(internalConfig.public_jwk) : undefined)
+
+  const customFieldsValue =
+    state.launchSettings.customFields?.split('\n').filter(f => !!f) ??
+    (internalConfig.custom_fields
+      ? Object.entries(internalConfig.custom_fields).map(([key, value]) => `${key}=${value}`)
+      : undefined)
 
   return (
     <ReviewScreen
       launchSettings={{
-        customFields: state.launchSettings.customFields?.split('\n').filter(f => !!f),
-        redirectUris: state.launchSettings.redirectURIs?.split('\n'),
-        defaultTargetLinkUri: state.launchSettings.targetLinkURI,
-        oidcInitiationUrl: state.launchSettings.openIDConnectInitiationURL,
+        customFields: customFieldsValue,
+        redirectUris:
+          state.launchSettings.redirectURIs?.split('\n') ??
+          toUndefined(internalConfig.redirect_uris),
+        defaultTargetLinkUri:
+          state.launchSettings.targetLinkURI ?? toUndefined(internalConfig.target_link_uri),
+        oidcInitiationUrl:
+          state.launchSettings.openIDConnectInitiationURL ??
+          toUndefined(internalConfig.oidc_initiation_url),
         jwkMethod: state.launchSettings.JwkMethod ?? 'public_jwk_url',
-        jwkUrl: state.launchSettings.JwkURL,
-        jwk: state.launchSettings.Jwk,
-        domain: state.launchSettings.domain,
+        jwkUrl: state.launchSettings.JwkURL ?? toUndefined(internalConfig.public_jwk_url),
+        jwk: jwkValue,
+        domain: state.launchSettings.domain ?? toUndefined(internalConfig.domain),
       }}
+      description={description}
       placements={placements}
       scopes={scopes}
       privacyLevel={privacyLevel}

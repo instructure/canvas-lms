@@ -24,7 +24,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 // Mock the API call
 jest.mock('@canvas/do-fetch-api-effect')
 
-const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+const render = children =>
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 describe('HelpLinks', () => {
   const featuredLink = {

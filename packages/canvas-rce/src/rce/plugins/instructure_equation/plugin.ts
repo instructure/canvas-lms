@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -19,6 +18,7 @@
 
 import formatMessage from '../../../format-message'
 import clickCallback from './clickCallback'
+// @ts-expect-error
 import {IconEquationLine} from '@instructure/ui-icons/es/svg'
 import tinymce from 'tinymce'
 
@@ -49,6 +49,7 @@ tinymce.PluginManager.add('instructure_equation', function (ed) {
     onAction: () => ed.execCommand('instructureEquation'),
     icon: 'equation',
     onSetup(buttonApi) {
+      // @ts-expect-error
       const toggleActive = eventApi => {
         buttonApi.setActive(isEquationImage(eventApi.element))
       }

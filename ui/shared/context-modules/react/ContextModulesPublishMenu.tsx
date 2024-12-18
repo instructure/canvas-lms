@@ -18,12 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import type {CanvasId, CanvasProgress} from './types'
-import {
-  IconArrowOpenDownLine,
-  IconPublishSolid,
-  IconUnpublishedLine,
-  // @ts-ignore
-} from '@instructure/ui-icons'
+import {IconArrowOpenDownLine, IconPublishSolid, IconUnpublishedLine} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Spinner} from '@instructure/ui-spinner'

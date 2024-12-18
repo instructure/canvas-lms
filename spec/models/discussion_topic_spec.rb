@@ -3880,4 +3880,22 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "#can_unpublish?" do
+    context "discussion topic with checkpoints" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, _, @topic = graded_discussion_topic_with_checkpoints(context: @course, reply_to_entry_required_count: 2)
+      end
+
+      it "returns true if there are no student submissions" do
+        expect(@topic.can_unpublish?).to be true
+      end
+
+      it "returns false if there are student sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(@topic.can_unpublish?).to be false
+      end
+    end
+  end
 end

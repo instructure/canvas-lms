@@ -79,8 +79,7 @@ const NavigationSection = ({background}: NavigationSectionProps) => {
           is={ButtonBlock}
           text="Announcements"
           iconName="announcement"
-          variant="condensed"
-          color="primary-inverse"
+          variant="text"
           href="../announcements"
           custom={{themeOverride: {fontWeight: 'bold'}}}
         />
@@ -89,16 +88,14 @@ const NavigationSection = ({background}: NavigationSectionProps) => {
           is={ButtonBlock}
           text="Virtual Classroom"
           iconName="video"
-          variant="condensed"
-          color="primary-inverse"
+          variant="text"
         />
         <Element
           id={`${cid}_link3`}
           is={ButtonBlock}
           text="Modules"
           iconName="module"
-          variant="condensed"
-          color="primary-inverse"
+          variant="text"
           href="../modules"
         />
         <Element
@@ -106,8 +103,7 @@ const NavigationSection = ({background}: NavigationSectionProps) => {
           is={ButtonBlock}
           text="Grades"
           iconName="gradebook"
-          variant="condensed"
-          color="primary-inverse"
+          variant="text"
           href="../grades"
         />
       </Element>

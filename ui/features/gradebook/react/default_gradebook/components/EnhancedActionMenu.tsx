@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -91,6 +90,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
 
   useEffect(() => {
     const questionMarkKeyDown = new KeyboardEvent('keydown', {keyCode: 191, shiftKey: true})
+    // @ts-expect-error
     setOpenKeyboardShortcut(questionMarkKeyDown)
 
     const existingExport = getExistingExport()
@@ -130,9 +130,11 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
   }
 
   const handleKeyboardShortcuts = () => {
+    // @ts-expect-error
     document.dispatchEvent(openKeyboardShortcut)
   }
 
+  // @ts-expect-error
   const handleExport = async currentView => {
     setExportInProgress(true)
     $.flashMessage(I18n.t('Gradebook export has started. This may take a few minutes.'))
@@ -163,6 +165,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       .catch(error => handleExportError(error))
   }
 
+  // @ts-expect-error
   const handleExportSuccess = resolution => {
     setExportInProgress(false)
 
@@ -187,6 +190,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     $.flashMessage(I18n.t('Gradebook export has completed'))
   }
 
+  // @ts-expect-error
   const handleExportError = error => {
     setExportInProgress(false)
 
@@ -336,6 +340,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       return (
         <Menu
           trigger={
+            // @ts-expect-error
             <Button color="secondary" margin="0 small 0 0" renderIcon={IconSisSyncedLine}>
               <View margin="0 x-small 0 0">
                 <Text weight="normal" fontStyle="normal" size="medium" color="primary">
@@ -368,6 +373,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
           data-testid="keyboard-shortcuts"
           margin="0 small 0 0"
           onClick={handleKeyboardShortcuts}
+          // @ts-expect-error
           renderIcon={IconKeyboardShortcutsLine}
         />
       )}
@@ -376,6 +382,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
         id="import_btn" // EVAL-4230
         color="secondary"
         margin="0 small 0 0"
+        // @ts-expect-error
         renderIcon={IconGradebookImportLine}
         interaction={disableImports() ? 'disabled' : undefined}
         onClick={handleImport}
@@ -386,6 +393,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       <Menu
         id="export_btn" // EVAL-4231
         trigger={
+          // @ts-expect-error
           <Button color="secondary" margin="0 small 0 0" renderIcon={IconGradebookExportLine}>
             <View margin="0 x-small 0 0" data-menu-id="export-dropdown" as="span">
               <Text weight="normal" fontStyle="normal" size="medium" color="primary">

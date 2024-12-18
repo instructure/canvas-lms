@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {IconCheckDarkSolid, IconCopyLine, IconXSolid} from '@instructure/ui-icons'
-import {IconButton, IconButtonProps} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Tooltip} from '@instructure/ui-tooltip'
 
@@ -29,7 +28,7 @@ export type CopyToClipboardButtonProps = {
   value: string
   screenReaderLabel: string
   tooltipText?: string
-  buttonProps?: Partial<IconButtonProps>
+  buttonProps?: Partial<unknown>
   tooltip?: boolean
 }
 
@@ -43,6 +42,7 @@ export default function CopyToClipboardButton({
   const [feedback, setFeedback] = useState<boolean | null>(null)
 
   const temporarilySetFeedback = useCallback(
+    // @ts-expect-error
     success => {
       setFeedback(success)
       setTimeout(() => setFeedback(null), 1000)

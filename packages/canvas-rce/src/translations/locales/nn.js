@@ -169,6 +169,7 @@ const locale = {
   "clubs_suit_c1ffedff": { "message": "Kløver (Korttype)" },
   "collaborations_5c56c15f": { "message": "Samarbeid" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Skjul og lukk { types }" },
+  "color_a363e1b0": { "message": "Farge" },
   "color_picker_6b359edf": { "message": "Fargeveljar" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Fargeveljar ({ colorName } vald)"
@@ -624,9 +625,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Fleirfargebilde" },
   "multiplication_sign_15f95c22": { "message": "Multiplikasjonsteikn" },
   "music_icon_4db5c972": { "message": "Musikk-ikon" },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Må vere minst { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "Mine filer" },
   "n_th_root_9991a6e4": { "message": "N-te rot" },
   "nabla_1e216d25": { "message": "Nabla" },

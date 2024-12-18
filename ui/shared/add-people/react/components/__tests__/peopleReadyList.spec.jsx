@@ -88,7 +88,7 @@ describe('PeopleReadyList', () => {
   })
 
   test('hides SIS ID column if not permitted', () => {
-    let wrapper = render(<PeopleReadyList {...props} canReadSIS={true} />)
+    const wrapper = render(<PeopleReadyList {...props} canReadSIS={true} />)
     let peopleReadyList = wrapper.container.querySelector('.addpeople__peoplereadylist')
 
     let cols = peopleReadyList.querySelectorAll('thead th')

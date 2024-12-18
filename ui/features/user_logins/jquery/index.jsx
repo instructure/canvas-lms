@@ -231,6 +231,7 @@ $(function () {
     if (typeof savedSSOIcons[id] === 'undefined') savedSSOIcons[id] = icon.cloneNode(true)
     const innerDiv = document.createElement('div')
     icon.replaceChildren(innerDiv)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<SuspendedIcon login={login} />, innerDiv)
   }
 

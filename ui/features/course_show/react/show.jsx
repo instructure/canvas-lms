@@ -115,6 +115,7 @@ const addToDoSidebar = parent => {
 $(() => {
   const container = document.getElementById('choose_home_page')
   if (container) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
   }
 
@@ -125,6 +126,7 @@ $(() => {
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <View as="div" maxWidth="12em">
         <ObserverOptions

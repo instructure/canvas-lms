@@ -71,6 +71,7 @@ describe('SyncChange component', () => {
   test.skip('displays the correct exception types', () => {
     const props = defaultProps()
     props.isLoadingHistory = true
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<SyncChange {...props} />, document.getElementById('fixtures'))
     $('.bcs__history-item__content button').click()
     const exceptionGroups = $('li.bcs__history-item__change-exceps__group')

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -27,6 +26,7 @@ import SimilarityIcon from '../../components/SimilarityIcon'
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 function tooltipText({similarityScore, status}) {
   if (status === 'error') {
     return I18n.t('Error submitting to plagiarism service')

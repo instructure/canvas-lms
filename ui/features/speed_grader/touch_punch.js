@@ -21,6 +21,7 @@
     define(['jquery', 'jquery-ui'], factory)
   } else {
     // Browser globals
+    // eslint-disable-next-line no-undef
     factory(jQuery)
   }
 })(function ($) {
@@ -30,6 +31,7 @@
     'ontouchstart' in document ||
     'ontouchstart' in window ||
     window.TouchEvent ||
+    // eslint-disable-next-line no-undef
     (window.DocumentTouch && document instanceof DocumentTouch) ||
     navigator.maxTouchPoints > 0 ||
     navigator.msMaxTouchPoints > 0

@@ -677,12 +677,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Gambar Multi Warna" },
   "multiplication_sign_15f95c22": { "message": "Tanda Perkalian" },
   "music_icon_4db5c972": { "message": "Ikon Musik" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Harus setidaknya { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Harus setidaknya { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "File saya" },
   "n_th_root_9991a6e4": { "message": "Akar pangkat N" },
   "nabla_1e216d25": { "message": "Nabla" },

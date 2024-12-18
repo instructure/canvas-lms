@@ -27,7 +27,10 @@ const I18n = useI18nScope('differentiated_modules')
 type RequiredRepliesDueDateTimeInputProps = CustomDateTimeInputProps & {
   requiredRepliesDueDate: string | null
   setRequiredRepliesDueDate: (requiredRepliesDueDate: string | null) => void
-  handleRequiredRepliesDueDateChange: (_event: React.SyntheticEvent, value: string | undefined) => void
+  handleRequiredRepliesDueDateChange: (
+    _event: React.SyntheticEvent,
+    value: string | undefined
+  ) => void
   disabledWithGradingPeriod?: boolean
   clearButtonAltLabel: string
 }
@@ -47,13 +50,18 @@ export function RequiredRepliesDueDateTimeInput({
   ...otherProps
 }: RequiredRepliesDueDateTimeInputProps) {
   const key = 'required_replies_due_at'
-  const handleClear = useCallback(() => setRequiredRepliesDueDate(null), [setRequiredRepliesDueDate])
+  const handleClear = useCallback(
+    () => setRequiredRepliesDueDate(null),
+    [setRequiredRepliesDueDate]
+  )
   const dateInputRef = useCallback(
+    // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
   const timeInputRef = useCallback(
+    // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []

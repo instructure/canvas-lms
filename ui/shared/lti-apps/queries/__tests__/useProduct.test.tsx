@@ -48,7 +48,7 @@ describe('isError, isLoading, and product return as expected', () => {
       terms_of_service_url: 'http://tos.com',
       privacy_policy_url: 'http://privacy.com',
       accessibility_url: 'http://accessibility.com',
-      support_link: 'http://support.com',
+      support_url: 'http://support.com',
       tags: [{id: '4', name: 'tag1'}],
       integration_resources: {
         comments: null,
@@ -57,6 +57,10 @@ describe('isError, isLoading, and product return as expected', () => {
     }
 
     global.fetch = jest.fn().mockResolvedValue({
+      // in the productsQuery.ts file, the fetchResponse function checks for response.ok to see if the fetch was successful
+      // so we need to mock the response.ok property to be true otherwise the function will throw an error
+      // TODO: a better solution when we write negative tests
+      ok: true,
       json: jest.fn().mockResolvedValue(mockedData),
     })
   })

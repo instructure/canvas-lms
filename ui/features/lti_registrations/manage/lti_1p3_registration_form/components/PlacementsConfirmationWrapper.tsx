@@ -21,7 +21,6 @@ import {
   PlacementsConfirmation,
   UNDOCUMENTED_PLACEMENTS,
 } from '../../registration_wizard_forms/PlacementsConfirmation'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {AllLtiPlacements} from '../../model/LtiPlacement'
@@ -40,7 +39,7 @@ export const PlacementsConfirmationWrapper = ({
   internalConfig,
   overlayStore,
 }: PlacementsConfirmationProps) => {
-  const [state, actions] = useOverlayStore(overlayStore)
+  const {state, ...actions} = overlayStore()
 
   return (
     <RegistrationModalBody>

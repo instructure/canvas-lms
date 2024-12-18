@@ -182,7 +182,7 @@ describe('AssignmentsIndexMenu', () => {
     expect(options.length).toBe(2)
   })
 
-  it('renders a dropdown menu with one option when sync to sis conditions are not met', () => {
+  it('renders a dropdown menu with one option when sync to sis conditions are not met (2)', () => {
     ENV.POST_TO_SIS_DEFAULT = true
     ENV.HAS_ASSIGNMENTS = false
     const {container} = renderComponent()

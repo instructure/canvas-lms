@@ -139,9 +139,17 @@ describe "Folders API", type: :request do
     end
 
     it "has url to list file and folder listings" do
+      Account.site_admin.disable_feature! :files_a11y_rewrite
       json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(action: "show"), {})
       expect(json["files_url"].ends_with?("/api/v1/folders/#{@root.id}/files")).to be true
       expect(json["folders_url"].ends_with?("/api/v1/folders/#{@root.id}/folders")).to be true
+      expect(json["all_url"]).to be_nil
+    end
+
+    it "has url to list file and folder listings with files_a11y_rewrite" do
+      Account.site_admin.enable_feature! :files_a11y_rewrite
+      json = api_call(:get, @folders_path + "/#{@root.id}", @folders_path_options.merge(action: "show"), {})
+      expect(json["all_url"].ends_with?("/api/v1/folders/#{@root.id}/all")).to be true
     end
 
     it "returns forbidden error if requestor is not permitted to view folder" do
@@ -1231,6 +1239,93 @@ describe "Folders API", type: :request do
         res = json.pluck("name")
         expect(res).to eq ["folder1", "folder2", "folder2.1", "folder2.1.1", "folderhidden", "folderlocked", "my files"]
       end
+    end
+  end
+
+  describe "#list_folders_and_files" do
+    before do
+      Account.site_admin.enable_feature!(:files_a11y_rewrite)
+    end
+
+    before(:once) do
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
+      @root = Folder.root_folders(@course).first
+      @folders_files_path = "/api/v1/folders/#{@root.id}/all"
+      @folders_files_path_options = { controller: "folders", action: "list_folders_and_files", format: "json", id: @root.id.to_param }
+
+      @folder1 = @root.sub_folders.create!(name: "folder1", context: @course, position: 1)
+      @folder2 = @root.sub_folders.create!(name: "folder2", context: @course, position: 2, hidden: true)
+      @file1 = Attachment.create!(
+        filename: "file1.txt",
+        display_name: "file1.txt",
+        uploaded_data: StringIO.new("existing"),
+        folder: @root,
+        context: @course,
+        user: @user
+      )
+      @file2 = Attachment.create!(
+        filename: "file2.txt",
+        display_name: "file2.txt",
+        uploaded_data: StringIO.new("existing"),
+        folder: @root,
+        context: @course,
+        hidden: true
+      )
+    end
+
+    it "returns unauthorized if feature is disabled" do
+      Account.site_admin.disable_feature!(:files_a11y_rewrite)
+
+      api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 403)
+    end
+
+    it "lists folders first, followed by files" do
+      json = api_call(:get, @folders_files_path, @folders_files_path_options, {})
+      result_names = json.map do |item|
+        item["name"] || item["display_name"] || item["filename"]
+      end
+      expect(result_names).to eq %w[folder1 folder2 file1.txt file2.txt]
+    end
+
+    it "paginates folders and files correctly" do
+      3.times { |i| @root.sub_folders.create!(name: "extra_folder_#{i}", context: @course) }
+      3.times do |i|
+        Attachment.create!(
+          filename: "extra_file_#{i}.txt",
+          display_name: "extra_file_#{i}.txt",
+          uploaded_data: StringIO.new("existing"),
+          folder: @root,
+          context: @course
+        )
+      end
+
+      json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(per_page: 5), {})
+      expect(json.size).to eq 5
+
+      next_page = Api.parse_pagination_links(response.headers["Link"]).detect { |p| p[:rel] == "next" }
+      next_page_json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(per_page: 5, page: next_page["page"]), {})
+      expect(next_page_json.size).to eq 5
+
+      result_names = next_page_json.map do |item|
+        item["name"] || item["display_name"] || item["filename"]
+      end
+      expect(result_names).to eq %w[extra_file_0.txt extra_file_1.txt extra_file_2.txt file1.txt file2.txt]
+    end
+
+    it "excludes hidden folders and files if the user lacks permission" do
+      course_with_student(course: @course)
+      json = api_call(:get, @folders_files_path, @folders_files_path_options)
+      result_ids = json.pluck("id")
+      expect(result_ids).not_to include(@folder2.id)
+      expect(result_ids).not_to include(@file2.id)
+    end
+
+    it "includes users when requested" do
+      json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(include: "user"))
+      result_names = json.map do |item|
+        item.dig("user", "display_name")
+      end
+      expect(result_names).to include(@user.name)
     end
   end
 end

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -21,7 +20,7 @@ import React from 'react'
 import {IconArrowNestLine, IconPeerReviewLine, IconPeerGradedLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Assignment, AssessmentRequest} from '../../../api.d'
+import type {Assignment, AssessmentRequest} from '../../../api.d'
 
 const I18n = useI18nScope('assignment')
 
@@ -48,6 +47,7 @@ type PeerReviewProps = {
 export const StudentViewPeerReviews = ({assignment}: StudentViewPeerReviewsProps) => {
   return (
     <>
+      {/* @ts-expect-error */}
       {assignment.assessment_requests.map((assessment, idx) => (
         <PeerReview
           assessment={assessment}

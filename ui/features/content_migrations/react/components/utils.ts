@@ -16,11 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {FormMessage} from '@instructure/ui-form-field'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('content_migrations_redesign')
-
 export const humanReadableSize = (size: number): string => {
   const units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
   let i = 0
@@ -35,7 +30,4 @@ export const timeout = (delay: number) => {
   return new Promise(resolve => setTimeout(resolve, delay))
 }
 
-export const noFileSelectedFormMessage: FormMessage = {
-  text: I18n.t('You must select a file to import content from'),
-  type: 'error',
-}
+export {parseDateToISOString} from '@canvas/content-migrations'

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {ReactNode, useEffect, useState} from 'react'
+import React, {type ReactNode, useEffect, useState} from 'react'
 import moment from 'moment-timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
@@ -35,7 +34,7 @@ import {
   coursePaceDateShortFormatter,
   coursePaceTimezone,
 } from '../../shared/api/backend_serializer'
-import {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
+import type {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
 
 const I18n = useI18nScope('course_paces_projected_dates')
@@ -95,14 +94,18 @@ export const PaceModalStats = ({
       coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
   }
 
+  // @ts-expect-error
   const getStartDateCaption = contextType => {
     if (startDateValue && coursePace.start_date_context !== 'hypothetical') {
+      // @ts-expect-error
       return START_DATE_CAPTIONS[contextType]
     }
     return START_DATE_CAPTIONS.empty
   }
+  // @ts-expect-error
   const getEndDateCaption = contextType => {
     if (endDateValue && coursePace.end_date_context !== 'hypothetical') {
+      // @ts-expect-error
       return END_DATE_CAPTIONS[contextType]
     }
     return END_DATE_CAPTIONS.empty
@@ -149,6 +152,7 @@ export const PaceModalStats = ({
     </Text>
   )
 
+  // @ts-expect-error
   const renderColoredDate = (label, dateValue, helpText, testid) => {
     return (
       <View data-testid={testid} display="inline-block">

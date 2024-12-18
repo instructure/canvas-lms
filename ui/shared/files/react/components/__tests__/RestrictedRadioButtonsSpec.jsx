@@ -23,7 +23,7 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import RestrictedRadioButtons from '../RestrictedRadioButtons'
 import Folder from '../../../backbone/models/Folder'
-import { mergeTimeAndDate } from '@instructure/moment-utils'
+import {mergeTimeAndDate} from '@instructure/moment-utils'
 
 QUnit.module('RestrictedRadioButtons', {
   setup() {
@@ -31,6 +31,7 @@ QUnit.module('RestrictedRadioButtons', {
       models: [new Folder({id: 999})],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.RestrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -72,6 +73,7 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
       ],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.RestrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -95,6 +97,7 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
       models: [new Folder({id: 999})],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]
@@ -185,7 +188,7 @@ test('returns the correct object to restrict an item based on dates in the absen
   $(this.restrictedRadioButtons.lock_at).data('unfudged-date', endDate)
   const expectedObject = {
     hidden: false,
-    unlock_at:  $(this.restrictedRadioButtons.unlock_at).data('unfudged-date'),
+    unlock_at: $(this.restrictedRadioButtons.unlock_at).data('unfudged-date'),
     lock_at: $(this.restrictedRadioButtons.lock_at).data('unfudged-date'),
     locked: false,
   }
@@ -215,6 +218,7 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
       ],
       radioStateChange: sinon.stub(),
     }
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.restrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
       $('<div>').appendTo('#fixtures')[0]

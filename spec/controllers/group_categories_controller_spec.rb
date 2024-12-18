@@ -409,15 +409,45 @@ describe GroupCategoriesController do
       user_session(@teacher)
       category1 = @course.group_categories.create(name: "Study Groups")
       category2 = @course.group_categories.create(name: "Other Groups")
-      @course.groups.create(name: "some group", group_category: category1)
-      @course.groups.create(name: "another group", group_category: category2)
+      group1 = @course.groups.create(name: "some group", group_category: category1)
+      group2 = @course.groups.create(name: "another group", group_category: category2)
+
       delete "destroy", params: { course_id: @course.id, id: category1.id }
       expect(response).to be_successful
+
       @course.reload
-      expect(@course.all_group_categories.length).to be(4)
-      expect(@course.group_categories.length).to be(3)
-      expect(@course.groups.length).to be(2)
-      expect(@course.groups.active.length).to be(1)
+
+      expected_all_group_category_ids = [
+        @collaborative_category.id,
+        category1.id,
+        category2.id
+      ]
+
+      expected_group_category_ids = [
+        @collaborative_category.id,
+        category2.id
+      ]
+
+      expected_group_ids = [
+        group1.id,
+        group2.id
+      ]
+
+      expected_active_group_ids = [
+        group2.id
+      ]
+
+      actual_all_group_category_ids = @course.all_group_categories.pluck(:id)
+      expect(actual_all_group_category_ids).to match_array(expected_all_group_category_ids)
+
+      actual_group_category_ids = @course.group_categories.pluck(:id)
+      expect(actual_group_category_ids).to match_array(expected_group_category_ids)
+
+      actual_group_ids = @course.groups.pluck(:id)
+      expect(actual_group_ids).to match_array(expected_group_ids)
+
+      actual_active_group_ids = @course.groups.active.pluck(:id)
+      expect(actual_active_group_ids).to match_array(expected_active_group_ids)
     end
 
     it "allows teachers to delete both types of group categories by default" do

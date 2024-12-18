@@ -202,6 +202,8 @@ export interface EnvCommon {
   K5_SUBJECT_COURSE: string
   LOCALE_TRANSLATION_FILE: string
   DEFAULT_DUE_TIME?: string
+  TIMEZONES: Array<{name: string; name_with_hour_offset: string}>
+  DEFAULT_TIMEZONE_NAME: string
 
   FEATURES: Partial<
     Record<
@@ -244,6 +246,7 @@ export type SiteAdminFeatureId =
   | 'selective_release_backend'
   | 'selective_release_ui_api'
   | 'selective_release_edit_page'
+  | 'assign_to_improved_search'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'
   | 'featured_help_links'
@@ -266,7 +269,6 @@ export type RootAccountFeatureId =
   | 'buttons_and_icons_root_account'
   | 'create_course_subaccount_picker'
   | 'extended_submission_state'
-  | 'granular_permissions_manage_users'
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
   | 'lti_dynamic_registration'

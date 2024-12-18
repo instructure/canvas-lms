@@ -1012,7 +1012,6 @@ describe Group do
           :send_messages,
           :send_messages_all,
           :manage,
-          :manage_admin_users,
           :allow_course_admin_actions,
           :manage_students,
           :update,
@@ -1041,7 +1040,7 @@ describe Group do
         allow(@course).to receive(:grants_right?).and_return(true)
         allow(@course).to receive(:grants_right?).with(anything, anything, :manage_tags_manage).and_return(false)
 
-        expect(@group.check_policy(@teacher)).not_to include(:manage, :update, :manage_admin_users, :allow_course_admin_actions, :manage_students)
+        expect(@group.check_policy(@teacher)).not_to include(:manage, :update, :allow_course_admin_actions, :manage_students)
       end
 
       it "checks delete permission correctly" do

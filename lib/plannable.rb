@@ -162,6 +162,7 @@ module Plannable
     end
 
     TYPE_MAP = {
+      text: ->(val) { val.is_a?(String) },
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
       datetime: ->(val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }

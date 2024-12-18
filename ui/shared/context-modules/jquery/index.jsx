@@ -20,7 +20,7 @@ import $ from 'jquery'
 import ModuleDuplicationSpinner from '../react/ModuleDuplicationSpinner'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { createRoot } from 'react-dom/client'
+import {createRoot} from 'react-dom/client'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
@@ -135,6 +135,7 @@ window.modules = (function () {
             $moduleElement.css('display', 'block')
           },
         }
+        // eslint-disable-next-line no-restricted-globals
         renderDifferentiatedModulesTray(event.target, $module, settings, options)
       } else {
         modules.editModule($module)
@@ -986,6 +987,7 @@ const updatePublishMenuDisabledState = function (disabled) {
     if (publishMenu) {
       const $publishMenu = $(publishMenu)
       $publishMenu.data('disabled', disabled)
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <ContextModulesPublishMenu
           courseId={$publishMenu.data('courseId')}
@@ -1327,6 +1329,7 @@ modules.initModuleManagement = async function (duplicate) {
     const spinner = <ModuleDuplicationSpinner />
     const $tempElement = $('<div id="temporary-spinner" class="item-group-condensed"></div>')
     $tempElement.insertAfter(duplicatedModuleElement)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(spinner, $('#temporary-spinner')[0])
     $.screenReaderFlashMessage(I18n.t('Duplicating Module, this may take some time'))
     const renderDuplicatedModule = function (response) {
@@ -1347,6 +1350,7 @@ modules.initModuleManagement = async function (duplicate) {
           const module_dnd = $newModule.find('.module_dnd')[0]
           if (module_dnd) {
             const contextModules = document.getElementById('context_modules')
+            // eslint-disable-next-line no-restricted-properties
             ReactDOM.render(
               <ModuleFileDrop
                 courseId={ENV.course_id}
@@ -2464,6 +2468,7 @@ $(document).ready(function () {
   }
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -2479,6 +2484,7 @@ $(document).ready(function () {
   }
 
   function renderSendToTray(open, contentSelection, returnFocusTo) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -2496,6 +2502,7 @@ $(document).ready(function () {
   function renderHeaderComponent() {
     const root = $('#context-modules-header-root')
     if (root[0]) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(<ContextModulesHeader {...root.data('props')} />, root[0])
     }
   }

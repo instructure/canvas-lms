@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -30,11 +29,14 @@ import {parseTextValue} from '@canvas/grading/GradeInputHelper'
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 function componentForGrade(grade, options = {}) {
+  // @ts-expect-error
   const textSize = options.forMenu ? null : 'small'
 
   switch (grade) {
     case 'excused': {
+      // @ts-expect-error
       return <Text size={textSize}>{GradeFormatHelper.excused()}</Text>
     }
     case 'complete': {
@@ -52,12 +54,15 @@ function componentForGrade(grade, options = {}) {
       )
     }
     default: {
+      // @ts-expect-error
       const ungradedValue = options.forMenu ? I18n.t('Ungraded') : '–'
+      // @ts-expect-error
       return <Text size={textSize}>{ungradedValue}</Text>
     }
   }
 }
 
+// @ts-expect-error
 function getGradeInfo(value, assignment) {
   return parseTextValue(value, {
     enterGradesAs: 'passFail',
@@ -92,31 +97,41 @@ export default class CompleteIncompleteGradeInput extends Component {
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
+    // @ts-expect-error
     this.bindButton = ref => {
+      // @ts-expect-error
       this.button = ref
     }
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
+    // @ts-expect-error
     const grade = this.props.submission.excused ? 'EX' : this.props.submission.enteredGrade
     this.state = {
+      // @ts-expect-error
       gradeInfo: this.props.pendingGradeInfo || getGradeInfo(grade, this.props.assignment),
     }
   }
 
   get gradeInfo() {
+    // @ts-expect-error
     return this.state.gradeInfo
   }
 
   focus() {
+    // @ts-expect-error
     if (this.button !== document.activeElement) {
+      // @ts-expect-error
       this.button.focus()
     }
   }
 
+  // @ts-expect-error
   handleKeyDown(event) {
     // Enter
+    // @ts-expect-error
     if (event.which === 13 && this.button === document.activeElement) {
       // the complete/incomplete menu opens and closes with Enter
       return false // prevent Grid behavior
@@ -125,17 +140,22 @@ export default class CompleteIncompleteGradeInput extends Component {
     return undefined
   }
 
+  // @ts-expect-error
   handleSelect(event, value) {
+    // @ts-expect-error
     this.setState({gradeInfo: getGradeInfo(value, this.props.assignment)})
   }
 
   hasGradeChanged() {
+    // @ts-expect-error
     const excusedChanged = this.state.gradeInfo.excused !== this.props.submission.excused
+    // @ts-expect-error
     const gradeChanged = this.state.gradeInfo.grade !== this.props.submission.enteredGrade
     return excusedChanged || gradeChanged
   }
 
   render() {
+    // @ts-expect-error
     const grade = this.state.gradeInfo.excused ? 'excused' : this.state.gradeInfo.grade
     const menuItems = [
       {status: 'complete', value: 'complete'},
@@ -150,13 +170,17 @@ export default class CompleteIncompleteGradeInput extends Component {
 
         <div className="Grid__GradeCell__CompleteIncompleteMenu">
           <Menu
+            // @ts-expect-error
             menuRef={this.props.menuContentRef}
+            // @ts-expect-error
             onDismiss={this.props.onMenuDismiss}
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
               <IconButton
+                // @ts-expect-error
                 elementRef={this.bindButton}
+                // @ts-expect-error
                 disabled={this.props.disabled}
                 size="small"
                 renderIcon={IconArrowOpenDownLine}
@@ -167,6 +191,7 @@ export default class CompleteIncompleteGradeInput extends Component {
             }
           >
             {menuItems.map(menuItem => (
+              // @ts-expect-error
               <Menu.Item key={menuItem.status} value={menuItem.value}>
                 {componentForGrade(menuItem.status, {forMenu: true})}
               </Menu.Item>

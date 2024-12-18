@@ -58,6 +58,7 @@ export const Component = () => {
   return (
     <>
       <Portal open={true} mountNode={breadcrumbMountPoint}>
+        {/* @ts-expect-error */}
         <RubricBreadcrumbs breadcrumbs={ENV.breadcrumbs} />
       </Portal>
       <Portal open={true} mountNode={mountPoint}>

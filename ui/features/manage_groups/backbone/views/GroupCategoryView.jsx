@@ -149,6 +149,7 @@ export default class GroupCategoryView extends View {
   renderProgress() {
     const container = document.getElementById('group-category-progress')
     if (container != null) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
         container

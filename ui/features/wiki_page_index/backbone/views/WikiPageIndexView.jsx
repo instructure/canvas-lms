@@ -141,6 +141,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const node = document.querySelector('.paginatedLoadingIndicator')
     if (node instanceof HTMLElement) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <View padding="x-small" textAlign="center" as="div" display="block">
           <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
@@ -326,6 +327,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
 
     const {ContentTypeExternalToolTray: ExternalToolTray} = this
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ExternalToolTray
         tool={tool}
@@ -349,6 +351,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const pageId = newCopyToItem?.id
     const {DirectShareCourseTray: CourseTray} = this
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CourseTray
         open={newCopyToItem !== null}
@@ -370,6 +373,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const pageId = newSendToItem?.id
     const {DirectShareUserModal: UserModal} = this
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <UserModal
         open={newSendToItem !== null}
@@ -393,6 +397,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
     const handleTrayExited = () => ReactDOM.unmountComponentAtNode(this.$assignToMountPoint[0])
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ItemAssignToManager
         open={open}

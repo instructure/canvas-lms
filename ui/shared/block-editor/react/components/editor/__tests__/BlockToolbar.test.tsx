@@ -53,7 +53,7 @@ let nodeCustomData: any = {
 const dummyBlockToolbar = () => {
   return <div>Dummy Block Toolbar</div>
 }
-let blockOwnToolbar: React.ReactNode | null = dummyBlockToolbar
+let blockOwnToolbar: React.ReactNode | null = dummyBlockToolbar()
 
 const nodeDomNode = document.createElement('div')
 nodeDomNode.id = 'nodeid'
@@ -144,6 +144,7 @@ describe('BlockToolbar', () => {
     downNode = {
       id: 'upnode',
     }
+    // @ts-expect-error
     blockOwnToolbar = dummyBlockToolbar
     nodeCustomData = {
       noToolbar: customNoToolbar,

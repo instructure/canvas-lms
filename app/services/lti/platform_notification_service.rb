@@ -21,24 +21,34 @@ module Lti
   module PlatformNotificationService
     module_function
 
-    def subscribe_tool_for_notice(tool:, notice_type:, handler_url:)
-      raise ArgumentError, "handler must be a valid URL or an empty string" unless handler_url.match?(URI::DEFAULT_PARSER.make_regexp)
+    class InvalidNoticeHandler < StandardError; end
 
-      validate_notice_parameters(tool:, notice_type:, handler_url:)
-      destroy_notice_handlers(tool:, notice_type:)
-      handler = tool.lti_notice_handlers.create!(
+    def subscribe_tool_for_notice(tool:, notice_type:, handler_url:, max_batch_size:)
+      validate_notice_type!(notice_type)
+      handler = tool.lti_notice_handlers.new(
         notice_type:,
         url: handler_url,
-        account: tool.related_account
+        account: tool.related_account,
+        max_batch_size:
       )
+
+      begin
+        handler.validate!
+      rescue ActiveRecord::RecordInvalid => e
+        raise InvalidNoticeHandler, e.message
+      end
+
+      destroy_notice_handlers(tool:, notice_type:)
+      handler.save!
+
       if notice_type == Lti::Pns::NoticeTypes::HELLO_WORLD
-        send_notice(tool:, notice_handler: handler, builders: [Lti::Pns::LtiHelloWorldNoticeBuilder.new])
+        send_notices(notice_handler: handler, builders: [Lti::Pns::LtiHelloWorldNoticeBuilder.new])
       end
       handler_api_json(handler:)
     end
 
     def unsubscribe_tool_for_notice(tool:, notice_type:)
-      validate_notice_parameters(tool:, notice_type:, handler_url: "")
+      validate_notice_type!(notice_type)
       destroy_notice_handlers(tool:, notice_type:)
       empty_api_json(notice_type:)
     end
@@ -55,7 +65,7 @@ module Lti
     end
 
     def handler_api_json(handler:)
-      { notice_type: handler.notice_type, handler: handler.url }
+      { notice_type: handler.notice_type, handler: handler.url, max_batch_size: handler.max_batch_size }.compact
     end
 
     def empty_api_json(notice_type:)
@@ -65,11 +75,28 @@ module Lti
     def notify_tools(account, *builders)
       notice_type = get_notice_type(builders:)
       Lti::NoticeHandler.active.where(notice_type:, account:).find_each do |notice_handler|
-        send_notice(tool: notice_handler.context_external_tool, notice_handler:, builders:)
+        send_notices(notice_handler:, builders:)
       end
     end
 
-    def send_notice(tool:, notice_handler:, builders:)
+    def validate_notice_type!(notice_type)
+      # This is also validated in the model, but we want to validate for
+      # unsubscribing and have a consistent error also for subscribing
+      unless Lti::Pns::NoticeTypes::ALL.include?(notice_type)
+        raise InvalidNoticeHandler, "Validation failed: Notice type unknown, must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]"
+      end
+    end
+    private_class_method :validate_notice_type!
+
+    def send_notices(notice_handler:, builders:)
+      builders.each_slice(notice_handler.max_batch_size || builders.length) do |batch|
+        send_notice_batch(notice_handler:, builders: batch)
+      end
+    end
+    private_class_method :send_notices
+
+    def send_notice_batch(notice_handler:, builders:)
+      tool = notice_handler.context_external_tool
       global_id = generate_notification_uuid
       notice_objects = builders.map { |builder| builder.build(tool) }
       webhook_body = { notices: notice_objects }.to_json
@@ -80,7 +107,7 @@ module Lti
         { url: notice_handler.url }.to_json
       )
     end
-    private_class_method :send_notice
+    private_class_method :send_notice_batch
 
     def get_notice_type(builders:)
       notice_types = builders.map(&:notice_type).uniq
@@ -94,12 +121,6 @@ module Lti
       "pns-notify/#{SecureRandom.uuid}"
     end
     private_class_method :generate_notification_uuid
-
-    def validate_notice_parameters(tool:, notice_type:, handler_url:)
-      raise ArgumentError, "unknown notice_type, it must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]" unless Lti::Pns::NoticeTypes::ALL.include?(notice_type)
-      raise ArgumentError, "handler url should match tool's domain" unless handler_url.blank? || tool.matches_host?(handler_url)
-    end
-    private_class_method :validate_notice_parameters
 
     def destroy_notice_handlers(tool:, notice_type:)
       tool.lti_notice_handlers.active.where(notice_type:).destroy_all

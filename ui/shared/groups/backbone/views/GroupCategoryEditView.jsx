@@ -118,7 +118,7 @@ GroupCategoryEditView.prototype.showSelfSignupEndDatePicker = function () {
     const root = createRoot(container)
     const initialEndDate = this.model.get('self_signup_end_at')
     this.model.set('initial_self_signup_end_at', initialEndDate)
-    const updateEndDate = (end) => {
+    const updateEndDate = end => {
       this.model.set('self_signup_end_at', end)
     }
     root.render(<SelfSignupEndDate initialEndDate={initialEndDate} onDateChange={updateEndDate} />)

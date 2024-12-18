@@ -229,6 +229,7 @@ export function computeAssignmentDetailText(
 export function mapUnderscoreSubmission(submission: Submission): GradebookUserSubmissionDetails {
   const parentSubmission = submission
 
+  // @ts-expect-error
   return {
     assignmentId: submission.assignment_id,
     enteredScore: submission.entered_score,
@@ -427,6 +428,7 @@ export function scoreToScaledPoints(score: number, pointsPossible: number, scali
   if (!Number.isFinite(scoreAsScaledPoints)) {
     return scoreAsScaledPoints
   }
+  // @ts-expect-error
   return toNumber(divide(score, divide(pointsPossible, scalingFactor)))
 }
 

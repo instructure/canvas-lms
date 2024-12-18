@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -84,6 +83,7 @@ const buildResponseMessages = ({
     sendError(GENERIC_ERROR_CODE, message)
   }
 
+  // @ts-expect-error
   const sendBadRequestError = message => {
     sendError(BAD_REQUEST_ERROR_CODE, message)
   }
@@ -100,6 +100,7 @@ const buildResponseMessages = ({
     sendError(UNAUTHORIZED_ERROR_CODE)
   }
 
+  // @ts-expect-error
   const isResponse = message => !!message.data?.subject?.endsWith('.response')
 
   return {

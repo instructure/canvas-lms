@@ -56,6 +56,7 @@ module Api::V1::Lti::Registration
       json["dynamic_registration"] = true if registration.dynamic_registration?
       json["developer_key_id"] = registration.developer_key&.global_id
       json["ims_registration_id"] = registration.ims_registration&.id
+      json["manual_configuration_id"] = registration.manual_configuration&.id
 
       if registration.created_by.present?
         json["created_by"] = user_json(registration.created_by, user, session, [], context, nil, ["pseudonym"])
@@ -63,8 +64,13 @@ module Api::V1::Lti::Registration
       if registration.updated_by.present?
         json["updated_by"] = user_json(registration.updated_by, user, session, [], context, nil, ["pseudonym"])
       end
+
       if includes.include?(:configuration)
-        json["configuration"] = registration.internal_lti_configuration(context:)
+        json["configuration"] = registration.internal_lti_configuration(include_overlay: false)
+      end
+
+      if includes.include?(:overlaid_configuration)
+        json["overlaid_configuration"] = registration.internal_lti_configuration(context:)
       end
 
       if includes.include?(:account_binding) && (acct_binding = registration.account_binding_for(context))

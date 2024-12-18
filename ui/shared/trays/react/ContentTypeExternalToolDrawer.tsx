@@ -63,6 +63,7 @@ export default function ContentTypeExternalToolDrawer({
   const toolIconAlt = toolTitle ? `${toolTitle} Icon` : 'Tool Icon'
   const iframeRef = useRef()
   const pageContentRef = useRef()
+  // @ts-expect-error
   const initDrawerLayoutMutex = window.ENV.INIT_DRAWER_LAYOUT_MUTEX
 
   useEffect(
@@ -70,6 +71,7 @@ export default function ContentTypeExternalToolDrawer({
     () => {
       // appends pageContent to DrawerLayout.content
       if (pageContentRef.current && pageContent) {
+        // @ts-expect-error
         pageContentRef.current.appendChild(pageContent)
       }
       /* Reparenting causes iFrames to reload or cancel load.
@@ -101,6 +103,7 @@ export default function ContentTypeExternalToolDrawer({
     <View display="block" height={pageContentHeight}>
       <DrawerLayout minWidth={pageContentMinWidth}>
         <DrawerLayout.Content label={pageContentTitle} id="drawer-layout-content">
+          {/* @ts-expect-error */}
           <div ref={pageContentRef} />
         </DrawerLayout.Content>
         <DrawerLayout.Tray
@@ -134,6 +137,7 @@ export default function ContentTypeExternalToolDrawer({
                 </Flex.Item>
                 <Flex.Item padding="none small none none">
                   {(toolIconUrl && <Img src={toolIconUrl} height="1rem" alt={toolIconAlt} />) || (
+                    // @ts-expect-error
                     <IconLtiLine alt={toolIconAlt} />
                   )}
                 </Flex.Item>
@@ -144,6 +148,7 @@ export default function ContentTypeExternalToolDrawer({
                 <ToolLaunchIframe
                   data-testid="ltiIframe"
                   ref={iframeRef}
+                  // @ts-expect-error
                   src={iframeUrl}
                   title={toolTitle}
                 />

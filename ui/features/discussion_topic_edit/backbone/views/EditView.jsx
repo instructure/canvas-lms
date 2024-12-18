@@ -402,11 +402,7 @@ EditView.prototype.render = function () {
 }
 
 EditView.prototype.shouldRenderUsageRights = function () {
-  return (
-    ENV.USAGE_RIGHTS_REQUIRED &&
-    ENV.PERMISSIONS.manage_files &&
-    this.permissions.CAN_ATTACH
-  )
+  return ENV.USAGE_RIGHTS_REQUIRED && ENV.PERMISSIONS.manage_files && this.permissions.CAN_ATTACH
 }
 
 EditView.prototype.afterRender = function () {
@@ -463,7 +459,7 @@ EditView.prototype.renderUsageRights = function () {
       isOpen: false,
       openModal: (function (_this) {
         return function (contents, _afterClose) {
-          // eslint-disable-next-line react/no-render-return-value
+          // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
           return ReactDOM.render(contents, _this.$('#usage_rights_modal')[0])
         }
       })(this),
@@ -475,7 +471,7 @@ EditView.prototype.renderUsageRights = function () {
     },
   }
   const component = React.createElement(UsageRightsIndicator, props, null)
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(component, this.$('#usage_rights_control')[0])
 }
 
@@ -552,7 +548,7 @@ EditView.prototype.loadConditionalRelease = function () {
 
 EditView.prototype.renderStudentTodoAtDate = function () {
   this.toggleTodoDateInput()
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(
     React.createElement(DueDateCalendarPicker, {
       dateType: 'todo_date',

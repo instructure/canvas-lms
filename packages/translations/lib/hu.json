@@ -332,6 +332,9 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Összecsukás az elrejtéshez { types }"
     },
+    "color_a363e1b0": {
+        "message": "Szín"
+    },
     "color_picker_6b359edf": {
         "message": "Színválasztó"
     },
@@ -1393,9 +1396,6 @@
     },
     "music_icon_4db5c972": {
         "message": "Zene Ikon"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Legalább { width } x { height } pixel szükséges"
     },
     "my_files_2f621040": {
         "message": "Fájljaim"

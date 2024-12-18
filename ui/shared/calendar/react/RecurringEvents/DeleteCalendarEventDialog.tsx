@@ -189,6 +189,7 @@ const DeleteCalendarEventDialog = ({
 }
 
 function renderDeleteCalendarEventDialog(element: Element, props: Props): void {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<DeleteCalendarEventDialog {...props} />, element)
 }
 

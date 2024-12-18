@@ -143,6 +143,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       DELETE: !!this.PAGE_RIGHTS.delete,
       EDIT_TITLE: !!this.PAGE_RIGHTS.update || json.new_record,
       EDIT_ROLES: !!this.WIKI_RIGHTS.update,
+      SELECT_ROLES: !ENV?.horizon_course,
     }
     json.SHOW = {COURSE_ROLES: json.contextName === 'courses'}
 
@@ -188,6 +189,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
+      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
       return ReactDOM.render(
         <DueDateCalendarPicker
           dateType="todo_date"
@@ -349,7 +351,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       errors.title = [
         {
           type: 'required',
-          message: I18n.t('errors.require_title', 'You must enter a title'),
+          message: I18n.t('A page title is required'),
         },
       ]
     }

@@ -127,6 +127,7 @@ function showMoveDialog(source, destinations, triggerElement, dialogLabel, onMov
     $('#application').append('<div id="eportfolios_move_to_modal_root"></div>')
     modalRoot = document.querySelector('#eportfolios_move_to_modal_root')
   }
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <MoveToDialog
       source={source}

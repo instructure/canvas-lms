@@ -93,6 +93,7 @@ export default (
   },
 
   reorderCustomColumns: (columnIds: string[]) =>
+    // @ts-expect-error
     $.ajaxJSON(get().reorderCustomColumnsUrl, 'POST', {
       order: columnIds,
     }),

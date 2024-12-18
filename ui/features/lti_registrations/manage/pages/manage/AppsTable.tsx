@@ -30,14 +30,18 @@ import {View} from '@instructure/ui-view'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
-import type {LtiRegistration} from '../../model/LtiRegistration'
+import {isForcedOn, type LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
-import {MANAGE_APPS_PAGE_LIMIT} from './ManagePageLoadingState'
-import {openEditDynamicRegistrationWizard} from '../../registration_wizard/RegistrationWizardModalState'
+import {MANAGE_APPS_PAGE_LIMIT, refreshRegistrations} from './ManagePageLoadingState'
+import {
+  openEditDynamicRegistrationWizard,
+  openEditManualRegistrationWizard,
+} from '../../registration_wizard/RegistrationWizardModalState'
+import {alert} from '@canvas/instui-bindings/react/Alert'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -66,6 +70,38 @@ type Column = {
 }
 
 const ellispsisStyles = {overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}
+
+const renderEditButton = (r: LtiRegistration) => {
+  const imsRegistrationId = r.ims_registration_id
+  const manualConfigurationId = r.manual_configuration_id
+  if (r.inherited) {
+    return null
+  } else if (imsRegistrationId) {
+    return (
+      <Menu.Item
+        onClick={() => {
+          openEditDynamicRegistrationWizard(imsRegistrationId)
+        }}
+      >
+        {I18n.t('Edit App')}
+      </Menu.Item>
+    )
+  } else if (manualConfigurationId && !r.inherited && window.ENV.FEATURES.lti_registrations_next) {
+    return (
+      <Menu.Item
+        onClick={() => {
+          openEditManualRegistrationWizard(r.id, () => {
+            refreshRegistrations()
+          })
+        }}
+      >
+        {I18n.t('Edit App')}
+      </Menu.Item>
+    )
+  } else {
+    return null
+  }
+}
 
 const Columns: ReadonlyArray<Column> = [
   {
@@ -137,7 +173,7 @@ const Columns: ReadonlyArray<Column> = [
       ) : (
         <div>
           <Tooltip renderTip={I18n.t('Historical data lacks records for "installed by."')}>
-            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
           </Tooltip>
         </div>
       ),
@@ -153,7 +189,7 @@ const Columns: ReadonlyArray<Column> = [
       ) : (
         <div>
           <Tooltip renderTip={I18n.t('Historical data lacks records for "updated by."')}>
-            <div style={{fontStyle: 'oblique'}}>{I18n.t('N/A')}</div>
+            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
           </Tooltip>
         </div>
       ),
@@ -163,18 +199,22 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('On/Off'),
     width: '96px',
     sortable: true,
-    render: r => <div>{r.workflow_state === 'active' ? I18n.t('On') : I18n.t('Off')}</div>,
+    render: r => (
+      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
+    ),
   },
   {
     id: 'actions',
     width: '80px',
     render: (r, {deleteApp}) => {
       const developerKeyId = r.developer_key_id
-      const imsRegistrationId = r.ims_registration_id
+
       return (
         <Menu
+          data-testid={`actions-menu-${r.id}`}
           trigger={
             <IconButton
+              data-testid={`actions-menu-${r.id}`}
               withBackground={false}
               withBorder={false}
               screenReaderLabel={I18n.t('More Registration Options')}
@@ -205,24 +245,45 @@ const Columns: ReadonlyArray<Column> = [
               {I18n.t('Copy Client ID')}
             </Menu.Item>
           ) : null}
-          {imsRegistrationId ? (
+          {renderEditButton(r)}
+          {isForcedOn(r) ? (
             <Menu.Item
+              themeOverride={{
+                labelColor: colors.textDanger,
+                activeBackground: colors.backgroundDanger,
+              }}
               onClick={() => {
-                openEditDynamicRegistrationWizard(imsRegistrationId)
+                alert({
+                  message: I18n.t('This App is locked on, and cannot be deleted.'),
+                  title: I18n.t('Delete App'),
+                  okButtonLabel: I18n.t('Ok'),
+                })
               }}
             >
-              {I18n.t('Edit App')}
+              {I18n.t('Delete App')}
             </Menu.Item>
-          ) : null}
-          <Menu.Item
-            themeOverride={{
-              labelColor: colors.textDanger,
-              activeBackground: colors.backgroundDanger,
+          ) : (
+            <Menu.Item
+              themeOverride={{
+                labelColor: colors.textDanger,
+                activeBackground: colors.backgroundDanger,
+              }}
+              onClick={() => deleteApp(r)}
+            >
+              {I18n.t('Delete App')}
+            </Menu.Item>
+          )}
+
+          {/* <Menu.Item
+            onClick={() => {
+              confirm({
+                message: JSON.stringify(r, null, 2),
+                title: I18n.t('Registration Details'),
+              })
             }}
-            onClick={() => deleteApp(r)}
           >
-            {I18n.t('Delete App')}
-          </Menu.Item>
+            Details
+          </Menu.Item> */}
         </Menu>
       )
     },

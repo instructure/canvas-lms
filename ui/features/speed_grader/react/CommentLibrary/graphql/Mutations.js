@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 import {COMMENTS_QUERY} from './Queries'
 
 export const CREATE_COMMENT_MUTATION = gql`

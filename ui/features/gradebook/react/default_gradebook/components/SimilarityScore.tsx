@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -65,8 +64,10 @@ export default class SimilarityScore extends PureComponent<Props> {
                 renderIcon={statusIcon}
                 href={reportUrl}
                 isWithinText={false}
+                // @ts-expect-error
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
+                {/* @ts-expect-error */}
                 <Text margin="auto auto auto small">
                   {I18n.t('%{score}% similarity score', {score: displayScore})}
                 </Text>
@@ -78,6 +79,7 @@ export default class SimilarityScore extends PureComponent<Props> {
         {hasAdditionalData && (
           <Grid.Row>
             <Grid.Col>
+              {/* @ts-expect-error */}
               <Text as="p" size="x-small" lineHeight="condensed" margin="small auto auto auto">
                 {I18n.t(
                   'This submission has plagiarism data for multiple attachments. To see all reports, open SpeedGrader.'

@@ -686,8 +686,15 @@ class AssignmentsController < ApplicationController
 
   def syllabus
     rce_js_env
-    add_crumb @context.elementary_enabled? ? t("Important Info") : t("#crumbs.syllabus", "Syllabus")
-
+    add_crumb(
+      if @context.elementary_enabled?
+        t("Important Info")
+      elsif @context.horizon_course?
+        t("Overview")
+      else
+        t("#crumbs.syllabus", "Syllabus")
+      end
+    )
     can_see_admin_tools = @context.grants_any_right?(
       @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
     )

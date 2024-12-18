@@ -106,6 +106,7 @@ const ItemAssignToCardMemo = memo(
       nextProps.persistEveryoneOption &&
       JSON.stringify(prevProps.customAllOptions) === JSON.stringify(nextProps.customAllOptions) &&
       prevProps.selectedAssigneeIds?.length === nextProps.selectedAssigneeIds?.length &&
+      prevProps.initialAssigneeOptions?.length === nextProps.initialAssigneeOptions?.length &&
       prevProps.highlightCard === nextProps.highlightCard &&
       prevProps.due_at === nextProps.due_at &&
       prevProps.original_due_at === nextProps.original_due_at &&
@@ -197,9 +198,11 @@ const ItemAssignToTrayContent = ({
           params: {per_page: 100},
         }
         while (url && pageCount < MAX_PAGES) {
+          // @ts-expect-error
           // eslint-disable-next-line no-await-in-loop
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
+          // @ts-expect-error
           url = response.link?.next?.url || null
           args = {
             path: url,
@@ -210,12 +213,14 @@ const ItemAssignToTrayContent = ({
         const combinedResponse = allResponses.reduce(
           (acc, response) => ({
             blueprint_date_locks: [
+              // @ts-expect-error
               ...(acc.blueprint_date_locks || []),
               ...(response.blueprint_date_locks || []),
             ],
           }),
           {}
         )
+        // @ts-expect-error
         setBlueprintDateLocks(combinedResponse.blueprint_date_locks)
       } catch {
         showFlashError()()
@@ -314,9 +319,11 @@ const ItemAssignToTrayContent = ({
           params: {per_page: 100},
         }
         while (url && pageCount < MAX_PAGES) {
+          // @ts-expect-error
           // eslint-disable-next-line no-await-in-loop
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
+          // @ts-expect-error
           url = response.link?.next?.url || null
           args = {
             path: url,
@@ -327,8 +334,10 @@ const ItemAssignToTrayContent = ({
         const combinedResponse = allResponses.reduce(
           (acc, response) => ({
             ...response,
+            // @ts-expect-error
             overrides: [...(acc.overrides || []), ...(response.overrides || [])],
             blueprint_date_locks: [
+              // @ts-expect-error
               ...(acc.blueprint_date_locks || []),
               ...(response.blueprint_date_locks || []),
             ],
@@ -337,14 +346,20 @@ const ItemAssignToTrayContent = ({
         )
 
         const dateDetailsApiResponse = combinedResponse
+        // @ts-expect-error
         const overrides = dateDetailsApiResponse.overrides
         const overriddenTargets = getOverriddenAssignees(overrides)
+        // @ts-expect-error
         delete dateDetailsApiResponse.overrides
+        // @ts-expect-error
         const baseDates: BaseDateDetails = dateDetailsApiResponse
         if (
+          // @ts-expect-error
           dateDetailsApiResponse.checkpoints &&
+          // @ts-expect-error
           Array.isArray(dateDetailsApiResponse.checkpoints)
         ) {
+          // @ts-expect-error
           dateDetailsApiResponse.checkpoints.forEach((checkpoint: any) => {
             if (checkpoint.tag === REPLY_TO_ENTRY) {
               baseDates.required_replies_due_at = checkpoint.due_at
@@ -354,9 +369,12 @@ const ItemAssignToTrayContent = ({
           })
         }
 
+        // @ts-expect-error
         const onlyOverrides = !dateDetailsApiResponse.visible_to_everyone
         const allModuleAssignees: string[] = []
+        // @ts-expect-error
         const hasModuleOverride = overrides?.some(override => override.context_module_id)
+        // @ts-expect-error
         const hasCourseOverride = overrides?.some(override => override.course_id)
 
         const cards: ItemAssignToCardSpec[] = []
@@ -376,11 +394,13 @@ const ItemAssignToTrayContent = ({
             unlock_at: baseDates.unlock_at,
             lock_at: baseDates.lock_at,
             selectedAssigneeIds: selectedOption,
+            // @ts-expect-error
             overrideId: dateDetailsApiResponse.id,
           })
           selectedOptionIds.push(...selectedOption)
         }
         if (overrides?.length) {
+          // @ts-expect-error
           overrides.forEach(override => {
             // if an override is unassigned, we don't need to show a card for it
             if (override.unassign_item) {
@@ -392,31 +412,50 @@ const ItemAssignToTrayContent = ({
                 allModuleAssignees.push(`section-${override.course_section_id}`)
               }
               if (override.student_ids) {
+                // @ts-expect-error
                 allModuleAssignees.push(...override.student_ids.map(id => `student-${id}`))
               }
             }
             let removeCard = false
-            let filteredStudents = override.student_ids
+            let filteredStudents = override.students
             if (override.context_module_id && override.student_ids) {
               filteredStudents = filteredStudents?.filter(
-                id => !overriddenTargets?.students?.includes(id)
+                // @ts-expect-error
+                student => !overriddenTargets?.students?.includes(student.id)
               )
               removeCard = override.student_ids?.length > 0 && filteredStudents?.length === 0
             }
             const studentOverrides =
-              filteredStudents?.map(studentId => `student-${studentId}`) ?? []
-            const defaultOptions = studentOverrides
+              // @ts-expect-error
+              filteredStudents?.map(student => ({
+                id: `student-${student.id}`,
+                value: student.name,
+                group: 'Students',
+              })) ?? []
+            const initialAssigneeOptions = studentOverrides
+            const defaultOptions = studentOverrides.map((option: {id: any}) => option.id)
             if (override.noop_id) {
               defaultOptions.push('mastery_paths')
             }
             if (override.course_section_id) {
               defaultOptions.push(`section-${override.course_section_id}`)
+              initialAssigneeOptions.push({
+                id: `section-${override.course_section_id}`,
+                value: override.title,
+                group: 'Sections',
+              })
             }
             if (override.course_id) {
               defaultOptions.push('everyone')
             }
             if (override.group_id) {
               defaultOptions.push(`group-${override.group_id}`)
+              initialAssigneeOptions.push({
+                id: `group-${override.group_id}`,
+                value: override.title,
+                groupCategoryId: override.group_category_id,
+                group: 'Groups',
+              })
             }
             removeCard = removeCard || override.student_ids?.length === 0
             if (
@@ -443,6 +482,7 @@ const ItemAssignToTrayContent = ({
               lock_at: override.lock_at,
               selectedAssigneeIds: defaultOptions,
               defaultOptions,
+              initialAssigneeOptions,
               overrideId: override.id,
               contextModuleId: override.context_module_id,
               contextModuleName: override.context_module_name,
@@ -452,8 +492,10 @@ const ItemAssignToTrayContent = ({
         }
         setModuleAssignees(allModuleAssignees)
         setHasModuleOverrides(hasModuleOverride || false)
+        // @ts-expect-error
         setGroupCategoryId(dateDetailsApiResponse.group_category_id)
         setOverridesFetched(true)
+        // @ts-expect-error
         setBlueprintDateLocks(dateDetailsApiResponse.blueprint_date_locks)
         disabledOptionIdsRef.current = selectedOptionIds
         setInitialCards(cards)
@@ -564,7 +606,7 @@ const ItemAssignToTrayContent = ({
 
       const parsedDeletedCard = deletedAssignees.map(id => {
         const card = allOptions.find(a => a.id === id)
-        const data = card?.id?.split('-')
+        const data = !card && isLoadingAssignees ? id?.split('-') : card?.id?.split('-')
         const deleted = {name: card?.value, type: data?.[0]} as exportedOverride
 
         if (id === everyoneOption.id) {
@@ -589,6 +631,7 @@ const ItemAssignToTrayContent = ({
       disabledOptionIdsRef,
       everyoneOption.id,
       hasModuleOverrides,
+      isLoadingAssignees,
       onAssigneesChange,
     ]
   )
@@ -679,6 +722,7 @@ const ItemAssignToTrayContent = ({
         onClick={handleAddCard}
         data-testid="add-card"
         margin="small 0 0 0"
+        // @ts-expect-error
         renderIcon={IconAddLine}
         interaction={!allCardsAssigned() || !!blueprintDateLocks?.length ? 'disabled' : 'enabled'}
         elementRef={firstButton ? undefined : el => (addCardButtonRef.current = el)}
@@ -717,9 +761,11 @@ const ItemAssignToTrayContent = ({
             onCardDatesChange={handleDatesChange}
             onValidityChange={handleCardValidityChange}
             isOpenRef={isOpenRef}
+            // @ts-expect-error
             disabledOptionIds={disabledOptionIdsRef.current}
             everyoneOption={everyoneOption}
             selectedAssigneeIds={card.selectedAssigneeIds}
+            initialAssigneeOptions={card.initialAssigneeOptions}
             customAllOptions={allOptions}
             customIsLoading={isLoadingAssignees}
             customSetSearchTerm={setSearchTerm}

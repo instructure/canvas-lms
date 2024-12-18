@@ -32,6 +32,7 @@ function reloadStudentGroup() {
 }
 
 function editGroup(group, open = true) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <GroupModal
       group={{

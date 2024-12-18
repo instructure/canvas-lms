@@ -66,7 +66,9 @@ function FeatureFlagTable({title, rows, disableDefaults}) {
                   featureFlag={feature.feature_flag}
                   disableDefaults={disableDefaults}
                   appliesTo={feature.applies_to}
-                  onStateChange={newState => setStateChanges({...stateChanges, [feature.feature]: newState})}
+                  onStateChange={newState =>
+                    setStateChanges({...stateChanges, [feature.feature]: newState})
+                  }
                 />
               </Cell>
             </Row>

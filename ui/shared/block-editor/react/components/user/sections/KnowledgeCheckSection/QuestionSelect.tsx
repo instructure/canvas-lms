@@ -50,6 +50,7 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
         withBackground={false}
         withBorder={false}
         screenReaderLabel={I18n.t('Clear search')}
+        title={I18n.t('Clear search')}
         onClick={() => setValue('')}
       >
         <IconTroubleLine />
@@ -69,9 +70,14 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
     return <div>{I18n.t('No questions found.')}</div>
   }
 
-  const filteredQuestions = questions.filter(question =>
-    question.entry.title.toLowerCase().includes(value.toLowerCase())
-  )
+  const filteredQuestions =
+    value.length > 0
+      ? questions.filter(
+          question =>
+            question.entry.title?.toLowerCase().includes(value.toLowerCase()) ||
+            question.entry.item_body?.toLowerCase().includes(value.toLowerCase())
+        )
+      : questions
 
   return (
     <View as="div">
@@ -90,6 +96,7 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
 
       {filteredQuestions.map(question => (
         <View as="div" margin="x-small" key={question.id}>
+          {/* @ts-expect-error */}
           <QuestionToggle question={question} onSelect={onSelect} />
         </View>
       ))}

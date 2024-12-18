@@ -152,12 +152,14 @@ describe('WikiPageView', () => {
       view.render()
       view.$('.al-trigger').simulate('click')
       view.$('.direct-share-send-to-menu-item').simulate('click')
+      // eslint-disable-next-line no-restricted-properties
       const props = ReactDOM.render.mock.calls[0][0].props
       expect(props.open).toBe(true)
       expect(props.sourceCourseId).toBe('123')
       expect(props.contentShare).toEqual({content_type: 'page', content_id: '42'})
       props.onDismiss()
 
+      // eslint-disable-next-line no-restricted-properties
       expect(ReactDOM.render.mock.lastCall[0].props.open).toBe(false)
     })
 
@@ -170,11 +172,13 @@ describe('WikiPageView', () => {
       view.render()
       view.$('.al-trigger').simulate('click')
       view.$('.direct-share-copy-to-menu-item').simulate('click')
+      // eslint-disable-next-line no-restricted-properties
       const props = ReactDOM.render.mock.calls[0][0].props
       expect(props.open).toBe(true)
       expect(props.sourceCourseId).toBe('123')
       expect(props.contentSelection).toEqual({pages: ['42']})
       props.onDismiss()
+      // eslint-disable-next-line no-restricted-properties
       expect(ReactDOM.render.mock.lastCall[0].props.open).toBe(false)
     })
   })

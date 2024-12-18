@@ -36,6 +36,8 @@
     dashboard_icon_path = "shared/svg/#{'k12/' if k12?}svg_icon_dashboard"
     courses_title = t('Courses')
   end
+
+  student_view_label = @context.is_a?(Course) && @context.horizon_course? ? t('View as Learner') : t('View as Student')
 %>
 
 <header id="mobile-header" class="no-print">
@@ -61,7 +63,7 @@
     <div id="immersive_reader_mobile_mount_point"></div>
   <% end %>
   <% if show_student_view_button? %>
-    <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => t('View as Student'), :role => "button", :method => :post do %>
+    <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => student_view_label, :role => "button", :method => :post do %>
       <i class="icon-student-view"></i>
     <% end %>
   <% else %>

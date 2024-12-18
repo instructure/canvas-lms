@@ -25,5 +25,6 @@ import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 ready(() => {
   initializeTopNavPortal()
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<WebZipExportApp />, $('#course-webzip-export-app')[0])
 })

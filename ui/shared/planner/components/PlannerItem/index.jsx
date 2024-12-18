@@ -594,7 +594,9 @@ export class PlannerItem_raw extends Component {
   renderExtraInfo() {
     const feedback = this.props.feedback
     if (feedback) {
-      const comment = feedback.is_media ? I18n.t('You have media feedback.') : stripHtmlTags(feedback.comment)
+      const comment = feedback.is_media
+        ? I18n.t('You have media feedback.')
+        : stripHtmlTags(feedback.comment)
       return (
         <div className={this.style.classNames.feedback}>
           <span className={this.style.classNames.feedbackAvatar}>
@@ -605,7 +607,7 @@ export class PlannerItem_raw extends Component {
               data-fs-exclude={true}
             />
           </span>
-          <span className={this.style.classNames.feedbackComment} data-testid='feedback-comment'>
+          <span className={this.style.classNames.feedbackComment} data-testid="feedback-comment">
             <Text fontStyle="italic">{comment}</Text>
           </span>
         </div>

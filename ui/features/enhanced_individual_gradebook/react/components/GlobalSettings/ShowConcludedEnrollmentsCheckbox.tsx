@@ -38,6 +38,7 @@ export default function ShowConcludedEnrollmentsCheckbox({
     const checked = event.target.checked
     doFetchApi({
       method: 'PUT',
+      // @ts-expect-error
       path: settingsUpdateUrl,
       body: {
         gradebook_settings: {

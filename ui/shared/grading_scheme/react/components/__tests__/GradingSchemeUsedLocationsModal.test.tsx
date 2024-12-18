@@ -40,6 +40,7 @@ describe('UsedLocationsModal', () => {
   })
 
   beforeEach(() => {
+    // @ts-expect-error
     doFetchApi.mockImplementation((opts: {path: string; method: string}) => {
       if (
         opts.path ===
@@ -91,6 +92,7 @@ describe('UsedLocationsModal', () => {
   })
 
   afterEach(() => {
+    // @ts-expect-error
     doFetchApi.mockClear()
   })
   function renderUsedLocationsModal(props: Partial<GradingSchemeUsedLocationsModalProps> = {}) {

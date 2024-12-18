@@ -2779,7 +2779,6 @@ describe Course do
       end
 
       it "shows people tab with granular permissions if hidden" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @course.tab_configuration = [{
           id: Course::TAB_PEOPLE,
           label: "People",
@@ -3053,6 +3052,19 @@ describe Course do
           end
         end
       end
+
+      describe "with horizon_course account setting on" do
+        before :once do
+          Account.default.enable_feature!(:horizon_course_setting)
+          @course.update!(horizon_course: true)
+          @course.save!
+        end
+
+        it "renames the syllabus tab to overview" do
+          syllabus_tab = @course.tabs_available(@user).find { |t| t[:id] == Course::TAB_SYLLABUS }
+          expect(syllabus_tab[:label]).to eq("Overview")
+        end
+      end
     end
 
     context "students" do
@@ -3085,7 +3097,6 @@ describe Course do
       end
 
       it "hides people tab with granular permissions if hidden" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @course.tab_configuration = [{
           id: Course::TAB_PEOPLE,
           label: "People",
@@ -8175,6 +8186,43 @@ describe Course do
 
     it "returns nil if modules is nil" do
       expect(course.get_assignment_ids_from_modules(nil)).to be_nil
+    end
+  end
+
+  describe "group and differentiation tag associations" do
+    before(:once) do
+      @course = Course.create!
+      @collaborative_category = GroupCategory.create!(context: @course, name: "Collab Category", non_collaborative: false)
+      @non_collab_category = GroupCategory.create!(context: @course, name: "Tag Category", non_collaborative: true)
+
+      @collaborative_group = Group.create!(context: @course, group_category: @collaborative_category, name: "Collab Group")
+      @differentiation_tag = Group.create!(context: @course, group_category: @non_collab_category, name: "Tag")
+
+      @deleted_collab_group = Group.create!(context: @course, group_category: @collaborative_category, name: "Deleted Collab")
+      @deleted_collab_group.destroy
+
+      @deleted_tag = Group.create!(context: @course, group_category: @non_collab_category, name: "Deleted Tag")
+      @deleted_tag.destroy
+    end
+
+    it "filters group categories by collaborative flag" do
+      expect(@course.group_categories).to contain_exactly(@collaborative_category)
+      expect(@course.differentiation_tag_categories).to contain_exactly(@non_collab_category)
+    end
+
+    it "includes all categories regardless of deleted status" do
+      expect(@course.all_group_categories).to contain_exactly(@collaborative_category)
+      expect(@course.all_differentiation_tag_categories).to contain_exactly(@non_collab_category)
+    end
+
+    it "filters groups by collaborative flag" do
+      expect(@course.groups).to match_array([@collaborative_group, @deleted_collab_group])
+      expect(@course.differentiation_tags).to match_array([@differentiation_tag, @deleted_tag])
+    end
+
+    it "only includes active groups in active associations" do
+      expect(@course.active_groups).to contain_exactly(@collaborative_group)
+      expect(@course.active_differentiation_tags).to contain_exactly(@differentiation_tag)
     end
   end
 end

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -22,7 +21,7 @@ import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
-import {StoreState} from '../types'
+import type {StoreState} from '../types'
 import {connect} from 'react-redux'
 import {getCategoryError, getSyncing} from '../reducers/ui'
 import {Spinner} from '@instructure/ui-spinner'

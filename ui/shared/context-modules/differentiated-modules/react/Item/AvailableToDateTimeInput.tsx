@@ -49,11 +49,13 @@ export function AvailableToDateTimeInput({
   const key = 'lock_at'
   const handleClear = useCallback(() => setAvailableToDate(null), [setAvailableToDate])
   const dateInputRef = useCallback(
+    // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   )
   const timeInputRef = useCallback(
+    // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []

@@ -24,9 +24,9 @@ import {RCETextBlockPopup} from './RCETextBlockPopup'
 import {RCETextBlockToolbar} from './RCETextBlockToolbar'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/rce-block')
+const I18n = useI18nScope('block-editor')
 
-export const RCETextBlock = ({text, width, height, sizeVariant = 'percent'}: RCETextBlockProps) => {
+export const RCETextBlock = ({text, width, height, sizeVariant = 'auto'}: RCETextBlockProps) => {
   const {enabled} = useEditor(state => ({
     enabled: state.options.enabled,
   }))
@@ -46,6 +46,14 @@ export const RCETextBlock = ({text, width, height, sizeVariant = 'percent'}: RCE
 
   const setSize = useCallback(() => {
     if (!blockRef) return
+
+    if (sizeVariant === 'auto') {
+      setStyl({
+        width: 'auto',
+        height: 'auto',
+      })
+      return
+    }
 
     const sty: any = {}
     const unit = sizeVariant === 'percent' ? '%' : 'px'
@@ -151,7 +159,7 @@ RCETextBlock.craft = {
   displayName: I18n.t('Text'),
   defaultProps: {
     text: '',
-    sizeVariant: 'percent',
+    sizeVariant: 'auto',
   },
   related: {
     toolbar: RCETextBlockToolbar,

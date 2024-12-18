@@ -24,7 +24,7 @@ import {IconPicker} from '../blocks/IconBlock'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/icon-popup')
+const I18n = useI18nScope('block-editor')
 
 export type IconPopupProps = {
   iconName?: string

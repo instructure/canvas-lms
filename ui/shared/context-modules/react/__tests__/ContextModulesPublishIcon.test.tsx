@@ -45,6 +45,7 @@ const defaultProps = {
 const PUBLISH_URL = '/api/v1/courses/1/modules/1'
 
 beforeEach(() => {
+  // @ts-expect-error
   doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
   initBody()
   makeModuleWithItems(1, 'Lesson 2', [117, 119])
@@ -52,6 +53,7 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.clearAllMocks()
+  // @ts-expect-error
   doFetchApi.mockReset()
   document.body.innerHTML = ''
 })
@@ -194,6 +196,7 @@ describe('ContextModulesPublishIcon', () => {
       })
       resolve({response: {ok: true}, json: {published: true}})
     })
+    // @ts-expect-error
     doFetchApi.mockReturnValue(fetchPromise)
     await fetchPromise
     waitFor(() => {
@@ -233,6 +236,7 @@ describe('ContextModulesPublishIcon', () => {
       })
       resolve({response: {ok: true}, json: {published: false}})
     })
+    // @ts-expect-error
     doFetchApi.mockReturnValue(fetchPromise)
     await fetchPromise
     waitFor(() => {
@@ -269,6 +273,7 @@ describe('ContextModulesPublishIcon', () => {
       })
       resolve({response: {ok: true}, json: {published: false}})
     })
+    // @ts-expect-error
     doFetchApi.mockReturnValue(fetchPromise)
     await fetchPromise
     waitFor(() => {

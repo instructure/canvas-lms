@@ -18,11 +18,13 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {useQuery} from '@tanstack/react-query'
 
 import {type File, type Folder} from '../../../interfaces/File'
 import SubTableContent from './SubTableContent'
@@ -30,6 +32,7 @@ import ActionMenuButton from './ActionMenuButton'
 import NameLink from './NameLink'
 import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('files_v2')
 
@@ -38,6 +41,16 @@ interface ColumnHeader {
   title: string
   textAlign: 'start' | 'center' | 'end'
   width?: string
+}
+
+const fetchFilesAndFolders = async (folderId: string) => {
+  const includeParams = ['user', 'usage_rights', 'enhanced_preview_url', 'context_asset_string']
+  const url = `/api/v1/folders/${folderId}/all?include[]=${includeParams.join('&include[]=')}`
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error('Failed to fetch files and folders')
+  }
+  return response.json()
 }
 
 const columnHeaders: ColumnHeader[] = [
@@ -61,7 +74,15 @@ const columnRenderers: {
   name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
   created: row => <FriendlyDatetime dateTime={row.created_at} />,
   lastModified: row => <FriendlyDatetime dateTime={row.updated_at} />,
-  modifiedBy: row => ('user' in row ? <TruncateText>{row.user.display_name}</TruncateText> : null),
+  modifiedBy: row =>
+    'user' in row ? (
+      <Link
+        isWithinText={false}
+        href={row.user.html_url}
+      >
+        <TruncateText>{row.user.display_name}</TruncateText>
+      </Link>
+    ) : null,
   size: row =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
   rights: _row => <RightsIconButton />,
@@ -73,19 +94,20 @@ const columnRenderers: {
 
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
-  isLoading: boolean
   userCanEditFilesForContext: boolean
-  rows?: (File | Folder)[]
+  folderId: string
 }
 
-const FileFolderTable = ({
-  size,
-  isLoading,
-  userCanEditFilesForContext,
-  rows = [],
-}: FileFolderTableProps) => {
+const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolderTableProps) => {
   const isStacked = size !== 'large'
+  const {data, error, isLoading} = useQuery<(File | Folder)[], unknown>(['files'], () =>
+    fetchFilesAndFolders(folderId)
+  )
+  if (error) {
+    showFlashError(I18n.t('Failed to fetch files and folders'))
+  }
 
+  const rows = data ?? []
   return (
     <>
       <Table

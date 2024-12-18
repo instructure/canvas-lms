@@ -57,6 +57,7 @@ const ASSIGNMENT_QUERY = gql`
       rubric {
         id
       }
+      rubricSelfAssessmentEnabled
     }
   }
   ${Assignment.fragment}

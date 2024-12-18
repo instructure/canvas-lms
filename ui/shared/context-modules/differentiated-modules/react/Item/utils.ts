@@ -106,6 +106,7 @@ function isFancyMidnightNeeded(value: string | undefined) {
     .utc(value)
     .tz(ENV.TIMEZONE || 'UTC')
     .format('HH:mm:00')
+  // @ts-expect-error
   return chosenDueTime === '00:00:00' && chosenDueTime !== fancyMidnightDueTime
 }
 

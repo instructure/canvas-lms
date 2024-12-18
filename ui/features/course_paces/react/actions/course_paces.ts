@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Action} from 'redux'
-import {ThunkAction} from 'redux-thunk'
+import type {Action} from 'redux'
+import type {ThunkAction} from 'redux-thunk'
 import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/browser'
 
-import {
+import type {
   CoursePaceItemDueDates,
   CoursePace,
   PaceContextTypes,
@@ -31,7 +30,7 @@ import {
   Progress,
   StoreState,
 } from '../types'
-import {createAction, ActionsUnion} from '../shared/types'
+import {createAction, type ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
 import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
@@ -77,6 +76,7 @@ const regularActions = {
     createAction(Constants.COURSE_PACE_SAVED, coursePace),
 }
 
+// @ts-expect-error
 const thunkActions = {
   onResetPace: (): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
@@ -99,6 +99,7 @@ const thunkActions = {
           dispatch(coursePaceActions.pollForPublishStatus())
           dispatch(
             paceContextsActions.addPublishingPace({
+              // @ts-expect-error
               progress_context_id: progress.context_id,
               pace_context: getState().paceContexts.selectedContext!,
               polling: true,
@@ -123,6 +124,7 @@ const thunkActions = {
   // an error message said: ThunkDispatch<StoreState, void, Action>
   // but that just moved the error
   syncUnpublishedChanges: () => {
+    // @ts-expect-error
     return (dispatch, getState) => {
       dispatch(uiActions.clearCategoryError('publish'))
 
@@ -155,6 +157,7 @@ const thunkActions = {
           .then(updatedProgress => {
             if (!updatedProgress) throw new Error(I18n.t('Response body was empty'))
             const paceContext = getState().paceContexts.contextsPublishing.find(
+              // @ts-expect-error
               ({progress_context_id}) => updatedProgress.context_id === progress_context_id
             )?.pace_context
             const paceName = paceContext?.name || ''
@@ -174,6 +177,7 @@ const thunkActions = {
                 type: 'success',
               })
               dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
+              // @ts-expect-error
               dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
             } else if (updatedProgress.workflow_state === 'failed') {
               showFlashAlert({
@@ -182,6 +186,7 @@ const thunkActions = {
                 type: 'error',
               })
               dispatch(uiActions.setCategoryError('publish'))
+              // @ts-expect-error
               dispatch(paceContextsActions.refreshPublishedContext(updatedProgress.context_id))
               console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console
             } else {
@@ -233,25 +238,28 @@ const thunkActions = {
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
-      return Api.getNewCoursePaceFor(getState().course.id, contextType, contextId)
-        .then(({course_pace: coursePace, progress}) => {
-          if (!coursePace) throw new Error(I18n.t('Response body was empty'))
-          if (afterAction) {
-            dispatch(afterAction(coursePace))
-          }
-          dispatch(coursePaceActions.setProgress(progress))
-          dispatch(coursePaceActions.pollForPublishStatus())
-          if (openModal) {
+      return (
+        Api.getNewCoursePaceFor(getState().course.id, contextType, contextId)
+          // @ts-expect-error
+          .then(({course_pace: coursePace, progress}) => {
+            if (!coursePace) throw new Error(I18n.t('Response body was empty'))
+            if (afterAction) {
+              dispatch(afterAction(coursePace))
+            }
+            dispatch(coursePaceActions.setProgress(progress))
+            dispatch(coursePaceActions.pollForPublishStatus())
+            if (openModal) {
+              dispatch(uiActions.hideLoadingOverlay())
+              dispatch(uiActions.showPaceModal(coursePace))
+            }
+          })
+          .catch(error => {
             dispatch(uiActions.hideLoadingOverlay())
-            dispatch(uiActions.showPaceModal(coursePace))
-          }
-        })
-        .catch(error => {
-          dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setCategoryError('loading', error?.toString()))
-          console.error(error) // eslint-disable-line no-console
-          captureException(error)
-        })
+            dispatch(uiActions.setCategoryError('loading', error?.toString()))
+            console.error(error) // eslint-disable-line no-console
+            captureException(error)
+          })
+      )
     }
   },
   relinkToParentPace: (): ThunkAction<void, StoreState, void, Action> => {
@@ -338,5 +346,6 @@ const thunkActions = {
   },
 }
 
+// @ts-expect-error
 export const coursePaceActions = {...regularActions, ...thunkActions}
 export type CoursePaceAction = ActionsUnion<typeof regularActions>

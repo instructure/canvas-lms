@@ -36,6 +36,7 @@ export type RubricAssessmentTrayProps = {
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
   shouldCloseOnDocumentClick?: boolean
+  viewModeOverride?: ViewMode
   onDismiss: () => void
   onSubmit?: (rubricAssessmentDraftData: RubricAssessmentData[]) => void
 }
@@ -49,10 +50,11 @@ export const RubricAssessmentTray = ({
   rubricAssessmentData,
   rubricSavedComments = {},
   shouldCloseOnDocumentClick,
+  viewModeOverride,
   onDismiss,
   onSubmit,
 }: RubricAssessmentTrayProps) => {
-  const [viewMode, setViewMode] = useState<ViewMode>('traditional')
+  const [viewMode, setViewMode] = useState<ViewMode>(viewModeOverride ?? 'traditional')
 
   return (
     <Tray

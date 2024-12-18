@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
+import React, {Component, createRef} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string, number} from 'prop-types'
@@ -63,6 +63,8 @@ export class Whitelist extends Component {
     inherited: false,
   }
 
+  domainNameInputRef = createRef()
+
   state = {
     addDomainInputValue: '',
     errors: [],
@@ -104,6 +106,7 @@ export class Whitelist extends Component {
           },
         ],
       })
+      this.domainNameInputRef.current.focus()
     }
   }
 
@@ -158,6 +161,7 @@ export class Whitelist extends Component {
         </View>
 
         <form
+          noValidate={true}
           onSubmit={e => {
             e.preventDefault()
             this.handleSubmit()
@@ -182,11 +186,13 @@ export class Whitelist extends Component {
           <Flex>
             <Flex.Item shouldGrow={true} shouldShrink={true} padding="0 medium 0 0">
               <TextInput
+                ref={this.domainNameInputRef}
                 renderLabel={I18n.t('Domain Name')}
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
                 disabled={(this.props.inherited && this.props.isSubAccount) || domainLimitReached}
+                isRequired={true}
                 onChange={e => {
                   this.setState({addDomainInputValue: e.currentTarget.value})
                 }}

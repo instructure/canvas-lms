@@ -43,7 +43,7 @@ const getProps = (overrides?: {[k: string]: any}): ComponentProps => ({
 })
 
 describe('renderWikiPageTitle', () => {
-  it('sets the wikipage title to the input', () => {
+  it('sets the wiki page title to the input', () => {
     const props = getProps()
     const component = renderWikiPageTitle(props)
     const {getByTestId} = render(component)
@@ -107,7 +107,7 @@ describe('renderWikiPageTitle', () => {
       expect(checkForTitleConflictDebounced).not.toHaveBeenCalled()
     })
 
-    it('does not call checkForTitleConflictDebounced when new value is whitepace', () => {
+    it('does not call checkForTitleConflictDebounced when new value is whitespace', () => {
       const {getByTestId} = render(renderWikiPageTitle(getProps()))
       const input = getByTestId('wikipage-title-input')
       fireEvent.change(input, {target: {value: '       '}})

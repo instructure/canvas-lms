@@ -18,7 +18,6 @@
 
 import React, {useEffect, useCallback} from 'react'
 import type {SetStateAction, Dispatch} from 'react'
-// @ts-ignore
 import {canvas} from '@instructure/ui-theme-tokens'
 import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
@@ -94,6 +93,7 @@ export const ContentMigrationsTable = ({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations`,
       params: {per_page: 25},
     })
+      // @ts-expect-error
       .then((response: MigrationsResponse) => setMigrations(_prevMigrations => response.json))
       .catch(showFlashError(I18n.t("Couldn't load previous content migrations")))
   }, [setMigrations])

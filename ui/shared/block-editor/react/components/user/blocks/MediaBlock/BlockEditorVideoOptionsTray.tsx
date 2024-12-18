@@ -26,7 +26,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/media-block')
+const I18n = useI18nScope('block-editor')
 
 export default function BlockEditorVideoOptionsTray({
   open,
@@ -65,6 +65,7 @@ export default function BlockEditorVideoOptionsTray({
         setProp((prps: MediaBlockProps) => {
           prps.title = titleText || undefined
         })
+        // @ts-expect-error
         videoContainer?.contentWindow.location.reload()
         setOpenTray(false)
       })
@@ -100,10 +101,13 @@ export default function BlockEditorVideoOptionsTray({
         onSave={onSaveProps => {
           applyOptions(onSaveProps)
         }}
+        // @ts-expect-error
         trayProps={{}}
+        // @ts-expect-error
         videoOptions={{
           titleText: videoContainer?.getAttribute('title') || '',
         }}
+        // @ts-expect-error
         requestSubtitlesFromIframe={(cb: any) => requestSubtitlesFromIframe(cb)}
         forBlockEditorUse={true}
       />

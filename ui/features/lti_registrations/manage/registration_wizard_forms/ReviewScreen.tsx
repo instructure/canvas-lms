@@ -54,9 +54,9 @@ type LaunchSettings = {
 
 export type ReviewScreenProps = {
   scopes: LtiScope[]
-  privacyLevel?: LtiPrivacyLevel
+  privacyLevel: LtiPrivacyLevel
   placements: LtiPlacement[]
-  nickname: string
+  nickname?: string
   description?: string
   labels: Partial<Record<LtiPlacement, string>>
   iconUrls: Partial<Record<LtiPlacementWithIcon, string>>
@@ -74,7 +74,7 @@ export type ReviewScreenProps = {
 export const ReviewScreen = ({
   launchSettings,
   scopes,
-  privacyLevel = 'anonymous',
+  privacyLevel,
   placements,
   nickname,
   description,
@@ -108,11 +108,17 @@ export const ReviewScreen = ({
             itemSpacing="small"
             size="small"
           >
-            {scopes.map(scope => (
-              <List.Item key={scope}>
-                <Text size="small">{i18nLtiScope(scope)}</Text>
-              </List.Item>
-            ))}
+            {scopes.length === 0 ? (
+              <Text size="small" fontStyle="italic">
+                {I18n.t('No permissions requested')}
+              </Text>
+            ) : (
+              scopes.map(scope => (
+                <List.Item key={scope}>
+                  <Text size="small">{i18nLtiScope(scope)}</Text>
+                </List.Item>
+              ))
+            )}
           </List>
         </View>
         <IconButton
@@ -159,7 +165,9 @@ export const ReviewScreen = ({
               <Text size="small" weight="bold">
                 {I18n.t('Administration Nickname')}:{' '}
               </Text>
-              <Text size="small">{nickname ?? ''}</Text>
+              <Text size="small" fontStyle={nickname ? 'normal' : 'italic'}>
+                {nickname ?? I18n.t('No nickname provided.')}
+              </Text>
             </div>
             <div>
               <Text size="small" weight="bold">
@@ -185,7 +193,7 @@ export const ReviewScreen = ({
                     dangerouslySetInnerHTML={{
                       __html: labels[placement]
                         ? htmlEscape(labels[placement])
-                        : I18n.t('**No label provided.**', {wrappers: ['<i>$1</i>']}),
+                        : I18n.t('*No label provided.*', {wrappers: ['<i>$1</i>']}),
                     }}
                   />
                 </div>
@@ -199,60 +207,18 @@ export const ReviewScreen = ({
           onClick={onEditNaming}
         />
       </ReviewSection>
-      <ReviewSection>
-        <View>
-          <Heading level="h4">{I18n.t('Icon URLs')}</Heading>
-          <Flex direction="column" gap="x-small" margin="small 0 0 0">
-            {placements
-              .filter((p: LtiPlacement): p is LtiPlacementWithIcon =>
-                LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
-              )
-              .map(p => {
-                let status: string
-                const url = iconUrls[p]
-                const placementDefaultUrl = defaultPlacementIconUrls[p]
-                const usingDefaultIcon = // We're using the placement's default URL
-                  (!url && !!placementDefaultUrl) ||
-                  // We're using the top-level default Icon URL
-                  (!url && !!defaultIconUrl) ||
-                  // Our configured URL matches the placement's default URL, and
-                  // both URL's are actually present
-                  (url === placementDefaultUrl && !!url && !!placementDefaultUrl) ||
-                  // Our configured URL matches the top-level default URL, and both
-                  // URL's are actually present
-                  (url === defaultIconUrl && !!url && !!defaultIconUrl)
-                if (usingDefaultIcon) {
-                  status = I18n.t('Default Icon')
-                } else if (url) {
-                  status = I18n.t('Custom Icon')
-                } else if (!url && p === 'editor_button') {
-                  status = I18n.t('Generated Icon')
-                } else {
-                  status = I18n.t('No Icon')
-                }
-
-                return (
-                  <div key={p}>
-                    <Text size="small" weight="bold">
-                      {i18nLtiPlacement(p)}:{' '}
-                    </Text>
-                    <Text size="small">{status}</Text>
-                  </div>
-                )
-              })}
-          </Flex>
-        </View>
-        <IconButton
-          renderIcon={IconEditLine}
-          screenReaderLabel={I18n.t('Edit Icon URLs')}
-          onClick={onEditIconUrls}
-        />
-      </ReviewSection>
+      <IconUrlsReviewSection
+        placements={placements}
+        iconUrls={iconUrls}
+        defaultPlacementIconUrls={defaultPlacementIconUrls}
+        defaultIconUrl={defaultIconUrl}
+        onEditIconUrls={onEditIconUrls}
+      />
     </RegistrationModalBody>
   )
 }
 
-const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
+export const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
   return (
     <Flex margin="medium 0 medium 0" alignItems="start" justifyItems="space-between">
       {children}
@@ -260,7 +226,7 @@ const ReviewSection = ({children}: React.PropsWithChildren<{}>) => {
   )
 }
 
-const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
+export const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
   return (
     <h5
       style={{
@@ -274,9 +240,9 @@ const LaunchSettingsHeader = ({children}: React.PropsWithChildren<{}>) => {
   )
 }
 
-type LaunchSettingsSectionProps = LaunchSettings & {onEditLaunchSettings: () => void}
+export type LaunchSettingsSectionProps = LaunchSettings & {onEditLaunchSettings: () => void}
 
-const LaunchSettingsSection = React.memo(
+export const LaunchSettingsSection = React.memo(
   ({
     jwkMethod,
     onEditLaunchSettings,
@@ -376,6 +342,88 @@ const LaunchSettingsSection = React.memo(
           renderIcon={IconEditLine}
           screenReaderLabel={I18n.t('Edit Launch Settings')}
           onClick={onEditLaunchSettings}
+        />
+      </ReviewSection>
+    )
+  }
+)
+
+export type IconUrlsReviewSectionProps = {
+  placements: LtiPlacement[]
+  iconUrls: ReviewScreenProps['iconUrls']
+  defaultPlacementIconUrls: ReviewScreenProps['defaultPlacementIconUrls']
+  defaultIconUrl?: string
+  onEditIconUrls: () => void
+}
+
+export const IconUrlsReviewSection = React.memo(
+  ({
+    placements,
+    iconUrls,
+    defaultPlacementIconUrls,
+    defaultIconUrl,
+    onEditIconUrls,
+  }: IconUrlsReviewSectionProps) => {
+    const placementsWithIcons = placements.filter((p): p is LtiPlacementWithIcon =>
+      LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
+    )
+
+    const body = (() => {
+      if (placementsWithIcons.length === 0) {
+        return (
+          <Text size="small" fontStyle="italic">
+            {I18n.t('No placements with icons')}
+          </Text>
+        )
+      } else {
+        return placementsWithIcons.map(placement => {
+          let status: string
+          const iconUrl = iconUrls[placement]
+          const defaultPlacementIconUrl = defaultPlacementIconUrls[placement]
+          const usingDefaultIcon = // We're using the placement's default URL
+            (!iconUrl && !!defaultPlacementIconUrl) ||
+            // We're using the top-level default Icon URL
+            (!iconUrl && !!defaultIconUrl) ||
+            // Our configured URL matches the placement's default URL, and
+            // both URL's are actually present
+            (iconUrl === defaultPlacementIconUrl && !!iconUrl && !!defaultPlacementIconUrl) ||
+            // Our configured URL matches the top-level default URL, and both
+            // URL's are actually present
+            (iconUrl === defaultIconUrl && !!iconUrl && !!defaultIconUrl)
+          if (usingDefaultIcon) {
+            status = I18n.t('Default Icon')
+          } else if (iconUrl) {
+            status = I18n.t('Custom Icon')
+          } else if (!iconUrl && placement === 'editor_button') {
+            status = I18n.t('Generated Icon')
+          } else {
+            status = I18n.t('No Icon')
+          }
+
+          return (
+            <div key={placement}>
+              <Text size="small" weight="bold">
+                {i18nLtiPlacement(placement)}:{' '}
+              </Text>
+              <Text size="small">{status}</Text>
+            </div>
+          )
+        })
+      }
+    })()
+
+    return (
+      <ReviewSection>
+        <View>
+          <Heading level="h4">{I18n.t('Icon URLs')}</Heading>
+          <Flex direction="column" gap="x-small" margin="small 0 0 0">
+            {body}
+          </Flex>
+        </View>
+        <IconButton
+          renderIcon={IconEditLine}
+          screenReaderLabel={I18n.t('Edit Icon URLs')}
+          onClick={onEditIconUrls}
         />
       </ReviewSection>
     )

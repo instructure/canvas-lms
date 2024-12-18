@@ -47,7 +47,9 @@ it('calls the onClick prop when dismissed is clicked', async () => {
   const tempProps = defaultProps()
   tempProps.dismiss = jest.fn()
   const wrapper = render(<Opportunity {...tempProps} />)
-  const dismissButton = wrapper.getByText('Dismiss this is a description about the opportunity').closest('button')
+  const dismissButton = wrapper
+    .getByText('Dismiss this is a description about the opportunity')
+    .closest('button')
   await userEvent.click(dismissButton)
   expect(tempProps.dismiss).toHaveBeenCalled()
 })

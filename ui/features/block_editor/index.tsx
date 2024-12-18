@@ -24,5 +24,6 @@ import ready from '@instructure/ready'
 import {BlockEditor} from '@canvas/block-editor'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<BlockEditor />, document.getElementById('block_editor'))
 })

@@ -29,6 +29,7 @@ export const renderFrontPagePill = (el: HTMLElement, props?: PillProps) => {
     delete props.children
   }
   if (frontPageContainer) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<Pill {...props}>{children}</Pill>, frontPageContainer)
   }
 

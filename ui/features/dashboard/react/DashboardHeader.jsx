@@ -521,6 +521,7 @@ function loadStartNewCourseHandler() {
   const modalContainer = document.getElementById('create_course_modal_container')
   if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
     startButton.addEventListener('click', () => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <CreateCourseModal
           isModalOpen={true}

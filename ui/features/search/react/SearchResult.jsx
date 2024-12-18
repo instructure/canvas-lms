@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
@@ -32,7 +32,7 @@ import {
   IconDiscussionLine,
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
-import stopwords from "./stopwords"
+import stopwords from './stopwords'
 
 const I18n = useI18nScope('SmartSearch')
 
@@ -69,54 +69,58 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
 
   const getHighlightedSegment = (searchTerm, text, maxTokens) => {
     // Split the searchTerm into tokens
-    const searchTerms = searchTerm.split(' ');
+    const searchTerms = searchTerm.split(' ')
 
     // Filter out single character search terms and common words
-    const validSearchTerms = searchTerms.filter(term => term.length > 1 && !stopwords.includes(term.toLowerCase()))
+    const validSearchTerms = searchTerms.filter(
+      term => term.length > 1 && !stopwords.includes(term.toLowerCase())
+    )
 
     // Escape each searchTerm and join them with '|'
-    const escapedSearchTerms = validSearchTerms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    const escapedSearchTerms = validSearchTerms
+      .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|')
 
     // Create a RegExp that matches any of the searchTerms
     // TODO: prefix this regex with a word boundry \\b to avoid substrings
     // or figure out a way to remove stop words from the search terms
-    const searchExpression = new RegExp(`(${escapedSearchTerms})`, 'gi');
+    const searchExpression = new RegExp(`(${escapedSearchTerms})`, 'gi')
 
     // Remove HTML tags and split the text into words
-    const words = text.replace(/<[^>]*>/gm, '').split(' ');
+    const words = text.replace(/<[^>]*>/gm, '').split(' ')
 
     // Calculate the concentration of highlight words in each segment of maxTokens words
-    let segmentIndex = 0;
-    let truncatedText = text;
-    if(words.length > maxTokens) {
-      const segments = [];
+    let segmentIndex = 0
+    let truncatedText = text
+    if (words.length > maxTokens) {
+      const segments = []
       for (let i = 0; i < words.length; i += maxTokens) {
         const segment = words.slice(i, i + maxTokens)
         const highlightCount = segment.filter(word => searchExpression.test(word)).length
-        const concentration = highlightCount / segment.length;
-        segments.push({ segment, concentration, segmentIndex: i / maxTokens })
+        const concentration = highlightCount / segment.length
+        segments.push({segment, concentration, segmentIndex: i / maxTokens})
       }
 
       // Keep the segment with the highest concentration
-      let segmentRecord = segments.sort((a, b) => b.concentration - a.concentration)[0]
+      const segmentRecord = segments.sort((a, b) => b.concentration - a.concentration)[0]
 
       // Join the words back into a string and add ellipses if the segment is not the first or last
       truncatedText = segmentRecord.segment.join(' ')
       segmentIndex = segmentRecord.segmentIndex
-      if(segmentIndex > 0) {
+      if (segmentIndex > 0) {
         truncatedText = '...' + truncatedText
       }
-      if(segmentIndex < segments.length - 1) {
+      if (segmentIndex < segments.length - 1) {
         truncatedText += '...'
       }
     }
 
-    return { truncatedText, searchExpression };
+    return {truncatedText, searchExpression}
   }
 
   const addSearchHighlighting = (searchTerm, text) => {
     const maxTokens = 128
-    const { truncatedText, searchExpression } = getHighlightedSegment(searchTerm, text, maxTokens)
+    const {truncatedText, searchExpression} = getHighlightedSegment(searchTerm, text, maxTokens)
 
     return truncatedText.replace(
       searchExpression,
@@ -170,17 +174,27 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
             </Flex.Item>
             <Flex.Item>
               <IconButton
-                onClick={_ => onLike({id: content_id, type: content_type}).then(_ => setFeedback("liked"))}
+                onClick={_ =>
+                  onLike({id: content_id, type: content_type}).then(_ => setFeedback('liked'))
+                }
                 screenReaderLabel={I18n.t('I like this result')}
-                renderIcon={feedback === "liked" ? <IconLikeSolid color="brand" />: <IconLikeLine />}
+                renderIcon={
+                  feedback === 'liked' ? <IconLikeSolid color="brand" /> : <IconLikeLine />
+                }
                 withBackground={false}
                 withBorder={false}
               />
               <span style={{display: 'inline-block', transform: 'rotate(180deg)'}}>
                 <IconButton
-                  onClick={_ => onDislike({id: content_id, type: content_type}).then(_ => setFeedback("disliked"))}
+                  onClick={_ =>
+                    onDislike({id: content_id, type: content_type}).then(_ =>
+                      setFeedback('disliked')
+                    )
+                  }
                   screenReaderLabel={I18n.t('I do not like this result')}
-                  renderIcon={feedback === "disliked" ? <IconLikeSolid color="brand" /> : <IconLikeLine />}
+                  renderIcon={
+                    feedback === 'disliked' ? <IconLikeSolid color="brand" /> : <IconLikeLine />
+                  }
                   withBackground={false}
                   withBorder={false}
                 />

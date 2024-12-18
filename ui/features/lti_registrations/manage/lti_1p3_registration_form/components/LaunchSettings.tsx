@@ -22,9 +22,11 @@ import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import {useValidateLaunchSettings} from '../hooks/useValidateLaunchSettings'
-import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
+import {
+  formatCustomFields,
+  type Lti1p3RegistrationOverlayStore,
+} from '../Lti1p3RegistrationOverlayState'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -33,18 +35,25 @@ import {Popover} from '@instructure/ui-popover'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
+import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import {toUndefined} from '../../../common/lib/toUndefined'
 
 const I18n = useI18nScope('lti_registrations')
 
 export type LaunchSettingsProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
+  internalConfig: InternalLtiConfiguration
   unregister: () => void
   reviewing: boolean
   onNextClicked: () => void
 }
 
 export const LaunchSettings = (props: LaunchSettingsProps) => {
-  const [{launchSettings}, actions] = useOverlayStore(props.overlayStore)
+  const config = props.internalConfig
+  const {
+    state: {launchSettings},
+    ...actions
+  } = props.overlayStore()
 
   const {
     redirectUrisMessages,
@@ -53,9 +62,9 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
     jwkMessages,
     domainMessages,
     customFieldsMessages,
-  } = useValidateLaunchSettings(launchSettings)
+  } = useValidateLaunchSettings(launchSettings, config)
 
-  const isNextDisabled = Object.values(useValidateLaunchSettings(launchSettings)).some(
+  const isNextDisabled = Object.values(useValidateLaunchSettings(launchSettings, config)).some(
     messages => messages.length !== 0
   )
 
@@ -82,10 +91,9 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
             <TextArea
               label={I18n.t('Redirect URIs')}
               maxHeight="76px"
-              value={launchSettings.redirectURIs}
+              value={launchSettings.redirectURIs || ''}
               onChange={e => actions.setRedirectURIs(e.target.value)}
               aria-describedby="redirect_uris_hint"
-              placeholder={'https://example.com/launch\nhttps://example.com/secondary_launch'}
               messages={redirectUrisMessages}
             />
             <Text size="small" id="redirect_uris_hint">
@@ -94,14 +102,15 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
           </div>
           <TextInput
             renderLabel={I18n.t('Default Target Link URI')}
-            value={launchSettings.targetLinkURI}
+            value={launchSettings.targetLinkURI || ''}
+            placeholder={config.target_link_uri}
             onChange={e => actions.setDefaultTargetLinkURI(e.target.value)}
             messages={targetLinkURIMessages}
             required={true}
           />
           <TextInput
             renderLabel={I18n.t('OpenID Connect Initiation URL')}
-            value={launchSettings.openIDConnectInitiationURL}
+            value={launchSettings.openIDConnectInitiationURL || ''}
             onChange={e => actions.setOIDCInitiationURI(e.target.value)}
             required={true}
             messages={openIDConnectInitiationURLMessages}
@@ -110,7 +119,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
             name="jwkMethod"
             description={I18n.t('JWK Method')}
             value={launchSettings.JwkMethod}
-            onChange={(e, value) => actions.setJwkMethod(value as 'public_jwk_url' | 'public_jwk')}
+            onChange={(_, value) => actions.setJwkMethod(value as 'public_jwk_url' | 'public_jwk')}
             layout="columns"
           >
             <RadioInput value="public_jwk_url" label={I18n.t('Public JWK URL')} />
@@ -120,22 +129,23 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
             <TextArea
               label={I18n.t('JWK')}
               maxHeight="10rem"
-              value={launchSettings.Jwk}
+              value={launchSettings.Jwk || ''}
               onChange={e => actions.setJwk(e.target.value)}
               messages={jwkMessages}
-              required={true}
+              themeOverride={{fontFamily: 'monospace'}}
             />
           ) : (
             <TextInput
               renderLabel={I18n.t('JWK URL')}
-              value={launchSettings.JwkURL}
+              value={launchSettings.JwkURL || ''}
               onChange={e => actions.setJwkURL(e.target.value)}
               messages={jwkMessages}
             />
           )}
           <TextInput
             renderLabel={I18n.t('Domain')}
-            value={launchSettings.domain}
+            value={launchSettings.domain || ''}
+            placeholder={toUndefined(config.domain)}
             onChange={e => actions.setDomain(e.target.value)}
             messages={domainMessages}
           />
@@ -173,10 +183,12 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
                 </>
               }
               maxHeight="10rem"
-              value={launchSettings.customFields}
+              value={launchSettings.customFields || ''}
               onChange={e => actions.setCustomFields(e.target.value)}
               aria-describedby="custom_fields_hint"
-              placeholder="name=value"
+              placeholder={
+                config.custom_fields ? formatCustomFields(config.custom_fields) : 'name=value'
+              }
               messages={customFieldsMessages}
               data-testid="custom-fields"
             />

@@ -123,7 +123,6 @@ describe ContextController do
 
     context "granular enrollment permissions" do
       it "teacher and student permissions are excluded from active_granular_enrollment_permissions when not enabled" do
-        @course.root_account.enable_feature!(:granular_permissions_manage_users)
         %w[add_student_to_course add_teacher_to_course].each do |perm|
           RoleOverride.create!(context: Account.default, permission: perm, role: teacher_role, enabled: false)
         end
@@ -138,7 +137,7 @@ describe ContextController do
 
     context "student context cards" do
       it "is always enabled for teachers" do
-        %w[manage_students manage_admin_users].each do |perm|
+        %w[manage_students allow_course_admin_actions].each do |perm|
           RoleOverride.manage_role_override(Account.default, teacher_role, perm, override: false)
         end
         user_session(@teacher)

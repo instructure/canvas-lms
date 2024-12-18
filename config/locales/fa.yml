@@ -5998,6 +5998,7 @@ fa:
   confirm_email_address_9072dd3c: "تأیید نشانی پست الکترونیکی"
   confirm_mastery_calculation_19ad19f9: "محاسبه تسلط را تأیید کنید"
   confirm_mastery_scale_9a779252: "تایید مقیاس تسلط"
+  confirm_password_aaf07824: "تأیید رمز عبور"
   confirm_qr_code_display_49664fa3: "نمایش کد QR را تأیید کنید"
   confirm_reactivation_ec0f30c6: "فعال سازی مجدد را تایید کنید"
   confirm_removal_a9bb889: "تأیید حذف"
@@ -13090,6 +13091,7 @@ fa:
   jobs_ec5d59d8: کارها
   jobs_v2_b20a83f7: "کارهای  v2"
   join_6cafecca: پیوستن
+  join_code_1e74e5a8: "رمز عضویت"
   join_course_511e6cb3: "ملحق شدن به %{course}"
   join_group_group_name_871a5e3f: "پیوستن به گروه %{group_name}"
   join_the_conversation_using_the_link_below_54ab1f0e: "از طریق پیوند زیر به گفتگو ملحق شوید."
@@ -18793,6 +18795,7 @@ fa:
   question_f06476d1: پرسش
   question_group_837b8014: "گروه پرسش"
   question_mark_icon_d2bbd204: "نماد علامت سؤال"
+  question_position_45eba089: "پرسش %{position}"
   question_unanswered: "هنوز پاسخ داده نشده است"
   questions_a955145c: "پرسش ها"
   queued_d0e45c4b: "صف شده"
@@ -22820,6 +22823,7 @@ fa:
       در حال بهبود ارائه می شود.
   student_page_history_ce86b3c2: "تاریخچه صفحه دانشجویی"
   student_paired_successfully_a88def61: "دانشجو با موفقیت جفت شد"
+  student_pairing_code_a28d8442: "رمز جفتی دانشجو"
   student_planner_date_4cc73abb: "تاریخ برنامه‌ریز دانشجویی:"
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
   student_position_6d3b7750: "دانشجو %{position}"
@@ -22919,6 +22923,10 @@ fa:
       other: "%{count} زیر حساب"
     titles: 
       sub_accounts: "زیر حساب ها"
+  sub_assignment: 
+    atom_no_author: "نویسنده موجود نیست"
+    labels: 
+      due: مهلت
   subaccount_91f4c279: زیرحساب
   subaccount_navigation_account_settings_add9eff9: "پیمایش زیر حساب (تنظیمات حساب)"
   subaccount_settings_8549eff7: "تنظیمات زیر حساب"
@@ -23979,6 +23987,7 @@ fa:
   time_left_in_your_instant_trial_5dd0392b: "%{time} در نمونه آزمایشی شما باقیمانده"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} در نمونه آزمایشی فوری شما باقیمانده *(همین حالا تمدید کنید)*"
   time_limit_a6f1a51e: "محدودیت زمانی"
+  time_range_4ae01737: "بازه زمانی"
   time_zone_f56f5183: "منطقه زمانی"
   time_zones: 
     abu_dhabi: "ابو ذبی"
@@ -25564,6 +25573,7 @@ fa:
   what_assignment_types_can_i_create_in_a_course_1ed4eed4: "چه نوع تکالیفی را می توانم در یک دوره ایجاد کنم؟"
   what_does_provisioning_only_mean_eac9a4a1: "فقط تدارک به چه معناست؟"
   what_happened_322d8259: "چه اتفاقی افتاد؟"
+  what_is_a_pairing_code_e312bd48: "رمز جفتی چیست؟"
   what_it_does_74ec1339: "چه کار میکند"
   what_it_does_d4debc07: "چکار میکند"
   what_options_can_i_set_in_a_quiz_53522d76: "چه گزینه هایی را می توانم در یک مسابقه تنظیم کنم؟"

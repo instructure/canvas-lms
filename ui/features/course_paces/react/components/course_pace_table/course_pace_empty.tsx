@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -26,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {ResponsiveSizes} from '../../types'
+import type {ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
 import PandaShowingPaces from '../../../images/PandaShowingPaces.svg'
 import PandaUsingPaces from '../../../images/PandaUsingPaces.svg'
@@ -53,6 +52,7 @@ export const CoursePaceEmpty = ({
         justifyItems={responsiveSize !== 'small' ? 'start' : 'center'}
         margin="0 0 medium 0"
       >
+        {/* @ts-expect-error */}
         <Flex.Item padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
@@ -85,6 +85,7 @@ export const CoursePaceEmpty = ({
           </Flex.Item>
         ) : null}
 
+        {/* @ts-expect-error */}
         <Flex.Item padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
@@ -117,6 +118,7 @@ export const CoursePaceEmpty = ({
         size="large"
         display={responsiveSize !== 'small' ? 'inline-block' : 'block'}
         onClick={() => {
+          // @ts-expect-error
           setSelectedPaceContext('Course', window.ENV.COURSE_ID)
         }}
       >
@@ -144,5 +146,6 @@ export const CoursePaceEmpty = ({
 }
 
 export default connect(null, {setSelectedPaceContext: actions.setSelectedPaceContext})(
+  // @ts-expect-error
   CoursePaceEmpty
 )

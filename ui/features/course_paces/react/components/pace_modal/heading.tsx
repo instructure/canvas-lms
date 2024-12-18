@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -23,7 +22,7 @@ import {connect} from 'react-redux'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
-import {CoursePace, PaceContext, Section, StoreState} from '../../types'
+import type {CoursePace, PaceContext, Section, StoreState} from '../../types'
 import {Text} from '@instructure/ui-text'
 import {IconUserSolid} from '@instructure/ui-icons'
 import {getBlueprintLocked} from '../../reducers/ui'

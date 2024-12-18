@@ -41,12 +41,14 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('block-editor')
 
+export type DisplayType = 'grid' | 'rows'
+
 export default function DisplayLayoutButtons({
   displayType,
   setDisplayType,
 }: {
-  displayType: 'grid' | 'rows'
-  setDisplayType: () => void
+  displayType: DisplayType
+  setDisplayType: (dtype: DisplayType) => void
 }) {
   const gridSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
       <g id="Icon">
@@ -112,6 +114,7 @@ export default function DisplayLayoutButtons({
         withBorder={displayType === 'grid'}
         onClick={selectGrid}
         screenReaderLabel={I18n.t('Display templates as grid')}
+        title={I18n.t('Display templates as grid')}
       >
         <SVGIcon src={gridSVG} />
       </IconButton>
@@ -120,6 +123,7 @@ export default function DisplayLayoutButtons({
         withBorder={displayType === 'rows'}
         onClick={selectRows}
         screenReaderLabel={I18n.t('Display templates as rows')}
+        title={I18n.t('Display templates as rows')}
       >
         <SVGIcon src={rowSVG} />
       </IconButton>

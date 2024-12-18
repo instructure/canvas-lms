@@ -23,7 +23,7 @@ import {KBNavigator} from '../../../../utils/KBNavigator'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/page-block')
+const I18n = useI18nScope('block-editor')
 
 export type PageBlockProps = {
   children?: React.ReactNode
@@ -75,6 +75,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
           }
         }
       } else if (kbnav) {
+        // @ts-expect-error
         kbnav.key(e, actions, query, selectedNodeId)
       }
     },

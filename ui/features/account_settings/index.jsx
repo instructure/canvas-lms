@@ -37,9 +37,11 @@ const I18n = useI18nScope('account_settings_jsx_bundle')
 ready(() => {
   initializeTopNavPortal()
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
 
   if (document.getElementById('custom_help_link_settings')) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CustomHelpLinkSettings
         {...{
@@ -55,10 +57,12 @@ ready(() => {
 
   const emojiDenyListContainer = document.getElementById('emoji-deny-list')
   if (emojiDenyListContainer) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<CustomEmojiDenyList />, emojiDenyListContainer)
   }
 
   if (document.getElementById('tab-security')) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <View as="div" margin="large" padding="large" textAlign="center">
         <Spinner size="large" renderTitle={I18n.t('Loading')} />
@@ -69,15 +73,18 @@ ready(() => {
 
   const internalSettingsMountpoint = document.getElementById('tab-internal-settings')
   if (internalSettingsMountpoint) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<InternalSettings />, internalSettingsMountpoint)
   }
 
   if (document.getElementById('tab-integrations')) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<MicrosoftSyncAccountSettings />, document.getElementById('tab-integrations'))
   }
 
   const courseCreationSettingsContainer = document.getElementById('course_creation_settings')
   if (courseCreationSettingsContainer) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <CourseCreationSettings currentValues={ENV.COURSE_CREATION_SETTINGS} />,
       courseCreationSettingsContainer

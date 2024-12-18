@@ -33,6 +33,7 @@ const setUp = (propOverrides = {}, mockSuccess = true) => {
   const mocks = mockSuccess ? [mockSetWorkflowSuccess] : [mockSetWorkflowFailure]
   return render(
     <MockedProvider mocks={mocks} addTypename={false}>
+      {/* @ts-expect-error */}
       <AssignmentPublishButton {...props} />
     </MockedProvider>
   )

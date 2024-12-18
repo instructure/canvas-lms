@@ -26,6 +26,7 @@ import {ProgressBar} from '@instructure/ui-progress'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
+import {FormLabel, RequiredFormLabel, ErrorFormMessage} from '@canvas/content-migrations'
 
 const I18n = useI18nScope('content_migrations_redesign')
 
@@ -35,10 +36,16 @@ type MigrationFileInputProps = {
   fileUploadProgress: number | null
   isSubmitting?: boolean
   externalFormMessage?: FormMessage
+  isRequired?: boolean
 }
 
 const getHintMessage = (text: string): FormMessage => ({text, type: 'hint'})
-const getErrorMessage = (text: string): FormMessage => ({text, type: 'error'})
+const getErrorMessage = (text: string): FormMessage => ({
+  text: <ErrorFormMessage>{text}</ErrorFormMessage>,
+  type: 'error',
+})
+
+const formLabelText = I18n.t('Source')
 
 const MigrationFileInput = ({
   onChange,
@@ -46,6 +53,7 @@ const MigrationFileInput = ({
   fileUploadProgress,
   isSubmitting,
   externalFormMessage,
+  isRequired,
 }: MigrationFileInputProps) => {
   const [formMessage, setFormMessage] = useState<FormMessage>(
     externalFormMessage || {text: I18n.t('No file chosen'), type: 'hint'}
@@ -92,10 +100,17 @@ const MigrationFileInput = ({
     <>
       <View margin="none none x-small none" style={{display: 'block'}}>
         <label htmlFor="migrationFileUpload">
-          <Text weight="bold">{I18n.t('Source')}</Text>
+          {isRequired ? (
+            <RequiredFormLabel showErrorState={formMessage && formMessage.type === 'error'}>
+              {formLabelText}
+            </RequiredFormLabel>
+          ) : (
+            <FormLabel>{formLabelText}</FormLabel>
+          )}
         </label>
       </View>
       <FileDrop
+        id="migrationFileUpload"
         accept={accepts || '.zip,.imscc,.mbz,.xml'}
         onDropAccepted={handleDropAccepted}
         interaction={isSubmitting ? 'disabled' : 'enabled'}
@@ -126,7 +141,6 @@ const MigrationFileInput = ({
               screenReaderLabel={I18n.t('Loading completion')}
               valueNow={fileUploadProgress || 0}
               valueMax={100}
-              // @ts-ignore
               shouldAnimate={true}
             />
             <span>{fileUploadProgress}%</span>

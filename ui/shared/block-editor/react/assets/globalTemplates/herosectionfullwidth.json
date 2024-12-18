@@ -122,16 +122,11 @@
       },
       "B_eUoQj7m1": {
         "type": {
-          "resolvedName": "TextBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "fontSize": "24pt",
-          "textAlign": "initial",
-          "color": "#35423AFF",
-          "text": "<p>Welcome to Class!</p>",
-          "width": 314,
-          "height": 41
+          "text": "<h2>Welcome to Class!</h2>"
         },
         "displayName": "Text",
         "custom": {
@@ -145,16 +140,11 @@
       },
       "bcAaEuLVEl": {
         "type": {
-          "resolvedName": "TextBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "fontSize": "12pt",
-          "textAlign": "initial",
-          "color": "#35423FFF",
-          "text": "<p>We’re excited to have you join us on this learning journey! This course is designed to inspire, engage, and equip you with valuable skills and knowledge. Here, you’ll find resources, assignments, and discussion forums to enhance your experience.</p>",
-          "width": 965,
-          "height": 49
+          "text": "<p>We’re excited to have you join us on this learning journey! This course is designed to inspire, engage, and equip you with valuable skills and knowledge. Here, you’ll find resources, assignments, and discussion forums to enhance your experience.</p>"
         },
         "displayName": "Text",
         "custom": {
@@ -176,7 +166,7 @@
           "href": "",
           "size": "medium",
           "variant": "filled",
-          "color": "#FFFFFFB0",
+          "background": "#F7FDFD",
           "iconName": "calendar"
         },
         "displayName": "Button",

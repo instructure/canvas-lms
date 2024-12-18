@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -26,14 +25,22 @@ const I18n = useI18nScope('LongTextEditor')
  * this is just LongTextEditor from slick.editors.js but with i18n and a
  * stupid dontblur class to cooperate with our gradebook's onGridBlur handler
  */
+// @ts-expect-error
 function LongTextEditor(args) {
+  // @ts-expect-error
   let $input
+  // @ts-expect-error
   let $wrapper
+  // @ts-expect-error
   let $saveButton
+  // @ts-expect-error
   let $cancelButton
+  // @ts-expect-error
   let defaultValue
+  // @ts-expect-error
   const scope = this
 
+  // @ts-expect-error
   this.init = function () {
     const $container = args.alt_container ? $(args.alt_container) : $('body')
 
@@ -81,10 +88,12 @@ function LongTextEditor(args) {
     $input.focus().select()
   }
 
+  // @ts-expect-error
   this.handleKeyDown = function (event) {
     const keyCode = event.which
     const target = event.target
 
+    // @ts-expect-error
     if (target === $input.get(0)) {
       if (keyCode === $.ui.keyCode.ENTER && event.ctrlKey) {
         event.preventDefault()
@@ -98,20 +107,26 @@ function LongTextEditor(args) {
       } else if (keyCode === $.ui.keyCode.TAB && !event.shiftKey) {
         // This explicit focus shifting allows JS specs to pass
         event.preventDefault()
+        // @ts-expect-error
         $saveButton.focus()
       }
+      // @ts-expect-error
     } else if (target === $saveButton.get(0)) {
       if (keyCode === $.ui.keyCode.TAB && event.shiftKey) {
         event.preventDefault()
+        // @ts-expect-error
         $input.focus()
       } else if (keyCode === $.ui.keyCode.TAB && !event.shiftKey) {
         // This explicit focus shifting allows JS specs to pass
         event.preventDefault()
+        // @ts-expect-error
         $cancelButton.focus()
       }
+      // @ts-expect-error
     } else if (target === $cancelButton.get(0)) {
       if (keyCode === $.ui.keyCode.TAB && event.shiftKey) {
         event.preventDefault()
+        // @ts-expect-error
         $saveButton.focus()
       } else if (keyCode === $.ui.keyCode.TAB && !event.shiftKey) {
         // This explicit focus shifting allows JS specs to pass
@@ -121,24 +136,33 @@ function LongTextEditor(args) {
     }
   }
 
+  // @ts-expect-error
   this.save = function () {
     args.commitChanges()
   }
 
+  // @ts-expect-error
   this.cancel = function () {
+    // @ts-expect-error
     $input.val(defaultValue)
     args.cancelChanges()
   }
 
+  // @ts-expect-error
   this.hide = function () {
+    // @ts-expect-error
     $wrapper.hide()
   }
 
+  // @ts-expect-error
   this.show = function () {
+    // @ts-expect-error
     $wrapper.show()
   }
 
+  // @ts-expect-error
   this.position = function () {
+    // @ts-expect-error
     $wrapper.position({
       my: 'center top',
       at: 'center top',
@@ -146,31 +170,44 @@ function LongTextEditor(args) {
     })
   }
 
+  // @ts-expect-error
   this.destroy = function () {
+    // @ts-expect-error
     $wrapper.remove()
   }
 
+  // @ts-expect-error
   this.focus = function () {
+    // @ts-expect-error
     $input.focus()
   }
 
+  // @ts-expect-error
   this.loadValue = function (item) {
+    // @ts-expect-error
     $input.val((defaultValue = item[args.column.field]))
+    // @ts-expect-error
     $input.select()
   }
 
+  // @ts-expect-error
   this.serializeValue = function () {
+    // @ts-expect-error
     return $input.val()
   }
 
+  // @ts-expect-error
   this.applyValue = function (item, state) {
     item[args.column.field] = state
   }
 
+  // @ts-expect-error
   this.isValueChanged = function () {
+    // @ts-expect-error
     return !($input.val() === '' && defaultValue == null) && $input.val() !== defaultValue
   }
 
+  // @ts-expect-error
   this.validate = function () {
     return {
       valid: true,
@@ -178,6 +215,7 @@ function LongTextEditor(args) {
     }
   }
 
+  // @ts-expect-error
   this.init()
 }
 

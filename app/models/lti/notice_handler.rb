@@ -24,5 +24,31 @@ class Lti::NoticeHandler < ApplicationRecord
   belongs_to :account, inverse_of: :lti_notice_handlers, optional: false
   belongs_to :context_external_tool, optional: false
 
+  # We don't actually currently need to enforce a minimum max_batch_size, but
+  # we are insisting on a 'reasonable minimum batch size' (from the spec) in
+  # case we want to batch in the future. In the future we might want
+  # notice-type specific values, or we can simply set this to 1 if we don't
+  # need the restriction.
+  MIN_MAX_BATCH_SIZE = 10
+
+  validates :max_batch_size,
+            numericality: {
+              only_integer: true,
+              greater_than_or_equal_to: MIN_MAX_BATCH_SIZE,
+            },
+            allow_nil: true,
+            if: :active?
+
+  validates :notice_type, inclusion: { in: Lti::Pns::NoticeTypes::ALL, message: "not in #{Lti::Pns::NoticeTypes::ALL}" }, if: :active?
+  validate :validate_tool_url, if: :active?
+
+  def validate_tool_url
+    if !url&.match?(URI::DEFAULT_PARSER.make_regexp)
+      errors.add(:url, "is not a valid URL")
+    elsif !context_external_tool&.matches_host?(url)
+      errors.add(:url, "should match tool's domain")
+    end
+  end
+
   resolves_root_account through: :account
 end

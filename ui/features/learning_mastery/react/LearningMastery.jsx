@@ -70,6 +70,7 @@ export default class LearningMastery {
 
   renderPagination(page = 0, pageCount = 0) {
     const loadPage = this.view.loadPage.bind(this.view)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Paginator page={page} pageCount={pageCount} loadPage={loadPage} />,
       document.getElementById('outcome-gradebook-paginator')
@@ -111,6 +112,7 @@ export default class LearningMastery {
       learningMasteryEnabled: true,
       variant: 'DefaultGradebookLearningMastery',
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<GradebookMenu {...props} />, $container)
   }
 

@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render} from '@testing-library/react'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {useNode} from '@craftjs/core'
+import {useNode, useEditor} from '@craftjs/core'
 import {GroupBlock, GroupBlockToolbar} from '..'
 
 let props = {...GroupBlock.craft.defaultProps}
@@ -30,9 +30,21 @@ const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => 
 
 jest.mock('@craftjs/core', () => {
   return {
+    useEditor: jest.fn(() => {
+      return {
+        query: {
+          getSerializedNodes: jest.fn(() => {
+            return {}
+          }),
+        },
+      }
+    }),
     useNode: jest.fn(_node => {
       return {
         actions: {setProp: mockSetProp},
+        node: {
+          dom: undefined,
+        },
         props: GroupBlock.craft.defaultProps,
       }
     }),

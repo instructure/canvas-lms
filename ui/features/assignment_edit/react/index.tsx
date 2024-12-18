@@ -28,13 +28,16 @@ import type {InMemoryCache} from 'apollo-cache-inmemory'
 
 export default function renderEditAssignmentsApp(elt: HTMLElement | null) {
   const client: ApolloClient<InMemoryCache> = createClient()
+  // @ts-expect-error
   const root = createRoot(elt)
   root.render(
     <QueryProvider>
       <ApolloProvider client={client}>
         {ENV.ASSIGNMENT_ID ? (
+          // @ts-expect-error
           <TeacherEditQuery assignmentLid={ENV.ASSIGNMENT_ID} />
         ) : (
+          // @ts-expect-error
           <TeacherCreateQuery courseId={ENV.COURSE_ID} />
         )}
       </ApolloProvider>

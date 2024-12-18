@@ -18,7 +18,7 @@
 
 import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import createStore from '@canvas/backbone/createStore'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {Button} from '@instructure/ui-buttons'
@@ -93,7 +93,11 @@ const CoursePublishButton = ({
           .getModules({courseId})
           .then(({data: modules}) => {
             if (defaultView === 'modules' && modules.length === 0) {
-              ReactDOM.render(
+              if (!container) {
+                throw new Error('Container not found')
+              }
+              const root = ReactDOM.createRoot(container)
+              root.render(
                 <HomePagePromptContainer
                   forceOpen={true}
                   store={defaultViewStore}
@@ -109,8 +113,7 @@ const CoursePublishButton = ({
                       })
                     }
                   }}
-                />,
-                container
+                />
               )
             } else {
               apiClient.publishCourse({courseId, onSuccess: () => handleUpdatePublishSuccess(true)})
@@ -129,6 +132,7 @@ const CoursePublishButton = ({
   }
 
   const getButtonLabel = (): React.ReactFragment => {
+    // @ts-expect-error
     return (
       <>
         {coursePublished ? I18n.t('Published') : I18n.t('Unpublished')}
@@ -170,6 +174,7 @@ const CoursePublishButton = ({
       onToggle={handleMenuToggle}
       trigger={
         <Button
+          // @ts-expect-error
           renderIcon={coursePublished ? IconPublishSolid : IconNoLine}
           color="primary-inverse"
           themeOverride={buttonThemeOverride}

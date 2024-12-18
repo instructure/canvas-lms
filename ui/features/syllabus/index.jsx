@@ -137,6 +137,7 @@ ready(() => {
   // Add the loading indicator now that the collections are fetching
   const node = document.querySelector('#loading_indicator')
   if (node instanceof HTMLElement) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />

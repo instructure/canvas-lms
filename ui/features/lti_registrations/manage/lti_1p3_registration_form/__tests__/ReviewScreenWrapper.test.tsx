@@ -38,7 +38,7 @@ describe('Review Screen Wrapper', () => {
     stateOverrides: Partial<Lti1p3RegistrationOverlayState> = {}
   ) => {
     const internalConfig = mockInternalConfiguration(internalConfigOverrides)
-    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig)
+    const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     const state = overlayStore.getState()
     overlayStore.setState({...state, state: {...state.state, ...stateOverrides}})
 
@@ -142,6 +142,22 @@ describe('Review Screen Wrapper', () => {
     renderComponent()
 
     expect(screen.getByText('Naming')).toBeInTheDocument()
+  })
+
+  it('renders appropriate text when no nickname is defined', () => {
+    renderComponent(
+      {},
+      {
+        naming: {
+          nickname: undefined,
+          placements: {},
+        },
+      }
+    )
+
+    screen.debug(undefined, 100000)
+
+    expect(screen.getByText(/no nickname provided/i)).toBeInTheDocument()
   })
 
   it('renders the icon URLs section', () => {

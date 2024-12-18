@@ -27,7 +27,7 @@ import {HeadingBlockToolbar} from './HeadingBlockToolbar'
 import {type HeadingBlockProps, type HeadingLevel} from './types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/text-block')
+const I18n = useI18nScope('block-editor')
 
 export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) => {
   const {enabled} = useEditor(state => {
@@ -49,6 +49,7 @@ export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) =>
   const [editable, setEditable] = useState(true) // editable when first added
 
   const handleChange = useCallback(
+    // @ts-expect-error
     e => {
       setProp((props: HeadingBlockProps) => {
         props.text = e.target.value.replace(/<\/?[^>]+(>|$)/g, '')
@@ -75,6 +76,7 @@ export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) =>
     [editable]
   )
 
+  // @ts-expect-error
   const handleClick = useCallback(_e => {
     setEditable(true)
   }, [])

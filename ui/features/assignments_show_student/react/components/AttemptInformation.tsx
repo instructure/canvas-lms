@@ -149,6 +149,7 @@ export default ({
                 !context.allowChangesToSubmission
               const button = (
                 <Button
+                  // @ts-expect-error
                   renderIcon={IconChatLine}
                   onClick={openCommentTray}
                   disabled={addCommentsDisabled}

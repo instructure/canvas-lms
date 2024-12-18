@@ -52,6 +52,7 @@ describe('ManageTempEnrollButton', () => {
       is_provider: true,
       is_recipient: true,
     })
+    // @ts-expect-error
     const {findByText} = render(<ManageTempEnrollButton {...defaultProps} />)
     const button = await findByText('Temporary Enrollments')
     expect(button).toBeInTheDocument()
@@ -62,6 +63,7 @@ describe('ManageTempEnrollButton', () => {
       is_provider: false,
       is_recipient: true,
     })
+    // @ts-expect-error
     const {queryByText} = render(<ManageTempEnrollButton {...defaultProps} />)
     const button = await waitFor(() => queryByText('Temporary Enrollments'))
     expect(button).not.toBeInTheDocument()

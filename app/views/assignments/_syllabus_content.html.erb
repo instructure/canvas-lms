@@ -24,6 +24,9 @@
     title_text = t("Important Info")
     submit_btn_text = t("Update Important Info")
     help_text = t("You can add important information here that you want to display under the Resources tab.")
+  elsif @context.horizon_course?
+    title_text = t("Overview")
+    submit_btn_text = t("Update Overview")
   else
     title_text = t("titles.course_syllabus", "Course Syllabus")
     submit_btn_text = t("buttons.update_syllabus", "Update Syllabus")

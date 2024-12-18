@@ -49,6 +49,7 @@ QUnit.module('ConfirmUnfavoriteCourseModal', suiteHooks => {
     const bindRef = ref => {
       component = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<ConfirmUnfavoriteCourseModal ref={bindRef} {...props} />, $container)
   }
 

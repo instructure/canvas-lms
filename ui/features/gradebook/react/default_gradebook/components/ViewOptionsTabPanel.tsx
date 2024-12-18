@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -31,6 +30,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')
 
+// @ts-expect-error
 function buildAssignmentSortOptions(includeModules) {
   const options = [
     {criterion: 'default', direction: 'ascending', label: I18n.t('Default Order')},
@@ -63,6 +63,7 @@ function buildAssignmentSortOptions(includeModules) {
   }))
 }
 
+// @ts-expect-error
 function renderCheckbox(setting, label, key) {
   return (
     <Checkbox
@@ -76,14 +77,23 @@ function renderCheckbox(setting, label, key) {
 }
 
 export default function ViewOptionsTabPanel({
+  // @ts-expect-error
   columnSort,
+  // @ts-expect-error
   finalGradeOverrideEnabled,
+  // @ts-expect-error
   hideAssignmentGroupTotals,
+  // @ts-expect-error
   hideTotal,
+  // @ts-expect-error
   showNotes,
+  // @ts-expect-error
   showUnpublishedAssignments,
+  // @ts-expect-error
   showSeparateFirstLastNames,
+  // @ts-expect-error
   statusColors,
+  // @ts-expect-error
   viewUngradedAsZero,
 }) {
   const sortOptions = buildAssignmentSortOptions(columnSort.modulesEnabled)

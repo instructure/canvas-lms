@@ -169,7 +169,12 @@ export function useAllPages<
   return queryResult
 }
 
-export function useMutation(options: UseMutationOptions) {
+export function useMutation<
+  TData = unknown,
+  TError = unknown,
+  TVariables = void,
+  TContext = unknown
+>(options: UseMutationOptions<TData, TError, TVariables, TContext>) {
   return baseUseMutation(options)
 }
 

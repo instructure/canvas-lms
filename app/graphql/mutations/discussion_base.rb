@@ -39,6 +39,7 @@ class Types::DiscussionCheckpointDateSetType < Types::BaseEnum
   value "CourseSection"
   value "Group"
   value "ADHOC"
+  value "Course"
 end
 
 class Mutations::DiscussionCheckpointDate < GraphQL::Schema::InputObject

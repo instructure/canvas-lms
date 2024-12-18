@@ -107,12 +107,14 @@
               {{/if}}
               {{#unless front_page}}
                   {{#if CAN.UPDATE}}
-                    <li>
-                      <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
-                         title="{{#t}}Use as {{frontPageText}}{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
-                          <i class="icon-bookmark" aria-hidden="true">{{#t}}Use as {{frontPageText}}{{/t}}</i>
-                      </a>
-                    </li>
+                    {{#unless is_horizon_course}}
+                      <li>
+                        <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+                          title="{{#t}}Use as {{frontPageText}}{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+                            <i class="icon-bookmark" aria-hidden="true">{{#t}}Use as {{frontPageText}}{{/t}}</i>
+                        </a>
+                      </li>
+                    {{/unless}}
                   {{/if}}
               {{/unless}}
               {{#if CAN.DUPLICATE}}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -26,7 +25,7 @@ import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {PaceContextTypes} from '../types'
+import type {PaceContextTypes} from '../types'
 
 const I18n = useI18nScope('remove_pace_warning_modal')
 
@@ -64,6 +63,7 @@ export const RemovePaceWarningModal = ({
         )
 
   return (
+    // @ts-expect-error
     <Modal size="small" open={open} onDismiss={onCancel} label={MODAL_HEADER_TEXT[contextType]}>
       <ModalBody>
         <View>

@@ -29,54 +29,9 @@
     class="hiddenDateEnd"
     name="end_time"
   />
-
-  <input type="submit" class="btn btn-primary span2" value="{{#t}}Find{{/t}}">
 </div>
 
 <div class="v-gutter">
   <h2 class="screenreader-only">{{#t}}Users{{/t}}</h2>
   <div data-view="users" class="users-container"></div>
-</div>
-
-<div class="pad-box border border-trbl search-controls">
-  <div class="control-group">
-    <label class="control-label" for="{{formName}}-dateStartSearchField">
-      {{#t "message_date_from"}}From Date{{/t}}
-    </label>
-    <label class="screenreader-only" id="search_start_date_label">
-      {{#t}}Limit search to activity after{{/t}}
-      {{datepickerScreenreaderPrompt}}
-    </label>
-    <div class="controls">
-      <input type="text"
-             id="{{formName}}-dateStartSearchField"
-             class="dateStartSearchField"
-             name="{{formName}}_start_time"
-             placeholder="{{#t "message_date_from"}}From Date{{/t}}"
-             maxlength="50"
-             aria-labelledby="search_start_date_label"
-             data-tooltip='{"position":"top","force_position":"true"}'
-             title="{{accessibleDateFormat}}"/>
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="{{formName}}-dateEndSearchField">
-      {{#t "message_date_to"}}To Date{{/t}}
-    </label>
-    <label class="screenreader-only" id="search_end_date_label">
-      {{#t}}Limit search to activity before{{/t}}
-      {{datepickerScreenreaderPrompt}}
-    </label>
-    <div class="controls">
-      <input type="text"
-             id="{{formName}}-dateEndSearchField"
-             class="dateEndSearchField"
-             name="{{formName}}_end_time"
-             placeholder="{{#t "message_date_to"}}To Date{{/t}}"
-             maxlength="50"
-             aria-labelledby="search_end_date_label"
-             data-tooltip='{"position":"top","force_position":"true"}'
-             title="{{accessibleDateFormat}}" />
-    </div>
-  </div>
 </div>

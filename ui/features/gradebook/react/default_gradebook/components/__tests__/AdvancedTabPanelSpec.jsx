@@ -42,6 +42,7 @@ QUnit.module('GradebookSettingsModal AdvancedTabPanel', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<AdvancedTabPanel {...props} />, $container)
   }
 

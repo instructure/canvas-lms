@@ -459,6 +459,7 @@ export default class ShowEventDetailsDialog {
 
     if (params.webConference) {
       const conferenceNode = this.popover.el.find('.conferencing')[0]
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <Conference
           conference={params.webConference}

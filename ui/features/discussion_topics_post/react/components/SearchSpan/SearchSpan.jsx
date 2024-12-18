@@ -27,40 +27,37 @@ const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
   }
 
   // If no HTML tags, bypass parsing for performance
-  if(!searchArea.includes('<')) return highlightText(searchArea, searchTerm)
+  if (!searchArea.includes('<')) return highlightText(searchArea, searchTerm)
 
   const textAndTags = [] // Stores HTML tags and plaintext as separate elements
   const textAndTagsMatches = [] // Stores indexes of matched elements
-  let tempString = ""
+  let tempString = ''
 
   // Parse the input to split HTML tags from plaintext elements
-  for(let i = 0; i < searchArea.length; i++) {
-    if(searchArea[i] === '<' && tempString) {
+  for (let i = 0; i < searchArea.length; i++) {
+    if (searchArea[i] === '<' && tempString) {
       // Check if the plaintext element contains the search term
-      if(tempString.toLowerCase().includes(searchTerm.toLowerCase())) {
+      if (tempString.toLowerCase().includes(searchTerm.toLowerCase())) {
         textAndTagsMatches.push(textAndTags.length)
       }
       // Add the plaintext element to array and reset for the tag element
       textAndTags.push(tempString)
       tempString = searchArea[i]
-    }
-    else if(searchArea[i] === '>' || i === searchArea.length - 1) {
+    } else if (searchArea[i] === '>' || i === searchArea.length - 1) {
       // Add the tag element to array and reset for next element
       tempString += searchArea[i]
       textAndTags.push(tempString)
-      tempString = ""
-    }
-    else
-    {
+      tempString = ''
+    } else {
       tempString += searchArea[i]
     }
   }
 
-  textAndTagsMatches.forEach( (index) => {
+  textAndTagsMatches.forEach(index => {
     textAndTags[index] = highlightText(textAndTags[index], searchTerm)
   })
 
-  return textAndTags.join("")
+  return textAndTags.join('')
 }
 
 // Highlight the search term and remove HTML

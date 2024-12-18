@@ -167,15 +167,13 @@
       },
       "VZf1m9OIjv": {
         "type": {
-          "resolvedName": "HeadingBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "text": "Reading Checklist",
-          "level": "h2",
-          "fontSize": "1.375rem"
+          "text": "<h2><span style='font-size: 18pt'>Reading Checklist</span></h2>"
         },
-        "displayName": "Heading",
+        "displayName": "Text",
         "custom": {
           "isResizable": true,
           "isBlock": true
@@ -187,16 +185,11 @@
       },
       "Q-4hy6Iwx1": {
         "type": {
-          "resolvedName": "TextBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "fontSize": "12pt",
-          "textAlign": "initial",
-          "color": "var(--ic-brand-font-color-dark)",
-          "text": "<p>Weekly reading materials can be found here.</p>",
-          "width": 209,
-          "height": 41
+          "text": "<p style='text-align: center;'>Weekly reading materials can be found here.</p>"
         },
         "displayName": "Text",
         "custom": {
@@ -218,7 +211,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -303,15 +295,13 @@
       },
       "_1b2OmZ-tj": {
         "type": {
-          "resolvedName": "HeadingBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "text": "Study Groups",
-          "level": "h2",
-          "fontSize": "1.375rem"
+          "text": "<h2><span style='font-size: 18pt'>Study Groups</span></h2>"
         },
-        "displayName": "Heading",
+        "displayName": "Text",
         "custom": {
           "isResizable": true,
           "isBlock": true
@@ -323,16 +313,11 @@
       },
       "yGUiDgwWgQ": {
         "type": {
-          "resolvedName": "TextBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "fontSize": "12pt",
-          "textAlign": "initial",
-          "color": "var(--ic-brand-font-color-dark)",
-          "text": "<p>Join a group to ensure your success in the course.</p>",
-          "width": 209,
-          "height": 41
+          "text": "<p style='text-align: center;'>Join a group to ensure your success in the course.</p>"
         },
         "displayName": "Text",
         "custom": {
@@ -354,7 +339,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",
@@ -439,15 +423,13 @@
       },
       "DIaZk454yk": {
         "type": {
-          "resolvedName": "HeadingBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "text": "Resources",
-          "level": "h2",
-          "fontSize": "1.375rem"
+          "text": "<h2><span style='font-size: 18pt'>Resources</span></h2>"
         },
-        "displayName": "Heading",
+        "displayName": "Text",
         "custom": {
           "isResizable": true,
           "isBlock": true
@@ -459,16 +441,11 @@
       },
       "9uQCG1WptZ": {
         "type": {
-          "resolvedName": "TextBlock"
+          "resolvedName": "RCETextBlock"
         },
         "isCanvas": false,
         "props": {
-          "fontSize": "12pt",
-          "textAlign": "initial",
-          "color": "var(--ic-brand-font-color-dark)",
-          "text": "<p>See tutoring schedule and contact information.</p>",
-          "width": 209,
-          "height": 41
+          "text": "<p style='text-align: center;'>See tutoring schedule and contact information.</p>"
         },
         "displayName": "Text",
         "custom": {
@@ -490,7 +467,6 @@
           "href": "",
           "size": "medium",
           "variant": "outlined",
-          "color": "secondary",
           "iconName": ""
         },
         "displayName": "Button",

@@ -41,7 +41,7 @@ type ProductCarouselProps = {
 }
 
 function ProductCarousel(props: ProductCarouselProps) {
-  const {products, companyName} = props
+  const {products} = props
   const slider = React.useRef<Slider>(null)
   const updatedSettings = settings(products)
   const {isDesktop, isTablet, isMobile} = useBreakpoints()
@@ -64,10 +64,10 @@ function ProductCarousel(props: ProductCarouselProps) {
 
   return (
     <div>
-      <Flex margin="0 0 medium 0">
+      <Flex margin="small 0 small 0">
         <Flex.Item shouldGrow={true} shouldShrink={true}>
-          <Text weight="bold" size="large">
-            {I18n.t('More Products by')} {companyName}
+          <Text weight="bold" size="x-large">
+            {I18n.t('More Tools by ')} {props.companyName}
           </Text>
         </Flex.Item>
         {(products?.length ?? 0) > 1 && (

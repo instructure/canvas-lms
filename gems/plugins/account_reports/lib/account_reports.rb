@@ -242,6 +242,7 @@ module AccountReports
   end
 
   def self.finalize_report(account_report, message, csv = nil)
+    account_report.reload
     report_attachment(account_report, csv)
     account_report.message = message
     failed_report(account_report) unless csv

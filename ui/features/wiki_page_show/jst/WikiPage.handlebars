@@ -73,7 +73,9 @@
                   {{/if}}
                   {{#unless front_page}}
                     {{#if CAN.UPDATE_CONTENT}}
-                      <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as {{frontPageText}}{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as {{frontPageText}}{{/t}}</a></li>
+                      {{#unless IS.HORIZON_COURSE}}
+                        <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as {{frontPageText}}{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as {{frontPageText}}{{/t}}</a></li>
+                      {{/unless}}
                     {{/if}}
                   {{/unless}}
                   {{#if CAN.DIRECT_SHARE}}

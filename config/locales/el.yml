@@ -2642,6 +2642,7 @@ el:
     upload_error_too_many_redirects: "Πάρα πολλές ανακατευθύνσεις"
     upload_error_unexpected: "Παρουσιάστηκε άγνωστο σφάλμα κατά τη λήψη από το %{url}"
   attachment_deffe5a9: "Επισυναπτόμενο αρχείο"
+  attachments_694cf227: Επισυνάψεις
   attempt_3dd42b18: προσπάθεια
   attempt_f2691284: Προσπάθεια
   attendance_ca433183: Παρουσίες
@@ -3652,6 +3653,7 @@ el:
   confirm_contact_method_29d6fe4b: "Επιβεβαίωση τρόπου επικοινωνίας"
   confirm_delete_6febeafb: "Επικύρωση Αφαίρεσης"
   confirm_email_address_9072dd3c: "Επικύρωση Ηλεκτρονικής Διεύθυνσης"
+  confirm_password_aaf07824: "Επικύρωση Συνθηματικού"
   confirm_unenrollment_64333263: "Επιβεβαίωση απεγγραφής"
   confirmation_code_required_22984955: "Κωδικός επιβεβαίωσης (απαιτείται)"
   confirmation_failed_please_try_again_ae566d37: "<mrk mid=\"5637\" mtype=\"seg\">Απέτυχε η επιβεβαίωση.</mrk>  <mrk mid=\"5638\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά.</mrk>"
@@ -5074,6 +5076,7 @@ el:
   create_users_view: 
     required: "Παρακαλώ, καταχωρίστε μερικές διευθύνσεις ηλεκτρονικού ταχυδρομείου."
   created_6ee36dff: "Δημιουργήθηκε:"
+  created_at_e607b3f5: "Δημιουργήθηκε Στις"
   created_by_b39b9c8b: "Δημιουργήθηκε απο τον/την"
   created_by_sis_b590894c: "Δημιουργήθηκε από το SIS _Student Information System_"
   created_group_group_name_2097306b: "Δημιουργήθηκε η ομάδα %{group_name}"
@@ -5476,6 +5479,7 @@ el:
       united_states_and_canada: "Ηνωμένες Πολιτείες και Καναδάς"
       vp: Αντιπρόεδρος
   description_436c48d7: Περιγραφή
+  description_709b38db: "Περιγραφή:"
   designer_c458392: "Εγγεγραμμένος ως σχεδιαστής"
   details_98a31b68: Λεπτομέρειες
   developer_key: 
@@ -7722,6 +7726,7 @@ el:
       last_error: "Τελευταίο Σφάλμα"
   jobs_ec5d59d8: Εργασίες
   join_6cafecca: Συμμετοχή
+  join_code_1e74e5a8: "Κωδικός Συμμετοχής"
   join_course_511e6cb3: "Συμμετοχή στο %{course}"
   join_group_group_name_871a5e3f: "Συμμετοχή στην ομάδα %{group_name}"
   joined_group_group_name_e3802c04: "Μπήκατε στην Ομάδα %{group_name}"
@@ -11681,6 +11686,7 @@ el:
   question_banks_45bdf347: "Τράπεζες Ερωτημάτων"
   question_f06476d1: ερώτημα
   question_group_837b8014: "Ομάδα Ερωτήσεων"
+  question_position_45eba089: "%{position} ερώτησης"
   question_unanswered: "Δεν έχει Απαντηθεί Ακόμη"
   questions_a955145c: Ερωτήσεις
   quiz: 
@@ -14346,6 +14352,7 @@ el:
   status_e7fdbe06: Κατάσταση
   stay_signed_in_1853e9b6: "Παραμείνετε συνδεδεμένος/η"
   step: Βήμα
+  storage_quota_9187910a: "Ποσόστωση Αποθηκευτικού Χώρου"
   strand_955969b1: Σκέλος
   stream_items_api: 
     assessment_request_title: "Ομότιμη Αξιολόγηση για %{title}"
@@ -14355,6 +14362,7 @@ el:
   student_groups: "Ομάδες Μαθητών"
   student_groups_863201c1: "Ομάδες Μαθητών"
   student_id: "Αναγνωριστικό -ID- Σπουδαστή/ιας"
+  student_id_9d73580f: "Αναγνωριστικό -ID- Σπουδαστή/ιας"
   student_information_8715d0c7: "Πληροφορίες Σπουδαστή"
   student_interactions_report_7717b685: "Αναφορά Αλληλεπιδράσεων Σπουδαστή"
   student_must_complete_one_of_these_requirements_6046eb3a: "Ο σπουδαστής θα πρέπει να ολοκληρώσει μία από αυτές τις απαιτήσεις"
@@ -14423,6 +14431,10 @@ el:
       other: "%{count} Υπο-λογαριασμοί"
     titles: 
       sub_accounts: Υπο-λογαρισμοί
+  sub_assignment: 
+    atom_no_author: "Δεν υπάρχει Συγγραφέας"
+    labels: 
+      due: "Καταληκτική Ημερομηνία"
   subaccount_91f4c279: Υπο-λογαριασμός
   subdomain_url_1e43b6f0: "URL υποτομέα"
   subject_reply_to: "<mrk mid=\"3085\" mtype=\"seg\">Απ:</mrk> <mrk mid=\"3086\" mtype=\"seg\">%{subject}</mrk>"
@@ -14914,6 +14926,7 @@ el:
       same_day: "%{date} από %{start_time} έως %{end_time}"
     with_ago: "πρίν από %{time}"
   time_2b5aac58: Χρόνος
+  time_range_4ae01737: "Χρονική Περίοδος"
   time_zones: 
     abu_dhabi: "Άμπου Ντάμπι"
     adelaide: Αδελαϊδα
@@ -15229,6 +15242,7 @@ el:
   update_settings_9b422d0f: "Ενημέρωση Ρυθμίσεων"
   update_tool_7d48ef2a: "Ενημέρωση %{tool}"
   update_your_notification_settings_ed9564f3: "Ενημέρωση των ρυθμίσεων ειδοποιήσεών σας"
+  updated_at_2eeb6a42: "Ενημερώθηκε στις"
   updated_group_group_name_727b1d98: "Η Ομάδα %{group_name} Ενημερώθηκε"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Ενημερωμένο UI για αναζήτηση και εμφάνιση χρηστών και μαθημάτων σε κάποιον λογαριασμό."
   updating_6edbab78: "Ενημέρωση σε εξέλιξη"
@@ -15274,6 +15288,7 @@ el:
       too_long: "Δεν πρέπει να έχει παραπάνω από %{max} χαρακτήρες"
   user_696f4d6a: χρήστης
   user_access_tokens_title: "Token Πρόσβασης Χρήστη"
+  user_agent_585ccbc7: "Πράκτορας χρήστη"
   user_avatars_e4fc4ed3: "Τα Avatars του Χρήστη"
   user_c95de254: Χρήστης
   user_content_aaf0fb5a: "Περιεχόμενο Χρήστη"
@@ -15349,6 +15364,7 @@ el:
       updating_user_details: "Γίνεται Ενημέρωση των Λεπτομερειών Χρήστη..."
     notices: 
       image_reported: "Έχει γίνει αναφορά αυτής της εικόνας"
+  user_name_dc9baa66: "Όνομα Χρήστη"
   user_name_fe5887fb: "όνομα χρήστη"
   user_name_has_just_turned_in_a_late_submission_for_874a9a31: "Ο χρήστης %{user_name} μόλις υπέβαλε εκπρόθεσμα την εργασία %{assignment_name} για το μάθημα %{course_name}"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "<mrk mid=\"1519\" mtype=\"seg\">Ο χρήστης %{user_name} μόλις σας προσέθεσε σε μια συνομιλία στο Canvas.</mrk> <mrk mid=\"1520\" mtype=\"seg\">Για να προβάλετε τη συζήτηση, κάντε κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"1521\" mtype=\"seg\">%{link}.</mrk>"
@@ -15895,6 +15911,7 @@ el:
   windows_tile_color_2b786bd9: "Χρώμα Πλακιδίου Windows:"
   windows_tile_square_b91d2b33: "<mrk mid=\"4701\" mtype=\"seg\">Πλακίδιο Windows:</mrk> <mrk mid=\"4702\" mtype=\"seg\">Τετράγωνο</mrk>"
   windows_tile_wide_4d40910: "<mrk mid=\"4703\" mtype=\"seg\">Πλακίδιο Windows:</mrk> <mrk mid=\"4704\" mtype=\"seg\">Ευρύ</mrk>"
+  workflow_state_cc8d711a: "Κατάσταση Ροής Εργασιών"
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Θα θέλατε να αποδεχτείτε ή να παραβλέψετε αυτή την ενημέρωση;"
   would_you_like_to_enable_this_app_ccdf735d: "Θα θέλετε να ενεργοποιήσετε αυτή την εφαρμογή;"
   would_you_like_to_go_back_to_include_1d279044: "Θα θέλατε να πάτε πίσω για να περιλάβετε:"

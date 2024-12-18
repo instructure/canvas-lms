@@ -36,7 +36,7 @@ import {TabsBlockToolbar} from './TabsBlockToolbar'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/tabs-block')
+const I18n = useI18nScope('block-editor')
 
 const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   const {actions, enabled} = useEditor(state => ({
@@ -85,6 +85,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   )
 
   const handleTabTitleChange = useCallback(
+    // @ts-expect-error
     e => {
       setProp((props: TabsBlockProps) => {
         if (!props.tabs) return
@@ -103,6 +104,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         e.preventDefault()
         e.stopPropagation()
         setEditable(false)
+        // @ts-expect-error
         document.getElementById(`tab-${tabs[activeTabIndex].id}`)?.focus()
       } else if (['ArrowDown', 'ArrowUp', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
         e.stopPropagation()
@@ -176,6 +178,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
               color="secondary"
               themeOverride={{smallHeight: '.75rem', secondaryGhostColor: color}}
               screenReaderLabel={I18n.t('Delete Tab')}
+              title={I18n.t('Delete Tab')}
               size="small"
               withBackground={false}
               withBorder={false}

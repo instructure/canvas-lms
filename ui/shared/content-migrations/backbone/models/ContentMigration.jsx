@@ -209,7 +209,7 @@ ContentMigration.prototype.onProgress = function (event) {
   if (event.lengthComputable) {
     mountPoint = document.getElementById('migration_upload_progress_bar')
     if (mountPoint) {
-      // eslint-disable-next-line react/no-render-return-value
+      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
       return ReactDOM.render(
         React.createElement(ProgressBar, {
           screenReaderLabel: I18n.t('Uploading progress'),

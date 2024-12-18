@@ -197,10 +197,10 @@ describe "native canvas conditional release" do
       ConditionalReleaseObjects.conditional_release_link.click
 
       ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "70", "")
-      expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to be(true)
+      expect(ConditionalReleaseObjects.scoring_input_error[0].text).to include("Please enter a score")
 
       ConditionalReleaseObjects.replace_mastery_path_scores(ConditionalReleaseObjects.division_cutoff1, "", "35")
-      expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to be(true)
+      expect(ConditionalReleaseObjects.scoring_input_error[0].text).to include("Please adjust score order")
     end
 
     it "does not show error setting middle range to 0" do
@@ -210,10 +210,7 @@ describe "native canvas conditional release" do
       replace_content(ConditionalReleaseObjects.division_cutoff1, "2")
       replace_content(ConditionalReleaseObjects.division_cutoff2, "0")
 
-      expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to be(false)
-      expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to be(false)
-      expect(ConditionalReleaseObjects.must_be_a_number_exists?).to be(false)
-      expect(ConditionalReleaseObjects.number_is_too_small_exists?).to be(false)
+      expect(element_exists?(ConditionalReleaseObjects.scoring_input_error_selector)).to be_falsey
     end
   end
 

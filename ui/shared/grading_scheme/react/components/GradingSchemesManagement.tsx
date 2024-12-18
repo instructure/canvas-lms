@@ -377,6 +377,7 @@ export const GradingSchemesManagement = ({
           })
       )
     } catch (e) {
+      // @ts-expect-error
       showFlashError(I18n.t('There was an error while loading grading schemes'))(e)
     }
   }
@@ -389,6 +390,7 @@ export const GradingSchemesManagement = ({
       setAccountDefaultGradingScheme(res)
       handleLoadingGradingSchemes()
     } catch (e) {
+      // @ts-expect-error
       showFlashError(I18n.t('There was an error while updating the default grading scheme'))(e)
     }
   }
@@ -528,6 +530,7 @@ export const GradingSchemesManagement = ({
               color="primary"
               onClick={addNewGradingScheme}
               disabled={!!(gradingSchemeCreating || editing)}
+              // @ts-expect-error
               renderIcon={IconAddLine}
             >
               {I18n.t('New Grading Scheme')}

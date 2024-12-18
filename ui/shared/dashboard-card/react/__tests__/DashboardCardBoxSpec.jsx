@@ -78,6 +78,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
   function mountComponent() {
     const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
     const CardBox = <Box connectDropTarget={el => el} ref={() => {}} {...props} />
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(CardBox, $container)
   }
 

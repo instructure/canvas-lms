@@ -73,7 +73,7 @@ gem "inst_access", "0.4.4"
 gem "inst_statsd", "~> 3.0"
 gem "inst-jobs", "~> 3.1"
 gem "inst-jobs-autoscaling", "2.1.1"
-gem "inst-jobs-statsd", "~> 3.0"
+gem "inst-jobs-statsd", "~> 4.0"
 gem "json_schemer", "~> 2.0"
 gem "json-jwt", "~> 1.13", require: false
 gem "link_header", "0.0.8"

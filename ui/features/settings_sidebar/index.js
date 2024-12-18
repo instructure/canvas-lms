@@ -30,6 +30,7 @@ ready(() => {
       courseId: ENV.COURSE_ID || ENV.COURSE.id,
       shouldRedirect: false,
     })
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(publishButton, coursePublishButtonContainer)
   }
 })

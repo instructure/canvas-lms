@@ -67,20 +67,24 @@ const EditTemplateButtons = ({
       <IconButton
         themeOverride={{smallHeight: '.75rem'}}
         screenReaderLabel={I18n.t('Edit Template')}
+        title={I18n.t('Edit Template')}
         size="small"
         withBackground={false}
         withBorder={false}
         onClick={handleEditTemplate.bind(null, templateId)}
+        data-testid="edit-template-icon-button-edit"
       >
         <IconEditLine size="x-small" themeOverride={{sizeXSmall: '.5rem'}} />
       </IconButton>
       <IconButton
         themeOverride={{smallHeight: '.75rem'}}
         screenReaderLabel={I18n.t('Delete Template')}
+        title={I18n.t('Delete Template')}
         size="small"
         withBackground={false}
         withBorder={false}
         onClick={handleDeleteTemplate.bind(null, templateId)}
+        data-testid="edit-template-icon-button-delete"
       >
         <IconXLine size="x-small" themeOverride={{sizeXSmall: '.5rem'}} />
       </IconButton>

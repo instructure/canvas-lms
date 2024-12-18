@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -36,6 +35,7 @@ type Color = {
 }
 
 const colorPickerColors = Object.keys(defaultColors).reduce((obj: Color[], key: string) => {
+  // @ts-expect-error
   obj.push({hexcode: defaultColors[key], name: key})
   return obj
 }, [])
@@ -95,6 +95,7 @@ class StatusColorListItem extends React.Component<Props, State> {
         <Grid vAlign="middle">
           <Grid.Row>
             <Grid.Col>
+              {/*  @ts-expect-error */}
               <Text>{statusesTitleMap[status]}</Text>
             </Grid.Col>
             <Grid.Col width="auto">

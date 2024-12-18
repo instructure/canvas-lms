@@ -27,6 +27,7 @@ const accountId = '42'
 jest.mock('@canvas/do-fetch-api-effect')
 
 afterEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
@@ -48,6 +49,7 @@ describe('useAccountDefaultGradingSchemeUpdateHook', () => {
       {name: 'B', value: 0.8},
     ]
 
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: {title: 'Scheme 1', data},
@@ -56,6 +58,7 @@ describe('useAccountDefaultGradingSchemeUpdateHook', () => {
       accountId,
       '99'
     )
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/accounts/${accountId}/grading_schemes/account_default`,

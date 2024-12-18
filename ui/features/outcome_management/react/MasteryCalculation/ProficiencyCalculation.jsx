@@ -281,6 +281,8 @@ const ProficiencyCalculation = ({
   setError,
   calcIntInputRef,
 }) => {
+  method = JSON.parse(JSON.stringify(method))
+
   const newDecayingAverageFF = ENV.OUTCOMES_NEW_DECAYING_AVERAGE_CALCULATION
 
   if (newDecayingAverageFF) {
@@ -333,7 +335,7 @@ const ProficiencyCalculation = ({
       updateCalculationInt(method.calculationInt)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [method])
+  }, [method.calculationMethod, method.calculationInt])
 
   const [showAlert, setShowAlert] = useState(true)
 
@@ -345,7 +347,7 @@ const ProficiencyCalculation = ({
       })
       setShowAlert(false)
     }
-  }, [displayInvalidCalculationMethod, method, showAlert])
+  }, [displayInvalidCalculationMethod, method.calculationMethod, showAlert])
 
   const calculationMethods = new CalculationMethodContent({
     calculation_method: calculationMethodKey,

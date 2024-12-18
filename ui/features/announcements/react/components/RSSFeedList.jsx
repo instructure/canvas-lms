@@ -141,7 +141,12 @@ export default class RSSFeedList extends React.Component {
       )
     } else {
       return (
-        <View id="external_rss_feed__rss-list" display="block" textAlign="start" data-testid="rss-feed-list">
+        <View
+          id="external_rss_feed__rss-list"
+          display="block"
+          textAlign="start"
+          data-testid="rss-feed-list"
+        >
           {this.props.feeds.map((feed, index) => this.renderFeedRow(feed, index))}
           <div className="announcements-tray-row" />
         </View>

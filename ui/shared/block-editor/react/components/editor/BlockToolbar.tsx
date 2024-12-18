@@ -298,6 +298,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
             size="small"
             onClick={handleGoUp}
             screenReaderLabel={I18n.t('Go up')}
+            title={I18n.t('Go up')}
             withBackground={false}
             withBorder={false}
             data-testid="block-toolbar-icon-button-go-up"
@@ -314,6 +315,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
             size="small"
             onClick={handleGoDown}
             screenReaderLabel={I18n.t('Go down')}
+            title={I18n.t('Go down')}
             withBackground={false}
             withBorder={false}
             data-testid="block-toolbar-icon-button-go-down"
@@ -336,6 +338,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
               size="small"
               elementRef={el => el && drag(el as HTMLElement)}
               screenReaderLabel={I18n.t('Drag to move')}
+              title={I18n.t('Drag to move')}
               withBackground={false}
               withBorder={false}
             >
@@ -352,6 +355,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
               size="small"
               onClick={handleDeleteNode}
               screenReaderLabel={I18n.t('Delete')}
+              title={I18n.t('Delete')}
               withBackground={false}
               withBorder={false}
               color="danger"
@@ -369,6 +373,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
               renderIcon={<IconSaveLine />}
               color="secondary"
               themeOverride={{secondaryGhostColor: '#0e68b3'}}
+              data-testid="block-toolbar-icon-button-save-template"
             >
               {I18n.t('Save as template')}
             </CondensedButton>

@@ -107,6 +107,7 @@ export default function Sticker({
   }
 
   return (
+    // @ts-expect-error
     <Sparkles key={submission.sticker} enabled={typeof submission.sticker === 'string' && hovering}>
       <div
         className={stickerContainerClass(size)}

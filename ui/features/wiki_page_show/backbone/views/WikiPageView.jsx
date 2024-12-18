@@ -237,7 +237,7 @@ export default class WikiPageView extends Backbone.View {
           const content = this.model.get('block_editor_attributes')
           renderBlockEditorView(content, container)
         })
-        .catch(e => {
+        .catch(() => {
           // eslint-disable-next-line no-alert
           window.alert('Error loading block editor content')
         })
@@ -305,6 +305,7 @@ export default class WikiPageView extends Backbone.View {
 
   openSendTo(ev, open = true) {
     if (ev) ev.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -321,6 +322,7 @@ export default class WikiPageView extends Backbone.View {
 
   openCopyTo(ev, open = true) {
     if (ev) ev.preventDefault()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -353,6 +355,7 @@ export default class WikiPageView extends Backbone.View {
     }
     const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -427,6 +430,9 @@ export default class WikiPageView extends Backbone.View {
       tool.url = `${tool.base_url}&pages[]=${this.model.get('page_id')}`
     })
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
+    json.IS = {
+      HORIZON_COURSE: ENV?.horizon_course,
+    }
     return json
   }
 }

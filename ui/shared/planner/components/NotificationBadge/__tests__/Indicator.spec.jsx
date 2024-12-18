@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import {render} from '@testing-library/react'
 import Indicator from '../Indicator'
 
 it('renders screenreader content with the title', () => {
-  const { getByText } = render(<Indicator title="a title" variant="primary" />)
+  const {getByText} = render(<Indicator title="a title" variant="primary" />)
   expect(getByText('a title')).toBeInTheDocument()
 })
 
 it('renders a badge with the specified variant', () => {
-  const { container } = render(<Indicator title="foo" variant="danger" />)
+  const {container} = render(<Indicator title="foo" variant="danger" />)
   const badge = container.querySelector('[class*="inlineBlock-badge"]')
   expect(badge).toBeInTheDocument()
   // Since the variant is not directly accessible, checking its presence should suffice.

@@ -49,6 +49,7 @@ describe('LatePolicyGrade', () => {
       ],
       pointsBasedGradingScheme: false,
     }
+    // @ts-expect-error
     return render(<LatePolicyGrade {...defaultProps} />)
   }
 

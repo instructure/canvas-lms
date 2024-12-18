@@ -132,4 +132,40 @@ export const testSupportedQuestion = {
   },
 }
 
-export const testQuestions = [testUnsupportedQuestion, testSupportedQuestion]
+export const testMissingValuesQuestion = {
+  id: '3',
+  position: 3,
+  points_possible: 1.0,
+  properties: {},
+  entry_type: 'Item',
+  entry_editable: true,
+  stimulus_quiz_entry_id: '',
+  status: 'mutable',
+  entry: {
+    title: null,
+    item_body: null,
+    calculator_type: 'none',
+    interaction_data: {
+      true_choice: 'True',
+      false_choice: 'False',
+    },
+    properties: {},
+    scoring_data: {
+      value: true,
+    },
+    answer_feedback: {},
+    scoring_algorithm: 'Equivalence',
+    interaction_type_slug: 'true-false',
+    feedback: {
+      neutral: '<p>Always shown</p>',
+      correct: '<p>This is correct!</p>',
+      incorrect: '<p>Nope.</p>',
+    },
+  },
+}
+
+export const testQuestions = [
+  testUnsupportedQuestion,
+  testSupportedQuestion,
+  testMissingValuesQuestion,
+]

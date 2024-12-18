@@ -17,7 +17,7 @@
  */
 
 import React, {useRef} from 'react'
-import {Controller, useForm} from 'react-hook-form'
+import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
@@ -28,7 +28,11 @@ import {raw} from '@instructure/html-escape'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import {zodResolver} from '@hookform/resolvers/zod'
-import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+import {
+  focusFiled,
+  getFormErrorMessage,
+  isDateTimeInputInvalid,
+} from '@canvas/forms/react/react-hook-form/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
@@ -57,6 +61,8 @@ const validationSchema = z.object({
   expires_at: z.string().optional(),
 })
 
+type FormValues = z.infer<typeof validationSchema>
+
 interface NewAccessTokenProps {
   onSubmit: (token: Token) => void
   onClose: () => void
@@ -71,16 +77,14 @@ const NewAccessToken = ({onSubmit, onClose}: NewAccessTokenProps) => {
     defaultValues,
     resolver: zodResolver(validationSchema),
   })
-  const expiresAtInputRef = useRef<any>(null)
+  const expiresAtInputRef = useRef<DateTimeInput>(null)
   const title = I18n.t('New Access Token')
   const submitButtonText = isSubmitting ? I18n.t('Generating Token...') : I18n.t('Generate Token')
   const cancelButtonText = I18n.t('Cancel')
 
-  const handleFormSubmit = async (token: typeof defaultValues) => {
+  const handleFormSubmit: SubmitHandler<FormValues> = async token => {
     try {
-      const isExpirationInvalid = expiresAtInputRef.current?.state?.message?.type === 'error'
-
-      if (isExpirationInvalid) {
+      if (isDateTimeInputInvalid(expiresAtInputRef)) {
         focusFiled(control, 'expires_at')
         return
       }

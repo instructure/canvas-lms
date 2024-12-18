@@ -44,6 +44,7 @@ ready(() => {
   // don't even mount it. This saves us from having
   // to download the code-split bundle.
   if (globalNavTourContainer && roles.length > 0) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <React.Suspense fallback={null}>
         <Tour roles={roles} />

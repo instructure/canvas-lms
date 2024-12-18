@@ -408,7 +408,7 @@ module Importers
         item.save!
         return item
       end
-      shift_options = CourseContentImporter.shift_date_options(migration.course, migration.date_shift_options)
+      shift_options = CourseContentImporter.shift_date_options_from_migration(migration)
 
       original_due_at = item.due_at
       original_lock_at = item.lock_at

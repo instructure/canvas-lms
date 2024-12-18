@@ -20,8 +20,8 @@ import React from 'react'
 import {render, screen, waitFor, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import {datetimeString} from '@canvas/datetime/date-functions'
-import AccessTokenDetails, {AccessTokenDetailsProps} from '../AccessTokenDetails'
-import {Token} from '../types'
+import AccessTokenDetails, {type AccessTokenDetailsProps} from '../AccessTokenDetails'
+import type {Token} from '../types'
 
 describe('AccessTokenDetails', () => {
   const fully_visible_token = '1~CZXKPGfzRnNrn2QUnBZGvxeuL9n9MLAhNNvRQMN6rW6xCNB2HMyBuAzGruY4yLfa'

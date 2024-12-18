@@ -81,6 +81,7 @@ QUnit.module('GradingPeriod', {
     }
     const props = defaults(opts, exampleProps)
     const GradingPeriodElement = <GradingPeriod {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return ReactDOM.render(GradingPeriodElement, wrapper)
   },
   teardown() {

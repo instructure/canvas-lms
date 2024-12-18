@@ -22,6 +22,7 @@ import MutationAuditLog from '../../react/MutationAuditLog'
 
 export default class GraphQLMutationContentView extends Backbone.View {
   render() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<MutationAuditLog />, this.el)
   }
 }

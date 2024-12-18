@@ -246,19 +246,23 @@ function insertEmoji(emoji) {
 export function setup() {
   $(document).ready(function () {
     if (ENV.EMOJIS_ENABLED) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <EmojiPicker insertEmoji={insertEmoji} />,
         document.getElementById('emoji-picker-container')
       )
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <EmojiQuickPicker insertEmoji={insertEmoji} />,
         document.getElementById('emoji-quick-picker-container')
       )
     }
-    const comments = document.getElementsByClassName("comment_content")
-    Array.from(comments).forEach((comment) => {
+    const comments = document.getElementsByClassName('comment_content')
+    Array.from(comments).forEach(comment => {
       const content = comment.dataset.content
-      const formattedComment = containsHtmlTags(content) ? sanitizeHtml(content) : formatMessage(content)
+      const formattedComment = containsHtmlTags(content)
+        ? sanitizeHtml(content)
+        : formatMessage(content)
       comment.innerHTML = formattedComment
     })
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')

@@ -26,7 +26,6 @@ import type React from 'react'
 interface TranslateArgs {
   subject?: string
   body?: string
-  callback: (arg: string) => void
   srcLang: string
   tgtLang: string
 }
@@ -53,9 +52,7 @@ export function translateMessage(args: TranslateArgs) {
   }
 
   // Translate the payload, then with that text.
-  translateText(args, payload).then(text => {
-    args.callback(text)
-  })
+  return translateText(args, payload)
 }
 
 /**
@@ -73,6 +70,7 @@ export async function translateText(args: TranslateArgs, text: string): Promise<
       },
     },
   })
+  // @ts-expect-error
   return result.json.translated_text
 }
 
@@ -90,6 +88,7 @@ export async function translateInboxMessage(
     },
   })
 
+  // @ts-expect-error
   callback(result.json)
 }
 
@@ -113,6 +112,7 @@ export function handleTranslatedModalBody(
   bodySetter: React.SetStateAction<string>,
   newBody?: string
 ) {
+  // @ts-expect-error
   bodySetter(prevBody => {
     let message
     if (typeof newBody !== 'undefined') {

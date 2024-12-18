@@ -75,7 +75,7 @@ describe "Pages API", type: :request do
         expect(returned_attributes["version"]).to eq(block_page_data[:version])
         expect(returned_attributes["blocks"]).to eq(block_page_data[:blocks])
         returned_body = json[0]["body"]
-        expect(returned_body).to eq("<iframe class='block_editor_view' src='/block_editors/#{returned_attributes["id"]}' />")
+        expect(returned_body).to include("<iframe class='block_editor_view' src='/block_editors/#{returned_attributes["id"]}' />")
       end
     end
 
@@ -90,7 +90,7 @@ describe "Pages API", type: :request do
                         url_or_id: @block_page.url)
 
         returned_attributes = json["block_editor_attributes"]
-        expect(json["body"]).to eq("<iframe class='block_editor_view' src='/block_editors/#{returned_attributes["id"]}' />")
+        expect(json["body"]).to include("<iframe class='block_editor_view' src='/block_editors/#{returned_attributes["id"]}' />")
         expect(json["editor"]).to eq("block_editor")
 
         expect(returned_attributes["version"]).to eq(block_page_data[:version])

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -32,7 +31,7 @@ import Footer from './components/footer'
 import Header from './components/header/header'
 import PaceContent from './components/content'
 import CoursePaceEmpty from './components/course_pace_table/course_pace_empty'
-import {ResponsiveSizes, StoreState, CoursePace} from './types'
+import type {ResponsiveSizes, StoreState, CoursePace} from './types'
 import {
   getLoadingMessage,
   getShowLoadingOverlay,
@@ -43,7 +42,7 @@ import UnpublishedChangesTrayContents from './components/unpublished_changes_tra
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getSummarizedChanges, getCoursePace, getPacePublishing} from './reducers/course_paces'
 import {coursePaceActions} from './actions/course_paces'
-import {SummarizedChange} from './utils/change_tracking'
+import type {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
 import Errors from './components/errors'
 import PaceModal from './components/pace_modal'
@@ -96,7 +95,9 @@ export const App = ({
 
   useEffect(() => {
     setBlueprintLocked(
+      // @ts-expect-error
       window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course &&
+        // @ts-expect-error
         window.ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
         coursePace.context_type === 'Course'
     )
@@ -130,6 +131,7 @@ export const App = ({
             isOpen={modalOpen}
             changes={unpublishedChanges}
             onClose={() => handleModalClose()}
+            // @ts-expect-error
             handleDrawerToggle={() => setTrayOpen(!trayOpen)}
           />
         </>
@@ -139,9 +141,11 @@ export const App = ({
         <>
           <View>
             <Errors />
+            {/* @ts-expect-error */}
             <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
           </View>
           <Body />
+          {/* @ts-expect-error */}
           <Footer responsiveSize={responsiveSize} />
           <Tray
             label={I18n.t('Unpublished Changes tray')}
@@ -154,6 +158,7 @@ export const App = ({
           >
             <UnpublishedChangesTrayContents
               handleTrayDismiss={() => setTrayOpen(false)}
+              // @ts-expect-error
               changes={unpublishedChanges}
             />
           </Tray>
@@ -187,6 +192,7 @@ export const ResponsiveApp = (props: ComponentProps) => (
       large: {responsiveSize: 'large'},
     }}
   >
+    {/*  @ts-expect-error */}
     {({responsiveSize}) => <App responsiveSize={responsiveSize} {...props} />}
   </Responsive>
 )
@@ -198,6 +204,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     modalOpen: getShowPaceModal(state),
     unpublishedChanges: getSummarizedChanges(state),
     coursePace: getCoursePace(state),
+    // @ts-expect-error
     isSyncing: getIsSyncing(state) === 1,
     isPacePublishing: getPacePublishing(state),
   }

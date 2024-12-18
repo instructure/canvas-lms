@@ -22,6 +22,8 @@ import {
   defaultEveryoneElseOption,
   ASSIGNMENT_OVERRIDE_GRAPHQL_TYPENAMES,
   masteryPathsOption,
+  REPLY_TO_TOPIC,
+  REPLY_TO_ENTRY,
 } from './constants'
 import {nanoid} from 'nanoid'
 
@@ -106,6 +108,8 @@ export const buildAssignmentOverrides = discussion => {
       availableFrom: override.unlockAt,
       availableUntil: override.lockAt,
       unassignItem: override.unassignItem,
+      students: override.set.students,
+      title: override.set.name,
       ...(override.contextModule && {
         context_module_id: override.contextModule._id,
         context_module_name: override.contextModule.name,
@@ -134,11 +138,11 @@ export const buildAssignmentOverrides = discussion => {
           return JSON.stringify(assignee) === JSON.stringify(getAssignedList(override))
         })[0]
         if (override) {
-          if (checkpoint.tag === 'reply_to_topic') {
+          if (checkpoint.tag === REPLY_TO_TOPIC) {
             returnHash.replyToTopicOverrideId = override._id
             returnHash.replyToTopicDueDate = override.dueAt
           }
-          if (checkpoint.tag === 'reply_to_entry') {
+          if (checkpoint.tag === REPLY_TO_ENTRY) {
             returnHash.replyToEntryOverrideId = override._id
             returnHash.requiredRepliesDueDate = override.dueAt
           }
@@ -150,8 +154,12 @@ export const buildAssignmentOverrides = discussion => {
       return returnHash
     })
 
-    const topicCheckpoint = discussion.assignment.checkpoints[0]
-    const replyCheckpoint = discussion.assignment.checkpoints[1]
+    const topicCheckpoint = discussion.assignment.checkpoints.find(
+      checkpoint => checkpoint.tag === REPLY_TO_TOPIC
+    )
+    const replyCheckpoint = discussion.assignment.checkpoints.find(
+      checkpoint => checkpoint.tag === REPLY_TO_ENTRY
+    )
 
     if (topicCheckpoint.dueAt || topicCheckpoint.unlockAt || topicCheckpoint.lockAt) {
       everyoneDates.replyToTopicDueDate = topicCheckpoint.dueAt

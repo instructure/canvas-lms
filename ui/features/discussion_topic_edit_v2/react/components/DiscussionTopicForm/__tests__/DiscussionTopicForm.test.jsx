@@ -521,13 +521,15 @@ describe('DiscussionTopicForm', () => {
       expect(queryByTestId('checkpoints-checkbox')).not.toBeInTheDocument()
     })
 
-    it('does not display "Allow Participants to Comment" when the setting is turned off', () => {
+    it('displays disabled "Allow Participants to Comment" when the setting is turned off', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
       window.ENV.ANNOUNCEMENTS_COMMENTS_DISABLED = true
 
-      const {queryByText} = setup()
+      const {queryByLabelText} = setup()
+      const component = queryByLabelText('Allow Participants to Comment')
 
-      expect(queryByText('Allow Participants to Comment')).not.toBeInTheDocument()
+      expect(component).toBeInTheDocument()
+      expect(component).toBeDisabled()
     })
 
     it('displays "Allow Participants to Comment" when the setting is turned on', () => {
@@ -650,6 +652,32 @@ describe('DiscussionTopicForm', () => {
         }
 
         expect(isGuidDataValid(mockEvent)).toBe(false)
+      })
+    })
+
+    describe('Course Pacing', () => {
+      it('can successfully validate the form when course pacing is enabled (custom ItemAssignToTray validation is skipped, as there is no related input is expected)', () => {
+        window.ENV.CONTEXT_TYPE = 'Group'
+        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
+        window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.in_paced_course = true
+        window.ENV.FEATURES.selective_release_ui_api = true
+        window.ENV.FEATURES.selective_release_edit_page = true
+
+        const onSubmit = jest.fn()
+        const {getByText, getByPlaceholderText} = setup({
+          onSubmit,
+          currentDiscussionTopic: DiscussionTopic.mock({
+            assignment: Assignment.mock({
+              hasSubAssignments: true,
+            }),
+            groupSet: GroupSet.mock(),
+            canGroup: true,
+          }),
+        })
+        const saveButton = getByText('Save')
+        fireEvent.input(getByPlaceholderText('Topic Title'), {target: {value: 'a title'}})
+        saveButton.click()
+        expect(onSubmit).toHaveBeenCalled()
       })
     })
 

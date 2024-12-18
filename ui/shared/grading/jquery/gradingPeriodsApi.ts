@@ -1,4 +1,3 @@
-// @ts-nocheck
 //
 // Copyright (C) 2016 - present Instructure, Inc.
 //
@@ -21,6 +20,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 import type {CamelizedGradingPeriod, SerializedGradingPeriod} from '../grading.d'
 
+// @ts-expect-error
 const batchUpdateUrl = (id: string) => replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
 
 const serializePeriods = (periods?: CamelizedGradingPeriod[]) => {

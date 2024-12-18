@@ -19,8 +19,6 @@
 // blocks
 import {Container} from './user/blocks/Container'
 import {ButtonBlock} from './user/blocks/ButtonBlock'
-import {TextBlock} from './user/blocks/TextBlock'
-import {HeadingBlock} from './user/blocks/HeadingBlock'
 import {ResourceCard} from './user/blocks/ResourceCard'
 import {IconBlock} from './user/blocks/IconBlock'
 import {PageBlock} from './user/blocks/PageBlock'
@@ -29,6 +27,9 @@ import {MediaBlock} from './user/blocks/MediaBlock'
 import {RCETextBlock} from './user/blocks/RCETextBlock/RCETextBlock'
 import {GroupBlock} from './user/blocks/GroupBlock'
 import {DividerBlock} from './user/blocks/DividerBlock'
+// these 2 aren't surfaced in the UI, but are used in specs
+import {TextBlock} from './user/blocks/TextBlock'
+import {HeadingBlock} from './user/blocks/HeadingBlock'
 
 // sections
 import {ResourcesSection, ResourcesSectionInner} from './user/sections/ResourcesSection'
@@ -47,9 +48,7 @@ import {NoSections} from './user/common'
 const blocks = {
   PageBlock,
   ButtonBlock,
-  TextBlock,
   Container,
-  HeadingBlock,
   ResourceCard,
   IconBlock,
   ImageBlock,
@@ -73,6 +72,8 @@ const blocks = {
   BlankSection,
   TabsBlock,
   DividerBlock,
+  TextBlock,
+  HeadingBlock,
 }
 
 export {blocks}

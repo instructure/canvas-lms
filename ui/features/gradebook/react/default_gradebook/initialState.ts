@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -134,7 +133,9 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
   const defaultGradingScheme = options.default_grading_standard
     ? {
         data: options.default_grading_standard,
+        // @ts-expect-error
         pointsBased: options.default_grading_standard_points_based,
+        // @ts-expect-error
         scalingFactor: options.default_grading_standard_scaling_factor,
       }
     : null
@@ -144,6 +145,7 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
     courseGradingSchemePointsBased: options.grading_standard_points_based,
     courseGradingSchemeScalingFactor: options.grading_standard_scaling_factor,
     defaultGradingScheme,
+    // @ts-expect-error
     gradingSchemes: options.grading_schemes.map(camelizeProperties),
     gradingPeriodAssignments: {},
     assignmentStudentVisibility: {},

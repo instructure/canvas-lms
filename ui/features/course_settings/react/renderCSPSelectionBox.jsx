@@ -22,6 +22,7 @@ import React from 'react'
 import CSPSelectionBox from './components/CSPSelectionBox'
 
 export function renderCSPSelectionBox(containerElement) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <CSPSelectionBox
       courseId={ENV.COURSE_ID}

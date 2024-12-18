@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -84,9 +83,11 @@ type MediaAttachmentPlayerProps = Omit<MediaAttachmentProps, 'onRemoveMediaComme
 const MediaAttachmentPlayer = (props: MediaAttachmentPlayerProps) => {
   const mediaSources = (): string[] => {
     if (props.file.src) {
+      // @ts-expect-error
       return [{label: I18n.t('Standard'), src: props.file.src, bitrate: '0'}]
     }
 
+    // @ts-expect-error
     return (
       props.file.mediaSources?.map(media => ({
         label: media.width + ' x ' + media.height,

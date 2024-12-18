@@ -69,6 +69,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
             placement="bottom end"
             trigger={
               <Tooltip renderTip={I18n.t('LTI Tools Menu')}>
+                {/* @ts-expect-error */}
                 <Button renderIcon={IconLtiLine} />
               </Tooltip>
             }
@@ -78,6 +79,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
             {menu_tools.map((tool: Tool) => {
               return (
                 <Menu.Item
+                  // @ts-expect-error
                   onSelect={(e, val) => handleToolClick(val, menu_tools, props.handleToolLaunch)}
                   key={tool.id}
                   value={tool.id}
@@ -100,6 +102,7 @@ export function TopNavigationTools(props: TopNavigationToolsProps) {
               <IconButton
                 renderIcon={getToolIcon(tool)}
                 onClick={e =>
+                  // @ts-expect-error
                   handleToolClick(e.target.dataset.toolId, pinned_tools, props.handleToolLaunch)
                 }
                 data-tool-id={tool.id}
@@ -133,6 +136,7 @@ export function MobileTopNavigationTools(props: TopNavigationToolsProps) {
       {pinned_tools.map((tool: Tool) => {
         return (
           <Menu.Item
+            // @ts-expect-error
             onSelect={(e, val) => handleToolClick(val, pinned_tools, props.handleToolLaunch)}
             key={tool.id}
             value={tool.id}
@@ -149,6 +153,7 @@ export function MobileTopNavigationTools(props: TopNavigationToolsProps) {
       {menu_tools.map((tool: Tool) => {
         return (
           <Menu.Item
+            // @ts-expect-error
             onSelect={(e, val) => handleToolClick(val, menu_tools, props.handleToolLaunch)}
             key={tool.id}
             value={tool.id}

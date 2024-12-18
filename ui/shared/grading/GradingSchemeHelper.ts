@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -24,6 +23,7 @@ export function indexOfGrade(
   grade: null | string | number,
   gradingSchemes: DeprecatedGradingScheme[]
 ) {
+  // @ts-expect-error
   const matches = (entry, key) => entry[0].toLowerCase() === key
   const cleanGrade = `${grade}`.trim().toLowerCase()
   let idx = gradingSchemes.findIndex(entry => matches(entry, cleanGrade))
@@ -49,7 +49,9 @@ export function gradeToScoreUpperBound(grade: number, gradingSchemes: Deprecated
     return 100
   }
 
+  // @ts-expect-error
   const matchingSchemeValue = gradingSchemes[index][1]
+  // @ts-expect-error
   const nextHigherSchemeValue = gradingSchemes[index - 1][1]
   const schemeValuesDiff = round(nextHigherSchemeValue - matchingSchemeValue, 4) * 100
   let percentageOffset = 1
@@ -80,6 +82,7 @@ export function gradeToScoreLowerBound(
     return null
   }
 
+  // @ts-expect-error
   const matchingSchemeValue = gradingSchemes[index][1]
 
   return round(matchingSchemeValue * 100, 2)

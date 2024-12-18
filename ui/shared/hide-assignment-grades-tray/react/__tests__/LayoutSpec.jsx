@@ -70,6 +70,7 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
   }
 
   function mountComponent(props = {}) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<Layout {...layoutProps(props)} />, $container)
   }
 

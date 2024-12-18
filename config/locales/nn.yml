@@ -6754,6 +6754,7 @@ nn:
   confirm_email_address_9072dd3c: "Stadfest e-postadresse"
   confirm_mastery_calculation_19ad19f9: "Bekreft ekspertiseberekning"
   confirm_mastery_scale_9a779252: "Stadfest meistringskala"
+  confirm_password_aaf07824: "Stadfeste passord"
   confirm_qr_code_display_49664fa3: "Bekreft QR-kode visning"
   confirm_reactivation_ec0f30c6: "Stadfest reaktivering"
   confirm_removal_a9bb889: "Stadfest fjerning"
@@ -14625,6 +14626,7 @@ nn:
   jobs_v2_b20a83f7: "Jobber v2"
   join_6cafecca: "Ta del"
   join_active_online_meeting_d9d892b2: "bli med på aktivt online møte"
+  join_code_1e74e5a8: Påmeldingskode
   join_course_511e6cb3: "Delta i %{course}"
   join_group_group_name_871a5e3f: "Bli med i gruppa %{group_name}"
   join_online_meeting_b1725843: "bli med på møtet"
@@ -20886,6 +20888,7 @@ nn:
   question_f06476d1: spørsmål
   question_group_837b8014: Spørsmålsgruppe
   question_mark_icon_d2bbd204: Spørsmålsteiknikon
+  question_position_45eba089: "Spørsmål %{position}"
   question_unanswered: "Har ikkje svart enno"
   questions_a955145c: Spørsmål
   queued_d0e45c4b: "Lagt i kø"
@@ -25211,6 +25214,7 @@ nn:
   student_pace_2200bf85: Studentframdrift
   student_page_history_ce86b3c2: "Student sidehistorikk"
   student_paired_successfully_a88def61: "Paring av studentar vellukka"
+  student_pairing_code_a28d8442: "Paringskode for student"
   student_planner_date_4cc73abb: "Studenttimeplan dato:"
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
   student_position_6d3b7750: "Student %{position}"
@@ -25328,6 +25332,10 @@ nn:
       other: "%{count} underkontoar"
     titles: 
       sub_accounts: Underkontoar
+  sub_assignment: 
+    atom_no_author: "Utan forfattar"
+    labels: 
+      due: Frist
   subaccount_91f4c279: Underkonto
   subaccount_admins_are_not_able_to_view_sis_informa_a9690589: "Administratorar på underkontonivå kan ikkje sjå SIS informasjon med mindre dei også har ein status som faglærar i eit emne"
   subaccount_admins_cannot_view_sis_information_with_15a41444: "Administratorar på underkontonivå kan ikkje sjå SIS informasjon utan emnetilknytning, då rollen som faglærar har løyve til å lese SIS data på kontonivå"
@@ -26837,6 +26845,7 @@ nn:
   time_left_in_your_instant_trial_5dd0392b: "%{time} er attende av prøvetida"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} er attende av prøvetida *(utvid no)*"
   time_limit_a6f1a51e: Tidsgrense
+  time_range_4ae01737: Tidsintervall
   time_to_complete_9d264097: "Tid for å fullføre"
   time_zone_f56f5183: Tidssone
   time_zones: 
@@ -28901,6 +28910,7 @@ nn:
   what_does_provisioning_only_mean_eac9a4a1: "Kva betyr 'Kun for klargjering'? "
   what_happened_322d8259: "Kva hendte?"
   what_if_score_updated_7565581d: "Kva-skjer-dersom-resultat oppdatert"
+  what_is_a_pairing_code_e312bd48: "Kva er ein paringskode?"
   what_is_smart_search_9446374d: "Kva er smart-søk?"
   what_it_does_74ec1339: "Kva den gjer"
   what_it_does_d4debc07: "Kva den gjer"

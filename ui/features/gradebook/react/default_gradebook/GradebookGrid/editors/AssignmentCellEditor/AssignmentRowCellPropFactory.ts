@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,11 +19,13 @@
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type Gradebook from '../../../Gradebook'
 
+// @ts-expect-error
 function isTrayOpen(gradebook: Gradebook, student, assignment) {
   const {open, studentId, assignmentId} = gradebook.getSubmissionTrayState()
   return open && studentId === student.id && assignmentId === assignment.id
 }
 
+// @ts-expect-error
 function similarityInfoToShow(submission) {
   const allSimilarityInfo = extractSimilarityInfo(submission)
 
@@ -47,6 +48,7 @@ export default class AssignmentRowCellPropFactory {
     this.gradebook = gradebook
   }
 
+  // @ts-expect-error
   getProps(editorOptions) {
     const student = this.gradebook.student(editorOptions.item.id)
     const assignment = this.gradebook.getAssignment(editorOptions.column.assignmentId)

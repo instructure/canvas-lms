@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Enrollments, Enrollment, StoreState, Section} from '../types'
+import type {Enrollments, Enrollment, StoreState, Section} from '../types'
 import {createSelector} from 'reselect'
 import natcompare from '@canvas/util/natcompare'
 
@@ -30,6 +29,7 @@ export const getEnrollment = (state: StoreState, id: number): Enrollment => stat
 export const getEnrolledSection = (state: StoreState, id: number): Section | null => {
   if (!id) return null
   const sectionId = state.enrollments[id]?.section_id
+  // @ts-expect-error
   return sectionId && state.sections[sectionId]
 }
 

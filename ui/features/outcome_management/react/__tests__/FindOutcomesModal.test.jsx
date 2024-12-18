@@ -24,7 +24,7 @@ import OutcomesContext, {
   ACCOUNT_GROUP_ID,
   ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {findModalMocks} from '@canvas/outcomes/mocks/Outcomes'
 import {

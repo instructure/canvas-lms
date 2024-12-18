@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -23,19 +22,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('discussion_create')
-
-type Section = {
-  id: string
-  name: string
-  end_at: string | null
-  override_course_and_term_dates: boolean | null
-  start_at: string | null
-}
 
 type Props = {
   onClose: () => void

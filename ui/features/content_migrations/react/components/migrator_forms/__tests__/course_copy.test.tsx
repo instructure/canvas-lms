@@ -18,9 +18,10 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import CourseCopyImporter, {parseDate} from '../course_copy'
+import CourseCopyImporter from '../course_copy'
 import userEvent from '@testing-library/user-event'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {sharedDateParsingTests} from './shared_form_cases'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -37,6 +38,7 @@ describe('CourseCopyImporter', () => {
       id: '0',
     }
     window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = true
+    // @ts-expect-error
     doFetchApi.mockReturnValue(
       Promise.resolve({
         json: [
@@ -45,6 +47,8 @@ describe('CourseCopyImporter', () => {
             label: 'Mathmatics',
             term: 'Default term',
             blueprint: true,
+            end_at: '16 Oct 2024 at 0:00',
+            start_at: '14 Oct 2024 at 0:00',
           },
           {
             id: '1',
@@ -61,7 +65,7 @@ describe('CourseCopyImporter', () => {
 
   it('searches for matching courses and includes concluded by default', async () => {
     renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math&include=concluded',
@@ -72,7 +76,7 @@ describe('CourseCopyImporter', () => {
 
   it('searches for matching courses and display proper terms', async () => {
     renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math&include=concluded',
@@ -85,7 +89,7 @@ describe('CourseCopyImporter', () => {
   it('searches for matching courses excluding concluded', async () => {
     renderComponent()
     await userEvent.click(screen.getByRole('checkbox', {name: 'Include completed courses'}))
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
     await waitFor(() => {
       expect(doFetchApi).toHaveBeenCalledWith({
         path: '/users/0/manageable_courses?term=math',
@@ -96,7 +100,7 @@ describe('CourseCopyImporter', () => {
 
   it('calls onSubmit', async () => {
     renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
     await userEvent.click(await screen.findByText('Mathmatics'))
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
     expect(onSubmit).toHaveBeenCalledWith(
@@ -110,7 +114,7 @@ describe('CourseCopyImporter', () => {
 
   it('calls onCancel', async () => {
     renderComponent()
-    await userEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+    await userEvent.click(screen.getByRole('button', {name: 'Clear'}))
     expect(onCancel).toHaveBeenCalled()
   })
 
@@ -119,7 +123,7 @@ describe('CourseCopyImporter', () => {
   // we're following the precedent and testing all the way to the child in this suite
   it('Renders BP settings import option if appropriate', async () => {
     renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
     await userEvent.click(await screen.findByText('Mathmatics'))
     await expect(await screen.getByText('Import Blueprint Course settings')).toBeInTheDocument()
   })
@@ -127,14 +131,14 @@ describe('CourseCopyImporter', () => {
   it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
     window.ENV.SHOW_BP_SETTINGS_IMPORT_OPTION = false
     renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'math')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
     await userEvent.click(await screen.findByText('Mathmatics'))
     expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })
 
   it('Does not render BP settings import option when the selected course is not a blueprint', async () => {
     renderComponent()
-    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course'}), 'biol')
+    await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'biol')
     await userEvent.click(await screen.findByText('Biology'))
     expect(screen.queryByText('Import Blueprint Course settings')).toBeNull()
   })
@@ -142,9 +146,9 @@ describe('CourseCopyImporter', () => {
   it('disable inputs while uploading', async () => {
     renderComponent({isSubmitting: true})
     await waitFor(() => {
-      expect(screen.getByRole('button', {name: 'Cancel'})).toBeDisabled()
+      expect(screen.getByRole('button', {name: 'Clear'})).toBeDisabled()
       expect(screen.getByRole('button', {name: /Adding.../})).toBeDisabled()
-      expect(screen.getByRole('combobox', {name: 'Search for a course'})).toBeDisabled()
+      expect(screen.getByRole('combobox', {name: 'Search for a course *'})).toBeDisabled()
       expect(screen.getByRole('radio', {name: /All content/})).toBeDisabled()
       expect(screen.getByRole('radio', {name: 'Select specific content'})).toBeDisabled()
       expect(screen.getByRole('checkbox', {name: 'Adjust events and due dates'})).toBeDisabled()
@@ -169,27 +173,32 @@ describe('CourseCopyImporter', () => {
       expect(getByRole('button', {name: 'Add substitution'})).toBeDisabled()
     })
   })
-})
 
-describe('parseDate', () => {
-  it('parses a valid date string correctly', () => {
-    const dateString = '01 Jan 2023 at 12:00'
-    const expectedDate = '2023-01-01T12:00:00.000Z'
-    expect(parseDate(dateString)).toBe(expectedDate)
-  })
+  sharedDateParsingTests(CourseCopyImporter)
 
-  it('not converts empty string', () => {
-    const dateString = ''
-    expect(parseDate(dateString)).toBe('')
-  })
+  describe('source course adjust date field prefills', () => {
+    const expectDateField = (label: string, value: string) => {
+      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    }
 
-  it('not converts undefined', () => {
-    const dateString = undefined
-    expect(parseDate(dateString)).toBeUndefined()
-  })
+    it('parse the date from found course start date', async () => {
+      const {getByRole} = renderComponent()
 
-  it('converts wrong string to null', () => {
-    const dateString = 'oops'
-    expect(parseDate(dateString)).toBeNull()
+      await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+      await userEvent.click(await screen.findByText('Mathmatics'))
+      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+      expectDateField('Select original beginning date', 'Oct 14 at 8pm')
+    })
+
+    it('parse the date from found course end date', async () => {
+      const {getByRole} = renderComponent()
+
+      await userEvent.type(screen.getByRole('combobox', {name: 'Search for a course *'}), 'math')
+      await userEvent.click(await screen.findByText('Mathmatics'))
+      await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
+
+      expectDateField('Select original end date', 'Oct 16 at 8pm')
+    })
   })
 })

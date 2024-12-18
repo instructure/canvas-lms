@@ -24,5 +24,6 @@ import GradeSummary from './react/index'
 
 ready(() => {
   const $container = document.getElementById('content')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<GradeSummary />, $container)
 })

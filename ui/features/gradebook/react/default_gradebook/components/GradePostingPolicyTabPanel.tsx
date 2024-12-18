@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -51,6 +50,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
     this.handlePostPolicySelected = this.handlePostPolicySelected.bind(this)
   }
 
+  // @ts-expect-error
   handlePostPolicySelected(_e, value) {
     if (value === AUTOMATIC_POST && this.props.anonymousAssignmentsPresent) {
       showFlashAlert({

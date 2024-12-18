@@ -20,7 +20,7 @@ import getCookie from '@instructure/get-cookie'
 import type {Product, ToolsByDisplayGroup} from '../models/Product'
 import {stringify} from 'qs'
 import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
-import type {LtiFilters, FilterItem} from '../models/Filter'
+import type {LtiFilters, FilterItem, OrganizationFiltes} from '../models/Filter'
 
 const accountId = window.location.pathname.split('/')[2]
 
@@ -34,6 +34,9 @@ type Meta = {
 export type ProductResponse = {
   tools: Array<Product>
   meta: Meta
+}
+export type OrganizationProductResponse = ProductResponse & {
+  description: string
 }
 
 export const fetchProducts = async (params: DiscoverParams): Promise<ProductResponse> => {
@@ -62,18 +65,7 @@ export const fetchProducts = async (params: DiscoverParams): Promise<ProductResp
     arrayFormat: 'brackets',
   })}`
 
-  const response = await fetch(url, {
-    method: 'get',
-    headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
-      'content-Type': 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch products`)
-  }
-  const products = await response.json()
+  const products = await fetchResponse('get', url, 'Failed to fetch products')
 
   return products || {}
 }
@@ -82,45 +74,19 @@ export const fetchProductDetails = async (global_product_id: String): Promise<Pr
   if (!global_product_id) return null
   const url = `/api/v1/accounts/${accountId}/learn_platform/products/${global_product_id}`
 
-  const response = fetch(url, {
-    method: 'get',
-    headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
-      'content-Type': 'application/json',
-    },
-  })
-    .then(resp => resp.json())
-    .then(product => {
-      return product
-    })
+  const product = await fetchResponse(
+    'get',
+    url,
+    `Failed to fetch product with id ${global_product_id}`
+  )
 
-  const getProduct = async () => {
-    const product = await response
-    return product
-  }
-
-  if (!response) {
-    throw new Error(`Failed to fetch product with id ${global_product_id}`)
-  }
-
-  return getProduct()
+  return product || {}
 }
 
 export const fetchToolsByDisplayGroups = async (): Promise<ToolsByDisplayGroup> => {
   const url = `/api/v1/accounts/${accountId}/learn_platform/products_categories`
 
-  const response = await fetch(url, {
-    method: 'get',
-    headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
-      'content-Type': 'application/json',
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch products categories`)
-  }
-  const displayGroups = await response.json()
+  const displayGroups = await fetchResponse('get', url, 'Failed to fetch products categories')
 
   return displayGroups.tools_by_display_group || []
 }
@@ -128,18 +94,20 @@ export const fetchToolsByDisplayGroups = async (): Promise<ToolsByDisplayGroup> 
 export const fetchLtiFilters = async (): Promise<LtiFilters> => {
   const url = `/api/v1/accounts/${accountId}/learn_platform/filters`
 
-  const response = await fetch(url, {
-    method: 'get',
-    headers: {
-      'X-CSRF-Token': getCookie('_csrf_token'),
-      'content-Type': 'application/json',
-    },
-  })
+  const filters = await fetchResponse('get', url, 'Failed to fetch lti filters')
 
-  if (!response.ok) {
-    throw new Error(`Failed to fetch lti filters`)
-  }
-  const filters = await response.json()
+  return filters || {}
+}
+
+export const fetchCustomFilters = async (salesforceId: number): Promise<OrganizationFiltes> => {
+  const url = `/api/v1/accounts/${accountId}/learn_platform/custom_filters?${stringify(
+    {salesforce_id: salesforceId},
+    {
+      arrayFormat: 'brackets',
+    }
+  )}`
+
+  const filters = await fetchResponse('get', url, 'Failed to fetch custom filters')
 
   return filters || {}
 }
@@ -147,7 +115,7 @@ export const fetchLtiFilters = async (): Promise<LtiFilters> => {
 export const fetchProductsByOrganization = async (
   params: DiscoverParams,
   organizationSalesforceId: string
-): Promise<ProductResponse> => {
+): Promise<OrganizationProductResponse> => {
   const {page, search} = params
   const {tags, companies, audience, versions} = params.filters
 
@@ -176,8 +144,18 @@ export const fetchProductsByOrganization = async (
     }
   )}`
 
+  const products: ProductResponse = await fetchResponse(
+    'get',
+    url,
+    'Failed to fetch products by organization'
+  )
+  // @ts-expect-error
+  return products
+}
+
+async function fetchResponse(method: string, url: string, errorText: string): Promise<any> {
   const response = await fetch(url, {
-    method: 'get',
+    method,
     headers: {
       'X-CSRF-Token': getCookie('_csrf_token'),
       'content-Type': 'application/json',
@@ -185,8 +163,8 @@ export const fetchProductsByOrganization = async (
   })
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch products by organization`)
+    throw new Error(errorText)
   }
-  const products: ProductResponse = await response.json()
+  const products: OrganizationProductResponse = await response.json()
   return products
 }

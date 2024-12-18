@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -75,6 +74,7 @@ function buildNoPointsPossibleWarning() {
   }
 }
 
+// @ts-expect-error
 // xsslint safeString.property score possible warningText icon letterGrade
 function render(options) {
   let tooltip = ''
@@ -164,6 +164,7 @@ export default class TotalGradeCellFormatter {
     }
   }
 
+  // @ts-expect-error
   render = (_row, _cell, grade /* value */, _columnDef, student /* dataContext */) => {
     if (grade == null) {
       return ''

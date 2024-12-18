@@ -104,6 +104,7 @@ export default class PostPolicies {
     const bindAssignmentPolicyTray = ref => {
       tray = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <AssignmentPostingPolicyTray ref={bindAssignmentPolicyTray} />,
       $assignmentPolicyContainer
@@ -139,6 +140,7 @@ export default class PostPolicies {
     const bindHideTray = ref => {
       tray = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
 
     tray.show({
@@ -171,6 +173,7 @@ export default class PostPolicies {
     const bindPostTray = ref => {
       tray = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
 
     tray.show({

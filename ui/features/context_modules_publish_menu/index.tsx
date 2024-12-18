@@ -27,6 +27,7 @@ ready(() => {
   const menuElement = document.getElementById('context-modules-publish-menu')
   if (menuElement) {
     const $menuElement = $(menuElement)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ContextModulesPublishMenu
         courseId={$menuElement.data('courseId')}

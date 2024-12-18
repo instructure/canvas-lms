@@ -27,8 +27,41 @@ module Schemas
           some_str: { type: "string", enum: %w[foo bar] },
           some_num: { type: "number" },
           some_bool: { type: "boolean" },
+          other_str: { type: "string" },
         },
         required: %w[some_str some_num],
+      }
+    end
+  end
+
+  class NestedValidationTest < Base
+    def schema
+      {
+        type: "object",
+        properties: {
+          str1: { type: "string" },
+          str2: { type: "string" },
+          things: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                str3: { type: "string" },
+                str4: { type: "string" },
+                more_things: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      str5: { type: "string" },
+                      str6: { type: "string" },
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     end
   end
@@ -91,6 +124,72 @@ module Schemas
           res = BaseSpecsTest.simple_validation_first_error({}, error_format: :hash)
           expect(res).to be_a(Hash)
           expect(res.keys).to contain_exactly(*%i[error schema details])
+        end
+      end
+    end
+
+    describe "validation_errors" do
+      subject { BaseSpecsTest.validation_errors(hash) }
+
+      let(:hash) { bad_str_and_num }
+
+      it "returns an array of error strings" do
+        res = subject
+        expect(res).to be_a(Array)
+        expect(res).to all(be_a(String))
+      end
+
+      context "with null values" do
+        let(:hash) { { "other_str" => nil, "some_str" => "foo", "some_num" => 1234 } }
+
+        it "errors" do
+          expect(subject).to eq(["value at `/other_str` is not a string"])
+        end
+
+        context "when allow_nil: true" do
+          subject { BaseSpecsTest.validation_errors(hash, allow_nil: true) }
+
+          it "does not error" do
+            expect(subject).to eq([])
+          end
+        end
+      end
+
+      context "with nested null values" do
+        subject { NestedValidationTest.validation_errors(hash, allow_nil:) }
+
+        let(:allow_nil) { false }
+        let(:hash) do
+          {
+            "str1" => "foo",
+            "str2" => nil,
+            "things" => [
+              {
+                "str3" => "bar",
+                "str4" => nil,
+                "more_things" => [
+                  "str5" => "baz",
+                  "str6" => nil
+                ]
+              }
+            ]
+          }
+        end
+
+        it "errors" do
+          expect(subject).to eq([
+                                  "value at `/str2` is not a string",
+                                  "value at `/things/0/str4` is not a string",
+                                  "value at `/things/0/more_things/0/str6` is not a string"
+                                ])
+        end
+
+        context "when allow_nil: true" do
+          let(:allow_nil) { true }
+
+          it "does not error" do
+            expect(subject).to eq([])
+          end
         end
       end
     end

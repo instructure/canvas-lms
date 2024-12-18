@@ -47,7 +47,6 @@ module SpeedGrader
         score
         points_deducted
         assignment_id
-        submission_comments
         grading_period_id
         excused
         updated_at
@@ -167,15 +166,7 @@ module SpeedGrader
         :assignment,
         { originality_reports: :lti_link }
       ]
-      includes << {
-        all_submission_comments: {
-          submission: {
-            assignment: {
-              context: :root_account
-            }
-          }
-        }
-      }
+      includes << (assignment.grade_as_group? ? :all_submission_comments_for_groups : :all_submission_comments)
       submissions = assignment.submissions.where(user_id: students).preload(*includes)
 
       student_json_fields =
@@ -288,8 +279,11 @@ module SpeedGrader
         end
       end
 
+      discussion_checkpoints_enabled = assignment.root_account.feature_enabled?(:discussion_checkpoints)
+
       res[:submissions] =
         submissions.map do |sub|
+          sub.workflow_state = "pending_review" if sub.checkpoints_needs_grading? && discussion_checkpoints_enabled
           submission_methods = %i[
             submission_history
             late
@@ -317,19 +311,17 @@ module SpeedGrader
             json.merge! provisional_grade_to_json(provisional_grade)
           end
 
-          json[:has_postable_comments] =
-            sub.all_submission_comments.any?(&:allows_posting_submission?)
-
+          submission_comments = sub.visible_submission_comments_for(current_user)
           json[:submission_comments] =
             anonymous_moderated_submission_comments_json(
               assignment:,
               course:,
               current_user:,
               avatars: display_avatars?,
-              submission_comments: sub.visible_submission_comments_for(current_user),
+              submission_comments:,
               submissions:
             )
-
+          json[:has_postable_comments] = submission_comments.any?(&:allows_posting_submission?)
           json[:proxy_submitter] = sub.proxy_submitter&.short_name
           json[:proxy_submitter_id] = sub.proxy_submitter_id
 
@@ -361,7 +353,7 @@ module SpeedGrader
           end
 
           if quizzes_next_submission?
-            quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user)
+            quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(assignment, sub.user, submission: sub)
             json["submission_history"] =
               quiz_lti_submission.grade_history.map { |submission| { submission: } }
           elsif json["submission_history"] && (assignment.quiz.nil? || too_many)

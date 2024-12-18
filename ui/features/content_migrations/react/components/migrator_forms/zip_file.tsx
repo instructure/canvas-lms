@@ -18,23 +18,27 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 
-import CommonMigratorControls from './common_migrator_controls'
-import {noFileSelectedFormMessage} from '../utils'
+import {
+  CommonMigratorControls,
+  RequiredFormLabel,
+  ErrorFormMessage,
+  noFileSelectedFormMessage,
+} from '@canvas/content-migrations'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 import type {FetchLinkHeader} from '@canvas/do-fetch-api-effect/types'
 import type {onSubmitMigrationFormCallback} from '../types'
 import MigrationFileInput from './file_input'
-
 import type {TreeBrowserProps} from '@instructure/ui-tree-browser'
+import {ImportLabel} from './import_label'
+import {ImportInProgressLabel} from './import_in_progress_label'
 
 type Collection = TreeBrowserProps['collections'][0]
 type CollectionClickArgs = TreeBrowserProps['onCollectionClick']
@@ -125,6 +129,7 @@ const ZipFileImporter = ({
           nextLink ||
           `/api/v1/courses/${window.ENV.COURSE_ID}/folders?sort_by=position&per_page=100`,
       })
+        // @ts-expect-error
         .then((response: FetchFoldersResponse) => {
           const {json, link} = response
           const folderData = accumulatedResults.concat(json || [])
@@ -224,13 +229,18 @@ const ZipFileImporter = ({
         onChange={setFile}
         isSubmitting={isSubmitting}
         externalFormMessage={fileError ? noFileSelectedFormMessage : undefined}
+        isRequired={true}
       />
       {!isSubmitting && (
         <View as="div" margin="medium none none none" width="100%">
           {folders.length > 0 ? (
             <>
               <TextInput
-                renderLabel={I18n.t('Upload to')}
+                renderLabel={
+                  <RequiredFormLabel showErrorState={folderError}>
+                    {I18n.t('Upload to')}
+                  </RequiredFormLabel>
+                }
                 placeholder={I18n.t('Search folders')}
                 value={searchValue}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -262,9 +272,9 @@ const ZipFileImporter = ({
       )}
       {folderError && (
         <p>
-          <Text color="danger" size="small">
+          <ErrorFormMessage>
             {I18n.t('You must select a folder to import content to')}
-          </Text>
+          </ErrorFormMessage>
         </p>
       )}
       <CommonMigratorControls
@@ -273,6 +283,8 @@ const ZipFileImporter = ({
         canSelectContent={false}
         onSubmit={handleSubmit}
         onCancel={onCancel}
+        SubmitLabel={ImportLabel}
+        SubmittingLabel={ImportInProgressLabel}
       />
     </>
   )

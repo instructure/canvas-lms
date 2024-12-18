@@ -98,11 +98,11 @@ class Lti::Overlay < ActiveRecord::Base
   end
 
   def data=(data)
-    write_attribute(:data, data&.deep_sort_values) if data.is_a?(Hash)
+    write_attribute(:data, data&.deep_sort_values&.compact) if data.is_a?(Hash)
   end
 
   def validate_data
-    schema_errors = Schemas::Lti::Overlay.validation_errors(data)
+    schema_errors = Schemas::Lti::Overlay.validation_errors(data, allow_nil: true)
     return if schema_errors.blank?
 
     errors.add(:data, schema_errors.to_json)
@@ -123,17 +123,14 @@ class Lti::Overlay < ActiveRecord::Base
     return internal_config.with_indifferent_access if overlay.blank?
 
     overlay = overlay.with_indifferent_access
-    internal_config = internal_config.with_indifferent_access
+    internal_config = internal_config.deep_dup.with_indifferent_access
 
     internal_config.merge!(overlay.slice(*Schemas::Lti::Overlay::ROOT_KEYS))
     internal_config[:launch_settings].merge!(overlay.slice(*Schemas::Lti::Overlay::LAUNCH_SETTINGS_KEYS))
 
     disabled_scopes = overlay[:disabled_scopes]
-    added_scopes = overlay[:scopes]&.difference(disabled_scopes) if disabled_scopes.present?
-    added_scopes ||= overlay[:scopes]
     disabled_placements = overlay[:disabled_placements]
 
-    internal_config[:scopes] = internal_config[:scopes].union(added_scopes) if added_scopes.present?
     # disabled_scopes takes precedence over scopes, in case there's any overlap.
     internal_config[:scopes].reject! { |scope| disabled_scopes&.include?(scope) }
     internal_config[:scopes].uniq!
@@ -145,7 +142,7 @@ class Lti::Overlay < ActiveRecord::Base
       placement.merge!(placement_overlay)
     end
 
-    # disabled_placements takes precendence over placements, in case there's any overlap.
+    # disabled_placements takes precedence over placements, in case there's any overlap.
     disabled_placements&.each do |placement|
       placement = internal_config[:placements].find { |p| p[:placement] == placement }
       placement[:enabled] = false if placement.present?
@@ -162,7 +159,7 @@ class Lti::Overlay < ActiveRecord::Base
 
     internal_config[:placements] += additional_placements if additional_placements.present?
 
-    internal_config
+    internal_config.compact
   end
 
   private

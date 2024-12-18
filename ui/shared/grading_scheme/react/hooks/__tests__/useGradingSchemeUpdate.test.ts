@@ -28,10 +28,12 @@ const accountId = '42'
 
 jest.mock('@canvas/do-fetch-api-effect')
 beforeEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
 afterEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
@@ -60,6 +62,7 @@ describe('useGradingSchemeUpdateHook', () => {
       scaling_factor: 1.0,
     }
 
+    // @ts-expect-error
     const gradingScheme: GradingScheme = {
       ...gradingSchemeUpdateRequest,
       assessed_assignment: false,
@@ -70,6 +73,7 @@ describe('useGradingSchemeUpdateHook', () => {
       workflow_state: 'active',
     }
 
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: gradingScheme,
@@ -79,6 +83,7 @@ describe('useGradingSchemeUpdateHook', () => {
       courseId,
       gradingSchemeUpdateRequest
     )
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/courses/${courseId}/grading_schemes/some-id`,
@@ -103,6 +108,7 @@ describe('useGradingSchemeUpdateHook', () => {
       points_based: false,
       scaling_factor: 1.0,
     }
+    // @ts-expect-error
     const gradingScheme: GradingScheme = {
       ...gradingSchemeUpdateRequest,
       assessed_assignment: false,
@@ -112,6 +118,7 @@ describe('useGradingSchemeUpdateHook', () => {
       permissions: {manage: true},
       workflow_state: 'active',
     }
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: gradingScheme,
@@ -121,6 +128,7 @@ describe('useGradingSchemeUpdateHook', () => {
       accountId,
       gradingSchemeUpdateRequest
     )
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/accounts/${accountId}/grading_schemes/some-id`,

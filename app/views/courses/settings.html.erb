@@ -60,11 +60,10 @@
         <li id="navigation_tab"><a href="#tab-navigation"><%= t('tabs.navigation', %{Navigation}) %></a></li>
       <% end %>
       <% if can_do(@context, @current_user, :read_as_admin) %>
-        <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps}) %></a></li>
+        <li id="external_tools_tab"><a href="#tab-tools" id="tab-tools-link"><%= t('tabs.tools', %{Apps (Legacy)}) %></a></li>
       <% end %>
       <% if can_do(@context, @current_user, :read_as_admin) && @context.root_account.feature_enabled?(:lti_apps_page_instructors) %>
-        <%# TODO: change name and deal with old apps? %>
-        <li id="apps_tab"><a href="#tab-apps" id="tab-apps-link">Apps (Discover)</a></li>
+        <li id="apps_tab"><a href="#tab-apps" id="tab-apps-link"><%= t('tabs.apps', %{Apps (New)}) %></a></li>
       <% end %>
       <% if @publishing_enabled %>
         <li id="grade_publishing_tab"><a href="#tab-grade-publishing" id="tab-grade-publishing-link"><%= t('Grade Syncing') %></a></li>
@@ -692,10 +691,16 @@
               <% end %>
               <% unless @context.elementary_subject_course? %>
                 <div class="checkbox-flex-container">
-                  <span <%= 'data-tooltip' if @context.account.lock_all_announcements[:locked] %> title="<%= t("This setting is locked on the account level")%>">
-                    <%= f.check_box :lock_all_announcements, :disabled => !can_manage || @context.account.lock_all_announcements[:locked] %>
+                  <% if !can_manage || @context.account.lock_all_announcements[:locked] %>
+                    <% locked_tooltip = t('tooltips.locked_announcements', %{This setting is locked on account level}) %>
+                    <span data-tooltip title="<%= locked_tooltip %>" class='checkbox-flex-container' style="color: #767676;">
+                      <%= f.check_box :lock_all_announcements, :disabled => true %>
+                      <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
+                    </span>
+                  <% else %>
+                    <%= f.check_box :lock_all_announcements %>
                     <%= f.label :lock_all_announcements, :en => 'Disable comments on announcements' %><br />
-                  </span>
+                  <% end %>
                 </div>
               <% end %>
               <% if @context.account.feature_enabled?(:horizon_course_setting) %>
@@ -1038,4 +1043,5 @@
   <a href="<%= context_url(@context, :context_grading_standards_url) %>" style="display: none;" class="create_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_grading_standard_url, "{{ id }}") %>" style="display: none;" id="update_grading_standard_url">&nbsp;</a>
   <a href="<%= context_url(@context, :context_url) %>" style="display: none;" id="update_course_url">&nbsp;</a>
+
 </div>

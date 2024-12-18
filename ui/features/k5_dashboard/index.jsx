@@ -29,6 +29,7 @@ useK5Theme()
 ready(() => {
   const dashboardContainer = document.getElementById('dashboard-app-container')
   if (dashboardContainer) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <QueryProvider>
         <K5Dashboard

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -32,7 +31,7 @@ type Props = {
   disabled: boolean
   onCheck: (checked: React.ChangeEvent<HTMLInputElement>) => void
   sections: Array<{id: string; name: string}>
-  sectionSelectionChanged: (boolean, string) => void
+  sectionSelectionChanged: (boolean: boolean, string: string) => void
   selectedSectionIds: string[]
 }
 

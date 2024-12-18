@@ -17,24 +17,24 @@
  */
 
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import { Leadership } from '../Leadership'
-import { GroupContext, SPLIT } from '../context'
+import {Leadership} from '../Leadership'
+import {GroupContext, SPLIT} from '../context'
 
-const providerState= {
-    enableAutoLeader: true,
-    autoLeaderType: 'FIRST',
-    selfSignup: true,
-    splitGroups: SPLIT.on
+const providerState = {
+  enableAutoLeader: true,
+  autoLeaderType: 'FIRST',
+  selfSignup: true,
+  splitGroups: SPLIT.on,
 }
 
 const Wrapper = ({state, props}) => {
-    return (
-        <GroupContext.Provider value={state}>
-            <Leadership {...props} />
-        </GroupContext.Provider>
-    )
+  return (
+    <GroupContext.Provider value={state}>
+      <Leadership {...props} />
+    </GroupContext.Provider>
+  )
 }
 
 const defaultProps = {onChange: Function.prototype}
@@ -48,7 +48,7 @@ describe('CreateOrEditSetModal::Leadership::', () => {
     const iconButton = screen.getByTestId('group-leadership-icon-button')
     fireEvent.click(iconButton)
 
-    expect(screen.getByTestId("group-leadership-help-text")).toBeInTheDocument()
+    expect(screen.getByTestId('group-leadership-help-text')).toBeInTheDocument()
   })
 
   it('displays the tooltip on icon button hover', () => {
@@ -57,7 +57,7 @@ describe('CreateOrEditSetModal::Leadership::', () => {
     const iconButton = screen.getByTestId('group-leadership-icon-button')
     fireEvent.mouseOver(iconButton)
 
-    expect(screen.getByTestId("group-leadership-help-text")).toBeInTheDocument()
+    expect(screen.getByTestId('group-leadership-help-text')).toBeInTheDocument()
   })
 
   it('displays the tooltip on icon button focus', () => {
@@ -66,6 +66,6 @@ describe('CreateOrEditSetModal::Leadership::', () => {
     const iconButton = screen.getByTestId('group-leadership-icon-button')
     fireEvent.focus(iconButton)
 
-    expect(screen.getByTestId("group-leadership-help-text")).toBeInTheDocument()
+    expect(screen.getByTestId('group-leadership-help-text')).toBeInTheDocument()
   })
 })

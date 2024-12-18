@@ -92,7 +92,10 @@ class ServicesApiController < ApplicationController
       serverTime: Time.zone.now.to_i
     }
     if value_to_boolean(params[:include_upload_config])
-      pseudonym = @context ? SisPseudonym.for(@current_user, @context) : @current_user.primary_pseudonym
+      pseudonym = SisPseudonym.for(@current_user,
+                                   @context || @domain_root_account,
+                                   type: :implicit,
+                                   require_sis: false)
       hash[:kaltura_setting] = CanvasKaltura::ClientV3.config.try(:slice,
                                                                   "domain",
                                                                   "resource_domain",

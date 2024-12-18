@@ -45,7 +45,7 @@ class CreateRubricImports < ActiveRecord::Migration[7.0]
   end
 
   def down
-    remove_reference :rubrics, :rubric_imports, if_exists: true, index: { algorithm: :concurrently, if_not_exists: true }
+    remove_reference :rubrics, :rubric_imports, if_exists: true, index: { algorithm: :concurrently, if_exists: true }
     drop_table :rubric_imports, if_exists: true
   end
 end

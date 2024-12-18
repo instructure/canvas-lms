@@ -23,6 +23,7 @@ import ready from '@instructure/ready'
 import {ApolloProvider, createClient} from '@canvas/apollo'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ApolloProvider client={createClient()}>
       <JobsIndex />

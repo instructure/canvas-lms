@@ -54,6 +54,7 @@ const DashboardWrapper = ({
   const [cards, setCards] = useState<Card[]>([])
 
   const observedUserID =
+    // @ts-expect-error
     observerMode() && ENV.OBSERVED_USERS_LIST.length > 0 ? savedObservedId(userID) : null
 
   const {

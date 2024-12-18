@@ -145,6 +145,7 @@ class Submission < ActiveRecord::Base
 
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: "SubmissionComment", dependent: :destroy
+  has_many :all_submission_comments_for_groups, -> { for_groups.order(:created_at) }, class_name: "SubmissionComment"
   has_many :group_memberships, through: :assignment
   has_many :submission_comments, -> { order(:created_at).where(provisional_grade_id: nil) }
   has_many :visible_submission_comments,
@@ -366,6 +367,18 @@ class Submission < ActiveRecord::Base
       )
   end
 
+  def checkpoints_needs_grading?
+    return false if assignment.nil?
+    return false unless assignment.checkpoints_parent?
+
+    Submission.where(user_id:)
+              .where(assignment_id: SubAssignment.select(:id).where(parent_assignment_id: assignment_id))
+              .find_each do |sub_assignment_submission|
+      return true if sub_assignment_submission.needs_grading?
+    end
+    false
+  end
+
   def proxy_submission?
     proxy_submitter.present?
   end
@@ -423,6 +436,8 @@ class Submission < ActiveRecord::Base
   before_save :set_root_account_id
   before_save :reset_redo_request
   before_save :remove_sticker, if: :will_save_change_to_attempt?
+  before_save :clear_body_word_count, if: -> { body.nil? }
+  after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -1946,7 +1961,8 @@ class Submission < ActiveRecord::Base
   end
 
   def self.originality_reports_by_submission_id_submission_time_attachment_id(submissions)
-    reports = OriginalityReport.where(submission_id: submissions)
+    unique_ids = submissions.map(&:id).uniq
+    reports = OriginalityReport.where(submission_id: unique_ids)
     reports.each_with_object({}) do |report, hash|
       report_submission_time = report.submission_time&.iso8601(6)
       hash[report.submission_id] ||= { by_time: {}, by_attachment: {} }
@@ -2408,7 +2424,6 @@ class Submission < ActiveRecord::Base
                else
                  super
                end
-    comments.preload(submission: :assignment)
 
     if @comment_limiting_user
       comments.select { |comment| comment.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) }
@@ -2419,17 +2434,21 @@ class Submission < ActiveRecord::Base
 
   def visible_submission_comments_for(current_user)
     displayable_comments = if assignment.grade_as_group?
-                             all_submission_comments.for_groups
+                             all_submission_comments_for_groups
                            elsif assignment.moderated_grading? && assignment.grades_published?
                              # When grades are published for a moderated assignment, provisional
                              # comments made by the chosen grader are duplicated as non-provisional
                              # comments. Ignore the provisional copies of that grader's comments.
-                             all_submission_comments.where.not("author_id = ? AND provisional_grade_id IS NOT NULL", grader_id)
+                             if association(:all_submission_comments).loaded?
+                               all_submission_comments.reject { |comment| comment.provisional_grade_id.present? && comment.author_id == grader_id }
+                             else
+                               all_submission_comments.where.not("author_id = ? AND provisional_grade_id IS NOT NULL", grader_id)
+                             end
                            else
                              all_submission_comments
                            end
 
-    displayable_comments.preload(submission: :assignment).select do |submission_comment|
+    displayable_comments.select do |submission_comment|
       submission_comment.grants_right?(current_user, :read)
     end
   end
@@ -3105,18 +3124,18 @@ class Submission < ActiveRecord::Base
   end
 
   def word_count
-    if body && submission_type != "online_quiz"
-      segments = body.split(%r{<br\s*/?>})
-      word_count = 0
-      segments.each do |segment|
-        tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
-        words = ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
-        word_count += words
-      end
-
-      word_count
+    if get_word_count_from_body?
+      read_or_calc_body_word_count
     elsif versioned_attachments.present?
       Attachment.where(id: versioned_attachments.pluck(:id)).sum(:word_count)
+    end
+  end
+
+  def read_or_calc_body_word_count
+    if body_word_count.present? && Account.site_admin.feature_enabled?(:use_body_word_count)
+      body_word_count
+    else
+      calc_body_word_count
     end
   end
 
@@ -3152,6 +3171,43 @@ class Submission < ActiveRecord::Base
     tracked_attributes = Checkpoints::SubmissionAggregatorService::AggregateSubmission.members.map(&:to_s) - ["updated_at"]
     relevant_changes = tracked_attributes & saved_changes.keys
     relevant_changes.any?
+  end
+
+  def clear_body_word_count
+    self.body_word_count = nil
+  end
+
+  def get_word_count_from_body?
+    !body.nil? && submission_type != "online_quiz"
+  end
+
+  # For large body text, this can be SLOW. Call this method in a delayed job.
+  def calc_body_word_count
+    return 0 if body.nil?
+
+    tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
+    segments = body.split(%r{<br\s*/?>})
+    segments.sum do |segment|
+      ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
+    end
+  end
+
+  def update_body_word_count_later
+    return unless Account.site_admin.feature_enabled?(:use_body_word_count)
+
+    delay(
+      n_strand: ["Submission#update_body_word_count", global_root_account_id],
+      singleton: "update_body_word_count#{global_id}",
+      on_permanent_failure: :set_body_word_count_to_zero
+    ).update_body_word_count
+  end
+
+  def set_body_word_count_to_zero(_error)
+    update(body_word_count: 0)
+  end
+
+  def update_body_word_count
+    update(body_word_count: calc_body_word_count)
   end
 
   def remove_sticker

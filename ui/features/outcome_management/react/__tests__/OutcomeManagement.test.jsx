@@ -28,7 +28,7 @@ import {
   masteryScalesGraphqlMocks,
   outcomeGroupsMocks,
 } from '@canvas/outcomes/mocks/Outcomes'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress,

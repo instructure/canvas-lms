@@ -21,7 +21,7 @@
       "@instructure/*": ["../packages/*"] // lets TS follow an 'import Foo from @instructure/bar' statement"
     }
   },
-  "include": ["ui/*", "ui/**/*"],
-  "exclude": ["**/node_modules", "**/.*/", "vendor"],
+  "include": ["ui/**/*.ts", "ui/**/*.tsx"],
+  "exclude": ["node_modules"],
   "types": []
 }

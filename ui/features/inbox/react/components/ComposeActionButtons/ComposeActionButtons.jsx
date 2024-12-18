@@ -23,6 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {IconAttachMediaLine, IconPaperclipLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ConversationContext} from '../../../util/constants'
+
 const I18n = useI18nScope('conversations_2')
 export const ComposeActionButtons = ({...props}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)

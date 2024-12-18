@@ -22,5 +22,6 @@ import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<CanvasInboxApp />, document.getElementById('content'))
 })

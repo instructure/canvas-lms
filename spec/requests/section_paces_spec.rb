@@ -122,6 +122,21 @@ describe "Section Paces API" do
         expect(json["progress"]["tag"]).to eq("course_pace_publish")
       end
     end
+
+    context "when course draft feature flag is enabled" do
+      before :once do
+        course.root_account.enable_feature!(:course_pace_draft_state)
+      end
+
+      it "can create a pace in an unpublished workflow_state" do
+        expect do
+          post api_v1_new_section_pace_path(course, section), params: { format: :json, workflow_state: "unpublished" }
+        end.to change {
+          section.course_paces.reload.count
+        }.by(1)
+         .and not_change { Progress.count }
+      end
+    end
   end
 
   describe "update" do
@@ -160,6 +175,22 @@ describe "Section Paces API" do
         }
       }
       expect(response).to have_http_status :unprocessable_entity
+    end
+
+    context "when course draft feature flag is enabled" do
+      before :once do
+        course.root_account.enable_feature!(:course_pace_draft_state)
+      end
+
+      it "updates an unpublished pace and leave it as unpublished workflow_state" do
+        pace.workflow_state = "unpublished"
+        pace.save!
+
+        expect do
+          patch api_v1_patch_section_pace_path(course, section), params: { format: :json, workflow_state: "unpublished" }
+        end.to not_change { Progress.count }
+        expect(pace.reload.workflow_state).to eq("unpublished")
+      end
     end
   end
 

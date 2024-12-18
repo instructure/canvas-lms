@@ -170,6 +170,28 @@ module Canvas::LiveEvents
                            })
   end
 
+  def self.account_created(account)
+    post_event_stringified("account_created", get_account_data(account))
+  end
+
+  def self.account_updated(account)
+    post_event_stringified("account_updated", get_account_data(account))
+  end
+
+  def self.get_account_data(account)
+    {
+      name: account.name,
+      account_id: account.global_id,
+      root_account_id: account.global_root_account_id,
+      parent_account_id: account.global_parent_account_id,
+      external_status: account.external_status,
+      workflow_state: account.workflow_state,
+      # TODO: Without read_attribute, this spec "spec/models/assignment_spec.rb:11453" fails
+      default_time_zone: account.read_attribute("default_time_zone"),
+      default_locale: account.default_locale,
+    }
+  end
+
   def self.get_group_membership_data(membership)
     {
       group_membership_id: membership.global_id,
@@ -434,6 +456,7 @@ module Canvas::LiveEvents
   end
 
   def self.get_user_data(user)
+    pseudo = SisPseudonym.for(user, nil, type: :implicit, require_sis: false)
     {
       user_id: user.global_id,
       uuid: user.uuid,
@@ -442,8 +465,8 @@ module Canvas::LiveEvents
       workflow_state: user.workflow_state,
       created_at: user.created_at,
       updated_at: user.updated_at,
-      user_login: user.primary_pseudonym&.unique_id,
-      user_sis_id: user.primary_pseudonym&.sis_user_id
+      user_login: pseudo&.unique_id,
+      user_sis_id: pseudo&.sis_user_id
     }
   end
 

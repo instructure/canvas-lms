@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -37,6 +36,7 @@ const I18n = useI18nScope('gradebook')
 
 const {Item: MenuItem, Group: MenuGroup, Separator: MenuSeparator} = Menu as any
 
+// @ts-expect-error
 function renderTrigger(ref) {
   return (
     <IconButton
@@ -51,6 +51,7 @@ function renderTrigger(ref) {
   )
 }
 
+// @ts-expect-error
 function TotalDetailContent({viewUngradedAsZero}) {
   if (viewUngradedAsZero) {
     return (
@@ -131,6 +132,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
       onMoveToBack: func.isRequired,
     }).isRequired,
     onApplyScoreToUngraded: func,
+    // @ts-expect-error
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     grabFocus: bool,
     pointsBasedGradingScheme: bool.isRequired,
@@ -148,6 +150,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     this.invokeAndSkipFocus(this.props.gradeDisplay)
   }
 
+  // @ts-expect-error
   invokeAndSkipFocus(action) {
     this.setState({skipFocusOnClose: true})
     action.onSelect(this.focusAtEnd)
@@ -167,6 +170,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     this.props.onSendMessageStudentsWho(args)
   }
 
+  // @ts-expect-error
   showMessageStudentsWhoDialog(students, courseId) {
     // @ts-expect-error
     this.state.skipFocusOnClose = true
@@ -175,12 +179,14 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     const props = {
       assignment: null,
       launchContext: MSWLaunchContext.TOTAL_COURSE_GRADE_CONTEXT,
+      // @ts-expect-error
       students: (students || []).filter(student => !student.isInactive && !student.isTestStudent),
       courseId,
       onClose: () => {},
       onSend: this.handleSendMessageStudentsWho,
       messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
       userId: this.props.userId,
+      // @ts-expect-error
       pointsBasedGradingScheme: this.props.pointsBasedGradingScheme,
     }
 
@@ -193,6 +199,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     const displayAsPoints = gradeDisplay.currentDisplay === 'points'
     const showSeparator = !gradeDisplay.hidden
     const menuShown = this.state.menuShown
+    // @ts-expect-error
     const allStudents = this.props.getAllStudents()
     const courseId = this.props.courseId
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
@@ -222,6 +229,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
                     onToggle={this.onToggle}
                     ref={this.bindOptionsMenu}
                     shouldFocusTriggerOnClose={false}
+                    // @ts-expect-error
                     trigger={renderTrigger(ref => (this.optionsMenuTrigger = ref))}
                   >
                     <Menu menuRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>

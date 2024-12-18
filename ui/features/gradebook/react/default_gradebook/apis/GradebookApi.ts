@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -43,6 +42,7 @@ function createTeacherNotesColumn(courseId: string) {
   return axios.post<CustomColumn>(url, data)
 }
 
+// @ts-expect-error
 function updateTeacherNotesColumn(courseId: string, columnId: string, attr) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}`
   return axios.put(url, {column: attr})
@@ -52,6 +52,7 @@ function updateSubmission(
   courseId: string,
   assignmentId: string,
   userId: string,
+  // @ts-expect-error
   submission,
   enterGradesAs?: string,
   subAssignmentTag?: string

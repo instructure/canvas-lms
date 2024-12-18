@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -62,6 +61,7 @@ function polyfillerFactory({
   polyfill,
   localeLoader,
 }: PolyfillerArgs): Capability {
+  // @ts-expect-error
   const subsys = Intl[subsysName]
   const native = subsys
   const nativeName = 'Native' + subsysName
@@ -93,6 +93,7 @@ function polyfillerFactory({
     try {
       /* eslint-disable no-await-in-loop */ // it's actually fine in for-loops
       for (const locale of locales) {
+        // @ts-expect-error
         const nativeSupport = Intl[subsysName].supportedLocalesOf([locale])
         if (nativeSupport.length > 0)
           return {subsys: subsysName, locale: nativeSupport[0], source: 'native'}
@@ -101,6 +102,7 @@ function polyfillerFactory({
         if (!doable || doable === 'en') continue
         await polyfill()
         if (typeof doable === 'string') await localeLoader(doable)
+        // @ts-expect-error
         Intl[nativeName] = native
         const retval: PolyfillerUpValue = {subsys: subsysName, locale, source: 'polyfill'}
         if (typeof doable === 'string') retval.loaded = doable
@@ -116,7 +118,9 @@ function polyfillerFactory({
 
   function down(): void {
     if (subsysName) {
+      // @ts-expect-error
       delete Intl[nativeName]
+      // @ts-expect-error
       Intl[subsysName] = native
     }
   }

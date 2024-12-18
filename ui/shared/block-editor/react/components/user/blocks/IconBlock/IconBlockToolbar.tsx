@@ -16,26 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useNode} from '@craftjs/core'
 import {Flex} from '@instructure/ui-flex'
 import {Menu, type MenuItemProps, type MenuItem} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconBoxLine} from '@instructure/ui-icons'
 import {IconPopup} from '../../common/IconPopup'
+import {ToolbarColor, type ColorSpec} from '../../common/ToolbarColor'
 import {type IconBlockProps, type IconSize} from './types'
+import {getEffectiveBackgroundColor, getEffectiveColor} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/icon-block')
+const I18n = useI18nScope('block-editor')
 
 const IconBlockToolbar = () => {
   const {
     actions: {setProp},
+    nodeDomNode,
     props,
   } = useNode(node => ({
+    nodeDomNode: node.dom,
     props: node.data.props,
   }))
+  const [effectiveBgColor] = useState<string>(
+    getEffectiveBackgroundColor(nodeDomNode as HTMLElement)
+  )
+  const [effectiveColor] = useState<string>(getEffectiveColor(nodeDomNode as HTMLElement))
 
   const handleSizeChange = useCallback(
     (
@@ -48,6 +56,20 @@ const IconBlockToolbar = () => {
     },
     [setProp]
   )
+
+  const handleColorChange = useCallback(
+    (newColors: ColorSpec) => {
+      setProp((prps: IconBlockProps) => {
+        if (newColors.fgcolor === effectiveColor) {
+          prps.color = undefined
+        } else {
+          prps.color = newColors.fgcolor
+        }
+      })
+    },
+    [effectiveColor, setProp]
+  )
+
   return (
     <Flex gap="small">
       <Menu
@@ -57,7 +79,8 @@ const IconBlockToolbar = () => {
             size="small"
             withBackground={false}
             withBorder={false}
-            screenReaderLabel="Size"
+            screenReaderLabel={I18n.t('Size')}
+            title={I18n.t('Size')}
           >
             <IconBoxLine size="x-small" />
           </IconButton>
@@ -74,6 +97,16 @@ const IconBlockToolbar = () => {
           {I18n.t('Large')}
         </Menu.Item>
       </Menu>
+      <ToolbarColor
+        tabs={{
+          foreground: {
+            color: props.color || effectiveColor,
+            default: effectiveColor,
+          },
+          effectiveBgColor,
+        }}
+        onChange={handleColorChange}
+      />
       <IconPopup iconName={props.iconName} />
     </Flex>
   )

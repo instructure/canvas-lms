@@ -25,9 +25,9 @@ const I18n = useI18nScope('lti_registrations')
 function Disclaimer() {
   return (
     <View as="div">
-      <Text color="secondary">
+      <Text color="secondary" size="small">
         {I18n.t(
-          'Apps offered in the Canvas Apps library are not reviewed or otherwise vetted by Instructure. We encourage you to review the AI, privacy, and security practices of each provider before connecting to your Canvas LMS account.'
+          'Apps offered in the Canvas Apps library are not reviewed or otherwise vetted by Instructure. We encourage you to review the AI, privacy, and security practices of each provider before connecting to your Canvas LMS account. The information on this page is provided by the respective Partner and pertains to the latest app version available on the Apps page. These policies and procedures are not controlled by Instructure. Partners are solely responsible for the accuracy of the information provided.'
         )}
       </Text>
     </View>

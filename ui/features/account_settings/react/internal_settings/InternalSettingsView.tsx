@@ -25,6 +25,7 @@ import React from 'react'
 const I18n = useI18nScope('internal-settings')
 
 export const InternalSettingsView = () => (
+  // @ts-expect-error
   <AlertManager>
     <Heading level="h2" margin="x-small auto">
       {I18n.t('Internal Settings')}

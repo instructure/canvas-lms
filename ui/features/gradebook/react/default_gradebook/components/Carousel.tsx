@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -65,6 +64,7 @@ export default class Carousel extends Component<CarouselProps> {
         data-testid="left-arrow-button"
         disabled={this.props.disabled}
         ref={button => {
+          // @ts-expect-error
           this.leftArrow = button
         }}
         color="secondary"
@@ -80,6 +80,7 @@ export default class Carousel extends Component<CarouselProps> {
         data-testid="right-arrow-button"
         disabled={this.props.disabled}
         ref={button => {
+          // @ts-expect-error
           this.rightArrow = button
         }}
         color="secondary"
@@ -106,6 +107,7 @@ export default class Carousel extends Component<CarouselProps> {
   }
 }
 
+// @ts-expect-error
 Carousel.defaultProps = {
   id: null,
 }

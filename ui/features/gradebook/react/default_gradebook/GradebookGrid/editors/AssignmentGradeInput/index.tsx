@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -61,10 +60,13 @@ export default class AssignmentGradeInput extends Component<Props> {
     pendingGradeInfo: null,
   }
 
+  // @ts-expect-error
   constructor(props) {
     super(props)
 
+    // @ts-expect-error
     this.bindGradeInput = ref => {
+      // @ts-expect-error
       this.gradeInput = ref
     }
 
@@ -72,18 +74,23 @@ export default class AssignmentGradeInput extends Component<Props> {
   }
 
   get gradeInfo() {
+    // @ts-expect-error
     return this.gradeInput.gradeInfo
   }
 
   focus() {
+    // @ts-expect-error
     this.gradeInput.focus()
   }
 
+  // @ts-expect-error
   handleKeyDown(event) {
+    // @ts-expect-error
     return this.gradeInput.handleKeyDown(event)
   }
 
   hasGradeChanged() {
+    // @ts-expect-error
     return this.gradeInput.hasGradeChanged()
   }
 
@@ -102,22 +109,27 @@ export default class AssignmentGradeInput extends Component<Props> {
             {...this.props}
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
+            // @ts-expect-error
             ref={this.bindGradeInput}
           />
         )}
         {this.props.enterGradesAs === 'passFail' && (
           <CompleteIncompleteGradeInput
             {...this.props}
+            // @ts-expect-error
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
+            // @ts-expect-error
             ref={this.bindGradeInput}
           />
         )}
         {!['gradingScheme', 'passFail'].includes(this.props.enterGradesAs) && (
+          // @ts-expect-error
           <TextGradeInput
             {...this.props}
             label={<ScreenReaderContent>{I18n.t('Grade')}</ScreenReaderContent>}
             messages={messages}
+            // @ts-expect-error
             ref={this.bindGradeInput}
           />
         )}

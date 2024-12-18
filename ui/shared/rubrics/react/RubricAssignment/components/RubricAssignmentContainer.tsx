@@ -135,6 +135,7 @@ export const RubricAssignmentContainer = ({
 
             <Button
               margin="0 0 0 xx-large"
+              // @ts-expect-error
               renderIcon={IconEyeLine}
               data-testid="preview-assignment-rubric-button"
               onClick={() => setIsPreviewTrayOpen(true)}
@@ -175,6 +176,7 @@ export const RubricAssignmentContainer = ({
             {canManageRubrics && (
               <Button
                 margin="0"
+                // @ts-expect-error
                 renderIcon={IconAddLine}
                 data-testid="create-assignment-rubric-button"
                 onClick={() => setRubricCreateModalOpen(true)}
@@ -185,6 +187,7 @@ export const RubricAssignmentContainer = ({
             <Button
               margin="0 0 0 small"
               data-testid="find-assignment-rubric-button"
+              // @ts-expect-error
               renderIcon={IconSearchLine}
               onClick={() => setIsSearchTrayOpen(true)}
             >

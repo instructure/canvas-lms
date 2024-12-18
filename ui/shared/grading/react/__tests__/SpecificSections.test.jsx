@@ -37,6 +37,7 @@ function getSectionToggleInput() {
 }
 
 function mountComponent() {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<SpecificSections {...context} />, $container)
 }
 

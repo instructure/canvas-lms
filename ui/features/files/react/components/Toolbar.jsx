@@ -104,6 +104,7 @@ export default class Toolbar extends React.Component {
       zIndex: 1000,
     })
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <RestrictedDialogForm
         models={this.props.selectedItems}
@@ -196,6 +197,7 @@ export default class Toolbar extends React.Component {
         window.location.reload()
       }
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

@@ -81,7 +81,7 @@ ready(() => {
       model: assignment,
       assignmentGroupSelector,
       gradingTypeSelector,
-      groupCategorySelector,
+      ...(!ENV.horizon_course && {groupCategorySelector}),
       peerReviewsSelector,
       views: {
         'js-assignment-overrides': new DueDateOverride({
@@ -93,7 +93,7 @@ ready(() => {
           inPacedCourse: assignment.inPacedCourse(),
           isModuleItem: ENV.IS_MODULE_ITEM,
           courseId: assignment.courseID(),
-          groupCategorySelector,
+          ...(!ENV.horizon_course && {groupCategorySelector}),
         }),
       },
       lockedItems: assignment.id ? lockedItems : {}, // if no id, creating a new assignment

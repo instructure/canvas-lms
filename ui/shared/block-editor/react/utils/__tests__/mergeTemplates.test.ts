@@ -59,6 +59,7 @@ describe('mergeTemplates', () => {
       {id: '3', global_id: 'c', name: 'Api 3'},
     ])
 
+    // @ts-expect-error
     const mergedTemplates2 = mergeTemplates(undefined, apiTemplates)
     expect(mergedTemplates2).toEqual([
       {id: '1', global_id: 'a', name: 'Api 1'},

@@ -53,6 +53,7 @@ describe('TopicView', () => {
 
   afterEach(() => {
     fakeENV.teardown()
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render.restore()
   })
 
@@ -67,7 +68,9 @@ describe('TopicView', () => {
       view.$announcementCog = {focus() {}}
 
       view.openSendTo()
+      // eslint-disable-next-line no-restricted-properties
       equal(ReactDOM.render.firstCall.args[0].type, DirectShareUserModal)
+      // eslint-disable-next-line no-restricted-properties
       const {onDismiss, ...props} = ReactDOM.render.firstCall.args[0].props
       deepEqual(props, {
         open: true,
@@ -75,6 +78,7 @@ describe('TopicView', () => {
         contentShare: {content_type: 'discussion_topic', content_id: '42'},
       })
       onDismiss()
+      // eslint-disable-next-line no-restricted-properties
       equal(ReactDOM.render.secondCall.args[0].props.open, false)
     })
 
@@ -86,7 +90,9 @@ describe('TopicView', () => {
       view.$announcementCog = {focus() {}}
 
       view.openCopyTo()
+      // eslint-disable-next-line no-restricted-properties
       equal(ReactDOM.render.firstCall.args[0].type, DirectShareCourseTray)
+      // eslint-disable-next-line no-restricted-properties
       const {onDismiss, ...props} = ReactDOM.render.firstCall.args[0].props
       deepEqual(props, {
         open: true,
@@ -94,6 +100,7 @@ describe('TopicView', () => {
         contentSelection: {discussion_topics: ['42']},
       })
       onDismiss()
+      // eslint-disable-next-line no-restricted-properties
       equal(ReactDOM.render.secondCall.args[0].props.open, false)
     })
   })

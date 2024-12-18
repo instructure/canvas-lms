@@ -233,7 +233,10 @@ export function renderStatusMenu(component: React.ReactElement | null, mountPoin
     mountPoint.id === SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
       ? SPEED_GRADER_EDIT_STATUS_MENU_SECONDARY_MOUNT_POINT
       : SPEED_GRADER_EDIT_STATUS_MENU_MOUNT_POINT
+
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<></>, document.getElementById(unmountPoint))
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(component || <></>, mountPoint)
 }
 
@@ -309,6 +312,7 @@ export function renderPostGradesMenu(EG: SpeedGrader) {
     onPostGrades,
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <SpeedGraderPostGradesMenu {...props} />,
     document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
@@ -324,6 +328,7 @@ export function renderHiddenSubmissionPill(submission: Submission) {
   if (!mountPoint) throw new Error('hidden submission pill mount point not found')
 
   if (isPostable(submission)) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Pill color="warning" margin="0 0 small">
         {I18n.t('Hidden')}
@@ -454,6 +459,7 @@ export function renderSettingsMenu(header) {
   }
 
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<SpeedGraderSettingsMenu {...props} />, mountPoint)
 }
 
@@ -469,6 +475,7 @@ export function speedGraderJSONErrorFn(
       dismissible: false,
     }
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Alert {...alertProps}>
         <span dangerouslySetInnerHTML={buildAlertMessage()} />

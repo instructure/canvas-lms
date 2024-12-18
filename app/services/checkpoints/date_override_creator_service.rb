@@ -25,6 +25,7 @@ class Checkpoints::DateOverrideCreatorService < Checkpoints::DateOverrideCommonS
       "CourseSection" => Checkpoints::SectionOverrideCreatorService,
       "Group" => Checkpoints::GroupOverrideCreatorService,
       "ADHOC" => Checkpoints::AdhocOverrideCreatorService,
+      "Course" => Checkpoints::CourseOverrideCreatorService,
     }
   end
 end

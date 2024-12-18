@@ -31,7 +31,6 @@ import customPropTypes from '../modules/customPropTypes'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import File from '../../backbone/models/File'
 import FilesystemObject from '../../backbone/models/FilesystemObject'
-import codeToRemoveLater from '../../jquery/codeToRemoveLater'
 import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('file_preview')

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -18,8 +17,8 @@
  */
 
 import React, {useState} from 'react'
-import {Story, Meta} from '@storybook/react'
-import {CollapsableList, CollapsableListProps} from './CollapsableList'
+import type {Story, Meta} from '@storybook/react'
+import {CollapsableList, type CollapsableListProps} from './CollapsableList'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {
@@ -32,7 +31,6 @@ import {
   IconDiscussionLine,
   IconDocumentLine,
   IconCalendarDayLine,
-  // @ts-expect-error
 } from '@instructure/ui-icons'
 
 export default {
@@ -64,41 +62,49 @@ Default.args = {
     {
       id: 'course-settings',
       label: 'Course Settings',
+      // @ts-expect-error
       icon: IconSettingsLine,
     },
     {
       id: 'syllabus-body',
       label: 'Syllabus Body',
+      // @ts-expect-error
       icon: IconAddressBookLine,
     },
     {
       id: 'course-pace',
       label: 'Course Pace',
+      // @ts-expect-error
       icon: IconHourGlassLine,
     },
     {
       id: 'modules',
       label: 'Modules',
+      // @ts-expect-error
       icon: IconModuleLine,
       children: [
         {
           id: 'module-1',
           label: 'Module 1',
+          // @ts-expect-error
           icon: IconModuleLine,
         },
         {
           id: 'module-2',
           label: 'Module 2',
+          // @ts-expect-error
           icon: IconModuleLine,
         },
         {
           id: 'module-3',
           label: 'Module 3',
+          // @ts-expect-error
           icon: IconModuleLine,
         },
         {
           id: 'module-4',
           label: 'Module 4',
+          // @ts-expect-error
           icon: IconModuleLine,
           children: [
             {
@@ -118,6 +124,7 @@ Default.args = {
         {
           id: 'module-5',
           label: 'Module 5',
+          // @ts-expect-error
           icon: IconModuleLine,
           children: [
             {
@@ -139,6 +146,7 @@ Default.args = {
     {
       id: 'assignments',
       label: 'Assignments',
+      // @ts-expect-error
       icon: IconAssignmentLine,
       children: [
         {
@@ -158,6 +166,7 @@ Default.args = {
     {
       id: 'quizzes',
       label: 'Quizzes',
+      // @ts-expect-error
       icon: IconQuizLine,
       children: [
         {
@@ -177,6 +186,7 @@ Default.args = {
     {
       id: 'discussion-topics',
       label: 'Discussion Topics',
+      // @ts-expect-error
       icon: IconDiscussionLine,
       children: [
         {
@@ -196,6 +206,7 @@ Default.args = {
     {
       id: 'pages',
       label: 'Pages',
+      // @ts-expect-error
       icon: IconDocumentLine,
       children: [
         {
@@ -215,6 +226,7 @@ Default.args = {
     {
       id: 'calendar-events',
       label: 'Calendar Events',
+      // @ts-expect-error
       icon: IconCalendarDayLine,
       children: [
         {

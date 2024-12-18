@@ -779,16 +779,9 @@ $outcome-border: 1px solid #BCC2CA;
 }
 
 #grades_summary tr.has_sub_assignments {
-  border-left: 1px solid;
-  border-right: 1px solid;
   border-top: 1px solid;
   border-color: #C7CDD1;
- }
-
- #grades_summary tr.sub_assignment_row {
-  border-left: 1px solid;
-  border-right: 1px solid;
-  border-color: #C7CDD1;
+  border-collapse: collapse;
  }
  
  #grades_summary tr.sub_assignment_row > td {

@@ -72,6 +72,7 @@ const speedGraderHelpers = {
     parts.push(` src="${src}"`)
     Object.keys(options).forEach(option => {
       let key = option
+      // @ts-expect-error
       const value = options[key]
       if (key === 'className') {
         key = 'class'

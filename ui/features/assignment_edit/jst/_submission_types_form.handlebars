@@ -18,16 +18,16 @@
           {{defaultToolName}}
         </option>
         {{/if}}
-        <option value="none" {{selectedIf defaultToNone}}>
+        <option value="none" {{selectedIf defaultToNone}} {{disabledIf isHorizonCourse}}>
           {{#t "submission_types.no_submission"}}No Submission{{/t}}
         </option>
         <option value="online" {{selectedIf defaultToOnline}}>
           {{#t "submission_types.online"}}Online{{/t}}
         </option>
-        <option value="on_paper" {{selectedIf defaultToOnPaper}}>
+        <option value="on_paper" {{selectedIf defaultToOnPaper}} {{disabledIf isHorizonCourse}}>
           {{#t "submission_types.on_paper"}}On Paper{{/t}}
         </option>
-        <option value="external_tool" {{selectedIf isGenericExternalTool}}>
+        <option value="external_tool" {{selectedIf isGenericExternalTool}} {{disabledIf isHorizonCourse}}>
           {{#t "submission_types.external_tool"}}External Tool{{/t}}
         </option>
         {{#if submissionTypeSelectionTools}}
@@ -61,7 +61,7 @@
           {{#t "labels.allow_text_entry"}}Text Entry{{/t}}
         </label>
 
-        <label class="checkbox" for="assignment_online_url">
+        <label class="checkbox" for="assignment_online_url" style="{{hiddenIf isHorizonCourse}}">
           {{checkbox "acceptsOnlineURL"
           id="assignment_online_url"
           name="online_submission_types[online_url]"
@@ -70,7 +70,7 @@
           {{#t "labels.allow_url"}}Website URL{{/t}}
         </label>
         {{#if kalturaEnabled}}
-        <label class="checkbox" for="assignment_media_recording">
+        <label class="checkbox" for="assignment_media_recording" style="{{hiddenIf isHorizonCourse}}">
           {{checkbox "acceptsMediaRecording"
           id="assignment_media_recording"
           name="online_submission_types[media_recording]"
@@ -79,7 +79,7 @@
           {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
         </label>
         {{/if}}
-        <label class="checkbox" for="assignment_annotated_document">
+        <label class="checkbox" for="assignment_annotated_document" style="{{hiddenIf isHorizonCourse}}">
           {{checkbox "acceptsAnnotatedDocument"
           id="assignment_annotated_document"
           name="online_submission_types[student_annotation]"

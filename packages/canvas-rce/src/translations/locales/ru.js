@@ -699,12 +699,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Многоцветное изображение" },
   "multiplication_sign_15f95c22": { "message": "Знак умножения" },
   "music_icon_4db5c972": { "message": "Значок музыки" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Должен быть как минимум { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Должно быть как минимум { width } x { height }пикселов"
-  },
   "my_files_2f621040": { "message": "Мои файлы" },
   "n_th_root_9991a6e4": { "message": "Корень N-й степени" },
   "nabla_1e216d25": { "message": "Набла" },

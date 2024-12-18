@@ -30,7 +30,7 @@ import {
 import {type MediaBlockProps} from './types'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('block-editor/media-block')
+const I18n = useI18nScope('block-editor')
 
 export const AddMediaButton = ({setProp}: {setProp: (args: any) => void}) => {
   const [showAllMediaUploadModal, setShowAllMediaUploadModal] = useState(false)

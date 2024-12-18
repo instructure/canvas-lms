@@ -19,6 +19,7 @@
 import {IconBlock} from './IconBlock'
 import {type IconBlockProps} from './types'
 import {IconPicker} from './IconPicker'
+// @ts-expect-error
 import {IconLikeLine} from '@instructure/ui-icons/es/svg'
 
 const IconBlockIcon = IconLikeLine?.src

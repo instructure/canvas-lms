@@ -87,11 +87,7 @@ export default class InvitationsView extends DialogBaseView {
     e.preventDefault()
     this.close()
     for (e of this.model.get('enrollments')) {
-      if (ENV.FEATURES.granular_permissions_manage_users) {
-        if (ENV.permissions.active_granular_enrollment_permissions.includes(e.type)) {
-          this.sendInvitation(e)
-        }
-      } else {
+      if (ENV.permissions.active_granular_enrollment_permissions.includes(e.type)) {
         this.sendInvitation(e)
       }
     }

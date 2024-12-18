@@ -720,6 +720,20 @@ describe "calendar2" do
         expect(ff(".fc-title").count).to be(1)
         expect(f(".fc-title")).to include_text("aprilfools") # should still load cached event
       end
+
+      it "does not include the module override in the assignment list" do
+        @section1 = CourseSection.create!(name: "Section 1", course: @course)
+        student_in_section(@section1, user: @student)
+        @assignment = @course.assignments.create!(title: "new assignment")
+        module0 = ContextModule.create!(name: "Alpha Mod", context: @course)
+        module0.content_tags.create!(context: @course, content: @assignment, tag_type: "context_module")
+        AssignmentOverride.create!(set_type: "CourseSection", set_id: @section1.id, title: @section1.name, workflow_state: "active", context_module_id: module0.id)
+
+        @assignment.assignment_overrides.create!(due_at: 1.week.from_now, due_at_overridden: true, set_type: "CourseSection", set_id: @section1.id, title: @section1.name, workflow_state: "active")
+        get "/calendar2"
+        wait_for_ajaximations
+        expect(f(".fc-event").text).to include("new assignment")
+      end
     end
   end
 end

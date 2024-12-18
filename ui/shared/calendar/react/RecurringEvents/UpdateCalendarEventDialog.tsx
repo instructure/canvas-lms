@@ -40,6 +40,7 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
 
   const handleCancel = useCallback(
     (e = null) => {
+      // @ts-expect-error
       if (e?.code !== 'Escape' && e?.target.type === 'radio') {
         return
       }
@@ -55,6 +56,7 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
   const renderFooter = useCallback((): JSX.Element => {
     return (
       <Flex as="section" justifyItems="end">
+        {/* @ts-expect-error */}
         <Button color="secondary" margin="0 small 0" onClick={handleCancel}>
           {I18n.t('Cancel')}
         </Button>
@@ -101,6 +103,7 @@ const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
   }
 
   const whichPromise = new Promise(resolve => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <UpdateCalendarEventDialog
         event={selectedEvent}

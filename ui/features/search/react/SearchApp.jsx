@@ -53,10 +53,11 @@ export default function SearchApp() {
   const [resolveFeedback, setResolveFeedback] = useState(null)
 
   useEffect(() => {
-    doUrlSearch(false)  // init the box but don't actually do the search until we've checked index status
+    doUrlSearch(false) // init the box but don't actually do the search until we've checked index status
     if (searchInput.current) {
       searchInput.current.focus()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const checkIndexStatus = useCallback(() => {
@@ -71,6 +72,7 @@ export default function SearchApp() {
         }
       })
     })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const doUrlSearch = useCallback((perform = true) => {
@@ -87,6 +89,7 @@ export default function SearchApp() {
   useEffect(() => {
     checkIndexStatus()
     window.addEventListener('popstate', doUrlSearch)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const onDislike = ({id, type}) => {
@@ -144,15 +147,15 @@ export default function SearchApp() {
     setSearchResults([])
     setPreviousSearch(searchTerm)
 
-    const url = new URL(window.location.href);
+    const url = new URL(window.location.href)
     if (url.searchParams.get('q') !== searchTerm) {
-      url.searchParams.set('q', searchTerm);
-      window.history.pushState({}, '', url);
+      url.searchParams.set('q', searchTerm)
+      window.history.pushState({}, '', url)
     }
 
     fetch(`/api/v1/courses/${ENV.COURSE_ID}/smartsearch?q=${searchTerm}&per_page=25`)
       .then(res => {
-        if(!res.ok) {
+        if (!res.ok) {
           throw new Error(I18n.t('Failed to execute search: ') + res.statusText)
         }
         res
@@ -231,9 +234,7 @@ export default function SearchApp() {
             </Pill>
           </Flex.Item>
           <Flex.Item>
-            <Button
-            onClick={ _ => setIsTrayOpen(true) }
-            >{I18n.t('How It Works')}</Button>
+            <Button onClick={_ => setIsTrayOpen(true)}>{I18n.t('How It Works')}</Button>
           </Flex.Item>
         </Flex>
       </Heading>
@@ -278,7 +279,9 @@ export default function SearchApp() {
       <Tray
         label={I18n.t('How It Works')}
         open={isTrayOpen}
-        onDismiss={_ => { setIsTrayOpen(false)}}
+        onDismiss={_ => {
+          setIsTrayOpen(false)
+        }}
         size="regular"
         placement="end"
       >
@@ -289,18 +292,42 @@ export default function SearchApp() {
                 placement="end"
                 offset="small"
                 screenReaderLabel="Close"
-                onClick={_ => { setIsTrayOpen(false)}}
+                onClick={_ => {
+                  setIsTrayOpen(false)
+                }}
               />
             </Flex.Item>
             <Flex.Item>
               <h3>{I18n.t('About Smart Search')}</h3>
-              <p>{I18n.t('Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.')}</p>
+              <p>
+                {I18n.t(
+                  'Smart Search, currently in development for Canvas, uses semantic algorithms and AI to understand query context and semantic meaning, not just keyword matching.'
+                )}
+              </p>
               <h3>{I18n.t('Using Smart Search')}</h3>
-              <p>{I18n.t('Smart Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.')}</p>
+              <p>
+                {I18n.t(
+                  'Smart Search employs "embeddings" to mathematically represent content and queries for comparison, understanding keywords or general queries in any language, thanks to its multilingual AI model. Write search queries using keywords, questions, sentences, or whatever is most natural for you to describe what you are trying to find.'
+                )}
+              </p>
               <h3>{I18n.t('Searchable Content')}</h3>
-              <p>{I18n.t('As of June 1, 2024, searchable items include content pages, announcements, discussion prompts, and assignment descriptions, with plans to expand.')}</p>
+              <p>
+                {I18n.t(
+                  'As of June 1, 2024, searchable items include content pages, announcements, discussion prompts, and assignment descriptions, with plans to expand.'
+                )}
+              </p>
               <h3>{I18n.t('Contributing to Development')}</h3>
-              <p>{I18n.t('Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: ')}<a href="https://community.canvaslms.com/t5/Smart-Search/gh-p/smart_search" target="_blank">{I18n.t('Smart Search Community')}</a></p>
+              <p>
+                {I18n.t(
+                  'Smart Search is in feature preview. Feedback can be provided through result ratings and the Canvas Community space for Smart Search Beta. Canvas community space can be found here: '
+                )}
+                <a
+                  href="https://community.canvaslms.com/t5/Smart-Search/gh-p/smart_search"
+                  target="_blank"
+                >
+                  {I18n.t('Smart Search Community')}
+                </a>
+              </p>
             </Flex.Item>
           </Flex>
         </View>

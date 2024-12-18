@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -20,6 +19,7 @@
 import {PureComponent} from 'react'
 
 export default class CellEditorComponent extends PureComponent {
+  // @ts-expect-error
   constructor(props) {
     super(props)
 

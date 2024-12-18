@@ -63,7 +63,7 @@ export const IconConfirmationWrapper = ({
   return (
     <IconConfirmation
       allPlacements={placements}
-      defaultIconUrl={
+      topLevelDefaultIconUrl={
         canvasPlatformSettings(registration.tool_configuration)?.settings.icon_url || undefined
       }
       name={overlayState.adminNickname ?? registration.client_name}

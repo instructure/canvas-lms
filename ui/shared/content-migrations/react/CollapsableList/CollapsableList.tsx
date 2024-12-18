@@ -18,7 +18,6 @@
 
 import React, {Fragment, type ComponentClass, useState, useEffect, useRef, useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
-// @ts-ignore
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'

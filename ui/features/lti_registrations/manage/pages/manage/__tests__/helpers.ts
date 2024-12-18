@@ -19,11 +19,15 @@
 import {ZLtiImsRegistrationId} from '../../../model/lti_ims_registration/LtiImsRegistrationId'
 import type {PaginatedList} from '../../../api/PaginatedList'
 import type {AccountId} from '../../../model/AccountId'
-import type {LtiRegistration} from '../../../model/LtiRegistration'
+import type {
+  LtiRegistration,
+  LtiRegistrationWithConfiguration,
+} from '../../../model/LtiRegistration'
 import type {LtiRegistrationAccountBindingId} from '../../../model/LtiRegistrationAccountBinding'
 import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ZUserId} from '../../../model/UserId'
 import type {DeveloperKeyId} from '../../../model/developer_key/DeveloperKeyId'
+import type {InternalLtiConfiguration} from '../../../model/internal_lti_configuration/InternalLtiConfiguration'
 
 export const mockPageOfRegistrations = (
   ...names: Array<string>
@@ -35,9 +39,14 @@ export const mockPageOfRegistrations = (
 }
 
 const mockRegistrations = (...names: Array<string>): Array<LtiRegistration> =>
-  names.map(mockRegistration)
+  names.map((n, i) => mockRegistration(n, i))
 
-export const mockRegistration = (n: string, i: number): LtiRegistration => {
+export const mockRegistration = (
+  n: string,
+  i: number,
+  configuration: Partial<InternalLtiConfiguration> = {},
+  registration: Partial<LtiRegistration> = {}
+): LtiRegistrationWithConfiguration => {
   const id = i.toString()
   const date = new Date()
   const user = {
@@ -71,8 +80,24 @@ export const mockRegistration = (n: string, i: number): LtiRegistration => {
     developer_key_id: id as DeveloperKeyId,
     internal_service: false,
     ims_registration_id: ZLtiImsRegistrationId.parse(id),
-    admin_nickname: n,
+    manual_configuration_id: null,
     icon_url: null,
     vendor: null,
+    admin_nickname: n,
+    configuration: {
+      custom_fields: {},
+      placements: [],
+      description: '',
+      domain: '',
+      launch_settings: {},
+      oidc_initiation_url: 'https://example.com',
+      oidc_initiation_urls: {},
+      scopes: [],
+      title: n,
+      redirect_uris: [],
+      target_link_uri: 'https://example.com',
+      ...configuration,
+    },
+    ...registration,
   }
 }

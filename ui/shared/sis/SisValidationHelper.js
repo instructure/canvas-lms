@@ -46,7 +46,17 @@ export default class SisValidationHelper {
 
   dueDateMissingDifferentiated() {
     if (!this.allDates) return false
-    return this.allDates.map(this.dueAtNotValid).indexOf(true) !== -1
+    // if the assignment has module overrides, its possible that there is a duplicate
+    // assignment-level assignment override for the same set, or a course override which
+    // overrides the 'everyone' dates. This ensures only the relevant dates are checked.
+    const hasCourseOverride = this.allDates.some(t => t.setType === 'Course')
+    const withoutDuplicates = this.allDates.filter(date => {
+      const firstOccurrence = date === this.allDates.find(t => t.dueFor === date.dueFor)
+      const removeEveryoneElse = hasCourseOverride && date.dueFor === 'Everyone else'
+
+      return firstOccurrence && !removeEveryoneElse
+    })
+    return withoutDuplicates.map(this.dueAtNotValid).indexOf(true) !== -1
   }
 
   baseDueDateMissing() {

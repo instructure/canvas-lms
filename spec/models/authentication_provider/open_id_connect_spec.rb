@@ -165,6 +165,16 @@ describe AuthenticationProvider::OpenIDConnect do
       expect(subject.unique_id(token)).to eq "myid"
     end
 
+    it "does not request more attributes if unnecessary, even if userinfo_endpoint is present" do
+      subject.userinfo_endpoint = "moar"
+      subject.login_attribute = "in_id_token"
+      payload = { sub: "1", in_id_token: "myid" }
+      id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
+      token = double(options: {}, params: { "id_token" => id_token })
+      expect(token).not_to receive(:get)
+      expect(subject.unique_id(token)).to eq "myid"
+    end
+
     it "ignores userinfo that doesn't match" do
       subject.userinfo_endpoint = "moar"
       subject.login_attribute = "not_in_id_token"
@@ -297,35 +307,25 @@ describe AuthenticationProvider::OpenIDConnect do
       subject.client_id = "abc"
     end
 
-    context "with the feature flag on" do
-      before do
-        Account.default.enable_feature!(:oidc_rp_initiated_logout_params)
-      end
-
-      it "returns the end_session_endpoint" do
-        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin"
-      end
-
-      it "preserves other query parameters" do
-        subject.end_session_endpoint = "http://somewhere/logout?foo=bar"
-        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin&foo=bar"
-      end
-
-      it "does not overwrite conflicting parameters" do
-        subject.end_session_endpoint = "http://somewhere/logout?post_logout_redirect_uri=elsewhere"
-        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=elsewhere"
-      end
-
-      it "includes the full id_token" do
-        id_token = Canvas::Security.create_jwt({ sub: "1" }, nil, :unsigned)
-        session = { oidc_id_token: id_token }
-        allow(controller).to receive(:session).and_return(session)
-        expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin&id_token_hint=#{id_token}"
-      end
+    it "returns the end_session_endpoint" do
+      expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin"
     end
 
-    it "doesn't add anything with the feature flag off" do
-      expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout"
+    it "preserves other query parameters" do
+      subject.end_session_endpoint = "http://somewhere/logout?foo=bar"
+      expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin&foo=bar"
+    end
+
+    it "does not overwrite conflicting parameters" do
+      subject.end_session_endpoint = "http://somewhere/logout?post_logout_redirect_uri=elsewhere"
+      expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=elsewhere"
+    end
+
+    it "includes the full id_token" do
+      id_token = Canvas::Security.create_jwt({ sub: "1" }, nil, :unsigned)
+      session = { oidc_id_token: id_token }
+      allow(controller).to receive(:session).and_return(session)
+      expect(subject.user_logout_redirect(controller, nil)).to eql "http://somewhere/logout?client_id=abc&post_logout_redirect_uri=http%2F%2Fwww.example.com%2Flogin&id_token_hint=#{id_token}"
     end
   end
 

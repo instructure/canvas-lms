@@ -1442,12 +1442,6 @@
     "music_icon_4db5c972": {
         "message": "Musikk-ikon"
     },
-    "must_be_at_least_percentage_22e373b6": {
-        "message": "Må være minst { percentage }%"
-    },
-    "must_be_at_least_width_x_height_px_41dc825e": {
-        "message": "Det må være minst { width } x { height }px"
-    },
     "my_files_2f621040": {
         "message": "Mine filer"
     },

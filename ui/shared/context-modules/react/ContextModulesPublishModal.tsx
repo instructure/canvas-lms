@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -29,7 +28,8 @@ import {View} from '@instructure/ui-view'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {ProgressResult} from '../utils/publishAllModulesHelper'
+// @ts-expect-error
+import type {ProgressResult} from '../utils/publishAllModulesHelper'
 
 const I18n = useI18nScope('context_modules_publish_menu')
 

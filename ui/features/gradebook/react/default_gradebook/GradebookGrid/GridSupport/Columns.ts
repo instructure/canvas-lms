@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -20,6 +19,7 @@
 import slickgrid from 'slickgrid'
 import type GridSupport from './index'
 
+// @ts-expect-error
 function destroyColumnHeader(column, $node: HTMLElement, gridSupport: GridSupport) {
   if (gridSupport.options.columnHeaderRenderer) {
     gridSupport.options.columnHeaderRenderer.destroyColumnHeader(column, $node, gridSupport)
@@ -37,14 +37,17 @@ export default class Columns {
   }
 
   initialize() {
+    // @ts-expect-error
     this.grid.onHeaderCellRendered.subscribe((_event, object) => {
       this.updateColumnHeaders([object.column.id])
     })
 
+    // @ts-expect-error
     this.grid.onBeforeHeaderCellDestroy.subscribe((_event, object) => {
       destroyColumnHeader(object.column, object.node, this.gridSupport)
     })
 
+    // @ts-expect-error
     this.grid.onColumnsResized.subscribe((sourceEvent, _object) => {
       const event = sourceEvent.originalEvent || sourceEvent
       const columns = this.grid.getColumns()
@@ -77,6 +80,7 @@ export default class Columns {
 
   getColumnsById(columnIds: string[]) {
     const columns = this.grid.getColumns()
+    // @ts-expect-error
     const columnMap = columns.reduce((map, column) => ({...map, [column.id]: column}), {})
     return columnIds.map(columnId => columnMap[columnId])
   }
@@ -85,6 +89,7 @@ export default class Columns {
     if (this.gridSupport.options.columnHeaderRenderer) {
       const columns = columnIds.length ? this.getColumnsById(columnIds) : this.grid.getColumns()
 
+      // @ts-expect-error
       columns.forEach(column => {
         const $node = this.gridSupport.helper.getColumnHeaderNode(column.id)
 

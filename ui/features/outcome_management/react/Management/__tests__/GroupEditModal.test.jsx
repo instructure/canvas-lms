@@ -19,7 +19,7 @@
 import React from 'react'
 import {render as realRender, fireEvent, act} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import GroupEditModal from '../GroupEditModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -126,8 +126,16 @@ describe('GroupEditModal', () => {
     const {getByDisplayValue, rerender} = render(<GroupEditModal {...defaultProps()} />)
     const titleField = getByDisplayValue('Group title')
     fireEvent.change(titleField, {target: {value: 'Updated title'}})
-    rerender(<MockedProvider><GroupEditModal {...defaultProps({isOpen: false})} /></MockedProvider>)
-    rerender(<MockedProvider><GroupEditModal {...defaultProps({isOpen: true})} /></MockedProvider>)
+    rerender(
+      <MockedProvider>
+        <GroupEditModal {...defaultProps({isOpen: false})} />
+      </MockedProvider>
+    )
+    rerender(
+      <MockedProvider>
+        <GroupEditModal {...defaultProps({isOpen: true})} />
+      </MockedProvider>
+    )
     expect(getByDisplayValue('Group title')).toBeInTheDocument()
   })
 

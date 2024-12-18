@@ -65,6 +65,7 @@ const useSubmitHandler = (onSubmit: onSubmitMigrationFormCallback) => {
   const [fileError, setFileError] = useState<boolean>(false)
 
   const handleSubmit = useCallback(
+    // @ts-expect-error
     formData => {
       if (isFormInvalid(formData, setFileError)) {
         return
@@ -92,6 +93,7 @@ const useSubmitHandlerWithQuestionBank = (onSubmit: onSubmitMigrationFormCallbac
   const [questionBankError, setQuestionBankError] = useState<boolean>(false)
 
   const handleSubmit = useCallback(
+    // @ts-expect-error
     formData => {
       if (isFormInvalid(formData, setFileError, questionBankSettings, setQuestionBankError)) {
         return

@@ -176,7 +176,7 @@ class PseudonymsController < ApplicationController
         flash[:error] = t 'The link you used has expired. Click "Forgot Password?" to get a new reset-password link.'
         redirect_to canvas_login_url
       end
-      @password_pseudonyms = @cc.user.pseudonyms.active_only.select { |p| p.account.canvas_authentication? }
+      @password_pseudonyms = @cc.user.pseudonyms_visible_to(@cc.user).select { |p| p.active? && p.account.canvas_authentication? }
       js_env PASSWORD_POLICY: @domain_root_account.password_policy,
              PASSWORD_POLICIES: @password_pseudonyms.to_h { |p| [p.id, p.account.password_policy] }
     end

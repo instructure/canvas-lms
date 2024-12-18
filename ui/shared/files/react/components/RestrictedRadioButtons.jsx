@@ -24,9 +24,9 @@ import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
 import File from '../../backbone/models/File'
 import filesEnv from '../modules/filesEnv'
-import { dateString, timeString} from '@canvas/datetime/date-functions'
-import { renderDatetimeField } from '@canvas/datetime/jquery/DatetimeField'
-import { mergeTimeAndDate } from '@instructure/moment-utils'
+import {dateString, timeString} from '@canvas/datetime/date-functions'
+import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import {mergeTimeAndDate} from '@instructure/moment-utils'
 import classnames from 'classnames'
 
 const I18n = useI18nScope('restrict_student_access')
@@ -125,20 +125,23 @@ class RestrictedRadioButtons extends React.Component {
 
     if (this.state.selectedOption === 'date_range') {
       unlock_at_datetime = $(this.unlock_at).data('unfudged-date') || ''
-      if ($(this.unlock_at_time).val()) { unlock_at_datetime = mergeTimeAndDate($(this.unlock_at_time).val(), $(this.unlock_at).data('unfudged-date')) || '' }
-
+      if ($(this.unlock_at_time).val()) {
+        unlock_at_datetime =
+          mergeTimeAndDate($(this.unlock_at_time).val(), $(this.unlock_at).data('unfudged-date')) ||
+          ''
+      }
 
       lock_at_datetime = $(this.lock_at).data('unfudged-date') || ''
-      if ($(this.lock_at_time).val()) { lock_at_datetime = mergeTimeAndDate($(this.lock_at_time).val(), $(this.lock_at).data('unfudged-date')) || '' }
+      if ($(this.lock_at_time).val()) {
+        lock_at_datetime =
+          mergeTimeAndDate($(this.lock_at_time).val(), $(this.lock_at).data('unfudged-date')) || ''
+      }
     }
 
     const opts = {
       hidden: this.state.selectedOption === 'link_only',
-      unlock_at:
-        (this.state.selectedOption === 'date_range' && unlock_at_datetime) ||
-        '',
-      lock_at:
-        (this.state.selectedOption === 'date_range' && lock_at_datetime) || '',
+      unlock_at: (this.state.selectedOption === 'date_range' && unlock_at_datetime) || '',
+      lock_at: (this.state.selectedOption === 'date_range' && lock_at_datetime) || '',
       locked: this.state.selectedOption === 'unpublished',
     }
 
@@ -193,15 +196,12 @@ class RestrictedRadioButtons extends React.Component {
   )
 
   renderDatePickers = () => {
-    const styleObj = classnames(
-      "RestrictedRadioButtons__dates_wrapper",
-      {"RestrictedRadioButtons__dates_wrapper_hidden": this.state.selectedOption !== 'date_range'}
-    )
+    const styleObj = classnames('RestrictedRadioButtons__dates_wrapper', {
+      RestrictedRadioButtons__dates_wrapper_hidden: this.state.selectedOption !== 'date_range',
+    })
     return (
       <div className={styleObj}>
-        <label
-          htmlFor="dateSelectInput"
-        >
+        <label htmlFor="dateSelectInput">
           <b>{I18n.t('Available From')}</b>
         </label>
         <div className="dateSelectInputContainer controls">
@@ -216,9 +216,7 @@ class RestrictedRadioButtons extends React.Component {
             aria-label={I18n.t('Available From Date')}
           />
         </div>
-        <label
-          htmlFor="timeSelectInput"
-        >
+        <label htmlFor="timeSelectInput">
           <b>{I18n.t('From Time')}</b>
         </label>
         <div className="dateSelectInputContainer controls">

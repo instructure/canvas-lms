@@ -22,6 +22,7 @@ import EditPage from './react/EditPage'
 import ready from '@instructure/ready'
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <EditPage
       appointment_group_id={ENV.APPOINTMENT_GROUP_ID && ENV.APPOINTMENT_GROUP_ID.toString()}

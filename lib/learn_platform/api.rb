@@ -90,5 +90,12 @@ module LearnPlatform
       endpoint = "/api/v2/lti/organizations/#{organization_salesforce_id}/tools"
       fetch_learnplatform_response(endpoint, 1.hour, params)
     end
+
+    def custom_filters(salesforce_id)
+      return {} unless valid_learnplatform?
+
+      endpoint = "/api/v2/lti/organizations/#{salesforce_id}/tools_filters"
+      fetch_learnplatform_response(endpoint, 1.hour)
+    end
   end
 end

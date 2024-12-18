@@ -46,6 +46,7 @@ QUnit.module('DueDateRow with empty props and canDelete true', {
       inputsDisabled: false,
     }
     const DueDateRowElement = <DueDateRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
   },
   teardown() {
@@ -108,6 +109,7 @@ QUnit.module('DueDateRow with realistic props and canDelete false', {
       inputsDisabled: false,
     }
     const DueDateRowElement = <DueDateRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
   },
   teardown() {
@@ -221,6 +223,7 @@ QUnit.module('DueDateRow with empty props and inputsDisabled true', {
       inputsDisabled: true,
     }
     const DueDateRowElement = <DueDateRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
   },
   teardown() {

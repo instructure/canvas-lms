@@ -374,6 +374,7 @@ describe('ItemAssignToTray', () => {
       const {getAllByText, findAllByTestId} = renderComponent({
         itemContentId: '31',
         defaultCards: [
+          // @ts-expect-error
           {
             defaultOptions: ['everyone'],
             key: 'key-card-0',
@@ -424,6 +425,7 @@ describe('ItemAssignToTray', () => {
       const {getAllByTestId, findAllByText} = renderComponent({
         itemContentId: '31',
         defaultCards: [
+          // @ts-expect-error
           {
             defaultOptions: ['everyone'],
             key: 'key-card-0',
@@ -820,6 +822,7 @@ describe('ItemAssignToTray', () => {
       const save = await findByTestId('differentiated_modules_save_button')
       await user.click(save)
       expect((await findAllByText(`${props.itemName} updated`))[0]).toBeInTheDocument()
+      // @ts-expect-error
       const requestBody = JSON.parse(fetchMock.lastOptions(DATE_DETAILS)?.body)
       // filters out invalid overrides
       expect(requestBody.assignment_overrides).toHaveLength(2)
@@ -983,7 +986,9 @@ describe('ItemAssignToTray', () => {
 
   describe('required due dates', () => {
     beforeEach(() => {
+      // @ts-expect-error
       global.ENV = {
+        // @ts-expect-error
         ...global.ENV,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: true,
       }

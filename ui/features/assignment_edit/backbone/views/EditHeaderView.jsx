@@ -75,6 +75,7 @@ EditHeaderView.prototype.afterRender = function () {
   }
   // EVAL-3711 Remove ICE feature flag
   if (ENV.FEATURES?.instui_nav) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Pill
         renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}

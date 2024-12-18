@@ -36,6 +36,7 @@ const renderComponent = (props = {appointment_group_id: '1'}) =>
 
 // use ReactDOM instead of TestUtils to test integration with non-react things that need real DOM
 const renderComponentInDOM = (props = {appointment_group_id: '1'}) =>
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   ReactDOM.render(<EditPage {...props} />, container)
 
 let sandbox = null

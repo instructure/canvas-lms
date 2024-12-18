@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {QueryProvider, queryClient} from '@canvas/query'
+import {QueryProvider} from '@canvas/query'
 
 import ready from '@instructure/ready'
 
@@ -49,6 +49,7 @@ ready(() => {
     }
 
     if (dashcard_query_enabled) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <QueryProvider>
           <DashboardWrapper {...dashboardProps} />
@@ -56,6 +57,7 @@ ready(() => {
         dashboardHeaderContainer
       )
     } else {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(<DashboardHeader {...dashboardProps} />, dashboardHeaderContainer)
     }
   } else {

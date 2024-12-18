@@ -69,18 +69,14 @@ export function PostMessage({...props}) {
 
     const translations = [
       getTranslation(translatedTitle, translateTargetLanguage, setTranslatedTitle),
-      getTranslation(
-        translatedMessage,
-        translateTargetLanguage,
-        setTranslatedMessage
-      )
+      getTranslation(translatedMessage, translateTargetLanguage, setTranslatedMessage),
     ]
 
     // Begin translating, clear spinner when done.
-    setIsTranslating(true);
-    Promise.all(translations)
-           .then(() => setIsTranslating(false));
+    setIsTranslating(true)
+    Promise.all(translations).then(() => setIsTranslating(false))
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [translateTargetLanguage, props.message])
 
   return (
@@ -112,11 +108,7 @@ export function PostMessage({...props}) {
         <View>
           {props.title ? (
             <View margin={responsiveProps.titleMargin} display={responsiveProps.titleDisplay}>
-              <Text
-                size={responsiveProps.titleTextSize}
-                data-testid="message_title"
-                weight="bold"
-              >
+              <Text size={responsiveProps.titleTextSize} data-testid="message_title" weight="bold">
                 <AccessibleContent
                   alt={I18n.t('Discussion Topic: %{title}', {title: translatedTitle})}
                 >

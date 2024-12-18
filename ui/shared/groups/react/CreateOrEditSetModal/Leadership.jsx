@@ -37,9 +37,7 @@ const tooltipText = I18n.t(
 
 const HelpText = () => (
   <div style={{maxWidth: '300px'}}>
-    <p data-testid="group-leadership-help-text">
-      {tooltipText}
-    </p>
+    <p data-testid="group-leadership-help-text">{tooltipText}</p>
   </div>
 )
 

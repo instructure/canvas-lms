@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -85,7 +84,9 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys))
       .isRequired,
     onToggleEnrollmentFilter: func.isRequired,
+    // @ts-expect-error
     disabled: Menu.propTypes.disabled.isRequired,
+    // @ts-expect-error
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     ...ColumnHeader.propTypes,
   }
@@ -152,22 +153,27 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
     this.onToggleEnrollmentFilter('concluded')
   }
 
+  // @ts-expect-error
   onSelectSecondaryInfo(secondaryInfoKey) {
     this.props.onSelectSecondaryInfo(secondaryInfoKey)
   }
 
+  // @ts-expect-error
   onSelectPrimaryInfo(primaryInfoKey) {
     this.props.onSelectPrimaryInfo(primaryInfoKey)
   }
 
+  // @ts-expect-error
   onToggleEnrollmentFilter(enrollmentFilterKey) {
     this.props.onToggleEnrollmentFilter(enrollmentFilterKey)
   }
 
+  // @ts-expect-error
   bindDisplayAsMenuContent = ref => {
     this.bindFlyoutMenu(ref, 'displayAsMenuContent')
   }
 
+  // @ts-expect-error
   bindSecondaryInfoMenuContent = ref => {
     this.bindFlyoutMenu(ref, 'secondaryInfoMenuContent')
   }
@@ -196,6 +202,7 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
     const sortMenu = (
       <Menu
         label={I18n.t('Sort by')}
+        // @ts-expect-error
         contentRef={this.bindSortByMenuContent}
         disabled={this.props.disabled}
       >
@@ -279,6 +286,7 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
               <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
+                    // @ts-expect-error
                     contentRef={this.bindOptionsMenuContent}
                     shouldFocusTriggerOnClose={false}
                     trigger={
@@ -300,6 +308,7 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
                     {this.showDisplayAsViewOption() && (
                       <Menu
                         label={I18n.t('Display as')}
+                        // @ts-expect-error
                         contentRef={this.bindDisplayAsMenuContent}
                         disabled={this.props.disabled}
                       >
@@ -325,6 +334,7 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
                     )}
 
                     <Menu
+                      // @ts-expect-error
                       contentRef={this.bindSecondaryInfoMenuContent}
                       disabled={this.props.disabled}
                       label={I18n.t('Secondary info')}

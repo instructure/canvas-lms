@@ -49,12 +49,15 @@ ready(() => {
   }
 
   function renderExternalToolDrawer(): void {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ContentTypeExternalToolDrawer
         tool={selectedTool}
+        // @ts-expect-error
         pageContent={canvasApplicationBody}
         pageContentTitle={I18n.t('Canvas LMS')}
         pageContentMinWidth="40rem"
+        // @ts-expect-error
         pageContentHeight={window.innerHeight}
         trayPlacement="end"
         onDismiss={handleDismissToolDrawer}
@@ -66,12 +69,14 @@ ready(() => {
   }
 
   function renderTopNavigationTools(): void {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <TopNavigationTools tools={ENV.top_navigation_tools} handleToolLaunch={handleToolLaunch} />,
       topNavToolsMountPoint
     )
 
     if (mobileTopNavToolsMountPoint) {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <MobileTopNavigationTools
           tools={ENV.top_navigation_tools}

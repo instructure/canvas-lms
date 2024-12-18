@@ -75,6 +75,7 @@ const doRequest = (
     method,
     body: convertModuleSettingsForApi(data),
   })
+    // @ts-expect-error
     .then((response: {json: Record<string, any>}) => {
       onSuccess(response.json)
       // add the alert in the next event cycle so that the alert is added to the DOM's aria-live

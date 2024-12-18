@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-pascal-case */
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -16,12 +17,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
 import fetchMock from 'fetch-mock'
 
+// eslint-disable-next-line no-var
 var toolDefinitions = [
   {
     definition_type: 'ContextExternalTool',

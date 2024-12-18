@@ -24,7 +24,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
-import {Controller, useForm, type Control} from 'react-hook-form'
+import {Controller, useForm, type Control, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
 import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {zodResolver} from '@hookform/resolvers/zod'
@@ -51,6 +51,8 @@ const validationSchema = z.object({
     ),
   password: z.string().optional(),
 })
+
+type FormValues = z.infer<typeof validationSchema>
 
 export const serviceConfigByName: Record<
   ServiceName,
@@ -171,7 +173,7 @@ const RegisterService = ({serviceName, onSubmit, onClose}: RegisterServiceProps)
   } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
   const {title, image, description, fields, button} = serviceConfigByName[serviceName]
 
-  const handleFormSubmit = async ({username, password}: typeof defaultValues) => {
+  const handleFormSubmit: SubmitHandler<FormValues> = async ({username, password}) => {
     try {
       await doFetchApi({
         path: '/profile/user_services',

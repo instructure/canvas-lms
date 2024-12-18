@@ -41,6 +41,7 @@ describe('RangeInput Component', () => {
   })
 
   test('renders range input', () => {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
     const input = component.rangeInput
     equal(input.type, 'range', 'renders range input')
@@ -49,6 +50,7 @@ describe('RangeInput Component', () => {
   })
 
   test('renders formatted output', done => {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
     const expected = 47
     const expectedFormatted = '47%'
@@ -63,6 +65,7 @@ describe('RangeInput Component', () => {
   })
 
   test('handleChange', () => {
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
     sinon.spy(component, 'setState')
     const event = {target: {value: 8}}

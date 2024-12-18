@@ -33,9 +33,11 @@ $('#coenrollment_link').click(function (event) {
   const template = $(this).data('template')
   const path = $(this).data('path')
   loadSignupDialog
+    // @ts-ignore
     .then(signupDialog => {
       signupDialog(template, I18n.t('parent_signup', 'Parent Signup'), path)
     })
+    // @ts-ignore
     .catch(error => {
       throw new Error('Failed to load signup dialog', error)
     })
@@ -65,6 +67,7 @@ $('#forgot_password_form').formSubmit({
     // Focus on the close button of the alert we just put up, per a11y
     $('#flash_message_holder button.close_link').focus()
   },
+  // @ts-expect-error
   error(_data) {
     $(this).loadingImage('remove')
   },

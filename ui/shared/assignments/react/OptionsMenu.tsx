@@ -122,6 +122,7 @@ const OptionsMenu = ({
         trigger={
           breakpoints.mobileOnly ? (
             <Button
+              // @ts-expect-error
               elementRef={buttonRefCallback}
               data-testid="assignment-options-button"
               display="block"
@@ -145,6 +146,7 @@ const OptionsMenu = ({
           </Menu.Item>
         )}
         {isSavedView && breakpoints.mobileOnly && (
+          // @ts-expect-error
           <Menu.Item value="Assign To" onClick={setAssignToTrayOpen} data-testid="assign-to-option">
             <IconUserLine size="x-small" />
             <View margin="0 0 0 x-small">{I18n.t('Assign To')}</View>
@@ -164,6 +166,7 @@ const OptionsMenu = ({
         {isSavedView && assignment.hasSubmittedSubmissions && (
           <Menu.Item
             value="Download Submissions"
+            // @ts-expect-error
             onClick={setDownloadSubmissionsModalOpen}
             data-testid="download-submissions-option"
           >
@@ -184,12 +187,14 @@ const OptionsMenu = ({
           </Menu.Item>
         )}
         {isSavedView && (
+          // @ts-expect-error
           <Menu.Item value="Send To" onClick={setSendToModalOpen} data-testid="send-to-option">
             <IconUserLine size="x-small" />
             <View margin="0 0 0 x-small">{I18n.t('Send To')}</View>
           </Menu.Item>
         )}
         {isSavedView && (
+          // @ts-expect-error
           <Menu.Item value="Copy To" onClick={setCopyToTrayOpen} data-testid="copy-to-option">
             <IconDuplicateLine size="x-small" />
             <View margin="0 0 0 x-small">{I18n.t('Copy To')}</View>
@@ -212,14 +217,18 @@ const OptionsMenu = ({
       {isSavedView && (
         <View margin="0">
           <ItemAssignToTray
+            // @ts-expect-error
             open={assignToTray}
+            // @ts-expect-error
             onClose={setAssignToTrayClose}
+            // @ts-expect-error
             onDismiss={setAssignToTrayClose}
             itemType="assignment"
             iconType="assignment"
             locale={ENV.LOCALE || 'env'}
             timezone={ENV.TIMEZONE || 'UTC'}
             courseId={assignment.course?.lid}
+            // @ts-expect-error
             itemName={assignment.name}
             itemContentId={assignment?.lid}
             pointsPossible={assignment.pointsPossible as number}
@@ -230,23 +239,29 @@ const OptionsMenu = ({
             sourceCourseId={assignment.course?.lid}
             contentSelection={{assignments: [assignment?.lid]}}
             onDismiss={() => {
+              // @ts-expect-error
               setCopyToTrayClose()
               buttonRef.current?.focus()
             }}
           />
+          {/* @ts-expect-error */}
           <DirectShareUserModal
             data-testid="send-to-modal"
             open={sendToModal}
             sourceCourseId={assignment.course?.lid}
             contentShare={{content_type: 'assignment', content_id: assignment?.lid}}
             onDismiss={() => {
+              // @ts-expect-error
               setSendToModalClose()
               buttonRef.current?.focus()
             }}
           />
           <DownloadSubmissionsModal
+            // @ts-expect-error
             open={downloadSubmissionsModal}
+            // @ts-expect-error
             handleCloseModal={setDownloadSubmissionsModalClose}
+            // @ts-expect-error
             assignmentId={assignment.lid}
             courseId={assignment.course.lid}
           />

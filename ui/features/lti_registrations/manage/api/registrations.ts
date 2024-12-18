@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ZLtiRegistration, type LtiRegistration} from '../model/LtiRegistration'
+import {
+  ZLtiRegistrationWithConfiguration,
+  ZLtiRegistration,
+  type LtiRegistrationWithConfiguration,
+  type LtiRegistration,
+} from '../model/LtiRegistration'
 import {
   type ApiResult,
   parseFetchResult,
@@ -130,8 +135,9 @@ export const deleteRegistration: DeleteRegistration = (accountId, registrationId
 export type CreateRegistration = (
   accountId: AccountId,
   internalConfig: InternalLtiConfiguration,
-  overlay: LtiConfigurationOverlay,
-  unifiedToolId?: string
+  overlay?: LtiConfigurationOverlay,
+  unifiedToolId?: string,
+  adminNickname?: string
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -146,13 +152,24 @@ export const createRegistration: CreateRegistration = (
   accountId,
   internalConfig,
   overlay,
-  unifiedToolId
+  unifiedToolId,
+  adminNickname
 ) =>
-  /* TODO: Implement this once INTEROP-8767 is done */ parseFetchResult(z.unknown())(
-    new Promise(resolve => {
-      setTimeout(() => {
-        resolve(new Response('{}', {status: 200}))
-      }, Math.random() * 2000)
+  parseFetchResult(z.unknown())(
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations`, {
+      ...defaultFetchOptions({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      method: 'POST',
+      body: JSON.stringify({
+        admin_nickname: adminNickname,
+        configuration: internalConfig,
+        overlay,
+        unified_tool_id: unifiedToolId,
+        workflow_state: 'on',
+      }),
     })
   )
 
@@ -160,8 +177,8 @@ export type UpdateRegistration = (
   accountId: AccountId,
   registrationId: LtiRegistrationId,
   internalConfig: InternalLtiConfiguration,
-  overlay: LtiConfigurationOverlay,
-  unifiedToolId?: string
+  overlay?: LtiConfigurationOverlay,
+  adminNickname?: string
 ) => Promise<ApiResult<unknown>>
 
 /**
@@ -178,27 +195,35 @@ export const updateRegistration: UpdateRegistration = (
   registrationId,
   internalConfig,
   overlay,
-  unifiedToolId
+  adminNickname
 ) =>
-  /* TODO: Implement this once INTEROP-8768 is done */
   parseFetchResult(z.unknown())(
-    new Promise(resolve => {
-      setTimeout(() => {
-        resolve(new Response('{}', {status: 200}))
-      }, Math.random() * 2000)
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`, {
+      ...defaultFetchOptions({
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }),
+      method: 'PUT',
+      body: JSON.stringify({
+        configuration: internalConfig,
+        overlay,
+        admin_nickname: adminNickname,
+      }),
     })
   )
 
 export const fetchRegistrationByClientId = (accountId: AccountId, clientId: DeveloperKeyId) =>
-  parseFetchResult(ZLtiRegistration)(
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
     fetch(`/api/v1/accounts/${accountId}/lti_registration_by_client_id/${clientId}`, {
       ...defaultFetchOptions(),
     })
   )
 
-export const bindGlobalLtiRegistration = (
+export const setGlobalLtiRegistrationWorkflowState = (
+  accountId: AccountId,
   ltiRegistrationId: LtiRegistrationId,
-  accountId: AccountId
+  workflowState: 'on' | 'off'
 ) =>
   parseFetchResult(z.unknown())(
     fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/bind`, {
@@ -209,7 +234,42 @@ export const bindGlobalLtiRegistration = (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        workflow_state: 'on',
+        workflow_state: workflowState,
       }),
     })
+  )
+
+export const bindGlobalLtiRegistration = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId
+) => setGlobalLtiRegistrationWorkflowState(accountId, ltiRegistrationId, 'on')
+
+export const unbindGlobalLtiRegistration = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId
+) => setGlobalLtiRegistrationWorkflowState(accountId, ltiRegistrationId, 'off')
+
+export type FetchLtiRegistration = (
+  accountId: AccountId,
+  registrationId: LtiRegistrationId
+) => Promise<ApiResult<LtiRegistrationWithConfiguration>>
+
+/**
+ * Fetch a single LtiRegistration
+ * @returns
+ */
+export const fetchLtiRegistration: FetchLtiRegistration = (
+  accountId,
+  ltiRegistrationId,
+  includes: Array<'overlay' | 'overlay_history'> = ['overlay', 'overlay_history']
+) =>
+  parseFetchResult(ZLtiRegistrationWithConfiguration)(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?${includes
+        .map(i => `include[]=${i}`)
+        .join('&')}`,
+      {
+        ...defaultFetchOptions(),
+      }
+    )
   )

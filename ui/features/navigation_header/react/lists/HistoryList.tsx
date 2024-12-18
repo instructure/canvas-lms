@@ -48,14 +48,18 @@ export default function HistoryList() {
     getNextPageParam: lastPage => lastPage.nextPage,
   })
 
+  // @ts-expect-error
   const combineHistoryEntries = pages => {
     if (pages != null) {
       // combine all entries into one array
+      // @ts-expect-error
       const allEntries = pages.reduce((accumulator, page) => {
         return [...accumulator, ...page.json]
       }, [])
       // iterate over all entries and combine based on asset_code
+      // @ts-expect-error
       const historyEntries = allEntries.reduce((accumulator, historyItem) => {
+        // @ts-expect-error
         const alreadyAdded = accumulator.some(entry => historyItem.asset_code === entry.asset_code)
         if (!alreadyAdded) {
           accumulator.push(historyItem)
@@ -97,6 +101,7 @@ export default function HistoryList() {
     return (
       <>
         <List isUnstyled={true} margin="small 0" itemSpacing="small">
+          {/* @ts-expect-error */}
           {historyEntries.map((entry, index) => {
             const isLast = index === historyEntries.length - 1
             return (

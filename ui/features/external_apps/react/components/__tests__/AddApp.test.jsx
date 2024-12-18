@@ -34,7 +34,7 @@ const handleToolInstalled = () => ok(true, 'handleToolInstalled called successfu
 const createElement = data => (
   <AddApp handleToolInstalled={data.handleToolInstalled} app={data.app} />
 )
-// eslint-disable-next-line react/no-render-return-value
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function (data) {
   const component = renderComponent(data)

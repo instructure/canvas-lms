@@ -68,6 +68,7 @@ export default class RosterView extends Backbone.View {
   }
 
   afterRender() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <TextInput
         onChange={e => {
@@ -94,9 +95,7 @@ export default class RosterView extends Backbone.View {
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
 
     const canReadSIS = 'permissions' in ENV ? !!ENV.permissions.read_sis : true
-    const canAddUser = ENV.FEATURES.granular_permissions_manage_users
-      ? role => role.addable_by_user
-      : role => role.manageable_by_user
+    const canAddUser = role => role.addable_by_user
 
     return (this.addPeopleApp = new AddPeopleApp(this.$createUsersModalHolder[0], {
       courseId: (ENV.course && ENV.course.id) || 0,

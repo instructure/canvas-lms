@@ -30,6 +30,7 @@ if (window.top.location !== self.location) {
 }
 
 ready(() => {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ThemeEditor
       {...{

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ready from '@instructure/ready'
 import {QRMobileLogin} from './react/components/QRMobileLogin'
 
@@ -31,6 +31,7 @@ ready(() => {
   container = document.querySelector('#qr_login_container')
 
   if (container) {
-    ReactDOM.render(<QRMobileLogin withWarning={true} />, container)
+    const root = createRoot(container)
+    root.render(<QRMobileLogin withWarning={true} />)
   }
 })

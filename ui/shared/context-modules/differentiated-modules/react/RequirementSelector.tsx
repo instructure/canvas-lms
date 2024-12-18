@@ -32,6 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('differentiated_modules')
 
+// @ts-expect-error
 const resourceLabelMap: Record<ModuleItem['resource'], string> = {
   assignment: I18n.t('Assignments'),
   quiz: I18n.t('Quizzes'),
@@ -125,7 +126,9 @@ export default function RequirementSelector({
             {/* @ts-expect-error */}
             {Object.keys(options).map((resource: ModuleItem['resource']) => {
               return (
+                // @ts-expect-error
                 <CanvasSelect.Group key={resource} label={resourceLabelMap[resource]}>
+                  {/* @ts-expect-error */}
                   {options[resource].map((moduleItem: ModuleItem) => (
                     <CanvasSelect.Option
                       id={moduleItem.id}

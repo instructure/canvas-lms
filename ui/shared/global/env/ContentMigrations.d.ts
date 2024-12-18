@@ -37,4 +37,7 @@ export interface EnvContentMigrations {
   SHOW_BP_SETTINGS_IMPORT_OPTION?: boolean
   OLD_START_DATE?: string
   OLD_END_DATE?: string
+  current_context?: {
+    id: string
+  }
 }

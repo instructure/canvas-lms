@@ -17,22 +17,31 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
 import App from './react/app'
+// @ts-ignore
 import extensions from '@canvas/bundles/extensions'
 
 ready(() => {
   if (document.getElementById('instui_content_migrations')) {
-    ReactDOM.render(<App />, document.getElementById('instui_content_migrations'))
+    const node = document.getElementById('instui_content_migrations')
+    if (!node) {
+      throw new Error('Could not find element with id instui_content_migrations')
+    }
+    const root = ReactDOM.createRoot(node)
+    root.render(<App />)
   }
 
+  // @ts-ignore
   const loadExtension = extensions['ui/features/content_migrations/instui_setup.tsx']?.()
   if (loadExtension) {
     loadExtension
+      // @ts-expect-error
       .then(module => {
         module.default()
       })
+      // @ts-expect-error
       .catch(err => {
         throw new Error(
           'Error loading extension for ui/features/content_migrations/instui_setup.tsx',

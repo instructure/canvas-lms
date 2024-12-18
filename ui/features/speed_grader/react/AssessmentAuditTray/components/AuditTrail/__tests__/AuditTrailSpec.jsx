@@ -60,6 +60,7 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
   })
 
   function mountComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<AuditTrail {...props} />, $container)
   }
 

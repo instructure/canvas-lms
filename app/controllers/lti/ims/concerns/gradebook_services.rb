@@ -35,11 +35,7 @@ module Lti::IMS::Concerns
     end
 
     def context
-      @_context ||= if Account.site_admin.feature_enabled?(:ags_improved_course_concluded_response_codes)
-                      Course.find(params[:course_id])
-                    else
-                      Course.not_completed.find(params[:course_id])
-                    end
+      @_context ||= Course.find(params[:course_id])
     end
 
     def user
@@ -65,8 +61,6 @@ module Lti::IMS::Concerns
     end
 
     def verify_course_not_concluded
-      return unless Account.site_admin.feature_enabled?(:ags_improved_course_concluded_response_codes)
-
       # If context is nil, the verify_context will handle rendering a 404.
       if context&.concluded?
         render_error("This course has concluded. AGS requests will no longer be accepted for this course.",

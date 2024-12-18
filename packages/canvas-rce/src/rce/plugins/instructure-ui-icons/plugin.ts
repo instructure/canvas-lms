@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -47,6 +46,7 @@ import {
   IconTextSubscriptLine,
   IconTextSuperscriptLine,
   IconUnderlineLine,
+  // @ts-expect-error
 } from '@instructure/ui-icons/es/svg'
 import tinymce from 'tinymce'
 
@@ -170,6 +170,7 @@ tinymce.PluginManager.add('instructure-ui-icons', function (editor) {
     },
   }
   Object.keys(icons).forEach(key => {
+    // @ts-expect-error
     editor.ui.registry.addIcon(key, icons[key].src)
   })
 })

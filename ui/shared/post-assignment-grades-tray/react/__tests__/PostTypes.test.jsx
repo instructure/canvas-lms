@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import { render, fireEvent } from '@testing-library/react'
-import PostTypes, { EVERYONE, GRADED } from '../PostTypes'
+import {render, fireEvent} from '@testing-library/react'
+import PostTypes, {EVERYONE, GRADED} from '../PostTypes'
 
 describe('PostTypes', () => {
   let context
@@ -33,25 +33,31 @@ describe('PostTypes', () => {
   })
 
   it('renders "Everyone" type with description', () => {
-    const { getByText } = render(<PostTypes {...context} />)
+    const {getByText} = render(<PostTypes {...context} />)
     expect(getByText('Everyone')).toBeInTheDocument()
-    expect(getByText('All students will be able to see their grade and/or submission comments.')).toBeInTheDocument()
+    expect(
+      getByText('All students will be able to see their grade and/or submission comments.')
+    ).toBeInTheDocument()
   })
 
   it('renders "Graded" type with description', () => {
-    const { getByText } = render(<PostTypes {...context} />)
+    const {getByText} = render(<PostTypes {...context} />)
     expect(getByText('Graded')).toBeInTheDocument()
-    expect(getByText('Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.')).toBeInTheDocument()
+    expect(
+      getByText(
+        'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('selects the defaultValue', () => {
     context.defaultValue = GRADED
-    const { getByDisplayValue } = render(<PostTypes {...context} />)
+    const {getByDisplayValue} = render(<PostTypes {...context} />)
     expect(getByDisplayValue('graded')).toBeChecked()
   })
 
   it('calls postTypeChanged when selecting another type', () => {
-    const { getByDisplayValue } = render(<PostTypes {...context} />)
+    const {getByDisplayValue} = render(<PostTypes {...context} />)
     fireEvent.click(getByDisplayValue('graded'))
     expect(context.postTypeChanged).toHaveBeenCalledTimes(1)
   })
@@ -60,27 +66,27 @@ describe('PostTypes', () => {
     it('forces EVERYONE type when true', () => {
       context.anonymousGrading = true
       context.defaultValue = GRADED
-      const { getByDisplayValue } = render(<PostTypes {...context} />)
+      const {getByDisplayValue} = render(<PostTypes {...context} />)
       expect(getByDisplayValue('everyone')).toBeChecked()
     })
 
     it('disables GRADED type when true', () => {
       context.anonymousGrading = true
-      const { getByDisplayValue } = render(<PostTypes {...context} />)
+      const {getByDisplayValue} = render(<PostTypes {...context} />)
       expect(getByDisplayValue('graded')).toBeDisabled()
     })
   })
 
   describe('"disabled" prop', () => {
     it('enables inputs when false', () => {
-      const { getByDisplayValue } = render(<PostTypes {...context} />)
+      const {getByDisplayValue} = render(<PostTypes {...context} />)
       expect(getByDisplayValue('everyone')).not.toBeDisabled()
       expect(getByDisplayValue('graded')).not.toBeDisabled()
     })
 
     it('disables inputs when true', () => {
       context.disabled = true
-      const { getByDisplayValue } = render(<PostTypes {...context} />)
+      const {getByDisplayValue} = render(<PostTypes {...context} />)
       expect(getByDisplayValue('everyone')).toBeDisabled()
       expect(getByDisplayValue('graded')).toBeDisabled()
     })

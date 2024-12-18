@@ -94,6 +94,7 @@ const MigrationIssuesModal = ({
     url.searchParams.set('page', currentPage.current.toString())
     url.searchParams.set('per_page', ISSUES_PAGE_SIZE.toString())
     doFetchApi({path: url.toString(), method: 'GET'})
+      // @ts-expect-error
       .then(({json}: {json: MigrationIssuesResponse}) => {
         if (issues) {
           const newIssues = issues.concat(json)
@@ -109,6 +110,7 @@ const MigrationIssuesModal = ({
     () =>
       migration_issues_url &&
       doFetchApi({path: migration_issues_url, method: 'GET'})
+        // @ts-expect-error
         .then(({json}: {json: MigrationIssuesResponse}) => {
           setIssues(json)
           setHaveNextPage(json.length < migration_issues_count)

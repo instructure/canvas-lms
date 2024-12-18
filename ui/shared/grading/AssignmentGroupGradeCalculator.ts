@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -27,8 +26,10 @@ type DroppableSubmission = {
   assignment_id?: string
 }
 
+// @ts-expect-error
 function partition(collection, partitionFn) {
   return collection.reduce(
+    // @ts-expect-error
     (result, current) => {
       const index = partitionFn(current) ? 0 : 1
       result[index].push(current)
@@ -69,6 +70,7 @@ function sortPairsAscending(
   return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
+// @ts-expect-error
 function sortSubmissionsAscending(submissionA, submissionB) {
   const scoreDiff = submissionA.score - submissionB.score
   if (scoreDiff !== 0) {
@@ -97,14 +99,18 @@ function estimateQHigh(
   return grades[grades.length - 1]
 }
 
+// @ts-expect-error
 function buildBigF(keepCount: number, cannotDrop: DroppableSubmission[], sortAsc) {
   return function bigF(q: number, submissions: SubmissionGradeCriteria[]) {
     const ratedScores = submissions.map(submission => [
+      // @ts-expect-error
       submission.score - q * submission.total,
       submission,
     ])
+    // @ts-expect-error
     const rankedScores = ratedScores.sort(sortAsc ? sortPairsAscending : sortPairsDescending)
     const keptScores = rankedScores.slice(0, keepCount)
+    // @ts-expect-error
     const qKept = sumBy(keptScores, ([score]) => score)
     const keptSubmissions = keptScores.map(([_score, submission]) => submission)
     const qCannotDrop = sumBy(
@@ -116,6 +122,7 @@ function buildBigF(keepCount: number, cannotDrop: DroppableSubmission[], sortAsc
   }
 }
 
+// @ts-expect-error
 function setUpGrades(pointed, unpointed) {
   const grades = pointed.map(getSubmissionGrade).sort()
   const qHigh = estimateQHigh(pointed, unpointed, grades)
@@ -125,6 +132,7 @@ function setUpGrades(pointed, unpointed) {
   return [qHigh, qLow, qMid]
 }
 
+// @ts-expect-error
 function keepHelper(submissions, initialKeepCount, sortAsc, cannotDrop, maxTotal) {
   const keepCount = Math.max(1, initialKeepCount)
 
@@ -135,6 +143,7 @@ function keepHelper(submissions, initialKeepCount, sortAsc, cannotDrop, maxTotal
   const allSubmissionData = [...submissions, ...cannotDrop]
   const [unpointed, pointed] = partition(
     allSubmissionData,
+    // @ts-expect-error
     submissionDatum => submissionDatum.total === 0
   )
 
@@ -145,6 +154,7 @@ function keepHelper(submissions, initialKeepCount, sortAsc, cannotDrop, maxTotal
   let [x, submissionsToKeep] = bigF(qMid, submissions)
   const threshold = 1 / (2 * keepCount * maxTotal ** 2)
   while (qHigh - qLow >= threshold) {
+    // @ts-expect-error
     if (x < 0) {
       qHigh = qMid
     } else {
@@ -186,6 +196,7 @@ function dropPointed(
   )
 }
 
+// @ts-expect-error
 function dropUnpointed(submissions, keepHighest, keepLowest) {
   const sortedSubmissions = submissions.sort(sortSubmissionsAscending)
   return sortedSubmissions.slice(-keepHighest).slice(0, keepLowest)
@@ -216,6 +227,7 @@ function dropAssignments(
   let cannotDrop: DroppableSubmission[] = []
   let droppableSubmissionData: DroppableSubmission[] = allSubmissionData
   if (neverDropIds.length > 0) {
+    // @ts-expect-error
     ;[cannotDrop, droppableSubmissionData] = partition(allSubmissionData, submission =>
       neverDropIds.includes(submission.submission.assignment_id)
     )
@@ -260,13 +272,16 @@ function calculateGroupGrade(
 ): AggregateGrade {
   // Remove assignments without visibility from gradeableAssignments.
   const hiddenAssignmentsById = allSubmissions
+    // @ts-expect-error
     .filter(submission => submission.hidden)
     .reduce((result, submission) => {
+      // @ts-expect-error
       result[submission.assignment_id] = submission
       return result
     }, {})
   const ungradeableCriteria = (assignment: Assignment) =>
     assignment.omit_from_final_grade ||
+    // @ts-expect-error
     hiddenAssignmentsById[assignment.id] ||
     JSON.stringify(assignment.submission_types) === JSON.stringify(['not_graded']) ||
     assignment.workflow_state === 'unpublished' ||
@@ -274,19 +289,25 @@ function calculateGroupGrade(
   const gradeableAssignments =
     group?.assignments?.filter((assignment: Assignment) => !ungradeableCriteria(assignment)) || []
   const assignments = gradeableAssignments.reduce((result, item) => {
+    // @ts-expect-error
     result[item.id] = item
     return result
   }, {})
 
   // Remove submissions from other assignment groups.
+  // @ts-expect-error
   let submissions: SubmissionGradeCriteria = allSubmissions.filter(
+    // @ts-expect-error
     (submission: SubmissionGradeCriteria) => assignments[submission.assignment_id]
   )
 
   // Remove excused submissions.
+  // @ts-expect-error
   submissions = submissions.filter(submission => submission.excused !== true)
 
+  // @ts-expect-error
   const submissionData = submissions.map((submission: SubmissionGradeCriteria) => ({
+    // @ts-expect-error
     total: parseScore(assignments[submission.assignment_id].points_possible),
     score: parseScore(submission.score),
     // @ts-expect-error
@@ -298,24 +319,29 @@ function calculateGroupGrade(
   let relevantSubmissionData = submissionData
   if (!opts.includeUngraded) {
     relevantSubmissionData = submissionData.filter(
+      // @ts-expect-error
       submission => submission.submitted && !submission.pending_review
     )
   }
 
   const submissionsToKeep = dropAssignments(relevantSubmissionData, group.rules)
+  // @ts-expect-error
   const score = sum(submissionsToKeep.map(submission => parseScore(submission.score)))
   const possible = sumBy(submissionsToKeep, 'total')
 
   return {
     score,
     possible,
+    // @ts-expect-error
     submission_count: submissionData.filter(submission => submission.submitted).length,
+    // @ts-expect-error
     submissions: submissionData.map(submissionDatum => {
       const percent = submissionDatum.total
         ? divide(submissionDatum.score, submissionDatum.total)
         : 0
       return {
         drop: submissionDatum.drop,
+        // @ts-expect-error
         percent: parseScore(percent),
         score: parseScore(submissionDatum.score),
         possible: submissionDatum.total,

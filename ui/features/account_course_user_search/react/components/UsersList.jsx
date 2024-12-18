@@ -97,6 +97,7 @@ export default class UsersList extends React.Component {
               accountId={this.props.accountId}
               user={user}
               permissions={this.props.permissions}
+              includeDeletedUsers={this.props.includeDeletedUsers}
             />
           ))}
         </Table.Body>
@@ -119,4 +120,5 @@ UsersList.propTypes = {
       label: string.isRequired,
     })
   ).isRequired,
+  includeDeletedUsers: string,
 }

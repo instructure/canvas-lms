@@ -671,12 +671,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "Bilde i flere farger" },
   "multiplication_sign_15f95c22": { "message": "Multiplikasjonstegn" },
   "music_icon_4db5c972": { "message": "Musikk-ikon" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "Må være minst { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "Det må være minst { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "Mine filer" },
   "n_th_root_9991a6e4": { "message": "n-te rot" },
   "nabla_1e216d25": { "message": "Nabla" },

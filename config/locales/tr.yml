@@ -4879,6 +4879,7 @@ tr:
   confirm_dialog_component: 
     ok: Tamam
   confirm_email_address_9072dd3c: "Eposta Adresini Onayla"
+  confirm_password_aaf07824: "Şifreyi Onayla"
   confirm_removal_a9bb889: "Kaldırma İşlemini Onayla"
   confirm_reservation_removal_e6350e7c: "Rezervasyon Silme Onayı"
   confirm_unenrollment_64333263: "Kaydın Silinmesini Onayla"
@@ -10605,6 +10606,7 @@ tr:
   jobs_ec5d59d8: Görevler
   jobs_v2_b20a83f7: "Görevler v2"
   join_6cafecca: Katıl
+  join_code_1e74e5a8: "Katılım Kodu"
   join_group_group_name_871a5e3f: "%{group_name} grubuna katıl"
   joined_group_group_name_e3802c04: "%{group_name} Grubuna Katıldı"
   joining_81f8b6c9: Katılınıyor
@@ -15377,6 +15379,7 @@ tr:
   question_banks_view_and_link_e6d9cde2: "Soru bankaları - göster ve bağlantı oluştur"
   question_f06476d1: soru
   question_group_837b8014: "Soru Grubu"
+  question_position_45eba089: "Soru %{position}"
   question_unanswered: "Henüz Cevaplanmadı"
   questions_a955145c: Sorular
   quiz: 
@@ -18709,6 +18712,10 @@ tr:
       other: "%{count} Alt Hesap"
     titles: 
       sub_accounts: "Alt Hesaplar"
+  sub_assignment: 
+    atom_no_author: "Yazar Yok"
+    labels: 
+      due: Bitiş
   subaccount_91f4c279: "Alt hesap"
   subject_114b2e98: Konu
   subject_reply_to: "Ynt: %{subject}"
@@ -19236,6 +19243,7 @@ tr:
     with_ago: "%{time} önce"
   time_2b5aac58: Süre
   time_limit_a6f1a51e: "Süre Sınırı"
+  time_range_4ae01737: "Saat Aralığı"
   time_zone_f56f5183: "Zaman Dilimi"
   time_zones: 
     abu_dhabi: "Abu Dhabi"

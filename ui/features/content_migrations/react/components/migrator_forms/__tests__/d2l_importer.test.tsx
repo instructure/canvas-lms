@@ -17,10 +17,16 @@
  */
 
 import D2LImporter from '../d2l_importer'
-import {sharedBankTests, sharedContentTests, sharedFormTests} from './shared_form_cases'
+import {
+  sharedBankTests,
+  sharedContentTests,
+  sharedDateParsingTests,
+  sharedFormTests,
+} from './shared_form_cases'
 
 describe('D2LImporter', () => {
   sharedFormTests(D2LImporter)
   sharedContentTests(D2LImporter)
   sharedBankTests(D2LImporter)
+  sharedDateParsingTests(D2LImporter)
 })

@@ -1762,21 +1762,78 @@ describe Assignment do
 
   describe ".clean_up_duplicating_assignments" do
     before do
-      duplicating_for_too_long_result = double
-      @in_batches_result = double
-      allow(described_class).to receive(:duplicating_for_too_long).and_return(duplicating_for_too_long_result)
-      allow(duplicating_for_too_long_result).to receive(:in_batches).and_return(@in_batches_result)
+      @scope = double
+      allow(Sentry).to receive(:with_scope).and_yield(@scope)
+      allow(@scope).to receive(:set_context)
+      allow(Sentry).to receive(:capture_message)
     end
 
-    it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
-      now = double("now")
-      expect(Time.zone).to receive(:now).and_return(now)
-      expect(@in_batches_result).to receive(:update_all).with(
-        duplication_started_at: nil,
-        workflow_state: "failed_to_duplicate",
-        updated_at: now
-      )
-      described_class.clean_up_duplicating_assignments
+    context "new_quizzes_report_failed_duplicates is enabled" do
+      let!(:old_duplicating_assignment_1) do
+        @course.assignments.create!(
+          workflow_state: "duplicating",
+          duplication_started_at: 20.minutes.ago,
+          **assignment_valid_attributes
+        )
+      end
+
+      let!(:old_duplicating_assignment_2) do
+        @course.assignments.create!(
+          workflow_state: "duplicating",
+          duplication_started_at: 20.minutes.ago,
+          **assignment_valid_attributes
+        )
+      end
+
+      before do
+        allow(Account.site_admin)
+          .to receive(:feature_enabled?)
+          .with(:new_quizzes_report_failed_duplicates)
+          .and_return(true)
+      end
+
+      it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
+        described_class.clean_up_duplicating_assignments
+        expect(@course.assignments).to all(have_attributes(workflow_state: "failed_to_duplicate"))
+      end
+
+      it "reports to sentry" do
+        described_class.clean_up_duplicating_assignments
+        expect(@scope).to have_received(:set_context).with(
+          "context",
+          {
+            @course.root_account_id => 2
+          }
+        )
+        expect(Sentry).to have_received(:capture_message).with("Failed to duplicate assignments")
+      end
+    end
+
+    context "new_quizzes_report_failed_duplicates is disabled" do
+      let!(:old_duplicating_assignment) do
+        @course.assignments.create!(
+          workflow_state: "duplicating",
+          duplication_started_at: 20.minutes.ago,
+          **assignment_valid_attributes
+        )
+      end
+
+      before do
+        allow(Account.site_admin)
+          .to receive(:feature_enabled?)
+          .with(:new_quizzes_report_failed_duplicates)
+          .and_return(false)
+      end
+
+      it "marks all assignments that have been duplicating for too long as failed_to_duplicate" do
+        described_class.clean_up_duplicating_assignments
+        expect(@course.assignments).to all(have_attributes(workflow_state: "failed_to_duplicate"))
+      end
+
+      it "does not report to sentry" do
+        described_class.clean_up_duplicating_assignments
+        expect(Sentry).not_to have_received(:capture_message)
+      end
     end
   end
 
@@ -2327,7 +2384,7 @@ describe Assignment do
 
       @assignment.unpublish
       expect(@assignment).not_to be_valid
-      expect(@assignment.errors["workflow_state"]).to eq ["Can't unpublish if there are student submissions"]
+      expect(@assignment.errors["workflow_state"]).to include("Can't unpublish if there are student submissions")
     end
 
     it "does allow itself to be unpublished if it has nil submissions" do
@@ -2335,6 +2392,63 @@ describe Assignment do
       expect(@assignment).to be_can_unpublish
       @assignment.unpublish
       expect(@assignment.workflow_state).to eq "unpublished"
+    end
+  end
+
+  describe "#has_student_submissions_for_sub_assignments?" do
+    context "checkpointed assignment" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(context: @course, reply_to_entry_required_count: 2)
+      end
+
+      it "return true if there are student sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to topic submission for #{@student.name}"
+        expect(@assignment.has_student_submissions_for_sub_assignments?).to be true
+      end
+
+      it "does not allow assignment to be unpublished if there are student sub_assignment submissions" do
+        @reply_to_entry.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(@assignment).not_to be_can_unpublish
+
+        @assignment.unpublish
+        expect(@assignment).not_to be_valid
+        expect(@assignment.errors["workflow_state"]).to eq ["Can't unpublish if there are student submissions for the assignment or its sub_assignments"]
+      end
+    end
+  end
+
+  describe "#can_unpublish?" do
+    context "checkpointed assignment" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
+      end
+
+      it "return false if there are student sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(@assignment.can_unpublish?).to be false
+      end
+    end
+  end
+
+  describe "#assignment_ids_with_sub_assignment_submissions" do
+    context "checkpointed assignment" do
+      before do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @reply_to_topic, = graded_discussion_topic_with_checkpoints(context: @course)
+        @other_assignment = @course.assignments.create(title: "other assignment", points_possible: 10)
+      end
+
+      it "returns assignment ids that have sub_assignment submissions" do
+        @reply_to_topic.submit_homework @student, body: "reply to entry submission for #{@student.name}"
+        expect(Assignment.assignment_ids_with_sub_assignment_submissions([@assignment.id, @other_assignment.id])).to match_array [@assignment.id]
+      end
+
+      it "does not return assignment ids that do not have sub_assignment submissions" do
+        @other_assignment.submit_homework @student, body: "assignment submission for #{@student.name}"
+        expect(Assignment.assignment_ids_with_sub_assignment_submissions([@assignment.id, @other_assignment.id])).to eq []
+      end
     end
   end
 

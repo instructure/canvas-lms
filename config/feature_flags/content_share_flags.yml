@@ -13,3 +13,10 @@ instui_for_course_copy_page:
   description: |-
     If enabled, the course copy page will use InstUI components
   applies_to: SiteAdmin
+
+fill_missing_dates_from_source_course:
+  state: hidden
+  display_name: Fill missing dates for date shifting from source course
+  description: |-
+    If enabled, the date shifting process will fill in missing dates from the source course.
+  applies_to: SiteAdmin

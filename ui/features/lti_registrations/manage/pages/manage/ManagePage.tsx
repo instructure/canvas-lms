@@ -31,6 +31,7 @@ import {formatSearchParamErrorMessages} from '../../../common/lib/useZodParams/P
 import {
   deleteRegistration as apiDeleteRegistration,
   fetchRegistrations as apiFetchRegistrations,
+  unbindGlobalLtiRegistration as apiUnbindGlobalRegistration,
 } from '../../api/registrations'
 import {ZAccountId, type AccountId} from '../../model/AccountId'
 import type {LtiRegistration} from '../../model/LtiRegistration'
@@ -82,7 +83,11 @@ const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
     ),
   })
 
-const useManagePageState = mkUseManagePageState(apiFetchRegistrations, apiDeleteRegistration)
+const useManagePageState = mkUseManagePageState(
+  apiFetchRegistrations,
+  apiDeleteRegistration,
+  apiUnbindGlobalRegistration
+)
 
 export const ManagePageInner = (props: ManagePageInnerProps) => {
   const {sort, dir, page} = props.searchParams
@@ -114,7 +119,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
   const deleteApp = React.useCallback(
     async (app: LtiRegistration) => {
       if (await confirmDeletion(app)) {
-        const deleteResult = await deleteRegistration(app)
+        const deleteResult = await deleteRegistration(app, props.accountId)
         const type = isSuccessful(deleteResult) ? 'success' : 'error'
         showFlashAlert({
           type,
@@ -125,7 +130,7 @@ export const ManagePageInner = (props: ManagePageInnerProps) => {
         })
       }
     },
-    [deleteRegistration]
+    [deleteRegistration, props.accountId]
   )
 
   /**

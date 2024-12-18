@@ -65,16 +65,31 @@ describe Lti::IMS::NoticeHandlersController do
 
       before do
         allow(Lti::PlatformNotificationService).to receive(:list_handlers).with(tool: cet).and_return(handlers)
-        allow(Lti::PlatformNotificationService).to receive(:subscribe_tool_for_notice)
-          .with(tool: cet, notice_type:, handler_url:)
-          .and_return(handler_object)
       end
 
       it "subscribes the tool for given notice and returns the created handler" do
+        expect(Lti::PlatformNotificationService).to \
+          receive(:subscribe_tool_for_notice)
+          .with(tool: cet, notice_type:, handler_url:, max_batch_size: nil)
+          .and_return(handler_object)
         send_request
         expect(response).to have_http_status(:ok)
-        expect(Lti::PlatformNotificationService).to have_received(:subscribe_tool_for_notice).with(tool: cet, notice_type:, handler_url:)
         expect(response.parsed_body).to eq(JSON.parse(handler_object.to_json))
+      end
+
+      context "with max_batch_size" do
+        let(:handler_object) { { notice_type:, handler: handler_url, max_batch_size: "20" } }
+
+        it "subscribes the tool for given notice and returns the created handler with max_batch_size" do
+          expect(Lti::PlatformNotificationService).to \
+            receive(:subscribe_tool_for_notice)
+            .with(tool: cet, notice_type:, handler_url:, max_batch_size: "20")
+            .and_return(handler_object)
+          send_request
+          expect(response).to have_http_status(:ok)
+
+          expect(response.parsed_body).to eq(JSON.parse(handler_object.to_json))
+        end
       end
     end
 
@@ -94,6 +109,16 @@ describe Lti::IMS::NoticeHandlersController do
         expect(response).to have_http_status(:ok)
         expect(Lti::PlatformNotificationService).to have_received(:unsubscribe_tool_for_notice).with(tool: cet, notice_type:)
         expect(response.parsed_body).to eq({ "handler" => "", "notice_type" => notice_type })
+      end
+    end
+
+    describe "with a missing handler url" do
+      let(:body_overrides) { { notice_type: }.to_json }
+
+      it "returns a 400" do
+        send_request
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body).to eq({ "errors" => { "message" => "handler must be a valid URL or an empty string", "type" => "bad_request" } })
       end
     end
 
@@ -125,6 +150,20 @@ describe Lti::IMS::NoticeHandlersController do
       it "rejected with 404" do
         send_request
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe "with devkey turned off" do
+      let(:handler_object) { { notice_type:, handler: handler_url } }
+      let(:body_overrides) { handler_object.to_json }
+
+      before do
+        developer_key.account_binding_for(Account.default).update!(workflow_state: "off")
+      end
+
+      it "it throws 401" do
+        send_request
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

@@ -34,34 +34,18 @@ import type {
   AttachmentProgressResponse,
   ContentMigrationItem,
   Migrator,
-  DateShifts,
   onSubmitMigrationFormCallback,
-  AdjustDates,
+  MigrationCreateRequestBody,
 } from './types'
 import CommonCartridgeImporter from './migrator_forms/common_cartridge'
 import MoodleZipImporter from './migrator_forms/moodle_zip'
 import QTIZipImporter from './migrator_forms/qti_zip'
+import {convertFormDataToMigrationCreateRequest} from '../converter/form_data_converter'
 import D2LImporter from './migrator_forms/d2l_importer'
 import AngelImporter from './migrator_forms/angel_importer'
 import BlackboardImporter from './migrator_forms/blackboard_importer'
 
 const I18n = useI18nScope('content_migrations_redesign')
-
-type RequestBody = {
-  course_id: string
-  migration_type: string
-  date_shift_options: DateShifts
-  adjust_dates: AdjustDates
-  selective_import: boolean
-  settings: {[key: string]: any}
-  daySubCollection?: object
-  errored?: boolean
-  pre_attachment?: {
-    name: string
-    no_redirect: boolean
-    size: number
-  }
-}
 
 type MigratorProps = {
   value: string
@@ -144,19 +128,20 @@ export const ContentMigrationsForm = ({
       }
       setIsSubmitting(true)
       setFileUploadProgress(0)
-      delete formData.errored
-      const requestBody: RequestBody = {
-        course_id: courseId,
-        migration_type: chosenMigrator,
-        ...formData,
-      }
+      const requestBody: MigrationCreateRequestBody = convertFormDataToMigrationCreateRequest(
+        formData,
+        courseId,
+        chosenMigrator
+      )
 
       const {json} = await doFetchApi({
         method: 'POST',
         path: `/api/v1/courses/${courseId}/content_migrations`,
         body: requestBody,
       })
+      // @ts-expect-error
       if (preAttachmentFile && json.pre_attachment) {
+        // @ts-expect-error
         const attachment = await completeUpload(json.pre_attachment, preAttachmentFile, {
           ignoreResult: true,
           onProgress: (response: any) => {
@@ -164,6 +149,7 @@ export const ContentMigrationsForm = ({
           },
         })
         const jsonWithAttachment: ContentMigrationItem = {
+          // @ts-expect-error
           ...json,
           attachment,
         }
@@ -182,6 +168,7 @@ export const ContentMigrationsForm = ({
     doFetchApi({
       path: `/api/v1/courses/${window.ENV.COURSE_ID}/content_migrations/migrators`,
     })
+      // @ts-expect-error
       .then((response: {json: Migrator[]}) => {
         // TODO: webct_scraper is not supported anymore, this should be removed from backend too.
         const filteredMigrators = response.json.filter((m: Migrator) => m.type !== 'webct_scraper')
@@ -219,10 +206,13 @@ export const ContentMigrationsForm = ({
             onChange={(_e: any, {value}: any) =>
               setChosenMigrator(value !== 'empty' ? value : null)
             }
+            data-testid="select-content-type-dropdown"
           >
-            <SimpleSelect.Option key="empty-option" id="empty" value="empty">
-              {I18n.t('Select one')}
-            </SimpleSelect.Option>
+            {!chosenMigrator && (
+              <SimpleSelect.Option key="empty-option" id="empty" value="empty">
+                {I18n.t('Select one')}
+              </SimpleSelect.Option>
+            )}
             {migrators.map((o: Migrator) => (
               <SimpleSelect.Option key={o.type} id={o.type} value={o.type}>
                 {o.name}

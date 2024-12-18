@@ -35,32 +35,32 @@ describe Lti::PlatformNotificationService do
   let(:builder) { Lti::Pns::LtiHelloWorldNoticeBuilder.new }
 
   before do
-    @valid_notice_type = "Notice2"
-    @hello_world_notice_type = "LtiHelloWorldNotice"
+    # A valid type besides LtiHelloWorldNotice (subscribing to that will try to
+    # send a test notice, require public keys/lti_1_3_spec_helper, etc.)
+    @valid_notice_type = "LtiAssetProcessorSubmissionNotice"
     @invalid_notice_type = "InvalidNoticeType"
     @valid_handler_url = tool.url + "/handler"
     @invalid_handler_url = "invalid_url"
-    stub_const("Lti::Pns::NoticeTypes::ALL", [@hello_world_notice_type, @valid_notice_type])
   end
 
   describe "subscribe_tool_for_notice" do
+    def subscribe!(**overrides)
+      Lti::PlatformNotificationService.subscribe_tool_for_notice(
+        tool:,
+        notice_type: @valid_notice_type,
+        handler_url: @valid_handler_url,
+        max_batch_size: nil,
+        **overrides
+      )
+    end
+
     context "with valid parameters" do
       it "creates a new notice handler" do
-        expect do
-          Lti::PlatformNotificationService.subscribe_tool_for_notice(
-            tool:,
-            notice_type: @valid_notice_type,
-            handler_url: @valid_handler_url
-          )
-        end.to change { Lti::NoticeHandler.count }.by(1)
+        expect { subscribe! }.to change { Lti::NoticeHandler.count }.by(1)
       end
 
       it "returns API JSON of the created notice handler" do
-        handler = Lti::PlatformNotificationService.subscribe_tool_for_notice(
-          tool:,
-          notice_type: @valid_notice_type,
-          handler_url: @valid_handler_url
-        )
+        handler = subscribe!
         expect(handler).to eq({ notice_type: @valid_notice_type, handler: @valid_handler_url })
       end
 
@@ -68,48 +68,59 @@ describe Lti::PlatformNotificationService do
         expect(Lti::Pns::LtiHelloWorldNoticeBuilder).to receive(:new).and_return(builder)
         expect(builder).to receive(:build).and_return({ jwt: "jwt" })
         expect(Services::NotificationService).to receive(:process).and_return("response")
-        handler = Lti::PlatformNotificationService.subscribe_tool_for_notice(
-          tool:,
-          notice_type: @hello_world_notice_type,
-          handler_url: @valid_handler_url
-        )
-        expect(handler).to eq({ notice_type: @hello_world_notice_type, handler: @valid_handler_url })
+        handler = subscribe!(notice_type: "LtiHelloWorldNotice")
+        expect(handler).to eq({ notice_type: "LtiHelloWorldNotice", handler: @valid_handler_url })
+      end
+
+      it "accepts a number for max_batch_size" do
+        handler = subscribe!(max_batch_size: 20)
+        expect(handler).to eq({ notice_type: @valid_notice_type, handler: @valid_handler_url, max_batch_size: 20 })
+      end
+    end
+
+    context "with non-integer max_batch_size" do
+      it "raises an InvalidNoticeHandler" do
+        expect { subscribe!(max_batch_size: "1.4") }.to \
+          raise_error(described_class::InvalidNoticeHandler, /max.batch.size must be an integer/i)
+
+        expect { subscribe!(max_batch_size: "foo") }.to \
+          raise_error(described_class::InvalidNoticeHandler, /max.batch.size is not a number/i)
+      end
+    end
+
+    context "with a number below the minimum max_batch_size" do
+      it "raises an InvalidNoticeHandler" do
+        expect { subscribe!(max_batch_size: Lti::NoticeHandler::MIN_MAX_BATCH_SIZE - 1) }.to \
+          raise_error(described_class::InvalidNoticeHandler, /max.batch.size must be greater than or equal to 10/i)
+        expect { subscribe!(max_batch_size: 0) }.to \
+          raise_error(described_class::InvalidNoticeHandler, /max.batch.size must be greater than or equal to 10/i)
+        expect { subscribe!(max_batch_size: -1) }.to \
+          raise_error(described_class::InvalidNoticeHandler, /max.batch.size must be greater than or equal to 10/i)
+        expect(Lti::NoticeHandler.count).to eq(0)
       end
     end
 
     context "with invalid notice_type" do
-      it "raises an ArgumentError" do
-        expect do
-          Lti::PlatformNotificationService.subscribe_tool_for_notice(
-            tool:,
-            notice_type: @invalid_notice_type,
-            handler_url: @valid_handler_url
-          )
-        end.to raise_error(ArgumentError, "unknown notice_type, it must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]")
+      it "raises an InvalidNoticeHandler" do
+        expect { subscribe!(notice_type: @invalid_notice_type) }.to \
+          raise_error(described_class::InvalidNoticeHandler, "Validation failed: Notice type unknown, must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]")
+        expect(Lti::NoticeHandler.count).to eq(0)
       end
     end
 
     context "with invalid handler_url" do
-      it "raises an ArgumentError" do
-        expect do
-          Lti::PlatformNotificationService.subscribe_tool_for_notice(
-            tool:,
-            notice_type: @valid_notice_type,
-            handler_url: @invalid_handler_url
-          )
-        end.to raise_error(ArgumentError, "handler must be a valid URL or an empty string")
+      it "raises an InvalidNoticeHandler" do
+        expect { subscribe!(handler_url: @invalid_handler_url) }.to \
+          raise_error(described_class::InvalidNoticeHandler, "Validation failed: Url is not a valid URL")
+        expect(Lti::NoticeHandler.count).to eq(0)
       end
     end
 
-    context "with handler_url does not match tool's host" do
-      it "raises an ArgumentError" do
-        expect do
-          Lti::PlatformNotificationService.subscribe_tool_for_notice(
-            tool:,
-            notice_type: @valid_notice_type,
-            handler_url: "http://www.invalid.com/handler"
-          )
-        end.to raise_error(ArgumentError, "handler url should match tool's domain")
+    context "when handler_url does not match tool's host" do
+      it "raises an InvalidNoticeHandler" do
+        expect { subscribe!(handler_url: "http://www.invalid.com/handler") }.to \
+          raise_error(described_class::InvalidNoticeHandler, "Validation failed: Url should match tool's domain")
+        expect(Lti::NoticeHandler.count).to eq(0)
       end
     end
   end
@@ -144,13 +155,13 @@ describe Lti::PlatformNotificationService do
     end
 
     context "with invalid notice_type" do
-      it "raises an ArgumentError" do
+      it "raises an InvalidNoticeHandler" do
         expect do
           Lti::PlatformNotificationService.unsubscribe_tool_for_notice(
             tool:,
             notice_type: @invalid_notice_type
           )
-        end.to raise_error(ArgumentError, "unknown notice_type, it must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]")
+        end.to raise_error(described_class::InvalidNoticeHandler, "Validation failed: Notice type unknown, must be one of [#{Lti::Pns::NoticeTypes::ALL.join(", ")}]")
       end
     end
   end
@@ -159,14 +170,19 @@ describe Lti::PlatformNotificationService do
     let(:builder) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 1 }) }
     let(:builder2) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 2 }) }
 
-    it "sends out notification_service webhook requests" do
+    def make_notice_handler!(**opts)
       Lti::NoticeHandler.create!(
         context_external_tool_id: tool.id,
         notice_type: "LtiHelloWorldNotice",
         url: @valid_handler_url,
         root_account: tool.root_account,
-        account: tool.account
+        account: tool.account,
+        **opts
       )
+    end
+
+    it "sends out notification_service webhook requests" do
+      make_notice_handler!
       allow(builder).to receive(:build).and_return({ jwt: "jwt" })
       allow(SecureRandom).to receive(:uuid).and_return("uuid")
       expect(Services::NotificationService).to receive(:process).with(
@@ -185,6 +201,27 @@ describe Lti::PlatformNotificationService do
       expect do
         Lti::PlatformNotificationService.notify_tools(tool.account, builder, builder2)
       end.to raise_error(ArgumentError, "builders must have the same notice_type")
+    end
+
+    it "batches notifications according to the max_batch_size of the handler" do
+      handler = make_notice_handler!
+      handler.max_batch_size = 2
+      handler.save!(validate: false)
+      builders = (1..5).map do |i|
+        builder = Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: i })
+        allow(builder).to receive(:build).and_return({ jwt: "jwt#{i}" })
+        builder
+      end
+      allow(SecureRandom).to receive(:uuid).and_return("uuid")
+      [%w[jwt1 jwt2], %w[jwt3 jwt4], %w[jwt5]].each do |batch|
+        expect(Services::NotificationService).to receive(:process).with(
+          "pns-notify/uuid",
+          { notices: batch.map { |jwt| { jwt: } } }.to_json,
+          "webhook",
+          { url: "http://www.tool.com/launch/handler" }.to_json
+        )
+      end
+      Lti::PlatformNotificationService.notify_tools(tool.account, *builders)
     end
   end
 end

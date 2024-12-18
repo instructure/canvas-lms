@@ -21,7 +21,12 @@ import {arrayOf, func, object, shape, string} from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {IconEditLine, IconMasqueradeLine, IconMessageLine, IconExportLine} from '@instructure/ui-icons'
+import {
+  IconEditLine,
+  IconMasqueradeLine,
+  IconMessageLine,
+  IconExportLine,
+} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
@@ -37,12 +42,16 @@ export default function UsersListRow({
   permissions,
   handleSubmitEditUserForm,
   roles,
+  includeDeletedUsers,
 }) {
+  let userLink = `/accounts/${accountId}/users/${user.id}`
+  if (includeDeletedUsers && !user.login_id)
+    userLink += `?include_deleted_users=${includeDeletedUsers}`
   return (
     <Table.Row>
       <Table.RowHeader>
         <UserLink
-          href={`/accounts/${accountId}/users/${user.id}`}
+          href={userLink}
           avatarName={user.short_name}
           name={user.sortable_name}
           avatar_url={user.avatar_url}
@@ -119,11 +128,7 @@ export default function UsersListRow({
           </CreateOrUpdateUserModal>
         )}
         {permissions.can_create_dsr && (
-          <CreateDSRModal
-            accountId={accountId}
-            user={user}
-            afterSave={handleSubmitEditUserForm}
-          >
+          <CreateDSRModal accountId={accountId} user={user} afterSave={handleSubmitEditUserForm}>
             <span>
               <Tooltip
                 data-testid="user-list-row-tooltip"
@@ -135,7 +140,9 @@ export default function UsersListRow({
                   size="small"
                   screenReaderLabel={I18n.t('Create DSR Request for %{name}', {name: user.name})}
                 >
-                  <IconExportLine title={I18n.t('Create DSR Request for %{name}', {name: user.name})} />
+                  <IconExportLine
+                    title={I18n.t('Create DSR Request for %{name}', {name: user.name})}
+                  />
                 </IconButton>
               </Tooltip>
             </span>
@@ -157,6 +164,7 @@ UsersListRow.propTypes = {
       label: string.isRequired,
     })
   ).isRequired,
+  includeDeletedUsers: string,
 }
 
 UsersListRow.displayName = 'Row'

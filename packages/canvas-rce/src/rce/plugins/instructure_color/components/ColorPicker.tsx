@@ -28,12 +28,14 @@ import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
-import {isTransparent, getContrastStatus} from './colorUtils'
+import {isTransparent, getContrastStatus, getDefaultColors} from './colorUtils'
 
-// this will hold colors the user picks during this session
-const previouslyChosenColors: string[] = []
+export type ColorTab = 'foreground' | 'background' | 'border'
 
-type ColorTab = 'foreground' | 'background' | 'border'
+export type TabSpec = {
+  color?: string
+  default: string
+}
 
 export type ColorSpec = {
   bgcolor?: string
@@ -44,44 +46,43 @@ export type ColorSpec = {
 // A custom type constraint that enforces at least one key is present
 export type AtLeastOne<T, U = {[K in keyof T]: Pick<T, K>}> = Partial<T> & U[keyof U]
 
-export type TabSpec = AtLeastOne<Record<ColorTab, string | undefined>>
+export type TabsSpec = AtLeastOne<Record<ColorTab, TabSpec>> & {effectiveBgColor: string}
+
+export type ColorsInUse = {
+  foreground: string[]
+  background: string[]
+  border: string[]
+}
 
 export type ColorPickerProps = {
-  tabs: TabSpec
+  tabs: TabsSpec
+  colorsInUse?: ColorsInUse
   onCancel: () => void
   onSave: (newcolors: ColorSpec) => void
 }
 
-const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
-  const [currFgColor, setCurrFgColor] = useState<string | undefined>(tabs.foreground)
+const ColorPicker = ({tabs, colorsInUse, onCancel, onSave}: ColorPickerProps) => {
+  const [currFgColor, setCurrFgColor] = useState<string | undefined>(tabs.foreground?.color)
   const [currBgColor, setCurrBgColor] = useState<string | undefined>(
-    isTransparent(tabs.background) ? undefined : tabs.background
+    isTransparent(tabs.background?.color)
+      ? tabs.effectiveBgColor || '#ffffff'
+      : tabs.background?.color
   )
-  const [currBorderColor, setCurrBorderColor] = useState(tabs.border || '#00000000')
-  const [activeTab, setActiveTab] = useState<ColorTab>(
-    tabs.foreground ? 'foreground' : 'background'
-  )
-  const [customBackground, setCustomBackground] = useState<boolean>(!isTransparent(tabs.background))
-  const [customBorder, setCustomBorder] = useState<boolean>(!isTransparent(tabs.border))
-  const [defaultColors] = useState(() => {
-    const fontcolor =
-      window
-        .getComputedStyle(document.documentElement)
-        .getPropertyValue('--ic-brand-font-color-dark') || '#000000'
-    return [fontcolor, '#FFFFFF']
+  const [currBorderColor, setCurrBorderColor] = useState(tabs.border?.color)
+  const [activeTab, setActiveTab] = useState<ColorTab>(() => {
+    if (tabs.foreground) return 'foreground'
+    if (tabs.background) return 'background'
+    return 'border'
   })
-
-  const updatePreviousColors = useCallback(
-    (color: string) => {
-      if (previouslyChosenColors.includes(color)) return
-      if (defaultColors.includes(color)) return
-      if (color === `${defaultColors[0]}FF`) return
-      if (isTransparent(color)) return
-
-      previouslyChosenColors.unshift(color)
-      if (previouslyChosenColors.length > 8) previouslyChosenColors.pop()
-    },
-    [defaultColors]
+  const [defaultColors] = useState(getDefaultColors())
+  const [customForeground, setCustomForeground] = useState<boolean>(
+    !!tabs.foreground?.color && tabs.foreground.color !== tabs.foreground.default
+  )
+  const [customBackground, setCustomBackground] = useState<boolean>(
+    !isTransparent(tabs.background?.color) && tabs.background?.color !== tabs.background?.default
+  )
+  const [customBorder, setCustomBorder] = useState<boolean>(
+    !isTransparent(tabs.border?.color) && tabs.border?.color !== tabs.border?.default
   )
 
   const handleFgColorChange = useCallback((newColor: string) => {
@@ -110,7 +111,12 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
   const handleChangePickAColor = useCallback(
     (_e: React.ChangeEvent<HTMLInputElement>, value: string) => {
       const isCustom = value === 'custom'
-      if (activeTab === 'background') {
+      if (activeTab === 'foreground') {
+        setCustomForeground(isCustom)
+        if (!isCustom) {
+          setCurrFgColor(undefined)
+        }
+      } else if (activeTab === 'background') {
         setCustomBackground(isCustom)
         if (!isCustom) {
           setCurrBgColor(undefined)
@@ -132,24 +138,23 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
   const handleSubmit = useCallback(() => {
     setActiveTab(currFgColor ? 'foreground' : 'background')
     const newcolors: ColorSpec = {}
+
+    if (customForeground && currFgColor) {
+      const c = tinycolor(currFgColor).toHexString()
+      newcolors.fgcolor = c
+    }
+
     if (customBackground && currBgColor) {
       const c = tinycolor(currBgColor).toHexString()
       newcolors.bgcolor = c
-      updatePreviousColors(c)
     }
 
-    if (currFgColor) {
-      const c = tinycolor(currFgColor).toHexString()
-      newcolors.fgcolor = c
-      updatePreviousColors(c)
-    }
     if (currBorderColor) {
       newcolors.bordercolor =
         customBorder && !isTransparent(currBorderColor) ? currBorderColor : undefined
       if (newcolors.bordercolor) {
         const c = tinycolor(newcolors.bordercolor).toHexString()
         newcolors.bordercolor = c
-        updatePreviousColors(c)
       }
     }
     onSave(newcolors)
@@ -159,9 +164,23 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
     currFgColor,
     customBackground,
     customBorder,
+    customForeground,
     onSave,
-    updatePreviousColors,
   ])
+
+  const getColorPresets = (variant: ColorTab) => {
+    const defaults = defaultColors
+    if (tabs.background?.default) {
+      defaults[0] = tabs.background.default
+    }
+    if (tabs.foreground?.default) {
+      defaults[1] = tabs.foreground.default
+    }
+    // return only unique colors
+    return [...defaults, ...(colorsInUse?.[variant] || [])].filter(
+      (c, i, a) => a.indexOf(c) === i && !isTransparent(c)
+    )
+  }
 
   const renderColorMixer = (variant: ColorTab, enabled: boolean) => {
     let value = currBgColor
@@ -215,30 +234,30 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
         data-testid="color-preset"
         disabled={!enabled}
         label={formatMessage('Previously chosen colors')}
-        colors={[...defaultColors, ...previouslyChosenColors]}
+        colors={getColorPresets(variant)}
         selected={currColor}
         onSelect={onSelectColor}
       />
     )
   }
 
+  // this will only get called if either tabs.foreground or tabs.border is defined
   const getFirstColor = (): {firstColor: string; firstColorLabel: string} => {
     let firstColor, firstColorLabel
-    if ('foreground' in tabs) {
-      if (isTransparent(currFgColor)) firstColor = null
-      firstColor = currFgColor as string
-      firstColorLabel = formatMessage('Foreground')
-    } else {
-      if (!customBorder || isTransparent(currBorderColor)) firstColor = null
-      firstColor = currBorderColor as string
+    if (activeTab === 'foreground' || (activeTab === 'background' && !!tabs.foreground)) {
+      firstColor = currFgColor || tabs.foreground?.default || defaultColors[0]
+      firstColorLabel = formatMessage('Color')
+    } else if (activeTab === 'border' || (activeTab === 'background' && !!tabs.border)) {
+      firstColor = currBorderColor || tabs.border?.default || defaultColors[0]
       firstColorLabel = formatMessage('Border')
     }
+    // @ts-expect-error
     return {firstColor, firstColorLabel}
   }
 
   const renderColorContrastSummary = () => {
     const {firstColor} = getFirstColor()
-    const ok = getContrastStatus(firstColor, currBgColor || '#fff')
+    const ok = getContrastStatus(firstColor, currBgColor || tabs.effectiveBgColor || '#fff')
     return (
       <Flex as="div" gap="x-large">
         <Text weight="bold">{formatMessage('Color Contrast')}</Text>
@@ -250,10 +269,9 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
   }
 
   const renderColorContrast = () => {
-    if (!('background' in tabs)) return null
-    if (!('foreground' in tabs || 'border' in tabs)) return null
-    if (!customBackground) return null
-    if ('border' in tabs && !customBorder) return null
+    if (!(tabs.background || tabs.effectiveBgColor)) return null
+    if (!(tabs.foreground || tabs.border)) return null
+    if (!currBgColor) return null
 
     const {firstColor, firstColorLabel} = getFirstColor()
     if (firstColor === null) return null
@@ -264,7 +282,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
           <ColorContrast
             data-testid="color-contrast"
             firstColor={firstColor}
-            secondColor={currBgColor || '#fff'}
+            secondColor={currBgColor || tabs.effectiveBgColor || '#fff'}
             label={formatMessage('Color Contrast Ratio')}
             successLabel={formatMessage('PASS')}
             failureLabel={formatMessage('FAIL')}
@@ -281,7 +299,9 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
 
   const renderTab = (variant: ColorTab) => {
     let choosersEnabled = true
-    if (variant === 'background') {
+    if (variant === 'foreground') {
+      choosersEnabled = customForeground
+    } else if (variant === 'background') {
       choosersEnabled = customBackground
     } else if (variant === 'border') {
       choosersEnabled = customBorder
@@ -289,21 +309,20 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
 
     return (
       <>
-        {variant !== 'foreground' && (
-          <View as="div" margin="0 0 small 0">
-            <RadioInputGroup
-              layout="columns"
-              name="pickcolor"
-              description={formatMessage('Pick a color')}
-              size="small"
-              value={choosersEnabled ? 'custom' : 'none'}
-              onChange={handleChangePickAColor}
-            >
-              <RadioInput label={formatMessage('None')} value="none" />
-              <RadioInput label={formatMessage('Custom')} value="custom" />
-            </RadioInputGroup>
-          </View>
-        )}
+        <View as="div" margin="0 0 small 0">
+          <RadioInputGroup
+            layout="columns"
+            name="pickcolor"
+            description={formatMessage('Pick a color')}
+            size="small"
+            value={choosersEnabled ? 'custom' : 'none'}
+            onChange={handleChangePickAColor}
+          >
+            <RadioInput label={formatMessage('Default')} value="none" />
+            <RadioInput label={formatMessage('Custom')} value="custom" />
+          </RadioInputGroup>
+        </View>
+
         {renderColorMixer(variant, choosersEnabled)}
         {renderColorPreset(variant, choosersEnabled)}
       </>
@@ -311,10 +330,10 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
   }
 
   return (
-    <View as="div">
+    <View as="div" data-testid="color-picker">
       <View as="div" padding="small" data-mce-component={true}>
         <Tabs onRequestTabChange={handleTabChange}>
-          {'foreground' in tabs && (
+          {!!tabs.foreground && (
             <Tabs.Panel
               id="foreground"
               renderTitle={formatMessage('Color')}
@@ -323,7 +342,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
               {renderTab('foreground')}
             </Tabs.Panel>
           )}
-          {'background' in tabs && (
+          {!!tabs.background && (
             <Tabs.Panel
               id="background"
               renderTitle={formatMessage('Background')}
@@ -332,7 +351,7 @@ const ColorPicker = ({tabs, onCancel, onSave}: ColorPickerProps) => {
               {renderTab('background')}
             </Tabs.Panel>
           )}
-          {'border' in tabs && (
+          {!!tabs.border && (
             <Tabs.Panel
               id="border"
               renderTitle={formatMessage('Border')}

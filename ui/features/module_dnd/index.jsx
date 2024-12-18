@@ -27,6 +27,7 @@ ready(() => {
     '.editable_context_module:not(#context_module_blank) .module_dnd'
   )
   zones.forEach(zone => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ModuleFileDrop
         courseId={ENV.course_id}

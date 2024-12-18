@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -19,7 +18,7 @@
 
 import {Table} from '@instructure/ui-table'
 import React, {useMemo, useState} from 'react'
-import {InternalSetting} from '../types'
+import type {InternalSetting} from '../types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {EditableCodeValue} from './EditableCodeValue'
@@ -56,6 +55,7 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
     sortBy: 'name',
   })
 
+  // @ts-expect-error
   const handleSort = (_, {id}: {id: string}) => {
     if (id === sort.sortBy) {
       setSort({...sort, ascending: !sort.ascending})
@@ -72,6 +72,7 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
   const sortedRows = useMemo(
     () =>
       [...props.internalSettings].sort((a, b) => {
+        // @ts-expect-error
         let [aVal, bVal] = [a[sort.sortBy], b[sort.sortBy]] as (string | null | undefined)[]
 
         if (aVal === null || aVal === undefined) {

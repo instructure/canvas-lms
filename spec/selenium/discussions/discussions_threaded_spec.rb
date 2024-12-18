@@ -57,7 +57,7 @@ describe "threaded discussions" do
       fj("button:contains('Post Reply')").click
       wait_for_ajaximations
       expect(get_all_replies.count).to eq 1
-      expect(f("iframe[src='https://example.com/']")).to be_present
+      expect(f("iframe[src='https://example.com']")).to be_present
     end
 
     it "only respects the 'n' shortcut when no rce editors are open" do
@@ -1000,7 +1000,7 @@ describe "threaded discussions" do
       f("textarea[data-rich_text='true']").send_keys entry_text
       fj("button:contains('Reply')").click
       wait_for_ajaximations
-      expect(f("iframe[src='https://example.com/']")).to be_present
+      expect(f("iframe[src='https://example.com']")).to be_present
     end
 
     it "allows edits to entries with replies" do

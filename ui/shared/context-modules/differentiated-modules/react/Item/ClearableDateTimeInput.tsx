@@ -90,6 +90,7 @@ function ClearableDateTimeInput({
   const elementRefCallback = (element: Element | null) => {
     elementRef.current = element
     if (elementRef?.current) {
+      // @ts-expect-error
       setHeight(elementRef.current.offsetHeight)
     }
   }

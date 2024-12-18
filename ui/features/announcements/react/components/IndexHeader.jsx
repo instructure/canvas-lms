@@ -25,12 +25,7 @@ import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {
-  IconLockLine,
-  IconPlusLine,
-  IconTrashLine,
-  IconUnlockLine,
-} from '@instructure/ui-icons'
+import {IconLockLine, IconPlusLine, IconTrashLine, IconUnlockLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import actions from '../actions'

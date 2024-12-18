@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -18,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {ReactElement} from 'react'
+import React, {type ReactElement} from 'react'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -74,6 +73,7 @@ function CanvasModal({
           offset="medium"
         />
       </Modal.Header>
+      {/* @ts-expect-error */}
       <Modal.Body padding={padding}>
         <View as="div" height="100%">
           <ErrorBoundary

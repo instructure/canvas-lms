@@ -39,7 +39,7 @@ class Checkpoints::SectionOverrideCreatorService < ApplicationService
   private
 
   def create_override(assignment:, section:, shell_override: false, parent_override: nil)
-    override = assignment.assignment_overrides.build(set: section, dont_touch_assignment: true, parent_override:)
+    override = assignment.assignment_overrides.build(set: section, dont_touch_assignment: true, parent_override:, unassign_item: @override.fetch(:unassign_item, false))
     apply_overridden_dates(override, @override, shell_override:)
     override.save!
     override

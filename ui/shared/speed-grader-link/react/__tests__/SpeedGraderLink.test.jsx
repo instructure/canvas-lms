@@ -32,6 +32,7 @@ describe('SpeedGraderLink', () => {
   let context
 
   function mountComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<SpeedGraderLink {...context} />, $container)
   }
 

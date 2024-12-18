@@ -24,5 +24,5 @@ const unreadSvg = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" x
 </svg>
 `
 export default function UnreadIcon() {
-  return (<SVGIcon src={unreadSvg} title="unread" color="inherit" />)
+  return <SVGIcon src={unreadSvg} title="unread" color="inherit" />
 }

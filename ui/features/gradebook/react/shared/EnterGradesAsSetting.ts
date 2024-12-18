@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -34,9 +33,11 @@ const gradingTypeDefaultOptionMap = {
 }
 
 export function defaultOptionForGradingType(gradingType: string) {
+  // @ts-expect-error
   return gradingTypeDefaultOptionMap[gradingType] || null
 }
 
 export function optionsForGradingType(gradingType: string) {
+  // @ts-expect-error
   return gradingTypeOptionMap[gradingType] || []
 }

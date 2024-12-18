@@ -87,6 +87,7 @@ export interface ItemAssignToCardSpec {
   required_replies_due_at: string | null
   lock_at: string | null
   selectedAssigneeIds: string[]
+  initialAssigneeOptions?: AssigneeOption[]
   defaultOptions?: string[]
   contextModuleId?: string | null
   contextModuleName?: string | null

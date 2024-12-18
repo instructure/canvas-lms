@@ -107,7 +107,7 @@ const KnowledgeCheckSection = ({id, entry}: KnowledgeCheckSectionProps) => {
     return (
       <div className="quiz-section__empty">
         {enabled ? (
-          <Button onClick={showModal} color="primary">
+          <Button onClick={showModal} color="secondary">
             {I18n.t('Select Quiz')}
           </Button>
         ) : (
@@ -119,6 +119,7 @@ const KnowledgeCheckSection = ({id, entry}: KnowledgeCheckSectionProps) => {
 
   const renderQuestionOrSelectButton = () => {
     if (question) {
+      // @ts-expect-error
       return renderQuestion(question, handleCheckAnswer)
     }
     return renderSelectQuestionButton()
@@ -143,6 +144,7 @@ const KnowledgeCheckSection = ({id, entry}: KnowledgeCheckSectionProps) => {
           {showResult && (
             <Alert variant={isCorrect ? 'success' : 'error'} margin="0 small 0 0">
               <div dangerouslySetInnerHTML={{__html: renderFeedback()}} />
+              {/* @ts-expect-error */}
               <div dangerouslySetInnerHTML={{__html: renderNeutralFeedback()}} />
             </Alert>
           )}

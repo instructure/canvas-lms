@@ -46,6 +46,7 @@ function openMoveDialog(
     onMove(models) && clearSelectedItems()
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <MoveDialog
       thingsToMove={thingsToMove}

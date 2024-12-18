@@ -28,7 +28,7 @@ import {getAspectRatio} from '../../../../utils'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/image-block')
+const I18n = useI18nScope('block-editor')
 
 type ImageSizePopupProps = {
   width: number
@@ -96,6 +96,7 @@ const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSize
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Image Size')}
+          title={I18n.t('Image Size')}
         >
           <IconResize size="x-small" />
         </IconButton>
@@ -104,7 +105,7 @@ const IconSizePopup = ({width, height, maintainAspectRatio, onChange}: ImageSize
       onShowContent={handleShowContent}
       onHideContent={handleHideContent}
       on="click"
-      screenReaderLabel={I18n.t('Popover Dialog Example')}
+      screenReaderLabel={I18n.t('Image Size')}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}

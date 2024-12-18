@@ -433,7 +433,7 @@ OutcomeGradebookView.prototype.renderSectionMenu = function () {
       disabled: false,
     }
     const component = React.createElement(SectionFilter, props)
-    // eslint-disable-next-line react/no-render-return-value
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     return (this.sectionFilterMenu = ReactDOM.render(component, mountPoint))
   }
 }

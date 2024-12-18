@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import TargetGroupSelector from './TargetGroupSelector'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {smallOutcomeTree, moveOutcomeMock} from '@canvas/outcomes/mocks/Management'

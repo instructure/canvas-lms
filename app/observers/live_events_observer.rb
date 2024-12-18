@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class LiveEventsObserver < ActiveRecord::Observer
-  observe :account_notification,
+  observe :account,
+          :account_notification,
           :assignment_group,
           :assignment_override,
           :assignment,

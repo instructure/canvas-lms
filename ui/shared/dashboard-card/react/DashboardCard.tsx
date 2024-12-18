@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2015 - present Instructure, Inc.
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
+import React, {type MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 
@@ -28,7 +27,7 @@ import PublishButton from './PublishButton'
 import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'
-import {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
+import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
 
 const I18n = useI18nScope('dashcards')
 
@@ -132,6 +131,7 @@ export const DashboardCard = ({
   frontPageTitle,
   onPublishedCourse = () => {},
 }: DashboardCardProps) => {
+  // @ts-expect-error
   const handleNicknameChange = nickname => setNicknameInfo(getNicknameInfo(nickname))
 
   const getNicknameInfo = (nickname: string) => ({
@@ -142,10 +142,12 @@ export const DashboardCard = ({
   })
 
   const [nicknameInfo, setNicknameInfo] = useState(getNicknameInfo(shortName))
+  // @ts-expect-error
   const [course, setCourse] = useState(CourseActivitySummaryStore.getStateForCourse(id))
   const settingsToggle = useRef<HTMLButtonElement | null>()
 
   const handleStoreChange = useCallback(
+    // @ts-expect-error
     () => setCourse(CourseActivitySummaryStore.getStateForCourse(id)),
     [id]
   )
@@ -178,6 +180,7 @@ export const DashboardCard = ({
       courseName: originalName,
       onConfirm: removeCourseFromFavorites,
     }
+    // @ts-expect-error
     showConfirmUnfavorite(modalProps)
   }
 
@@ -245,6 +248,7 @@ export const DashboardCard = ({
       const screenReaderLabel = `${link.label} - ${nicknameInfo.nickname}`
       return (
         <DashboardCardAction
+          // @ts-expect-error
           unreadCount={unreadCount(link.icon, course?.stream)}
           iconClass={link.icon}
           linkClass={link.css_class}
@@ -275,6 +279,7 @@ export const DashboardCard = ({
           nicknameInfo={nicknameInfo}
           assetString={assetString}
           onUnfavorite={handleUnfavorite}
+          // @ts-expect-error
           isFavorited={isFavorited}
           {...reorderingProps}
           trigger={
@@ -337,6 +342,7 @@ export const DashboardCard = ({
           </div>
         </a>
         {!published && canChangeCoursePublishState && (
+          // @ts-expect-error
           <PublishButton
             courseNickname={nicknameInfo.nickname}
             defaultView={defaultView}

@@ -72,11 +72,11 @@ it('filters addable roles by blueprint and permissions', () => {
       can_create_enrollments={true}
       concluded={false}
       roles={[
-        {id: '1', base_role_name: 'TeacherEnrollment', manageable_by_user: true},
-        {id: '2', base_role_name: 'TaEnrollment', manageable_by_user: true},
-        {id: '3', base_role_name: 'StudentEnrollment', manageable_by_user: true},
-        {id: '4', base_role_name: 'ObserverEnrollment', manageable_by_user: true},
-        {id: '5', base_role_name: 'DesignerEnrollment', manageable_by_user: false},
+        {id: '1', base_role_name: 'TeacherEnrollment', addable_by_user: true},
+        {id: '2', base_role_name: 'TaEnrollment', addable_by_user: true},
+        {id: '3', base_role_name: 'StudentEnrollment', addable_by_user: true},
+        {id: '4', base_role_name: 'ObserverEnrollment', addable_by_user: true},
+        {id: '5', base_role_name: 'DesignerEnrollment', addable_by_user: false},
       ]}
     />
   )
@@ -146,22 +146,16 @@ it('shows the teacher count when needed', () => {
 })
 
 it('shows published icon and tooltip for published course', () => {
-  const { queryAllByText} = renderRow(
-    <CoursesListRow {...props} />
-  )
+  const {queryAllByText} = renderRow(<CoursesListRow {...props} />)
   expect(queryAllByText('Published').length).toBeGreaterThan(0)
 })
 
 it('shows unpublished icon and tooltip for unpublished course', () => {
-  const { queryAllByText} = renderRow(
-    <CoursesListRow {...props} workflow_state={"unpublished"} />
-  )
+  const {queryAllByText} = renderRow(<CoursesListRow {...props} workflow_state="unpublished" />)
   expect(queryAllByText('Unpublished').length).toBeGreaterThan(0)
 })
 
 it('shows completed icon and tooltip for concluded course', () => {
-  const { queryAllByText} = renderRow(
-    <CoursesListRow {...props} workflow_state={"completed"} />
-  )
+  const {queryAllByText} = renderRow(<CoursesListRow {...props} workflow_state="completed" />)
   expect(queryAllByText('Concluded').length).toBeGreaterThan(0)
 })

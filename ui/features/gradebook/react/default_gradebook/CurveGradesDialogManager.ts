@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -55,6 +54,7 @@ const CurveGradesDialogManager = {
         !gradesPublished ||
         checkpoints?.length > 0,
 
+      // @ts-expect-error
       async onSelect(onClose) {
         if (!isAdmin && assignment.inClosedGradingPeriod) {
           return $.flashError(

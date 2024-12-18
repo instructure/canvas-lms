@@ -233,7 +233,7 @@
 
 .block {
   position: relative;
-  min-height: 2rem;
+  min-height: 1rem;
   min-width: 2rem;
   &.page-block {
     background-color: transparent;
@@ -249,10 +249,6 @@
   }
 
   &.button-block {
-    a {
-      text-decoration: none;
-
-    }
   }
 }
 
@@ -578,18 +574,6 @@
   overflow: hidden;
 }
 
-
-/*
-.iframe-block__overlay {
-  position: absolute;
-  box-sizing: border-box;
-  top: 0;
-  left: 0;
-  z-index: 2;
-  background-color: rgba(0,0,0,0.1);
-}
-*/
-
 .iframe-block iframe {
   width: 100%;
   height: 100%;
@@ -751,8 +735,14 @@
   background-repeat: no-repeat;
   background-size: 100% auto;
   cursor: pointer;
+  &.grid {
+    width: 341px;
+    height: 241px;
+  }
+  &.rows {
+    width: calc(50% - 2.25rem);
+    height: 40vh;
+  }
 
-  > * { background-color: rgba(255, 255, 255, 0.7) }
-
-  &:not(:hover):not(:focus):not(:focus-within):not(.blank-card) > * { display: none; }
+  &:not(:hover):not(:focus):not(:focus-within):not(.blank-card) > .block-template-preview-card__content { display: none; }
 }

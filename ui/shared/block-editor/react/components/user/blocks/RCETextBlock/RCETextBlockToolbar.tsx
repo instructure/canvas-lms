@@ -32,7 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {changeSizeVariant} from '../../../../utils/resizeHelpers'
 
-const I18n = useI18nScope('block-editor/image-block')
+const I18n = useI18nScope('block-editor')
 
 const RCETextBlockToolbar = () => {
   const {
@@ -73,11 +73,20 @@ const RCETextBlockToolbar = () => {
             withBackground={false}
             withBorder={false}
             screenReaderLabel={I18n.t('Block Size')}
+            title={I18n.t('Block Size')}
           >
             <IconResize size="x-small" />
           </IconButton>
         }
       >
+        <Menu.Item
+          type="checkbox"
+          value="auto"
+          selected={props.sizeVariant === 'auto'}
+          onSelect={handleChangeSzVariant}
+        >
+          <Text size="small">{I18n.t('Auto')}</Text>
+        </Menu.Item>
         <Menu.Item
           type="checkbox"
           value="pixel"

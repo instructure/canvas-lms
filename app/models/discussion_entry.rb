@@ -68,7 +68,25 @@ class DiscussionEntry < ActiveRecord::Base
   validate :discussion_not_deleted, on: :create
   validate :must_be_reply_to_same_discussion, on: :create
 
-  sanitize_field :message, CanvasSanitize::SANITIZE
+  def self.sanitize_config
+    CanvasSanitize::SANITIZE.dup.tap do |cfg|
+      cfg[:attributes] = cfg[:attributes].dup
+      cfg[:attributes][:all] -= ["id"]
+      cfg[:attributes]["a"] = (cfg[:attributes]["a"] || []) + ["id"]
+      cfg[:transformers] = Array(cfg[:transformers]) + [
+        lambda do |env|
+          node = env[:node]
+          return unless node.name == "a" && node["id"]
+
+          unless node["class"]&.split&.include?("instructure_inline_media_comment")
+            node.remove_attribute("id")
+          end
+        end
+      ]
+    end
+  end
+
+  sanitize_field :message, sanitize_config
 
   # parse_and_create_mentions has to run before has_a_broadcast_policy and the
   # after_save hook it adds.
@@ -749,5 +767,11 @@ class DiscussionEntry < ActiveRecord::Base
     if will_save_change_to_message? && !new_record?
       self.edited_at = Time.now.utc
     end
+  end
+
+  def highest_level_parent_or_self
+    return self if parent_entry.nil?
+
+    parent_entry.highest_level_parent_or_self
   end
 end

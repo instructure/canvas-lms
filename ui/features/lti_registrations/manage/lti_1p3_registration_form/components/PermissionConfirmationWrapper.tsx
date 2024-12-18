@@ -18,7 +18,6 @@
 
 import React from 'react'
 import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 import {PermissionConfirmation} from '../../registration_wizard_forms/PermissionConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
@@ -33,7 +32,7 @@ export const PermissionConfirmationWrapper = ({
   overlayStore,
   internalConfig,
 }: PermissionConfirmationWrapperProps) => {
-  const [state, actions] = useOverlayStore(overlayStore)
+  const {state, ...actions} = overlayStore()
 
   return (
     <RegistrationModalBody>

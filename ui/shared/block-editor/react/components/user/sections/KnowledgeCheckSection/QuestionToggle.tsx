@@ -72,7 +72,9 @@ const QuestionToggle: React.FC<QuestionToggleProps> = ({question, onSelect}) => 
           {questionType()}
         </Text>
         <br />
-        <Text>{question.entry.title}</Text>
+        <Text>
+          {question.entry.title || I18n.t('Question %{position}', {position: question.position})}
+        </Text>
       </View>
     )
   }
@@ -91,6 +93,7 @@ const QuestionToggle: React.FC<QuestionToggleProps> = ({question, onSelect}) => 
         onToggle={handleToggle}
         data-testid={`question-toggle-${question.id}`}
       >
+        {/* @ts-expect-error */}
         <View as="div" padding="small" opacity="50%">
           {renderQuestion(question.entry)}
         </View>

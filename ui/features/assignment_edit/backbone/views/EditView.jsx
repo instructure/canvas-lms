@@ -646,7 +646,9 @@ EditView.prototype.handleAssignmentSelectionSubmit = function (data) {
       height: data['item[iframe][height]'],
     },
     lineItem: tryJsonParse(data['item[line_item]']),
-    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': tryJsonParse(data['item[preserveExistingAssignmentName]']),
+    'https://canvas.instructure.com/lti/preserveExistingAssignmentName': tryJsonParse(
+      data['item[preserveExistingAssignmentName]']
+    ),
   }
   this.handleContentItem(contentItem)
 }
@@ -675,8 +677,9 @@ EditView.prototype.handleContentItem = function (item) {
     }
   }
 
-  const newAssignmentName = (lineItem && 'label' in lineItem) ? lineItem.label : item.title
-  const replaceAssignmentName = !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
+  const newAssignmentName = lineItem && 'label' in lineItem ? lineItem.label : item.title
+  const replaceAssignmentName =
+    !item['https://canvas.instructure.com/lti/preserveExistingAssignmentName']
   if (newAssignmentName && (replaceAssignmentName || this.$name.val() === '')) {
     this.$name.val(newAssignmentName)
   }
@@ -691,14 +694,11 @@ EditView.prototype.handleContentItem = function (item) {
 }
 
 EditView.prototype.setDefaultSubmissionTypeSelectionContentType = function () {
-  return this.$externalToolsContentType.val(
-    DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
-  )
+  return this.$externalToolsContentType.val(DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE)
 }
 
 EditView.prototype.submissionTypeSelectionHasResource = function () {
-  return this.$externalToolsContentType.val() !==
-    DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
+  return this.$externalToolsContentType.val() !== DEFAULT_SUBMISSION_TYPE_SELECTION_CONTENT_TYPE
 }
 
 // used when loading an existing assignment with a resource link. otherwise
@@ -837,7 +837,7 @@ EditView.prototype.renderAnnotatedDocumentSelector = function () {
     })(this),
   }
   const element = React.createElement(AnnotatedDocumentSelector, props)
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(element, this.getAnnotatedDocumentContainer())
 }
 
@@ -904,6 +904,7 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
   if (annotatedDocument) {
     contextType = annotatedDocument.contextType
     contextId = annotatedDocument.contextId
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       React.createElement(UsageRightsSelectBox, {
         contextType,
@@ -963,7 +964,7 @@ EditView.prototype.renderDefaultExternalTool = function () {
     toolInfoMessage: ENV.DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE,
     previouslySelected: this.assignment.defaultToolSelected(),
   }
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(
     React.createElement(DefaultToolForm, props),
     document.querySelector('[data-component="DefaultToolForm"]')
@@ -1079,10 +1080,9 @@ EditView.prototype.handlePlacementExternalToolSelect = function (selection) {
 }
 
 EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
-   const resource=
-    this.submissionTypeSelectionHasResource() ?
-    {title: this.$externalToolsTitle.val() } :
-    undefined;
+  const resource = this.submissionTypeSelectionHasResource()
+    ? {title: this.$externalToolsTitle.val()}
+    : undefined
 
   const props = {
     tool: this.selectedTool,
@@ -1091,6 +1091,7 @@ EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
     onLaunchButtonClick: this.handleSubmissionTypeSelectionLaunch,
   }
 
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     React.createElement(AssignmentSubmissionTypeContainer, props),
     document.querySelector('[data-component="AssignmentSubmissionTypeContainer"]')
@@ -1138,7 +1139,7 @@ EditView.prototype.renderSubmissionTypeSelectionDialog = function (open) {
   }
   const mountPoint = document.querySelector('#assignment_submission_type_selection_tool_dialog')
   const dialog = React.createElement(ExternalToolModalLauncher, props)
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(dialog, mountPoint)
 }
 
@@ -1340,7 +1341,10 @@ EditView.prototype.getFormData = function () {
   data = this._filterAllowedExtensions(data)
   data = this._unsetGroupsIfExternalTool(data)
   data.ab_guid = this.assignment.get('ab_guid')
-  if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)) {
+  if (
+    this.groupCategorySelector &&
+    !(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)
+  ) {
     data = this.groupCategorySelector.filterFormData(data)
   }
   if (!data.post_to_sis) {
@@ -1533,7 +1537,10 @@ EditView.prototype.validateBeforeSave = function (data, errors) {
   errors = this.assignmentGroupSelector.validateBeforeSave(data, errors)
   Object.assign(errors, this.validateFinalGrader(data))
   Object.assign(errors, this.validateGraderCount(data))
-  if (!(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)) {
+  if (
+    this.groupCategorySelector &&
+    !(typeof ENV !== 'undefined' && ENV !== null ? ENV.IS_LARGE_ROSTER : void 0)
+  ) {
     errors = this.groupCategorySelector.validateBeforeSave(data, errors)
   }
   errors = this._validatePointsPossible(data, errors)
@@ -1941,7 +1948,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
   }
   const formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
   const mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(formFieldGroup, mountPoint)
 }
 
@@ -1955,7 +1962,7 @@ EditView.prototype.renderAllowedAttempts = function () {
     locked: !!this.lockedItems.settings,
   }
   const mountPoint = document.querySelector('#allowed-attempts-target')
-  // eslint-disable-next-line react/no-render-return-value
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   return ReactDOM.render(React.createElement(AllowedAttemptsWithState, props), mountPoint)
 }
 

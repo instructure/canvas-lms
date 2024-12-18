@@ -65,13 +65,9 @@ import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
 import {isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
-// @ts-expect-error
 import studentViewedAtTemplate from '../jst/student_viewed_at.handlebars'
-// @ts-expect-error
 import submissionsDropdownTemplate from '../jst/submissions_dropdown.handlebars'
-// @ts-expect-error
 import speechRecognitionTemplate from '../jst/speech_recognition.handlebars'
-// @ts-expect-error
 import unsubmittedCommentsTemplate from '../jst/unsubmitted_comment.handlebars'
 import useStore from '../stores/index'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -127,13 +123,9 @@ import {
   unmountCommentTextArea,
 } from './speed_grader.utils'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
-// @ts-expect-error
 import turnitinInfoTemplate from '../jst/_turnitinInfo.handlebars'
-// @ts-expect-error
 import turnitinScoreTemplate from '@canvas/grading/jst/_turnitinScore.handlebars'
-// @ts-expect-error
 import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
-// @ts-expect-error
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
@@ -860,7 +852,9 @@ function renderCheckpoints(submission: Submission) {
     ReactDOM.render(
       <SpeedGraderCheckpointsWrapper
         courseId={ENV.course_id}
+        // @ts-expect-error
         assignmentId={submission.assignment_id}
+        // @ts-expect-error
         studentId={submission.user_id}
       />,
       mountPoint
@@ -1351,9 +1345,9 @@ EG = {
     $grade.change(EG.handleGradeSubmit)
 
     $multiple_submissions.change(_e => {
-      // @ts-expect-error
       if (typeof EG.currentStudent.submission === 'undefined') EG.currentStudent.submission = {}
       const i =
+        // @ts-expect-error
         $('#submission_to_view').val() || EG.currentStudent.submission.submission_history.length - 1
       EG.currentStudent.submission.currentSelectedIndex = parseInt(String(i), 10)
       EG.handleSubmissionSelectionChange()
@@ -1945,6 +1939,7 @@ EG = {
       $rightside_inner.show()
     }
 
+    // @ts-expect-error
     this.renderSticker()
     if (ENV.grading_role === 'moderator') {
       this.renderProvisionalGradeSelector({showingNewStudent: true})
@@ -2064,6 +2059,7 @@ EG = {
     const method = 'POST'
     EG.toggleFullRubric('close')
 
+    // @ts-expect-error
     const promise = $.ajaxJSON(
       url,
       method,
@@ -2381,6 +2377,7 @@ EG = {
           event.preventDefault()
           $(this).prop('disabled', true).text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
 
+          // @ts-expect-error
           $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
             SpeedgraderHelpers.reloadPage()
           })
@@ -2434,7 +2431,6 @@ EG = {
     const inlineableAttachments: Attachment[] = []
     const browserableAttachments: Attachment[] = []
 
-    // @ts-expect-error
     let submission: HistoricalSubmission = {graded_at: null}
     if (submissionHistory && submissionHistory[currentSelectedIndex]) {
       submission =
@@ -2481,6 +2477,7 @@ EG = {
           vericiteAsset,
           $vericiteScoreContainer,
           $vericiteInfoContainer,
+          // @ts-expect-error
           isMostRecent
         )
       }
@@ -2507,6 +2504,7 @@ EG = {
           turnitinAsset,
           $turnitinScoreContainer,
           $turnitinInfoContainer,
+          // @ts-expect-error
           isMostRecent
         )
       }
@@ -2598,6 +2596,7 @@ EG = {
           turnitinAsset,
           $turnitinScoreContainer,
           $turnitinInfoContainer,
+          // @ts-expect-error
           isMostRecent
         )
       }
@@ -2612,6 +2611,7 @@ EG = {
           vericiteAsset,
           $vericiteScoreContainer,
           $vericiteInfoContainer,
+          // @ts-expect-error
           isMostRecent
         )
       }
@@ -2691,6 +2691,7 @@ EG = {
         renderStatusMenu(component, mountPoint)
       }
     }
+    // @ts-expect-error
     this.renderSticker()
 
     EG.showDiscussion()
@@ -2783,6 +2784,7 @@ EG = {
     const currentSubmission = this.currentStudent.submission
     if (currentSubmission && currentSubmission.workflow_state !== 'unsubmitted') {
       this.refreshSubmissionsToView()
+      // @ts-expect-error
       let index = currentSubmission.submission_history.length - 1
 
       if (EG.hasOwnProperty('initialVersion')) {
@@ -3034,6 +3036,7 @@ EG = {
       id: 'speedgrader_iframe',
       mimeType: attachment.content_type,
       attachment_id: attachment.id,
+      // @ts-expect-error
       submission_id: this.currentStudent.submission.id,
       attachment_view_inline_ping_url: attachment.view_inline_ping_url,
       attachment_preview_processing:
@@ -3335,7 +3338,9 @@ EG = {
       .showIf(comment.publishable && !isConcluded)
   },
 
+  // @ts-expect-error
   addCommentEditDraftHandler(commentElement, comment) {
+    // @ts-expect-error
     commentElement.find('.edit_comment_link').click(_event => {
       setCommentText(comment.comment, true)
     })
@@ -3437,6 +3442,7 @@ EG = {
 
     this.addCommentDeletionHandler(commentElement, comment)
     this.addCommentSubmissionHandler(commentElement, comment)
+    // @ts-expect-error
     this.addCommentEditDraftHandler(commentElement, comment)
 
     return commentElement
@@ -3557,6 +3563,7 @@ EG = {
     }
     $reassign_assignment.prop('disabled', true)
     $reassign_assignment.text(I18n.t('Reassigning ...'))
+    // @ts-expect-error
     $.ajaxJSON(
       url,
       method,
@@ -3609,7 +3616,6 @@ EG = {
     }
 
     if (ENV.group_comments_per_attempt) {
-      // @ts-expect-error
       formData['submission[attempt]'] = EG.currentDisplayedSubmission().attempt
     }
 
@@ -3664,6 +3670,7 @@ EG = {
         formError
       )
     } else {
+      // @ts-expect-error
       $.ajaxJSON(url, method, formData, formSuccess, formError)
     }
 
@@ -3893,6 +3900,7 @@ EG = {
       }
     }
 
+    // @ts-expect-error
     $.ajaxJSON(url, method, formData, submissionSuccess, submissionError)
   },
 
@@ -4006,6 +4014,7 @@ EG = {
               formatGradeOpts
             )
             grade.adjusted = GradeFormatHelper.formatGrade(
+              // @ts-expect-error
               round(submission.grade, 2),
               formatGradeOpts
             )
@@ -4219,6 +4228,7 @@ EG = {
       }
     }
 
+    // @ts-expect-error
     $.ajaxJSON(selectGradeUrl, 'PUT', {}, submitSucceeded)
   },
 
@@ -4261,7 +4271,6 @@ EG = {
     EG.currentStudent.needs_provisional_grade = data.needs_provisional_grade
 
     if (ENV.grading_role === 'moderator' && data.provisional_grades) {
-      // @ts-expect-error
       if (!EG.currentStudent.submission) EG.currentStudent.submission = {}
       EG.currentStudent.submission.provisional_grades = data.provisional_grades
       EG.currentStudent.submission.updated_at = data.updated_at
@@ -4346,7 +4355,9 @@ EG = {
     } = EG.currentDisplayedSubmission()
 
     const submission = {courseId: ENV.course_id, id, anonymousId, assignmentId, userId, sticker}
+    // @ts-expect-error
     const changeSticker = newSticker => {
+      // @ts-expect-error
       const currentSubmission = EG.currentDisplayedSubmission(true)
       currentSubmission.sticker = newSticker
 
@@ -4357,6 +4368,7 @@ EG = {
         this.currentStudent.submission.sticker = newSticker
         renderHiddenSubmissionPill(this.currentStudent.submission)
       }
+      // @ts-expect-error
       this.renderSticker()
     }
 
@@ -4366,6 +4378,7 @@ EG = {
         editable={isMostRecentAttempt}
         onStickerChange={changeSticker}
         size="small"
+        // @ts-expect-error
         submission={submission}
       />,
       mountPoint
@@ -4425,6 +4438,7 @@ function getGradingPeriods() {
   const dfd = $.Deferred()
   // treating failure as a success here since grading periods 404 when not
   // enabled
+  // @ts-expect-error
   $.ajaxJSON(
     `/api/v1/courses/${ENV.course_id}/grading_periods`,
     'GET',
@@ -4570,6 +4584,7 @@ export default {
     // @ts-expect-error
     window.jsonData = {}
     const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`
+    // @ts-expect-error
     const speedGraderJsonDfd = $.ajaxJSON(
       speedGraderJSONUrl,
       'GET',

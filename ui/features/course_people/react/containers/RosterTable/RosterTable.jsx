@@ -46,7 +46,6 @@ const RosterTable = ({data}) => {
     read_sis,
     read_reports,
     can_allow_admin_actions,
-    manage_admin_users,
     manage_students,
   } = ENV?.permissions || {}
   const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
@@ -56,7 +55,7 @@ const RosterTable = ({data}) => {
     const {totalActivityTime, htmlUrl, state} = enrollments[0]
     const canRemoveUser = enrollments.every(enrollment => enrollment.canBeRemoved)
     const canManageUser = enrollments.some(enrollment => enrollment.type !== STUDENT_ENROLLMENT)
-      ? can_allow_admin_actions || manage_admin_users
+      ? can_allow_admin_actions
       : manage_students
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null

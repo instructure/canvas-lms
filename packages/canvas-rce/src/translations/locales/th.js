@@ -647,12 +647,6 @@ const locale = {
   "multi_color_image_63d7372f": { "message": "ภาพหลายสี" },
   "multiplication_sign_15f95c22": { "message": "สัญลักษณ์คูณ" },
   "music_icon_4db5c972": { "message": "ไอคอนดนตรี" },
-  "must_be_at_least_percentage_22e373b6": {
-    "message": "จะต้องเท่ากับอย่างน้อย { percentage }%"
-  },
-  "must_be_at_least_width_x_height_px_41dc825e": {
-    "message": "จะต้องเท่ากับอย่างน้อย { width } x { height }px"
-  },
   "my_files_2f621040": { "message": "ไฟล์ของฉัน" },
   "n_th_root_9991a6e4": { "message": "รากที่ n" },
   "nabla_1e216d25": { "message": "Nabla" },

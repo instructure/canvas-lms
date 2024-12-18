@@ -46,6 +46,7 @@ const twoUser = {
   primary_email: 'user2@email.com',
 } as User
 
+// @ts-expect-error
 const twoBrotherUser = {
   user_name: 'brother_2',
   user_id: '21',
@@ -53,6 +54,7 @@ const twoBrotherUser = {
   primary_email: 'user2@email.com',
 } as DuplicateUser
 
+// @ts-expect-error
 const twoSisterUser = {
   name: 'sister_2',
   user_name: 'sister_2',
@@ -124,6 +126,7 @@ describe('TempEnrollSearchConfirmation', () => {
       sis_3: [threeSisterUser, threeBrotherUser],
     }
     const {getByText, getAllByText} = render(
+      // @ts-expect-error
       <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />
     )
 
@@ -142,6 +145,7 @@ describe('TempEnrollSearchConfirmation', () => {
       sis_3: [threeSisterUser, threeBrotherUser],
     }
     const {getByLabelText, getByText} = render(
+      // @ts-expect-error
       <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />
     )
 

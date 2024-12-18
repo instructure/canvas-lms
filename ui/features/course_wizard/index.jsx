@@ -27,6 +27,7 @@ const CourseWizard = React.lazy(() => import('./react/CourseWizard'))
  * CourseWizard React component that is the actual wizard.
  */
 function renderWizard(showWizard) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <Suspense fallback={<div />}>
       {showWizard && <CourseWizard onHideWizard={() => renderWizard(false)} />}

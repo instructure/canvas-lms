@@ -45,6 +45,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {isValidJson} from '../../common/lib/validators/isValidJson'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
+import {EditLti1p3RegistrationWizard} from '../lti_1p3_registration_form/EditLti1p3RegistrationWizard'
 
 const I18n = useI18nScope('lti_registrations')
 
@@ -160,12 +161,30 @@ const ModalBodyWrapper = ({
           }}
         />
       )
+    } else if (state.method === 'manual' && state.existingRegistrationId) {
+      return (
+        <EditLti1p3RegistrationWizard
+          accountId={accountId}
+          onSuccessfulRegistration={() => {
+            state.close()
+            state.onSuccessfulInstallation?.()
+          }}
+          registrationId={state.existingRegistrationId}
+          service={lti1p3RegistrationWizardService}
+          unregister={() => {
+            state.close()
+          }}
+          unifiedToolId={state.unifiedToolId}
+        />
+      )
     } else if (state.method === 'manual') {
       return (
         <Lti1p3RegistrationWizard
           accountId={accountId}
           service={lti1p3RegistrationWizardService}
           internalConfiguration={{
+            description: '',
+            launch_settings: {},
             title: state.manualAppName.trim(),
             target_link_uri: '',
             scopes: [],

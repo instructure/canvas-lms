@@ -22,6 +22,7 @@ import {IconPicker} from '..'
 
 describe('IconPicker', () => {
   it('should render', () => {
+    // @ts-expect-error
     const {getByText, getByTitle} = render(<IconPicker onSelect={() => {}} />)
 
     expect(getByText('Select an icon')).toBeInTheDocument()
@@ -31,6 +32,7 @@ describe('IconPicker', () => {
 
   it('should call onSelect with the selected icon', () => {
     const onSelect = jest.fn()
+    // @ts-expect-error
     const {getByTitle} = render(<IconPicker onSelect={onSelect} />)
 
     const icon = getByTitle('glasses').closest('div[role="button"]') as HTMLButtonElement
@@ -40,6 +42,7 @@ describe('IconPicker', () => {
   })
 
   it('should select the given icon', () => {
+    // @ts-expect-error
     const {getByTitle} = render(<IconPicker iconName="idea" onSelect={() => {}} />)
 
     const some_icon = getByTitle('calendar').closest('div[role="button"]') as HTMLButtonElement

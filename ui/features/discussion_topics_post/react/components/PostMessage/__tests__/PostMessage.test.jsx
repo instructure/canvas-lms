@@ -63,7 +63,7 @@ describe('PostMessage', () => {
     expect(queryByText('Thoughts')).toBeTruthy()
   })
 
-  it('displays the title', () => {
+  it('displays the title (2)', () => {
     const {queryByText} = setup()
     const screenReaderText = queryByText('Discussion Topic: Thoughts')
 

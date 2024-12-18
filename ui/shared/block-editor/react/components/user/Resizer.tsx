@@ -39,6 +39,8 @@ import {
   percentToPx,
   getElementDimensions,
   type SizeType,
+  // @ts-expect-error
+  // eslint-disable-next-line import/extensions
 } from '../../numToMeasurement'
 
 const Indicators = styled.div<{bound?: 'row' | 'column'}>`

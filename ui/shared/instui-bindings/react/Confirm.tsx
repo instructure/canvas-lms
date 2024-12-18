@@ -77,6 +77,7 @@ export function confirm(confirmProps: ConfirmProps): Promise<boolean> {
       alertContainer.removeChild(container)
       resolve(false)
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ConfirmationModal {...confirmProps} onConfirm={handleConfirm} onCancel={handleCancel} />,
       container

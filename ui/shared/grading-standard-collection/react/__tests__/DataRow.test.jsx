@@ -47,6 +47,7 @@ describe('DataRow not being edited, without a sibling', () => {
       onRowMinScoreChange() {},
     }
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   })
   afterEach(() => {
@@ -88,6 +89,7 @@ describe('DataRow being edited', () => {
       onDeleteRow() {},
     }
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   })
 
@@ -103,6 +105,7 @@ describe('DataRow being edited', () => {
   test('on change, accepts arbitrary input and saves to state', function () {
     const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.change(dataRow.minScoreInput, {target: {value: 'A'}})
     deepEqual(dataRow.renderMinScore(), 'A')
@@ -131,6 +134,7 @@ describe('DataRow being edited', () => {
   test('on blur, does not call onRowMinScoreChange if the input parsed value is less than 0', function () {
     const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.change(dataRow.minScoreInput, {target: {value: '-1'}})
     Simulate.blur(dataRow.minScoreInput)
@@ -141,6 +145,7 @@ describe('DataRow being edited', () => {
   test('on blur, does not call onRowMinScoreChange if the input parsed value is greater than 100', function () {
     const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.change(dataRow.minScoreInput, {target: {value: '101'}})
     Simulate.blur(dataRow.minScoreInput)
@@ -151,6 +156,7 @@ describe('DataRow being edited', () => {
   test('on blur, calls onRowMinScoreChange when input parsed value is between 0 and 100', function () {
     const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.change(dataRow.minScoreInput, {target: {value: '88.'}})
     Simulate.blur(dataRow.minScoreInput)
@@ -171,6 +177,7 @@ describe('DataRow being edited', () => {
   test('on blur, does not call onRowMinScoreChange when input has not changed', function () {
     const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.blur(dataRow.minScoreInput)
     ok(changeMinScore.notCalled)
@@ -180,6 +187,7 @@ describe('DataRow being edited', () => {
   test('calls onRowNameChange when input changes', function () {
     const changeMinScore = sandbox.spy(props, 'onRowNameChange')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.change(dataRow.refs.nameInput, {target: {value: 'F'}})
     ok(changeMinScore.calledOnce)
@@ -189,6 +197,7 @@ describe('DataRow being edited', () => {
   test('calls onDeleteRow when the delete button is clicked', function () {
     const deleteRow = sandbox.spy(props, 'onDeleteRow')
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
     Simulate.click(dataRow.deleteButtonRef)
     ok(deleteRow.calledOnce)
@@ -207,6 +216,7 @@ describe('DataRow with a sibling', () => {
       onRowMinScoreChange() {},
     }
     const DataRowElement = <DataRow {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   })
 

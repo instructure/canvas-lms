@@ -21,6 +21,7 @@ import ReactDOM from 'react-dom'
 import StudentLastAttended from './StudentLastAttended'
 
 export default function initLastAttended(rootElement, courseID, studentID, lastAttendedDate) {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <StudentLastAttended
       defaultDate={lastAttendedDate}

@@ -90,6 +90,7 @@ const defaultProps = () => ({
 })
 
 // using ReactDOM instead of TestUtils to render because of InstUI
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = props => ReactDOM.render(<RangesView {...props} />, container)
 
 // skip if webpack: CNVS-33473

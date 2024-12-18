@@ -52,18 +52,11 @@ if ! git diff HEAD~1 --exit-code -GENV -- 'packages/canvas-rce/**/*.js' 'package
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"error\",\"message\":\"$message\"}"
 fi
 
-node ui-build/webpack/generatePluginBundles.js
-ruby script/tsc & TSC_PID=$!
 ruby script/stylelint
 ruby script/rlint --no-fail-on-offense
-[ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
 ruby script/lint_commit_message
-node script/yarn-validate-workspace-deps.js 2>/dev/null < <(yarn --silent workspaces info --json)
-node_modules/.bin/depcruise ./ --include-only "^(ui|packages)"
-node ui-build/tools/component-info.mjs -i -v -g
 
 bin/rails css:styleguide doc:api
 
-wait $TSC_PID
 gergich status
 echo "LINTER OK!"

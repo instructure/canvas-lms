@@ -56,6 +56,7 @@ function ClearBadgeCountsButton({courseId, userId}: ClearBadgeCountsButtonProps)
       color="primary"
       margin="small"
       onClick={handleClick}
+      // @ts-expect-error
       renderIcon={IconAlertsSolid}
       interaction={interaction}
     >

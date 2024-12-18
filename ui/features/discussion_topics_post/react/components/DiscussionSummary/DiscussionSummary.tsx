@@ -46,8 +46,11 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
   const [disliked, setDisliked] = useState<boolean>(false)
   const [isFeedbackLoading, setIsFeedbackLoading] = useState(false)
 
+  // @ts-expect-error
   const contextType = ENV.context_type.toLowerCase()
+  // @ts-expect-error
   const contextId = ENV.context_id
+  // @ts-expect-error
   const apiUrlPrefix = `/api/v1/${contextType}s/${contextId}/discussion_topics/${ENV.discussion_topic_id}`
 
   const likeAction = liked ? 'reset_like' : 'like'
@@ -65,7 +68,9 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
             _action: action,
           },
         })
+        // @ts-expect-error
         setLiked(json.liked)
+        // @ts-expect-error
         setDisliked(json.disliked)
       } catch (error) {
         setOnFailure(
@@ -118,6 +123,7 @@ export const DiscussionSummary: React.FC<DiscussionSummaryProps> = props => {
 
   const fetchSummary = useCallback(async () => {
     try {
+      // @ts-expect-error
       setSummary(await getDiscussionSummary())
       setPreviousUserInput(userInput)
     } catch (error: any) {

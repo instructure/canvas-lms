@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import {paceContextsActions} from '../actions/pace_contexts'
 
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {APIPaceContextTypes, OrderType, SortableColumn, StoreState} from '../types'
+import type {APIPaceContextTypes, OrderType, SortableColumn, StoreState} from '../types'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -59,12 +58,14 @@ export const Search = ({
   currentOrderType,
   currentSortBy,
 }: ComponentProps) => {
+  // @ts-expect-error
   const handleClear = e => {
     e.stopPropagation()
     setSearchTerm('')
     fetchPaceContexts({contextType, page: 1, searchTerm: ''})
   }
 
+  // @ts-expect-error
   const handleSearch = e => {
     e.preventDefault()
 
@@ -164,4 +165,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 export default connect(mapStateToProps, {
   fetchPaceContexts: paceContextsActions.fetchPaceContexts,
   setSearchTerm: paceContextsActions.setSearchTerm,
+  // @ts-expect-error
 })(Search)

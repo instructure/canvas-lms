@@ -41,7 +41,11 @@ const defaultProps: ProxyUploadModalProps = {
 
 function renderComponent(overrideProps = {}) {
   const props = {...defaultProps, ...overrideProps}
-  return render(<MockedProvider><ProxyUploadModal {...props} /></MockedProvider>)
+  return render(
+    <MockedProvider>
+      <ProxyUploadModal {...props} />
+    </MockedProvider>
+  )
 }
 
 describe('ProxyUploadModal', () => {

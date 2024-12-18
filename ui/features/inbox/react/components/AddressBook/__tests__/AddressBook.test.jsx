@@ -128,24 +128,33 @@ describe('Address Book Component', () => {
       describe('can_add_pronouns disabled', () => {
         it('do not show up pronouns', async () => {
           const mockSetIsMenuOpen = jest.fn()
-          const {queryByText} = setup({...defaultProps, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
+          const {queryByText} = setup({
+            ...defaultProps,
+            isMenuOpen: true,
+            isSubMenu: true,
+            setIsMenuOpen: mockSetIsMenuOpen,
+          })
           await screen.findByTestId('address-book-popover')
           expect(queryByText('he/him')).not.toBeInTheDocument()
         })
-
       })
       describe('can_add_pronouns enabled', () => {
         beforeEach(() => {
           ENV = {
             SETTINGS: {
-              can_add_pronouns: true
-            }
+              can_add_pronouns: true,
+            },
           }
         })
 
-        it('Show up pronouns if pronouns is not null', async ()  => {
+        it('Show up pronouns if pronouns is not null', async () => {
           const mockSetIsMenuOpen = jest.fn()
-          const {getByText} = setup({...defaultProps, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
+          const {getByText} = setup({
+            ...defaultProps,
+            isMenuOpen: true,
+            isSubMenu: true,
+            setIsMenuOpen: mockSetIsMenuOpen,
+          })
           await screen.findByTestId('address-book-popover')
           expect(getByText('he/him')).toBeInTheDocument()
         })
@@ -154,7 +163,12 @@ describe('Address Book Component', () => {
           const mockSetIsMenuOpen = jest.fn()
           const props = {...defaultProps}
           props.menuData.userData[0].pronouns = null
-          const {queryByText} = setup({...props, isMenuOpen: true, isSubMenu: true, setIsMenuOpen: mockSetIsMenuOpen})
+          const {queryByText} = setup({
+            ...props,
+            isMenuOpen: true,
+            isSubMenu: true,
+            setIsMenuOpen: mockSetIsMenuOpen,
+          })
           await screen.findByTestId('address-book-popover')
           expect(queryByText('he/him')).not.toBeInTheDocument()
         })

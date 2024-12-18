@@ -54,34 +54,34 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   initializeDateGroups() {
-    const assignments = flatten(this.assignmentGroups.map(ag => ag.get('assignments').models));
-    const undated = [];
-    const past = [];
-    const overdue = [];
-    const upcoming = [];
+    const assignments = flatten(this.assignmentGroups.map(ag => ag.get('assignments').models))
+    const undated = []
+    const past = []
+    const overdue = []
+    const upcoming = []
 
     each(assignments, a => {
-      let group;
+      let group
       if (a.hasSubAssignments()) {
-        group = a.getCheckpointDateGroup();
+        group = a.getCheckpointDateGroup()
       } else {
-        group = a.getDateSortGroup();
+        group = a.getDateSortGroup()
       }
-      switch(group) {
+      switch (group) {
         case 'undated':
-          undated.push(a);
-          break;
+          undated.push(a)
+          break
         case 'upcoming':
-          upcoming.push(a);
-          break;
+          upcoming.push(a)
+          break
         case 'overdue':
-          overdue.push(a);
-          break;
+          overdue.push(a)
+          break
         case 'past':
-          past.push(a);
-          break;
+          past.push(a)
+          break
       }
-    });
+    })
     const overdue_group = new AssignmentGroup({
       id: 'overdue',
       name: I18n.t('overdue_assignments', 'Overdue Assignments'),
@@ -149,6 +149,7 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   renderToggle() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>

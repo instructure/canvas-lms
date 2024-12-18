@@ -315,6 +315,10 @@ module Api::V1::Assignment
       end
     end
 
+    if opts[:include_has_rubric]
+      hash["has_rubric"] = assignment.active_rubric_association?
+    end
+
     unless opts[:exclude_response_fields].include?("rubric")
       if assignment.active_rubric_association?
         hash["use_rubric_for_grading"] = !!assignment.rubric_association.use_for_grading

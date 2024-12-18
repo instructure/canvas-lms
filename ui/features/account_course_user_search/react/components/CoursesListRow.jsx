@@ -120,9 +120,7 @@ export default class CoursesListRow extends React.Component {
   }
 
   getAvailableRoles = () => {
-    const filterFunc = ENV.FEATURES.granular_permissions_manage_users
-      ? role => role.addable_by_user
-      : role => role.manageable_by_user
+    const filterFunc = role => role.addable_by_user
 
     let roles = (this.props.roles || []).filter(filterFunc)
     if (this.props.blueprint) {
@@ -235,9 +233,7 @@ export default class CoursesListRow extends React.Component {
 
     return (
       <Table.Row>
-        <Table.RowHeader textAlign="center">
-          {this.renderCourseStatusIcon()}
-        </Table.RowHeader>
+        <Table.RowHeader textAlign="center">{this.renderCourseStatusIcon()}</Table.RowHeader>
         <Table.Cell>
           <a href={url}>
             <span style={{paddingRight: '0.5em'}}>{name}</span>

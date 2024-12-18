@@ -1320,6 +1320,8 @@ Returns the title of the assignment that was launched.
 ## Canvas.assignment.pointsPossible
 Returns the points possible of the assignment that was launched.
 
+This is an alias of `LineItem.resultValue.max`.
+
 **Availability**: *when launched as an assignment*  
 
 
@@ -1683,4 +1685,16 @@ This variable helps tools handle the merged user's history.
 
 ```
 123,456,789
+```
+## LineItem.resultValue.max
+Returns the points possible of the assignment that was launched.
+For other LineItem properties, use the LTI 1.3 <a href="file.assignment_tools.html">Assignments and Grade Services</a>
+
+This is an alias of `Canvas.assignment.pointsPossible`.
+
+**Availability**: *when launched as an assignment*  
+
+
+```
+100
 ```

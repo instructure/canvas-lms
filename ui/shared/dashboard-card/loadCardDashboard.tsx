@@ -59,6 +59,7 @@ export class CardDashboardLoader {
 
   renderIntoDOM = (dashboardCards: Card[]) => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       createDashboardCards(dashboardCards, DashboardCard, {observedUserId: this.observedUserId}),
       dashboardContainer

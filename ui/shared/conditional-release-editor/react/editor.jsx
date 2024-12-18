@@ -108,7 +108,7 @@ class ConditionalReleaseEditor {
     const errors = this.getErrors()
     if (errors.length > 0) {
       const index = errors[0].index
-      document.querySelectorAll('.cr-percent-input__input')[index].focus()
+      document.querySelectorAll('.cr-percent-input')[index].querySelectorAll('input')[0].focus()
     }
   }
 }

@@ -39,6 +39,7 @@ export default {
       selectedOption: state.selectedOption,
     }))(ChooseMasteryPath)
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Provider store={store}>
         <ConnectedApp selectOption={boundActions.selectOption} />

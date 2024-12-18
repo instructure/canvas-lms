@@ -28,10 +28,12 @@ const accountId = '42'
 
 jest.mock('@canvas/do-fetch-api-effect')
 beforeEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
 afterEach(() => {
+  // @ts-expect-error
   doFetchApi.mockClear()
 })
 
@@ -59,6 +61,7 @@ describe('useGradingSchemeCreateHook', () => {
       scaling_factor: 1.0,
     }
 
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: gradingSchemeTemplate,
@@ -68,6 +71,7 @@ describe('useGradingSchemeCreateHook', () => {
       courseId,
       gradingSchemeTemplate
     )
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/courses/${courseId}/grading_schemes`,
@@ -97,6 +101,7 @@ describe('useGradingSchemeCreateHook', () => {
       scaling_factor: 1.0,
     }
 
+    // @ts-expect-error
     doFetchApi.mockResolvedValue({
       response: {ok: true},
       json: gradingSchemeTemplate,
@@ -106,6 +111,7 @@ describe('useGradingSchemeCreateHook', () => {
       accountId,
       gradingSchemeTemplate
     )
+    // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
     expect(lastCall[0]).toMatchObject({
       path: `/accounts/${accountId}/grading_schemes`,

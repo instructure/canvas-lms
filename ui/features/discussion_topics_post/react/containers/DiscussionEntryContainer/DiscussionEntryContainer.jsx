@@ -103,7 +103,12 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
       <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
         <Flex direction={props.isTopic ? direction : 'row'}>
           {hasAuthor && (
-            <Flex.Item overflowY="visible" shouldGrow={true} shouldShrink={true} padding={authorInfoPadding}>
+            <Flex.Item
+              overflowY="visible"
+              shouldGrow={true}
+              shouldShrink={true}
+              padding={authorInfoPadding}
+            >
               <AuthorInfo
                 author={props.author}
                 threadParent={props.threadParent}

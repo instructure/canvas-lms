@@ -499,6 +499,7 @@ const Grid = {
         },
         null
       )
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(menu, node)
     },
     studentHeaderRowCell(node, _column, grid) {
@@ -511,6 +512,7 @@ const Grid = {
         },
         null
       )
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(menu, node)
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {

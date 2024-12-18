@@ -16,38 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useState} from 'react'
+import {useEditor} from '@craftjs/core'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
-import {ColorPicker, type ColorSpec, type TabSpec} from '@instructure/canvas-rce'
+import {ColorPicker, type ColorSpec, type TabsSpec} from '@instructure/canvas-rce'
+import {getColorsInUse, type ColorsInUse} from '../../../utils'
 
 import {useScope} from '@canvas/i18n'
 
 const I18n = useScope('block-editor')
 
 type ToolbarColorProps = {
-  tabs: TabSpec
+  tabs: TabsSpec
   onChange: (newcolors: ColorSpec) => void
 }
 
 const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
+  const {query} = useEditor()
   const [isShowingContent, setIsShowingContent] = useState(false)
-  const [recreateKey, setRecreateKey] = useState(0)
-
-  useEffect(() => {
-    if (!isShowingContent) {
-      setRecreateKey(Date.now())
-    }
-  }, [isShowingContent])
+  const [colorsInUse, setColorsInUse] = useState<ColorsInUse>(getColorsInUse(query))
 
   const handleShowContent = useCallback(() => {
+    setColorsInUse(getColorsInUse(query))
     setIsShowingContent(true)
-  }, [])
-
-  const handleHideContent = useCallback(() => {
-    setIsShowingContent(false)
-  }, [])
+  }, [query])
 
   const handleCancel = useCallback(() => {
     setIsShowingContent(false)
@@ -61,29 +55,45 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
     [onChange]
   )
 
+  const handleKey = useCallback((e: React.KeyboardEvent) => {
+    // capture the arrow keys so they change tabs in the ColorPicker and don't
+    // change focus to the next element in the toolbar
+    if (['ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowLeft'].includes(e.key)) {
+      e.stopPropagation()
+    }
+  }, [])
+
   return (
     <Popover
-      key={recreateKey}
       renderTrigger={
         <IconButton
           color="secondary"
           withBackground={false}
           withBorder={false}
           screenReaderLabel={I18n.t('Color')}
+          title={I18n.t('Color')}
         >
           <IconBackgroundColor size="x-small" />
         </IconButton>
       }
       isShowingContent={isShowingContent}
       onShowContent={handleShowContent}
-      onHideContent={handleHideContent}
+      onHideContent={handleCancel}
       on="click"
       screenReaderLabel={I18n.t('Color popup')}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       shouldCloseOnDocumentClick={true}
     >
-      <ColorPicker tabs={tabs} onCancel={handleCancel} onSave={handleSubmit} />
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+      <div style={{maxHeight: '80vh', overflowY: 'auto'}} onKeyDown={handleKey}>
+        <ColorPicker
+          tabs={tabs}
+          colorsInUse={colorsInUse}
+          onCancel={handleCancel}
+          onSave={handleSubmit}
+        />
+      </div>
     </Popover>
   )
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {humanReadableSize} from '../utils'
+import {humanReadableSize, parseDateToISOString} from '../utils'
 
 describe('humanReadableSize', () => {
   it('returns Bytes', () => {

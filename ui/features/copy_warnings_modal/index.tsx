@@ -24,6 +24,7 @@ import CopyWarningsModal from './react/CopyWarningsModal'
 ready(() => {
   const container = document.querySelector('#warning_messages_modal_container')
   if (container && ENV.EXPORT_WARNINGS && ENV.EXPORT_WARNINGS.length > 0) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<CopyWarningsModal errorMessages={ENV.EXPORT_WARNINGS} />, container)
   }
 })

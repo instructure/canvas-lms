@@ -51,6 +51,7 @@ export default class CustomColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<CustomColumnHeader {...props} />, $container)
   }
 

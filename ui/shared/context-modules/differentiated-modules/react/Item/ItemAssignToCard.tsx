@@ -89,6 +89,7 @@ export type ItemAssignToCardProps = {
   ) => void
   onCardDatesChange?: (cardId: string, dateAttribute: string, dateValue: string | null) => void
   selectedAssigneeIds: string[]
+  initialAssigneeOptions?: AssigneeOption[]
   everyoneOption?: AssigneeOption
   customAllOptions?: AssigneeOption[]
   customIsLoading?: boolean
@@ -127,6 +128,7 @@ export default forwardRef(function ItemAssignToCard(
     onValidityChange,
     onCardAssignmentChange,
     selectedAssigneeIds,
+    initialAssigneeOptions,
     everyoneOption,
     customAllOptions,
     customIsLoading,
@@ -429,11 +431,12 @@ export default forwardRef(function ItemAssignToCard(
           selectedOptionIds={selectedAssigneeIds}
           everyoneOption={everyoneOption}
           courseId={courseId}
-          defaultValues={[]}
+          defaultValues={initialAssigneeOptions || []}
           clearAllDisabled={true}
           size="medium"
           messages={showValidations ? error : []}
           disabledOptionIds={disabledOptionIdsRef?.current}
+          // @ts-expect-error
           disableFetch={!isOpenRef?.current ?? false}
           customAllOptions={customAllOptions}
           customIsLoading={customIsLoading}
@@ -444,6 +447,7 @@ export default forwardRef(function ItemAssignToCard(
           disabledOptionIdsRef={disabledOptionIdsRef}
           itemType={itemType}
         />
+        {/* @ts-expect-error */}
         {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (
           <DueDateTimeInput
             {...{
@@ -462,6 +466,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
+        {/* @ts-expect-error */}
         {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
           <ReplyToTopicDueDateTimeInput
             {...{
@@ -482,6 +487,7 @@ export default forwardRef(function ItemAssignToCard(
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
         )}
+        {/* @ts-expect-error */}
         {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
           <RequiredRepliesDueDateTimeInput
             {...{

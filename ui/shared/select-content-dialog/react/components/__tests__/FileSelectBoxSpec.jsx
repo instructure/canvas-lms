@@ -24,6 +24,7 @@ let wrapper
 
 const renderComponent = () => {
   const ref = React.createRef()
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<FileSelectBox ref={ref} contextString="test_3" />, wrapper)
   return ref.current
 }

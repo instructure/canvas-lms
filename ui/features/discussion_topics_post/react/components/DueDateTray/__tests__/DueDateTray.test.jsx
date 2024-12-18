@@ -38,7 +38,7 @@ beforeAll(() => {
 })
 
 const overrides = [
-  AssignmentOverride.mock({title: 'assignment override 1', adhocStudents: null}),
+  AssignmentOverride.mock({title: 'assignment override 1', set: null}),
   AssignmentOverride.mock({
     id: 'QXNzaWdubWVudE92ZXJyaWRlLTI=',
     _id: '2',
@@ -46,7 +46,7 @@ const overrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-07T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    adhocStudents: null,
+    set: null,
   }),
   AssignmentOverride.mock({
     id: 'QXNzaWdubWVudE92ZXJyaWRlLTM=',
@@ -55,7 +55,7 @@ const overrides = [
     dueAt: '2021-05-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    adhocStudents: null,
+    set: null,
   }),
 ]
 
@@ -113,7 +113,7 @@ describe('DueDateTray', () => {
       const {getByText} = setup({
         assignmentOverrides: [
           AssignmentOverride.mock({
-            adhocStudents: AdhocStudents.mock({
+            set: AdhocStudents.mock({
               students,
             }),
           }),
@@ -138,7 +138,7 @@ describe('DueDateTray', () => {
       const {getByText} = setup({
         assignmentOverrides: [
           AssignmentOverride.mock({
-            adhocStudents: AdhocStudents.mock({
+            set: AdhocStudents.mock({
               students,
             }),
           }),

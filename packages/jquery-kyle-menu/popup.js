@@ -183,6 +183,14 @@ $.widget('ui.popup', {
       },
       mouseup(event) {
         clearTimeout(this.closeTimer)
+        // use a timer to prevent closing the popup immediately when it has larger height than window
+        // mouseUpTimer is used in the onclick event listener to prevent closing the popup if set
+        this.mouseUpTimer = window.setTimeout(
+          function () {
+            delete this.mouseUpTimer
+          }.bind(this),
+          0
+        )
       },
     })
 
@@ -199,7 +207,8 @@ $.widget('ui.popup', {
       click(event) {
         if (
           this.isOpen &&
-          !$(event.target).closest(this.element.add(this.options.trigger)).length
+          !$(event.target).closest(this.element.add(this.options.trigger)).length &&
+          !this.mouseUpTimer
         ) {
           this.close(event)
         }

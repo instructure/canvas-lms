@@ -47,6 +47,7 @@ import type {Submission, Student, Enrollment} from '../../../../../api.d'
 import {enrollment, student, enrollmentFilter, appliedFilters, student2} from './fixtures'
 import type {CamelizedGradingPeriod} from '@canvas/grading/grading'
 
+// @ts-expect-error
 const unsubmittedSubmission: Submission = {
   anonymous_id: 'dNq5T',
   assignment_id: '32',

@@ -105,16 +105,19 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
     })
 
     hooks.afterEach(() => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render.restore()
     })
 
     test('renders with React', () => {
       createEditor()
+      // eslint-disable-next-line no-restricted-properties
       strictEqual(ReactDOM.render.callCount, 1)
     })
 
     test('renders an AssignmentRowCell', () => {
       createEditor()
+      // eslint-disable-next-line no-restricted-properties
       const [element] = ReactDOM.render.lastCall.args
       equal(element.type.name, 'AssignmentRowCell')
     })
@@ -122,12 +125,14 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
     test('renders a ReadOnlyCell when the grade is not editable', () => {
       gradebook.isGradeEditable.returns(false)
       createEditor()
+      // eslint-disable-next-line no-restricted-properties
       const [element] = ReactDOM.render.lastCall.args
       equal(element.type.name, 'AssignmentRowCell')
     })
 
     test('renders into the given container', () => {
       createEditor()
+      // eslint-disable-next-line no-restricted-properties
       const [, /* element */ container] = ReactDOM.render.lastCall.args
       strictEqual(container, $container)
     })

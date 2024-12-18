@@ -85,6 +85,7 @@ ready(() => {
     const container = document.getElementById('create_subject_modal_container')
     if (container) {
       startButton.addEventListener('click', () => {
+        // eslint-disable-next-line no-restricted-properties
         ReactDOM.render(
           <CreateCourseModal
             isModalOpen={true}

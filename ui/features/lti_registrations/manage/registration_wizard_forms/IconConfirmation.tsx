@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback} from 'react'
+import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -39,11 +39,13 @@ import {
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
+import type {InternalLtiConfiguration} from '../model/internal_lti_configuration/InternalLtiConfiguration'
 
 const I18n = useI18nScope('lti_registration.wizard')
 export type IconConfirmationProps = {
+  internalConfig?: InternalLtiConfiguration
   name: string
-  defaultIconUrl?: string
+  topLevelDefaultIconUrl?: string
   developerKeyId?: DeveloperKeyId
   allPlacements: LtiPlacement[]
   placementIconOverrides: Partial<Record<LtiPlacementWithIcon, string>>
@@ -55,7 +57,8 @@ export type IconConfirmationProps = {
 
 export const IconConfirmation = ({
   name,
-  defaultIconUrl,
+  topLevelDefaultIconUrl,
+  internalConfig,
   developerKeyId,
   allPlacements,
   placementIconOverrides,
@@ -104,12 +107,16 @@ export const IconConfirmation = ({
             <Text>{I18n.t('Choose what icon displays in each placement (optional).')}</Text>
             <Flex direction="column" gap="medium" margin="medium 0 medium 0">
               {placementsWithIcons.map(placement => {
+                // prefer the placement-specific icon, but fall back to the top-level default
+                const defaultIcon =
+                  internalConfig?.placements?.find(p => p.placement === placement)?.icon_url ??
+                  topLevelDefaultIconUrl
                 return (
                   <IconOverrideInput
                     key={placement}
                     placement={placement}
                     toolName={name}
-                    defaultIconUrl={defaultIconUrl}
+                    defaultIconUrl={defaultIcon}
                     developerKeyId={developerKeyId}
                     inputUrl={actualInputValues[placement]}
                     imageUrl={placementIconOverrides[placement]}
@@ -199,13 +206,15 @@ const IconOverrideInput = React.memo(
       placement: i18nLtiPlacement(placement),
     })
 
+    const renderedImageUrl = imageUrl ?? defaultIconUrl
+
     return (
       <div key={placement}>
         <TextInput
           renderLabel={<Heading level="h4">{i18nLtiPlacement(placement)}</Heading>}
           placeholder={defaultIconUrl ?? ''}
           renderAfterInput={
-            imageUrl && isValidHttpUrl(imageUrl) ? (
+            renderedImageUrl && isValidHttpUrl(renderedImageUrl) ? (
               <div
                 style={{
                   overflow: 'hidden',
@@ -214,7 +223,7 @@ const IconOverrideInput = React.memo(
                 }}
               >
                 <Img
-                  src={imageUrl}
+                  src={renderedImageUrl}
                   alt={imgTitle}
                   loading="lazy"
                   height="2rem"

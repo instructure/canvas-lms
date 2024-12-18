@@ -669,6 +669,7 @@ QUnit.module('direct share', hooks => {
   })
 
   hooks.afterEach(() => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render.restore()
     fakeENV.teardown()
     $('#direct-share-mount-point').remove()
@@ -693,12 +694,14 @@ QUnit.module('direct share', hooks => {
     const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
     view.$(`.al-trigger`).simulate('click')
     view.$(`.quiz-copy-to`).simulate('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.firstCall.args
     equal(args[0].props.open, true)
     equal(args[0].props.sourceCourseId, 123)
     deepEqual(args[0].props.contentSelection, {quizzes: [1]})
 
     clearTimeout(args[0].props.onDismiss())
+    // eslint-disable-next-line no-restricted-properties
     equal(ReactDOM.render.lastCall.args[0].props.open, false)
   })
 
@@ -707,12 +710,14 @@ QUnit.module('direct share', hooks => {
     const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
     view.$(`.al-trigger`).simulate('click')
     view.$(`.quiz-copy-to`).simulate('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.firstCall.args
     equal(args[0].props.open, true)
     equal(args[0].props.sourceCourseId, 123)
     deepEqual(args[0].props.contentSelection, {assignments: [1]})
 
     clearTimeout(args[0].props.onDismiss())
+    // eslint-disable-next-line no-restricted-properties
     equal(ReactDOM.render.lastCall.args[0].props.open, false)
   })
 
@@ -721,12 +726,14 @@ QUnit.module('direct share', hooks => {
     const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
     view.$(`.al-trigger`).simulate('click')
     view.$(`.quiz-send-to`).simulate('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.firstCall.args
     equal(args[0].props.open, true)
     equal(args[0].props.sourceCourseId, 123)
     deepEqual(args[0].props.contentShare, {content_type: 'quiz', content_id: '1'})
 
     clearTimeout(args[0].props.onDismiss())
+    // eslint-disable-next-line no-restricted-properties
     equal(ReactDOM.render.lastCall.args[0].props.open, false)
   })
 
@@ -735,12 +742,14 @@ QUnit.module('direct share', hooks => {
     const view = createView(quiz, {DIRECT_SHARE_ENABLED: true})
     view.$(`.al-trigger`).simulate('click')
     view.$(`.quiz-send-to`).simulate('click')
+    // eslint-disable-next-line no-restricted-properties
     const args = ReactDOM.render.firstCall.args
     equal(args[0].props.open, true)
     equal(args[0].props.sourceCourseId, 123)
     deepEqual(args[0].props.contentShare, {content_type: 'assignment', content_id: '1'})
 
     clearTimeout(args[0].props.onDismiss())
+    // eslint-disable-next-line no-restricted-properties
     equal(ReactDOM.render.lastCall.args[0].props.open, false)
   })
 })

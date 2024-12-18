@@ -244,7 +244,6 @@ describe('TempEnrollAssign', () => {
     })
 
     it('displays Local and Account datetime in correct timezones', async () => {
-      // @ts-expect-error the only test that requires TIMEZONE
       window.ENV = {...window.ENV, TIMEZONE: 'America/Denver'}
 
       const {findAllByLabelText, findAllByText} = render(<TempEnrollAssign {...props} />)

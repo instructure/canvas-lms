@@ -80,6 +80,7 @@ QUnit.module('DueDates', {
     }
     this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
   },
   teardown() {
@@ -409,6 +410,7 @@ QUnit.module('DueDates with grading periods', {
     }
     this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
     this.dueDates.handleStudentStoreChange()
     this.dropdownOptions = this.dueDates.validDropdownOptions().map(opt => opt.name)
@@ -504,6 +506,7 @@ test('fetchAdhocStudents does not fire until state is set', function () {
   const DueDatesElement = <DueDates {...this.props} />
 
   // render with the props (which should provide info for fetchStudentsByID call)
+  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
   this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
   this.dueDates.setState({
     rows: [
@@ -555,6 +558,7 @@ QUnit.module('DueDates important dates', {
     }
     this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
+    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
     this.dueDates = ReactDOM.render(DueDatesElement, $('<div>').appendTo('body')[0])
   },
   teardown() {

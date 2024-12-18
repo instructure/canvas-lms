@@ -101,6 +101,7 @@ ready(() => {
 
   const bouncedEmailsMountPoint = document.getElementById('bouncedEmailsPane')
   if (bouncedEmailsMountPoint) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<BouncedEmailsView accountId={ENV.ACCOUNT_ID} />, bouncedEmailsMountPoint)
   }
 })

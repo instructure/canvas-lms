@@ -28,9 +28,9 @@ import type {LtiPlacement} from '../../model/LtiPlacement'
 describe('NamingConfirmationWrapper', () => {
   it('renders the NamingConfirmation', () => {
     const config = mockInternalConfiguration()
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
 
-    render(<NamingConfirmationWrapper config={config} overlayStore={overlayStore} />)
+    render(<NamingConfirmationWrapper internalConfig={config} overlayStore={overlayStore} />)
 
     expect(screen.getByText('Nickname')).toBeInTheDocument()
     expect(screen.getByText('Description')).toBeInTheDocument()
@@ -38,10 +38,10 @@ describe('NamingConfirmationWrapper', () => {
 
   it('lets users change the nickname', async () => {
     const config = mockInternalConfiguration()
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
     overlayStore.getState().setAdminNickname('Foo')
 
-    render(<NamingConfirmationWrapper config={config} overlayStore={overlayStore} />)
+    render(<NamingConfirmationWrapper internalConfig={config} overlayStore={overlayStore} />)
 
     const input = screen.getByLabelText(/Administration Nickname/i)
     expect(input).toHaveValue('Foo')
@@ -55,11 +55,11 @@ describe('NamingConfirmationWrapper', () => {
 
   it('lets users change the description', async () => {
     const config = mockInternalConfiguration({description: 'Foo'})
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
 
     overlayStore.getState().setDescription('Foo')
 
-    render(<NamingConfirmationWrapper config={config} overlayStore={overlayStore} />)
+    render(<NamingConfirmationWrapper internalConfig={config} overlayStore={overlayStore} />)
 
     const input = screen.getByLabelText(/Choose a description/i)
     expect(input).toHaveValue('Foo')
@@ -76,15 +76,15 @@ describe('NamingConfirmationWrapper', () => {
     const config = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}, {placement: 'global_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
 
-    render(<NamingConfirmationWrapper config={config} overlayStore={overlayStore} />)
+    render(<NamingConfirmationWrapper internalConfig={config} overlayStore={overlayStore} />)
 
     for (const placement of placements) {
-      const el = screen.getByLabelText(i18nLtiPlacement(placement))
+      const el = screen.getByLabelText(new RegExp(i18nLtiPlacement(placement)))
       expect(el).toBeInTheDocument()
-      // Defaults to the registration's title
-      expect(el).toHaveValue('title')
+      // Defaults to the configuration's launch setting's text
+      expect(el).toHaveAttribute('placeholder', 'Default Title')
       // eslint-disable-next-line no-await-in-loop
       await userEvent.clear(el)
       // eslint-disable-next-line no-await-in-loop
@@ -98,9 +98,9 @@ describe('NamingConfirmationWrapper', () => {
     const config = mockInternalConfiguration({
       placements: [{placement: 'course_navigation'}, {placement: 'global_navigation'}],
     })
-    const overlayStore = createLti1p3RegistrationOverlayStore(config)
+    const overlayStore = createLti1p3RegistrationOverlayStore(config, '')
 
-    render(<NamingConfirmationWrapper config={config} overlayStore={overlayStore} />)
+    render(<NamingConfirmationWrapper internalConfig={config} overlayStore={overlayStore} />)
 
     expect(screen.queryByLabelText(i18nLtiPlacement('top_navigation'))).not.toBeInTheDocument()
 

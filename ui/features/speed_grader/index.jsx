@@ -37,7 +37,7 @@ import {updateCommentBankItem} from './mutations/comment_bank/updateCommentBankI
 import {updateCommentSuggestionsEnabled} from './mutations/comment_bank/updateCommentSuggestionsEnabled'
 import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
 import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
-import { reassignAssignment } from './mutations/reassignAssignmentMutation'
+import {reassignAssignment} from './mutations/reassignAssignmentMutation'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -58,6 +58,7 @@ ready(() => {
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <div
         style={{
@@ -83,6 +84,7 @@ ready(() => {
 
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GenericErrorPage
         imageUrl={errorShipUrl}
@@ -168,6 +170,7 @@ ready(() => {
       // eslint-disable-next-line no-console
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <GenericErrorPage
           imageUrl={errorShipUrl}

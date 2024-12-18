@@ -22,22 +22,23 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {InstructorApps} from '../../../../shared/lti-apps/components/InstructorApps'
 import ProductDetail from '../../../../shared/lti-apps/components/ProductDetail/ProductDetail'
 import {getBasename} from '@canvas/lti-apps/utils/basename'
+import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
 
 export const CourseApps = () => {
   const router = createBrowserRouter(
     [
       {
+        id: 'root',
         path: '/',
         element: <InstructorApps />,
       },
       {
+        id: 'product_detail',
         path: 'product_detail/:id',
         element: <ProductDetail />,
       },
     ],
-    {
-      basename: getBasename('configurations'),
-    }
+    {basename: getBasename(instructorAppsRoute)}
   )
   const queryClient = new QueryClient()
 

@@ -21,6 +21,7 @@ import {
   sharedAdjustDateTests,
   sharedBankTests,
   sharedContentTests,
+  sharedDateParsingTests,
   sharedFormTests,
 } from './shared_form_cases'
 
@@ -33,4 +34,5 @@ describe('MoodleZipImporter', () => {
   sharedContentTests(MoodleZipImporter)
   sharedBankTests(MoodleZipImporter)
   sharedAdjustDateTests(MoodleZipImporter)
+  sharedDateParsingTests(MoodleZipImporter)
 })

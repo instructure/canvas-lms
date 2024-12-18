@@ -35,7 +35,7 @@ const submissionsCommentsMock = (overrides = {}) => ({
   participantString: 'Hank Mccoy',
   messages: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()],
   count: 3,
-  ...overrides
+  ...overrides,
 })
 
 describe('ConversationListItem', () => {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -18,9 +17,9 @@
  */
 
 import moment from 'moment-timezone'
-import {BlackoutDate} from '../shared/types'
+import type {BlackoutDate} from '../shared/types'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
-import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {initialCalendarEventBlackoutDates} from '../reducers/original'
 
 /* API methods */

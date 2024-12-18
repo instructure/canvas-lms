@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
  *
@@ -22,6 +21,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 const DEFAULT_GRADE = ''
 
 export default {
+  // @ts-expect-error
   scoreToGrade(score, assignment, gradingScheme) {
     if (score == null) {
       return DEFAULT_GRADE

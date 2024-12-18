@@ -192,6 +192,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     const bindRef = ref => {
       component = ref
     }
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<GradebookSettingsModal ref={bindRef} {...props} />, $container)
   }
 

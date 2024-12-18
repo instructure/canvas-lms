@@ -243,7 +243,6 @@ export default function CanvasDateInput({
 
   function generateMonthMoments() {
     const firstMoment = moment.tz(renderedMoment, timezone).startOf('month').startOf('week')
-    // @ts-ignore DAY_COUNT is not included in instructure-ui 7 types
     return [...Array(Calendar.DAY_COUNT).keys()].map(index =>
       firstMoment.clone().add(index, 'days')
     )
@@ -450,6 +449,7 @@ export default function CanvasDateInput({
   }
 
   return (
+    // @ts-expect-error
     <DateInput
       renderLabel={renderLabel}
       assistiveText={I18n.t('Type a date or use arrow keys to navigate date picker.')}

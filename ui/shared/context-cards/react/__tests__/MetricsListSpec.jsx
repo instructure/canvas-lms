@@ -44,7 +44,7 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
       const overrideGrade = 'A+'
       subject = TestUtils.renderIntoDocument(
         <MetricsList
-          allowFinalGradeOverride
+          allowFinalGradeOverride={true}
           user={{
             enrollments: [
               {
@@ -88,7 +88,7 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
       const overrideScore = '81.8'
       subject = TestUtils.renderIntoDocument(
         <MetricsList
-          allowFinalGradeOverride
+          allowFinalGradeOverride={true}
           user={{
             enrollments: [
               {

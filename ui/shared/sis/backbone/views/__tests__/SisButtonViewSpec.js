@@ -242,7 +242,10 @@ test('model does not save if there is only one due date override and no base due
   ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
   this.assignment.set('post_to_sis', false)
   this.assignment.set('name', 'Too Much Tuna')
-  this.assignment.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
+  this.assignment.set('all_dates', [
+    {dueAt: 'Test', dueFor: 'section_1'},
+    {dueAt: null, dueFor: 'section_2'},
+  ])
   this.assignment.set('due_at', null)
   this.view = new SisButtonView({model: this.assignment, dueDateRequired: true})
   this.view.render()
@@ -294,7 +297,10 @@ test('model does not save if there is only one due date override and no base due
   ENV.SIS_INTEGRATION_SETTINGS_ENABLED = true
   this.quiz.set('post_to_sis', false)
   this.quiz.set('title', 'Too Much Tuna')
-  this.quiz.set('all_dates', [{dueAt: 'Test'}, {dueAt: null}])
+  this.quiz.set('all_dates', [
+    {dueAt: 'Test', dueFor: 'section_1'},
+    {dueAt: null, dueFor: 'section_2'},
+  ])
   this.quiz.set('due_at', null)
   this.view = new SisButtonView({model: this.quiz, dueDateRequired: true})
   this.view.render()

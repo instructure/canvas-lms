@@ -25,7 +25,7 @@ import {type TextBlockProps} from './types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor/text-block')
+const I18n = useI18nScope('block-editor')
 
 const isAParagraph = (text: string) => /<p>[\s\S]*?<\/p>/s.test(text)
 
@@ -47,6 +47,7 @@ export const TextBlock = ({text = '', fontSize, textAlign, color}: TextBlockProp
   const [editable, setEditable] = useState(true)
 
   const handleChange = useCallback(
+    // @ts-expect-error
     e => {
       let html = e.target.value
       if (!isAParagraph(html)) {

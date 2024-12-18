@@ -74,6 +74,7 @@ jest.mock('@craftjs/core', () => {
               }),
             }
           }),
+          getSerializedNodes: jest.fn(() => ({})),
         },
       }
     }),

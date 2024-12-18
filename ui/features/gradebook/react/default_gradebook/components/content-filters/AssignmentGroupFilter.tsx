@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *
@@ -29,6 +28,7 @@ const I18n = useI18nScope(
 
 const ALL_ITEMS_ID = '0'
 
+// @ts-expect-error
 export default function AssignmentGroupFilter(props) {
   const {assignmentGroups, selectedAssignmentGroupId, ...filterProps} = props
 

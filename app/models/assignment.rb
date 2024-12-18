@@ -20,6 +20,7 @@
 
 class Assignment < AbstractAssignment
   validates :parent_assignment_id, :sub_assignment_tag, absence: true
+  validate :unpublish_ok?, if: -> { will_save_change_to_workflow_state?(to: "unpublished") }
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
@@ -112,6 +113,39 @@ class Assignment < AbstractAssignment
     update_sub_assignments
   end
 
+  def has_student_submissions_for_sub_assignments? # rubocop:disable Naming/PredicateName
+    return false unless has_sub_assignments?
+
+    sub_assignments.active.any?(&:has_student_submissions?)
+  end
+
+  def self.assignment_ids_with_sub_assignment_submissions(assignment_ids)
+    Assignment
+      .where(id: assignment_ids)
+      .joins("LEFT OUTER JOIN #{SubAssignment.quoted_table_name} AS sub_assignments ON assignments.id = sub_assignments.parent_assignment_id")
+      .where(Submission.active.having_submission.where("submissions.assignment_id=sub_assignments.id").arel.exists)
+      .distinct
+      .pluck("sub_assignments.parent_assignment_id")
+  end
+
+  # AbstractAssignment method with added support for sub_assignment submisssions
+  def can_unpublish?
+    return true if new_record?
+    return @can_unpublish unless @can_unpublish.nil?
+
+    @can_unpublish = !has_student_submissions? && !has_student_submissions_for_sub_assignments?
+  end
+  attr_writer :can_unpublish
+
+  # AbstractAssignment method with added support for sub_assignment submisssions
+  def self.preload_can_unpublish(assignments, assmnt_ids_with_subs = nil)
+    return unless assignments.any?
+
+    assignment_ids = assignments.map(&:id)
+    assmnt_ids_with_subs ||= (assignment_ids_with_submissions(assignment_ids) + assignment_ids_with_sub_assignment_submissions(assignment_ids)).uniq
+    assignments.each { |a| a.can_unpublish = !assmnt_ids_with_subs.include?(a.id) }
+  end
+
   private
 
   def before_soft_delete
@@ -146,5 +180,11 @@ class Assignment < AbstractAssignment
 
   def sync_attributes_changes
     previous_changes.slice(*SUB_ASSIGNMENT_SYNC_ATTRIBUTES)
+  end
+
+  def unpublish_ok?
+    if has_student_submissions? || has_student_submissions_for_sub_assignments?
+      errors.add :workflow_state, I18n.t("Can't unpublish if there are student submissions for the assignment or its sub_assignments")
+    end
   end
 end

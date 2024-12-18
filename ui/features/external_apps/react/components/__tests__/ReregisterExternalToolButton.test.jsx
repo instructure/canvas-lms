@@ -35,9 +35,15 @@ const ok = value => expect(value).toBeTruthy()
 let tools
 
 const createElement = data => (
-  <ReregisterExternalToolButton tool={data.tool} canAdd canAddEdit returnFocus={() => {}} />
+  <ReregisterExternalToolButton
+    tool={data.tool}
+    canAdd={true}
+    canAddEdit={true}
+    returnFocus={() => {}}
+  />
 )
 
+// eslint-disable-next-line react/no-render-return-value, no-restricted-properties
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 
 const getDOMNodes = function (data) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -28,6 +27,7 @@ import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
 type Props = {
   store: ReturnType<typeof PostGradesStore>
+  // @ts-expect-error
   closeDialog: (event) => void
 }
 
@@ -56,11 +56,13 @@ class PostGradesDialog extends React.Component<Props> {
     this.props.store.setState({pleaseShowSummaryPage: true})
   }
 
+  // @ts-expect-error
   postGrades = e => {
     this.props.store.postGrades()
     this.props.closeDialog(e)
   }
 
+  // @ts-expect-error
   validOverrideForSelection = (store, a) => {
     if (
       store.validCheck(a) &&
@@ -73,6 +75,7 @@ class PostGradesDialog extends React.Component<Props> {
     return false
   }
 
+  // @ts-expect-error
   validMultipleOverride = a => {
     const invalid_overrides = filter(a.overrides, o => o == null)
     if (
@@ -88,6 +91,7 @@ class PostGradesDialog extends React.Component<Props> {
     }
   }
 
+  // @ts-expect-error
   invalidAssignments = (assignments, store) => {
     const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
     const invalid_assignments: AssignmentWithOverride[] = []
@@ -165,6 +169,7 @@ class PostGradesDialog extends React.Component<Props> {
     return invalid_assignments
   }
 
+  // @ts-expect-error
   pageSet = (page: string, errors) => {
     if (page === 'corrections' && errors.length === 0) {
       page = 'summary'
@@ -215,6 +220,7 @@ class PostGradesDialog extends React.Component<Props> {
         )
         return (
           <PostGradesDialogNeedsGradingPage
+            // @ts-expect-error
             needsGrading={needsGrading}
             leaveNeedsGradingPage={this.leaveNeedsGradingPage}
           /> // /

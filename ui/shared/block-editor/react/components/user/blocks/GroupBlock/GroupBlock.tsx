@@ -24,6 +24,7 @@ import {Container} from '../Container/Container'
 import {
   useClassNames,
   isNthChild,
+  isTransparent,
   getContrastingColor,
   getEffectiveBackgroundColor,
 } from '../../../../utils'
@@ -90,7 +91,7 @@ export const GroupBlock = (props: GroupBlockProps) => {
   if (height) {
     styl.height = `${height}px`
   }
-  if (background) {
+  if (background && !isTransparent(background)) {
     styl.backgroundColor = background
     styl.color = getContrastingColor(background)
   } else if (containerRef) {

@@ -672,6 +672,7 @@ class WikiPagesApiController < ApplicationController
 
     if page_params.key?(:editing_roles)
       editing_roles = page_params[:editing_roles].split(",").map(&:strip)
+      editing_roles = %w[teachers] if @context.is_a?(Course) && @context.horizon_course?
       invalid_roles = editing_roles.reject { |role| %w[teachers students members public].include?(role) }
       unless invalid_roles.empty?
         @page.errors.add(:editing_roles, t(:invalid_editing_roles, "The provided editing roles are invalid"))
@@ -683,6 +684,7 @@ class WikiPagesApiController < ApplicationController
 
     if page_params.key?(:front_page)
       @set_as_front_page = value_to_boolean(page_params.delete(:front_page))
+      @set_as_front_page = false if @context.is_a?(Course) && @context.horizon_course?
       @set_front_page = true if @was_front_page != @set_as_front_page
     end
     change_front_page = !!@set_front_page

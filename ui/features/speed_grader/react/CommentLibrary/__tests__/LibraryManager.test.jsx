@@ -19,7 +19,7 @@
 import React from 'react'
 import {MockedProvider} from '@apollo/react-testing'
 import {act, fireEvent, render as rtlRender, waitFor} from '@testing-library/react'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {

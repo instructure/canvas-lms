@@ -128,6 +128,7 @@ QUnit.module('Dashboard Header', hooks => {
       })
       const promiseToGetNewCourseForm = import('../../jquery/util/newCourseForm')
 
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <FakeDashboard
           planner_enabled={false}
@@ -160,6 +161,7 @@ QUnit.module('Dashboard Header', hooks => {
   test('it should switch dashboard view appropriately when changeDashboard is called', async assert => {
     const done = assert.async()
     let dashboardHeader = null
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard
         headerRef={c => {
@@ -186,6 +188,7 @@ QUnit.module('Dashboard Header', hooks => {
   test('it should switch dashboard view appropriately with Student Planner enabled', async assert => {
     const done = assert.async()
     let dashboardHeader = null
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard
         headerRef={c => {
@@ -232,6 +235,7 @@ QUnit.module('Dashboard Header', hooks => {
     saveDashboardViewStub.restore()
     const done = assert.async()
     let dashboardHeader = null
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard
         headerRef={c => {
@@ -255,6 +259,7 @@ QUnit.module('Dashboard Header', hooks => {
   })
 
   test('it should show the card dashboard if planner is selected, but not enabled', () => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard headerRef={() => false} planner_enabled={false} dashboard_view="planner" />,
       container
@@ -270,6 +275,7 @@ QUnit.module('Dashboard Header', hooks => {
     saveDashboardViewStub.restore()
     const done = assert.async()
     let dashboardHeader = null
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard
         headerRef={c => {
@@ -296,6 +302,7 @@ QUnit.module('Dashboard Header', hooks => {
 
   test('it should add planner classes to the page when planner is loaded', () => {
     let dashboardHeader = null
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard
         headerRef={c => {
@@ -314,6 +321,7 @@ QUnit.module('Dashboard Header', hooks => {
 
   test('it should allow switching back to the Elementary dashboard if it was disabled', () => {
     let dashboardHeader = null
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <FakeDashboard
         headerRef={c => {
@@ -349,11 +357,13 @@ QUnit.module('Dashboard Header', hooks => {
     })
 
     test('it should show the observer options Select on planner dashboard', () => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(<FakeDashboard planner_enabled={true} dashboard_view="planner" />, container)
       ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
     })
 
     test('it should show the observer options Select on recent activity dashboard', () => {
+      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(<FakeDashboard planner_enabled={true} dashboard_view="activity" />, container)
       ok(document.querySelector('[data-testid="observed-student-dropdown"]'))
     })

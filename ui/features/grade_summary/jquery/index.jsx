@@ -677,9 +677,7 @@ function bindShowAllDetailsButton($ariaAnnouncer) {
 
 $(window).on('beforeprint', function () {
   $('tr.sub_assignment_row').show()
-  $(`.toggle_sub_assignments i`)
-        .removeClass('icon-arrow-open-end')
-        .addClass('icon-arrow-open-down')
+  $(`.toggle_sub_assignments i`).removeClass('icon-arrow-open-end').addClass('icon-arrow-open-down')
 })
 
 function displayPageContent() {
@@ -721,6 +719,7 @@ function getCourseId() {
 }
 
 function renderSelectMenuGroup() {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />,
     document.getElementById('GradeSummarySelectMenuGroup')
@@ -728,6 +727,7 @@ function renderSelectMenuGroup() {
 }
 
 function renderGradeSummaryTable() {
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<GradeSummaryManager />, document.getElementById('grade-summary-react'))
 }
 
@@ -775,6 +775,7 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 
 function renderSubmissionCommentsTray() {
   ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <SubmissionCommentsTray
       onDismiss={() => {
@@ -791,6 +792,7 @@ function renderClearBadgeCountsButton() {
   ReactDOM.unmountComponentAtNode(document.getElementById('ClearBadgeCountsButton'))
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
+  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <ClearBadgeCountsButton userId={userId} courseId={courseId} />,
     document.getElementById('ClearBadgeCountsButton')
@@ -868,14 +870,14 @@ function setup() {
         $(`#${assignmentcode} i`)
           .removeClass('icon-arrow-open-end')
           .addClass('icon-arrow-open-down')
-        $("#aria-announcer").text(I18n.t('Sub Assignment details expanded'))
+        $('#aria-announcer').text(I18n.t('Sub Assignment details expanded'))
       } else {
         $(`.${assignmentcode}`).hide()
         $(`.${assignmentcode}`).prop('aria-expanded', true)
         $(`#${assignmentcode} i`)
           .removeClass('icon-arrow-open-down')
           .addClass('icon-arrow-open-end')
-        $("#aria-announcer").text(I18n.t('Sub Assignment details collapsed'))
+        $('#aria-announcer').text(I18n.t('Sub Assignment details collapsed'))
       }
     })
 

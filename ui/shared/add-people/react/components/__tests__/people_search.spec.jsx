@@ -51,7 +51,7 @@ describe('PeopleSearch', () => {
   })
 
   test('displays role and section', () => {
-    const wrapper = render(<PeopleSearch {...props}/>)
+    const wrapper = render(<PeopleSearch {...props} />)
     expect(wrapper.queryByTestId('people-search-role-section-container')).toBeInTheDocument()
     expect(wrapper.queryByText('Role')).toBeInTheDocument()
     expect(wrapper.queryByText('Section')).toBeInTheDocument()

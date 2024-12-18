@@ -20,28 +20,28 @@ import React from 'react'
 import {IconConfirmation} from '../../registration_wizard_forms/IconConfirmation'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import type {Lti1p3RegistrationOverlayStore} from '../Lti1p3RegistrationOverlayState'
-import {useOverlayStore} from '../hooks/useOverlayStore'
 
 export type IconConfirmationWrapperProps = {
   onNextButtonClicked: () => void
   onPreviousButtonClicked: () => void
   reviewing: boolean
   overlayStore: Lti1p3RegistrationOverlayStore
-  config: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration
 }
 export const IconConfirmationWrapper = ({
   overlayStore,
-  config,
+  internalConfig,
   reviewing,
   onNextButtonClicked,
   onPreviousButtonClicked,
 }: IconConfirmationWrapperProps) => {
-  const [state, actions] = useOverlayStore(overlayStore)
+  const {state, ...actions} = overlayStore()
 
   return (
     <IconConfirmation
-      name={state.naming.nickname ?? config.title}
-      defaultIconUrl={config.launch_settings?.icon_url}
+      internalConfig={internalConfig}
+      name={internalConfig.title}
+      topLevelDefaultIconUrl={internalConfig.launch_settings?.icon_url}
       allPlacements={state.placements.placements ?? []}
       placementIconOverrides={state.icons.placements}
       reviewing={reviewing}

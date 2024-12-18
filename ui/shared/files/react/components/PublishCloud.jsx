@@ -44,6 +44,7 @@ PublishCloud.openRestrictedDialog = function () {
   })
 
   import('./RestrictedDialogForm').then(({default: RestrictedDialogForm}) => {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <RestrictedDialogForm
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}

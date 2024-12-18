@@ -22,7 +22,8 @@ import {queryClient} from '@canvas/query'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
 import axios from 'axios'
 
-const render = children => testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+const render = children =>
+  testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 jest.mock('axios')
 
@@ -33,7 +34,10 @@ describe('MobileNavigation', () => {
       ACCOUNT_ID: 'test-account-id',
     }
     axios.get.mockImplementation(url => {
-      if (url === '/api/v1/accounts/test-account-id/lti_apps/launch_definitions?per_page=50&placements[]=global_navigation&only_visible=true') {
+      if (
+        url ===
+        '/api/v1/accounts/test-account-id/lti_apps/launch_definitions?per_page=50&placements[]=global_navigation&only_visible=true'
+      ) {
         return Promise.resolve({
           data: [],
         })

@@ -44,9 +44,7 @@ describe('CourseListSpec', () => {
 
     component = render(<CourseList courses={props} />)
     // 'should have an li element per course in @props'
-    expect(component.container.querySelectorAll('li').length).toEqual(
-      Object.keys(props).length
-    )
+    expect(component.container.querySelectorAll('li').length).toEqual(Object.keys(props).length)
     component.unmount()
   })
 })

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import {actions} from '../../actions/ui'
-import {CoursePace, StoreState} from '../../types'
+import type {CoursePace, StoreState} from '../../types'
 import {getCoursePace} from '../../reducers/course_paces'
 
 const I18n = useI18nScope('course_paces_blueprint_lock')
@@ -45,12 +44,15 @@ interface StoreProps {
 export class BlueprintLock extends React.Component<PassedProps & StoreProps & DispatchProps> {
   private lockManager
 
+  // @ts-expect-error
   private isLocked
 
+  // @ts-expect-error
   private isChild
 
   private tooltipMessage
 
+  // @ts-expect-error
   private isCourseLevelPace
 
   private useRedesign
@@ -74,10 +76,12 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
       itemType: 'course_pace',
       page: 'show',
       bannerSelector: this.props.bannerSelector,
+      // @ts-expect-error
       lockCallback: locked => {
         this.props.setBlueprintLocked(
           locked && this.isCourseLevelPace && this.lockManager.state.isChildContent
         )
+        // @ts-expect-error
         window.ENV.MASTER_COURSE_DATA.restricted_by_master_course = locked
       },
     })
@@ -111,6 +115,7 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
           renderTip={this.tooltipMessage}
           on={!disabledLock || this.isChild ? [] : ['hover', 'focus']}
         >
+          {/* @ts-expect-error */}
           <div className="blueprint-label" style={disabledLock ? disabledStyle : {}} />
           <ScreenReaderContent>{this.tooltipMessage}</ScreenReaderContent>
         </Tooltip>

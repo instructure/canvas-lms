@@ -137,7 +137,7 @@ export const resetStagedCards = (cards, newCardsState, defaultState) => {
   const newState = cloneObject(newCardsState)
   Object.keys(newState).forEach(rowKey => {
     const card = cards[rowKey] ?? defaultState[rowKey]
-    if(!card) return undefined;
+    if (!card) return undefined
     const newCard = newState[rowKey]
     const validOverrides = card.overrides.filter(o =>
       newCard?.overrides.find(override => o.stagedOverrideId === override.stagedOverrideId)
@@ -168,7 +168,11 @@ export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defa
     const datesForGroup = datesFromOverride(overrides[0])
     index++
     // ensure on initial load of the cards, the everyone option is first
-    const everyoneOption = ENV.FEATURES?.selective_release_edit_page && overrides[0].course_section_id === defaultSectionId ? 0 : undefined
+    const everyoneOption =
+      ENV.FEATURES?.selective_release_edit_page &&
+      overrides[0].course_section_id === defaultSectionId
+        ? 0
+        : undefined
     index = cards?.[key]?.index ?? overrides[0].index ?? everyoneOption ?? index
     acc[key] = {overrides, dates: datesForGroup, index}
     return acc
@@ -254,7 +258,7 @@ export const processModuleOverrides = (overrides, lastCheckpoint) => {
 // This is a slightly modified version of the processModuleOverrides function for AssignToContent
 // The original function can be removed once we remove DifferentiatedModulesSection
 export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
-  const rowKeyModuleOverrides = initialModuleOverrides.map(obj => obj.rowKey);
+  const rowKeyModuleOverrides = initialModuleOverrides.map(obj => obj.rowKey)
   const withoutModuleOverrides = overrides.map(o => {
     if (rowKeyModuleOverrides.includes(o.rowKey)) {
       const initialModuleOverrideState = initialModuleOverrides.find(obj => obj.rowKey === o.rowKey)
@@ -270,8 +274,14 @@ export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
         ...currentAttributes
       } = o
 
-      const hasDates = currentAttributes.due_at || currentAttributes.lock_at || currentAttributes.unlock_at
-      const hasChanges = !(!hasDates && currentAttributes.course_section_id == previousAttributes.course_section_id && JSON.stringify(currentAttributes.student_ids)== JSON.stringify(previousAttributes.student_ids))
+      const hasDates =
+        currentAttributes.due_at || currentAttributes.lock_at || currentAttributes.unlock_at
+      const hasChanges = !(
+        !hasDates &&
+        currentAttributes.course_section_id == previousAttributes.course_section_id &&
+        JSON.stringify(currentAttributes.student_ids) ==
+          JSON.stringify(previousAttributes.student_ids)
+      )
 
       //   If there are changes, remove the context_module override information
       return hasChanges
@@ -282,11 +292,11 @@ export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
             id: undefined,
           }
         : {
-          ...o,
-          context_module_id: initialModuleOverrideState.context_module_id,
-          context_module_name: initialModuleOverrideState.context_module_name,
-          id: initialModuleOverrideState.id,
-        } // If there are no changes, use the current override as is
+            ...o,
+            context_module_id: initialModuleOverrideState.context_module_id,
+            context_module_name: initialModuleOverrideState.context_module_name,
+            id: initialModuleOverrideState.id,
+          } // If there are no changes, use the current override as is
     }
 
     return o

@@ -15,38 +15,45 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import React from 'react'
+import * as React from 'react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {createRoot} from 'react-dom/client'
 import {createBrowserRouter, RouterProvider} from 'react-router-dom'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {LtiAppsLayout} from './layout/LtiAppsLayout'
-import {DiscoverRoute} from './discover'
-import {ManageRoutes} from './manage'
 import ProductDetail from '../../shared/lti-apps/components/ProductDetail/ProductDetail'
-import {ZAccountId} from './manage/model/AccountId'
-import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
-import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
-import {
-  fetchRegistrationToken,
-  getRegistrationById,
-  getRegistrationByUUID,
-  updateRegistrationOverlay,
-} from './manage/api/ltiImsRegistration'
+import {DiscoverRoute} from './discover'
+import {LtiAppsLayout} from './layout/LtiAppsLayout'
+import {ManageRoutes} from './manage'
 import {
   deleteDeveloperKey,
   updateAdminNickname,
   updateDeveloperKeyWorkflowState,
 } from './manage/api/developerKey'
 import {
-  fetchThirdPartyToolConfiguration,
+  fetchRegistrationToken,
+  getLtiImsRegistrationById,
+  getRegistrationByUUID,
+  updateRegistrationOverlay,
+} from './manage/api/ltiImsRegistration'
+import {
+  bindGlobalLtiRegistration,
   createRegistration,
+  fetchRegistrationByClientId,
+  fetchThirdPartyToolConfiguration,
   updateRegistration,
+  fetchLtiRegistration,
 } from './manage/api/registrations'
-import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
+import type {DynamicRegistrationWizardService} from './manage/dynamic_registration_wizard/DynamicRegistrationWizardService'
+import {InheritedKeyRegistrationWizard} from './manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizard'
+import type {InheritedKeyService} from './manage/inherited_key_registration_wizard/InheritedKeyService'
 import type {Lti1p3RegistrationWizardService} from './manage/lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {openDynamicRegistrationWizard} from './manage/registration_wizard/RegistrationWizardModalState'
 import {getBasename} from '@canvas/lti-apps/utils/basename'
+import {ZAccountId} from './manage/model/AccountId'
+import type {JsonUrlWizardService} from './manage/registration_wizard/JsonUrlWizardService'
+import {RegistrationWizardModal} from './manage/registration_wizard/RegistrationWizardModal'
+import {ProductConfigureButton} from './discover/ProductConfigureButton'
+
+const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
 
 const queryClient = new QueryClient()
 
@@ -63,7 +70,18 @@ const router = createBrowserRouter(
     },
     {
       path: 'product_detail/:id',
-      element: <ProductDetail onConfigure={openDynamicRegistrationWizard} />,
+      element: (
+        <ProductDetail
+          renderConfigureButton={(buttonWidth, ltiConfiguration) => {
+            return (
+              <ProductConfigureButton
+                buttonWidth={buttonWidth}
+                ltiConfiguration={ltiConfiguration}
+              />
+            )
+          }}
+        />
+      ),
     },
   ],
 
@@ -72,13 +90,11 @@ const router = createBrowserRouter(
   }
 )
 
-const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])
-
 const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
   deleteDeveloperKey,
   fetchRegistrationToken,
   getRegistrationByUUID,
-  getRegistrationById,
+  getLtiImsRegistrationById,
   updateDeveloperKeyWorkflowState,
   updateAdminNickname,
   updateRegistrationOverlay,
@@ -91,6 +107,12 @@ const jsonUrlWizardService: JsonUrlWizardService = {
 const lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService = {
   createLtiRegistration: createRegistration,
   updateLtiRegistration: updateRegistration,
+  fetchLtiRegistration,
+}
+
+const inheritedKeyService: InheritedKeyService = {
+  bindGlobalLtiRegistration,
+  fetchRegistrationByClientId,
 }
 
 const root = createRoot(document.getElementById('reactContent')!)
@@ -103,6 +125,7 @@ root.render(
       lti1p3RegistrationWizardService={lti1p3RegistrationWizardService}
       jsonUrlWizardService={jsonUrlWizardService}
     />
+    <InheritedKeyRegistrationWizard accountId={accountId} service={inheritedKeyService} />
     <RouterProvider router={router} />
   </QueryClientProvider>
 )

@@ -69,9 +69,11 @@ describe('DeleteCalendarEventDialog', () => {
   it('renders assignment deletion warning', () => {
     const {getByText} = renderDialog({isRepeating: false, eventType: 'assignment'})
     expect(getByText('Confirm Deletion')).toBeInTheDocument()
-    expect(getByText(
-      'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.'
-    )).toBeInTheDocument()
+    expect(
+      getByText(
+        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.'
+      )
+    ).toBeInTheDocument()
   })
 
   it('renders event series dialog', () => {

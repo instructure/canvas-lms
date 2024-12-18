@@ -281,6 +281,20 @@ module AccountReports::ReportHelper
     end
   end
 
+  #
+  # Returns a string suitable for substitution into a join clause that will ensure only the
+  # most relevant pseudonym is joined
+  #
+  # If the query is already using a DISTINCT ON, it's best to just use SisPseudonym.order
+  # on the final relation, instead of introducing a subquery
+  #
+  # @example
+  #   User.joins("INNER JOIN #{ordered_pseudonyms} p ON users.id = p.user_id")
+  #
+  def ordered_pseudonyms(relation = Pseudonym.all)
+    "(#{SisPseudonym.order(relation.select("DISTINCT ON (user_id) *").order(:user_id)).to_sql})"
+  end
+
   def valid_enrollment_workflow_states
     %w[invited creation_pending active completed inactive deleted rejected].freeze &
       Api.value_to_array(@account_report.parameters["enrollment_states"])

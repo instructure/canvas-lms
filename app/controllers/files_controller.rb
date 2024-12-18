@@ -340,63 +340,45 @@ class FilesController < ApplicationController
       verify_api_id unless @context.present?
       @folder = Folder.from_context_or_id(@context, params[:id])
 
-      if authorized_action(@folder, @current_user, :read_contents)
-        params[:sort] ||= params[:sort_by] # :sort_by was undocumented; :sort is more consistent with other APIs such as wikis
-        params[:include] = Array(params[:include])
-        params[:include] << "user" if params[:sort] == "user"
+      return unless authorized_action(@folder, @current_user, :read_contents)
 
-        scope = Attachments::ScopedToUser.new(@context || @folder, @current_user).scope
-        scope = scope.preload(:user) if params[:include].include?("user") && params[:sort] != "user"
-        scope = scope.preload(:usage_rights) if params[:include].include?("usage_rights")
-        scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term], normalize_unicode: true)
+      scope = file_index_scope(@context || @folder, @current_user, params)
 
-        order_clause = case params[:sort]
-                       when "position" # undocumented; kept for compatibility
-                         "attachments.position, #{Attachment.display_name_order_by_clause("attachments")}"
-                       when "size"
-                         "attachments.size"
-                       when "created_at"
-                         "attachments.created_at"
-                       when "updated_at"
-                         "attachments.updated_at"
-                       when "content_type"
-                         "attachments.content_type"
-                       when "user"
-                         scope.primary_shard.activate do
-                           scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
-                         end
-                         "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause("users")}"
-                       else
-                         Attachment.display_name_order_by_clause("attachments")
+      order_clause = case params[:sort]
+                     when "position"
+                       "attachments.position, #{Attachment.display_name_order_by_clause("attachments")}"
+                     when "size"
+                       "attachments.size"
+                     when "created_at"
+                       "attachments.created_at"
+                     when "updated_at"
+                       "attachments.updated_at"
+                     when "content_type"
+                       "attachments.content_type"
+                     when "user"
+                       scope.primary_shard.activate do
+                         scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
                        end
-        order_clause = "#{order_clause} DESC" if params[:order] == "desc"
-        scope = scope.order(Arel.sql(order_clause)).order(id: (params[:order] == "desc") ? :desc : :asc)
+                       "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause("users")}"
+                     else
+                       Attachment.display_name_order_by_clause("attachments")
+                     end
 
-        if params[:content_types].present?
-          scope = scope.by_content_types(Array(params[:content_types]))
-        end
+      order_clause = "#{order_clause} DESC" if params[:order] == "desc"
+      scope = scope.order(Arel.sql(order_clause)).order(id: (params[:order] == "desc") ? :desc : :asc)
 
-        if params[:exclude_content_types].present?
-          scope = scope.by_exclude_content_types(Array(params[:exclude_content_types]))
-        end
+      url = @context ? context_files_url : api_v1_list_files_url(@folder)
+      @files = Api.paginate(scope, self, url)
 
-        if params[:category].present?
-          scope = scope.for_category(params[:category])
-        end
+      log_asset_access(["files", @context], "files")
 
-        url = @context ? context_files_url : api_v1_list_files_url(@folder)
-        @files = Api.paginate(scope, self, url)
-
-        log_asset_access(["files", @context], "files")
-
-        render json: attachments_json(@files, @current_user, {}, {
-                                        can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
-                                        context: @context || @folder.context,
-                                        include: params[:include],
-                                        only: params[:only],
-                                        omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
-                                      })
-      end
+      render json: attachments_json(@files, @current_user, {}, {
+                                      can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
+                                      context: @context || @folder.context,
+                                      include: params[:include],
+                                      only: params[:only],
+                                      omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
+                                    })
     end
   end
 
@@ -443,7 +425,7 @@ class FilesController < ApplicationController
                                 else
                                   []
                                 end
-
+        root_folder_id = Folder.root_folders(context)&.first&.id if Account.site_admin.feature_enabled?(:files_a11y_rewrite)
         {
           asset_string: context.asset_string,
           name: (context == @current_user) ? t("my_files", "My Files") : context.name,
@@ -454,7 +436,8 @@ class FilesController < ApplicationController
             manage_files_delete: context.grants_right?(@current_user, session, :manage_files_delete),
           },
           file_menu_tools:,
-          file_index_menu_tools:
+          file_index_menu_tools:,
+          root_folder_id:
         }
       end
 

@@ -26,7 +26,7 @@ import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
 import useGroupCreate from './hooks/useGroupCreate'
 import useCanvasContext from './hooks/useCanvasContext'
-import {gql} from '@canvas/apollo'
+import {gql} from '@canvas/apollo-v3'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -176,6 +176,14 @@ const useTreeBrowser = queryVariables => {
   }
 
   const updateCache = newGroups => {
+    // First evict the cache to show that the data is being replaced, and does not need to be merged.
+    // https://github.com/apollographql/apollo-client/issues/6451#issuecomment-645612063
+    client.cache.evict({
+      fieldName: 'groups',
+      broadcast: false,
+      variables: queryVariables,
+    })
+
     client.writeQuery({
       query: GROUPS_QUERY,
       variables: queryVariables,

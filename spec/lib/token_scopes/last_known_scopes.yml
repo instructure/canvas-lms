@@ -184,6 +184,8 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/help_links'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/learn_platform/custom_filters'
+- verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/filters'
 - verb: GET
   path: '/api/v1/accounts/:account_id/learn_platform/organizations/:organization_salesforce_id/products'
@@ -206,6 +208,8 @@
 - verb: GET
   path: '/api/v1/accounts/:account_id/lti_registration_by_client_id/:client_id'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations'
+- verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations'
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/lti_registrations/:id'
@@ -273,6 +277,8 @@
   path: '/api/v1/accounts/:account_id/reports/:report/:id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/reports/:report/:id'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/reports/:report/:id/abort'
 - verb: GET
   path: '/api/v1/accounts/:account_id/roles'
 - verb: POST
@@ -1463,6 +1469,8 @@
   path: '/api/v1/folders/:id'
 - verb: PUT
   path: '/api/v1/folders/:id'
+- verb: GET
+  path: '/api/v1/folders/:id/all'
 - verb: GET
   path: '/api/v1/folders/:id/files'
 - verb: GET

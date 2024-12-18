@@ -149,6 +149,7 @@ export function QRMobileLogin({
         const {json} = await doFetchApi({path: '/canvas/login.png', method: 'POST'})
         displayValidFor(Date.now() + QR_CODE_LIFETIME)
         refetchAt = Date.now() + refreshInterval
+        // @ts-expect-error
         setImagePng(json.png)
       } catch (err) {
         showFlashAlert({

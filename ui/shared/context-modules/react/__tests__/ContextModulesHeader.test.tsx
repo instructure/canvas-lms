@@ -80,11 +80,13 @@ describe('ContextModulesHeader', () => {
 
   describe('basic rendering', () => {
     it('renders the title', () => {
+      // @ts-expect-error
       const {getByRole} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByRole('heading', {level: 1, name: defaultProps.title})).toBeInTheDocument()
     })
 
     it('"Publish All" is visible', () => {
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByText('Publish All')).toBeInTheDocument()
     })
@@ -94,6 +96,7 @@ describe('ContextModulesHeader', () => {
       global.dispatchEvent(new Event('resize'))
 
       defaultProps.publishMenu.disabled = true
+      // @ts-expect-error
       const {container} = render(<ContextModulesHeader {...defaultProps} />)
       expect(
         container.querySelector('.context-modules-header-publish-menu-responsive button')
@@ -102,38 +105,45 @@ describe('ContextModulesHeader', () => {
 
     it('"Publish All" is not visible', () => {
       defaultProps.publishMenu.visible = false
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() => getByText('Publish All')).toThrow(/Unable to find an element/)
     })
 
     it('"View Progress" is visible', () => {
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByText(defaultProps.viewProgress.label)).toBeInTheDocument()
     })
 
     it('"View Progress" is not visible', () => {
       defaultProps.viewProgress.visible = false
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() => getByText(defaultProps.viewProgress.label)).toThrow(/Unable to find an element/)
     })
 
     it('"Expand / Collapse All" is visible', () => {
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByText('Expand All')).toBeInTheDocument()
     })
 
     it('"Add Module" is visible', () => {
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByText(defaultProps.addModule.label)).toBeInTheDocument()
     })
 
     it('"Add Module" is not visible', () => {
       defaultProps.addModule.visible = false
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() => getByText(defaultProps.addModule.label)).toThrow(/Unable to find an element/)
     })
 
     it('"Last Export" is visible', () => {
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(
         getByText(`${defaultProps.lastExport.label} ${defaultProps.lastExport.date}`)
@@ -142,6 +152,7 @@ describe('ContextModulesHeader', () => {
 
     it('"Last Export" is not visible', () => {
       defaultProps.lastExport.visible = false
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() =>
         getByText(`${defaultProps.lastExport.label} ${defaultProps.lastExport.date}`)
@@ -149,11 +160,13 @@ describe('ContextModulesHeader', () => {
     })
 
     it('"More Menu" is visible', () => {
+      // @ts-expect-error
       const {getByRole} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByRole('button', {name: 'More'})).toBeInTheDocument()
     })
 
     it('"Export Course Content" is visible inside "More Menu"', () => {
+      // @ts-expect-error
       const {getByRole, getByText} = render(<ContextModulesHeader {...defaultProps} />)
       const button = getByRole('button', {name: 'More'})
 
@@ -165,6 +178,7 @@ describe('ContextModulesHeader', () => {
     it('"Export Course Content" is not visible inside "More Menu"', () => {
       defaultProps.moreMenu.exportCourseContent.visible = false
       defaultProps.moreMenu.menuTools.visible = true
+      // @ts-expect-error
       const {getByRole, getByText} = render(<ContextModulesHeader {...defaultProps} />)
       const button = getByRole('button', {name: 'More'})
 
@@ -176,6 +190,7 @@ describe('ContextModulesHeader', () => {
     })
 
     it('"Tools menu" is visible inside "More Menu"', () => {
+      // @ts-expect-error
       const {getByRole, getByText} = render(<ContextModulesHeader {...defaultProps} />)
       const button = getByRole('button', {name: 'More'})
 
@@ -187,6 +202,7 @@ describe('ContextModulesHeader', () => {
     it('"Export Course Content" is visible outside "More Menu"', () => {
       defaultProps.moreMenu.exportCourseContent.visible = true
       defaultProps.moreMenu.menuTools.visible = false
+      // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
       expect(getByText(defaultProps.moreMenu.exportCourseContent.label)).toBeInTheDocument()
     })
@@ -194,6 +210,7 @@ describe('ContextModulesHeader', () => {
     it('"More Menu" is not visible', () => {
       defaultProps.moreMenu.exportCourseContent.visible = false
       defaultProps.moreMenu.menuTools.visible = false
+      // @ts-expect-error
       const {getByRole} = render(<ContextModulesHeader {...defaultProps} />)
       expect(() => getByRole('button', {name: 'More'})).toThrow(
         /Unable to find an accessible element/

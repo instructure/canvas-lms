@@ -18,14 +18,21 @@
 
 import React, {useMemo, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import LtiFilterTray from './apps/LtiFilterTray'
 import FilterTags from './apps/FilterTags'
-import {fetchLtiFilters, fetchProductsByOrganization} from '../queries/productsQuery'
-import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
-import Disclaimer from './common/Disclaimer'
+import LtiFilterTray from './apps/LtiFilterTray'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
+import Disclaimer from './common/Disclaimer'
+import {
+  fetchCustomFilters,
+  fetchLtiFilters,
+  fetchProductsByOrganization,
+} from '../queries/productsQuery'
+import useDiscoverQueryParams from '../hooks/useDiscoverQueryParams'
+import {Header} from './apps/Header'
 import type {Product} from '../models/Product'
+import {View} from '@instructure/ui-view'
+import useBreakpoints from '../hooks/useBreakpoints'
 
 export const InstructorApps = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -34,16 +41,19 @@ export const InstructorApps = () => {
     () => Object.values(queryParams.filters).flat().length > 0 || queryParams.search.length > 0,
     [queryParams]
   )
+  const {isDesktop} = useBreakpoints()
 
   const {
-    data: {tools, meta},
+    data: {tools, meta, description},
     isLoading,
   } = useQuery({
     queryKey: ['lti_product_info', queryParams],
+    // @ts-expect-error
     queryFn: () => fetchProductsByOrganization(queryParams, ENV.DOMAIN_ROOT_ACCOUNT_SFID),
     initialData: {
       tools: [] as Product[],
       meta: {total_count: 0, current_page: 1, num_pages: 1, count: 0, per_page: 21},
+      description: '',
     },
   })
 
@@ -52,8 +62,15 @@ export const InstructorApps = () => {
     queryFn: () => fetchLtiFilters(),
   })
 
+  const {data: customFilterData} = useQuery({
+    queryKey: ['custom_filters'],
+    // @ts-expect-error
+    queryFn: () => fetchCustomFilters(window.ENV.DOMAIN_ROOT_ACCOUNT_SFID),
+  })
+
   return (
-    <>
+    <View as="div" padding={isDesktop ? 'none mediumSmall' : 'none'}>
+      <Header description={description} />
       <SearchAndFilter setIsTrayOpen={setIsTrayOpen} />
       {isFilterApplied && (
         <FilterTags
@@ -68,6 +85,7 @@ export const InstructorApps = () => {
         isLoading={isLoading}
         numberOfPages={meta.num_pages}
         tools={tools}
+        isOrgTools={true}
       />
       <Disclaimer />
 
@@ -75,11 +93,16 @@ export const InstructorApps = () => {
         <LtiFilterTray
           isTrayOpen={isTrayOpen}
           setIsTrayOpen={setIsTrayOpen}
-          filterValues={filterData}
+          filterValues={{
+            ...filterData,
+            'approval status': customFilterData?.approval_status || [],
+            'privacy status': customFilterData?.privacy_status || [],
+          }}
+          lpFilterValues={customFilterData?.organization_filters || []}
           queryParams={queryParams}
           setQueryParams={setQueryParams}
         />
       )}
-    </>
+    </View>
   )
 }

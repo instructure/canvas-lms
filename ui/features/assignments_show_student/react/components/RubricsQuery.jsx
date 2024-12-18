@@ -42,9 +42,21 @@ export default function RubricsQuery(props) {
     },
     fetchPolicy: 'network-only',
     onCompleted: data => {
-      const parsedAssessments = data.submission?.rubricAssessmentsConnection?.nodes?.map(
-        assessment => transformRubricAssessmentData(assessment)
+      const allAssessments = data.submission?.rubricAssessmentsConnection?.nodes ?? []
+
+      const {parsedAssessments, selfAssessment} = allAssessments.reduce(
+        (prev, curr) => {
+          if (curr.assessment_type === 'self_assessment') {
+            return {...prev, selfAssessment: transformRubricAssessmentData(curr)}
+          }
+
+          const parsedAssessment = transformRubricAssessmentData(curr)
+
+          return {...prev, parsedAssessments: [...prev.parsedAssessments, parsedAssessment]}
+        },
+        {parsedAssessments: [], selfAssessment: null}
       )
+
       const parsedRubric = transformRubricData(data.assignment.rubric)
 
       const assessment = props.assignment.env.peerReviewModeEnabled
@@ -54,6 +66,7 @@ export default function RubricsQuery(props) {
 
       useStore.setState({
         displayedAssessment: filledAssessment,
+        selfAssessment,
       })
     },
   })

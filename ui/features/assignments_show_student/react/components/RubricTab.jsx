@@ -54,8 +54,11 @@ export default function RubricTab(props) {
   const [rubricTrayOpen, setRubricTrayOpen] = useState(true)
   const displayedAssessment = useStore(state => state.displayedAssessment)
 
+  const rubricAssessments =
+    props.assessments?.filter(x => x.assessment_type !== 'self_assessment') ?? []
+
   const findAssessmentById = id => {
-    return props.assessments?.find(assessment => assessment._id === id)
+    return rubricAssessments.find(assessment => assessment._id === id)
   }
 
   const onAssessmentChange = updatedAssessment => {
@@ -73,7 +76,7 @@ export default function RubricTab(props) {
     useStore.setState({displayedAssessment: filledAssessment})
   }
 
-  const hasSubmittedAssessment = props.assessments?.some(
+  const hasSubmittedAssessment = rubricAssessments.some(
     assessment => assessment.assessor?._id === ENV.current_user.id
   )
 
@@ -203,7 +206,7 @@ export default function RubricTab(props) {
               </Text>
             }
           >
-            {!props.peerReviewModeEnabled && !!props.assessments?.length && (
+            {!props.peerReviewModeEnabled && !!rubricAssessments.length && (
               <div style={{marginBottom: '22px', width: '325px'}}>
                 <CanvasSelect
                   label={I18n.t('Select Grader')}
@@ -211,7 +214,7 @@ export default function RubricTab(props) {
                   data-testid="select-grader-dropdown"
                   onChange={(e, optionValue) => assessmentSelectorChanged(optionValue)}
                 >
-                  {props.assessments.map(assessment => (
+                  {rubricAssessments.map(assessment => (
                     <CanvasSelect.Option
                       key={assessment._id}
                       value={assessment._id}

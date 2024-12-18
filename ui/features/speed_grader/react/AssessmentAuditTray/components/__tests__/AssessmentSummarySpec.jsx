@@ -65,6 +65,7 @@ QUnit.module('AssessmentSummary', suiteHooks => {
   })
 
   function renderComponent() {
+    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<AssessmentSummary {...props} />, $container)
   }
 

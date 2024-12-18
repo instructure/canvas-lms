@@ -22,7 +22,6 @@ export const updateCommentSuggestionsEnabled = (state: boolean) => {
   return doFetchApi({
     path: '/api/v1/users/self/settings',
     method: 'PUT',
-    // @ts-ignore JSON.stringify will not be parsed correctly
     body: {comment_library_suggestions_enabled: state},
   })
 }

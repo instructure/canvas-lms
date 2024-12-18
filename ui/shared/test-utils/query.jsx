@@ -32,9 +32,7 @@ export function MockedQueryProvider({children}) {
 export function MockedQueryClientProvider({children, client}) {
   return (
     <MockedProvider>
-      <QueryClientProvider client={client}>
-        {children}
-      </QueryClientProvider>
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
     </MockedProvider>
   )
 }

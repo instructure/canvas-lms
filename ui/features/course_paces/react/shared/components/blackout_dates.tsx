@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,7 +19,7 @@
 import React, {useCallback} from 'react'
 import {uid} from '@instructure/uid'
 
-import {BlackoutDate} from '../types'
+import type {BlackoutDate} from '../types'
 import {BlackoutDatesTable} from './blackout_dates_table'
 import NewBlackoutDatesForm from './new_blackout_dates_form'
 

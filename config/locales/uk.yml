@@ -4267,6 +4267,7 @@ uk:
   confirm_delete_6febeafb: "Підтвердити видалення"
   confirm_deletion_b2efe7d4: "Підтвердити видалення"
   confirm_email_address_9072dd3c: "Підтвердити електронну адресу"
+  confirm_password_aaf07824: "Підтвердити пароль"
   confirm_removal_a9bb889: "Підтвердження видалення"
   confirm_reservation_removal_e6350e7c: "Підтвердження зарезервованого видалення"
   confirm_unenrollment_64333263: "Підтвердити дереєстрацію"
@@ -9179,6 +9180,7 @@ uk:
       last_error: "Остання помилка"
   jobs_ec5d59d8: "Перелік робіт"
   join_6cafecca: Приєднатися
+  join_code_1e74e5a8: "Код входу"
   join_course_511e6cb3: "Приєднуйтесь до  %{course}"
   join_group_group_name_871a5e3f: "Приєднуйтесь до групи %{group_name}"
   join_the_conversation_using_the_link_below_54ab1f0e: "Приєднуйтесь до обговорення за посиланням нижче."
@@ -13736,6 +13738,7 @@ uk:
   question_f06476d1: питання
   question_group_837b8014: "Група питань"
   question_mark_icon_d2bbd204: "Іконка питання"
+  question_position_45eba089: "Питання %{position}"
   question_unanswered: "Ще не відповів"
   questions_a955145c: Питання
   queued_d0e45c4b: "В черзі"
@@ -16911,6 +16914,10 @@ uk:
       other: "%{count} додаткових облікових записів"
     titles: 
       sub_accounts: "Додаткові облікові записи"
+  sub_assignment: 
+    atom_no_author: "Немає автора"
+    labels: 
+      due: Очікується
   subaccount_91f4c279: "Додатковий обліковий запис"
   subdomain_url_1e43b6f0: "Субдомен URL"
   subject_114b2e98: Тема
@@ -17613,6 +17620,7 @@ uk:
   time_left_in_your_instant_trial_5dd0392b: "%{time} залишилося в вашому поточному пробному періоді"
   time_left_in_your_instant_trial_extend_now_afb9bd2f: "%{time} залишилося в вашому поточному пробному періоді *(продовжити зараз)*"
   time_limit_a6f1a51e: "Часовий ліміт"
+  time_range_4ae01737: "Діапазон часу"
   time_zone_f56f5183: "Часовий пояс"
   time_zones: 
     abu_dhabi: "Абу Дабі"

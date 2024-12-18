@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2020 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import React from 'react'
 import {useQuery} from '@apollo/react-hooks'
 import {INTERNAL_SETTINGS_QUERY} from './graphql/Queries'
-import {InternalSettingsData} from './types'
+import type {InternalSettingsData} from './types'
 import {InternalSettingsManager} from './InternalSettingsManager'
 
 const I18n = useI18nScope('internal-settings')
