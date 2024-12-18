@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {NewLoginProvider} from '../../context/NewLoginContext'
-import {RememberMeCheckbox} from '..'
 import {render} from '@testing-library/react'
+import React from 'react'
+import {RememberMeCheckbox} from '..'
+import {NewLoginProvider} from '../../context'
 
 describe('RememberMeCheckbox', () => {
   it('mounts without crashing', () => {
     render(
       <NewLoginProvider>
         <RememberMeCheckbox />
-      </NewLoginProvider>
+      </NewLoginProvider>,
     )
   })
 })

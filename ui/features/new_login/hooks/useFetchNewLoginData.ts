@@ -71,7 +71,7 @@ const transformPasswordPolicy = (rawPolicy: any): PasswordPolicy => {
 
 // transform a string into a typed SelfRegistrationType, if valid
 const transformSelfRegistrationType = (
-  value: string | undefined
+  value: string | undefined,
 ): SelfRegistrationType | undefined =>
   value && Object.values(SelfRegistrationType).includes(value as SelfRegistrationType)
     ? (value as SelfRegistrationType)
@@ -84,7 +84,7 @@ const getLoginDataContainer = (): HTMLElement | null => document.getElementById(
 const getStringAttribute = <T>(
   container: HTMLElement,
   attribute: string,
-  transform?: (value: string | undefined) => T | undefined
+  transform?: (value: string | undefined) => T | undefined,
 ): T | undefined => {
   const rawValue = container.getAttribute(attribute)?.trim()
   if (rawValue === '') return undefined
@@ -101,7 +101,7 @@ const getBooleanAttribute = (container: HTMLElement, attribute: string): boolean
 const getObjectAttribute = <T>(
   container: HTMLElement,
   attribute: string,
-  transform?: (raw: unknown) => T
+  transform?: (raw: unknown) => T,
 ): T | undefined => {
   const value = getStringAttribute(container, attribute)
   if (!value) return undefined
@@ -133,7 +133,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         selfRegistrationType: getStringAttribute<SelfRegistrationType>(
           container,
           'data-self-registration-type',
-          transformSelfRegistrationType
+          transformSelfRegistrationType,
         ),
         recaptchaKey: getStringAttribute(container, 'data-recaptcha-key'),
         termsRequired: getBooleanAttribute(container, 'data-terms-required'),
@@ -143,7 +143,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         passwordPolicy: getObjectAttribute<PasswordPolicy>(
           container,
           'data-password-policy',
-          transformPasswordPolicy
+          transformPasswordPolicy,
         ),
         forgotPasswordUrl: getStringAttribute(container, 'data-forgot-password-url'),
         invalidLoginFaqUrl: getStringAttribute(container, 'data-invalid-login-faq-url'),
@@ -152,7 +152,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
 }
 
 // hook …
-export const useNewLoginData = (): NewLoginDataResult => {
+export const useFetchNewLoginData = (): NewLoginDataResult => {
   const [newLoginData, setNewLoginData] = useState<NewLoginData>({
     enableCourseCatalog: undefined,
     authProviders: undefined,

@@ -17,7 +17,7 @@
  */
 
 import {renderHook} from '@testing-library/react-hooks'
-import {useNewLoginData} from '../useNewLoginData'
+import {useFetchNewLoginData} from '..'
 
 const createMockContainer = (
   enableCourseCatalog: string | null,
@@ -35,7 +35,7 @@ const createMockContainer = (
   privacyPolicyUrl: string | null,
   requireEmail: string | null,
   passwordPolicy: string | null,
-  forgotPasswordUrl: string | null
+  forgotPasswordUrl: string | null,
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -90,7 +90,7 @@ const createMockContainer = (
   document.body.appendChild(container)
 }
 
-describe('useNewLoginData', () => {
+describe('useFetchNewLoginData', () => {
   afterEach(() => {
     const container = document.getElementById('new_login_data')
     if (container) {
@@ -99,12 +99,12 @@ describe('useNewLoginData', () => {
   })
 
   it('mounts without crashing', () => {
-    const {result} = renderHook(() => useNewLoginData())
+    const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current).toBeDefined()
   })
 
   it('returns default undefined values when container is not present', () => {
-    const {result} = renderHook(() => useNewLoginData())
+    const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
       authProviders: undefined,
@@ -152,10 +152,10 @@ describe('useNewLoginData', () => {
         require_symbol_characters: 'false',
         disallow_common_passwords: 'true',
       }),
-      'https://example.com/privacy'
+      'https://example.com/privacy',
     )
 
-    const {result} = renderHook(() => useNewLoginData())
+    const {result} = renderHook(() => useFetchNewLoginData())
 
     expect(result.current.data).toEqual({
       enableCourseCatalog: true,
@@ -204,13 +204,13 @@ describe('useNewLoginData', () => {
       null,
       null,
       null,
-      null
+      null,
     )
-    const {result} = renderHook(() => useNewLoginData())
+    const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data.authProviders).toBeUndefined()
     expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining('Failed to parse data-auth-providers'),
-      expect.any(SyntaxError)
+      expect.any(SyntaxError),
     )
     consoleErrorMock.mockRestore()
   })
@@ -232,16 +232,16 @@ describe('useNewLoginData', () => {
       null,
       null,
       null,
-      null
+      null,
     )
-    const {result} = renderHook(() => useNewLoginData())
+    const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data.enableCourseCatalog).toBe(false)
     expect(result.current.data.isPreviewMode).toBe(false)
   })
 
   it('returns undefined for empty string attributes', () => {
     createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
-    const {result} = renderHook(() => useNewLoginData())
+    const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
       authProviders: undefined,

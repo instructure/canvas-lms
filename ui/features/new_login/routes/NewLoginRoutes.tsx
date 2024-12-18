@@ -17,11 +17,11 @@
  */
 
 import React, {lazy} from 'react'
-import RegistrationRoutesMiddleware from './RegistrationRoutesMiddleware'
-import {LoginLayout} from '../layouts/LoginLayout'
-import {NewLoginProvider} from '../context/NewLoginContext'
-import {ROUTES} from './routes'
 import {Route} from 'react-router-dom'
+import {NewLoginDataProvider, NewLoginProvider} from '../context'
+import {LoginLayout} from '../layouts/LoginLayout'
+import RegistrationRoutesMiddleware from './RegistrationRoutesMiddleware'
+import {ROUTES} from './routes'
 
 const SignIn = lazy(() => import('../pages/SignIn'))
 const ForgotPassword = lazy(() => import('../pages/ForgotPassword'))
@@ -35,7 +35,9 @@ export const NewLoginRoutes = (
     path={ROUTES.SIGN_IN}
     element={
       <NewLoginProvider>
-        <LoginLayout />
+        <NewLoginDataProvider>
+          <LoginLayout />
+        </NewLoginDataProvider>
       </NewLoginProvider>
     }
   >

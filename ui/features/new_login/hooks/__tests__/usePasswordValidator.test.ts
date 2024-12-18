@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {PasswordPolicy} from '../../types'
 import {renderHook} from '@testing-library/react-hooks'
-import {usePasswordValidator} from '../usePasswordValidator'
+import {usePasswordValidator} from '..'
+import type {PasswordPolicy} from '../../types'
 
 describe('usePasswordValidator', () => {
   const policy: PasswordPolicy = {

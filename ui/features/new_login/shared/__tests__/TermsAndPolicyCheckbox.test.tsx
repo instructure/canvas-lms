@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {render, screen} from '@testing-library/react'
 import React from 'react'
 import TermsAndPolicyCheckbox from '../TermsAndPolicyCheckbox'
-import {render, screen} from '@testing-library/react'
 
 describe('TermsAndPolicyCheckbox', () => {
   const termsOfUseUrl = 'http://www.canvaslms.com/policies/terms-of-use'
@@ -31,7 +31,7 @@ describe('TermsAndPolicyCheckbox', () => {
         checked={false}
         isDisabled={false}
         onChange={jest.fn()}
-      />
+      />,
     )
   })
 
@@ -44,14 +44,14 @@ describe('TermsAndPolicyCheckbox', () => {
         onChange={jest.fn()}
         termsOfUseUrl={termsOfUseUrl}
         privacyPolicyUrl={privacyPolicyUrl}
-      />
+      />,
     )
     expect(screen.getByText('terms of use')).toBeInTheDocument()
     expect(screen.getByText('privacy policy')).toBeInTheDocument()
     expect(screen.getByText('terms of use').closest('a')).toHaveAttribute('href', termsOfUseUrl)
     expect(screen.getByText('privacy policy').closest('a')).toHaveAttribute(
       'href',
-      privacyPolicyUrl
+      privacyPolicyUrl,
     )
   })
 
@@ -63,7 +63,7 @@ describe('TermsAndPolicyCheckbox', () => {
         isDisabled={false}
         onChange={jest.fn()}
         termsOfUseUrl={termsOfUseUrl}
-      />
+      />,
     )
     expect(screen.getByText('terms of use')).toBeInTheDocument()
     expect(screen.queryByText('privacy policy')).not.toBeInTheDocument()
@@ -78,13 +78,13 @@ describe('TermsAndPolicyCheckbox', () => {
         isDisabled={false}
         onChange={jest.fn()}
         privacyPolicyUrl={privacyPolicyUrl}
-      />
+      />,
     )
     expect(screen.getByText('privacy policy')).toBeInTheDocument()
     expect(screen.queryByText('terms of use')).not.toBeInTheDocument()
     expect(screen.getByText('privacy policy').closest('a')).toHaveAttribute(
       'href',
-      privacyPolicyUrl
+      privacyPolicyUrl,
     )
   })
 
@@ -95,7 +95,7 @@ describe('TermsAndPolicyCheckbox', () => {
         checked={false}
         isDisabled={false}
         onChange={jest.fn()}
-      />
+      />,
     )
     expect(container).toBeEmptyDOMElement()
   })

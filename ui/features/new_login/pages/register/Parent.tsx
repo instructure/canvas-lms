@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useState} from 'react'
-import type {ReCaptchaSectionRef} from '../../shared/recaptcha/ReCaptchaSection'
-import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
-import {ROUTES} from '../../routes/routes'
-import {ReCaptchaSection} from '../../shared/recaptcha'
-import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
-import {createParentAccount} from '../../services'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {TextInput} from '@instructure/ui-text-input'
+import React, {useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../../context/NewLoginContext'
-import {usePasswordValidator} from '../../hooks/usePasswordValidator'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {useServerErrorsMap} from '../../hooks/useServerErrorsMap'
+import {useNewLogin, useNewLoginData} from '../../context'
+import {usePasswordValidator, useServerErrorsMap} from '../../hooks'
+import {ROUTES} from '../../routes/routes'
+import {createParentAccount} from '../../services'
+import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {EMAIL_REGEX, createErrorMessage, handleRegistrationRedirect} from '../../shared/helpers'
+import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
 
 const I18n = createI18nScope('new_login')
 
@@ -48,15 +46,9 @@ const ERROR_MESSAGES = {
 }
 
 const Parent = () => {
-  const {
-    isUiActionPending,
-    setIsUiActionPending,
-    passwordPolicy,
-    privacyPolicyUrl,
-    recaptchaKey,
-    termsOfUseUrl,
-    termsRequired,
-  } = useNewLogin()
+  const {isUiActionPending, setIsUiActionPending} = useNewLogin()
+  const {passwordPolicy, privacyPolicyUrl, recaptchaKey, termsOfUseUrl, termsRequired} =
+    useNewLoginData()
   const validatePassword = usePasswordValidator(passwordPolicy)
   const serverErrorsMap = useServerErrorsMap(passwordPolicy)
   const navigate = useNavigate()
@@ -107,7 +99,7 @@ const Parent = () => {
       if (errorKey) {
         setPasswordError(
           // using server error messaging here to avoid duplication
-          serverErrorsMap[`pseudonym.password.${errorKey}`] || I18n.t('An unknown error occurred.')
+          serverErrorsMap[`pseudonym.password.${errorKey}`] || I18n.t('An unknown error occurred.'),
         )
         passwordInputRef.current?.focus()
         return false
@@ -315,7 +307,6 @@ const Parent = () => {
   }
 
   const handleReCaptchaVerify = (token: string | null) => {
-     
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
     setCaptchaToken(token)
   }

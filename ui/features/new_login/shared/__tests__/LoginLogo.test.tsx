@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
+import React from 'react'
 import {LoginLogo} from '..'
-import {NewLoginProvider} from '../../context/NewLoginContext'
+import {NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 describe('LoginLogo', () => {
   it('mounts without crashing', () => {
     render(
       <NewLoginProvider>
-        <LoginLogo />
-      </NewLoginProvider>
+        <NewLoginDataProvider>
+          <LoginLogo />
+        </NewLoginDataProvider>
+      </NewLoginProvider>,
     )
   })
 })

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
+import React from 'react'
 import LoginAlert from '../LoginAlert'
 
 describe('LoginAlert', () => {
@@ -27,7 +27,7 @@ describe('LoginAlert', () => {
         invalidLoginFaqUrl="https://example.com/login-faq"
         onClose={() => {}}
         loginHandleName="username"
-      />
+      />,
     )
   })
 

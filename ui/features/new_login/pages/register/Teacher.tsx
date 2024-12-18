@@ -16,23 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useState} from 'react'
-import type {ReCaptchaSectionRef} from '../../shared/recaptcha/ReCaptchaSection'
-import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {ROUTES} from '../../routes/routes'
-import {ReCaptchaSection} from '../../shared/recaptcha'
-import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
-import {createTeacherAccount} from '../../services'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {TextInput} from '@instructure/ui-text-input'
+import React, {useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {useServerErrorsMap} from '../../hooks/useServerErrorsMap'
+import {useNewLogin, useNewLoginData} from '../../context'
+import {useServerErrorsMap} from '../../hooks'
+import {ROUTES} from '../../routes/routes'
+import {createTeacherAccount} from '../../services'
+import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {EMAIL_REGEX, createErrorMessage, handleRegistrationRedirect} from '../../shared/helpers'
+import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
 
 const I18n = createI18nScope('new_login')
 
@@ -43,15 +42,9 @@ const ERROR_MESSAGES = {
 }
 
 const Teacher = () => {
-  const {
-    isUiActionPending,
-    setIsUiActionPending,
-    passwordPolicy,
-    privacyPolicyUrl,
-    recaptchaKey,
-    termsOfUseUrl,
-    termsRequired,
-  } = useNewLogin()
+  const {isUiActionPending, setIsUiActionPending} = useNewLogin()
+  const {passwordPolicy, privacyPolicyUrl, recaptchaKey, termsOfUseUrl, termsRequired} =
+    useNewLoginData()
   const serverErrorsMap = useServerErrorsMap(passwordPolicy)
   const navigate = useNavigate()
 

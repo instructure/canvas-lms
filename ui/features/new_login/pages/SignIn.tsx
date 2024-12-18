@@ -16,37 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import OtpForm from './OtpForm'
-import {ActionPrompt, RememberMeCheckbox, SignInLinks, SSOButtons} from '../shared'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {SelfRegistrationType} from '../types'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {createErrorMessage} from '../shared/helpers'
+import React, {useEffect, useRef, useState} from 'react'
+import {useNewLogin, useNewLoginData} from '../context'
 import {performSignIn} from '../services'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {ActionPrompt, RememberMeCheckbox, SSOButtons, SignInLinks} from '../shared'
 import LoginAlert from '../shared/LoginAlert'
+import {createErrorMessage} from '../shared/helpers'
+import {SelfRegistrationType} from '../types'
+import OtpForm from './OtpForm'
 
 const I18n = createI18nScope('new_login')
 
 const SignIn = () => {
-  const {
-    authProviders,
-    invalidLoginFaqUrl,
-    isPreviewMode,
-    isUiActionPending,
-    setIsUiActionPending,
-    loginHandleName,
-    otpRequired,
-    setOtpRequired,
-    rememberMe,
-    selfRegistrationType,
-  } = useNewLogin()
+  const {isUiActionPending, setIsUiActionPending, otpRequired, setOtpRequired, rememberMe} =
+    useNewLogin()
+  const {authProviders, invalidLoginFaqUrl, isPreviewMode, selfRegistrationType, loginHandleName} =
+    useNewLoginData()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
