@@ -169,6 +169,7 @@ class TimeBlockSelectorRow extends React.Component {
               onClick={this.handleDelete}
               withBorder={false}
               withBackground={false}
+              data-testid="delete-button"
             />
           )}
         </div>
