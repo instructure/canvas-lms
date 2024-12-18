@@ -185,13 +185,11 @@ class UnzipAttachment
   end
 
   def with_unzip_configuration
-    Attachment.skip_touch_context(true)
-    Attachment.skip_3rd_party_submits(true)
-    FileInContext.queue_files_to_delete(true)
-    begin
+    Attachment.skip_touch_context do
+      Attachment.skip_3rd_party_submits(true)
+      FileInContext.queue_files_to_delete(true)
       yield
     ensure
-      Attachment.skip_touch_context(false)
       Attachment.skip_3rd_party_submits(false)
       FileInContext.queue_files_to_delete(false)
       FileInContext.destroy_queued_files

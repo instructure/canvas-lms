@@ -94,152 +94,153 @@ module Importers
         (data["web_link_categories"] || []).pluck("links").flatten.each do |link|
           course.external_url_hash[link["link_id"]] = link
         end
-        ActiveRecord::Base.skip_touch_context
 
-        unless migration.for_course_copy?
-          migration.find_source_course_for_import if migration.canvas_import?
-          Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
-          Importers::GradingStandardImporter.select_course_grading_standard(data, migration)
-          # These only need to be processed once
-          Attachment.skip_media_object_creation do
-            process_migration_files(data, migration)
-            migration.update_import_progress(18)
-            Importers::AttachmentImporter.process_migration(data, migration)
-            migration.update_import_progress(20)
-            mo_attachments = migration.imported_migration_items_by_class(Attachment).find_all { |i| i.media_entry_id.present? }
-            begin
-              import_media_objects(mo_attachments, migration)
-            rescue => e
-              er = Canvas::Errors.capture_exception(:import_media_objects, e)[:error_report]
-              error_message = t("Failed to import media objects")
-              migration.add_error(error_message, error_report_id: er)
+        ActiveRecord::Base.skip_touch_context do
+          unless migration.for_course_copy?
+            migration.find_source_course_for_import if migration.canvas_import?
+            Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
+            Importers::GradingStandardImporter.select_course_grading_standard(data, migration)
+            # These only need to be processed once
+            Attachment.skip_media_object_creation do
+              process_migration_files(data, migration)
+              migration.update_import_progress(18)
+              Importers::AttachmentImporter.process_migration(data, migration)
+              migration.update_import_progress(20)
+              mo_attachments = migration.imported_migration_items_by_class(Attachment).find_all { |i| i.media_entry_id.present? }
+              begin
+                import_media_objects(mo_attachments, migration)
+              rescue => e
+                er = Canvas::Errors.capture_exception(:import_media_objects, e)[:error_report]
+                error_message = t("Failed to import media objects")
+                migration.add_error(error_message, error_report_id: er)
+              end
             end
           end
+
+          if (!migration.for_course_copy? || Account.site_admin.feature_enabled?(:media_links_use_attachment_id)) &&
+             (migration.canvas_import? || migration.for_master_course_import?)
+            migration.update_import_progress(30)
+            Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
+          end
+
+          migration.update_import_progress(35)
+          unless migration.quizzes_next_banks_migration?
+            question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration)
+            migration.update_import_progress(45)
+          end
+          Importers::GroupImporter.process_migration(data, migration)
+          migration.update_import_progress(48)
+          Importers::LearningOutcomeImporter.process_migration(data, migration)
+          migration.update_import_progress(50)
+          Importers::RubricImporter.process_migration(data, migration)
+          migration.update_import_progress(52)
+          course.assignment_group_no_drop_assignments = {}
+          Importers::AssignmentGroupImporter.process_migration(data, migration)
+          migration.update_import_progress(54)
+          Importers::ExternalFeedImporter.process_migration(data, migration)
+          migration.update_import_progress(56)
+          Importers::GradingStandardImporter.process_migration(data, migration)
+          migration.update_import_progress(58)
+          Importers::ContextExternalToolImporter.process_migration(data, migration)
+          migration.update_import_progress(60)
+          Importers::ToolProfileImporter.process_migration(data, migration)
+          migration.update_import_progress(61)
+
+          Assignment.suspend_due_date_caching do
+            Importers::QuizImporter.process_migration(data, migration, question_data)
+            migration.update_import_progress(65)
+          end
+
+          Assignment.suspend_due_date_caching do
+            Importers::DiscussionTopicImporter.process_migration(data, migration)
+            migration.update_import_progress(70)
+          end
+          Importers::WikiPageImporter.process_migration(data, migration)
+          migration.update_import_progress(75)
+
+          Assignment.suspend_due_date_caching do
+            Importers::AssignmentImporter.process_migration(data, migration)
+            migration.update_import_progress(80)
+          end
+
+          module_id = migration.migration_settings[:insert_into_module_id].presence
+          unless module_id && course.context_modules.where(id: module_id).exists? # we're importing into a module so don't create new ones
+            Importers::ContextModuleImporter.process_migration(data, migration)
+          end
+
+          migration.update_import_progress(85)
+          Importers::WikiPageImporter.process_migration_course_outline(data, migration)
+          Importers::CalendarEventImporter.process_migration(data, migration)
+          Importers::LtiResourceLinkImporter.process_migration(data, migration)
+
+          # FIXME: Eventually remove feature flag checking
+          Importers::CoursePaceImporter.process_migration(data, migration) if course.account.feature_enabled?(:course_paces)
+
+          everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
+
+          if (everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])) && !(migration.should_skip_import? "all_course_settings")
+            import_settings_from_migration(course, data, migration)
+            Importers::LatePolicyImporter.process_migration(data, migration) unless migration.should_skip_import? "LatePolicy"
+          end
+          migration.update_import_progress(90)
+
+          if (migration.migration_settings[:import_blueprint_settings] || (migration.copy_options && migration.copy_options[:all_blueprint_settings])) &&
+             (course.account.grants_right?(migration.user, :manage_courses_admin) && course.account.grants_right?(migration.user, :manage_master_courses))
+            Importers::BlueprintSettingsImporter.process_migration(data, migration)
+          end
+
+          front_page = course.wiki.front_page
+          course.wiki.unset_front_page! if front_page.nil? || front_page.new_record?
+
+          syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
+          if syllabus_should_be_added
+            syllabus_body = data[:course][:syllabus_body] if data[:course]
+            import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
+          end
+
+          course.save! if course.changed?
+
+          migration.resolve_content_links!
+          migration.update_import_progress(95)
+
+          if data["external_content"]
+            Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data["external_content"])
+          end
+          migration.update_import_progress(97)
+
+          insert_into_module(course, migration, data)
+          migration.update_import_progress(98)
+
+          move_to_assignment_group(course, migration)
+          migration.update_import_progress(99)
+
+          adjust_dates(course, migration)
+
+          migration.progress = 100
+          migration.migration_settings ||= {}
+
+          imported_asset_hash = {}
+          migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(",") if assets.present? }
+          migration.migration_settings[:imported_assets] = imported_asset_hash
+          migration.migration_settings[:attachment_path_id_lookup] = migration.attachment_path_id_lookup
+          migration.workflow_state = :imported unless post_processing?(migration)
+          migration.save
+
+          if migration.for_master_course_import? &&
+             migration.migration_settings[:publish_after_completion] &&
+             course.unpublished?
+            # i could just do it directly but this way preserves the audit trail
+            course.update_one({ event: "offer" }, migration.user, :blueprint_sync)
+          end
+
+          if course.changed?
+            course.save!
+          else
+            course.touch
+          end
+
+          clear_assignment_and_quiz_caches(migration)
         end
-
-        if (!migration.for_course_copy? || Account.site_admin.feature_enabled?(:media_links_use_attachment_id)) &&
-           (migration.canvas_import? || migration.for_master_course_import?)
-          migration.update_import_progress(30)
-          Importers::MediaTrackImporter.process_migration(data[:media_tracks], migration)
-        end
-
-        migration.update_import_progress(35)
-        unless migration.quizzes_next_banks_migration?
-          question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration)
-          migration.update_import_progress(45)
-        end
-        Importers::GroupImporter.process_migration(data, migration)
-        migration.update_import_progress(48)
-        Importers::LearningOutcomeImporter.process_migration(data, migration)
-        migration.update_import_progress(50)
-        Importers::RubricImporter.process_migration(data, migration)
-        migration.update_import_progress(52)
-        course.assignment_group_no_drop_assignments = {}
-        Importers::AssignmentGroupImporter.process_migration(data, migration)
-        migration.update_import_progress(54)
-        Importers::ExternalFeedImporter.process_migration(data, migration)
-        migration.update_import_progress(56)
-        Importers::GradingStandardImporter.process_migration(data, migration)
-        migration.update_import_progress(58)
-        Importers::ContextExternalToolImporter.process_migration(data, migration)
-        migration.update_import_progress(60)
-        Importers::ToolProfileImporter.process_migration(data, migration)
-        migration.update_import_progress(61)
-
-        Assignment.suspend_due_date_caching do
-          Importers::QuizImporter.process_migration(data, migration, question_data)
-          migration.update_import_progress(65)
-        end
-
-        Assignment.suspend_due_date_caching do
-          Importers::DiscussionTopicImporter.process_migration(data, migration)
-          migration.update_import_progress(70)
-        end
-        Importers::WikiPageImporter.process_migration(data, migration)
-        migration.update_import_progress(75)
-
-        Assignment.suspend_due_date_caching do
-          Importers::AssignmentImporter.process_migration(data, migration)
-          migration.update_import_progress(80)
-        end
-
-        module_id = migration.migration_settings[:insert_into_module_id].presence
-        unless module_id && course.context_modules.where(id: module_id).exists? # we're importing into a module so don't create new ones
-          Importers::ContextModuleImporter.process_migration(data, migration)
-        end
-
-        migration.update_import_progress(85)
-        Importers::WikiPageImporter.process_migration_course_outline(data, migration)
-        Importers::CalendarEventImporter.process_migration(data, migration)
-        Importers::LtiResourceLinkImporter.process_migration(data, migration)
-
-        # FIXME: Eventually remove feature flag checking
-        Importers::CoursePaceImporter.process_migration(data, migration) if course.account.feature_enabled?(:course_paces)
-
-        everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
-
-        if (everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])) && !(migration.should_skip_import? "all_course_settings")
-          import_settings_from_migration(course, data, migration)
-          Importers::LatePolicyImporter.process_migration(data, migration) unless migration.should_skip_import? "LatePolicy"
-        end
-        migration.update_import_progress(90)
-
-        if (migration.migration_settings[:import_blueprint_settings] || (migration.copy_options && migration.copy_options[:all_blueprint_settings])) &&
-           (course.account.grants_right?(migration.user, :manage_courses_admin) && course.account.grants_right?(migration.user, :manage_master_courses))
-          Importers::BlueprintSettingsImporter.process_migration(data, migration)
-        end
-
-        front_page = course.wiki.front_page
-        course.wiki.unset_front_page! if front_page.nil? || front_page.new_record?
-
-        syllabus_should_be_added = everything_selected || migration.copy_options[:syllabus_body] || migration.copy_options[:all_syllabus_body]
-        if syllabus_should_be_added
-          syllabus_body = data[:course][:syllabus_body] if data[:course]
-          import_syllabus_from_migration(course, syllabus_body, migration) if syllabus_body
-        end
-
-        course.save! if course.changed?
-
-        migration.resolve_content_links!
-        migration.update_import_progress(95)
-
-        if data["external_content"]
-          Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data["external_content"])
-        end
-        migration.update_import_progress(97)
-
-        insert_into_module(course, migration, data)
-        migration.update_import_progress(98)
-
-        move_to_assignment_group(course, migration)
-        migration.update_import_progress(99)
-
-        adjust_dates(course, migration)
-
-        migration.progress = 100
-        migration.migration_settings ||= {}
-
-        imported_asset_hash = {}
-        migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(",") if assets.present? }
-        migration.migration_settings[:imported_assets] = imported_asset_hash
-        migration.migration_settings[:attachment_path_id_lookup] = migration.attachment_path_id_lookup
-        migration.workflow_state = :imported unless post_processing?(migration)
-        migration.save
-
-        if migration.for_master_course_import? &&
-           migration.migration_settings[:publish_after_completion] &&
-           course.unpublished?
-          # i could just do it directly but this way preserves the audit trail
-          course.update_one({ event: "offer" }, migration.user, :blueprint_sync)
-        end
-
-        if course.changed?
-          course.save!
-        else
-          course.touch
-        end
-
-        clear_assignment_and_quiz_caches(migration)
       end
 
       migration.trigger_live_events!
@@ -251,8 +252,6 @@ module Importers
     rescue Exception # rubocop:disable Lint/RescueException
       InstStatsd::Statsd.increment("content_migrations.import_failure")
       raise
-    ensure
-      ActiveRecord::Base.skip_touch_context(false)
     end
 
     def self.insert_into_module(course, migration, data)
