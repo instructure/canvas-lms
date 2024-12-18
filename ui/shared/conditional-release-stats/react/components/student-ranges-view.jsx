@@ -58,11 +58,13 @@ export default class StudentRangesView extends React.Component {
       const upper = transformScore(range.scoring_range.upper_bound, this.props.assignment, true)
       const rangeTitle = `> ${lower} - ${upper}`
       return (
-        <View as="div" padding="xxx-small">
+        <View
+          key={`range-${i}`}
+          as="div"
+          padding="xxx-small"
+        >
           <ToggleDetails
             variant="filled"
-             
-            key={i}
             expanded={expanded}
             summary={rangeTitle}
             onToggle={() => this.handleToggle(i)}
