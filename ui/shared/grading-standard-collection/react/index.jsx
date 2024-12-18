@@ -29,7 +29,7 @@ const I18n = createI18nScope('external_toolsgradingStandardCollection')
 class GradingStandardCollection extends React.Component {
   state = {standards: null}
 
-  UNSAFE_componentWillMount() {
+  componentDidMount() {
     if (ENV.GRADING_STANDARDS_URL) {
       $.getJSON(`${ENV.GRADING_STANDARDS_URL}.json`).done(this.gotStandards)
     }
@@ -44,8 +44,12 @@ class GradingStandardCollection extends React.Component {
     this.setState({standards: formattedStandards})
   }
 
-  formatStandardData = standardData =>
-    map(standardData, dataRow => [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)])
+  formatStandardData = standardData => {
+    const formatted = map(standardData, dataRow => {
+      return [dataRow[0], this.roundToTwoDecimalPlaces(dataRow[1] * 100)]
+    })
+    return formatted
+  }
 
   addGradingStandard = () => {
     const newStandard = {

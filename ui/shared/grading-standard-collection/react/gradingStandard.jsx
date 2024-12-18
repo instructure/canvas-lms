@@ -211,7 +211,6 @@ class GradingStandard extends React.Component {
     return data.map(function (item, idx, array) {
       return (
         <DataRow
-           
           key={idx}
           uniqueId={idx}
           row={item}
@@ -419,6 +418,7 @@ class GradingStandard extends React.Component {
         <div
           className="grading_standard react_grading_standard pad-box-mini border border-trbl border-round"
           id={this.renderIdNames()}
+          data-testid={this.renderIdNames()}
         >
           {this.renderStandardAlert()}
           <div>
