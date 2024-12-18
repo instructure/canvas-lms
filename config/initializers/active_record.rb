@@ -366,7 +366,7 @@ class ActiveRecord::Base
     end
 
     value = wildcard_pattern(value, case_sensitive:, type:)
-    cols = args.map { |col| like_condition(col, "?", !case_sensitive) }
+    cols = args.map { |col| like_condition(col, "?", downcase: !case_sensitive) }
     sanitize_sql_array ["(#{cols.join(" OR ")})", *([value] * cols.size)]
   end
 
@@ -383,7 +383,7 @@ class ActiveRecord::Base
     value = args.pop
     value = wildcard_pattern(value)
     cols = coalesce_chain(args)
-    sanitize_sql_array ["(#{like_condition(cols, "?", false)})", value]
+    sanitize_sql_array ["(#{like_condition(cols, "?", downcase: false)})", value]
   end
 
   def self.coalesce_chain(cols)
@@ -394,7 +394,7 @@ class ActiveRecord::Base
     "COALESCE(LOWER(#{column}), '')"
   end
 
-  def self.like_condition(value, pattern = "?", downcase = true)
+  def self.like_condition(value, pattern = "?", downcase: true)
     value = "LOWER(#{value})" if downcase
     "#{value} LIKE #{pattern}"
   end
@@ -1578,7 +1578,7 @@ end
 Switchman::ActiveRecord::Relation.include(UpdateAndDeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
-  def respond_to?(name, include_private = false)
+  def respond_to?(name, include_private = false) # rubocop:disable Style/OptionalBooleanParameter
     return super if [:marshal_dump, :_dump, "marshal_dump", "_dump"].include?(name)
 
     super ||

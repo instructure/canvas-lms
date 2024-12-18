@@ -367,29 +367,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "3eaff243d053ea3fc947043dbc45d2fa3e8f0f7b3be372c9c304892afc5766b9",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/conversation_participant.rb",
-      "line": 72,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "where((\"conversation_participants.root_account_ids <> '' AND \" + like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)), ((\"[\" + Shard.birth.activate do\n accts = (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end\n((masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:id) + (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:global_id))\n\n end.join(\"][\")) + \"]\"))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ConversationParticipant",
-        "method": "for_masquerading_user"
-      },
-      "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "43aed4f93ac312cbfc36318b3752856c01b9db4c4b3a6677509a5681d755842f",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -656,6 +633,29 @@
       "confidence": "Medium",
       "cwe_id": [
         22
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "750eb4c930157426d6110fe086f4f5567c5baacf015a038468b99519ac0ede2f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/conversation_participant.rb",
+      "line": 72,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where((\"conversation_participants.root_account_ids <> '' AND \" + like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", :downcase => false)), ((\"[\" + Shard.birth.activate do\n accts = (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end\n((masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:id) + (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:global_id))\n\n end.join(\"][\")) + \"]\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ConversationParticipant",
+        "method": "for_masquerading_user"
+      },
+      "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", :downcase => false)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
       ],
       "note": ""
     },
