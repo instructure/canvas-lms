@@ -45,10 +45,11 @@ const InstructureLogo = () => {
     >
       <Img
         constrain="contain"
-        display="block"
         height="1.125rem"
         src={require('../assets/images/instructure.svg')}
         width="7.9375rem"
+        // InstUI v10 bug: <Img /> does not focus when display="block"
+        // Semantically, this standalone image is block-level
       />
     </Link>
   )

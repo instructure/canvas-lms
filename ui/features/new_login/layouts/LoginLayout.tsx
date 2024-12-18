@@ -55,7 +55,7 @@ export const LoginLayout = () => {
                   <Flex direction="column" gap="large">
                     <FooterLinks />
 
-                    <Flex.Item align="center">
+                    <Flex.Item align="center" overflowX="visible" overflowY="visible">
                       <InstructureLogo />
                     </Flex.Item>
                   </Flex>
