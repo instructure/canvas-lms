@@ -112,6 +112,26 @@ class EportfolioCategoriesController < ApplicationController
     end
   end
 
+  # pages of a category
+  def pages
+    return unless authorized_action(@portfolio, @current_user, :read)
+
+    @category = @portfolio.eportfolio_categories.find(params[:category_id])
+    entries = Api.paginate(
+      @category.eportfolio_entries.order(:position),
+      self,
+      api_v1_eportfolio_pages_url
+    )
+
+    entries_json = entries.map do |e|
+      entry_url = @category.slug.presence && e.slug.presence && eportfolio_named_category_entry_path(@portfolio, @category.slug, e.slug)
+      hash = eportfolio_entry_json(e, @current_user, session)
+      hash["entry_url"] = entry_url
+      hash
+    end
+    render json: entries_json
+  end
+
   protected
 
   def eportfolio_category_params

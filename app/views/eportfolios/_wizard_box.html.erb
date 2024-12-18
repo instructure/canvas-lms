@@ -65,20 +65,16 @@
             <p><%= t('pages.body1', <<-DETAILS,
               Sections have multiple pages. You can see the list of pages for
               the current section on the right side of the window (%{showme1}).
-              To organize or add pages, click the "%{manage_pages}" link
-              (%{showme2}).
+              To organize or edit a page, click the %{manage_pages}.
               DETAILS
               :showme1 => show_me('pages_list_hover'),
-              :manage_pages => manage_pages_link_text,
-              :showme2 => show_me('organize_pages_hover')) %></p>
+              :manage_pages => '<i class="icon-more"></i>'.html_safe) %></p>
 
             <p><%= t('pages.body2', <<-DETAILS,
-              You can rename any page by click on the %{edit_icon} icon that
-              appears, delete a page by clicking the %{delete_icon} icon, or
-              rearrange the order of pages by click and dragging them.
+              You can rename any section by clicking "Rename", rearrange sections by clicking "Move To...",
+              or delete sections by clicking "Delete" in the popup menu.
               DETAILS
-              :edit_icon => edit_icon,
-              :delete_icon => delete_icon) %></p>
+              ) %></p>
           </div>
         </div>
       </li>
