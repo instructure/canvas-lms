@@ -2775,10 +2775,18 @@ class UsersController < ApplicationController
               existing_users:
             )
           end
-      elsif user.save
-        invited_users << user_hash.merge(id: user.id, user_token: user.token)
       else
-        errored_users << user_hash.merge(user.errors.as_json)
+        # I didn't want a long running transaction for all the users so we get a single transaction
+        # per user. This call to save creates causes the cc and user to changing triggering to
+        # potential syncs, hence the transaction debouncing
+        user_saved = User.transaction do
+          user.save
+        end
+        if user_saved
+          invited_users << user_hash.merge(id: user.id, user_token: user.token)
+        else
+          errored_users << user_hash.merge(user.errors.as_json)
+        end
       end
     end
     render json: { invited_users:, errored_users: }
