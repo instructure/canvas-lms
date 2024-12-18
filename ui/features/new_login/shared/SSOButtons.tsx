@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {AuthProvider} from '../types'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Responsive} from '@instructure/ui-responsive'
-import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {canvas} from '@instructure/ui-theme-tokens'
-import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
+import React from 'react'
+import {useNewLogin, useNewLoginData} from '../context'
+import type {AuthProvider} from '../types'
 
 import iconApple from '../assets/images/apple.svg'
 import iconClasslink from '../assets/images/classlink.svg'
@@ -50,7 +50,8 @@ const providerIcons: Record<string, string> = {
 }
 
 const SSOButtons = () => {
-  const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
+  const {isUiActionPending} = useNewLogin()
+  const {isPreviewMode, authProviders} = useNewLoginData()
 
   const isDisabled = isPreviewMode || isUiActionPending
 
@@ -59,7 +60,7 @@ const SSOButtons = () => {
   }
 
   const handleClick = (
-    event: React.KeyboardEvent<ViewOwnProps> | React.MouseEvent<ViewOwnProps>
+    event: React.KeyboardEvent<ViewOwnProps> | React.MouseEvent<ViewOwnProps>,
   ) => {
     if (isDisabled) {
       event.preventDefault()

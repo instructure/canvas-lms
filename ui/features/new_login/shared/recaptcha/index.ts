@@ -16,6 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {default as ReCaptchaSection} from './ReCaptchaSection'
+export {default as ReCaptchaSection, type ReCaptchaSectionRef} from './ReCaptchaSection'
 export {default as ReCaptchaWrapper} from './ReCaptchaWrapper'
 export {default as ReCaptcha} from './ReCaptcha'

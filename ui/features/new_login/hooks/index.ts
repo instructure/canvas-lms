@@ -16,29 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import classNames from 'classnames'
-import React, {useMemo} from 'react'
-import {useNewLoginData} from '../context'
-
-interface Props {
-  className?: string
-}
-
-const Background = ({className}: Props) => {
-  const {bodyBgColor, bodyBgImage} = useNewLoginData()
-
-  const backgroundStyle = useMemo(
-    () => ({
-      backgroundColor: bodyBgColor || undefined,
-      backgroundImage: bodyBgImage ? `url(${bodyBgImage})` : undefined,
-      backgroundPosition: 'left center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-    }),
-    [bodyBgColor, bodyBgImage],
-  )
-
-  return <div className={classNames(className)} style={backgroundStyle} />
-}
-
-export default Background
+export {useFetchNewLoginData} from './useFetchNewLoginData'
+export {usePasswordValidator} from './usePasswordValidator'
+export {useServerErrorsMap} from './useServerErrorsMap'

@@ -18,17 +18,17 @@
 
 import React from 'react'
 import '@testing-library/jest-dom'
-import SignIn from '../SignIn'
-import {MemoryRouter} from 'react-router-dom'
-import {NewLoginProvider} from '../../context/NewLoginContext'
 import {render} from '@testing-library/react'
+import {MemoryRouter} from 'react-router-dom'
+import {NewLoginDataProvider, NewLoginProvider} from '../../context'
+import SignIn from '../SignIn'
 
-jest.mock('../../context/NewLoginContext', () => {
-  const actualContext = jest.requireActual('../../context/NewLoginContext')
+jest.mock('../../context/NewLoginDataContext', () => {
+  const actualContext = jest.requireActual('../../context/NewLoginDataContext')
   return {
     ...actualContext,
-    useNewLogin: () => ({
-      ...actualContext.useNewLogin(),
+    useNewLoginData: () => ({
+      ...actualContext.useNewLoginData(),
       // mock the data attribute default values that would normally be provided by the back-end
       loginHandleName: 'Email',
     }),
@@ -40,9 +40,11 @@ describe('SignIn', () => {
     render(
       <MemoryRouter>
         <NewLoginProvider>
-          <SignIn />
+          <NewLoginDataProvider>
+            <SignIn />
+          </NewLoginDataProvider>
         </NewLoginProvider>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

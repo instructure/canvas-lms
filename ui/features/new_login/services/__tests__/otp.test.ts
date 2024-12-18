@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../otp'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {cancelOtpRequest, initiateOtpRequest, verifyOtpRequest} from '../otp'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,

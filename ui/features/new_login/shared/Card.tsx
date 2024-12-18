@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
+import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
-import {Link} from '@instructure/ui-link'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import React from 'react'
 
 const I18n = createI18nScope('new_login')
 

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Global, css} from '@instructure/emotion'
 import React from 'react'
-import {css, Global} from '@instructure/emotion'
 
 // https://emotion.sh/docs/@emotion/css#global-styles
 const GlobalStyle = () => (

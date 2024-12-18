@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Checkbox} from '@instructure/ui-checkbox'
+import React from 'react'
+import {useNewLogin} from '../context'
 
 const I18n = createI18nScope('new_login')
 

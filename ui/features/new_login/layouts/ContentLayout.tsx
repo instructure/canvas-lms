@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense} from 'react'
-import classNames from 'classnames'
-import {Background, Loading} from '../shared'
-import {Responsive} from '@instructure/ui-responsive'
-import {View} from '@instructure/ui-view'
-import {canvas} from '@instructure/ui-theme-tokens'
-import {useNewLogin} from '../context/NewLoginContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Responsive} from '@instructure/ui-responsive'
+import {canvas} from '@instructure/ui-theme-tokens'
+import {View} from '@instructure/ui-view'
+import classNames from 'classnames'
+import React, {Suspense} from 'react'
+import {useNewLoginData} from '../context'
+import {Background, Loading} from '../shared'
 
 // @ts-expect-error
 import styles from './ContentLayout.module.css'
@@ -40,7 +40,7 @@ interface Props {
 }
 
 const ContentLayout = ({children}: Props) => {
-  const {isDataLoading} = useNewLogin()
+  const {isDataLoading} = useNewLoginData()
 
   // <Responsive> renders as a <div> with display="block", so we set its height to 100% to fill the
   // available space within its parent, which is a flex item

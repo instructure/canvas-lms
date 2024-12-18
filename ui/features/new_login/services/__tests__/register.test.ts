@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createTeacherAccount, createParentAccount, createStudentAccount} from '../register'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {createParentAccount, createStudentAccount, createTeacherAccount} from '../register'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,

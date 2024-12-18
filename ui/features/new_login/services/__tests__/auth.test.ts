@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forgotPassword, performSignIn} from '../auth'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {forgotPassword, performSignIn} from '../auth'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,

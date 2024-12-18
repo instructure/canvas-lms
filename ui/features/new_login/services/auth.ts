@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {ApiResponse, LoginResponse} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import type {ApiResponse, LoginResponse} from '../types'
 
 export const performSignIn = async (
   username: string,
   password: string,
-  rememberMe: boolean
+  rememberMe: boolean,
 ): Promise<ApiResponse<LoginResponse>> => {
   const {json, response} = await doFetchApi<LoginResponse>({
     path: '/login/canvas',

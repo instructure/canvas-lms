@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import type {FormMessage} from '@instructure/ui-form-field'
-import {Checkbox} from '@instructure/ui-checkbox'
-import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Checkbox} from '@instructure/ui-checkbox'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {Link} from '@instructure/ui-link'
+import React from 'react'
 
 const I18n = createI18nScope('new_login')
 

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Alert} from '@instructure/ui-alerts'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
+import React from 'react'
 
 const I18n = createI18nScope('new_login')
 
@@ -33,7 +33,7 @@ function LoginAlert({invalidLoginFaqUrl, onClose, loginHandleName}: Props) {
   if (invalidLoginFaqUrl) {
     const translatedText = I18n.t(
       'Please verify your %{loginHandleName} or password and try again. Trouble logging in? %{faqLink}.',
-      {loginHandleName, faqLink: 'ZZZZ_FAQ'}
+      {loginHandleName, faqLink: 'ZZZZ_FAQ'},
     )
     const splitText = translatedText.split(/ZZZZ_FAQ/)
 

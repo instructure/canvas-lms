@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {ActionPrompt, Card} from '../../shared'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {ROUTES} from '../../routes/routes'
 import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {type ViewOwnProps} from '@instructure/ui-view'
+import React from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useNewLogin} from '../../context/NewLoginContext'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import {useNewLogin} from '../../context'
+import {ROUTES} from '../../routes/routes'
+import {ActionPrompt, Card} from '../../shared'
 
-import iconTeacher from '../../assets/images/teacher.svg'
-import iconStudent from '../../assets/images/student.svg'
 import iconParent from '../../assets/images/parent.svg'
+import iconStudent from '../../assets/images/student.svg'
+import iconTeacher from '../../assets/images/teacher.svg'
 
 const I18n = createI18nScope('new_login')
 

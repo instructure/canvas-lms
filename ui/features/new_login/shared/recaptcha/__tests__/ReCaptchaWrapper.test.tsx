@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {render} from '@testing-library/react'
 import React from 'react'
 import {ReCaptchaWrapper} from '..'
-import {render} from '@testing-library/react'
 
 describe('ReCaptchaWrapper', () => {
   it('mounts without crashing', () => {
     render(
       <ReCaptchaWrapper>
         <div>ReCaptcha Content</div>
-      </ReCaptchaWrapper>
+      </ReCaptchaWrapper>,
     )
   })
 })
