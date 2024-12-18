@@ -203,10 +203,10 @@ class SisPseudonym
       relation.to_a
     elsif type == :implicit && root_account
       if include_all_pseudonyms
-        return relation.select { |p| p.works_for_account?(root_account, true) }
+        return relation.select { |p| p.works_for_account?(root_account, allow_implicit: true) }
       end
 
-      relation.detect { |p| p.works_for_account?(root_account, true) }
+      relation.detect { |p| p.works_for_account?(root_account, allow_implicit: true) }
     else
       relation.first
     end
@@ -226,7 +226,7 @@ class SisPseudonym
       collection.select do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next true if root_account.nil?
-        next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
+        next if !account_ids && !p.works_for_account?(root_account, allow_implicit: type == :implicit)
         next if require_sis && !p.sis_user_id
 
         true
@@ -237,7 +237,7 @@ class SisPseudonym
       end.detect do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next true if root_account.nil?
-        next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
+        next if !account_ids && !p.works_for_account?(root_account, allow_implicit: type == :implicit)
         next if require_sis && !p.sis_user_id
 
         include_deleted || p.workflow_state != "deleted"

@@ -337,7 +337,9 @@ describe SisPseudonym do
         @pseudonym = @s1root.pseudonyms.create!(user: @user, unique_id: "user") do |p|
           p.sis_user_id = "abc"
         end
-        allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(Account.default, true).and_return(true)
+        allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?)
+          .with(Account.default, allow_implicit: true)
+          .and_return(true)
       end
       expect(SisPseudonym.for(@user, Account.default, type: :implicit)).to eq @pseudonym
       expect(SisPseudonym.for(@user, Account.default, type: :implicit, in_region: true)).to eq @pseudonym

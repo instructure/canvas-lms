@@ -503,7 +503,9 @@ describe Login::SamlController do
 
       account2 = instance_double(Account)
       expect(Account).to receive(:find_by_domain).and_return(account2)
-      expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(account2, true).and_return(true)
+      expect_any_instantiation_of(@pseudonym).to receive(:works_for_account?)
+        .with(account2, allow_implicit: true)
+        .and_return(true)
 
       post :create, params: { SAMLResponse: "foo", RelayState: "https://otheraccount/courses/1" }
       expect(response).to be_redirect

@@ -236,7 +236,9 @@ describe Api::V1::User do
       @account2 = Account.create!
       @user.pseudonyms.destroy_all
       p = @user.pseudonyms.create!(unique_id: "abc", account: @account2, sis_user_id: "a")
-      allow(p).to receive(:works_for_account?).with(Account.default, true).and_return(true)
+      allow(p).to receive(:works_for_account?)
+        .with(Account.default, allow_implicit: true)
+        .and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trust_exists?).and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@account2.id])
       expect(HostUrl).to receive(:context_host).with(@account2).and_return("school1")
