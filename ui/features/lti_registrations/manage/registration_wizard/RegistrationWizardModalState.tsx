@@ -167,6 +167,60 @@ export const openRegistrationWizard = (
   })
 }
 
+export const openJsonRegistrationWizard = (
+  jsonCode: string,
+  internalLtiConfig: InternalLtiConfiguration,
+  unifiedToolId?: UnifiedToolId,
+  onSuccessfulInstallation?: () => void
+) => {
+  useRegistrationModalWizardState.setState(prev => {
+    return {
+      ...prev,
+      jsonCode,
+      method: 'json',
+      open: true,
+      jsonFetch: {
+        _tag: 'loaded',
+        result: {
+          _type: 'Success',
+          data: internalLtiConfig,
+        },
+      },
+      unifiedToolId,
+      exitOnCancel: true,
+      registering: true,
+      onSuccessfulInstallation,
+    }
+  })
+}
+
+export const openJsonUrlRegistrationWizard = (
+  jsonUrl: string,
+  internalLtiConfig: InternalLtiConfiguration,
+  unifiedToolId?: UnifiedToolId,
+  onSuccessfulInstallation?: () => void
+) => {
+  useRegistrationModalWizardState.setState(prev => {
+    return {
+      ...prev,
+      jsonUrl,
+      method: 'json_url',
+      open: true,
+      jsonFetch: {
+        _tag: 'loaded',
+        result: {
+          _type: 'Success',
+          data: internalLtiConfig,
+        },
+      },
+      unifiedToolId,
+      registering: true,
+      exitOnCancel: true,
+      onSuccessfulInstallation,
+    }
+  })
+}
+
 /**
  * Opens the registration wizard with the dynamic registration URL
  * already populated and the registration flow started
