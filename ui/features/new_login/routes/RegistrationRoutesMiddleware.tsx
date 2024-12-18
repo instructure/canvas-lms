@@ -58,7 +58,6 @@ const RegistrationRoutesMiddleware = () => {
 
   // redirect if the user does not have access
   if (!selfRegistrationType || !canAccess) {
-    // eslint-disable-next-line no-console
     console.warn(
       `Unauthorized access attempt: selfRegistrationType=${selfRegistrationType}, route=${relativePath}`
     )

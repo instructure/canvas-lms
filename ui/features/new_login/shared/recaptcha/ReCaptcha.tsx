@@ -45,7 +45,6 @@ const ReCaptcha = ({siteKey, onVerify}: Props) => {
   useEffect(() => {
     const grecaptcha = window.grecaptcha as NonNullable<typeof window.grecaptcha>
     if (!grecaptcha || !containerRef.current) {
-      // eslint-disable-next-line no-console
       console.error('reCAPTCHA script not found on window')
       return
     }

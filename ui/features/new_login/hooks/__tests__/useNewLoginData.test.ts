@@ -208,7 +208,6 @@ describe('useNewLoginData', () => {
     )
     const {result} = renderHook(() => useNewLoginData())
     expect(result.current.data.authProviders).toBeUndefined()
-    // eslint-disable-next-line no-console
     expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining('Failed to parse data-auth-providers'),
       expect.any(SyntaxError)
