@@ -65,7 +65,6 @@ export type Lti1p3RegistrationWizardStep =
   | 'Review'
   | 'Installing'
   | 'Updating'
-  | 'Success'
   | 'Error'
 
 export type Lti1p3RegistrationWizardStore = {
@@ -119,13 +118,6 @@ export const createLti1p3RegistrationWizardState = ({
       )
 
       if (isSuccessful(result)) {
-        set(state => ({
-          ...state,
-          state: {
-            ...state.state,
-            _step: 'Success',
-          },
-        }))
         onSuccessfulInstallation()
       } else {
         set(state => ({
@@ -154,12 +146,6 @@ export const createLti1p3RegistrationWizardState = ({
       )
 
       if (isSuccessful(result)) {
-        set(state => ({
-          state: {
-            ...state.state,
-            _step: 'Success',
-          },
-        }))
         onSuccessfulUpdate()
       } else {
         set(state => ({

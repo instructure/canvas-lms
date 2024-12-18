@@ -266,16 +266,5 @@ export const Lti1p3RegistrationWizard = ({
           />
         </RegistrationModalBody>
       )
-    case 'Success':
-      return (
-        <RegistrationModalBody>
-          <Heading>{I18n.t('App Installed Successfully')}</Heading>
-          <Text>
-            {I18n.t(
-              'Your app has been successfully installed. This modal should close in a moment.'
-            )}
-          </Text>
-        </RegistrationModalBody>
-      )
   }
 }
