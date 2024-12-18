@@ -101,7 +101,6 @@ describe "discussions index" do
     end
 
     it "show checkpoint info on the index page", :ignore_js_errors do
-      skip("Will be fixed in EGG-438")
       user_session(@teacher)
       Discussion.start_new_discussion(@course.id)
       wait_for_ajaximations
@@ -134,17 +133,17 @@ describe "discussions index" do
       # student within everyone
       user_session(@student2)
       get "/courses/#{@course.id}/discussion_topics"
-      expect(fj("span:contains('Reply to topic: #{format_date_for_view(next_week)}')")).to be_present
-      expect(fj("span:contains('Required replies (1): #{format_date_for_view(next_week)}')")).to be_present
-      expect(f("body")).not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(half_month)}')")
-      expect(f("body")).not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(half_month)}')")
+      expect(fj("span:contains('Reply to topic: #{format_date_for_view(next_week, :short)}')")).to be_present
+      expect(fj("span:contains('Required replies (1): #{format_date_for_view(next_week, :short)}')")).to be_present
+      expect(f("body")).not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(half_month, :short)}')")
+      expect(f("body")).not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(half_month, :short)}')")
       # student in the second assign card
       user_session(@student)
       get "/courses/#{@course.id}/discussion_topics"
-      expect(fj("span:contains('Reply to topic: #{format_date_for_view(half_month)}')")).to be_present
-      expect(fj("span:contains('Required replies (1): #{format_date_for_view(half_month)}')")).to be_present
-      expect(f("body")).not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(next_week)}')")
-      expect(f("body")).not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(next_week)}')")
+      expect(fj("span:contains('Reply to topic: #{format_date_for_view(half_month, :short)}')")).to be_present
+      expect(fj("span:contains('Required replies (1): #{format_date_for_view(half_month, :short)}')")).to be_present
+      expect(f("body")).not_to contain_jqcss("span:contains('Reply to topic: #{format_date_for_view(next_week, :short)}')")
+      expect(f("body")).not_to contain_jqcss("span:contains('Required replies (1): #{format_date_for_view(next_week, :short)}')")
     end
   end
 end
