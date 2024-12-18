@@ -111,6 +111,8 @@ const MigrationRow = ({migration, view, updateMigrationItem}: ContentMigrationsR
     }
   }, [fetchProgress, migration.progress_url, migration.workflow_state])
 
+  migration.migration_type_title ||= I18n.t('Content Migration')
+
   return view === 'condensed'
     ? condensedMarkup(migration, updateMigrationItem, statusPillState)
     : extendedMarkup(migration, updateMigrationItem, statusPillState)
