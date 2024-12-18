@@ -46,7 +46,6 @@ interface NewLoginDataResult {
 // transform raw password policy data into a typed object
 const transformPasswordPolicy = (rawPolicy: any): PasswordPolicy => {
   if (typeof rawPolicy !== 'object' || rawPolicy === null) {
-    // eslint-disable-next-line no-console
     console.error('Invalid password policy data:', rawPolicy)
     return {}
   }
@@ -110,7 +109,6 @@ const getObjectAttribute = <T>(
       const parsedValue = JSON.parse(value)
       return transform ? transform(parsedValue) : (parsedValue as T)
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(`Failed to parse ${attribute} as JSON:`, e)
     }
   }
@@ -180,7 +178,6 @@ export const useNewLoginData = (): NewLoginDataResult => {
         const data = fetchLoginDataFromAttributes()
         setNewLoginData(data)
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error('Failed to fetch login data:', error)
       } finally {
         setIsDataLoading(false)
