@@ -89,13 +89,16 @@ export default class BreakdownDetails extends React.Component {
         placement="end"
         shouldContainFocus={true}
         defaultFocusElement={() => this.closeButton}
+        label={I18n.t('Student Details')}
       >
-        <div className="crs-breakdown-details">
+        <div className="crs-breakdown-details" data-testid="breakdown-details">
           <div className="crs-breakdown-details__content">
             <span className="crs-breakdown-details__closeButton">
               <IconButton
                 withBorder={false}
                 withBackground={false}
+                data-testid="breakdown-details-close"
+                screenReaderLabel={I18n.t('Close details sidebar')}
                 ref={e => {
                   this.closeButton = e
                 }}

@@ -73,6 +73,7 @@ export default class StudentDetailsView extends React.Component {
             this.backButton = e
           }}
           onClick={this.props.unselectStudent}
+          data-testid="back-button"
         >
           <i aria-hidden={true} className="icon-arrow-open-left" />
           {I18n.t('Back')}
@@ -98,6 +99,7 @@ export default class StudentDetailsView extends React.Component {
           aria-label={I18n.t('view previous student')}
           onClick={this.props.selectPrevStudent}
           type="button"
+          data-testid="prev-student-button"
         >
           <i aria-hidden={true} className="icon-arrow-open-left" />
         </button>
@@ -124,6 +126,7 @@ export default class StudentDetailsView extends React.Component {
           aria-label={I18n.t('view next student')}
           onClick={this.props.selectNextStudent}
           type="button"
+          data-testid="next-student-button"
         >
           <i aria-hidden={true} className="icon-arrow-open-right" />
         </button>
