@@ -252,7 +252,7 @@
                       <% if submission.try :pending_review? %>
                         <span class="screenreader-only"><%= hidden_text %></span>
                       <% end %>
-                      <%= student_score_display_for(submission, !can_do(@context, @current_user, :manage_grades)) %>
+                      <%= student_score_display_for(submission, student_view: !can_do(@context, @current_user, :manage_grades)) %>
                     <% end %>
                   </span>
                   <% if assignment_presenter.is_letter_graded_or_gpa_scaled? %>
@@ -534,7 +534,7 @@
                           <% if sa_submission.try :pending_review? %>
                             <span class="screenreader-only"><%= hidden_text %></span>
                           <% end %>
-                          <%= student_score_display_for(sa_submission, !can_do(@context, @current_user, :manage_grades)) %>
+                          <%= student_score_display_for(sa_submission, student_view: !can_do(@context, @current_user, :manage_grades)) %>
                         <% end %>
                       </span>
                       <% if sub_assignment_presenter.is_letter_graded_or_gpa_scaled? %>

@@ -490,7 +490,7 @@
                 <div>
                   <%= settings.check_box :enable_name_pronunciation, :checked => @account.enable_name_pronunciation?, class: "element_toggler", "aria-controls": "name_pronunciation_options" %>
                   <%= settings.label :enable_name_pronunciation, :en => "Enable name pronunciation" %>
-                  <div id="name_pronunciation_options" <%= hidden(true) unless @account.settings[:enable_name_pronunciation]%>>
+                  <div id="name_pronunciation_options" <%= hidden(include_style: true) unless @account.settings[:enable_name_pronunciation]%>>
                     <div style="font-size: 0.8em;"><%= t(:pronunciation_change_description, "Limit name pronunciation editing by base role") %></div>
                       <div>
                         <%= settings.check_box :allow_name_pronunciation_edit_for_admins, :checked => @account.allow_name_pronunciation_edit_for_admins? %>
@@ -510,7 +510,7 @@
               <% if !@account.site_admin?  %>
                 <%= settings.check_box :can_add_pronouns, :checked => @account.settings[:can_add_pronouns], class: "element_toggler", "aria-controls": "personal_pronouns_options" %>
                 <%= settings.label :can_add_pronouns, en: "Enable Personal Pronouns" %>
-                <div id="personal_pronouns_options" <%= hidden(true) unless @account.settings[:can_add_pronouns] %>>
+                <div id="personal_pronouns_options" <%= hidden(include_style: true) unless @account.settings[:can_add_pronouns] %>>
                   <div id="change_personal_pronouns">
                     <%= settings.check_box :can_change_pronouns, :checked => @account.can_change_pronouns? %>
                     <%= settings.label :can_change_pronouns, en: "Allow users to change their pronouns in Canvas" %>

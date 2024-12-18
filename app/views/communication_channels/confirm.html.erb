@@ -36,7 +36,7 @@
       <a href="<%= login_url(:enrollment => @enrollment.uuid, :login_hint => @user.pseudonym.try(:unique_id), :expected_user_id => @user.id) %>" class="btn" id="login"><%=  t 'buttons.login_as', "Log in as %{invited_user}", :invited_user => @user.name %></a>
     </div>
   <% elsif !@merge_opportunities.empty? %>
-    <div class="disambiguation_box" <%= hidden(true) if params[:register] %>>
+    <div class="disambiguation_box" <%= hidden(include_style: true) if params[:register] %>>
       <% if @merge_opportunities.length == 1 && (@user.registered? || !@current_user || @current_user.communication_channels.active.email.by_path(@communication_channel.path).first) %>
         <div>
           <% if !@enrollment && @user.registered? %>
