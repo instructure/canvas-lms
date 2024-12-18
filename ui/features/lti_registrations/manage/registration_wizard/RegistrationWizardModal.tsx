@@ -229,7 +229,6 @@ const renderDebugMessage = (jsonUrlFetch: JsonFetchStatus) => {
   if (jsonUrlFetch._tag === 'loaded' && jsonUrlFetch.result._type === 'ApiError') {
     const result = z.object({errors: z.array(z.string())}).safeParse(jsonUrlFetch.result.body)
     if (result.success) {
-       
       return result.data.errors.map((err, i) => <div key={i}>{err}</div>)
     }
   }
@@ -260,7 +259,6 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
               if (value === '1p3' || value === '1p1') {
                 props.state.updateLtiVersion(value)
               } else {
-                 
                 console.warn(`Invalid value for lti_version: ${value}`)
               }
             }}
@@ -366,6 +364,13 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
             {debugging && renderDebugMessage(props.state.jsonFetch)}
           </>
         )}
+        {props.state.lti_version === '1p1' && (
+          <View display="block" margin="medium 0" padding="small" background="secondary">
+            {I18n.t(
+              'Thank you for your interest in 1.1. We are exploring implementing this feature in future releases'
+            )}
+          </View>
+        )}
       </RegistrationModalBody>
 
       <Modal.Footer>
@@ -385,7 +390,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
                       lti_configuration: JSON.parse(props.state.jsonCode),
                     }
                   : {url: props.state.jsonUrl}
-               
+
               props.jsonUrlWizardService
                 .fetchThirdPartyToolConfiguration(body, props.accountId)
                 .then(result => {
