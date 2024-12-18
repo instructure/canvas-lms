@@ -71,32 +71,33 @@ describe "eportfolios" do
       expect(f("#wizard_box")).not_to be_displayed
     end
 
-    it "adds a new page", priority: "1" do
-      page_title = "I made this page."
+    it "adds a page", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
-      add_eportfolio_page(page_title)
-      expect(f("#page_list")).to include_text(page_title)
-      get "/eportfolios/#{@eportfolio.id}/category/i-made-this-page"
-      wait_for_ajaximations
-      expect(pages.last).to include_text(page_title)
-      expect(f("#content h2")).to include_text(page_title)
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+      add_eportfolio_page("test page name")
+      wait_for_ajax_requests
+      expect(pages.last).to include_text("test page name")
     end
 
     it "deletes a page", priority: "1" do
       get "/eportfolios/#{@eportfolio.id}"
-      # add a few pages
+      wait_for_ajax_requests
+      expect(f("body")).not_to contain_css("svg[role='img'] circle")
+
+      # add a page
       add_eportfolio_page("page #1")
 
-      # delete page using the settings menu
+      # delete section using the settings menu
       page = pages.last
       delete_eportfolio_page(page)
+      wait_for_ajax_requests
 
-      # The last remaining page should not include the "Delete" action.
-      organize_pages
+      # The last remaining section should not include the "Delete" action.
       expect(pages.length).to eq 1
       last_page = pages.last
-      last_page.find_element(:css, ".page_settings_menu").click
-      expect(last_page).not_to contain_jqcss(".remove_page_link:visible")
+      last_page.find("button").click
+      expect(f("ul[role='menu']")).not_to include_text("Delete")
     end
 
     it "reorders a page", :ignore_js_errors, priority: "1" do

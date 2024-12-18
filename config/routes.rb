@@ -596,7 +596,9 @@ CanvasRails::Application.routes.draw do
   resources :eportfolios, except: :index do
     post :reorder_categories
     post ":eportfolio_category_id/reorder_entries" => "eportfolios#reorder_entries", :as => :reorder_entries
-    resources :categories, controller: :eportfolio_categories
+    resources :categories, controller: :eportfolio_categories do
+      get "pages" => "eportfolio_categories#pages", :as => :pages
+    end
     resources :entries, controller: :eportfolio_entries do
       resources :page_comments, path: :comments, only: [:create, :destroy]
       get "files/:attachment_id" => "eportfolio_entries#attachment", :as => :view_file
