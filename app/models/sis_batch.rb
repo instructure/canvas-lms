@@ -225,7 +225,7 @@ class SisBatch < ActiveRecord::Base
 
   def self.abort_all_pending_for_account(account)
     transaction do
-      account.sis_batches.not_started.lock(:no_key_update).order(:id).find_in_batches do |batch|
+      account.sis_batches.not_started.lock("FOR NO KEY UPDATE").order(:id).find_in_batches do |batch|
         SisBatch.where(id: batch).update_all(workflow_state: "aborted", progress: 100)
       end
     end
