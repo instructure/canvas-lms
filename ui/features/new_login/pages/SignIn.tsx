@@ -200,7 +200,7 @@ const SignIn = () => {
               {I18n.t('Log In')}
             </Button>
 
-            <Flex.Item align="center">
+            <Flex.Item align="center" overflowX="visible" overflowY="visible">
               <SignInLinks />
             </Flex.Item>
           </Flex>
