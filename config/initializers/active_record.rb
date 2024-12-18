@@ -232,13 +232,17 @@ class ActiveRecord::Base
     end
   end
 
-  def self.skip_touch_context(skip = true)
-    @@skip_touch_context = skip
+  def self.skip_touch_context
+    @@skip_touch_context = true
+    yield
+  ensure
+    @@skip_touch_context = false
   end
 
   def save_without_touching_context
     @skip_touch_context = true
     save
+  ensure
     @skip_touch_context = false
   end
 

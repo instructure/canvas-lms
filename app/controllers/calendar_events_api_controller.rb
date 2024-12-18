@@ -876,42 +876,42 @@ class CalendarEventsApiController < ApplicationController
     end
 
     error = nil
-    CalendarEvent.skip_touch_context
-    CalendarEvent.transaction do
-      events.find_each do |event|
-        event.updating_user = @current_user
-        event.cancel_reason = params[:cancel_reason]
-        if event.destroy
-          if event.appointment_group && @event.appointment_group.appointments.count == 0
-            event.appointment_group.destroy(@current_user)
-          end
-        else
-          error = event.errors
-          raise ActiveRecord::Rollback
-        end
-      end
-
-      if params[:which] == "following"
-        # the remaining series just got shorter. reflect that in the rrrule
-        front_half_events = (find_which_series_events(target_event: @event, which: "all", for_update: false) - events).to_a
-        unless front_half_events.empty?
-          params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(@event[:rrule], front_half_events.length)).permit(:rrule)
-          front_half_events.each do |event|
-            event.updating_user = @current_user
-            unless event.grants_any_right?(@current_user, session, :update)
-              error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
-              raise ActiveRecord::Rollback
+    CalendarEvent.skip_touch_context do
+      CalendarEvent.transaction do
+        events.find_each do |event|
+          event.updating_user = @current_user
+          event.cancel_reason = params[:cancel_reason]
+          if event.destroy
+            if event.appointment_group && @event.appointment_group.appointments.count == 0
+              event.appointment_group.destroy(@current_user)
             end
+          else
+            error = event.errors
+            raise ActiveRecord::Rollback
+          end
+        end
 
-            unless event.update(params_for_update_front_half)
-              error = { message: t("Failed updating an event in the series, update not saved") }
-              raise ActiveRecord::Rollback
+        if params[:which] == "following"
+          # the remaining series just got shorter. reflect that in the rrrule
+          front_half_events = (find_which_series_events(target_event: @event, which: "all", for_update: false) - events).to_a
+          unless front_half_events.empty?
+            params_for_update_front_half = ActionController::Parameters.new(rrule: update_rrule_count_or_until(@event[:rrule], front_half_events.length)).permit(:rrule)
+            front_half_events.each do |event|
+              event.updating_user = @current_user
+              unless event.grants_any_right?(@current_user, session, :update)
+                error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+                raise ActiveRecord::Rollback
+              end
+
+              unless event.update(params_for_update_front_half)
+                error = { message: t("Failed updating an event in the series, update not saved") }
+                raise ActiveRecord::Rollback
+              end
             end
           end
         end
       end
     end
-    CalendarEvent.skip_touch_context(false)
 
     return render json: error, status: :bad_request if error
 
@@ -1052,99 +1052,99 @@ class CalendarEventsApiController < ApplicationController
     update_limit = rrule_changed ? RruleHelper::RECURRING_EVENT_LIMIT : events.length
 
     error = nil
-    CalendarEvent.skip_touch_context
-    CalendarEvent.transaction do
-      dtstart_list = rr.present? ? rr.all(limit: update_limit) : []
-      if rr.present? && events.length > dtstart_list.length
-        # truncate the list of events we're updating to how many
-        # we'll end up with given the (possible updated) rrule
-        events.drop(dtstart_list.length).each do |event|
-          unless event.grants_any_right?(@current_user, session, :delete)
-            error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
-            raise ActiveRecord::Rollback
-          end
+    CalendarEvent.skip_touch_context do
+      CalendarEvent.transaction do
+        dtstart_list = rr.present? ? rr.all(limit: update_limit) : []
+        if rr.present? && events.length > dtstart_list.length
+          # truncate the list of events we're updating to how many
+          # we'll end up with given the (possible updated) rrule
+          events.drop(dtstart_list.length).each do |event|
+            unless event.grants_any_right?(@current_user, session, :delete)
+              error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
 
-          unless event.destroy
-            error = { message: t("Failed deleting an event from the series, update not saved") }
-            raise ActiveRecord::Rollback
+            unless event.destroy
+              error = { message: t("Failed deleting an event from the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
+          end
+          events = events.take(dtstart_list.length)
+        end
+
+        if new_series_head
+          events[0].series_head = true
+        end
+
+        dtstart_list.each_with_index do |dtstart, i|
+          params_for_update = set_series_params(params_for_update, dtstart, duration)
+          event = events[i]
+          event.update_all = true if which != "one" && event&.series_uuid && event&.series_head
+          if event.nil?
+            event = target_event.context.calendar_events.build(params_for_update)
+            events << event
+            unless event.grants_any_right?(@current_user, session, :create)
+              error = { message: t("Failed creating an event for the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.save
+              error = { message: t("Failed creating an event for the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
+          else
+            event.updating_user = @current_user
+            unless event.grants_any_right?(@current_user, session, :update)
+              error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.update(params_for_update)
+              error = { message: t("Failed updating an event in the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
           end
         end
-        events = events.take(dtstart_list.length)
-      end
 
-      if new_series_head
-        events[0].series_head = true
-      end
-
-      dtstart_list.each_with_index do |dtstart, i|
-        params_for_update = set_series_params(params_for_update, dtstart, duration)
-        event = events[i]
-        event.update_all = true if which != "one" && event&.series_uuid && event&.series_head
-        if event.nil?
-          event = target_event.context.calendar_events.build(params_for_update)
-          events << event
-          unless event.grants_any_right?(@current_user, session, :create)
-            error = { message: t("Failed creating an event for the series, update not saved"), status: :unauthorized }
+        # For convert series to single event, all the series event will be removed except the target event
+        if change_to_single_event
+          params_for_update[:series_head] = false
+          params_for_update[:series_uuid] = nil
+          params_for_update[:rrule] = nil
+          unless target_event.update(params_for_update)
+            error = { message: t("Failed updating an event in the series, update not saved") }
             raise ActiveRecord::Rollback
           end
 
-          unless event.save
-            error = { message: t("Failed creating an event for the series, update not saved") }
-            raise ActiveRecord::Rollback
+          (events - [target_event]).each do |event|
+            unless event.grants_any_right?(@current_user, session, :delete)
+              error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
+              raise ActiveRecord::Rollback
+            end
+
+            unless event.destroy
+              error = { message: t("Failed deleting an event from the series, update not saved") }
+              raise ActiveRecord::Rollback
+            end
           end
-        else
+          events = [target_event]
+        end
+
+        # if we updated this-and-all-following, we had to update the front half's rrule
+        front_half_events.each do |event|
           event.updating_user = @current_user
           unless event.grants_any_right?(@current_user, session, :update)
             error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
             raise ActiveRecord::Rollback
           end
 
-          unless event.update(params_for_update)
+          unless event.update(params_for_update_front_half)
             error = { message: t("Failed updating an event in the series, update not saved") }
             raise ActiveRecord::Rollback
           end
         end
       end
-
-      # For convert series to single event, all the series event will be removed except the target event
-      if change_to_single_event
-        params_for_update[:series_head] = false
-        params_for_update[:series_uuid] = nil
-        params_for_update[:rrule] = nil
-        unless target_event.update(params_for_update)
-          error = { message: t("Failed updating an event in the series, update not saved") }
-          raise ActiveRecord::Rollback
-        end
-
-        (events - [target_event]).each do |event|
-          unless event.grants_any_right?(@current_user, session, :delete)
-            error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
-            raise ActiveRecord::Rollback
-          end
-
-          unless event.destroy
-            error = { message: t("Failed deleting an event from the series, update not saved") }
-            raise ActiveRecord::Rollback
-          end
-        end
-        events = [target_event]
-      end
-
-      # if we updated this-and-all-following, we had to update the front half's rrule
-      front_half_events.each do |event|
-        event.updating_user = @current_user
-        unless event.grants_any_right?(@current_user, session, :update)
-          error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
-          raise ActiveRecord::Rollback
-        end
-
-        unless event.update(params_for_update_front_half)
-          error = { message: t("Failed updating an event in the series, update not saved") }
-          raise ActiveRecord::Rollback
-        end
-      end
     end
-    CalendarEvent.skip_touch_context(false)
 
     if error
       status = error[:status] || :bad_request
