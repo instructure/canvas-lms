@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState, useCallback} from 'react'
+import React, {useEffect, useState, useCallback, useMemo} from 'react'
 import type {SetStateAction, Dispatch} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -44,6 +44,7 @@ import {convertFormDataToMigrationCreateRequest} from '@canvas/content-migration
 import D2LImporter from './migrator_forms/d2l_importer'
 import AngelImporter from './migrator_forms/angel_importer'
 import BlackboardImporter from './migrator_forms/blackboard_importer'
+import ExternalToolImporter from './migrator_forms/external_tool_importer'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -53,9 +54,19 @@ type MigratorProps = {
   onCancel: () => void
   fileUploadProgress: number | null
   isSubmitting: boolean
+  externalToolTitle?: string
 }
 
 const renderMigrator = (props: MigratorProps) => {
+  if (props.value.startsWith('context_external_tool_')) {
+    return <ExternalToolImporter
+      value={props.value}
+      onSubmit={props.onSubmit}
+      onCancel={props.onCancel}
+      isSubmitting={props.isSubmitting}
+      title={props.externalToolTitle || ''}
+    />
+  }
   switch (props.value) {
     case 'zip_file_importer':
       return <ZipFileImporter {...props} />
@@ -105,6 +116,10 @@ export const ContentMigrationsForm = ({
   const [migrators, setMigrators] = useState<any>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [chosenMigrator, setChosenMigrator] = useState<string | null>(null)
+
+  const externalToolTitle = useMemo(() => {
+    return migrators.find((m: Migrator) => m.type === chosenMigrator)?.name
+  }, [migrators, chosenMigrator])
 
   const [fileUploadProgress, setFileUploadProgress] = useState<number | null>(null)
   const onResetForm = useCallback(() => {
@@ -232,6 +247,7 @@ export const ContentMigrationsForm = ({
             onCancel: onResetForm,
             fileUploadProgress,
             isSubmitting,
+            externalToolTitle,
           })}
           <hr role="presentation" aria-hidden="true" />
         </>
