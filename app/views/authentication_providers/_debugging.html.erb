@@ -34,22 +34,22 @@
     <p>
       <a href="<%= account_authentication_provider_debugging_url(provider.account, provider) %>"
          class="start_debugging btn"
-         style="<%= hidden(!debugging) %>">
+         style="<%= hidden if debugging %>">
         <%= t('start_debugging', 'Start Debugging') %>
       </a>
       <a href="<%= account_authentication_provider_debugging_url(provider.account, provider) %>"
          class="refresh_debugging btn"
-         style="<%= hidden(debugging) %>">
+         style="<%= hidden unless debugging %>">
         <%= t('refresh_debugging', 'Refresh') %>
       </a>
       <a href="<%= account_authentication_provider_debugging_url(provider.account, provider) %>"
          class="stop_debugging btn"
-         style="<%= hidden(debugging) %>">
+         style="<%= hidden unless debugging %>">
         <%= t('stop_debugging', 'Stop Debugging') %>
       </a>
     </p>
 
-    <div class="debug_data" style="<%= hidden(debugging) %>">
+    <div class="debug_data" style="<%= hidden unless debugging %>">
       <% if debugging %>
         <%= render partial: 'debug_data', locals: { provider: provider } %>
       <% end %>

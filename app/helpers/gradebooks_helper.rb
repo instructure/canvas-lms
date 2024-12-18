@@ -114,10 +114,10 @@ module GradebooksHelper
     "assignment_#{submission.assignment_id}_user_#{submission.user_id}_current_grade"
   end
 
-  def student_score_display_for(submission, show_student_view = false)
+  def student_score_display_for(submission, student_view: false)
     return "-" if submission.blank?
 
-    score, grade = if show_student_view
+    score, grade = if student_view
                      [submission.published_score, submission.published_grade]
                    else
                      [submission.score, submission.grade]

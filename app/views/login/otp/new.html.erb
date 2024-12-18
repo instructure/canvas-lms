@@ -87,7 +87,7 @@
                     </div>
                   <% end %>
                 <% end %>
-                <%= form_for :otp_login, url: send_otp_via_sms_path, html: { id: "new_phone_form", style: (hidden(false) unless ccs.empty?), class: "ic-Form-group" } do |f| %>
+                <%= form_for :otp_login, url: send_otp_via_sms_path, html: { id: "new_phone_form", style: (hidden unless ccs.empty?), class: "ic-Form-group" } do |f| %>
                   <div class="ic-Form-control">
                     <%= f.blabel :phone_number, :en => "US Mobile Number", :class => "ic-Label" %>
                     <div class="controls">

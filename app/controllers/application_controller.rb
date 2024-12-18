@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
 
         editor_hc_css = [
           active_brand_config_url("css", { force_high_contrast: true }),
-          view_context.stylesheet_path(css_url_for("what_gets_loaded_inside_the_tinymce_editor", false, { force_high_contrast: true }))
+          view_context.stylesheet_path(css_url_for("what_gets_loaded_inside_the_tinymce_editor", plugin: false, force_high_contrast: true))
         ]
 
         editor_css << view_context.stylesheet_path(css_url_for("fonts"))
