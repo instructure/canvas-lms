@@ -516,11 +516,6 @@ EditView.prototype.handlePostToSisBoxChange = function () {
   if (ENV.FEATURES?.selective_release_ui_api) {
     const postToSISChecked = this.$postToSisBox.prop('checked')
     this.model.set('post_to_sis', postToSISChecked)
-
-    // Disabling this to not run the Post to SIS validations on check/uncheck
-    if (!ENV.FEATURES?.selective_release_edit_page) {
-      this.dueDateOverrideView.render()
-    }
   }
 }
 

@@ -34,7 +34,7 @@ import {
   cloneObject,
   getParsedOverrides,
   removeOverriddenAssignees,
-  processModuleOverridesV2,
+  processModuleOverrides,
 } from '../util/differentiatedModulesUtil'
 import {uid} from '@instructure/uid'
 import DateValidator from '@canvas/grading/DateValidator'
@@ -206,7 +206,7 @@ const AssignToContent = ({
       })
     }
 
-    const withoutModuleOverrides = processModuleOverridesV2(newOverrides, initialModuleOverrides)
+    const withoutModuleOverrides = processModuleOverrides(newOverrides, initialModuleOverrides)
     resetOverrides(newOverrides, withoutModuleOverrides)
 
     const noModuleOverrides = newOverrides.filter(o => !o.context_module_id)

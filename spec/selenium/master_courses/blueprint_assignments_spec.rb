@@ -178,12 +178,6 @@ describe "blueprint courses assignments" do
       expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
       expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
 
-      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-        AssignmentCreateEditPage.click_manage_assign_to_button
-        wait_for_assign_to_tray_spinner
-        keep_trying_until { expect(item_tray_exists?).to be_truthy }
-      end
-
       expect(assign_to_due_date(0).enabled?).to be_falsey
       expect(assign_to_due_time(0).enabled?).to be_falsey
       expect(assign_to_available_from_date(0).enabled?).to be_falsey
@@ -206,12 +200,6 @@ describe "blueprint courses assignments" do
       expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
       expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
 
-      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-        AssignmentCreateEditPage.click_manage_assign_to_button
-        wait_for_assign_to_tray_spinner
-        keep_trying_until { expect(item_tray_exists?).to be_truthy }
-      end
-
       expect(assign_to_due_date(0).enabled?).to be_falsey
       expect(assign_to_due_time(0).enabled?).to be_falsey
       expect(assign_to_available_from_date(0).enabled?).to be_truthy
@@ -233,12 +221,6 @@ describe "blueprint courses assignments" do
       expect(f("#assignment_points_possible").attribute("readonly")).to eq "true"
       expect(f("#assignment_grading_type")).to contain_css('option[value="points"]')
       expect(f("#assignment_grading_type")).not_to contain_css('option[value="not_graded"]')
-
-      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-        AssignmentCreateEditPage.click_manage_assign_to_button
-        wait_for_assign_to_tray_spinner
-        keep_trying_until { expect(item_tray_exists?).to be_truthy }
-      end
 
       expect(assign_to_due_date(0).enabled?).to be_truthy
       expect(assign_to_due_time(0).enabled?).to be_truthy

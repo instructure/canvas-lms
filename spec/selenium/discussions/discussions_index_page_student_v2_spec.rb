@@ -111,9 +111,6 @@ describe "discussions index" do
       Discussion.reply_to_topic_points_possible_input.send_keys("10")
       Discussion.reply_to_entry_required_count_input.send_keys("1")
       Discussion.points_possible_reply_to_entry_input.send_keys("10")
-      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-        Discussion.click_assign_to_button
-      end
       next_week = 1.week.from_now
       half_month = 2.weeks.from_now
       update_reply_to_topic_date(0, format_date_for_view(next_week))
@@ -126,9 +123,6 @@ describe "discussions index" do
       update_reply_to_topic_time(1, "11:59 PM")
       update_required_replies_date(1, format_date_for_view(half_month))
       update_required_replies_time(1, "11:59 PM")
-      unless Account.site_admin.feature_enabled?(:selective_release_edit_page)
-        click_save_button("Apply")
-      end
       Discussion.save_and_publish_button.click
       # student within everyone
       user_session(@student2)

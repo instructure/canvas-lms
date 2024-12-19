@@ -161,7 +161,6 @@ describe "override assignees" do
 
   context "basic assignee overrides" do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_edit_page)
       course_with_teacher(active_all: true)
       @assignment = Assignment.create!(context: @course, title: "Test Assignment", only_visible_to_overrides: true)
       @assignment.assignment_overrides.create!(set_type: "ADHOC")
@@ -188,7 +187,6 @@ describe "override assignees" do
 
   context "group assignments", :ignore_js_errors do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_edit_page)
       course_with_teacher(active_all: true)
       group_test_setup(3, 3, 1, true)
       @normal_assignment = Assignment.create!(context: @course, title: "Normal Assignment")
@@ -258,8 +256,6 @@ describe "override assignees" do
 
   context "assignments show page assign to", :ignore_js_errors do
     before :once do
-      Account.site_admin.enable_feature!(:selective_release_edit_page)
-
       course_with_teacher(active_all: true)
       @assignment1 = @course.assignments.create(name: "test assignment", submission_types: "online_url")
       @section1 = @course.course_sections.create!(name: "section1")

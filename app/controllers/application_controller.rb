@@ -369,7 +369,6 @@ class ApplicationController < ActionController::Base
     permanent_page_links
     selective_release_backend
     selective_release_ui_api
-    selective_release_edit_page
     assign_to_improved_search
     enhanced_course_creation_account_fetching
     instui_for_import_page

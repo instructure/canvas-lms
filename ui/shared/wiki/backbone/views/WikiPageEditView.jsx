@@ -366,16 +366,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       ]
     }
 
-    if (ENV.FEATURES.selective_release_edit_page) {
-      const sectionViewRef = document.getElementById(
-        'manage-assign-to-container'
-      )?.reactComponentInstance
-      const invalidInput = sectionViewRef?.focusErrors()
-      if (invalidInput) {
-        errors.invalid_card = {$input: null, showError: this.showError}
-      } else {
-        delete errors.invalid_card
-      }
+    const sectionViewRef = document.getElementById(
+      'manage-assign-to-container'
+    )?.reactComponentInstance
+    const invalidInput = sectionViewRef?.focusErrors()
+    if (invalidInput) {
+      errors.invalid_card = {$input: null, showError: this.showError}
+    } else {
+      delete errors.invalid_card
     }
 
     return errors

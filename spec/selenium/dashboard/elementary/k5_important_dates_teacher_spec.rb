@@ -128,15 +128,8 @@ describe "teacher k5 dashboard important dates" do
 
         expect(mark_important_dates_input).to be_disabled
 
-        if Account.site_admin.feature_enabled?(:selective_release_edit_page)
-          formatted_date = format_date_for_view(due_at, "%m/%d/%Y")
-          update_due_date(0, formatted_date)
-        else
-          AssignmentCreateEditPage.click_manage_assign_to_button
-          formatted_date = format_date_for_view(due_at, "%m/%d/%Y")
-          update_due_date(0, formatted_date)
-          click_save_button("Apply")
-        end
+        formatted_date = format_date_for_view(due_at, "%m/%d/%Y")
+        update_due_date(0, formatted_date)
 
         expect(mark_important_dates_input).not_to be_disabled
       end
@@ -148,13 +141,7 @@ describe "teacher k5 dashboard important dates" do
 
         get "/courses/#{@subject_course.id}/assignments/#{assignment.id}/edit"
 
-        if Account.site_admin.feature_enabled?(:selective_release_edit_page)
-          click_duedate_clear_button(0)
-        else
-          AssignmentCreateEditPage.click_manage_assign_to_button
-          click_duedate_clear_button(0)
-          click_save_button("Apply")
-        end
+        click_duedate_clear_button(0)
 
         expect(mark_important_dates_input).to be_disabled
         expect(is_checked(mark_important_dates_selector)).to be_falsey
@@ -167,27 +154,13 @@ describe "teacher k5 dashboard important dates" do
 
         get "/courses/#{@subject_course.id}/assignments/#{assignment.id}/edit"
 
-        if Account.site_admin.feature_enabled?(:selective_release_edit_page)
-          formatted_date = format_date_for_view(due_at, "%m/%d/%Y")
-          click_add_assign_to_card
-          select_module_item_assignee(1, @student.name)
-        else
-          AssignmentCreateEditPage.click_manage_assign_to_button
-          formatted_date = format_date_for_view(due_at, "%m/%d/%Y")
-          click_add_assign_to_card
-          select_module_item_assignee(1, @student.name)
-          click_save_button("Apply")
-        end
+        formatted_date = format_date_for_view(due_at, "%m/%d/%Y")
+        click_add_assign_to_card
+        select_module_item_assignee(1, @student.name)
 
         expect(mark_important_dates_input).to be_disabled
 
-        if Account.site_admin.feature_enabled?(:selective_release_edit_page)
-          update_due_date(1, formatted_date)
-        else
-          AssignmentCreateEditPage.click_manage_assign_to_button
-          update_due_date(1, formatted_date)
-          click_save_button("Apply")
-        end
+        update_due_date(1, formatted_date)
 
         expect(mark_important_dates_input).not_to be_disabled
       end

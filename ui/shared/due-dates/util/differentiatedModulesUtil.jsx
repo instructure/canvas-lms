@@ -169,7 +169,6 @@ export const getParsedOverrides = (stagedOverrides, cards, groupCategoryId, defa
     index++
     // ensure on initial load of the cards, the everyone option is first
     const everyoneOption =
-      ENV.FEATURES?.selective_release_edit_page &&
       overrides[0].course_section_id === defaultSectionId
         ? 0
         : undefined
@@ -216,48 +215,9 @@ export const removeOverriddenAssignees = (overrides, parsedOverrides) => {
   return parsedOverrides
 }
 
-export const processModuleOverrides = (overrides, lastCheckpoint) => {
-  const withoutModuleOverrides = overrides.map(o => {
-    if (o.context_module_id) {
-      const checkpointOverrides = lastCheckpoint[o.rowKey]?.overrides
-
-      const lastOverrideState = checkpointOverrides?.find(
-        override => override.stagedOverrideId === o.stagedOverrideId
-      )
-
-      const {persisted, id, context_module_id, context_module_name, ...previousAttributes} =
-        lastOverrideState || {}
-
-      const {
-        persisted: _p,
-        id: id_,
-        context_module_id: cId,
-        context_module_name: cName,
-        ...currentAttributes
-      } = o
-
-      const hasChanges = JSON.stringify(previousAttributes) !== JSON.stringify(currentAttributes)
-
-      //   If there are changes, remove the context_module override information
-      return hasChanges
-        ? {
-            ...o,
-            context_module_id: undefined,
-            context_module_name: undefined,
-            id: undefined,
-          }
-        : o // If there are no changes, use the current override as is
-    }
-
-    return o
-  })
-
-  return withoutModuleOverrides
-}
-
 // This is a slightly modified version of the processModuleOverrides function for AssignToContent
 // The original function can be removed once we remove DifferentiatedModulesSection
-export const processModuleOverridesV2 = (overrides, initialModuleOverrides) => {
+export const processModuleOverrides = (overrides, initialModuleOverrides) => {
   const rowKeyModuleOverrides = initialModuleOverrides.map(obj => obj.rowKey)
   const withoutModuleOverrides = overrides.map(o => {
     if (rowKeyModuleOverrides.includes(o.rowKey)) {
