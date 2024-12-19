@@ -84,5 +84,5 @@
      <%= "data-require-email='true'".html_safe if require_email %>
      <%= "data-password-policy=#{raw password_policy_data}" if password_policy_data.present? %>
      <%= "data-forgot-password-url='#{forgot_password_url}'".html_safe if forgot_password_url.present? %>
-     <%= "data-invalid-login-faq-url='#{invalid_login_faq_url}'".html_safe if invalid_login_faq_url.present? %>
+     <%= "data-invalid-login-faq-url='#{h(invalid_login_faq_url)}'".html_safe if invalid_login_faq_url.present? %>
 ></div>
