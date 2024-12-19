@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,10 +17,8 @@
  */
 
 import $ from 'jquery'
-import 'jquery-migrate'
-import fakeENV from '@canvas/test-utils/fakeENV'
+import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import api from '../enrollmentTermsApi'
-import '@canvas/jquery/jquery.ajaxJSON'
 
 const deserializedTerms = [
   {
@@ -48,6 +46,7 @@ const deserializedTerms = [
     gradingPeriodGroupId: '1',
   },
 ]
+
 const serializedTerms = {
   enrollment_terms: [
     {
@@ -77,55 +76,44 @@ const serializedTerms = {
   ],
 }
 
-QUnit.module('list', {
-  setup() {
-    this.server = sinon.fakeServer.create()
-    this.fakeHeaders = '<http://some_url?page=1&per_page=10>; rel="last"'
-    fakeENV.setup()
-    ENV.ENROLLMENT_TERMS_URL = 'api/enrollment_terms'
-  },
-  teardown() {
-    fakeENV.teardown()
-    this.server.restore()
-  },
-})
+jest.mock('@canvas/network/NaiveRequestDispatch/index')
 
-test('calls the resolved endpoint', () => {
-  sandbox.stub($, 'ajaxJSON')
-  api.list()
-  ok($.ajaxJSON.calledWith('api/enrollment_terms'))
-})
+describe('enrollmentTermsApi', () => {
+  let mockDeferred
 
-test('deserializes returned enrollment terms', function (assert) {
-  const start = assert.async()
-  this.server.respondWith('GET', /enrollment_terms/, [
-    200,
-    {
-      'Content-Type': 'application/json',
-      Link: this.fakeHeaders,
-    },
-    JSON.stringify(serializedTerms),
-  ])
-  // eslint-disable-next-line promise/catch-or-return
-  api.list().then(terms => {
-    deepEqual(terms, deserializedTerms)
-    // eslint-disable-next-line qunit/no-global-stop-start
-    start()
+  beforeEach(() => {
+    window.ENV = {
+      ENROLLMENT_TERMS_URL: 'api/enrollment_terms',
+    }
+    mockDeferred = $.Deferred()
+    const mockDispatch = {
+      getDepaginated: jest.fn().mockReturnValue(mockDeferred),
+    }
+    NaiveRequestDispatch.mockImplementation(() => mockDispatch)
   })
-  this.server.respond()
-})
 
-test('rejects the promise upon errors', function (assert) {
-  const start = assert.async()
-  this.server.respondWith('GET', /enrollment_terms/, [
-    404,
-    {'Content-Type': 'application/json'},
-    'FAIL',
-  ])
-  api.list().catch(error => {
-    ok('we got here')
-    // eslint-disable-next-line qunit/no-global-stop-start
-    start()
+  afterEach(() => {
+    delete window.ENV
+    jest.resetAllMocks()
   })
-  this.server.respond()
+
+  describe('list', () => {
+    it('calls the endpoint with correct URL', () => {
+      const dispatch = new NaiveRequestDispatch()
+      api.list()
+      expect(dispatch.getDepaginated).toHaveBeenCalledWith('api/enrollment_terms')
+    })
+
+    it('deserializes returned enrollment terms', async () => {
+      mockDeferred.resolve([serializedTerms])
+      const terms = await api.list()
+      expect(terms).toEqual(deserializedTerms)
+    })
+
+    it('rejects the promise upon errors', async () => {
+      const error = new Error('FAIL')
+      mockDeferred.reject(error)
+      await expect(api.list()).rejects.toThrow('FAIL')
+    })
+  })
 })
