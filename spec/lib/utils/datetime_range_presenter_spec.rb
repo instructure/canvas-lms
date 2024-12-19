@@ -72,14 +72,14 @@ module Utils
       end
 
       it "ignores ranges for due dates" do
-        datetime = Time.zone.parse("#{Time.now.year}-01-01 12:00:00")
+        datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
         endtime = datetime + 1.hour
         presenter = DatetimeRangePresenter.new(datetime, endtime, :due_date)
         expect(presenter.as_string).to eq("Jan 1 by 12pm")
       end
 
       it "handles ranges" do
-        datetime = Time.zone.parse("#{Time.now.year}-01-01 12:00:00")
+        datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
         end_datetime = datetime + 2.days
         presenter = DatetimeRangePresenter.new(datetime, end_datetime)
         expect(presenter.as_string).to eq("Jan 1 at 12pm to Jan 3 at 12pm")
@@ -122,7 +122,7 @@ module Utils
         pre_zone = Time.zone
         Time.zone = "Alaska"
         Timecop.freeze(Time.utc(2014, 10, 1, 7, 30)) do
-          datetime = Time.now
+          datetime = Time.zone.now
 
           alaskan_presenter = DatetimeRangePresenter.new(datetime)
           mountain_presenter = overridden_presenter(datetime, "America/Denver")

@@ -17,11 +17,12 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Assignment, Checkpoint} from '../../../api'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {datetimeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('assignment')
+const I18n = createI18nScope('assignment')
 
 const REPLY_TO_TOPIC = 'reply_to_topic'
 
@@ -30,12 +31,6 @@ type AssignmentCheckpoints = Pick<Assignment, 'id' | 'checkpoints' | 'discussion
 type TeacherCheckpointsInfoProps = {
   assignment: AssignmentCheckpoints
 }
-
-const dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
-  month: 'short',
-  day: 'numeric',
-  timeZone: ENV.TIMEZONE,
-})
 
 interface DueDate {
   dueFor: string
@@ -69,6 +64,55 @@ const getCheckpointDueDates = (
   return {multipleDueDates: false, dates: [{dueFor: I18n.t('Everyone'), dueAt: null}]}
 }
 
+const getAvailabilityInfo = (
+  checkpoint: Checkpoint | undefined
+): {title: string; multipleDueDates: boolean; dates: DueDate[]} => {
+  let title = ''
+  let availability = null
+  const dates = []
+  if (!checkpoint)
+    return {title, multipleDueDates: false, dates: [{dueFor: I18n.t('Everyone'), dueAt: null}]}
+
+  if (checkpoint.overrides && checkpoint.overrides.length > 0) {
+    title = I18n.t('Availability')
+    checkpoint.overrides.forEach(override => {
+      availability = getAvailabilityText(override.unlock_at, override.lock_at)
+      if (availability.dueFor) {
+        dates.push({
+          dueFor: `${override.title} ${availability.dueFor}` || I18n.t('Section'),
+          dueAt: availability.dueAt,
+        })
+      }
+    })
+    availability = getAvailabilityText(checkpoint.unlock_at, checkpoint.lock_at)
+    if (availability.dueFor) {
+      dates.push({
+        dueFor: `${I18n.t('Everyone else')} ${availability.dueFor}`,
+        dueAt: availability.dueAt,
+      })
+    }
+    return {title, multipleDueDates: true, dates}
+  }
+
+  availability = getAvailabilityText(checkpoint.unlock_at, checkpoint.lock_at)
+  return {
+    title: availability.dueFor,
+    multipleDueDates: false,
+    dates: [{dueFor: I18n.t('Everyone'), dueAt: availability.dueAt}],
+  }
+}
+
+const getAvailabilityText = (unlockAt: string | null, lockAt: string | null): DueDate => {
+  const now = new Date()
+  const isLocked = unlockAt && new Date(unlockAt) > now
+  const isOpen = unlockAt && now > new Date(unlockAt)
+  if (!unlockAt && !lockAt) return {dueFor: '', dueAt: null}
+  if (!unlockAt && lockAt) return {dueFor: I18n.t('Available Until'), dueAt: lockAt}
+  if (isOpen && !lockAt) return {dueFor: '', dueAt: null}
+  if (isLocked) return {dueFor: I18n.t('Not Available Until'), dueAt: unlockAt}
+  else return {dueFor: I18n.t('Available Until'), dueAt: lockAt}
+}
+
 const renderRequiredRepliesTitle = (assignment: AssignmentCheckpoints): string => {
   const translatedReplyToEntryRequiredCount = I18n.n(
     assignment.discussion_topic.reply_to_entry_required_count
@@ -86,7 +130,7 @@ const TooltipContent: React.FC<{dates: DueDate[]}> = ({dates}) => (
         <dd>
           {date.dueAt ? (
             <span title={new Date(date.dueAt).toLocaleString()}>
-              {dateFormatter.format(new Date(date.dueAt))}
+              {datetimeString(date.dueAt, {timezone: ENV.TIMEZONE})}
             </span>
           ) : (
             '-'
@@ -96,7 +140,6 @@ const TooltipContent: React.FC<{dates: DueDate[]}> = ({dates}) => (
     ))}
   </dl>
 )
-
 const CheckpointInfo: React.FC<{
   title: string
   dueDate: {multipleDueDates: boolean; dates: DueDate[]}
@@ -120,7 +163,7 @@ const CheckpointInfo: React.FC<{
         </button>
       </Tooltip>
     ) : dueDate.dates[0].dueAt ? (
-      dateFormatter.format(new Date(dueDate.dates[0].dueAt))
+      datetimeString(dueDate.dates[0].dueAt, {timezone: ENV.TIMEZONE})
     ) : (
       I18n.t('No Due Date')
     )}
@@ -130,7 +173,7 @@ const CheckpointInfo: React.FC<{
 export const TeacherCheckpointsInfo: React.FC<TeacherCheckpointsInfoProps> = ({assignment}) => {
   const replyToTopicCheckpoint = assignment.checkpoints.find(cp => cp.tag === REPLY_TO_TOPIC)
   const requiredRepliesCheckpoint = assignment.checkpoints.find(cp => cp.tag !== REPLY_TO_TOPIC)
-
+  const {title, ...availabilityDates} = getAvailabilityInfo(replyToTopicCheckpoint)
   return (
     <div
       style={{
@@ -139,6 +182,13 @@ export const TeacherCheckpointsInfo: React.FC<TeacherCheckpointsInfoProps> = ({a
         gap: '.5rem',
       }}
     >
+      {!!title && (
+        <CheckpointInfo
+          title={title}
+          dueDate={availabilityDates}
+          testId={`${assignment.id}_cp_availability`}
+        />
+      )}
       <CheckpointInfo
         title={I18n.t('Reply to Topic')}
         dueDate={getCheckpointDueDates(replyToTopicCheckpoint)}

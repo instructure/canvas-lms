@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Pastas disponíveis"
     },
+    "background_1bc88842": {
+        "message": "Contexto"
+    },
     "backslash_b2d5442d": {
         "message": "Barra invertida"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Azul"
+    },
+    "border_5b08b06d": {
+        "message": "Limite"
     },
     "bottom_15a2a9be": {
         "message": "Inferior"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Recolher para ocultar { types }"
     },
+    "color_a363e1b0": {
+        "message": "Cor"
+    },
+    "color_contrast_4c418add": {
+        "message": "Contraste de cor"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Taxa de contraste de cores"
+    },
     "color_picker_6b359edf": {
         "message": "Selecionador de Cores"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Seletor de cores ({ colorName } selecionado)"
+    },
+    "color_popup_af39810f": {
+        "message": "Popup de cores"
     },
     "column_e1ae5c64": {
         "message": "Coluna"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (função)"
     },
+    "fail_544e5dde": {
+        "message": "FALHA"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Falha ao obter o conteúdo do arquivo"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Notas"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Texto gráfico"
     },
     "greater_than_e98af662": {
         "message": "Melhor que"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Infinity"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Campo de entrada para alfa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Campo de entrada para azul"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Campo de entrada para verde"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Campo de entrada para vermelho"
+    },
     "insert_593145ef": {
         "message": "Inserir"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Grande"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Texto grande"
     },
     "latvian_2bbb6aab": {
         "message": "Letão"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Nenhum selecionado"
     },
+    "normal_text_7b03da48": {
+        "message": "Texto normal"
+    },
     "norwegian_53f391ec": {
         "message": "Norueguês"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "Tamanho do contorno"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } não é um protocolo válido que deve ser ftp, http, https, mailto, skype, tel ou pode ser omitido"
-    },
     "page_50c4823d": {
         "message": "Página"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Parcial (Derivativo)"
     },
+    "pass_1c19a2b3": {
+        "message": "APROVADO"
+    },
     "paste_5963d1c1": {
         "message": "Colar"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "O percentual deve ser um número"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "A porcentagem deve ser de pelo menos { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Ícone de artes cênicas"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (variante)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Escolha uma cor"
+    },
     "pink_68ad45cb": {
         "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Os pixels devem ter pelo menos { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Reproduzir"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "{ findText } anterior"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Cores escolhidas anteriormente"
     },
     "prime_917ea60e": {
         "message": "Melhor"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Iídiche"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Você está em uma paleta de cores. Para navegar na paleta para cima, para a esquerda, para baixo ou para a direita, use os botões ''W'', ''A'', ''S'' e ''D'', respectivamente"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Você está em um controle deslizante de cores. Para navegar no controle deslizante para a esquerda ou para a direita, use os botões ''A'' e ''D'', respectivamente"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Você está em um controle deslizante alfa. Para navegar no controle deslizante para a esquerda ou para a direita, use os botões ''A'' e ''D'', respectivamente"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Você pode substituir carregando um novo arquivo de legenda."

@@ -20,7 +20,6 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import ForbiddenWordsFileUpload, {createFolder} from '../ForbiddenWordsFileUpload'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect')

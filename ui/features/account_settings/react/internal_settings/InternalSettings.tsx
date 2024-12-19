@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import {InternalSettingsView} from './InternalSettingsView'
 
 const client = createClient()

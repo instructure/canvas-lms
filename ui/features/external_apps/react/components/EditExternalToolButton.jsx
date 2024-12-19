@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -26,13 +26,12 @@ import store from '../lib/ExternalAppsStore'
 import ConfigurationForm from './configuration_forms/ConfigurationForm'
 import Lti2Edit from './Lti2Edit'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
     canEdit: PropTypes.bool.isRequired,
-    canAddEdit: PropTypes.bool.isRequired,
     returnFocus: PropTypes.func.isRequired,
   }
 
@@ -151,7 +150,7 @@ export default class EditExternalToolButton extends React.Component {
   }
 
   render() {
-    if (this.props.canEdit || this.props.canAddEdit) {
+    if (this.props.canEdit) {
       const editAriaLabel = I18n.t('Edit %{toolName} App', {toolName: this.state.tool.name})
 
       return (

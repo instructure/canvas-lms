@@ -165,9 +165,9 @@ describe "quiz show page assign to" do
   end
 
   context "overrides table" do
-    let(:due_at) { Time.parse("2024-04-15") }
-    let(:unlock_at) { Time.parse("2024-04-10") }
-    let(:lock_at) { Time.parse("2024-04-20") }
+    let(:due_at) { Time.zone.parse("2024-04-15") }
+    let(:unlock_at) { Time.zone.parse("2024-04-10") }
+    let(:lock_at) { Time.zone.parse("2024-04-20") }
 
     before do
       @course_section1 = @course.course_sections.create!(name: "Section Alpha")

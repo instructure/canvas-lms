@@ -20,7 +20,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import successSVG from '../../images/Success.svg'
 
@@ -30,7 +30,7 @@ type Spacing = ViewProps['margin']
 type BorderWidth = ViewProps['borderWidth']
 type BorderColor = ViewProps['borderColor']
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export type PeerReviewSubheader = {
   text: string

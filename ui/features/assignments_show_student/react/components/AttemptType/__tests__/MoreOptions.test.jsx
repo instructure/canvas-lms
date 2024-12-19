@@ -21,7 +21,7 @@ import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {render, screen, act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import MoreOptions from '../MoreOptions/index'
 import React from 'react'

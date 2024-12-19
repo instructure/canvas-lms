@@ -22,7 +22,7 @@ require "jira_ref_parser"
 module RuboCop
   module Cop
     module Specs
-      class NoSkipWithoutTicket < Cop
+      class NoSkipWithoutTicket < Base
         MSG = "Reference a ticket if skipping. " \
               "Example: skip('time bomb on saturdays CNVS-123456')."
 

@@ -19,7 +19,7 @@ import {addMocksToSchema} from '@graphql-tools/mock'
 import {makeExecutableSchema} from '@graphql-tools/schema'
 import {addTypenameToDocument} from 'apollo-utilities'
 import {graphql} from 'graphql'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {mergeWith} from 'lodash'
 import {print} from 'graphql/language/printer'
 

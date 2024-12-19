@@ -268,7 +268,7 @@ describe CalendarsController do
 end
 
 describe CalendarEventsApiController do
-  def course_event(date = Time.now)
+  def course_event(date = Time.zone.now)
     @event = @course.calendar_events.create(title: "some assignment", start_at: date, end_at: date)
   end
 

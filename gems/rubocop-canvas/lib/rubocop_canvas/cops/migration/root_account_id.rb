@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class RootAccountId < Cop
+      class RootAccountId < Base
         include RuboCop::Canvas::CurrentDef
 
         EXAMPLE_REFERENCES_LINE = "t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false"
@@ -144,7 +144,7 @@ module RuboCop
               if %i[str sym].include?(table_name.type)
                 example = "e.g. `#{EXAMPLE_REPLICA_IDENTITY_LINE % table_name.value}`"
               end
-              add_offense nil, location: last_line_range(node), message: <<~TEXT, severity: :info
+              add_offense last_line_range(node), message: <<~TEXT, severity: :info
                 Ensure another migration in this commit uses `set_replica_identity`
                 #{example}
               TEXT

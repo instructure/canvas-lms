@@ -24,7 +24,7 @@ describe Quizzes::QuizStatistics do
     @quiz = @course.quizzes.create!
     @quiz.quiz_questions.create!(question_data: { name: "test 1" })
     @quiz.generate_quiz_data
-    @quiz.published_at = Time.now
+    @quiz.published_at = Time.zone.now
     @quiz.save!
   end
 
@@ -79,7 +79,7 @@ describe Quizzes::QuizStatistics do
 
     stats2 = Timecop.freeze(2.minutes.from_now) do
       @quiz.one_question_at_a_time = true
-      @quiz.published_at = Time.now
+      @quiz.published_at = Time.zone.now
       @quiz.save!
       @quiz.reload
       @quiz.current_statistics_for("student_analysis") # twice

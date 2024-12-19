@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class AddForeignKey < Cop
+      class AddForeignKey < Base
         MSG = <<~TEXT
           When adding a foreign key to an existing table, use a non-transactional migration
           and pass `delay_validation: true` (unless the table is known to be small).

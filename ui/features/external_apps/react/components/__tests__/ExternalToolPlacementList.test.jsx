@@ -72,7 +72,7 @@ describe('ExternalToolPlacementList', () => {
 
   describe('with 1.3 tool in an editable context', () => {
     beforeAll(() => {
-      window.ENV.PERMISSIONS = {create_tool_manually: true, edit_tool_manually: true}
+      window.ENV.PERMISSIONS = {edit_tool_manually: true}
       window.ENV.CONTEXT_BASE_URL = '/accounts/1'
 
       store.togglePlacements.mockImplementation(({onSuccess}) => onSuccess())
@@ -192,7 +192,7 @@ describe('ExternalToolPlacementList', () => {
 
   describe('with 1.1 tool in an editable context', () => {
     beforeAll(() => {
-      window.ENV.PERMISSIONS = {create_tool_manually: true, edit_tool_manually: true}
+      window.ENV.PERMISSIONS = {edit_tool_manually: true}
       window.ENV.CONTEXT_BASE_URL = '/accounts/1'
 
       store.togglePlacements.mockImplementation(({onSuccess}) => onSuccess())

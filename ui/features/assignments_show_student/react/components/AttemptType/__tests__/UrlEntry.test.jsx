@@ -20,7 +20,7 @@ import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graph
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import StudentViewContext from '../../Context'
 
 import UrlEntry from '../UrlEntry'

@@ -156,7 +156,8 @@ interface ApiCoursePaceModuleItemsAttributes {
 interface CompressApiFormattedCoursePace {
   readonly start_date?: string
   readonly end_date: OptionalDate
-  readonly exclude_weekends: boolean
+  readonly exclude_weekends?: boolean
+  readonly selected_days_to_skip?: string[]
   readonly course_pace_module_items_attributes: ApiCoursePaceModuleItemsAttributes[]
 }
 interface PublishApiFormattedCoursePace extends CompressApiFormattedCoursePace {
@@ -169,31 +170,34 @@ const transformCoursePaceForApi = (
   coursePace: CoursePace,
   mode: ApiMode = ApiMode.PUBLISH
 ): PublishApiFormattedCoursePace | CompressApiFormattedCoursePace => {
-  const coursePaceItems: ApiCoursePaceModuleItemsAttributes[] = []
-  coursePace.modules.forEach(module => {
-    module.items.forEach(item => {
-      coursePaceItems.push({
-        id: item.id,
-        duration: item.duration,
-        module_item_id: item.module_item_id,
-      })
-    })
-  })
+  const coursePaceItems: ApiCoursePaceModuleItemsAttributes[] = coursePace.modules.flatMap(module =>
+    module.items.map(item => ({
+      id: item.id,
+      duration: item.duration,
+      module_item_id: item.module_item_id,
+    }))
+  )
+
+  const selectedDaysToSkipValue = window.ENV.FEATURES.course_paces_skip_selected_days
+    ? coursePace.selected_days_to_skip
+    : coursePace.exclude_weekends
+    ? ['sat', 'sun']
+    : []
+
+  const compressedCoursePace = {
+    start_date: coursePace.start_date,
+    end_date: coursePace.end_date,
+    course_pace_module_items_attributes: coursePaceItems,
+    selected_days_to_skip: selectedDaysToSkipValue,
+    exclude_weekends: coursePace.exclude_weekends,
+  }
 
   return mode === ApiMode.COMPRESS
-    ? {
-        start_date: coursePace.start_date,
-        end_date: coursePace.end_date,
-        exclude_weekends: coursePace.exclude_weekends,
-        course_pace_module_items_attributes: coursePaceItems,
-      }
+    ? compressedCoursePace
     : {
-        start_date: coursePace.start_date,
-        end_date: coursePace.end_date,
+        ...compressedCoursePace,
         workflow_state: coursePace.workflow_state,
-        exclude_weekends: coursePace.exclude_weekends,
         context_type: coursePace.context_type,
         context_id: coursePace.context_id,
-        course_pace_module_items_attributes: coursePaceItems,
       }
 }

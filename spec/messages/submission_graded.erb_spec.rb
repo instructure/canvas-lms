@@ -41,13 +41,6 @@ describe "submission_graded" do
     expect(message.body).to match("For #{@submission.user.name}")
   end
 
-  it "does not fail for twitter message" do
-    observer = user_model
-    observer.preferences[:send_observed_names_in_notifications] = true
-    message = generate_message(:submission_graded, :twitter, asset, user: observer)
-    expect(message.body).to match(@submission.user.name)
-  end
-
   context "with a graded submission and sending scores in emails is allowed" do
     before do
       @assignment.points_possible = 100
@@ -65,8 +58,6 @@ describe "submission_graded" do
       email = generate_message(:submission_graded, :email, asset, user: @student)
       expect(email.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
       expect(email.html_body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
-      twitter = generate_message(:submission_graded, :twitter, asset, user: @student)
-      expect(twitter.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
       sms = generate_message(:submission_graded, :sms, asset, user: @student)
       expect(sms.body).to include("score: #{@submission.score} out of #{@assignment.points_possible}")
     end
@@ -87,8 +78,6 @@ describe "submission_graded" do
       email = generate_message(:submission_graded, :email, asset, user: @student)
       expect(email.body).to include("grade: A")
       expect(email.html_body).to include("grade: A")
-      twitter = generate_message(:submission_graded, :twitter, asset, user: @student)
-      expect(twitter.body).to include("grade: A")
       sms = generate_message(:submission_graded, :sms, asset, user: @student)
       expect(sms.body).to include("grade: A")
     end

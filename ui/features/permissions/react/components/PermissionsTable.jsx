@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component, Fragment} from 'react'
 import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
@@ -37,7 +37,7 @@ import {ConnectedPermissionButton} from './PermissionButton'
 import {ConnectedGranularCheckbox} from './GranularCheckbox'
 import propTypes from '@canvas/permissions/react/propTypes'
 
-const I18n = useI18nScope('permissions')
+const I18n = createI18nScope('permissions')
 
 const GRANULAR_PERMISSION_TAG = 'ic-permissions__grp-tag'
 
@@ -171,7 +171,7 @@ export default class PermissionsTable extends Component {
     const toggleExpanded = () => {
       this.setState(prevState => {
         // Need to make a copy to avoid mutating existing state
-        // eslint-disable-next-line prefer-object-spread
+         
         const expanded = Object.assign({}, prevState.expanded)
         expanded[name] = !expanded[name]
 

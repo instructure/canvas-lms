@@ -17,13 +17,13 @@
  */
 
 import {useEffect} from 'react'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import useCanvasContext from './useCanvasContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {COURSE_ALIGNMENT_STATS} from '../../graphql/Management'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const useCourseAlignmentStats = () => {
   const {contextId} = useCanvasContext()

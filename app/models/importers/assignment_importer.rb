@@ -294,7 +294,7 @@ module Importers
           # the quiz is published because it has an assignment
           q.assignment = item
           q.generate_quiz_data
-          q.published_at = Time.now
+          q.published_at = Time.zone.now
           q.workflow_state = "available"
           q.save
         end

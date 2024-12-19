@@ -271,9 +271,7 @@ export type RootAccountFeatureId =
   | 'extended_submission_state'
   | 'instui_nav'
   | 'lti_deep_linking_module_index_menu_modal'
-  | 'lti_dynamic_registration'
   | 'lti_registrations_next'
-  | 'lti_overwrite_user_url_input_select_content_dialog'
   | 'mobile_offline_mode'
   | 'product_tours'
   | 'rce_transform_loaded_content'
@@ -284,6 +282,9 @@ export type RootAccountFeatureId =
   | 'rubric_criterion_range'
   | 'rce_lite_enabled_speedgrader_comments'
   | 'login_registration_ui_identity'
+  | 'course_paces_skip_selected_days'
+  | 'course_pace_download_document'
+  | 'course_pace_draft_state'
 
 /**
  * From ApplicationController#JS_ENV_BRAND_ACCOUNT_FEATURES

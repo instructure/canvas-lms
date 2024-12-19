@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import type {FormMessage} from '@instructure/ui-form-field'
@@ -27,7 +27,7 @@ import type {I18nType, TextAreaChangeHandler, TextInputChangeHandler} from './ty
 import MembershipServiceAccess from './MembershipServiceAccess'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n: I18nType = useI18nScope('external_tools')
+const I18n: I18nType = createI18nScope('external_tools')
 
 export interface ConfigurationFormXmlProps {
   name?: string

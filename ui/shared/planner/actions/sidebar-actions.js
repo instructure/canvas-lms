@@ -22,10 +22,10 @@ import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import {transformApiToInternalItem, findNextLink, buildURL} from '../utilities/apiUtils'
 import {identifiableThunk} from '../utilities/redux-identifiable-thunk'
 import {getCourseList, gotCourseList} from './loading-actions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {alert} from '../utilities/alertUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const {
   sidebarItemsLoading,

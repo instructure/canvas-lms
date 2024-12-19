@@ -21,7 +21,7 @@ import Backbone from '@canvas/backbone'
 import ValidatedMixin from './ValidatedMixin'
 import $ from 'jquery'
 import {map, forEach, isEqual, includes, clone, isObject, chain, keys} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.toJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/jquery.instructure_forms'
@@ -29,7 +29,7 @@ import {send} from '@canvas/rce-command-shim'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import sanitizeData from '../../sanitizeData'
 
-const I18n = useI18nScope('errors')
+const I18n = createI18nScope('errors')
 
 const slice = [].slice
 
@@ -122,7 +122,7 @@ ValidatedFormView.prototype.submit = function (event, sendFunc) {
   if (keys(errors).length === 0) {
     disablingDfd = this.disablingDfd ?? new $.Deferred()
     saveDfd = this.saveFormData(data)
-    // eslint-disable-next-line promise/catch-or-return
+     
     saveDfd.then(this.onSaveSuccess.bind(this), this.onSaveFail.bind(this))
     saveDfd.fail(
       (function (_this) {
@@ -254,7 +254,7 @@ ValidatedFormView.prototype.hideErrors = function () {
 }
 
 ValidatedFormView.prototype.onSaveSuccess = function (xhr) {
-  // eslint-disable-next-line prefer-spread
+   
   return this.trigger.apply(this, ['success', xhr].concat(slice.call(arguments)))
 }
 
@@ -263,7 +263,7 @@ ValidatedFormView.prototype.onSaveFail = function (xhr) {
   errors = this.parseErrorResponse(xhr)
   errors || (errors = {})
   this.showErrors(errors)
-  // eslint-disable-next-line prefer-spread
+   
   return this.trigger.apply(this, ['fail', errors].concat(slice.call(arguments)))
 }
 
@@ -340,7 +340,7 @@ ValidatedFormView.prototype.fieldSelectors = null
 ValidatedFormView.prototype.findField = function (field) {
   let $el, ref
   const selector =
-    // eslint-disable-next-line no-void
+     
     ((ref = this.fieldSelectors) != null ? ref[field] : void 0) || "[name='" + field + "']"
   $el = this.$(selector)
   if ($el.length === 0) {

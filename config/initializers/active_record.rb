@@ -232,13 +232,17 @@ class ActiveRecord::Base
     end
   end
 
-  def self.skip_touch_context(skip = true)
-    @@skip_touch_context = skip
+  def self.skip_touch_context
+    @@skip_touch_context = true
+    yield
+  ensure
+    @@skip_touch_context = false
   end
 
   def save_without_touching_context
     @skip_touch_context = true
     save
+  ensure
     @skip_touch_context = false
   end
 
@@ -362,7 +366,7 @@ class ActiveRecord::Base
     end
 
     value = wildcard_pattern(value, case_sensitive:, type:)
-    cols = args.map { |col| like_condition(col, "?", !case_sensitive) }
+    cols = args.map { |col| like_condition(col, "?", downcase: !case_sensitive) }
     sanitize_sql_array ["(#{cols.join(" OR ")})", *([value] * cols.size)]
   end
 
@@ -379,7 +383,7 @@ class ActiveRecord::Base
     value = args.pop
     value = wildcard_pattern(value)
     cols = coalesce_chain(args)
-    sanitize_sql_array ["(#{like_condition(cols, "?", false)})", value]
+    sanitize_sql_array ["(#{like_condition(cols, "?", downcase: false)})", value]
   end
 
   def self.coalesce_chain(cols)
@@ -390,7 +394,7 @@ class ActiveRecord::Base
     "COALESCE(LOWER(#{column}), '')"
   end
 
-  def self.like_condition(value, pattern = "?", downcase = true)
+  def self.like_condition(value, pattern = "?", downcase: true)
     value = "LOWER(#{value})" if downcase
     "#{value} LIKE #{pattern}"
   end
@@ -778,7 +782,7 @@ class ActiveRecord::Base
 
     run_callbacks :save do
       run_callbacks :create do
-        timestamp = Time.now
+        timestamp = Time.zone.now
 
         self.created_at ||= timestamp
         self.updated_at ||= timestamp
@@ -1292,23 +1296,6 @@ module BatchWithColumnsPreloaded
   end
 end
 
-module LockForNoKeyUpdate
-  def lock(lock_type = true)
-    super(lock_type_clause(lock_type))
-  end
-
-  private
-
-  def lock_type_clause(lock_type)
-    return "FOR NO KEY UPDATE" if lock_type == :no_key_update
-    return "FOR NO KEY UPDATE SKIP LOCKED" if lock_type == :no_key_update_skip_locked
-    return "FOR UPDATE" if lock_type == true
-
-    lock_type
-  end
-end
-ActiveRecord::Relation.prepend(LockForNoKeyUpdate)
-
 ActiveRecord::Relation.class_eval do
   def includes(*args)
     return super if args.empty? || args == [nil]
@@ -1333,7 +1320,7 @@ ActiveRecord::Relation.class_eval do
     scope
   end
 
-  def update_all_locked_in_order(lock_type: :no_key_update, **updates)
+  def update_all_locked_in_order(lock_type: "FOR NO KEY UPDATE", **updates)
     locked_scope = lock_for_subquery_update(lock_type).order(primary_key.to_sym)
     base_class.unscoped.where(primary_key => locked_scope).update_all(updates)
   end
@@ -1346,7 +1333,7 @@ ActiveRecord::Relation.class_eval do
 
   def touch_all_skip_locked(*names, time: nil)
     activate do |relation|
-      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:), lock_type: :no_key_update_skip_locked)
+      relation.update_all_locked_in_order(**relation.klass.touch_attributes_with_time(*names, time:), lock_type: "FOR NO KEY UPDATE SKIP LOCKED")
     end
   end
 
@@ -1550,11 +1537,11 @@ module UpdateAndDeleteAllWithLimit
 
   private
 
-  def lock_for_subquery_update(lock_type = true)
+  def lock_for_subquery_update(lock_type = "FOR NO KEY UPDATE")
     return lock(lock_type) if !lock_type || joins_values.empty?
 
     # make sure to lock the proper table
-    lock("#{lock_type_clause(lock_type)} OF #{connection.quote_local_table_name(klass.table_name)}")
+    lock("#{lock_type} OF #{connection.quote_local_table_name(klass.table_name)}")
   end
 
   # Introduced temporarily by BUDA-26 to monitor whether the limit clause is ignored or not by the update_all or delete_all functions.
@@ -1574,7 +1561,7 @@ end
 Switchman::ActiveRecord::Relation.include(UpdateAndDeleteAllWithLimit)
 
 ActiveRecord::Associations::CollectionProxy.class_eval do
-  def respond_to?(name, include_private = false)
+  def respond_to?(name, include_private = false) # rubocop:disable Style/OptionalBooleanParameter
     return super if [:marshal_dump, :_dump, "marshal_dump", "_dump"].include?(name)
 
     super ||

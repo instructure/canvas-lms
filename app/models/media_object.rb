@@ -162,9 +162,12 @@ class MediaObject < ActiveRecord::Base
     root_account = Account.where(id: root_account_id).first
     data[:entries].each do |entry|
       attachment_id = nil
-      if entry[:originalId].present? && (Integer(entry[:originalId]).is_a?(Integer) rescue false)
-        attachment_id = entry[:originalId]
-      elsif entry[:originalId].present? && entry[:originalId].length >= 2
+      begin
+        attachment_id = Integer(entry[:originalId]) if entry[:originalId].present?
+      rescue ArgumentError
+        # ignore
+      end
+      if !attachment_id && entry[:originalId].present? && entry[:originalId].length >= 2
         partner_data = Rack::Utils.parse_nested_query(entry[:originalId]).with_indifferent_access
         attachment_id = partner_data[:attachment_id] if partner_data[:attachment_id].present?
       end
@@ -219,7 +222,7 @@ class MediaObject < ActiveRecord::Base
   # typically call this in a delayed job, since it has to contact kaltura
   def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && by_media_id(media_id).none?
-      create!(**create_opts.merge(media_id:))
+      create!(**create_opts, media_id:)
     end
   end
 
@@ -368,7 +371,7 @@ class MediaObject < ActiveRecord::Base
   def viewed!
     # in the delayed job, current_attachment gets reset
     # so we pass it in here and then set it again in the next method
-    delay.updated_viewed_at_and_retrieve_details(Time.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
+    delay.updated_viewed_at_and_retrieve_details(Time.zone.now, current_attachment) if !self.data[:last_viewed_at] || self.data[:last_viewed_at] > 1.hour.ago
     true
   end
 

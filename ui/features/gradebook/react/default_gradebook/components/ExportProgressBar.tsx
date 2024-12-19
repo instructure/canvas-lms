@@ -22,11 +22,11 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import GradebookExportManager from '../../shared/GradebookExportManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Transition} from '@instructure/ui-motion'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('gradebookExport')
+const I18n = createI18nScope('gradebookExport')
 
 export type ExportProgressBarProps = {
   exportState?: {

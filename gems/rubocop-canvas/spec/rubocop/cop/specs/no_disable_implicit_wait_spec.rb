@@ -21,7 +21,7 @@ describe RuboCop::Cop::Specs::NoDisableImplicitWait do
   subject(:cop) { described_class.new }
 
   it "disallows disable_implicit_wait" do
-    inspect_source(%{
+    offenses = inspect_source(%{
       describe "sis imports ui" do
         it 'should properly show sis stickiness options' do
           expect(ff('.fc-view-container .icon-calendar-month')).to have_size(1)
@@ -39,8 +39,8 @@ describe RuboCop::Cop::Specs::NoDisableImplicitWait do
         end
       end
     })
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/disable_implicit_wait/)
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/disable_implicit_wait/)
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 end

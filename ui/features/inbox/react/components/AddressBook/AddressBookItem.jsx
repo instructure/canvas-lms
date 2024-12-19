@@ -22,10 +22,10 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const AddressBookItem = ({
   children,
@@ -110,9 +110,11 @@ export const AddressBookItem = ({
               <TruncateText>
                 <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
               </TruncateText>
-              {pronouns &&
-                <Text weight="light" size="small">{pronouns}</Text>
-              }
+              {pronouns && (
+                <Text weight="light" size="small">
+                  {pronouns}
+                </Text>
+              )}
               {isOnObserverSubmenu && observerEnrollments && observerEnrollments.length > 0 && (
                 <Text size="small" color={isSelected ? 'secondary-inverse' : 'secondary'}>
                   <TruncateText onUpdate={updateObserveesAreTruncated}>

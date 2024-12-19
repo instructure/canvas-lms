@@ -24,7 +24,7 @@ import useOutcomesImport, {
   IMPORT_COMPLETED,
 } from '../useOutcomesImport'
 import {createCache} from '@canvas/apollo-v3'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {importGroupMocks, importOutcomeMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -283,7 +283,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
-        message: 'An error occurred while importing these outcomes: GraphQL error: Network error.',
+        message: 'An error occurred while importing these outcomes: Network error.',
         type: 'error',
       })
     })
@@ -448,7 +448,7 @@ describe('useOutcomesImport', () => {
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlert).toHaveBeenCalledWith({
-        message: 'An error occurred while importing this outcome: GraphQL error: Network error.',
+        message: 'An error occurred while importing this outcome: Network error.',
         type: 'error',
       })
     })

@@ -44,9 +44,9 @@ import {Text} from '@instructure/ui-text'
 import {type ViewOwnProps} from '@instructure/ui-view'
 import {type HeadingBlockProps} from './types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const HeadingBlockToolbar = () => {
   const {
@@ -58,7 +58,7 @@ const HeadingBlockToolbar = () => {
 
   const handleLevelChange = useCallback(
     (
-      e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem
@@ -70,7 +70,7 @@ const HeadingBlockToolbar = () => {
   )
   const handleFontSizeChange = useCallback(
     (
-      e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem

@@ -19,7 +19,7 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {AssignmentDueDate} from './AssignmentDueDate'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {nanoid} from 'nanoid'
@@ -35,7 +35,7 @@ import {
 } from '../../util/constants'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 const getDefaultBaseOptions = (includeMasteryPath, everyoneOption) => {
   return includeMasteryPath ? [everyoneOption, masteryPathsOption] : [everyoneOption]

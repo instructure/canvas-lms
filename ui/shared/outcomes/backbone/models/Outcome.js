@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {map, find, extend as lodashExtend} from 'lodash'
 import Backbone from '@canvas/backbone'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 
-const I18n = useI18nScope('modelsOutcome')
+const I18n = createI18nScope('modelsOutcome')
 
 extend(Outcome, Backbone.Model)
 
@@ -63,7 +63,7 @@ Outcome.prototype.setMasteryScales = function () {
         }
       })(this)
     ).points,
-    // eslint-disable-next-line prefer-spread
+     
     points_possible: Math.max.apply(
       Math,
       map(ratings, function (r) {

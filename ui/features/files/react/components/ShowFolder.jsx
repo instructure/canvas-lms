@@ -20,7 +20,7 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import {indexOf} from 'lodash'
 import classnames from 'classnames'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ShowFolder from '../legacy/components/ShowFolder'
 import File from '@canvas/files/backbone/models/File'
 import FilePreview from '@canvas/files/react/components/FilePreview'
@@ -33,7 +33,7 @@ import LoadingIndicator from './LoadingIndicator'
 import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 ShowFolder.getInitialState = function () {
   return {

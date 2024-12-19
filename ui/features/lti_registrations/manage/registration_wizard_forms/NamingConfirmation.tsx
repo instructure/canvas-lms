@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
@@ -28,7 +28,7 @@ import type {LtiPlacement} from '../model/LtiPlacement'
 import {i18nLtiPlacement} from '../model/i18nLtiPlacement'
 import htmlEscape from '@instructure/html-escape'
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 export type NamingConfirmationProps = {
   toolName: string

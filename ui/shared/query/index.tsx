@@ -175,7 +175,7 @@ export function useMutation<
   TVariables = void,
   TContext = unknown
 >(options: UseMutationOptions<TData, TError, TVariables, TContext>) {
-  return baseUseMutation(options)
+  return baseUseMutation<TData, TError, TVariables, TContext>(options)
 }
 
 export function prefetchQuery(queryKey: QueryKey, queryFn: QueryFunction) {

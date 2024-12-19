@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {number} from 'prop-types'
 import React from 'react'
 import '@canvas/content-locks/jquery/lock_reason'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 PeerReviewsCounter.propTypes = {
   current: number,

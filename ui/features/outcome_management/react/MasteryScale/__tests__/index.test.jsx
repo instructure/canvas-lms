@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import moxios from 'moxios'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '@canvas/outcomes/graphql/MasteryScale'
@@ -98,7 +98,10 @@ describe('MasteryScale', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(<MasteryScale />, {mocks: []})
+    const mocks = [...masteryScalesGraphqlMocks]
+    mocks[0] = { ...mocks[0], result: { errors: new Error('aw shucks') } }
+
+    const {getByText} = render(<MasteryScale />, {mocks: mocks})
     await waitFor(() => expect(getByText(/An error occurred/)).toBeInTheDocument())
   })
 

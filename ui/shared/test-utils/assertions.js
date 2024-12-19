@@ -65,7 +65,7 @@ const isAccessible = async (element, options = {}) => {
   }
 
   // clean up the element from the DOM if it was added
-  if (!document.body.contains(element)) {
+  if (document.body.contains(element)) {
     document.body.removeChild(element)
   }
 }

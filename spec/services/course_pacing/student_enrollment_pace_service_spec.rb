@@ -120,17 +120,43 @@ describe CoursePacing::StudentEnrollmentPaceService do
   end
 
   describe ".update_pace" do
-    let(:update_params) { { exclude_weekends: false } }
-
     context "the update is successful" do
-      it "returns the updated pace" do
-        expect do
-          expect(
-            CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
-          ).to eq pace
-        end.to change {
-          pace.exclude_weekends
-        }.to false
+      context "when add_selected_days_to_skip_param is enabled" do
+        before do
+          stub_const("SKIP_SELECTED_DAYS", %w[sun tue thu sat])
+
+          @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        end
+
+        let(:update_params) { { selected_days_to_skip: SKIP_SELECTED_DAYS } }
+
+        it "returns the updated pace" do
+          expect do
+            expect(
+              CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
+            ).to eq pace
+          end.to change {
+            pace.selected_days_to_skip
+          }.to SKIP_SELECTED_DAYS
+        end
+      end
+
+      context "when add_selected_days_to_skip_param is disabled" do
+        before do
+          @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        end
+
+        let(:update_params) { { exclude_weekends: false } }
+
+        it "returns the updated pace" do
+          expect do
+            expect(
+              CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
+            ).to eq pace
+          end.to change {
+            pace.exclude_weekends
+          }.to false
+        end
       end
     end
 
@@ -138,7 +164,7 @@ describe CoursePacing::StudentEnrollmentPaceService do
       it "returns false" do
         allow(pace).to receive(:update).and_return false
         expect(
-          CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
+          CoursePacing::StudentEnrollmentPaceService.update_pace(pace, { exclude_weekends: true })
         ).to be false
       end
     end

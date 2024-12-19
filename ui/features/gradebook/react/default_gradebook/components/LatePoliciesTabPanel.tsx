@@ -31,9 +31,9 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import NumberHelper from '@canvas/i18n/numberHelper'
 
 import Round from '@canvas/round'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const MIN_PERCENTAGE_INPUT = 0
 const MAX_PERCENTAGE_INPUT = 100
@@ -360,6 +360,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      allowStringValue={true}
                       id="missing-submission-grade"
                       // @ts-expect-error
                       locale={this.props.locale}
@@ -428,6 +429,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      allowStringValue={true}
                       id="late-submission-deduction"
                       // @ts-expect-error
                       locale={this.props.locale}
@@ -478,6 +480,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                 <Grid.Row>
                   <Grid.Col width="auto">
                     <NumberInput
+                      allowStringValue={true}
                       id="late-submission-minimum-percent"
                       // @ts-expect-error
                       locale={this.props.locale}

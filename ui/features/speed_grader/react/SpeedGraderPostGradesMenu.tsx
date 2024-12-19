@@ -21,9 +21,9 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('SpeedGraderPostGradesMenu')
+const I18n = createI18nScope('SpeedGraderPostGradesMenu')
 
 const {Item: MenuItem} = Menu as any
 

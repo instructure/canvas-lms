@@ -33,8 +33,6 @@ yarn build:all
 yarn test:jest
 ```
 
-There are still legacy mocha tests run with `yarn test:mocha`. The command `yarn test` runs them all.
-
 ### Test Debugging Hints
 
 ```
@@ -42,12 +40,6 @@ yarn test:jest:debug path/to/__test__/file.test.js
 ```
 
 will break and wait for you to attach a debugger (e.g. `chrome://inspect/#devices`).
-
-Similarly, for mocha tests
-
-```
-yarn test:mocha:debug path/to/test/file.test.js
-```
 
 Both those commands may include a `--watch` argument to keep the process alive
 while you iterate.

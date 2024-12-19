@@ -17,7 +17,7 @@
  */
 
 import React, {useContext} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -29,7 +29,7 @@ import {bool, func, string} from 'prop-types'
 import {GroupContext} from './context'
 import SelfSignupEndDate from './SelfSignupEndDate'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 const HelpText = () => (
   <div style={{maxWidth: '300px'}}>
@@ -82,7 +82,7 @@ export const SelfSignup = ({
         </Tooltip>
       </Flex.Item>
       <Flex.Item shouldGrow={true}>
-        <View display="block" padding="x-small x-small">
+        <View display="block" padding="x-small x-small" data-testid="allow-self-signup-wrapper">
           <Checkbox
             checked={selfSignup}
             label={I18n.t('Allow self sign-up')}

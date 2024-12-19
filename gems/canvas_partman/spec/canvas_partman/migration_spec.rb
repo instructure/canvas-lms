@@ -38,7 +38,7 @@ describe CanvasPartman::Migration do
 
   it "applies a migration on all partition tables" do
     partman = CanvasPartman::PartitionManager.create(Animal)
-    partman.create_partition(Time.new(2014, 11))
+    partman.create_partition(Time.local(2014, 11))
 
     Animal.transaction do
       AddFooToPartmanAnimals.new.migrate(:up)
@@ -53,7 +53,7 @@ describe CanvasPartman::Migration do
 
   it "applies multiple migrations" do
     partman = CanvasPartman::PartitionManager.create(Animal)
-    partman.create_partition(Time.new(2014, 11))
+    partman.create_partition(Time.local(2014, 11))
 
     Animal.transaction do
       AddFooToPartmanAnimals.new.migrate(:up)
@@ -90,8 +90,8 @@ describe CanvasPartman::Migration do
 
   it "applies multiple migrations on multiple partitions" do
     partman = CanvasPartman::PartitionManager.create(Animal)
-    partman.create_partition(Time.new(2014, 11))
-    partman.create_partition(Time.new(2014, 12))
+    partman.create_partition(Time.local(2014, 11))
+    partman.create_partition(Time.local(2014, 12))
 
     Animal.transaction do
       AddFooToPartmanAnimals.new.migrate(:up)
@@ -146,7 +146,7 @@ describe CanvasPartman::Migration do
 
   it "accepts an explicitly specified base class" do
     partman = CanvasPartman::PartitionManager.create(CanvasPartmanTest::AnimalAlias)
-    partman.create_partition(Time.new(2014, 11))
+    partman.create_partition(Time.local(2014, 11))
 
     Animal.transaction do
       AddAnotherThingToPartmanAnimals.new.migrate(:up)
@@ -161,7 +161,7 @@ describe CanvasPartman::Migration do
 
   it "add/removes indices just fine" do
     partman = CanvasPartman::PartitionManager.create(Animal)
-    partman.create_partition(Time.new(2014, 11))
+    partman.create_partition(Time.local(2014, 11))
 
     Animal.transaction do
       AddRaceIndexToPartmanAnimals.new.migrate(:up)

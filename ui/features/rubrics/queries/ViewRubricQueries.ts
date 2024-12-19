@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {executeQuery} from '@canvas/query/graphql'
 import type {
   RubricQueryResponse,
@@ -161,7 +161,10 @@ type CourseRubricQueryResponse = {
 }
 
 type RubricPreviewQueryResponse = {
-  rubric: Pick<Rubric, 'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments'>
+  rubric: Pick<
+    Rubric,
+    'criteria' | 'title' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+  >
 }
 
 type AccountRubricQueryResponse = {

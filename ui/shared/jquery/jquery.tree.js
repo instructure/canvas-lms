@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable @typescript-eslint/no-redeclare */
-/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable block-scoped-var */
-/* eslint-disable eqeqeq */
-/* eslint-disable no-var */
-/* eslint-disable vars-on-top */
+/* eslint-disable no-redeclare */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable import/no-named-as-default */
 
 // xsslint jqueryObject.identifier tree
 import $ from 'jquery'

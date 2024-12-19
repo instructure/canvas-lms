@@ -46,7 +46,11 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     set_checkpoints: nil,
     group_category_id: nil,
     ungraded_discussion_overrides: nil,
-    anonymous_state: nil
+    anonymous_state: nil,
+    sort_order: nil,
+    sort_order_locked: nil,
+    expanded: nil,
+    expanded_locked: nil
   )
     <<~GQL
       mutation {
@@ -68,12 +72,20 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
           #{"setCheckpoints: #{set_checkpoints}" unless set_checkpoints.nil?}
           #{"ungradedDiscussionOverrides: #{ungraded_discussion_overrides_str(ungraded_discussion_overrides)}" unless ungraded_discussion_overrides.nil?}
           #{"anonymousState: #{anonymous_state}" unless anonymous_state.nil?}
+          #{"sortOrder: #{sort_order}" unless sort_order.nil?}
+          #{"sortOrderLocked: #{sort_order_locked}" unless sort_order_locked.nil?}
+          #{"expanded: #{expanded}" unless expanded.nil?}
+          #{"expandedLocked: #{expanded_locked}" unless expanded_locked.nil?}
         }) {
           discussionTopic {
             _id
             published
             locked
             replyToEntryRequiredCount
+            expanded
+            expandedLocked
+            sortOrder
+            sortOrderLocked
             ungradedDiscussionOverrides {
               nodes {
                 _id
@@ -782,6 +794,65 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       end
     end
 
+    it "successfully updates a discussion topic with checkpoints, part two" do
+      missing_submission_deduction = 10.0
+      @course.create_late_policy(
+        missing_submission_deduction_enabled: true,
+        missing_submission_deduction:
+      )
+
+      @student_for_missing = student_in_course.user
+
+      @graded_topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+
+      @reply_to_topic_points = 5
+      @reply_to_entry_points = 15
+
+      discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+      @reply_to_topic = creator_service.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+        dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student_for_missing.id] }],
+        points_possible: @reply_to_topic_points
+      )
+
+      @reply_to_entry = creator_service.call(
+        discussion_topic: discussion,
+        checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+        dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student_for_missing.id] }],
+        points_possible: @reply_to_entry_points,
+        replies_required: 3
+      )
+
+      c1_assignment_override = @reply_to_topic.assignment_overrides.active.first
+      c2_assignment_override = @reply_to_entry.assignment_overrides.active.first
+
+      result = run_mutation(id: discussion.id, assignment: { forCheckpoints: true }, checkpoints: [
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ id: c1_assignment_override.id, type: "override", setType: "ADHOC", studentIds: [@student_for_missing.id], dueAt: 14.days.ago.iso8601 }], pointsPossible: @reply_to_topic_points },
+                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ id: c2_assignment_override.id, type: "override", setType: "ADHOC", studentIds: [@student_for_missing.id], dueAt: 7.days.ago.iso8601 }], pointsPossible: @reply_to_entry_points, repliesRequired: 3 }
+                            ])
+
+      expect(result["errors"]).to be_nil
+
+      parent_assignment = discussion.assignment
+      student2_parent_submission = parent_assignment.submission_for_student(@student_for_missing)
+      student2_reply_to_topic_submission = @reply_to_topic.submission_for_student(@student_for_missing)
+      student2_reply_to_entry_submission = @reply_to_entry.submission_for_student(@student_for_missing)
+
+      expect(student2_reply_to_topic_submission.missing?).to be true
+      expect(student2_reply_to_entry_submission.missing?).to be true
+      expect(student2_parent_submission.missing?).to be true
+
+      expected_reply_to_topic_score = @reply_to_topic_points.to_f * ((100 - missing_submission_deduction.to_f) / 100)
+      expected_reply_to_entry_score = @reply_to_entry_points.to_f * ((100 - missing_submission_deduction.to_f) / 100)
+      expected_parent_score = expected_reply_to_topic_score + expected_reply_to_entry_score
+
+      expect(student2_reply_to_topic_submission.score).to eq expected_reply_to_topic_score
+      expect(student2_reply_to_entry_submission.score).to eq expected_reply_to_entry_score
+
+      expect(student2_parent_submission.score).to eq expected_parent_score
+    end
+
     it "updates the reply to topic checkpoint due at date" do
       new_due_at = 3.days.from_now
       result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
@@ -1113,5 +1184,23 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       new_override = DiscussionTopic.last.active_assignment_overrides.first
       expect(new_override).to be_nil
     end
+  end
+
+  it "updates the default sort order" do
+    result = run_mutation({ id: @topic.id, sort_order: :asc })
+    expect(result["errors"]).to be_nil
+    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrder]).to eq("asc")
+    result = run_mutation({ id: @topic.id, sort_order_locked: true })
+    expect(result["errors"]).to be_nil
+    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrderLocked]).to be true
+  end
+
+  it "updates the default expand fields" do
+    result = run_mutation({ id: @topic.id, expanded: true })
+    expect(result["errors"]).to be_nil
+    expect(@topic.reload.expanded).to be true
+    result = run_mutation({ id: @topic.id, expanded_locked: true })
+    expect(result["errors"]).to be_nil
+    expect(@topic.reload.expanded_locked).to be true
   end
 end

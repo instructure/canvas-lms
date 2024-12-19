@@ -17,7 +17,7 @@
  */
 import type {LtiPlacement} from '../../model/LtiPlacements'
 import type {LtiRegistration} from '../../model/LtiRegistration'
-import createStore from 'zustand/vanilla'
+import {createStore} from 'zustand/vanilla'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {LtiPrivacyLevel} from 'features/developer_keys_v2/model/LtiPrivacyLevel'
@@ -169,7 +169,7 @@ export const createRegistrationOverlayStore = (
   developerKeyName: string | null,
   ltiRegistration: LtiRegistration
 ) =>
-  createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>(
+  createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>()(
     subscribeWithSelector(set => ({
       state: initialOverlayStateFromLtiRegistration(
         ltiRegistration.tool_configuration,

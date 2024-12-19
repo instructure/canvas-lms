@@ -141,8 +141,8 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.users.where(enrollments: { type: "DesignerEnrollment" }).first.name).to eq "User Cinco"
     siete = course.teacher_enrollments.detect { |e| e.user.name == "User Siete" }
     expect(siete).not_to be_nil
-    expect(siete.start_at).to eq DateTime.new(1985, 8, 24)
-    expect(siete.end_at).to eq DateTime.new(2011, 8, 29)
+    expect(siete.start_at).to eq Time.zone.local(1985, 8, 24)
+    expect(siete.end_at).to eq Time.zone.local(2011, 8, 29)
   end
 
   it "enrolls users by integration id" do
@@ -184,10 +184,10 @@ describe SIS::CSV::EnrollmentImporter do
     )
     course = @account.courses.where(sis_source_id: "test_1").first
     course.teacher_enrollments.first.tap do |e|
-      expect(e.start_at).to eq DateTime.parse("1985-08-24")
-      expect(e.end_at).to eq DateTime.parse("2011-08-29")
-      e.start_at = DateTime.parse("1985-05-24")
-      e.end_at = DateTime.parse("2011-05-29")
+      expect(e.start_at).to eq Time.zone.parse("1985-08-24")
+      expect(e.end_at).to eq Time.zone.parse("2011-08-29")
+      e.start_at = Time.zone.parse("1985-05-24")
+      e.end_at = Time.zone.parse("2011-05-29")
       e.save!
     end
     process_csv_data_cleanly(
@@ -196,8 +196,8 @@ describe SIS::CSV::EnrollmentImporter do
     )
     course.reload
     course.teacher_enrollments.first.tap do |e|
-      expect(e.start_at).to eq DateTime.parse("1985-05-24")
-      expect(e.end_at).to eq DateTime.parse("2011-05-29")
+      expect(e.start_at).to eq Time.zone.parse("1985-05-24")
+      expect(e.end_at).to eq Time.zone.parse("2011-05-29")
     end
   end
 

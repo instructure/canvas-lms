@@ -247,16 +247,16 @@ describe UsersController do
     it "handles google_drive oauth_success for a logged_in_user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials",
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
                                            :fetch_access_token! => nil,
                                            :refresh_token => "refresh_token",
                                            :access_token => "access_token")
-      about_mock = instance_double("Google::Apis::DriveV3::About",
-                                   user: instance_double("Google::Apis::DriveV3::User",
+      about_mock = instance_double(Google::Apis::DriveV3::About,
+                                   user: instance_double(Google::Apis::DriveV3::User,
                                                          email_address: "blah@blah.com",
                                                          permission_id: "permission_id"))
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService,
                                     get_about: about_mock,
                                     authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -281,12 +281,12 @@ describe UsersController do
     it "handles google_drive oauth_success for a non logged in user" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials",
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials,
                                            :code= => nil,
                                            :fetch_access_token! => nil,
                                            :refresh_token => "refresh_token",
                                            :access_token => "access_token")
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService,
                                     get_about: nil,
                                     authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -305,12 +305,12 @@ describe UsersController do
     it "rejects invalid state" do
       settings_mock = double
       allow(settings_mock).to receive(:settings).and_return({})
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials")
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials)
       allow(authorization_mock).to receive_messages(:code= => nil,
                                                     :fetch_access_token! => nil,
                                                     :refresh_token => "refresh_token",
                                                     :access_token => "access_token")
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService",
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService,
                                     get_about: nil,
                                     authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
@@ -325,11 +325,11 @@ describe UsersController do
     end
 
     it "handles auth failure gracefully" do
-      authorization_mock = instance_double("Google::Auth::UserRefreshCredentials", :code= => nil)
+      authorization_mock = instance_double(Google::Auth::UserRefreshCredentials, :code= => nil)
       allow(authorization_mock).to receive(:fetch_access_token!) do
         raise Signet::AuthorizationError, "{\"error\": \"invalid_grant\", \"error_description\": \"Bad Request\"}"
       end
-      client_mock = instance_double("Google::Apis::DriveV3::DriveService", authorization: authorization_mock)
+      client_mock = instance_double(Google::Apis::DriveV3::DriveService, authorization: authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
       state = Canvas::Security.create_jwt({ "return_to_url" => "http://localhost.com/return",
                                             "nonce" => "abc123" })
@@ -738,7 +738,7 @@ describe UsersController do
         accepted_terms = json["user"]["user"]["preferences"]["accepted_terms"]
         expect(response).to be_successful
         expect(accepted_terms).to be_present
-        expect(Time.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
+        expect(Time.zone.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
       end
 
       it "stores a confirmation_redirect url if it's trusted" do
@@ -3297,9 +3297,8 @@ describe UsersController do
 
       it "has exp that matches expires_at" do
         subject
-        exp = DateTime.strptime(token["exp"].to_s, "%s")
-        expires_at = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q")
-        expect(exp.to_s).to eq expires_at.to_s
+        expires_at = Time.strptime(response.parsed_body["expires_at"].to_s, "%Q")
+        expect(token["exp"]).to eq expires_at.to_i
       end
     end
 
@@ -3332,14 +3331,14 @@ describe UsersController do
         subject
         expires_at = response.parsed_body["expires_at"]
         expect(expires_at).to be_a Float
-        expires_at_date = DateTime.strptime(expires_at.to_s, "%Q")
-        expect(expires_at_date).to be_a DateTime
+        expires_at_date = Time.strptime(expires_at.to_s, "%Q")
+        expect(expires_at_date).to be_a Time
       end
 
       it "is ~1 day from now" do
         subject
         expires_at = response.parsed_body["expires_at"]
-        expect(DateTime.strptime(expires_at.to_s, "%Q").utc).to be_within(1.minute).of(1.day.from_now)
+        expect(Time.strptime(expires_at.to_s, "%Q").utc).to be_within(1.minute).of(1.day.from_now)
       end
     end
 
@@ -3353,8 +3352,8 @@ describe UsersController do
           get "pandata_events_token", params: { app_key: }
 
           token = CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"])
-          exp = DateTime.strptime(token["exp"].to_s, "%s").to_s
-          expires_at = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
+          exp = Time.zone.at(token["exp"])
+          expires_at = Time.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
 
           expect(exp).to eq expires_at
         end
@@ -3363,8 +3362,8 @@ describe UsersController do
         get "pandata_events_token", params: { app_key: }
 
         token = CanvasSecurity.decode_jwt(response.parsed_body["auth_token"], ["secret"])
-        exp2 = DateTime.strptime(token["exp"].to_s, "%s").to_s
-        expires_at2 = DateTime.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
+        exp2 = Time.zone.at(token["exp"])
+        expires_at2 = Time.strptime(response.parsed_body["expires_at"].to_s, "%Q").to_s
 
         expect(expires_at).not_to eq expires_at2
         expect(exp2).to eq expires_at2

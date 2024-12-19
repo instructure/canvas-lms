@@ -19,10 +19,10 @@
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {ContentMigrationItem} from './types'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 const obtainText = ({
   migration_type,

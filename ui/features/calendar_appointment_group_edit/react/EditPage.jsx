@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
@@ -38,7 +38,7 @@ import AppointmentGroupList from './AppointmentGroupList'
 import ContextSelector from './ContextSelector'
 import TimeBlockSelector from './TimeBlockSelector'
 
-const I18n = useI18nScope('appointment_groups')
+const I18n = createI18nScope('appointment_groups')
 
 const parseFormValues = data => ({
   description: data.description,
@@ -82,7 +82,16 @@ class EditPage extends React.Component {
         context_codes: [],
         sub_context_codes: [],
       },
-      formValues: {},
+      formValues: {
+        title: '',
+        description: '',
+        location: '',
+        limitUsersPerSlot: '',
+        limitSlotsPerUser: '',
+        allowStudentsToView: false,
+        allowObserverSignup: false,
+        timeblocks: [],
+      },
       contexts: [],
       isDeleting: false,
       eventDataSource: null,
@@ -259,7 +268,7 @@ class EditPage extends React.Component {
 
   render() {
     return (
-      <div className="EditPage">
+      <div className="EditPage" data-testid="edit-page">
         <Breadcrumb label={I18n.t('You are here:')}>
           <Breadcrumb.Link href="/calendar">{I18n.t('Calendar')}</Breadcrumb.Link>
           {this.state.appointmentGroup.title && (

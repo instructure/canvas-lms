@@ -633,15 +633,23 @@ export type Course = Readonly<{
       name: string
     }
   ]
+  restrict_enrollments_to_course_dates: boolean
+}>
+
+export type ContentMigration = Readonly<{
+  id: string
+  migration_type: string
+}>
+
+export type Term = Readonly<{
+  id: string
+  name: string
+  start_at: string
+  end_at: string
 }>
 
 export type EnrollmentTerms = Readonly<{
-  enrollment_terms: [
-    {
-      id: string
-      name: string
-    }
-  ]
+  enrollment_terms: Term[]
 }>
 
 // '/api/v1/users/self/tabs',
@@ -697,6 +705,8 @@ export type Checkpoint = {
   overrides: CheckpointOverride[]
   points_possible: number
   tag: string
+  unlock_at: string | null
+  lock_at: string | null
 }
 
 export type CheckpointOverride = {
@@ -708,4 +718,6 @@ export type CheckpointOverride = {
   student_ids: string[]
   title: string
   unassign_item: boolean
+  unlock_at: string | null
+  lock_at: string | null
 }

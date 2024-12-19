@@ -247,6 +247,7 @@ const locale = {
   "decorative_type_upper_f2c95e3": { "message": "Dekoratív { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Behúzás csökkentése" },
   "deep_purple_bb3e2907": { "message": "Sötétlila" },
+  "default_9db103d": { "message": "Alapértelmezett" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "alapértelmezett nem rendezett lista"
   },
@@ -747,9 +748,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Vázlat színe" },
   "outline_size_a6059a21": { "message": "Vázlat mérete" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } nem egy érvényes protokoll; lehet ftp, http, https, mailto, skype, tel, vagy esetleg elhagyható"
-  },
   "page_50c4823d": { "message": "Oldal" },
   "pages_e5414c2c": { "message": "Oldalak" },
   "paragraph_5e5ad8eb": { "message": "Bekezdés" },

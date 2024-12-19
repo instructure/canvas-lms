@@ -39,7 +39,7 @@ describe "grading periods account page" do
       expect(grading_standards_page.add_grading_period_link_displayed?).to be(true)
     end
 
-    it "enable wieghted grading on grading period set", priority: "1" do
+    it "enable weighted grading on grading period set", priority: "1" do
       grading_standards_page.visit(Account.default.id)
       grading_standards_page.add_grading_period_set(name: "Set Name!", term: "Default Term", weighted: true)
       expect(grading_standards_page.weight_field_in_grading_period?).to be(true)

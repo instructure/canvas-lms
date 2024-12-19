@@ -18,52 +18,48 @@
 
 import {IconMoreSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useContext, useEffect, useState} from 'react'
-import {DiscussionManagerUtilityContext} from '../../utils/constants'
+import React from 'react'
 import {Menu} from '@instructure/ui-menu'
+import PropTypes from 'prop-types'
+import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('discussions_posts')
-
-export const MoreMenuButton = () => {
-  const {translationLanguages, setShowTranslationControl} = useContext(
-    DiscussionManagerUtilityContext
-  )
-  const [translationOptionText, setTranslationOptionText] = useState(I18n.t('Translate Text'))
-  const [hideTranslateText, setHideTranslateText] = useState(false)
-
-  const toggleTranslateText = () => {
-    // Update local state
-    setHideTranslateText(!hideTranslateText)
-    setTranslationOptionText(
-      hideTranslateText ? I18n.t('Translate Text') : I18n.t('Hide Translate Text')
-    )
-    // Update context
-    setShowTranslationControl(!hideTranslateText)
-  }
-
-  const menuOptions = []
-  if (translationLanguages.current.length > 0) {
-    menuOptions.push({text: translationOptionText, onClick: toggleTranslateText})
+const MoreMenuButton = props => {
+  const clickOnMenuItem = clickItem => {
+    clickItem()
   }
 
   return (
     <Menu
       placement="bottom start"
       trigger={
-        <Button>
+        <Button display="block" style={{width: '100%'}}>
           <IconMoreSolid />
         </Button>
       }
       withArrow={false}
     >
-      {menuOptions.map(({text, onClick}) => {
+      {props.menuOptions.map(({text, clickItem, buttonIcon: ButtonIcon}) => {
         return (
-          <Menu.Item key={text} onClick={onClick}>
-            {text}
+          <Menu.Item key={text} onClick={() => clickOnMenuItem(clickItem)}>
+            <Flex gap="small">
+              {ButtonIcon && <ButtonIcon />}
+              {text}
+            </Flex>
           </Menu.Item>
         )
       })}
     </Menu>
   )
+}
+
+export default MoreMenuButton
+
+export const MoreMenuButtonOptions = {
+  text: PropTypes.string,
+  clickItem: PropTypes.func,
+  buttonIcon: PropTypes.elementType,
+}
+
+MoreMenuButton.propTypes = {
+  menuOptions: PropTypes.arrayOf(PropTypes.shape(MoreMenuButtonOptions)).isRequired,
 }

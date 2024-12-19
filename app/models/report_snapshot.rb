@@ -60,7 +60,7 @@ class ReportSnapshot < ActiveRecord::Base
   def data
     unless @data
       @data = JSON.parse(super || "{}")
-      @data["generated_at"] = Time.at(@data["generated_at"].to_i / 1000) if @data["generated_at"]
+      @data["generated_at"] = Time.zone.at(@data["generated_at"].to_i / 1000) if @data["generated_at"]
     end
     @data
   end

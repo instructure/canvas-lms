@@ -29,9 +29,9 @@ import {
 } from './types'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 interface Props {
   user: {
@@ -53,7 +53,6 @@ function ManageTempEnrollButton(props: Props) {
   }, [])
 
   useFetchApi(
-    // @ts-expect-error - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
       ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {params: {account_id: ENV.ACCOUNT_ID}}),

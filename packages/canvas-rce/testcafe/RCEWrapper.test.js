@@ -17,7 +17,6 @@
  */
 
 import {Selector, ClientFunction} from 'testcafe'
-// eslint-disable-next-line babel/no-unused-expressions
 fixture`RCEWrapper`.page`./testcafe.html`
 const tinyIframe = Selector('#textarea_ifr')
 const textArea = Selector('.RceHtmlEditor')

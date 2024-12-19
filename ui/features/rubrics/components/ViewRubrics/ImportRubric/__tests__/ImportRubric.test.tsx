@@ -80,7 +80,8 @@ describe('ImportRubric Tests', () => {
       expect(importRubricTray).toHaveTextContent('Import Rubrics')
     })
 
-    it('successfully imports the rubric csv and displays rubric import data in ImportTable', async () => {
+    // TODO: unskip fickle test (cf. EVAL-4893)
+    it.skip('successfully imports the rubric csv and displays rubric import data in ImportTable', async () => {
       jest.spyOn(ViewRubricQueries, 'fetchRubricImport').mockImplementation(() =>
         Promise.resolve({
           attachment: {

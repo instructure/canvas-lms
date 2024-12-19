@@ -17,7 +17,7 @@
  */
 
 import React, {type MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 
 import DashboardCardAction from './DashboardCardAction'
@@ -29,7 +29,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'
 import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
 
-const I18n = useI18nScope('dashcards')
+const I18n = createI18nScope('dashcards')
 
 export type DashboardCardHeaderHeroProps = {
   image?: string

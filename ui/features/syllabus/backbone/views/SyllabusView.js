@@ -28,9 +28,9 @@ import {reduce, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('syllabus')
+const I18n = createI18nScope('syllabus')
 
 function assignmentSubType(json) {
   if (/discussion/.test(json.submission_types)) return 'discussion_topic'
@@ -252,7 +252,7 @@ export default class SyllabusView extends Backbone.View {
         events[0].override = null
       } else {
         for (const event of Array.from(events)) {
-          // eslint-disable-next-line no-bitwise
+           
           overrides_present |= event.override !== null
         }
       }

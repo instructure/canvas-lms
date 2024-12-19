@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import type {RubricRating} from '../types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
@@ -25,25 +25,39 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {possibleString, possibleStringRange} from '../Points'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
+import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton';
 
 const {shamrock} = colors
 
 type VerticalButtonDisplayProps = {
   isPreviewMode: boolean
+  isSelfAssessment: boolean
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingId?: string
   onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
+  shouldFocusFirstRating?: boolean
 }
 export const VerticalButtonDisplay = ({
   isPreviewMode,
+  isSelfAssessment,
   ratings,
   ratingOrder,
   selectedRatingId,
   onSelectRating,
   criterionUseRange,
+  shouldFocusFirstRating = false,
 }: VerticalButtonDisplayProps) => {
+  const firstRatingRef = useRef<Element | null>(null)
+
+  useEffect(() => {
+    if (shouldFocusFirstRating && firstRatingRef.current) {
+      const button = firstRatingRef.current.getElementsByTagName('button')[0]
+      button?.focus()
+    }
+  }, [shouldFocusFirstRating])
+
   return (
     <Flex
       as="div"
@@ -71,14 +85,28 @@ export const VerticalButtonDisplay = ({
                 align={isSelected ? 'start' : 'center'}
                 data-testid={`rating-button-${rating.id}-${index}`}
                 aria-label={buttonAriaLabel}
+                elementRef={ref => {
+                  if (index === 0) {
+                    firstRatingRef.current = ref
+                  }
+                }}
               >
-                <RatingButton
-                  buttonDisplay={buttonDisplay}
-                  isPreviewMode={isPreviewMode}
-                  isSelected={isSelected}
-                  selectedArrowDirection="right"
-                  onClick={() => onSelectRating(rating)}
-                />
+                {isSelfAssessment ? (
+                  <SelfAssessmentRatingButton
+                    buttonDisplay={buttonDisplay}
+                    isPreviewMode={isPreviewMode}
+                    isSelected={isSelected}
+                    onClick={() => onSelectRating(rating)}
+                  />
+                ) : (
+                  <RatingButton
+                    buttonDisplay={buttonDisplay}
+                    isPreviewMode={isPreviewMode}
+                    isSelected={isSelected}
+                    selectedArrowDirection="right"
+                    onClick={() => onSelectRating(rating)}
+                  />
+                )}
               </Flex.Item>
               <Flex.Item
                 margin={isSelected ? '0' : '0 0 x-small x-small'}

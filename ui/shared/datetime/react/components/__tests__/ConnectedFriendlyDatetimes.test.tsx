@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ConnectedFriendlyDatetimes from '../ConnectedFriendlyDatetimes'
 import {render} from '@testing-library/react'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 describe('ConnectedFriendlyDatetimes', () => {
   const defaultProps = {

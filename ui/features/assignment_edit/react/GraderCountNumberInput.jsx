@@ -18,10 +18,10 @@
 
 import {number, string} from 'prop-types'
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {NumberInput} from '@instructure/ui-number-input'
 
-const I18n = useI18nScope('GraderCountNumberInput')
+const I18n = createI18nScope('GraderCountNumberInput')
 
 const DEFAULT_GRADER_COUNT = 2
 
@@ -94,6 +94,7 @@ export default class GraderCountNumberInput extends React.Component {
     return (
       <div className="ModeratedGrading__GraderCountInputContainer">
         <NumberInput
+          allowStringValue={true}
           id="grader_count"
           value={this.state.graderCount.toString()}
           renderLabel={label}

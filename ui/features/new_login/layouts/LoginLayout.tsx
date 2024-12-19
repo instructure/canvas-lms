@@ -17,14 +17,8 @@
  */
 
 import React from 'react'
-import {
-  AppNavBar,
-  ContentLayout,
-  FooterLinks,
-  GlobalStyle,
-  InstructureLogo,
-  LoginLogo,
-} from '../shared'
+import ContentLayout from './ContentLayout'
+import {AppNavBar, FooterLinks, GlobalStyle, InstructureLogo, LoginLogo} from '../shared'
 import {Flex} from '@instructure/ui-flex'
 import {Outlet, ScrollRestoration} from 'react-router-dom'
 import {View} from '@instructure/ui-view'
@@ -60,7 +54,10 @@ export const LoginLayout = () => {
                 <View as="footer">
                   <Flex direction="column" gap="large">
                     <FooterLinks />
-                    <InstructureLogo />
+
+                    <Flex.Item align="center" overflowX="visible" overflowY="visible">
+                      <InstructureLogo />
+                    </Flex.Item>
                   </Flex>
                 </View>
               </Flex>

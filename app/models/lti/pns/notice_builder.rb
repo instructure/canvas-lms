@@ -32,7 +32,9 @@ module Lti
           tool:,
           context: custom_context || tool.context,
           notice: notice_claim,
-          user:
+          user:,
+          opts:,
+          expander: variable_expander(tool)
         ).generate_post_payload_message.to_h
       end
 
@@ -59,6 +61,18 @@ module Lti
         add_ims_prefix(custom_ims_claims(tool)).merge(add_instructure_prefix(custom_instructure_claims(tool)))
       end
 
+      def variable_expander(tool)
+        Lti::VariableExpander.new(
+          (custom_context || tool.context).root_account,
+          Lti::IMS::Providers::MembershipsProvider.unwrap(custom_context || tool.context),
+          nil, # no controller
+          {
+            current_user: user,
+            tool:
+          }
+        )
+      end
+
       def custom_ims_claims(_tool)
         raise NotImplementedError, "custom_ims_claims method must be implemented in subclass"
       end
@@ -76,6 +90,10 @@ module Lti
       end
 
       def custom_context
+        nil
+      end
+
+      def opts
         nil
       end
 

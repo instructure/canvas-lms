@@ -27,7 +27,7 @@ export function parseUrlOrNull(url: string | null | undefined, base?: string | U
 
   try {
     return new URL(url, base)
-  } catch (e) {
+  } catch (_e) {
     return null
   }
 }
@@ -39,6 +39,10 @@ export function relativizeUrl(url: string): string {
   delete parsed.host
   delete parsed.port
   return URI.serialize(parsed)
+}
+
+export function parseUrlPath(url: string) {
+  return URI.parse(url).path
 }
 
 /**

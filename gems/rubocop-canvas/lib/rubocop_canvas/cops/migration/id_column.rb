@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class IdColumn < Cop
+      class IdColumn < Base
         include RuboCop::Canvas::CurrentDef
 
         MSG = "Use `:bigint` for id columns"

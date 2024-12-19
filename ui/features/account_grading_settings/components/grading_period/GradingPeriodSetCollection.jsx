@@ -34,7 +34,7 @@ import {
 } from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodSet from './GradingPeriodSet'
 import SearchGradingPeriodsField from './SearchGradingPeriodsField'
 import SearchHelpers from '@canvas/util/searchHelpers'
@@ -46,7 +46,7 @@ import SetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import TermsApi from './enrollmentTermsApi'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('GradingPeriodSetCollection')
+const I18n = createI18nScope('GradingPeriodSetCollection')
 
 const presentEnrollmentTerms = function (enrollmentTerms) {
   return map(enrollmentTerms, term => {

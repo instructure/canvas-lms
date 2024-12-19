@@ -25,11 +25,11 @@ import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AnnouncementFactory from './AnnouncementFactory'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import WithBreakpoints from '@canvas/with-breakpoints'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('past_global_announcements')
+const I18n = createI18nScope('past_global_announcements')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 const PastGlobalAnnouncements = ({breakpoints}) => {

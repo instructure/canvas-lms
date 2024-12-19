@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ProficiencyCalculation from './ProficiencyCalculation'
@@ -27,11 +27,11 @@ import {
   COURSE_OUTCOME_CALCULATION_QUERY,
   SET_OUTCOME_CALCULATION_METHOD,
 } from '@canvas/outcomes/graphql/MasteryCalculation'
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation} from '@apollo/client'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('MasteryScale')
+const I18n = createI18nScope('MasteryScale')
 
 const MasteryCalculation = ({onNotifyPendingChanges}) => {
   const {contextType, contextId} = useCanvasContext()

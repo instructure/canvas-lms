@@ -17,7 +17,7 @@
  */
 
 import type {Moment} from 'moment-timezone'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import RRuleHelper, {type RRuleHelperSpec} from '../RRuleHelper'
 import {AllRRULEDayValues, RRULEWeekDayValues, type FrequencyOptionValue} from '../types'
 import {cardinalDayInMonth, weekdayInMonth} from '../utils'
@@ -32,7 +32,7 @@ const FrequencyCounts = {
   'every-weekday': 52 * 5, // weeks in a year * weekdays
 }
 
-const I18n = useScope('calendar_frequency_picker')
+const I18n = createI18nScope('calendar_frequency_picker')
 
 export const generateFrequencyOptions = (
   eventStart: Moment,

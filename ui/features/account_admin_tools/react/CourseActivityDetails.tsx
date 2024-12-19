@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -28,7 +28,7 @@ import {Table} from '@instructure/ui-table'
 import {dateString, timeString} from '@canvas/datetime/date-functions'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('course_logging_details')
+const I18n = createI18nScope('course_logging_details')
 
 type EventType =
   | {event_type: 'copied_to' | 'copied_from' | 'reset_to' | 'reset_from'; event_data: undefined}

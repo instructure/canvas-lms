@@ -26,7 +26,7 @@ import {
   IconCalendarReservedSolid,
 } from '@instructure/ui-icons'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {EnrollmentType, Role, TemporaryEnrollmentStatus} from './types'
 import {MODULE_NAME, PROVIDER, RECIPIENT, TOOLTIP_MAX_WIDTH} from './types'
 import {TempEnrollModal} from './TempEnrollModal'
@@ -38,7 +38,7 @@ import type {EnvCommon} from '@canvas/global/env/EnvCommon'
 
 declare const ENV: GlobalEnv & EnvCommon
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
 
@@ -115,7 +115,6 @@ export default function TempEnrollUsersListRow(props: Props) {
   }
 
   useFetchApi(
-    // @ts-expect-error - this hook isn't ts-ified
     {
       path: `/api/v1/users/${props.user.id}/temporary_enrollment_status`,
       ...(ENV.ACCOUNT_ID !== ENV.ROOT_ACCOUNT_ID && {params: {account_id: ENV.ACCOUNT_ID}}),

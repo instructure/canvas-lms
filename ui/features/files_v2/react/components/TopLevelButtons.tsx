@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine, IconUploadLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
   size: string

@@ -23,14 +23,14 @@ import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import DateHelper from '@canvas/datetime/dateHelper'
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export const DiscussionEntryVersionHistory = props => {
   const [open, setOpen] = useState(false)

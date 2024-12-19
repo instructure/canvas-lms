@@ -17,7 +17,7 @@
  */
 import {arrayOf, bool, shape, string} from 'prop-types'
 import {SubmissionCommentFile} from './File'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {MediaObject} from './MediaObject'
 import {SubmissionCommentAuthor} from './User'
 

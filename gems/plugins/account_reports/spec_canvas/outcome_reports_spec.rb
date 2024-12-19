@@ -1512,7 +1512,7 @@ describe "Outcome Reports" do
       double("canvas_scope").tap do |scope|
         allow(scope).to receive(:find_each) do |&block|
           (1..3).each do |i|
-            block.call(double(attributes: { "course id" => i, "assignment id" => i, "submission date" => Time.now + i.days }))
+            block.call(double(attributes: { "course id" => i, "assignment id" => i, "submission date" => i.days.from_now }))
           end
         end
         except_scope = double("except_scope")
@@ -1568,7 +1568,7 @@ describe "Outcome Reports" do
 
       it "writes records from canvas_scope before os_scope by default" do
         # Assigning OS scope
-        config_options[:new_quizzes_scope] = [{ "student name" => "OS John Doe", "course id" => 1, "assignment id" => 1, "submission date" => Time.now }]
+        config_options[:new_quizzes_scope] = [{ "student name" => "OS John Doe", "course id" => 1, "assignment id" => 1, "submission date" => Time.zone.now }]
 
         # Execute the method
         outcome_reports.send(:write_outcomes_report, headers, canvas_scope, config_options)
@@ -1650,7 +1650,7 @@ describe "Outcome Reports" do
 
       it "writes records from canvas_scope before os_scope by default" do
         # Assigning OS scope
-        config_options[:new_quizzes_scope] = [{ "student name" => "OS John Doe", "course id" => 1, "assignment id" => 1, "submission date" => Time.now }]
+        config_options[:new_quizzes_scope] = [{ "student name" => "OS John Doe", "course id" => 1, "assignment id" => 1, "submission date" => Time.zone.now }]
 
         # Execute the method
         outcome_reports.send(:write_outcomes_report, headers, canvas_scope, config_options)

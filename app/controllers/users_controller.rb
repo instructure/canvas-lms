@@ -306,18 +306,6 @@ class UsersController < ApplicationController
       session[:oauth_gdrive_nonce] = SecureRandom.hex
       state = Canvas::Security.create_jwt(redirect_uri:, return_to_url:, nonce: session[:oauth_gdrive_nonce])
       redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
-    when "twitter"
-      success_url = oauth_success_url(service: "twitter")
-      request_token = Twitter::Connection.request_token(success_url)
-      OAuthRequest.create(
-        service: "twitter",
-        token: request_token.token,
-        secret: request_token.secret,
-        return_url: return_to_url,
-        user: @current_user,
-        original_host_with_port: request.host_with_port
-      )
-      redirect_to request_token.authorize_url
     end
   end
 
@@ -373,29 +361,6 @@ class UsersController < ApplicationController
       url = url_for request.parameters.merge(host: oauth_request.original_host_with_port, only_path: false)
       redirect_to url
     else
-      begin
-        raise "No OAuth Twitter User" unless oauth_request.user
-
-        twitter = Twitter::Connection.from_request_token(
-          oauth_request.token,
-          oauth_request.secret,
-          params[:oauth_verifier]
-        )
-        UserService.register(
-          service: "twitter",
-          access_token: twitter.access_token,
-          user: oauth_request.user,
-          service_domain: "twitter.com",
-          service_user_id: twitter.service_user_id,
-          service_user_name: twitter.service_user_name
-        )
-        oauth_request.destroy
-
-        flash[:notice] = t("twitter_added", "X.com access authorized!")
-      rescue => e
-        Canvas::Errors.capture_exception(:oauth, e)
-        flash[:error] = t("twitter_fail_whale", "X.com authorization failed. Please try again")
-      end
       return_to(oauth_request.return_url, user_profile_url(@current_user))
     end
   end
@@ -3313,18 +3278,20 @@ class UsersController < ApplicationController
         PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
       end
 
-      @user.save!
+      message_sent = User.transaction do
+        @user.save!
 
-      if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
-        UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
-        @pairing_code&.destroy
-      end
+        if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
+          UserObservationLink.create_or_restore(student: @observee, observer: @user, root_account: @context)
+          @pairing_code&.destroy
+        end
 
-      if notify_policy.is_self_registration?
-        registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies:)
-        @user.new_registration(registration_params)
+        if notify_policy.is_self_registration?
+          registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies:)
+          @user.new_registration(registration_params)
+        end
+        notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
       end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
 
       data = if api_request?
                user_json(@user, @current_user, session, includes)

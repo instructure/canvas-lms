@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {htmlEscape} from '@instructure/html-escape'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -39,7 +39,7 @@ import type {LtiPrivacyLevel} from '../model/LtiPrivacyLevel'
 import {RegistrationModalBody} from '../registration_wizard/RegistrationModalBody'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 type LaunchSettings = {
   redirectUris?: string[]

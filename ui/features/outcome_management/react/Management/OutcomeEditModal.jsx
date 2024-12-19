@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Text} from '@instructure/ui-text'
@@ -37,7 +37,7 @@ import {
   SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
 } from '@canvas/outcomes/graphql/Management'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import OutcomesRceField from '../shared/OutcomesRceField'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
 import useRatings from '@canvas/outcomes/react/hooks/useRatings'
@@ -46,7 +46,7 @@ import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHe
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const componentOverrides = {
   Mask: {

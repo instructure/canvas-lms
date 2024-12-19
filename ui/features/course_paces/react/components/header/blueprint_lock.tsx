@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
@@ -26,7 +26,7 @@ import {actions} from '../../actions/ui'
 import type {CoursePace, StoreState} from '../../types'
 import {getCoursePace} from '../../reducers/course_paces'
 
-const I18n = useI18nScope('course_paces_blueprint_lock')
+const I18n = createI18nScope('course_paces_blueprint_lock')
 
 interface PassedProps {
   readonly newPace: boolean

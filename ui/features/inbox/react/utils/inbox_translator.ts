@@ -74,10 +74,7 @@ export async function translateText(args: TranslateArgs, text: string): Promise<
   return result.json.translated_text
 }
 
-export async function translateInboxMessage(
-  text: string,
-  callback: (arg: string) => void
-): Promise<void> {
+export async function translateInboxMessage(text: string): Promise<string> {
   const result = await doFetchApi({
     method: 'POST',
     path: '/translate/message',
@@ -87,9 +84,8 @@ export async function translateInboxMessage(
       },
     },
   })
-
   // @ts-expect-error
-  callback(result.json)
+  return result.json.translated_text
 }
 
 /**

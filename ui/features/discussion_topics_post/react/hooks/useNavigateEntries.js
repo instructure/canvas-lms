@@ -18,7 +18,7 @@
 
 import {useEffect, useState, useCallback} from 'react'
 import {STUDENT_DISCUSSION_QUERY} from '../../graphql/Queries'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import useSpeedGrader from './useSpeedGrader'
 
 export default function useNavigateEntries({

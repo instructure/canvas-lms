@@ -46,16 +46,16 @@ describe "CanvasSort::First" do
   end
 
   it "is less than any time or time with zone" do
-    expect(CanvasSort::First).to be < Time.now
-    expect(CanvasSort::First).to be < Time.at(0)
-    expect(CanvasSort::First).to be < Time.at(-1)
+    expect(CanvasSort::First).to be < Time.zone.now
+    expect(CanvasSort::First).to be < Time.zone.at(0)
+    expect(CanvasSort::First).to be < Time.zone.at(-1)
     expect(CanvasSort::First).to be < Time.zone.now
   end
 
   it "is less than any time or time with zone, commutatively" do
-    expect(Time.now).to be > CanvasSort::First
-    expect(Time.at(0)).to be > CanvasSort::First
-    expect(Time.at(-1)).to be > CanvasSort::First
+    expect(Time.zone.now).to be > CanvasSort::First
+    expect(Time.zone.at(0)).to be > CanvasSort::First
+    expect(Time.zone.at(-1)).to be > CanvasSort::First
     expect(Time.zone.now).to be > CanvasSort::First
   end
 
@@ -69,7 +69,7 @@ describe "CanvasSort::First" do
 
   it "sorts with a few times" do
     a = 5.seconds.ago
-    b = Time.now
+    b = Time.zone.now
     expect([CanvasSort::Last, a, CanvasSort::First, b].sort).to eq [CanvasSort::First, a, b, CanvasSort::Last]
   end
 

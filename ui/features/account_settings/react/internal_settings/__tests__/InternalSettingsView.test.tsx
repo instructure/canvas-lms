@@ -22,8 +22,8 @@ import type {InternalSettingsData} from '../types'
 import React from 'react'
 import {InternalSettingsView} from '../InternalSettingsView'
 import {render} from '@testing-library/react'
-import {createCache} from '@canvas/apollo'
-import {MockedProvider} from '@apollo/react-testing'
+import {createCache} from '@canvas/apollo-v3'
+import {MockedProvider} from '@apollo/client/testing'
 // @ts-expect-error
 import type {ExecutionResult} from '@apollo/client'
 

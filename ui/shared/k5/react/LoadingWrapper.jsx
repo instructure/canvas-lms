@@ -46,10 +46,13 @@ export default function LoadingWrapper({
   persistInCache = true,
 }) {
   const generateKey = index => `skeleton-${id}-${index}`
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const wasLoading = useRef(false)
   const skeletons = []
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [skeletonsToRender, setSkeletonsToRender] = useState()
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (isLoading !== wasLoading.current) {
       const cacheKey = `loading-skeletons-${id}-num`

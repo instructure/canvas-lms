@@ -25,7 +25,7 @@
 // settings on their own personal eportfolio, they can't
 // affect anyone else
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -50,7 +50,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
 
-const I18n = useI18nScope('eportfolio')
+const I18n = createI18nScope('eportfolio')
 
 // optimization so user isn't waiting on RCS to
 // respond when they hit edit
@@ -127,7 +127,7 @@ function showMoveDialog(source, destinations, triggerElement, dialogLabel, onMov
     $('#application').append('<div id="eportfolios_move_to_modal_root"></div>')
     modalRoot = document.querySelector('#eportfolios_move_to_modal_root')
   }
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <MoveToDialog
       source={source}
@@ -226,7 +226,7 @@ function saveObject($obj, type) {
         name_message = I18n.t('errors.section_name_too_long', 'Section name is too long')
       }
       if ($obj.hasClass('unsaved')) {
-        /* eslint-disable-next-line no-alert */
+         
         alert(name_message)
         $obj.remove()
       } else {

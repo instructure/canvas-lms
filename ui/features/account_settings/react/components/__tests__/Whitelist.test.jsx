@@ -39,7 +39,7 @@ describe('ConnectedWhitelist', () => {
   it('renders items on the allowed domain list after they are added', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -52,7 +52,7 @@ describe('ConnectedWhitelist', () => {
   it('handles adding wildcard entries to the allowed domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: '*.instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -93,7 +93,7 @@ describe('ConnectedWhitelist', () => {
   it('shows an error message when an invalid domain is entered', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'fake'}})
 
     const button = getByLabelText('Add Domain')
@@ -106,7 +106,7 @@ describe('ConnectedWhitelist', () => {
   it('shows the correct count for the domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
     const button = getByLabelText('Add Domain')
@@ -119,7 +119,7 @@ describe('ConnectedWhitelist', () => {
   it('clears the input box after a successful submisssion', () => {
     const {getByLabelText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
 
-    const domainInput = getByLabelText('Domain Name')
+    const domainInput = getByLabelText('Domain Name *')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
     const button = getByLabelText('Add Domain')

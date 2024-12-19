@@ -53,9 +53,9 @@ import {isCaretAtBoldText, isCaretAtStyledText, getCaretPosition} from '../../..
 import {ColorModal} from '../../common/ColorModal'
 import {type TextBlockProps} from './types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 // NOTE: This component uses document.execCommand which is deprecated, but there
 //       (1) is still supported by browsers, and
@@ -130,7 +130,7 @@ const TextBlockToolbar = () => {
 
   const handleFontSizeChange = useCallback(
     (
-      e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem

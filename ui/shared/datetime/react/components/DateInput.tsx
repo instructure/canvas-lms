@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useRef, useCallback, useEffect, useState} from 'react'
 import moment, {type Moment} from 'moment-timezone'
 import * as tz from '@instructure/moment-utils'
@@ -47,7 +47,7 @@ type Messages = DateInputProps['messages']
 // making use of the onBlur callback is paying any attention to the actual event anyway.
 type BlurReturn = SyntheticEvent<Element, Event> | KeyboardEvent<DateInputProps>
 
-const I18n = useI18nScope('app_shared_components_canvas_date_time')
+const I18n = createI18nScope('app_shared_components_canvas_date_time')
 
 const EARLIEST_YEAR = 1980 // do not allow any manually entered year before this
 

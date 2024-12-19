@@ -169,7 +169,7 @@ describe AssignmentOverride do
     end
 
     it "does not notify of change for deleted assignment override due to enrollment removal" do
-      due_date_timestamp = DateTime.now.iso8601
+      due_date_timestamp = Time.zone.now.iso8601
       assignment = assignment_model(course: @course)
       override = assignment.assignment_overrides.create!(
         due_at: due_date_timestamp,
@@ -183,7 +183,7 @@ describe AssignmentOverride do
     end
 
     it "does not notify of change for course that has concluded" do
-      due_date_timestamp = DateTime.now.iso8601
+      due_date_timestamp = Time.zone.now.iso8601
       assignment = assignment_model(course: @course)
       override = assignment.assignment_overrides.create!(
         due_at: due_date_timestamp,

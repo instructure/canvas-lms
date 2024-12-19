@@ -16,7 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {submitMigrationFormData} from '@canvas/content-migrations/react/CommonMigratorControls/types'
+
+export type NextPageTerms = {
+  page?: string
+  per_page?: string
+}
+
 export type Term = Readonly<{
   name: string
   id: string
+  startAt?: string
+  endAt?: string
 }>
+
+export type CopyCourseFormSubmitData = Readonly<
+  {
+    courseName: string
+    courseCode: string
+    newCourseStartDate: Date | null
+    newCourseEndDate: Date | null
+    selectedTerm: Term | null
+    restrictEnrollmentsToCourseDates: boolean
+    courseTimeZone: string
+  } & submitMigrationFormData
+>
+
+export const courseCopyRootKey = 'copy_course'
+export const courseFetchKey = 'course'
+export const enrollmentTermsFetchKey = 'enrollment_terms'
+export const createCourseAndMigrationKey = 'create_course_and_migration'

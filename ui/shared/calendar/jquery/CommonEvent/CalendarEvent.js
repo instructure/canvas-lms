@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import fcUtil from '../fcUtil'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import CommonEvent from './CommonEvent'
@@ -25,7 +25,7 @@ import {extend} from '@canvas/util/legacyCoffeesScriptHelpers'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 extend(CalendarEvent, CommonEvent)
 export default function CalendarEvent(data, contextInfo, actualContextInfo) {

@@ -18,10 +18,10 @@
 
 import $ from 'jquery'
 import _, {isEmpty} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-const I18n = useI18nScope('gradebook_upload')
+const I18n = createI18nScope('gradebook_upload')
 
 const successMessage = I18n.t(
   'You will be redirected to Gradebook while your file is being uploaded. ' +
@@ -94,7 +94,7 @@ const ProcessGradebookUpload = {
 
     return $.when(...deferreds).then(() => {
       if (uploadingBulkData) {
-        alert(successMessage) // eslint-disable-line no-alert
+        alert(successMessage)  
       }
       this.goToGradebook()
     })

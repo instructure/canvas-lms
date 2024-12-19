@@ -20,7 +20,7 @@ import React, {type ComponentType, useCallback, useEffect, useState} from 'react
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {Button} from '@instructure/ui-buttons'
@@ -31,7 +31,7 @@ import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from './types'
 import {RequiredFormLabel} from './FormLabel'
 import {ErrorFormMessage} from '../errorFormMessage'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type CommonMigratorControlsProps = {
   canSelectContent?: boolean
@@ -50,6 +50,7 @@ type CommonMigratorControlsProps = {
   newEndDate?: string | null
   SubmitLabel: ComponentType
   SubmittingLabel: ComponentType
+  CancelLabel: ComponentType
 }
 
 const generateNewQuizzesLabel = () => {
@@ -132,6 +133,7 @@ export const CommonMigratorControls = ({
   newEndDate,
   SubmitLabel,
   SubmittingLabel,
+  CancelLabel,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -345,7 +347,7 @@ export const CommonMigratorControls = ({
 
       <View as="div" margin="medium none none none">
         <Button disabled={isSubmitting} onClick={onCancel} data-testid="clear-migration-button">
-          {I18n.t('Clear')}
+          <CancelLabel />
         </Button>
         <Button
           disabled={isSubmitting}

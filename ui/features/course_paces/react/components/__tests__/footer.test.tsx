@@ -215,7 +215,7 @@ describe('Footer', () => {
       const removeButton = getByText('Remove Pace').closest('button')
       expect(removeButton).toBeInTheDocument()
       expect(removeButton).toBeEnabled()
-      expect(getByText('No pending changes to apply')).toBeInTheDocument()
+      expect(getByText('No pending changes')).toBeInTheDocument()
     })
 
     it('includes the correct components for an existing, changed pace', () => {
@@ -283,7 +283,7 @@ describe('Footer', () => {
 
       it('does not render a button for existing course pace types', () => {
         const {getByText, queryByText} = renderConnected(<Footer {...defaultProps} />)
-        expect(getByText('No pending changes to apply')).toBeInTheDocument()
+        expect(getByText('No pending changes')).toBeInTheDocument()
         expect(queryByText('Remove Pace', {selector: 'button span'})).not.toBeInTheDocument()
       })
 

@@ -32,11 +32,11 @@ import {
   IconOutcomesLine,
   IconArchiveLine,
 } from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const OutcomeKebabMenu = ({
   menuTitle,

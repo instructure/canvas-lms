@@ -17,10 +17,10 @@
  */
 
 import type {AssignedAssessments} from '../../../../api.d'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {PeerReviewSubheader} from '../components/PeerReviewPromptModal'
 
-const I18n = useI18nScope('assignments_2_peer_review')
+const I18n = createI18nScope('assignments_2_peer_review')
 
 export const getRedirectUrlToFirstPeerReview = (
   assignedAssessments: AssignedAssessments[] = []

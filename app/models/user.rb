@@ -1074,7 +1074,7 @@ class User < ActiveRecord::Base
   end
 
   def gmail
-    res = gmail_channel.path rescue nil
+    res = gmail_channel&.path
     res ||= google_drive_address
     res ||= google_docs_address
     res || email
@@ -1590,7 +1590,10 @@ class User < ActiveRecord::Base
 
   def gravatar_url(size = 50, fallback = nil, request = nil)
     fallback = self.class.avatar_fallback_url(fallback, request)
-    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(email) rescue "000"}?s=#{size}&d=#{CGI.escape(fallback)}"
+    email = self.email
+    return fallback unless email
+
+    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(email)}?s=#{size}&d=#{CGI.escape(fallback)}"
   end
 
   # Public: Set a user's avatar image. This is a convenience method that sets
@@ -1662,7 +1665,7 @@ class User < ActiveRecord::Base
       if val == "none"
         self.avatar_image_url = nil
         self.avatar_image_source = "no_pic"
-        self.avatar_image_updated_at = Time.now
+        self.avatar_image_updated_at = Time.zone.now
       end
       super(val.to_s)
     end
@@ -1724,28 +1727,31 @@ class User < ActiveRecord::Base
   end
 
   def self.avatar_fallback_url(fallback = nil, request = nil)
-    if fallback && (uri = URI.parse(fallback) rescue nil)
-      # something got built without request context, so we want to inherit that
-      # context now that we have a request
-      if uri.host == "localhost"
-        uri.scheme = request.scheme
-        uri.host = request.host
-        uri.port = request.port unless [80, 443].include?(request.port)
+    begin
+      if fallback && (uri = URI.parse(fallback))
+        # something got built without request context, so we want to inherit that
+        # context now that we have a request
+        if uri.host == "localhost"
+          uri.scheme = request.scheme
+          uri.host = request.host
+          uri.port = request.port unless [80, 443].include?(request.port)
+        end
+        uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
+        if HostUrl.cdn_host
+          uri.host = HostUrl.cdn_host
+        elsif request && !uri.host
+          uri.host = request.host
+          uri.port = request.port unless [80, 443].include?(request.port)
+        elsif !uri.host
+          uri.host, port = HostUrl.default_host.split(":")
+          uri.port = Integer(port) if port
+        end
+        return uri.to_s
       end
-      uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
-      if HostUrl.cdn_host
-        uri.host = HostUrl.cdn_host
-      elsif request && !uri.host
-        uri.host = request.host
-        uri.port = request.port unless [80, 443].include?(request.port)
-      elsif !uri.host
-        uri.host, port = HostUrl.default_host.split(":")
-        uri.port = Integer(port) if port
-      end
-      uri.to_s
-    else
-      avatar_fallback_url(default_avatar_fallback, request)
+    rescue URI::InvalidURIError
+      # ignore
     end
+    avatar_fallback_url(default_avatar_fallback, request)
   end
 
   # Clear the avatar_image_url attribute and save it if the URL contains the given uuid.
@@ -1998,7 +2004,7 @@ class User < ActiveRecord::Base
   end
 
   def last_seen_release_note
-    preferences[:last_seen_release_note] || Time.at(0)
+    preferences[:last_seen_release_note] || Time.zone.at(0)
   end
 
   def release_notes_badge_disabled?
@@ -2071,7 +2077,7 @@ class User < ActiveRecord::Base
   end
 
   def account
-    pseudonym.account rescue Account.default
+    pseudonym&.account || Account.default
   end
 
   def alternate_account_for_course_creation
@@ -2837,11 +2843,11 @@ class User < ActiveRecord::Base
   end
 
   def last_completed_module
-    context_module_progressions.select(&:completed?).max_by { |p| p.completed_at || p.created_at }.context_module rescue nil
+    context_module_progressions.completed.order_by(Arel.sql("COALESCE(completed_at, created_at) DESC")).take&.context_module
   end
 
   def last_completed_course
-    enrollments.select(&:completed?).max_by { |e| e.completed_at || e.created_at }.course rescue nil
+    enrollments.select(&:completed?).max_by { |e| e.completed_at || e.created_at }&.course
   end
 
   def last_mastered_assignment
@@ -2996,7 +3002,7 @@ class User < ActiveRecord::Base
     can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || roles(c.root_account).include?("teacher") }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
     courses = courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
-              .sort_by { |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }
+              .sort_by { |c| [c.primary_enrollment_rank, Time.zone.now - (c.primary_enrollment_date || Time.zone.now)] }
               .first(Setting.get("menu_course_limit", "20").to_i)
               .sort_by { |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.name)] }
     favorites = courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)

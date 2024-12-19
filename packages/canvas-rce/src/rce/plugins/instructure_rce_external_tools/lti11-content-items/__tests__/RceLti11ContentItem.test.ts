@@ -66,7 +66,7 @@ describe('RceLti11ContentItem LTI Link', () => {
     )
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
-      '<a href="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="{&quot;displayHeight&quot;:600,&quot;displayWidth&quot;:800,&quot;presentationDocumentTarget&quot;:&quot;iframe&quot;}" class="lti-thumbnail-launch"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail iframe"></a>'
+      '<a href="/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" target="{&quot;displayHeight&quot;:600,&quot;displayWidth&quot;:800,&quot;presentationDocumentTarget&quot;:&quot;iframe&quot;}" class="lti-thumbnail-launch"><img src="http://www.runeaudio.com/assets/img/banner-archlinux.png" style="height: 128px; width: 128px;" alt="Arch Linux thumbnail iframe"></a>'
     )
   })
 
@@ -117,9 +117,16 @@ describe('RceLti11ContentItem LTI Link', () => {
   })
 
   it("Handles LTI link with presentation target of 'window' and thumbnail is *NOT* set", () => {
-    const iframe = $('.mce-tinymce').find('iframe')[0]
-    const tinymce_element = $(iframe).find('body').append('<p>&nbsp;</p>')
-    tinymce_element.click()
+    const iframe = document.querySelector('.mce-tinymce iframe')
+    if (iframe instanceof HTMLIFrameElement) {
+      const iframeBody = iframe.contentDocument?.body
+      if (iframeBody) {
+        const paragraph = document.createElement('p')
+        paragraph.innerHTML = '&nbsp;'
+        iframeBody.appendChild(paragraph)
+        iframeBody.click()
+      }
+    }
     const contentItem = RceLti11ContentItem.fromJSON(exampleLti11ContentItems.lti_window)
     expect(contentItem.text).toEqual('Arch Linux plain window')
     expect(contentItem.url).toEqual(
@@ -265,6 +272,55 @@ describe('RceLti11ContentItem File Item', () => {
   })
 })
 
+describe('RceLti11ContentItem image content', () => {
+  it('handles missing dimensions gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'Test Image',
+      url: 'http://example.com/test.jpg',
+      mediaType: 'image/jpeg',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+      },
+    })
+
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<img')
+    expect(payload).toContain('src="http://example.com/test.jpg"')
+    expect(payload).not.toContain('style=')
+  })
+
+  it('handles empty text gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      url: 'http://example.com/test.jpg',
+      mediaType: 'image/jpeg',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+      },
+    })
+
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<img')
+    expect(payload).toContain('src="http://example.com/test.jpg"')
+    expect(payload).not.toContain('alt=')
+  })
+
+  it('handles non-image media types with embed target', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'PDF Document',
+      url: 'http://example.com/document.pdf',
+      mediaType: 'application/pdf',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+        displayWidth: '800',
+        displayHeight: '600',
+      },
+    })
+
+    const payload = contentItem.codePayload
+    expect(payload).toBe('PDF Document')
+  })
+})
+
 describe('Studio LTI content items', () => {
   it('with custom params set to false', () => {
     const itemData = {
@@ -305,6 +361,183 @@ describe('Studio LTI content items', () => {
     equalHtmlIgnoringAttributeOrder(
       contentItem.codePayload,
       `<iframe data-studio-convertible-to-link="true" data-studio-resizable="true" data-studio-tray-enabled="true" src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="undefined" style="width: 800px; height: 600px; display: inline-block;" width="800" height="600"></iframe>`
+    )
+  })
+})
+
+describe('Additional RceLti11ContentItem Tests', () => {
+  it('Handles missing url gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'No URL item',
+      mediaType: 'application/pdf',
+      placementAdvice: {presentationDocumentTarget: 'embed'},
+    })
+    expect(contentItem.url).toBeUndefined()
+    equalHtmlIgnoringAttributeOrder(contentItem.codePayload, 'No URL item')
+  })
+
+  it('Handles null properties gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: null,
+      url: null,
+      mediaType: null,
+      placementAdvice: {presentationDocumentTarget: 'embed'},
+    })
+    equalHtmlIgnoringAttributeOrder(contentItem.codePayload, '')
+  })
+
+  it('Handles no mediaType gracefully', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'No Media',
+      url: 'http://example.com/',
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/">No Media</a>'
+    )
+  })
+
+  it('Handles custom attributes without Studio (no custom property)', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/vnd.ims.lti.v1.launch+json',
+      url: 'http://example.com/lti',
+      text: 'No Custom',
+      placementAdvice: {presentationDocumentTarget: 'iframe'},
+    })
+    // Should still produce an iframe without studio attributes
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<iframe')
+    expect(payload).not.toContain('data-studio-')
+  })
+
+  it('Falls back gracefully for unknown docTarget', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      text: 'Unknown Target',
+      url: 'http://example.com/',
+      mediaType: 'text/html',
+      placementAdvice: {presentationDocumentTarget: 'unknown'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/">Unknown Target</a>'
+    )
+  })
+
+  it('Handles undefined ltiIframeAllowPolicy', () => {
+    const contentItem = RceLti11ContentItem.fromJSON(
+      {
+        mediaType: 'application/vnd.ims.lti.v1.launch+json',
+        url: 'http://example.com/lti',
+        text: 'No Policy',
+        placementAdvice: {presentationDocumentTarget: 'iframe'},
+      },
+      createDeepMockProxy<ExternalToolsEnv>({}, {ltiIframeAllowPolicy: undefined})
+    )
+    expect(contentItem.codePayload).toContain('allowfullscreen="true"')
+    expect(contentItem.codePayload).not.toContain('allow="undefined"')
+  })
+
+  it('Sanitizes javascript: URLs', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/pdf',
+      // eslint-disable-next-line no-script-url
+      url: 'javascript:alert(1)',
+      text: 'Injected',
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="#javascript:alert(1)">Injected</a>'
+    )
+  })
+
+  it('Preserves complex selection HTML', () => {
+    const contentItem = RceLti11ContentItem.fromJSON(
+      {
+        mediaType: 'application/pdf',
+        url: 'http://example.com/doc.pdf',
+        title: 'Complex Selection',
+        placementAdvice: {presentationDocumentTarget: 'frame'},
+      },
+      createDeepMockProxy<ExternalToolsEnv>(
+        {},
+        {editorSelection: '<strong><em>BoldItalic</em></strong>'}
+      )
+    )
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/doc.pdf" title="Complex Selection"><strong><em>BoldItalic</em></strong></a>'
+    )
+  })
+
+  it('Handles thumbnail missing @id', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/pdf',
+      url: 'http://example.com/doc.pdf',
+      text: 'No Thumbnail ID',
+      thumbnail: {height: 128, width: 128},
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com/doc.pdf">No Thumbnail ID</a>'
+    )
+  })
+
+  it('Handles invalid displayWidth/Height', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'image/jpeg',
+      url: 'http://example.com/image.jpg',
+      text: 'Invalid Dimensions',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+        displayWidth: 'abc',
+        displayHeight: 'xyz',
+      },
+    })
+    const payload = contentItem.codePayload
+    expect(payload).toContain('<img')
+    expect(payload).not.toContain('width="abc"')
+    expect(payload).not.toContain('height="xyz"')
+  })
+
+  it('Handles numeric width/height for images correctly', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'image/png',
+      url: 'http://example.com/image.png',
+      text: 'Numeric Dimensions',
+      placementAdvice: {
+        presentationDocumentTarget: 'embed',
+        displayWidth: 200,
+        displayHeight: 300,
+      },
+    })
+    const payload = contentItem.codePayload
+    expect(payload).toContain('style="width: 200px; height: 300px;"')
+  })
+
+  it('Non-image embed target falls back to text', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'application/pdf',
+      url: 'http://example.com/doc.pdf',
+      text: 'Non-image embed',
+      placementAdvice: {presentationDocumentTarget: 'embed'},
+    })
+    equalHtmlIgnoringAttributeOrder(contentItem.codePayload, 'Non-image embed')
+  })
+
+  it('Correctly identifies non-LTI content', () => {
+    const contentItem = RceLti11ContentItem.fromJSON({
+      mediaType: 'text/html',
+      url: 'http://example.com',
+      text: 'Not LTI',
+      placementAdvice: {presentationDocumentTarget: 'frame'},
+    })
+    expect(contentItem.isLTI).toBe(false)
+    equalHtmlIgnoringAttributeOrder(
+      contentItem.codePayload,
+      '<a href="http://example.com">Not LTI</a>'
     )
   })
 })

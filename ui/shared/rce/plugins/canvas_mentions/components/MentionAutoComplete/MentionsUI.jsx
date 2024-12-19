@@ -17,16 +17,16 @@
  */
 
 import PropTypes from 'prop-types'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 import MentionDropdown from './MentionDropdown'
 import React from 'react'
 import GenericErrorPage from '@canvas/generic-error-page'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('mentions')
+const I18n = createI18nScope('mentions')
 
 const client = createClient()
 

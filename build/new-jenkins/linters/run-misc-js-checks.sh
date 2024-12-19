@@ -10,7 +10,7 @@ node ui-build/webpack/generatePluginBundles.js
 
 echo "Running dependency cruiser..."
 # reintroduce later; wasn't failing builds earlier
-node_modules/.bin/depcruise ./ --include-only "^(ui|packages)" || { echo "Dependency cruiser check failed"; }
+node_modules/.bin/depcruise ./ --include-only "^(ui|packages)" || { echo "Dependency cruiser check failed"; exit_status=1; }
 
 echo "Validating workspace dependencies..."
 node script/yarn-validate-workspace-deps.js 2>/dev/null < <(yarn --silent workspaces info --json) || { echo "Workspace dependency validation failed"; exit_status=1; }

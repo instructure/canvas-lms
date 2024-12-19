@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Carpetas disponibles"
     },
+    "background_1bc88842": {
+        "message": "Fondo"
+    },
     "backslash_b2d5442d": {
         "message": "Barra invertida"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Azul"
+    },
+    "border_5b08b06d": {
+        "message": "Borde"
     },
     "bottom_15a2a9be": {
         "message": "Botón"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Colapsar para ocultar { types }"
     },
+    "color_a363e1b0": {
+        "message": "Color"
+    },
+    "color_contrast_4c418add": {
+        "message": "Contraste de color"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Ratio de contraste de color"
+    },
     "color_picker_6b359edf": {
         "message": "Selector de color"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Selector de color ({ colorName } seleccionado)"
+    },
+    "color_popup_af39810f": {
+        "message": "Ventana emergente de color"
     },
     "column_e1ae5c64": {
         "message": "Columna"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (función)"
     },
+    "fail_544e5dde": {
+        "message": "SUSPENDIDO"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Ha habido un error al obtener el contenido"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Notas"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Texto de los gráficos"
     },
     "greater_than_e98af662": {
         "message": "Mayor que "
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Infinito"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Campo de entrada para canal alfa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Campo de entrada para azul"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Campo de entrada para verde"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Campo de entrada para rojo"
+    },
     "insert_593145ef": {
         "message": "Insertar"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Grande"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Texto grande"
     },
     "latvian_2bbb6aab": {
         "message": "Letón"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Ninguna seleccionada"
     },
+    "normal_text_7b03da48": {
+        "message": "Texto normal"
+    },
     "norwegian_53f391ec": {
         "message": "Noruego"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "Tamaño de contorno"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } no es un protocolo válido, que debe ser ftp, http, https, mailto, skype, tel, o puede omitirse"
-    },
     "page_50c4823d": {
         "message": "Página"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Parcial (Derivado)"
     },
+    "pass_1c19a2b3": {
+        "message": "APROBADO"
+    },
     "paste_5963d1c1": {
         "message": "Pegar"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "El porcentaje debe ser un número"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "El porcentaje debe ser al menos el { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Icono plástica"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Variante)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Elige un color"
+    },
     "pink_68ad45cb": {
         "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Píxeles"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Los píxeles deben ser al menos { width } x { height } px"
     },
     "play_1a47eaa7": {
         "message": "Reproducir"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Anterior { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Colores elegidos previamente"
     },
     "prime_917ea60e": {
         "message": "Primo"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Yidis"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Estás en una paleta de colores. Para navegar hacia arriba, a la izquierda, hacia abajo o a la derecha por la paleta, utiliza los botones «W», «A», «S» y «D», respectivamente"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Estás en un control deslizante de colores. Para navegar hacia la izquierda o la derecha, utiliza los botones «A» y «D», respectivamente"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Estás en un control deslizante de canal alfa. Para navegar hacia la izquierda o la derecha, utiliza los botones «A» y «D», respectivamente"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Lo puedes reemplazar al cargar un nuevo archivo de subtítulos."

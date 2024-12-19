@@ -166,7 +166,7 @@ describe "Account Notification API", type: :request do
                       action: "create",
                       format: "json",
                       account_id: @admin.account.id.to_s }
-      @start_at = DateTime.now.utc
+      @start_at = Time.zone.now.utc
       @end_at = 1.day.from_now.utc
     end
 

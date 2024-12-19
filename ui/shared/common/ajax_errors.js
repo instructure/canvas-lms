@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON' // ajaxJSON, defaultAjaxError
@@ -24,7 +24,7 @@ import '@canvas/rails-flash-notifications' // flashError
 
 if (!('INST' in window)) window.INST = {}
 
-const I18n = useI18nScope('ajax_errors')
+const I18n = createI18nScope('ajax_errors')
 
 INST.errorCount = 0
 window.onerror = function (_msg, _url, _line, _column, _errorObj) {
@@ -103,7 +103,7 @@ $(document).ready(function () {
             '</a>'
           $.flashError({html: message}, 30000)
           $('#inactivity_login_link').focus()
-          // eslint-disable-next-line eqeqeq
+           
         } else if (status != 409) {
           ajaxErrorFlash(
             I18n.t('errors.unhandled', "Oops! The last request didn't work out."),

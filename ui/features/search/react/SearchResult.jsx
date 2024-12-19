@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -34,7 +34,7 @@ import {
 import {View} from '@instructure/ui-view'
 import stopwords from './stopwords'
 
-const I18n = useI18nScope('SmartSearch')
+const I18n = createI18nScope('SmartSearch')
 
 const preview = (body, maxLength = 512) => {
   const preview = []

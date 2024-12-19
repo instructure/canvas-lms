@@ -36,7 +36,7 @@ module Lti
 
     Token = Struct.new(:tool, :pseudonym, :timestamp, :nonce) do
       def self.create(tool, pseudonym)
-        Token.new(tool, pseudonym, Time.now, SecureRandom.hex(8))
+        Token.new(tool, pseudonym, Time.zone.now, SecureRandom.hex(8))
       end
 
       def serialize

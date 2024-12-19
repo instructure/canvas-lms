@@ -20,7 +20,7 @@ import React from 'react'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {useValidateLaunchSettings} from '../hooks/useValidateLaunchSettings'
 import {
@@ -38,7 +38,7 @@ import {View} from '@instructure/ui-view'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {toUndefined} from '../../../common/lib/toUndefined'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export type LaunchSettingsProps = {
   overlayStore: Lti1p3RegistrationOverlayStore

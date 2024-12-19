@@ -42,15 +42,14 @@
 #           "type": "string"
 #         },
 #         "type": {
-#           "description": "The type of communcation channel being described. Possible values are: 'email', 'push', 'sms', or 'twitter'. This field determines the type of value seen in 'address'.",
+#           "description": "The type of communcation channel being described. Possible values are: 'email', 'push', 'sms'. This field determines the type of value seen in 'address'.",
 #           "example": "email",
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "email",
 #               "push",
-#               "sms",
-#               "twitter"
+#               "sms"
 #             ]
 #           }
 #         },
@@ -222,14 +221,18 @@ class CommunicationChannelsController < ApplicationController
     @cc.re_activate! if @cc.retired?
     @cc.workflow_state = skip_confirmation ? "active" : "unconfirmed"
 
-    # Save channel and return response
-    if @cc.save
+    cc_saved = User.transaction do
+      saved =  @cc.save
+      if saved
+        # need to change them from pre-registered to registered them as well
+        # so that they can get notifications
+        @user.register if skip_confirmation
+      end
+      saved
+    end
+
+    if cc_saved
       @cc.send_confirmation!(@domain_root_account) unless skip_confirmation
-
-      # need to change them from pre-registered to registered them as well
-      # so that they can get notifications
-      @user.register if skip_confirmation
-
       flash[:notice] = t("profile.notices.contact_registered", "Contact method registered!")
       render json: communication_channel_json(@cc, @current_user, session)
     else
@@ -277,16 +280,19 @@ class CommunicationChannelsController < ApplicationController
       end
 
       if @user.registered? && cc.unconfirmed?
-        add_additional_email_if_allowed
         unless @current_user == @user
+          add_additional_email_if_allowed
           session[:return_to] = request.url
           flash[:notice] = t "notices.login_to_confirm", "Please log in to confirm your e-mail address"
           redirect_to login_url(pseudonym_session: { unique_id: @user.pseudonym.try(:unique_id) }, expected_user_id: @user.id)
           return
         end
 
-        cc.confirm
-        @user.touch
+        User.transaction do
+          add_additional_email_if_allowed
+          cc.confirm
+          @user.touch
+        end
         return respond_to do |format|
           format.html do
             flash[:notice] = t "notices.registration_confirmed", "Registration confirmed!"
@@ -342,11 +348,12 @@ class CommunicationChannelsController < ApplicationController
           end
         end
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
-
         if params[:transfer_enrollment].present?
           @current_user.associate_with_shard(@enrollment.shard)
           @user.transaction do
             @current_user.transaction do
+              # cc will be active, so we will never call confirm here. If the user is already registered and the
+              # cc is not active, we would have entered the if block above, which returns from this method.
               cc.active? || cc.confirm
               @enrollment.user = @current_user
               # accept will save it
@@ -367,8 +374,10 @@ class CommunicationChannelsController < ApplicationController
       elsif cc.active?
         pseudonym = @root_account.pseudonyms.active_only.where(user_id: @user).exists?
         if @user.pre_registered? && pseudonym
-          @user.register
-          add_additional_email_if_allowed
+          User.transaction do
+            @user.register
+            add_additional_email_if_allowed
+          end
           return redirect_with_success_flash
         else
           failed = true
@@ -419,31 +428,34 @@ class CommunicationChannelsController < ApplicationController
                           status: :bad_request
           end
 
-          # They may have switched e-mail address when they logged in; create a CC if so
-          if @pseudonym.unique_id != cc.path && EmailAddressValidator.valid?(@pseudonym.unique_id)
-            new_cc = @user.communication_channels.email.by_path(@pseudonym.unique_id).first
-            new_cc ||= @user.communication_channels.build(path: @pseudonym.unique_id)
-            new_cc.user = @user
-            new_cc.workflow_state = "unconfirmed" if new_cc.retired?
-            new_cc.send_confirmation!(@root_account) if new_cc.unconfirmed?
-            new_cc.save! if new_cc.changed?
-            @pseudonym.communication_channel = new_cc
-          end
-          @pseudonym.communication_channel.pseudonym = @pseudonym if @pseudonym.communication_channel
+          User.transaction do
+            # They may have switched e-mail address when they logged in; create a CC if so
+            if @pseudonym.unique_id != cc.path && EmailAddressValidator.valid?(@pseudonym.unique_id)
+              new_cc = @user.communication_channels.email.by_path(@pseudonym.unique_id).first
+              new_cc ||= @user.communication_channels.build(path: @pseudonym.unique_id)
+              new_cc.user = @user
+              new_cc.workflow_state = "unconfirmed" if new_cc.retired?
+              new_cc.send_confirmation!(@root_account) if new_cc.unconfirmed?
+              new_cc.save! if new_cc.changed?
+              @pseudonym.communication_channel = new_cc
+            end
+            @pseudonym.communication_channel.pseudonym = @pseudonym if @pseudonym.communication_channel
 
-          @user.save!
-          @pseudonym.save!
+            @user.save!
+            @pseudonym.save!
 
-          if cc.confirm
-            @enrollment&.accept
-            reset_session_saving_keys(:return_to)
-            @user.register
+            if cc.confirm
+              @enrollment&.accept
+              reset_session_saving_keys(:return_to)
+              @user.register
 
-            # Login, since we're satisfied that this person is the right person.
-            @pseudonym_session = PseudonymSession.new(@pseudonym, true)
-            @pseudonym_session.save
-          else
-            failed = true
+              # Login, since we're satisfied that this person is the right person.
+              @pseudonym_session = PseudonymSession.new(@pseudonym, true)
+              @pseudonym_session.save
+              add_additional_email_if_allowed
+            else
+              failed = true
+            end
           end
         else
           return # render
@@ -457,9 +469,6 @@ class CommunicationChannelsController < ApplicationController
         format.json { render json: {}, status: :bad_request }
       end
     else
-      add_additional_email_if_allowed
-      # make sure additions take the above use of
-      # redirect_with_success_flash into account
       redirect_with_success_flash
     end
   end

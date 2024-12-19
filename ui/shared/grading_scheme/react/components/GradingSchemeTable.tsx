@@ -19,7 +19,7 @@
 import React, {useState} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Responsive} from '@instructure/ui-responsive'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   IconDuplicateLine,
   IconEditLine,
@@ -34,7 +34,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 export type GradingSchemeTableProps = {
   caption: string
@@ -106,7 +106,7 @@ export const GradingSchemeTable = ({
       >
         {I18n.t('Grading Scheme Name')}
       </Table.ColHeader>
-      {showUsedLocations && (
+      {showUsedLocations ? (
         <Table.ColHeader
           id="locationsUsed"
           key="locationsUsed"
@@ -115,6 +115,8 @@ export const GradingSchemeTable = ({
         >
           {I18n.t('Locations Used')}
         </Table.ColHeader>
+      ) : (
+        <></>
       )}
       <Table.ColHeader id="actions" key="actions" width="20%" />
     </Table.Row>
@@ -177,7 +179,7 @@ export const GradingSchemeTable = ({
                         <TruncateText>{gradingSchemeCard.gradingScheme.title}</TruncateText>
                       </Link>
                     </Table.Cell>
-                    {showUsedLocations && (
+                    {showUsedLocations ? (
                       <Table.Cell>
                         {gradingSchemeCard.gradingScheme.assessed_assignment ||
                         (defaultAccountGradingSchemeEnabled &&
@@ -195,6 +197,8 @@ export const GradingSchemeTable = ({
                           ''
                         )}
                       </Table.Cell>
+                    ) : (
+                      <></>
                     )}
                     <Table.Cell textAlign="end">
                       <IconButton

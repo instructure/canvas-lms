@@ -23,11 +23,11 @@ import {each, filter, map, isEmpty} from 'lodash'
 import $ from 'jquery'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import EnrollmentTermInput from './EnrollmentTermInput'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('GradingPeriodSetForm')
+const I18n = createI18nScope('GradingPeriodSetForm')
 
 const {array, bool, func, shape, string} = PropTypes
 
@@ -78,10 +78,13 @@ class GradingPeriodSetForm extends React.Component {
     }
 
     this.state = {set: buildSet(set)}
+    this.titleRef = React.createRef()
+    this.cancelButtonRef = React.createRef()
+    this.saveButtonRef = React.createRef()
   }
 
   componentDidMount() {
-    ReactDOM.findDOMNode(this.refs.title).focus()
+    this.titleRef.current?.focus()
   }
 
   changeTitle = e => {
@@ -126,16 +129,21 @@ class GradingPeriodSetForm extends React.Component {
 
   renderSaveAndCancelButtons = () => (
     <div className="ic-Form-actions below-line">
-      <Button disabled={this.props.disabled} onClick={this.triggerCancel} ref="cancelButton">
+      <Button
+        ref={this.cancelButtonRef}
+        disabled={this.props.disabled}
+        onClick={this.triggerCancel}
+      >
         {I18n.t('Cancel')}
       </Button>
       &nbsp;
       <Button
-        color="primary"
+        ref={this.saveButtonRef}
         disabled={this.props.disabled}
-        aria-label={I18n.t('Save Grading Period Set')}
+        color="primary"
         onClick={this.triggerSave}
-        ref="saveButton"
+        margin="0 0 0 x-small"
+        aria-label={I18n.t('Save Grading Period Set')}
       >
         {I18n.t('Save')}
       </Button>
@@ -154,13 +162,12 @@ class GradingPeriodSetForm extends React.Component {
                 </label>
                 <input
                   id="set-name"
-                  ref="title"
+                  ref={this.titleRef}
+                  type="text"
+                  value={this.state.set.title}
+                  onChange={this.changeTitle}
                   className="ic-Input"
                   placeholder={I18n.t('Set name...')}
-                  title={I18n.t('Grading Period Set Title')}
-                  defaultValue={this.state.set.title}
-                  onChange={this.changeTitle}
-                  type="text"
                 />
               </div>
 

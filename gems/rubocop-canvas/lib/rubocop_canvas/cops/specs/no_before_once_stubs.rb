@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class NoBeforeOnceStubs < Cop
+      class NoBeforeOnceStubs < Base
         MSG = "Stubs in a `before(:once)` block won't carry over " \
               "to the examples; you should move this to a `before(:each)`"
 

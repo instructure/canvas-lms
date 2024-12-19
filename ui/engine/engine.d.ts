@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-declare module '@canvas/i18n'
-
 // a little disappointed this has to be done by hand
 declare namespace Intl {
   function getCanonicalLocales(locales: string | string[]): string[]

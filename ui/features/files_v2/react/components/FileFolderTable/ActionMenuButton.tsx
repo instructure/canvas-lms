@@ -19,9 +19,9 @@
 import React from 'react'
 import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface ActionMenuButtonProps {
   isStacked: boolean

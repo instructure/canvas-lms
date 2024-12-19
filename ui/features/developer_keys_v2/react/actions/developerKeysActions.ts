@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
 import $ from 'jquery'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
@@ -25,7 +25,7 @@ import type {AnyAction, Dispatch} from 'redux'
 import type {DeveloperKey, DeveloperKeyAccountBinding} from '../../model/api/DeveloperKey'
 import type {LtiToolConfiguration} from 'features/developer_keys_v2/model/api/LtiToolConfiguration'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export type LtiDeveloperKeyApiResponse = {
   developer_key: DeveloperKey

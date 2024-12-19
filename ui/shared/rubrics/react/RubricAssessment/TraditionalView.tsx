@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {useEffect, useState, useRef} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -36,7 +36,7 @@ import {OutcomeTag} from './OutcomeTag'
 import {LongDescriptionModal} from './LongDescriptionModal'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 const {shamrock, tiara} = colors
 
 export type TraditionalViewProps = {
@@ -50,6 +50,7 @@ export type TraditionalViewProps = {
   rubricTitle: string
   rubricSavedComments?: Record<string, string[]>
   onUpdateAssessmentData: (params: UpdateAssessmentData) => void
+  validationErrors?: string[]
 }
 
 export const TraditionalView = ({
@@ -63,6 +64,7 @@ export const TraditionalView = ({
   rubricTitle,
   rubricSavedComments,
   onUpdateAssessmentData,
+  validationErrors,
 }: TraditionalViewProps) => {
   const pointsColumnWidth = hidePoints ? 0 : 8.875
   const criteriaColumnWidth = 11.25
@@ -138,7 +140,7 @@ export const TraditionalView = ({
         return (
           <CriterionRow
             // we use the array index because rating may not have an id
-            /* eslint-disable-next-line react/no-array-index-key */
+             
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
@@ -151,6 +153,8 @@ export const TraditionalView = ({
             isFreeFormCriterionComments={isFreeFormCriterionComments}
             hidePoints={hidePoints}
             ratingsColumnMinWidth={ratingsColumnMinWidth}
+            validationErrors={validationErrors}
+            shouldFocusFirstRating={validationErrors?.[0] === criterion.id}
           />
         )
       })}
@@ -170,6 +174,8 @@ type CriterionRowProps = {
   ratingsColumnMinWidth: number
   ratingOrder: string
   rubricSavedComments: string[]
+  validationErrors?: string[]
+  shouldFocusFirstRating?: boolean
 }
 const CriterionRow = ({
   criterion,
@@ -183,6 +189,8 @@ const CriterionRow = ({
   ratingsColumnMinWidth,
   ratingOrder,
   rubricSavedComments,
+  validationErrors,
+  shouldFocusFirstRating = false,
 }: CriterionRowProps) => {
   const [hoveredRatingIndex, setHoveredRatingIndex] = useState<number>()
   const [commentText, setCommentText] = useState<string>(criterionAssessment?.comments ?? '')
@@ -195,6 +203,9 @@ const CriterionRow = ({
     criterionRatings.reverse()
   }
 
+  const hasValidationError = validationErrors?.includes(criterion.id)
+  const firstRatingRef = useRef<HTMLElement | null>(null)
+
   const updateAssessmentData = (params: Partial<UpdateAssessmentData>) => {
     const updatedCriterionAssessment: UpdateAssessmentData = {
       ...criterionAssessment,
@@ -203,6 +214,12 @@ const CriterionRow = ({
     }
     onUpdateAssessmentData(updatedCriterionAssessment)
   }
+
+  useEffect(() => {
+    if (shouldFocusFirstRating && firstRatingRef.current) {
+      firstRatingRef.current.focus()
+    }
+  }, [shouldFocusFirstRating])
 
   useEffect(() => {
     setCommentText(criterionAssessment?.comments ?? '')
@@ -278,7 +295,13 @@ const CriterionRow = ({
         </Flex.Item>
         {isFreeFormCriterionComments ? (
           <Flex.Item shouldGrow={true} shouldShrink={true} align="start">
-            <View as="div" padding="x-small small 0 small" borderWidth="small">
+            <View
+              as="div"
+              padding="x-small small 0 small"
+              borderWidth={hasValidationError ? 'medium' : 'small'}
+              borderColor={hasValidationError ? 'danger' : 'primary'}
+              borderRadius={hasValidationError ? 'medium' : 'small'}
+            >
               <Flex direction="column">
                 {!isPreviewMode && !isPeerReview && rubricSavedComments.length > 0 && (
                   <>
@@ -341,139 +364,162 @@ const CriterionRow = ({
           </Flex.Item>
         ) : (
           <Flex.Item as="div" width="100%" shouldGrow={true} shouldShrink={true} align="stretch">
-            <Flex alignItems="stretch" height="100%">
-              {criterionRatings.map((rating, index) => {
-                const isHovered = hoveredRatingIndex === index
-                const isSelected = rating.id && selectedRatingId === rating.id
-                const isLastRatingIndex = criterionRatings.length - 1 === index
+            <View
+              as="div"
+              padding="0"
+              margin="0"
+              borderWidth={hasValidationError ? 'medium' : 'none'}
+              borderColor={hasValidationError ? 'danger' : 'transparent'}
+              borderRadius="medium"
+            >
+              <Flex alignItems="stretch" height="100%">
+                {criterionRatings.map((rating, index) => {
+                  const isHovered = hoveredRatingIndex === index
+                  const isSelected = rating.id && selectedRatingId === rating.id
+                  const isLastRatingIndex = criterionRatings.length - 1 === index
 
-                const borderColor = isHovered || isSelected ? 'brand' : 'primary'
+                  const borderColor = isHovered || isSelected ? 'brand' : 'primary'
 
-                const onClickRating = (ratingId: string) => {
-                  if (selectedRatingId === ratingId) {
-                    updateAssessmentData({
-                      points: undefined,
-                      ratingId: undefined,
-                    })
-                  } else {
-                    updateAssessmentData({
-                      points: rating.points,
-                      ratingId,
-                    })
+                  const onClickRating = (ratingId: string) => {
+                    if (selectedRatingId === ratingId) {
+                      updateAssessmentData({
+                        points: undefined,
+                        ratingId: undefined,
+                      })
+                    } else {
+                      updateAssessmentData({
+                        points: rating.points,
+                        ratingId,
+                      })
+                    }
                   }
-                }
 
-                const min = criterion.criterionUseRange
-                  ? rangingFrom(criterionRatings, index, ratingOrder)
-                  : undefined
+                  const min = criterion.criterionUseRange
+                    ? rangingFrom(criterionRatings, index, ratingOrder)
+                    : undefined
 
-                const primaryBorderColor = `${tiara} ${
-                  isLastRatingIndex ? tiara : 'transparent'
-                } ${tiara} ${tiara}`
+                  const primaryBorderColor = `${tiara} ${
+                    isLastRatingIndex ? tiara : 'transparent'
+                  } ${tiara} ${tiara}`
 
-                return (
-                  <Flex.Item
-                    align="stretch"
-                    shouldGrow={true}
-                    // we use the array index because rating may not have an id
-                    /* eslint-disable-next-line react/no-array-index-key */
-                    key={`criterion-${criterion.id}-ratings-${index}`}
-                    width={ratingsColumnMinWidth / criterionRatings.length + 'rem'}
-                  >
-                    <View
-                      as="div"
-                      borderColor={borderColor}
-                      borderWidth="small"
-                      height="100%"
-                      padding="0"
-                      margin="0"
-                      themeOverride={{
-                        borderColorBrand: shamrock,
-                        borderColorPrimary: primaryBorderColor,
-                      }}
+                  return (
+                    <Flex.Item
+                      align="stretch"
+                      shouldGrow={true}
+                      // we use the array index because rating may not have an id
+                       
+                      key={`criterion-${criterion.id}-ratings-${index}`}
+                      width={ratingsColumnMinWidth / criterionRatings.length + 'rem'}
                     >
                       <View
-                        as="button"
-                        disabled={isPreviewMode}
-                        tabIndex={0}
-                        background="transparent"
-                        height="100%"
-                        width="100%"
-                        borderWidth="small"
+                        as="div"
                         borderColor={borderColor}
-                        overflowX="hidden"
-                        cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
-                        padding="xxx-small x-small 0 x-small"
-                        onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
-                        onMouseOut={() => setHoveredRatingIndex(undefined)}
-                        onClick={() => onClickRating(rating.id)}
+                        borderWidth="small"
+                        height="100%"
+                        padding="0"
+                        margin="0"
                         themeOverride={{
-                          borderWidthSmall: '0.125rem',
                           borderColorBrand: shamrock,
-                          borderColorPrimary: 'transparent',
+                          borderColorPrimary: primaryBorderColor,
                         }}
-                        data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
+                        elementRef={ref => {
+                          if (index === 0) {
+                            firstRatingRef.current = ref as HTMLElement
+                          }
+                        }}
                       >
-                        <Flex direction="column" height="100%" alignItems="stretch">
-                          <Flex.Item>
-                            <Text weight="bold">{rating.description}</Text>
-                          </Flex.Item>
-                          <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
-                            <View as="div">
-                              <Text
-                                size="small"
-                                dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
-                              />
-                            </View>
-                          </Flex.Item>
-                          <Flex.Item>
-                            <View
-                              as="div"
-                              textAlign="end"
-                              position="relative"
-                              padding="0 0 x-small 0"
-                              overflowX="hidden"
-                              overflowY="hidden"
-                              minHeight="1.875rem"
-                            >
-                              <View>
+                        <View
+                          as="button"
+                          disabled={isPreviewMode}
+                          tabIndex={0}
+                          background="transparent"
+                          height="100%"
+                          width="100%"
+                          borderWidth="small"
+                          borderColor={borderColor}
+                          overflowX="hidden"
+                          cursor={isPreviewMode ? 'not-allowed' : 'pointer'}
+                          padding="xxx-small x-small 0 x-small"
+                          onMouseOver={() => setHoveredRatingIndex(isPreviewMode ? -1 : index)}
+                          onMouseOut={() => setHoveredRatingIndex(undefined)}
+                          onClick={() => onClickRating(rating.id)}
+                          themeOverride={{
+                            borderWidthSmall: '0.125rem',
+                            borderColorBrand: shamrock,
+                            borderColorPrimary: 'transparent',
+                          }}
+                          data-testid={`traditional-criterion-${criterion.id}-ratings-${index}`}
+                        >
+                          <Flex direction="column" height="100%" alignItems="stretch">
+                            <Flex.Item>
+                              <Text weight="bold">{rating.description}</Text>
+                            </Flex.Item>
+                            <Flex.Item margin="small 0 0 0" shouldGrow={true} textAlign="start">
+                              <View as="div">
                                 <Text
                                   size="small"
-                                  weight="bold"
-                                  data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
-                                >
-                                  {!hidePoints &&
-                                    (min != null
-                                      ? possibleStringRange(min, rating.points)
-                                      : possibleString(rating.points))}
-                                </Text>
-                              </View>
-
-                              {isSelected && (
-                                <div
-                                  data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
-                                  style={{
-                                    position: 'absolute',
-                                    bottom: '0',
-                                    height: '0',
-                                    width: '0',
-                                    left: '50%',
-                                    borderLeft: '12px solid transparent',
-                                    borderRight: '12px solid transparent',
-                                    borderBottom: `12px solid ${shamrock}`,
-                                    transform: 'translateX(-50%)',
-                                  }}
+                                  dangerouslySetInnerHTML={escapeNewLineText(
+                                    rating.longDescription
+                                  )}
                                 />
-                              )}
-                            </View>
-                          </Flex.Item>
-                        </Flex>
+                              </View>
+                            </Flex.Item>
+                            <Flex.Item>
+                              <View
+                                as="div"
+                                textAlign="end"
+                                position="relative"
+                                padding="0 0 x-small 0"
+                                overflowX="hidden"
+                                overflowY="hidden"
+                                minHeight="1.875rem"
+                              >
+                                <View>
+                                  <Text
+                                    size="small"
+                                    weight="bold"
+                                    data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-points`}
+                                  >
+                                    {!hidePoints &&
+                                      (min != null
+                                        ? possibleStringRange(min, rating.points)
+                                        : possibleString(rating.points))}
+                                  </Text>
+                                </View>
+
+                                {isSelected && (
+                                  <div
+                                    data-testid={`traditional-criterion-${criterion.id}-ratings-${index}-selected`}
+                                    style={{
+                                      position: 'absolute',
+                                      bottom: '0',
+                                      height: '0',
+                                      width: '0',
+                                      left: '50%',
+                                      borderLeft: '12px solid transparent',
+                                      borderRight: '12px solid transparent',
+                                      borderBottom: `12px solid ${shamrock}`,
+                                      transform: 'translateX(-50%)',
+                                    }}
+                                  />
+                                )}
+                              </View>
+                            </Flex.Item>
+                          </Flex>
+                        </View>
                       </View>
-                    </View>
-                  </Flex.Item>
-                )
-              })}
-            </Flex>
+                    </Flex.Item>
+                  )
+                })}
+              </Flex>
+            </View>
+            {hasValidationError && (
+              <View as="div" padding="small" borderWidth="0 0 small 0">
+                <Text size="small" color="danger">
+                  {I18n.t('Select a rating')}
+                </Text>
+              </View>
+            )}
           </Flex.Item>
         )}
         {!hidePoints && (

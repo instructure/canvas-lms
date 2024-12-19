@@ -177,7 +177,7 @@ describe "report helper" do
 
   describe "timezone_strftime" do
     it "formats DateTime" do
-      date_time = DateTime.new(2003, 9, 13)
+      date_time = Time.zone.local(2003, 9, 13)
       formatted = report.timezone_strftime(date_time, "%d-%b")
       expect(formatted).to eq "13-Sep"
     end

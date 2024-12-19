@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {useMemo} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -34,7 +34,7 @@ import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface ColumnHeader {
   id: string
@@ -75,11 +75,8 @@ const columnRenderers: {
   created: row => <FriendlyDatetime dateTime={row.created_at} />,
   lastModified: row => <FriendlyDatetime dateTime={row.updated_at} />,
   modifiedBy: row =>
-    'user' in row ? (
-      <Link
-        isWithinText={false}
-        href={row.user.html_url}
-      >
+    'user' in row && row.user?.display_name ? (
+      <Link isWithinText={false} href={row.user.html_url}>
         <TruncateText>{row.user.display_name}</TruncateText>
       </Link>
     ) : null,
@@ -100,14 +97,17 @@ interface FileFolderTableProps {
 
 const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolderTableProps) => {
   const isStacked = size !== 'large'
-  const {data, error, isLoading} = useQuery<(File | Folder)[], unknown>(['files'], () =>
+  const queryKey = useMemo(() => ['files', folderId], [folderId])
+
+  const {data, error, isLoading, isFetching} = useQuery<(File | Folder)[], unknown>(queryKey, () =>
     fetchFilesAndFolders(folderId)
   )
+
   if (error) {
     showFlashError(I18n.t('Failed to fetch files and folders'))
   }
 
-  const rows = data ?? []
+  const rows = !isFetching && data && data.length > 0 ? data : []
   return (
     <>
       <Table
@@ -142,7 +142,10 @@ const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolde
           ))}
         </Table.Body>
       </Table>
-      <SubTableContent isLoading={isLoading} isEmpty={rows.length === 0} />
+      <SubTableContent
+        isLoading={isLoading || isFetching}
+        isEmpty={rows.length === 0 && !isFetching}
+      />
     </>
   )
 }

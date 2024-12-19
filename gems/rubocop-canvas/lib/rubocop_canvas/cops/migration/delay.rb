@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class Delay < Cop
+      class Delay < Base
         include RuboCop::Canvas::MigrationTags
 
         PREDEPLOY_MSG = "`delay` cannot be used in a " \

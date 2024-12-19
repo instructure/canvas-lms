@@ -595,7 +595,7 @@ describe DeveloperKey do
         it "retries the job" do
           expect(subject).to receive(:delay).and_raise(PG::ConnectionBad)
           expect do
-            subject.send(:manage_external_tools_multi_shard, {}, :update_tools_on_active_shard, account_model, Time.now)
+            subject.send(:manage_external_tools_multi_shard, {}, :update_tools_on_active_shard, account_model, Time.zone.now)
           end.to raise_error(Delayed::RetriableError)
         end
       end
@@ -606,7 +606,7 @@ describe DeveloperKey do
         it "retries the job" do
           expect(subject).to receive(:delay).and_raise(PG::ConnectionBad)
           expect do
-            subject.send(:manage_external_tools_multi_shard_in_region, {}, :update_tools_on_active_shard, account_model, Time.now)
+            subject.send(:manage_external_tools_multi_shard_in_region, {}, :update_tools_on_active_shard, account_model, Time.zone.now)
           end.to raise_error(Delayed::RetriableError)
         end
       end

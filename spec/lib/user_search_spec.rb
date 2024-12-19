@@ -365,7 +365,7 @@ describe UserSearch do
       end
 
       it "will not match channels where the type is not email" do
-        cc.update!(path_type: CommunicationChannel::TYPE_TWITTER)
+        cc.update!(path_type: CommunicationChannel::TYPE_SMS)
         expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
       end
 

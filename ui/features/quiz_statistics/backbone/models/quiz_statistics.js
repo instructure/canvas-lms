@@ -18,13 +18,13 @@
 
 import {find} from 'lodash'
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import K from '../../constants'
 import pickAndNormalize from '@canvas/quiz-legacy-client-apps/util/pick_and_normalize'
 import round from '@canvas/quiz-legacy-client-apps/util/round'
 import wrap from '@canvas/quiz-legacy-client-apps/util/array_wrap'
 
-const I18n = useI18nScope('quiz_statistics')
+const I18n = createI18nScope('quiz_statistics')
 
 let parseQuestion
 

@@ -203,9 +203,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def default_values
-    self.title ||= content.title rescue nil
-    self.title ||= content.name rescue nil
-    self.title ||= content.display_name rescue nil
+    self.title ||= content.try(:title)
+    self.title ||= content.try(:name)
+    self.title ||= content.try(:display_name)
     self.title ||= t(:no_title, "No title")
     self.comments ||= ""
     self.comments = "" if self.comments == "Comments"
@@ -214,11 +214,11 @@ class ContentTag < ActiveRecord::Base
   protected :default_values
 
   def context_code
-    super || "#{context_type.to_s.underscore}_#{context_id}" rescue nil
+    super || (context_type && "#{context_type.to_s.underscore}_#{context_id}")
   end
 
   def context_name
-    context.name rescue ""
+    context.try(:name).to_s
   end
 
   def update_could_be_locked
@@ -295,7 +295,7 @@ class ContentTag < ActiveRecord::Base
         is_student ? "lti-quiz" : "quiz"
       elsif content && content.submission_types == "discussion_topic"
         "discussion_topic"
-      elsif self&.content&.quiz_lti?
+      elsif content&.quiz_lti?
         "lti-quiz"
       else
         "assignment"
@@ -831,7 +831,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def check_for_restricted_content_changes
-    if !new_record? && title_changed? && !@importing_migration && content && content.respond_to?(:is_child_content?) &&
+    if !new_record? && title_changed? && !@importing_migration && content.respond_to?(:is_child_content?) &&
        content.is_child_content? && content.editing_restricted?(:content)
       errors.add(:title, "cannot change title - associated content locked by Master Course")
     end

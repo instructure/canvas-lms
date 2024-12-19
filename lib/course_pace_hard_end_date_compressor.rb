@@ -39,12 +39,27 @@ class CoursePaceHardEndDateCompressor
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
     start_date_of_item_group = start_date || enrollment_start_date&.to_date || course_pace.start_date.to_date
     end_date = course_pace.end_date || course_pace.course.end_at&.to_date || course_pace.course.enrollment_term&.end_at&.to_date
-
-    unless CoursePacesDateHelpers.day_is_enabled?(start_date_of_item_group, course_pace.exclude_weekends, blackout_dates)
-      start_date_of_item_group = CoursePacesDateHelpers.first_enabled_day(start_date_of_item_group, course_pace.exclude_weekends, blackout_dates)
+    unless CoursePacesDateHelpers.day_is_enabled?(
+      start_date_of_item_group,
+      course_pace,
+      blackout_dates
+    )
+      start_date_of_item_group = CoursePacesDateHelpers.first_enabled_day(
+        start_date_of_item_group,
+        course_pace,
+        blackout_dates
+      )
     end
-    unless end_date.nil? || CoursePacesDateHelpers.day_is_enabled?(end_date, course_pace.exclude_weekends, blackout_dates)
-      end_date = CoursePacesDateHelpers.previous_enabled_day(end_date, course_pace.exclude_weekends, blackout_dates)
+    unless end_date.nil? || CoursePacesDateHelpers.day_is_enabled?(
+      end_date,
+      course_pace,
+      blackout_dates
+    )
+      end_date = CoursePacesDateHelpers.previous_enabled_day(
+        end_date,
+        course_pace,
+        blackout_dates
+      )
     end
 
     due_dates = course_pace_due_dates_calculator.get_due_dates(items, enrollment, start_date: start_date_of_item_group)
@@ -55,7 +70,7 @@ class CoursePaceHardEndDateCompressor
       start_date_of_item_group = CoursePacesDateHelpers.add_days(
         due_dates[starting_item.id],
         1,
-        course_pace.exclude_weekends,
+        course_pace,
         blackout_dates
       )
       items = items[compress_items_after + 1..]
@@ -65,7 +80,7 @@ class CoursePaceHardEndDateCompressor
     actual_plan_length = CoursePacesDateHelpers.days_between(
       start_date_of_item_group,
       end_date,
-      course_pace.exclude_weekends,
+      course_pace,
       blackout_dates:
     )
 
@@ -81,7 +96,7 @@ class CoursePaceHardEndDateCompressor
     plan_length_with_items = CoursePacesDateHelpers.days_between(
       start_date_of_item_group,
       (start_date_of_item_group > final_item_due_date) ? start_date_of_item_group : final_item_due_date,
-      course_pace.exclude_weekends,
+      course_pace,
       blackout_dates:
     )
 
@@ -103,7 +118,7 @@ class CoursePaceHardEndDateCompressor
       days_over = CoursePacesDateHelpers.days_between(
         end_date,
         new_due_dates[key],
-        course_pace.exclude_weekends,
+        course_pace,
         inclusive_end: false,
         blackout_dates:
       )

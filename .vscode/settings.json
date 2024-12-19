@@ -1,4 +1,5 @@
 {
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -26,5 +27,6 @@
   ],
   "search.exclude": {
       "packages/*/es/**": true
-  }
+  },
+  "biome.enabled": false
 }

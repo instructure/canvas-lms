@@ -29,9 +29,9 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {debounce, isEqual} from 'lodash'
 import AccountCalendarResultsArea from './AccountCalendarsResultsArea'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_calendars_modal')
+const I18n = createI18nScope('account_calendars_modal')
 
 const TYPING_DEBOUNCE = 500
 const MIN_SEARCH_LENGTH = 2

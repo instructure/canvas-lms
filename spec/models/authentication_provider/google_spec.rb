@@ -113,7 +113,7 @@ describe AuthenticationProvider::Google do
       keypair = OpenSSL::PKey::RSA.new(2048)
       jwk = JSON::JWK.new(keypair.public_key)
 
-      allow(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double("Net::HTTPOK", body: [jwk].to_json))
+      allow(CanvasHttp).to receive(:get).with("http://jwks").and_return(instance_double(Net::HTTPOK, body: [jwk].to_json))
 
       subject.save!
       expect(subject.jwks[jwk[:kid]]).to eq jwk.as_json

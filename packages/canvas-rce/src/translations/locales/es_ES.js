@@ -104,6 +104,7 @@ const locale = {
     "message": "Hay contenido guardado automáticamente. ¿Quieres cargar el contenido guardado automáticamente?"
   },
   "available_folders_694d0436": { "message": "Carpetas disponibles" },
+  "background_1bc88842": { "message": "Fondo" },
   "backslash_b2d5442d": { "message": "Barra invertida" },
   "bar_ec63ed6": { "message": "Barra" },
   "basic_554cdc0a": { "message": "Básico" },
@@ -114,6 +115,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Coeficiente binomial" },
   "black_4cb01371": { "message": "Negro" },
   "blue_daf8fea9": { "message": "Azul" },
+  "border_5b08b06d": { "message": "Borde" },
   "bottom_15a2a9be": { "message": "Botón" },
   "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
   "bowtie_5f9629e4": { "message": "Lacito" },
@@ -195,10 +197,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Colapsar para ocultar { types }"
   },
+  "color_a363e1b0": { "message": "Color" },
+  "color_contrast_4c418add": { "message": "Contraste de color" },
+  "color_contrast_ratio_687782f0": { "message": "Ratio de contraste de color" },
   "color_picker_6b359edf": { "message": "Selector de color" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Selector de color ({ colorName } seleccionado)"
   },
+  "color_popup_af39810f": { "message": "Ventana emergente de color" },
   "column_e1ae5c64": { "message": "Columna" },
   "column_group_1c062368": { "message": "Grupo de columnas" },
   "complex_numbers_a543d004": { "message": "Números complejos" },
@@ -386,6 +392,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "Extra pequeño" },
   "extracurricular_icon_67c8ca42": { "message": "Icono extracurricular" },
   "f_function_fe422d65": { "message": "F (función)" },
+  "fail_544e5dde": { "message": "SUSPENDIDO" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Ha habido un error al obtener el contenido"
   },
@@ -443,6 +450,7 @@ const locale = {
     "message": "Ir a la barra de herramientas del editor"
   },
   "grades_a61eba0a": { "message": "Notas" },
+  "graphics_text_bc9568bc": { "message": "Texto de los gráficos" },
   "greater_than_e98af662": { "message": "Mayor que " },
   "greater_than_or_equal_b911949a": { "message": "Mayor o igual que" },
   "greek_65c5b3f7": { "message": "Griego" },
@@ -548,6 +556,14 @@ const locale = {
   "indigo_2035fc55": { "message": "Índigo" },
   "inference_fed5c960": { "message": "Inferencia" },
   "infinity_7a10f206": { "message": "Infinito" },
+  "input_field_for_alpha_678265fd": {
+    "message": "Campo de entrada para canal alfa"
+  },
+  "input_field_for_blue_561e020a": { "message": "Campo de entrada para azul" },
+  "input_field_for_green_67f8b2b6": {
+    "message": "Campo de entrada para verde"
+  },
+  "input_field_for_red_86a84615": { "message": "Campo de entrada para rojo" },
   "insert_593145ef": { "message": "Insertar" },
   "insert_link_6dc23cae": { "message": "Insertar enlace" },
   "insert_math_equation_57c6e767": {
@@ -571,6 +587,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Icono plástica e idiomas" },
   "languages_icon_9d20539": { "message": "Icono idiomas" },
   "large_9c5e80e7": { "message": "Grande" },
+  "large_text_e7ba08cd": { "message": "Texto grande" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Más información sobre enlaces adyacentes"
   },
@@ -773,6 +790,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "No hay vídeo" },
   "none_3b5e34d2": { "message": "Ninguno" },
   "none_selected_b93d56d2": { "message": "Ninguna seleccionada" },
+  "normal_text_7b03da48": { "message": "Texto normal" },
   "not_equal_6e2980e6": { "message": "No es igual" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "No en (No un elemento de)"
@@ -812,9 +830,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Color de contorno" },
   "outline_size_a6059a21": { "message": "Tamaño de contorno" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } no es un protocolo válido, que debe ser ftp, http, https, mailto, skype, tel, o puede omitirse"
-  },
   "page_50c4823d": { "message": "Página" },
   "pages_e5414c2c": { "message": "Páginas" },
   "paragraph_5e5ad8eb": { "message": "Párrafo" },
@@ -823,6 +838,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Paralelo" },
   "partial_derivative_4a9159df": { "message": "Parcial (Derivado)" },
+  "pass_1c19a2b3": { "message": "APROBADO" },
   "paste_5963d1c1": { "message": "Pegar" },
   "pause_12af3bb4": { "message": "Pausar" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
@@ -831,6 +847,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "El porcentaje debe ser un número"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "El porcentaje debe ser al menos el { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Icono plástica" },
   "perpendicular_7c48ede4": { "message": "Perpendicular" },
   "phi_4ac33b6d": { "message": "Fi" },
@@ -838,8 +857,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Icono educación física" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Variante)" },
+  "pick_a_color_557abfb0": { "message": "Elige un color" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Píxeles" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Los píxeles deben ser al menos { width } x { height } px"
+  },
   "play_1a47eaa7": { "message": "Reproducir" },
   "play_media_comment_35257210": {
     "message": "Reproducir comentario multimedia."
@@ -870,6 +893,9 @@ const locale = {
   "preview_inline_9787330": { "message": "Vista previa online" },
   "previous_bd2ac015": { "message": "Anterior" },
   "previous_findtext_8dfbfd30": { "message": "Anterior { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Colores elegidos previamente"
+  },
   "prime_917ea60e": { "message": "Primo" },
   "prime_numbers_13464f61": { "message": "Números primo" },
   "product_39cf144f": { "message": "Producto" },
@@ -1358,6 +1384,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Asistente de redacción" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Sí" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Estás en una paleta de colores. Para navegar hacia arriba, a la izquierda, hacia abajo o a la derecha por la paleta, utiliza los botones «W», «A», «S» y «D», respectivamente"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Estás en un control deslizante de colores. Para navegar hacia la izquierda o la derecha, utiliza los botones «A» y «D», respectivamente"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Estás en un control deslizante de canal alfa. Para navegar hacia la izquierda o la derecha, utiliza los botones «A» y «D», respectivamente"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Tienes cambios sin guardar en la bandeja del creador de iconos. ¿Quieres continuar sin guardar esos cambios?"
   },

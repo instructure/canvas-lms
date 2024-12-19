@@ -302,6 +302,10 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     nil
   end
 
+  def slo?
+    false
+  end
+
   def user_logout_redirect(controller, _current_user)
     controller.login_ldap_url unless controller.instance_variable_get(:@domain_root_account).auth_discovery_url
   end
@@ -316,7 +320,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     begin
       return errors unless (cert = internal_ca_cert)
 
-      time = Time.now
+      time = Time.zone.now
 
       errors << "certificate is not a CA" unless cert.extensions.map(&:to_h)&.any? { |e| e["critical"] && e["oid"] == "basicConstraints" && e["value"].include?("CA:TRUE") }
       errors << "certificate is expired or not yet valid" unless cert.not_before <= time && cert.not_after >= time

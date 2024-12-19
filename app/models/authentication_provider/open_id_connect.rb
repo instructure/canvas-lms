@@ -139,6 +139,10 @@ class AuthenticationProvider
       session[:oidc_id_token_sid] = id_token["sid"] if id_token["sid"]
     end
 
+    def slo?
+      end_session_endpoint.present?
+    end
+
     def user_logout_redirect(controller, _current_user)
       return super unless end_session_endpoint.present?
 
@@ -282,6 +286,24 @@ class AuthenticationProvider
       end
     end
 
+    def unverified_id_token(token)
+      jwt_string = token.options[:jwt_string] = token.params["id_token"] || token.token
+      debug_set(:id_token, jwt_string) if instance_debugging
+      id_token = {} if jwt_string.blank?
+
+      id_token ||= begin
+        ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
+      rescue ::Canvas::Security::InvalidToken, ::Canvas::Security::TokenExpired => e
+        Rails.logger.warn("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
+        raise OAuthValidationError, e.message
+      end
+
+      debug_set(:header, id_token.header.to_json) if instance_debugging
+      debug_set(:claims, id_token.to_json) if instance_debugging
+
+      id_token
+    end
+
     private
 
     def download_jwks(force: false)
@@ -350,18 +372,7 @@ class AuthenticationProvider
 
     def claims(token)
       token.options[:claims] ||= begin
-        jwt_string = token.options[:jwt_string] = token.params["id_token"] || token.token
-        debug_set(:id_token, jwt_string) if instance_debugging
-        id_token = {} if jwt_string.blank?
-
-        id_token ||= begin
-          ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
-        rescue ::Canvas::Security::InvalidToken, ::Canvas::Security::TokenExpired => e
-          Rails.logger.warn("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")
-          raise OAuthValidationError, e.message
-        end
-        debug_set(:header, id_token.header.to_json) if instance_debugging
-        debug_set(:claims, id_token.to_json) if instance_debugging
+        id_token = unverified_id_token(token)
 
         if self.class.always_validate? || account.feature_enabled?(:oidc_full_token_validation)
           unless (missing_claims = %w[aud iss iat exp nonce] - id_token.keys).empty?

@@ -38,7 +38,7 @@ describe QuizzesHelper do
       quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = "available"
       quiz.last_edited_at = 10.minutes.ago
-      quiz.published_at   = Time.now
+      quiz.published_at   = Time.zone.now
 
       allow(self).to receive(:can_publish).and_return(true)
       expect(needs_unpublished_warning?(quiz)).to be_falsey
@@ -55,7 +55,7 @@ describe QuizzesHelper do
     it "is true if quiz has unpublished changes" do
       quiz = Quizzes::Quiz.new(context: @course)
       quiz.workflow_state = "available"
-      quiz.last_edited_at = Time.now
+      quiz.last_edited_at = Time.zone.now
       quiz.published_at   = 10.minutes.ago
 
       allow(self).to receive(:can_publish).and_return(true)

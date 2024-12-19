@@ -70,7 +70,7 @@ class Canvadoc < ActiveRecord::Base
       # with by a user on this test cluster.  This will create the document on the configured
       # DocViewer test cluster for this region.
       region = ApplicationController.region
-      if (refresh_timestamp = Setting.get("last_data_refresh_time_#{region}", nil)) && updated_at < Time.parse(refresh_timestamp)
+      if (refresh_timestamp = Setting.get("last_data_refresh_time_#{region}", nil)) && updated_at < Time.zone.parse(refresh_timestamp)
         nil
       else
         self[:document_id]

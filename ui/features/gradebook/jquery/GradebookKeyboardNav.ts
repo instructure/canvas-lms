@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery-keycodes'
 import type GridSupport from '../react/default_gradebook/GradebookGrid/GridSupport/index'
@@ -29,7 +29,7 @@ type KeyBinding = {
 
 type Location = {region: string; cell?: any; row?: any; columnId?: string}
 
-const I18n = useI18nScope('gradebookGradebookKeyboardNav')
+const I18n = createI18nScope('gradebookGradebookKeyboardNav')
 
 type GradebookKeyboardNavOptions = {
   getColumnTypeForColumnId: (columnId: string) => string

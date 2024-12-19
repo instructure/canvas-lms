@@ -9,22 +9,29 @@ namespace :graphql do
       f.puts CanvasSchema.to_definition
     end
 
-    Rails.root.join("ui/shared/apollo/fragmentTypes.json").open("w") do |f|
-      types = CanvasSchema.execute(<<~GQL)
-        {
-          __schema {
-            types {
-              kind
+    types = CanvasSchema.execute(<<~GQL)
+      {
+        __schema {
+          types {
+            kind
+            name
+            possibleTypes {
               name
-              possibleTypes {
-                name
-              }
             }
           }
         }
-      GQL
-      types["data"]["__schema"]["types"].reject! { |t| t["possibleTypes"].nil? }
-      f.puts JSON.pretty_generate(types["data"])
+      }
+    GQL
+    types["data"]["__schema"]["types"].reject! { |t| t["possibleTypes"].nil? }
+
+    Rails.root.join("ui/shared/apollo-v3/possibleTypes.json").open("w") do |f|
+      possible_types = {}
+
+      types["data"]["__schema"]["types"].each do |type|
+        possible_types[type["name"]] = type["possibleTypes"].pluck("name")
+      end
+
+      f.puts JSON.pretty_generate(possible_types)
     end
   end
 

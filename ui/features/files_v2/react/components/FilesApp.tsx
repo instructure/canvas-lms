@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {Flex} from '@instructure/ui-flex'
@@ -29,23 +29,30 @@ import TopLevelButtons from './TopLevelButtons'
 import FileFolderTable from './FileFolderTable'
 
 import FilesUsageBar from './FilesUsageBar'
+import {useLoaderData} from 'react-router-dom'
+import {type Folder} from '../../interfaces/File'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface FilesAppProps {
   isUserContext: boolean
   size: 'small' | 'medium' | 'large'
-  folderId: string
 }
 
-const FilesApp = ({isUserContext, size, folderId}: FilesAppProps) => {
-  const contextType = filesEnv.contextType ?? ''
-  const contextId = filesEnv.contextId ?? ''
-
-  const canManageFilesForContext = (permission: string) => {
-    return filesEnv.userHasPermission({contextType, contextId}, permission) ?? false
+const FilesApp = ({isUserContext, size}: FilesAppProps) => {
+  const folders = useLoaderData() as Folder[] | null
+  if (!folders || folders.length === 0) {
+    showFlashError(I18n.t('Failed to retrieve folder information'))
+    return null
   }
-
+  const currentFolder = folders[folders.length - 1]
+  const folderId = currentFolder.id
+  const contextId = currentFolder.context_id
+  const contextType = currentFolder.context_type.toLowerCase()
+  const canManageFilesForContext = (permission: string) => {
+    return filesEnv.userHasPermission({contextType, contextId}, permission)
+  }
   const userCanAddFilesForContext = canManageFilesForContext('manage_files_add')
   const userCanEditFilesForContext = canManageFilesForContext('manage_files_edit')
   const userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
@@ -95,10 +102,9 @@ const FilesApp = ({isUserContext, size, folderId}: FilesAppProps) => {
 }
 interface ResponsiveFilesAppProps {
   contextAssetString: string
-  folderId: string
 }
 
-const ResponsiveFilesApp = ({contextAssetString, folderId}: ResponsiveFilesAppProps) => {
+const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
   const isUserContext = contextAssetString.startsWith('user_')
 
   return (
@@ -112,7 +118,6 @@ const ResponsiveFilesApp = ({contextAssetString, folderId}: ResponsiveFilesAppPr
         <FilesApp
           isUserContext={isUserContext}
           size={(matches?.[0] as 'small' | 'medium') || 'large'}
-          folderId={folderId}
         />
       )}
     />

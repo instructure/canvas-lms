@@ -33,12 +33,14 @@ const renderComponent = (overrideProps?: any) =>
       onCancel={onCancel}
       {...overrideProps}
       SubmitLabel={TextLabel}
+      CancelLabel={TextCancelLabel}
       SubmittingLabel={TextSubmittingLabel}
     />
   )
 
 const TextLabel = () => <Text>Add to Import Queue</Text>
 const TextSubmittingLabel = () => <Text>Submitting test</Text>
+const TextCancelLabel = () => <Text>Clear</Text>
 
 describe('CommonMigratorControls', () => {
   afterEach(() => jest.clearAllMocks())
@@ -190,6 +192,7 @@ describe('CommonMigratorControls', () => {
         fileUploadProgress={10}
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
+        CancelLabel={TextCancelLabel}
       />
     )
     expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
@@ -225,6 +228,7 @@ describe('CommonMigratorControls', () => {
         fileUploadProgress={10}
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
+        CancelLabel={TextCancelLabel}
       />
     )
     expect(getByRole('checkbox', {name: 'Import Blueprint Course settings'})).toBeDisabled()
@@ -257,8 +261,8 @@ describe('CommonMigratorControls', () => {
     const newEndDateInputSting = '2024-08-11T08:00:00+00:00'
     const newEndDateExpectedDate = 'Aug 11 at 8am'
 
-    const expectDateField = (label: string, value: string) => {
-      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    const expectDateField = (dataCid: string, value: string) => {
+      expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)
     }
 
     describe('when dates are not provided', () => {
@@ -276,19 +280,19 @@ describe('CommonMigratorControls', () => {
       })
 
       it('not fills the original beginning date', () => {
-        expectDateField('Select original beginning date', '')
+        expectDateField('old_start_date', '')
       })
 
       it('not fills the original end date', () => {
-        expectDateField('Select original end date', '')
+        expectDateField('old_end_date', '')
       })
 
       it('not fills the new beginning date', () => {
-        expectDateField('Select new beginning date', '')
+        expectDateField('new_start_date', '')
       })
 
       it('not fills the new end date', () => {
-        expectDateField('Select new end date', '')
+        expectDateField('new_end_date', '')
       })
     })
 
@@ -307,19 +311,19 @@ describe('CommonMigratorControls', () => {
       })
 
       it('not fills the original beginning date', () => {
-        expectDateField('Select original beginning date', oldStartDateExpectedDate)
+        expectDateField('old_start_date', oldStartDateExpectedDate)
       })
 
       it('not fills the original end date', () => {
-        expectDateField('Select original end date', oldEndDateExpectedDate)
+        expectDateField('old_end_date', oldEndDateExpectedDate)
       })
 
       it('not fills the new beginning date', () => {
-        expectDateField('Select new beginning date', newStartDateExpectedDate)
+        expectDateField('new_start_date', newStartDateExpectedDate)
       })
 
       it('not fills the new end date', () => {
-        expectDateField('Select new end date', newEndDateExpectedDate)
+        expectDateField('new_end_date', newEndDateExpectedDate)
       })
     })
   })

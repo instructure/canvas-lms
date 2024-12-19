@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class NoStrftime < Cop
+      class NoStrftime < Base
         # include RuboCop::Cop::FileMeta
         MSG = "Avoid using strftime. " \
               "Use format_date_for_view or format_time_for_view instead."

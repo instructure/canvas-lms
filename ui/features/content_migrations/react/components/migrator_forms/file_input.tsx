@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {IconUploadSolid} from '@instructure/ui-icons'
@@ -28,7 +28,7 @@ import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {FormLabel, RequiredFormLabel, ErrorFormMessage} from '@canvas/content-migrations'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type MigrationFileInputProps = {
   onChange: (file: File | null) => void

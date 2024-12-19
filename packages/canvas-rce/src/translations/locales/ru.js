@@ -100,6 +100,7 @@ const locale = {
     "message": "Существует сохраненное в автоматическом режиме содержимое. Вы хотите загрузить сохраненное в автоматическом режиме содержимое?"
   },
   "available_folders_694d0436": { "message": "Доступные папки" },
+  "background_1bc88842": { "message": "Исходные данные" },
   "backslash_b2d5442d": { "message": "Обратная косая черта" },
   "bar_ec63ed6": { "message": "Полоса" },
   "basic_554cdc0a": { "message": "Основной" },
@@ -110,6 +111,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Биноминальный коэффициент" },
   "black_4cb01371": { "message": "Черный" },
   "blue_daf8fea9": { "message": "Синий" },
+  "border_5b08b06d": { "message": "Граница" },
   "bottom_15a2a9be": { "message": "Низ" },
   "bottom_third_5f5fec1d": { "message": "Нижняя треть" },
   "bowtie_5f9629e4": { "message": "Галстук-бабочка" },
@@ -189,10 +191,16 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Свернуть, чтобы скрыть { types }"
   },
+  "color_a363e1b0": { "message": "Цвет" },
+  "color_contrast_4c418add": { "message": "Цветовой контраст" },
+  "color_contrast_ratio_687782f0": {
+    "message": "Коэффициент цветового контраста"
+  },
   "color_picker_6b359edf": { "message": "Селектор цвета" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Селектор цвета (выбрано { colorName })"
   },
+  "color_popup_af39810f": { "message": "Цветное всплывающее окно" },
   "column_e1ae5c64": { "message": "Колонка" },
   "column_group_1c062368": { "message": "Группа колонок" },
   "complex_numbers_a543d004": { "message": "Комплексные числа" },
@@ -382,6 +390,7 @@ const locale = {
     "message": "Значок факультативных дисциплин"
   },
   "f_function_fe422d65": { "message": "F (функция)" },
+  "fail_544e5dde": { "message": "СБОЙ" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Не удалось получить содержание файлов"
   },
@@ -443,6 +452,7 @@ const locale = {
     "message": "Перейти в панель инструментов редактора"
   },
   "grades_a61eba0a": { "message": "Оценки" },
+  "graphics_text_bc9568bc": { "message": "Графический текст" },
   "greater_than_e98af662": { "message": "Больше чем" },
   "greater_than_or_equal_b911949a": { "message": "Больше чем или равно" },
   "greek_65c5b3f7": { "message": "Греческий" },
@@ -544,6 +554,10 @@ const locale = {
   "indigo_2035fc55": { "message": "Индиго" },
   "inference_fed5c960": { "message": "Логическое рассуждение" },
   "infinity_7a10f206": { "message": "Бесконечность" },
+  "input_field_for_alpha_678265fd": { "message": "Поле ввода для Альфа" },
+  "input_field_for_blue_561e020a": { "message": "Поле ввода для синего" },
+  "input_field_for_green_67f8b2b6": { "message": "Поле ввода для зеленого" },
+  "input_field_for_red_86a84615": { "message": "Поле ввода для красного" },
   "insert_593145ef": { "message": "Вставить" },
   "insert_link_6dc23cae": { "message": "Вставить ссылку" },
   "insert_math_equation_57c6e767": {
@@ -567,6 +581,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Значок языковых дисциплин" },
   "languages_icon_9d20539": { "message": "Значок языков" },
   "large_9c5e80e7": { "message": "Большой" },
+  "large_text_e7ba08cd": { "message": "Большой текст" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Узнать больше о соседних ссылках"
   },
@@ -757,6 +772,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "Видео отсутствует" },
   "none_3b5e34d2": { "message": "Нет" },
   "none_selected_b93d56d2": { "message": "Нет выбранных элементов" },
+  "normal_text_7b03da48": { "message": "Обычный текст" },
   "not_equal_6e2980e6": { "message": "Не равно" },
   "not_in_not_an_element_of_fb1ffb54": { "message": "Не в (не элемент из)" },
   "not_negation_1418ebb8": { "message": "Нет (отрицание)" },
@@ -794,9 +810,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Цвет контура" },
   "outline_size_a6059a21": { "message": "Размер контура" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } — недействительный протокол. Это должен быть ftp, http, https, mailto, skype, tel или может не указываться"
-  },
   "page_50c4823d": { "message": "Страница" },
   "pages_e5414c2c": { "message": "Страницы" },
   "paragraph_5e5ad8eb": { "message": "Параграф" },
@@ -805,6 +818,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Параллельно" },
   "partial_derivative_4a9159df": { "message": "Элементарная (производная)" },
+  "pass_1c19a2b3": { "message": "ПРОЙДЕНО" },
   "paste_5963d1c1": { "message": "Вставить" },
   "pause_12af3bb4": { "message": "Пауза" },
   "pentagon_17d82ea3": { "message": "Пятиугольник" },
@@ -812,6 +826,9 @@ const locale = {
   "percentage_34ab7c2c": { "message": "Процент" },
   "percentage_must_be_a_number_8033c341": {
     "message": "Процентное значение должно быть указано в виде числа"
+  },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Процентное значение должно быть не ниже { percentage }%"
   },
   "performing_arts_icon_f3497486": {
     "message": "Значок исполнительских видов искусства"
@@ -822,8 +839,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Значок физкультуры" },
   "pi_dc4f0bd8": { "message": "Пи" },
   "pi_variant_10f5f520": { "message": "Пи (вариант)" },
+  "pick_a_color_557abfb0": { "message": "Выбрать цвет" },
   "pink_68ad45cb": { "message": "Розовый" },
   "pixels_52ece7d1": { "message": "Пиксели" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Плотность пикселей должна быть минимум { width } x { height }"
+  },
   "play_1a47eaa7": { "message": "Воспроизвести" },
   "play_media_comment_35257210": {
     "message": "Воспроизведение мультимедийного комментария."
@@ -858,6 +879,7 @@ const locale = {
   },
   "previous_bd2ac015": { "message": "Предыдущий" },
   "previous_findtext_8dfbfd30": { "message": "Предыдущий { findText }" },
+  "previously_chosen_colors_f1338315": { "message": "Ранее выбранные цвета" },
   "prime_917ea60e": { "message": "Знак штриха" },
   "prime_numbers_13464f61": { "message": "Простые числа" },
   "product_39cf144f": { "message": "Продукт" },
@@ -1342,6 +1364,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Помощник по написанию текстов" },
   "xi_149681d0": { "message": "Кси" },
   "yes_dde87d5": { "message": "Да" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Вы находитесь в цветовой палитре. Для перемещения по палитре вверх, влево, вниз или вправо используются кнопки «W», «A», «S» и «D» соответственно."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Вы находитесь на ползунке настройки цвета. Для перемещения ползунка влево или вправо используются кнопки «A» и «D» соответственно."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Вы находитесь на ползунке Альфа. Для перемещения ползунка влево или вправо используются кнопки «A» и «D» соответственно."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "У вас есть несохраненные изменения в лотке Средства создания значков. Вы хотите продолжить без сохранения этих изменений?"
   },

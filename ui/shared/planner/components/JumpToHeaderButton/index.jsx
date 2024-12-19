@@ -18,10 +18,10 @@
 
 import React, {PureComponent} from 'react'
 import {Button} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {WEEKLY_PLANNER_ACTIVE_BTN_ID} from '../WeeklyPlannerHeader'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const WEEKLY_PLANNER_JUMP_TO_NAV_BUTTON = 'jump-to-weekly-nav-button'
 

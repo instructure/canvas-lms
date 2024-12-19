@@ -19,10 +19,10 @@
 import React, {type ReactElement} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 
-const I18n = useI18nScope('modal')
+const I18n = createI18nScope('modal')
 
 /*
 ---

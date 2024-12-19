@@ -45,12 +45,12 @@ describe('UnpublishedChangesIndicator', () => {
     ).toBeInTheDocument()
     expect(
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={1} />).getByText(
-        '1 unpublished change'
+        '1 unsaved change'
       )
     ).toBeInTheDocument()
     expect(
       render(<UnpublishedChangesIndicator {...defaultProps} changeCount={2500} />).getByText(
-        '2,500 unpublished changes'
+        '2,500 unsaved changes'
       )
     ).toBeInTheDocument()
   })
@@ -60,11 +60,11 @@ describe('UnpublishedChangesIndicator', () => {
     beforeEach(() => (onClick = jest.fn()))
 
     it('is called when clicked if there are pending changes', async () => {
-      const {getByRole} = render(
+      const {getByText} = render(
         <UnpublishedChangesIndicator {...defaultProps} changeCount={3} onClick={onClick} />
       )
 
-      await userEvent.click(getByRole('button', {name: '3 unpublished changes'}))
+      await userEvent.click(getByText('3 unsaved changes'))
       expect(onClick).toHaveBeenCalled()
     })
 
@@ -120,9 +120,9 @@ describe('UnpublishedChangesIndicator', () => {
       window.ENV.FEATURES.course_paces_redesign = true
     })
 
-    it('renders "No pending changes to apply" text', () => {
+    it('renders "No pending changes" text', () => {
       const {getByText} = render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />)
-      expect(getByText('No pending changes to apply')).toBeInTheDocument()
+      expect(getByText('No pending changes')).toBeInTheDocument()
     })
   })
 })

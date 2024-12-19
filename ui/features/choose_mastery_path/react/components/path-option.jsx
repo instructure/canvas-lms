@@ -19,12 +19,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Assignment from './assignment'
 import SelectButton from './select-button'
 import assignmentShape from '../shapes/assignment-shape'
 
-const I18n = useI18nScope('choose_mastery_path')
+const I18n = createI18nScope('choose_mastery_path')
 
 const {func, number, arrayOf} = PropTypes
 
@@ -67,7 +67,7 @@ export default class PathOption extends React.Component {
           </div>
           <ul className="ig-list">
             {this.props.assignments.map((assg, i) => (
-              // eslint-disable-next-line react/no-array-index-key
+               
               <Assignment key={i} assignment={assg} isSelected={selected} />
             ))}
           </ul>

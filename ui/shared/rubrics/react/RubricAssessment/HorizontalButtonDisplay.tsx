@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import type {RubricRating} from '../types/rubric'
 import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
@@ -25,28 +25,41 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {possibleString, possibleStringRange} from '../Points'
+import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton';
 
 const {shamrock} = colors
 
 type HorizontalButtonDisplayProps = {
   isPreviewMode: boolean
+  isSelfAssessment: boolean
   ratings: RubricRating[]
   ratingOrder: string
   selectedRatingId?: string
   onSelectRating: (rating: RubricRating) => void
   criterionUseRange: boolean
+  shouldFocusFirstRating?: boolean
 }
 export const HorizontalButtonDisplay = ({
   isPreviewMode,
   ratings,
+  isSelfAssessment,
   ratingOrder,
   selectedRatingId,
   onSelectRating,
   criterionUseRange,
+  shouldFocusFirstRating = false,
 }: HorizontalButtonDisplayProps) => {
+  const firstRatingRef = useRef<Element | null>(null)
   const selectedRating = ratings.find(rating => rating.id && rating.id === selectedRatingId)
   const selectedRatingIndex = selectedRating ? ratings.indexOf(selectedRating) : -1
   const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
+
+  useEffect(() => {
+    if (shouldFocusFirstRating && firstRatingRef.current) {
+      const button = firstRatingRef.current.getElementsByTagName('button')[0]
+      button?.focus()
+    }
+  }, [shouldFocusFirstRating])
 
   const getPossibleText = (points?: number) => {
     return min != null ? possibleStringRange(min, points) : possibleString(points)
@@ -58,7 +71,7 @@ export const HorizontalButtonDisplay = ({
         <View
           as="div"
           borderColor="brand"
-          borderWidth="medium"
+          borderWidth={isSelfAssessment ? 'small' : 'medium'}
           borderRadius="medium"
           padding="xx-small"
           margin="0 xx-small small xx-small"
@@ -96,14 +109,29 @@ export const HorizontalButtonDisplay = ({
               key={`${rating.id}-${buttonDisplay}`}
               data-testid={`rating-button-${rating.id}-${index}`}
               aria-label={buttonAriaLabel}
+              elementRef={ref => {
+                if (index === 0) {
+                  firstRatingRef.current = ref
+                }
+              }}
             >
-              <RatingButton
-                buttonDisplay={buttonDisplay}
-                isSelected={selectedRatingIndex === index}
-                isPreviewMode={isPreviewMode}
-                selectedArrowDirection="up"
-                onClick={() => onSelectRating(rating)}
-              />
+              {isSelfAssessment ? (
+                <SelfAssessmentRatingButton
+                  buttonDisplay={buttonDisplay}
+                  isSelected={selectedRatingIndex === index}
+                  isPreviewMode={isPreviewMode}
+                  onClick={() => onSelectRating(rating)}
+                />
+              ) : (
+                <RatingButton
+                  buttonDisplay={buttonDisplay}
+                  isSelected={selectedRatingIndex === index}
+                  isPreviewMode={isPreviewMode}
+                  selectedArrowDirection="up"
+                  onClick={() => onSelectRating(rating)}
+                />
+              )}
+
             </Flex.Item>
           )
         })}

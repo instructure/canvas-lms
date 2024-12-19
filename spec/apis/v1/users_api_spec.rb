@@ -1580,7 +1580,7 @@ describe "Users API", type: :request do
         communication_channel = user.communication_channels.email.first
         expect(communication_channel).not_to be_nil
         # create presenter with a mock request
-        request = instance_double("ActionDispatch::Request", host_with_port: "example.com")
+        request = instance_double(ActionDispatch::Request, host_with_port: "example.com")
         presenter = CommunicationChannelPresenter.new(communication_channel, request)
 
         expect(user.name).to eql "Test User"
@@ -2028,7 +2028,7 @@ describe "Users API", type: :request do
 
     context "an admin user" do
       it "is able to update a user" do
-        birthday = Time.now
+        birthday = Time.zone.now
         json = api_call(:put, @path, @path_options, {
                           user: {
                             name: "Tobias Funke",

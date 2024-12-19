@@ -497,7 +497,7 @@ class DiscussionTopicsController < ApplicationController
     root_topic_id = params[:root_discussion_topic_id]
 
     root_topic_id && @context.respond_to?(:context) &&
-      @context.context && @context.context.discussion_topics.find(root_topic_id)
+      @context.context&.discussion_topics&.find(root_topic_id)
   end
 
   def announcements_locked?
@@ -796,7 +796,7 @@ class DiscussionTopicsController < ApplicationController
 
         entry = entry.highest_level_parent_or_self
         sort_order = @topic.participant(current_user: @current_user).sort_order
-        condition = (sort_order == DiscussionTopicParticipant::SortOrder::DESC) ? ">=" : "<="
+        condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">=" : "<="
         count_before = @topic.root_discussion_entries
                              .where(parent_id: nil)
                              .where("created_at #{condition}?", entry.created_at).count
@@ -872,6 +872,7 @@ class DiscussionTopicsController < ApplicationController
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
                discussion_translation_available: Translation.available?(@context, :translation), # Is translation enabled on the course.
+               ai_translation_improvements: @domain_root_account.feature_enabled?(:translate_inbox_messages),
                discussion_translation_languages: Translation.available?(@context, :translation) ? Translation.translated_languages(@current_user) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),

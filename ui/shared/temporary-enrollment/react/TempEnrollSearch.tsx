@@ -18,7 +18,7 @@
 
 import type {ChangeEvent} from 'react'
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -36,7 +36,7 @@ import {TempEnrollSearchConfirmation} from './TempEnrollSearchConfirmation'
 
 declare const ENV: GlobalEnv
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)

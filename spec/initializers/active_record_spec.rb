@@ -236,7 +236,7 @@ module ActiveRecord
           "user_id" => -1,
           "pseudonym_id" => -1,
           "event_type" => "login",
-          "created_at" => DateTime.now.utc
+          "created_at" => Time.zone.now.utc
         }
         expect do
           Auditors::ActiveRecord::AuthenticationRecord.bulk_insert([attrs])
@@ -253,7 +253,7 @@ module ActiveRecord
           "user_id" => user.id,
           "pseudonym_id" => pseud.id,
           "event_type" => "login",
-          "created_at" => DateTime.now.utc
+          "created_at" => Time.zone.now.utc
         }
         attrs_2 = attrs_1.merge({
                                   "created_at" => 1.month.from_now
@@ -488,22 +488,6 @@ module ActiveRecord
   end
 
   describe Relation do
-    describe "lock_with_exclusive_smarts" do
-      let(:scope) { User.active }
-
-      it "uses FOR UPDATE on a normal exclusive lock" do
-        expect(scope.lock(true).lock_value).to eq "FOR UPDATE"
-      end
-
-      it "substitutes 'FOR NO KEY UPDATE' if specified" do
-        expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
-      end
-
-      it "substitutes 'FOR NO KEY UPDATE SKIP LOCKED' if specified" do
-        expect(scope.lock(:no_key_update_skip_locked).lock_value).to eq "FOR NO KEY UPDATE SKIP LOCKED"
-      end
-    end
-
     describe "union" do
       shared_examples_for "query creation" do
         it "includes conditions after the union inside of the subquery" do
@@ -599,7 +583,7 @@ module ActiveRecord
       it "uses 'SKIP LOCKED' lock" do
         Timecop.freeze do
           now = Time.now.utc
-          expect(@relation).to receive(:update_all_locked_in_order).with("updated_at" => now, :lock_type => :no_key_update_skip_locked)
+          expect(@relation).to receive(:update_all_locked_in_order).with("updated_at" => now, :lock_type => "FOR NO KEY UPDATE SKIP LOCKED")
           @relation.touch_all_skip_locked
         end
       end

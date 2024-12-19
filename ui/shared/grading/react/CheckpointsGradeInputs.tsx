@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import DefaultGradeInput from '@canvas/grading/react/DefaultGradeInput'
 import type {GradingType} from '../../../api'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 // The following are lean types to be used in this file only, to be TypeScript compliant
 export type AssignmentCheckpoint = {
@@ -41,7 +41,7 @@ type Props = {
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 
-const I18n = useI18nScope('sharedSetDefaultGradeDialog')
+const I18n = createI18nScope('sharedSetDefaultGradeDialog')
 
 export default function CheckpointsGradeInputs({assignment}: Props) {
   return (

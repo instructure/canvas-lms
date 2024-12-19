@@ -42,7 +42,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
   def set_completed_at
     if completed?
-      self.completed_at ||= Time.now
+      self.completed_at ||= Time.zone.now
     else
       self.completed_at = nil
     end
@@ -504,6 +504,7 @@ class ContextModuleProgression < ActiveRecord::Base
       .readonly(false)
       .where(context_modules: { context_type: "Course", context_id: course_id })
   }
+  scope :compleleted, -> { where(workflow_state: "completed") }
 
   workflow do
     state :locked

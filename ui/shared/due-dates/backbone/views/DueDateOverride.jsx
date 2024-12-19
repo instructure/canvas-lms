@@ -24,7 +24,7 @@ import ReactDOM from 'react-dom'
 import DueDateOverride from '@canvas/assignments/jst/DueDateOverride.handlebars'
 import DateValidator from '@canvas/grading/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
@@ -36,7 +36,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
 import {showPostToSisFlashAlert, combinedDates} from '../../util/differentiatedModulesUtil'
 
-const I18n = useI18nScope('DueDateOverrideView')
+const I18n = createI18nScope('DueDateOverrideView')
 
 const indexOf = [].indexOf
 const hasProp = {}.hasOwnProperty
@@ -76,7 +76,7 @@ DueDateOverrideView.prototype.render = function () {
     return
   }
   if (this.options && this.options.inPacedCourse && this.options.isModuleItem) {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render(
       React.createElement(CoursePacingNotice, {
         courseId: this.options.courseId,
@@ -165,7 +165,7 @@ DueDateOverrideView.prototype.render = function () {
         defaultDueTime: ENV.DEFAULT_DUE_TIME,
       })
 
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(assignToSection, div, () => {
     // Run this function until the focus is performed after all re-renders
     // Needs to be wrapped in a setTimeout since there are some internal
@@ -293,7 +293,7 @@ DueDateOverrideView.prototype.validateDatetimes = function (data, errors) {
       continue
     }
     rowErrors = dateValidator.validateDatetimes(override)
-    // eslint-disable-next-line no-loop-func
+     
     Object.keys(rowErrors).forEach(function (key) {
       return (rowErrors[key] = {
         message: rowErrors[key],

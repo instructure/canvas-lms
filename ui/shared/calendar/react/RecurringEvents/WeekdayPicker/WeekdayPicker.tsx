@@ -24,17 +24,19 @@
  * and are sorted in the order of the locale's first day of week.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState, useMemo} from 'react'
 import moment from 'moment'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Alert} from '@instructure/ui-alerts'
 
 import type {RRULEDayValue, SelectedDaysArray} from '../types'
 
-const I18n = useScope('calendar_custom_recurring_event_weekday_picker')
+const I18n = createI18nScope('calendar_custom_recurring_event_weekday_picker')
 
 export type WeekArray = [string, string, string, string, string, string, string]
 export type WeekDaysSpec = {
@@ -54,6 +56,7 @@ export type WeekdayPickerProps = {
 const defaultWeekDayAbbreviations = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 
 export default function WeekdayPicker({locale, selectedDays = [], onChange}: WeekdayPickerProps) {
+  const [showError, setShowError] = useState(selectedDays.length === 0)
   const [weekDays, setWeekDays] = useState<WeekDaysSpec>({
     dayNames: [
       I18n.t('Sunday'),
@@ -110,6 +113,7 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
       const sortedDays = newDays.sort(
         (a, b) => weekDays.dayRRULEValues.indexOf(a) - weekDays.dayRRULEValues.indexOf(b)
       )
+      setShowError(sortedDays.length === 0)
       onChange(sortedDays)
     },
     [onChange, selectedDays, weekDays.dayRRULEValues]
@@ -121,8 +125,48 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
     gap: '.5rem',
   }
 
+  const alertStyle = {
+    padding: '0 0.375rem 0 0',
+    verticalAlign: 'bottom',
+  }
+
+  const description = useMemo(
+    () =>
+      showError ? (
+        <>
+          {I18n.t('Repeats on:')}
+          <Text color="danger">*</Text>
+        </>
+      ) : (
+        <>
+          {I18n.t('Repeats on:')}
+          <span aria-hidden="true">*</span>
+        </>
+      ),
+    [showError]
+  )
+
   return (
-    <FormFieldGroup description={I18n.t('Repeats on:')} layout="columns">
+    <FormFieldGroup description={description} layout="stacked">
+      {showError && (
+        <View width="100%" display="block">
+          <Text color="danger">
+            <span style={alertStyle}>
+              <IconWarningSolid size="x-small" color="error" />
+            </span>
+            {I18n.t('Please select at least one option')}
+          </Text>
+          <Alert
+            variant="error"
+            screenReaderOnly={true}
+            liveRegionPoliteness="assertive"
+            isLiveRegionAtomic={true}
+            liveRegion={() => document.getElementById('flash_screenreader_holder') as HTMLElement}
+          >
+            {I18n.t('Please select at least one option')}
+          </Alert>
+        </View>
+      )}
       <div style={flexStyle}>
         {weekDays.dayRRULEValues.map((d, i) => {
           const checked = selectedDays.includes(d as RRULEDayValue)

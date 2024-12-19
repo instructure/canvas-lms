@@ -23,7 +23,7 @@ import type {
   CamelizedGradingPeriodSet,
   SubmissionGradeCriteria,
 } from '@canvas/grading/grading.d'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import * as tz from '@instructure/moment-utils'
 import userSettings from '@canvas/user-settings'
@@ -46,33 +46,13 @@ import type {
   SubmissionGradeChange,
 } from '../types'
 import type {GradingPeriodSet, Submission, WorkflowState} from '../../../api.d'
-import DateHelper from '@canvas/datetime/dateHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {scopeToUser, updateWithSubmissions} from '@canvas/grading/EffectiveDueDates'
 import {scoreToGrade, type GradingStandard} from '@instructure/grading-utils'
 import {divide, toNumber} from '@canvas/grading/GradeCalculationHelper'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../react/components/GradingResults'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
-
-export const passFailStatusOptions = [
-  {
-    label: I18n.t('Ungraded'),
-    value: ' ',
-  },
-  {
-    label: I18n.t('Complete'),
-    value: 'complete',
-  },
-  {
-    label: I18n.t('Incomplete'),
-    value: 'incomplete',
-  },
-  {
-    label: I18n.t('Excused'),
-    value: 'EX',
-  },
-]
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export function mapAssignmentGroupQueryResults(
   assignmentGroup: AssignmentGroupConnection[],
@@ -262,50 +242,6 @@ export function mapUnderscoreSubmission(submission: Submission): GradebookUserSu
           excused: subAssignmentSubmission.excused,
         }))
       : undefined,
-  }
-}
-
-export function submitterPreviewText(submission: GradebookUserSubmissionDetails): string {
-  if (!submission.submissionType) {
-    return I18n.t('Has not submitted')
-  }
-  const formattedDate = DateHelper.formatDatetimeForDisplay(submission.submittedAt)
-  if (submission.proxySubmitter) {
-    return I18n.t('Submitted by %{proxy} on %{date}', {
-      proxy: submission.proxySubmitter,
-      date: formattedDate,
-    })
-  }
-  return I18n.t('Submitted on %{date}', {date: formattedDate})
-}
-
-export function outOfText(
-  assignment: AssignmentConnection,
-  submission: GradebookUserSubmissionDetails,
-  pointsBasedGradingScheme: boolean
-): string {
-  const {gradingType, pointsPossible} = assignment
-
-  if (submission.excused) {
-    return I18n.t('Excused')
-  } else if (gradingType === 'gpa_scale') {
-    return ''
-  } else if (gradingType === 'letter_grade' || gradingType === 'pass_fail') {
-    if (pointsBasedGradingScheme) {
-      return I18n.t('(%{score} out of %{points})', {
-        points: I18n.n(pointsPossible, {precision: 2}),
-        score: I18n.n(submission.enteredScore, {precision: 2}) ?? ' -',
-      })
-    } else {
-      return I18n.t('(%{score} out of %{points})', {
-        points: I18n.n(pointsPossible),
-        score: submission.enteredScore ?? ' -',
-      })
-    }
-  } else if (pointsPossible === null || pointsPossible === undefined) {
-    return I18n.t('No points possible')
-  } else {
-    return I18n.t('(out of %{points})', {points: I18n.n(pointsPossible)})
   }
 }
 
@@ -539,32 +475,4 @@ function mapToSortableAssignment(
 
 export function isInPastGradingPeriodAndNotAdmin(assignment: AssignmentConnection): boolean {
   return (assignment.inClosedGradingPeriod ?? false) && !ENV.current_user_is_admin
-}
-
-export function disableGrading(
-  assignment: AssignmentConnection,
-  submitScoreStatus?: ApiCallStatus
-): boolean {
-  return (
-    submitScoreStatus === ApiCallStatus.PENDING ||
-    isInPastGradingPeriodAndNotAdmin(assignment) ||
-    (assignment.moderatedGrading && !assignment.gradesPublished)
-  )
-}
-
-export function assignmentHasCheckpoints(assignment: AssignmentConnection): boolean {
-  return (assignment.checkpoints?.length ?? 0) > 0
-}
-
-export const getCorrectSubmission = (
-  submission?: GradebookUserSubmissionDetails,
-  subAssignmentTag?: string | null
-) => {
-  if (subAssignmentTag === REPLY_TO_TOPIC || subAssignmentTag === REPLY_TO_ENTRY) {
-    return submission?.subAssignmentSubmissions?.find(
-      subSubmission => subSubmission.subAssignmentTag === subAssignmentTag
-    )
-  }
-
-  return submission
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {arrayOf, bool, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {ExternalTool} from './ExternalTool'
 import {MediaObject} from './MediaObject'
 import {SubmissionDraftFile} from './File'

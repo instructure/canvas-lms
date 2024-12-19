@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getEnrollmentLabel, renderCell} from './StudentCellFormatter.utils'
 import type Gradebook from '../../Gradebook'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export default class StudentFirstNameCellFormatter {
   options: {

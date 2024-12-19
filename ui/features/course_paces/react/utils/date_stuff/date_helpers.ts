@@ -21,9 +21,9 @@ import moment from 'moment-timezone'
 import type {BlackoutDate} from '../../shared/types'
 import {weekendIntegers} from '../../shared/api/backend_serializer'
 import * as tz from '@instructure/moment-utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_paces_app')
+const I18n = createI18nScope('course_paces_app')
 
 /*
  * Any date manipulation should be consolidated into helper functions in this file
@@ -44,6 +44,7 @@ export const daysBetween = (
   start: string | moment.Moment,
   end: string | moment.Moment,
   excludeWeekends: boolean,
+  selectedDaysToSkip: string[],
   blackoutDates: BlackoutDate[] = [],
   inclusiveEnd = true
 ): number => {
@@ -67,7 +68,7 @@ export const daysBetween = (
   let count = 0
 
   for (let i = 0; i < Math.abs(fullDiff); i++) {
-    if (!dayIsDisabled(countingDate, excludeWeekends, blackoutDates)) {
+    if (!dayIsDisabled(countingDate, excludeWeekends, selectedDaysToSkip, blackoutDates)) {
       count = sign === 'plus' ? count + 1 : count - 1
     }
     countingDate.add(1, 'day')
@@ -83,18 +84,19 @@ export const addDays = (
   start: string | moment.Moment,
   numberOfDays: number,
   excludeWeekends: boolean,
+  selectedDaysToSkip: string[] = [],
   blackoutDates: BlackoutDate[] = []
 ): string => {
   const date = moment(start)
 
-  while (dayIsDisabled(date, excludeWeekends, blackoutDates)) {
+  while (dayIsDisabled(date, excludeWeekends, selectedDaysToSkip, blackoutDates)) {
     date.add(1, 'day')
   }
 
   while (numberOfDays > 0) {
     date.add(1, 'days')
 
-    if (!dayIsDisabled(date, excludeWeekends, blackoutDates)) {
+    if (!dayIsDisabled(date, excludeWeekends, selectedDaysToSkip, blackoutDates)) {
       numberOfDays--
     }
   }
@@ -130,8 +132,16 @@ export const inBlackoutDate = (
 const dayIsDisabled = (
   date: moment.Moment,
   excludeWeekends: boolean,
+  selectedDaysToSkip: string[],
   blackoutDates: BlackoutDate[]
 ) => {
+  if (window.ENV.FEATURES.course_paces_skip_selected_days) {
+    return (
+      selectedDaysToSkip.includes(date.format('ddd').toLowerCase()) ||
+      inBlackoutDate(date, blackoutDates)
+    )
+  }
+
   return (
     (excludeWeekends && weekendIntegers.includes(date.weekday())) ||
     inBlackoutDate(date, blackoutDates)

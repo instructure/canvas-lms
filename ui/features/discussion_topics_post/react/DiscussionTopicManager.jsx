@@ -17,9 +17,7 @@
  */
 
 import {DISCUSSION_QUERY} from '../graphql/Queries'
-import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
-import {DiscussionTopicHeaderContainer} from './containers/DiscussionTopicHeaderContainer/DiscussionTopicHeaderContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -33,11 +31,11 @@ import {
   REPLY_TO_ENTRY,
   isSpeedGraderInTopUrl,
 } from './utils/constants'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef, useState, useCallback} from 'react'
-import {useQuery} from '@apollo/react-hooks'
+import React, {useEffect, useRef, useState} from 'react'
+import {useQuery} from '@apollo/client'
 import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 import {DrawerLayout} from '@instructure/ui-drawer-layout'
 import {Mask} from '@instructure/ui-overlays'
@@ -49,8 +47,9 @@ import {captureException} from '@sentry/react'
 import {LoadingSpinner} from './components/LoadingSpinner/LoadingSpinner'
 import useNavigateEntries from './hooks/useNavigateEntries'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import DiscussionTopicToolbarContainer from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -156,7 +155,6 @@ const DiscussionTopicManager = props => {
     setIsSummaryEnabled,
   }
 
-  const isModuleItem = ENV.SEQUENCE != null
   const urlParams = new URLSearchParams(window.location.search)
   const isPersistEnabled = urlParams.get('persist') === '1'
 
@@ -390,7 +388,6 @@ const DiscussionTopicManager = props => {
             mobile: {
               viewPortWidth: '100vw',
               padding: 'medium x-small 0',
-              isMobile: true,
             },
             desktop: {
               viewPortWidth: '480px',
@@ -415,15 +412,11 @@ const DiscussionTopicManager = props => {
                 >
                   <View
                     display="block"
-                    {...(!responsiveProps.isMobile && {height: isModuleItem ? '85vh' : '90vh'})}
                     padding={responsiveProps.padding}
                     overflowX="auto"
                     overflowY="auto"
+                    id="module_sequence_footer_container"
                   >
-                    <DiscussionTopicHeaderContainer
-                      discussionTopicTitle={discussionTopicQuery.data.legacyNode.title}
-                      mobileHeader={!props.breakpoints.ICEDesktop}
-                    />
                     <DiscussionTopicToolbarContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}
                       setUserSplitScreenPreference={setUserSplitScreenPreference}
@@ -431,6 +424,7 @@ const DiscussionTopicManager = props => {
                       setIsSummaryEnabled={setIsSummaryEnabled}
                       isSummaryEnabled={isSummaryEnabled}
                       closeView={closeView}
+                      breakpoints={props.breakpoints}
                     />
                     <DiscussionTopicContainer
                       discussionTopic={discussionTopicQuery.data.legacyNode}

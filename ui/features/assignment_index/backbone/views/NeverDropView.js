@@ -19,10 +19,10 @@
 import {extend} from '@canvas/backbone/utils'
 import {defer} from 'lodash'
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import neverDropTemplate from '../../jst/NeverDrop.handlebars'
 
-const I18n = useI18nScope('assignmentsNeverDrop')
+const I18n = createI18nScope('assignmentsNeverDrop')
 
 extend(NeverDrop, Backbone.View)
 

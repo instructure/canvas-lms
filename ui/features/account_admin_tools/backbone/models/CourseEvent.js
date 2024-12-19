@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Backbone from '@canvas/backbone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_logging')
+const I18n = createI18nScope('course_logging')
 
 const last = obj => obj.at(-1)
 const notEmpty = obj => Object.keys(obj).length > 0

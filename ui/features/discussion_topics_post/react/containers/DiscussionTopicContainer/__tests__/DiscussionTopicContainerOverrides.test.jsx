@@ -19,7 +19,7 @@
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 
 jest.mock('../../../utils', () => ({

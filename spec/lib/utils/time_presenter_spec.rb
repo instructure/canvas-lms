@@ -43,7 +43,7 @@ module Utils
 
       after { Time.zone = @zone }
 
-      let(:time) { Time.parse("2014-10-01 09:00") }
+      let(:time) { Time.zone.parse("2014-10-01 09:00") }
 
       def hour(t)
         t.hour.to_s.rjust(2)
@@ -67,7 +67,7 @@ module Utils
       end
 
       it "can present a range of times" do
-        time2 = Time.parse("2014-10-01 10:00")
+        time2 = Time.zone.parse("2014-10-01 10:00")
         presenter = TimePresenter.new(time)
         expect(presenter.as_string(display_as_range: time2)).to match(/[ap]m to.*[ap]m$/)
       end

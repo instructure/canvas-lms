@@ -137,7 +137,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
-    versions.limit(1)
+    versions.order(:number).last
   end
 
   def sanitize_responses
@@ -232,7 +232,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
        )",
-                 { time: Time.now }).to_a
+                 { time: Time.zone.now }).to_a
     resp.select!(&:needs_grading?)
     resp
   end
@@ -269,7 +269,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def finished_in_words
     extend ActionView::Helpers::DateHelper
-    started_at && finished_at && time_ago_in_words(Time.now - (finished_at - started_at))
+    started_at && finished_at && time_ago_in_words(Time.zone.now - (finished_at - started_at))
   end
 
   def finished_at_fallback
@@ -290,7 +290,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     params = sanitize_params(params)
 
     new_params = if !graded? && submission_data[:attempt] == attempt
-                   submission_data.deep_merge(params) rescue params
+                   submission_data.deep_merge(params)
                  else
                    params
                  end
@@ -456,7 +456,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
       @assignment_submission.quiz_submission_id = id
       @assignment_submission.graded_at = Time.zone.now
       @assignment_submission.grader_id = grader_id || "-#{quiz_id}".to_i
-      @assignment_submission.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{score}, time: #{Time.now}"
+      @assignment_submission.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{score}, time: #{Time.zone.now}"
       @assignment_submission.user_id = user_id
       @assignment_submission.submission_type = "online_quiz"
       @assignment_submission.saved_by = :quiz_submission
@@ -472,12 +472,12 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def scores_for_versions(exclude_version_id)
-    versions = self.versions.reload.reject { |v| v.id == exclude_version_id } rescue []
+    versions = self.versions.where.not(id: exclude_version_id)
     scores = {}
     scores[attempt] = score if score
 
     # only most recent version for each attempt - some have regraded a version
-    versions.sort_by(&:number).reverse_each do |ver|
+    versions.order(number: :desc).each do |ver|
       scores[ver.model.attempt] ||= ver.model.score || 0.0
     end
 
@@ -561,7 +561,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def less_than_allotted_time?
-    started_at && end_at && quiz && quiz.time_limit && (end_at - started_at) < quiz.time_limit.minutes.to_i
+    started_at && end_at && quiz&.time_limit && (end_at - started_at) < quiz.time_limit.minutes.to_i
   end
 
   def completed?
@@ -666,7 +666,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_submission_version(version, attrs)
     version_data = YAML.load(version.yaml)
     version_data["submission_data"] = submission_data if attrs.include?(:submission_data)
-    version_data["temporary_user_code"] = "was #{version_data["score"]} until #{Time.now}"
+    version_data["temporary_user_code"] = "was #{version_data["score"]} until #{Time.zone.now}"
     version_data["score"] = score if attrs.include?(:score)
     version_data["fudge_points"] = fudge_points if attrs.include?(:fudge_points)
     version_data["workflow_state"] = workflow_state if attrs.include?(:workflow_state)
@@ -734,7 +734,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         self.workflow_state = "pending_review" if question && question["question_type"] != "text_only_question"
       end
       res << answer
-      tally += answer["points"].to_f rescue 0
+      tally += answer["points"].to_f
     end
 
     # Graded surveys always get the full points
@@ -767,7 +767,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
         s.score = kept_score
         s.grade_change_event_author_id = params[:grader_id]
         s.grade_matches_current_submission = workflow_state != "pending_review" || attempt == 1
-        s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.now}"
+        s.body = "user: #{user_id}, quiz: #{quiz_id}, score: #{kept_score}, time: #{Time.zone.now}"
         s.saved_by = :quiz_submission
       end
     end
@@ -786,7 +786,9 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def duration
-    (finished_at || started_at) - started_at rescue 0
+    return 0 unless finished_at && started_at
+
+    finished_at - started_at
   end
 
   def time_spent

@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Color} from '@canvas/grading-status-list-item'
 import '@canvas/rails-flash-notifications'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -28,7 +28,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('calendar_color_picker')
+const I18n = createI18nScope('calendar_color_picker')
 
 const COLORS_PER_ROW = 5
 const DEFAULT_COLOR_PREVIEW = '#FFFFFF'

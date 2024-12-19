@@ -545,6 +545,8 @@ CanvasRails::Application.routes.draw do
   get "external_content/retrieve/oembed" => "external_content#oembed_retrieve", :as => :external_content_oembed_retrieve
   get "external_content/cancel/:service" => "external_content#cancel", :as => :external_content_cancel
 
+  get "deep_linking_cancel", controller: "lti/ims/deep_linking", action: :deep_linking_cancel, as: "deep_linking_cancel"
+
   resources :block_editors, only: :show
 
   %w[account course group].each do |context|
@@ -840,6 +842,12 @@ CanvasRails::Application.routes.draw do
   get "login/canvas" => "login/canvas#new", :as => :canvas_login
   get "login/canvas/forgot-password", to: "login/canvas#new"
   post "login/canvas" => "login/canvas#create"
+  scope "login/canvas/register", as: "register" do
+    get "/", to: "login/canvas#new", as: :landing
+    get "/student", to: "login/canvas#new", as: :student
+    get "/parent", to: "login/canvas#new", as: :parent
+    get "/teacher", to: "login/canvas#new", as: :teacher
+  end
 
   get "login/email_verify" => "login/email_verify#show", :as => :login_email_verify_show
   post "login/email_verify" => "login/email_verify#verify", :as => :login_email_verify
@@ -892,7 +900,6 @@ CanvasRails::Application.routes.draw do
   get "login/openid_connect" => "login/openid_connect#new"
   get "login/openid_connect/:id" => "login/openid_connect#new", :as => :openid_connect_login
   post "login/openid_connect/logout" => "login/openid_connect#destroy", :as => :openid_connect_logout
-  get "login/twitter" => "login/twitter#new", :as => :twitter_login
 
   get "login/otp" => "login/otp#new", :as => :otp_login
   post "login/otp/sms" => "login/otp#send_via_sms", :as => :send_otp_via_sms

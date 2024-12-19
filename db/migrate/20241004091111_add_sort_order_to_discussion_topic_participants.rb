@@ -19,6 +19,6 @@
 class AddSortOrderToDiscussionTopicParticipants < ActiveRecord::Migration[7.1]
   tag :predeploy
   def change
-    add_column :discussion_topic_participants, :sort_order, :string, null: false, default: DiscussionTopicParticipant::SortOrder::DESC
+    add_column :discussion_topic_participants, :sort_order, :string, null: false, default: DiscussionTopic::SortOrder::DESC
   end
 end

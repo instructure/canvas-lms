@@ -32,7 +32,7 @@ module Importers
       item.position = position
       item.name = hash[:title] || t("#quizzes.quiz_group.question_group", "Question Group")
       if hash[:question_bank_migration_id]
-        if hash[:question_bank_is_external] && migration && migration.user && hash[:question_bank_context].present? && hash[:question_bank_migration_id].present?
+        if hash[:question_bank_is_external] && migration&.user && hash[:question_bank_context].present? && hash[:question_bank_migration_id].present?
           bank = nil
           bank_context = nil
 

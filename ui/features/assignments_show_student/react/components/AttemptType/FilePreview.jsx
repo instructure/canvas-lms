@@ -18,7 +18,7 @@
  */
 
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
 import React, {useState, useEffect, useRef, useMemo} from 'react'
@@ -37,7 +37,7 @@ import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
 import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default function FilePreview({submission, isOriginalityReportVisible}) {
   const [selectedFileIndex, setSelectedFileIndex] = useState(0)

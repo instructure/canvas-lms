@@ -29,9 +29,9 @@ import {IconWarningLine} from '@instructure/ui-icons'
 import {DEFAULT_COUNT, MAX_COUNT} from '../RRuleHelper'
 import type {FrequencyValue} from '../types'
 
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useScope('calendar_custom_recurring_event_end_picker')
+const I18n = createI18nScope('calendar_custom_recurring_event_end_picker')
 
 export type ModeValues = 'ON' | 'AFTER'
 export type OnRecurrenceEndChangeType = {
@@ -380,6 +380,7 @@ export default function RecurrenceEndPicker({
         >
           <div style={{display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
             <NumberInput
+              allowStringValue={true}
               data-testid="recurrence-end-count-input"
               display="inline-block"
               interaction={mode === 'AFTER' ? 'enabled' : 'disabled'}

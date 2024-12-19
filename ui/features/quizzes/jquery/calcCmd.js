@@ -18,13 +18,13 @@
 
 // Ignored rules can be removed incrementally
 // Resolving all these up-front is untenable and unlikely
-/* eslint-disable eqeqeq,@typescript-eslint/no-redeclare */
-/* eslint-disable block-scoped-var,no-var,vars-on-top */
+
+/* eslint-disable no-redeclare */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('calculator.command')
+const I18n = createI18nScope('calculator.command')
 
 const calcCmd = {}
 

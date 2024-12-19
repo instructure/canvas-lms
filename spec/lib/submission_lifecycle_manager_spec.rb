@@ -291,7 +291,7 @@ describe SubmissionLifecycleManager do
       let!(:student_1) { @student }
       let(:student_2) { student_in_course(course: @course) }
       let(:student_ids) { [student_1.id, student_2.id] }
-      let(:instance) { instance_double("SubmissionLifecycleManager", recompute: nil) }
+      let(:instance) { instance_double(SubmissionLifecycleManager, recompute: nil) }
 
       it "delegates to an instance" do
         expect(SubmissionLifecycleManager).to receive(:new).and_return(instance)
@@ -395,7 +395,7 @@ describe SubmissionLifecycleManager do
     let(:other_student) { User.create! }
     let(:course) { Course.create! }
     let(:assignment) { course.assignments.create!(title: "hi") }
-    let(:instance) { instance_double("SubmissionLifecycleManager", recompute: nil) }
+    let(:instance) { instance_double(SubmissionLifecycleManager, recompute: nil) }
 
     it "accepts a User" do
       expect do

@@ -59,7 +59,7 @@ describe "course paces edit tray" do
       click_create_default_pace_button
 
       expect(publish_status).to be_displayed
-      expect(publish_status.text).to eq("No pending changes to apply")
+      expect(publish_status.text).to eq("No pending changes")
       expect(publish_status_button_exists?).to be_falsey
     end
 
@@ -71,7 +71,7 @@ describe "course paces edit tray" do
 
       update_module_item_duration(0, 3)
       expect(publish_status_button_exists?).to be_truthy
-      expect(publish_status_button.text).to eq("1 unpublished change")
+      expect(publish_status_button.text).to eq("1 unsaved change")
 
       update_module_item_duration(0, 2)
       expect(publish_status_button_exists?).to be_falsey
@@ -121,7 +121,7 @@ describe "course paces edit tray" do
       click_reset_all_reset_button
 
       expect(unpublished_changes_tray_exists?).to be_falsey
-      expect(publish_status.text).to eq("No pending changes to apply")
+      expect(publish_status.text).to eq("No pending changes")
       expect(duration_field[0]).to have_value "2"
     end
 

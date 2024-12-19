@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {bool, number, oneOf, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {asJson, defaultFetchOptions} from '@canvas/util/xhr'
 
-const I18n = useI18nScope('CanvasMediaPlayer')
+const I18n = createI18nScope('CanvasMediaPlayer')
 
 const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
 
@@ -143,7 +143,7 @@ export default function CanvasMediaPlayer(props) {
         setMediaObjNetworkErr(null)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e) {
-        // eslint-disable-next-line no-console
+         
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
         return

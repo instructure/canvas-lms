@@ -70,11 +70,11 @@ module DatesOverridable
   end
 
   def has_overrides?
-    if current_version?
-      preloaded_all_overrides ? preloaded_all_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
-    else
+    if is_a?(SimplyVersioned::InstanceMethods) && !current_version?
       # the old version's overrides might have be deleted too but it's probably more trouble than it's worth to check here
       preloaded_all_overrides ? preloaded_all_overrides.any? : all_assignment_overrides.exists?
+    else
+      preloaded_all_overrides ? preloaded_all_overrides.any?(&:active?) : all_assignment_overrides.active.exists?
     end
   end
 
@@ -346,7 +346,7 @@ module DatesOverridable
       else
         all_due_dates
       end
-    elsif ObserverEnrollment.observed_students(context, user).any?
+    elsif ObserverEnrollment.observed_students(context, user).any? && !(context.user_has_been_admin?(user) || context.user_has_been_instructor?(user))
       observed_student_due_dates(user)
     elsif context.user_has_been_student?(user) ||
           context.user_has_been_admin?(user) ||
@@ -568,7 +568,7 @@ module DatesOverridable
       override_hash = override.respond_to?(:to_h) ? override.to_h : override
 
       everyone_override_ids << override_hash[:id] if default_options.include?("everyone")
-      section_options = default_options.filter { |o| /\Asection-\d+\z/.match?(o) }
+      section_options = default_options.grep(/\Asection-\d+\z/)
       section_override_ids.concat(section_options) unless section_options.empty?
 
       result << {
@@ -641,7 +641,7 @@ module DatesOverridable
     tag_info[:points_possible] = points_possible unless try(:quiz_type) == "survey"
 
     if user && tag_info[:due_date]
-      if tag_info[:due_date] < Time.now &&
+      if tag_info[:due_date] < Time.zone.now &&
          (is_a?(Quizzes::Quiz) || (is_a?(AbstractAssignment) && expects_submission?)) &&
          !has_submission
         tag_info[:past_due] = true

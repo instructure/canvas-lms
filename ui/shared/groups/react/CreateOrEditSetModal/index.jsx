@@ -18,7 +18,7 @@
 
 import React, {useEffect, useRef, useReducer, useState} from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
@@ -36,7 +36,7 @@ import {AssignmentProgress} from './AssignmentProgress'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Responsive} from '@instructure/ui-responsive'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 const INITIAL_STATE = Object.freeze({
   name: '',
@@ -417,7 +417,7 @@ CreateOrEditSetModal.defaultProps = {
 export function renderCreateDialog(div, mockApi) {
   return new Promise(resolve => {
     function onDismiss(result) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <CreateOrEditSetModal
           allowSelfSignup={ENV.allow_self_signup}
@@ -429,7 +429,7 @@ export function renderCreateDialog(div, mockApi) {
       resolve(result)
     }
     const context = ENV.context_asset_string.split('_')
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <CreateOrEditSetModal
         studentSectionCount={ENV.student_section_count}

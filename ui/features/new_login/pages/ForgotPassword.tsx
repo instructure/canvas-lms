@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useRef, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
-import {EMAIL_REGEX} from '../shared'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {ROUTES} from '../routes/routes'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
+import {createErrorMessage, EMAIL_REGEX} from '../shared/helpers'
 import {forgotPassword} from '../services'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const ForgotPassword = () => {
   const {isUiActionPending, setIsUiActionPending, loginHandleName} = useNewLogin()
@@ -40,26 +41,24 @@ const ForgotPassword = () => {
   const [emailSent, setEmailSent] = useState(false)
   const [submittedEmail, setSubmittedEmail] = useState('')
 
-  const emailInputRef = useRef<HTMLInputElement | undefined>(undefined)
+  const emailInputRef = useRef<HTMLInputElement | null>(null)
 
-  useEffect(() => {
-    if (emailError && emailInputRef.current) {
-      emailInputRef.current.focus()
+  const validateForm = (): boolean => {
+    setEmailError('')
+
+    if (!EMAIL_REGEX.test(email)) {
+      setEmailError(I18n.t('Please enter a valid %{loginHandleName} address.', {loginHandleName}))
+      emailInputRef.current?.focus()
+      return false
     }
-  }, [emailError])
 
-  const validateEmail = (value: string): boolean => {
-    const isValid = EMAIL_REGEX.test(value)
-    setEmailError(
-      isValid ? '' : I18n.t('Please enter a valid %{loginHandleName}', {loginHandleName})
-    )
-    return isValid
+    return true
   }
 
   const handleForgotPassword = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (isUiActionPending || !validateEmail(email)) return
+    if (isUiActionPending || !validateForm()) return
 
     setIsUiActionPending(true)
 
@@ -72,6 +71,7 @@ const ForgotPassword = () => {
         setEmailSent(true)
       } else {
         setEmailError(I18n.t('No account found for this email address'))
+        emailInputRef.current?.focus()
       }
     } catch (_error: unknown) {
       showFlashAlert({
@@ -84,25 +84,11 @@ const ForgotPassword = () => {
   }
 
   const handleEmailChange = (_: React.ChangeEvent<HTMLInputElement>, value: string) => {
-    const trimmedValue = value.trim()
-    setEmail(trimmedValue)
-    if (trimmedValue === '') {
-      setEmailError('')
-    } else if (emailError) {
-      validateEmail(trimmedValue)
-    }
-  }
-
-  const handleEmailBlur = () => {
-    if (email === '') {
-      setEmailError('')
-    } else {
-      validateEmail(email)
-    }
+    setEmail(value.trim())
   }
 
   const handleCancel = () => {
-    navigate('/login/canvas')
+    navigate(ROUTES.SIGN_IN)
   }
 
   const passwordRecoveryForm = (
@@ -123,19 +109,16 @@ const ForgotPassword = () => {
       <form onSubmit={handleForgotPassword} noValidate={true}>
         <Flex direction="column" gap="large">
           <TextInput
+            aria-describedby="emailHelp"
+            autoComplete="email"
+            disabled={isUiActionPending}
             id="email"
+            inputRef={inputElement => (emailInputRef.current = inputElement)}
+            messages={createErrorMessage(emailError)}
+            onChange={handleEmailChange}
             renderLabel={loginHandleName}
             type="email"
             value={email}
-            onChange={handleEmailChange}
-            onBlur={handleEmailBlur}
-            messages={emailError ? [{type: 'error', text: emailError}] : []}
-            autoComplete="email"
-            disabled={isUiActionPending}
-            aria-describedby="emailHelp"
-            inputRef={inputElement => {
-              emailInputRef.current = inputElement as HTMLInputElement | undefined
-            }}
           />
 
           <Flex direction="row" gap="small">

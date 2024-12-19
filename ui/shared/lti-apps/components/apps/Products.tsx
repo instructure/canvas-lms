@@ -29,9 +29,9 @@ import useBreakpoints from '../../hooks/useBreakpoints'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {CondensedButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const Products = (props: {
   isFilterApplied: boolean
@@ -123,7 +123,7 @@ export const Products = (props: {
           >
             {Array.from(Array(numberOfPages)).map((_, i) => (
               <Pagination.Page
-                // eslint-disable-next-line react/no-array-index-key
+                 
                 key={i}
                 current={i === queryParams.page - 1}
                 onClick={() => updateQueryParams({page: i + 1})}

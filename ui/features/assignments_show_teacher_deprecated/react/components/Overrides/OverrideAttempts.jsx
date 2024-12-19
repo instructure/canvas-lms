@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {bool, oneOf, number} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {requiredIfDetail} from '../../assignmentData'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -28,7 +28,7 @@ import {Text} from '@instructure/ui-text'
 
 import NumberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 /*
  *  CAUTION: The InstUI Select component is greatly changed in v7.
@@ -110,6 +110,7 @@ export default class OverrideAttempts extends React.Component {
       return (
         <Flex.Item margin="small 0 0" data-testid="OverrideAttempts-Attempts">
           <NumberInput
+            allowStringValue={true}
             readOnly={this.props.readOnly}
             display="inline-block"
             width="5.5rem"

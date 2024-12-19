@@ -26,8 +26,8 @@ module Factories
       use_signature: opts[:use_signature] || true,
       signature: opts[:signature] || "Signature",
       use_out_of_office: opts[:use_out_of_office] || true,
-      out_of_office_first_date: opts[:out_of_office_first_date] || Time.now,
-      out_of_office_last_date: opts[:out_of_office_last_date] || (Time.now + 1.week),
+      out_of_office_first_date: opts[:out_of_office_first_date] || Time.zone.now,
+      out_of_office_last_date: opts[:out_of_office_last_date] || 1.week.from_now,
       out_of_office_subject: opts[:out_of_office_subject] || "Out of office",
       out_of_office_message: opts[:out_of_office_message] || "I'm out of office for a week"
     )

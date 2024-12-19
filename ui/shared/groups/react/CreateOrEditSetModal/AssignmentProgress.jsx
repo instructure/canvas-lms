@@ -17,14 +17,14 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ProgressCircle} from '@instructure/ui-progress'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {func, string} from 'prop-types'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 const pctFormat = new Intl.NumberFormat(ENV.LOCALE || navigator.language, {style: 'percent'}).format
 
 const POLLING_INTERVAL = 1000

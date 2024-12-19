@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {
   IconPublishSolid,
@@ -29,7 +29,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {type File, type Folder} from '../../../interfaces/File'
 
-const I18n = useI18nScope('files_v2')
+const I18n = createI18nScope('files_v2')
 
 interface PublishIconButtonProps {
   item: File | Folder

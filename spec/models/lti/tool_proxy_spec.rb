@@ -603,15 +603,15 @@ module Lti
       end
 
       it "does not match when vendor code is wrong" do
-        expect(tool_proxy.matches?(**fields.merge(vendor_code: ""))).to be(false)
+        expect(tool_proxy.matches?(**fields, vendor_code: "")).to be(false)
       end
 
       it "does not match when product_code is wrong" do
-        expect(tool_proxy.matches?(**fields.merge(product_code: ""))).to be(false)
+        expect(tool_proxy.matches?(**fields, product_code: "")).to be(false)
       end
 
       it "does not match when resource_type_code is wrong" do
-        expect(tool_proxy.matches?(**fields.merge(resource_type_code: ""))).to be(false)
+        expect(tool_proxy.matches?(**fields, resource_type_code: "")).to be(false)
       end
     end
 

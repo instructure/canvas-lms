@@ -18,11 +18,10 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {ApolloProvider} from '@apollo/react-common'
+import {ApolloClient, ApolloProvider} from '@apollo/client'
 import TeacherQuery from './components/TeacherQuery'
-import {createClient} from '@canvas/apollo'
-import {ApolloClient} from 'apollo-client'
-import type {InMemoryCache} from 'apollo-cache-inmemory'
+import {createClient} from '@canvas/apollo-v3'
+import type {InMemoryCache} from '@apollo/client'
 
 export default function renderAssignmentsApp(elt: HTMLElement | null) {
   const client: ApolloClient<InMemoryCache> = createClient()

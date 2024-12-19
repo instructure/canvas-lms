@@ -30,19 +30,23 @@ describe('SubmissionCommentCreateForm', () => {
   }
 
   function cancelButton() {
-    return wrapper.container.querySelectorAll('button')[0]
+    const buttons = wrapper.queryAllByRole('button', {name: 'Cancel'})
+    return buttons[0]
   }
 
   function submitButton() {
-    return wrapper.container.querySelectorAll('button')[1]
+    const buttons = wrapper.queryAllByRole('button', {name: 'Submit'})
+    return buttons[0]
   }
 
   function cancelButtonComponent() {
-    return wrapper.container.querySelectorAll('Button')[0]
+    const buttons = wrapper.queryAllByRole('button', {name: 'Cancel'})
+    return buttons[0]
   }
 
   function submitButtonComponent() {
-    return wrapper.container.querySelectorAll('Button')[1]
+    const buttons = wrapper.queryAllByRole('button', {name: 'Submit'})
+    return buttons[0]
   }
 
   beforeEach(() => {
@@ -94,9 +98,10 @@ describe('SubmissionCommentCreateForm', () => {
 
   test('TextArea is empty, with label and placeholder', () => {
     wrapper = mountComponent()
-    expect(wrapper.container.querySelector('TextArea')).toHaveValue('')
-    expect(wrapper.container.querySelector('TextArea').placeholder).toEqual('Leave a comment')
-    expect(wrapper.container.querySelector('label').textContent).toEqual('Leave a comment')
+    const textarea = wrapper.getByTestId('comment-textarea')
+    expect(textarea).toHaveValue('')
+    expect(textarea.placeholder).toEqual('Leave a comment')
+    expect(wrapper.container.querySelector('label')?.textContent).toEqual('Leave a comment')
   })
 
   test('the default action is prevented when handlePublishComment runs', () => {
@@ -114,7 +119,7 @@ describe('SubmissionCommentCreateForm', () => {
     props.createSubmissionComment = jest.fn()
     wrapper = mountComponent()
     ref.current.focusTextarea = jest.fn()
-    fireEvent.change(wrapper.container.querySelector('Textarea'), {target: {value: 'some message'}})
+    fireEvent.change(wrapper.getByTestId('comment-textarea'), {target: {value: 'some message'}})
     fireEvent.click(submitButton())
     expect(ref.current.focusTextarea).toHaveBeenCalledTimes(1)
   })
@@ -122,7 +127,7 @@ describe('SubmissionCommentCreateForm', () => {
   test('"Submit" button is disabled while processing', () => {
     props.processing = true
     wrapper = mountComponent()
-    fireEvent.change(wrapper.container.querySelector('textarea'), {target: {value: 'some message'}})
+    fireEvent.change(wrapper.getByTestId('comment-textarea'), {target: {value: 'some message'}})
     expect(submitButtonComponent()).toBeDisabled()
   })
 

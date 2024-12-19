@@ -20,11 +20,11 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PublishCloud from './LegacyPublishCloud'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('publish_cloud')
+const I18n = createI18nScope('publish_cloud')
 
 // Function Summary
 // Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
@@ -44,7 +44,7 @@ PublishCloud.openRestrictedDialog = function () {
   })
 
   import('./RestrictedDialogForm').then(({default: RestrictedDialogForm}) => {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <RestrictedDialogForm
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
@@ -64,6 +64,7 @@ PublishCloud.render = function () {
     if (this.state.published && this.state.restricted) {
       return (
         <button
+          data-testid="restricted-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -82,6 +83,7 @@ PublishCloud.render = function () {
     } else if (this.state.published && this.state.hidden) {
       return (
         <button
+          data-testid="hidden-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -102,6 +104,7 @@ PublishCloud.render = function () {
     } else if (this.state.published) {
       return (
         <button
+          data-testid="published-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -117,6 +120,7 @@ PublishCloud.render = function () {
     } else {
       return (
         <button
+          data-testid="unpublished-button"
           type="button"
           data-tooltip="left"
           onClick={this.openRestrictedDialog}
@@ -133,6 +137,7 @@ PublishCloud.render = function () {
   } else if (this.state.published && this.state.restricted) {
     return (
       <div
+        data-testid="restricted-status"
         style={{marginRight: '12px'}}
         data-tooltip="left"
         ref="publishCloud"

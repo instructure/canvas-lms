@@ -1481,21 +1481,35 @@ describe Assignment do
   end
 
   describe "#tool_settings_tool=" do
+    subject(:assign_tool) { assignment.update!(tool_settings_tool: new_value) }
+
+    let(:assignment) { setup_assignment_with_homework }
+    let(:tool) {  @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret") }
+
+    context "when a tool settings tool is currently set" do
+      before { assignment.update!(tool_settings_tool: tool) }
+
+      context "and the tool settings tool is re-assigned to `nil`" do
+        let(:new_value) { nil }
+
+        it "deletes the assignment configuration tool lookups" do
+          expect { assign_tool }.to change { assignment.assignment_configuration_tool_lookups.count }.from(1).to(0)
+        end
+
+        it "does not destroy the tool" do
+          expect(tool).to be_active
+
+          expect { assign_tool }.not_to change { tool.reload.workflow_state }
+        end
+      end
+    end
+
     it "allows ContextExternalTools through polymorphic association" do
       setup_assignment_with_homework
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @assignment.tool_settings_tool = tool
       @assignment.save
       expect(@assignment.tool_settings_tool).to eq(tool)
-    end
-
-    it "destroys tool unless tool is 'ContextExternalTool'" do
-      setup_assignment_with_homework
-      tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @assignment.tool_settings_tool = tool
-      @assignment.save!
-      @assignment.tool_settings_tool = nil
-      @assignment.save!
     end
 
     context "when the tool proxy is account-level" do
@@ -2559,8 +2573,8 @@ describe Assignment do
     end
 
     describe "grade_posting_in_progress" do
-      let(:submission) { instance_double("Submission") }
-      let(:result) { instance_double("Lti::Result") }
+      let(:submission) { instance_double(Submission) }
+      let(:result) { instance_double(Lti::Result) }
 
       before do
         allow(assignment).to receive(:find_or_create_submissions)
@@ -2680,7 +2694,7 @@ describe Assignment do
           # Force an update to make the submission infer its values. Basically,
           # we're trying to emulate a request from the lti/scores_controller here.
           result
-          submission.update!(updated_at: Time.now)
+          submission.update!(updated_at: Time.zone.now)
         end
 
         it "marks the submission and result as fully graded" do
@@ -5804,7 +5818,7 @@ describe Assignment do
       Time.zone = "UTC"
       assignment_model(due_at: "Sep 3 2008 11:55am", course: @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       expect(res).not_to be_nil
       expect(res.include?("DTEND:20080903T115500Z")).not_to be_nil
@@ -5816,7 +5830,7 @@ describe Assignment do
       Time.zone = "UTC"
       assignment_model(due_at: "Sep 3 2008 11:55am", course: @course, time_zone_edited: "EST")
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       expect(res).not_to be_nil
       expect(res.include?("DTEND:20080903T115500Z")).not_to be_nil
@@ -5828,7 +5842,7 @@ describe Assignment do
       Time.zone = "UTC"
       assignment_model(due_at: "Sep 3 2008 11:59pm", course: @course, time_zone_edited: "EST")
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       Time.zone = "HST"
       res = @assignment.to_ics
       expect(res).not_to be_nil
@@ -5841,7 +5855,7 @@ describe Assignment do
       Time.zone = "Alaska" # -0800
       assignment_model(due_at: "Sep 3 2008 11:55am", course: @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
+      @assignment.updated_at = Time.zone.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics
       expect(res).not_to be_nil
       expect(res.include?("DTEND:20080903T195500Z")).not_to be_nil
@@ -5853,7 +5867,7 @@ describe Assignment do
       Time.zone = "UTC"
       assignment_model(due_at: "Sep 3 2008 11:55am", course: @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
+      @assignment.updated_at = Time.zone.at(1_220_443_500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.dtstart.tz_utc).to be true
@@ -5868,7 +5882,7 @@ describe Assignment do
       Time.zone = "Alaska" # -0800
       assignment_model(due_at: "Sep 3 2008 11:55am", course: @course)
       # force known value so we can check serialization
-      @assignment.updated_at = Time.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
+      @assignment.updated_at = Time.zone.at(1_220_472_300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
       expect(res.dtstart.tz_utc).to be true
@@ -5937,7 +5951,7 @@ describe Assignment do
       expect(@a.submission_types).to eql("online_quiz")
       expect(@a.quiz).not_to be_nil
       expect(@a.quiz.assignment_id).to eql(@a.id)
-      @a.due_at = Time.now
+      @a.due_at = Time.zone.now
       @a.save
       @a.reload
       expect(@a.quiz).not_to be_nil
@@ -6461,7 +6475,7 @@ describe Assignment do
       end
 
       it "creates a message when an assignment changes after it's been published" do
-        @a.created_at = Time.parse("Jan 2 2000")
+        @a.created_at = Time.zone.parse("Jan 2 2000")
         @a.description = "something different"
         @a.notify_of_update = true
         @a.save
@@ -6519,8 +6533,8 @@ describe Assignment do
         @course.enroll_user(@ta2, "TaEnrollment", section: @section2, enrollment_state: "active", limit_privileges_to_course_section: true)
 
         Time.zone = "Alaska"
-        default_due = DateTime.parse("01 Jan 2011 14:00 AKST")
-        section_2_due = DateTime.parse("02 Jan 2011 14:00 AKST")
+        default_due = Time.zone.parse("01 Jan 2011 14:00 AKST")
+        section_2_due = Time.zone.parse("02 Jan 2011 14:00 AKST")
         @assignment = @course.assignments.build(title: "some assignment", due_at: default_due, submission_types: ["online_text_entry"])
         @assignment.save_without_broadcasting!
         override = @assignment.assignment_overrides.build
@@ -6589,7 +6603,7 @@ describe Assignment do
         it "notifies appropriate parties when the default due date changes" do
           @assignment.update_attribute(:created_at, 1.day.ago)
 
-          @assignment.due_at = DateTime.parse("09 Jan 2011 14:00 AKST")
+          @assignment.due_at = Time.zone.parse("09 Jan 2011 14:00 AKST")
           @assignment.save!
 
           messages_sent = @assignment.messages_sent["Assignment Due Date Changed"]
@@ -6604,7 +6618,7 @@ describe Assignment do
           @assignment.update_attribute(:created_at, 1.day.ago)
 
           override = @assignment.assignment_overrides.first.reload
-          override.override_due_at(DateTime.parse("11 Jan 2011 11:11 AKST"))
+          override.override_due_at(Time.zone.parse("11 Jan 2011 11:11 AKST"))
           override.save!
 
           messages_sent = override.messages_sent["Assignment Due Date Changed"]
@@ -6625,7 +6639,7 @@ describe Assignment do
         end
 
         it "sends a late submission notification iff the submit date is late for the submitter" do
-          fake_submission_time = Time.parse "Jan 01 17:00:00 -0900 2011"
+          fake_submission_time = Time.zone.parse "Jan 01 17:00:00 -0900 2011"
           allow(Time).to receive(:now).and_return(fake_submission_time)
           subA = @assignment.submit_homework @studentA, submission_type: "online_text_entry", body: "ooga"
           subB = @assignment.submit_homework @studentB, submission_type: "online_text_entry", body: "booga"
@@ -6641,16 +6655,16 @@ describe Assignment do
         end
 
         it "sends a late submission notification iff the submit date is late for the group" do
-          @a = assignment_model(course: @course, group_category: "Study Groups", due_at: Time.parse("Jan 01 17:00:00 -0900 2011"), submission_types: ["online_text_entry"])
+          @a = assignment_model(course: @course, group_category: "Study Groups", due_at: Time.zone.parse("Jan 01 17:00:00 -0900 2011"), submission_types: ["online_text_entry"])
           @group1 = @a.context.groups.create!(name: "Study Group 1", group_category: @a.group_category)
           @group1.add_user(@studentA)
           @group2 = @a.context.groups.create!(name: "Study Group 2", group_category: @a.group_category)
           @group2.add_user(@studentB)
           override = @a.assignment_overrides.new
           override.set = @group2
-          override.override_due_at(Time.parse("Jan 03 17:00:00 -0900 2011"))
+          override.override_due_at(Time.zone.parse("Jan 03 17:00:00 -0900 2011"))
           override.save!
-          fake_submission_time = Time.parse("Jan 02 17:00:00 -0900 2011")
+          fake_submission_time = Time.zone.parse("Jan 02 17:00:00 -0900 2011")
           allow(Time).to receive(:now).and_return(fake_submission_time)
           subA = @assignment.submit_homework @studentA, submission_type: "online_text_entry", body: "eenie"
           subB = @assignment.submit_homework @studentB, submission_type: "online_text_entry", body: "meenie"
@@ -7296,7 +7310,7 @@ describe Assignment do
     before :once do
       course_factory
       @s2 = @course.course_sections.create! name: "other section"
-      @dates = (0..7).map { |x| DateTime.new(2020, 1, 10 + x, 12, 0, 0) }
+      @dates = (0..7).map { |x| Time.zone.local(2020, 1, 10 + x, 12, 0, 0) }
       @a1 = @course.assignments.create!(title: "no due date")
       @a2 = @course.assignments.create!(title: "no overrides", due_at: @dates[0])
       @a3 = @course.assignments.create!(title: "latest is override", due_at: @dates[1])
@@ -7326,11 +7340,11 @@ describe Assignment do
 
   context "due_between_with_overrides" do
     before :once do
-      @assignment = @course.assignments.create!(title: "assignment", due_at: Time.now)
-      @overridden_assignment = @course.assignments.create!(title: "overridden_assignment", due_at: Time.now)
+      @assignment = @course.assignments.create!(title: "assignment", due_at: Time.zone.now)
+      @overridden_assignment = @course.assignments.create!(title: "overridden_assignment", due_at: Time.zone.now)
 
       override = @assignment.assignment_overrides.build
-      override.due_at = Time.now
+      override.due_at = Time.zone.now
       override.title = "override"
       override.save!
     end

@@ -39,7 +39,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
   field :conversations, [Types::ConversationParticipantType], null: true
   def resolve(input:)
     @current_user = current_user
-    recipients = get_recipients(input[:recipients], input[:context_code], input[:conversation_id])
+    recipients = get_recipients(input[:recipients], input[:context_code], input[:conversation_id], input[:group_conversation])
     tags = infer_tags(tags: input[:tags], recipients: input[:recipients], context_code: input[:context_code])
 
     context = input[:context_code] ? Context.find_by_asset_string(input[:context_code]) : nil
@@ -168,10 +168,14 @@ class Mutations::CreateConversation < Mutations::BaseMutation
     validation_error(I18n.t("Course concluded, unable to send messages"))
   rescue ConversationsHelper::InvalidRecipientsError
     validation_error(I18n.t("Invalid recipients"))
+  rescue ConversationsHelper::GroupConversationForDifferentiationTagsNotAllowedError
+    validation_error(I18n.t("Group conversation for differentiation tags not allowed"))
+  rescue ConversationsHelper::InsufficientPermissionsForDifferentiationTagsError
+    validation_error(I18n.t("Insufficient permissions for differentiation tags"))
   end
 
-  def get_recipients(recipient_ids, context_code, conversation_id)
-    recipients = normalize_recipients(recipients: recipient_ids, context_code:, conversation_id:)
+  def get_recipients(recipient_ids, context_code, conversation_id, group_conversation)
+    recipients = normalize_recipients(recipients: recipient_ids, context_code:, conversation_id:, group_conversation:)
     raise ConversationsHelper::InvalidRecipientsError if recipients.blank?
 
     recipients

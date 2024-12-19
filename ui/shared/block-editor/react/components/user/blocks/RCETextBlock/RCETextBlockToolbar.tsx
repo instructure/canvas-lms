@@ -28,11 +28,11 @@ import {IconResize} from '../../../../assets/internal-icons'
 
 import {type RCETextBlockProps} from './types'
 import {type SizeVariant} from '../../../editor/types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {changeSizeVariant} from '../../../../utils/resizeHelpers'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const RCETextBlockToolbar = () => {
   const {
@@ -46,7 +46,7 @@ const RCETextBlockToolbar = () => {
 
   const handleChangeSzVariant = useCallback(
     (
-      _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem

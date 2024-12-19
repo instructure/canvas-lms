@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class RenameTable < Cop
+      class RenameTable < Base
         include RuboCop::Canvas::CurrentDef
 
         MSG = "Renaming a table requires a multi-deploy process; see https://instructure.atlassian.net/l/c/mArfa4cn"

@@ -1468,8 +1468,14 @@ class GradebooksController < ApplicationController
   end
 
   def gradebook_group_categories_json
-    @context
-      .group_categories
+    can_view_tags = @context.grants_any_right?(
+      @current_user,
+      session,
+      *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS
+    )
+
+    categories = can_view_tags ? @context.active_combined_group_and_differentiation_tag_categories : @context.group_categories
+    categories
       .joins("LEFT JOIN #{Group.quoted_table_name} ON groups.group_category_id=group_categories.id AND groups.workflow_state <> 'deleted'")
       .group("group_categories.id", "group_categories.name")
       .pluck("group_categories.id", "group_categories.name", Arel.sql("json_agg(json_build_object('id', groups.id, 'name', groups.name))"))

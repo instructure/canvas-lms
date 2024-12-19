@@ -17,14 +17,14 @@
  */
 
 import React, {useRef, useEffect, useCallback, type RefObject} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {debounce} from 'lodash'
 import {DEFAULT_SEARCH_DELAY} from '../utils/constants'
 
-const I18n = useI18nScope('searchfiled')
+const I18n = createI18nScope('searchfiled')
 
 interface CustomTextInput extends TextInput {
   inputRef: RefObject<TextInput>

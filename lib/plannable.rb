@@ -165,7 +165,11 @@ module Plannable
       text: ->(val) { val.is_a?(String) },
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
-      datetime: ->(val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
+      datetime: lambda do |val|
+        val.is_a?(String) && Time.zone.parse(val)
+      rescue ArgumentError
+        false
+      end
     }.freeze
 
     def validate(bookmark)

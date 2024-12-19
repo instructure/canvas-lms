@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {initializeReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
-const I18n = useI18nScope('syllabus')
+const I18n = createI18nScope('syllabus')
 
 export function attachImmersiveReaderButton(mountPoints) {
   const title = I18n.t('Course Syllabus')

@@ -29,11 +29,11 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SearchResults from './SearchResults'
 import IndexingProgress from './IndexingProgress'
 
-const I18n = useI18nScope('SmartSearch')
+const I18n = createI18nScope('SmartSearch')
 
 export default function SearchApp() {
   const [previousSearch, setPreviousSearch] = useState(null)
@@ -323,7 +323,7 @@ export default function SearchApp() {
                 )}
                 <a
                   href="https://community.canvaslms.com/t5/Smart-Search/gh-p/smart_search"
-                  target="_blank"
+                  target="_blank" rel="noreferrer"
                 >
                   {I18n.t('Smart Search Community')}
                 </a>

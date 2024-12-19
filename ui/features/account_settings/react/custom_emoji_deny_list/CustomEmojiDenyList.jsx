@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
@@ -24,7 +24,7 @@ import {EmojiPicker} from '@canvas/emoji'
 import {Emoji} from 'emoji-mart'
 import data from 'emoji-mart/data/all.json'
 
-const I18n = useI18nScope('i18n!custom_emoji_deny_list')
+const I18n = createI18nScope('i18n!custom_emoji_deny_list')
 
 export default function CustomEmojiDenyList() {
   const [blockedEmojis, setBlockedEmojis] = useState(

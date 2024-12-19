@@ -17,13 +17,13 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import TimeBlockListManager from '@canvas/calendar/TimeBlockListManager'
 import TimeBlockRow from './TimeBlockRow'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@instructure/date-js'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 export default class TimeBlockList {
   constructor(element, splitterSelector, blocks, blankRow) {
@@ -90,11 +90,11 @@ export default class TimeBlockList {
     })
 
     if (this.blocksManager.blocks.length === 0) {
-      // eslint-disable-next-line no-alert
+       
       window.alert(I18n.t('no_dates_error', 'You need to specify at least one date and time'))
       valid = false
     } else if (!valid) {
-      // eslint-disable-next-line no-alert
+       
       window.alert(I18n.t('time_block_errors', 'There are errors in your time block selections.'))
     }
     return valid

@@ -173,7 +173,7 @@ module IncomingMail
     end
 
     def valid_user_and_context?(context, user)
-      user && context && context.respond_to?(:reply_from)
+      user && context.respond_to?(:reply_from)
     end
 
     def sent_from_channel(user, incoming_message)

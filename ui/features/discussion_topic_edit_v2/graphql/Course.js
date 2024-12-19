@@ -20,7 +20,7 @@ import {GroupSet} from './GroupSet'
 import {AssignmentGroup} from './AssignmentGroup'
 import {Section} from './Section'
 import {arrayOf, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const Course = {
   fragment: gql`

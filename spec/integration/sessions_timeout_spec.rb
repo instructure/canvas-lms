@@ -33,7 +33,7 @@ describe "Session Timeout" do
       it "times out after 40 minutes of inactivity" do
         login_as
 
-        now = Time.now
+        now = Time.zone.now
         get "/"
         expect(response).to be_successful
 
@@ -45,7 +45,7 @@ describe "Session Timeout" do
       it "does not time out if the user remains active" do
         login_as
 
-        now = Time.now
+        now = Time.zone.now
         get "/"
         expect(response).to be_successful
 

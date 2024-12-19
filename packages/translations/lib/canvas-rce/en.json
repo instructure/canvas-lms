@@ -228,6 +228,7 @@
   "decorative_type_upper_f2c95e3": { "message": "Decorative { TYPE_UPPER }" },
   "decrease_indent_d9cf469d": { "message": "Decrease Indent" },
   "deep_purple_bb3e2907": { "message": "Deep Purple" },
+  "default_9db103d": { "message": "Default" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "default bulleted unordered list"
   },
@@ -375,7 +376,6 @@
   },
   "folder_tree_fbab0726": { "message": "Folder tree" },
   "for_all_b919f972": { "message": "For All" },
-  "foreground_3acfb942": { "message": "Foreground" },
   "format_4247a9c5": { "message": "Format" },
   "format_as_a_list_142210c3": { "message": "Format as a list" },
   "formatting_5b143aa8": { "message": "Formatting" },
@@ -747,8 +747,8 @@
   },
   "outline_color_3ef2cea7": { "message": "Outline Color" },
   "outline_size_a6059a21": { "message": "Outline Size" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted"
+  "p_is_not_a_valid_protocol_b1c4efaa": {
+    "message": "{ p } is not a valid protocol."
   },
   "page_50c4823d": { "message": "Page" },
   "pages_e5414c2c": { "message": "Pages" },

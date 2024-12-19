@@ -542,7 +542,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       end
     end
 
-    context 'when the current user does not have "lti_add_edit"' do
+    context 'when the current user does not have "manage_lti_add"' do
       let(:student) { student_in_course(active_all: true).user }
 
       before { user_session(student) }

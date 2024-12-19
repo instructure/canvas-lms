@@ -19,10 +19,10 @@
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {Heading} from '@instructure/ui-heading'
 import {InternalSettingsQuery} from './InternalSettingsQuery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('internal-settings')
+const I18n = createI18nScope('internal-settings')
 
 export const InternalSettingsView = () => (
   // @ts-expect-error

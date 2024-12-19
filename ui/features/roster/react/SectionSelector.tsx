@@ -23,11 +23,11 @@ import {View} from '@instructure/ui-view'
 import SectionInput from './SectionInput'
 import enrollmentName from '@canvas/handlebars-helpers/enrollmentName'
 import {CloseButton} from '@instructure/ui-buttons'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {ResponseSection} from './api'
 
-const I18n = useScope('roster_section_selector')
+const I18n = createI18nScope('roster_section_selector')
 
 type ExistingSectionEnrollment = {
   id: string

@@ -82,6 +82,7 @@ describe('FileBrowser', () => {
       const elements = await screen.findAllByRole('treeitem')
       const items = elements.filter(elem => !['Course files', 'My files'].includes(elem.name))
       items.forEach(item => {
+        // eslint-disable-next-line jest/valid-expect
         expect(item.title === item.getAttribute('aria-label'))
       })
     })

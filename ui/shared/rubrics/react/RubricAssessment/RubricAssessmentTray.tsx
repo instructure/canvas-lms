@@ -17,14 +17,14 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Tray} from '@instructure/ui-tray'
 import {RubricAssessmentContainer, type ViewMode} from './RubricAssessmentContainer'
 import type {Rubric, RubricAssessmentData} from '../types/rubric'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('rubrics-assessment-tray')
+const I18n = createI18nScope('rubrics-assessment-tray')
 
 export type RubricAssessmentTrayProps = {
   hidePoints?: boolean
@@ -32,7 +32,11 @@ export type RubricAssessmentTrayProps = {
   isOpen: boolean
   isPreviewMode: boolean
   isPeerReview?: boolean
-  rubric?: Pick<Rubric, 'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments'>
+  isSelfAssessment?: boolean
+  rubric?: Pick<
+    Rubric,
+    'title' | 'criteria' | 'ratingOrder' | 'freeFormCriterionComments' | 'pointsPossible'
+  >
   rubricAssessmentData: RubricAssessmentData[]
   rubricSavedComments?: Record<string, string[]>
   shouldCloseOnDocumentClick?: boolean
@@ -46,6 +50,7 @@ export const RubricAssessmentTray = ({
   isLoading = false,
   isPreviewMode,
   isPeerReview = false,
+  isSelfAssessment = false,
   rubric,
   rubricAssessmentData,
   rubricSavedComments = {},
@@ -79,6 +84,8 @@ export const RubricAssessmentTray = ({
             isFreeFormCriterionComments={rubric.freeFormCriterionComments ?? false}
             ratingOrder={rubric.ratingOrder ?? 'descending'}
             rubricTitle={rubric.title}
+            pointsPossible={rubric.pointsPossible}
+            isSelfAssessment={isSelfAssessment}
             rubricAssessmentData={rubricAssessmentData}
             rubricSavedComments={rubricSavedComments}
             viewModeOverride={viewMode}

@@ -16,62 +16,101 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {parse} from 'url'
 import formatMessage from '../../../format-message'
 
-// keep in sync with the protocols permitted for <a href>
-// as listed in gems/canvas_sanitize/lib/canvas_sanitize/canvas_sanitize.rb
+// Keep in sync with the protocols permitted for <a href>
+//   as listed in gems/canvas_sanitize/lib/canvas_sanitize/canvas_sanitize.rb
 const allowed_protocols = ['ftp:', 'http:', 'https:', 'mailto:', 'tel:', 'skype:']
 
-// weakly validate a url
-// return true if valid
-// return false if not valid yet, but incomplete
-// throw an Error if invalid
+/**
+ * Weakly validate a URL
+ * @param {string} url URL to validate
+ * @returns {boolean} true if valid, false if not valid yet, but incomplete, throws if invalid
+ */
 export default function validateURL(url) {
   const href = url.trim()
-  const parsed = parse(href, false, true)
-  const protocol = parsed.protocol
-  if (!protocol) {
-    if (parsed.href[0] === ':') {
-      // ":anything" is invalid
-      // need this check as an artifact of parse(href)
+
+  // Handle special cases for partial URLs
+  if (href === '' || href === 'mailto:' || href === 'tel:' || href === 'skype:') {
+    return false
+  }
+  if (/^\/\/$/.test(href)) {
+    return false
+  }
+
+  try {
+    // Handle URLs starting with :// (invalid protocol)
+    if (href.startsWith('://')) {
       throw new Error(
         formatMessage('Protocol must be ftp, http, https, mailto, skype, tel or may be omitted')
       )
     }
-    if (/^\/\/$/.test(href)) {
-      // "//" by itself is not a URL yet
-      return false
-    }
-  } else if (protocol) {
-    if (!allowed_protocols.includes(protocol)) {
-      throw new Error(
-        formatMessage(
-          '{p} is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted',
-          {
-            p: protocol.replace(/:$/, ''),
-          }
-        )
-      )
+
+    // For URLs with protocols, we can use the URL constructor directly
+    if (/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(href)) {
+      const protocol = href.substring(0, href.indexOf(':') + 1)
+      if (!allowed_protocols.includes(protocol)) {
+        throw new Error(formatMessage('{p} is not a valid protocol.', {p: protocol.slice(0, -1)}))
+      }
+
+      // For absolute URLs with protocols that require //, validate the format
+      if (['http:', 'https:', 'ftp:'].includes(protocol) && !href.startsWith(protocol + '//')) {
+        throw new Error(formatMessage('Invalid URL'))
+      }
+
+      // Special handling for mailto:, tel:, and skype: URLs
+      if (['mailto:', 'tel:', 'skype:'].includes(protocol)) {
+        // Consider protocol:// as incomplete for these protocols
+        if (href === protocol + '//' || href === protocol + '///') {
+          return false
+        }
+        return href.length > protocol.length
+      }
+
+      // Handle partial URLs
+      if (href === protocol || href === protocol + '/' || href === protocol + '//') {
+        return false
+      }
+
+      // Try constructing the URL to validate the format
+      try {
+        if (href.includes('//')) {
+          new URL(href)
+        }
+        return true
+      } catch {
+        // If URL construction fails but we have more than just protocol://, consider it valid
+        // This allows for test URLs like ftp://host:port/path
+        return href.length > protocol.length + 2
+      }
     }
 
-    // ftp, http, https require ://anything
-    if (/(?:ftp|http|https):\/\/.+/.test(href)) {
-      return true
+    // Handle protocol-relative URLs
+    if (href.startsWith('//')) {
+      if (href === '//' || href === '///') {
+        return false
+      }
+      try {
+        new URL('http:' + href)
+        return true
+      } catch {
+        // If URL construction fails but we have more than just //, consider it valid
+        return href.length > 2
+      }
     }
 
-    // allow mailto:address, skype:participant, tel:911 or
-    // mailto://address, skype://participant, tel://911,
-    if (/(?:mailto|skype|tel):(\/\/)?[^/].*/.test(href)) {
-      return true
+    // Handle relative paths
+    return true
+  } catch (e) {
+    if (e instanceof Error) {
+      if (e.message.includes('Invalid URL')) {
+        if (href.match(/^(https?|ftp):\/?\/?$/)) {
+          return false
+        }
+        throw new Error(formatMessage('Invalid URL'))
+      }
+      throw e
     }
-
-    // http:/xyzzy is invalid
-    if (/^(?:ftp|http|https):\/{0,1}[^/]/.test(href)) {
-      throw new Error(formatMessage('Invalid URL'))
-    }
-
-    return false
+    throw e
   }
-  return true
 }

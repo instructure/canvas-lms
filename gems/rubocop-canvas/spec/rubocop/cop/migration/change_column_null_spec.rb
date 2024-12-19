@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::ChangeColumnNull do
   subject(:cop) { described_class.new }
 
   it "expects a non-transactional migration" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           DataFixup::BackfillNulls.run(User, :karma, default_value: 0)
@@ -29,13 +29,13 @@ describe RuboCop::Cop::Migration::ChangeColumnNull do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Use `disable_ddl_transaction!`"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to include "Use `disable_ddl_transaction!`"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "expects BackfillNulls" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
         def up
@@ -43,13 +43,13 @@ describe RuboCop::Cop::Migration::ChangeColumnNull do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to include "Use `DataFixup::BackfillNulls`"
-    expect(cop.offenses.first.severity.name).to eq(:warning)
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to include "Use `DataFixup::BackfillNulls`"
+    expect(offenses.first.severity.name).to eq(:warning)
   end
 
   it "emits no warnings when conditions are satisfied" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
         def up
@@ -58,28 +58,28 @@ describe RuboCop::Cop::Migration::ChangeColumnNull do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 
   it "doesn't flag when removing a not-NULL constraint" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           change_column_null :users, :karma, true
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 
   it "doesn't flag when adding a not-NULL constraint in `down`" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def down
           change_column_null :users, :karma, false
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 0
+    expect(offenses.size).to eq 0
   end
 end

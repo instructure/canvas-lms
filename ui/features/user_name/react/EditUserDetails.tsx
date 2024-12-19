@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -27,13 +27,13 @@ import * as z from 'zod'
 import {Controller, useForm} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {TextInput} from '@instructure/ui-text-input'
-import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {computeShortAndSortableNamesFromName} from '@canvas/user-sortable-name/react'
 
-const I18n = useI18nScope('user_name')
+const I18n = createI18nScope('user_name')
 
 export interface UserDetails {
   name: string
@@ -80,6 +80,7 @@ const EditUserDetails = ({
     getValues,
     setValue,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues: userDetails,
     resolver: zodResolver(createValidationSchema(canManageUserDetails)),
@@ -102,8 +103,8 @@ const EditUserDetails = ({
   }
 
   useEffect(() => {
-    focusFiled(control, 'name')
-  }, [control])
+    setFocus('name')
+  }, [setFocus])
 
   return (
     <Modal

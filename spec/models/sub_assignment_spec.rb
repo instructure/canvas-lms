@@ -370,4 +370,53 @@ describe SubAssignment do
       expect(SubAssignment.title_and_id("Required Replies Required Replies (1)")).to eq(["Required Replies", "1"])
     end
   end
+
+  describe "to_atom" do
+    before :once do
+      course_model
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @required_replies = 2
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(
+        context: @course,
+        reply_to_entry_required_count: @required_replies
+      )
+    end
+
+    it "generates correct feed titles for discussion checkpoints" do
+      expect(@reply_to_topic.to_atom[:title]).to eq "Assignment: #{@topic.title} Reply to Topic"
+      expect(@reply_to_entry.to_atom[:title]).to eq "Assignment: #{@topic.title} Required Replies (#{@required_replies})"
+    end
+
+    it "generates correct feed links for discussion checkpoints" do
+      expect(@reply_to_topic.to_atom[:link]).to include @reply_to_topic.direct_link.to_s
+      expect(@reply_to_entry.to_atom[:link]).to include @reply_to_entry.direct_link.to_s
+    end
+  end
+
+  describe "title_with_required_replies" do
+    before :once do
+      course_model
+      @course.root_account.enable_feature!(:discussion_checkpoints)
+      @required_replies = 2
+      @reply_to_topic, @reply_to_entry = graded_discussion_topic_with_checkpoints(
+        context: @course,
+        reply_to_entry_required_count: @required_replies
+      )
+    end
+
+    it "generates correct title for reply to topic checkpoint" do
+      expect(@reply_to_topic.title_with_required_replies).to eq "#{@reply_to_topic.title} Reply to Topic"
+    end
+
+    it "generates correct title for reply to entry checkpoint" do
+      expect(@reply_to_entry.title_with_required_replies).to eq "#{@reply_to_entry.title} Required Replies (#{@required_replies})"
+      @reply_to_entry.sub_assignment_tag = "invalid"
+      expect(@reply_to_entry.title_with_required_replies).to eq @reply_to_entry.title.to_s
+    end
+
+    it "generates correct title for sub_assignment with invalid sub_assignment_tag" do
+      @reply_to_topic.sub_assignment_tag = "invalid"
+      expect(@reply_to_topic.title_with_required_replies).to eq @reply_to_topic.title.to_s
+    end
+  end
 end

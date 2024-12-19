@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -24,7 +24,7 @@ import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icon
 
 import Slider from 'react-slick'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 const disabled = I18n.t('disabled')
 const enabled = I18n.t('enabled')
 
@@ -32,21 +32,23 @@ type NextArrowProps = {
   currentSlideNumber: number
   slider: React.RefObject<Slider>
   updatedArrowDisableIndex: number
+  screenReaderLabel?: string
 }
 
 type PreviousArrowProps = {
   currentSlideNumber: number
   slider: React.RefObject<Slider>
+  screenReaderLabel?: string
 }
 
 export const NextArrow = (props: NextArrowProps) => {
-  const {currentSlideNumber, slider, updatedArrowDisableIndex} = props
+  const {currentSlideNumber, slider, updatedArrowDisableIndex, screenReaderLabel} = props
 
   return (
     <Flex.Item>
       <div>
         <IconButton
-          screenReaderLabel={I18n.t('Carousel Next Item Button')}
+          screenReaderLabel={screenReaderLabel || I18n.t('Carousel Next Item Button')}
           withBackground={false}
           withBorder={false}
           color="secondary"
@@ -61,13 +63,13 @@ export const NextArrow = (props: NextArrowProps) => {
 }
 
 export const PreviousArrow = (props: PreviousArrowProps) => {
-  const {currentSlideNumber, slider} = props
+  const {currentSlideNumber, slider, screenReaderLabel} = props
 
   return (
     <Flex.Item>
       <div style={{marginRight: '0.8rem'}}>
         <IconButton
-          screenReaderLabel={I18n.t('Carousel Previous Item Button')}
+          screenReaderLabel={screenReaderLabel || I18n.t('Carousel Previous Item Button')}
           withBackground={false}
           withBorder={false}
           color="secondary"

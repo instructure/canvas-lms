@@ -18,7 +18,7 @@
 
 import React, {Suspense, lazy} from 'react'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,7 +30,7 @@ import {Tray} from '@instructure/ui-tray'
 import {Heading} from '@instructure/ui-heading'
 import {bool, func} from 'prop-types'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 const CommentsTrayBody = lazy(() => {
   return import(

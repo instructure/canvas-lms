@@ -41,11 +41,11 @@ import {
   getPeerReviewSubHeaderText,
   getPeerReviewButtonText,
 } from '../helpers/PeerReviewHelpers'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import {useMutation, useApolloClient} from '@apollo/react-hooks'
+import {useMutation, useApolloClient} from '@apollo/client'
 import PropTypes from 'prop-types'
 import React, {useState, useEffect, useContext} from 'react'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
@@ -67,7 +67,7 @@ import qs from 'qs'
 import useStore from './stores/index'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 
-const I18n = useI18nScope('assignments_2_file_upload')
+const I18n = createI18nScope('assignments_2_file_upload')
 
 function DraftStatus({status}) {
   const statusConfigs = {
@@ -330,7 +330,7 @@ const SubmissionManager = ({
   }
 
   const updateCachedSubmissionDraft = (cache, newDraft) => {
-    const {assignment: cachedAssignment, submission: cachedSubmission} = JSON.parse(
+    const queryResult = JSON.parse(
       JSON.stringify(
         cache.readQuery({
           query: STUDENT_VIEW_QUERY,
@@ -341,6 +341,12 @@ const SubmissionManager = ({
         })
       )
     )
+
+    if (!queryResult) {
+      return
+    }
+
+    const {assignment: cachedAssignment, submission: cachedSubmission} = queryResult
 
     cachedSubmission.submissionDraft = newDraft
     cache.writeQuery({
@@ -946,6 +952,7 @@ const SubmissionManager = ({
     title: assignment.rubric?.title,
     ratingOrder: assignment.rubric?.ratingOrder,
     freeFormCriterionComments: assignment.rubric?.free_form_criterion_comments,
+    pointsPossible: assignment.rubric?.points_possible,
     criteria: (assignment.rubric?.criteria || []).map(criterion => {
       return {
         ...criterion,
@@ -998,6 +1005,7 @@ const SubmissionManager = ({
         hidePoints={rubricData?.assignment?.rubricAssociation?.hide_points}
         isOpen={isSelfAssessmentOpen}
         isPreviewMode={!!selfAssessment}
+        isSelfAssessment={shouldRenderSelfAssessment()}
         isPeerReview={false}
         onDismiss={() => setIsSelfAssessmentOpen(false)}
         rubricAssessmentData={rubricAssessmentData}

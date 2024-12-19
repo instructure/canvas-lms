@@ -139,7 +139,7 @@ module Api::V1::OutcomeResults
   def outcome_results_include_alignments_json(alignments)
     alignments.map do |alignment|
       hash = { id: alignment.asset_string, name: alignment.title }
-      html_url = polymorphic_url([alignment.context, alignment]) rescue nil
+      html_url = polymorphic_url([alignment.context, alignment])
       hash[:html_url] = html_url if html_url
       hash
     end

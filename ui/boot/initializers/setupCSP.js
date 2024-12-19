@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {debounce} from 'lodash'
 
-const I18n = useI18nScope('common_bundle')
+const I18n = createI18nScope('common_bundle')
 
 /**
  * Sets up CSP enforcement for iframes and alerts end users to csp failures

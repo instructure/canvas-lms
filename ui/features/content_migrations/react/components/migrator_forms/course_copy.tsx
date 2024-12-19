@@ -18,7 +18,7 @@
 
 import React, {useRef, useState, useCallback, type ChangeEvent} from 'react'
 import {throttle} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
@@ -34,8 +34,9 @@ import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {parseDateToISOString} from '../utils'
 import {ImportLabel} from './import_label'
 import {ImportInProgressLabel} from './import_in_progress_label'
+import {ImportClearLabel} from './import_clear_label'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type CourseOption = {
   id: string
@@ -212,6 +213,7 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
         onCancel={onCancel}
         SubmitLabel={ImportLabel}
         SubmittingLabel={ImportInProgressLabel}
+        CancelLabel={ImportClearLabel}
       />
     </>
   )

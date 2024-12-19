@@ -140,7 +140,7 @@ module RespondusSoapEndpoint
       # all other arguments are strings
       args = args.map { |a| a.is_a?(String) ? a : nil }
       userName, password, context, *args = args
-      Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env["REMOTE_ADDR"]} at #{Time.now}) [SOAP]"
+      Rails.logger.debug "\nProcessing RespondusSoapApi##{method} (for #{rack_env["REMOTE_ADDR"]} at #{Time.zone.now}) [SOAP]"
       log_args = args.dup
       log_args.pop if %w[publishServerItem replaceServerItem appendServerItem].include?(method.to_s)
       Rails.logger.debug "Parameters: #{([userName, "[FILTERED]", context] + log_args).inspect}"

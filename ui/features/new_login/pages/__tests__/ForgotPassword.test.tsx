@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
-import {MemoryRouter} from 'react-router-dom'
 import ForgotPassword from '../ForgotPassword'
+import {MemoryRouter} from 'react-router-dom'
 import {NewLoginProvider} from '../../context/NewLoginContext'
+import {render} from '@testing-library/react'
 
 jest.mock('../../context/NewLoginContext', () => {
   const actualContext = jest.requireActual('../../context/NewLoginContext')

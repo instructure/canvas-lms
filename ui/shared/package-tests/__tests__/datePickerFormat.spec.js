@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import datePickerFormat from '@instructure/moment-utils/datePickerFormat'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 describe('Date Picker Format Spec', () => {
   test('formats medium with weekday correctly', () => {

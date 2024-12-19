@@ -19,10 +19,10 @@
 import React from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import StuckList from './StuckList'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function StuckModal({shard, isOpen, onClose}) {
   const Footer = () => {

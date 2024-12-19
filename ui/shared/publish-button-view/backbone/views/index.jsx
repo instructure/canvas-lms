@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import htmlEscape from '@instructure/html-escape'
@@ -29,7 +29,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import DelayedPublishDialog from '../../react/components/DelayedPublishDialog'
 
-const I18n = useI18nScope('publish_btn_module')
+const I18n = createI18nScope('publish_btn_module')
 
 export default (function (superClass) {
   extend(PublishButton, superClass)
@@ -443,7 +443,7 @@ export default (function (superClass) {
         }
       })(this),
     }
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     return ReactDOM.render(React.createElement(DelayedPublishDialog, props), this.$dpd_mount[0])
   }
 

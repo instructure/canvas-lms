@@ -29,9 +29,9 @@ import {KnowledgeCheckSectionToolbar} from './KnowledgeCheckSectionToolbar'
 import {QuizModal} from './QuizModal'
 import {renderQuestion} from './utils/questionUtils'
 import {type QuestionProps, type KnowledgeCheckSectionProps} from './types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const WIDTH = 'auto'
 const HEIGHT = 'auto'

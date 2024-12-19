@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, waitFor, within} from '@testing-library/react'
+import { fireEvent, render, waitFor, within } from '@testing-library/react'
 import {
   defaultRoleChoice,
   deleteMultipleEnrollmentsByNoMatch,
@@ -38,9 +38,9 @@ import {
   type Role,
   type User,
 } from '../types'
-import {deleteEnrollment, getTemporaryEnrollmentPairing} from '../api/enrollment'
+import { deleteEnrollment, getTemporaryEnrollmentPairing } from '../api/enrollment'
 import * as localStorageUtils from '../util/helpers'
-import {getDayBoundaries} from '../util/helpers'
+import { getDayBoundaries } from '../util/helpers'
 import MockDate from 'mockdate'
 
 const backCall = jest.fn()
@@ -112,8 +112,8 @@ const props: Props = {
   } as User,
   rolePermissions: truePermissions,
   roles: [
-    {id: '91', name: 'StudentEnrollment', label: 'Student', base_role_name: 'StudentEnrollment'},
-    {id: '92', name: 'TeacherEnrollment', label: 'Teacher', base_role_name: 'TeacherEnrollment'},
+    { id: '91', name: 'StudentEnrollment', label: 'Student', base_role_name: 'StudentEnrollment' },
+    { id: '92', name: 'TeacherEnrollment', label: 'Teacher', base_role_name: 'TeacherEnrollment' },
     {
       id: '93',
       name: 'Custom Teacher Enrollment',
@@ -135,8 +135,8 @@ const ENROLLMENTS_URI = encodeURI(
 function formatDateToLocalString(utcDateStr: string) {
   const date = new Date(utcDateStr)
   return {
-    date: new Intl.DateTimeFormat('en-US', {dateStyle: 'long'}).format(date),
-    time: new Intl.DateTimeFormat('en-US', {timeStyle: 'short', hour12: true}).format(date),
+    date: new Intl.DateTimeFormat('en-US', { dateStyle: 'long' }).format(date),
+    time: new Intl.DateTimeFormat('en-US', { timeStyle: 'short', hour12: true }).format(date),
   }
 }
 
@@ -169,7 +169,7 @@ describe('TempEnrollAssign', () => {
     })
 
     it('initializes with ROLE as the default role in the summary', async () => {
-      const {findByText} = render(<TempEnrollAssign {...props} />)
+      const { findByText } = render(<TempEnrollAssign {...props} />)
       const defaultMessage = await findByText(
         /Canvas will enroll .+ as a .+ in the selected courses of .+ from .+ - .+/
       )
@@ -182,7 +182,7 @@ describe('TempEnrollAssign', () => {
         ...props,
         enrollments: [...props.enrollments, additionalRecipient],
       }
-      const {findByText} = render(<TempEnrollAssign {...modifiedProps} />)
+      const { findByText } = render(<TempEnrollAssign {...modifiedProps} />)
 
       const summaryMsg = await findByText(/Canvas will enroll 2 users/)
       const readyMsg = await findByText(/2 users will receive/)
@@ -192,7 +192,7 @@ describe('TempEnrollAssign', () => {
     })
 
     it('triggers goBack when back is clicked', async () => {
-      const {findByText} = render(<TempEnrollAssign {...props} />)
+      const { findByText } = render(<TempEnrollAssign {...props} />)
       const backButton = await findByText('Back')
 
       fireEvent.click(backButton)
@@ -205,7 +205,7 @@ describe('TempEnrollAssign', () => {
         ...props,
         isInAssignEditMode: true,
       }
-      const {queryByText} = render(<TempEnrollAssign {...modifiedProps} />)
+      const { queryByText } = render(<TempEnrollAssign {...modifiedProps} />)
       const backButton = queryByText('Back')
 
       expect(backButton).toBeNull()
@@ -227,14 +227,14 @@ describe('TempEnrollAssign', () => {
     })
 
     it('changes summary when date and time changes', async () => {
-      const {findByLabelText, findByTestId} = render(<TempEnrollAssign {...props} />)
-      const startDate = await findByLabelText('Begins On')
-      const endDate = await findByLabelText('Until')
+      const { findByLabelText, findByTestId } = render(<TempEnrollAssign {...props} />)
+      const startDate = await findByLabelText('Begins On *')
+      const endDate = await findByLabelText('Until *')
 
-      fireEvent.input(startDate, {target: {value: 'Apr 10 2022'}})
+      fireEvent.input(startDate, { target: { value: 'Apr 10 2022' } })
       fireEvent.blur(startDate)
 
-      fireEvent.input(endDate, {target: {value: 'Apr 12 2022'}})
+      fireEvent.input(endDate, { target: { value: 'Apr 12 2022' } })
       fireEvent.blur(endDate)
 
       // Date.now sets default according to system timezone and cannot be fed a timezone; is midnight in manual testing
@@ -244,15 +244,15 @@ describe('TempEnrollAssign', () => {
     })
 
     it('displays Local and Account datetime in correct timezones', async () => {
-      window.ENV = {...window.ENV, TIMEZONE: 'America/Denver'}
+      window.ENV = { ...window.ENV, TIMEZONE: 'America/Denver' }
 
-      const {findAllByLabelText, findAllByText} = render(<TempEnrollAssign {...props} />)
-      const startDate = (await findAllByLabelText('Begins On'))[0]
-      fireEvent.input(startDate, {target: {value: 'Oct 31 2024'}})
+      const { findAllByLabelText, findAllByText } = render(<TempEnrollAssign {...props} />)
+      const startDate = (await findAllByLabelText('Begins On *'))[0]
+      fireEvent.input(startDate, { target: { value: 'Oct 31 2024' } })
       fireEvent.blur(startDate)
 
       const startTime = (await findAllByLabelText('Time'))[0]
-      fireEvent.input(startTime, {target: {value: '9:00 AM'}})
+      fireEvent.input(startTime, { target: { value: '9:00 AM' } })
       fireEvent.blur(startTime)
 
       const localTime = (await findAllByText(/Local: /))[0]
@@ -264,9 +264,9 @@ describe('TempEnrollAssign', () => {
 
     it('show error when date field is blank', async () => {
       const screen = render(<TempEnrollAssign {...props} />)
-      const startDate = await screen.findByLabelText('Begins On')
+      const startDate = await screen.findByLabelText('Begins On *')
 
-      fireEvent.input(startDate, {target: {value: ''}})
+      fireEvent.input(startDate, { target: { value: '' } })
       fireEvent.blur(startDate)
 
       const errorMsg = (await screen.findAllByText('The chosen date and time is invalid.'))[0]
@@ -275,9 +275,9 @@ describe('TempEnrollAssign', () => {
 
     it('shows error when start date is after end date', async () => {
       const screen = render(<TempEnrollAssign {...props} />)
-      const endDate = await screen.findByLabelText('Until')
+      const endDate = await screen.findByLabelText('Until *')
 
-      fireEvent.input(endDate, {target: {value: 'Apr 10 2022'}})
+      fireEvent.input(endDate, { target: { value: 'Apr 10 2022' } })
       fireEvent.blur(endDate)
 
       expect(
@@ -286,7 +286,7 @@ describe('TempEnrollAssign', () => {
     })
 
     it('hides roles the user does not have permission to enroll', async () => {
-      const {queryByText} = render(
+      const { queryByText } = render(
         <TempEnrollAssign {...props} rolePermissions={falsePermissions} />
       )
       expect(queryByText('No roles available')).not.toBeInTheDocument()
@@ -295,7 +295,7 @@ describe('TempEnrollAssign', () => {
     describe('localStorage interactions', () => {
       it('sets state from localStorage on mount', async () => {
         const mockData = {
-          roleChoice: {id: '92', name: 'TeacherEnrollment'},
+          roleChoice: { id: '92', name: 'TeacherEnrollment' },
         }
         localStorage.setItem(tempEnrollAssignData, JSON.stringify(mockData))
 
@@ -321,7 +321,7 @@ describe('TempEnrollAssign', () => {
 
         const storedData = localStorage.getItem(tempEnrollAssignData) as string
         const parsedData = JSON.parse(storedData)
-        expect(parsedData).toEqual({roleChoice: {id: '92', name: 'Teacher'}})
+        expect(parsedData).toEqual({ roleChoice: { id: '92', name: 'Teacher' } })
       })
 
       it('saves to localStorage on state select', async () => {
@@ -332,7 +332,7 @@ describe('TempEnrollAssign', () => {
         fireEvent.click(options[0]) // select the “Deleted” option
         const storedData = localStorage.getItem(tempEnrollAssignData) as string
         const parsedData = JSON.parse(storedData)
-        expect(parsedData).toEqual({stateChoice: 'deleted'})
+        expect(parsedData).toEqual({ stateChoice: 'deleted' })
       })
 
       it('saves to localStorage on START date change', async () => {
@@ -340,20 +340,20 @@ describe('TempEnrollAssign', () => {
         const expectedStartDateISO = '2023-04-15'
         const expectedStartTime12Hr = '1:00 PM'
 
-        const {findByLabelText, getByText} = render(<TempEnrollAssign {...props} />)
+        const { findByLabelText, getByText } = render(<TempEnrollAssign {...props} />)
 
-        const startDate = await findByLabelText('Begins On')
-        fireEvent.input(startDate, {target: {value: expectedStartDateDisplay}})
+        const startDate = await findByLabelText('Begins On *')
+        fireEvent.input(startDate, { target: { value: expectedStartDateDisplay } })
         fireEvent.blur(startDate)
 
         const startDateContainer = getByText('Start Date for Melvin').closest('fieldset')
 
-        const {findByLabelText: findByLabelTextWithinStartDate} = within(
+        const { findByLabelText: findByLabelTextWithinStartDate } = within(
           startDateContainer as HTMLElement
         )
         const startTime = await findByLabelTextWithinStartDate('Time')
 
-        fireEvent.input(startTime, {target: {value: expectedStartTime12Hr}})
+        fireEvent.input(startTime, { target: { value: expectedStartTime12Hr } })
         fireEvent.blur(startTime)
 
         await waitFor(() => {
@@ -380,20 +380,20 @@ describe('TempEnrollAssign', () => {
         const expectedEndDateISO = '2023-04-16'
         const expectedEndTime12Hr = '2:00 PM'
 
-        const {findByLabelText, getByText} = render(<TempEnrollAssign {...props} />)
+        const { findByLabelText, getByText } = render(<TempEnrollAssign {...props} />)
 
-        const endDate = await findByLabelText('Until')
-        fireEvent.input(endDate, {target: {value: expectedEndDateDisplay}})
+        const endDate = await findByLabelText('Until *')
+        fireEvent.input(endDate, { target: { value: expectedEndDateDisplay } })
         fireEvent.blur(endDate)
 
         const endDateContainer = getByText('End Date for Melvin').closest('fieldset')
 
-        const {findByLabelText: findByLabelTextWithinEndDate} = within(
+        const { findByLabelText: findByLabelTextWithinEndDate } = within(
           endDateContainer as HTMLElement
         )
         const endTime = await findByLabelTextWithinEndDate('Time')
 
-        fireEvent.input(endTime, {target: {value: expectedEndTime12Hr}})
+        fireEvent.input(endTime, { target: { value: expectedEndTime12Hr } })
         fireEvent.blur(endTime)
 
         await waitFor(() => {
@@ -420,13 +420,13 @@ describe('TempEnrollAssign', () => {
   describe('With Failed API calls', () => {
     beforeEach(() => {
       // mock console.error
-      jest.spyOn(console, 'error').mockImplementation(() => {})
+      jest.spyOn(console, 'error').mockImplementation(() => { })
 
       fetchMock.get(ENROLLMENTS_URI, 500)
     })
 
     it('shows error for failed enrollments fetch', async () => {
-      const {findAllByText} = render(<TempEnrollAssign {...props} />)
+      const { findAllByText } = render(<TempEnrollAssign {...props} />)
       const errorMessage = await findAllByText(
         /There was an error while requesting user enrollments, please try again/i
       )
@@ -436,7 +436,7 @@ describe('TempEnrollAssign', () => {
 
   describe('getEnrollmentAndUserProps', () => {
     it('should return enrollmentProps and userProps correctly when enrollmentType is RECIPIENT', () => {
-      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+      const { enrollmentProps, userProps } = getEnrollmentAndUserProps({
         enrollmentType: RECIPIENT,
         enrollments: props.enrollments,
         user: props.user,
@@ -447,7 +447,7 @@ describe('TempEnrollAssign', () => {
     })
 
     it('should return enrollmentProps and userProps correctly when enrollmentType is PROVIDER', () => {
-      const {enrollmentProps, userProps} = getEnrollmentAndUserProps({
+      const { enrollmentProps, userProps } = getEnrollmentAndUserProps({
         enrollmentType: PROVIDER,
         enrollments: props.enrollments,
         user: props.user,
@@ -479,31 +479,31 @@ describe('TempEnrollAssign', () => {
         ...props,
         tempEnrollmentsPairing: tempEnrollmentsPairingMock,
       }
-      ;(getTemporaryEnrollmentPairing as jest.Mock).mockResolvedValue({
-        response: {status: 204, ok: true},
-        json: {
-          temporary_enrollment_pairing: {
-            id: '143',
-            root_account_id: '2',
-            workflow_state: 'active',
-            created_at: '2024-01-12T20:02:47Z',
-            updated_at: '2024-01-12T20:02:47Z',
-            created_by_id: '1',
-            deleted_by_id: null,
-            ending_enrollment_state: null,
+        ; (getTemporaryEnrollmentPairing as jest.Mock).mockResolvedValue({
+          response: { status: 204, ok: true },
+          json: {
+            temporary_enrollment_pairing: {
+              id: '143',
+              root_account_id: '2',
+              workflow_state: 'active',
+              created_at: '2024-01-12T20:02:47Z',
+              updated_at: '2024-01-12T20:02:47Z',
+              created_by_id: '1',
+              deleted_by_id: null,
+              ending_enrollment_state: null,
+            },
           },
-        },
-      })
+        })
     })
 
     it('should set the role correctly when a matching role is found', async () => {
-      const {findByPlaceholderText} = render(<TempEnrollAssign {...tempProps} />)
+      const { findByPlaceholderText } = render(<TempEnrollAssign {...tempProps} />)
       const roleSelect = (await findByPlaceholderText('Select a Role')) as HTMLInputElement
       expect(roleSelect.value).toBe('Teacher')
     })
 
     it('should set the state correctly when a matching state is found', async () => {
-      const {findByPlaceholderText} = render(<TempEnrollAssign {...tempProps} />)
+      const { findByPlaceholderText } = render(<TempEnrollAssign {...tempProps} />)
       const stateSelect = (await findByPlaceholderText(
         'Begin typing to search'
       )) as HTMLInputElement
@@ -518,7 +518,7 @@ describe('TempEnrollAssign', () => {
         label: 'Test',
       }
       tempProps.roles = [doNotFindThisRoleId]
-      const {findByPlaceholderText, findByTestId} = render(<TempEnrollAssign {...tempProps} />)
+      const { findByPlaceholderText, findByTestId } = render(<TempEnrollAssign {...tempProps} />)
       const roleSelect = (await findByPlaceholderText('Select a Role')) as HTMLInputElement
       expect(roleSelect.value).toBe('')
       expect((await findByTestId('temp-enroll-summary')).textContent).toMatch(
@@ -528,10 +528,10 @@ describe('TempEnrollAssign', () => {
 
     it('should set the start date and time correctly', async () => {
       const localStartDate = formatDateToLocalString(startAt)
-      const {findByLabelText, getByText} = render(<TempEnrollAssign {...tempProps} />)
-      const startDate = (await findByLabelText('Begins On')) as HTMLInputElement
+      const { findByLabelText, getByText } = render(<TempEnrollAssign {...tempProps} />)
+      const startDate = (await findByLabelText('Begins On *')) as HTMLInputElement
       const startDateContainer = getByText('Start Date for Melvin').closest('fieldset')
-      const {findByLabelText: findByLabelTextWithinStartDate} = within(
+      const { findByLabelText: findByLabelTextWithinStartDate } = within(
         startDateContainer as HTMLElement
       )
       const startTime = (await findByLabelTextWithinStartDate('Time')) as HTMLInputElement
@@ -541,10 +541,10 @@ describe('TempEnrollAssign', () => {
 
     it('should set the end date and time correctly', async () => {
       const localEndDate = formatDateToLocalString(endAt)
-      const {findByLabelText, getByText} = render(<TempEnrollAssign {...tempProps} />)
-      const endDate = (await findByLabelText('Until')) as HTMLInputElement
+      const { findByLabelText, getByText } = render(<TempEnrollAssign {...tempProps} />)
+      const endDate = (await findByLabelText('Until *')) as HTMLInputElement
       const endDateContainer = getByText('End Date for Melvin').closest('fieldset')
-      const {findByLabelText: findByLabelTextWithinEndDate} = within(
+      const { findByLabelText: findByLabelTextWithinEndDate } = within(
         endDateContainer as HTMLElement
       )
       const endTime = (await findByLabelTextWithinEndDate('Time')) as HTMLInputElement
@@ -679,15 +679,15 @@ describe('TempEnrollAssign', () => {
           role_id: '20',
         },
       ]
-      ;(deleteEnrollment as jest.Mock).mockResolvedValue({
-        response: {status: 204, ok: true},
-        json: [],
-      })
+        ; (deleteEnrollment as jest.Mock).mockResolvedValue({
+          response: { status: 204, ok: true },
+          json: [],
+        })
     })
 
     it('should call deleteEnrollment for matching criteria', async () => {
       const sectionIds = ['55', '220', '19']
-      const enrollmentUsers: User[] = [{id: '1', name: 'user1'}]
+      const enrollmentUsers: User[] = [{ id: '1', name: 'user1' }]
       const roleId = '20'
       const promises = deleteMultipleEnrollmentsByNoMatch(
         mockTempEnrollments,
@@ -702,7 +702,7 @@ describe('TempEnrollAssign', () => {
 
     it('should not call deleteEnrollment for non-matching criteria', async () => {
       const sectionIds = ['7', '55', '220', '19']
-      const enrollmentUsers: User[] = [{id: '1', name: 'user1'}]
+      const enrollmentUsers: User[] = [{ id: '1', name: 'user1' }]
       const roleId = '20'
       const promises = deleteMultipleEnrollmentsByNoMatch(
         mockTempEnrollments,
@@ -772,7 +772,7 @@ describe('TempEnrollAssign', () => {
       mockGetFromLocalStorage({})
       const result = getStoredData(mockRoles)
       const [expectedDefaultStartDate, expectedDefaultEndDate] = getDayBoundaries()
-      const expectedTeacherRoleChoice = {id: '20', name: 'Teacher'}
+      const expectedTeacherRoleChoice = { id: '20', name: 'Teacher' }
       expect(result.roleChoice).toEqual(expectedTeacherRoleChoice)
       expect(result.startDate).toEqual(expectedDefaultStartDate)
       expect(result.endDate).toEqual(expectedDefaultEndDate)
@@ -780,7 +780,7 @@ describe('TempEnrollAssign', () => {
 
     it('should correctly use local storage data when available', () => {
       const mockLocalStorageData = {
-        roleChoice: {id: '20', name: 'Teacher'},
+        roleChoice: { id: '20', name: 'Teacher' },
         startDate: '2022-01-01T00:00:00.000Z',
         endDate: '2022-01-31T00:00:00.000Z',
       }

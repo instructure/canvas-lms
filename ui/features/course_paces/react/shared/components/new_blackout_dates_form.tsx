@@ -27,11 +27,11 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {coursePaceTimezone} from '../api/backend_serializer'
 
 import type {BlackoutDate} from '../types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 type CanvasDateInputMessageType = unknown
 
-const I18n = useI18nScope('course_paces_app')
+const I18n = createI18nScope('course_paces_app')
 
 const dateTimeFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
   month: 'numeric',

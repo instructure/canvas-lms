@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as MoveItem from '@canvas/move-item-tray'
 import Cache from '../../cache'
@@ -38,7 +38,7 @@ import {ltiState} from '@canvas/lti/jquery/messages'
 import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
 import {createRoot} from 'react-dom/client'
 
-const I18n = useI18nScope('AssignmentGroupListItemView')
+const I18n = createI18nScope('AssignmentGroupListItemView')
 
 extend(AssignmentGroupListItemView, DraggableCollectionView)
 
@@ -158,7 +158,7 @@ AssignmentGroupListItemView.prototype.createItemView = function (model) {
   const options = {
     userIsAdmin: this.userIsAdmin,
   }
-  // eslint-disable-next-line new-cap
+   
   return new this.itemView(
     $.extend(
       {},
@@ -758,7 +758,7 @@ AssignmentGroupListItemView.prototype.setExternalToolTray = function (tool, retu
     open: tool !== null,
   }
   const component = React.createElement(ContentTypeExternalToolTray, props)
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, $('#external-tool-mount-point')[0])
 }
 

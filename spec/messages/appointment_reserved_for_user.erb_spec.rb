@@ -77,13 +77,4 @@ describe "appointment_reserved_for_user" do
       expect(msg.body).to include(@teacher.name)
     end
   end
-
-  describe ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset, message_options)
-      expect(msg.body).to include("some title")
-    end
-  end
 end

@@ -17,7 +17,7 @@
  */
 
 import {arrayOf, number, shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {RubricAssessmentRating} from './RubricAssessmentRating'
 import {RubricAssociation} from './RubricAssociation'
 

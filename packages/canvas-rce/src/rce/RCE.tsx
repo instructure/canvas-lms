@@ -111,7 +111,7 @@ const RCE = forwardRef<RCEWrapper, RCEPropTypes>(function RCE(props, rceRef) {
       },
       variant,
     }
-    wrapInitCb(mirroredAttrs, iProps.editorOptions)
+    wrapInitCb(mirroredAttrs || {}, iProps.editorOptions)
 
     return iProps
   })

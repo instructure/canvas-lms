@@ -26,10 +26,10 @@ import {type ColumnsSectionProps} from './types'
 import {GroupBlock} from '../../blocks/GroupBlock'
 import {ToolbarColor, type ColorSpec} from '../../common/ToolbarColor'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getEffectiveBackgroundColor} from '@canvas/block-editor/react/utils'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const MIN_COLS = 1
 const MAX_COLS = 4
@@ -114,6 +114,7 @@ const ColumnsSectionToolbar = () => {
       <Flex gap="x-small">
         <Text>{I18n.t('Section Columns')}</Text>
         <NumberInput
+          allowStringValue={true}
           data-testid="columns-input"
           inputRef={el => {
             colInputRef.current = el

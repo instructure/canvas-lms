@@ -15,14 +15,14 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import Slick from 'slickgrid'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('jobs')
+const I18n = createI18nScope('jobs')
 /*
 xsslint safeString.identifier klass d out_of runtime_string
 */
@@ -296,7 +296,7 @@ class Jobs extends FlavorGrid {
     }
 
     if (this.grid.getSelectedRows().length < 1) {
-      // eslint-disable-next-line no-alert
+       
       window.alert('No jobs are selected')
       return
     }
@@ -325,7 +325,7 @@ class Jobs extends FlavorGrid {
             )
         }
       })()
-      // eslint-disable-next-line no-alert
+       
       if (!window.confirm(message)) return
     }
 

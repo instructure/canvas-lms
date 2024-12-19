@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import store from '../lib/ExternalAppsStore'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class DeleteExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.shape({name: PropTypes.string}).isRequired,
     returnFocus: PropTypes.func.isRequired,
     canDelete: PropTypes.bool.isRequired,
-    canAddEdit: PropTypes.bool.isRequired,
   }
 
   state = {
@@ -68,7 +67,7 @@ export default class DeleteExternalToolButton extends React.Component {
   }
 
   render() {
-    if (this.props.canDelete || this.props.canAddEdit) {
+    if (this.props.canDelete) {
       return (
         <li role="presentation" className="DeleteExternalToolButton">
           {/* TODO: use InstUI button */}

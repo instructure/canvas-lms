@@ -24,10 +24,10 @@ import {Img} from '@instructure/ui-img'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Tool} from '@canvas/global/env/EnvCommon'
 
-const I18n = useI18nScope('top_navigation_tools')
+const I18n = createI18nScope('top_navigation_tools')
 
 type TopNavigationToolsProps = {
   tools: Tool[]
@@ -50,7 +50,7 @@ function getToolIcon(tool: Tool) {
   )
 }
 
-function handleToolClick(val: String, tools: Tool[], handleToolLaunch: (tool: Tool) => void) {
+function handleToolClick(val: string, tools: Tool[], handleToolLaunch: (tool: Tool) => void) {
   const targeted_tool = tools.find((tool: Tool) => tool.id === val)
   if (targeted_tool) {
     handleToolLaunch(targeted_tool)

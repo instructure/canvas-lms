@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import create from 'zustand'
+import {create} from 'zustand'
 import {type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'

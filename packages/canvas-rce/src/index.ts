@@ -48,7 +48,6 @@ export {
   UploadFilePanelIds,
   handleSubmit,
   UploadFile,
-  type UploadFilePanelId,
   type UploadFileProps,
 } from './rce/plugins/shared/Upload'
 

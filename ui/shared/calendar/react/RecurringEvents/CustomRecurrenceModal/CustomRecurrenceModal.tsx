@@ -18,12 +18,12 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import CustomRecurrence from '../CustomRecurrence/CustomRecurrence'
 import RRuleHelper, {type RRuleHelperSpec} from '../RRuleHelper'
 
-const I18n = useScope('calendar_custom_recurring_event_custom_recurrence_modal')
+const I18n = createI18nScope('calendar_custom_recurring_event_custom_recurrence_modal')
 
 const isValid = (spec: RRuleHelperSpec): boolean => {
   const rrule = new RRuleHelper(spec)

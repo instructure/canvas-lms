@@ -55,6 +55,10 @@ module Lti
         # sub claim filled based on user's lti_context_id, but it is optional in pns messages
         nil
       end
+
+      def variable_expander(_tool)
+        nil
+      end
     end
   end
 end

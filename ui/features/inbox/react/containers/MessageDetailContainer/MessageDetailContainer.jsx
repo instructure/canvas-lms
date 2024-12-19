@@ -21,17 +21,17 @@ import {Conversation} from '../../../graphql/Conversation'
 import {ConversationContext} from '../../../util/constants'
 import {CONVERSATION_MESSAGES_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../../graphql/Queries'
 import {DELETE_CONVERSATION_MESSAGES} from '../../../graphql/Mutations'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useMemo, useCallback} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useMutation, useQuery} from '@apollo/react-hooks'
+import {useMutation, useQuery} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import {inboxMessagesWrapper} from '../../../util/utils'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -98,7 +98,7 @@ export const MessageDetailContainer = props => {
       'Are you sure you want to delete your copy of this message? This action cannot be undone.'
     )
 
-    const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(delMsg)
     if (confirmResult) {
       deleteConversationMessages({variables: {ids: [conversationMessageId]}})
     }
@@ -329,6 +329,7 @@ export const MessageDetailContainer = props => {
   )
 
   // Memo which returns array of ConversationListItem's
+
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const renderedItems = useMemo(() => {
     const menuData = inboxMessageData?.inboxMessages

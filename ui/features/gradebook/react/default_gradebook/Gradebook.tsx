@@ -122,7 +122,7 @@ import {QueryProvider} from '@canvas/query'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import KeyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
@@ -260,7 +260,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {RubricAssessmentImport} from './RubricAssessmentImport'
 import {RubricAssessmentExportModal} from './RubricAssessmentExport/RubricAssessmentExportModal'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const GradebookGrid = React.lazy(() => import('./components/GradebookGrid'))
 
@@ -637,7 +637,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             return results
           })()
           if (!isEqual(currentCustomColumnIds, updatedCustomColumnIds)) {
-            // eslint-disable-next-line promise/catch-or-return
+             
             this.props.reorderCustomColumns(updatedCustomColumnIds).then(() => {
               const colsById: {
                 [columnId: string]: CustomColumn
@@ -853,7 +853,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       ...Object.values(this.students),
       ...Object.values(this.studentViewStudents),
     ])
-    // eslint-disable-next-line promise/catch-or-return
+     
     this.gridReady.promise.then(() => {
       const studentIds = this.setupGrading(students)
       this.invalidateRowsForStudentIds(studentIds)
@@ -5190,7 +5190,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
     this.setState({isGridLoaded: true})
 
-    // eslint-disable-next-line promise/catch-or-return
+     
     this.gridReady.promise.then(() => {
       // Preload the Grade Detail Tray
       AsyncComponents.loadGradeDetailTray()
@@ -5208,7 +5208,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         <Portal node={this.props.flashMessageContainer}>
           {this.props.flashAlerts.map(alert => (
             <div key={alert.key} id={alert.key} className="Gradebook__FlashMessage">
-              {/* eslint-disable-next-line react/jsx-pascal-case */}
+              { }
               <FlashAlert.default
                 message={alert.message}
                 onClose={() => document.getElementById(alert.key)?.remove()}

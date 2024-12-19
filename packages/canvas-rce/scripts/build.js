@@ -18,8 +18,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Generates all the pre-translated code in lib/translated/{locale}.
-
 const shell = require('shelljs')
 
 shell.set('-e')
@@ -34,7 +32,9 @@ shell.exec('mkdir -p es')
 // delete everything in it.
 shell.exec('rm -rf lib/*')
 shell.exec('rm -rf es/*')
-shell.exec('scripts/installTranslations.js')
+shell.exec('yarn installTranslations')
 
 shell.echo('Building')
-shell.exec("npx babel --out-dir es src --ignore '**/__tests__' --extensions '.ts,.tsx,.js,.jsx'")
+shell.exec('yarn build:es')
+shell.echo('Building TypeScript declarations')
+shell.exec('yarn build:types')

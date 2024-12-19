@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
@@ -26,7 +26,7 @@ import {Link} from '@instructure/ui-link'
 import {useQuery} from '@canvas/query'
 import getAccounts from '@canvas/api/accounts/getAccounts'
 
-const I18n = useI18nScope('AccountsTray')
+const I18n = createI18nScope('AccountsTray')
 export default function AccountsTray() {
   const {data, isLoading, isSuccess} = useQuery({
     queryKey: ['accounts', {pageIndex: 1}],

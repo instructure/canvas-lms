@@ -27,9 +27,9 @@ import BlockEditorView from '../../BlockEditorView'
 import {LATEST_BLOCK_DATA_VERSION} from '../../utils/transformations'
 import {IconDesktop, IconTablet, IconMobile} from '../../assets/internal-icons'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type ViewSize = 'desktop' | 'tablet' | 'mobile'
 
@@ -274,7 +274,7 @@ const PreviewModal = ({open, onDismiss}: PreviewModalProps) => {
 
   useEffect(() => {
     if (viewRef && rendered) {
-      // @ts-expect-error enhandeUserContent is not typed
+      // @ts-expect-error
       enhanceUserContent(viewRef, {canvasOrigin: window.location.origin})
     }
   }, [viewRef, rendered])

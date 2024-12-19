@@ -111,7 +111,7 @@ class CalendarEvent < ActiveRecord::Base
       context = contexts[code] && contexts[code][0]
       new_event = events.detect { |e| e[:context_code] == context&.asset_string }
       existing_event = record.child_events.where(context:).first
-      event_unchanged = new_event && existing_event && DateTime.parse(new_event[:start_at]) == existing_event.start_at && DateTime.parse(new_event[:end_at]) == existing_event.end_at
+      event_unchanged = new_event && existing_event && Time.zone.parse(new_event[:start_at]) == existing_event.start_at && Time.zone.parse(new_event[:end_at]) == existing_event.end_at
       next if (context&.grants_right?(record.updating_user, :manage_calendar) || event_unchanged) && context.try(:parent_event_context) == record.context
 
       break record.errors.add(attr, t("errors.invalid_child_event_context", "Invalid child event context"))
@@ -253,7 +253,7 @@ class CalendarEvent < ActiveRecord::Base
 
   def default_values
     self.context_code = "#{context_type.underscore}_#{context_id}"
-    self.title ||= (context_type.to_s + " Event") rescue "Event"
+    self.title ||= (context_type.to_s + " Event")
 
     populate_missing_dates
     populate_all_day_flag unless imported
@@ -331,29 +331,31 @@ class CalendarEvent < ActiveRecord::Base
   def populate_all_day_flag
     # If the all day flag has been changed to all day, set the times to 00:00
     if all_day_changed? && all_day?
-      self.start_at = zoned_start_at.beginning_of_day rescue nil
-      self.end_at = zoned_end_at.beginning_of_day rescue nil
+      self.start_at = zoned_start_at&.beginning_of_day
+      self.end_at = zoned_end_at&.beginning_of_day
     elsif start_at_changed? || end_at_changed? || Canvas::Plugin.value_to_boolean(remove_child_events)
       self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == "00:00"
     end
 
     if all_day && (!all_day_date || start_at_changed? || all_day_date_changed?)
-      self.start_at = zoned_start_at.beginning_of_day rescue nil
-      self.end_at = zoned_end_at.beginning_of_day rescue nil
-      self.all_day_date = (zoned_start_at.to_date rescue nil)
+      self.start_at = zoned_start_at&.beginning_of_day
+      self.end_at = zoned_end_at&.beginning_of_day
+      self.all_day_date = zoned_start_at&.to_date
     end
   end
   protected :populate_all_day_flag
 
   # Localized start_at
   def zoned_start_at
-    self.start_at && ActiveSupport::TimeWithZone.new(self.start_at.utc,
-                                                     ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
+    start_at&.in_time_zone(edited_in_zone)
   end
 
   def zoned_end_at
-    self.end_at && ActiveSupport::TimeWithZone.new(self.end_at.utc,
-                                                   ((ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone))
+    end_at&.in_time_zone(edited_in_zone)
+  end
+
+  def edited_in_zone
+    (time_zone_edited && ActiveSupport::TimeZone[time_zone_edited]) || Time.zone
   end
 
   CASCADED_ATTRIBUTES = %i[
@@ -654,9 +656,9 @@ class CalendarEvent < ActiveRecord::Base
       author: context.name,
       updated: updated_at.utc,
       published: created_at.utc,
-      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{self.start_at.strftime("%m") rescue ""}&year=#{self.start_at.strftime("%Y") rescue ""}#calendar_event_#{id}",
-      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{self.start_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}_#{self.end_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
-      content: "#{datetime_string(self.start_at, self.end_at)}<br/>#{description}"
+      link: "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/calendar?month=#{start_at&.strftime("%m")}&year=#{start_at&.strftime("%Y")}#calendar_event_#{id}",
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/calendar_events/#{feed_code}_#{start_at&.strftime("%Y-%m-%d-%H-%M") || "none"}_#{end_at&.strftime("%Y-%m-%d-%H-%M")}",
+      content: "#{datetime_string(start_at, end_at)}<br/>#{description}"
     }
   end
 
@@ -752,8 +754,8 @@ class CalendarEvent < ActiveRecord::Base
       start_at = @event.is_a?(CalendarEvent) ? @event.start_at : @event.due_at
       end_at = @event.is_a?(CalendarEvent) ? @event.end_at : @event.due_at
 
-      event.dtstart = Icalendar::Values::DateTime.new(start_at.utc_datetime, "tzid" => "UTC") if start_at
-      event.dtend = Icalendar::Values::DateTime.new(end_at.utc_datetime, "tzid" => "UTC") if end_at
+      event.dtstart = Icalendar::Values::DateTime.new(start_at.utc.change(sec: 0), "tzid" => "UTC") if start_at
+      event.dtend = Icalendar::Values::DateTime.new(end_at.utc.change(sec: 0), "tzid" => "UTC") if end_at
 
       if @event.all_day && @event.all_day_date
         event.dtstart = Icalendar::Values::Date.new(@event.all_day_date)
@@ -762,7 +764,7 @@ class CalendarEvent < ActiveRecord::Base
         event.dtend = nil
       end
 
-      event.summary = @event.title
+      event.summary = @event.is_a?(SubAssignment) ? @event.title_with_required_replies : @event.title
 
       if @event.description && include_description
         html = api_user_content(@event.description, @event.context, nil, preloaded_attachments)
@@ -795,7 +797,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       event.location = loc_string
-      event.dtstamp = Icalendar::Values::DateTime.new(@event.updated_at.utc_datetime, "tzid" => "UTC") if @event.updated_at
+      event.dtstamp = Icalendar::Values::DateTime.new(@event.updated_at.utc.change(sec: 0), "tzid" => "UTC") if @event.updated_at
 
       tag_name = @event.class.name.underscore
 
@@ -805,9 +807,15 @@ class CalendarEvent < ActiveRecord::Base
         url_context = url_context.account
       end
 
+      tag_name_and_id = if @event.is_a?(SubAssignment)
+                          "assignment_#{@event.parent_assignment_id}"
+                        else
+                          "#{tag_name}_#{@event.id}"
+                        end
+
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
-      event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
+      event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name_and_id}"
       event.uid =         "event-#{tag_name.tr("_", "-")}-#{@event.id}"
       event.sequence =    0
 
@@ -815,9 +823,10 @@ class CalendarEvent < ActiveRecord::Base
         @event.applied_overrides.try(:each) do |override|
           next unless override.due_at_overridden
 
+          title = @event.is_a?(SubAssignment) ? @event.title_with_required_replies : @event.title
           tag_name = override.class.name.underscore
           event.uid       = "event-#{tag_name.tr("_", "-")}-#{override.id}"
-          event.summary   = "#{@event.title} (#{override.title})"
+          event.summary   = "#{title} (#{override.title})"
           # TODO: event.url
         end
       end

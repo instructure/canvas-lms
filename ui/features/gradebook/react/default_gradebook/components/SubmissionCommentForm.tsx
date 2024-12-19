@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type Props = {
   cancelCommenting: () => void
@@ -109,6 +109,7 @@ export default class SubmissionCommentForm extends React.Component<Props, State>
       <div>
         <div id="textarea-container">
           <TextArea
+            data-testid="comment-textarea"
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
             placeholder={I18n.t('Leave a comment')}
             onChange={this.handleCommentChange}

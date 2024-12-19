@@ -18,7 +18,7 @@
 
 import React, {useEffect, useState, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import {useQuery, useMutation, useLazyQuery} from '@apollo/react-hooks'
+import {useQuery, useMutation, useLazyQuery} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -32,10 +32,10 @@ import {
 } from './graphql/Mutations'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {COMMENTS_QUERY} from './graphql/Queries'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Library from './Library'
 
-const I18n = useI18nScope('CommentLibrary')
+const I18n = createI18nScope('CommentLibrary')
 
 function persistCheckbox(state) {
   doFetchApi({

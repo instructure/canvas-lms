@@ -18,12 +18,12 @@
 
 import {useContext} from 'react'
 import {CREATE_DISCUSSION_ENTRY} from '../../graphql/Mutations'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export default function useCreateDiscussionEntry(onCompleteCallback, updateCacheCallback) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

@@ -297,19 +297,19 @@ module CanvasColor
     end
 
     def inspect
-      to_s(true)
+      "##{self}"
     end
 
-    def to_s(add_hash = true)
-      trans? ? to_rgba(add_hash) : to_rgb(add_hash)
+    def to_s
+      trans? ? to_rgba : to_rgb
     end
 
-    def to_rgb(add_hash = true)
-      (add_hash ? "#" : "") + to_hex(r) + to_hex(g) + to_hex(b)
+    def to_rgb
+      "##{to_hex(r)}#{to_hex(g)}#{to_hex(b)}"
     end
 
-    def to_rgba(add_hash = true)
-      to_rgb(add_hash) + to_hex(a)
+    def to_rgba
+      "##{to_hex(r)}#{to_hex(g)}#{to_hex(b)}#{to_hex(a)}"
     end
 
     def opaque?
@@ -329,7 +329,7 @@ module CanvasColor
       return self if amt <= 0
       return WHITE if amt >= 1.0
 
-      val = Color.new(self)
+      val = dup
       val.r += ((255 - val.r) * amt).to_i
       val.g += ((255 - val.g) * amt).to_i
       val.b += ((255 - val.b) * amt).to_i
@@ -347,7 +347,7 @@ module CanvasColor
       return self if amt <= 0
       return BLACK if amt >= 1.0
 
-      val = Color.new(self)
+      val = dup
       val.r -= (val.r * amt).to_i
       val.g -= (val.g * amt).to_i
       val.b -= (val.b * amt).to_i
@@ -362,7 +362,7 @@ module CanvasColor
 
     # Convert to grayscale, using perception-based weighting
     def grayscale
-      val = Color.new(self)
+      val = dup
       val.r = val.g = val.b = ((0.2126 * val.r) + (0.7152 * val.g) + (0.0722 * val.b))
       val
     end
@@ -377,10 +377,10 @@ module CanvasColor
     # red.blend(blue, 0.5) will be purple, white.blend(black, 0.5) will be gray, etc.
     def blend(other, amt)
       other = Color.parse(other)
-      return Color.new(self) if amt <= 0 || other.nil?
-      return Color.new(other) if amt >= 1.0
+      return dup if amt <= 0 || other.nil?
+      return other.dup if amt >= 1.0
 
-      val = Color.new(self)
+      val = dup
       val.r += ((other.r - val.r) * amt).to_i
       val.g += ((other.g - val.g) * amt).to_i
       val.b += ((other.b - val.b) * amt).to_i
@@ -424,12 +424,5 @@ module CanvasColor
     # Some constants for general use
     WHITE = Color.new(255, 255, 255).freeze
     BLACK = Color.new(0, 0, 0).freeze
-  end
-
-  # "Global" method for creating Color objects, eg:
-  #   new_color = rgb(params[:new_color])
-  #   style="border: 1px solid <%= rgb(10,50,80).lighten %>"
-  def rgb(*)
-    Color.parse(*)
   end
 end

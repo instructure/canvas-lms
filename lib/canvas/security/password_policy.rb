@@ -58,10 +58,18 @@ module Canvas::Security
           symbol_regex = %r{[\!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\|\;\:\'\"\<\>\,\.\?/]}
           record.errors.add attr, "no_symbols" unless symbol_regex.match?(value)
         end
-        # check for common passwords using provided password dictionary
+        # a password dictionary has been provided to check against
         if policy[:common_passwords_attachment_id].present?
-          cache_key = ["common_passwords_set", record.account.global_id, policy[:common_passwords_attachment_id]].cache_key
-          record.errors.add attr, "common" if check_password_membership(cache_key, value, policy)
+          # key {tag} is to ensure related keys are stored on the same node
+          # given a production-like distributed Redis setup (e.g., Redis Cluster)
+          key = ["common_passwords:{#{record.account.global_id}}", policy[:common_passwords_attachment_id]].cache_key
+          # validate password against the Redis set
+          password_membership = check_password_membership(key, value, policy)
+          if password_membership
+            record.errors.add attr, "common"
+          elsif password_membership.nil?
+            record.errors.add attr, "unexpected"
+          end
         end
       elsif value.length < MIN_CHARACTER_LENGTH.to_i
         # fallback to minimum character length
@@ -106,20 +114,24 @@ module Canvas::Security
 
     def self.check_password_membership(key, value, policy)
       if Canvas.redis_enabled?
-        if Canvas.redis.srandmember(key).present?
-          # if an element exists, we can assume the set is populated
-          return Canvas.redis.sismember(key, value)
-        else
-          # if the set is empty, we need to populate it
-          file_data = load_common_passwords_file_data(policy)
-          if file_data
-            add_password_membership(key, file_data)
+        begin
+          if Canvas.redis.srandmember(key).present?
+            # if an element exists, we can assume the set is populated
+            return Canvas.redis.sismember(key, value)
           else
-            false
+            # if the set is empty, we need to populate it
+            file_data = load_common_passwords_file_data(policy)
+            if file_data
+              add_password_membership(key, file_data)
+            else
+              false
+            end
           end
-        end
 
-        Canvas.redis.sismember(key, value)
+          Canvas.redis.sismember(key, value)
+        rescue Redis::BaseConnectionError, Redis::Distributed::CannotDistribute
+          nil
+        end
       end
     end
 

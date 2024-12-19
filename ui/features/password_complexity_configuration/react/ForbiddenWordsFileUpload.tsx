@@ -17,7 +17,8 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {uploadFile} from '@canvas/upload-file'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {RocketSVG} from '@instructure/canvas-media'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -28,29 +29,23 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
-import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import './ForbiddenWordsFileUpload.css'
 import type {PasswordSettingsResponse} from './types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('password_complexity_configuration')
+const I18n = createI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 
 interface FileDetails {
+  newFile: File | null
   url: string | null
   filename: string | null
 }
 
 interface FolderResponse {
   id: number
-}
-
-interface FileResponse {
-  upload_url: string
-  upload_params: Record<string, string>
-  id: string
 }
 
 interface Props {
@@ -64,7 +59,7 @@ interface Props {
   setEnableApplyButton: (enabled: boolean) => void
 }
 
-const initialFileDetails: FileDetails = {url: null, filename: null}
+const initialFileDetails: FileDetails = {newFile: null, url: null, filename: null}
 
 export const createFolder = async (): Promise<number | null> => {
   try {
@@ -85,7 +80,7 @@ export const createFolder = async (): Promise<number | null> => {
     } else {
       throw new Error('Failed to create folder')
     }
-  } catch (error) {
+  } catch {
     return null
   }
 }
@@ -115,106 +110,70 @@ const ForbiddenWordsFileUpload = ({
   }, [])
 
   const handleUpload = useCallback(async () => {
-    const {url, filename} = fileDetails
+    const {newFile, url, filename} = fileDetails
 
-    if (!filename || isUploading || uploadAttempted) return
+    if (!newFile || isUploading || uploadAttempted) return
 
     setIsUploading(true)
     setUploadAttempted(true)
 
     try {
-      const {status, data: settingsResult} = await executeApiRequest<PasswordSettingsResponse>({
+      const {json, response} = await doFetchApi<PasswordSettingsResponse>({
         path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/settings`,
         method: 'GET',
       })
 
-      if (status !== 200) {
+      if (response.status !== 200) {
         throw new Error('Failed to fetch current settings.')
       }
 
       let folderId
-      if (settingsResult?.password_policy.common_passwords_folder_id) {
-        folderId = settingsResult?.password_policy.common_passwords_folder_id
+      if (json?.password_policy.common_passwords_folder_id) {
+        folderId = json?.password_policy.common_passwords_folder_id
       } else {
         folderId = await createFolder()
       }
       if (!folderId) throw new Error('Failed to create folder')
 
-      const initialRequestFormData = new FormData()
-      initialRequestFormData.append('name', filename)
+      const preflightUrl = `/api/v1/folders/${folderId}/files`
+      const preflightData = {name: filename, size: newFile.size, content_type: newFile.type}
+      const uploadResponse = await uploadFile(preflightUrl, preflightData, newFile)
 
-      // Temporarily using doFetchApi until the endpoint correctly return JSON
-      // TODO: Remove doFetchApi and use executeApiRequest once the endpoint returns JSON
-      const response = await doFetchApi<FileResponse>({
-        method: 'POST',
-        path: `/api/v1/folders/${folderId}/files`,
-        body: initialRequestFormData,
-      })
-
-      if (response.response.status !== 200) {
-        throw new Error('Failed to initiate file upload')
-      }
-
-      const responseBodyParsed = JSON.parse(response.text)
-
-      const upload_url = responseBodyParsed.upload_url
-      const upload_params = responseBodyParsed.upload_params
-
-      const uploadFileFormData = new FormData()
-      for (const [key, value] of Object.entries(upload_params)) {
-        uploadFileFormData.append(key, value as string)
-      }
-
-      if (url && filename) {
-        uploadFileFormData.append('file', new File([url], filename))
-      } else {
-        throw new Error('URL or filename is missing')
-      }
-
-      const {data: uploadResponseData, status: uploadStatus} =
-        await executeApiRequest<FileResponse>({
-          path: upload_url,
-          method: 'POST',
-          body: uploadFileFormData,
-        })
-
-      if (uploadStatus !== 200 && uploadStatus !== 201) {
+      if (uploadResponse.upload_status !== 'success') {
         throw new Error('Failed to complete the file upload')
       }
 
-      const fileId = Number(uploadResponseData.id)
-
+      const attachmentId = Number(uploadResponse.id)
       const updatedPasswordPolicy = {
         account: {
           settings: {
             password_policy: {
-              ...settingsResult?.password_policy,
+              ...json?.password_policy,
               common_passwords_folder_id: folderId,
-              common_passwords_attachment_id: fileId,
+              common_passwords_attachment_id: attachmentId,
             },
           },
         },
       }
-
-      const {status: accountsSettingsStatus} = await executeApiRequest({
+      const {response: accountSettingsResponse} = await doFetchApi({
         path: `/api/v1/accounts/${ENV.DOMAIN_ROOT_ACCOUNT_ID}/`,
         body: updatedPasswordPolicy,
         method: 'PUT',
       })
 
-      if (accountsSettingsStatus === 200) {
+      if (accountSettingsResponse.status === 200) {
         setForbiddenWordsUrl(url)
         setForbiddenWordsFilename(filename)
-        setCurrentAttachmentId(fileId)
-        setCommonPasswordsAttachmentId(fileId)
-        onSave(fileId)
+        setCurrentAttachmentId(attachmentId)
+        setCommonPasswordsAttachmentId(attachmentId)
+        onSave(attachmentId)
         setModalClosing(true)
         onDismiss()
         setEnableApplyButton(true)
       } else {
         throw new Error('Failed to save password policy settings')
       }
-    } catch (error) {
+    } catch {
       setFileDropMessages([
         {
           text: I18n.t('An error occurred during the upload. Please try again later.'),
@@ -242,7 +201,7 @@ const ForbiddenWordsFileUpload = ({
     const url = URL.createObjectURL(newFile)
     const filename = newFile.name
 
-    setFileDetails({url, filename})
+    setFileDetails({newFile, url, filename})
     setUploadAttempted(false)
   }, [])
 

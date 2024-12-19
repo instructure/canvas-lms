@@ -21,12 +21,12 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
 import {IconXSolid} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import StudentRangesView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
 import {assignmentShape, selectedPathShape} from '../shapes/index'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_details')
+const I18n = createI18nScope('cyoe_assignment_sidebar_breakdown_details')
 
 const {array, object, func, bool} = PropTypes
 
@@ -89,13 +89,16 @@ export default class BreakdownDetails extends React.Component {
         placement="end"
         shouldContainFocus={true}
         defaultFocusElement={() => this.closeButton}
+        label={I18n.t('Student Details')}
       >
-        <div className="crs-breakdown-details">
+        <div className="crs-breakdown-details" data-testid="breakdown-details">
           <div className="crs-breakdown-details__content">
             <span className="crs-breakdown-details__closeButton">
               <IconButton
                 withBorder={false}
                 withBackground={false}
+                data-testid="breakdown-details-close"
+                screenReaderLabel={I18n.t('Close details sidebar')}
                 ref={e => {
                   this.closeButton = e
                 }}

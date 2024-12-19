@@ -17,7 +17,7 @@
  */
 
 import type {SubmissionAttemptsComments} from 'api'
-import create from 'zustand'
+import {create} from 'zustand'
 
 export type GradeSummaryStore = {
   submissionCommentsTray?: SubmissionAttemptsComments

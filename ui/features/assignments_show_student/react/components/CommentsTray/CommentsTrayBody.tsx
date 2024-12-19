@@ -23,7 +23,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -33,7 +33,7 @@ import React, {useContext, useState} from 'react'
 import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import {bool, func} from 'prop-types'
 import PeerReviewPromptModal from '../PeerReviewPromptModal'
 import {
@@ -45,7 +45,7 @@ import {
   getPeerReviewButtonText,
 } from '../../helpers/PeerReviewHelpers'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 const COMPLETED_WORKFLOW_STATE = 'completed'
 
 // @ts-expect-error
@@ -71,7 +71,6 @@ export default function CommentsTrayBody(props) {
     setIsFetchingMoreComments(true)
     await fetchMore({
       variables: {
-        // @ts-expect-error
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
         ...queryVariables,
       },

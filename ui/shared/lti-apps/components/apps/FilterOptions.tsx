@@ -21,11 +21,11 @@ import type {FilterItem} from '../../models/Filter'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {capitalize} from 'lodash'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export default function FilterOptions(props: {
   categoryName: string

@@ -90,6 +90,7 @@ export function SearchSpan({...props}) {
       className="user_content"
       data-resource-type={resourceType()}
       data-resource-id={props.resourceId}
+      data-testid={props.testId}
       dangerouslySetInnerHTML={{
         __html: addSearchHighlighting(props.searchTerm, props.text, props.isSplitView),
       }}
@@ -110,6 +111,7 @@ SearchSpan.propTypes = {
   isAnnouncement: PropTypes.bool,
   isTopic: PropTypes.bool,
   resourceId: PropTypes.string,
+  testId: PropTypes.string,
   /**
    * Language code if the span has been translated
    */

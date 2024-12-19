@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo'
+import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo-v3'
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import * as z from 'zod'
 import {Button} from '@instructure/ui-buttons'
@@ -61,7 +61,7 @@ type QueryData = {
   }
 }
 
-const I18n = useI18nScope('mutationActivity')
+const I18n = createI18nScope('mutationActivity')
 
 function formatDate(date: Date) {
   return tz.format(date, 'date.formats.medium_with_weekday') ?? ''
@@ -326,6 +326,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}: AuditLogRe
                         first: pageSize,
                         after: pageInfo.endCursor,
                       },
+                      // @ts-expect-error
                       updateQuery: (prevData: Required<QueryData>, {fetchMoreResult: newData}) => {
                         return {
                           auditLogs: {

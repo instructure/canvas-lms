@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {GetState, SetState} from 'zustand'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import type {StoreApi} from 'zustand'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Module} from '../../../../../api.d'
 import type {GradebookStore} from './index'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export type ModulesState = {
   modules: Module[]
@@ -30,7 +30,10 @@ export type ModulesState = {
   fetchModules: () => Promise<any>
 }
 
-export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): ModulesState => ({
+export default (
+  set: StoreApi<GradebookStore>['setState'],
+  get: StoreApi<GradebookStore>['getState']
+): ModulesState => ({
   modules: [],
 
   hasModules: false,

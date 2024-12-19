@@ -44,6 +44,7 @@ export type DoFetchApiOpts = {
   method?: string
   headers?: {[k: string]: string}
   params?: QueryParameterRecord
+  // eslint-disable-next-line no-undef
   body?: BodyInit
   fetchOpts?: RequestInit
 }
@@ -78,6 +79,7 @@ export default async function doFetchApi<T = unknown>({
     body,
     method,
     ...finalFetchOptions,
+    // eslint-disable-next-line no-undef
     credentials: finalFetchOptions.credentials as RequestCredentials,
   })
   if (!response.ok) {

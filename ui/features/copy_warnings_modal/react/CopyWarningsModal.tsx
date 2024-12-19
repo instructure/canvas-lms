@@ -17,12 +17,12 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('copy_warnings_modal')
+const I18n = createI18nScope('copy_warnings_modal')
 
 interface CopyWarningsModalProps {
   errorMessages: string[]

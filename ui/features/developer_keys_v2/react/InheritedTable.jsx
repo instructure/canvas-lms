@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FilterBar from '@canvas/filter-bar'
 
 import DeveloperKey from './DeveloperKey'
@@ -31,7 +31,7 @@ import {createSetFocusCallback} from './AdminTable'
 
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 class InheritedTable extends React.Component {
   constructor(props) {
@@ -41,7 +41,6 @@ class InheritedTable extends React.Component {
       sortAscending: false,
       typeFilter: 'all',
       searchQuery: '',
-      sortFlagEnabled: window.ENV?.FEATURES?.enhanced_developer_keys_tables,
     }
   }
 
@@ -98,7 +97,7 @@ class InheritedTable extends React.Component {
 
   renderHeader = () => {
     const {prefix} = this.props
-    const {sortBy, sortAscending, sortFlagEnabled} = this.state
+    const {sortBy, sortAscending} = this.state
     const direction = sortAscending ? 'ascending' : 'descending'
 
     return (
@@ -108,13 +107,12 @@ class InheritedTable extends React.Component {
             key={header.id}
             id={header.id}
             width={header.width}
-            {...(header.sortable &&
-              sortFlagEnabled && {
-                sortDirection: sortBy === header.id ? direction : 'none',
-                onRequestSort: this.onRequestSort,
-              })}
+            {...(header.sortable && {
+              sortDirection: sortBy === header.id ? direction : 'none',
+              onRequestSort: this.onRequestSort,
+            })}
           >
-            {header.sortText && sortFlagEnabled ? (
+            {header.sortText ? (
               <Tooltip renderTip={header.sortText} placement="top">
                 {header.text}
               </Tooltip>
@@ -130,11 +128,7 @@ class InheritedTable extends React.Component {
   sortedDeveloperKeys = () => {
     const {prefix} = this.props
     const headers = this.headers(prefix)
-    const {sortBy, sortAscending, sortFlagEnabled} = this.state
-
-    if (!sortFlagEnabled) {
-      return this.props.developerKeysList
-    }
+    const {sortBy, sortAscending} = this.state
 
     const developerKeys = this.filteredDeveloperKeys()
     const sortedKeys = developerKeys.sort((a, b) => {
@@ -152,11 +146,7 @@ class InheritedTable extends React.Component {
   }
 
   filteredDeveloperKeys = () => {
-    const {typeFilter, searchQuery, sortFlagEnabled} = this.state
-
-    if (!sortFlagEnabled) {
-      return this.props.developerKeysList
-    }
+    const {typeFilter, searchQuery} = this.state
 
     return this.props.developerKeysList.filter(key => {
       const keyType = key.is_lti_key ? 'lti' : 'api'
@@ -191,34 +181,25 @@ class InheritedTable extends React.Component {
 
   render() {
     const {label} = this.props
-    const {sortFlagEnabled} = this.state
     const developerKeys = this.sortedDeveloperKeys()
     return (
       <div>
-        {sortFlagEnabled && (
-          <FilterBar
-            filterOptions={[
-              {value: 'lti', text: I18n.t('LTI Keys')},
-              {value: 'api', text: I18n.t('API Keys')},
-            ]}
-            onFilter={typeFilter => this.setState({typeFilter})}
-            onSearch={searchQuery => this.setState({searchQuery})}
-            searchPlaceholder={I18n.t('Search by name or ID')}
-            searchScreenReaderLabel={I18n.t('Search Developer Keys')}
-          />
-        )}
+        <FilterBar
+          filterOptions={[
+            {value: 'lti', text: I18n.t('LTI Keys')},
+            {value: 'api', text: I18n.t('API Keys')},
+          ]}
+          onFilter={typeFilter => this.setState({typeFilter})}
+          onSearch={searchQuery => this.setState({searchQuery})}
+          searchPlaceholder={I18n.t('Search by name or ID')}
+          searchScreenReaderLabel={I18n.t('Search Developer Keys')}
+        />
         <Table
           data-automation="devKeyInheritedTable"
           caption={<ScreenReaderContent>{label}</ScreenReaderContent>}
           size="medium"
         >
-          <Table.Head
-            {...(sortFlagEnabled && {
-              renderSortLabel: I18n.t('Sort by'),
-            })}
-          >
-            {this.renderHeader()}
-          </Table.Head>
+          <Table.Head renderSortLabel={I18n.t('Sort by')}>{this.renderHeader()}</Table.Head>
           <Table.Body>
             {developerKeys.map(developerKey => (
               <DeveloperKey

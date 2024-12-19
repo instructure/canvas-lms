@@ -55,10 +55,10 @@ describe ErrorReport do
     end
 
     it "plugs together with Canvas::Errors::Info to log the user" do
-      req = instance_double("request", request_method_symbol: "GET", format: "html")
+      req = instance_double(ActionDispatch::Request, request_method_symbol: "GET", format: "html")
       allow(Canvas::Errors::Info).to receive_messages(useful_http_env_stuff_from_request: {},
                                                       useful_http_headers: {})
-      user = instance_double("User", global_id: 5)
+      user = instance_double(User, global_id: 5)
       err = Exception.new("error")
       info = Canvas::Errors::Info.new(req, Account.default, user, {})
       report = described_class.log_exception_from_canvas_errors(err, info.to_h)
@@ -66,10 +66,10 @@ describe ErrorReport do
     end
 
     it "doesn't save the error report when we're out of region" do
-      req = instance_double("request", request_method_symbol: "GET", format: "html")
+      req = instance_double(ActionDispatch::Request, request_method_symbol: "GET", format: "html")
       allow(Canvas::Errors::Info).to receive_messages(useful_http_env_stuff_from_request: {},
                                                       useful_http_headers: {})
-      user = instance_double("User", global_id: 5)
+      user = instance_double(User, global_id: 5)
       err = Exception.new("error")
       info = Canvas::Errors::Info.new(req, Account.default, user, {})
       expect(Shard.current).to receive(:in_current_region?).and_return(false)
@@ -120,6 +120,32 @@ describe ErrorReport do
     q_params = { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }
     expect(report.data["query_parameters"]).to eq(q_params.inspect)
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
+  end
+
+  it "filters password reset params" do
+    mock_attrs = {
+      env: { "REQUEST_URI" => "https://www.example.instructure.com/profile" },
+      remote_ip: "",
+      url: "https://www.example.instructure.com/profile",
+      path_parameters: { controller: "profile", action: "update" },
+      query_parameters: {},
+      request_parameters: { "pseudonym" =>
+        { "old_password" => "elitepotato", "password" => "ghosthunter", "password_confirmation" => "ghosthunter" } }
+    }
+    req = double(mock_attrs)
+    report = described_class.new
+    report.assign_data(Canvas::Errors::Info.useful_http_env_stuff_from_request(req))
+
+    expect(report.data["request_parameters"]).to eq(
+      {
+        "pseudonym" =>
+          {
+            "old_password" => "[FILTERED]",
+            "password" => "[FILTERED]",
+            "password_confirmation" => "[FILTERED]"
+          }
+      }.inspect
+    )
   end
 
   it "does not try to assign protected fields" do

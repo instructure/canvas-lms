@@ -16,11 +16,11 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import K5Uploader from '@instructure/k5uploader'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import KalturaSessionLoader from '@canvas/media-comments/jquery/kaltura_session_loader'
 import $ from 'jquery'
 
-const I18n = useI18nScope('sg_uploader')
+const I18n = createI18nScope('sg_uploader')
 
 export default class SGUploader {
   constructor() {

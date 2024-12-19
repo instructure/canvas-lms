@@ -81,7 +81,7 @@ module Qti
     end
 
     def readtime(v)
-      (v == "unlimited") ? nil : Time.at(v.to_i)
+      (v == "unlimited") ? nil : Time.zone.at(v.to_i)
     end
 
     def read_setting(setting_name)

@@ -21,14 +21,14 @@ import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import AssignmentGradeInput from '../AssignmentGradeInput/index'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
 import SimilarityIndicator from '../SimilarityIndicator'
 import type {Submission} from '../../../../../../../api.d' // !!!! FIXME
 import type {CamelizedAssignment, GradeEntryMode} from '@canvas/grading/grading.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const componentOverrides = {
   IconButton: {

@@ -20,7 +20,7 @@ import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import _, {map, find} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import template from '../../../jst/subviews/CourseFindSelect.handlebars'
 import autocompleteItemTemplate from '../../../jst/autocomplete_item.handlebars'
@@ -30,7 +30,7 @@ import 'jqueryui/menu'
 import 'jqueryui/autocomplete'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(CourseFindSelectView, Backbone.View)
 
@@ -207,7 +207,7 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
       }
     })(this)
   )
-  // eslint-disable-next-line no-void
+   
   return this.$courseSearchField.val(courseObj != null ? courseObj.value : void 0)
 }
 
@@ -216,7 +216,7 @@ CourseFindSelectView.prototype.updateSearch = function (event) {
 // @api private
 CourseFindSelectView.prototype.setSourceCourseId = function (id) {
   let course, ref
-  // eslint-disable-next-line no-void
+   
   if (id === ((ref = ENV.COURSE_ID) != null ? ref.toString() : void 0)) {
     this.$selectWarning.show()
   } else {
@@ -245,7 +245,7 @@ CourseFindSelectView.prototype.setSourceCourseId = function (id) {
 CourseFindSelectView.prototype.validations = function () {
   const errors = {}
   const settings = this.model.get('settings')
-  // eslint-disable-next-line no-void
+   
   if (!(settings != null ? settings.source_course_id : void 0)) {
     errors.courseSearchField = [
       {

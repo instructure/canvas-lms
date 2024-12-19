@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, number, node, object, oneOfType} from 'prop-types'
@@ -24,7 +24,7 @@ import {func, number, node, object, oneOfType} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('announcements_v2')
+const I18n = createI18nScope('announcements_v2')
 
 export function showConfirmDelete(props) {
   const parent = document.createElement('div')
@@ -35,7 +35,7 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
     parent

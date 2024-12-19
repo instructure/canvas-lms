@@ -27,7 +27,7 @@ import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   isTopicAuthor,
   updateDiscussionTopicEntryCounts,
@@ -48,12 +48,12 @@ import {
   UPDATE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {View} from '@instructure/ui-view'
 import {ReportReply} from '../../components/ReportReply/ReportReply'
 import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const SplitScreenThreadsContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -104,8 +104,12 @@ export const SplitScreenThreadsContainer = props => {
     if (discussionEntriesToUpdate.size > 0) {
       const interval = setInterval(() => {
         const entryIds = Array.from(discussionEntriesToUpdate)
-        const entries = extractedSubentryNodes.filter(
-          entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
+        const entries = JSON.parse(
+          JSON.stringify(
+            extractedSubentryNodes.filter(
+              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
+            )
+          )
         )
 
         entries.forEach(entry => (entry.entryParticipant.read = true))

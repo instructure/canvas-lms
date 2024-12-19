@@ -83,8 +83,10 @@ module Canvas
     LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i
                        (size > 0) ? size : 4096)
     def self.sample_memory
-      s = File.read("/proc/#{Process.pid}/statm").to_i rescue 0
+      s = File.read("/proc/#{Process.pid}/statm").to_i
       s * LINUX_PAGE_SIZE / 1024
+    rescue
+      0
     end
   else
     # generic unix solution

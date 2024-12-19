@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Datafixup
-      class EagerLoad < Cop
+      class EagerLoad < Base
         def on_send(node)
           _receiver, method_name, *_args = *node
           if method_name.to_s == "eager_load"

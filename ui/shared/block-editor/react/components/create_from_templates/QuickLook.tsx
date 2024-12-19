@@ -22,13 +22,13 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import BlockEditorView from '../../BlockEditorView'
 import {LATEST_BLOCK_DATA_VERSION} from '../../utils/transformations'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export default function QuickLook({
   template,

@@ -17,7 +17,7 @@
  */
 
 import {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
 import {fetchStudentSubmissionComments} from '../../queries/Queries'
@@ -25,7 +25,7 @@ import {ApiCallStatus, type CommentConnection} from '../../types'
 import type {Submission} from '../../../../api.d'
 import {useQuery} from '@canvas/query'
 
-const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
+const I18n = createI18nScope('enhanced_individual_gradebook_submit_score')
 
 type UseCommentsProps = {
   courseId?: string

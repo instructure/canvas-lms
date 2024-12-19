@@ -17,7 +17,7 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import type {Product, ToolsByDisplayGroup} from '../models/Product'
+import type {OrganizationProduct, Product, ToolsByDisplayGroup} from '../models/Product'
 import {stringify} from 'qs'
 import type {DiscoverParams} from '../hooks/useDiscoverQueryParams'
 import type {LtiFilters, FilterItem, OrganizationFiltes} from '../models/Filter'
@@ -35,8 +35,10 @@ export type ProductResponse = {
   tools: Array<Product>
   meta: Meta
 }
-export type OrganizationProductResponse = ProductResponse & {
+export type OrganizationProductResponse = {
   description: string
+  tools: Array<OrganizationProduct>
+  meta: Meta
 }
 
 export const fetchProducts = async (params: DiscoverParams): Promise<ProductResponse> => {
@@ -53,7 +55,7 @@ export const fetchProducts = async (params: DiscoverParams): Promise<ProductResp
         company_id_in: companies.map((company: FilterItem) => company.id),
       }),
       ...(audience && {
-        audience_id_in: audience.map((audience: FilterItem) => audience.id),
+        audience_id_in: audience.map((aud: FilterItem) => aud.id),
       }),
       ...(versions && {
         version_id_in: versions.map((version: FilterItem) => version.id),
@@ -129,7 +131,7 @@ export const fetchProductsByOrganization = async (
         company_id_in: companies.map(company => company.id),
       }),
       ...(audience && {
-        audience_id_in: audience.map(audience => audience.id),
+        audience_id_in: audience.map(aud => aud.id),
       }),
       ...(versions && {
         version_id_in: versions.map(version => version.id),
@@ -144,12 +146,12 @@ export const fetchProductsByOrganization = async (
     }
   )}`
 
-  const products: ProductResponse = await fetchResponse(
+  const products: OrganizationProductResponse = await fetchResponse(
     'get',
     url,
     'Failed to fetch products by organization'
   )
-  // @ts-expect-error
+
   return products
 }
 
@@ -162,9 +164,14 @@ async function fetchResponse(method: string, url: string, errorText: string): Pr
     },
   })
 
+  const products = await response.json()
+
   if (!response.ok) {
+    if (products.lp_server_error) {
+      throw new Error(products.json.error)
+    }
     throw new Error(errorText)
   }
-  const products: OrganizationProductResponse = await response.json()
+
   return products
 }

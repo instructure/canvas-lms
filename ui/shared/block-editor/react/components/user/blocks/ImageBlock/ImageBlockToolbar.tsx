@@ -30,13 +30,13 @@ import {IconResize} from '../../../../assets/internal-icons'
 import {type ImageBlockProps, type ImageConstraint} from './types'
 import {type SizeVariant} from '../../../editor/types'
 import {AddImageModal} from '../../../editor/AddImageModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {TextArea} from '@instructure/ui-text-area'
 
 import {changeSizeVariant} from '../../../../utils/resizeHelpers'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const ImageBlockToolbar = () => {
   const {
@@ -51,7 +51,7 @@ const ImageBlockToolbar = () => {
 
   const handleConstraintChange = useCallback(
     (
-      _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem
@@ -74,7 +74,7 @@ const ImageBlockToolbar = () => {
 
   const handleChangeSzVariant = useCallback(
     (
-      _e: React.MouseEvent<ViewOwnProps, MouseEvent>,
+      _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
       _args: MenuItem

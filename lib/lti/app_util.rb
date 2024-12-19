@@ -40,10 +40,6 @@ module Lti
         display_type = display_override
       end
 
-      if display_type == "in_rce" && !Account.site_admin.feature_enabled?(:lti_rce_postmessage_support)
-        display_type = "borderless"
-      end
-
       TOOL_DISPLAY_TEMPLATES[display_type].dup
     end
 

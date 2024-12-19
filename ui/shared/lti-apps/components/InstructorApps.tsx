@@ -33,6 +33,8 @@ import {Header} from './apps/Header'
 import type {Product} from '../models/Product'
 import {View} from '@instructure/ui-view'
 import useBreakpoints from '../hooks/useBreakpoints'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 export const InstructorApps = () => {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -42,6 +44,7 @@ export const InstructorApps = () => {
     [queryParams]
   )
   const {isDesktop} = useBreakpoints()
+  const I18n = createI18nScope('lti_registrations')
 
   const {
     data: {tools, meta, description},
@@ -54,6 +57,9 @@ export const InstructorApps = () => {
       tools: [] as Product[],
       meta: {total_count: 0, current_page: 1, num_pages: 1, count: 0, per_page: 21},
       description: '',
+    },
+    onError: (err: Error) => {
+      showFlashError(I18n.t("Couldn't load apps"))(err)
     },
   })
 

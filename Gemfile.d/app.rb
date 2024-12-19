@@ -22,6 +22,7 @@
 gem "bootsnap", "~> 1.16", require: false
 gem "rails", "~> 7.1.3"
   # can't upgrade to 3.1 until Rails 7.2
+  # if rack is updated, please remove gems/autoextend/lib/rack/
   gem "rack", "~> 3.0.11" if $canvas_rails == "7.1"
   # can't upgrade to 2.0 until Rails 7.2
   gem "sqlite3", "~> 1.7"
@@ -57,7 +58,7 @@ gem "datadog", "~> 2.1", require: false
 gem "docx", "~> 0.8"
 gem "encrypted_cookie_store-instructure", "~> 1.2", require: "encrypted_cookie_store"
 gem "gepub", "~> 1.0"
-gem "graphql", "~> 2.3.0"
+gem "graphql", "~> 2.3"
 gem "graphql-batch", "~> 0.5"
 gem "hashdiff", "~> 1.1", require: false
 gem "highline", "~> 3.0", require: false
@@ -91,7 +92,7 @@ gem "oj", "~> 3.16"
 gem "outrigger", "~> 3.0"
 gem "parallel", "~> 1.23", require: false
 gem "pdf-reader", "~> 2.11"
-gem "pg_query", "~> 5.1", require: false
+gem "pg_query", "~> 6.0", require: false
 gem "pragmatic_segmenter", "~> 0.3"
 gem "prawn-emoji", "~> 5.3", require: false
 gem "prawn-rails", "~> 1.4"
@@ -168,7 +169,6 @@ path "../gems" do
   gem "request_context"
   gem "stringify_ids"
   gem "turnitin_api"
-  gem "twitter"
   gem "utf8_cleaner"
   gem "workflow"
 end

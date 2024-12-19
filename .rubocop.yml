@@ -140,6 +140,10 @@ Rails/RedundantPresenceValidationOnBelongsTo:
                  # config.load_defaults line
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
+Rails/TimeZone:
+  Exclude:
+    - "gems/*/lib/**/*.rb"
+    - "gems/*/spec/**/*.rb"
 Rails/WhereExists:
   EnforcedStyle: where
 Rails/WhereNotWithMultipleConditions:
@@ -200,8 +204,12 @@ Style/OpenStructUse:
   Severity: warning # unfortunately, legacy code uses it a lot;
 Style/ParallelAssignment:
   Enabled: false # most uses are legitimate deconstruction or value swapping
+Style/RescueModifier:
+  AutoCorrect: false # force the developer to think about how to handle it; don't just blindly ignore errors
 Style/ReturnNil:
   Enabled: false # explicit nil is okay when a method is expected to have a return value
+Style/SafeNavigationChainLength:
+  Enabled: false # kind of Metrics-y, not clear it actually improves code quality
 Style/SoleNestedConditional:
   AllowModifier: true # it makes lines too long and complicated otherwise
 Style/SpecialGlobalVars:
@@ -288,9 +296,6 @@ Rails/OutputSafety:
 Rails/RakeEnvironment:
   Severity: convention
   AutoCorrect: false
-Rails/TimeZone:
-  Enabled: false
-  AutoCorrect: false
 Rails/TimeZoneAssignment:
   Severity: convention
 
@@ -374,8 +379,6 @@ RSpec/VerifiedDoubleReference:
 RSpec/VerifiedDoubles:
   Enabled: false
 
-Style/AccessModifierDeclarations:
-  Severity: convention
 Style/AccessorGrouping:
   Severity: convention
   AutoCorrect: false
@@ -428,9 +431,6 @@ Style/OptionalArguments:
   Severity: convention
 Style/OptionalBooleanParameter:
   Severity: convention
-Style/RescueModifier:
-  Severity: warning
-  AutoCorrect: false
 Style/StringConcatenation:
   Enabled: false
   AutoCorrect: false

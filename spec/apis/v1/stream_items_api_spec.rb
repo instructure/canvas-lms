@@ -845,7 +845,7 @@ describe UsersController, type: :request do
 
   it "formats WebConference" do
     allow(WebConference).to receive(:plugins).and_return(
-      [instance_double("Canvas::Plugin",
+      [instance_double(Canvas::Plugin,
                        id: "big_blue_button",
                        name: "BigBlueButton",
                        settings: { domain: "bbb.instructure.com", secret_dec: "secret" },

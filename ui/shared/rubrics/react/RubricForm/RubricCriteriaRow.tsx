@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
 import {OutcomeTag, escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
@@ -39,7 +39,7 @@ import {
 import {Draggable} from 'react-beautiful-dnd'
 import './drag-and-drop/styles.css'
 
-const I18n = useI18nScope('rubrics-criteria-row')
+const I18n = createI18nScope('rubrics-criteria-row')
 
 type RubricCriteriaRowProps = {
   criterion: RubricCriterion
@@ -264,7 +264,7 @@ const RatingScaleAccordion = ({
             <RatingScaleAccordionItem
               hidePoints={hidePoints}
               rating={rating}
-              // eslint-disable-next-line react/no-array-index-key
+               
               key={`rating-scale-item-${rating.id}-${index}`}
               scale={scale}
               spacing={spacing}

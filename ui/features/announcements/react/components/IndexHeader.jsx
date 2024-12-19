@@ -19,7 +19,7 @@
 import {bindActionCreators} from 'redux'
 import {bool, func, number, string} from 'prop-types'
 import {connect} from 'react-redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
@@ -40,7 +40,7 @@ import {SearchField} from '@canvas/discussions/react/components/SearchField'
 import {ActionDropDown} from '@canvas/announcements/react/components/ActionDropDown'
 import ReadIcon from '@canvas/read-icon'
 
-const I18n = useI18nScope('announcements_v2')
+const I18n = createI18nScope('announcements_v2')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 

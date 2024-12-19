@@ -231,13 +231,18 @@ describe PlannerController do
       context "ungraded discussions" do
         before do
           @discussion = discussion_topic_model(context: @course, title: "discussion ghost", delayed_post_at: 3.days.ago, lock_at: 3.days.from_now, todo_date: 1.day.from_now)
+          @graded_discussion = discussion_topic_model(context: @course, title: "graded discussion", user: @teacher, todo_date: 1.day.from_now)
+          @graded_discussion.assignment = assignment_model(course: @course)
+          @graded_discussion.save!
           PlannerOverride.create!(plannable_id: @discussion.id, plannable_type: DiscussionTopic, user_id: @student.id)
         end
 
-        it "includes ungraded discussions for students" do
+        it "includes ungraded discussions but not graded ones" do
           get :index, params: { filter: "all_ungraded_todo_items", context_codes: ["course_#{@course.id}"] }
           response_json = json_parse(response.body)
-          expect(response_json.pluck("plannable").pluck("title")).to include @discussion.title
+          titles = response_json.pluck("plannable").pluck("title")
+          expect(titles).to include @discussion.title
+          expect(titles).not_to include @graded_discussion.title
         end
 
         context "delayed post discussion" do
@@ -1360,7 +1365,7 @@ describe PlannerController do
       end
 
       context "date ranges" do
-        let(:start_date) { Time.parse("2020-01-1T00:00:00") }
+        let(:start_date) { Time.zone.parse("2020-01-1T00:00:00") }
         let(:end_date) { Time.parse("2020-01-1T23:59:59Z") }
 
         it "only returns items between (inclusive) the specified dates" do

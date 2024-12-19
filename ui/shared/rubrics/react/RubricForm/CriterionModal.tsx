@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -37,7 +37,7 @@ import {DragDropContext as DragAndDrop, Droppable, Draggable} from 'react-beauti
 import type {DropResult} from 'react-beautiful-dnd'
 import {WarningModal} from './WarningModal'
 
-const I18n = useI18nScope('rubrics-criterion-modal')
+const I18n = createI18nScope('rubrics-criterion-modal')
 
 export const DEFAULT_RUBRIC_RATINGS: RubricRating[] = [
   {
@@ -391,7 +391,7 @@ export const CriterionModal = ({
                         const rangeStart = rangingFrom(ratings, index)
 
                         return (
-                          // eslint-disable-next-line react/no-array-index-key
+                           
                           <View as="div" key={`rating-row-${rating.id}-${index}`}>
                             <AddRatingRow
                               onClick={() => addRating(index)}
@@ -532,6 +532,7 @@ const RatingRow = ({
                   {unassessed ? (
                     <Flex.Item>
                       <NumberInput
+                        allowStringValue={true}
                         renderLabel={
                           <ScreenReaderContent>{I18n.t('Rating Points')}</ScreenReaderContent>
                         }

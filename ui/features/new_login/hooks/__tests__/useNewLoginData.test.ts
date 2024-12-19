@@ -27,7 +27,15 @@ const createMockContainer = (
   loginLogoText: string | null,
   bodyBgColor: string | null,
   bodyBgImage: string | null,
-  isPreviewMode: string | null
+  isPreviewMode: string | null,
+  selfRegistrationType: string | null,
+  recaptchaKey: string | null,
+  termsRequired: string | null,
+  termsOfUseUrl: string | null,
+  privacyPolicyUrl: string | null,
+  requireEmail: string | null,
+  passwordPolicy: string | null,
+  forgotPasswordUrl: string | null
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -55,6 +63,30 @@ const createMockContainer = (
   if (isPreviewMode !== null) {
     container.setAttribute('data-is-preview-mode', isPreviewMode)
   }
+  if (selfRegistrationType !== null) {
+    container.setAttribute('data-self-registration-type', selfRegistrationType)
+  }
+  if (recaptchaKey !== null) {
+    container.setAttribute('data-recaptcha-key', recaptchaKey)
+  }
+  if (termsRequired !== null) {
+    container.setAttribute('data-terms-required', termsRequired)
+  }
+  if (termsOfUseUrl !== null) {
+    container.setAttribute('data-terms-of-use-url', termsOfUseUrl)
+  }
+  if (privacyPolicyUrl !== null) {
+    container.setAttribute('data-privacy-policy-url', privacyPolicyUrl)
+  }
+  if (requireEmail !== null) {
+    container.setAttribute('data-require-email', requireEmail)
+  }
+  if (passwordPolicy !== null) {
+    container.setAttribute('data-password-policy', passwordPolicy)
+  }
+  if (forgotPasswordUrl !== null) {
+    container.setAttribute('data-forgot-password-url', forgotPasswordUrl)
+  }
   document.body.appendChild(container)
 }
 
@@ -71,19 +103,29 @@ describe('useNewLoginData', () => {
     expect(result.current).toBeDefined()
   })
 
-  it('returns default undefined values when container is not present at all', () => {
+  it('returns default undefined values when container is not present', () => {
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.enableCourseCatalog).toBeUndefined()
-    expect(result.current.authProviders).toBeUndefined()
-    expect(result.current.loginHandleName).toBeUndefined()
-    expect(result.current.loginLogoUrl).toBeUndefined()
-    expect(result.current.loginLogoText).toBeUndefined()
-    expect(result.current.bodyBgColor).toBeUndefined()
-    expect(result.current.bodyBgImage).toBeUndefined()
-    expect(result.current.isPreviewMode).toBeUndefined()
+    expect(result.current.data).toEqual({
+      enableCourseCatalog: undefined,
+      authProviders: undefined,
+      loginHandleName: undefined,
+      loginLogoUrl: undefined,
+      loginLogoText: undefined,
+      bodyBgColor: undefined,
+      bodyBgImage: undefined,
+      isPreviewMode: undefined,
+      selfRegistrationType: undefined,
+      recaptchaKey: undefined,
+      termsRequired: undefined,
+      termsOfUseUrl: undefined,
+      privacyPolicyUrl: undefined,
+      requireEmail: undefined,
+      passwordPolicy: undefined,
+      forgotPasswordUrl: undefined,
+    })
   })
 
-  it('returns parsed values from the container when present', () => {
+  it('returns parsed values from the container when attributes are present', () => {
     createMockContainer(
       'true',
       JSON.stringify([{id: '1', name: 'Google', auth_type: 'google'}]),
@@ -92,67 +134,80 @@ describe('useNewLoginData', () => {
       'Custom Alt Text',
       '#ffffff',
       'https://example.com/bg.png',
-      'true'
+      'true',
+      'all',
+      'recaptcha_key_value',
+      'true',
+      'https://example.com/terms-of-use',
+      'https://example.com/privacy',
+      'true',
+      JSON.stringify({
+        minimum_character_length: 8,
+        maximum_character_length: 50,
+        max_repeats: 3,
+        max_sequence: 4,
+        maximum_login_attempts: 10,
+        allow_login_suspension: 'false',
+        require_number_characters: 'false',
+        require_symbol_characters: 'false',
+        disallow_common_passwords: 'true',
+      }),
+      'https://example.com/privacy'
     )
-    const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.enableCourseCatalog).toBe(true)
-    expect(result.current.authProviders).toEqual([{id: '1', name: 'Google', auth_type: 'google'}])
-    expect(result.current.loginHandleName).toBe('Username')
-    expect(result.current.loginLogoUrl).toBe('https://example.com/logo.png')
-    expect(result.current.loginLogoText).toBe('Custom Alt Text')
-    expect(result.current.bodyBgColor).toBe('#ffffff')
-    expect(result.current.bodyBgImage).toBe('https://example.com/bg.png')
-    expect(result.current.isPreviewMode).toBe(true)
-  })
 
-  it('returns undefined for missing attributes', () => {
-    createMockContainer(null, null, null, null, null, null, null, null)
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.enableCourseCatalog).toBeUndefined()
-    expect(result.current.authProviders).toBeUndefined()
-    expect(result.current.loginHandleName).toBeUndefined()
-    expect(result.current.loginLogoUrl).toBeUndefined()
-    expect(result.current.loginLogoText).toBeUndefined()
-    expect(result.current.bodyBgColor).toBeUndefined()
-    expect(result.current.bodyBgImage).toBeUndefined()
-    expect(result.current.isPreviewMode).toBeUndefined()
-  })
 
-  it('returns undefined for empty string attributes', () => {
-    createMockContainer('', '', '', '', '', '', '', '')
-    const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.enableCourseCatalog).toBeUndefined()
-    expect(result.current.authProviders).toBeUndefined()
-    expect(result.current.loginHandleName).toBeUndefined()
-    expect(result.current.loginLogoUrl).toBeUndefined()
-    expect(result.current.loginLogoText).toBeUndefined()
-    expect(result.current.bodyBgColor).toBeUndefined()
-    expect(result.current.bodyBgImage).toBeUndefined()
-    expect(result.current.isPreviewMode).toBeUndefined()
+    expect(result.current.data).toEqual({
+      enableCourseCatalog: true,
+      authProviders: [{id: '1', name: 'Google', auth_type: 'google'}],
+      loginHandleName: 'Username',
+      loginLogoUrl: 'https://example.com/logo.png',
+      loginLogoText: 'Custom Alt Text',
+      bodyBgColor: '#ffffff',
+      bodyBgImage: 'https://example.com/bg.png',
+      isPreviewMode: true,
+      selfRegistrationType: 'all',
+      recaptchaKey: 'recaptcha_key_value',
+      termsRequired: true,
+      termsOfUseUrl: 'https://example.com/terms-of-use',
+      privacyPolicyUrl: 'https://example.com/privacy',
+      requireEmail: true,
+      passwordPolicy: {
+        minimumCharacterLength: 8,
+        maximumCharacterLength: 50,
+        maxRepeats: 3,
+        maxSequence: 4,
+        maximumLoginAttempts: 10,
+        requireNumberCharacters: false,
+        requireSymbolCharacters: false,
+        disallowCommonPasswords: true,
+      },
+      forgotPasswordUrl: 'https://example.com/privacy',
+    })
   })
 
   it('handles invalid JSON in data-auth-providers gracefully', () => {
     const consoleErrorMock = jest.spyOn(console, 'error').mockImplementation(() => {})
     createMockContainer(
-      'true',
+      null,
       'invalid JSON',
-      'Username',
-      'https://example.com/logo.png',
-      'Custom Alt Text',
-      '#ffffff',
-      'https://example.com/bg.png',
-      'true'
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     )
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.enableCourseCatalog).toBe(true)
-    expect(result.current.authProviders).toBeUndefined()
-    expect(result.current.loginHandleName).toBe('Username')
-    expect(result.current.loginLogoUrl).toBe('https://example.com/logo.png')
-    expect(result.current.loginLogoText).toBe('Custom Alt Text')
-    expect(result.current.bodyBgColor).toBe('#ffffff')
-    expect(result.current.bodyBgImage).toBe('https://example.com/bg.png')
-    expect(result.current.isPreviewMode).toBe(true)
-    // eslint-disable-next-line no-console
+    expect(result.current.data.authProviders).toBeUndefined()
     expect(console.error).toHaveBeenCalledWith(
       expect.stringContaining('Failed to parse data-auth-providers'),
       expect.any(SyntaxError)
@@ -160,15 +215,50 @@ describe('useNewLoginData', () => {
     consoleErrorMock.mockRestore()
   })
 
-  it('returns false for isPreviewMode when set to "false"', () => {
-    createMockContainer('false', null, null, null, null, null, null, 'false')
+  it('returns false for boolean attributes when set to "false"', () => {
+    createMockContainer(
+      'false',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      'false',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    )
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.isPreviewMode).toBe(false)
+    expect(result.current.data.enableCourseCatalog).toBe(false)
+    expect(result.current.data.isPreviewMode).toBe(false)
   })
 
-  it('returns false for enableCourseCatalog when set to "false"', () => {
-    createMockContainer('false', null, null, null, null, null, null, 'false')
+  it('returns undefined for empty string attributes', () => {
+    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
     const {result} = renderHook(() => useNewLoginData())
-    expect(result.current.enableCourseCatalog).toBe(false)
+    expect(result.current.data).toEqual({
+      enableCourseCatalog: undefined,
+      authProviders: undefined,
+      loginHandleName: undefined,
+      loginLogoUrl: undefined,
+      loginLogoText: undefined,
+      bodyBgColor: undefined,
+      bodyBgImage: undefined,
+      isPreviewMode: undefined,
+      selfRegistrationType: undefined,
+      recaptchaKey: undefined,
+      termsRequired: undefined,
+      termsOfUseUrl: undefined,
+      privacyPolicyUrl: undefined,
+      requireEmail: undefined,
+      passwordPolicy: undefined,
+      forgotPasswordUrl: undefined,
+    })
   })
 })

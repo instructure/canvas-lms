@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useContext, useEffect} from 'react'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -49,7 +49,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import _ from 'lodash'
 import {OBSERVER_ENROLLMENTS_QUERY} from '../graphql/Queries'
 import Pill from './Pill'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   FileAttachmentUpload,
@@ -79,7 +79,7 @@ export type SendMessageArgs = {
   }
 }
 
-const I18n = useI18nScope('public_message_students_who')
+const I18n = createI18nScope('public_message_students_who')
 
 export type Student = {
   id: string
@@ -753,6 +753,7 @@ const MessageStudentsWhoDialog = ({
             {selectedCriterion.requiresCutoff && (
               <>
                 <NumberInput
+                  allowStringValue={true}
                   value={cutoff}
                   onChange={(_e, value) => {
                     // @ts-expect-error

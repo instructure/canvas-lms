@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -25,7 +25,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('dashcards')
+const I18n = createI18nScope('dashcards')
 
 export function showConfirmUnfavorite(props: Props) {
   const parent = document.createElement('div')
@@ -36,7 +36,7 @@ export function showConfirmUnfavorite(props: Props) {
     if (modal) modal.show()
   }
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ConfirmUnfavoriteCourseModal {...props} ref={showConfirmUnfavoriteRef} />,
     parent
@@ -53,7 +53,7 @@ export function showNoFavoritesAlert() {
   parent.setAttribute('class', 'no-favorites-alert-container')
   document.querySelector('.ic-DashboardCard__box')?.appendChild(parent)
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <Alert variant="info" renderCloseButtonLabel="Close" margin="small">
       {I18n.t(`You have no courses favorited. Reloading this page will show all

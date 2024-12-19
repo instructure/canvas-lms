@@ -131,24 +131,42 @@ describe('ContentSelectionModal', () => {
       })
     })
 
-    it('shows alert if fetch fails', async () => {
-      // @ts-expect-error
-      doFetchApi.mockImplementation(() => Promise.reject())
-      renderComponent()
-      const button = screen.getByRole('button', {name: 'Select content'})
-      await userEvent.click(button)
-      await waitFor(() => {
-        expect(screen.getByText('Failed to fetch content for import.')).toBeInTheDocument()
+    describe('fetch fails', () => {
+      beforeEach(async () => {
+        // @ts-expect-error
+        doFetchApi.mockImplementation(() => Promise.reject())
+        renderComponent()
+        const button = screen.getByRole('button', {name: 'Select content'})
+        await userEvent.click(button)
+      })
+
+      it('shows alert', async () => {
+        await waitFor(() => {
+          expect(screen.getByText('Failed to fetch content for import.')).toBeInTheDocument()
+        })
+      })
+
+      it('submit button is disabled', async () => {
+        expect(screen.getByRole('button', {name: 'Select Content'})).toBeDisabled()
       })
     })
 
-    it('shows spinner when loading', async () => {
-      // @ts-expect-error
-      doFetchApi.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 5000)))
-      renderComponent()
-      const button = screen.getByRole('button', {name: 'Select content'})
-      await userEvent.click(button)
-      expect(screen.getByText('Loading content for import.')).toBeInTheDocument()
+    describe('is loading', () => {
+      beforeEach(async () => {
+        // @ts-expect-error
+        doFetchApi.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 5000)))
+        renderComponent()
+        const button = screen.getByRole('button', {name: 'Select content'})
+        await userEvent.click(button)
+      })
+
+      it('shows spinner', async () => {
+        expect(screen.getByText('Loading content for import.')).toBeInTheDocument()
+      })
+
+      it('submit button is disabled', async () => {
+        expect(screen.getByRole('button', {name: 'Select Content'})).toBeDisabled()
+      })
     })
 
     it('closes with x button', async () => {
@@ -175,6 +193,47 @@ describe('ContentSelectionModal', () => {
       expect(
         screen.queryByRole('heading', {name: 'Select Content for Import'})
       ).not.toBeInTheDocument()
+    })
+
+    describe('response is empty', () => {
+      beforeEach(async () => {
+        // @ts-expect-error
+        doFetchApi.mockImplementation(() => Promise.resolve({json: []}))
+        renderComponent()
+        const button = screen.getByRole('button', {name: 'Select content'})
+        await userEvent.click(button)
+      })
+
+      it('show empty message', async () => {
+        await waitFor(() => {
+          expect(
+            screen.getByText(
+              'This file appears to be empty. Do you still want to proceed with content selection?'
+            )
+          ).toBeInTheDocument()
+        })
+      })
+
+      it('submit button is enabled', async () => {
+        expect(screen.getByRole('button', {name: 'Select Content'})).not.toBeDisabled()
+      })
+
+      it('sends empty data', async () => {
+        window.ENV.current_user_id = '3'
+        const submitButton = screen.getByRole('button', {name: 'Select Content'})
+        await userEvent.click(submitButton)
+
+        expect(doFetchApi).toHaveBeenCalledWith({
+          path: '/api/v1/courses/1/content_migrations/2',
+          method: 'PUT',
+          body: {
+            id: '2',
+            user_id: '3',
+            workflow_state: 'waiting_for_select',
+            copy: {},
+          },
+        })
+      })
     })
   })
 })

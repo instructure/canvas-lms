@@ -21,9 +21,9 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../../jst/subviews/SelectContentCheckbox.handlebars'
 import ImportBlueprintSettingsView from './ImportBlueprintSettingsView'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('select_content_checkbox')
+const I18n = createI18nScope('select_content_checkbox')
 
 extend(SelectContentCheckbox, Backbone.View)
 
@@ -68,7 +68,7 @@ SelectContentCheckbox.prototype.courseSelected = function (course) {
 SelectContentCheckbox.prototype.validations = function () {
   const errors = {}
   const selective_import = this.model.get('selective_import')
-  // eslint-disable-next-line no-void
+   
   if (selective_import === null || selective_import === void 0) {
     errors.selective_import = [
       {

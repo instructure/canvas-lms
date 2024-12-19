@@ -22,12 +22,14 @@ import CourseCopy from './components/CourseCopy'
 export const App = ({
   courseId,
   accountId,
-  timeZone,
+  userTimeZone,
+  courseTimeZone,
   canImportAsNewQuizzes,
 }: {
   courseId: string
   accountId: string
-  timeZone?: string
+  userTimeZone?: string
+  courseTimeZone?: string
   canImportAsNewQuizzes: boolean
 }) => {
   return (
@@ -36,7 +38,8 @@ export const App = ({
         canImportAsNewQuizzes={canImportAsNewQuizzes}
         courseId={courseId}
         accountId={accountId}
-        timeZone={timeZone}
+        courseTimeZone={courseTimeZone}
+        userTimeZone={userTimeZone}
       />
     </QueryProvider>
   )

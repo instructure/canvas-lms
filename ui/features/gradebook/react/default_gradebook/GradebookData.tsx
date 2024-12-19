@@ -17,7 +17,7 @@
  */
 
 import React, {useRef, useEffect, useCallback} from 'react'
-import shallow from 'zustand/shallow'
+import {useShallow} from 'zustand/react/shallow'
 import {camelizeProperties} from '@canvas/convert-case'
 import PostGradesStore from '../SISGradePassback/PostGradesStore'
 import Gradebook from './Gradebook'
@@ -61,7 +61,7 @@ export default function GradebookData(props: Props) {
   const courseId = props.gradebookEnv.context_id
   const flashMessages = useStore(state => state.flashMessages)
 
-  const appliedFilters = useStore(state => state.appliedFilters, shallow)
+  const appliedFilters = useStore(useShallow(state => state.appliedFilters))
   const isFiltersLoading = useStore(state => state.isFiltersLoading)
   const initializeAppliedFilters = useStore(state => state.initializeAppliedFilters)
   const initializeStagedFilters = useStore(state => state.initializeStagedFilters)
@@ -71,7 +71,7 @@ export default function GradebookData(props: Props) {
   const isModulesLoading = useStore(state => state.isModulesLoading)
   const fetchModules = useStore(state => state.fetchModules)
 
-  const customColumns = useStore(state => state.customColumns, shallow)
+  const customColumns = useStore(useShallow(state => state.customColumns))
   const isCustomColumnsLoaded = useStore(state => state.isCustomColumnsLoaded)
   const fetchCustomColumns = useStore(state => state.fetchCustomColumns)
   const loadDataForCustomColumn = useStore(state => state.loadDataForCustomColumn)
@@ -82,7 +82,7 @@ export default function GradebookData(props: Props) {
   const finalGradeOverrides = useStore(state => state.finalGradeOverrides)
   const fetchFinalGradeOverrides = useStore(state => state.fetchFinalGradeOverrides)
 
-  const studentIds = useStore(state => state.studentIds, shallow)
+  const studentIds = useStore(useShallow(state => state.studentIds))
   const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
   const recentlyLoadedStudents = useStore(state => state.recentlyLoadedStudents)
   const recentlyLoadedSubmissions = useStore(state => state.recentlyLoadedSubmissions)

@@ -539,10 +539,10 @@ class PlannerController < ApplicationController
   def discussion_topic_todo_scopes
     scopes = []
     Shard.partition_by_shard(@pub_contexts) do |contexts|
-      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts).published_or_post_delayed
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts, assignment_id: nil).published_or_post_delayed
     end
     Shard.partition_by_shard(@unpub_contexts) do |contexts|
-      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts).active
+      scopes << DiscussionTopic.where(todo_date: @start_date..@end_date, context: contexts, assignment_id: nil).active
     end
     scopes
   end

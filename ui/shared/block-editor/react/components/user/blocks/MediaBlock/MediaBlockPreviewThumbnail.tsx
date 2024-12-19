@@ -17,11 +17,11 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MediaPreviewModal} from './MediaPreviewModal'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export const MediaBlockPreviewThumbnail = ({
   attachmentId,

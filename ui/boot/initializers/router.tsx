@@ -28,7 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import accountGradingSettingsRoutes from '../../features/account_grading_settings/routes/accountGradingSettingsRoutes'
 import {RubricRoutes} from '../../features/rubrics/routes/rubricRoutes'
 import {NewLoginRoutes} from '../../features/new_login/routes/NewLoginRoutes'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {QueryProvider} from '@canvas/query'
 import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 
@@ -72,8 +72,8 @@ const portalRouter = createBrowserRouter(
 
 export function loadReactRouter() {
   const mountNode = document.querySelector('#react-router-portals')
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const I18n = useI18nScope('main')
+   
+  const I18n = createI18nScope('main')
   if (mountNode) {
     const root = ReactDOM.createRoot(mountNode)
     root.render(

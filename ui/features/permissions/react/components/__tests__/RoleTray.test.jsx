@@ -179,7 +179,7 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     deleteAlertVisible: true,
     editBaseRoleAlertVisible: true,
     editTrayVisible: true,
-    editRoleLabelErrorMessages: [{text: 'ERROR', type: 'error'}],
+    editRoleLabelErrorMessages: [{text: 'ERROR', type: 'newError'}],
     newTargetBaseRole: 'banana',
   })
   tree.instance().hideTray() // components hideTray, not props.hideTray method
@@ -257,7 +257,7 @@ it('onChangeRoleLabel sets error if role is used', () => {
   expect(tree.state().editRoleLabelErrorMessages[0].text).toEqual(
     'Cannot change role name to teacher: already in use'
   )
-  expect(tree.state().editRoleLabelErrorMessages[0].type).toEqual('error')
+  expect(tree.state().editRoleLabelErrorMessages[0].type).toEqual('newError')
 })
 
 it('onChangeRoleLabel, not an error if label === present', () => {

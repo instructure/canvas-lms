@@ -49,6 +49,10 @@ describe Mutations::CreateDiscussionTopic do
             podcastEnabled
             podcastHasStudentPosts
             isSectionSpecific
+            expanded
+            expandedLocked
+            sortOrder
+            sortOrderLocked
             ungradedDiscussionOverrides {
               nodes {
                 _id
@@ -101,6 +105,10 @@ describe Mutations::CreateDiscussionTopic do
             podcastHasStudentPosts
             isSectionSpecific
             replyToEntryRequiredCount
+            expanded
+            expandedLocked
+            sortOrder
+            sortOrderLocked
             groupSet {
               _id
             }
@@ -184,6 +192,10 @@ describe Mutations::CreateDiscussionTopic do
     expect(created_discussion_topic["podcastEnabled"]).to be false
     expect(created_discussion_topic["podcastHasStudentPosts"]).to be false
     expect(created_discussion_topic["isSectionSpecific"]).to be false
+    expect(created_discussion_topic["expanded"]).to be false
+    expect(created_discussion_topic["expandedLocked"]).to be false
+    expect(created_discussion_topic["sortOrder"]).to eq DiscussionTopic::SortOrder::DESC
+    expect(created_discussion_topic["sortOrderLocked"]).to be false
     expect(DiscussionTopic.where("id = #{created_discussion_topic["_id"]}").count).to eq 1
   end
 
@@ -1722,5 +1734,55 @@ describe Mutations::CreateDiscussionTopic do
         expect(override).to be_nil
       end
     end
+  end
+
+  it "default sort order is correct" do
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = false
+    require_initial_post = true
+
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: #{context_type}
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+      sortOrder: asc
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["sortOrder"]).to eq DiscussionTopic::SortOrder::ASC
+  end
+
+  it "sort order is not necessary when discussion_default_sort ff is off" do
+    Account.site_admin.disable_feature!(:discussion_default_sort)
+
+    context_type = "Course"
+    title = "Test Title"
+    message = "A message"
+    published = false
+    require_initial_post = true
+
+    query = <<~GQL
+      contextId: "#{@course.id}"
+      contextType: #{context_type}
+      title: "#{title}"
+      message: "#{message}"
+      published: #{published}
+      requireInitialPost: #{require_initial_post}
+    GQL
+
+    result = execute_with_input(query)
+    created_discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
+    expect(result["errors"]).to be_nil
+    expect(result.dig("data", "discussionTopic", "errors")).to be_nil
+    expect(created_discussion_topic["sortOrder"]).to eq DiscussionTopic::SortOrder::DESC
   end
 end

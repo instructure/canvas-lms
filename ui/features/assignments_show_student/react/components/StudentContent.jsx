@@ -25,7 +25,7 @@ import SubmissionSticker from '@canvas/submission-sticker'
 import StudentViewContext from './Context'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
@@ -45,7 +45,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
 
-const I18n = useI18nScope('assignments_2_student_content')
+const I18n = createI18nScope('assignments_2_student_content')
 
 const LoggedOutTabs = lazy(() =>
   import(
@@ -259,7 +259,7 @@ function StudentContent(props) {
           })
         })
         .catch(e => {
-          console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+          console.log('Error loading immersive readers.', e)  
         })
     }
 

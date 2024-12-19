@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
@@ -37,7 +37,7 @@ import {
   SelectStrings,
 } from '@canvas/upload-media-translations'
 import {ConversationContext} from '../../../util/constants'
-import {useLazyQuery, useQuery} from '@apollo/react-hooks'
+import {useLazyQuery, useQuery} from '@apollo/client'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 import {ModalBodyContext, translationSeparator} from '../../utils/constants'
 import {
@@ -46,7 +46,7 @@ import {
   stripSignature,
 } from '../../utils/inbox_translator'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -181,14 +181,14 @@ const ComposeModalContainer = props => {
   }, [])
 
   useEffect(() => {
-    if (!props.isReply && !props.isForward && props.currentCourseFilter) {
+    if (!props.isReply && !props.isForward && props.activeCourseFilterID) {
       setSelectedContext({
-        contextID: props.currentCourseFilter,
-        contextName: getContextName(props.currentCourseFilter),
+        contextID: props.activeCourseFilterID,
+        contextName: getContextName(props.activeCourseFilterID),
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.courses, props.currentCourseFilter, props.isForward, props.isReply])
+  }, [props.courses, props.activeCourseFilterID, props.isForward, props.isReply])
 
   const getRecipientsObserver = () => {
     if (selectedContext?.contextID) {
@@ -604,6 +604,6 @@ ComposeModalContainer.propTypes = {
   modalError: PropTypes.string,
   setModalError: PropTypes.func,
   isPrivateConversation: PropTypes.bool,
-  currentCourseFilter: PropTypes.string,
+  activeCourseFilterID: PropTypes.string,
   inboxSignatureBlock: PropTypes.bool,
 }

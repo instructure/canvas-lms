@@ -32,7 +32,7 @@ describe('CourseActivityForm', () => {
   it('should be able to submit the form with course id only', async () => {
     render(<CourseActivityForm {...props} />)
     const courseIdValue = '123'
-    const courseId = screen.getByLabelText('Course ID')
+    const courseId = screen.getByLabelText('Course ID *')
     const submit = screen.getByLabelText('Find')
 
     fireEvent.change(courseId, {target: {value: courseIdValue}})
@@ -50,7 +50,7 @@ describe('CourseActivityForm', () => {
   it('should be able to submit the form with course id and dates', async () => {
     render(<CourseActivityForm {...props} />)
     const courseIdValue = '123'
-    const courseId = screen.getByLabelText('Course ID')
+    const courseId = screen.getByLabelText('Course ID *')
     const fromDateValue = 'November 14, 2024'
     const toDateValue = 'November 15, 2024'
     const fromDate = screen.getByLabelText('From Date')
@@ -114,7 +114,7 @@ describe('CourseActivityForm', () => {
   it('should show an error message if "From" date is after "To" date', async () => {
     render(<CourseActivityForm {...props} />)
     const courseIdValue = '123'
-    const courseId = screen.getByLabelText('Course ID')
+    const courseId = screen.getByLabelText('Course ID *')
     const fromDateValue = 'November 15, 2024'
     const toDateValue = 'November 14, 2024'
     const timeValue = '12:00 AM'

@@ -22,7 +22,7 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ProficiencyFilter from './ProficiencyFilter'
 import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
@@ -33,7 +33,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBContext'
 import ExportCSVButton from './ExportCSVButton'
 
-const I18n = useI18nScope('LearningMasteryGradebook')
+const I18n = createI18nScope('LearningMasteryGradebook')
 
 const getRatings = ratings => {
   const masteryAt = ratings.find(rating => rating.mastery).points

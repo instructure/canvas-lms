@@ -65,7 +65,7 @@ describe "course paces edit tray" do
 
       update_module_item_duration(0, 3)
       expect(publish_status_button_exists?).to be_truthy
-      expect(publish_status_button.text).to eq("1 unpublished change")
+      expect(publish_status_button.text).to eq("1 unsaved change")
 
       update_module_item_duration(0, 2)
       expect(publish_status_button_exists?).to be_falsey

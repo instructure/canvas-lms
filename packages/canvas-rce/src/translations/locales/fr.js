@@ -104,6 +104,7 @@ const locale = {
     "message": "Du contenu enregistré automatiquement existe. Souhaitez-vous charger le contenu enregistré automatiquement à la place ?"
   },
   "available_folders_694d0436": { "message": "Dossiers disponibles" },
+  "background_1bc88842": { "message": "Arrière-plan" },
   "backslash_b2d5442d": { "message": "Barre oblique inverse" },
   "bar_ec63ed6": { "message": "Barre" },
   "basic_554cdc0a": { "message": "Basique" },
@@ -114,6 +115,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Coefficient binomial" },
   "black_4cb01371": { "message": "Noir" },
   "blue_daf8fea9": { "message": "Bleu" },
+  "border_5b08b06d": { "message": "Bordure" },
   "bottom_15a2a9be": { "message": "Bas" },
   "bottom_third_5f5fec1d": { "message": "Tiers inférieur" },
   "bowtie_5f9629e4": { "message": "Nœud papillon" },
@@ -193,10 +195,16 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Réduisez pour masquer { types }"
   },
+  "color_a363e1b0": { "message": "Couleur" },
+  "color_contrast_4c418add": { "message": "Contraste de couleurs" },
+  "color_contrast_ratio_687782f0": {
+    "message": "Bouton radio Contraste de couleurs"
+  },
   "color_picker_6b359edf": { "message": "Nuancier" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Nuancier ({ colorName } sélectionné)"
   },
+  "color_popup_af39810f": { "message": "Fenêtre contextuelle Couleurs" },
   "column_e1ae5c64": { "message": "Colonne" },
   "column_group_1c062368": { "message": "Groupe de colonnes" },
   "complex_numbers_a543d004": { "message": "Nombres complexes" },
@@ -382,6 +390,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "Très petit" },
   "extracurricular_icon_67c8ca42": { "message": "Icône extrascolaire" },
   "f_function_fe422d65": { "message": "F (fonction)" },
+  "fail_544e5dde": { "message": "ÉCHEC" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Échec de la récupération des contenus de fichiers"
   },
@@ -443,6 +452,7 @@ const locale = {
     "message": "Aller à la barre d''outils de l''éditeur"
   },
   "grades_a61eba0a": { "message": "Notes" },
+  "graphics_text_bc9568bc": { "message": "Texte des éléments graphiques" },
   "greater_than_e98af662": { "message": "Supérieur à" },
   "greater_than_or_equal_b911949a": { "message": "Supérieur ou égal à" },
   "greek_65c5b3f7": { "message": "Grec" },
@@ -546,6 +556,10 @@ const locale = {
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Inférence" },
   "infinity_7a10f206": { "message": "Infini" },
+  "input_field_for_alpha_678265fd": { "message": "Champ de saisie pour alpha" },
+  "input_field_for_blue_561e020a": { "message": "Champ de saisie pour bleu" },
+  "input_field_for_green_67f8b2b6": { "message": "Champ de saisie pour vert" },
+  "input_field_for_red_86a84615": { "message": "Champ de saisie pour rouge" },
   "insert_593145ef": { "message": "Insérer" },
   "insert_link_6dc23cae": { "message": "Insérer un lien" },
   "insert_math_equation_57c6e767": {
@@ -569,6 +583,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Icône Arts de la langue" },
   "languages_icon_9d20539": { "message": "Icône langues" },
   "large_9c5e80e7": { "message": "Grand" },
+  "large_text_e7ba08cd": { "message": "Texte de grande taille" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Apprenez-en davantage sur les liens adjacents"
   },
@@ -763,6 +778,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "Pas de vidéo" },
   "none_3b5e34d2": { "message": "Aucun" },
   "none_selected_b93d56d2": { "message": "Aucun sélectionné" },
+  "normal_text_7b03da48": { "message": "Texte normal" },
   "not_equal_6e2980e6": { "message": "Non égal" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "N''appartient pas à (n’est pas un élément de)"
@@ -804,9 +820,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Couleur du contour" },
   "outline_size_a6059a21": { "message": "Taille du contour" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } n''est pas un protocole valable qui doit être ftp, http, https, mailto, skype, tel ou peut être omis"
-  },
   "page_50c4823d": { "message": "Page" },
   "pages_e5414c2c": { "message": "Pages" },
   "paragraph_5e5ad8eb": { "message": "Paragraphe" },
@@ -815,6 +828,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Parallèle" },
   "partial_derivative_4a9159df": { "message": "Dérivée partielle" },
+  "pass_1c19a2b3": { "message": "RÉUSSITE" },
   "paste_5963d1c1": { "message": "Coller" },
   "pause_12af3bb4": { "message": "Mettre en pause" },
   "pentagon_17d82ea3": { "message": "Pentagone" },
@@ -823,6 +837,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Le pourcentage doit être un nombre"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Le pourcentage doit être d’au moins { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "Icône arts du spectacle" },
   "perpendicular_7c48ede4": { "message": "Perpendiculaire" },
   "phi_4ac33b6d": { "message": "Phi" },
@@ -830,8 +847,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Icône éducation physique" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (variante)" },
+  "pick_a_color_557abfb0": { "message": "Choisissez une couleur" },
   "pink_68ad45cb": { "message": "Rose" },
   "pixels_52ece7d1": { "message": "Pixels" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Le nombre de pixels doit être d’au moins { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Lecture" },
   "play_media_comment_35257210": {
     "message": "Lancer le commentaire sur média."
@@ -863,6 +884,9 @@ const locale = {
   "previous_bd2ac015": { "message": "Précédent" },
   "previous_findtext_8dfbfd30": {
     "message": "Occurrence précédente de { findText }"
+  },
+  "previously_chosen_colors_f1338315": {
+    "message": "Couleurs précédemment choisies"
   },
   "prime_917ea60e": { "message": "Prime" },
   "prime_numbers_13464f61": { "message": "Nombres premiers" },
@@ -1364,6 +1388,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Assistant de rédaction" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Oui" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Vous utilisez une palette de couleurs. Pour naviguer vers le haut, la gauche, le bas ou la droite de la palette, utilisez les boutons « W », « A », « S » et « D » respectivement."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Vous utilisez un curseur de couleurs. Pour déplacer le curseur vers la gauche ou la droite, utilisez les boutons « A » et « D» respectivement."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Vous utilisez un curseur alpha. Pour déplacer le curseur vers la gauche ou la droite, utilisez les boutons « A » et « D» respectivement."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Il y a des changements non enregistrés dans le bac Icon Maker Souhaitez-vous continuer sans enregistrer ces changements ?"
   },

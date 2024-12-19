@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "المجلدات المتاحة"
     },
+    "background_1bc88842": {
+        "message": "الخلفية"
+    },
     "backslash_b2d5442d": {
         "message": "شرطة مائلة للخلف"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "أزرق"
+    },
+    "border_5b08b06d": {
+        "message": "الحد"
     },
     "bottom_15a2a9be": {
         "message": "أسفل"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "الطي لإخفاء { types }"
     },
+    "color_a363e1b0": {
+        "message": "اللون"
+    },
+    "color_contrast_4c418add": {
+        "message": "تباين الألوان"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "نسبة تباين الألوان"
+    },
     "color_picker_6b359edf": {
         "message": "أداة انتقاء اللون"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "أداة انتقاء اللون (تم تحديد { colorName })"
+    },
+    "color_popup_af39810f": {
+        "message": "نافذة منبثقة ملونة"
     },
     "column_e1ae5c64": {
         "message": "عمود"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (دالة)"
     },
+    "fail_544e5dde": {
+        "message": "فشل"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "تعذر الحصول على محتويات الملف"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "الدرجات"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "نص الرسومات"
     },
     "greater_than_e98af662": {
         "message": "أكبر من"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "ما لا نهاية"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "حقل الإدخال لألفا"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "حقل الإدخال للون الأزرق"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "حقل الإدخال للون الأخضر"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "حقل الإدخال للون الأحمر"
+    },
     "insert_593145ef": {
         "message": "إدخال"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "كبير"
+    },
+    "large_text_e7ba08cd": {
+        "message": "نص كبير"
     },
     "latvian_2bbb6aab": {
         "message": "اللاتفية"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "لم يتم تحديد شيء"
     },
+    "normal_text_7b03da48": {
+        "message": "نص عادي"
+    },
     "norwegian_53f391ec": {
         "message": "النرويجية"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "حجم المخطط التفصيلي"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } ليس بروتوكولاً صالحًا الذي يجب أن يكون ftp وhttp وhttps وmailto وskype وإلا سيتم حذفه"
-    },
     "page_50c4823d": {
         "message": "صفحة"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "جزئي (مشتق)"
     },
+    "pass_1c19a2b3": {
+        "message": "نجاح"
+    },
     "paste_5963d1c1": {
         "message": "لصق"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "يجب أن تكون النسبة المئوية رقمًا"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "يجب أن تكون النسبة المئوية { percentage }% بحد أدنى"
     },
     "performing_arts_icon_f3497486": {
         "message": "أيقونة الفنون التعبيرية"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (متغير)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "اختر لونًا"
+    },
     "pink_68ad45cb": {
         "message": "وردي"
     },
     "pixels_52ece7d1": {
         "message": "بكسل"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "يجب أن تكون البكسلات { width } x { height } بكسل بحد أدنى"
     },
     "play_1a47eaa7": {
         "message": "تشغيل"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "{ findText } السابق"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "الألوان المختار سابقًا"
     },
     "prime_917ea60e": {
         "message": "Prime"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "اليديشية"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "أنت على لوحة ألوان. للتنقل في اللوحة لأعلى ويسارًا ولأسفل ويمينًا، استخدام الأزرار \"W\" و\"A\" و\"S\" و\"D\" بالترتيب"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "أنت على شريط تمرير ألوان. للتنقل يسار ويمين شريط التمرير، استخدم الزرين \"A\" و\"D\" بالترتيب"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "أنت على شريط تمرير ألفا. للتنقل يسار ويمين شريط التمرير، استخدم الزرين \"A\" و\"D\" بالترتيب"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "يمكنك استبداله بتحميل ملف تسمية توضيحية جديد."

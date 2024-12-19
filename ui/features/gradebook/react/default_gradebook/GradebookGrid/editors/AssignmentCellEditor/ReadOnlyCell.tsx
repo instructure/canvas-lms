@@ -23,10 +23,10 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconCheckMarkSolid, IconExpandStartLine, IconEndSolid} from '@instructure/ui-icons'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const componentOverrides = {
   IconButton: {

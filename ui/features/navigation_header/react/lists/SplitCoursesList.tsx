@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Course} from '../../../../api.d'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
@@ -27,7 +27,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 declare const ENV: GlobalEnv
 
-const I18n = useI18nScope('CoursesTray')
+const I18n = createI18nScope('CoursesTray')
 
 const UNPUBLISHED = 'unpublished'
 

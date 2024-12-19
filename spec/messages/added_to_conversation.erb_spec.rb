@@ -59,13 +59,4 @@ describe "added_to_conversation" do
       generate_message(notification_name, path_type, asset)
     end
   end
-
-  describe ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body).to be_present
-    end
-  end
 end

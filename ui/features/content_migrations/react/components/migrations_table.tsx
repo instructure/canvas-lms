@@ -23,13 +23,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Table} from '@instructure/ui-table'
 import {Heading} from '@instructure/ui-heading'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Responsive} from '@instructure/ui-responsive'
 import type {ContentMigrationItem, UpdateMigrationItemType} from './types'
 import MigrationRow from './migration_row'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type MigrationsResponse = {json: ContentMigrationItem[]}
 

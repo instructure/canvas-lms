@@ -19,7 +19,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,7 +30,7 @@ import GroupSelectionDrillDown from './GroupSelectionDrillDown'
 import {useTargetGroupSelector} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('MoveOutcomesModal')
+const I18n = createI18nScope('MoveOutcomesModal')
 
 const getAncestorsIds = (targetGroup, collections) => {
   const ids = []
