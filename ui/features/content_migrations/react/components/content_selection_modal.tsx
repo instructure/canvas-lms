@@ -21,132 +21,31 @@ import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {
-  IconSettingsLine,
-  IconSyllabusLine,
-  IconModuleLine,
-  IconHourGlassLine,
-  IconAssignmentLine,
-  IconQuizLine,
-  IconCollectionLine,
-  IconDiscussionLine,
-  IconNoteLine,
-  IconLtiLine,
-  IconAnnouncementLine,
-  IconCalendarDaysLine,
-  IconRubricLine,
-  IconGroupLine,
-  IconOutcomesLine,
-  IconFolderLine,
-  IconDocumentLine,
-} from '@instructure/ui-icons'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {CollapsableList, type Item} from '@canvas/content-migrations'
-import type {ContentMigrationItem, ContentMigrationWorkflowState} from './types'
-import {Text} from '@instructure/ui-text'
+import {
+  TreeSelector,
+  type CheckboxTreeNode,
+  type CheckboxState,
+  type ItemType,
+} from '@canvas/content-migrations'
+import type {ContentMigrationItem, GenericItemResponse} from './types'
+import {mapToCheckboxTreeNodes, generateSelectiveDataResponse, responseToItem} from './utils'
 
-const I18n = createI18nScope('content_migrations_redesign')
-
-const ICONS: {[key: string]: any} = {
-  course_settings: IconSettingsLine,
-  syllabus_body: IconSyllabusLine,
-  course_paces: IconHourGlassLine,
-  context_modules: IconModuleLine,
-  assignments: IconAssignmentLine,
-  quizzes: IconQuizLine,
-  assessment_question_banks: IconCollectionLine,
-  discussion_topics: IconDiscussionLine,
-  wiki_pages: IconNoteLine,
-  context_external_tools: IconLtiLine,
-  tool_profiles: IconLtiLine,
-  announcements: IconAnnouncementLine,
-  calendar_events: IconCalendarDaysLine,
-  rubrics: IconRubricLine,
-  groups: IconGroupLine,
-  learning_outcomes: IconOutcomesLine,
-  learning_outcome_groups: IconFolderLine,
-  attachments: IconDocumentLine,
-  assignment_groups: IconFolderLine,
-  folders: IconFolderLine,
-  blueprint_settings: IconSettingsLine,
-}
-
-type GenericItemResponse = {
-  property: string
-  title: string
-  type: string
-  sub_items?: GenericItemResponse[]
-}
-
-type SelectiveDataRequest = {
+export type Item = {
   id: string
-  user_id: string
-  copy: {[key: string]: string | {[key: string]: string}}
-  workflow_state: ContentMigrationWorkflowState
+  label: string
+  type: ItemType
+  migrationId?: string
+  children?: Item[]
+  linkedId?: string
+  checkboxState: CheckboxState
 }
 
 type SelectiveDataResponse = (GenericItemResponse & {count?: number; sub_items_url?: string})[]
-
-const responseToItem = ({type, title, property, sub_items}: GenericItemResponse): Item => ({
-  id: property,
-  label: title,
-  icon: ICONS[type],
-  children: sub_items ? sub_items.map(responseToItem) : undefined,
-})
-
-const mapSelectiveDataResponse = async (response: SelectiveDataResponse): Promise<Item[]> => {
-  const rootItems: Item[] = []
-
-  for (const {type, title, property, sub_items, count, sub_items_url} of response) {
-    const rootItem = responseToItem({
-      type,
-      title,
-      property,
-      sub_items,
-    })
-
-    if (sub_items_url && count) {
-      // @ts-expect-error
-       
-      const {json}: {json: GenericItemResponse[]} = await doFetchApi({
-        path: sub_items_url,
-        method: 'GET',
-      })
-      rootItem.label = I18n.t('%{title} (%{count})', {title, count})
-      rootItem.children = json.map(responseToItem)
-    }
-    rootItems.push(rootItem)
-  }
-  return rootItems
-}
-
-const generateSelectiveDataResponse = (
-  migrationId: string,
-  userId: string,
-  selectedProperties: string[]
-): SelectiveDataRequest => {
-  const copy: {[key: string]: any} = {}
-  // This regex is used to get the copy key and sub-keys to use it to build the json
-  // Example: copy[all_course_settings], copy[attachments][migration_abc123]
-  const propertyRegex = /copy\[(.*?)\](?:\[(.*?)\])?/i
-  selectedProperties.forEach(property => {
-    const matches = property.match(propertyRegex)
-    if (matches) {
-      const key = matches[1]
-      const subKey = matches[2]
-      if (!subKey) {
-        copy[key] = '1'
-      } else {
-        if (!copy[key]) copy[key] = {}
-        copy[key][subKey] = '1'
-      }
-    }
-  })
-  return {id: migrationId, user_id: userId, workflow_state: 'waiting_for_select', copy}
-}
 
 type ContentSelectionModalProps = {
   courseId: string | undefined
@@ -160,29 +59,73 @@ export const ContentSelectionModal = ({
   updateMigrationItem,
 }: ContentSelectionModalProps) => {
   const [open, setOpen] = useState(false)
-  const [selectedProperties, setSelectedProperties] = useState<Array<string>>([])
-  const [items, setItems] = useState<Item[]>([])
+  const [checkboxTreeNodes, setCheckboxTreeNodes] = useState<Record<string, CheckboxTreeNode>>({})
   const [hasErrors, setHasErrors] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const handleEntered = useCallback(() => {
+  const I18n = useI18nScope('content_migrations_redesign')
+
+  const getChildSelectiveData = async (
+    response: SelectiveDataResponse,
+    setHasErrors: (hasErrors: boolean) => void,
+  ): Promise<Record<string, CheckboxTreeNode>> => {
+    const rootItems: Item[] = []
+
+    for (const {type, title, property, sub_items, count, sub_items_url, migration_id} of response) {
+      const rootItem = responseToItem({
+        type,
+        title,
+        property,
+        sub_items,
+        migration_id,
+      }, I18n)
+
+      if (sub_items_url && count) {
+         
+        const {json} = await doFetchApi<GenericItemResponse[]>({
+          path: sub_items_url,
+          method: 'GET',
+        })
+        if (!json) {
+          setHasErrors(true)
+          continue
+        }
+        rootItem.label = I18n.t('%{title} (%{count})', {title, count})
+        rootItem.children = json.map(jsonElement => responseToItem(jsonElement, I18n))
+      }
+      rootItems.push(rootItem)
+    }
+
+    return mapToCheckboxTreeNodes(rootItems)
+  }
+
+  const handleEntered = useCallback(async () => {
+    setHasErrors(false)
     setIsLoading(true)
-    doFetchApi({
-      path: `/api/v1/courses/${courseId}/content_migrations/${migration.id}/selective_data`,
-      method: 'GET',
-    })
-      // @ts-expect-error
-      .then(({json}: {json: SelectiveDataResponse}) => mapSelectiveDataResponse(json))
-      .then((mappedItems: Item[]) => setItems(mappedItems))
-      .catch(() => setHasErrors(true))
-      .finally(() => setIsLoading(false))
-  }, [courseId, migration.id])
+    try {
+      const {json} = await doFetchApi<SelectiveDataResponse>({
+        path: `/api/v1/courses/${courseId}/content_migrations/${migration.id}/selective_data`,
+        method: 'GET',
+      })
+      if (!json) {
+        setHasErrors(true)
+        setCheckboxTreeNodes({})
+        return
+      }
+      const mappedItems = await getChildSelectiveData(json, setHasErrors)
+      setCheckboxTreeNodes(mappedItems)
+    } catch {
+      setHasErrors(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [courseId, getChildSelectiveData, migration.id])
 
   const handleSubmit = () => {
     doFetchApi({
       path: `/api/v1/courses/${courseId}/content_migrations/${migration.id}`,
       method: 'PUT',
-      body: generateSelectiveDataResponse(migration.id, ENV.current_user_id!, selectedProperties),
+      body: generateSelectiveDataResponse(migration.id, ENV.current_user_id!, checkboxTreeNodes),
     })
       .then(() => {
         updateMigrationItem?.(migration.id)
@@ -194,13 +137,8 @@ export const ContentSelectionModal = ({
   if (!courseId || migration.workflow_state !== 'waiting_for_select') return null
 
   let content
-  if (items.length > 0 && !hasErrors && !isLoading) {
-    content = (
-      <CollapsableList
-        items={items}
-        onChange={newSelectedProperties => setSelectedProperties(newSelectedProperties)}
-      />
-    )
+  if (Object.keys(checkboxTreeNodes).length > 0 && !hasErrors && !isLoading) {
+    content = <TreeSelector checkboxTreeNodes={checkboxTreeNodes} onChange={setCheckboxTreeNodes} />
   } else if (hasErrors) {
     content = (
       <Alert variant="error" margin="small">
@@ -213,7 +151,7 @@ export const ContentSelectionModal = ({
         <Spinner renderTitle={() => I18n.t('Loading content for import.')} />
       </View>
     )
-  } else if (items.length === 0) {
+  } else if (Object.keys(checkboxTreeNodes).length === 0) {
     content = (
       <View display="block" padding="0 0 xx-large">
         <Text>
