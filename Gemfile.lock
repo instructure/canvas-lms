@@ -477,7 +477,7 @@ GEM
       libdatadog (~> 12.0.0.1.0)
       libddwaf (~> 1.14.0.0.0)
       msgpack
-    date (3.3.4)
+    date (3.4.1)
     db-query-matchers (0.13.0)
       activesupport (>= 4.0, < 7.3)
       rspec (>= 3.0)

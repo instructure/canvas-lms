@@ -82,7 +82,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    date (3.3.4)
+    date (3.4.1)
     diff-lcs (1.5.1)
     digest-murmurhash (1.1.1)
     drb (2.2.1)
