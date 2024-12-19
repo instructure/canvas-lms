@@ -116,5 +116,19 @@ describe "assignments" do
       click_cog_to_edit
       expect(f("[data-testid='assignment-name-input']").attribute(:value)).to include(@title)
     end
+
+    context "more options button" do
+      it "redirects to quiz edit page", priority: "1" do
+        quiz = @course.quizzes.create
+        quiz.publish!
+
+        get "/courses/#{@course.id}/assignments"
+        click_cog_to_edit
+
+        f("[data-testid='more-options-button']").click
+
+        expect(driver.current_url).to include("/quizzes/#{quiz.id}/edit")
+      end
+    end
   end
 end
