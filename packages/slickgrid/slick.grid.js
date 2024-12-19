@@ -1577,12 +1577,12 @@ if (typeof Slick === 'undefined') {
         rule = getColumnCssRules(i)
         if (i < numberOfColumnsToFreeze) {
           // FrozenColumns
-          if (!rule[rear]) {
+          if (rule[rear]) {
             rule[rear].style[rear] = frozenWidth + 'px'
           }
-          if (!rule[front]) {
+          if (rule[front]) {
             rule[front].style[front] = canvasWidth_0 - frozenWidth - w + 'px'
-          } 
+          }
           frozenWidth += columns[i].width
         } else {
           // NonFrozenColumns
