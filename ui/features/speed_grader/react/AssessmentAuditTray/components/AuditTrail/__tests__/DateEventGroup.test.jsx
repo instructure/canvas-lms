@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,21 +17,25 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import * as timezone from '@instructure/moment-utils'
+import {render} from '@testing-library/react'
+import tz from 'timezone'
+import tzInTest from '@instructure/moment-utils/specHelpers'
 import newYork from 'timezone/America/New_York'
 
 import DateEventGroup from '../DateEventGroup'
 import {buildEvent} from '../../../__tests__/AuditTrailSpecHelpers'
 import buildAuditTrail from '../../../buildAuditTrail'
 
-QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
-  let $container
-  let props
-  let timezoneSnapshot
+describe('DateEventGroup', () => {
+  let defaultProps
 
-  suiteHooks.beforeEach(() => {
-    $container = document.body.appendChild(document.createElement('div'))
+  beforeEach(() => {
+    tzInTest.configureAndRestoreLater({
+      tz: tz(newYork, 'America/New_York'),
+      tzData: {
+        'America/New_York': newYork,
+      },
+    })
 
     const auditEvents = [
       buildEvent({id: '4901', userId: '1101', createdAt: '2018-09-01T16:34:00Z'}),
@@ -43,34 +47,27 @@ QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
     const quizzes = []
     const auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
 
-    props = {
+    defaultProps = {
       dateEventGroup: auditTrail.creatorEventGroups[0].dateEventGroups[0],
     }
-
-    timezoneSnapshot = timezone.snapshot()
-    timezone.changeZone(newYork, 'America/New_York')
   })
 
-  suiteHooks.afterEach(() => {
-    ReactDOM.unmountComponentAtNode($container)
-    $container.remove()
-    timezone.restore(timezoneSnapshot)
+  afterEach(() => {
+    tzInTest.restore()
   })
 
-  function mountComponent() {
-    // eslint-disable-next-line no-restricted-properties
-    ReactDOM.render(<DateEventGroup {...props} />, $container)
+  const renderDateEventGroup = (props = {}) => {
+    return render(<DateEventGroup {...defaultProps} {...props} />)
   }
 
-  test('displays the starting date and time in the timezone of the current user', () => {
-    mountComponent()
-    const $heading = $container.querySelector('h4')
-    equal($heading.textContent, 'September 1 starting at 12:34pm')
+  it('displays the starting date and time in the timezone of the current user', () => {
+    const {getByText} = renderDateEventGroup()
+    expect(getByText('September 1 starting at 12:34pm')).toBeInTheDocument()
   })
 
-  test('displays a list of all events', () => {
-    mountComponent()
-    const $events = $container.querySelectorAll('ul li')
-    strictEqual($events.length, 3)
+  it('displays a list of all events', () => {
+    const {container} = renderDateEventGroup()
+    const events = container.querySelectorAll('ul li')
+    expect(events).toHaveLength(3)
   })
 })
