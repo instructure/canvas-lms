@@ -25,10 +25,6 @@ class Lti::Registration < ActiveRecord::Base
   include Canvas::SoftDeletable
 
   attr_accessor :skip_lti_sync
-  # these preloaded* variables are used during bulk loading of Registrations
-  # to avoid N+1 queries. During bulk loading, *_loaded is set to true for all
-  # Registrations even if they don't have a value, to avoid re-running the query.
-  attr_writer :account_binding_loaded, :overlay_loaded, :preloaded_account_binding, :preloaded_overlay
 
   belongs_to :account, inverse_of: :lti_registrations, optional: false
   belongs_to :created_by, class_name: "User", inverse_of: :created_lti_registrations, optional: true
@@ -64,7 +60,6 @@ class Lti::Registration < ActiveRecord::Base
   # @return [Lti::RegistrationAccountBinding | nil]
   def account_binding_for(account)
     return nil unless account
-    return @preloaded_account_binding if @account_binding_loaded
 
     # If subaccount support/bindings are needed in the future, reference
     # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
@@ -95,8 +90,6 @@ class Lti::Registration < ActiveRecord::Base
   # @param context [Account | Course | nil]
   # @return [Lti::Overlay | nil]
   def overlay_for(context)
-    return @preloaded_overlay if @overlay_loaded
-
     # If subaccount support is needed in the future, reference
     # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority.
     account = if context.blank?
@@ -134,64 +127,6 @@ class Lti::Registration < ActiveRecord::Base
     tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || privacy_level
     tool
   end
-
-  def self.preload_account_bindings(registrations, account)
-    return nil unless account
-
-    # If subaccount support/bindings are needed in the future, reference
-    # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
-    # for the correct priority searching logic.
-    unless account.root_account?
-      account = account.root_account
-    end
-
-    account_bindings = Lti::RegistrationAccountBinding.where(account:, registration: registrations).preload(:created_by, :updated_by) +
-                       Lti::RegistrationAccountBinding.find_all_in_site_admin(registrations)
-
-    associate_bindings(registrations, account_bindings)
-  end
-
-  def self.associate_bindings(registrations, account_bindings)
-    registrations_by_id = registrations.index_by(&:global_id)
-
-    registrations.each { |registration| registration.account_binding_loaded = true }
-
-    account_bindings.each do |acct_binding|
-      global_registration_id = Shard.global_id_for(acct_binding.registration_id, Shard.current)
-      registration = registrations_by_id[global_registration_id]
-      registration&.preloaded_account_binding = acct_binding
-    end
-  end
-  private_class_method :associate_bindings
-
-  def self.preload_overlays(registrations, account)
-    return nil unless account
-
-    # If subaccount support/overlays are needed in the future, reference
-    # DeveloperKey#account_binding_for and DeveloperKeyAccountBinding#find_in_account_priority
-    # for the correct priority searching logic.
-    unless account.root_account?
-      account = account.root_account
-    end
-
-    overlays = Lti::Overlay.where(account:, registration: registrations).preload(:updated_by) +
-               Lti::Overlay.find_all_in_site_admin(registrations)
-
-    associate_overlays(registrations, overlays)
-  end
-
-  def self.associate_overlays(registrations, overlays)
-    registrations_by_id = registrations.index_by(&:global_id)
-
-    registrations.each { |registration| registration.overlay_loaded = true }
-
-    overlays.each do |overlay|
-      global_registration_id = Shard.global_id_for(overlay.registration_id, Shard.current)
-      registration = registrations_by_id[global_registration_id]
-      registration&.preloaded_overlay = overlay
-    end
-  end
-  private_class_method :associate_overlays
 
   # Returns true if this Registration is from a different account than the given account.
   #
@@ -286,9 +221,6 @@ class Lti::Registration < ActiveRecord::Base
   end
 
   private
-
-  # private readers exposed only for testing.
-  attr_reader :preloaded_account_binding, :preloaded_overlay
 
   # Returns which placements are disabled at the Lti::IMS::Registration or Lti::ToolConfiguration level.
   # Note that this is legacy behavior, as moving forward, the overlay will be the source of truth. This method
