@@ -3100,22 +3100,7 @@ class UsersController < ApplicationController
     @pseudonym = nil
     @user = nil
     if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
-      @pseudonym = @context.pseudonyms.where(sis_user_id:, workflow_state: "deleted").first
-      if @pseudonym
-        @pseudonym.workflow_state = "active"
-        @pseudonym.save!
-        @user = @pseudonym.user
-        @user.workflow_state = "registered"
-        @user.update_account_associations
-        if params[:user]&.dig(:skip_registration) && params[:communication_channel]&.dig(:skip_confirmation)
-          cc = CommunicationChannel.where(user_id: @user.id, path_type: :email).order(updated_at: :desc).first
-          if cc
-            cc.pseudonym = @pseudonym
-            cc.workflow_state = "active"
-            cc.save!
-          end
-        end
-      end
+      perform_sis_reactivation!(sis_user_id)
     end
 
     if @pseudonym.nil?
@@ -3274,19 +3259,22 @@ class UsersController < ApplicationController
       @cc.confirmation_redirect = cc_confirmation_redirect
     end
 
-    if @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && (@invalid_observee_creds.nil? & @invalid_observee_code.nil?)
-      # saving the user takes care of the @pseudonym and @cc, so we can't call
-      # save_without_session_maintenance directly. we don't want to auto-log-in
-      # unless the user is registered/pre_registered (if the latter, he still
-      # needs to confirm his email and set a password, otherwise he can't get
-      # back in once his session expires)
-      if @current_user
-        @pseudonym.send(:skip_session_maintenance=, true)
-      else # automagically logged in
-        PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
-      end
+    save_user = @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && (@invalid_observee_creds.nil? & @invalid_observee_code.nil?)
 
-      message_sent = User.transaction do
+    message_sent = User.transaction do
+      handle_instructure_identity(save_user)
+      if save_user
+        # saving the user takes care of the @pseudonym and @cc, so we can't call
+        # save_without_session_maintenance directly. we don't want to auto-log-in
+        # unless the user is registered/pre_registered (if the latter, he still
+        # needs to confirm his email and set a password, otherwise he can't get
+        # back in once his session expires)
+        if @current_user
+          @pseudonym.send(:skip_session_maintenance=, true)
+        else # automagically logged in
+          PseudonymSession.new(@pseudonym).save unless @pseudonym.new_record?
+        end
+
         @user.save!
 
         if @observee && !@user.as_observer_observation_links.where(user_id: @observee, root_account: @context).exists?
@@ -3300,7 +3288,9 @@ class UsersController < ApplicationController
         end
         notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
       end
+    end
 
+    if save_user
       data = if api_request?
                user_json(@user, @current_user, session, includes)
              else
@@ -3345,6 +3335,27 @@ class UsersController < ApplicationController
         }
       }
       render json: errors, status: :bad_request
+    end
+  end
+
+  def handle_instructure_identity(will_be_saving_user) end
+
+  def perform_sis_reactivation!(sis_user_id)
+    @pseudonym = @context.pseudonyms.where(sis_user_id:, workflow_state: "deleted").first
+    if @pseudonym
+      @pseudonym.workflow_state = "active"
+      @pseudonym.save!
+      @user = @pseudonym.user
+      @user.workflow_state = "registered"
+      @user.update_account_associations
+      if params[:user]&.dig(:skip_registration) && params[:communication_channel]&.dig(:skip_confirmation)
+        cc = CommunicationChannel.where(user_id: @user.id, path_type: :email).order(updated_at: :desc).first
+        if cc
+          cc.pseudonym = @pseudonym
+          cc.workflow_state = "active"
+          cc.save!
+        end
+      end
     end
   end
 
