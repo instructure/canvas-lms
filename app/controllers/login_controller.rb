@@ -175,4 +175,6 @@ class LoginController < ApplicationController
     redirect_to url_for({ controller: "login/#{auth_type}", action: :new }
       .merge(params.permit(:id, :login_hint).to_unsafe_h))
   end
+
+  def auth_type; end
 end
