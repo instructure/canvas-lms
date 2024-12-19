@@ -963,94 +963,25 @@ class Lti::RegistrationsController < ApplicationController
   #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/registrations' \
   #        -H "Authorization: Bearer <token>"
   def list
-    GuardRail.activate(:secondary) do
-      preload_models = [
-        { lti_registration_account_bindings: [:created_by, :updated_by] },
-        :ims_registration,
-        :manual_configuration,
-        :developer_key,
-        :created_by, # registration's created_by
-        :updated_by  # registration's updated_by
-      ]
-      # eager loaded instead of preloaded for use in where queries
-      eager_load_models = [:lti_registration_account_bindings]
-      all_active_registrations = Lti::Registration.active.preload(preload_models).eager_load(eager_load_models)
-      # Get all registrations on this account, regardless of their bindings
-      account_registrations = all_active_registrations.where(account: @account)
+    includes = [:account_binding] + (Array(params[:include]).map(&:to_sym) - [:overlay_versions])
+    list_service_params = {
+      account: @account,
+      search_terms: params[:query]&.downcase&.split,
+      sort_field: params[:sort]&.to_sym || :installed,
+      sort_direction: params[:dir]&.to_sym || :desc,
+      preload_overlays: includes.include?(:overlay)
+    }
 
-      # Get all registration account bindings that are bound to the site admin account and that are "on,"
-      # since they will apply to this account (and all accounts)
-      forced_on_in_site_admin = all_active_registrations
-                                .shard(Shard.default)
-                                .where(account: Account.site_admin)
-                                .where(lti_registration_account_bindings: { workflow_state: "on", account_id: Account.site_admin.id })
+    registrations, preloads = Lti::ListRegistrationService
+                              .call(**list_service_params)
+                              .values_at(:registrations, :preloaded_associations)
 
-      consortia_registrations = if @account.root_account.primary_settings_root_account? || @account.root_account.consortium_parent_account.blank?
-                                  Lti::RegistrationAccountBinding.none
-                                else
-                                  consortium_parent = @account.root_account.consortium_parent_account
-                                  all_active_registrations
-                                    .shard(consortium_parent.shard)
-                                    .where(account: consortium_parent)
-                                    .where(lti_registration_account_bindings: {
-                                             workflow_state: "on",
-                                             account: consortium_parent
-                                           })
-                                end
-
-      # Get all registration account bindings in this account, then fetch the registrations from their own shards
-      # Omit registrations that were found in the "account_registrations" list; we're only looking for ones that
-      # are uniquely being inherited from a different account.
-      inherited_on_registration_ids = Lti::RegistrationAccountBinding
-                                      .where(workflow_state: "on")
-                                      .where(account: @account)
-                                      .where.not(registration_id: account_registrations.map(&:id))
-                                      .pluck(:registration_id)
-                                      .uniq
-
-      inherited_on_registrations = Shard.partition_by_shard(inherited_on_registration_ids) do |registration_ids_for_shard|
-        all_active_registrations.where(id: registration_ids_for_shard)
-      end.flatten
-
-      all_registrations = account_registrations + forced_on_in_site_admin + inherited_on_registrations + consortia_registrations
-      Lti::Registration.preload_account_bindings(all_registrations, @account)
-
-      search_terms = params[:query]&.downcase&.split
-      all_registrations = filter_registrations_by_search_query(all_registrations, search_terms) if search_terms
-
-      # sort by the 'sort' parameter, or installed (a.k.a. created_at) if no parameter was given
-      sort_field = params[:sort]&.to_sym || :installed
-      sorted_registrations = all_registrations.sort_by do |reg|
-        case sort_field
-        when :name
-          reg.name.downcase
-        when :nickname
-          reg.admin_nickname&.downcase || ""
-        when :lti_version
-          reg.lti_version
-        when :installed
-          reg.created_at
-        when :installed_by
-          reg.created_by&.name&.downcase || ""
-        when :updated_by
-          reg.updated_by&.name&.downcase || ""
-        when :updated
-          reg.updated_at
-        when :on
-          reg.account_binding_for(@account)&.workflow_state || ""
-        end
-      end
-
-      sorted_registrations.reverse! unless params[:dir] == "asc"
-
-      per_page = Api.per_page_for(self, default: 15)
-      paginated_registrations, _metadata = Api.jsonapi_paginate(sorted_registrations, self, url_for, { per_page: })
-      includes = [:account_binding] + (Array(params[:include]).map(&:to_sym) - [:overlay_versions])
-      render json: {
-        total: all_registrations.size,
-        data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes:)
-      }
-    end
+    per_page = Api.per_page_for(self, default: 15)
+    paginated_registrations, _metadata = Api.jsonapi_paginate(registrations, self, url_for, { per_page: })
+    render json: {
+      total: registrations.size,
+      data: lti_registrations_json(paginated_registrations, @current_user, session, @context, includes:, preloads:)
+    }
   rescue => e
     report_error(e)
     raise e
@@ -1151,7 +1082,15 @@ class Lti::RegistrationsController < ApplicationController
     GuardRail.activate(:secondary) do
       registration = Lti::Registration.active.find(params[:id])
       includes = [:account_binding, :configuration] + Array(params[:include]).map(&:to_sym)
-      render json: lti_registration_json(registration, @current_user, session, @context, includes:)
+      account_binding = registration.account_binding_for(@context)
+      overlay = registration.overlay_for(@context) if includes.include?(:overlay)
+      render json: lti_registration_json(registration,
+                                         @current_user,
+                                         session,
+                                         @context,
+                                         includes:,
+                                         account_binding:,
+                                         overlay:)
     end
   rescue => e
     report_error(e)
@@ -1222,13 +1161,13 @@ class Lti::RegistrationsController < ApplicationController
       )
 
       if overlay_params.present?
-        Lti::Overlay.create!(
+        overlay = Lti::Overlay.create!(
           registration:,
           account: @context,
           updated_by: @current_user,
           data: overlay_params
         )
-        scopes = Lti::Overlay.apply_to(overlay_params, configuration_params)[:scopes]
+        scopes = overlay.apply_to(configuration_params)[:scopes]
       end
 
       dk = DeveloperKey.create!(
@@ -1277,7 +1216,9 @@ class Lti::RegistrationsController < ApplicationController
                                                          @current_user,
                                                          session,
                                                          @context,
-                                                         includes: %i[account_binding configuration overlay])
+                                                         includes: %i[account_binding configuration overlay],
+                                                         account_binding: registration.account_binding_for(@context),
+                                                         overlay: registration.overlay_for(@context))
   end
 
   # @API Show an LTI Registration (via the client_id)
@@ -1299,7 +1240,13 @@ class Lti::RegistrationsController < ApplicationController
       end
 
       registration = developer_key.lti_registration
-      render json: lti_registration_json(registration, @current_user, session, @context, includes: [:account_binding, :configuration])
+
+      render json: lti_registration_json(registration,
+                                         @current_user,
+                                         session,
+                                         @context,
+                                         includes: [:account_binding, :configuration],
+                                         account_binding: registration.account_binding_for(@context))
     end
   rescue => e
     report_error(e)
@@ -1401,7 +1348,9 @@ class Lti::RegistrationsController < ApplicationController
                                        includes: %i[account_binding
                                                     configuration
                                                     overlay
-                                                    overlay_versions])
+                                                    overlay_versions],
+                                       account_binding: registration.account_binding_for(@context),
+                                       overlay: registration.overlay_for(@context))
   rescue => e
     report_error(e)
     raise e
@@ -1423,7 +1372,13 @@ class Lti::RegistrationsController < ApplicationController
     end
 
     registration.destroy
-    render json: lti_registration_json(registration, @current_user, session, @context, includes: %i[account_binding configuration overlay])
+    render json: lti_registration_json(registration,
+                                       @current_user,
+                                       session,
+                                       @context,
+                                       includes: %i[account_binding configuration overlay],
+                                       account_binding: registration.account_binding_for(@context),
+                                       overlay: registration.overlay_for(@context))
   rescue => e
     report_error(e)
     raise e
@@ -1598,23 +1553,5 @@ class Lti::RegistrationsController < ApplicationController
   def report_error(exception, code = nil)
     code ||= response_code_for_rescue(exception) if exception
     InstStatsd::Statsd.increment("canvas.lti_registrations_controller.request_error", tags: { action: action_name, code: })
-  end
-
-  def filter_registrations_by_search_query(registrations, search_terms)
-    # all search terms must appear, but each can be in either the name,
-    # admin_nickname, or vendor name. Remove the search terms from the list
-    # as they are found -- keep the registration as a matching result if the
-    # list is empty at the end.
-    registrations.select do |registration|
-      terms_to_find = search_terms.dup
-      terms_to_find.delete_if do |term|
-        attributes = %i[name admin_nickname vendor]
-        attributes.any? do |attribute|
-          registration[attribute]&.downcase&.include?(term)
-        end
-      end
-
-      terms_to_find.empty?
-    end
   end
 end
