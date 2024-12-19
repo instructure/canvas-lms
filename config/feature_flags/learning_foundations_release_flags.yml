@@ -153,20 +153,6 @@ selective_release_ui_api:
     development:
       state: allowed_on # enable for local development
 
-selective_release_edit_page:
-  state: hidden
-  display_name: Selective Release - Edit Page
-  description: |-
-    If enabled, with selective release the edit page for assignments, quizzes, pages,
-    and discussions will have the assign to functionality directly in the page instead
-    of in a tray.
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on # enable for automated testings builds and local testing
-    development:
-      state: allowed_on # enable for local development
-
 differentiated_files:
   state: hidden
   display_name: Selective Release - Files

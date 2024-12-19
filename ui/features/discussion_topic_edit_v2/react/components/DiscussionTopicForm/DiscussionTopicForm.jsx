@@ -373,15 +373,14 @@ function DiscussionTopicForm({
     pointsPossible,
     isGraded,
     isCheckpoints,
-    postToSis: ENV.FEATURES.selective_release_edit_page ? postToSisForCards.current : postToSis,
+    postToSis: postToSisForCards.current,
   }
 
   useEffect(() => {
     // Expects to force the focus the errors on re-render once
     if (
       shouldForceFocusAfterRenderRef.current &&
-      ENV.FEATURES.selective_release_ui_api &&
-      ENV.FEATURES.selective_release_edit_page
+      ENV.FEATURES.selective_release_ui_api
     ) {
       const sectionViewRef = document.getElementById(
         'manage-assign-to-container'
@@ -644,7 +643,7 @@ function DiscussionTopicForm({
       sectionIdsToPostTo,
       assignedInfoList,
       postToSis,
-      showPostToSisFlashAlert('manage-assign-to', !ENV.FEATURES.selective_release_edit_page)
+      showPostToSisFlashAlert('manage-assign-to', false)
     )
 
   const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
@@ -660,8 +659,7 @@ function DiscussionTopicForm({
     if (
       // Not validate override dates for announcements or ungraded group discussions
       !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type === 'Group') &&
-      ENV.FEATURES.selective_release_ui_api &&
-      ENV.FEATURES.selective_release_edit_page
+      ENV.FEATURES.selective_release_ui_api
     ) {
       const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
@@ -687,7 +685,7 @@ function DiscussionTopicForm({
     }
 
     setTimeout(() => {
-      if (ENV.FEATURES.selective_release_ui_api && ENV.FEATURES.selective_release_edit_page) {
+      if (ENV.FEATURES.selective_release_ui_api) {
         if (!formIsValid) {
           // If there are errors visible already don't force the focus
           if (hasAfterRenderIssue) {
@@ -1224,7 +1222,7 @@ function DiscussionTopicForm({
                 checked={isGroupDiscussion}
                 messages={groupDiscussionErrors}
                 onChange={() => {
-                  if (ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
+                  if (hasGroupOverrides()) {
                     setGroupDiscussionErrors([
                       {
                         type: 'error',
@@ -1250,7 +1248,7 @@ function DiscussionTopicForm({
                   defaultValue=""
                   value={groupCategoryId}
                   onChange={(_event, newChoice) => {
-                    if (ENV.FEATURES.selective_release_edit_page && hasGroupOverrides()) {
+                    if (hasGroupOverrides()) {
                       setGroupCategorySelectError([
                         {
                           type: 'error',

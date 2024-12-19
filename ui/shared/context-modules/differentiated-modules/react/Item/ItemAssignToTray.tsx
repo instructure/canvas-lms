@@ -262,7 +262,7 @@ export default function ItemAssignToTray({
   }, [defaultCards, initialCardsState.length])
 
   useEffect(() => {
-    if (!ENV.FEATURES?.selective_release_edit_page || onChange === undefined) return
+    if (onChange === undefined) return
     const deletedModuleAssignees = moduleAssignees.filter(
       override => !disabledOptionIdsRef.current.includes(override)
     )

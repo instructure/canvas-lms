@@ -248,11 +248,7 @@ describe "editing a quiz" do
         get "/courses/#{@course.id}/quizzes/#{item.content_id}/edit"
 
         if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          if Account.site_admin.feature_enabled?(:selective_release_edit_page)
-            expect(assign_to_card).to be_displayed
-          else
-            expect(manage_assign_to_button).to be_displayed
-          end
+          expect(assign_to_card).to be_displayed
         else
           expect(f(quiz_edit_form)).to contain_css(due_date_container)
         end

@@ -60,7 +60,7 @@ window.ENV = {
   COURSE_ID: '1',
 }
 
-describe('renderAssignToTray', () => {
+describe('renderAssignToTray embedded', () => {
   const ASSIGNMENT_OVERRIDES_URL = `/api/v1/courses/1/modules/2/assignment_overrides?per_page=100`
   const COURSE_SETTINGS_URL = `/api/v1/courses/1/settings`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
@@ -76,48 +76,6 @@ describe('renderAssignToTray', () => {
 
   afterEach(() => {
     fetchMock.restore()
-  })
-
-  const container = document.createElement('div')
-  container.id = 'assign-to-mount-point'
-
-  it('renders the Assign To option', () => {
-    const assignToOption = renderAssignToTray(container, props)
-
-    const {getByTestId} = render(assignToOption)
-    const assignToButton = getByTestId('manage-assign-to')
-    expect(assignToButton).toBeInTheDocument()
-  })
-
-  it('opens the AssignToTray on click', async () => {
-    const assignToOption = renderAssignToTray(container, props)
-
-    const {findByText, getByTestId} = render(assignToOption)
-    getByTestId('manage-assign-to').click()
-    const trayTitle = await findByText(props.pageName)
-    expect(trayTitle).toBeInTheDocument()
-  })
-
-  it('sets default state for new pages', async () => {
-    const assignToOption = renderAssignToTray(container, {...props, pageId: undefined})
-
-    const {findAllByTestId, getByTestId} = render(assignToOption)
-    getByTestId('manage-assign-to').click()
-    const selectedOptions = await findAllByTestId('assignee_selector_selected_option')
-    expect(selectedOptions).toHaveLength(1)
-    waitFor(() => expect(selectedOptions[0]).toHaveTextContent('Everyone'))
-  })
-})
-
-describe('renderAssignToTray embedded', () => {
-  beforeAll(() => {
-    // @ts-expect-error
-    window.ENV = {
-      COURSE_ID: '1',
-      FEATURES: {
-        selective_release_edit_page: true,
-      },
-    }
   })
 
   const container = document.createElement('div')

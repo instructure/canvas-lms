@@ -28,7 +28,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
-import DifferentiatedModulesSection from '../../react/DifferentiatedModulesSection'
 import AssignToContent from '../../react/AssignToContent'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import * as tz from '@instructure/moment-utils'
@@ -84,11 +83,9 @@ DueDateOverrideView.prototype.render = function () {
       div
     )
   }
-  const selective_release_section = ENV.FEATURES?.selective_release_edit_page
-    ? AssignToContent
-    : DifferentiatedModulesSection
+
   const assignToSection = ENV.FEATURES?.selective_release_ui_api
-    ? React.createElement(selective_release_section, {
+    ? React.createElement(AssignToContent, {
         onSync: this.setNewOverridesCollection,
         defaultSectionId: this.model.defaultDueDateSectionId,
         overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
@@ -180,7 +177,7 @@ DueDateOverrideView.prototype.render = function () {
         this.shouldForceFocusAfterRender = false
       }
     }
-    if (this.shouldForceFocusAfterRender && ENV.FEATURES.selective_release_edit_page) {
+    if (this.shouldForceFocusAfterRender) {
       forceFocus()
     }
   })
@@ -206,39 +203,33 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
   errors = this.validateTokenInput(data, errors)
   errors = this.validateGroupOverrides(data, errors)
   const requiredDueDates = ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
-  if (ENV.FEATURES.selective_release_edit_page) {
-    const sectionViewRef = document.getElementById(
-      'manage-assign-to-container'
-    )?.reactComponentInstance
-    const postToSisEnabled = data.postToSIS && requiredDueDates
-    // Runs custom validation for all cards with the current post to sis selection without re-renders
-    const formIsValid = sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
 
-    if (!formIsValid) {
-      const aDueDateMissing = data.assignment_overrides.some(
-        o => o.due_at === null || o.due_at === ''
-      )
-      const hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
-      // If there are errors visible already don't force the focus
-      if (hasAfterRenderIssue) {
-        showPostToSisFlashAlert('manage-assign-to')()
-        // Forces focus after the re-render process is made
-        this.shouldForceFocusAfterRender = true
-        this.render()
+  const sectionViewRef = document.getElementById(
+    'manage-assign-to-container'
+  )?.reactComponentInstance
+  const postToSisEnabled = data.postToSIS && requiredDueDates
+  // Runs custom validation for all cards with the current post to sis selection without re-renders
+  const formIsValid = sectionViewRef?.allCardsValidCustom({dueDateRequired: postToSisEnabled})
+
+  if (!formIsValid) {
+    const aDueDateMissing = data.assignment_overrides.some(
+      o => o.due_at === null || o.due_at === ''
+    )
+    const hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
+    // If there are errors visible already don't force the focus
+    if (hasAfterRenderIssue) {
+      showPostToSisFlashAlert('manage-assign-to')()
+      // Forces focus after the re-render process is made
+      this.shouldForceFocusAfterRender = true
+      this.render()
+    } else {
+      // Focuses inmmediately the visible errors in the component
+      const invalidInput = sectionViewRef?.focusErrors()
+      if (invalidInput) {
+        errors.invalid_card = {$input: null, showError: this.showError}
       } else {
-        // Focuses inmmediately the visible errors in the component
-        const invalidInput = sectionViewRef?.focusErrors()
-        if (invalidInput) {
-          errors.invalid_card = {$input: null, showError: this.showError}
-        } else {
-          delete errors.invalid_card
-        }
+        delete errors.invalid_card
       }
-    }
-  } else {
-    const hasEmptyDueDates = data.assignment_overrides.some(o => o.due_at === null)
-    if (hasEmptyDueDates && data.postToSIS && requiredDueDates) {
-      showPostToSisFlashAlert('manage-assign-to', true)()
     }
   }
 
