@@ -249,6 +249,7 @@ export default class StudentContextTray extends React.Component {
                         <div className="StudentContextTray-Header__Name">
                           <Heading level="h3" as="h2">
                             <Link
+                              data-testid="student-name-link"
                               size="large"
                               href={`/courses/${this.props.courseId}/users/${this.props.studentId}`}
                               isWithinText={false}
