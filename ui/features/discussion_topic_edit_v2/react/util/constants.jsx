@@ -67,6 +67,11 @@ export const maximumReplyToEntryRequiredCount = 10
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'
 
+export const DEFAULT_SORT_ORDER = 'desc'
+export const DEFAULT_SORT_ORDER_LOCKED = false
+export const DEFAULT_EXPANDED_STATE = false
+export const DEFAULT_EXPANDED_LOCKED = false
+
 export const useShouldShowContent = (
   isGraded,
   isAnnouncement,
@@ -85,16 +90,18 @@ export const useShouldShowContent = (
     ENV.STUDENT_PLANNER_ENABLED
 
   const shouldShowPostToSectionOption =
-    !isGraded &&
-    !isGroupDiscussion &&
-    !isGroupContext &&
-    isAnnouncement
+    !isGraded && !isGroupDiscussion && !isGroupContext && isAnnouncement
 
   const shouldShowAnonymousOptions =
     !isGroupContext &&
     !isAnnouncement &&
     (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
       ENV.allow_student_anonymous_discussion_topics)
+
+  const shouldShowViewSettings =
+    !isStudent &&
+    !isAnnouncement &&
+    (ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED || ENV.DISCUSSION_DEFAULT_SORT_ENABLED)
 
   const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
 
@@ -132,9 +139,7 @@ export const useShouldShowContent = (
     isGraded && ENV.DISCUSSION_CHECKPOINTS_ENABLED && !ENV.RESTRICT_QUANTITATIVE_DATA
 
   const shouldShowAssignToForUngradedDiscussions =
-    !isAnnouncement &&
-    !isGraded &&
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
+    !isAnnouncement && !isGraded && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
 
   const shouldShowAllowParticipantsToCommentOption =
     !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && shouldShowAnnouncementOnlyOptions
@@ -143,6 +148,7 @@ export const useShouldShowContent = (
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
     shouldShowAnonymousOptions,
+    shouldShowViewSettings,
     shouldShowAnnouncementOnlyOptions,
     shouldShowGroupOptions,
     shouldShowGradedDiscussionOptions,

@@ -1190,21 +1190,28 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     end
   end
 
-  it "updates the default sort order" do
-    result = run_mutation({ id: @topic.id, sort_order: :asc })
-    expect(result["errors"]).to be_nil
-    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrder]).to eq("asc")
-    result = run_mutation({ id: @topic.id, sort_order_locked: true })
-    expect(result["errors"]).to be_nil
-    expect(result[:data][:updateDiscussionTopic][:discussionTopic][:sortOrderLocked]).to be true
-  end
+  context "discussion_default_expand and discussion_default_sort" do
+    it "updates the default sort order" do
+      result = run_mutation({ id: @topic.id, sort_order: :asc })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(result[:discussionTopic][:sortOrder]).to eq("asc")
+      result = run_mutation({ id: @topic.id, sort_order_locked: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(result[:discussionTopic][:sortOrderLocked]).to be true
+    end
 
-  it "updates the default expand fields" do
-    result = run_mutation({ id: @topic.id, expanded: true })
-    expect(result["errors"]).to be_nil
-    expect(@topic.reload.expanded).to be true
-    result = run_mutation({ id: @topic.id, expanded_locked: true })
-    expect(result["errors"]).to be_nil
-    expect(@topic.reload.expanded_locked).to be true
+    it "updates the default expand fields" do
+      result = run_mutation({ id: @topic.id, expanded: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.expanded).to be true
+      result = run_mutation({ id: @topic.id, expanded_locked: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.expanded_locked).to be true
+    end
+
+    it "fails to update, if default_expand = false and default_expand_locked = true" do
+      result = run_mutation({ id: @topic.id, expanded: false, expanded_locked: true })[:data][:updateDiscussionTopic]
+      expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
+    end
   end
 end
