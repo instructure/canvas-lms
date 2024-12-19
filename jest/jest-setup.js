@@ -47,7 +47,7 @@ rceFormatMessage.setup({
  * the warning/error, add it to the ignore list below.
  */
 
-const globalLog = global.console.error
+const globalLog = global.console.log
 const globalError = global.console.error
 const ignoredLogs = [
   /Migrate is installed with logging active/,
@@ -90,7 +90,7 @@ global.console = {
     if (ignoredLogs.some(regex => regex.test(log))) {
       return
     }
-    globalLog(log, rest)
+    globalLog(log, ...rest)
   },
   error: (error, ...rest) => {
     if (
