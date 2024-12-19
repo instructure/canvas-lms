@@ -51,6 +51,26 @@ describe RubricAssessmentImportsController do
       @attachment = fixture_file_upload("rubric/assessments.csv", "text/csv")
     end
 
+    context "anonymous grading" do
+      it "return error if anonymous grading" do
+        @assignment.update!(anonymous_grading: true, moderated_grading: true, grader_count: 1)
+        post :create, params: { course_id: @course.id, assignment_id: @assignment.id, attachment: @attachment }
+        expect(response).to be_bad_request
+        expect(response.body).to match(/Rubric import is not supported for assignments with anonymous grading/)
+      end
+
+      it "create import if de-anonymized students" do
+        @assignment.update!(
+          anonymous_grading: true, moderated_grading: true, grader_count: 1, grades_published_at: 1.hour.ago
+        )
+        post :create, params: { course_id: @course.id, assignment_id: @assignment.id, attachment: @attachment }
+        expect(response).to be_successful
+        response_body = json_parse(response.body)
+        expect(response_body["assignment_id"]).to eq(@assignment.id)
+        expect(response_body["workflow_state"]).to eq("created")
+      end
+    end
+
     it "returns bad request if file attachment not passed in" do
       post :create, params: { course_id: @course.id, assignment_id: @assignment.id }
       expect(response).to be_bad_request

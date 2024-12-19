@@ -219,7 +219,7 @@ class RubricAssessmentsController < ApplicationController
       return render json: { message: I18n.t("Assignment not found or does not have a rubric association") }, status: :bad_request
     end
 
-    if assignment.anonymous_grading?
+    if assignment.anonymize_students?
       return render json: { message: I18n.t("Rubric export is not supported for assignments with anonymous grading") }, status: :bad_request
     end
 
