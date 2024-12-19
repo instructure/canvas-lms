@@ -31,7 +31,7 @@ export default class AuditTrail extends PureComponent {
     const {creatorEventGroups} = this.props.auditTrail
 
     return (
-      <View as="div" id="assessment-audit-trail">
+      <View as="div" id="assessment-audit-trail" data-testid="assessment-audit-trail">
         {creatorEventGroups.map(group => (
           <CreatorEventGroup key={group.creator.key} creatorEventGroup={group} />
         ))}
