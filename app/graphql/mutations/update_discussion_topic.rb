@@ -86,6 +86,11 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
       discussion_topic.discussion_type = input[:discussion_type]
     end
 
+    # Validating default expand input data
+    if input.key?(:expanded) && input.key?(:expanded_locked) && (!input[:expanded] && input[:expanded_locked])
+      return validation_error(I18n.t("Cannot set default thread state locked, when threads are collapsed"))
+    end
+
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
     process_locked_parameter(input[:locked], discussion_topic) unless input[:locked].nil?

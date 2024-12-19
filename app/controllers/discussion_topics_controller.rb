@@ -635,6 +635,8 @@ class DiscussionTopicsController < ApplicationController
       DISCUSSION_CHECKPOINTS_ENABLED: @context.root_account.feature_enabled?(:discussion_checkpoints),
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements),
       ANNOUNCEMENTS_COMMENTS_DISABLED: Announcement.new(context: @context).comments_disabled?,
+      DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
+      DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -899,6 +901,8 @@ class DiscussionTopicsController < ApplicationController
                checkpointed_discussion_without_feature_flag:
                  @topic.assignment&.has_sub_assignments? && !@domain_root_account&.feature_enabled?(:discussion_checkpoints),
                DISCUSSION_CHECKPOINTS_ENABLED: @domain_root_account.feature_enabled?(:discussion_checkpoints),
+               DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
+               DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
              })
       unless @locked
         InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
