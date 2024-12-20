@@ -26,16 +26,14 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-
-// @ts-expect-error
-import {ResponsiveSizes, StoreState} from '../types'
+import type {ResponsiveSizes, StoreState} from '../types'
 import {
   getAnyActiveRequests,
   getAutoSaving,
   getShowLoadingOverlay,
   getSyncing,
   getBlueprintLocked,
-  getSavingDraft
+  getSavingDraft,
 } from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
 import {
@@ -119,9 +117,12 @@ export const Footer = ({
   const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
   const allowDraftPaces = window.ENV.FEATURES.course_pace_draft_state && isCoursePace
 
-  const handlePublish = useCallback((saveAsDraft: boolean) => {
-    syncUnpublishedChanges(saveAsDraft)
-  }, [syncUnpublishedChanges])
+  const handlePublish = useCallback(
+    (saveAsDraft: boolean) => {
+      syncUnpublishedChanges(saveAsDraft)
+    },
+    [syncUnpublishedChanges]
+  )
 
   const handlePublishClicked = () => {
     handlePublish(false)
@@ -144,7 +145,7 @@ export const Footer = ({
   const removeDisabled = autoSaving || isSyncing || showLoadingOverlay || pacePublishing
   const saveDraftEnabled = (isDraftPace || isUnpublishedNewPace) && unpublishedChanges
   // always override publishing to be enabled when a pace is a draft, even if there are no unsaved changes
-  if (allowDraftPaces && isDraftPace ) pubDisabled = false
+  if (allowDraftPaces && isDraftPace) pubDisabled = false
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
@@ -152,7 +153,8 @@ export const Footer = ({
     if (newPace) {
       publishLabel = I18n.t('Create Pace')
     } else {
-      publishLabel = allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
+      publishLabel =
+        allowDraftPaces && isDraftPace ? I18n.t('Publish Pace') : I18n.t('Apply Changes')
     }
   }
 
@@ -195,10 +197,7 @@ export const Footer = ({
 
       return (
         <>
-          <Tooltip
-            renderTip={draftTip}
-            on={['hover', 'focus']}
-          >
+          <Tooltip renderTip={draftTip} on={['hover', 'focus']}>
             <Button
               data-testid="save-pace-draft-button"
               color="secondary"
@@ -317,7 +316,7 @@ export const Footer = ({
               {useRedesign ? I18n.t('Close') : I18n.t('Cancel')}
             </Button>
           </Tooltip>
-          { getSaveDraftButton()}
+          {getSaveDraftButton()}
           <Tooltip
             renderTip={pubDisabled ? pubTip : ''}
             on={pubDisabled && !useRedesign ? ['hover', 'focus'] : []}

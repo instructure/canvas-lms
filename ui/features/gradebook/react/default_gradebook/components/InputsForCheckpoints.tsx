@@ -36,10 +36,8 @@ import {
 // @ts-expect-error
 import type {GradingStandard, PendingGradeInfo} from '../gradebook.d'
 import {
-  // @ts-expect-error
   CamelizedAssignment,
   type GradeEntryMode,
-  // @ts-expect-error
   GradeResult,
   type SubmissionData,
 } from '@canvas/grading/grading.d'
