@@ -94,6 +94,7 @@ class GradingPeriod extends React.Component {
   render() {
     return (
       <GradingPeriodTemplate
+        data-testid="grading-period"
         key={this.props.id}
         ref={c => (this.templateRef = c)}
         id={this.props.id}
