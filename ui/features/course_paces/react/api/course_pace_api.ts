@@ -184,7 +184,7 @@ const transformCoursePaceForApi = (
     ? ['sat', 'sun']
     : []
 
-  const compressedCoursePace = {
+  const compressedCoursePace: CompressApiFormattedCoursePace = {
     start_date: coursePace.start_date,
     end_date: coursePace.end_date,
     course_pace_module_items_attributes: coursePaceItems,

@@ -96,7 +96,7 @@ interface PassedProps {
 
 type ComponentProps = PassedProps & DispatchProps & StoreProps
 
-type ResponsiveComponentProps = ComponentProps & {
+export type ResponsiveComponentProps = ComponentProps & {
   readonly outerResponsiveSize: ResponsiveSizes
   responsiveSize: ResponsiveSizes
 }

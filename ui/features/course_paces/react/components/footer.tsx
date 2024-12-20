@@ -84,7 +84,7 @@ interface PassedProps {
   readonly focusOnClose?: () => void
 }
 
-type ComponentProps = StoreProps & DispatchProps & PassedProps
+export type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 export const Footer = ({
   autoSaving,

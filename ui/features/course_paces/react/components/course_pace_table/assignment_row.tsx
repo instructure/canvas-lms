@@ -93,7 +93,7 @@ interface LocalState {
   readonly hovering: boolean
 }
 
-type ComponentProps = PassedProps & StoreProps & DispatchProps
+export type ComponentProps = PassedProps & StoreProps & DispatchProps
 
 export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   state: LocalState = {
@@ -182,7 +182,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   onDecrementOrIncrement = (_e: React.FormEvent<HTMLInputElement>, direction: number) => {
     // it's either this error or a typescript typing error using the function version of setState
-     
+
     const newValue = (this.parsePositiveNumber(this.state.duration) || 0) + direction
     if (newValue < 0) return
     this.setState({duration: newValue.toString()})

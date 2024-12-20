@@ -66,7 +66,7 @@ interface DispatchProps {
 
 type ComponentProps = StoreProps & DispatchProps
 
-type ResponsiveComponentProps = ComponentProps & {
+export type ResponsiveComponentProps = ComponentProps & {
   readonly responsiveSize: ResponsiveSizes
 }
 
@@ -95,14 +95,10 @@ export const App = ({
 
   useEffect(() => {
     setBlueprintLocked(
-      // @ts-expect-error
       window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course &&
-        // @ts-expect-error
         window.ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
         coursePace.context_type === 'Course'
     )
-    // this should run on first render
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleModalClose = () => {
@@ -131,8 +127,6 @@ export const App = ({
             isOpen={modalOpen}
             changes={unpublishedChanges}
             onClose={() => handleModalClose()}
-            // @ts-expect-error
-            handleDrawerToggle={() => setTrayOpen(!trayOpen)}
           />
         </>
       )
@@ -141,8 +135,7 @@ export const App = ({
         <>
           <View>
             <Errors />
-            {/* @ts-expect-error */}
-            <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
+            <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} responsiveSize="large" />
           </View>
           <Body />
           {/* @ts-expect-error */}
@@ -156,11 +149,7 @@ export const App = ({
             shouldReturnFocus={true}
             shouldCloseOnDocumentClick={true}
           >
-            <UnpublishedChangesTrayContents
-              handleTrayDismiss={() => setTrayOpen(false)}
-              // @ts-expect-error
-              changes={unpublishedChanges}
-            />
+            <UnpublishedChangesTrayContents handleTrayDismiss={() => setTrayOpen(false)} />
           </Tray>
         </>
       )
@@ -192,8 +181,9 @@ export const ResponsiveApp = (props: ComponentProps) => (
       large: {responsiveSize: 'large'},
     }}
   >
-    {/*  @ts-expect-error */}
-    {({responsiveSize}) => <App responsiveSize={responsiveSize} {...props} />}
+    {responsiveProps => (
+      <App responsiveSize={responsiveProps!.responsiveSize as ResponsiveSizes} {...props} />
+    )}
   </Responsive>
 )
 
@@ -204,9 +194,6 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     modalOpen: getShowPaceModal(state),
     unpublishedChanges: getSummarizedChanges(state),
     coursePace: getCoursePace(state),
-    // @ts-expect-error
-    isSyncing: getIsSyncing(state) === 1,
-    isPacePublishing: getPacePublishing(state),
   }
 }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -21,14 +20,14 @@ import React from 'react'
 import {act, render, within} from '@testing-library/react'
 import {renderConnected} from '../../__tests__/utils'
 
-import {Footer} from '../footer'
+import {Footer, type ComponentProps} from '../footer'
 
 const syncUnpublishedChanges = jest.fn()
 const onResetPace = jest.fn()
 const removePace = jest.fn()
 const handleCancel = jest.fn()
 
-const defaultProps = {
+const defaultProps: ComponentProps = {
   autoSaving: false,
   pacePublishing: false,
   isSyncing: false,
@@ -47,6 +46,9 @@ const defaultProps = {
   anyActiveRequests: false,
   isUnpublishedNewPace: false,
   paceName: 'Cool Class',
+  isSavingDraft: false,
+  blueprintLocked: false,
+  isDraftPace: false,
 }
 
 afterEach(() => {

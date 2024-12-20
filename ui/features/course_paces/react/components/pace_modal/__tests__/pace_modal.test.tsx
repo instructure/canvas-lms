@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -28,12 +27,12 @@ import {
   STUDENT_PACE,
 } from '../../../__tests__/fixtures'
 
-import {PaceModal} from '..'
+import {PaceModal, type ResponsiveComponentProps} from '..'
 
 const onClose = jest.fn(),
   clearCategoryError = jest.fn()
 
-const defaultProps = {
+const defaultProps: ResponsiveComponentProps = {
   coursePace: PRIMARY_PACE,
   isOpen: true,
   onClose,
@@ -48,6 +47,7 @@ const defaultProps = {
   paceDuration: {weeks: 2, days: 3},
   plannedEndDate: '2022-12-01',
   compression: 0,
+  outerResponsiveSize: 'large',
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
   setOuterResponsiveSize: jest.fn(),
