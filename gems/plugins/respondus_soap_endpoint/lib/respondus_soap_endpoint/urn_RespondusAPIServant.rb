@@ -532,8 +532,8 @@ Implemented for: Canvas LMS)]
     end
 
     ASSET_TYPES = {
-      "quiz" => /^quizzes:quiz_/,
-      "qdb" => /^assessment_question_bank_/,
+      "quiz" => "Quizzes::Quiz",
+      "qdb" => "AssessmentQuestionBank",
     }.freeze
 
     ATTACHMENT_FOLDER_NAME = "imported qti files"
@@ -612,13 +612,11 @@ Implemented for: Canvas LMS)]
         return ["pending"]
       end
 
-      assets = migration.migration_settings[:imported_assets] || []
-      a_type = ASSET_TYPES[session["pending_migration_itemType"]]
-      asset = assets.find { |a| a =~ a_type }
-      raise(OtherError, "Invalid file data") unless asset
+      assets = migration.migration_settings[:imported_assets] || {}
+      asset_type = ASSET_TYPES[session["pending_migration_itemType"]]
+      item_id = assets.fetch(asset_type, nil)
 
-      # asset is in the form "quiz_123"
-      item_id = asset.split("_").last
+      raise(OtherError, "Invalid file data") unless item_id
 
       [item_id]
     end
