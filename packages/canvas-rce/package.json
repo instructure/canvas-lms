@@ -107,6 +107,7 @@
     "@instructure/ui-number-input": "9.10.0",
     "@instructure/ui-overlays": "9.10.0",
     "@instructure/ui-pagination": "9.10.0",
+    "@instructure/ui-pill": "9.10.0",
     "@instructure/ui-popover": "9.10.0",
     "@instructure/ui-radio-input": "9.10.0",
     "@instructure/ui-react-utils": "9.10.0",
