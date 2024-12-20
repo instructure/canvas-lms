@@ -65,7 +65,7 @@ export default function AssessmentSummary(props) {
     overallAnonymityDescription = I18n.t('Anonymous was never turned on')
   } else {
     overallAnonymityDescription = (
-      <FriendlyDatetime dateTime={anonymityDate} prefix={I18n.t('As of')} showTime={true} />
+      <FriendlyDatetime data-testid="anonymity-date" dateTime={anonymityDate} prefix={I18n.t('As of')} showTime={true} />
     )
   }
 
@@ -93,7 +93,7 @@ export default function AssessmentSummary(props) {
           </PresentationContent>
 
           <Text fontStyle="italic" size="small">
-            <FriendlyDatetime dateTime={props.finalGradeDate} showTime={true} />
+            <FriendlyDatetime data-testid="final-grade-date" dateTime={props.finalGradeDate} showTime={true} />
           </Text>
         </Text>
       </Flex.Item>
@@ -104,7 +104,7 @@ export default function AssessmentSummary(props) {
         <Text as="div">{I18n.t('Posted to student')}</Text>
 
         <Text as="div" fontStyle="italic" size="small" weight="bold">
-          <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime={true} />
+          <FriendlyDatetime data-testid="grades-posted-date" dateTime={props.assignment.gradesPublishedAt} showTime={true} />
         </Text>
       </Flex.Item>
 
