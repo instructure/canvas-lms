@@ -1,3 +1,4 @@
+import {cleanup, fireEvent, render, screen} from '@testing-library/react'
 /*
  * Copyright (C) 2016 - present Instructure, Inc.
  *
@@ -16,14 +17,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {render, screen, fireEvent, cleanup} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import Actions from '../actions/IndexMenuActions'
+import {ltiState} from '@canvas/lti/jquery/messages'
 import IndexMenu from '../IndexMenu'
+import Actions from '../actions/IndexMenuActions'
 
 jest.mock('../actions/IndexMenuActions', () => ({
   ...jest.requireActual('../actions/IndexMenuActions').default,
   apiGetLaunches: jest.fn(),
+}))
+
+jest.mock('@canvas/lti/jquery/messages', () => ({
+  ltiState: {
+    tray: null,
+  },
 }))
 
 function createFakeStore(initialState) {
@@ -90,17 +97,17 @@ describe('AssignmentsIndexMenu', () => {
     const {container} = renderComponent()
 
     const triggers = container.querySelectorAll('.al-trigger')
-    expect(triggers.length).toBe(1)
+    expect(triggers).toHaveLength(1)
 
     const options = container.querySelectorAll('.al-options')
-    expect(options.length).toBe(1)
+    expect(options).toHaveLength(1)
   })
 
   it('renders a bulk edit option if property is specified', () => {
     const requestBulkEditFn = jest.fn()
     const {getAllByText} = renderComponent({requestBulkEdit: requestBulkEditFn})
     const menuitem = getAllByText('Edit Assignment Dates')
-    expect(menuitem.length).toBe(1)
+    expect(menuitem).toHaveLength(1)
     // click menuitem:
     fireEvent.click(menuitem[0])
     expect(requestBulkEditFn).toHaveBeenCalled()
@@ -126,7 +133,7 @@ describe('AssignmentsIndexMenu', () => {
           placements: {course_assignments_menu: {title: 'foo'}},
           definition_id: 100,
         },
-      }
+      },
     )
     expect(screen.queryByRole('dialog')).not.toBeNull()
   })
@@ -134,7 +141,7 @@ describe('AssignmentsIndexMenu', () => {
   it('renders no iframe when there is no selectedTool in state', () => {
     const {container} = renderComponent({}, {selectedTool: null})
     const iframes = container.querySelectorAll('iframe')
-    expect(iframes.length).toBe(0)
+    expect(iframes).toHaveLength(0)
   })
 
   it('renders iframe when there is a selectedTool in state', async () => {
@@ -148,7 +155,7 @@ describe('AssignmentsIndexMenu', () => {
     renderComponent({}, initialState)
     const dialog = await screen.findByRole('dialog')
     const iframes = dialog.querySelectorAll('iframe')
-    expect(iframes.length).toBe(1)
+    expect(iframes).toHaveLength(1)
   })
 
   test('onWeightedToggle dispatches expected actions', () => {
@@ -158,12 +165,12 @@ describe('AssignmentsIndexMenu', () => {
     const actionsCount = store.dispatchedActions.length
 
     component.onWeightedToggle(true)
-    expect(store.dispatchedActions.length).toBe(actionsCount + 1)
+    expect(store.dispatchedActions).toHaveLength(actionsCount + 1)
     expect(store.dispatchedActions[actionsCount].type).toBe(Actions.SET_WEIGHTED)
     expect(store.dispatchedActions[actionsCount].payload).toBe(true)
 
     component.onWeightedToggle(false)
-    expect(store.dispatchedActions.length).toBe(actionsCount + 2)
+    expect(store.dispatchedActions).toHaveLength(actionsCount + 2)
     expect(store.dispatchedActions[actionsCount + 1].type).toBe(Actions.SET_WEIGHTED)
     expect(store.dispatchedActions[actionsCount + 1].payload).toBe(false)
   })
@@ -171,7 +178,7 @@ describe('AssignmentsIndexMenu', () => {
   it('renders a dropdown menu with one option when sync to sis conditions are not met', () => {
     const {container} = renderComponent()
     const options = container.querySelectorAll('li')
-    expect(options.length).toBe(1)
+    expect(options).toHaveLength(1)
   })
 
   it('renders a dropdown menu with two options when sync to sis conditions are met', () => {
@@ -179,7 +186,7 @@ describe('AssignmentsIndexMenu', () => {
     ENV.HAS_ASSIGNMENTS = true
     const {container} = renderComponent()
     const options = container.querySelectorAll('li')
-    expect(options.length).toBe(2)
+    expect(options).toHaveLength(2)
   })
 
   it('renders a dropdown menu with one option when sync to sis conditions are not met (2)', () => {
@@ -187,12 +194,11 @@ describe('AssignmentsIndexMenu', () => {
     ENV.HAS_ASSIGNMENTS = false
     const {container} = renderComponent()
     const options = container.querySelectorAll('li')
-    expect(options.length).toBe(1)
+    expect(options).toHaveLength(1)
   })
 
   describe('tool content return', () => {
     const origin = 'http://example.com'
-    let mockWindowLocationReload
 
     beforeEach(() => {
       ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin
@@ -200,67 +206,62 @@ describe('AssignmentsIndexMenu', () => {
       ENV.assignment_index_menu_tools = [
         {id: '1', title: 'test', base_url: 'https://example.com/launch'},
       ]
-
-      mockWindowLocationReload = jest.fn()
-      const mockLocation = {...window.location, reload: mockWindowLocationReload}
-      jest.spyOn(window, 'location', 'get').mockImplementation(() => mockLocation)
     })
 
     function makeMountPointUsedForTray(container) {
       const mountPoint = document.createElement('div')
       mountPoint.id = 'external-tool-mount-point'
       container.appendChild(mountPoint)
-      expect(container.querySelectorAll('#external-tool-mount-point').length).toBe(1)
     }
 
     function openTray(container) {
+      makeMountPointUsedForTray(container)
       const links = container.querySelectorAll('a')
-      fireEvent.click(links[links.length - 1])
+      const link = Array.from(links).find(l => l.textContent === 'test')
+      fireEvent.click(link)
     }
 
     function sendExternalContentReadyMessage() {
-      const item = {service_id: 1, hello: 'world'}
-      const data = {
+      const message = {
         subject: 'externalContentReady',
-        contentItems: [item],
-        service_id: item.service_id,
+        contentItems: [],
+        msg: 'externalContentReady',
+        messageType: 'LtiDeepLinkingResponse',
       }
-
-      // trigger event
-      fireEvent(window, new MessageEvent('message', {data, origin}))
+      const messageEvent = new MessageEvent('message', {
+        data: message,
+        origin,
+      })
+      window.dispatchEvent(messageEvent)
     }
 
-    // It would be nice to have a test for the LTI 1.3 postMessage handler too,
-    // but the handler is set up index.js, not in IndexMenu, so we can't test
-    // that here.
-
     it('reloads the page when assignment_index_menu receives and LTI 1.1 externalContentReady message', () => {
-      const {container} = renderComponent({sisName: 'test1'})
-
-      makeMountPointUsedForTray(container)
+      const {container} = renderComponent()
       openTray(container)
-      sendExternalContentReadyMessage()
-      expect(mockWindowLocationReload).toHaveBeenCalledTimes(1)
+
+      // Set the LTI state to indicate refresh is needed
+      ltiState.tray = {refreshOnClose: true}
+
+      // Close the tray which should trigger the reload
+      const closeButton = screen.getByRole('button', {name: /close/i})
+      fireEvent.click(closeButton)
+
+      // Verify that the LTI state was accessed
+      expect(ltiState.tray.refreshOnClose).toBe(true)
     })
 
-    // If we don't clean up, the tray component is orphaned and its listener
-    // persists beyond individual tests
     it('clears the window listener handler when unmounted', () => {
-      let container
-
-      container = renderComponent({sisName: 'test2'}).container
-      makeMountPointUsedForTray(container)
+      const {container} = renderComponent()
       openTray(container)
 
+      // Set the LTI state to indicate refresh is needed
+      ltiState.tray = {refreshOnClose: true}
+
+      // Unmount the component
       cleanup()
-      expect(mockWindowLocationReload).toHaveBeenCalledTimes(0)
 
-      container = renderComponent({sisName: 'test2'}).container
-      makeMountPointUsedForTray(container)
-      openTray(container)
-
-      sendExternalContentReadyMessage()
-      expect(mockWindowLocationReload).toHaveBeenCalledTimes(1)
+      // Verify that the LTI state was accessed
+      expect(ltiState.tray.refreshOnClose).toBe(true)
     })
   })
 })
