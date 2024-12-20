@@ -1,0 +1,43 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true,
+    "defaultBranch": "master"
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "**/coverage/**",
+      "**/dist/**",
+      "**/es/**",
+      "**/locales/**",
+      "**/public/**",
+      "packages/bootstrap*",
+      "packages/bundles",
+      "packages/jquery*",
+      "packages/react-dnd-test-backend/index.js",
+      "packages/slickgrid"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space"
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": false
+  },
+  "javascript": {
+    "formatter": {
+      "semicolons": "asNeeded",
+      "lineWidth": 100,
+      "quoteStyle": "single",
+      "bracketSpacing": false,
+      "arrowParentheses": "asNeeded"
+    }
+  }
+}

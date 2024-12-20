@@ -1,8 +1,8 @@
 {
   "recommendations": [
+    "biomejs.biome",
     "github.copilot",
     "ms-vscode-remote.remote-containers",
-    "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "Shopify.ruby-lsp"
   ]

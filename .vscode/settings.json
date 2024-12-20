@@ -1,20 +1,26 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescriptreact]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[javascript]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[javascriptreact]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "editor.codeActionsOnSave": {
+    "source.organizeImports.biome": "explicit"
+  },
+  "[json]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[ruby]": {
     "editor.defaultFormatter": "Shopify.ruby-lsp",
@@ -26,7 +32,8 @@
     "urlsafe"
   ],
   "search.exclude": {
-      "packages/*/es/**": true
+    "packages/*/es/**": true
   },
-  "biome.enabled": false
+  "biome.enabled": true,
+  "prettier.enable": false
 }
