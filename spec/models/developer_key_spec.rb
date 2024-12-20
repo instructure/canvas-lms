@@ -940,50 +940,6 @@ describe DeveloperKey do
           developer_key_with_scopes.update!(scopes: valid_scopes.push("url:PUT|/api/v1/courses/:course_id/quizzes/:id"))
           expect(developer_key_with_scopes.access_tokens).to match_array [access_token]
         end
-
-        context "updates lti_registration" do
-          let(:lti_registration) do
-            Lti::Registration.create!(developer_key: developer_key_with_scopes,
-                                      name: "test_tool",
-                                      admin_nickname: "the_test_tool",
-                                      vendor: "test",
-                                      account_id: account.id,
-                                      created_by: user,
-                                      updated_by: user)
-          end
-
-          before do
-            developer_key_with_scopes.update!(is_lti_key: true, public_jwk:, skip_lti_sync: true, lti_registration:)
-          end
-
-          it "updates the corresponding lti registration" do
-            developer_key_with_scopes.update!(skip_lti_sync: false, name: "new tool name")
-            expect(developer_key_with_scopes.lti_registration.reload.admin_nickname).to eq "new tool name"
-          end
-
-          it "does not update the corresponding lti registration if skip_lti_sync is true" do
-            developer_key_with_scopes.update!(skip_lti_sync: true, name: "new tool name")
-            expect(developer_key_with_scopes.lti_registration.reload.admin_nickname).to_not eq "new tool name"
-          end
-
-          it "sets the lti_registration.manual_configuration if the dev key has a tool_configuration" do
-            expect(developer_key_with_scopes.lti_registration.manual_configuration)
-              .to eq(developer_key_with_scopes.tool_configuration)
-          end
-
-          context "when the developer key has an Lti::IMS::Registration for a configuration" do
-            let(:developer_key_with_ims_registration) do
-              dk = lti_developer_key_model
-              dk.ims_registration = lti_ims_registration_model
-              dk.save!
-              dk
-            end
-
-            it "does not set lti_registration.manual_configuration" do
-              expect(developer_key_with_ims_registration.lti_registration.manual_configuration).to be_nil
-            end
-          end
-        end
       end
 
       it "raises an error if scopes contain invalid scopes" do
@@ -1171,6 +1127,19 @@ describe DeveloperKey do
             expect(developer_key_not_saved.root_account).to eq account
           end
         end
+      end
+    end
+
+    describe "destroy_registration" do
+      let(:developer_key) { lti_developer_key_model(account:) }
+
+      before do
+        developer_key.save!
+      end
+
+      it "destroys the associated lti registration" do
+        developer_key.destroy
+        expect(developer_key.lti_registration).to be_deleted
       end
     end
   end
@@ -1604,7 +1573,7 @@ describe DeveloperKey do
   end
 
   it "doesn't allow the default key to be deleted" do
-    expect { DeveloperKey.default.destroy }.to raise_error "Please never delete the default developer key"
+    expect { DeveloperKey.default.destroy }.to raise_error "Please don't turn off the default developer key"
     expect { DeveloperKey.default.deactivate }.to raise_error "Please never delete the default developer key"
   end
 

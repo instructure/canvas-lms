@@ -136,18 +136,28 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def update
-    tool_config = developer_key.tool_configuration
     settings = tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields)
-    update_params = {
+    configuration_params = {
       disabled_placements: tool_configuration_params[:disabled_placements],
       redirect_uris: tool_configuration_redirect_uris,
+      privacy_level: tool_configuration_params[:privacy_level],
       **Schemas::InternalLtiConfiguration.from_lti_configuration(settings)
-    }
-    update_params[:privacy_level] = tool_configuration_params[:privacy_level] unless tool_configuration_params[:privacy_level].nil?
-    tool_config.update!(update_params)
-    update_developer_key!(tool_config, params.dig(:developer_key, :redirect_uris))
+    }.compact
 
-    render json: Lti::ToolConfigurationSerializer.new(tool_config, include_warnings: true)
+    update_params = {
+      id: developer_key.lti_registration_id,
+      registration_params: {
+        name: tool_configuration_params[:name] || "Unnamed tool",
+        admin_nickname: developer_key_params[:name],
+      },
+      updated_by: @current_user,
+      developer_key_params:,
+      configuration_params:,
+      account:,
+    }
+    registration = Lti::UpdateRegistrationService.call(**update_params)
+
+    render json: Lti::ToolConfigurationSerializer.new(registration.manual_configuration, include_warnings: true)
   end
 
   # @API Show Tool configuration

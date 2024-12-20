@@ -647,36 +647,4 @@ RSpec.describe Lti::Registration do
       end
     end
   end
-
-  describe "after_update" do
-    let(:developer_key) do
-      DeveloperKey.create!(
-        name: "test devkey",
-        email: "test@test.com",
-        redirect_uri: "http://test.com",
-        account_id: account.id,
-        skip_lti_sync: false
-      )
-    end
-    let(:lti_registration) do
-      Lti::Registration.create!(
-        developer_key:,
-        name: "test registration",
-        admin_nickname: "test reg",
-        vendor: "test vendor",
-        account_id: account.id,
-        created_by: user,
-        updated_by: user
-      )
-    end
-
-    it "updates the developer key after updating lti_registration" do
-      lti_registration.update!(admin_nickname: "new test name")
-      expect(lti_registration.developer_key.name).to eq("new test name")
-    end
-
-    it "does not update the developer key if skip_lti_sync is true" do
-      expect(Lti::Registration.where(developer_key:).first).to be_nil
-    end
-  end
 end

@@ -1283,59 +1283,24 @@ class Lti::RegistrationsController < ApplicationController
   #
   # @returns Lti::Registration
   def update
-    Lti::Registration.transaction do
-      name = params[:name]
-      reg_params = params.permit(:admin_nickname, :vendor, :name).to_h
-      registration.update!(reg_params.merge({ updated_by: @current_user })) if reg_params.present?
+    registration_params = params.permit(:admin_nickname, :vendor, :name).to_h
 
-      updated_overlay = if overlay_params.present?
-                          overlay = Lti::Overlay.find_or_initialize_by(registration:, account: @context)
-                          overlay.updated_by = @current_user
-                          overlay.data = overlay_params
-                          overlay.save!
-                          overlay
-                        end
+    binding_params = {
+      workflow_state: params[:workflow_state],
+    }.compact
 
-      scopes = if updated_overlay.present? && configuration_params.present?
-                 updated_overlay.apply_to(configuration_params)[:scopes]
-               elsif updated_overlay.blank? && configuration_params.present?
-                 configuration_params[:scopes]
-               elsif updated_overlay.present?
-                 # Get the result of applying the overlay to the existing configuration.
-                 registration.internal_lti_configuration(include_overlay: true)[:scopes]
-               else
-                 nil
-               end
+    update_params = {
+      id: params[:id],
+      account: @context,
+      registration_params:,
+      configuration_params:,
+      overlay_params:,
+      binding_params:,
+      updated_by: @current_user
+    }
 
-      if configuration_params.present?
-        tool_configuration.update!(**configuration_params) if configuration_params.present?
-      elsif overlay_params.present?
-        # Ensure that if only the overlay changes we still propagate the changes to all
-        # associated external tools
-        registration.developer_key.update_external_tools!
-      end
+    registration = Lti::UpdateRegistrationService.call(**update_params)
 
-      developer_key_update_params = {
-        icon_url: configuration_params&.dig(:launch_settings, :icon_url),
-        name:,
-        public_jwk: configuration_params&.dig(:public_jwk),
-        public_jwk_url: configuration_params&.dig(:public_jwk_url),
-        redirect_uris: configuration_params&.dig(:redirect_uris),
-        scopes:,
-      }.compact
-
-      registration.developer_key.update!(developer_key_update_params) if developer_key_update_params.present?
-
-      if workflow_state.present?
-        Lti::AccountBindingService
-          .call(
-            account: @context,
-            registration:,
-            workflow_state:,
-            user: @current_user
-          )
-      end
-    end
     render json: lti_registration_json(registration,
                                        @current_user,
                                        session,
@@ -1538,17 +1503,7 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def registration
-    @registration ||= Lti::Registration.active
-                                       .eager_load(:ims_registration, :manual_configuration, :developer_key)
-                                       .find(params[:id])
-  end
-
-  def overlay
-    @overlay ||= registration.overlay_for(@context)
-  end
-
-  def tool_configuration
-    @tool_configuration ||= registration.manual_configuration
+    @registration ||= Lti::Registration.active.find(params[:id])
   end
 
   def require_account_context_instrumented

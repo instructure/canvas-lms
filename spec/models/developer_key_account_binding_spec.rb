@@ -64,6 +64,11 @@ RSpec.describe DeveloperKeyAccountBinding do
         binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
         expect { binding.update!(workflow_state: "allow") }.to raise_error("Please don't turn off the default developer key")
       end
+
+      it "does not allow default key binding to be deleted" do
+        binding = DeveloperKeyAccountBinding.where(developer_key_id: developer_key.id).first
+        expect { binding.update!(workflow_state: "deleted") }.to raise_error("Please don't turn off the default developer key")
+      end
     end
 
     describe "workflow state" do

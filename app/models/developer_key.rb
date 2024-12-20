@@ -68,7 +68,7 @@ class DeveloperKey < ActiveRecord::Base
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_update :destroy_external_tools!, if: :destroy_external_tools?
-  after_update :update_lti_registration
+  before_destroy :destroy_registration!
 
   validates :client_type, inclusion: { in: [PUBLIC_CLIENT_TYPE, CONFIDENTIAL_CLIENT_TYPE] }
   validates_as_url :redirect_uri, :oidc_initiation_url, :public_jwk_url, allowed_schemes: nil
@@ -116,7 +116,7 @@ class DeveloperKey < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = "deleted"
-    save
+    run_callbacks(:destroy) { save }
   end
 
   def confidential_client?
@@ -439,26 +439,8 @@ class DeveloperKey < ActiveRecord::Base
                                              name: tool_configuration_name,
                                              workflow_state:,
                                              ims_registration:,
-                                             skip_lti_sync: true,
                                              manual_configuration: referenced_tool_configuration)
     lti_registration.save!
-  end
-
-  def update_lti_registration
-    return unless is_lti_key?
-    return if skip_lti_sync
-
-    if lti_registration.blank?
-      create_lti_registration
-      return
-    end
-
-    lti_registration.update!(name: tool_configuration_name,
-                             admin_nickname: name,
-                             updated_by: current_user,
-                             workflow_state:,
-                             skip_lti_sync: true,
-                             manual_configuration: referenced_tool_configuration)
   end
 
   def tool_configuration_name
@@ -562,6 +544,10 @@ class DeveloperKey < ActiveRecord::Base
       :destroy_tools_from_active_shard!,
       account
     )
+  end
+
+  def destroy_registration!
+    lti_registration&.destroy
   end
 
   def destroy_tools_from_active_shard!(affected_account)
