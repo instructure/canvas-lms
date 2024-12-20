@@ -22014,10 +22014,6 @@ postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.2, postcss@^7.0.26, postcss@^7.0.3
     picocolors "^0.2.1"
     source-map "^0.6.1"
 
-"postinstall-postinstall@https://github.com/instructure/postinstall-postinstall#1732ae8ba054fa7a3335b4a1ecd019f78ca68b10":
-  version "2.0.0"
-  resolved "https://github.com/instructure/postinstall-postinstall#1732ae8ba054fa7a3335b4a1ecd019f78ca68b10"
-
 preact-render-to-string@^5.1.19:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/preact-render-to-string/-/preact-render-to-string-5.2.1.tgz#71f3e8cda65f33dbc8ad8d904ff58e3f532e59f3"
