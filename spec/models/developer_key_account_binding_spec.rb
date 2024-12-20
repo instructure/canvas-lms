@@ -51,44 +51,6 @@ RSpec.describe DeveloperKeyAccountBinding do
       )
     end
 
-    it "creates a corresponding lti registration account binding" do
-      lti_developer_key = DeveloperKey.create!(is_lti_key: true, public_jwk_url: "https://example.com")
-
-      # create a new dkab to mimic an inherited binding being created that doesn't default to "off"
-      new_dev_key_binding = DeveloperKeyAccountBinding.create!({
-                                                                 account:,
-                                                                 developer_key: lti_developer_key,
-                                                                 workflow_state: "on"
-                                                               })
-
-      expect(new_dev_key_binding.lti_registration_account_binding).to be_persisted
-      expect(new_dev_key_binding.lti_registration_account_binding.workflow_state).to eq("on")
-    end
-
-    it "updates the corresponding lti registration account binding" do
-      user = user_model
-      user2 = user_model
-      lti_registration = Lti::Registration.create!(
-        name: "an lti registration",
-        account:,
-        created_by: user,
-        updated_by: user
-      )
-      dev_key_binding.lti_registration_account_binding = Lti::RegistrationAccountBinding.create!(
-        workflow_state: dev_key_binding.workflow_state,
-        account: dev_key_binding.account,
-        registration: lti_registration
-      )
-      dev_key_binding.save!
-      expect(dev_key_binding.lti_registration_account_binding).to be_persisted
-
-      dev_key_binding.update!(workflow_state: :on, current_user: user2)
-
-      lrab = dev_key_binding.lti_registration_account_binding
-      expect(lrab.workflow_state).to eq("on")
-      expect(lrab.updated_by).to eq(user2)
-    end
-
     context "for default key" do
       let(:developer_key) { DeveloperKey.default }
       let(:account) { Account.site_admin }

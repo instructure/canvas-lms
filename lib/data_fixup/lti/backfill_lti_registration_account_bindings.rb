@@ -28,7 +28,6 @@ module DataFixup::Lti::BackfillLtiRegistrationAccountBindings
         account: account_binding.account,
         registration: account_binding.developer_key.lti_registration,
         developer_key_account_binding: account_binding,
-        skip_lime_sync: true,
         workflow_state: account_binding.workflow_state
       )
     rescue => e

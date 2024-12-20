@@ -1191,24 +1191,11 @@ class Lti::RegistrationsController < ApplicationController
         **configuration_params
       )
 
-      if params[:workflow_state].present? && params[:workflow_state] != "off"
-        # This is automatically created when we create the developer key, but we need to update it
-        # with the correct workflow state.
-        account_binding = Lti::RegistrationAccountBinding.find_by(account: @context, registration:)
-
-        # We have to suspend_callbacks/avoid validations because we're still inside a transaction and the
-        # developer_key_account_binding will fail validations, as it will look to the secondary
-        # when trying to validate the presence of its developer key. The
-        # developer key doesn't exist in the secondary (yet), so it fails.
-        # See DeveloperKey::CacheOnAssociation for the offending code.
-        account_binding.suspend_callbacks(:update_developer_key_account_binding) do
-          account_binding.update!(workflow_state: params[:workflow_state],
-                                  created_by: @current_user,
-                                  updated_by: @current_user)
-        end
-        # Avoid validating developer key is present, we already know it is.
-        account_binding.developer_key_account_binding.update_column(:workflow_state, params[:workflow_state])
-      end
+      Lti::AccountBindingService.call(account: @context,
+                                      registration:,
+                                      user: @current_user,
+                                      overwrite_created_by: true,
+                                      workflow_state: workflow_state || :off)
       registration
     end
 
@@ -1339,7 +1326,15 @@ class Lti::RegistrationsController < ApplicationController
 
       registration.developer_key.update!(developer_key_update_params) if developer_key_update_params.present?
 
-      bind_registration_to_account(registration, params[:workflow_state]) if params[:workflow_state].present?
+      if workflow_state.present?
+        Lti::AccountBindingService
+          .call(
+            account: @context,
+            registration:,
+            workflow_state: workflow_state,
+            user: @current_user
+          )
+      end
     end
     render json: lti_registration_json(registration,
                                        @current_user,
@@ -1412,29 +1407,20 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Content-Type: application/json" \
   #        -d '{"workflow_state": "on"}'
   def bind
-    account_binding = bind_registration_to_account(registration, params.require(:workflow_state))
-    render json: lti_registration_account_binding_json(account_binding, @current_user, session, @context)
+    Lti::AccountBindingService.call(
+      account: @context,
+      registration:,
+      workflow_state: params.require(:workflow_state),
+      user: @current_user
+    ) => {lti_registration_account_binding:}
+
+    render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
   end
 
   private
 
   def render_configuration_errors(errors)
     render json: { errors: }, status: :unprocessable_entity
-  end
-
-  def bind_registration_to_account(registration, workflow_state)
-    account_binding = Lti::RegistrationAccountBinding
-                      .find_or_initialize_by(account: @context, registration:)
-
-    if account_binding.new_record?
-      account_binding.created_by = @current_user
-    end
-
-    account_binding.updated_by = @current_user
-    account_binding.workflow_state = workflow_state
-
-    account_binding.save!
-    account_binding
   end
 
   def configuration_params
@@ -1487,9 +1473,15 @@ class Lti::RegistrationsController < ApplicationController
   # At the model level, setting an invalid workflow_state will silently change it to the
   # initial state ("off") without complaining, so enforce this here as part of the API contract.
   def validate_workflow_state
-    return if params[:workflow_state].nil? || %w[on off allow].include?(params[:workflow_state])
+    return if workflow_state.nil? || %w[on off].include?(workflow_state)
 
-    render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+    return if workflow_state == "allow" && context.site_admin?
+
+    if workflow_state == "allow" && !context.site_admin?
+      render_error(:invalid_workflow_state, "only site admin registrations can have a state of 'allow'")
+    else
+      render_error(:invalid_workflow_state, "workflow_state must be one of 'on', 'off', or 'allow'")
+    end
   end
 
   def validate_list_params
@@ -1499,6 +1491,10 @@ class Lti::RegistrationsController < ApplicationController
 
     valid_sort_fields = %w[name nickname lti_version installed installed_by updated_by updated on]
     render_error("invalid_sort", "#{params[:sort]} is not a valid field for sorting") unless [*valid_sort_fields, nil].include?(params[:sort])
+  end
+
+  def workflow_state
+    params[:workflow_state]
   end
 
   def require_registration_params

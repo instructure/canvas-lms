@@ -21,12 +21,16 @@
 RSpec.describe DataFixup::Lti::SetLtiRegistrationAccountBindingsWorkflowState do
   let(:account) { account_model }
 
+  let(:dev_key) { lti_developer_key_model(account:) }
   let(:dkab) do
-    dev_key = lti_developer_key_model(account:)
     dev_key.developer_key_account_bindings.first
   end
 
-  let(:lrab) { dkab.lti_registration_account_binding }
+  let(:lrab) do
+    Lti::RegistrationAccountBinding.create!(account:,
+                                            developer_key_account_binding: dkab,
+                                            registration: dev_key.lti_registration)
+  end
 
   context "when the LRAB and DKAB have a different workflow_state" do
     before do
@@ -59,8 +63,8 @@ RSpec.describe DataFixup::Lti::SetLtiRegistrationAccountBindingsWorkflowState do
         5.times do
           dev_key = lti_developer_key_model(account:)
           dkab = dev_key.developer_key_account_bindings.first
-          dkab.update_column(:workflow_state, "off")
-          dkab.lti_registration_account_binding.update_column(:workflow_state, "on")
+          dkab.update!(workflow_state: "off")
+          Lti::RegistrationAccountBinding.create!(developer_key_account_binding: dkab, workflow_state: "on", account:, registration: dev_key.lti_registration)
         end
       end
 

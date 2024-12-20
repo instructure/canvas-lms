@@ -125,14 +125,6 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
   end
   # -- END SoftDeleteable --
 
-  # The skip_lime_sync attribute should be set when this this model is being updated
-  # by the developer_key_account_binding's after_save method. If it is set, this model
-  # should skip its own update_developer_key_account_binding method. This is to prevent
-  # a loop between the two models' after_saves.
-  attr_accessor :skip_lime_sync
-
-  after_save :update_developer_key_account_binding
-
   private
 
   def require_root_account
@@ -164,19 +156,5 @@ class Lti::RegistrationAccountBinding < ActiveRecord::Base
     return if account.account_chain(include_site_admin: true).include?(registration.account)
 
     errors.add(:registration, :registration_not_found, message: I18n.t("Registration does not belong to a related account"))
-  end
-
-  def update_developer_key_account_binding
-    if skip_lime_sync
-      self.skip_lime_sync = false
-      return
-    end
-
-    if developer_key_account_binding
-      developer_key_account_binding.update!(workflow_state:, skip_lime_sync: true)
-    elsif registration.developer_key
-      developer_key_account_binding = DeveloperKeyAccountBinding.find_or_initialize_by(account:, developer_key: registration.developer_key)
-      developer_key_account_binding.update!(workflow_state:, skip_lime_sync: true, lti_registration_account_binding: self)
-    end
   end
 end
