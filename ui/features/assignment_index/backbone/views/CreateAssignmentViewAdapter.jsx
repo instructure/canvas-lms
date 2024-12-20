@@ -50,7 +50,7 @@ const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}
 
     // Redirect to appropriate "edit" page
     if (data.type === ONLINE_QUIZ) {
-      launchQuizEdit(newQuizUrl(), mappedData)
+      isNewAssignment ? launchQuizNew(mappedData) : launchQuizEdit(assignmentModel, mappedData)
     } else if (data.type === DISCUSSION_TOPIC) {
       launchDiscussionTopicEdit(assignmentModel, assignmentGroup, mappedData, isNewAssignment)
     } else {
@@ -153,9 +153,14 @@ const redirectTo = url => {
   window.location.href = url
 }
 
-const launchQuizEdit = async (url, data) => {
-  const response = await axios.post(url, data)
+const launchQuizNew = async (data) => {
+  const response = await axios.post(newQuizUrl(), data)
   redirectTo(response.data.url)
+}
+
+const launchQuizEdit = (assignment, data) => {
+  const url = assignment.htmlEditUrl()
+  redirectTo(url + '?' + encodeQueryString(data))
 }
 
 const generateNewAssignment = assignmentGroup => {
