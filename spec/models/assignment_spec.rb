@@ -11626,7 +11626,7 @@ describe Assignment do
   describe "checkpointed assignments" do
     before do
       @course.root_account.enable_feature!(:discussion_checkpoints)
-      @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published")
+      @parent = @course.assignments.create!(has_sub_assignments: true, workflow_state: "published", grading_type: "points")
       @first_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
       @second_checkpoint = @parent.sub_assignments.create!(context: @course, sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
     end
@@ -11663,6 +11663,14 @@ describe Assignment do
       @parent.update!(workflow_state: "unpublished")
       expect(@first_checkpoint.reload.workflow_state).to eq "unpublished"
       expect(@second_checkpoint.reload.workflow_state).to eq "unpublished"
+    end
+
+    it "will update the sub_assignment grading_type when parent updates" do
+      expect(@first_checkpoint.reload.grading_type).to eq "points"
+      expect(@second_checkpoint.reload.grading_type).to eq "points"
+      @parent.update!(grading_type: "pass_fail")
+      expect(@first_checkpoint.reload.grading_type).to eq "pass_fail"
+      expect(@second_checkpoint.reload.grading_type).to eq "pass_fail"
     end
 
     it "will update the sub_assignment lock_at and unlock_at when parent updates" do

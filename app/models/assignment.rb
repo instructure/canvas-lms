@@ -24,7 +24,7 @@ class Assignment < AbstractAssignment
 
   before_save :before_soft_delete, if: -> { will_save_change_to_workflow_state?(to: "deleted") }
 
-  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state unlock_at lock_at].freeze
+  SUB_ASSIGNMENT_SYNC_ATTRIBUTES = %w[workflow_state unlock_at lock_at grading_type].freeze
   after_commit :update_sub_assignments, if: :sync_attributes_changed?
 
   set_broadcast_policy do |p|
