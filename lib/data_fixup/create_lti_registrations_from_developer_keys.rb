@@ -30,7 +30,6 @@ module DataFixup
             internal_service: developer_key.internal_service,
             name: developer_key.tool_configuration.internal_lti_configuration[:title],
             ims_registration: developer_key.ims_registration, # can be nil
-            skip_lti_sync: true,
           }
         )
 
