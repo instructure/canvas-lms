@@ -1323,8 +1323,9 @@ RSpec.describe Lti::RegistrationsController do
   describe "POST bind", type: :request do
     subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
 
-    let(:registration) { lti_registration_model(account:) }
-    let(:workflow_state) { "off" }
+    let_once(:registration) { developer_key.lti_registration }
+    let_once(:developer_key) { lti_developer_key_model(account:) }
+    let_once(:workflow_state) { "off" }
 
     context "without user session" do
       before { remove_user_session }
@@ -1360,7 +1361,8 @@ RSpec.describe Lti::RegistrationsController do
       subject { post "/api/v1/accounts/#{child_account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
 
       let(:child_account) { account_model(parent_account: account) }
-      let(:registration) { lti_registration_model(account: child_account) }
+      let(:registration) { developer_key.lti_registration }
+      let(:developer_key) { lti_developer_key_model(account: child_account) }
 
       it "returns 422" do
         subject
