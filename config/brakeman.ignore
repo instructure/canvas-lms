@@ -70,6 +70,40 @@
       "note": ""
     },
     {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "0a5b6d9664973fda2fa90355928b95e7b88e065f7bbff90e27e2736b1f380b30",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/login/canvas/new_login.html.erb",
+      "line": 87,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Setting.get(\"invalid_login_faq_url\", nil)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Login::CanvasController",
+          "method": "render_new_login",
+          "line": 215,
+          "file": "app/controllers/login/canvas_controller.rb",
+          "rendered": {
+            "name": "login/canvas/new_login",
+            "file": "app/views/login/canvas/new_login.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "login/canvas/new_login"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        79
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "0e15b8a6ab3d2158a04d098f25c49a631614b1fe6fea57e98d52dbe9052e3e80",
