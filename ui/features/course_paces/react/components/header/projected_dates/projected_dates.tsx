@@ -61,7 +61,7 @@ const END_DATE_CAPTIONS = {
   hypothetical: I18n.t('Determined by course pace'),
 }
 
-type StoreProps = {
+export type StoreProps = {
   readonly coursePace: CoursePace
   readonly assignments: number
   readonly paceDuration: PaceDuration

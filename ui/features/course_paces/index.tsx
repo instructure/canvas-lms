@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -32,6 +31,6 @@ const CoursePage = () => (
 )
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<CoursePage />, document.getElementById('course_paces'))
 })

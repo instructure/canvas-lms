@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -31,11 +30,11 @@ import {
 } from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
-import {AssignmentRow} from '../assignment_row'
+import {AssignmentRow, type ComponentProps} from '../assignment_row'
 
 const setPaceItemDuration = jest.fn()
 
-const defaultProps = {
+const defaultProps: ComponentProps = {
   coursePace: PRIMARY_PACE,
   dueDate: '2020-01-01T02:00:00-05:00',
   excludeWeekends: false,
@@ -43,8 +42,6 @@ const defaultProps = {
   coursePaceItemPosition: 0,
   isSyncing: false,
   blackoutDates: BLACKOUT_DATES,
-  autosaving: false,
-  disabledDaysOfWeek: [],
   showProjections: true,
   setPaceItemDuration,
   datesVisible: true,
@@ -52,6 +49,9 @@ const defaultProps = {
   isStacked: false,
   isStudentPace: false,
   coursePaceItemChanges: [],
+  blueprintLocked: false,
+  selectedDaysToSkip: [],
+  context_type: 'Course',
 }
 
 beforeAll(() => {

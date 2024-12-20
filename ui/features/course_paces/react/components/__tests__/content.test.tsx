@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -31,7 +30,7 @@ import {
 import PaceContent from '../content'
 import fetchMock from 'fetch-mock'
 import {actions as uiActions} from '../../actions/ui'
-import {APIPaceContextTypes, Pace, PaceContextsState} from '../../types'
+import type {APIPaceContextTypes, Pace, PaceContextsState} from '../../types'
 import * as tz from '@instructure/moment-utils'
 
 jest.mock('../../actions/ui', () => ({
@@ -64,7 +63,7 @@ const HOUR = MINUTE * 60
 const DAY = HOUR * 24
 const WEEK = DAY * 7
 
-const generateModifiedPace = timeAgo => {
+const generateModifiedPace = (timeAgo: number) => {
   const lastModified = new Date(Date.now() - timeAgo)
   const appliedPace: Pace = {
     ...firstSection.applied_pace!,
@@ -183,7 +182,7 @@ describe('PaceContextsContent', () => {
       fireEvent.change(searchInput, {target: {value: 'A'}})
       act(() => searchButton.click())
       const noResults = await findAllByText('No results found')
-      expect(noResults.length).toBe(2) // no results label, SR-only alert
+      expect(noResults).toHaveLength(2) // no results label, SR-only alert
       expect(getByText('Please try another search term')).toBeInTheDocument()
     })
 
@@ -267,7 +266,7 @@ describe('PaceContextsContent', () => {
         )
 
         const {findByText} = renderConnected(<PaceContent />)
-        expect(await findByText(formattedDate)).toBeInTheDocument()
+        expect(await findByText(formattedDate!)).toBeInTheDocument()
       })
     })
 

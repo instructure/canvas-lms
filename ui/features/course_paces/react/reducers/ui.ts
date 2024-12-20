@@ -38,7 +38,6 @@ export const initialState: UIState = {
   showPaceModal: false,
   responsiveSize: 'large',
   showProjections: true,
-  // @ts-expect-error
   blueprintLocked: window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course,
 }
 

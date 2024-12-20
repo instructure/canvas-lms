@@ -35,7 +35,12 @@ import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
 import BlueprintLock from './blueprint_lock'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
-import {getBlueprintLocked, getSelectedContextId, getSelectedContextType, getSyncing} from '../../reducers/ui'
+import {
+  getBlueprintLocked,
+  getSelectedContextId,
+  getSelectedContextType,
+  getSyncing,
+} from '../../reducers/ui'
 import {getCoursePace, isNewPace, getIsDraftPace} from '../../reducers/course_paces'
 import type {PaceContext, CoursePace, StoreState, ResponsiveSizes} from '../../types'
 import {actions} from '../../actions/ui'
@@ -163,22 +168,24 @@ export const Header = (props: HeaderProps) => {
             </Text>
             {props.isDraftPace ? (
               <>
-                <br/>
-                <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">Draft</Pill>
+                <br />
+                <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">
+                  Draft
+                </Pill>
               </>
-            ) : null }
+            ) : null}
           </Flex.Item>
           <Flex.Item margin="none none auto none">
             {props.isDraftPace ? (
-              <Button 
+              <Button
                 color="success"
                 data-testid="direct-publish-draft-pace-button"
-                renderIcon={!props.isSyncing ? <IconPublishSolid/> : null}
+                renderIcon={!props.isSyncing ? <IconPublishSolid /> : null}
                 onClick={() => handlePublishClicked()}
               >
                 {getPublishLabel()}
               </Button>
-            ) : null }
+            ) : null}
           </Flex.Item>
         </Flex>
 

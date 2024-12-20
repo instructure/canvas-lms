@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,9 +19,9 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 
-import SlideTransition from '../slide_transition'
+import SlideTransition, {type ComponentProps} from '../slide_transition'
 
-const renderComponent = props =>
+const renderComponent = (props: Omit<ComponentProps, 'size' | 'children'>) =>
   render(
     <SlideTransition size={100} {...props}>
       <span>Hey look it&apos;s me!</span>

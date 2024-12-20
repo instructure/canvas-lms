@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -25,17 +24,28 @@ import {
   PRIMARY_PACE,
   HEADING_STATS_API_RESPONSE,
   DEFAULT_STORE_STATE,
+  COURSE_PACE_CONTEXT,
 } from '../../../__tests__/fixtures'
-import ConnectedHeader, {Header} from '../header'
-import {CoursePace} from 'features/course_paces/react/types'
+import ConnectedHeader, {Header, type HeaderProps} from '../header'
+import type {CoursePace} from '../../../types'
 import {enableFetchMocks} from 'jest-fetch-mock'
 
 enableFetchMocks()
 
-const defaultProps = {
+const defaultProps: HeaderProps = {
   context_type: 'Course',
   context_id: '17',
   newPace: false,
+  responsiveSize: 'large',
+  coursePace: PRIMARY_PACE,
+  defaultPaceContext: COURSE_PACE_CONTEXT,
+  blueprintLocked: false,
+  isDraftPace: false,
+  isSyncing: false,
+  fetchDefaultPaceContext: jest.fn(),
+  setDefaultPaceContextAsSelected: jest.fn(),
+  setSelectedPaceContext: jest.fn(),
+  syncUnpublishedChanges: jest.fn(),
 }
 
 describe('Course paces header', () => {
@@ -113,10 +123,9 @@ describe('Course paces header', () => {
     })
 
     it('renders metrics as table', async () => {
-      window.ENV.COURSE_ID = 30
-      const {getByRole, getByTestId} = renderConnected(
-        <ConnectedHeader {...defaultProps} coursePace={PRIMARY_PACE} />
-      )
+      window.ENV.COURSE_ID = '30'
+      type Foo = Parameters<typeof ConnectedHeader>[0]
+      const {getByRole, getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
       await waitFor(() => {
         expect(getByRole('columnheader', {name: 'Students'})).toBeInTheDocument()
         expect(getByRole('columnheader', {name: 'Sections'})).toBeInTheDocument()
@@ -125,11 +134,9 @@ describe('Course paces header', () => {
     })
 
     it('renders the data pulled from the context api', async () => {
-      window.ENV.COURSE_ID = 30
+      window.ENV.COURSE_ID = '30'
       fetchMock.mock('/api/v1/courses/30/pace_contexts?type=course', HEADING_STATS_API_RESPONSE)
-      const {getByRole, getByTestId} = renderConnected(
-        <ConnectedHeader {...defaultProps} coursePace={PRIMARY_PACE} />
-      )
+      const {getByRole, getByTestId} = renderConnected(<ConnectedHeader {...defaultProps} />)
 
       await waitFor(() => {
         expect(getByRole('heading', {name: 'Defense Against the Dark Arts'})).toBeInTheDocument()
@@ -158,9 +165,7 @@ describe('Course paces header', () => {
     })
 
     it('renders an info tooltip for durations stat', () => {
-      const {getAllByRole} = renderConnected(
-        <ConnectedHeader {...defaultProps} coursePace={PRIMARY_PACE} />
-      )
+      const {getAllByRole} = renderConnected(<ConnectedHeader {...defaultProps} />)
       expect(
         getAllByRole('tooltip', {
           name: 'This duration does not take into account weekends and blackout days.',
