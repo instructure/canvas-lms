@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {bool, func} from 'prop-types'
+import React from 'react'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {View} from '@instructure/ui-view'
 import {Grid} from '@instructure/ui-grid'
+import {View} from '@instructure/ui-view'
 
+import {assignLocation} from '@canvas/util/globalUtils'
 import {TeacherAssignmentShape} from '../assignmentData'
+import AssignmentGroup from './Editables/AssignmentGroup'
+import AssignmentModules from './Editables/AssignmentModules'
+import AssignmentName from './Editables/AssignmentName'
+import AssignmentType from './Editables/AssignmentType'
 import TeacherViewContext from './TeacherViewContext'
 import Toolbox from './Toolbox'
-import AssignmentName from './Editables/AssignmentName'
-import AssignmentModules from './Editables/AssignmentModules'
-import AssignmentType from './Editables/AssignmentType'
-import AssignmentGroup from './Editables/AssignmentGroup'
 
 const I18n = createI18nScope('assignments_2')
 
@@ -38,13 +39,13 @@ const I18n = createI18nScope('assignments_2')
 // their own components. too much logic to cram in here
 
 const confirmQuizType = I18n.t(
-  'Quizzes are not yet handled in the new assignments flow. Head to the legacy create quiz page?'
+  'Quizzes are not yet handled in the new assignments flow. Head to the legacy create quiz page?',
 )
 const confirmPeerReviewType = I18n.t(
-  'Peer reviewed assignments are not yet handled in the new assignments flow. Head to the legacy create assignment page?'
+  'Peer reviewed assignments are not yet handled in the new assignments flow. Head to the legacy create assignment page?',
 )
 const confirmGroupType = I18n.t(
-  'Creating a group is not yet handled by the new assignments flow. Head to the legacy assignments page?'
+  'Creating a group is not yet handled by the new assignments flow. Head to the legacy assignments page?',
 )
 
 function assignmentIsNew(assignment) {
@@ -96,7 +97,6 @@ export default class Header extends React.Component {
     this.setState({assignmentTypeMode: mode})
   }
 
-   
   handleTypeChange = selectedType => {
     switch (selectedType) {
       case 'assignment':
@@ -105,20 +105,18 @@ export default class Header extends React.Component {
         if (window.confirm(confirmQuizType)) {
           // must be true, because that's the only way quiz is an option
           if (ENV.QUIZ_LTI_ENABLED) {
-            window.location.assign(
-              `/courses/${this.props.assignment.course.lid}/assignments/new?quiz_lti`
-            )
+            assignLocation(`/courses/${this.props.assignment.course.lid}/assignments/new?quiz_lti`)
           }
         }
         break
       case 'peer-review':
         if (window.confirm(confirmPeerReviewType)) {
-          window.location.assign(`/courses/${this.props.assignment.course.lid}/assignments/new`)
+          assignLocation(`/courses/${this.props.assignment.course.lid}/assignments/new`)
         }
         break
       case 'group':
         if (window.confirm(confirmGroupType)) {
-          window.location.assign(`/courses/${this.props.assignment.course.lid}/assignments/new`)
+          assignLocation(`/courses/${this.props.assignment.course.lid}/assignments/new`)
         }
         break
     }
@@ -136,7 +134,6 @@ export default class Header extends React.Component {
       })
     })
   }
-   
 
   handleModulesChange = selectedModules => {
     this.props.onChangeAssignment('modules', selectedModules)

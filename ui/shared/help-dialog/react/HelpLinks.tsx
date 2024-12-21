@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Link} from '@instructure/ui-link'
-import {Pill} from '@instructure/ui-pill'
-import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
-import {Spinner} from '@instructure/ui-spinner'
-import FeaturedHelpLink from './FeaturedHelpLink'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
-import tourPubSub from '@canvas/tour-pubsub'
 import {useQuery} from '@canvas/query'
-import helpLinksQuery from '../queries/helpLinksQuery'
+import tourPubSub from '@canvas/tour-pubsub'
+import {replaceLocation} from '@canvas/util/globalUtils'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
+import {Pill} from '@instructure/ui-pill'
+import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import React from 'react'
 import type {HelpLink} from '../../../api.d'
+import helpLinksQuery from '../queries/helpLinksQuery'
+import FeaturedHelpLink from './FeaturedHelpLink'
 
 const I18n = createI18nScope('HelpLinks')
 
@@ -61,7 +62,7 @@ export default function HelpLinks({onClick}: Props) {
     }
     if (link.no_new_window) {
       event.preventDefault()
-      window.location.replace(link.url)
+      replaceLocation(link.url)
     }
   }
 
@@ -130,7 +131,7 @@ export default function HelpLinks({onClick}: Props) {
                       </View>
                     </List.Item>,
                   ]
-                : []
+                : [],
             )
             .concat(
               // if the current user is an admin, show the settings link to
@@ -149,7 +150,7 @@ export default function HelpLinks({onClick}: Props) {
                       </Link>
                     </List.Item>,
                   ]
-                : []
+                : [],
             )
             .filter(Boolean)}
         </List>

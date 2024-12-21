@@ -16,37 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import React, {useRef, useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
+import DateHelper from '@canvas/datetime/dateHelper'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import * as tz from '@instructure/moment-utils'
+import {Button} from '@instructure/ui-buttons'
 import {
-  IconGradebookExportLine,
-  IconGradebookImportLine,
-  IconSisSyncedLine,
   IconArrowOpenDownLine,
   IconArrowOpenUpLine,
+  IconGradebookExportLine,
+  IconGradebookImportLine,
   IconKeyboardShortcutsLine,
+  IconSisSyncedLine,
 } from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import GradebookExportManager from '../../shared/GradebookExportManager'
+import $ from 'jquery'
+import PropTypes from 'prop-types'
+import React, {useRef, useEffect, useState} from 'react'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
-import * as tz from '@instructure/moment-utils'
-import DateHelper from '@canvas/datetime/dateHelper'
-import {useScope as createI18nScope} from '@canvas/i18n'
+import GradebookExportManager from '../../shared/GradebookExportManager'
 import '@canvas/rails-flash-notifications'
+import {assignLocation} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('gradebookActionMenu')
 
 const {Item: MenuItem, Separator: MenuSeparator} = Menu as any
 
 const {arrayOf, bool, func, object, shape, string} = PropTypes
-
-function gotoUrl(url: string) {
-  window.location.href = url
-}
 
 type Lti = {id: string; name: string; onSelect: () => void}
 
@@ -99,7 +96,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       props.currentUserId,
       existingExport,
       undefined,
-      props.updateExportState
+      props.updateExportState,
     )
     if (props.setExportManager) {
       props.setExportManager(exportManager.current)
@@ -149,7 +146,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
         props.getAssignmentOrder,
         props.showStudentFirstLastName,
         props.getStudentOrder,
-        currentView
+        currentView,
       )
       return handleExportSuccess(resolution)
     } catch (reason) {
@@ -184,7 +181,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     setPreviousExportState(previousExportValue)
 
     // Since we're still on the page, let's automatically download the CSV for them as well
-    gotoUrl(attachmentUrl)
+    assignLocation(attachmentUrl)
 
     handleUpdateExportState(undefined, undefined)
     $.flashMessage(I18n.t('Gradebook export has completed'))
@@ -206,11 +203,11 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
   }
 
   const handleImport = () => {
-    gotoUrl(props.gradebookImportUrl)
+    assignLocation(props.gradebookImportUrl)
   }
 
   const handlePublishGradesToSis = () => {
-    gotoUrl(props.publishGradesToSis.publishToSisUrl)
+    assignLocation(props.publishGradesToSis.publishToSisUrl)
   }
 
   const disableImports = () => {
@@ -300,7 +297,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
       <MenuItem
         key="previousExport"
         onSelect={() => {
-          gotoUrl(downloadFrdUrl)
+          assignLocation(downloadFrdUrl)
         }}
       >
         <span data-menu-id="previous-export">{lastExportDescription}</span>
@@ -462,7 +459,7 @@ EnhancedActionMenu.propTypes = {
       id: string.isRequired,
       name: string.isRequired,
       onSelect: func.isRequired,
-    })
+    }),
   ),
 
   postGradesFeature: shape({

@@ -61,6 +61,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         aria-expanded={!!node.data.custom?.isExpanded}
         id={id || `container-${node.id}`}
         className={`container-block ${className}`}
+        data-testid="container-block"
         data-placeholder={rest['data-placeholder'] || 'Drop blocks here'}
         ref={el => {
           if (el) connect(drag(el))

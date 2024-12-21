@@ -16,12 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useEffect, useLayoutEffect, useRef, useState} from 'react'
-import {connect, Provider} from 'react-redux'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
+import React, {forwardRef, useEffect, useLayoutEffect, useRef, useState} from 'react'
+import {Provider, connect} from 'react-redux'
 
 import {store} from '@canvas/planner'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconAddLine,
   IconBankLine,
@@ -34,46 +39,42 @@ import {
   IconStudentViewLine,
   IconXLine,
 } from '@instructure/ui-icons'
-import {InstUISettingsProvider} from '@instructure/emotion'
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-heading'
-import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
-import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
+import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {View} from '@instructure/ui-view'
 
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
+import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import GroupsPage from '@canvas/k5/react/GroupsPage'
+import K5Announcement from '@canvas/k5/react/K5Announcement'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import K5Tabs, {scrollElementIntoViewIfCoveredByHeader} from '@canvas/k5/react/K5Tabs'
+import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
-import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
-import {
-  parseAnnouncementDetails,
-  dropCourse,
-  DEFAULT_COURSE_COLOR,
-  TAB_IDS,
-  MOBILE_NAV_BREAKPOINT_PX,
-} from '@canvas/k5/react/utils'
 import {getK5ThemeOverrides} from '@canvas/k5/react/k5-theme'
-import EmptyCourse from './EmptyCourse'
-import OverviewPage from './OverviewPage'
-import {GradesPage} from './GradesPage'
-import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
-import K5Announcement from '@canvas/k5/react/K5Announcement'
-import ResourcesPage from '@canvas/k5/react/ResourcesPage'
-import EmptyModules from './EmptyModules'
-import EmptyHome from './EmptyHome'
+import {
+  DEFAULT_COURSE_COLOR,
+  MOBILE_NAV_BREAKPOINT_PX,
+  TAB_IDS,
+  dropCourse,
+  parseAnnouncementDetails,
+} from '@canvas/k5/react/utils'
+import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
 import ObserverOptions, {
   ObservedUsersListShape,
   shouldShowObserverOptions,
 } from '@canvas/observer-picker'
-import GroupsPage from '@canvas/k5/react/GroupsPage'
-import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import {reloadWindow} from '@canvas/util/globalUtils'
+import EmptyCourse from './EmptyCourse'
+import EmptyHome from './EmptyHome'
+import EmptyModules from './EmptyModules'
+import {GradesPage} from './GradesPage'
+import OverviewPage from './OverviewPage'
 
 const I18n = createI18nScope('k5_course')
 
@@ -153,7 +154,7 @@ const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
     dropCourse(dropLink)
       .then(() => {
         closeModal()
-        window.location.reload()
+        reloadWindow()
       })
       .catch(err => showFlashError(I18n.t('Unable to drop the subject'))(err))
       .finally(() => setPosting(false))
@@ -178,7 +179,7 @@ const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
             </Heading>
             <Text>
               {I18n.t(
-                'Are you sure you want to unenroll in this subject?  You will no longer be able to see the subject roster or communicate directly with the teachers, and you will no longer see subject events in your stream and as notifications.'
+                'Are you sure you want to unenroll in this subject?  You will no longer be able to see the subject roster or communicate directly with the teachers, and you will no longer see subject events in your stream and as notifications.',
               )}
             </Text>
           </>
@@ -224,7 +225,7 @@ export const CourseHeaderHero = forwardRef(
       observerMode,
       shouldShrink,
     },
-    ref
+    ref,
   ) => {
     const [isModalOpen, setModalOpen] = useState(false)
     const possiblyTruncatedName = shouldShrink ? <TruncateText>{name}</TruncateText> : name
@@ -290,7 +291,7 @@ export const CourseHeaderHero = forwardRef(
         )}
       </div>
     )
-  }
+  },
 )
 
 CourseHeaderHero.propTypes = {
@@ -320,7 +321,7 @@ export const CourseHeaderOptions = forwardRef(
       isMasterCourse,
       windowWidth,
     },
-    ref
+    ref,
   ) => {
     const ManageButton = () => {
       const buttonProps = {
@@ -397,7 +398,7 @@ export const CourseHeaderOptions = forwardRef(
         </View>
       </div>
     ) : null
-  }
+  },
 )
 
 CourseHeaderOptions.propTypes = {

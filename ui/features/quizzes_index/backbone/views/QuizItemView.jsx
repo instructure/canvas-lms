@@ -17,23 +17,24 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import $ from 'jquery'
-import {each, extend} from 'lodash'
+import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
 import Backbone from '@canvas/backbone'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
-import DateDueColumnView from '@canvas/assignments/backbone/views/DateDueColumnView'
-import DateAvailableColumnView from '@canvas/assignments/backbone/views/DateAvailableColumnView'
+import PublishIconView from '@canvas/publish-icon-view'
 import SisButtonView from '@canvas/sis/backbone/views/SisButtonView'
+import $ from 'jquery'
+import {each, extend} from 'lodash'
 import template from '../../jst/QuizItemView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import React from 'react'
-import ReactDOM from 'react-dom'
+import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
-import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import Quiz from '@canvas/quizzes/backbone/models/Quiz'
+import {assignLocation} from '@canvas/util/globalUtils'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 const I18n = createI18nScope('quizzes.index')
 
@@ -140,7 +141,8 @@ export default class ItemView extends Backbone.View {
   }
 
   redirectTo(path) {
-    return (window.location.href = path)
+    assignLocation(path)
+    return path
   }
 
   migrateQuizEnabled() {
@@ -175,7 +177,7 @@ export default class ItemView extends Backbone.View {
 
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
     const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
-     
+
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -191,7 +193,7 @@ export default class ItemView extends Backbone.View {
         timezone={ENV.TIMEZONE || 'UTC'}
         {...itemProps}
       />,
-      document.getElementById('assign-to-mount-point')
+      document.getElementById('assign-to-mount-point'),
     )
   }
 
@@ -220,7 +222,6 @@ export default class ItemView extends Backbone.View {
   onDelete(e) {
     e.preventDefault()
     if (this.canDelete()) {
-       
       if (window.confirm(this.messages.confirm)) return this.delete()
     }
   }
@@ -246,7 +247,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentSelection = isOldQuiz ? {quizzes: [quizId]} : {assignments: [quizId]}
-     
+
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -257,7 +258,7 @@ export default class ItemView extends Backbone.View {
           return setTimeout(() => this.$settingsButton.focus(), 100)
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 
@@ -270,7 +271,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentType = isOldQuiz ? 'quiz' : 'assignment'
-     
+
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -281,7 +282,7 @@ export default class ItemView extends Backbone.View {
           return setTimeout(() => this.$settingsButton.focus(), 100)
         }}
       />,
-      document.getElementById('direct-share-mount-point')
+      document.getElementById('direct-share-mount-point'),
     )
   }
 

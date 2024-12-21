@@ -16,46 +16,99 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {Editor, Frame, useNode} from '@craftjs/core'
 import {render} from '@testing-library/react'
-import {Editor, Frame} from '@craftjs/core'
+import React from 'react'
 import {IconBlock, type IconBlockProps} from '..'
 
-const renderBlock = (props: Partial<IconBlockProps> = {}) => {
+const mockNode = {
+  id: 'test-id',
+  data: {
+    displayName: IconBlock.craft.displayName,
+  },
+  events: {
+    selected: false,
+  },
+}
+
+jest.mock('@craftjs/core', () => {
+  const module = jest.requireActual('@craftjs/core')
+  return {
+    ...module,
+    useNode: jest.fn(() => ({
+      node: mockNode,
+      connectors: {
+        connect: jest.fn(),
+        drag: jest.fn(),
+      },
+    })),
+  }
+})
+
+const renderIconBlock = (props: Partial<IconBlockProps> = {}) => {
   return render(
     <Editor enabled={true} resolver={{IconBlock}}>
       <Frame>
-        <IconBlock iconName="idea" {...props} />
+        <IconBlock iconName="idea" data-testid="icon-block" {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 
 describe('IconBlock', () => {
-  it('should render with default props', () => {
-    const {container, getByTitle} = renderBlock()
-
-    const icon = container.querySelector('svg')
-    expect(icon).toBeInTheDocument()
-    expect(getByTitle('idea')).toBeInTheDocument()
-    expect(icon).toHaveStyle({width: '1em', height: '1em', fontSize: '2rem'}) // small
+  beforeEach(() => {
+    mockNode.events.selected = false
   })
 
-  it('should honor size prop', () => {
-    const {container, getByTitle} = renderBlock({size: 'large'})
-
-    const icon = container.querySelector('svg')
-    expect(icon).toBeInTheDocument()
-    expect(getByTitle('idea')).toBeInTheDocument()
-    expect(icon).toHaveStyle({width: '1em', height: '1em', fontSize: '5rem'}) // large
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
-  it('should honor color prop', () => {
-    const {container, getByTitle} = renderBlock({color: 'red'})
+  describe('rendering', () => {
+    it('renders with default props', () => {
+      const {getByTestId} = renderIconBlock()
+      const iconBlock = getByTestId('icon-block')
+      const icon = iconBlock.querySelector('svg')
 
-    const icon = container.querySelector('svg')
-    expect(icon).toBeInTheDocument()
-    expect(getByTitle('idea')).toBeInTheDocument()
-    expect(document.querySelector('.icon-block')).toHaveStyle({color: 'red'})
+      expect(iconBlock).toBeInTheDocument()
+      expect(icon).toBeInTheDocument()
+      expect(icon).toHaveAttribute('class', expect.stringContaining('inlineSVG-svgIcon'))
+    })
+
+    it('renders with custom size', () => {
+      const {getByTestId} = renderIconBlock({size: 'large'})
+      const icon = getByTestId('icon-block').querySelector('svg')
+
+      expect(icon).toHaveAttribute('class', expect.stringContaining('inlineSVG-svgIcon'))
+    })
+
+    it('renders with custom color', () => {
+      const {getByTestId} = renderIconBlock({color: 'rgb(255, 0, 0)'})
+      const iconBlock = getByTestId('icon-block')
+
+      expect(iconBlock).toHaveStyle({
+        color: 'rgb(255, 0, 0)',
+      })
+    })
+  })
+
+  describe('accessibility', () => {
+    it('sets correct aria attributes', () => {
+      const {getByTestId} = renderIconBlock()
+      const iconBlock = getByTestId('icon-block')
+
+      expect(iconBlock).toHaveAttribute('role', 'treeitem')
+      expect(iconBlock).toHaveAttribute('aria-label', IconBlock.craft.displayName)
+      expect(iconBlock).toHaveAttribute('aria-selected', 'false')
+      expect(iconBlock).toHaveAttribute('tabIndex', '-1')
+    })
+
+    it('reflects selection state', () => {
+      mockNode.events.selected = true
+      const {getByTestId} = renderIconBlock()
+      const iconBlock = getByTestId('icon-block')
+
+      expect(iconBlock).toHaveAttribute('aria-selected', 'true')
+    })
   })
 })

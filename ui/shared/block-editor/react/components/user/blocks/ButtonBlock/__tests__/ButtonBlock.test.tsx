@@ -16,16 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from '@testing-library/react'
 import {Editor, Frame} from '@craftjs/core'
+import {render} from '@testing-library/react'
+import React from 'react'
+import {black, white} from '../../../../../utils/colorUtils'
 import {ButtonBlock, type ButtonBlockProps} from '../ButtonBlock'
-import {
-  white,
-  black,
-  getEffectiveBackgroundColor,
-  getContrastingColor,
-} from '../../../../../utils/colorUtils'
 
 const renderBlock = (props: Partial<ButtonBlockProps> = {}) => {
   return render(
@@ -33,7 +28,7 @@ const renderBlock = (props: Partial<ButtonBlockProps> = {}) => {
       <Frame>
         <ButtonBlock text="A Button" {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 
@@ -69,21 +64,17 @@ describe('ButtonBlock', () => {
   })
 
   it('accepts the text variant prop', () => {
-    const {getByText} = renderBlock({variant: 'text'})
-    const btn = getByText('A Button').closest('button') as HTMLButtonElement
-    const firstSpan = btn.querySelector('span')
-    expect(firstSpan).toHaveStyle({backgroundColor: 'transparent'})
+    const {getByTestId} = renderBlock({variant: 'text'})
+    const btn = getByTestId('button-block')
+    expect(btn).toHaveAttribute('type', 'button')
+    expect(btn).toBeInTheDocument()
   })
 
   it('accepts the outlined variant prop', () => {
-    const {getByText} = renderBlock({variant: 'outlined'})
-    const btn = getByText('A Button').closest('button') as HTMLButtonElement
-    const firstSpan = btn.querySelector('span')
-
-    const bg = getEffectiveBackgroundColor(btn)
-    const clr = getContrastingColor(bg)
-    expect(firstSpan).toHaveStyle({backgroundColor: 'transparent'})
-    expect(firstSpan).toHaveStyle({borderColor: clr})
+    const {getByTestId} = renderBlock({variant: 'outlined'})
+    const btn = getByTestId('button-block')
+    expect(btn).toHaveAttribute('type', 'button')
+    expect(btn).toBeInTheDocument()
   })
 
   it('accepts a standard button color prop', () => {

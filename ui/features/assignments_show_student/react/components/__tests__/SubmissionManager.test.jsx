@@ -24,22 +24,27 @@ import {
   SET_MODULE_ITEM_COMPLETION,
 } from '@canvas/assignments/graphql/student/Mutations'
 import {
+  RUBRIC_QUERY,
   SUBMISSION_HISTORIES_QUERY,
   USER_GROUPS_QUERY,
-  RUBRIC_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
-import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
-import ContextModuleApi from '../../apis/ContextModuleApi'
+import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
+import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import React from 'react'
+import ContextModuleApi from '../../apis/ContextModuleApi'
+import {COMPLETED_PEER_REVIEW_TEXT, availableReviewCount} from '../../helpers/PeerReviewHelpers'
+import TextEntry from '../AttemptType/TextEntry'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
-import TextEntry from '../AttemptType/TextEntry'
-import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import store from '../stores'
-import {availableReviewCount, COMPLETED_PEER_REVIEW_TEXT} from '../../helpers/PeerReviewHelpers'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
@@ -55,7 +60,7 @@ function renderInContext(overrides = {}, children) {
   const contextProps = {...StudentViewContextDefaults, ...overrides}
 
   return render(
-    <StudentViewContext.Provider value={contextProps}>{children}</StudentViewContext.Provider>
+    <StudentViewContext.Provider value={contextProps}>{children}</StudentViewContext.Provider>,
   )
 }
 
@@ -109,7 +114,7 @@ describe('SubmissionManager', () => {
     const {getByTestId} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByTestId('attempt-tab')).toBeInTheDocument()
@@ -120,7 +125,7 @@ describe('SubmissionManager', () => {
     const {getByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
@@ -131,7 +136,7 @@ describe('SubmissionManager', () => {
     const {queryByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(queryByText('Submit')).not.toBeInTheDocument()
@@ -144,7 +149,7 @@ describe('SubmissionManager', () => {
     const {getByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByText('Submit Assignment')).toBeInTheDocument()
@@ -162,7 +167,7 @@ describe('SubmissionManager', () => {
     const {getByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
@@ -181,7 +186,7 @@ describe('SubmissionManager', () => {
     const {getByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
@@ -195,7 +200,7 @@ describe('SubmissionManager', () => {
       {allowChangesToSubmission: false, isObserver: true},
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
@@ -211,7 +216,7 @@ describe('SubmissionManager', () => {
       {isLatestAttempt: false, latestSubmission},
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
@@ -224,7 +229,7 @@ describe('SubmissionManager', () => {
     const {queryByText} = render(
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
@@ -239,7 +244,7 @@ describe('SubmissionManager', () => {
       {allowChangesToSubmission: false},
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
@@ -253,7 +258,7 @@ describe('SubmissionManager', () => {
       {lastSubmittedSubmission: props.submission},
       <MockedProvider>
         <SubmissionManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
@@ -294,7 +299,7 @@ describe('SubmissionManager', () => {
         const submissionHistoriesResult = await mockQuery(
           SUBMISSION_HISTORIES_QUERY,
           {Node: {__typename: 'Submission'}},
-          {submissionID: '1'}
+          {submissionID: '1'},
         )
         const mocks = [
           {
@@ -312,7 +317,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
 
         act(() => {
@@ -346,7 +351,6 @@ describe('SubmissionManager', () => {
   })
 
   describe('Peer Review modal after clicking the "Submit Assignment" button', () => {
-    const {assign} = window.location
     let props, createSubmissionResult, submissionHistoriesResult, mocks, oldEnv
     const variables = {
       assignmentLid: '1',
@@ -361,14 +365,12 @@ describe('SubmissionManager', () => {
         ASSIGNMENT_ID: '1',
         COURSE_ID: '1',
       }
-      delete window.location
-      window.location = {assign: jest.fn(), origin: 'http://localhost'}
 
       createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
       submissionHistoriesResult = await mockQuery(
         SUBMISSION_HISTORIES_QUERY,
         {Node: {__typename: 'Submission'}},
-        {submissionID: '1'}
+        {submissionID: '1'},
       )
       mocks = [
         {
@@ -404,7 +406,6 @@ describe('SubmissionManager', () => {
 
     afterEach(() => {
       window.ENV = oldEnv
-      window.location.assign = assign
     })
 
     it('is present when there are assigned assessments', async () => {
@@ -413,7 +414,7 @@ describe('SubmissionManager', () => {
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const submitButton = getByText('Submit Assignment')
@@ -428,11 +429,11 @@ describe('SubmissionManager', () => {
       expect(await findByText('Your work has been submitted.')).toBeTruthy()
       expect(await findByText('Check back later to view feedback.')).toBeTruthy()
       const assignedAssessmentsTotal = props.submission.assignedAssessments.filter(
-        a => a.workflowState === 'assigned'
+        a => a.workflowState === 'assigned',
       ).length
       const availableTotal = availableReviewCount(props.submission.assignedAssessments)
       expect(
-        await findByText(`You have ${assignedAssessmentsTotal} Peer Review to complete.`)
+        await findByText(`You have ${assignedAssessmentsTotal} Peer Review to complete.`),
       ).toBeTruthy()
       expect(await findByText(`Peer submissions ready for review: ${availableTotal}`)).toBeTruthy()
     })
@@ -445,7 +446,7 @@ describe('SubmissionManager', () => {
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const submitButton = getByText('Submit Assignment')
@@ -483,7 +484,7 @@ describe('SubmissionManager', () => {
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const submitButton = getByText('Submit Assignment')
@@ -520,7 +521,7 @@ describe('SubmissionManager', () => {
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const submitButton = getByText('Submit Assignment')
@@ -534,8 +535,8 @@ describe('SubmissionManager', () => {
       fireEvent.click(peerReviewButton)
 
       const availableAssessment = props.submission.assignedAssessments[1]
-      expect(window.location.assign).toHaveBeenCalledWith(
-        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?reviewee_id=${availableAssessment.anonymizedUser._id}`
+      expect(assignLocation).toHaveBeenCalledWith(
+        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?reviewee_id=${availableAssessment.anonymizedUser._id}`,
       )
     })
 
@@ -545,7 +546,7 @@ describe('SubmissionManager', () => {
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const submitButton = getByText('Submit Assignment')
@@ -559,8 +560,8 @@ describe('SubmissionManager', () => {
       fireEvent.click(peerReviewButton)
 
       const availableAssessment = props.submission.assignedAssessments[1]
-      expect(window.location.assign).toHaveBeenCalledWith(
-        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?anonymous_asset_id=${availableAssessment.anonymousId}`
+      expect(assignLocation).toHaveBeenCalledWith(
+        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?anonymous_asset_id=${availableAssessment.anonymousId}`,
       )
     })
   })
@@ -580,7 +581,7 @@ describe('SubmissionManager', () => {
     const submissionHistoriesResult = await mockQuery(
       SUBMISSION_HISTORIES_QUERY,
       {Node: {__typename: 'Submission'}},
-      {submissionID: '1'}
+      {submissionID: '1'},
     )
     const mocks = [
       {
@@ -598,7 +599,7 @@ describe('SubmissionManager', () => {
         <MockedProvider mocks={mocks}>
           <SubmissionManager {...props} />
         </MockedProvider>
-      </AlertManagerContext.Provider>
+      </AlertManagerContext.Provider>,
     )
 
     const submitButton = getByText('Submit Assignment')
@@ -626,7 +627,7 @@ describe('SubmissionManager', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const submitButton = getByTestId('submit-button')
@@ -685,7 +686,7 @@ describe('SubmissionManager', () => {
         const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const markAsDoneButton = getByTestId('set-module-item-completion-button')
@@ -698,7 +699,7 @@ describe('SubmissionManager', () => {
         const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const markAsDoneButton = getByTestId('set-module-item-completion-button')
@@ -726,7 +727,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
 
         const markAsDoneButton = getByTestId('set-module-item-completion-button')
@@ -760,7 +761,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
 
         const markAsDoneButton = getByTestId('set-module-item-completion-button')
@@ -794,7 +795,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
 
         const markAsDoneButton = getByTestId('set-module-item-completion-button')
@@ -815,7 +816,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('set-module-item-completion-button')).not.toBeInTheDocument()
     })
@@ -834,7 +835,7 @@ describe('SubmissionManager', () => {
         const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         expect(getByTestId('new-attempt-button')).toBeInTheDocument()
@@ -851,7 +852,7 @@ describe('SubmissionManager', () => {
           {allowChangesToSubmission: false, isObserver: true},
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
       })
@@ -864,7 +865,7 @@ describe('SubmissionManager', () => {
           {allowChangesToSubmission: false},
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
       })
@@ -875,7 +876,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
@@ -890,7 +891,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
@@ -902,7 +903,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
@@ -915,7 +916,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
@@ -928,7 +929,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
@@ -944,7 +945,7 @@ describe('SubmissionManager', () => {
         {latestSubmission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
     })
@@ -960,7 +961,7 @@ describe('SubmissionManager', () => {
         {latestSubmission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
     })
@@ -977,7 +978,7 @@ describe('SubmissionManager', () => {
         {latestSubmission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(getByTestId('back-to-attempt-button')).toBeInTheDocument()
@@ -993,7 +994,7 @@ describe('SubmissionManager', () => {
         {latestSubmission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = getByTestId('back-to-attempt-button')
       expect(button).toHaveTextContent('Back to Attempt 2')
@@ -1007,7 +1008,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('back-to-attempt-button')).not.toBeInTheDocument()
     })
@@ -1022,7 +1023,7 @@ describe('SubmissionManager', () => {
         {latestSubmission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('back-to-attempt-button')).not.toBeInTheDocument()
     })
@@ -1043,7 +1044,7 @@ describe('SubmissionManager', () => {
         {latestSubmission, showDraftAction},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       act(() => {
@@ -1063,7 +1064,7 @@ describe('SubmissionManager', () => {
         {latestSubmission: props.submission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByTestId('cancel-attempt-button')).toBeInTheDocument()
     })
@@ -1077,7 +1078,7 @@ describe('SubmissionManager', () => {
         {latestSubmission: props.submission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(queryByTestId('cancel-attempt-button')).not.toBeInTheDocument()
     })
@@ -1091,7 +1092,7 @@ describe('SubmissionManager', () => {
         {latestSubmission: props.submission},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = getByTestId('cancel-attempt-button')
@@ -1106,7 +1107,7 @@ describe('SubmissionManager', () => {
       const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByTestId('cancel-attempt-button')).not.toBeInTheDocument()
@@ -1121,7 +1122,7 @@ describe('SubmissionManager', () => {
         {latestSubmission: {attempt: 2, state: 'unsubmitted'}},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByTestId('cancel-attempt-button')).not.toBeInTheDocument()
@@ -1161,7 +1162,7 @@ describe('SubmissionManager', () => {
           const deleteSubmissionDraftResult = await mockQuery(
             DELETE_SUBMISSION_DRAFT,
             {},
-            variables
+            variables,
           )
 
           const mocks = [
@@ -1177,7 +1178,7 @@ describe('SubmissionManager', () => {
                   Node: {__typename: 'User'},
                   User: {groups: []},
                 },
-                {userID: '1'}
+                {userID: '1'},
               ),
             },
           ]
@@ -1186,7 +1187,7 @@ describe('SubmissionManager', () => {
             {latestSubmission: props.submission, cancelDraftAction},
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
-            </MockedProvider>
+            </MockedProvider>,
           )
         }
 
@@ -1232,7 +1233,7 @@ describe('SubmissionManager', () => {
             {latestSubmission: props.submission, cancelDraftAction},
             <MockedProvider>
               <SubmissionManager {...props} />
-            </MockedProvider>
+            </MockedProvider>,
           )
         }
 
@@ -1262,7 +1263,7 @@ describe('SubmissionManager', () => {
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
       const {unmount} = render(
-        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />
+        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />,
       )
       await waitFor(() => {
         expect(tinymce.editors[0]).toBeDefined()
@@ -1294,7 +1295,7 @@ describe('SubmissionManager', () => {
         {latestSubmission: submission},
         <MockedProvider mocks={mocks}>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       // Wait for callbacks to fire and the "editor" to be loaded
@@ -1302,7 +1303,7 @@ describe('SubmissionManager', () => {
         () => {
           expect(tinymce?.editors[0]).toBeDefined()
         },
-        {timeout: 4000}
+        {timeout: 4000},
       )
       fakeEditor = tinymce.editors[0]
       return result
@@ -1406,7 +1407,7 @@ describe('SubmissionManager', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(getByTestId('student-footer')).toBeInTheDocument()
@@ -1421,7 +1422,7 @@ describe('SubmissionManager', () => {
         {allowChangesToSubmission: false},
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByTestId('student-footer')).not.toBeInTheDocument()
@@ -1461,16 +1462,16 @@ describe('SubmissionManager', () => {
         const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
         const footer = getByTestId('student-footer')
         expect(
-          within(footer).getByTestId('previous-assignment-btn', {name: /Previous/})
+          within(footer).getByTestId('previous-assignment-btn', {name: /Previous/}),
         ).toBeInTheDocument()
         expect(
-          within(footer).getByTestId('next-assignment-btn', {name: /Next/})
+          within(footer).getByTestId('next-assignment-btn', {name: /Next/}),
         ).toBeInTheDocument()
       })
 
@@ -1487,7 +1488,7 @@ describe('SubmissionManager', () => {
         const {queryByRole} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
@@ -1531,7 +1532,7 @@ describe('SubmissionManager', () => {
       const {getByLabelText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(getByLabelText(/I agree to the tool's/)).toBeInTheDocument()
@@ -1543,7 +1544,7 @@ describe('SubmissionManager', () => {
       const {queryByLabelText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByLabelText(/I agree to the tool's/)).not.toBeInTheDocument()
@@ -1553,7 +1554,7 @@ describe('SubmissionManager', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const submitButton = getByTestId('submit-button')
@@ -1564,7 +1565,7 @@ describe('SubmissionManager', () => {
       const {getByLabelText, getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const agreementCheckbox = getByLabelText(/I agree to the tool's/)
@@ -1585,7 +1586,7 @@ describe('SubmissionManager', () => {
         const {queryByText} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
@@ -1597,7 +1598,7 @@ describe('SubmissionManager', () => {
 
       function generateAssessmentItem(
         criterionId,
-        {hasComments = false, hasValue = false, hasValidValue = true}
+        {hasComments = false, hasValue = false, hasValidValue = true},
       ) {
         return {
           commentFocus: true,
@@ -1688,7 +1689,7 @@ describe('SubmissionManager', () => {
         const {queryByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1699,7 +1700,7 @@ describe('SubmissionManager', () => {
         const {queryByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1721,7 +1722,7 @@ describe('SubmissionManager', () => {
         const {getByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1746,7 +1747,7 @@ describe('SubmissionManager', () => {
         const {getByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1771,7 +1772,7 @@ describe('SubmissionManager', () => {
         const {getByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1793,7 +1794,7 @@ describe('SubmissionManager', () => {
         const {queryByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -1805,7 +1806,7 @@ describe('SubmissionManager', () => {
             method: 'POST',
             path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
             body: expect.stringContaining('user_id%5D=4'),
-          })
+          }),
         )
       })
 
@@ -1827,7 +1828,7 @@ describe('SubmissionManager', () => {
         const {findByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         await new Promise(resolve => setTimeout(resolve, 1000))
         fireEvent.click(await findByText('Submit'))
@@ -1838,7 +1839,7 @@ describe('SubmissionManager', () => {
             method: 'POST',
             path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
             body: expect.stringContaining('anonymous_id%5D=ad0f'),
-          })
+          }),
         )
       })
 
@@ -1860,7 +1861,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
         await new Promise(resolve => setTimeout(resolve, 1000))
         fireEvent.click(await findByText('Submit'))
@@ -1907,7 +1908,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
         await new Promise(resolve => setTimeout(resolve, 1))
         const submitButton = getByText('Submit')
@@ -1953,7 +1954,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
         await new Promise(resolve => setTimeout(resolve, 1))
         const submitButton = getByText('Submit')
@@ -2004,7 +2005,7 @@ describe('SubmissionManager', () => {
         const {getByText, findByText} = render(
           <MockedProvider mocks={mocks}>
             <SubmissionManager {...prop} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         await new Promise(resolve => setTimeout(resolve, 1))
         const submitButton = getByText('Submit')
@@ -2033,7 +2034,7 @@ describe('SubmissionManager', () => {
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
             </MockedProvider>
-          </AlertManagerContext.Provider>
+          </AlertManagerContext.Provider>,
         )
 
         await new Promise(resolve => setTimeout(resolve, 1000))
@@ -2093,7 +2094,7 @@ describe('SubmissionManager', () => {
       return render(
         <MockedProvider>
           <SubmissionManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
     }
 

@@ -132,10 +132,13 @@ describe('setupSubmitHandler', () => {
   describe('success', () => {
     let attachment
     let success
+    let formElement
 
     beforeEach(() => {
       attachment = {id: '729'}
       success = setupSubmitHandler(formId, 'user_1').success
+      formElement = document.getElementById(formId)
+      formElement.submit = sandbox.stub()
     })
 
     it('adds the attachment ID to the form', () => {
@@ -146,7 +149,7 @@ describe('setupSubmitHandler', () => {
 
     it('submits the form', () => {
       success(attachment)
-      expect(formSubmit.callCount).toEqual(1)
+      expect(formElement.submit.callCount).toEqual(1)
     })
 
     it('removes the file input', () => {

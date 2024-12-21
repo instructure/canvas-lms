@@ -32,8 +32,7 @@ describe('Highlight', () => {
   })
 
   it('displays the highlight with persist', () => {
-    delete window.location
-    window.location = {search: '?persist=1'}
+    window.history.pushState({}, '', '?persist=1')
     const {container} = setup({isHighlighted: true})
 
     expect(container.querySelector('.highlight-discussion')).toBeInTheDocument()

@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {merge} from 'lodash'
+import React from 'react'
 import {DiscussionRow} from '../DiscussionRow'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 // We can't call the wrapped component because a lot of these tests are depending
 // on the class component instances. So we've got to cobble up enough of the date
@@ -91,7 +96,7 @@ describe('DiscussionRow', () => {
         dateFormatter,
         breakpoints: {mobileOnly: false},
       },
-      props
+      props,
     )
 
   const openManageMenu = async title => {
@@ -120,7 +125,7 @@ describe('DiscussionRow', () => {
     const discussion = {discussion_subentry_count: 5}
     render(<DiscussionRow {...makeProps({discussion})} />)
     const nodes = screen.getAllByText('0 unread replies')
-    expect(nodes.length).toBe(2)
+    expect(nodes).toHaveLength(2)
   })
 
   it('renders title as a link', () => {
@@ -151,7 +156,7 @@ describe('DiscussionRow', () => {
           updateDiscussion: updateDiscussionMock,
           discussion,
         })}
-      />
+      />,
     )
 
     await openManageMenu(discussion.title)
@@ -165,7 +170,7 @@ describe('DiscussionRow', () => {
         successMessage: 'Lock discussion blerp succeeded',
         failMessage: 'Lock discussion blerp failed',
       }),
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -180,7 +185,7 @@ describe('DiscussionRow', () => {
           updateDiscussion: updateDiscussionMock,
           discussion,
         })}
-      />
+      />,
     )
 
     await openManageMenu(discussion.title)
@@ -194,7 +199,7 @@ describe('DiscussionRow', () => {
         successMessage: 'Unlock discussion blerp succeeded',
         failMessage: 'Unlock discussion blerp failed',
       }),
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -238,7 +243,7 @@ describe('DiscussionRow', () => {
   it('renders the publish ToggleIcon', () => {
     const discussion = {published: false}
     render(<DiscussionRow {...makeProps({canPublish: true, discussion})} />)
-    expect(screen.getAllByText('Publish Hello World', {exact: false}).length).toBe(2)
+    expect(screen.getAllByText('Publish Hello World', {exact: false})).toHaveLength(2)
   })
 
   it('when feature flag is off, renders anonymous discussion lock explanation for read_as_admin', () => {
@@ -310,7 +315,7 @@ describe('DiscussionRow', () => {
 
   it('renders a last reply at date', () => {
     render(<DiscussionRow {...makeProps()} />)
-    expect(screen.getAllByText('Last post at 2/14', {exact: false}).length).toBe(2)
+    expect(screen.getAllByText('Last post at 2/14', {exact: false})).toHaveLength(2)
   })
 
   it('does not render last reply at date if there is none', () => {
@@ -324,7 +329,7 @@ describe('DiscussionRow', () => {
     futureDate.setYear(futureDate.getFullYear() + 1)
     const discussion = {lock_at: futureDate}
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText('Available until', {exact: false}).length).toBe(2)
+    expect(screen.getAllByText('Available until', {exact: false})).toHaveLength(2)
     // We need a relative date to ensure future-ness, so we can't really insist
     // on a given date element appearing this time
   })
@@ -372,7 +377,7 @@ describe('DiscussionRow', () => {
     pastDate.setYear(pastDate.getFullYear() - 1)
     const discussion = {lock_at: pastDate}
     render(<DiscussionRow {...makeProps({discussion})} />)
-    expect(screen.getAllByText('No longer available', {exact: false}).length).toBe(2)
+    expect(screen.getAllByText('No longer available', {exact: false})).toHaveLength(2)
     // We need a relative date to ensure past-ness, so we can't really insist
     // on a given date element appearing this time
   })
@@ -393,7 +398,7 @@ describe('DiscussionRow', () => {
       },
     })
     render(<DiscussionRow {...props} />)
-    expect(screen.getAllByText('Due ', {exact: false}).length).toBe(2)
+    expect(screen.getAllByText('Due ', {exact: false})).toHaveLength(2)
     expect(screen.queryByText('To do', {exact: false})).not.toBeInTheDocument()
   })
 
@@ -421,10 +426,10 @@ describe('DiscussionRow', () => {
     expect(screen.queryByText('Reply to topic:', {exact: false})).toBeInTheDocument()
     expect(screen.queryByText('Required replies (2):', {exact: false})).toBeInTheDocument()
     expect(
-      screen.queryByText(props.dateFormatter('2024-09-14T05:59:00Z'), {exact: false})
+      screen.queryByText(props.dateFormatter('2024-09-14T05:59:00Z'), {exact: false}),
     ).toBeInTheDocument()
     expect(
-      screen.queryByText(props.dateFormatter('2024-09-21T05:59:00Z'), {exact: false})
+      screen.queryByText(props.dateFormatter('2024-09-21T05:59:00Z'), {exact: false}),
     ).toBeInTheDocument()
     expect(screen.queryByText('No Due Date', {exact: false})).not.toBeInTheDocument()
   })
@@ -453,7 +458,7 @@ describe('DiscussionRow', () => {
     expect(
       screen.queryByText('Reply to topic: No Due Date Required replies (4): No Due Date', {
         exact: false,
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -582,7 +587,7 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           onMoveDiscussion: () => {},
         })}
-      />
+      />,
     )
     // We still should show the menu thingy itself
     expect(screen.getByText('Manage options for Hello World')).toBeInTheDocument()
@@ -596,7 +601,7 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           onMoveDiscussion: () => {},
         })}
-      />
+      />,
     )
 
     await openManageMenu('Hello World')
@@ -627,12 +632,12 @@ describe('DiscussionRow', () => {
           canPublish: true,
           published: false,
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu(discussion.title)
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(3)
+    expect(allKeys).toHaveLength(3)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
     expect(allKeys[1].textContent.includes('Pin')).toBe(true)
     expect(allKeys[2].textContent.includes('Delete')).toBe(true)
@@ -667,7 +672,7 @@ describe('DiscussionRow', () => {
       expect.objectContaining({
         open: true,
         selection: {discussion_topics: [props.discussion.id]},
-      })
+      }),
     )
   })
 
@@ -691,7 +696,7 @@ describe('DiscussionRow', () => {
           content_type: 'discussion_topic',
           content_id: props.discussion.id,
         },
-      })
+      }),
     )
   })
 
@@ -706,7 +711,7 @@ describe('DiscussionRow', () => {
             },
           },
         })}
-      />
+      />,
     )
 
     expect(screen.getByText('No longer available')).toBeInTheDocument()
@@ -719,12 +724,12 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           onMoveDiscussion: () => {},
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Move To')).toBe(true)
   })
 
@@ -735,12 +740,12 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           displayPinMenuItem: true,
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Pin')).toBe(true)
   })
 
@@ -758,12 +763,12 @@ describe('DiscussionRow', () => {
             },
           },
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('SpeedGrader')).toBe(true)
   })
 
@@ -774,12 +779,12 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           displayDuplicateMenuItem: true,
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Duplicate')).toBe(true)
   })
 
@@ -790,12 +795,12 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           displayDeleteMenuItem: true,
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Delete')).toBe(true)
   })
 
@@ -806,19 +811,16 @@ describe('DiscussionRow', () => {
           displayManageMenu: true,
           displayLockMenuItem: true,
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Close for comments')).toBe(true)
   })
 
   it('renders edit menu item if the user has update permission and discussion has html_url', async () => {
-    Object.defineProperty(window, 'location', {
-      value: {assign: jest.fn()},
-    })
     render(
       <DiscussionRow
         {...makeProps({
@@ -828,18 +830,18 @@ describe('DiscussionRow', () => {
             html_url: 'https://example.com',
           },
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Edit')).toBe(true)
 
     const edit = screen.getByText('Edit')
     await user.click(edit)
 
-    expect(window.location.assign).toHaveBeenCalledWith('https://example.com/edit')
+    expect(assignLocation).toHaveBeenCalledWith('https://example.com/edit')
   })
 
   it('renders mastery paths menu item if permitted', async () => {
@@ -852,12 +854,12 @@ describe('DiscussionRow', () => {
           },
           displayMasteryPathsMenuItem: true,
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('Mastery Paths')).toBe(true)
   })
 
@@ -871,7 +873,7 @@ describe('DiscussionRow', () => {
           },
           displayMasteryPathsLink: true,
         })}
-      />
+      />,
     )
 
     expect(screen.getByText('Mastery Paths')).toBeInTheDocument()
@@ -891,12 +893,12 @@ describe('DiscussionRow', () => {
             },
           ],
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(1)
+    expect(allKeys).toHaveLength(1)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
   })
 
@@ -920,12 +922,12 @@ describe('DiscussionRow', () => {
             },
           ],
         })}
-      />
+      />,
     )
 
     const list = await openManageMenu('Hello World')
     const allKeys = list.querySelectorAll('li')
-    expect(allKeys.length).toBe(2)
+    expect(allKeys).toHaveLength(2)
     expect(allKeys[0].textContent.includes('discussion_topic_menu Text')).toBe(true)
     expect(allKeys[1].textContent.includes('discussion_topic_menu otherText')).toBe(true)
   })

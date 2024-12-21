@@ -464,7 +464,8 @@
     "@instructure/ui-text-input": "9.10.0",
     "@instructure/ui-truncate-text": "9.10.0",
     "@instructure/ui-view": "9.10.0",
-    "@instructure/uid": "9.10.0"
+    "@instructure/uid": "9.10.0",
+    "jsdom": "25.0.1"
   },
   "packageManager": "yarn@1.19.1+sha512.8019df6cbf6b618d391add1c8c986cfec8aa4171d89596a54e32b79d79f640edb4c5b90814fa1bf8b947e3830be3b19c478554f7fd9d61c93505614cd096afc7"
 }
