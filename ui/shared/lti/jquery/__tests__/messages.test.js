@@ -16,8 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ltiMessageHandler, ltiState} from '../messages'
 import $ from '@canvas/rails-flash-notifications'
+import {ltiMessageHandler, ltiState} from '../messages'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 const requestFullWindowLaunchMessage = {
   subject: 'requestFullWindowLaunch',
@@ -54,16 +58,7 @@ describe('ltiMessageHander', () => {
   })
 
   describe('when a whitelisted event is processed', () => {
-    let oldLocation
-
-    beforeEach(() => {
-      oldLocation = window.location
-      delete window.location
-      window.location = {assign: jest.fn()}
-    })
-
     afterEach(() => {
-      window.location = oldLocation
       delete ltiState.fullWindowProxy
     })
 
@@ -100,7 +95,7 @@ describe('ltiMessageHander', () => {
 
     it('rejects older org.imsglobal.lti.* subjects', async () => {
       expect(
-        await ltiMessageHandler(postMessageEvent({subject: 'org.imsglobal.lti.capabilities'}))
+        await ltiMessageHandler(postMessageEvent({subject: 'org.imsglobal.lti.capabilities'})),
       ).toBe(false)
     })
   })
@@ -133,7 +128,7 @@ describe('ltiMessageHander', () => {
               message: 'Not supported inside Rich Content Editor',
             },
           }),
-          undefined
+          undefined,
         )
       })
     })
@@ -157,7 +152,7 @@ describe('ltiMessageHander', () => {
               code: error_code,
             },
           }),
-          undefined
+          undefined,
         )
       })
     })
@@ -174,7 +169,7 @@ describe('ltiMessageHander', () => {
               code: error_code,
             },
           }),
-          undefined
+          undefined,
         )
       })
     })
@@ -191,7 +186,7 @@ describe('ltiMessageHander', () => {
           expect.objectContaining({
             subject: subject_response,
           }),
-          undefined
+          undefined,
         )
       })
     })
@@ -218,7 +213,7 @@ describe('ltiMessageHander', () => {
       })
 
       afterEach(() => {
-        // eslint-disable-next-line no-console
+         
         console.error.mockRestore()
       })
 
