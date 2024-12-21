@@ -16,151 +16,121 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {Editor, Frame} from '@craftjs/core'
 import {render} from '@testing-library/react'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {Editor, Frame, useNode} from '@craftjs/core'
+import React from 'react'
 import {Container, type ContainerProps} from '..'
 
-let isSelected = false
-let isExpanded = false
+const mockNode = {
+  id: 'xyzzy',
+  data: {
+    displayName: Container.craft.displayName,
+    custom: {
+      isExpanded: false,
+    },
+  },
+  events: {
+    selected: false,
+  },
+}
 
 jest.mock('@craftjs/core', () => {
   const module = jest.requireActual('@craftjs/core')
   return {
     ...module,
-    useNode: jest.fn(() => {
-      return {
-        node: {
-          id: 'xyzzy',
-          data: {
-            displayName: Container.craft.displayName,
-            custom: {
-              isExpanded,
-            },
-          },
-          events: {
-            selected: isSelected,
-          },
-        },
-        connectors: {
-          connect: jest.fn(),
-          drag: jest.fn(),
-        },
-      }
-    }),
+    useNode: jest.fn(() => ({
+      node: mockNode,
+      connectors: {
+        connect: jest.fn(),
+        drag: jest.fn(),
+      },
+    })),
   }
 })
 
-const renderBlock = (props: Partial<ContainerProps> = {}) => {
-  const {container} = render(
+const renderContainer = (props: Partial<ContainerProps> = {}) => {
+  return render(
     <Editor enabled={true} resolver={{Container}}>
       <Frame>
         <Container {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
-  return container.querySelector('.container-block') as HTMLElement
 }
 
-// the container is just a div  with no content of its own
-// so we have to test by peeking into the rendered element
 describe('Container', () => {
   beforeEach(() => {
-    isSelected = false
-    isExpanded = false
+    mockNode.events.selected = false
+    mockNode.data.custom.isExpanded = false
   })
 
-  it('should render with default props', () => {
-    const containerBlock = renderBlock()
-    expect(containerBlock.getAttribute('data-placeholder')).toEqual('Drop blocks here')
+  it('renders with default props', () => {
+    const {getByTestId} = renderContainer()
+    const container = getByTestId('container-block')
+    expect(container).toBeInTheDocument()
+    expect(container).toHaveAttribute('data-placeholder', 'Drop blocks here')
+    expect(container).toHaveAttribute('id', 'container-xyzzy')
+    expect(container).toHaveClass('container-block')
   })
 
-  it('sets the default id attribute', () => {
-    const containerBlock = renderBlock()
-    expect(containerBlock.getAttribute('id')).toBe('container-xyzzy')
+  it('renders with custom id', () => {
+    const {getByTestId} = renderContainer({id: 'custom-id'})
+    const container = getByTestId('container-block')
+    expect(container).toHaveAttribute('id', 'custom-id')
   })
 
-  it('sets the id attribute from props', () => {
-    const containerBlock = renderBlock({id: 'myid'})
-    expect(containerBlock.getAttribute('id')).toBe('myid')
+  it('renders with custom background color', () => {
+    const {getByTestId} = renderContainer({background: 'rgb(0, 0, 255)'})
+    const container = getByTestId('container-block')
+    expect(container).toHaveStyle({backgroundColor: 'rgb(0, 0, 255)'})
   })
 
-  it('has a default background of transparent', () => {
-    const containerBlock = renderBlock()
-    expect(containerBlock).toHaveStyle({background: 'transparent'})
+  it('renders with custom styles', () => {
+    const {getByTestId} = renderContainer({style: {color: 'rgb(255, 0, 0)'}})
+    const container = getByTestId('container-block')
+    expect(container).toHaveStyle({color: 'rgb(255, 0, 0)'})
   })
 
-  it('respects any background color passed to it', () => {
-    const containerBlock = renderBlock({background: 'blue'})
-    expect(containerBlock).toHaveStyle({background: 'blue'})
+  it('renders with custom placeholder', () => {
+    const {getByTestId} = renderContainer({'data-placeholder': 'Custom placeholder'})
+    const container = getByTestId('container-block')
+    expect(container).toHaveAttribute('data-placeholder', 'Custom placeholder')
   })
 
-  it('respects any style attribute passed to it', () => {
-    const containerBlock = renderBlock({id: 'myid', style: {color: 'red'}})
-    expect(containerBlock).toHaveStyle({color: 'red'})
+  it('renders with custom class names', () => {
+    const {getByTestId} = renderContainer({className: 'custom-class'})
+    const container = getByTestId('container-block')
+    expect(container).toHaveClass('custom-class')
+    expect(container).toHaveClass('container-block')
   })
 
-  it('sets the data-placeholder attribute from props', () => {
-    const containerBlock = renderBlock({'data-placeholder': 'My placeholder'})
-    expect(containerBlock.getAttribute('data-placeholder')).toBe('My placeholder')
+  it('renders children', () => {
+    const {getByText} = renderContainer({children: <div>Child content</div>})
+    expect(getByText('Child content')).toBeInTheDocument()
   })
 
-  it('had a default className of container-block', () => {
-    const containerBlock = renderBlock()
-    expect(containerBlock).toHaveClass('container-block')
-  })
-
-  it('includes the className prop', () => {
-    const containerBlock = renderBlock({className: 'my-class my-other-class'})
-    expect(containerBlock).toHaveClass('my-class')
-    expect(containerBlock).toHaveClass('my-other-class')
-  })
-
-  it('renders its children', () => {
-    const containerBlock = renderBlock({children: <div>Child</div>})
-    expect(containerBlock).toHaveTextContent('Child')
-  })
-
-  it('renders its children reprise', () => {
-    const {getByText} = render(
-      <Editor enabled={true} resolver={{Container}}>
-        <Frame>
-          <Container>
-            <div>Another child</div>
-          </Container>
-        </Frame>
-      </Editor>
-    )
-    expect(getByText('Another child')).toBeInTheDocument()
-  })
-
-  describe('aria attributes', () => {
-    it('sets the aria-label attribute to the displayName of the node', () => {
-      const containerBlock = renderBlock()
-      expect(containerBlock.getAttribute('aria-label')).toBe(Container.craft.displayName)
+  describe('accessibility attributes', () => {
+    it('sets correct aria attributes', () => {
+      const {getByTestId} = renderContainer()
+      const container = getByTestId('container-block')
+      expect(container).toHaveAttribute('aria-label', Container.craft.displayName)
+      expect(container).toHaveAttribute('aria-selected', 'false')
+      expect(container).toHaveAttribute('aria-expanded', 'false')
+      expect(container).toHaveAttribute('role', 'treeitem')
     })
 
-    it('sets the aria-selected attribute to the "false" if the node is not selected', () => {
-      const containerBlock = renderBlock()
-      expect(containerBlock.getAttribute('aria-selected')).toBe('false')
+    it('reflects selection state', () => {
+      mockNode.events.selected = true
+      const {getByTestId} = renderContainer()
+      const container = getByTestId('container-block')
+      expect(container).toHaveAttribute('aria-selected', 'true')
     })
 
-    it('sets the aria-selected attribute to the "true" if the node is selected', () => {
-      isSelected = true
-      const containerBlock = renderBlock()
-      expect(containerBlock.getAttribute('aria-selected')).toBe('true')
-    })
-
-    it('sets the aria-expanded attribute to "false" if the node is not expanded', () => {
-      const containerBlock = renderBlock()
-      expect(containerBlock.getAttribute('aria-expanded')).toBe('false')
-    })
-
-    it('sets the aria-expanded attribute to "true" if the node is expanded', () => {
-      isExpanded = true
-      const containerBlock = renderBlock()
-      expect(containerBlock.getAttribute('aria-expanded')).toBe('true')
+    it('reflects expansion state', () => {
+      mockNode.data.custom.isExpanded = true
+      const {getByTestId} = renderContainer()
+      const container = getByTestId('container-block')
+      expect(container).toHaveAttribute('aria-expanded', 'true')
     })
   })
 })

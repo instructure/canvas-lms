@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import React from 'react'
 
-import {View} from '@instructure/ui-view'
+import {assignLocation} from '@canvas/util/globalUtils'
+import type {Breakpoints} from '@canvas/with-breakpoints'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import type {Breakpoints} from '@canvas/with-breakpoints'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('discussion_create')
 
@@ -60,7 +61,7 @@ export const FormControlButtons = ({
         margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
         onClick={() => {
           // @ts-expect-error
-          window.location.assign(ENV?.CANCEL_TO)
+          assignLocation(ENV?.CANCEL_TO)
         }}
         disabled={isSubmitting}
       >

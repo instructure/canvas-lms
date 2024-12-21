@@ -16,18 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {type MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import React, {type MouseEventHandler, useCallback, useEffect, useRef, useState} from 'react'
 
-import DashboardCardAction from './DashboardCardAction'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {assignLocation} from '@canvas/util/globalUtils'
+import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
+import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'
+import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
 import CourseActivitySummaryStore from './CourseActivitySummaryStore'
+import DashboardCardAction from './DashboardCardAction'
 import DashboardCardMenu from './DashboardCardMenu'
 import PublishButton from './PublishButton'
-import {showConfirmUnfavorite} from './ConfirmUnfavoriteCourseModal'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import instFSOptimizedImageUrl from '../util/instFSOptimizedImageUrl'
-import type {ConnectDragSource, ConnectDropTarget} from 'react-dnd'
 
 const I18n = createI18nScope('dashcards')
 
@@ -149,7 +150,7 @@ export const DashboardCard = ({
   const handleStoreChange = useCallback(
     // @ts-expect-error
     () => setCourse(CourseActivitySummaryStore.getStateForCourse(id)),
-    [id]
+    [id],
   )
 
   useEffect(() => {
@@ -165,7 +166,7 @@ export const DashboardCard = ({
 
   const headerClick: MouseEventHandler = e => {
     e.preventDefault()
-    window.location.assign(href)
+    assignLocation(href)
   }
 
   const handleMove = (asset: string, atIndex: number) => {
@@ -200,7 +201,7 @@ export const DashboardCard = ({
       item =>
         // only return 'Message' type if category is 'Due Date' (for assignments)
         item.type === activityType &&
-        (activityType !== 'Message' || item.notification_category === I18n.t('Due Date'))
+        (activityType !== 'Message' || item.notification_category === I18n.t('Due Date')),
     )
 
     // TODO: unread count is always 0 for assignments (see CNVS-21227)
@@ -229,7 +230,7 @@ export const DashboardCard = ({
         }
       })
       .catch(() =>
-        showFlashError(I18n.t('We were unable to remove this course from your favorites.'))
+        showFlashError(I18n.t('We were unable to remove this course from your favorites.')),
       )
   }
 

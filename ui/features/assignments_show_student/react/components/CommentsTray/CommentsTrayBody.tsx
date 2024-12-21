@@ -15,35 +15,37 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import {useQuery} from '@apollo/client'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import CommentContent from './CommentContent'
-import CommentTextArea from './CommentTextArea'
+import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import ErrorBoundary from '@canvas/error-boundary'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
-import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import React, {useContext, useState} from 'react'
-import StudentViewContext from '../Context'
-import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {useQuery} from '@apollo/client'
 import {bool, func} from 'prop-types'
-import PeerReviewPromptModal from '../PeerReviewPromptModal'
+import React, {useContext, useState} from 'react'
+import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
+import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import {
-  getRedirectUrlToFirstPeerReview,
   assignedAssessmentsCount,
   availableAndUnavailableCounts,
+  getPeerReviewButtonText,
   getPeerReviewHeaderText,
   getPeerReviewSubHeaderText,
-  getPeerReviewButtonText,
+  getRedirectUrlToFirstPeerReview,
 } from '../../helpers/PeerReviewHelpers'
+import StudentViewContext from '../Context'
+import PeerReviewPromptModal from '../PeerReviewPromptModal'
+import CommentContent from './CommentContent'
+import CommentTextArea from './CommentTextArea'
 
 const I18n = createI18nScope('assignments_2')
 const COMPLETED_WORKFLOW_STATE = 'completed'
@@ -122,7 +124,7 @@ export default function CommentsTrayBody(props) {
 
   const comments = data.submissionComments.commentsConnection.nodes
   const hiddenCommentsMessage = I18n.t(
-    'You may not see all comments for this assignment until grades are posted.'
+    'You may not see all comments for this assignment until grades are posted.',
   )
   return (
     <ErrorBoundary
@@ -205,7 +207,7 @@ export default function CommentsTrayBody(props) {
           onClose={() => setPeerReviewModalOpen(false)}
           onRedirect={() => {
             const url = getRedirectUrlToFirstPeerReview(assignedAssessments)
-            if (url) window.location.assign(url)
+            if (url) assignLocation(url)
           }}
         />
       </Flex>

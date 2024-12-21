@@ -16,25 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {CopyCourseForm} from './form/CopyCourseForm'
-import {useQuery, useMutation} from '@canvas/query'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+// @ts-ignore
+import ErrorShip from '@canvas/images/ErrorShip.svg'
+import {useMutation, useQuery} from '@canvas/query'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import React from 'react'
+import {createCourseCopyMutation} from '../mutations/createCourseCopyMutation'
 import {coursesQuery} from '../queries/courseQuery'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {useTermsQuery} from '../queries/termsQuery'
-import GenericErrorPage from '@canvas/generic-error-page/react'
 import {
   type CopyCourseFormSubmitData,
   courseCopyRootKey,
   courseFetchKey,
   createCourseAndMigrationKey,
 } from '../types'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {createCourseCopyMutation} from '../mutations/createCourseCopyMutation'
-// @ts-ignore
-import ErrorShip from '@canvas/images/ErrorShip.svg'
+import {CopyCourseForm} from './form/CopyCourseForm'
 
 const I18n = createI18nScope('content_copy_redesign')
 
@@ -44,7 +45,7 @@ export const onSuccessCallback = (newCourseId: string) => {
 
 export const onErrorCallback = () => {
   showFlashError(
-    I18n.t('Something went wrong during copy course operation. Reload the page and try again.')
+    I18n.t('Something went wrong during copy course operation. Reload the page and try again.'),
   )()
 }
 
@@ -77,7 +78,7 @@ export const CourseCopy = ({
   })
 
   const handleCancel = () => {
-    window.location.href = `/courses/${courseId}/settings`
+    assignLocation(`/courses/${courseId}/settings`)
   }
 
   const handleSubmit = (formData: CopyCourseFormSubmitData) => {

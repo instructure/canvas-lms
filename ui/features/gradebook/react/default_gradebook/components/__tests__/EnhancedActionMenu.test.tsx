@@ -17,11 +17,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PostGradesApp from '../../../SISGradePassback/PostGradesApp'
-import EnhancedActionMenu from '../EnhancedActionMenu'
-import GradebookExportManager from '../../../shared/GradebookExportManager'
-import {waitFor, act, render, fireEvent} from '@testing-library/react'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {assign} from 'lodash'
 import React from 'react'
+import PostGradesApp from '../../../SISGradePassback/PostGradesApp'
+import GradebookExportManager from '../../../shared/GradebookExportManager'
+import EnhancedActionMenu from '../EnhancedActionMenu'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 const defaultResult = {
   attachmentUrl: 'http://attachmentUrl',
@@ -104,21 +110,14 @@ describe('EnhancedActionMenu', () => {
     clickElement('menuitem', name)
   }
 
-  const {location} = window
-
   beforeEach(() => {
     props = {
       ...workingMenuProps(),
     }
-
-    delete window.location
-    window.location = {
-      href: '',
-    }
   })
 
   afterEach(() => {
-    window.location = location
+    jest.clearAllMocks()
   })
 
   describe('Basic Rendering', () => {
@@ -263,7 +262,7 @@ describe('EnhancedActionMenu', () => {
       await waitFor(() => {
         expect(spy).toHaveBeenCalled()
         expect(spy.mock.calls[0][0]).toEqual(
-          'Gradebook export has started. This may take a few minutes.'
+          'Gradebook export has started. This may take a few minutes.',
         )
       })
     })
@@ -323,7 +322,9 @@ describe('EnhancedActionMenu', () => {
       act(() => {
         selectDropdownOption('Export Current Gradebook View')
       })
-      await waitFor(() => expect(window.location.href).toEqual(defaultResult.attachmentUrl))
+      await waitFor(() => {
+        expect(assignLocation).toHaveBeenCalledWith(defaultResult.attachmentUrl)
+      })
     })
 
     it('on success, re-enables the "Export Entire Gradebook" menu item', async () => {
@@ -377,7 +378,7 @@ describe('EnhancedActionMenu', () => {
       await waitFor(() => {
         expect(messageSpy).toHaveBeenCalled()
         expect(messageSpy.mock.calls[0][0]).toEqual(
-          'Gradebook export has started. This may take a few minutes.'
+          'Gradebook export has started. This may take a few minutes.',
         )
         expect(messageSpy.mock.calls[1][0]).toEqual('Gradebook export has completed')
         expect(handleUpdateSpyTimeout).toHaveBeenCalled()
@@ -394,7 +395,7 @@ describe('EnhancedActionMenu', () => {
       await waitFor(() => {
         expect(spy).toHaveBeenCalled()
         expect(spy.mock.calls[0][0]).toEqual(
-          'Gradebook Export Failed: Error: Export failure reason'
+          'Gradebook Export Failed: Error: Export failure reason',
         )
       })
     })
@@ -430,7 +431,7 @@ describe('EnhancedActionMenu', () => {
 
     it('it takes you to the new imports page', async () => {
       clickOnDropdown('Import')
-      expect(window.location.href).toEqual(props.gradebookImportUrl)
+      expect(assignLocation).toHaveBeenCalledWith(props.gradebookImportUrl)
     })
   })
 
@@ -546,7 +547,7 @@ describe('EnhancedActionMenu', () => {
       component = renderComponent(props)
       clickOnDropdown('Sync')
       selectDropdownOption('Sync grades to SIS')
-      expect(window.location.href).toEqual(props.publishGradesToSis.publishToSisUrl)
+      expect(assignLocation).toHaveBeenCalledWith(props.publishGradesToSis.publishToSisUrl)
     })
   })
 })

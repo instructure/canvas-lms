@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
-import GridColor from '../GridColor'
+import React from 'react'
 import {darken, defaultColors, statusColors} from '../../constants/colors'
+import GridColor from '../GridColor'
 
 function defaultProps(props = {}) {
   return {
@@ -76,15 +76,15 @@ describe('GridColor', () => {
             data-testid="grid-color-editable-2"
           />
         </div>
-      </>
+      </>,
     )
 
     expect(getByTestId('grid-color-even')).toHaveStyle('background-color: #00ffff')
     expect(getByTestId('grid-color-odd')).toHaveStyle(`background-color: ${darken('#00ffff', 5)}`)
-    expect(getByTestId('grid-color-editable')).toHaveStyle('background-color: white')
+    expect(getByTestId('grid-color-editable')).toHaveStyle('background-color: rgb(255, 255, 255)')
     expect(getByTestId('grid-color-even-2')).toHaveStyle('background-color: #ff00ff')
     expect(getByTestId('grid-color-odd-2')).toHaveStyle(`background-color: ${darken('#ff00ff', 5)}`)
-    expect(getByTestId('grid-color-editable-2')).toHaveStyle('background-color: white')
+    expect(getByTestId('grid-color-editable-2')).toHaveStyle('background-color: rgb(255, 255, 255)')
   })
 
   it('renders with blank custom status and standard status colors', () => {
@@ -130,7 +130,7 @@ describe('GridColor', () => {
     expect(rules).toEqual(
       `.even .gradebook-cell.late { background-color: ${defaultColors.blue}; }` +
         `.odd .gradebook-cell.late { background-color: ${darken(defaultColors.blue, 5)}; }` +
-        `.slick-cell.editable .gradebook-cell.late { background-color: white; }`
+        `.slick-cell.editable .gradebook-cell.late { background-color: white; }`,
     )
   })
 
@@ -143,7 +143,7 @@ describe('GridColor', () => {
         '.slick-cell.editable .gradebook-cell.late { background-color: white; }' +
         `.even .gradebook-cell.missing { background-color: ${defaultColors.salmon}; }` +
         `.odd .gradebook-cell.missing { background-color: ${darken(defaultColors.salmon, 5)}; }` +
-        '.slick-cell.editable .gradebook-cell.missing { background-color: white; }'
+        '.slick-cell.editable .gradebook-cell.missing { background-color: white; }',
     )
   })
 })

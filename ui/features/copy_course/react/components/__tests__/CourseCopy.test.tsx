@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {useMutation, useQuery} from '@canvas/query'
+import {assignLocation} from '@canvas/util/globalUtils'
 import {fireEvent, render} from '@testing-library/react'
-import {useQuery, useMutation} from '@canvas/query'
-import CourseCopy from '../CourseCopy'
+import React from 'react'
 import {useTermsQuery} from '../../queries/termsQuery'
+import CourseCopy from '../CourseCopy'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 jest.mock('@canvas/query')
 jest.mock('../../queries/termsQuery')
@@ -160,9 +165,6 @@ describe('CourseCopy', () => {
   })
 
   it('handleCancel redirects to the course settings page', () => {
-    // @ts-ignore
-    delete window.location
-    window.location = {href: ''} as Location
     mockUseQuery.mockReturnValue({isLoading: false, isError: false, data: courseData})
     mockUseTermsQuery.mockReturnValue({
       isLoading: false,
@@ -175,7 +177,7 @@ describe('CourseCopy', () => {
     const {getByRole} = render(<CourseCopy {...defaultProps} />)
 
     fireEvent.click(getByRole('button', {name: 'Cancel'}))
-    expect(window.location.href).toBe(`/courses/${defaultProps.courseId}/settings`)
+    expect(assignLocation).toHaveBeenCalledWith(`/courses/${defaultProps.courseId}/settings`)
   })
 
   it('handleSubmit calls mutate', () => {

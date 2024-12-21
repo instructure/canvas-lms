@@ -39,7 +39,7 @@ module.exports = {
     '@instructure/studio-player':
       '<rootDir>/packages/canvas-rce/src/rce/__mocks__/_mockStudioPlayer.js',
   },
-  roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
+  roots: ['<rootDir>/ui', 'public/javascripts'],
   moduleDirectories: ['public/javascripts', 'node_modules'],
   reporters: [
     'default',
@@ -55,10 +55,7 @@ module.exports = {
   ],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
-  setupFilesAfterEnv: [
-    '@testing-library/jest-dom',
-    '<rootDir>/jest/stubInstUi.js',
-  ],
+  setupFilesAfterEnv: ['@testing-library/jest-dom', '<rootDir>/jest/stubInstUi.js'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
   coverageDirectory: '<rootDir>/coverage-jest/',

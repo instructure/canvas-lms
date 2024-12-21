@@ -54,7 +54,7 @@ describe('TextBlock', () => {
       })
     })
 
-    it('should stop being editaaable on blur', async () => {
+    it('should stop being editable on blur', async () => {
       const {container} = renderBlock(true, {text: 'some text'})
       const contentEditable = container.querySelector('[contenteditable]') as HTMLElement
       ;(document.querySelector('.text-block') as HTMLElement).focus()
@@ -99,7 +99,7 @@ describe('TextBlock', () => {
         color: 'red',
       })
       const block = container.querySelector('.text-block')
-      expect(block).toHaveStyle('color: red')
+      expect(block).toHaveStyle({color: 'rgb(255, 0, 0)'})
     })
   })
 
@@ -131,7 +131,7 @@ describe('TextBlock', () => {
       expect(block).toHaveStyle({
         fontSize: '24pt',
         textAlign: 'center',
-        color: 'red',
+        color: 'rgb(255, 0, 0)',
       })
     })
   })

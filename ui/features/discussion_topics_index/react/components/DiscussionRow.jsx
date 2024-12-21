@@ -18,21 +18,20 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import cx from 'classnames'
+import {arrayOf, bool, func, string} from 'prop-types'
 import React, {Component} from 'react'
-import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux'
 import {DragSource, DropTarget} from 'react-dnd'
 import {findDOMNode} from 'react-dom'
-import {func, bool, string, arrayOf} from 'prop-types'
-import cx from 'classnames'
-import useDateTimeFormat from '@canvas/use-date-time-format-hook'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
 
-import {Text} from '@instructure/ui-text'
-import {Pill} from '@instructure/ui-pill'
-import {Heading} from '@instructure/ui-heading'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Badge} from '@instructure/ui-badge'
+import {ToggleButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
-import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconAssignmentLine,
   IconBookmarkLine,
@@ -40,9 +39,11 @@ import {
   IconCopySolid,
   IconDragHandleLine,
   IconDuplicateLine,
+  IconEditLine,
   IconLockLine,
   IconLtiLine,
   IconPeerReviewLine,
+  IconPermissionsLine,
   IconPinLine,
   IconPinSolid,
   IconPublishSolid,
@@ -51,30 +52,30 @@ import {
   IconUnpublishedLine,
   IconUpdownLine,
   IconUserLine,
-  IconPermissionsLine,
-  IconEditLine,
 } from '@instructure/ui-icons'
-import {ToggleButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
+import {Pill} from '@instructure/ui-pill'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 import DiscussionModel from '@canvas/discussions/backbone/models/DiscussionTopic'
 import LockIconView from '@canvas/lock-icon'
 
-import actions from '../actions'
-import {flowRight as compose} from 'lodash'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import DiscussionManageMenu from './DiscussionManageMenu'
-import discussionShape from '../proptypes/discussion'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
-import propTypes from '../propTypes'
-import SectionsTooltip from '@canvas/sections-tooltip'
-import select from '@canvas/obj-select'
-import UnreadBadge from '@canvas/unread-badge'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
+import select from '@canvas/obj-select'
+import SectionsTooltip from '@canvas/sections-tooltip'
+import UnreadBadge from '@canvas/unread-badge'
+import {assignLocation} from '@canvas/util/globalUtils'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
+import {flowRight as compose} from 'lodash'
 import moment from 'moment'
+import actions from '../actions'
+import propTypes from '../propTypes'
+import discussionShape from '../proptypes/discussion'
+import DiscussionManageMenu from './DiscussionManageMenu'
 
 const I18n = createI18nScope('discussion_row')
 
@@ -211,7 +212,7 @@ class DiscussionRow extends Component {
           this.props.discussion,
           {pinned: !this.props.discussion.pinned},
           this.makePinSuccessFailMessages(this.props.discussion),
-          'manageMenu'
+          'manageMenu',
         )
         break
       case 'delete':
@@ -222,7 +223,7 @@ class DiscussionRow extends Component {
           this.props.discussion,
           {locked: !this.props.discussion.locked},
           this.makeLockedSuccessFailMessages(this.props.discussion),
-          'manageMenu'
+          'manageMenu',
         )
         break
       case 'copyTo':
@@ -253,7 +254,7 @@ class DiscussionRow extends Component {
         this.props.onOpenAssignToTray(this.props.discussion)
         break
       case 'edit':
-        window.location.assign(`${this.props.discussion.html_url}/edit`)
+        assignLocation(`${this.props.discussion.html_url}/edit`)
         break
       default:
         throw new Error('Unknown manage discussion action encountered')
@@ -304,13 +305,13 @@ class DiscussionRow extends Component {
     const assignment = this.props.discussion.assignment
 
     const ungradedLockAt = this.props.discussion.ungraded_discussion_overrides?.sort((a, b) =>
-      moment.utc(b.assignment_override?.lock_at).diff(moment.utc(a.assignment_override?.lock_at))
+      moment.utc(b.assignment_override?.lock_at).diff(moment.utc(a.assignment_override?.lock_at)),
     )
 
     const ungradedUnlockAt = this.props.discussion.ungraded_discussion_overrides?.sort((a, b) =>
       moment
         .utc(b.assignment_override?.unlock_at)
-        .diff(moment.utc(a.assignment_override?.unlock_at))
+        .diff(moment.utc(a.assignment_override?.unlock_at)),
     )
 
     let availabilityBegin, availabilityEnd
@@ -432,15 +433,15 @@ class DiscussionRow extends Component {
                   title: this.props.discussion.title,
                 })
               : this.props.discussion.subscription_hold !== undefined
-              ? I18n.t('Reply to subscribe')
-              : I18n.t('Subscribe to %{title}', {title: this.props.discussion.title})
+                ? I18n.t('Reply to subscribe')
+                : I18n.t('Subscribe to %{title}', {title: this.props.discussion.title})
           }
           screenReaderLabel={
             this.props.discussion.subscribed
               ? I18n.t('Subscribed')
               : this.props.discussion.subscription_hold !== undefined
-              ? I18n.t('Reply to subscribe')
-              : I18n.t('Unsubscribed')
+                ? I18n.t('Reply to subscribe')
+                : I18n.t('Unsubscribed')
           }
           interaction={
             this.props.discussion.subscription_hold !== undefined ? 'disabled' : 'enabled'
@@ -485,7 +486,7 @@ class DiscussionRow extends Component {
               {
                 published: !this.props.discussion.published,
               },
-              {}
+              {},
             )
           }
         />
@@ -565,8 +566,8 @@ class DiscussionRow extends Component {
             <IconEditLine />
             &nbsp;&nbsp;{I18n.t('Edit')}
           </span>,
-          I18n.t('Edit discussion %{title}', {title: discussionTitle})
-        )
+          I18n.t('Edit discussion %{title}', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -585,8 +586,8 @@ class DiscussionRow extends Component {
             {' '}
             {icon}&nbsp;&nbsp;{menuLabel}{' '}
           </span>,
-          screenReaderContent
-        )
+          screenReaderContent,
+        ),
       )
     }
 
@@ -601,8 +602,8 @@ class DiscussionRow extends Component {
             <IconPermissionsLine />
             &nbsp;&nbsp;{I18n.t('Assign To...')}
           </span>,
-          I18n.t('Set Assign to for %{title}', {title: discussionTitle})
-        )
+          I18n.t('Set Assign to for %{title}', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -611,7 +612,7 @@ class DiscussionRow extends Component {
         ? I18n.t('Unpin discussion %{title}', {title: discussionTitle})
         : I18n.t('Pin discussion %{title}', {title: discussionTitle})
       menuList.push(
-        this.createMenuItem('togglepinned', this.pinMenuItemDisplay(), screenReaderContent)
+        this.createMenuItem('togglepinned', this.pinMenuItemDisplay(), screenReaderContent),
       )
     }
 
@@ -631,8 +632,8 @@ class DiscussionRow extends Component {
           >
             {I18n.t('SpeedGrader')}
           </a>,
-          I18n.t('Navigate to SpeedGrader for %{title} assignment', {title: discussionTitle})
-        )
+          I18n.t('Navigate to SpeedGrader for %{title} assignment', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -644,8 +645,8 @@ class DiscussionRow extends Component {
             <IconUpdownLine />
             &nbsp;&nbsp;{I18n.t('Move To')}
           </span>,
-          I18n.t('Move discussion %{title}', {title: discussionTitle})
-        )
+          I18n.t('Move discussion %{title}', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -657,8 +658,8 @@ class DiscussionRow extends Component {
             <IconCopySolid />
             &nbsp;&nbsp;{I18n.t('Duplicate')}
           </span>,
-          I18n.t('Duplicate discussion %{title}', {title: discussionTitle})
-        )
+          I18n.t('Duplicate discussion %{title}', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -670,8 +671,8 @@ class DiscussionRow extends Component {
             <IconUserLine />
             &nbsp;&nbsp;{I18n.t('Send To...')}
           </span>,
-          I18n.t('Send %{title} to user', {title: discussionTitle})
-        )
+          I18n.t('Send %{title} to user', {title: discussionTitle}),
+        ),
       )
       menuList.push(
         this.createMenuItem(
@@ -680,8 +681,8 @@ class DiscussionRow extends Component {
             <IconDuplicateLine />
             &nbsp;&nbsp;{I18n.t('Copy To...')}
           </span>,
-          I18n.t('Copy %{title} to course', {title: discussionTitle})
-        )
+          I18n.t('Copy %{title} to course', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -691,8 +692,8 @@ class DiscussionRow extends Component {
         this.createMenuItem(
           'masterypaths',
           <span aria-hidden="true">{I18n.t('Mastery Paths')}</span>,
-          I18n.t('Edit Mastery Paths for %{title}', {title: discussionTitle})
-        )
+          I18n.t('Edit Mastery Paths for %{title}', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -711,7 +712,7 @@ class DiscussionRow extends Component {
           >
             <span aria-hidden="true">{this.renderMenuToolIcon(menuTool)}</span>
             <ScreenReaderContent>{menuTool.title}</ScreenReaderContent>
-          </Menu.Item>
+          </Menu.Item>,
         )
       })
     }
@@ -724,8 +725,8 @@ class DiscussionRow extends Component {
             <IconTrashSolid />
             &nbsp;&nbsp;{I18n.t('Delete')}
           </span>,
-          I18n.t('Delete discussion %{title}', {title: discussionTitle})
-        )
+          I18n.t('Delete discussion %{title}', {title: discussionTitle}),
+        ),
       )
     }
 
@@ -875,7 +876,7 @@ class DiscussionRow extends Component {
           topicDate: replyToTopic ? this.props.dateFormatter(replyToTopic) : noDate,
           entryDate: replyToEntry ? this.props.dateFormatter(replyToEntry) : noDate,
           count: this.props.discussion.reply_to_entry_required_count,
-        }
+        },
       )
     }
     return (
@@ -1050,8 +1051,8 @@ class DiscussionRow extends Component {
             </span>
           </div>
         </div>,
-        {dropEffect: 'copy'}
-      )
+        {dropEffect: 'copy'},
+      ),
     )
   }
 
@@ -1168,7 +1169,7 @@ export const DraggableDiscussionRow = compose(
     connectDragSource: dConnect.dragSource(),
     isDragging: monitor.isDragging(),
     connectDragPreview: dConnect.dragPreview(),
-  }))
+  })),
 )(WrappedDiscussionRow)
 
 export {DiscussionRow} // for tests only
@@ -1176,5 +1177,5 @@ export {DiscussionRow} // for tests only
 export const ConnectedDiscussionRow = connect(mapState, mapDispatch)(WrappedDiscussionRow)
 export const ConnectedDraggableDiscussionRow = connect(
   mapState,
-  mapDispatch
+  mapDispatch,
 )(DraggableDiscussionRow)
