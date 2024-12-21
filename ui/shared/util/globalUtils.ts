@@ -45,3 +45,7 @@ export function assignLocation(url: string): void {
 export function forceReload(): void {
   window.location.search = window.location.search + '&for_reload=1'
 }
+
+export function windowAlert(message: string): void {
+  window.alert(message)
+}

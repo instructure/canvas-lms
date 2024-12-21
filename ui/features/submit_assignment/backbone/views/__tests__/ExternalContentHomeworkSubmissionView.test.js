@@ -17,8 +17,13 @@
  */
 
 import Backbone from '@canvas/backbone'
-import ExternalContentHomeworkSubmissionView from '../ExternalContentHomeworkSubmissionView'
 import sinon from 'sinon'
+import ExternalContentHomeworkSubmissionView from '../ExternalContentHomeworkSubmissionView'
+
+// mock windowAlert
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: jest.fn(),
+}))
 
 const ok = x => expect(x).toBeTruthy()
 const notOk = x => expect(x).toBeFalsy()
