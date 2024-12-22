@@ -1036,4 +1036,5 @@ export default lodashExtend(GradeSummary, {
   renderClearBadgeCountsButton,
   updateScoreForAssignment,
   updateStudentGrades,
+  bindShowAllDetailsButton,
 })
