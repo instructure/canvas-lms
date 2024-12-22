@@ -45,7 +45,7 @@ async function countAndShowRandomFile(searchPattern, description) {
     // Use git ls-files to only get tracked files, then filter by pattern
     const {stdout} = await execAsync(
       `git ls-files "ui/" "packages/" | grep -E "${searchPattern}"`,
-      {cwd: projectRoot}
+      {cwd: projectRoot},
     )
     const files = stdout.trim().split('\n').filter(Boolean)
     const fileCount = files.length
@@ -66,7 +66,7 @@ async function countTsSuppressions(type) {
   try {
     const {stdout} = await execAsync(
       `git ls-files "ui/" | grep -E "\\.(ts|tsx)$" | xargs grep -l "@${type}" | wc -l`,
-      {cwd: projectRoot}
+      {cwd: projectRoot},
     )
     return Number.parseInt(stdout.trim(), 10)
   } catch (error) {
@@ -79,7 +79,7 @@ async function getRandomTsSuppressionFile(type) {
   try {
     const {stdout} = await execAsync(
       `git ls-files "ui/" | grep -E "\\.(ts|tsx)$" | xargs grep -l "@${type}"`,
-      {cwd: projectRoot}
+      {cwd: projectRoot},
     )
     const files = stdout.trim().split('\n').filter(Boolean)
     if (files.length > 0) {
@@ -142,70 +142,62 @@ async function showJqueryImportStats() {
 
 async function checkOutdatedPackages() {
   try {
-    execSync('npm outdated --json', {
+    const output = execSync('npm outdated --json', {
       cwd: projectRoot,
       stdio: ['pipe', 'pipe', 'pipe'],
       encoding: 'utf8',
     }).toString()
 
-    // If we get here, there were no outdated packages
-    console.log(
-      colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`)
-    )
-  } catch (error) {
-    // npm outdated exits with code 1 when it finds outdated packages
-    if (error.stdout) {
-      try {
-        const outdatedData = JSON.parse(error.stdout)
-        const majorOutdated = []
+    // Parse the output if we have it, regardless of exit code
+    if (output.trim()) {
+      const outdatedData = JSON.parse(output)
+      const majorOutdated = []
 
-        for (const packageName in outdatedData) {
-          const pkg = outdatedData[packageName]
-          // Skip if we don't have all the version information
-          if (!pkg.current || !pkg.latest) continue
+      for (const packageName in outdatedData) {
+        const pkg = outdatedData[packageName]
+        // Skip if we don't have all the version information
+        if (!pkg.current || !pkg.latest) continue
 
-          const currentMajor = Number.parseInt((pkg.current || '0').split('.')[0], 10)
-          const latestMajor = Number.parseInt((pkg.latest || '0').split('.')[0], 10)
+        const currentMajor = Number.parseInt((pkg.current || '0').split('.')[0], 10)
+        const latestMajor = Number.parseInt((pkg.latest || '0').split('.')[0], 10)
 
-          if (
-            !Number.isNaN(currentMajor) &&
-            !Number.isNaN(latestMajor) &&
-            latestMajor > currentMajor
-          ) {
-            majorOutdated.push({
-              packageName,
-              current: pkg.current,
-              wanted: pkg.wanted || pkg.current,
-              latest: pkg.latest,
-            })
-          }
+        if (
+          !Number.isNaN(currentMajor) &&
+          !Number.isNaN(latestMajor) &&
+          latestMajor > currentMajor
+        ) {
+          majorOutdated.push({
+            packageName,
+            current: pkg.current,
+            wanted: pkg.wanted || pkg.current,
+            latest: pkg.latest,
+          })
         }
+      }
 
-        if (majorOutdated.length > 0) {
-          console.log(
-            colorize(
-              'yellow',
-              `- Packages outdated by major version: ${bold(majorOutdated.length)}`
-            )
-          )
-          const randomPackage = majorOutdated[Math.floor(Math.random() * majorOutdated.length)]
-          console.log(
-            colorize(
-              'gray',
-              `  Example: ${randomPackage.packageName} (current: ${randomPackage.current}, wanted: ${randomPackage.wanted}, latest: ${randomPackage.latest})`
-            )
-          )
-        } else {
-          console.log(
-            colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`)
-          )
-        }
-      } catch (parseError) {
-        console.error(colorize('red', `Error parsing npm outdated output: ${parseError.message}`))
+      if (majorOutdated.length > 0) {
+        console.log(
+          colorize('yellow', `- Packages outdated by major version: ${bold(majorOutdated.length)}`),
+        )
+        const randomPackage = majorOutdated[Math.floor(Math.random() * majorOutdated.length)]
+        console.log(
+          colorize(
+            'gray',
+            `  Example: ${randomPackage.packageName} (current: ${randomPackage.current}, wanted: ${randomPackage.wanted}, latest: ${randomPackage.latest})`,
+          ),
+        )
+      } else {
+        console.log(
+          colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`),
+        )
       }
     } else {
-      console.error(colorize('red', `Error running npm outdated: ${error.message}`))
+      console.log(
+        colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`),
+      )
     }
+  } catch (error) {
+    console.error(colorize('red', `Error running npm outdated: ${error.message}`))
   }
 }
 
@@ -214,7 +206,7 @@ async function countTestFiles() {
     // Find both *Spec.js* and *.test.js* files
     const {stdout} = await execAsync(
       `git ls-files "ui/" "packages/" | grep -E "Spec\\.(js|jsx)$"`,
-      {cwd: projectRoot}
+      {cwd: projectRoot},
     )
     const files = stdout.trim().split('\n').filter(Boolean)
     const fileCount = files.length
@@ -236,7 +228,7 @@ async function countReactDomRenderFiles() {
     // Find files containing ReactDOM.render
     const {stdout} = await execAsync(
       `git ls-files "ui/" "packages/" | xargs grep -l "ReactDOM.render"`,
-      {cwd: projectRoot}
+      {cwd: projectRoot},
     )
     const files = stdout.trim().split('\n').filter(Boolean)
     const fileCount = files.length
@@ -246,12 +238,16 @@ async function countReactDomRenderFiles() {
       const randomFile = normalizePath(files[Math.floor(Math.random() * fileCount)])
       console.log(colorize('gray', `  Example: ${randomFile}`))
     } else {
-      console.log(colorize('yellow', `- Total files with ReactDOM.render: ${colorize('green', 'None')}`))
+      console.log(
+        colorize('yellow', `- Total files with ReactDOM.render: ${colorize('green', 'None')}`),
+      )
     }
   } catch (error) {
     if (error.code === 1 && !error.stdout) {
       // grep returns exit code 1 when no matches are found
-      console.log(colorize('yellow', `- Total files with ReactDOM.render: ${colorize('green', 'None')}`))
+      console.log(
+        colorize('yellow', `- Total files with ReactDOM.render: ${colorize('green', 'None')}`),
+      )
     } else {
       console.error(colorize('red', `Error counting ReactDOM.render files: ${error.message}`))
     }
@@ -262,31 +258,31 @@ async function printDashboard() {
   console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
   console.log(
-    `${bold(colorize('white', 'Handlebars Files'))} ${colorize('gray', '(convert to React)')}`
+    `${bold(colorize('white', 'Handlebars Files'))} ${colorize('gray', '(convert to React)')}`,
   )
   await countAndShowRandomFile('.handlebars$', 'Total Handlebars files')
   console.log('')
 
   console.log(
-    `${bold(colorize('white', 'JQuery Imports'))} ${colorize('gray', '(use native DOM)')}`
+    `${bold(colorize('white', 'JQuery Imports'))} ${colorize('gray', '(use native DOM)')}`,
   )
   await showJqueryImportStats()
   console.log('')
 
   console.log(
-    `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`
+    `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`,
   )
   await countTestFiles()
   console.log('')
 
   console.log(
-    `${bold(colorize('white', 'ReactDOM.render Files'))} ${colorize('gray', '(convert to createRoot)')}`
+    `${bold(colorize('white', 'ReactDOM.render Files'))} ${colorize('gray', '(convert to createRoot)')}`,
   )
   await countReactDomRenderFiles()
   console.log('')
 
   console.log(
-    `${bold(colorize('white', 'JavaScript Files'))} ${colorize('gray', '(convert to TypeScript)')}`
+    `${bold(colorize('white', 'JavaScript Files'))} ${colorize('gray', '(convert to TypeScript)')}`,
   )
   await countAndShowRandomFile('.(js|jsx)$', 'Total JavaScript files')
   console.log('')
