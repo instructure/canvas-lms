@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 
 import StudentColumnHeader from '../StudentColumnHeader'
 import studentRowHeaderConstants from '../../../constants/studentRowHeaderConstants'
-import {blurElement, getMenuItem} from './ColumnHeaderSpecHelpers'
+import {getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
   let $container
@@ -106,197 +106,394 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
     openOptionsMenu()
   }
 
-  QUnit.module('"Options" > "Show" setting', () => {
-    function getShowOption(label) {
-      return getMenuItem($menuContent, label)
+  function closeOptionsMenu() {
+    getOptionsMenuTrigger().click()
+  }
+
+  QUnit.module('"Options" > "Secondary info" setting', () => {
+    function getSecondaryInfoOption(label) {
+      return getMenuItem($menuContent, 'Secondary info', label)
     }
 
-    QUnit.module('"Inactive enrollments" option', () => {
-      test('is always present', () => {
+    QUnit.skip('is added as a Gradebook element when opened', () => {
+      mountAndOpenOptionsMenu()
+      const $sortByMenuContent = getMenuContent($menuContent, 'Secondary info')
+      notEqual(gradebookElements.indexOf($sortByMenuContent), -1)
+    })
+
+    test('is removed as a Gradebook element when closed', () => {
+      mountAndOpenOptionsMenu()
+      const $sortByMenuContent = getMenuContent($menuContent, 'Secondary info')
+      closeOptionsMenu()
+      strictEqual(gradebookElements.indexOf($sortByMenuContent), -1)
+    })
+
+    test('is disabled when all options are disabled', () => {
+      props.disabled = true
+      mountAndOpenOptionsMenu()
+      strictEqual(getMenuItem($menuContent, 'Secondary info').getAttribute('aria-disabled'), 'true')
+    })
+
+    QUnit.module('"Section" option', () => {
+      test('is present when the course is using sections', () => {
         mountAndOpenOptionsMenu()
-        ok(getShowOption('Inactive enrollments'))
+        ok(getSecondaryInfoOption('Section'))
       })
 
-      test('is selected when showing inactive enrollments', () => {
-        props.selectedEnrollmentFilters = ['concluded', 'inactive']
+      test('is not present when the course is not using sections', () => {
+        props.sectionsEnabled = false
         mountAndOpenOptionsMenu()
-        strictEqual(getShowOption('Inactive enrollments').getAttribute('aria-checked'), 'true')
+        notOk(getSecondaryInfoOption('Section'))
       })
 
-      test('is not selected when not showing inactive enrollments', () => {
-        props.selectedEnrollmentFilters = ['concluded']
+      test('is selected when displaying sections for secondary info', () => {
+        props.selectedSecondaryInfo = 'section'
         mountAndOpenOptionsMenu()
-        strictEqual(getShowOption('Inactive enrollments').getAttribute('aria-checked'), 'false')
+        strictEqual(getSecondaryInfoOption('Section').getAttribute('aria-checked'), 'true')
       })
 
-      test('is disabled when all options are disabled', () => {
-        props.disabled = true
+      test('is not selected when displaying different secondary info', () => {
+        props.selectedSecondaryInfo = 'sis_id'
         mountAndOpenOptionsMenu()
-        strictEqual(getShowOption('Inactive enrollments').getAttribute('aria-disabled'), 'true')
+        strictEqual(getSecondaryInfoOption('Section').getAttribute('aria-checked'), 'false')
       })
 
       QUnit.module('when clicked', contextHooks => {
         contextHooks.beforeEach(() => {
-          props.onToggleEnrollmentFilter = sinon.stub()
+          props.onSelectSecondaryInfo = sinon.stub()
         })
 
-        test('calls the .onToggleEnrollmentFilter callback', () => {
+        test('calls the .onSelectSecondaryInfo callback', () => {
           mountAndOpenOptionsMenu()
-          getShowOption('Inactive enrollments').click()
-          strictEqual(props.onToggleEnrollmentFilter.callCount, 1)
+          getSecondaryInfoOption('Section').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
         })
 
-        test('includes "inactive" when calling the .onToggleEnrollmentFilter callback', () => {
+        test('includes "section" when calling the .onSelectSecondaryInfo callback', () => {
           mountAndOpenOptionsMenu()
-          getShowOption('Inactive enrollments').click()
-          const [secondaryInfoType] = props.onToggleEnrollmentFilter.lastCall.args
-          equal(secondaryInfoType, 'inactive')
+          getSecondaryInfoOption('Section').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'section')
         })
 
         test('returns focus to the "Options" menu trigger', () => {
           mountAndOpenOptionsMenu()
-          getShowOption('Inactive enrollments').focus()
-          getShowOption('Inactive enrollments').click()
+          getSecondaryInfoOption('Section').focus()
+          getSecondaryInfoOption('Section').click()
           strictEqual(document.activeElement, getOptionsMenuTrigger())
         })
+
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'section'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('Section').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
       })
     })
 
-    QUnit.module('"Concluded enrollments" option', () => {
-      test('is always present', () => {
+    QUnit.module('"Group" option', () => {
+      test('is present when the course has student groups', () => {
         mountAndOpenOptionsMenu()
-        ok(getShowOption('Concluded enrollments'))
+        ok(getSecondaryInfoOption('Group'))
       })
 
-      test('is selected when showing concluded enrollments', () => {
-        props.selectedEnrollmentFilters = ['concluded', 'inactive']
+      test('is not present when the course has no student groups', () => {
+        props.studentGroupsEnabled = false
         mountAndOpenOptionsMenu()
-        strictEqual(getShowOption('Concluded enrollments').getAttribute('aria-checked'), 'true')
+        notOk(getSecondaryInfoOption('Group'))
       })
 
-      test('is not selected when not showing concluded enrollments', () => {
-        props.selectedEnrollmentFilters = ['inactive']
+      test('is selected when displaying student groups for secondary info', () => {
+        props.selectedSecondaryInfo = 'group'
         mountAndOpenOptionsMenu()
-        strictEqual(getShowOption('Concluded enrollments').getAttribute('aria-checked'), 'false')
+        strictEqual(getSecondaryInfoOption('Group').getAttribute('aria-checked'), 'true')
       })
 
-      test('is disabled when all options are disabled', () => {
-        props.disabled = true
+      test('is not selected when displaying different secondary info', () => {
+        props.selectedSecondaryInfo = 'sis_id'
         mountAndOpenOptionsMenu()
-        strictEqual(getShowOption('Concluded enrollments').getAttribute('aria-disabled'), 'true')
+        strictEqual(getSecondaryInfoOption('Group').getAttribute('aria-checked'), 'false')
       })
 
       QUnit.module('when clicked', contextHooks => {
         contextHooks.beforeEach(() => {
-          props.onToggleEnrollmentFilter = sinon.stub()
+          props.onSelectSecondaryInfo = sinon.stub()
         })
 
-        test('calls the .onToggleEnrollmentFilter callback', () => {
+        test('calls the .onSelectSecondaryInfo callback', () => {
           mountAndOpenOptionsMenu()
-          getShowOption('Concluded enrollments').click()
-          strictEqual(props.onToggleEnrollmentFilter.callCount, 1)
+          getSecondaryInfoOption('Group').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
         })
 
-        test('includes "concluded" when calling the .onToggleEnrollmentFilter callback', () => {
+        test('includes "group" when calling the .onSelectSecondaryInfo callback', () => {
           mountAndOpenOptionsMenu()
-          getShowOption('Concluded enrollments').click()
-          const [secondaryInfoType] = props.onToggleEnrollmentFilter.lastCall.args
-          equal(secondaryInfoType, 'concluded')
+          getSecondaryInfoOption('Group').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'group')
         })
 
         test('returns focus to the "Options" menu trigger', () => {
           mountAndOpenOptionsMenu()
-          getShowOption('Concluded enrollments').focus()
-          getShowOption('Concluded enrollments').click()
+          getSecondaryInfoOption('Group').focus()
+          getSecondaryInfoOption('Group').click()
           strictEqual(document.activeElement, getOptionsMenuTrigger())
         })
-      })
-    })
-  })
 
-  QUnit.module('#handleKeyDown()', hooks => {
-    let preventDefault
-
-    hooks.beforeEach(() => {
-      preventDefault = sinon.spy()
-      mountComponent()
-    })
-
-    function handleKeyDown(which, shiftKey = false) {
-      return component.handleKeyDown({which, shiftKey, preventDefault})
-    }
-
-    QUnit.module('when the "Options" menu trigger has focus', contextHooks => {
-      contextHooks.beforeEach(() => {
-        getOptionsMenuTrigger().focus()
-      })
-
-      test('does not handle Tab', () => {
-        // This allows Grid Support Navigation to handle navigation.
-        const returnValue = handleKeyDown(9, false) // Tab
-        equal(typeof returnValue, 'undefined')
-      })
-
-      test('does not handle Shift+Tab', () => {
-        // This allows Grid Support Navigation to handle navigation.
-        const returnValue = handleKeyDown(9, true) // Shift+Tab
-        equal(typeof returnValue, 'undefined')
-      })
-
-      test('Enter opens the the "Options" menu', () => {
-        handleKeyDown(13) // Enter
-        ok($menuContent)
-      })
-
-      test('returns false for Enter', () => {
-        // This prevents additional behavior in Grid Support Navigation.
-        const returnValue = handleKeyDown(13) // Enter
-        strictEqual(returnValue, false)
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'group'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('Group').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
       })
     })
 
-    QUnit.module('when the header does not have focus', () => {
-      test('does not handle Tab', () => {
-        const returnValue = handleKeyDown(9, false) // Tab
-        equal(typeof returnValue, 'undefined')
+    QUnit.module('"SIS ID" option', () => {
+      test('displays the configured SIS name', () => {
+        props.sisName = 'Powerschool'
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('Powerschool'))
       })
 
-      test('does not handle Shift+Tab', () => {
-        const returnValue = handleKeyDown(9, true) // Shift+Tab
-        equal(typeof returnValue, 'undefined')
+      test('displays "SIS ID" when no SIS is configured', () => {
+        props.sisName = null
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('SIS ID'))
       })
 
-      test('does not handle Enter', () => {
-        const returnValue = handleKeyDown(13) // Enter
-        equal(typeof returnValue, 'undefined')
+      test('is selected when displaying SIS ids for secondary info', () => {
+        props.selectedSecondaryInfo = 'sis_id'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('SIS ID').getAttribute('aria-checked'), 'true')
+      })
+
+      test('is not selected when displaying different secondary info', () => {
+        props.selectedSecondaryInfo = 'section'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('SIS ID').getAttribute('aria-checked'), 'false')
+      })
+
+      QUnit.module('when clicked', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.onSelectSecondaryInfo = sinon.stub()
+        })
+
+        test('calls the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('SIS ID').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
+        })
+
+        test('includes "sis_id" when calling the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('SIS ID').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'sis_id')
+        })
+
+        test('returns focus to the "Options" menu trigger', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('SIS ID').focus()
+          getSecondaryInfoOption('SIS ID').click()
+          strictEqual(document.activeElement, getOptionsMenuTrigger())
+        })
+
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'sis_id'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('SIS ID').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
       })
     })
-  })
 
-  QUnit.module('focus', hooks => {
-    hooks.beforeEach(() => {
-      mountComponent()
+    QUnit.module('"Integration ID" option', () => {
+      test('is always present', () => {
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('Integration ID'))
+      })
+
+      test('is selected when displaying integration ids for secondary info', () => {
+        props.selectedSecondaryInfo = 'integration_id'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('Integration ID').getAttribute('aria-checked'), 'true')
+      })
+
+      test('is not selected when displaying different secondary info', () => {
+        props.selectedSecondaryInfo = 'section'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('Integration ID').getAttribute('aria-checked'), 'false')
+      })
+
+      QUnit.module('when clicked', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.onSelectSecondaryInfo = sinon.stub()
+        })
+
+        test('calls the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Integration ID').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
+        })
+
+        test('includes "integration_id" when calling the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Integration ID').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'integration_id')
+        })
+
+        test('returns focus to the "Options" menu trigger', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Integration ID').focus()
+          getSecondaryInfoOption('Integration ID').click()
+          strictEqual(document.activeElement, getOptionsMenuTrigger())
+        })
+
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'integration_id'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('Integration ID').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
+      })
     })
 
-    test('#focusAtStart() sets focus on the "Options" menu trigger', () => {
-      component.focusAtStart()
-      strictEqual(document.activeElement, getOptionsMenuTrigger())
+    QUnit.module('"Login ID" option', () => {
+      test('displays the configured login id name', () => {
+        props.loginHandleName = 'Email'
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('Email'))
+      })
+
+      test('displays "Login ID" when no login id name is configured', () => {
+        props.sisName = null
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('Login ID'))
+      })
+
+      test('is selected when displaying login ids for secondary info', () => {
+        props.selectedSecondaryInfo = 'login_id'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('Login ID').getAttribute('aria-checked'), 'true')
+      })
+
+      test('is not selected when displaying different secondary info', () => {
+        props.selectedSecondaryInfo = 'section'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('Login ID').getAttribute('aria-checked'), 'false')
+      })
+
+      QUnit.module('when clicked', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.onSelectSecondaryInfo = sinon.stub()
+        })
+
+        test('calls the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Login ID').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
+        })
+
+        test('includes "login_id" when calling the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Login ID').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'login_id')
+        })
+
+        test('returns focus to the "Options" menu trigger', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Login ID').focus()
+          getSecondaryInfoOption('Login ID').click()
+          strictEqual(document.activeElement, getOptionsMenuTrigger())
+        })
+
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'login_id'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('Login ID').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
+      })
     })
 
-    test('#focusAtEnd() sets focus on the "Options" menu trigger', () => {
-      component.focusAtEnd()
-      strictEqual(document.activeElement, getOptionsMenuTrigger())
-    })
+    QUnit.module('"None" option', () => {
+      test('is always present', () => {
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('None'))
+      })
 
-    test('adds the "focused" class to the header when the "Options" menu trigger receives focus', () => {
-      getOptionsMenuTrigger().focus()
-      ok($container.firstChild.classList.contains('focused'))
-    })
+      test('is selected when not displaying secondary info', () => {
+        props.selectedSecondaryInfo = 'none'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('None').getAttribute('aria-checked'), 'true')
+      })
 
-    test('removes the "focused" class from the header when focus leaves', () => {
-      getOptionsMenuTrigger().focus()
-      blurElement(getOptionsMenuTrigger())
-      notOk($container.firstChild.classList.contains('focused'))
+      test('is not selected when displaying secondary info', () => {
+        props.selectedSecondaryInfo = 'section'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('None').getAttribute('aria-checked'), 'false')
+      })
+
+      QUnit.module('when clicked', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.onSelectSecondaryInfo = sinon.stub()
+        })
+
+        test('calls the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('None').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
+        })
+
+        test('includes "none" when calling the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('None').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'none')
+        })
+
+        test('returns focus to the "Options" menu trigger', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('None').focus()
+          getSecondaryInfoOption('None').click()
+          strictEqual(document.activeElement, getOptionsMenuTrigger())
+        })
+
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'none'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('None').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
+      })
     })
   })
 })

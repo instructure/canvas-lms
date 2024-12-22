@@ -25,8 +25,8 @@ import {getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
   let $container
-  let component
   let $menuContent
+  let component
   let gradebookElements
   let props
 
@@ -110,20 +110,73 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
     getOptionsMenuTrigger().click()
   }
 
-  QUnit.module('"Options" > "Display as" setting', () => {
-    function getDisplayAsOption(label) {
-      return getMenuItem($menuContent, 'Display as', label)
+  test('displays "Student Name" as the column title', () => {
+    mountComponent()
+    ok($container.textContent.includes('Student Name'))
+  })
+
+  QUnit.module('"Options" menu trigger', () => {
+    test('is labeled with "Student Name Options"', () => {
+      mountComponent()
+      const $trigger = getOptionsMenuTrigger()
+      ok($trigger.textContent.includes('Student Name Options'))
+    })
+
+    test('opens the options menu when clicked', () => {
+      mountComponent()
+      getOptionsMenuTrigger().click()
+      ok(getOptionsMenuContent())
+    })
+
+    test('closes the options menu when clicked', () => {
+      mountAndOpenOptionsMenu()
+      getOptionsMenuTrigger().click()
+      notOk(getOptionsMenuContent())
+    })
+  })
+
+  QUnit.module('"Options" > "Sort by" setting', () => {
+    function getSortTypeOption(label) {
+      return getMenuItem($menuContent, 'Sort by', label)
+    }
+
+    function getSortOrderOption(label) {
+      return getMenuItem($menuContent, 'Sort by', label)
+    }
+
+    function getSortByNameOption() {
+      return getSortTypeOption('Name')
+    }
+
+    function getSortByLoginIdOption() {
+      return getSortTypeOption('Login ID')
+    }
+
+    function getSortBySisIdOption() {
+      return getSortTypeOption('SIS ID')
+    }
+
+    function getSortByIntegrationIdOption() {
+      return getSortTypeOption('Integration ID')
+    }
+
+    function getAscendingSortOrderOption() {
+      return getSortOrderOption('A–Z')
+    }
+
+    function getDescendingSortOrderOption() {
+      return getSortOrderOption('Z–A')
     }
 
     QUnit.skip('is added as a Gradebook element when opened', () => {
       mountAndOpenOptionsMenu()
-      const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
+      const $sortByMenuContent = getMenuContent($menuContent, 'Sort by')
       notEqual(gradebookElements.indexOf($sortByMenuContent), -1)
     })
 
     test('is removed as a Gradebook element when closed', () => {
       mountAndOpenOptionsMenu()
-      const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
+      const $sortByMenuContent = getMenuContent($menuContent, 'Sort by')
       closeOptionsMenu()
       strictEqual(gradebookElements.indexOf($sortByMenuContent), -1)
     })
@@ -131,101 +184,345 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
     test('is disabled when all options are disabled', () => {
       props.disabled = true
       mountAndOpenOptionsMenu()
-      strictEqual(getMenuItem($menuContent, 'Display as').getAttribute('aria-disabled'), 'true')
+      strictEqual(getMenuItem($menuContent, 'Sort by').getAttribute('aria-disabled'), 'true')
     })
 
-    QUnit.module('"First, Last Name" option', () => {
-      test('is selected when displaying first name before last', () => {
-        props.selectedPrimaryInfo = 'first_last'
-        mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('First, Last Name').getAttribute('aria-checked'), 'true')
+    QUnit.module('"Type" menu group', () => {
+      QUnit.module('"Name" option', () => {
+        test('is selected when sorting by sortable name', () => {
+          props.sortBySetting.settingKey = 'sortable_name'
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByNameOption().getAttribute('aria-checked'), 'true')
+        })
+
+        test('is not selected when not sorting by sortable name', () => {
+          props.sortBySetting.settingKey = 'login_id'
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByNameOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is not selected when isSortColumn is false', () => {
+          props.sortBySetting.isSortColumn = false
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByNameOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is optionally disabled', () => {
+          props.sortBySetting.disabled = true
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByNameOption().getAttribute('aria-disabled'), 'true')
+        })
+
+        QUnit.module('when clicked', contextHooks => {
+          contextHooks.beforeEach(() => {
+            props.sortBySetting.onSortBySortableName = sinon.stub()
+          })
+
+          test('calls the .sortBySetting.onSortBySortableName callback', () => {
+            mountAndOpenOptionsMenu()
+            getSortByNameOption().click()
+            strictEqual(props.sortBySetting.onSortBySortableName.callCount, 1)
+          })
+
+          test('returns focus to the "Options" menu trigger', () => {
+            mountAndOpenOptionsMenu()
+            getSortByNameOption().focus()
+            getSortByNameOption().click()
+            strictEqual(document.activeElement, getOptionsMenuTrigger())
+          })
+
+          // TODO: GRADE-____
+          QUnit.skip(
+            'does not call the .sortBySetting.onSortBySortableName callback when already selected',
+            () => {
+              props.sortBySetting.settingKey = 'sortable_name'
+              mountAndOpenOptionsMenu()
+              getSortByNameOption().focus()
+              strictEqual(props.sortBySetting.onSortBySortableName.callCount, 0)
+            }
+          )
+        })
       })
 
-      test('is not selected when displaying last name before first', () => {
-        props.selectedPrimaryInfo = 'last_first'
-        mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('First, Last Name').getAttribute('aria-checked'), 'false')
+      QUnit.module('"SIS ID" option', () => {
+        test('is selected when sorting by SIS ID', () => {
+          props.sortBySetting.settingKey = 'sis_user_id'
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortBySisIdOption().getAttribute('aria-checked'), 'true')
+        })
+
+        test('is not selected when not sorting by SIS ID', () => {
+          props.sortBySetting.settingKey = 'login_id'
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortBySisIdOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is not selected when isSortColumn is false', () => {
+          props.sortBySetting.isSortColumn = false
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortBySisIdOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is optionally disabled', () => {
+          props.sortBySetting.disabled = true
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortBySisIdOption().getAttribute('aria-disabled'), 'true')
+        })
+
+        QUnit.module('when clicked', contextHooks => {
+          contextHooks.beforeEach(() => {
+            props.sortBySetting.onSortBySisId = sinon.stub()
+          })
+
+          test('calls the .sortBySetting.onSortBySisId callback', () => {
+            mountAndOpenOptionsMenu()
+            getSortBySisIdOption().click()
+            strictEqual(props.sortBySetting.onSortBySisId.callCount, 1)
+          })
+
+          test('returns focus to the "Options" menu trigger', () => {
+            mountAndOpenOptionsMenu()
+            getSortBySisIdOption().focus()
+            getSortBySisIdOption().click()
+            strictEqual(document.activeElement, getOptionsMenuTrigger())
+          })
+
+          // TODO: GRADE-____
+          QUnit.skip(
+            'does not call the .sortBySetting.onSortBySisId callback when already selected',
+            () => {
+              props.sortBySetting.settingKey = 'sis_user_id'
+              mountAndOpenOptionsMenu()
+              getSortBySisIdOption().focus()
+              strictEqual(props.sortBySetting.onSortBySisId.callCount, 0)
+            }
+          )
+        })
       })
 
-      QUnit.module('when clicked', contextHooks => {
-        contextHooks.beforeEach(() => {
-          props.onSelectPrimaryInfo = sinon.stub()
+      QUnit.module('"Integration ID" option', () => {
+        test('is selected when sorting by integration ID', () => {
+          props.sortBySetting.settingKey = 'integration_id'
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByIntegrationIdOption().getAttribute('aria-checked'), 'true')
         })
 
-        test('calls the .onSelectPrimaryInfo callback', () => {
+        test('is not selected when not sorting by integration ID', () => {
+          props.sortBySetting.settingKey = 'login_id'
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('First, Last Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 1)
+          strictEqual(getSortByIntegrationIdOption().getAttribute('aria-checked'), 'false')
         })
 
-        test('includes "first_last" when calling the .onSelectPrimaryInfo callback', () => {
+        test('is not selected when isSortColumn is false', () => {
+          props.sortBySetting.isSortColumn = false
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('First, Last Name').click()
-          const [primaryInfoType] = props.onSelectPrimaryInfo.lastCall.args
-          equal(primaryInfoType, 'first_last')
+          strictEqual(getSortByIntegrationIdOption().getAttribute('aria-checked'), 'false')
         })
 
-        test('returns focus to the "Options" menu trigger', () => {
+        test('is optionally disabled', () => {
+          props.sortBySetting.disabled = true
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('First, Last Name').focus()
-          getDisplayAsOption('First, Last Name').click()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
+          strictEqual(getSortByIntegrationIdOption().getAttribute('aria-disabled'), 'true')
         })
 
-        // TODO: GRADE-____
-        QUnit.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
-          props.selectedPrimaryInfo = 'first_last'
+        QUnit.module('when clicked', contextHooks => {
+          contextHooks.beforeEach(() => {
+            props.sortBySetting.onSortByIntegrationId = sinon.stub()
+          })
+
+          test('calls the .sortBySetting.onSortByIntegrationId callback', () => {
+            mountAndOpenOptionsMenu()
+            getSortByIntegrationIdOption().click()
+            strictEqual(props.sortBySetting.onSortByIntegrationId.callCount, 1)
+          })
+
+          test('returns focus to the "Options" menu trigger', () => {
+            mountAndOpenOptionsMenu()
+            getSortByIntegrationIdOption().focus()
+            getSortByIntegrationIdOption().click()
+            strictEqual(document.activeElement, getOptionsMenuTrigger())
+          })
+
+          // TODO: GRADE-____
+          QUnit.skip(
+            'does not call the .sortBySetting.onSortByIntegrationId callback when already selected',
+            () => {
+              props.sortBySetting.settingKey = 'integration_id'
+              mountAndOpenOptionsMenu()
+              getSortByIntegrationIdOption().focus()
+              strictEqual(props.sortBySetting.onSortByIntegrationId.callCount, 0)
+            }
+          )
+        })
+      })
+
+      QUnit.module('"Login ID" option', () => {
+        test('is selected when sorting by login ID', () => {
+          props.sortBySetting.settingKey = 'login_id'
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('First, Last Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 0)
+          strictEqual(getSortByLoginIdOption().getAttribute('aria-checked'), 'true')
+        })
+
+        test('is not selected when not sorting by login ID', () => {
+          props.sortBySetting.settingKey = 'sortable_name'
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByLoginIdOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is not selected when isSortColumn is false', () => {
+          props.sortBySetting.isSortColumn = false
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByLoginIdOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is optionally disabled', () => {
+          props.sortBySetting.disabled = true
+          mountAndOpenOptionsMenu()
+          strictEqual(getSortByLoginIdOption().getAttribute('aria-disabled'), 'true')
+        })
+
+        QUnit.module('when clicked', contextHooks => {
+          contextHooks.beforeEach(() => {
+            props.sortBySetting.onSortByLoginId = sinon.stub()
+          })
+
+          test('calls the .sortBySetting.onSortByLoginId callback', () => {
+            mountAndOpenOptionsMenu()
+            getSortByLoginIdOption().click()
+            strictEqual(props.sortBySetting.onSortByLoginId.callCount, 1)
+          })
+
+          test('returns focus to the "Options" menu trigger', () => {
+            mountAndOpenOptionsMenu()
+            getSortByLoginIdOption().focus()
+            getSortByLoginIdOption().click()
+            strictEqual(document.activeElement, getOptionsMenuTrigger())
+          })
+
+          // TODO: GRADE-____
+          QUnit.skip(
+            'does not call the .sortBySetting.onSortByLoginId callback when already selected',
+            () => {
+              props.sortBySetting.settingKey = 'login_id'
+              mountAndOpenOptionsMenu()
+              getSortByLoginIdOption().focus()
+              strictEqual(props.sortBySetting.onSortByLoginId.callCount, 0)
+            }
+          )
         })
       })
     })
 
-    QUnit.module('"Last, First Name" option', () => {
-      test('is selected when displaying last name before first', () => {
-        props.selectedPrimaryInfo = 'last_first'
-        mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('Last, First Name').getAttribute('aria-checked'), 'true')
+    QUnit.module('"Order" menu group', () => {
+      QUnit.module('"A–Z" option', () => {
+        test('is selected when sorting in ascending order', () => {
+          props.sortBySetting.direction = 'ascending'
+          mountAndOpenOptionsMenu()
+          strictEqual(getAscendingSortOrderOption().getAttribute('aria-checked'), 'true')
+        })
+
+        test('is not selected when not sorting in ascending order', () => {
+          props.sortBySetting.direction = 'descending'
+          mountAndOpenOptionsMenu()
+          strictEqual(getAscendingSortOrderOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is not selected when isSortColumn is false', () => {
+          props.sortBySetting.isSortColumn = false
+          mountAndOpenOptionsMenu()
+          strictEqual(getAscendingSortOrderOption().getAttribute('aria-checked'), 'false')
+        })
+
+        test('is optionally disabled', () => {
+          props.sortBySetting.disabled = true
+          mountAndOpenOptionsMenu()
+          strictEqual(getAscendingSortOrderOption().getAttribute('aria-disabled'), 'true')
+        })
+
+        QUnit.module('when clicked', contextHooks => {
+          contextHooks.beforeEach(() => {
+            props.sortBySetting.onSortInAscendingOrder = sinon.stub()
+          })
+
+          test('calls the .sortBySetting.onSortInAscendingOrder callback', () => {
+            mountAndOpenOptionsMenu()
+            getAscendingSortOrderOption().click()
+            strictEqual(props.sortBySetting.onSortInAscendingOrder.callCount, 1)
+          })
+
+          test('returns focus to the "Options" menu trigger', () => {
+            mountAndOpenOptionsMenu()
+            getAscendingSortOrderOption().focus()
+            getAscendingSortOrderOption().click()
+            strictEqual(document.activeElement, getOptionsMenuTrigger())
+          })
+
+          // TODO: GRADE-____
+          QUnit.skip(
+            'does not call the .sortBySetting.onSortInAscendingOrder callback when already selected',
+            () => {
+              props.sortBySetting.direction = 'ascending'
+              mountAndOpenOptionsMenu()
+              getAscendingSortOrderOption().click()
+              strictEqual(props.sortBySetting.onSortBySortableNameAscending.callCount, 0)
+            }
+          )
+        })
       })
 
-      test('is not selected when displaying first name before last', () => {
-        props.selectedPrimaryInfo = 'first_last'
-        mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('Last, First Name').getAttribute('aria-checked'), 'false')
-      })
-
-      QUnit.module('when clicked', contextHooks => {
-        contextHooks.beforeEach(() => {
-          props.onSelectPrimaryInfo = sinon.stub()
+      QUnit.module('"Z–A" option', () => {
+        test('is selected when sorting in descending order', () => {
+          props.sortBySetting.direction = 'descending'
+          mountAndOpenOptionsMenu()
+          strictEqual(getDescendingSortOrderOption().getAttribute('aria-checked'), 'true')
         })
 
-        test('calls the .onSelectPrimaryInfo callback', () => {
+        test('is not selected when not sorting in descending order', () => {
+          props.sortBySetting.direction = 'ascending'
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('Last, First Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 1)
+          strictEqual(getDescendingSortOrderOption().getAttribute('aria-checked'), 'false')
         })
 
-        test('includes "last_first" when calling the .onSelectPrimaryInfo callback', () => {
+        test('is not selected when isSortColumn is false', () => {
+          props.sortBySetting.isSortColumn = false
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('Last, First Name').click()
-          const [primaryInfoType] = props.onSelectPrimaryInfo.lastCall.args
-          equal(primaryInfoType, 'last_first')
+          strictEqual(getDescendingSortOrderOption().getAttribute('aria-checked'), 'false')
         })
 
-        test('returns focus to the "Options" menu trigger', () => {
+        test('is optionally disabled', () => {
+          props.sortBySetting.disabled = true
           mountAndOpenOptionsMenu()
-          getDisplayAsOption('Last, First Name').focus()
-          getDisplayAsOption('Last, First Name').click()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
+          strictEqual(getDescendingSortOrderOption().getAttribute('aria-disabled'), 'true')
         })
 
-        // TODO: GRADE-____
-        QUnit.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
-          props.selectedPrimaryInfo = 'last_first'
-          mountAndOpenOptionsMenu()
-          getDisplayAsOption('Last, First Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 0)
+        QUnit.module('when clicked', contextHooks => {
+          contextHooks.beforeEach(() => {
+            props.sortBySetting.onSortInDescendingOrder = sinon.stub()
+          })
+
+          test('calls the .sortBySetting.onSortInDescendingOrder callback', () => {
+            mountAndOpenOptionsMenu()
+            getDescendingSortOrderOption().click()
+            strictEqual(props.sortBySetting.onSortInDescendingOrder.callCount, 1)
+          })
+
+          test('returns focus to the "Options" menu trigger', () => {
+            mountAndOpenOptionsMenu()
+            getDescendingSortOrderOption().focus()
+            getDescendingSortOrderOption().click()
+            strictEqual(document.activeElement, getOptionsMenuTrigger())
+          })
+
+          // TODO: GRADE-____
+          QUnit.skip(
+            'does not call the .sortBySetting.onSortInDescendingOrder callback when already selected',
+            () => {
+              props.sortBySetting.direction = 'ascending'
+              mountAndOpenOptionsMenu()
+              getDescendingSortOrderOption().click()
+              strictEqual(props.sortBySetting.onSortBySortableNameDescending.callCount, 0)
+            }
+          )
         })
       })
     })
