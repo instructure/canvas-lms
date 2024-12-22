@@ -130,11 +130,50 @@ async function getRandomJqueryImportFile() {
   return null
 }
 
+async function countReactTestUtilsImports() {
+  try {
+    const cmd =
+      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]react-dom/test-utils[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting React test utils imports: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomReactTestUtilsImportFile() {
+  try {
+    const cmd =
+      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]react-dom/test-utils[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    if (files.length > 0) {
+      return normalizePath(files[Math.floor(Math.random() * files.length)])
+    }
+  } catch (error) {
+    console.error(colorize('red', `Error finding ReactTestUtils import example: ${error.message}`))
+  }
+  return null
+}
+
 async function showJqueryImportStats() {
   const count = await countJqueryImports()
   const randomFile = await getRandomJqueryImportFile()
 
   console.log(colorize('yellow', `- Files with jQuery imports: ${bold(count)}`))
+  if (randomFile) {
+    console.log(colorize('gray', `  Example: ${randomFile}`))
+  }
+}
+
+async function showReactTestUtilsImportStats() {
+  const count = await countReactTestUtilsImports()
+  const randomFile = await getRandomReactTestUtilsImportFile()
+
+  console.log(colorize('yellow', `- Files with ReactTestUtils imports: ${bold(count)}`))
   if (randomFile) {
     console.log(colorize('gray', `  Example: ${randomFile}`))
   }
@@ -254,8 +293,60 @@ async function countReactDomRenderFiles() {
   }
 }
 
+async function countReactClassComponentFiles() {
+  try {
+    // Find files containing class components using both patterns
+    const {stdout: reactComponentStdout} = await execAsync(
+      `git ls-files "ui/" "packages/" | xargs grep -l "extends React.Component"`,
+      {cwd: projectRoot},
+    )
+    const {stdout: componentStdout} = await execAsync(
+      `git ls-files "ui/" "packages/" | xargs grep -l "extends Component"`,
+      {cwd: projectRoot},
+    )
+
+    const reactComponentFiles = reactComponentStdout.trim().split('\n').filter(Boolean)
+    const componentFiles = componentStdout.trim().split('\n').filter(Boolean)
+
+    // Combine and deduplicate files
+    const allFiles = [...new Set([...reactComponentFiles, ...componentFiles])]
+    const fileCount = allFiles.length
+
+    if (fileCount > 0) {
+      console.log(colorize('yellow', `- Total files with class components: ${bold(fileCount)}`))
+      const randomFile = normalizePath(allFiles[Math.floor(Math.random() * fileCount)])
+      console.log(colorize('gray', `  Example: ${randomFile}`))
+    } else {
+      console.log(
+        colorize('yellow', `- Total files with class components: ${colorize('green', 'None')}`),
+      )
+    }
+  } catch (error) {
+    if (error.code === 1 && !error.stdout) {
+      // grep returns exit code 1 when no matches are found
+      console.log(
+        colorize('yellow', `- Total files with class components: ${colorize('green', 'None')}`),
+      )
+    } else {
+      console.error(colorize('red', `Error counting class component files: ${error.message}`))
+    }
+  }
+}
+
 async function printDashboard() {
   console.log(bold(colorize('green', '\nTech Debt Summary\n')))
+
+  console.log(
+    `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`,
+  )
+  await countTestFiles()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'ReactTestUtils Imports'))} ${colorize('gray', '(use testing-library)')}`,
+  )
+  await showReactTestUtilsImportStats()
+  console.log('')
 
   console.log(
     `${bold(colorize('white', 'Handlebars Files'))} ${colorize('gray', '(convert to React)')}`,
@@ -270,15 +361,15 @@ async function printDashboard() {
   console.log('')
 
   console.log(
-    `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`,
-  )
-  await countTestFiles()
-  console.log('')
-
-  console.log(
     `${bold(colorize('white', 'ReactDOM.render Files'))} ${colorize('gray', '(convert to createRoot)')}`,
   )
   await countReactDomRenderFiles()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'React Class Component Files'))} ${colorize('gray', '(convert to function components)')}`,
+  )
+  await countReactClassComponentFiles()
   console.log('')
 
   console.log(
