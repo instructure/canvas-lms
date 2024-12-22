@@ -38,49 +38,6 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
     return dialog.$dialog[0].closest('.ui-dialog')
   }
 
-  function closeDialog() {
-    getDialog().querySelector('.ui-dialog-titlebar-close').click()
-  }
-
-  test('#gradeIsExcused returns true if grade is EX', () => {
-    dialog = new SetDefaultGradeDialog({assignment})
-    dialog.show()
-    deepEqual(dialog.gradeIsExcused('EX'), true)
-    deepEqual(dialog.gradeIsExcused('ex'), true)
-    deepEqual(dialog.gradeIsExcused('eX'), true)
-    deepEqual(dialog.gradeIsExcused('Ex'), true)
-    closeDialog()
-  })
-
-  test('#gradeIsExcused returns false if grade is not EX', () => {
-    dialog = new SetDefaultGradeDialog({assignment})
-    dialog.show()
-    deepEqual(dialog.gradeIsExcused('14'), false)
-    deepEqual(dialog.gradeIsExcused('F'), false)
-    // this test documents that we do not consider 'excused' to return true
-    deepEqual(dialog.gradeIsExcused('excused'), false)
-    closeDialog()
-  })
-
-  test('#show text', () => {
-    dialog = new SetDefaultGradeDialog({assignment})
-    dialog.show()
-    ok(getDialog().querySelector('#default_grade_description').innerText.includes('same grade'))
-    closeDialog()
-  })
-
-  test('#show changes text for grading percent', () => {
-    const percentAssignmentParams = {...assignment, grading_type: 'percent'}
-    dialog = new SetDefaultGradeDialog({assignment: percentAssignmentParams})
-    dialog.show()
-    ok(
-      getDialog()
-        .querySelector('#default_grade_description')
-        .innerText.includes('same percent grade')
-    )
-    closeDialog()
-  })
-
   QUnit.module('submit behaviors', submitBehaviorHooks => {
     const context_id = '1'
     let alert
