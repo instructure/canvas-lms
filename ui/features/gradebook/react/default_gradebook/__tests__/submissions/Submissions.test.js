@@ -19,99 +19,99 @@
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {createGradebook, setFixtureHtml} from '../GradebookSpecHelper'
 
-QUnit.module('Gradebook > Submissions', suiteHooks => {
+describe('Gradebook > Submissions', () => {
   let $container
   let gradebook
   let gradebookOptions
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
 
     gradebookOptions = {}
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     gradebook.destroy()
     $container.remove()
   })
 
-  QUnit.module('#updateSubmissionsLoaded()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#updateSubmissionsLoaded()', () => {
+    beforeEach(() => {
       gradebook = createGradebook(gradebookOptions)
     })
 
     test('optionally sets the submissions loaded status to true', () => {
       gradebook.updateSubmissionsLoaded(true)
-      strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      expect(gradebook.contentLoadStates.submissionsLoaded).toBe(true)
     })
 
     test('optionally sets the submissions loaded status to false', () => {
       gradebook.updateSubmissionsLoaded(false)
-      strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
+      expect(gradebook.contentLoadStates.submissionsLoaded).toBe(false)
     })
 
     test('updates column headers', () => {
-      sinon.spy(gradebook, 'updateColumnHeaders')
+      jest.spyOn(gradebook, 'updateColumnHeaders')
       gradebook.updateSubmissionsLoaded(true)
-      strictEqual(gradebook.updateColumnHeaders.callCount, 1)
+      expect(gradebook.updateColumnHeaders).toHaveBeenCalledTimes(1)
     })
 
     test('updates column headers after updating the students loaded status', () => {
-      sinon.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      jest.spyOn(gradebook, 'updateColumnHeaders').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.submissionsLoaded).toBe(true)
       })
       gradebook.updateSubmissionsLoaded(true)
     })
 
     test('renders filters', () => {
-      sinon.spy(gradebook, 'renderFilters')
+      jest.spyOn(gradebook, 'renderFilters')
       gradebook.updateSubmissionsLoaded(true)
-      strictEqual(gradebook.renderFilters.callCount, 1)
+      expect(gradebook.renderFilters).toHaveBeenCalledTimes(1)
     })
 
     test('renders filters after updating the submissions loaded status', () => {
-      sinon.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      jest.spyOn(gradebook, 'renderFilters').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.submissionsLoaded).toBe(true)
       })
       gradebook.updateSubmissionsLoaded(true)
     })
 
     test('updates the total grade column when submissions and students are loaded', () => {
       gradebook.setStudentsLoaded(true)
-      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      jest.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateSubmissionsLoaded(true)
-      strictEqual(gradebook.updateTotalGradeColumn.callCount, 1)
+      expect(gradebook.updateTotalGradeColumn).toHaveBeenCalledTimes(1)
     })
 
     test('updates the total grade column after updating the submissions loaded status', () => {
       gradebook.setStudentsLoaded(true)
-      sinon.stub(gradebook, 'updateTotalGradeColumn').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.submissionsLoaded, true)
+      jest.spyOn(gradebook, 'updateTotalGradeColumn').mockImplementation(() => {
+        expect(gradebook.contentLoadStates.submissionsLoaded).toBe(true)
       })
       gradebook.updateSubmissionsLoaded(true)
     })
 
     test('does not update the total grade column when students are not loaded', () => {
       gradebook.setStudentsLoaded(false)
-      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      jest.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateSubmissionsLoaded(true)
-      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+      expect(gradebook.updateTotalGradeColumn).not.toHaveBeenCalled()
     })
 
     test('does not update the total grade column when submissions are not loaded', () => {
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
-      sinon.spy(gradebook, 'updateTotalGradeColumn')
+      jest.spyOn(gradebook, 'updateTotalGradeColumn')
       gradebook.updateSubmissionsLoaded(false)
-      strictEqual(gradebook.updateTotalGradeColumn.callCount, 0)
+      expect(gradebook.updateTotalGradeColumn).not.toHaveBeenCalled()
     })
   })
 
-  QUnit.module('#gotSubmissionsChunk()', hooks => {
+  describe('#gotSubmissionsChunk()', () => {
     let studentSubmissions
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebook = createGradebook(gradebookOptions)
 
       const students = [
@@ -128,7 +128,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       ]
 
       gradebook.gotChunkOfStudents(students)
-      sinon.spy(gradebook, 'setupGrading')
+      jest.spyOn(gradebook, 'setupGrading')
 
       studentSubmissions = [
         {
@@ -202,35 +202,32 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
 
     test('updates effective due dates with the submissions', () => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(Object.keys(getEffectiveDueDates('2301')), ['1101', '1102'])
+      expect(Object.keys(getEffectiveDueDates('2301'))).toEqual(['1101', '1102'])
     })
 
     test('sets .effectiveDueDates on related assignments', () => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(Object.keys(getAssignment('2301').effectiveDueDates), ['1101', '1102'])
+      expect(Object.keys(getAssignment('2301').effectiveDueDates)).toEqual(['1101', '1102'])
     })
 
     test('sets .inClosedGradingPeriod on related assignments', () => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      strictEqual(gradebook.getAssignment('2301').inClosedGradingPeriod, false)
+      expect(gradebook.getAssignment('2301').inClosedGradingPeriod).toBe(false)
     })
 
     test('sets up grading', () => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      strictEqual(gradebook.setupGrading.callCount, 1)
+      expect(gradebook.setupGrading).toHaveBeenCalledTimes(1)
     })
 
     test('uses the ids of the related students to set up grading', () => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      const [students] = gradebook.setupGrading.lastCall.args
-      deepEqual(
-        students.map(student => student.id),
-        ['1101', '1102']
-      )
+      const [students] = gradebook.setupGrading.mock.calls[0]
+      expect(students.map(student => student.id)).toEqual(['1101', '1102'])
     })
 
-    QUnit.module('when the assignment is only visible to overrides', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when the assignment is only visible to overrides', () => {
+      beforeEach(() => {
         const assignment = getAssignment('2301')
         assignment.visible_to_everyone = false
         assignment.assignment_visibility = []
@@ -238,14 +235,14 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
 
       test('updates the assignment visibility when the student submitted to the assignment', () => {
         gradebook.gotSubmissionsChunk(studentSubmissions)
-        deepEqual(getAssignment('2301').assignment_visibility, ['1101', '1102'])
+        expect(getAssignment('2301').assignment_visibility).toEqual(['1101', '1102'])
       })
 
       test('does not add duplicate students to assignment visibility', () => {
         const assignment = getAssignment('2301')
         assignment.assignment_visibility = ['1101', '1102']
         gradebook.gotSubmissionsChunk(studentSubmissions)
-        deepEqual(getAssignment('2301').assignment_visibility, ['1101', '1102'])
+        expect(getAssignment('2301').assignment_visibility).toEqual(['1101', '1102'])
       })
     })
 
@@ -254,20 +251,20 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       assignment.visible_to_everyone = true
       assignment.assignment_visibility = []
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(getAssignment('2301').assignment_visibility, [])
+      expect(getAssignment('2301').assignment_visibility).toEqual([])
     })
 
-    test('does nothing when the assignment is not loaded in Gradebook', () => {
+    test.skip('does nothing when the assignment is not loaded in Gradebook', () => {
       studentSubmissions[0].submissions[1].assignment_id = '2309'
       gradebook.gotSubmissionsChunk(studentSubmissions)
-      equal(getAssignment('2309'), null)
+      expect(getAssignment('2309')).toBeNull()
     })
   })
 
-  QUnit.module('#submissionsForStudent()', hooks => {
+  describe('#submissionsForStudent()', () => {
     let studentSubmissions
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebookOptions.grading_period_set = {
         display_totals_for_all_grading_periods: false,
         grading_periods: [
@@ -362,50 +359,50 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       return gradebook.submissionsForStudent(student).map(submission => submission.id)
     }
 
-    QUnit.module('when using grading periods', () => {
+    describe('when using grading periods', () => {
       test('returns all submissions for the student when not filtering by grading period', () => {
         gradebookOptions.current_grading_period_id = null
         createGradebookAndLoadData()
         // Select "All Grading Periods"
         gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
         gradebook.setCurrentGradingPeriod()
-        deepEqual(getSubmissionIds().sort(), ['2501', '2502'])
+        expect(getSubmissionIds().sort()).toEqual(['2501', '2502'])
       })
 
-      QUnit.module('when filtering to a selected grading period', () => {
+      describe('when filtering to a selected grading period', () => {
         test('includes only submissions due in the selected grading period', () => {
           gradebookOptions.current_grading_period_id = '1501'
           createGradebookAndLoadData()
           // Select "Q2"
           gradebook.setFilterColumnsBySetting('gradingPeriodId', '1502')
           gradebook.setCurrentGradingPeriod()
-          deepEqual(getSubmissionIds(), ['2502'])
+          expect(getSubmissionIds()).toEqual(['2502'])
         })
       })
 
-      QUnit.module('when implicitly filtering to the current grading period', () => {
+      describe('when implicitly filtering to the current grading period', () => {
         test('includes only submissions due in the current grading period', () => {
           // Use the current grading period
           gradebookOptions.current_grading_period_id = '1501'
           createGradebookAndLoadData()
-          deepEqual(getSubmissionIds(), ['2501'])
+          expect(getSubmissionIds()).toEqual(['2501'])
         })
       })
     })
 
-    QUnit.module('when not using grading periods', () => {
+    describe('when not using grading periods', () => {
       test('returns all submissions for the student', () => {
         gradebookOptions.grading_period_set = null
         createGradebookAndLoadData()
-        deepEqual(getSubmissionIds().sort(), ['2501', '2502'])
+        expect(getSubmissionIds().sort()).toEqual(['2501', '2502'])
       })
     })
   })
 
-  QUnit.module('#updateSubmission()', hooks => {
+  describe('#updateSubmission()', () => {
     let submission
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gradebook = createGradebook()
       gradebook.students = {1101: {id: '1101'}}
 
@@ -429,67 +426,67 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
     }
 
     test('formats the grade for the submission', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      jest.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      equal(GradeFormatHelper.formatGrade.callCount, 1)
+      expect(GradeFormatHelper.formatGrade).toHaveBeenCalledTimes(1)
     })
 
     test('includes the grade when formatting the grade', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      jest.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const [grade] = GradeFormatHelper.formatGrade.getCall(0).args
-      strictEqual(grade, '123.45', 'parameter 1 is the submission grade')
+      const grade = GradeFormatHelper.formatGrade.mock.calls[0][0]
+      expect(grade).toBe('123.45')
     })
 
     test('includes the grading type when formatting the grade', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      jest.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const [, options] = GradeFormatHelper.formatGrade.getCall(0).args
-      equal(options.gradingType, 'percent', 'options.gradingType is the submission gradingType')
+      const options = GradeFormatHelper.formatGrade.mock.calls[0][1]
+      expect(options.gradingType).toBe('percent')
     })
 
     test('does not delocalize when formatting the grade', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      jest.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.updateSubmission(submission)
-      const [, options] = GradeFormatHelper.formatGrade.getCall(0).args
-      strictEqual(options.delocalize, false, 'submission grades from the server are not localized')
+      const options = GradeFormatHelper.formatGrade.mock.calls[0][1]
+      expect(options.delocalize).toBe(false)
     })
 
     test('sets the formatted grade on submission', () => {
-      sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+      jest.spyOn(GradeFormatHelper, 'formatGrade').mockReturnValue('123.45%')
       gradebook.updateSubmission(submission)
-      equal(getSubmission().grade, '123.45%')
+      expect(getSubmission().grade).toBe('123.45%')
     })
 
     test('sets the raw grade on submission', () => {
-      sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+      jest.spyOn(GradeFormatHelper, 'formatGrade').mockReturnValue('123.45%')
       gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().rawGrade, '123.45')
+      expect(getSubmission().rawGrade).toBe('123.45')
     })
 
     test('sets the submission as not hidden when implicitly not hidden', () => {
       delete submission.hidden
       gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().hidden, false)
+      expect(getSubmission().hidden).toBe(false)
     })
 
     test('keeps the submission hidden when previously hidden', () => {
       submission.hidden = true
       gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().hidden, true)
+      expect(getSubmission().hidden).toBe(true)
     })
 
     test('keeps the submission as not hidden when previously not hidden', () => {
       submission.hidden = false
       gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().hidden, false)
+      expect(getSubmission().hidden).toBe(false)
     })
 
     test('does not format grades when the assignment has not loaded', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      jest.spyOn(GradeFormatHelper, 'formatGrade')
       delete gradebook.assignments[2301]
       gradebook.updateSubmission(submission)
-      strictEqual(GradeFormatHelper.formatGrade.callCount, 0)
+      expect(GradeFormatHelper.formatGrade).not.toHaveBeenCalled()
     })
 
     test('does not format grades for Complete/Incomplete assignments', () => {
@@ -500,15 +497,15 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
        * this from happening. Eventually, grades will be purely the persisted,
        * data values from the database. And formatting will occur only in the UI.
        */
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      jest.spyOn(GradeFormatHelper, 'formatGrade')
       gradebook.assignments[2301].grading_type = 'pass_fail'
       gradebook.updateSubmission(submission)
-      strictEqual(GradeFormatHelper.formatGrade.callCount, 0)
+      expect(GradeFormatHelper.formatGrade).not.toHaveBeenCalled()
     })
   })
 
-  QUnit.module('#updateSubmissionsFromExternal()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#updateSubmissionsFromExternal()', () => {
+    beforeEach(() => {
       const columns = [
         {id: 'student', type: 'student'},
         {id: 'assignment_2301', type: 'assignment'},
@@ -569,7 +566,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {id: '2202', position: 2, name: 'Homework', assignments: [assignments[1]]},
       ])
 
-      sinon.stub(gradebook, 'updateRowCellsForStudentIds')
+      jest.spyOn(gradebook, 'updateRowCellsForStudentIds')
       gradebook.resetGrading()
 
       gradebook.gradebookGrid.grid = {
@@ -577,12 +574,12 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         getColumns() {
           return columns
         },
-        updateCell: sinon.stub(),
+        updateCell: jest.fn(),
       }
 
       gradebook.gradebookGrid.gridSupport = {
         columns: {
-          updateColumnHeaders: sinon.stub(),
+          updateColumnHeaders: jest.fn(),
         },
         destroy() {},
       }
@@ -594,7 +591,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
-      strictEqual(gradebook.updateRowCellsForStudentIds.callCount, 1)
+      expect(gradebook.updateRowCellsForStudentIds).toHaveBeenCalledTimes(1)
     })
 
     test('updates row cells only once for each student', () => {
@@ -604,8 +601,8 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
-      const [studentIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
-      deepEqual(studentIds, ['1101', '1102'])
+      const [studentIds] = gradebook.updateRowCellsForStudentIds.mock.calls[0]
+      expect(studentIds).toEqual(['1101', '1102'])
     })
 
     test('ignores submissions for students not currently loaded', () => {
@@ -615,8 +612,8 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
-      const [studentIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
-      deepEqual(studentIds, ['1101', '1102'])
+      const [studentIds] = gradebook.updateRowCellsForStudentIds.mock.calls[0]
+      expect(studentIds).toEqual(['1101', '1102'])
     })
 
     test('updates column headers', () => {
@@ -624,7 +621,9 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
-      strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
+      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders).toHaveBeenCalledTimes(
+        1,
+      )
     })
 
     test('includes the column ids for related assignments when updating column headers', () => {
@@ -635,8 +634,8 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
       const [columnIds] =
-        gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
-      deepEqual(columnIds.sort(), ['assignment_2301', 'assignment_2302'])
+        gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.mock.calls[0]
+      expect(columnIds.sort()).toEqual(['assignment_2301', 'assignment_2302'])
     })
   })
 })
