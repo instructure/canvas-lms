@@ -9098,6 +9098,7 @@ hy:
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle ներմուծող"
   main_navigation_3f080c80: "Հիմնական նավարկում"
+  make_it_public_71bf2a86: "Դարձնել հանրությանը հասանելի"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Համոզվեք, որ ընտրել եք ամենահարմար տարբերակը, քանի որ դա ԿԱՐՈՂ Է ազդել ունկնդիրների գնահատականների վրա:"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Դարձրեք այս դասընթացը հանրության համար տեսանելի (ունկնդիրների տվյալները կմնան գաղտնի):"
   malformed_csv_aaa4b7f2: "Սխալ ձևավորված CSV ֆայլ"
@@ -11968,6 +11969,7 @@ hy:
     loading_more_results: "Բեռնում է լրացուցիչ արդյունքներ"
   parent_signup_b7c6bf0a: "Ծնողների գրանցում"
   parents_sign_up_here_f0aa8f4f: "Ծնողներն այստեղ են գրանցվում"
+  participated_6279fba: "Մասնակցել է"
   participations_1823832d: Մասնակցություններ
   pass_fail_3d9461b0: Հանձնած/չհանձնած
   password_8a271b1c: Գաղտնաբառ
@@ -14955,6 +14957,7 @@ hy:
   section_ends_at_bb9df3c0: "Բաժինն ավարտվում է "
   section_filter_cde54d0a: "Բաժնի ֆիլտր"
   section_id_8ec4f46f: "Բաժնի նույնականացուցիչը"
+  section_name_16ea8a4a: "Բաժնի անվանում"
   section_name_b6d82574: "Բաժնի անվանում"
   section_name_edb51b2: "բաժնի անվանում"
   section_sis_id_6f989834: "sis բաժնի id"
@@ -17016,6 +17019,7 @@ hy:
   unpublished_courses_title: "Չհրապարակված դասընթացներ"
   unpublished_dfd8801: չհրապարակված
   unread_e9c1b19c: Չընթերցված
+  unrecognized_browser_1fd80dfb: "Չճանաչված բրաուզեր"
   unstar_b84daaef: "Հանել աստղիկը"
   unstarted_932f2990: "Չի սկսվել"
   unsubscribe_8be438ff: "Հանել բաժանորդագրությունը"
