@@ -524,7 +524,7 @@ const RatingRow = ({
                   {criterionUseRange && (
                     <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
                       <View as="span" margin="0 small 0 0">
-                        {rangeStart ? `${rangeStart} to ` : `--`}
+                      {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
                     </Flex.Item>
                   )}
