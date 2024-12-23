@@ -14171,6 +14171,7 @@ hu:
   main_text_color_7d65ab1b: "Szöveg színe"
   maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Karbantartási ablakok:a hónap %{days} %{weekday} napja ettől %{time_range} (%{utc_time_range} UTC )\n\
       \x20       "
+  make_it_public_71bf2a86: "Tegye nyilvánossá"
   make_key_developername_invisible_212ecf72: "A kulcs %{developerName} láthatatlanná tétele"
   make_key_developername_visible_97c404bf: "A kulcs %{developerName} láthatóvá tétele"
   make_key_invisible_e66af89: "Láthatatlanná teszi a kulcsot"
@@ -18027,6 +18028,7 @@ hu:
   participantcount_less_8d258f6: "%{participantCount} kevesebb"
   participantcount_more_50363e55: "%{participantCount} több"
   participants_must_respond_to_the_topic_before_view_27a0395a: "A résztvevőknek a többi válasz megtekintése előtt válaszolniuk kell a témára."
+  participated_6279fba: "Részt vett"
   participation_af2598: Részvétel
   participations_1823832d: Résztvevők
   pass_2a8c4f07: megfelelt
@@ -21819,6 +21821,7 @@ hu:
   section_id_6f73f3d5: szekcióazonosító
   section_id_8ec4f46f: Szekcióazonosító
   section_id_b5aad4a7: "Szekció azonosító"
+  section_name_16ea8a4a: Szekciónév
   section_name_b6d82574: "Szekció neve"
   section_name_edb51b2: szekciónév
   section_name_fa2b80d7: "Szekció neve:"
@@ -26073,6 +26076,7 @@ hu:
   unread_rubric_assessment_2b2d5c47: "Olvasatlan Értékelőtábla értékelés"
   unreadcount_unread_9b2af1e7: "%{unreadCount} olvasatlan"
   unreadcount_unread_replies_509e167f: "%{unreadCount} olvasatlan válasz"
+  unrecognized_browser_1fd80dfb: "Ismeretlen böngésző"
   unregister_service_985238e9: "Nem regisztrált szolgáltatás"
   unreserved_e86b7425: "Nem lefoglalt"
   unsafe_file_link_8a18eceb: "nem biztonságos fájl hivatkozás"
