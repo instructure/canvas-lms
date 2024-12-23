@@ -6,7 +6,7 @@
   "types": "es/index.d.ts",
   "owner": "LF",
   "scripts": {
-    "i18n:extract": "format-message extract \"src/**/*.[jt]s*\" -g underscored_crc32 -o locales/en.json",
+    "i18n:extract": "format-message extract \"src/**/*.{js,jsx,ts,tsx}\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",
     "lint": "eslint --quiet",
     "lint:fix": "eslint --quiet --fix",
