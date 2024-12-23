@@ -15428,6 +15428,7 @@ nn:
   main_navigation_3f080c80: Hovednavigasjon
   main_text_color_7d65ab1b: Hovudtekstfarge
   maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Vedlikehaldsvindauge: %{days} %{weekday} i månaden frå %{time_range} (%{utc_time_range} UTC)"
+  make_it_public_71bf2a86: "Endre til Offentleg"
   make_key_developername_invisible_212ecf72: "Gjer nøkkel %{developerName} usynleg"
   make_key_developername_visible_97c404bf: "Gjer nøkkel %{developerName} synleg"
   make_key_invisible_e66af89: "Gjer nøkkel usynleg"
@@ -19359,6 +19360,7 @@ nn:
   partially_enabled_cd506819: "Delvis skrudd på"
   participantcount_less_8d258f6: "%{participantCount}mindre"
   participantcount_more_50363e55: "%{participantCount}meir"
+  participated_6279fba: Deltok
   participation_af2598: Deltaking
   participations_1823832d: Deltakingar
   pass_2a8c4f07: godkjend
@@ -23289,6 +23291,7 @@ nn:
   section_id_6f73f3d5: seksjon-ID
   section_id_8ec4f46f: Seksjon-ID
   section_id_b5aad4a7: Seksjon-ID
+  section_name_16ea8a4a: Seksjonsnamn
   section_name_b6d82574: Seksjonsnamn
   section_name_edb51b2: "namn på seksjon"
   section_name_fa2b80d7: "Seksjonsnamn:"
@@ -27907,6 +27910,7 @@ nn:
   unread_rubric_assessment_2b2d5c47: "Ulest vurderingsskjemavurdering"
   unreadcount_unread_9b2af1e7: "%{unreadCount} ulest"
   unreadcount_unread_replies_509e167f: "%{unreadCount} uleste svar"
+  unrecognized_browser_1fd80dfb: "Ukjend nettlesar"
   unregister_service_985238e9: "Fjern denne tenesta"
   unreserved_e86b7425: "Ikkje reservert"
   unsafe_file_link_8a18eceb: "usikker fil-lenke"
