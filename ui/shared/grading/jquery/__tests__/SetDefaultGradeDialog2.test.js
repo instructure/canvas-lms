@@ -18,14 +18,17 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-
+import sinon from 'sinon'
 import SetDefaultGradeDialog from '../SetDefaultGradeDialog'
 
-QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
+const sandbox = sinon.createSandbox()
+const server = sinon.fakeServer.create()
+
+describe('Shared > SetDefaultGradeDialog', () => {
   let assignment
   let dialog
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     assignment = {
       grading_type: 'points',
       id: '2',
@@ -38,7 +41,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
     return dialog.$dialog[0].closest('.ui-dialog')
   }
 
-  QUnit.module('submit behaviors', submitBehaviorHooks => {
+  describe('submit behaviors', () => {
     const context_id = '1'
     let alert
 
@@ -49,21 +52,20 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
     }
 
     function respondWithPayload(payload) {
-      sandbox.server.respondWith('POST', `/courses/${context_id}/gradebook/update_submission`, [
+      server.respondWith('POST', `/courses/${context_id}/gradebook/update_submission`, [
         200,
         {'Content-Type': 'application/json'},
         JSON.stringify(payload),
       ])
     }
 
-    submitBehaviorHooks.beforeEach(() => {
-      sandbox.server.respondImmediately = true
+    beforeEach(() => {
+      server.respondImmediately = true
       alert = sinon.spy()
-      sandbox.stub($, 'publish')
+      jest.spyOn($, 'publish').mockImplementation(jest.fn())
     })
 
-    test('submit reports number of students scored', async assert => {
-      const done = assert.async()
+    test('submit reports number of students scored', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -85,12 +87,10 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
           args: [message],
         },
       } = alert
-      strictEqual(message, '2 student scores updated')
-      done()
+      expect(message).toEqual('2 student scores updated')
     })
 
-    test('submit reports number of students marked as missing', async assert => {
-      const done = assert.async()
+    test('submit reports number of students marked as missing', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -113,12 +113,10 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
           args: [message],
         },
       } = alert
-      strictEqual(message, '2 students marked as missing')
-      done()
+      expect(message).toEqual('2 students marked as missing')
     })
 
-    test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async assert => {
-      const done = assert.async()
+    test('submit ignores the missing shortcut when the shortcut feature flag is disabled', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -141,12 +139,10 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
           args: [message],
         },
       } = alert
-      strictEqual(message, '2 student scores updated')
-      done()
+      expect(message).toEqual('2 student scores updated')
     })
 
-    test('submit reports number of students when api includes duplicates due to group assignments', async assert => {
-      const done = assert.async()
+    test('submit reports number of students when api includes duplicates due to group assignments', async () => {
       const payload = [
         {submission: {id: '11', assignment_id: '2', user_id: '3'}},
         {submission: {id: '22', assignment_id: '2', user_id: '4'}},
@@ -172,8 +168,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
           args: [message],
         },
       } = alert
-      strictEqual(message, '4 student scores updated')
-      done()
+      expect(message).toEqual('4 student scores updated')
     })
   })
 })
