@@ -7565,6 +7565,7 @@ ko:
     index: 
       title: 확장
   m2c_name: "Moodle 가져오기"
+  make_it_public_71bf2a86: 공개하기
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "학생의 점수에 영향을 미치므로 가장 적절한 옵션을 선택하십시오."
   manage_all_other_course_content_d77de830: "모든 기타 과목 내용을 관리"
   manage_avatars: 
@@ -10083,6 +10084,7 @@ ko:
     view_more_link: "더 보기"
   paginated_view: 
     loading_more_results: "더 많은 결과 로드 중"
+  participated_6279fba: 참여
   password_8a271b1c: 암호
   paste_xml_cda3a64e: "XML 붙여넣기"
   paypal: 
@@ -12349,6 +12351,7 @@ ko:
       confirming_course: "%{course_name} 확인 중..."
       removing_crosslisting_of_section: "섹션 교차 나열 해제 중..."
   section_id_8ec4f46f: "섹션 ID"
+  section_name_16ea8a4a: "이름 선택"
   section_name_edb51b2: 섹션명
   sections: 
     section_created: "섹션을 성공적으로 만들었습니다!"
@@ -13981,6 +13984,7 @@ ko:
   unlock_date_cannot_be_after_due_date_8829d9ca: "잠금 해제 날짜는 기한 이후일 수 없음"
   unlock_date_cannot_be_after_lock_date_591f7fda: "잠금 해제 날짜는 잠금 날짜 이후일 수 없음"
   unnamed_tool_961cb95b: "이름 없는 도구"
+  unrecognized_browser_1fd80dfb: "인식할 수 없는 브라우저"
   unstar_b84daaef: "별표 해제"
   unsubscribe_8be438ff: "구독 해제"
   unsubscribed_c93564a2: "구독 해제함"
