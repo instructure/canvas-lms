@@ -13396,6 +13396,7 @@ el:
   section_ends_at_bb9df3c0: "Ο τομέας τελειώνει στις"
   section_filter_cde54d0a: "Φίλτρο Τομέα"
   section_id_8ec4f46f: "ID Τομέα"
+  section_name_16ea8a4a: "Όνομα Τμήματος"
   section_name_b6d82574: "Όνομα Τομέα"
   section_name_edb51b2: "όνομα τμήματος"
   section_sis_id_6f989834: "section sis id"
@@ -15225,6 +15226,7 @@ el:
   unpublished_courses_title: "Μη Δημοσιευμένα Μαθήματα"
   unpublished_dfd8801: "μη δημοσιευμένο"
   unread_e9c1b19c: "Μη αναγνωσμένα"
+  unrecognized_browser_1fd80dfb: "Μη Αναγνωρισμένος Φυλλομετρητής"
   unstar_b84daaef: "Αφαίρεση αστερίσκου"
   unstarted_932f2990: "Δεν έχει ξεκινήσει"
   unsubscribe_8be438ff: Διαγραφή

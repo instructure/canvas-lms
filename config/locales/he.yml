@@ -11033,6 +11033,7 @@ he:
   m2c_name: "Moodle Importer"
   main_navigation_3f080c80: "ניווט ראשי"
   main_text_color_7d65ab1b: "צבע טקסט עיקרי"
+  make_it_public_71bf2a86: "הפיכה לציבורי "
   make_new_settings_for_sis_integrations_visible_and_875039ca: "סימון ביצוע הגדרות חדשות לאינטגרציה עם המערכת הבית ספרית כנצפה ופעיל"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "נא לוודא שנבחרה האפשרות הנכונה ביותר כיון שהדבר יכול להשפיע על ציוני התלמידים."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "הפיכת קורס זה זמין לציבור (נתוני תלמידים עדיין ישארו פרטיים)"
@@ -14107,6 +14108,7 @@ he:
   parent_of_a_canvas_user_afba1624: "ההורה של משתמש קנבס?"
   parent_signup_b7c6bf0a: "הזדהות הורה"
   parents_sign_up_here_f0aa8f4f: "הרשמת הורים כאן"
+  participated_6279fba: השתתף/ה
   participation_af2598: השתתפות
   participations_1823832d: השתתפויות
   pass_2a8c4f07: עבר
@@ -17363,6 +17365,7 @@ he:
   section_id_6f73f3d5: "מזהה הקבצה"
   section_id_8ec4f46f: "מזהה פרק"
   section_id_b5aad4a7: "מזהה הקבצה"
+  section_name_16ea8a4a: "שם הקבצה"
   section_name_b6d82574: "שם הקבצה"
   section_name_edb51b2: "שם הקבצה"
   section_section_names_98f172e6: "הקבצה: %{section_names}"
@@ -19858,6 +19861,7 @@ he:
   unpublished_courses_title: "קורסים שלא פורסמו"
   unpublished_dfd8801: "לא פורסם"
   unread_e9c1b19c: "לא נקראו"
+  unrecognized_browser_1fd80dfb: "דפדפן לא מזוהה"
   unregister_service_985238e9: "ביטול רישום שרות"
   unreserved_e86b7425: "לא שמור"
   unstar_b84daaef: "הסרת כוכבית"
