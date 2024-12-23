@@ -261,7 +261,7 @@ $context_module_bg_color: $ic-color-light;
     td .type_icon {
       padding-#{direction(right)}: 15px;
     }
-    .outdent_item_link {
+    li:has(a.outdent_item_link) {
       display: none !important;
     }
   }
