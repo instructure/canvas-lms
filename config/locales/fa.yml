@@ -13746,6 +13746,7 @@ fa:
   magenta_4a65993c: ارغوانی
   main_navigation_3f080c80: "پیمایش اصلی"
   main_text_color_7d65ab1b: "رنگ متن اصلی"
+  make_it_public_71bf2a86: "عمومی کردن آن"
   make_key_developername_invisible_212ecf72: "کلید %{developerName} را نامرئی کن"
   make_key_developername_visible_97c404bf: "کلید %{developerName}را  قابل مشاهده کن"
   make_key_invisible_e66af89: "کلید را نامرئی کن"
@@ -17441,6 +17442,7 @@ fa:
   partially_enabled_cd506819: "تا حدی فعال است"
   participantcount_less_8d258f6: "%{participantCount} کمتر"
   participantcount_more_50363e55: "%{participantCount} بیشتر"
+  participated_6279fba: "شرکت شده"
   participation_af2598: مشارکت
   participations_1823832d: "مشارکت ها"
   pass_2a8c4f07: قبول
@@ -21124,6 +21126,7 @@ fa:
   section_id_6f73f3d5: "شناسه بخش"
   section_id_8ec4f46f: "شناسه بخش"
   section_id_b5aad4a7: "شناسه بخش"
+  section_name_16ea8a4a: "نام بخش"
   section_name_b6d82574: "نام بخش"
   section_name_edb51b2: "نام بخش"
   section_removed_2ac72a79: "%{section} حذف شد."
@@ -24700,6 +24703,7 @@ fa:
   unread_e9c1b19c: "خوانده نشده"
   unread_post_47a1a06b: "پست خوانده نشده"
   unreadcount_unread_replies_509e167f: "%{unreadCount} پاسخ خوانده نشده"
+  unrecognized_browser_1fd80dfb: "مرورگر ناشناس"
   unregister_service_985238e9: "لغو ثبت سرویس"
   unreserved_e86b7425: "رزرو نشده"
   unsafe_file_link_8a18eceb: "پیوند فایل ناامن"
