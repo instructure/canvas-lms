@@ -59,7 +59,7 @@ export type EnhancedActionMenuProps = {
   gradingPeriodId: string
   lastExport: any
   postGradesFeature: {
-    enabled: boolean
+    enabled?: boolean
     returnFocusTo: HTMLElement
     label: string
     store: any
@@ -463,7 +463,7 @@ EnhancedActionMenu.propTypes = {
   ),
 
   postGradesFeature: shape({
-    enabled: bool.isRequired,
+    enabled: bool,
     store: object.isRequired,
     returnFocusTo: object,
   }).isRequired,
