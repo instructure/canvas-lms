@@ -44,7 +44,7 @@ module GradingStandards
     end
 
     def term_input
-      f('input[aria-label^="Start typing to search."]')
+      f('[role="combobox"][data-testid="enrollment-term-select"][aria-expanded="false"]')
     end
 
     def create_set_button
@@ -84,6 +84,7 @@ module GradingStandards
     end
 
     def edit_set_save_button
+      wait_for(method: nil, timeout: 5) { f('button[aria-label="Save Grading Period Set"]').displayed? }
       f('button[aria-label="Save Grading Period Set"]')
     end
 
@@ -233,6 +234,7 @@ module GradingStandards
     end
 
     def grading_period_set_displayed?(set_name)
+      wait_for(method: nil, timeout: 5) { !ff(all_sets_css).empty? }
       set = find_set(set_name)
       if set.nil?
         false
