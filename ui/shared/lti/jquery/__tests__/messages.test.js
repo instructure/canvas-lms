@@ -213,7 +213,6 @@ describe('ltiMessageHander', () => {
       })
 
       afterEach(() => {
-         
         console.error.mockRestore()
       })
 
@@ -245,6 +244,98 @@ describe('ltiMessageHander', () => {
         await ltiMessageHandler(event)
         expect(event.source.postMessage).not.toHaveBeenCalled()
       })
+    })
+  })
+
+  describe('page functionality', () => {
+    let ltiToolWrapperFixture
+
+    beforeEach(() => {
+      ltiToolWrapperFixture = document.createElement('div')
+      ltiToolWrapperFixture.id = 'fixtures'
+      document.body.appendChild(ltiToolWrapperFixture)
+    })
+
+    afterEach(() => {
+      ltiToolWrapperFixture.remove()
+    })
+
+    it('returns the height and width of the page along with the iframe offset', async () => {
+      ltiToolWrapperFixture.innerHTML = `
+        <div>
+          <h1 class="page-title">LTI resize test</h1>
+          <p><iframe style="width: 100%; height: 100px;" src="https://canvas.example.com/courses/4/external_tools/retrieve?display=borderless" width="100%" height="100px" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></p>
+        </div>
+      `
+      const postMessageMock = jest.fn()
+      await ltiMessageHandler(
+        postMessageEvent({subject: 'lti.fetchWindowSize'}, 'origin', {
+          postMessage: postMessageMock,
+        }),
+      )
+      expect(postMessageMock).toHaveBeenCalled()
+    })
+
+    it('hides the module navigation', async () => {
+      ltiToolWrapperFixture.innerHTML = `
+        <div>
+          <div id="module-footer" class="module-sequence-footer">Next</div>
+        </div>
+      `
+      const moduleFooter = document.getElementById('module-footer')
+
+      expect(moduleFooter).toBeVisible()
+      await ltiMessageHandler(
+        postMessageEvent({
+          subject: 'lti.showModuleNavigation',
+          show: false,
+        }),
+      )
+      expect(moduleFooter).not.toBeVisible()
+    })
+
+    it('sets the unload message', async () => {
+      const addEventListenerSpy = jest.spyOn(window, 'addEventListener')
+      await ltiMessageHandler(
+        postMessageEvent({
+          subject: 'lti.setUnloadMessage',
+          message: 'unload message',
+        }),
+      )
+      expect(addEventListenerSpy).toHaveBeenCalled()
+      addEventListenerSpy.mockRestore()
+    })
+
+    it('sets the unload message event if no "message" is given', async () => {
+      const addEventListenerSpy = jest.spyOn(window, 'addEventListener')
+      await ltiMessageHandler(
+        postMessageEvent({
+          subject: 'lti.setUnloadMessage',
+        }),
+      )
+      expect(addEventListenerSpy).toHaveBeenCalled()
+      const handler = addEventListenerSpy.mock.calls[0][1]
+      const event = {}
+      handler(event)
+      expect(event.returnValue).toBeTruthy()
+      addEventListenerSpy.mockRestore()
+    })
+
+    it('hides the right side wrapper', async () => {
+      ltiToolWrapperFixture.innerHTML = `
+        <div>
+          <div id="right-side-wrapper">someWrapping</div>
+        </div>
+      `
+      const moduleWrapper = document.getElementById('right-side-wrapper')
+
+      expect(moduleWrapper).toBeVisible()
+      await ltiMessageHandler(
+        postMessageEvent({
+          subject: 'lti.hideRightSideWrapper',
+        }),
+      )
+      expect(moduleWrapper).not.toBeVisible()
     })
   })
 })
