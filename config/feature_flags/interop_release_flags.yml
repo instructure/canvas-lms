@@ -95,6 +95,7 @@ lti_ags_remove_top_submitted_at:
       state: allowed_on
 lti_apps_page_instructors:
   state: hidden
+  shadow: true
   applies_to: RootAccount
   display_name: LTI Apps Page for Instructors
   description: When enabled, the LTI Apps page will be available in the Course navigation sidebar.
