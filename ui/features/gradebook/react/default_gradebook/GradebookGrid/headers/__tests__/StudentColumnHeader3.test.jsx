@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,18 +19,18 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import StudentColumnHeader from '../StudentColumnHeader'
 import studentRowHeaderConstants from '../../../constants/studentRowHeaderConstants'
+import StudentColumnHeader from '../StudentColumnHeader'
 import {getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
-QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
+describe('GradebookGrid StudentColumnHeader', () => {
   let $container
   let component
   let $menuContent
   let gradebookElements
   let props
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
 
     gradebookElements = []
@@ -75,7 +75,7 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
   })
@@ -87,7 +87,7 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
 
   function getOptionsMenuTrigger() {
     return [...$container.querySelectorAll('button')].find(
-      $button => $button.textContent === 'Student Name Options'
+      $button => $button.textContent === 'Student Name Options',
     )
   }
 
@@ -110,122 +110,124 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
     getOptionsMenuTrigger().click()
   }
 
-  QUnit.module('"Options" > "Display as" setting', () => {
+  describe('"Options" > "Display as" setting', () => {
     function getDisplayAsOption(label) {
       return getMenuItem($menuContent, 'Display as', label)
     }
 
-    QUnit.skip('is added as a Gradebook element when opened', () => {
+    it.skip('is added as a Gradebook element when opened', () => {
       mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
-      notEqual(gradebookElements.indexOf($sortByMenuContent), -1)
+      expect(gradebookElements.indexOf($sortByMenuContent)).not.toBe(-1)
     })
 
-    test('is removed as a Gradebook element when closed', () => {
+    it('is removed as a Gradebook element when closed', () => {
       mountAndOpenOptionsMenu()
       const $sortByMenuContent = getMenuContent($menuContent, 'Display as')
       closeOptionsMenu()
-      strictEqual(gradebookElements.indexOf($sortByMenuContent), -1)
+      expect(gradebookElements.indexOf($sortByMenuContent)).toBe(-1)
     })
 
-    test('is disabled when all options are disabled', () => {
+    it('is disabled when all options are disabled', () => {
       props.disabled = true
       mountAndOpenOptionsMenu()
-      strictEqual(getMenuItem($menuContent, 'Display as').getAttribute('aria-disabled'), 'true')
+      expect(getMenuItem($menuContent, 'Display as').getAttribute('aria-disabled')).toBe('true')
     })
 
-    QUnit.module('"First, Last Name" option', () => {
-      test('is selected when displaying first name before last', () => {
+    describe('"First, Last Name" option', () => {
+      it('is selected when displaying first name before last', () => {
         props.selectedPrimaryInfo = 'first_last'
         mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('First, Last Name').getAttribute('aria-checked'), 'true')
+        expect(getDisplayAsOption('First, Last Name').getAttribute('aria-checked')).toBe('true')
       })
 
-      test('is not selected when displaying last name before first', () => {
+      it('is not selected when displaying last name before first', () => {
         props.selectedPrimaryInfo = 'last_first'
         mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('First, Last Name').getAttribute('aria-checked'), 'false')
+        expect(getDisplayAsOption('First, Last Name').getAttribute('aria-checked')).toBe('false')
       })
 
-      QUnit.module('when clicked', contextHooks => {
-        contextHooks.beforeEach(() => {
-          props.onSelectPrimaryInfo = sinon.stub()
+      describe('when clicked', () => {
+        beforeEach(() => {
+          props.onSelectPrimaryInfo = jest.fn()
         })
 
-        test('calls the .onSelectPrimaryInfo callback', () => {
+        it('calls the .onSelectPrimaryInfo callback', () => {
           mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 1)
+          expect(props.onSelectPrimaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        test('includes "first_last" when calling the .onSelectPrimaryInfo callback', () => {
+        it('includes "first_last" when calling the .onSelectPrimaryInfo callback', () => {
           mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').click()
-          const [primaryInfoType] = props.onSelectPrimaryInfo.lastCall.args
-          equal(primaryInfoType, 'first_last')
+          const [primaryInfoType] =
+            props.onSelectPrimaryInfo.mock.calls[props.onSelectPrimaryInfo.mock.calls.length - 1]
+          expect(primaryInfoType).toBe('first_last')
         })
 
-        test('returns focus to the "Options" menu trigger', () => {
+        it('returns focus to the "Options" menu trigger', () => {
           mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').focus()
           getDisplayAsOption('First, Last Name').click()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
+          expect(document.activeElement).toBe(getOptionsMenuTrigger())
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
+        it.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
           props.selectedPrimaryInfo = 'first_last'
           mountAndOpenOptionsMenu()
           getDisplayAsOption('First, Last Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 0)
+          expect(props.onSelectPrimaryInfo).not.toHaveBeenCalled()
         })
       })
     })
 
-    QUnit.module('"Last, First Name" option', () => {
-      test('is selected when displaying last name before first', () => {
+    describe('"Last, First Name" option', () => {
+      it('is selected when displaying last name before first', () => {
         props.selectedPrimaryInfo = 'last_first'
         mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('Last, First Name').getAttribute('aria-checked'), 'true')
+        expect(getDisplayAsOption('Last, First Name').getAttribute('aria-checked')).toBe('true')
       })
 
-      test('is not selected when displaying first name before last', () => {
+      it('is not selected when displaying first name before last', () => {
         props.selectedPrimaryInfo = 'first_last'
         mountAndOpenOptionsMenu()
-        strictEqual(getDisplayAsOption('Last, First Name').getAttribute('aria-checked'), 'false')
+        expect(getDisplayAsOption('Last, First Name').getAttribute('aria-checked')).toBe('false')
       })
 
-      QUnit.module('when clicked', contextHooks => {
-        contextHooks.beforeEach(() => {
-          props.onSelectPrimaryInfo = sinon.stub()
+      describe('when clicked', () => {
+        beforeEach(() => {
+          props.onSelectPrimaryInfo = jest.fn()
         })
 
-        test('calls the .onSelectPrimaryInfo callback', () => {
+        it('calls the .onSelectPrimaryInfo callback', () => {
           mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 1)
+          expect(props.onSelectPrimaryInfo).toHaveBeenCalledTimes(1)
         })
 
-        test('includes "last_first" when calling the .onSelectPrimaryInfo callback', () => {
+        it('includes "last_first" when calling the .onSelectPrimaryInfo callback', () => {
           mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').click()
-          const [primaryInfoType] = props.onSelectPrimaryInfo.lastCall.args
-          equal(primaryInfoType, 'last_first')
+          const [primaryInfoType] =
+            props.onSelectPrimaryInfo.mock.calls[props.onSelectPrimaryInfo.mock.calls.length - 1]
+          expect(primaryInfoType).toBe('last_first')
         })
 
-        test('returns focus to the "Options" menu trigger', () => {
+        it('returns focus to the "Options" menu trigger', () => {
           mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').focus()
           getDisplayAsOption('Last, First Name').click()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
+          expect(document.activeElement).toBe(getOptionsMenuTrigger())
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
+        it.skip('does not call the .onSelectPrimaryInfo callback when already selected', () => {
           props.selectedPrimaryInfo = 'last_first'
           mountAndOpenOptionsMenu()
           getDisplayAsOption('Last, First Name').click()
-          strictEqual(props.onSelectPrimaryInfo.callCount, 0)
+          expect(props.onSelectPrimaryInfo).not.toHaveBeenCalled()
         })
       })
     })
