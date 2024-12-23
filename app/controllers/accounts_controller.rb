@@ -493,7 +493,8 @@ class AccountsController < ApplicationController
                       microsoft_sync_login_attribute_suffix
                       microsoft_sync_remote_attribute
                       enable_as_k5_account
-                      use_classic_font_in_k5]
+                      use_classic_font_in_k5
+                      allow_assign_to_differentiation_tags]
     settings_hash = public_attrs.index_with { |key| @account.settings[key] }.compact
 
     if @account.password_complexity_enabled? && !@account.site_admin?
