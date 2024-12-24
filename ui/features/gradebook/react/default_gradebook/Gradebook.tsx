@@ -3083,12 +3083,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   missingSort = (columnId: string) => {
     // @ts-expect-error
-    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].missing))
+    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId]?.missing))
   }
 
   lateSort = (columnId: string) => {
     // @ts-expect-error
-    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId].late))
+    this.sortRowsWithFunction((row: Submission) => Boolean(row[columnId]?.late))
   }
 
   sortByStudentColumn = (settingKey: SortRowsSettingKey, direction: SortDirection) => {
