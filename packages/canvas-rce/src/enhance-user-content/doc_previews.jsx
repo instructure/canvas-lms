@@ -247,7 +247,8 @@ export function loadDocPreview($container, options) {
     } else {
       paragraph.textContent = formatMessage('This document cannot be displayed within Canvas.')
     }
-    $container.empty().append(paragraph)
+    $container.replaceChildren()
+    $container.appendChild(paragraph)
   }
 }
 
