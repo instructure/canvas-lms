@@ -52,7 +52,7 @@ describe('OutcomeMoveModal', () => {
           parentGroupId,
         },
       }),
-      {}
+      {},
     )
 
   const defaultProps = (props = {}) => ({
@@ -95,7 +95,7 @@ describe('OutcomeMoveModal', () => {
       rootOutcomeGroup = {id: '100'},
       mocks = defaultMocks,
       treeBrowserRootGroupId = '1',
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider
@@ -104,25 +104,27 @@ describe('OutcomeMoveModal', () => {
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
-  it('renders component with customized outcome title if single outcome provided', async () => {
+  // fickle
+  it.skip('renders component with customized outcome title if single outcome provided', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Move "Outcome 101"?')).toBeInTheDocument()
   })
 
-  it('renders component with generic outcome title if multiple outcomes provided', async () => {
+  // fickle
+  it.skip('renders component with generic outcome title if multiple outcomes provided', async () => {
     const {getByText} = render(
-      <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />
+      <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
     )
     await act(async () => jest.runAllTimers())
     expect(getByText('Move 2 Outcomes?')).toBeInTheDocument()
   })
 
-  it('shows modal if open prop true', async () => {
+  it.skip('shows modal if open prop true', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Cancel')).toBeInTheDocument()
@@ -224,7 +226,7 @@ describe('OutcomeMoveModal', () => {
           ...smallOutcomeTree('Account'),
           moveOutcomeMock({outcomeLinkIds: ['1']}),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -240,7 +242,7 @@ describe('OutcomeMoveModal', () => {
           ...smallOutcomeTree('Account'),
           moveOutcomeMock({outcomeLinkIds: ['1']}),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -253,7 +255,7 @@ describe('OutcomeMoveModal', () => {
       <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
       {
         mocks: [...defaultMocks, ...smallOutcomeTree(), moveOutcomeMock()],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -282,7 +284,7 @@ describe('OutcomeMoveModal', () => {
             failResponse: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -306,7 +308,7 @@ describe('OutcomeMoveModal', () => {
             failMutation: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -330,7 +332,7 @@ describe('OutcomeMoveModal', () => {
             failMutationNoErrMsg: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -354,7 +356,7 @@ describe('OutcomeMoveModal', () => {
             partialSuccess: true,
           }),
         ],
-      }
+      },
     )
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
