@@ -18,20 +18,20 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-
+import sinon from 'sinon'
 import TotalGradeOverrideCellPropFactory from '../../editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
 import TotalGradeOverrideCellEditor from '../../editors/TotalGradeOverrideCellEditor/index'
 import GridEvent from '../../GridSupport/GridEvent'
 import {createGradebook} from '../../../__tests__/GradebookSpecHelper'
 
-QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
+describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   let $container
   let editor
   let editorOptions
   let gradebook
   let gridSupport
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
 
     gridSupport = {
@@ -70,7 +70,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
     if ($container.childNodes.length > 0) {
       editor.destroy()
     }
@@ -81,37 +81,37 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
     editor = new TotalGradeOverrideCellEditor(editorOptions)
   }
 
-  QUnit.module('initialization', () => {
+  describe('initialization', () => {
     test('renders an editable cell when the student is gradeable', () => {
       createEditor()
-      notOk($container.querySelector('.Grid__ReadOnlyCell'))
+      expect($container.querySelector('.Grid__ReadOnlyCell')).toBeFalsy()
     })
 
     test('renders a read-only cell when the student is not gradeable', () => {
       gradebook.isStudentGradeable.withArgs('1101').returns(false)
       createEditor()
-      ok($container.querySelector('.Grid__ReadOnlyCell'))
+      expect($container.querySelector('.Grid__ReadOnlyCell')).toBeTruthy()
     })
 
     test('renders a read-only cell when the student has no graded submissions', () => {
       gradebook.studentHasGradedSubmission.withArgs('1101').returns(false)
       createEditor()
-      ok($container.querySelector('.Grid__ReadOnlyCell'))
+      expect($container.querySelector('.Grid__ReadOnlyCell')).toBeTruthy()
     })
 
     test('stores a reference to the rendered component', () => {
       createEditor()
-      ok(editor.component instanceof React.Component)
+      expect(editor.component instanceof React.Component).toBeTruthy()
     })
   })
 
-  QUnit.module('"onKeyDown" event', () => {
+  describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the component when triggered', () => {
       createEditor()
       sinon.spy(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      strictEqual(editor.component.handleKeyDown.callCount, 1)
+      expect(editor.component.handleKeyDown.callCount).toBe(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
@@ -120,7 +120,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
       const [event] = editor.component.handleKeyDown.lastCall.args
-      strictEqual(event, keyboardEvent)
+      expect(event).toBe(keyboardEvent)
     })
 
     test('returns the return value from the component', () => {
@@ -128,7 +128,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       sinon.stub(editor.component, 'handleKeyDown').returns(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      strictEqual(returnValue, false)
+      expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when the student is not gradeable', () => {
@@ -137,15 +137,15 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       sinon.spy(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      strictEqual(editor.component.handleKeyDown.callCount, 1)
+      expect(editor.component.handleKeyDown.callCount).toBe(1)
     })
   })
 
-  QUnit.module('#destroy()', () => {
+  describe('#destroy()', () => {
     test('removes the reference to the component', () => {
       createEditor()
       editor.destroy()
-      strictEqual(editor.component, null)
+      expect(editor.component).toBeNull()
     })
 
     test('unsubscribes from gridSupport.events.onKeyDown', () => {
@@ -153,10 +153,9 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       editor.destroy()
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      strictEqual(
-        returnValue,
+      expect(returnValue).toBe(
         true,
-        '"true" is the default return value when the event has no subscribers'
+        '"true" is the default return value when the event has no subscribers',
       )
     })
 
@@ -164,16 +163,16 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       createEditor()
       editor.destroy()
       const unmounted = ReactDOM.unmountComponentAtNode($container)
-      strictEqual(unmounted, false, 'component was already unmounted')
+      expect(unmounted).toBe(false, 'component was already unmounted')
     })
   })
 
-  QUnit.module('#focus()', () => {
+  describe('#focus()', () => {
     test('calls .focus on the component', () => {
       createEditor()
       sinon.spy(editor.component, 'focus')
       editor.focus()
-      strictEqual(editor.component.focus.callCount, 1)
+      expect(editor.component.focus.callCount).toBe(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when the student is not gradeable', () => {
@@ -181,62 +180,62 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       createEditor()
       sinon.spy(editor.component, 'focus')
       editor.focus()
-      strictEqual(editor.component.focus.callCount, 1)
+      expect(editor.component.focus.callCount).toBe(1)
     })
   })
 
-  QUnit.module('#isValueChanged()', () => {
+  describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the component', () => {
       createEditor()
       sinon.stub(editor.component, 'isValueChanged').returns(true)
-      strictEqual(editor.isValueChanged(), true)
+      expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the student is not gradeable', () => {
       gradebook.isStudentGradeable.returns(false)
       createEditor()
       sinon.stub(editor.component, 'isValueChanged').returns(true)
-      strictEqual(editor.isValueChanged(), true)
+      expect(editor.isValueChanged()).toBe(true)
     })
 
     test('returns false when the component has not yet rendered', () => {
       createEditor()
       editor.component = null
-      strictEqual(editor.isValueChanged(), false)
+      expect(editor.isValueChanged()).toBe(false)
     })
   })
 
-  QUnit.module('#serializeValue()', () => {
+  describe('#serializeValue()', () => {
     test('returns null', () => {
       createEditor()
-      strictEqual(editor.serializeValue(), null)
+      expect(editor.serializeValue()).toBeNull()
     })
   })
 
-  QUnit.module('#loadValue()', () => {
+  describe('#loadValue()', () => {
     test('re-renders the component', () => {
       createEditor()
       ReactDOM.unmountComponentAtNode($container)
       editor.loadValue(/* SlickGrid API parameters are not used */)
-      ok($container.querySelector('.Grid__GradeCell'))
+      expect($container.querySelector('.Grid__GradeCell')).toBeTruthy()
     })
   })
 
-  QUnit.module('#applyValue()', () => {
+  describe('#applyValue()', () => {
     test('calls .applyValue on the component', () => {
       createEditor()
       sinon.stub(editor.component, 'applyValue')
       editor.applyValue(/* SlickGrid API parameters are not used */)
-      strictEqual(editor.component.applyValue.callCount, 1)
+      expect(editor.component.applyValue.callCount).toBe(1)
     })
   })
 
-  QUnit.module('#validate()', () => {
+  describe('#validate()', () => {
     test('returns an empty validation success', () => {
       // SlickGrid validation is not used.
       // Validation is performed within Gradebook.
       createEditor()
-      deepEqual(editor.validate(), {msg: null, valid: true})
+      expect(editor.validate()).toEqual({msg: null, valid: true})
     })
   })
 })
