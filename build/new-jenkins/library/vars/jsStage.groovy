@@ -18,7 +18,6 @@
 
 import groovy.transform.Field
 
-@Field static final KARMA_NODE_COUNT = 8
 @Field static final JEST_NODE_COUNT = 12
 @Field static final RCE_NODE_COUNT = 5
 
@@ -74,19 +73,6 @@ def getSeleniumGridContainers(parentIndex, count) {
   ]
 }
 
-def karmaNodeRequirementsTemplate(index) {
-  def baseTestContainer = [
-    image: 'local/karma-runner',
-    command: 'cat',
-    ports: [9876],
-    envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: 9876],
-  ]
-
-  return [
-    containers: [baseTestContainer + [name: "karma-qunit-${index}"]] + getSeleniumGridContainers("karma-${index}", 1),
-  ]
-}
-
 def packagesNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: 'local/karma-runner',
@@ -139,17 +125,6 @@ def queueJestDistribution(index) {
     ]
 
     callableWithDelegate(queueTestStage())(stages, "jest-${index}", jestEnvVars, 'yarn test:jest:build')
-  }
-}
-
-def queueKarmaDistribution(index) {
-  { stages ->
-    def jsgEnvVars = [
-        "CI_NODE_INDEX=${index}",
-        "CI_NODE_TOTAL=${KARMA_NODE_COUNT}",
-      ]
-
-    callableWithDelegate(queueTestStage())(stages, "karma-qunit-${index}", jsgEnvVars, 'yarn test:karma:headless')
   }
 }
 

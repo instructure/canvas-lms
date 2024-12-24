@@ -595,18 +595,6 @@ pipeline {
                   parallel(nestedStages)
                 }
 
-                extendedStage('Javascript (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(JS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) {
-                  def nestedStages = [:]
-
-                  extendedStage('Javascript')
-                    .hooks(buildSummaryReportHooks.withRunManifest(true))
-                    .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
-                      string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
-                    ])
-
-                  parallel(nestedStages)
-                }
-
                 extendedStage('Linters (Waiting for Dependencies)').obeysAllowStages(false).waitsFor(LINTERS_BUILD_IMAGE_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
                   extendedStage('Linters - Dependency Check')
                     .nodeRequirements(label: nodeLabel(), podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')

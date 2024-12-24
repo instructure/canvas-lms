@@ -55,18 +55,6 @@ yarn run test:jest:coverage
 
 then you will run the jest tests for Canvas and the coverage report will be placed in the `coverage-jest` directory.
 
-## Canvas qUnit/Karma Coverage
-
-If you run:
-
-```bash
-
-COVERAGE=1 yarn run test:karma
-
-```
-
-then you will run the qUnit/Karma tests for Canvas and the coverage report will be placed in the `coverage-karma` directory.
-
 ## Packages Coverage
 
 If you run:
