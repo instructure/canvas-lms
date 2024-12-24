@@ -19,6 +19,7 @@
 import '@canvas/jquery-keycodes' // used by some SlickGrid editors
 import slickgrid from 'slickgrid'
 import GridSupport from '../index'
+import sinon from 'sinon'
 
 const {Grid, Editors} = slickgrid
 
@@ -66,7 +67,7 @@ function createGrid() {
   return new Grid('#example-grid', createRows(), createColumns(), options)
 }
 
-QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
+describe('GradebookGrid GridSupport Navigation', () => {
   let $fixtures
   let $activeElement
 
@@ -75,6 +76,7 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
   let grid
   let gridSupport
   let triggeredEvent
+  let sandbox
 
   function onKeyDown(event) {
     bubbledEvent = event
@@ -83,42 +85,57 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     defaultPrevented = event.defaultPrevented
   }
 
-  function simulateKeyDown(key, $element = $activeElement) {
+  function simulateKeyDown(key, element = $activeElement) {
     const {which, shiftKey} = keyMap[key]
     const event = new Event('keydown', {bubbles: true, cancelable: true})
     event.keyCode = which
     event.shiftKey = shiftKey
     event.which = which
-    $element.dispatchEvent(event)
+    element.dispatchEvent(event)
     triggeredEvent = event
   }
 
-  suiteHooks.beforeEach(() => {
-    // avoid spec pollution by listeners on #fixtures
+  beforeEach(() => {
+    // Setup fixture
     $fixtures = document.createElement('div')
     document.body.appendChild($fixtures)
     const $gridContainer = document.createElement('div')
     $gridContainer.id = 'example-grid'
     $fixtures.appendChild($gridContainer)
 
+    // Initialize Grid and GridSupport
     grid = createGrid()
     gridSupport = new GridSupport(grid)
     gridSupport.initialize()
+
+    // Add event listener
     document.body.addEventListener('keydown', onKeyDown, false)
 
+    // Reset event tracking variables
     bubbledEvent = undefined
     triggeredEvent = undefined
+
+    // Create sandbox for each test
+    sandbox = sinon.createSandbox()
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
+    // Cleanup event listener
     document.body.removeEventListener('keydown', onKeyDown, false)
+
+    // Destroy GridSupport and Grid
     gridSupport.destroy()
     grid.destroy()
+
+    // Remove fixtures
     $fixtures.remove()
+
+    // Restore sandbox
+    sandbox.restore()
   })
 
-  QUnit.module('Tab into the grid', hooks => {
-    hooks.beforeEach(() => {
+  describe('Tab into the grid', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('beforeGrid')
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -126,16 +143,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the first cell of the header', () => {
       simulateKeyDown('Tab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateNext', () => {
@@ -144,7 +161,7 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('Tab')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateNext', () => {
@@ -153,29 +170,29 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         location = activeLocation
       })
       simulateKeyDown('Tab')
-      equal(location.region, 'header')
-      equal(location.cell, 0)
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('header')
+      expect(location.cell).toBe(0)
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('Tab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('Tab')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('Tab')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('other keys on the beforeGrid region', hooks => {
-    hooks.beforeEach(() => {
+  describe('other keys on the beforeGrid region', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('beforeGrid')
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -183,29 +200,29 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('RightArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'beforeGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('beforeGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('Tab on a header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('Tab on a header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 1})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -213,16 +230,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('sets the active location to the afterGrid region', () => {
       simulateKeyDown('Tab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'afterGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('afterGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateNext', () => {
@@ -231,7 +248,7 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('Tab')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateNext', () => {
@@ -240,32 +257,33 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         location = activeLocation
       })
       simulateKeyDown('Tab')
-      equal(location.region, 'afterGrid')
-      equal(typeof location.cell, 'undefined')
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('afterGrid')
+      expect(location.cell).toBeUndefined()
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('Tab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('Tab')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('Tab')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
 
     test('activates the afterGrid region when handling keydown on a header child element', () => {
-      simulateKeyDown('Tab', document.querySelectorAll('.slick-column-name')[2])
+      const headerChild = document.querySelectorAll('.slick-column-name')[2]
+      simulateKeyDown('Tab', headerChild)
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'afterGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('afterGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('activates the previously-active location when followed by Shift+Tab', () => {
@@ -274,13 +292,14 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       simulateKeyDown('ShiftTab')
 
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 1)
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(1)
+      expect(activeLocation.row).toBeUndefined()
     })
   })
 
-  QUnit.module('Tab on a body cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('Tab on a body cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 1})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -288,40 +307,24 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('sets the active location to the afterGrid region', () => {
       simulateKeyDown('Tab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'afterGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('afterGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('Tab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('Tab')
-      equal(bubbledEvent, triggeredEvent)
-    })
-
-    test('does not prevent the default behavior of the event', () => {
-      simulateKeyDown('Tab')
-      strictEqual(defaultPrevented, false)
-    })
-
-    test('activates the previously-active location when followed by Shift+Tab', () => {
-      simulateKeyDown('Tab')
-      $activeElement = gridSupport.helper.getAfterGridNode()
-      simulateKeyDown('ShiftTab')
-
-      const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.row, 0)
-      strictEqual(activeLocation.cell, 1)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('Tab out of the afterGrid region', hooks => {
-    hooks.beforeEach(() => {
+  describe('Tab out of the afterGrid region', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('afterGrid')
       $activeElement = gridSupport.helper.getAfterGridNode()
     })
@@ -329,16 +332,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('sets the active location to "unknown"', () => {
       simulateKeyDown('Tab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'unknown')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('unknown')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('triggers onNavigateNext', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateNext.subscribe(handler)
       simulateKeyDown('Tab')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateNext', () => {
@@ -347,7 +350,7 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('Tab')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateNext', () => {
@@ -356,29 +359,29 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         location = activeLocation
       })
       simulateKeyDown('Tab')
-      equal(location.region, 'unknown')
-      equal(typeof location.cell, 'undefined')
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('unknown')
+      expect(location.cell).toBeUndefined()
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('Tab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('Tab')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('Tab')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('other keys on the afterGrid region', hooks => {
-    hooks.beforeEach(() => {
+  describe('other keys on the afterGrid region', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('afterGrid')
       $activeElement = gridSupport.helper.getAfterGridNode()
     })
@@ -386,51 +389,51 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'afterGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('afterGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('Shift+Tab back out of the beforeGrid region', hooks => {
-    hooks.beforeEach(() => {
+  describe('Shift+Tab back out of the beforeGrid region', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('beforeGrid')
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('ShiftTab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('ShiftTab')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('ShiftTab')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('Shift+Tab on a header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('Shift+Tab on a header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {row: 0, cell: 1})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -438,16 +441,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('sets the active location to the beforeGrid region', () => {
       simulateKeyDown('ShiftTab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'beforeGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('beforeGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('triggers onNavigatePrev', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigatePrev.subscribe(handler)
       simulateKeyDown('ShiftTab')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigatePrev', () => {
@@ -456,47 +459,48 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('ShiftTab')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigatePrev', () => {
       let location
-      gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigatePrev.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('ShiftTab')
-      equal(location.region, 'beforeGrid')
-      equal(typeof location.row, 'undefined')
-      equal(typeof location.cell, 'undefined')
+      expect(location.region).toBe('beforeGrid')
+      expect(location.cell).toBeUndefined()
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('ShiftTab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('ShiftTab')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('ShiftTab')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
 
     test('activates the previously-active location when followed by Tab', () => {
       simulateKeyDown('Tab')
       $activeElement = gridSupport.helper.getAfterGridNode()
       simulateKeyDown('ShiftTab')
+
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 1)
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(1)
     })
   })
 
-  QUnit.module('Shift+Tab on a body cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('Shift+Tab on a body cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 1, cell: 1})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -504,16 +508,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the beforeGrid region', () => {
       simulateKeyDown('ShiftTab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'beforeGrid')
-      equal(typeof activeLocation.cell, 'undefined')
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('beforeGrid')
+      expect(activeLocation.cell).toBeUndefined()
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('triggers onNavigatePrev', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigatePrev.subscribe(handler)
       simulateKeyDown('ShiftTab')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigatePrev', () => {
@@ -522,33 +526,33 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('ShiftTab')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigatePrev', () => {
       let location
-      gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigatePrev.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('ShiftTab')
-      equal(location.region, 'beforeGrid')
-      equal(typeof location.cell, 'undefined')
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('beforeGrid')
+      expect(location.cell).toBeUndefined()
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('ShiftTab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('ShiftTab')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('ShiftTab')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
 
     test('activates the previously-active location when followed by Tab', () => {
@@ -557,71 +561,14 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       simulateKeyDown('ShiftTab')
 
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.row, 1)
-      strictEqual(activeLocation.cell, 1)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.row).toBe(1)
+      expect(activeLocation.cell).toBe(1)
     })
   })
 
-  QUnit.module('Shift+Tab back into the grid', hooks => {
-    hooks.beforeEach(() => {
-      gridSupport.state.setActiveLocation('afterGrid')
-      $activeElement = gridSupport.helper.getAfterGridNode()
-    })
-
-    test('sets the active location to the first column of the header by default', () => {
-      simulateKeyDown('ShiftTab')
-      const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(typeof activeLocation.row, 'undefined')
-    })
-
-    test('triggers onNavigatePrev', () => {
-      const handler = sinon.spy()
-      gridSupport.events.onNavigatePrev.subscribe(handler)
-      simulateKeyDown('ShiftTab')
-      strictEqual(handler.callCount, 1)
-    })
-
-    test('includes the event when triggering onNavigatePrev', () => {
-      let capturedEvent
-      gridSupport.events.onNavigatePrev.subscribe((event, _activeLocation) => {
-        capturedEvent = event
-      })
-      simulateKeyDown('ShiftTab')
-      equal(capturedEvent, triggeredEvent)
-    })
-
-    test('includes the active location when triggering onNavigatePrev', () => {
-      let location
-      gridSupport.events.onNavigatePrev.subscribe((_event, activeLocation) => {
-        location = activeLocation
-      })
-      simulateKeyDown('ShiftTab')
-      equal(location.region, 'header')
-      strictEqual(location.cell, 0)
-      strictEqual(typeof location.row, 'undefined')
-    })
-
-    test('prevents SlickGrid default behavior', () => {
-      simulateKeyDown('ShiftTab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
-    })
-
-    test('does not stop propagation of the event', () => {
-      simulateKeyDown('ShiftTab')
-      equal(bubbledEvent, triggeredEvent)
-    })
-
-    test('prevents the default behavior of the event', () => {
-      simulateKeyDown('ShiftTab')
-      strictEqual(defaultPrevented, true)
-    })
-  })
-
-  QUnit.module('RightArrow between two header cells', hooks => {
-    hooks.beforeEach(() => {
+  describe('RightArrow between two header cells', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 0})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -629,15 +576,15 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the next header cell', () => {
       simulateKeyDown('RightArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 1)
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(1)
     })
 
     test('triggers onNavigateRight', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateRight', () => {
@@ -646,38 +593,38 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('RightArrow')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateRight', () => {
       let location
-      gridSupport.events.onNavigateRight.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigateRight.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('RightArrow')
-      equal(location.region, 'header')
-      equal(location.cell, 1)
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('header')
+      expect(location.cell).toBe(1)
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('RightArrow from frozen header cell to scrollable header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('RightArrow from frozen header cell to scrollable header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 1})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -685,15 +632,15 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the next header cell', () => {
       simulateKeyDown('RightArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 2)
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(2)
     })
 
     test('triggers onNavigateRight', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateRight', () => {
@@ -702,38 +649,38 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('RightArrow')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateRight', () => {
       let location
-      gridSupport.events.onNavigateRight.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigateRight.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('RightArrow')
-      equal(location.region, 'header')
-      equal(location.cell, 2)
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('header')
+      expect(location.cell).toBe(2)
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('RightArrow on the last header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('RightArrow on the last header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 3})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -741,36 +688,36 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('RightArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 3)
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(3)
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('does not trigger onNavigateRight', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateRight.subscribe(handler)
       simulateKeyDown('RightArrow')
-      strictEqual(handler.callCount, 0)
+      expect(handler.callCount).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('RightArrow between two body cells', hooks => {
-    hooks.beforeEach(() => {
+  describe('RightArrow between two body cells', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -778,24 +725,24 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the next cell of the body row', () => {
       simulateKeyDown('RightArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 1)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(1)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('RightArrow on the last cell of a row', hooks => {
-    hooks.beforeEach(() => {
+  describe('RightArrow on the last cell of a row', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 3})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -803,45 +750,45 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('RightArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 3)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(3)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('does not prevent SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined')
+      expect(triggeredEvent.skipSlickGridDefaults).toBeUndefined()
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('RightArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('LeftArrow between two header cells', hooks => {
-    hooks.beforeEach(() => {
+  describe('LeftArrow between two header cells', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 1})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
 
-    test('activates the next header cell', () => {
+    test('activates the previous header cell', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 0)
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(0)
     })
 
     test('triggers onNavigateLeft', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateLeft', () => {
@@ -850,54 +797,54 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('LeftArrow')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateLeft', () => {
       let location
-      gridSupport.events.onNavigateLeft.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigateLeft.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('LeftArrow')
-      equal(location.region, 'header')
-      equal(location.cell, 0)
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('header')
+      expect(location.cell).toBe(0)
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('LeftArrow from scrollable header cell to frozen header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('LeftArrow from scrollable header cell to frozen header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 2})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
 
-    test('activates the next header cell', () => {
+    test('activates the previous header cell', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 1)
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(1)
     })
 
     test('triggers onNavigateLeft', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateLeft', () => {
@@ -906,38 +853,38 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('LeftArrow')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateLeft', () => {
       let location
-      gridSupport.events.onNavigateLeft.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigateLeft.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('LeftArrow')
-      equal(location.region, 'header')
-      equal(location.cell, 1)
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('header')
+      expect(location.cell).toBe(1)
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('LeftArrow on the first header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('LeftArrow on the first header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 0})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -945,36 +892,36 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 0)
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('does not trigger onNavigateLeft', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateLeft.subscribe(handler)
       simulateKeyDown('LeftArrow')
-      strictEqual(handler.callCount, 0)
+      expect(handler.callCount).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('LeftArrow between two body cells', hooks => {
-    hooks.beforeEach(() => {
+  describe('LeftArrow between two body cells', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 1})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -982,24 +929,24 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the previous cell of the body row', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('LeftArrow on the first cell of a row', hooks => {
-    hooks.beforeEach(() => {
+  describe('LeftArrow on the first cell of a row', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1007,32 +954,29 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  // This addresses a bug in SlickGrid that sets the active cell to the next
-  // column of the first row when navigating left on the first cell of the last
-  // row.
-  QUnit.module('LeftArrow on the first cell of the last row', hooks => {
-    hooks.beforeEach(() => {
+  describe('LeftArrow on the first cell of the last row', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 1, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1040,29 +984,29 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('LeftArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(activeLocation.row, 1)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBe(1)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('LeftArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('UpArrow on a header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('UpArrow on a header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 0})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -1070,36 +1014,36 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('does not change the active location', () => {
       simulateKeyDown('UpArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 0)
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('does not trigger onNavigateUp', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateUp.subscribe(handler)
       simulateKeyDown('UpArrow')
-      strictEqual(handler.callCount, 0)
+      expect(handler.callCount).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('UpArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('UpArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('does not prevent the default behavior of the event', () => {
       simulateKeyDown('UpArrow')
-      strictEqual(defaultPrevented, false)
+      expect(defaultPrevented).toBe(false)
     })
   })
 
-  QUnit.module('UpArrow on a cell in the first row', hooks => {
-    hooks.beforeEach(() => {
+  describe('UpArrow on a cell in the first row', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1107,16 +1051,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the related header cell', () => {
       simulateKeyDown('UpArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 0)
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('triggers onNavigateUp', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateUp.subscribe(handler)
       simulateKeyDown('UpArrow')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateUp', () => {
@@ -1125,38 +1069,38 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('UpArrow')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateUp', () => {
       let location
-      gridSupport.events.onNavigateUp.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigateUp.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('UpArrow')
-      equal(location.region, 'header')
-      equal(location.cell, 0)
-      equal(typeof location.row, 'undefined')
+      expect(location.region).toBe('header')
+      expect(location.cell).toBe(0)
+      expect(location.row).toBeUndefined()
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('UpArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('UpArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('UpArrow')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('UpArrow on a cell in a row other than the first', hooks => {
-    hooks.beforeEach(() => {
+  describe('UpArrow on a cell in a row other than the first', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 1, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1164,24 +1108,24 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the adjacent cell of the previous row', () => {
       simulateKeyDown('UpArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('UpArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('UpArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('DownArrow on a header cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('DownArrow on a header cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 0})
       $activeElement = gridSupport.helper.getBeforeGridNode()
     })
@@ -1189,16 +1133,16 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the related cell of the first row', () => {
       simulateKeyDown('DownArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('triggers onNavigateDown', () => {
-      const handler = sinon.spy()
+      const handler = sandbox.spy()
       gridSupport.events.onNavigateDown.subscribe(handler)
       simulateKeyDown('DownArrow')
-      strictEqual(handler.callCount, 1)
+      expect(handler.callCount).toBe(1)
     })
 
     test('includes the event when triggering onNavigateDown', () => {
@@ -1207,38 +1151,38 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
         capturedEvent = event
       })
       simulateKeyDown('DownArrow')
-      equal(capturedEvent, triggeredEvent)
+      expect(capturedEvent).toBe(triggeredEvent)
     })
 
     test('includes the active location when triggering onNavigateDown', () => {
       let location
-      gridSupport.events.onNavigateDown.subscribe((_event, activeLocation) => {
+      gridSupport.events.onNavigateDown.subscribe((event, activeLocation) => {
         location = activeLocation
       })
       simulateKeyDown('DownArrow')
-      equal(location.region, 'body')
-      strictEqual(location.cell, 0)
-      strictEqual(location.row, 0)
+      expect(location.region).toBe('body')
+      expect(location.cell).toBe(0)
+      expect(location.row).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('DownArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('DownArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
 
     test('prevents the default behavior of the event', () => {
       simulateKeyDown('DownArrow')
-      strictEqual(defaultPrevented, true)
+      expect(defaultPrevented).toBe(true)
     })
   })
 
-  QUnit.module('DownArrow on a body cell', hooks => {
-    hooks.beforeEach(() => {
+  describe('DownArrow on a body cell', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1246,24 +1190,24 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the adjacent cell of the next row', () => {
       simulateKeyDown('DownArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 0)
-      strictEqual(activeLocation.row, 1)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(0)
+      expect(activeLocation.row).toBe(1)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('DownArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('DownArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('DownArrow on a cell in the last row', hooks => {
-    hooks.beforeEach(() => {
+  describe('DownArrow on a cell in the last row', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 1, cell: 0})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1271,24 +1215,24 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('activates the cell of the next column in the first row', () => {
       simulateKeyDown('DownArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 1)
-      strictEqual(activeLocation.row, 0)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(1)
+      expect(activeLocation.row).toBe(0)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('DownArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('DownArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('DownArrow on a cell in the last row of the last column', hooks => {
-    hooks.beforeEach(() => {
+  describe('DownArrow on a cell in the last row of the last column', () => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('body', {row: 1, cell: 3})
       $activeElement = gridSupport.state.getActiveNode()
     })
@@ -1296,27 +1240,27 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
     test('keeps the current cell selected', () => {
       simulateKeyDown('DownArrow')
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'body')
-      strictEqual(activeLocation.cell, 3)
-      strictEqual(activeLocation.row, 1)
+      expect(activeLocation.region).toBe('body')
+      expect(activeLocation.cell).toBe(3)
+      expect(activeLocation.row).toBe(1)
     })
 
     test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('DownArrow')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('does not stop propagation of the event', () => {
       simulateKeyDown('DownArrow')
-      equal(bubbledEvent, triggeredEvent)
+      expect(bubbledEvent).toBe(triggeredEvent)
     })
   })
 
-  QUnit.module('with onKeyDown GridEvent subscribers', hooks => {
+  describe('with onKeyDown GridEvent subscribers', () => {
     let handledEvent
     let handledLocation
 
-    hooks.beforeEach(() => {
+    beforeEach(() => {
       gridSupport.state.setActiveLocation('header', {cell: 0})
       gridSupport.events.onKeyDown.subscribe((event, location) => {
         handledEvent = event
@@ -1330,80 +1274,87 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
 
     test('calls each handler with the triggered event', () => {
       simulateKeyDown('Tab')
-      equal(handledEvent, triggeredEvent)
+      expect(handledEvent).toBe(triggeredEvent)
     })
 
     test('calls each handler with the active location', () => {
       simulateKeyDown('Tab')
-      equal(handledLocation.region, 'header')
-      strictEqual(handledLocation.cell, 0)
-      equal(typeof handledLocation.row, 'undefined')
+      expect(handledLocation.region).toBe('header')
+      expect(handledLocation.cell).toBe(0)
+      expect(handledLocation.row).toBeUndefined()
     })
 
     test('triggers the event when handling keydown on a header child element', () => {
-      const spy = sinon.spy()
+      const spy = sandbox.spy()
       gridSupport.events.onKeyDown.subscribe(spy)
-      simulateKeyDown('Tab', document.querySelectorAll('.slick-column-name')[2])
-      strictEqual(spy.callCount, 1)
+      const headerChild = document.querySelectorAll('.slick-column-name')[2]
+      simulateKeyDown('Tab', headerChild)
+      expect(spy.callCount).toBe(1)
     })
 
     test('skips Navigation behavior when a handler returns false', () => {
       gridSupport.events.onKeyDown.subscribe(() => false)
       simulateKeyDown('Tab')
       const activeLocation = gridSupport.state.getActiveLocation()
-      strictEqual(activeLocation.cell, 0, 'active location did not change to second header cell')
+      expect(activeLocation.cell).toBe(0) // active location did not change to second header cell
     })
 
     test('prevents SlickGrid default behavior when a handler returns false', () => {
       gridSupport.events.onKeyDown.subscribe(() => false)
       simulateKeyDown('Tab')
-      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+      expect(triggeredEvent.skipSlickGridDefaults).toBe(true)
     })
 
     test('includes the columnId in the active location when handling a header cell event', () => {
       simulateKeyDown('Tab')
-      equal(handledLocation.columnId, 'column1')
+      expect(handledLocation.columnId).toBe('column1')
     })
 
     test('includes the columnId in the active location when handling keydown on a header child element', () => {
-      simulateKeyDown('Tab', document.querySelectorAll('.slick-column-name')[1])
-      equal(handledLocation.columnId, 'column2')
+      const headerChild = document.querySelectorAll('.slick-column-name')[1]
+      simulateKeyDown('Tab', headerChild)
+      expect(handledLocation.columnId).toBe('column2')
     })
 
     test('includes the columnId in the active location when handling a body cell event', () => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 1})
-      simulateKeyDown('Tab', gridSupport.state.getActiveNode())
-      equal(handledLocation.columnId, 'column2')
+      const bodyCell = gridSupport.state.getActiveNode()
+      simulateKeyDown('Tab', bodyCell)
+      expect(handledLocation.columnId).toBe('column2')
     })
 
     test('excludes a columnId from the active location when handling a "before grid" event', () => {
       gridSupport.state.setActiveLocation('beforeGrid')
-      simulateKeyDown('Tab', gridSupport.helper.getBeforeGridNode())
-      equal(typeof handledLocation.columnId, 'undefined')
+      const beforeGridNode = gridSupport.helper.getBeforeGridNode()
+      simulateKeyDown('Tab', beforeGridNode)
+      expect(handledLocation.columnId).toBeUndefined()
     })
 
     test('excludes a columnId from the active location when handling an "after grid" event', () => {
       gridSupport.state.setActiveLocation('afterGrid')
-      simulateKeyDown('Tab', gridSupport.helper.getAfterGridNode())
-      equal(typeof handledLocation.columnId, 'undefined')
+      const afterGridNode = gridSupport.helper.getAfterGridNode()
+      simulateKeyDown('Tab', afterGridNode)
+      expect(handledLocation.columnId).toBeUndefined()
     })
   })
 
-  QUnit.module('Click on a header', () => {
+  describe('Click on a header', () => {
     test('activates the header location being clicked', () => {
-      document.querySelectorAll('.slick-header-column')[1].click()
+      const headerColumn = document.querySelectorAll('.slick-header-column')[1]
+      headerColumn.click()
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 1)
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(1)
+      expect(activeLocation.row).toBeUndefined()
     })
 
     test('activates the header location when handling click on a header child element', () => {
-      document.querySelectorAll('.slick-column-name')[1].click()
+      const headerChild = document.querySelectorAll('.slick-column-name')[1]
+      headerChild.click()
       const activeLocation = gridSupport.state.getActiveLocation()
-      equal(activeLocation.region, 'header')
-      strictEqual(activeLocation.cell, 1)
-      equal(typeof activeLocation.row, 'undefined')
+      expect(activeLocation.region).toBe('header')
+      expect(activeLocation.cell).toBe(1)
+      expect(activeLocation.row).toBeUndefined()
     })
   })
 })
