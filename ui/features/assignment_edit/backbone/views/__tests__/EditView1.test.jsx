@@ -475,6 +475,106 @@ describe('EditView', () => {
         'http://example.com/launch',
       )
     })
+
+    it('does not allow submission_type_selection tools (selectedTool set) with require_resource_selection=true when content type is context_external_tool', () => {
+      const view = editView()
+      view.selectedTool = {require_resource_selection: true}
+      const data = {
+        submission_type: 'external_tool',
+        external_tool_tag_attributes: {
+          content_type: 'context_external_tool',
+          title: "shouldn't look at this",
+        },
+      }
+      const errors = view._validateExternalTool(data, [])
+      expect(errors.assignment_submission_container[0].message).toBe(
+        'Please click below to launch the tool and select a resource.',
+      )
+    })
+
+    it('allows submission_type_selection tools (selectedTool set) with require_resource_selection not set with no resource title', () => {
+      const view = editView()
+      view.selectedTool = {}
+      const data = {submission_type: 'external_tool'}
+      const errors = view._validateExternalTool(data, [])
+      expect(errors.assignment_submission_container).toBeUndefined()
+    })
+
+    it('allows submission_type_selection tools with require_resource_selection=true with a resource title', () => {
+      const view = editView()
+      view.selectedTool = {require_resource_selection: true}
+      const data = {
+        submission_type: 'external_tool',
+        external_tool_tag_attributes: {
+          content_type: 'ltiResourceLink',
+          title: 'some title',
+        },
+      }
+      const errors = view._validateExternalTool(data, [])
+      expect(errors.assignment_submission_container).toBeUndefined()
+    })
+
+    it('when a submission_type_selection tool is chosen and a resource selected: sets selectedTool, title, assignment name', () => {
+      const view = editView()
+      view.afterRender()
+      view.$('#assignment_submission_type').val('external_tool_placement_123')
+      view.$('#assignment_submission_type').trigger('change')
+      view.handleContentItem({
+        type: 'ltiResourceLink',
+        title: 'Tool Resource',
+        url: 'http://example.com/launch',
+      })
+      expect(view.$('#assignment_name').val()).toBe('Tool Resource')
+      expect(view.$('#assignment_external_tool_tag_attributes_url').val()).toBe('http://example.com/launch')
+    })
+
+    it('when a submission_type_selection tool is chosen and a resource w/o title selected: sets selectedTool and sets content type to ltiResourceLink', () => {
+      const view = editView()
+      view.afterRender()
+      view.$('#assignment_submission_type').val('external_tool_placement_123')
+      view.$('#assignment_submission_type').trigger('change')
+      view.handleContentItem({
+        type: 'ltiResourceLink',
+        url: 'http://example.com/launch',
+      })
+      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe('ltiResourceLink')
+    })
+
+    it('when a submission_type_selection tool chosen, a resource selected, and the resource removed: keeps selectedTool but clears out title and content type', () => {
+      const view = editView()
+      view.afterRender()
+      view.$('#assignment_submission_type').val('external_tool_placement_123')
+      view.$('#assignment_submission_type').trigger('change')
+      view.handleContentItem({
+        type: 'ltiResourceLink',
+        title: 'Tool Resource',
+        url: 'http://example.com/launch',
+      })
+      // Simulate removing content by triggering change with empty values
+      view.$('#assignment_external_tool_tag_attributes_content_type').val('').trigger('change')
+      view.$('#assignment_external_tool_tag_attributes_title').val('').trigger('change')
+      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe('')
+      expect(view.$('#assignment_external_tool_tag_attributes_title').val()).toBe('')
+    })
+
+    it('when a submission_type_selection tool chosen but changed back to generic "External Tool": URL and content type are reset', () => {
+      const view = editView()
+      view.afterRender()
+      view.$('#assignment_submission_type').val('external_tool_placement_123')
+      view.$('#assignment_submission_type').trigger('change')
+      view.handleContentItem({
+        type: 'ltiResourceLink',
+        title: 'Tool Resource',
+        url: 'http://example.com/launch',
+      })
+      // Reset the form and trigger all necessary changes
+      view.$('#assignment_external_tool_tag_attributes_content_type').val('context_external_tool')
+      view.$('#assignment_external_tool_tag_attributes_url').val('')
+      view.$('#assignment_submission_type').val('external_tool')
+      view.$('#assignment_submission_type').trigger('change')
+      expect(view.$('#assignment_external_tool_tag_attributes_url').val()).toBe('')
+      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe('context_external_tool')
+    })
   })
 
   it('does not validate allowed extensions if file uploads is not a submission type', () => {
@@ -485,9 +585,18 @@ describe('EditView', () => {
   })
 
   it('adds and removes student group', () => {
-    ENV.GROUP_CATEGORIES = [{id: 1, name: 'fun group'}]
+    ENV.GROUP_CATEGORIES = [{id: '1', name: 'fun group'}]
     ENV.ASSIGNMENT_GROUPS = [{id: 1, name: 'assignment group 1'}]
     const view = editView()
     expect(view.assignment.toView().groupCategoryId).toBeNull()
+
+    // Test adding group
+    view.$('#has_group_category').prop('checked', true).trigger('change')
+    view.$('#assignment_group_category_id').val('1').trigger('change')
+    expect(view.getFormData().group_category_id).toBe('1')
+
+    // Test removing group
+    view.$('#has_group_category').prop('checked', false).trigger('change')
+    expect(view.getFormData().group_category_id).toBeNull()
   })
 })
