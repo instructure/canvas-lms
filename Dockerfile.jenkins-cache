@@ -115,7 +115,6 @@ RUN --mount=target=/tmp/src \
         ui \
         ui-build \
         jest.config.js \
-        karma.conf.js \
         package.json \
         tsconfig.json \
         yarn.lock \

@@ -174,68 +174,25 @@ docker-compose exec web pry-remote --wait
 $ docker-compose exec web bundle exec rspec spec
 ```
 
-## Running javascript tests
-
-First off, there's some general JS testing info in
-[testing_javascript.md](https://github.com/instructure/canvas-lms/blob/master/doc/testing_javascript.md).
-That will guide you on running JS tests natively.  To run them in docker, read on.
-
-First add `docker-compose/js-tests.override.yml` to your `COMPOSE_FILE` var in
-`.env`. Then prepare that container with:
-
-```
-docker-compose run --rm js-tests yarn install
-```
-
-If you run into issues with `yarn install`, either during initial setup or after
-updating master, try to fix it with a `nuke_node`:
-
-```
-docker-compose run --rm js-tests ./script/nuke_node.sh
-docker-compose run --rm js-tests yarn install
-```
-
-### QUnit Karma Tests in Headless Chrome
-
-Run all QUnit tests in watch mode with:
-
-```
-docker-compose up js-tests
-```
-
-Or, if you're iterating on something and want to just run a targeted test file
-in watch mode, set the `JSPEC_PATH` env var, e.g.:
-
-```
-export JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js
-docker-compose up js-tests
-```
-
-To run a targeted test without watch mode:
-
-```
-docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-tests yarn test:karma:headless
-```
-
 ### Jest Tests
 
 Run all Jest tests with:
 
 ```
-docker-compose run --rm js-tests yarn test:jest
+docker-compose run --rm webpack yarn test:jest
 ```
 
 Or run a targeted subset of tests:
 
 ```
-docker-compose run --rm js-tests yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker-compose run --rm webpack yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 To run a targeted subset of tests in watch mode, use `test:jest:watch` and
 specify the paths to the test files as one or more arguments, e.g.:
 
 ```
-docker-compose run --rm js-tests yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker-compose run --rm webpack yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 ## Selenium

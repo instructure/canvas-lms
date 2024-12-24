@@ -65,21 +65,9 @@ and while you are changing stuff, it will run *all* the QUnit specs on
 any change. It should only take a couple seconds for webpack to process
 the file change and to reload the specs in the browser.
 
-When karma starts, it automatically starts a webpack-dev-server and
-webpacks whatever it needs to run the tests. see karma.conf.js for
-more info on how it works.
-
 To run all the tests, you can run:
 
 `yarn test`
-
-If you are using docker and want to run them all in a headless container you can 
-do so with with:
-
-`docker-compose run --rm js-tests`
-
-which spools up the "js-tests" container specified in docker-compose.yml, which
-has an entry point that knows how to kick off karma with a headless runner.
 
 ### Webpack Notifications
 

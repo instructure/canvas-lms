@@ -9,19 +9,17 @@ const importPlugin = require('eslint-plugin-import')
 const lodashPlugin = require('eslint-plugin-lodash')
 const notice = require('eslint-plugin-notice')
 const comments = require('@eslint-community/eslint-plugin-eslint-comments/configs')
+const path = require('path')
+
+const projectRoot = __dirname
 
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [
   {
+    ignores: ['**/doc/**', '**/es/**', 'Jenkinsfile.js', '**/ui/shared/jquery/**', '**/*.config.*', '**/jest/**'],
+  },
+  {
     files: ['ui/**/*.{js,mjs,ts,jsx,tsx}', 'ui-build/**/*.{js,mjs,ts,jsx,tsx}'],
-    ignores: [
-      '**/doc/*',
-      '**/es/*',
-      'Jenkinsfile.js',
-      'ui/shared/jquery/**',
-      '*.config.*',
-      'jest/**',
-    ],
   },
 
   // Globals
