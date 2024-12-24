@@ -211,7 +211,7 @@ tinymce.PluginManager.add('instructure_links', function (ed) {
           text: item.text,
           value: item.value,
           onAction: () => doMenuItem(ed, item.value),
-        }))
+        })),
       ),
     onSetup(api) {
       // @ts-expect-error
@@ -219,7 +219,9 @@ tinymce.PluginManager.add('instructure_links', function (ed) {
         if (e?.element) {
           api.setActive(!!getAnchorElement(ed, e.element))
         }
-        api.setDisabled(!isOKToLink(ed.selection.getContent()))
+        if (ed.selection) {
+          api.setDisabled(!isOKToLink(ed.selection.getContent()))
+        }
       }
 
       // if the user selects all the content w/in a link and deletes it via the keyboard
