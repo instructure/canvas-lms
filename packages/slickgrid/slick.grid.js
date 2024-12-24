@@ -3370,6 +3370,7 @@ if (typeof Slick === 'undefined') {
       // walk up the tree
       var offsetParent = elem.offsetParent
       while ((elem = elem.parentNode) != document.body) {
+        if (!elem) continue
         if (
           box.visible &&
           elem.scrollHeight != elem.offsetHeight &&
