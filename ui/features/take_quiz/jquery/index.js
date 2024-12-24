@@ -429,8 +429,15 @@ const quizSubmission = (function () {
     getTimeElapsed() {
       $('.time_header').text(I18n.beforeLabel(I18n.t('labels.time_elapsed', 'Time Elapsed')))
       const now = new Date().getTime()
-      const startedAt = Date.parse(quizSubmission.startedAt.text()).getTime()
-      return now - startedAt
+      const startedAtText = quizSubmission.startedAt.text()
+      if (!startedAtText) {
+        return NaN
+      }
+      const startedAtTime = Date.parse(startedAtText)
+      if (isNaN(startedAtTime)) {
+        return NaN
+      }
+      return now - startedAtTime
     },
 
     updateTimeDisplay(currentTimeLeft) {
