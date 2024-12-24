@@ -18,18 +18,18 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-
+import sinon from 'sinon'
 import GradeInput from '../../components/GradeInput'
 import GradeInputDriver from './GradeInputDriver'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHooks => {
+describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
   let $container
   let component
   let gradeInput
   let props
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
@@ -61,8 +61,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     gradeInput = null
   })
 
-  suiteHooks.afterEach(() => {
-    component.unmount()
+  afterEach(() => {
+    if (component) {
+      component.unmount()
+    }
     $container.remove()
     fakeENV.teardown()
   })
@@ -76,39 +78,44 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     }
   }
 
-  QUnit.module('when entering Complete/Incomplete grades', () => {
+  describe('when entering Complete/Incomplete grades', () => {
     test('displays a label of "Grade"', () => {
       renderComponent()
-      equal(gradeInput.labelText, 'Grade')
+      // checks if the label text is "Grade"
+      expect(gradeInput.labelText).toBe('Grade')
     })
 
     test('includes "Ungraded," "Complete," and "Incomplete" as options text', () => {
       renderComponent()
       gradeInput.clickToExpand()
-      deepEqual(gradeInput.optionLabels, ['Ungraded', 'Complete', 'Incomplete'])
+      // verifies the option labels
+      expect(gradeInput.optionLabels).toEqual(['Ungraded', 'Complete', 'Incomplete'])
     })
 
-    QUnit.module('when the submission is not graded', () => {
+    describe('when the submission is not graded', () => {
       test('sets the select value to "Ungraded"', () => {
         props.submission.enteredGrade = null
         renderComponent()
-        equal(gradeInput.value, 'Ungraded')
+        // checks if the value is "Ungraded"
+        expect(gradeInput.value).toBe('Ungraded')
       })
 
       test('sets the active option to "Ungraded"', () => {
         props.submission.enteredGrade = null
         renderComponent()
         gradeInput.clickToExpand()
-        equal(gradeInput.activeItemLabel, 'Ungraded')
+        // verifies the active item label
+        expect(gradeInput.activeItemLabel).toBe('Ungraded')
       })
     })
 
-    QUnit.module('when the submission is complete', () => {
+    describe('when the submission is complete', () => {
       test('sets the select value to "Complete"', () => {
         props.submission.enteredScore = 10
         props.submission.enteredGrade = 'complete'
         renderComponent()
-        equal(gradeInput.value, 'Complete')
+        // checks if the value is "Complete"
+        expect(gradeInput.value).toBe('Complete')
       })
 
       test('sets the active option to "Complete"', () => {
@@ -116,133 +123,154 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
         props.submission.enteredGrade = 'complete'
         renderComponent()
         gradeInput.clickToExpand()
-        equal(gradeInput.activeItemLabel, 'Complete')
+        // verifies the active item label
+        expect(gradeInput.activeItemLabel).toBe('Complete')
       })
     })
 
-    QUnit.module('when the submission is incomplete', () => {
+    describe('when the submission is incomplete', () => {
       test('sets the select value to "Incomplete"', () => {
         props.submission.enteredGrade = 'incomplete'
         renderComponent()
-        equal(gradeInput.value, 'Incomplete')
+        // checks if the value is "Incomplete"
+        expect(gradeInput.value).toBe('Incomplete')
       })
 
       test('sets the active option to "Incomplete"', () => {
         props.submission.enteredGrade = 'incomplete'
         renderComponent()
         gradeInput.clickToExpand()
-        equal(gradeInput.activeItemLabel, 'Incomplete')
+        // verifies the active item label
+        expect(gradeInput.activeItemLabel).toBe('Incomplete')
       })
     })
 
-    QUnit.module('when the submission is excused', () => {
+    describe('when the submission is excused', () => {
       test('sets the input value to "Excused"', () => {
         props.submission.excused = true
         renderComponent()
-        equal(gradeInput.value, 'Excused')
+        // checks if the value is "Excused"
+        expect(gradeInput.value).toBe('Excused')
       })
 
       test('sets the input to "read only"', () => {
         props.submission.excused = true
         renderComponent()
-        strictEqual(gradeInput.isReadOnly, true)
+        // verifies if the input is read-only
+        expect(gradeInput.isReadOnly).toBe(true)
       })
     })
 
     test('is blank the assignment has anonymized students', () => {
       props.assignment.anonymizeStudents = true
       renderComponent()
-      strictEqual(gradeInput.value, '')
+      // checks if the value is blank
+      expect(gradeInput.value).toBe('')
     })
 
     test('disables the input when disabled is true', () => {
       props.disabled = true
       renderComponent()
-      strictEqual(gradeInput.inputIsDisabled, true)
+      // verifies if the input is disabled
+      expect(gradeInput.inputIsDisabled).toBe(true)
     })
 
-    QUnit.module('when "Complete" is selected', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when "Complete" is selected', () => {
+      beforeEach(() => {
         renderComponent()
         gradeInput.clickToExpand()
         gradeInput.clickToSelectOption('Complete')
       })
 
       test('collapses the options list', () => {
-        strictEqual(gradeInput.isExpanded, false)
+        // checks if the options list is collapsed
+        expect(gradeInput.isExpanded).toBe(false)
       })
 
       test('sets the input value to "Complete"', () => {
-        equal(gradeInput.value, 'Complete')
+        // verifies the input value
+        expect(gradeInput.value).toBe('Complete')
       })
 
       test('calls the onSubmissionUpdate prop', () => {
-        strictEqual(props.onSubmissionUpdate.callCount, 1)
+        // checks if the onSubmissionUpdate prop was called once
+        expect(props.onSubmissionUpdate.callCount).toBe(1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
         const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-        strictEqual(updatedSubmission, props.submission)
+        // verifies the updated submission
+        expect(updatedSubmission).toBe(props.submission)
       })
 
       test('calls the onSubmissionUpdate prop with the grade form of the selected grade', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        equal(gradingData.grade, 'complete')
+        // checks the grade form
+        expect(gradingData.grade).toBe('complete')
       })
 
       test('calls the onSubmissionUpdate prop with the score form of the selected grade', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        strictEqual(gradingData.score, 10)
+        // verifies the score form
+        expect(gradingData.score).toBe(10)
       })
 
       test('calls the onSubmissionUpdate prop with the enteredAs set to "passFail"', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        equal(gradingData.enteredAs, 'passFail')
+        // checks the enteredAs field
+        expect(gradingData.enteredAs).toBe('passFail')
       })
     })
 
-    QUnit.module('when "Incomplete" is selected', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when "Incomplete" is selected', () => {
+      beforeEach(() => {
         renderComponent()
         gradeInput.clickToExpand()
         gradeInput.clickToSelectOption('Incomplete')
       })
 
       test('collapses the options list', () => {
-        strictEqual(gradeInput.isExpanded, false)
+        // checks if the options list is collapsed
+        expect(gradeInput.isExpanded).toBe(false)
       })
 
       test('sets the input value to "Incomplete"', () => {
-        equal(gradeInput.value, 'Incomplete')
+        // verifies the input value
+        expect(gradeInput.value).toBe('Incomplete')
       })
 
       test('calls the onSubmissionUpdate prop', () => {
-        strictEqual(props.onSubmissionUpdate.callCount, 1)
+        // checks if the onSubmissionUpdate prop was called once
+        expect(props.onSubmissionUpdate.callCount).toBe(1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
         const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-        strictEqual(updatedSubmission, props.submission)
+        // verifies the updated submission
+        expect(updatedSubmission).toBe(props.submission)
       })
 
       test('calls the onSubmissionUpdate prop with the entered grade', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        equal(gradingData.grade, 'incomplete')
+        // checks the entered grade
+        expect(gradingData.grade).toBe('incomplete')
       })
 
       test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        strictEqual(gradingData.score, 0)
+        // verifies the score form
+        expect(gradingData.score).toBe(0)
       })
 
       test('calls the onSubmissionUpdate prop with the enteredAs set to "passFail"', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        equal(gradingData.enteredAs, 'passFail')
+        // checks the enteredAs field
+        expect(gradingData.enteredAs).toBe('passFail')
       })
     })
 
-    QUnit.module('when the current grade is cleared', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when the current grade is cleared', () => {
+      beforeEach(() => {
         props.submission.enteredGrade = 'incomplete'
         renderComponent()
         gradeInput.clickToExpand()
@@ -250,63 +278,73 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
       })
 
       test('collapses the options list', () => {
-        strictEqual(gradeInput.isExpanded, false)
+        // checks if the options list is collapsed
+        expect(gradeInput.isExpanded).toBe(false)
       })
 
       test('sets the input value to "Ungraded"', () => {
-        equal(gradeInput.value, 'Ungraded')
+        // verifies the input value
+        expect(gradeInput.value).toBe('Ungraded')
       })
 
       test('calls the onSubmissionUpdate prop', () => {
-        strictEqual(props.onSubmissionUpdate.callCount, 1)
+        // checks if the onSubmissionUpdate prop was called once
+        expect(props.onSubmissionUpdate.callCount).toBe(1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
         const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-        strictEqual(updatedSubmission, props.submission)
+        // verifies the updated submission
+        expect(updatedSubmission).toBe(props.submission)
       })
 
       test('calls the onSubmissionUpdate prop with a null grade form', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        strictEqual(gradingData.grade, null)
+        // checks the grade form
+        expect(gradingData.grade).toBeNull()
       })
 
       test('calls the onSubmissionUpdate prop with a null score form', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        strictEqual(gradingData.score, null)
+        // verifies the score form
+        expect(gradingData.score).toBeNull()
       })
 
       test('calls the onSubmissionUpdate prop with the enteredAs set to null', () => {
         const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        strictEqual(gradingData.enteredAs, null)
+        // checks the enteredAs field
+        expect(gradingData.enteredAs).toBeNull()
       })
     })
 
-    QUnit.module('when the submission grade is updating', contextHooks => {
-      contextHooks.beforeEach(() => {
+    describe('when the submission grade is updating', () => {
+      beforeEach(() => {
         props.submissionUpdating = true
         props.pendingGradeInfo = {grade: 'complete', valid: true, excused: false}
       })
 
       test('updates the text input with the value of the pending grade', () => {
         renderComponent()
-        equal(gradeInput.value, 'Complete')
+        // checks if the value matches the pending grade
+        expect(gradeInput.value).toBe('Complete')
       })
 
       test('sets the text input to "Excused" when the submission is being excused', () => {
         props.pendingGradeInfo = {grade: null, valid: false, excused: true}
         renderComponent()
-        equal(gradeInput.value, 'Excused')
+        // verifies the input value is "Excused"
+        expect(gradeInput.value).toBe('Excused')
       })
 
       test('disables the other select options', () => {
         renderComponent()
         gradeInput.clickToExpand()
-        strictEqual(gradeInput.optionsAreDisabled, true)
+        // checks if the select options are disabled
+        expect(gradeInput.optionsAreDisabled).toBe(true)
       })
 
-      QUnit.module('when the submission grade finishes updating', moreHooks => {
-        moreHooks.beforeEach(() => {
+      describe('when the submission grade finishes updating', () => {
+        beforeEach(() => {
           renderComponent()
           props.submission = {...props.submission, enteredGrade: 'complete'}
           props.submissionUpdating = false
@@ -314,23 +352,26 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
         })
 
         test('updates the input value with the updated grade', () => {
-          equal(gradeInput.value, 'Complete')
+          // verifies the updated grade
+          expect(gradeInput.value).toBe('Complete')
         })
 
         test('enables the select options', () => {
           gradeInput.clickToExpand()
-          strictEqual(gradeInput.optionsAreDisabled, false)
+          // checks if the select options are enabled
+          expect(gradeInput.optionsAreDisabled).toBe(false)
         })
       })
     })
 
-    QUnit.module('when the submission is otherwise being updated', () => {
+    describe('when the submission is otherwise being updated', () => {
       test('does not update the input value when the submission begins updating', () => {
         renderComponent()
         props.submission = {...props.submission, enteredGrade: 'complete'}
         props.submissionUpdating = true
         renderComponent()
-        equal(gradeInput.value, 'Ungraded')
+        // checks if the value remains "Ungraded"
+        expect(gradeInput.value).toBe('Ungraded')
       })
 
       test('updates the input value when the submission finishes updating', () => {
@@ -339,26 +380,29 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
         props.submission = {...props.submission, enteredGrade: 'complete'}
         props.submissionUpdating = false
         renderComponent()
-        equal(gradeInput.value, 'Complete')
+        // verifies the input value is updated to "Complete"
+        expect(gradeInput.value).toBe('Complete')
       })
     })
 
-    QUnit.module('when handling down arrow', () => {
+    describe('when handling down arrow', () => {
       test('activates the option after the current active option', () => {
         renderComponent()
         gradeInput.clickToExpand()
-        gradeInput.keyDown(40)
-        equal(gradeInput.activeItemLabel, 'Complete')
+        gradeInput.keyDown(40) // Arrow Down key code
+        // checks if the active item label is "Complete"
+        expect(gradeInput.activeItemLabel).toBe('Complete')
       })
     })
 
-    QUnit.module('when handling up arrow', () => {
+    describe('when handling up arrow', () => {
       test('activates the option previous to the current active option', () => {
         props.submission = {...props.submission, enteredGrade: 'complete'}
         renderComponent()
         gradeInput.clickToExpand()
-        gradeInput.keyDown(38)
-        equal(gradeInput.activeItemLabel, 'Ungraded')
+        gradeInput.keyDown(38) // Arrow Up key code
+        // verifies the active item label is "Ungraded"
+        expect(gradeInput.activeItemLabel).toBe('Ungraded')
       })
     })
   })
