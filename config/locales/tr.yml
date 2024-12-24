@@ -6814,6 +6814,7 @@ tr:
   crumbs: 
     access_report: "Erişim Raporu"
     announcements: Duyurular
+    apps: Uygulamalar
     assignments: Ödevler
     calendar_events: "Takvim Olayları"
     collaborations: İşbirlikleri
@@ -11048,6 +11049,9 @@ tr:
       new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
       new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
       new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
+    registrations: 
+      index: 
+        title: Uygulamalar
   lti2: 
     register_tool: "Kayıt Aracı"
   lti_2_reregistration_afabde25: "LTI 2 Yeniden Kayıt"
