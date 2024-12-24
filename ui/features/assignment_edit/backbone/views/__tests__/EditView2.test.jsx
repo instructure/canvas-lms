@@ -201,6 +201,28 @@ describe('EditView', () => {
     expect(view.locationAfterCancel({})).toBe(currentOrigin + '/bar')
   })
 
+  it('cancels to return_to', () => {
+    ENV.CANCEL_TO = currentOrigin + '/foo'
+    const view = editView()
+    expect(view.locationAfterCancel({return_to: currentOrigin + '/bar'})).toBe(
+      currentOrigin + '/bar',
+    )
+  })
+
+  it('does not cancel to return_to with javascript protocol', () => {
+    ENV.CANCEL_TO = currentOrigin + '/foo'
+    const view = editView()
+    expect(view.locationAfterCancel({return_to: 'javascript:alert(1)'})).toBe(
+      currentOrigin + '/foo',
+    )
+  })
+
+  it('does not follow a cross-origin return_to', () => {
+    ENV.CANCEL_TO = currentOrigin + '/foo'
+    const view = editView()
+    expect(view.locationAfterCancel({return_to: 'http://evil.com'})).toBe(currentOrigin + '/foo')
+  })
+
   it('disableCheckbox is called for a disabled checkbox', () => {
     const view = editView({in_closed_grading_period: true})
     view.$el.appendTo($(fixtures))
@@ -395,5 +417,184 @@ describe('EditView', () => {
     $('<input type="checkbox" id="group_category_checkbox"/>').appendTo($(view.$el))
     disableCheckbox('group_category_checkbox')
     expect(document.getElementById('group_category_checkbox').disabled).toBe(true)
+  })
+
+  it('rounds points_possible', () => {
+    const view = editView()
+    view.$assignmentPointsPossible.val('1.234')
+    const data = view.getFormData()
+    expect(data.points_possible).toBe(1.23)
+  })
+
+  it('sets seconds of due_at to 59 if the new minute value is 59', () => {
+    const view = editView({
+      due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    })
+    const override = view.assignment.attributes.assignment_overrides.models[0]
+    override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    expect(view.getFormData().due_at).toBe('2000-08-28T11:59:59.000Z')
+  })
+
+  it('sets seconds of due_at to 00 if the new minute value is not 59', () => {
+    const view = editView({
+      due_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    })
+    const override = view.assignment.attributes.assignment_overrides.models[0]
+    override.attributes.due_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+    expect(view.getFormData().due_at).toBe('2000-09-28T11:58:00.000Z')
+  })
+
+  it('sets seconds of unlock_at to 59 if the new minute value is 59', () => {
+    const view = editView({
+      unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    })
+    const override = view.assignment.attributes.assignment_overrides.models[0]
+    override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    expect(view.getFormData().unlock_at).toBe('2000-08-28T11:59:59.000Z')
+  })
+
+  it('sets seconds of unlock_at to 00 if the new minute value is not 59', () => {
+    const view = editView({
+      unlock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    })
+    const override = view.assignment.attributes.assignment_overrides.models[0]
+    override.attributes.unlock_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+    expect(view.getFormData().unlock_at).toBe('2000-09-28T11:58:00.000Z')
+  })
+
+  it('sets seconds of lock_at to 59 if the new minute value is 59', () => {
+    const view = editView({
+      lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23')),
+    })
+    const override = view.assignment.attributes.assignment_overrides.models[0]
+    override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+    expect(view.getFormData().lock_at).toBe('2000-08-28T11:59:59.000Z')
+  })
+
+  it('sets seconds of lock_at to 00 if the new minute value is not 59', () => {
+    const view = editView({
+      lock_at: unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23')),
+    })
+    const override = view.assignment.attributes.assignment_overrides.models[0]
+    override.attributes.lock_at = unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+    expect(view.getFormData().lock_at).toBe('2000-09-28T11:58:00.000Z')
+  })
+
+  it('getFormData returns custom_params as a JSON object, not a string', () => {
+    const custom_params = {
+      hello: 'world',
+    }
+    const view = editView()
+    view.$externalToolsCustomParams.val(JSON.stringify(custom_params))
+    expect(view.getFormData().external_tool_tag_attributes.custom_params).toEqual(custom_params)
+  })
+
+  it('disables fields when inClosedGradingPeriod', () => {
+    ENV.current_user_is_admin = false
+    const view = editView({in_closed_grading_period: true})
+    view.$el.appendTo($(fixtures))
+
+    expect(view.$el.find('#assignment_name').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('#assignment_points_possible').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('#assignment_group_id').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('#assignment_group_id').attr('aria-readonly')).toBe('true')
+    expect(view.$el.find('#assignment_grading_type').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('input[name="grading_type"]').attr('type')).toBe('hidden')
+    expect(view.$el.find('#has_group_category').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('#has_group_category').attr('aria-readonly')).toBe('true')
+  })
+
+  it('disables fields when user does not have Grade - edit permissions and submissions have been graded', () => {
+    ENV.PERMISSIONS = {can_edit_grades: false}
+    const view = editView({graded_submissions_exist: true})
+    view.$el.appendTo($(fixtures))
+
+    expect(view.$el.find('#assignment_points_possible').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('#assignment_grading_type').attr('readonly')).toBeTruthy()
+  })
+
+  it('does not disable fields when user does not have Grade - edit permissions and submissions have not been graded', () => {
+    ENV.PERMISSIONS = {can_edit_grades: false}
+    const view = editView({graded_submissions_exist: false})
+    view.$el.appendTo($(fixtures))
+
+    expect(view.$el.find('#assignment_points_possible').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_grading_type').attr('readonly')).toBeFalsy()
+  })
+
+  it('does not disable fields when user has Grade - edit permissions', () => {
+    ENV.PERMISSIONS = {can_edit_grades: true}
+    const view = editView({graded_submissions_exist: true})
+    view.$el.appendTo($(fixtures))
+
+    expect(view.$el.find('#assignment_points_possible').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_grading_type').attr('readonly')).toBeFalsy()
+  })
+
+  it('disables grading type field when frozen', () => {
+    const view = editView({frozen_attributes: ['grading_type']})
+    view.$el.appendTo($(fixtures))
+
+    expect(view.$el.find('#assignment_grading_type').attr('readonly')).toBeTruthy()
+    expect(view.$el.find('input[name="grading_type"]').attr('type')).toBe('hidden')
+  })
+
+  it('does not disable post to sis when inClosedGradingPeriod', () => {
+    ENV.POST_TO_SIS = true
+    const view = editView({in_closed_grading_period: true})
+    view.$el.appendTo($(fixtures))
+    expect(view.$el.find('#assignment_post_to_sis').prop('disabled')).toBeFalsy()
+  })
+
+  it('ignoreClickHandler is called for a disabled radio', () => {
+    const view = editView({in_closed_grading_period: true})
+    view.$el.appendTo($(fixtures))
+    $('<input type="radio" id="fixture_radio"/>').appendTo($(view.$el))
+
+    const ignoreClickHandlerSpy = jest.spyOn(view, 'ignoreClickHandler')
+    view.disableFields()
+
+    view.$el.find('#fixture_radio').click()
+    expect(ignoreClickHandlerSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('lockSelectValueHandler is called for a disabled select', () => {
+    const view = editView({in_closed_grading_period: true})
+    view.$el.html('')
+    $(
+      '<select id="select_fixture"><option selected>1</option></option>2</option></select>',
+    ).appendTo($(view.$el))
+    view.$el.appendTo($(fixtures))
+
+    const lockSelectValueHandlerSpy = jest.spyOn(view, 'lockSelectValueHandler')
+    view.disableFields()
+    expect(lockSelectValueHandlerSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('lockSelectValueHandler freezes selected value', () => {
+    const view = editView({in_closed_grading_period: true})
+    view.$el.html('')
+    $(
+      '<select id="select_fixture"><option selected>1</option></option>2</option></select>',
+    ).appendTo($(view.$el))
+    view.$el.appendTo($(fixtures))
+
+    const selectedValue = view.$el.find('#fixture_select').val()
+    view.$el.find('#fixture_select').val(2).trigger('change')
+    expect(view.$el.find('#fixture_select').val()).toBe(selectedValue)
+  })
+
+  it('fields are enabled when not inClosedGradingPeriod', () => {
+    const view = editView()
+    view.$el.appendTo($(fixtures))
+
+    expect(view.$el.find('#assignment_name').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_points_possible').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_group_id').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_group_id').attr('aria-readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_grading_type').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#assignment_grading_type').attr('aria-readonly')).toBeFalsy()
+    expect(view.$el.find('#has_group_category').attr('readonly')).toBeFalsy()
+    expect(view.$el.find('#has_group_category').attr('aria-readonly')).toBeFalsy()
   })
 })
