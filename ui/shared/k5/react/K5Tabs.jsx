@@ -31,6 +31,7 @@ const I18n = createI18nScope('k5_tabs')
 
 export const scrollElementIntoViewIfCoveredByHeader = tabsRef => e => {
   const elementY = e.target.getBoundingClientRect().y
+  if (!tabsRef) return
   const headerHeight = tabsRef.getBoundingClientRect().y + tabsRef.getBoundingClientRect().height
   // If the focused element is positioned higher than the sticky header, scroll the window by
   // the difference in height (plus a little extra for legibility)
@@ -72,7 +73,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
       ([e]) => {
         setSticky(e.intersectionRatio < 1)
       },
-      {threshold: [1]}
+      {threshold: [1]},
     )
     observer.observe(cachedRef)
     return () => observer.unobserve(cachedRef)
@@ -123,7 +124,7 @@ K5Tabs.propTypes = {
       id: PropTypes.string.isRequired,
       icon: PropTypes.elementType.isRequired,
       label: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   tabsRef: PropTypes.func,
   courseContext: PropTypes.string,
