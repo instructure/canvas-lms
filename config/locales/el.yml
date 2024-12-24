@@ -8085,6 +8085,7 @@ el:
   luxembourg_352_85f4124d: "Luxembourg (+352)"
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Εισαγωγέας Moodle "
+  make_it_public_71bf2a86: "Δημοσίευσέ το"
   malformed_csv_aaa4b7f2: "Παραμορφωμένο CSV"
   manage_access_bd923d8d: "Διαχείριση Πρόσβασης"
   manage_all_other_course_content_d77de830: "Διαχείριση όλου του υπόλοιπου περιεχομένου του μαθήματος"
@@ -10687,6 +10688,7 @@ el:
   parent_of_a_canvas_user_afba1624: "Γονέας ή Χρήστης Canvas;"
   parent_signup_b7c6bf0a: "Εγγραφή Γονέα"
   parents_sign_up_here_f0aa8f4f: "Οι γονείς εγγράφονται εδώ"
+  participated_6279fba: Συμμετείχε
   participation_af2598: Συμμετοχή
   participations_1823832d: Συμμετοχές
   pass_fail_3d9461b0: Επιτυχία/Αποτυχία
