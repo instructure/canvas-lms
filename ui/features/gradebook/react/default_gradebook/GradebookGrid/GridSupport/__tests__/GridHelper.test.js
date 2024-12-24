@@ -58,48 +58,57 @@ function createGrid() {
   return new Grid('#example-grid', createRows(), createColumns(), options)
 }
 
-QUnit.module('GradebookGrid GridHelper', suiteHooks => {
+describe('GradebookGrid GridHelper', () => {
   let $gridContainer
   let grid
   let gridSupport
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
+    // Create and append grid container to the document body
     $gridContainer = document.createElement('div')
     $gridContainer.id = 'example-grid'
     document.body.appendChild($gridContainer)
+
+    // Initialize SlickGrid and GridSupport
     grid = createGrid()
     gridSupport = new GridSupport(grid)
     gridSupport.initialize()
   })
 
-  suiteHooks.afterEach(() => {
+  afterEach(() => {
+    // Destroy GridSupport and SlickGrid instances
     gridSupport.destroy()
     grid.destroy()
+
+    // Remove grid container from the document body
     $gridContainer.remove()
   })
 
-  QUnit.module('#beginEdit()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#beginEdit()', () => {
+    beforeEach(() => {
+      // Set active location to the first cell of the first row
       gridSupport.state.setActiveLocation('body', {cell: 0, row: 0})
+
+      // Commit any existing edits to ensure a clean state
       gridSupport.helper.commitCurrentEdit()
     })
 
     test('edits the active cell', () => {
       gridSupport.helper.beginEdit()
-      strictEqual(grid.getEditorLock().isActive(), true)
+      expect(grid.getEditorLock().isActive()).toBe(true)
     })
 
     test('does not edit the active cell when the grid is not editable', () => {
       grid.setOptions({editable: false})
       gridSupport.helper.beginEdit()
-      strictEqual(grid.getEditorLock().isActive(), false)
+      expect(grid.getEditorLock().isActive()).toBe(false)
     })
   })
 
-  QUnit.module('#focus()', () => {
+  describe('#focus()', () => {
     test('sets focus on the grid', () => {
       gridSupport.helper.focus()
-      equal(document.activeElement, gridSupport.helper.getAfterGridNode())
+      expect(document.activeElement).toBe(gridSupport.helper.getAfterGridNode())
     })
   })
 })
