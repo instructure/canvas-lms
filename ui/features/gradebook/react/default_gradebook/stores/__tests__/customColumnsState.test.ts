@@ -23,6 +23,10 @@ import store from '../index'
 import type {CustomColumn} from '../../gradebook.d'
 import sinon from 'sinon'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashError: jest.fn(),
+}))
+
 const exampleCustomColumns: CustomColumn[] = [
   {
     hidden: false,

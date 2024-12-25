@@ -20,6 +20,38 @@ import {uploadFile, completeUpload} from '../index'
 import sinon from 'sinon'
 
 describe('Upload File', () => {
+  beforeEach(() => {
+    global.FormData = function () {
+      const data = new Map()
+      return {
+        append: (key, value) => data.set(key, value),
+        get: key => data.get(key),
+        has: key => data.has(key),
+        entries: () => data.entries(),
+        toString: () => {
+          const pairs = []
+          data.forEach((value, key) => pairs.push(`${key}=${value}`))
+          return pairs.join('&')
+        },
+      }
+    }
+
+    // Mock Blob
+    global.Blob = function (content, options) {
+      return {
+        content,
+        type: options?.type || '',
+        size: content[0]?.length || 0,
+        toString: () => content[0],
+      }
+    }
+  })
+
+  afterEach(() => {
+    delete global.FormData
+    delete global.Blob
+  })
+
   test('uploadFile posts form data instead of json if necessary', async () => {
     const preflightResponse = new Promise(resolve => {
       setTimeout(() =>
@@ -27,7 +59,7 @@ describe('Upload File', () => {
           data: {
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -45,11 +77,11 @@ describe('Upload File', () => {
       name: 'fake',
       'attachment[context_code]': 'course_1',
     }
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
     expect(
-      postStub.calledWith(url, 'name=fake&attachment%5Bcontext_code%5D=course_1&no_redirect=true')
+      postStub.calledWith(url, 'name=fake&attachment%5Bcontext_code%5D=course_1&no_redirect=true'),
     ).toBeTruthy()
   })
 
@@ -60,7 +92,7 @@ describe('Upload File', () => {
           data: {
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -75,7 +107,7 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
     expect(postStub.calledWith(url, {name: 'fake', no_redirect: true})).toBeTruthy()
@@ -90,7 +122,7 @@ describe('Upload File', () => {
             upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -107,7 +139,7 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
     expect(getStub.calledWith(successUrl)).toBeTruthy()
@@ -122,7 +154,7 @@ describe('Upload File', () => {
             upload_params: {fakeKey: 'fakeValue'},
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -131,7 +163,7 @@ describe('Upload File', () => {
         resolve({
           status: 201,
           data: {location: successUrl},
-        })
+        }),
       )
     })
 
@@ -148,7 +180,7 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     await uploadFile(url, data, file, fakeAjaxLib)
     expect(getStub.calledWith(successUrl)).toBeTruthy()
@@ -162,7 +194,7 @@ describe('Upload File', () => {
             upload_params: {fakeKey: 'fakeValue'},
             upload_url: 'http://uploadUrl',
           },
-        })
+        }),
       )
     })
 
@@ -170,7 +202,7 @@ describe('Upload File', () => {
       setTimeout(() =>
         resolve({
           data: {id: 1},
-        })
+        }),
       )
     })
 
@@ -187,7 +219,7 @@ describe('Upload File', () => {
 
     const url = `/api/v1/courses/1/files`
     const data = {name: 'fake'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     const response = await uploadFile(url, data, file, fakeAjaxLib)
     expect(response.id).toBe(1)
@@ -203,7 +235,7 @@ describe('Upload File', () => {
     postStub.resolves({data: {}})
     const fakeAjaxLib = {post: postStub}
 
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
 
     return completeUpload(preflightResponse, file, {ajaxLib: fakeAjaxLib}).then(() => {
       expect(postStub.calledWith(upload_url, sinon.match.any, sinon.match.any)).toBeTruthy()
@@ -216,7 +248,7 @@ describe('Upload File', () => {
     const fakeAjaxLib = {post: postStub}
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {
       ajaxLib: fakeAjaxLib,
       onProgress: sinon.spy(),
@@ -229,8 +261,8 @@ describe('Upload File', () => {
           sinon.match.any,
           sinon.match({
             onUploadProgress: options.onProgress,
-          })
-        )
+          }),
+        ),
       ).toBeTruthy()
     })
   })
@@ -243,7 +275,7 @@ describe('Upload File', () => {
         resolve({
           status: 201,
           data: {location: successUrl},
-        })
+        }),
       )
     })
 
@@ -258,7 +290,7 @@ describe('Upload File', () => {
     }
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {
       ajaxLib: fakeAjaxLib,
       ignoreResult: true,
@@ -277,7 +309,7 @@ describe('Upload File', () => {
         resolve({
           status: 201,
           data: {location: successUrl},
-        })
+        }),
       )
     })
 
@@ -292,7 +324,7 @@ describe('Upload File', () => {
     }
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {
       ajaxLib: fakeAjaxLib,
       includeAvatar: true,
@@ -320,7 +352,7 @@ describe('Upload File', () => {
       upload_url: 'http://uploadUrl',
       success_url: successUrl,
     }
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(() => {
@@ -330,8 +362,8 @@ describe('Upload File', () => {
           sinon.match.any,
           sinon.match({
             withCredentials: false,
-          })
-        )
+          }),
+        ),
       ).toBeTruthy()
     })
   })
@@ -348,7 +380,7 @@ describe('Upload File', () => {
     }
 
     const preflightResponse = {upload_url: 'http://uploadUrl'}
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     const options = {ajaxLib: fakeAjaxLib}
 
     return completeUpload(preflightResponse, file, options).then(() => {
@@ -358,8 +390,8 @@ describe('Upload File', () => {
           sinon.match.any,
           sinon.match({
             withCredentials: true,
-          })
-        )
+          }),
+        ),
       ).toBeTruthy()
     })
   })
@@ -384,8 +416,8 @@ describe('Upload File', () => {
         postStub.calledWith(
           sinon.match.any,
           sinon.match(formData => !formData.has('file')),
-          sinon.match.any
-        )
+          sinon.match.any,
+        ),
       ).toBeTruthy()
     })
   })
@@ -440,7 +472,7 @@ describe('Upload File', () => {
   test('uploadFile differentiates network failures during preflight', async () => {
     const fakeAjaxLib = {post: sinon.stub()}
     fakeAjaxLib.post.rejects({message: 'Network Error'}) // preflight attempt
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     try {
       await uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
       expect(false).toBeTruthy() // preflight should fail
@@ -453,7 +485,7 @@ describe('Upload File', () => {
     const fakeAjaxLib = {post: sinon.stub()}
     fakeAjaxLib.post.onCall(0).resolves({data: {upload_url: 'http://uploadUrl'}}) // preflight
     fakeAjaxLib.post.onCall(1).rejects({message: 'Network Error'}) // upload attempt
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     try {
       await uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
       expect(false).toBeTruthy() // upload should fail
@@ -472,7 +504,7 @@ describe('Upload File', () => {
     }) // preflight
     fakeAjaxLib.post.onCall(1).resolves({data: {}}) // upload
     fakeAjaxLib.get.rejects({message: 'Network Error'}) // success url attempt
-    const file = new File(['fake'], 'fake.txt')
+    const file = new Blob(['fake'], {type: 'text/plain'})
     try {
       await uploadFile('http://preflightUrl', {}, file, fakeAjaxLib)
       expect(false).toBeTruthy() // finalization should fail

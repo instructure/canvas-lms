@@ -25,6 +25,7 @@ import React from 'react'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -33,24 +34,169 @@ jest.mock('../../../util/utils', () => ({
 
 describe('ConversationListContainer', () => {
   const server = mswServer(handlers)
-  const getConversationsQuery = (scope, course) => {
-    const response = handlers[0].resolver(
-      {
-        variables: {
-          scope,
-          course,
+  const getConversationsQuery = (scope = 'inbox', course) => {
+    const nodes =
+      scope === 'null_nodes'
+        ? []
+        : scope === 'multipleConversations'
+          ? [
+              {
+                _id: '1',
+                id: '1',
+                workflowState: 'read',
+                label: 'label',
+                starred: false,
+                properties: ['attachments'],
+                conversation: {
+                  _id: '1',
+                  subject: 'This is an inbox conversation',
+                  conversationMessagesCount: 1,
+                  conversationParticipantsConnection: {
+                    nodes: [
+                      {
+                        name: 'Bob Barker',
+                        _id: '1',
+                      },
+                    ],
+                  },
+                  conversationMessagesConnection: {
+                    nodes: [
+                      {
+                        _id: '1',
+                        author: {
+                          name: 'Bob Barker',
+                          _id: '1',
+                        },
+                        createdAt: '2023-01-01T12:00:00Z',
+                        body: 'This is a very long message that should be truncated differently based on the screen size. It contains more than 93 characters to test truncation.',
+                      },
+                    ],
+                  },
+                },
+              },
+              {
+                _id: '2',
+                id: '2',
+                workflowState: 'read',
+                label: 'label',
+                starred: false,
+                properties: ['attachments'],
+                conversation: {
+                  _id: '2',
+                  subject: 'This is another conversation',
+                  conversationMessagesCount: 1,
+                  conversationParticipantsConnection: {
+                    nodes: [
+                      {
+                        name: 'Bob Barker',
+                        _id: '1',
+                      },
+                    ],
+                  },
+                  conversationMessagesConnection: {
+                    nodes: [
+                      {
+                        _id: '2',
+                        author: {
+                          name: 'Bob Barker',
+                          _id: '1',
+                        },
+                        createdAt: '2023-01-01T12:00:00Z',
+                        body: 'This is another message',
+                      },
+                    ],
+                  },
+                },
+              },
+              {
+                _id: '3',
+                id: '3',
+                workflowState: 'read',
+                label: 'label',
+                starred: false,
+                properties: ['attachments'],
+                conversation: {
+                  _id: '3',
+                  subject: 'This is a third conversation',
+                  conversationMessagesCount: 1,
+                  conversationParticipantsConnection: {
+                    nodes: [
+                      {
+                        name: 'Bob Barker',
+                        _id: '1',
+                      },
+                    ],
+                  },
+                  conversationMessagesConnection: {
+                    nodes: [
+                      {
+                        _id: '3',
+                        author: {
+                          name: 'Bob Barker',
+                          _id: '1',
+                        },
+                        createdAt: '2023-01-01T12:00:00Z',
+                        body: 'This is a third message',
+                      },
+                    ],
+                  },
+                },
+              },
+            ]
+          : scope === 'sent' || course
+            ? []
+            : [
+                {
+                  _id: '1',
+                  id: '1',
+                  workflowState: 'read',
+                  label: 'label',
+                  starred: false,
+                  properties: ['attachments'],
+                  conversation: {
+                    _id: '1',
+                    subject: 'This is an inbox conversation',
+                    conversationMessagesCount: 1,
+                    conversationParticipantsConnection: {
+                      nodes: [
+                        {
+                          name: 'Bob Barker',
+                          _id: '1',
+                        },
+                      ],
+                    },
+                    conversationMessagesConnection: {
+                      nodes: [
+                        {
+                          _id: '1',
+                          author: {
+                            name: 'Bob Barker',
+                            _id: '1',
+                          },
+                          createdAt: '2023-01-01T12:00:00Z',
+                          body: 'This is a very long message that should be truncated differently based on the screen size. It contains more than 93 characters to test truncation.',
+                        },
+                      ],
+                    },
+                  },
+                },
+              ]
+
+    return {
+      data: {
+        legacyNode: {
+          _id: '1',
+          id: '1',
+          conversationsConnection: {
+            nodes,
+            pageInfo: {
+              hasNextPage: false,
+              endCursor: null,
+            },
+          },
         },
       },
-      res => {
-        return {...res}
-      },
-      {
-        data: data => {
-          return {data}
-        },
-      }
-    )
-    return JSON.parse(response.body.toString())
+    }
   }
 
   beforeAll(() => {
@@ -97,7 +243,7 @@ describe('ConversationListContainer', () => {
           submissionCommentsQuery={submissionCommentsQuery}
           {...conversationListContainerProps}
         />
-      </ApolloProvider>
+      </ApolloProvider>,
     )
   }
 
@@ -125,11 +271,11 @@ describe('ConversationListContainer', () => {
             conversationsQuery={conversationsQuery}
             submissionCommentsQuery={submissionCommentsQuery}
           />
-        </ApolloProvider>
+        </ApolloProvider>,
       )
 
       await waitFor(() =>
-        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument()
+        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument(),
       )
     })
 
@@ -149,11 +295,11 @@ describe('ConversationListContainer', () => {
             conversationsQuery={conversationsQuery}
             submissionCommentsQuery={submissionCommentsQuery}
           />
-        </ApolloProvider>
+        </ApolloProvider>,
       )
 
       await waitFor(() =>
-        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument()
+        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument(),
       )
     })
 
@@ -173,11 +319,11 @@ describe('ConversationListContainer', () => {
             conversationsQuery={conversationsQuery}
             submissionCommentsQuery={submissionCommentsQuery}
           />
-        </ApolloProvider>
+        </ApolloProvider>,
       )
 
       await waitFor(() =>
-        expect(component.queryByText('This is an inbox conversation')).toBeInTheDocument()
+        expect(component.queryByText('This is an inbox conversation')).toBeInTheDocument(),
       )
 
       // Select course
@@ -190,11 +336,11 @@ describe('ConversationListContainer', () => {
             conversationsQuery={conversationsQuery}
             submissionCommentsQuery={submissionCommentsQuery}
           />
-        </ApolloProvider>
+        </ApolloProvider>,
       )
 
       await waitFor(() =>
-        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument()
+        expect(component.queryByText('This is an inbox conversation')).not.toBeInTheDocument(),
       )
     })
   })
@@ -207,6 +353,7 @@ describe('ConversationListContainer', () => {
         }
       }
     })
+
     it('should track when conversations are clicked', async () => {
       const mock = jest.fn()
       const conversationsQuery = {
@@ -214,27 +361,20 @@ describe('ConversationListContainer', () => {
         loading: false,
       }
 
-      const conversationList = setup({
+      const {findAllByTestId} = setup({
         onSelectConversation: mock,
         conversationsQuery,
       })
 
       await waitForApolloLoading()
 
-      const checkboxes = await conversationList.findAllByText(
-        'This is an inbox conversation not selected'
-      )
-      checkboxes.forEach(checkbox => {
-        fireEvent(
-          checkbox,
-          new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-          })
-        )
-      })
+      const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+      for (const checkbox of checkboxes) {
+        fireEvent.click(checkbox)
+      }
 
-      expect(mock.mock.calls.length).toBe(4)
+      // Check that the last call contains all three conversations
+      expect(mock.mock.calls[mock.mock.calls.length - 1][0]).toHaveLength(3)
     })
 
     it('should be able to select range of conversations ASC', async () => {
@@ -243,16 +383,15 @@ describe('ConversationListContainer', () => {
         loading: false,
       }
 
-      const conversationList = setup({conversationsQuery})
+      const {findAllByTestId} = setup({conversationsQuery})
       await waitForApolloLoading()
 
-      const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
-      fireEvent.click(conversations[0])
-      fireEvent.click(conversations[2], {
+      const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+      fireEvent.click(checkboxes[0])
+      fireEvent.click(checkboxes[2], {
         shiftKey: true,
       })
-      const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
-      expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+      expect(checkboxes.filter(c => c.checked === true)).toHaveLength(3)
     })
 
     it('should be able to select range of conversations DESC', async () => {
@@ -261,16 +400,48 @@ describe('ConversationListContainer', () => {
         loading: false,
       }
 
-      const conversationList = setup({conversationsQuery})
+      const {findAllByTestId} = setup({conversationsQuery})
       await waitForApolloLoading()
 
-      const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
-      fireEvent.click(conversations[2])
-      fireEvent.click(conversations[0], {
+      const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
+      fireEvent.click(checkboxes[2])
+      fireEvent.click(checkboxes[0], {
         shiftKey: true,
       })
-      const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
-      expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+      expect(checkboxes.filter(c => c.checked === true)).toHaveLength(3)
+    })
+  })
+
+  describe('error handling', () => {
+    it('should display an error message when the API call fails', async () => {
+      const setOnFailure = jest.fn()
+      const errorMessage = 'Unable to load messages.'
+      const mockError = new Error('Bad Request')
+      const conversationsQuery = {
+        data: null,
+        loading: false,
+        error: mockError,
+      }
+      const submissionCommentsQuery = {
+        data: null,
+        loading: false,
+        error: null,
+      }
+
+      render(
+        <ApolloProvider client={mswClient}>
+          <AlertManagerContext.Provider value={{setOnFailure}}>
+            <ConversationListContainer
+              conversationsQuery={conversationsQuery}
+              submissionCommentsQuery={submissionCommentsQuery}
+            />
+          </AlertManagerContext.Provider>
+        </ApolloProvider>,
+      )
+
+      await waitFor(() => {
+        expect(setOnFailure).toHaveBeenCalledWith(errorMessage)
+      })
     })
   })
 
@@ -294,7 +465,7 @@ describe('ConversationListContainer', () => {
         expect(component.container).toBeTruthy()
         const listItem = await component.findByTestId('last-message-content')
 
-        expect(listItem.textContent.length).toBe(93)
+        expect(listItem.textContent).toHaveLength(93)
       })
     })
 
@@ -317,7 +488,7 @@ describe('ConversationListContainer', () => {
         expect(component.container).toBeTruthy()
         const listItem = await component.findByTestId('last-message-content')
 
-        expect(listItem.textContent.length).toBe(43)
+        expect(listItem.textContent).toHaveLength(43)
       })
     })
 
@@ -340,7 +511,7 @@ describe('ConversationListContainer', () => {
         expect(component.container).toBeTruthy()
         const listItem = await component.findByTestId('last-message-content')
 
-        expect(listItem.textContent.length).toBe(43)
+        expect(listItem.textContent).toHaveLength(43)
       })
     })
   })

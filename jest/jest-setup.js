@@ -18,7 +18,6 @@
 
 import 'cross-fetch/polyfill'
 // eslint-disable-next-line import/no-nodejs-modules, no-redeclare
-import {TextDecoder, TextEncoder} from 'node:util'
 import {loadDevMessages, loadErrorMessages} from '@apollo/client/dev'
 import {up as configureDateTime} from '@canvas/datetime/configureDateTime'
 import {up as configureDateTimeMomentParser} from '@canvas/datetime/configureDateTimeMomentParser'
@@ -29,7 +28,6 @@ import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import CoreTranslations from '../public/javascripts/translations/en.json'
 import {up as installNodeDecorations} from '../ui/boot/initializers/installNodeDecorations'
-import MockBroadcastChannel from './MockBroadcastChannel'
 
 loadDevMessages()
 loadErrorMessages()
@@ -226,7 +224,12 @@ if (!('matchMedia' in window)) {
   window.matchMedia._mocked = true
 }
 
-global.BroadcastChannel = global.BroadcastChannel || MockBroadcastChannel
+global.BroadcastChannel = jest.fn().mockImplementation(() => ({
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  postMessage: jest.fn(),
+  close: jest.fn(),
+}))
 
 global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 
@@ -277,9 +280,6 @@ Document.prototype.createRange =
       }
     },
   }))
-
-global.TextEncoder = TextEncoder
-global.TextDecoder = TextDecoder
 
 if (!('Worker' in window)) {
   Object.defineProperty(window, 'Worker', {

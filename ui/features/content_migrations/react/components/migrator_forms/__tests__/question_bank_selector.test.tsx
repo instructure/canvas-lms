@@ -19,7 +19,17 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {setupServer} from 'msw/node'
+import {http} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import QuestionBankSelector from '../question_bank_selector'
+
+const server = setupServer(
+  // @ts-expect-error
+  http.get('/api/v1/courses/:courseId/question_banks', (_req, res, ctx) => {
+    return res(ctx.status(200), ctx.json([]))
+  }),
+)
 
 const onChange = jest.fn()
 
@@ -27,8 +37,24 @@ const renderComponent = (overrideProps?: any) =>
   render(<QuestionBankSelector onChange={onChange} {...overrideProps} />)
 
 describe('QuestionBankSelector', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+    onChange.mockClear()
+    fakeENV.teardown()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   it('calls onChange with question bank', async () => {
-    window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
+    fakeENV.setup({
+      QUESTION_BANKS: [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}],
+    })
 
     renderComponent()
 
@@ -39,7 +65,9 @@ describe('QuestionBankSelector', () => {
   })
 
   it('calls onChange with new question bank name', async () => {
-    window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
+    fakeENV.setup({
+      QUESTION_BANKS: [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}],
+    })
 
     renderComponent()
 
@@ -50,7 +78,9 @@ describe('QuestionBankSelector', () => {
   })
 
   it('calls onChange with new question bank name when input changes', async () => {
-    window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
+    fakeENV.setup({
+      QUESTION_BANKS: [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}],
+    })
 
     renderComponent()
 
@@ -58,14 +88,16 @@ describe('QuestionBankSelector', () => {
     await userEvent.click(screen.getByRole('option', {name: 'Create new question bank...'}))
     await userEvent.type(
       screen.getByPlaceholderText('New question bank'),
-      'This is a new question bank!'
+      'This is a new question bank!',
     )
 
     expect(onChange).toHaveBeenCalledWith({question_bank_name: 'This is a new question bank!'})
   })
 
   it('calls onChange with null', async () => {
-    window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
+    fakeENV.setup({
+      QUESTION_BANKS: [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}],
+    })
 
     renderComponent()
 
@@ -76,7 +108,9 @@ describe('QuestionBankSelector', () => {
   })
 
   it('disable question bank fields', async () => {
-    window.ENV.QUESTION_BANKS = [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}]
+    fakeENV.setup({
+      QUESTION_BANKS: [{assessment_question_bank: {id: 1, title: 'My Question Bank'}}],
+    })
 
     renderComponent({disable: true})
 
