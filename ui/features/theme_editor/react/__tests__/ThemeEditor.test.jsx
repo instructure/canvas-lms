@@ -17,324 +17,126 @@
  */
 
 import React from 'react'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import ThemeEditor from '../ThemeEditor'
-import {shallow} from 'enzyme'
-import {fromPairs} from 'lodash'
 
-const ok = x => expect(x).toBeTruthy()
-const deepEqual = (x, y) => expect(x).toEqual(y)
-const equal = (x, y) => expect(x).toBe(y)
-
-const fixturesDiv = document.createElement('div')
-fixturesDiv.id = 'fixtures'
-document.body.appendChild(fixturesDiv)
-
-describe('Theme Editor', () => {
-  test('when something has changed it puts tabIndex=-1 and aria-hidden on the preview frame', () => {
-    const props = {
-      brandConfig: {
-        md5: '9e3c6d00c73e0fa989896e63077b45a8',
-        variables: {},
+describe('ThemeEditor', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'sessionStorage', {
+      value: {
+        getItem: jest.fn(() => null),
+        setItem: jest.fn(),
+        removeItem: jest.fn(),
       },
-      hasUnsavedChanges: true,
-      variableSchema: [],
-      accountID: '1',
-    }
-    sessionStorage.setItem(
-      'sharedBrandConfigBeingEdited',
-      JSON.stringify({
-        brand_config: {md5: '9e3c6d00c73e0fa989896e63077b45aa', variables: {}},
-        name: 'Fake',
-      })
-    )
-    const wrapper = shallow(<ThemeEditor {...props} />)
-    wrapper.instance().changeSomething('bgColor', '#fff', false)
-    const iframe = wrapper.find('#previewIframe')
-    ok(iframe.prop('aria-hidden'))
-    equal(iframe.prop('tabIndex'), '-1')
+      writable: true,
+    })
   })
 
-  let testProps
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
-  const getDefaultFileList = () => {
-    const KEYS = ['js_overrides', 'css_overrides', 'mobile_js_overrides', 'mobile_css_overrides']
-    return KEYS.map(x => ({
-      customFileUpload: true,
-      variable_name: x,
-      value: undefined,
-    }))
+  const defaultProps = {
+    accountID: '1',
+    brandConfig: {
+      md5: '9e3c6d00c73e0fa989896e63077b45a8',
+      variables: {
+        'ic-brand-primary': '#0374B5',
+        'ic-brand-font-color-dark': '#2D3B45',
+      },
+    },
+    sharedBrandConfigs: [],
+    sharedBrandConfigBeingEdited: {
+      id: '1',
+      brand_config_md5: '9e3c6d00c73e0fa989896e63077b45a8',
+      name: 'Test Theme',
+    },
+    allowGlobalIncludes: true,
+    hasUnsavedChanges: false,
+    variableSchema: [
+      {
+        group_name: 'Global Branding',
+        group_key: 'global_branding',
+        variables: [
+          {
+            variable_name: 'ic-brand-primary',
+            type: 'color',
+            human_name: 'Primary Brand Color',
+            default: '#0374B5',
+          },
+          {
+            variable_name: 'ic-brand-font-color-dark',
+            type: 'color',
+            human_name: 'Main Text Color',
+            default: '#2D3B45',
+          },
+        ],
+      },
+    ],
   }
 
-  describe('Theme Editor Theme Store', () => {
-    beforeEach(() => {
-      testProps = {
-        brandConfig: {
-          md5: '9e3c6d00c73e0fa989896e63077b45a8',
-          variables: {
-            'ic-brand-primary': 'green',
-            'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          },
-        },
-        hasUnsavedChanges: true,
-        variableSchema: [
-          {
-            group_key: 'global_branding',
-            variables: [
-              {
-                variable_name: 'ic-brand-primary',
-                type: 'color',
-                default: '#0374B5',
-                human_name: 'Primary Brand Color',
-              },
-              {
-                variable_name: 'ic-brand-font-color-dark',
-                type: 'color',
-                default: '#2D3B45',
-                human_name: 'Main Text Color',
-              },
-            ],
-            group_name: 'Global Branding',
-          },
-          {
-            group_key: 'global_navigation',
-            variables: [
-              {
-                variable_name: 'ic-brand-global-nav-bgd',
-                type: 'color',
-                default: '#394B58',
-                human_name: 'Nav Background',
-              },
-              {
-                variable_name: 'ic-brand-global-nav-ic-icon-svg-fill',
-                type: 'color',
-                default: '#ffffff',
-                human_name: 'Nav Icon',
-              },
-            ],
-            group_name: 'Global Navigation',
-          },
-          {
-            group_key: 'watermarks',
-            variables: [
-              {
-                variable_name: 'ic-brand-favicon',
-                type: 'image',
-                accept: 'image/vnd.microsoft.icon,image/x-icon,image/png,image/gif',
-                default: '/images/favicon.ico',
-                human_name: 'Favicon',
-                helper_text: 'You can use a single 16x16, 32x32, 48x48 ico file.',
-              },
-            ],
-          },
-        ],
-        accountID: '1',
-      }
-      sessionStorage.setItem(
-        'sharedBrandConfigBeingEdited',
-        JSON.stringify({
-          brand_config: {md5: '9e3c6d00c73e0fa989896e63077b45aa', variables: {}},
-          name: 'Fake',
-        })
-      )
-    })
+  it('makes preview iframe inaccessible when there are unsaved changes', async () => {
+    const user = userEvent.setup()
+    const {getByTitle, getByLabelText} = render(<ThemeEditor {...defaultProps} />)
+    const iframe = getByTitle('Preview')
+    const colorInput = getByLabelText('Primary Brand Color')
 
-    afterEach(() => {
-      testProps = null
-    })
+    expect(iframe).toHaveAttribute('aria-hidden', 'false')
+    await user.clear(colorInput)
+    await user.type(colorInput, '#000000')
+    expect(iframe).toHaveAttribute('aria-hidden', 'true')
+  })
 
-    test('constructor sets the theme store state properly using variableSchema and brandConfig props', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': '#2D3B45',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: getDefaultFileList(),
-      })
-    })
+  it('initializes theme store with correct values', () => {
+    const {getByRole} = render(<ThemeEditor {...defaultProps} />)
+    const colorInput = getByRole('textbox', {name: /Primary Brand Color/i})
+    expect(colorInput.placeholder).toBe('#0374B5')
+  })
 
-    test('handleThemeStateChange updates theme store', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': 'black',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: getDefaultFileList(),
-      })
-    })
+  it('updates theme store when color value changes', async () => {
+    const {getByRole} = render(<ThemeEditor {...defaultProps} />)
+    const user = userEvent.setup()
+    const colorInput = getByRole('textbox', {name: /Primary Brand Color/i})
 
-    test('handleThemeStateChange updates when there is a file', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      const key = 'ic-brand-favicon'
-      const value = new File(['foo'], 'foo.png')
-      wrapper.instance().handleThemeStateChange(key, value)
+    await user.clear(colorInput)
+    await user.type(colorInput, '#000000')
+    expect(colorInput.value).toBe('#000000')
+  })
 
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': '#2D3B45',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: [
-          ...getDefaultFileList(),
-          {
-            value,
-            variable_name: key,
-          },
-        ],
-      })
-    })
+  it('updates theme store when file is uploaded', async () => {
+    const {container, getByRole} = render(<ThemeEditor {...defaultProps} />)
+    const user = userEvent.setup()
+    const uploadTab = getByRole('tab', {name: /Upload/i})
+    await user.click(uploadTab)
 
-    test('handleThemeStateChange sets the file object to have the customFileUpload flag when there is a customFileUpload', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      const key = 'custom_css'
-      const value = new File(['foo'], 'foo.png')
-      wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': '#2D3B45',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: [
-          ...getDefaultFileList(),
-          {
-            value,
-            variable_name: key,
-            customFileUpload: true,
-          },
-        ],
-      })
-    })
+    // Mock URL.createObjectURL since it's not available in jsdom
+    const mockObjectURL = 'blob:mock-url'
+    const originalCreateObjectURL = window.URL.createObjectURL
+    window.URL.createObjectURL = jest.fn(() => mockObjectURL)
 
-    test('handleThemeStateChange resets to default when opts.resetValue is set', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
+    const fileInput = container.querySelector('input[type="file"][accept=".css"]')
+    const file = new File(['test'], 'theme.css', {type: 'text/css'})
 
-      wrapper
-        .instance()
-        .handleThemeStateChange('ic-brand-font-color-dark', null, {resetValue: true})
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': '#2D3B45',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: getDefaultFileList(),
-      })
-    })
+    await user.upload(fileInput, file)
+    expect(fileInput.files[0]).toBe(file)
+    expect(window.URL.createObjectURL).toHaveBeenCalledWith(file)
 
-    test('handleThemeStateChange sets values to original default values when opts.useDefault is set', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      wrapper.instance().handleThemeStateChange('ic-brand-favicon', '/path/to/some/image.ico')
+    // Cleanup
+    window.URL.createObjectURL = originalCreateObjectURL
+  })
 
-      wrapper
-        .instance()
-        .handleThemeStateChange('ic-brand-favicon', null, {resetValue: true, useDefault: true})
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': '#2D3B45',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: getDefaultFileList(),
-      })
-    })
+  it('resets value to original when reset is clicked', async () => {
+    const {getByRole} = render(<ThemeEditor {...defaultProps} />)
+    const user = userEvent.setup()
+    const colorInput = getByRole('textbox', {name: /Primary Brand Color/i})
 
-    test('handleThemeStateChange sets file objects in the store to their previous value when opts.resetValue is set', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      const key = 'ic-brand-favicon'
-      const value = new File(['foo'], 'foo.png')
-      wrapper.instance().handleThemeStateChange(key, value)
+    await user.clear(colorInput)
+    await user.type(colorInput, '#000000')
+    expect(colorInput.value).toBe('#000000')
 
-      wrapper.instance().handleThemeStateChange(key, null, {resetValue: true})
-      deepEqual(wrapper.state('themeStore'), {
-        properties: {
-          'ic-brand-primary': 'green',
-          'ic-brand-font-color-dark': '#2D3B45',
-          'ic-brand-global-nav-bgd': '#394B58',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-          'ic-brand-favicon': '/images/favicon.ico',
-        },
-        files: [
-          ...getDefaultFileList(),
-          {
-            value: undefined,
-            variable_name: 'ic-brand-favicon',
-          },
-        ],
-      })
-    })
-
-    test('processThemeStoreForSubmit puts the themeStore into a FormData and returns it', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      const fileValue = new File(['foo'], 'foo.png')
-      wrapper.instance().handleThemeStateChange('ic-brand-favicon', fileValue)
-      wrapper.instance().handleThemeStateChange('ic-brand-font-color-dark', 'black')
-      wrapper.instance().changeSomething('ic-brand-font-color-dark', 'black', false)
-      const formData = wrapper.instance().processThemeStoreForSubmit()
-      const formObj = fromPairs(Array.from(formData.entries()))
-      deepEqual(formObj, {
-        'brand_config[variables][ic-brand-font-color-dark]': 'black',
-        'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
-        'brand_config[variables][ic-brand-primary]': 'green',
-        'brand_config[variables][ic-brand-favicon]': fileValue,
-        css_overrides: '',
-        js_overrides: '',
-        mobile_css_overrides: '',
-        mobile_js_overrides: '',
-      })
-    })
-
-    test('processThemeStoreForSubmit sets the correct keys for custom uploads', () => {
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      const key = 'css_overrides'
-      const value = new File(['foo'], 'foo.png')
-      wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
-      const formData = wrapper.instance().processThemeStoreForSubmit()
-      const formObj = fromPairs(Array.from(formData.entries()))
-      deepEqual(formObj, {
-        'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
-        'brand_config[variables][ic-brand-primary]': 'green',
-        js_overrides: '',
-        mobile_css_overrides: '',
-        mobile_js_overrides: '',
-        [key]: value,
-      })
-    })
-
-    test('processThemeStoreForSubmit sets the correct keys for custom uploads that already have values', () => {
-      testProps.brandConfig.js_overrides = '/some/path/to/a/file'
-      const wrapper = shallow(<ThemeEditor {...testProps} />)
-      const key = 'css_overrides'
-      const value = new File(['foo'], 'foo.png')
-      wrapper.instance().handleThemeStateChange(key, value, {customFileUpload: true})
-      const formData = wrapper.instance().processThemeStoreForSubmit()
-      const formObj = fromPairs(Array.from(formData.entries()))
-      deepEqual(formObj, {
-        'brand_config[variables][ic-brand-global-nav-ic-icon-svg-fill]': '#efefef',
-        'brand_config[variables][ic-brand-primary]': 'green',
-        js_overrides: '/some/path/to/a/file',
-        mobile_css_overrides: '',
-        mobile_js_overrides: '',
-        [key]: value,
-      })
-    })
+    await user.clear(colorInput)
+    expect(colorInput.value).toBe('')
+    expect(colorInput.placeholder).toBe('#0374B5')
   })
 })

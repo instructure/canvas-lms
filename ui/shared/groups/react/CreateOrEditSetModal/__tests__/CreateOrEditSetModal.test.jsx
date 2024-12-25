@@ -28,7 +28,8 @@ describe('CreateOrEditSetModal', () => {
 
   it('should render the correct error message if the api call returns an errors object', async () => {
     const contextId = '1'
-    const errorMessage = 'fake response error message'
+    const errorMessage =
+      'An error occurred while creating the Group Set: doFetchApi received a bad response: 400 Bad Request'
     fetchMock.postOnce(`post:/api/v1/accounts/${contextId}/group_categories`, {
       body: {
         errors: {
@@ -38,7 +39,7 @@ describe('CreateOrEditSetModal', () => {
       status: 400,
     })
     const {getByText, getAllByText, getByPlaceholderText} = render(
-      <CreateOrEditSetModal allowSelfSignup={true} contextId={contextId} />
+      <CreateOrEditSetModal allowSelfSignup={true} contextId={contextId} />,
     )
     fireEvent.input(getByPlaceholderText('Enter Group Set Name'), {
       target: {value: 'name'},

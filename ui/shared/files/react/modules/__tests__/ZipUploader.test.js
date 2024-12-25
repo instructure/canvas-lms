@@ -76,10 +76,12 @@ const folder = {
 }
 
 const mockFileOptions = function () {
-  // I realize type: 'text/plain' looks wrong for a zipuploader test,
-  // but we need a File and we're never really unzipping
+  const blob = new Blob(['hello world'], {type: 'text/plain'})
+  const file = new File([blob], 'foo', {type: 'text/plain'})
+  Object.defineProperty(file, 'size', {value: 123})
   return {
-    file: new File(['hello world'], 'foo', {type: 'text/plain'}),
+    file,
+    name: file.name,
   }
 }
 
@@ -87,6 +89,19 @@ describe('ZipUploader', () => {
   beforeEach(() => {
     moxios.install()
     setupMocks()
+
+    URL.createObjectURL = jest.fn(blob => {
+      return `blob:mock-url-${blob.name || 'unnamed'}`
+    })
+
+    global.FormData = class FormData {
+      constructor() {
+        this.data = new Map()
+      }
+      append(key, value) {
+        this.data.set(key, value)
+      }
+    }
   })
 
   afterEach(() => {
@@ -126,12 +141,13 @@ describe('ZipUploader', () => {
     sandbox.stub(zuploader, 'getContentMigration')
 
     moxios.wait(() => {
-      return zuploader.upload().then(_response => {
-        // 'got content migration'
-        expect(zuploader.getContentMigration.calledOnce).toBeTruthy()
-        // eslint-disable-next-line promise/no-callback-in-promise
-        done()
-      })
+      zuploader
+        .upload()
+        .then(_response => {
+          expect(zuploader.getContentMigration.calledOnce).toBeTruthy()
+          done()
+        })
+        .catch(done)
     })
   })
 
@@ -140,12 +156,13 @@ describe('ZipUploader', () => {
     sandbox.stub(zuploader, 'trackProgress')
 
     moxios.wait(() => {
-      return zuploader.upload().then(_response => {
-        // 'got track progress'
-        expect(zuploader.trackProgress.calledOnce).toBeTruthy()
-        // eslint-disable-next-line promise/no-callback-in-promise
-        done()
-      })
+      zuploader
+        .upload()
+        .then(_response => {
+          expect(zuploader.trackProgress.calledOnce).toBeTruthy()
+          done()
+        })
+        .catch(done)
     })
   })
 

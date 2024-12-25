@@ -33,7 +33,6 @@ import EditView from '../EditView'
 import '@canvas/jquery/jquery.simulate'
 
 const s_params = 'some super secure params'
-const currentOrigin = window.location.origin
 
 const nameLengthHelper = (
   view,
@@ -151,14 +150,6 @@ const editView = (assignmentOpts = {}) => {
   app.$similarityDetectionTools = app.$('#similarity_detection_tools')
 
   return app
-}
-
-const checkCheckbox = id => {
-  $(`#${id}`).prop('checked', true).trigger('change')
-}
-
-const disableCheckbox = id => {
-  $(`#${id}`).prop('disabled', true)
 }
 
 describe('EditView', () => {

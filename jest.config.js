@@ -71,7 +71,7 @@ module.exports = {
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
   restoreMocks: true,
 
-  testEnvironment: 'jsdom',
+  testEnvironment: 'jest-fixed-jsdom',
 
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
 

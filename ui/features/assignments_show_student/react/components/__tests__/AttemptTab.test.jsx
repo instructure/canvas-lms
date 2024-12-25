@@ -44,13 +44,25 @@ describe('ContentTabs', () => {
   beforeAll(() => {
     window.INST = window.INST || {}
     window.INST.editorButtons = []
+
+    // Mock URL.createObjectURL for file handling
+    URL.createObjectURL = jest.fn(blob => {
+      return `blob:mock-url-${blob.name || 'unnamed'}`
+    })
+
+    // Mock Blob.prototype.slice for file handling
+    if (!Blob.prototype.slice) {
+      Blob.prototype.slice = jest.fn(function (start, end) {
+        return this
+      })
+    }
   })
 
   const renderAttemptTab = async props => {
     const retval = render(
       <MockedProvider mocks={defaultMocks()}>
         <AttemptTab {...props} focusAttemptOnInit={false} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     if (props.assignment.submissionTypes.includes('online_text_entry')) {
@@ -58,7 +70,7 @@ describe('ContentTabs', () => {
         () => {
           expect(tinymce?.editors[0]).toBeDefined()
         },
-        {timeout: 4000}
+        {timeout: 4000},
       )
       return retval
     } else {
@@ -74,7 +86,7 @@ describe('ContentTabs', () => {
       const {findByText} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -91,7 +103,7 @@ describe('ContentTabs', () => {
       const {findByTestId} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -113,7 +125,7 @@ describe('ContentTabs', () => {
       const {findByTestId} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -130,7 +142,7 @@ describe('ContentTabs', () => {
       const {findByTestId} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
@@ -144,7 +156,7 @@ describe('ContentTabs', () => {
       const {findByText} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -158,7 +170,7 @@ describe('ContentTabs', () => {
       const {findByText} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await findByText('Availability Dates')).toBeInTheDocument()
@@ -174,7 +186,7 @@ describe('ContentTabs', () => {
       const {getByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(await waitFor(() => getByTestId('upload-pane'))).toBeInTheDocument()
     })
@@ -210,7 +222,7 @@ describe('ContentTabs', () => {
         const {getAllByText} = render(
           <MockedProvider mocks={defaultMocks()}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(await waitFor(() => getAllByText('test.jpg')[0])).toBeInTheDocument()
       })
@@ -230,7 +242,7 @@ describe('ContentTabs', () => {
       const {getByTestId} = render(
         <MockedProvider>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await new Promise(resolve => setTimeout(resolve, CUSTOM_TIMEOUT_LIMIT))
       expect(await waitFor(() => getByTestId('canvadocs-pane'))).toBeInTheDocument()
@@ -245,7 +257,7 @@ describe('ContentTabs', () => {
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
       const {unmount} = render(
-        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />
+        <TextEntry focusOnInit={false} submission={{id: '1', _id: '1', state: 'unsubmitted'}} />,
       )
       await waitFor(() => {
         expect(tinymce.editors[0]).toBeDefined()
@@ -319,7 +331,7 @@ describe('ContentTabs', () => {
           const {findByTestId} = render(
             <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
               <AttemptTab {...props} focusAttemptOnInit={false} />
-            </StudentViewContext.Provider>
+            </StudentViewContext.Provider>,
           )
 
           expect(await findByTestId('read-only-content')).toBeInTheDocument()
@@ -349,7 +361,7 @@ describe('ContentTabs', () => {
         const {getByTestId} = render(
           <MockedProvider mocks={defaultMocks()}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         expect(getByTestId('submission-type-selector')).toBeInTheDocument()
@@ -363,7 +375,7 @@ describe('ContentTabs', () => {
         const {getAllByRole} = render(
           <MockedProvider mocks={defaultMocks()}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const buttons = getAllByRole('button')
@@ -383,7 +395,7 @@ describe('ContentTabs', () => {
             >
               <AttemptTab {...props} focusAttemptOnInit={false} />
             </StudentViewContext.Provider>
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const buttons = getAllByRole('button')
@@ -403,7 +415,7 @@ describe('ContentTabs', () => {
             >
               <AttemptTab {...props} focusAttemptOnInit={false} />
             </StudentViewContext.Provider>
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         expect(getByText('Available submission types')).toBeInTheDocument()
@@ -418,7 +430,7 @@ describe('ContentTabs', () => {
             <StudentViewContext.Provider value={{allowChangesToSubmission: true, observer: false}}>
               <AttemptTab {...props} focusAttemptOnInit={false} />
             </StudentViewContext.Provider>
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         expect(getByText('Choose a submission type')).toBeInTheDocument()
@@ -431,7 +443,7 @@ describe('ContentTabs', () => {
         const {queryByTestId} = render(
           <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
-          </StudentViewContext.Provider>
+          </StudentViewContext.Provider>,
         )
 
         expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
@@ -450,7 +462,7 @@ describe('ContentTabs', () => {
             updateActiveSubmissionType={mockedUpdateActiveSubmissionType}
             focusAttemptOnInit={false}
           />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const textButton = getByRole('button', {name: /Text/})
@@ -468,7 +480,7 @@ describe('ContentTabs', () => {
       const {findByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} activeSubmissionType="online_url" focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await findByTestId('url-entry')).toBeInTheDocument()
@@ -484,7 +496,7 @@ describe('ContentTabs', () => {
       const {queryByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
@@ -501,7 +513,7 @@ describe('ContentTabs', () => {
       const {queryByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
@@ -518,7 +530,7 @@ describe('ContentTabs', () => {
       const {queryByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByTestId('submission-type-selector')).toBeInTheDocument()
@@ -532,7 +544,7 @@ describe('ContentTabs', () => {
       const {queryByTestId} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </StudentViewContext.Provider>
+        </StudentViewContext.Provider>,
       )
 
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
@@ -562,7 +574,7 @@ describe('ContentTabs', () => {
           <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
           </StudentViewContext.Provider>
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(getByText(groupMatcher)).toBeInTheDocument()
@@ -583,7 +595,7 @@ describe('ContentTabs', () => {
           <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
           </StudentViewContext.Provider>
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
@@ -609,7 +621,7 @@ describe('ContentTabs', () => {
           <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
           </StudentViewContext.Provider>
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
@@ -633,7 +645,7 @@ describe('ContentTabs', () => {
       const {queryByText} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </StudentViewContext.Provider>
+        </StudentViewContext.Provider>,
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
@@ -657,7 +669,7 @@ describe('ContentTabs', () => {
       const {queryByText} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
-        </StudentViewContext.Provider>
+        </StudentViewContext.Provider>,
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
@@ -700,7 +712,7 @@ describe('ContentTabs', () => {
       return render(
         <MockedProvider>
           <AttemptTab {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
     }
 
@@ -735,7 +747,7 @@ describe('ContentTabs', () => {
       await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
       const {calls} = uploadFileModule.uploadFile.mock
       expect(calls[0][0]).toEqual(
-        `/api/v1/courses/1/assignments/${props.assignment._id}/submissions/1/files`
+        `/api/v1/courses/1/assignments/${props.assignment._id}/submissions/1/files`,
       )
     })
 
@@ -753,7 +765,7 @@ describe('ContentTabs', () => {
       await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
       const {calls} = uploadFileModule.uploadFile.mock
       expect(calls[0][0]).toEqual(
-        `/api/v1/groups/${props.assignment.groupSet.currentGroup._id}/files`
+        `/api/v1/groups/${props.assignment.groupSet.currentGroup._id}/files`,
       )
     })
 
@@ -827,7 +839,7 @@ describe('ContentTabs', () => {
       expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
       expect(progressBars[0]).toHaveAttribute(
         'aria-label',
-        'Upload progress for file1.pdf 10 percent'
+        'Upload progress for file1.pdf 10 percent',
       )
 
       expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
@@ -835,7 +847,7 @@ describe('ContentTabs', () => {
       expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
       expect(progressBars[1]).toHaveAttribute(
         'aria-label',
-        'Upload progress for file2.pdf 20 percent'
+        'Upload progress for file2.pdf 20 percent',
       )
     })
 
@@ -847,7 +859,7 @@ describe('ContentTabs', () => {
             subject: 'LtiDeepLinkingResponse',
             content_items: [contentItem],
           },
-        })
+        }),
       )
     }
 
@@ -878,7 +890,7 @@ describe('ContentTabs', () => {
       expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
       expect(progressBars[0]).toHaveAttribute(
         'aria-label',
-        'Upload progress for http://localhost/some-lti-file 10 percent'
+        'Upload progress for http://localhost/some-lti-file 10 percent',
       )
     })
 

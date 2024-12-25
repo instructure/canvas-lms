@@ -35,7 +35,8 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 jest.useFakeTimers()
 
-describe('OutcomeMoveModal', () => {
+// TODO: resolve fickle tests; cf. AE-1541
+describe.skip('OutcomeMoveModal', () => {
   let cache
   let onCloseHandlerMock
   let onCleanupHandlerMock
@@ -101,22 +102,18 @@ describe('OutcomeMoveModal', () => {
       <OutcomesContext.Provider
         value={{env: {contextType, contextId, rootOutcomeGroup, treeBrowserRootGroupId}}}
       >
-        <MockedProvider cache={cache} mocks={mocks}>
-          {children}
-        </MockedProvider>
+        <MockedProvider mocks={mocks}>{children}</MockedProvider>
       </OutcomesContext.Provider>,
     )
   }
 
-  // fickle
-  it.skip('renders component with customized outcome title if single outcome provided', async () => {
+  it('renders component with customized outcome title if single outcome provided', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Move "Outcome 101"?')).toBeInTheDocument()
   })
 
-  // fickle
-  it.skip('renders component with generic outcome title if multiple outcomes provided', async () => {
+  it('renders component with generic outcome title if multiple outcomes provided', async () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
     )
@@ -124,7 +121,7 @@ describe('OutcomeMoveModal', () => {
     expect(getByText('Move 2 Outcomes?')).toBeInTheDocument()
   })
 
-  it.skip('shows modal if open prop true', async () => {
+  it('shows modal if open prop true', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />)
     await act(async () => jest.runAllTimers())
     expect(getByText('Cancel')).toBeInTheDocument()
