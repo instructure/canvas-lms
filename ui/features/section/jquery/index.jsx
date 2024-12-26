@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -34,6 +36,10 @@ import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 import replaceTags from '@canvas/util/replaceTags'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
+import {createRoot} from 'react-dom/client'
+import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('section')
 
@@ -53,12 +59,106 @@ $(document).ready(function () {
     url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
   })
 
+  const errorRoots = {
+  }
+
+  const renderFormErrors = (formErrors, shouldFocus = false)=>{
+    formErrors.forEach((formError)=> {
+      const container = $edit_section_form.find(formError.containerId)
+      const errorsContainer = $edit_section_form.find(formError.errorsContainerId)[0]
+      if (container) {
+        container.css({
+          outline: '1px solid red',
+          borderRadius: '3px',
+        })
+        if (shouldFocus){
+          container.focus()
+        }
+      }
+      const root = errorRoots[formError.containerId] ?? createRoot(errorsContainer)
+      errorRoots[formError.containerId] = root
+      root.render(
+        <Flex as="div" alignItems="center" margin="0 0 xx-small 0">
+          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+            <IconWarningSolid color="error" />
+          </Flex.Item>
+          <Text size="small" color="danger">
+            {I18n.t('%{errorText}',{errorText: formError.errorText})}
+          </Text>
+        </Flex>
+      )
+    })
+  }
+
+  const validateSectionFormName = () => {
+    const sectionNameValue = $edit_section_form.find('#course_section_name')[0].value
+    const nameErrors = []
+    if(!(sectionNameValue?.trim())){
+      const error = {}
+      error.containerId = '#course_section_name'
+      error.errorsContainerId = '#course_section_name_errors'
+      error.errorText = I18n.t('A section name is required')
+      nameErrors.push(error)
+    }
+    if((sectionNameValue?.length > 255)){
+      const error = {}
+      error.containerId = '#course_section_name'
+      error.errorsContainerId = '#course_section_name_errors'
+      error.errorText = I18n.t('Section name is too long')
+      nameErrors.push(error)
+    }
+    if(nameErrors.length > 0){
+      $('label[for="course_section_name"] > abbr').addClass('text-error')
+    } else {
+      $('label[for="course_section_name"] > abbr').removeClass('text-error')
+    }
+    return nameErrors
+  }
+
+  // remove course_section_name errors if you begin to type.
+  $edit_section_form.find('#course_section_name').on("input", function (e) {
+    const container = $(this)
+      if (container) {
+        container.css({
+          outline: '',
+          borderRadius: '',
+        })
+      }
+    errorRoots['#course_section_name']?.unmount()
+    errorRoots['#course_section_name'] = null
+    $('label[for="course_section_name"] > abbr').removeClass('text-error')
+  })
+
+  $edit_section_form.find('#course_section_name').blur(function (e) {
+    const validateFormErrors = validateSectionFormName()
+    if(validateFormErrors.length > 0){
+      renderFormErrors(validateFormErrors)
+    }
+    else {
+      const container = $(this)
+      if (container) {
+        container.css({
+          outline: '',
+          borderRadius: '',
+        })
+      }
+      errorRoots['#course_section_name']?.unmount()
+      errorRoots['#course_section_name'] = null
+    }
+  })
+
   $edit_section_form
     .formSubmit({
       beforeSubmit(data) {
-        $edit_section_form.hide()
-        $edit_section_form.find('.name').text(data['course_section[name]']).show()
-        $edit_section_form.loadingImage({image_size: 'small'})
+        const validateFormErrors = [...validateSectionFormName()];
+        if (validateFormErrors.length > 0){
+          renderFormErrors(validateFormErrors, true)
+          return false
+        } else {
+          $edit_section_form.hide()
+          $edit_section_form.find('.name').text(data['course_section[name]']).show()
+          $edit_section_form.loadingImage({image_size: 'small'})
+        }
       },
       success(data) {
         const section = data.course_section

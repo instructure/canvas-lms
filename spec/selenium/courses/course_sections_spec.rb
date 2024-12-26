@@ -99,6 +99,34 @@ describe "course sections" do
     expect(@section.end_at).to eq(Date.new(2015, 3, 4))
   end
 
+  describe "edit form validations" do
+    it "validates non-empty course_section name" do
+      edit_name = "  "
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+
+      f(".edit_section_link").click
+      edit_form = f("#edit_section_form")
+      replace_content(edit_form.find_element(:id, "course_section_name"), edit_name)
+      submit_form(edit_form)
+      wait_for_ajaximations
+
+      expect(f("#course_section_name_errors")).to include_text("A section name is required")
+    end
+
+    it "validates course_section name less than 255 characters" do
+      edit_name = "a" * 256
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+
+      f(".edit_section_link").click
+      edit_form = f("#edit_section_form")
+      replace_content(edit_form.find_element(:id, "course_section_name"), edit_name)
+      submit_form(edit_form)
+      wait_for_ajaximations
+
+      expect(f("#course_section_name_errors")).to include_text("Section name is too long")
+    end
+  end
+
   context "account admin" do
     before do
       Account.default.role_overrides.create! role: admin_role, permission: "manage_sis", enabled: true

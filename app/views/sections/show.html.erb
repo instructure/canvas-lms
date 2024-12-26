@@ -123,8 +123,8 @@ h3 .tally {
 <%= form_for @section, :url => context_url(@context, :context_section_url, @section), :html => {:id => "edit_section_form", :style => "display: none;"} do |f| %>
 <table class="formtable">
   <tr>
-    <td><%= f.blabel :name, :en => "Section Name" %></td>
-    <td><%= f.text_field :name %></td>
+    <td><label for="course_section_name">Section Name<abbr>*</abbr>:</label></td>
+    <td><%= f.text_field :name %><div id="course_section_name_errors"></div></td>
   </tr>
   <% if @section.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
     <tr>
