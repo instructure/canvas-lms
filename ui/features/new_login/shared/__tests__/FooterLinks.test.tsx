@@ -20,7 +20,7 @@ import {render} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {FooterLinks} from '..'
-import {NewLoginDataProvider, NewLoginProvider} from '../../context'
+import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 describe('FooterLinks', () => {
   it('mounts without crashing', () => {
@@ -28,7 +28,9 @@ describe('FooterLinks', () => {
       <MemoryRouter>
         <NewLoginProvider>
           <NewLoginDataProvider>
-            <FooterLinks />
+            <HelpTrayProvider>
+              <FooterLinks />
+            </HelpTrayProvider>
           </NewLoginDataProvider>
         </NewLoginProvider>
       </MemoryRouter>,

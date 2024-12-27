@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {type AuthProvider, type PasswordPolicy, SelfRegistrationType} from '../types'
+import {type AuthProvider, type HelpLink, type PasswordPolicy, SelfRegistrationType} from '../types'
 
 interface NewLoginData {
   enableCourseCatalog?: boolean
@@ -37,6 +37,7 @@ interface NewLoginData {
   passwordPolicy?: PasswordPolicy
   forgotPasswordUrl?: string
   invalidLoginFaqUrl?: string
+  helpLink?: HelpLink
 }
 
 interface NewLoginDataResult {
@@ -76,6 +77,13 @@ const transformSelfRegistrationType = (
   value && Object.values(SelfRegistrationType).includes(value as SelfRegistrationType)
     ? (value as SelfRegistrationType)
     : undefined
+
+// transform raw help link data into a typed object
+const transformHelpLink = (rawLink: any): HelpLink => ({
+  text: rawLink?.text || '',
+  trackCategory: rawLink?.trackCategory || '',
+  trackLabel: rawLink?.trackLabel || '',
+})
 
 // retrieve the login data container element from the DOM
 const getLoginDataContainer = (): HTMLElement | null => document.getElementById('new_login_data')
@@ -147,6 +155,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         ),
         forgotPasswordUrl: getStringAttribute(container, 'data-forgot-password-url'),
         invalidLoginFaqUrl: getStringAttribute(container, 'data-invalid-login-faq-url'),
+        helpLink: getObjectAttribute<HelpLink>(container, 'data-help-link', transformHelpLink),
       }
     : {}
 }
@@ -171,6 +180,7 @@ export const useFetchNewLoginData = (): NewLoginDataResult => {
     passwordPolicy: undefined,
     forgotPasswordUrl: undefined,
     invalidLoginFaqUrl: undefined,
+    helpLink: undefined,
   })
   const [isDataLoading, setIsDataLoading] = useState(true)
 

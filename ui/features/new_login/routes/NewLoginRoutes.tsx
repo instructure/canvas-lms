@@ -18,8 +18,9 @@
 
 import React, {lazy} from 'react'
 import {Route} from 'react-router-dom'
-import {NewLoginDataProvider, NewLoginProvider} from '../context'
+import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../context'
 import {LoginLayout} from '../layouts/LoginLayout'
+import {HelpTray} from '../shared'
 import RegistrationRoutesMiddleware from './RegistrationRoutesMiddleware'
 import {ROUTES} from './routes'
 
@@ -36,7 +37,10 @@ export const NewLoginRoutes = (
     element={
       <NewLoginProvider>
         <NewLoginDataProvider>
-          <LoginLayout />
+          <HelpTrayProvider>
+            <LoginLayout />
+            <HelpTray />
+          </HelpTrayProvider>
         </NewLoginDataProvider>
       </NewLoginProvider>
     }

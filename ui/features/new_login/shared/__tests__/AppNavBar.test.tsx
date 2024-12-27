@@ -20,7 +20,7 @@ import {render} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {AppNavBar} from '..'
-import {NewLoginDataProvider, NewLoginProvider} from '../../context'
+import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 describe('AppNavBar', () => {
   it('mounts without crashing', () => {
@@ -28,7 +28,9 @@ describe('AppNavBar', () => {
       <MemoryRouter>
         <NewLoginProvider>
           <NewLoginDataProvider>
-            <AppNavBar />
+            <HelpTrayProvider>
+              <AppNavBar />
+            </HelpTrayProvider>
           </NewLoginDataProvider>
         </NewLoginProvider>
       </MemoryRouter>,
