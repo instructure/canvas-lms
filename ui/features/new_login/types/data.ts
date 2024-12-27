@@ -26,3 +26,9 @@ export enum SelfRegistrationType {
   ALL = 'all',
   OBSERVER = 'observer',
 }
+
+export interface HelpLink {
+  text: string
+  trackCategory: string
+  trackLabel: string
+}

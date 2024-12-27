@@ -21,30 +21,43 @@ import {Link} from '@instructure/ui-link'
 import {InlineList} from '@instructure/ui-list'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import React from 'react'
-import {useNewLogin, useNewLoginData} from '../context'
+import {useHelpTray, useNewLogin, useNewLoginData} from '../context'
 
 const I18n = createI18nScope('new_login')
 
 const FooterLinks = () => {
   const {isUiActionPending} = useNewLogin()
-  const {isPreviewMode} = useNewLoginData()
+  const {isPreviewMode, helpLink} = useNewLoginData()
+  const {openHelpTray} = useHelpTray()
 
   const isDisabled = isPreviewMode || isUiActionPending
 
   const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
+    event.preventDefault()
+
     if (isDisabled) {
-      event.preventDefault()
+      return
     }
+
+    openHelpTray()
   }
 
   return (
     <View as="div" textAlign="center">
       <InlineList delimiter="pipe" size="small">
-        <InlineList.Item>
-          <Link href="https://community.canvaslms.com/" target="_blank" onClick={handleClick}>
-            {I18n.t('Help')}
-          </Link>
-        </InlineList.Item>
+        {helpLink && (
+          <InlineList.Item>
+            <Link
+              href="https://community.canvaslms.com/"
+              target="_blank"
+              onClick={handleClick}
+              data-track-category={helpLink.trackCategory}
+              data-track-label={helpLink.trackLabel}
+            >
+              {helpLink.text}
+            </Link>
+          </InlineList.Item>
+        )}
 
         <InlineList.Item>
           <Link href="/privacy_policy" onClick={handleClick}>

@@ -21,7 +21,7 @@ import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import {LoginLayout} from '../LoginLayout'
 import '@testing-library/jest-dom'
-import {NewLoginDataProvider, NewLoginProvider} from '../../context'
+import {HelpTrayProvider, NewLoginDataProvider, NewLoginProvider} from '../../context'
 
 jest.mock('react-router-dom', () => {
   const originalModule = jest.requireActual('react-router-dom')
@@ -39,7 +39,9 @@ describe('LoginLayout', () => {
       <MemoryRouter>
         <NewLoginProvider>
           <NewLoginDataProvider>
-            <LoginLayout />
+            <HelpTrayProvider>
+              <LoginLayout />
+            </HelpTrayProvider>
           </NewLoginDataProvider>
         </NewLoginProvider>
       </MemoryRouter>,

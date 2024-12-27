@@ -16,5 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export {HelpTrayProvider, useHelpTray} from './HelpTrayContext'
 export {NewLoginDataProvider, useNewLoginData} from './NewLoginDataContext'
 export {NewLoginProvider, useNewLogin} from './NewLoginContext'
