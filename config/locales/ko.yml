@@ -1392,6 +1392,7 @@ ko:
   add_module_5ad6fee2: "모듈 추가"
   add_prerequisite_6409bd9: "필수 조건 추가"
   add_quiz_cebfa28b: "퀴즈 추가"
+  add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "이 포트폴리오의 섹션을 추가, 제거, 다시 배열 "
   add_students_to_the_course_874be8fb: "과목에 학생 추가"
   add_tas_to_the_course_2aac6e02: "과목에 조교 추가"
   adding_efca307a: "추가 중..."
@@ -2908,6 +2909,7 @@ ko:
         login_expiration_minimum: "세션 만료는 20분 이상이어야 함"
         need_integer: "재생 목록 캐시를 위한 정수를 입력하시기 바랍니다."
   canvas_3962b702: Canvas
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas 알림 - 변경: %{assignment_name}, %{course_name}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas 알림 - 지연된 과제: %{user_name}, %{assignment_name}"
   canvas_cartridge_description: "Canvas 내보내기를 가져올 수 있는 중재 JSON 형식으로 변환"
   canvas_cartridge_display: "Canvas Common Cartridge"
@@ -5330,6 +5332,7 @@ ko:
   discussions_a5f96392: 토론
   does_not_meet_expectations_b0736d20: "기대치에 미치지 못함"
   domain_3b54c511: 도메인
+  done_editing_9f7379d9: "편집 마침"
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "마쳤습니다. 업로드한 파일을 받아 간단한 의견과 함께 각 사용자의 이 과제에 대한 제출물 페이지에 첨부했습니다. 학생은 새 의견이 추가되었다는 알림을 받게 됩니다."
   download_submissions_7454665f: "제출물 다운로드"
   draft_83493fcd: 초안
@@ -5527,6 +5530,7 @@ ko:
     click_through: "페이지 내용을 보려면 클릭"
     default_content: "추가된 내용 없음"
     default_name: "페이지 이름"
+  eportfolio_settings_75ba1f9a: "ePortfolio 설정"
   eportfolios: 
     _page_section: 
       section_types: 
@@ -9169,9 +9173,9 @@ ko:
         subject: "평점 변경됨: %{title}, %{context}"
       twitter: 
         no_date_set: "날짜 설정 안 됨"
-        not_applicable: N/A
+        not_applicable: "해당 사항 없음"
         score: "점수:  %{score} / %{total}"
-        score_pending: "(검토 대기)"
+        score_pending: "(검토 대기 중)"
         tweet: "Canvas 알림 - 평점 변경: %{date}"
     submission_graded: 
       email: 
@@ -9209,7 +9213,7 @@ ko:
         subject: "과제 평가됨: %{assignment}, %{context}"
       twitter: 
         no_date_set: "날짜 설정 안 됨"
-        not_applicable: N/A
+        not_applicable: "해당 사항 없음"
         score: "점수:  %{score} / %{total}"
         score_pending_review: "(검토 대기 중)"
         tweet: "Canvas 알림 - 평가됨: %{assignment}, %{context}"
@@ -10376,6 +10380,10 @@ ko:
         queue_for_parallel_jobs: "병렬 작업에 사용되는 작업 대기열  (기본 값은 공란)"
     twitter: 
       description: "Twitter 알림"
+    twitter_settings: 
+      labels: 
+        consumer_key: "소비자 키"
+        consumer_secret: "소비자 시크릿"
     unsplash_settings: 
       labels: 
         access_key: "액세스 키"
@@ -12352,6 +12360,7 @@ ko:
       removing_crosslisting_of_section: "섹션 교차 나열 해제 중..."
   section_id_8ec4f46f: "섹션 ID"
   section_name_16ea8a4a: "이름 선택"
+  section_name_b6d82574: "섹션 이름"
   section_name_edb51b2: 섹션명
   sections: 
     section_created: "섹션을 성공적으로 만들었습니다!"
