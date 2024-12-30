@@ -4127,7 +4127,7 @@ he:
         stream_name_required: "נדרש שם לרצף התנועה"
   canvas_3962b702: קנבס
   canvas_account_id_97b0471f: canvas_account_id
-  canvas_alert_change_assignment_name_course_name_2fc63d9c: "התראת קנבס - יש לשנות:%{assignment_name}, %{course_name}"
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "התראת קנבס - חל שינוי: %{assignment_name} בקורס %{course_name} "
   canvas_alert_invited_course_as_role_type_9ed79ce3: "התראת קנבס - הוזמנת: %{course} כ %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "התראת קנבס - הוזמנת: קורס כ %{role_type}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "התראת קנבס - הגשה באיחור: %{user_name}, %{assignment_name}"
@@ -7828,7 +7828,7 @@ he:
     confirm_delete_page: "לבטל את הדף הזה על כל תוכנו?"
     confirm_delete_section: "למחוק את ההקבצה הזו ואת כל דפיה?"
     default_description: "זוהי הגשתי %{assignment} עבור  %{course}."
-    eportfolio_settings: "הגדרות  ePortfolio"
+    eportfolio_settings: "הגדרות  ePortfolio "
     errors: 
       compiling: "אירעה שגיאה בעת עיבוד ה eportfolio שלך. יש לנסות שוב מאוחר יותר"
       missing_file: "אנה בחר קובץ"
@@ -7863,7 +7863,7 @@ he:
     click_through: "יש להקליק כדי לצפות בתוכן הדף"
     default_content: "טרם התווסף תוכן כלשהו"
     default_name: "שם דף"
-  eportfolio_settings_75ba1f9a: "הגדרות  ePortfolio"
+  eportfolio_settings_75ba1f9a: "הגדרות  ePortfolio "
   eportfolios: 
     _page_section: 
       section_types: 
@@ -11285,7 +11285,7 @@ he:
         unknown_user: "משתמש לא מוכר"
       twitter: 
         tweet: "התראת קנבס - התווספת לדיון ע\"י %{user_name}."
-        unknown_user: "משתמש לא מוכר"
+        unknown_user: "משתמש לא מוכר "
     alert: 
       email: 
         body: 
@@ -11650,8 +11650,8 @@ he:
         no_due_date: "תאריך יעד: לא נקבע תאריך "
       twitter: 
         assignment_change: "התראת קנבס - תאריך השתנה: %{assignment_name} בקורס %{course_name}"
-        due_at: "תאריך יעד: %{assignment_due_date_time}"
-        no_due_date: "תאריך יעד: אין תאריך"
+        due_at: "תאריך יעד: %{assignment_due_date_time} "
+        no_due_date: "תאריך יעד: לא נקבע תאריך "
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "תאריךיעד משימה השתנה: %{assignment_name}, בקורס %{course_name} (%{override})"
@@ -11674,8 +11674,8 @@ he:
         no_due_date: "תאריך יעד: אין תאריך"
       twitter: 
         assignment_change: "התראת קנבס - תאריך השתנה:: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "תאריך יעד: %{assignment_due_date_time}"
-        no_due_date: "תאריך יעד: אין תאריך"
+        due_at: "תאריך יעד: %{assignment_due_date_time} "
+        no_due_date: "תאריך יעד: לא נקבע תאריך "
     assignment_graded: 
       email: 
         assignment_graded: "משימה הוערכה: %{assignment_name}, בקורס %{course_name}"
@@ -11928,7 +11928,7 @@ he:
         subject: "%{user_name}, שלחת הודעה בקנבס. "
         unknown_user: "משתמש לא מוכר "
       twitter: 
-        tweet: "התראת קנבס - הודעה מ %{user_name}."
+        tweet: "התראת קנבס - הודעה מ %{user_name}. "
     conversation_message: 
       email: 
         attached_files: "קבצים מצורפים:"
@@ -12681,7 +12681,7 @@ he:
         body: "%{author} זה עתה שלח/ה הודעה חדשה לגבי ההגשה של %{user} עבור %{assignment}"
         subject: "שליחת הערה: %{user}, %{assignment}, %{context} "
       twitter: 
-        tweet: "התראת קנבס - הערה: %{author} של %{assignment}, %{user}, %{context}."
+        tweet: "התראת קנבס - הערה: %{author} של %{assignment}, %{user}, %{context}. "
     submission_comment_for_teacher: 
       email: 
         body: "%{author} זה עתה שלח/ה הודעה חדשה לגבי ההגשה של %{user} עבור %{assignment}"
@@ -12742,7 +12742,7 @@ he:
         no_date_set: "לא נקבע תאריך "
         not_applicable: "N/A "
         score: "ניקוד: %{score} מתוך %{total}"
-        score_pending: "(ממתין לביקורת)"
+        score_pending: "(ממתין לביקורת) "
         tweet: "התראת קנבס - הערכה השתנתה: %{date}"
     submission_graded: 
       email: 
@@ -12781,9 +12781,9 @@ he:
         score_pending_review: "הציון ממתין לעיון המורה "
         subject: "משימה הוערכה: %{assignment}, %{context} "
       twitter: 
-        no_date_set: "תאריך לא נקבע "
+        no_date_set: "לא נקבע תאריך "
         not_applicable: "N/A "
-        score: "ניקוד: %{score} מתוך %{total} "
+        score: "ניקוד: %{score} מתוך %{total}"
         score_pending_review: "(ממתין לביקורת) "
         tweet: "התראת קנבס - בוצעה הערכה: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -14062,7 +14062,7 @@ he:
         date: תאריך
         participated: השתתף/ה
         time: "זמן "
-        url: "כתובת דף"
+        url: "כתובת דף אינטרנט"
         user_agent: "מאפייני סביבת המיחשוב של המשתמש"
   page_views_eb64cf53: "צפיות דף"
   page_views_only_312b7577: "צפיות דף בלבד"

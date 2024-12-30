@@ -9472,7 +9472,7 @@ hu:
   don_t_show_this_again_2c3ba281: "Ne mutasd meg ezt még egyszer!"
   done_54e3d4b6: Kész
   done_8af51c9b: Kész.
-  done_editing_9f7379d9: "Szerkesztés kész"
+  done_editing_9f7379d9: "A szerkesztés kész"
   done_we_took_the_files_you_uploaded_and_attached_t_e529cfc0: "Kész! Fogtuk a fájlokat melyeket feltöltött és hozzácsatoltuk egy rövid megjegyzéssel minden felhasználó ehhez a feladathoz tartozó beadási oldalához. A hallgatók egy értesítést kapnak arról, hogy egy új megjegyzés lett hozzáadva."
   dorsey_business_schools_student_activity_and_perfo_160cf319: "Dorsey Business Schools – hallgatók tevékenysége és teljesítménye"
   down_5831a426: Le
@@ -10069,7 +10069,7 @@ hu:
   env_settings_1131f267: "%{env} Beállítások"
   eportfolio: 
     buttons: 
-      done_editing: "Szerkesztés kész"
+      done_editing: "A szerkesztés kész"
       manage_sections: "Szekciók kezelése"
     confirm_delete_message: "Biztos benne, hogy törli az üzenetet?"
     confirm_delete_page: "Biztos benne, hogy törli az oldalt és minden tartalmát?"
@@ -14897,7 +14897,7 @@ hu:
         no_due_date: "határidő: Nincs megadva határidő"
       twitter: 
         assignment_change: "Canvas-figyelmeztetés - Módosult határidő: %{assignment_name}, %{course_name}"
-        due_at: "esedékes: %{assignment_due_date_time}"
+        due_at: "határidő: %{assignment_due_date_time}"
         no_due_date: "határidő: Nincs megadva határidő"
     assignment_due_date_override_changed: 
       email: 
@@ -14919,7 +14919,7 @@ hu:
         no_due_date: "határidő: Nincs megadva határidő"
       twitter: 
         assignment_change: "Canvas-figyelmeztetés - Módosult határidő: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "esedékes: %{assignment_due_date_time}"
+        due_at: "határidő: %{assignment_due_date_time}"
         no_due_date: "határidő: Nincs megadva határidő"
     assignment_graded: 
       email: 
@@ -16007,7 +16007,7 @@ hu:
       twitter: 
         grade: "osztályzat:%{letter_grade}"
         no_date_set: "Nincs dátum beállítva"
-        not_applicable: N/A
+        not_applicable: "-"
         score: "pontok:  %{score} a megszerezhető %{total} pontból"
         score_pending: "(társértékelés függőben)"
         tweet: "Canvas-figyelmeztetés - Az érdemjegy megváltozott: %{date}"
@@ -16054,8 +16054,8 @@ hu:
       twitter: 
         grade: "osztályzat:%{letter_grade}"
         no_date_set: "Nincs dátum beállítva"
-        not_applicable: N/A
-        score: "pontszám:  %{score}, a megszerezhető %{total} pontból"
+        not_applicable: "-"
+        score: "pontok:  %{score} a megszerezhető %{total} pontból"
         score_pending_review: "(társértékelés függőben)"
         tweet: "Canvas-figyelmeztetés - Értékelve: %{assignment}, %{context}"
     submission_needs_grading: 

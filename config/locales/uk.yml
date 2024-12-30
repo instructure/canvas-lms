@@ -10258,7 +10258,7 @@ uk:
       twitter: 
         assignment_change: "Canvas Оповіщення - Зміна дати: %{assignment_name}, %{course_name}"
         due_at: "очікується:  %{assignment_due_date_time}"
-        no_due_date: "очікується: Відсутня очікувана дата"
+        no_due_date: "очікується: Відсутній термін виконання"
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Очікувана дата завдання змінена: %{assignment_name}, %{course_name} (%{override})"
@@ -10280,7 +10280,7 @@ uk:
       twitter: 
         assignment_change: "Canvas Оповіщення - Зміна дати: %{assignment_name}, %{course_name} (%{override})"
         due_at: "очікується:  %{assignment_due_date_time}"
-        no_due_date: "очікується: Відсутня очікувана дата"
+        no_due_date: "очікується: Відсутній термін виконання"
     assignment_graded: 
       email: 
         assignment_graded: "Завдання оцінено: %{assignment_name}, %{course_name}"

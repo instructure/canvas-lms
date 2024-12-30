@@ -14454,7 +14454,7 @@ fa:
         no_due_date: "مهلت: بدون تاریخ مهلت"
       twitter: 
         assignment_change: "هشدار کانواس - تغییر تاریخ: %{assignment_name}، %{course_name} (%{override})"
-        due_at: "مهلت: %{assignment_due_date_time}"
+        due_at: "due: %{assignment_due_date_time}"
         no_due_date: "مهلت: بدون تاریخ مهلت"
     assignment_graded: 
       email: 
@@ -15018,7 +15018,7 @@ fa:
       twitter: 
         email_body: "زمان رویداد %{event_title}، برای درس %{course_name} تغییر یافته است. اکنون بدین قرار است: %{new_time}"
         from_to_time: "از %{start_date_time} تا %{end_date_time}"
-        no_time_set: "هیچ زمانی تعیین نشده است"
+        no_time_set: "زمان تعیین نشده است"
     file_locked: "این فایل در حال حاضر قفل است."
     file_locked_at: "این فایل در %{at} قفل شد."
     file_locked_module: "این فایل بخشی از ماژول *%{module}* است و هنوز قفل گشایی نشده است."
@@ -15348,7 +15348,7 @@ fa:
         subject: "رویداد جدید - %{event_title}، %{course_name}"
       twitter: 
         from_to_time: "از %{start_date_time} تا %{end_date_time}"
-        no_time_set: "هیچ زمانی تعیین نشده است"
+        no_time_set: "زمان تعیین نشده است"
         subject: "هشدار کانواس - رویداد: %{event_title}، %{course_name}"
     new_file_added: 
       email: 
@@ -15583,7 +15583,7 @@ fa:
         someone: "یک شخص"
         subject: "نظر درباره مورد ارسالی: %{user}، %{assignment}، %{context}"
       twitter: 
-        tweet: "هشدار کانواس  -  نظر: %{author} برای %{assignment}، %{user}، %{context}."
+        tweet: "هشدار کانواس - نظر : %{author} برای %{assignment}، %{user}، %{context}."
     submission_comment_for_teacher: 
       email: 
         body: "%{author} یک نظر جدید درباره مورد ارسالی برای %{user} برای %{assignment} ایجاد کرد"
