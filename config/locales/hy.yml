@@ -3428,7 +3428,7 @@ hy:
         need_integer: "Վերարտադրելու ցանկի քեշի համար մուտքագրեք ամբողջ թիվ "
         stream_name_required: "Պահանջվում է նշել kinesis հոսքի անվանումը"
   canvas_3962b702: Canvas
-  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas համակարգի նախազգուշացում - Փոփոխություն: %{assignment_name}, %{course_name}"
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas համակարգի նախազգուշացում. փոփոխություն՝ %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas համակարգի նախազգուշացում - Հրավիրված եք %{course} դասընթացին որպես %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas համակարգի նախազգուշացում - Հրավիրված եք դասընթացին որպես %{role_type}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas համակարգի նախազգուշացում. ուշացրած ուղարկում՝ %{user_name}, %{assignment_name}"
@@ -6538,13 +6538,13 @@ hy:
   enter_your_question_text_students_will_see_the_que_f19af9e9: "Մուտքագրեք Ձեր հարցը: Ուսանողները կտեսնեն հարցը եւ դրան կից դաշտում կլրացնեն իրենց պատասխանը:"
   eportfolio: 
     buttons: 
-      done_editing: "Խմբագրումը ավարտվել է"
+      done_editing: "Խմբագրումը կատարված  է"
       manage_sections: "Բաժինների կառավարում"
     confirm_delete_message: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս հաղորդագրությունը:"
     confirm_delete_page: "Ջնջե՞լ այս էջը և նրա ամբողջ բովանդակությունը:"
     confirm_delete_section: "Ջնջե՞լ այս բաժինը և նրա ամբողջ էջերը:"
     default_description: "Սա %{course}-ի իմ %{assignment}-ի ներկայացումն է:"
-    eportfolio_settings: "Էլ. պորտֆոլիոյի կարգաբերումներ"
+    eportfolio_settings: "Էլ. պորտֆոլիոյի կարգաբերումները"
     errors: 
       compiling: "Ձեր Էլ. պորտֆոլիոն կազմելիս սխալ է տեղի ունեցել: Խնդրում ենք ավելի ուշ կրկին փորձեք:"
       missing_file: "Ընտրեք ֆայլը"
@@ -6579,7 +6579,7 @@ hy:
     click_through: "Սեղմեք էջի բովանդակությունը դիտելու համար"
     default_content: "Դեռևս ոչ մի բովանդակություն չի ավելացվել"
     default_name: "Էջի անվանում"
-  eportfolio_settings_75ba1f9a: "Էլ. պորտֆոլիոյի կարգաբերումներ"
+  eportfolio_settings_75ba1f9a: "Էլ. պորտֆոլիոյի կարգաբերումները"
   eportfolios: 
     _page_section: 
       section_types: 
@@ -9681,8 +9681,8 @@ hy:
         no_due_date: "Կատարման ժամկետ չկա"
       twitter: 
         assignment_change: "Canvas համակարգի նախազգուշացում.%{assignment_name}, %{course_name} կատարման ամսաթիվը փոխվել է:"
-        due_at: "կատարման ամսաթիվ՝ %{assignment_due_date_time}"
-        no_due_date: "Կատարման ժամկետ չկա"
+        due_at: "վերջնաժամկետ՝ %{assignment_due_date_time}"
+        no_due_date: "վերջնաժամկետ՝ վերջնաժամկետ չկա"
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Հանձնարարության կատարման ամսաթիվը փոխվել է՝  %{assignment_name}, %{course_name} (%{override})"
@@ -9705,8 +9705,8 @@ hy:
         no_due_date: "Մինչև՝ կատարման ժամկետ չկա"
       twitter: 
         assignment_change: "Canvas համակարգի նախազգուշացում. %{course_name} (%{override})-ի   %{assignment_name} կատարման ժամկետի փոփոխություն "
-        due_at: "կատարման ամսաթիվ՝ %{assignment_due_date_time}"
-        no_due_date: "Կատարման ժամկետ չկա"
+        due_at: "վերջնաժամկետ՝ %{assignment_due_date_time}"
+        no_due_date: "վերջնաժամկետ՝ վերջնաժամկետ չկա"
     assignment_graded: 
       email: 
         assignment_graded: "Հանձնարարությունը գնահատված է՝ %{assignment_name}, %{course_name}"
@@ -10753,7 +10753,7 @@ hy:
         someone: "Ինչ-որ մեկը"
         subject: "Ուղարկված աշխատանքների մեկնաբանություն՝ %{user}, %{assignment}, %{context}"
       twitter: 
-        tweet: "Canvas համակարգի նախազգուշացում. մեկնաբանություն՝ %{author}, %{assignment}, %{user}, %{context}."
+        tweet: "Canvas համակարգի նախազգուշացում. մեկնաբանություն՝ %{author} for %{assignment}, %{user}, %{context}"
     submission_comment_for_teacher: 
       email: 
         body: "%{author}-ը նոր մեկնաբանություն է կատարել %{user}-ի կողմից ուղարկված %{assignment}-ի վերաբերյալ:"
@@ -10813,7 +10813,7 @@ hy:
         subject: "Գնահատականը փոխվել է՝ %{title}, %{context}"
       twitter: 
         no_date_set: "Ժամկետ սահմանված չէ"
-        not_applicable: "Չի կիրառվում"
+        not_applicable: Չկա
         score: "գնահատականը՝ %{total} -ից %{score} "
         score_pending: "(ենթակա է ստուգման)"
         tweet: "Canvas ծանուցում. գնահատականի փոփոխություն՝ %{date}"
@@ -11929,8 +11929,8 @@ hy:
       headers: 
         date: Ամսաթիվ
         participated: "Մասնակցել է"
-        time: Ժամ
-        url: "URL հասցե"
+        time: Ժամը
+        url: URL
         user_agent: "Օգտատիրոջ ներկայացուցիչ"
   page_views_eb64cf53: "Էջերի դիտումներ"
   pages: 
@@ -12409,7 +12409,7 @@ hy:
       description: "Twitter ծանուցումներ"
     twitter_settings: 
       labels: 
-        consumer_key: "Սպառողի բանալի"
+        consumer_key: "Օգտատիրոջ բանալի"
         consumer_secret: "Սպառողի գաղտնի բանալի"
     webct_scraper_settings: 
       description: "Եթե կազմակերպությունը չի օգտագործում WebCT-ի \"Ուսուցման մոդուլները\" (ներառյալ դպրոցները, որոնք ընդունել են WebCT՝ նախքան 4.0 տարբերակը, երբ մոդուլները հասանելի դարձան), դասընթացի տեղափոխությունները կարող են բարելավվել,  \"Ուսուցման մոդուլների\" փոխարեն որպես Canvas-ի մոդուլներ ներմուծելով \"Դասընթացի բովանդակությունը\": Այս էջը հնարավորություն է տալիս կարգաբերել WebCT-ի տեղափոխության գործիքի լռությամբ ընդունվող ռեժիմը  համաձայն բովանդակության մոդուլների: Անհրաժեշտ է հիշել, որ այն դեպքում, երբ դասընթացների առանձին տեղափոխությունները պահպանում են ընտրելու հնարավորությունը, զանգվածային տեղափոխության գործիքը միշտ օգտագործում է այստեղ կարգաբերված մեծությունը և չի կարող փոխվել առանձին տեղափոխության դեպքում:"
