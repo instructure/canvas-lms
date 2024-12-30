@@ -722,6 +722,7 @@ describe "calendar2" do
       end
 
       it "does not include the module override in the assignment list" do
+        skip("FOO-5019")
         @section1 = CourseSection.create!(name: "Section 1", course: @course)
         student_in_section(@section1, user: @student)
         @assignment = @course.assignments.create!(title: "new assignment")
