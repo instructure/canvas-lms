@@ -10905,7 +10905,7 @@ nn:
     confirm_delete_page: "Vil du slette denne sida og alt innhald?"
     confirm_delete_section: "Vil du slette denne klassa og alt innhald?"
     default_description: "Dette er mi innlevering av %{assignment} for %{course}."
-    eportfolio_settings: "Innstillingar for e-portefølje"
+    eportfolio_settings: Porteføljeinnstillingar
     errors: 
       compiling: "Det oppstod ein feil under kompilering av e-portefølje.  Prøv på nytt seinare."
       missing_file: "Vel ei fil"
@@ -19270,7 +19270,7 @@ nn:
         date: Dato
         participated: Deltok
         time: Tidspunkt
-        url: URL-adresse
+        url: URL
         user_agent: Brukaragent
   page_views_csv_9835a9f9: "Sidevisningar csv"
   page_views_eb64cf53: Sidevisingar
