@@ -48,13 +48,12 @@ module ActiveRecord
               expect(indexes.any? { |index| Array(index.columns).first == enum_column }).to(
                 be_truthy,
                 <<~TEXT
-                  Expected an index on the column '#{enum_column}' in the model '#{model.name}', but none was found.
+                  A new enum column has been added to a table without an index (#{model.name}.#{enum_column}).
 
-                  If you are adding a new enum column, please add an index to the column. This helps to ensure
-                  the performance of the enum-related ActiveRecord scopes.
+                  Depending on the cardinality of the enum and your query pattern, an index may not always be beneficial.
+                  If you're unsure whether an index should be added, consult with a DBA to evaluate the trade-offs.
 
-                  If you have tested query performance in a production-like environment and determined an index is
-                  not required add the model and colum to the `index_ignore_list`.
+                  If an index is not needed for your enum and query pattern, add your model name and enum column to `index_ignore_list`
                 TEXT
               )
             end
