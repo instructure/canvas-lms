@@ -62,8 +62,37 @@ function defaultProps() {
   }
 }
 
-function mountComponent(customProps = {}) {
-  // @ts-ignore
+interface SearchResultsComponentProps {
+  caption?: string
+  fetchHistoryStatus?: string
+  historyItems?: Array<{
+    assignment: {
+      anonymousGrading: boolean
+      gradingType: string
+      muted: boolean
+      name: string
+    }
+    date: string
+    displayAsPoints: boolean
+    grader: string
+    gradeAfter: string
+    gradeBefore: string
+    gradeCurrent: string
+    id: string
+    pointsPossibleBefore: string
+    pointsPossibleAfter: string
+    pointsPossibleCurrent: string
+    student: string
+    time: string
+    gradedAnonymously: boolean
+    courseOverrideGrade: boolean
+  }>
+  getNextPage?: () => void
+  nextPage?: string
+  requestingResults?: boolean
+}
+
+function mountComponent(customProps: Partial<SearchResultsComponentProps> = {}) {
   return shallow(<SearchResultsComponent {...defaultProps()} {...customProps} />)
 }
 
@@ -105,7 +134,7 @@ describe('SearchResults', () => {
     const items = defaultHistoryItems()
     const props = {...defaultProps(), items}
     const tableBody = render(<SearchResultsComponent {...props} />)
-    expect(tableBody.container.querySelectorAll('tbody tr').length).toEqual(items.length)
+    expect(tableBody.container.querySelectorAll('tbody tr')).toHaveLength(items.length)
     tableBody.unmount()
   })
 
