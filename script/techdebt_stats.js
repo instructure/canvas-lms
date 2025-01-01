@@ -179,6 +179,45 @@ async function showReactTestUtilsImportStats() {
   }
 }
 
+async function countSkippedTests() {
+  try {
+    const {stdout: itSkipStdout} = await execAsync(
+      `git ls-files "ui/" "packages/" | xargs grep -l "it\\.skip("`,
+      {cwd: projectRoot},
+    )
+    const {stdout: describeSkipStdout} = await execAsync(
+      `git ls-files "ui/" "packages/" | xargs grep -l "describe\\.skip("`,
+      {cwd: projectRoot},
+    )
+
+    const itSkipFiles = itSkipStdout.trim().split('\n').filter(Boolean)
+    const describeSkipFiles = describeSkipStdout.trim().split('\n').filter(Boolean)
+
+    // Combine and deduplicate files
+    const allFiles = [...new Set([...itSkipFiles, ...describeSkipFiles])]
+    const fileCount = allFiles.length
+
+    if (fileCount > 0) {
+      console.log(colorize('yellow', `- Total files with skipped tests: ${bold(fileCount)}`))
+      const randomFile = normalizePath(allFiles[Math.floor(Math.random() * fileCount)])
+      console.log(colorize('gray', `  Example: ${randomFile}`))
+    } else {
+      console.log(
+        colorize('yellow', `- Total files with skipped tests: ${colorize('green', 'None')}`)
+      )
+    }
+  } catch (error) {
+    if (error.code === 1 && !error.stdout) {
+      // grep returns exit code 1 when no matches are found
+      console.log(
+        colorize('yellow', `- Total files with skipped tests: ${colorize('green', 'None')}`)
+      )
+    } else {
+      console.error(colorize('red', `Error counting skipped test files: ${error.message}`))
+    }
+  }
+}
+
 async function checkOutdatedPackages() {
   try {
     const output = execSync('npm outdated --json', {
@@ -340,6 +379,12 @@ async function printDashboard() {
     `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`,
   )
   await countTestFiles()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'Skipped Tests'))} ${colorize('gray', '(fix or remove)')}`
+  )
+  await countSkippedTests()
   console.log('')
 
   console.log(
