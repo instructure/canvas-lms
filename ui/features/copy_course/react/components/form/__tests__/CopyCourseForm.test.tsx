@@ -30,12 +30,13 @@ import chicago from 'timezone/America/Chicago'
 import detroit from 'timezone/America/Detroit'
 
 describe('CourseCopyForm', () => {
+  const currentYear = new Date().getFullYear()
   const courseName = 'Course name'
   const courseCode = 'Course code'
-  const startAt = '2024-01-01'
-  const termStartAt = '2024-02-01'
-  const endAt = '2024-01-02'
-  const termEndAt = '2024-02-02'
+  const startAt = `${currentYear}-01-01`
+  const termStartAt = `${currentYear}-02-01`
+  const endAt = `${currentYear}-01-02`
+  const termEndAt = `${currentYear}-02-02`
 
   const course: Course = {
     blueprint: false,
@@ -70,6 +71,22 @@ describe('CourseCopyForm', () => {
     onCancel: jest.fn(),
     canImportAsNewQuizzes: true,
   }
+
+  beforeEach(() => {
+    // Set timezone and mock current date
+    const timezone = 'America/Denver'
+    moment.tz.setDefault(timezone)
+    window.ENV = window.ENV || {}
+    window.ENV.TIMEZONE = timezone
+
+    // Mock the current date to be January 1st of the current year at noon
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date(`${currentYear}-01-01T12:00:00.000Z`))
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
 
   const renderCopyCourseForm = (props = {}) =>
     render(<CopyCourseForm {...defaultProps} {...props} />)
@@ -312,10 +329,10 @@ describe('CourseCopyForm', () => {
 
       const courseTimeZone = 'America/Detroit'
       const userTimeZone = 'America/Chicago'
-      const startDate = '2024-02-03T00:00:00.000Z'
+      const startDate = `${currentYear}-02-03T00:00:00.000Z`
       const expectedStartDateCourseDateString = 'Local: Feb 2 at 6pm'
       const expectedStartDateUserDateString = 'Course: Feb 2 at 7pm'
-      const endDate = '2024-03-03T00:00:00.000Z'
+      const endDate = `${currentYear}-03-03T00:00:00.000Z`
       const expectedEndDateCourseDateString = 'Local: Mar 2 at 6pm'
       const expectedEndDateUserDateString = 'Course: Mar 2 at 7pm'
 

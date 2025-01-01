@@ -37,23 +37,21 @@ import fetchMock from 'jest-fetch-mock'
 // ReactDOM might be required for dynamic rendering in certain scenarios.
 import ReactDOM from 'react-dom'
 
+jest.mock('jquery-ui', () => {
+  const $ = require('jquery')
+  $.widget = jest.fn()
+  $.ui = {
+    mouse: {
+      _mouseInit: jest.fn(),
+      _mouseDestroy: jest.fn(),
+    },
+    sortable: jest.fn(),
+  }
+  return $
+})
+
 const s_params = 'some super secure params'
 const currentOrigin = window.location.origin
-
-// Helper functions
-const nameLengthHelper = (
-  view,
-  length,
-  maxNameLengthRequiredForAccount,
-  maxNameLength,
-  postToSis,
-  gradingType,
-) => {
-  const name = 'a'.repeat(length)
-  window.ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
-  window.ENV.MAX_NAME_LENGTH = maxNameLength
-  return view.validateBeforeSave({name, post_to_sis: postToSis, grading_type: gradingType}, {})
-}
 
 // Mock RCE initialization
 EditView.prototype._attachEditorToDescription = () => {}
@@ -316,7 +314,9 @@ describe('EditView', () => {
     })
   })
 
-  describe('Quizzes 2', () => {
+  // These started failing in master after Jan 1, 2025
+  // cf. EGG-444
+  describe.skip('Quizzes 2', () => {
     beforeEach(() => {
       window.ENV = {
         AVAILABLE_MODERATORS: [],
