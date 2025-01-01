@@ -90,7 +90,7 @@ describe('DateAdjustment', () => {
 
   describe('Date fill in on initial data', () => {
     const dateObject = '2024-08-08T08:00:00+00:00'
-    const expectedDate = 'Aug 8 at 8am'
+    const expectedDate = 'Aug 8, 2024 at 8am'
     const getComponent = (dateShiftOptionVariant: Partial<DateShifts>) => {
       return (
         <DateAdjustments
@@ -208,8 +208,8 @@ describe('DateAdjustment', () => {
         />
       )
 
-      expect(screen.queryByText('Local: Nov 8 at 2am')).toBeInTheDocument()
-      expect(screen.queryByText('Course: Nov 8 at 3am')).toBeInTheDocument()
+      expect(screen.queryByText('Local: Nov 8, 2024 at 2am')).toBeInTheDocument()
+      expect(screen.queryByText('Course: Nov 8, 2024 at 3am')).toBeInTheDocument()
     })
   })
 })

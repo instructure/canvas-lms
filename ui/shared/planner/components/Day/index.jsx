@@ -159,6 +159,7 @@ export class Day extends Component {
     <>
       <style>{this.style.css}</style>
       <div
+        data-testid="day"
         className={classnames(this.style.classNames.root, 'planner-day', {
           'planner-today': this.thisIsToday,
         })}
@@ -166,13 +167,13 @@ export class Day extends Component {
         <Heading border={this.hasItems() ? 'none' : 'bottom'}>
           {this.thisIsToday ? (
             <>
-              <Text as="div" size="large" weight="bold">
+              <Text data-testid="today-text" as="div" size="large" weight="bold">
                 {this.friendlyName}
               </Text>
-              <div className={this.style.classNames.secondary}>{this.date}</div>
+              <div data-testid="today-date" className={this.style.classNames.secondary}>{this.date}</div>
             </>
           ) : (
-            <div className={this.style.classNames.secondary}>
+            <div data-testid="not-today" className={this.style.classNames.secondary}>
               {this.friendlyName}, {this.date}
             </div>
           )}
@@ -182,16 +183,18 @@ export class Day extends Component {
           {this.hasItems() ? (
             this.renderGroupings()
           ) : (
-            <View textAlign="center" display="block" margin="small 0 0 0">
+            <View data-testid="no-items" textAlign="center" display="block" margin="small 0 0 0">
               {I18n.t('Nothing Planned Yet')}
             </View>
           )}
         </div>
         {this.thisIsToday && this.props.showMissingAssignments && (
-          <MissingAssignments
-            timeZone={this.props.timeZone}
-            responsiveSize={this.props.responsiveSize}
-          />
+          <div data-testid="missing-assignments">
+            <MissingAssignments
+              timeZone={this.props.timeZone}
+              responsiveSize={this.props.responsiveSize}
+            />
+          </div>
         )}
       </div>
     </>

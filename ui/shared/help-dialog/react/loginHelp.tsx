@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {QueryProvider} from '@canvas/query'
 import HelpDialog from '.'
 import {Modal} from '@instructure/ui-modal'
@@ -87,11 +87,11 @@ export function renderLoginHelp(loginLink: Element): void {
   anchorElement.replaceWith(wrapper)
   wrapper.appendChild(anchorElement)
    
-  ReactDOM.render(
+  const root = createRoot(wrapper)
+  root.render(
     <QueryProvider>
       <LoginHelp linkText={anchorElement.innerText} />
-    </QueryProvider>,
-    wrapper
+    </QueryProvider>
   )
 }
 

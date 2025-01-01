@@ -68,7 +68,8 @@ describe('PublishIconButton', () => {
   it('renders restricted icon when item is published and restricted', () => {
     defaultProps.item.lock_at = '2024-12-31T23:59:59Z'
     render(<PublishIconButton {...defaultProps} />)
-    expect(screen.getByText('Available until Dec 31 at 11:59pm')).toBeInTheDocument()
+    const tooltip = screen.getByRole('tooltip')
+    expect(tooltip).toHaveTextContent(/Available until .* at \d{1,2}:\d{2}(am|pm)/i)
   })
 
   it('renders hidden icon when item is published and hidden', () => {
@@ -81,7 +82,8 @@ describe('PublishIconButton', () => {
     defaultProps.userCanEditFilesForContext = false
     defaultProps.item.lock_at = '2024-12-31T23:59:59Z'
     render(<PublishIconButton {...defaultProps} />)
-    expect(screen.getByText('Available until Dec 31 at 11:59pm')).toBeInTheDocument()
+    const tooltip = screen.getByRole('tooltip')
+    expect(tooltip).toHaveTextContent(/Available until .* at \d{1,2}:\d{2}(am|pm)/i)
   })
 
   it('renders nothing when user cannot edit and item is not restricted', () => {

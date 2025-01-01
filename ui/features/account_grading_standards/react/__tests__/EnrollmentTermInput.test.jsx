@@ -136,29 +136,29 @@ describe('EnrollmentTermInput', () => {
 
   it('groups terms by their status', async () => {
     const user = userEvent.setup()
-    const now = new Date('2024-12-15T20:48:56-07:00')
+    const now = new Date()
     const terms = [
       {
         id: '1',
         name: 'Active Term',
-        startAt: new Date('2024-12-01T00:00:00-07:00'),
-        endAt: new Date('2024-12-31T00:00:00-07:00'),
+        startAt: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+        endAt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         workflowState: 'active',
         displayName: 'Active Term',
       },
       {
         id: '2',
         name: 'Future Term',
-        startAt: new Date('2025-01-01T00:00:00-07:00'),
-        endAt: new Date('2025-06-01T00:00:00-07:00'),
+        startAt: new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000), // 60 days from now
+        endAt: new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000), // 90 days from now
         workflowState: 'active',
         displayName: 'Future Term',
       },
       {
         id: '3',
         name: 'Past Term',
-        startAt: new Date('2024-06-01T00:00:00-07:00'),
-        endAt: new Date('2024-11-30T00:00:00-07:00'),
+        startAt: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000), // 90 days ago
+        endAt: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
         workflowState: 'active',
         displayName: 'Past Term',
       }

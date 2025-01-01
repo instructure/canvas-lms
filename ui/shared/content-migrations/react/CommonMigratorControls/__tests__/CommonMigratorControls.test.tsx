@@ -253,13 +253,13 @@ describe('CommonMigratorControls', () => {
 
   describe('Date fill in', () => {
     const oldStartDateInputSting = '2024-08-08T08:00:00+00:00'
-    const oldStartDateExpectedDate = 'Aug 8 at 8am'
+    const oldStartDateExpectedDate = 'Aug 8, 2024 at 8am'
     const oldEndDateInputSting = '2024-08-09T08:00:00+00:00'
-    const oldEndDateExpectedDate = 'Aug 9 at 8am'
+    const oldEndDateExpectedDate = 'Aug 9, 2024 at 8am'
     const newStartDateInputSting = '2024-08-10T08:00:00+00:00'
-    const newStartDateExpectedDate = 'Aug 10 at 8am'
+    const newStartDateExpectedDate = 'Aug 10, 2024 at 8am'
     const newEndDateInputSting = '2024-08-11T08:00:00+00:00'
-    const newEndDateExpectedDate = 'Aug 11 at 8am'
+    const newEndDateExpectedDate = 'Aug 11, 2024 at 8am'
 
     const expectDateField = (dataCid: string, value: string) => {
       expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)

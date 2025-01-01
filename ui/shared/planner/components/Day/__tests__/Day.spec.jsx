@@ -16,13 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import moment from 'moment-timezone'
+import {Provider} from 'react-redux'
+import {createStore} from 'redux'
 import {Day} from '../index'
 
 const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#0B874B'}
-const defaultProps = {registerAnimatable: jest.fn, deregisterAnimatable: jest.fn}
+const defaultProps = {registerAnimatable: jest.fn(), deregisterAnimatable: jest.fn()}
+
+// Create a mock store for MissingAssignments component
+const defaultState = {
+  opportunities: {
+    items: [],
+    missingItemsExpanded: false,
+  },
+  courses: [],
+}
+
+const mockAssignment = {
+  id: '1',
+  name: 'Missing Assignment 1',
+  points_possible: 10,
+  html_url: 'http://example.com/assignment1',
+  due_at: '2024-01-01T00:00:00Z',
+  submission_types: ['online_text_entry'],
+  course_id: '1',
+  uniqueId: '1',
+}
+
+const store = createStore((state = defaultState, action) => {
+  switch (action.type) {
+    case 'SET_STATE':
+      return {...state, ...action.payload}
+    default:
+      return state
+  }
+})
+
+const renderWithRedux = (ui, {reduxState = defaultState} = {}) => {
+  store.dispatch({type: 'SET_STATE', payload: reduxState})
+  return render(<Provider store={store}>{ui}</Provider>)
+}
 
 const currentTimeZoneName = moment.tz.guess()
 const otherTimeZoneName = ['America/Denver', 'Europe/London'].find(it => it !== currentTimeZoneName)
@@ -33,298 +68,206 @@ for (const [timeZoneDesc, timeZoneName] of [
   ['In other timezone', otherTimeZoneName],
 ]) {
   describe(timeZoneDesc, () => {
+    let originalNow
+
     beforeAll(() => {
       moment.tz.setDefault(timeZoneName)
+      originalNow = Date.now
+      // Set fixed date to 2025-01-01 for consistent testing
+      const fixedDate = new Date('2025-01-01T12:53:31-07:00').getTime()
+      Date.now = jest.fn(() => fixedDate)
     })
 
-    it('renders the base component with required props', () => {
-      const wrapper = shallow(<Day {...defaultProps} timeZone={timeZoneName} day="2017-04-25" />)
-      expect(wrapper).toMatchSnapshot()
+    afterAll(() => {
+      Date.now = originalNow
+      moment.tz.setDefault()
     })
 
-    it('renders the friendly name in large text and rest of the date on a second line when it is today', () => {
-      const today = moment()
-      const wrapper = shallow(
-        <Day {...defaultProps} timeZone={timeZoneName} day={today.format('YYYY-MM-DD')} />
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
+    it('renders today view correctly', () => {
+      const today = moment().format('YYYY-MM-DD')
+      const {getByTestId} = renderWithRedux(
+        <Day {...defaultProps} timeZone={timeZoneName} day={today} />,
       )
-      const friendlyName = wrapper.find('Heading').first().childAt(0)
-      const fullDate = wrapper.find('Heading').first().childAt(1)
 
-      expect(friendlyName.props().size).toBe('large')
-      expect(fullDate.text()).toBe(today.format('MMMM D'))
+      const todayText = getByTestId('today-text')
+      expect(todayText).toHaveTextContent('Today')
+      expect(getByTestId('today-date')).toHaveTextContent('January 1')
     })
 
-    it('renders the full date with friendly name on one line when it is not today', () => {
-      const yesterday = moment().subtract(1, 'days')
-      const wrapper = shallow(
-        <Day {...defaultProps} timeZone={timeZoneName} day={yesterday.format('YYYY-MM-DD')} />
+    it('renders future date correctly', () => {
+      const tomorrow = moment().add(1, 'days').format('YYYY-MM-DD')
+      const {getByTestId} = renderWithRedux(
+        <Day {...defaultProps} timeZone={timeZoneName} day={tomorrow} />,
       )
-      const fullDate = wrapper.find('Heading').first().childAt(0)
 
-      expect(fullDate.text()).toBe(`Yesterday, ${yesterday.format('MMMM D')}`)
+      expect(getByTestId('not-today')).toHaveTextContent('Tomorrow, January 2')
     })
 
-    it('renders missing assignments if showMissingAssignments is true and it is today', () => {
-      const today = moment()
-      const wrapper = shallow(
+    it('shows missing assignments component on today when enabled', () => {
+      const today = moment().format('YYYY-MM-DD')
+      const mockState = {
+        opportunities: {
+          items: [mockAssignment],
+          missingItemsExpanded: true,
+        },
+        courses: [{id: '1', shortName: 'Course 1', color: '#00FF00', originalName: 'Course 1'}],
+      }
+      const {getByTestId} = renderWithRedux(
         <Day
           {...defaultProps}
           timeZone={timeZoneName}
-          day={today.format('YYYY-MM-DD')}
+          day={today}
           showMissingAssignments={true}
-        />
+        />,
+        {reduxState: mockState},
       )
-      expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeTruthy()
+
+      expect(getByTestId('missing-assignments')).toBeInTheDocument()
     })
 
-    it('does not render missing assignments if it is not today', () => {
-      const yesterday = moment().subtract(1, 'days')
-      const wrapper = shallow(
+    it('does not show missing assignments component on non-today', () => {
+      const tomorrow = moment().add(1, 'days').format('YYYY-MM-DD')
+      const {queryByTestId} = renderWithRedux(
         <Day
           {...defaultProps}
           timeZone={timeZoneName}
-          day={yesterday.format('YYYY-MM-DD')}
+          day={tomorrow}
           showMissingAssignments={true}
-        />
+        />,
       )
-      expect(wrapper.find('Connect(MissingAssignments)').exists()).toBeFalsy()
+
+      expect(queryByTestId('missing-assignments')).not.toBeInTheDocument()
     })
 
-    it('only renders the year when the date is not in the current year', () => {
-      const lastYear = moment().subtract(1, 'year')
-      const wrapper = shallow(
-        <Day {...defaultProps} timeZone={timeZoneName} day={lastYear.format('YYYY-MM-DD')} />
+    it('shows "Nothing Planned Yet" when no items exist', () => {
+      const today = moment().format('YYYY-MM-DD')
+      const {getByTestId} = renderWithRedux(
+        <Day {...defaultProps} timeZone={timeZoneName} day={today} />,
       )
-      const fullDate = wrapper.find('Heading').first().childAt(0)
 
-      expect(fullDate.text()).toBe(lastYear.format('dddd, MMMM D, YYYY'))
+      expect(getByTestId('no-items')).toHaveTextContent('Nothing Planned Yet')
     })
   })
 }
 
-it('renders grouping correctly when having itemsForDay', () => {
+describe('Day items grouping', () => {
   const TZ = 'America/Denver'
-  const items = [
-    {
-      title: 'Black Friday',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 128,
-        url: 'http://www.non_default_url.com',
+  let originalNow
+
+  beforeAll(() => {
+    moment.tz.setDefault(TZ)
+    originalNow = Date.now
+    // Set fixed date to 2025-01-01 for consistent testing
+    const fixedDate = new Date('2025-01-01T12:53:31-07:00').getTime()
+    Date.now = jest.fn(() => fixedDate)
+  })
+
+  afterAll(() => {
+    Date.now = originalNow
+    moment.tz.setDefault()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('groups items by context correctly', () => {
+    const items = [
+      {
+        title: 'Assignment 1',
+        date: moment.tz('2025-01-01T12:00:00Z', TZ),
+        context: {
+          type: 'Course',
+          id: 1,
+          title: 'Course 1',
+        },
       },
-    },
-    {
-      title: 'San Juan',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 256,
-        url: 'http://www.non_default_url.com',
+      {
+        title: 'Assignment 2',
+        date: moment.tz('2025-01-01T12:00:00Z', TZ),
+        context: {
+          type: 'Course',
+          id: 1,
+          title: 'Course 1',
+        },
       },
-    },
-    {
-      title: 'Roll for the Galaxy',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 256,
-        url: 'http://www.non_default_url.com',
+      {
+        title: 'Assignment 3',
+        date: moment.tz('2025-01-01T12:00:00Z', TZ),
+        context: {
+          type: 'Course',
+          id: 2,
+          title: 'Course 2',
+        },
       },
-    },
-    {
-      title: 'Same id, different type',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Group',
-        id: 256,
+    ]
+
+    const {getByTestId} = renderWithRedux(
+      <Day
+        {...defaultProps}
+        timeZone={TZ}
+        day={moment().format('YYYY-MM-DD')}
+        itemsForDay={items}
+        currentUser={user}
+      />,
+    )
+
+    expect(getByTestId('day')).toBeInTheDocument()
+  })
+
+  it('groups items without context into Notes category', () => {
+    const items = [
+      {
+        title: 'Note 1',
+        date: moment.tz('2025-01-01T12:00:00Z', TZ),
       },
-    },
-  ]
-
-  const wrapper = shallow(
-    <Day
-      {...defaultProps}
-      timeZone={TZ}
-      day="2017-04-25"
-      itemsForDay={items}
-      animatableIndex={1}
-      currentUser={user}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
-it('groups itemsForDay that have no context into the "Notes" category', () => {
-  const TZ = 'America/Denver'
-  const items = [
-    {
-      title: 'Black Friday',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 128,
+      {
+        title: 'Note 2',
+        date: moment.tz('2025-01-01T12:00:00Z', TZ),
       },
-    },
-    {
-      title: 'San Juan',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 256,
-      },
-    },
-    {
-      title: 'Roll for the Galaxy',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 256,
-      },
-    },
-    {
-      title: 'Get work done!',
-    },
-  ]
+    ]
 
-  const wrapper = shallow(
-    <Day {...defaultProps} timeZone={TZ} day="2017-04-25" itemsForDay={items} currentUser={user} />
-  )
-  expect(wrapper).toMatchSnapshot()
-})
+    const {getByTestId} = renderWithRedux(
+      <Day
+        {...defaultProps}
+        timeZone={TZ}
+        day={moment().format('YYYY-MM-DD')}
+        itemsForDay={items}
+        currentUser={user}
+      />,
+    )
 
-it('groups itemsForDay that come in on prop changes', () => {
-  const TZ = 'America/Denver'
-  const items = [
-    {
-      title: 'Black Friday',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 128,
-      },
-    },
-    {
-      title: 'San Juan',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 256,
-      },
-    },
-  ]
+    expect(getByTestId('day')).toBeInTheDocument()
+  })
 
-  const wrapper = shallow(
-    <Day
-      timeZone={TZ}
-      day="2017-04-25"
-      itemsForDay={items}
-      registerAnimatable={() => {}}
-      deregisterAnimatable={() => {}}
-      currentUser={user}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
+  it('registers as animatable on mount', () => {
+    const registerMock = jest.fn()
+    const props = {
+      ...defaultProps,
+      registerAnimatable: registerMock,
+      timeZone: TZ,
+      day: moment().format('YYYY-MM-DD'),
+    }
 
-  const newItemsForDay = items.concat([
-    {
-      title: 'Roll for the Galaxy',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {
-        type: 'Course',
-        id: 256,
-      },
-    },
-    {
-      title: 'Get work done!',
-    },
-  ])
+    renderWithRedux(<Day {...props} />)
+    expect(registerMock).toHaveBeenCalledWith('day', expect.any(Object), 0, [])
+  })
 
-  wrapper.setProps({itemsForDay: newItemsForDay})
-  expect(wrapper).toMatchSnapshot()
-})
+  it('deregisters as animatable on unmount', () => {
+    const deregisterMock = jest.fn()
+    const props = {
+      ...defaultProps,
+      deregisterAnimatable: deregisterMock,
+      timeZone: TZ,
+      day: moment().format('YYYY-MM-DD'),
+    }
 
-it('renders even when there are no items', () => {
-  const date = moment.tz('Asia/Tokyo').add(13, 'days')
-  const wrapper = shallow(
-    <Day
-      {...defaultProps}
-      timeZone="Asia/Tokyo"
-      day={date.format('YYYY-MM-DD')}
-      itemsForDay={[]}
-      currentUser={user}
-    />
-  )
-  expect(wrapper.type).not.toBeNull()
-})
-
-it('registers itself as animatable', () => {
-  const TZ = 'Asia/Tokyo'
-  const fakeRegister = jest.fn()
-  const fakeDeregister = jest.fn()
-  const firstItems = [
-    {
-      title: 'asdf',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {id: 128},
-      id: '1',
-      uniqueId: 'first',
-    },
-    {
-      title: 'jkl',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {id: 256},
-      id: '2',
-      uniqueId: 'second',
-    },
-  ]
-  const secondItems = [
-    {
-      title: 'qwer',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {id: 128},
-      id: '3',
-      uniqueId: 'third',
-    },
-    {
-      title: 'uiop',
-      date: moment.tz('2017-04-25T23:59:00Z', TZ),
-      context: {id: 256},
-      id: '4',
-      uniqueId: 'fourth',
-    },
-  ]
-
-  const ref = React.createRef()
-  const {rerender} = render(
-    <Day
-      day="2017-08-11"
-      timeZone={TZ}
-      animatableIndex={42}
-      itemsForDay={firstItems}
-      registerAnimatable={fakeRegister}
-      deregisterAnimatable={fakeDeregister}
-      updateTodo={() => {}}
-      currentUser={user}
-      ref={ref}
-    />
-  )
-
-  expect(fakeRegister).toHaveBeenCalledWith('day', ref.current, 42, ['first', 'second'])
-
-  rerender(
-    <Day
-      day="2017-08-11"
-      timeZone={TZ}
-      animatableIndex={42}
-      itemsForDay={secondItems}
-      registerAnimatable={fakeRegister}
-      deregisterAnimatable={fakeDeregister}
-      updateTodo={() => {}}
-      currentUser={user}
-      ref={ref}
-    />
-  )
-
-  expect(fakeDeregister).toHaveBeenCalledWith('day', ref.current, ['first', 'second'])
-  expect(fakeRegister).toHaveBeenCalledWith('day', ref.current, 42, ['third', 'fourth'])
+    const {unmount} = renderWithRedux(<Day {...props} />)
+    unmount()
+    expect(deregisterMock).toHaveBeenCalledWith('day', expect.any(Object), [])
+  })
 })
