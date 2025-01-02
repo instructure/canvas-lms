@@ -203,14 +203,14 @@ async function countSkippedTests() {
       console.log(colorize('gray', `  Example: ${randomFile}`))
     } else {
       console.log(
-        colorize('yellow', `- Total files with skipped tests: ${colorize('green', 'None')}`)
+        colorize('yellow', `- Total files with skipped tests: ${colorize('green', 'None')}`),
       )
     }
   } catch (error) {
     if (error.code === 1 && !error.stdout) {
       // grep returns exit code 1 when no matches are found
       console.log(
-        colorize('yellow', `- Total files with skipped tests: ${colorize('green', 'None')}`)
+        colorize('yellow', `- Total files with skipped tests: ${colorize('green', 'None')}`),
       )
     } else {
       console.error(colorize('red', `Error counting skipped test files: ${error.message}`))
@@ -276,28 +276,6 @@ async function checkOutdatedPackages() {
     }
   } catch (error) {
     console.error(colorize('red', `Error running npm outdated: ${error.message}`))
-  }
-}
-
-async function countTestFiles() {
-  try {
-    // Find both *Spec.js* and *.test.js* files
-    const {stdout} = await execAsync(
-      `git ls-files "ui/" "packages/" | grep -E "Spec\\.(js|jsx)$"`,
-      {cwd: projectRoot},
-    )
-    const files = stdout.trim().split('\n').filter(Boolean)
-    const fileCount = files.length
-
-    if (fileCount > 0) {
-      console.log(colorize('yellow', `- Total test files: ${bold(fileCount)}`))
-      const randomFile = normalizePath(files[Math.floor(Math.random() * fileCount)])
-      console.log(colorize('gray', `  Example: ${randomFile}`))
-    } else {
-      console.log(colorize('yellow', `- Total test files: ${colorize('green', 'None')}`))
-    }
-  } catch (error) {
-    console.error(colorize('red', `Error counting test files: ${error.message}`))
   }
 }
 
@@ -375,15 +353,7 @@ async function countReactClassComponentFiles() {
 async function printDashboard() {
   console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
-  console.log(
-    `${bold(colorize('white', 'QUnit Test Files'))} ${colorize('gray', '(convert to Jest)')}`,
-  )
-  await countTestFiles()
-  console.log('')
-
-  console.log(
-    `${bold(colorize('white', 'Skipped Tests'))} ${colorize('gray', '(fix or remove)')}`
-  )
+  console.log(`${bold(colorize('white', 'Skipped Tests'))} ${colorize('gray', '(fix or remove)')}`)
   await countSkippedTests()
   console.log('')
 
