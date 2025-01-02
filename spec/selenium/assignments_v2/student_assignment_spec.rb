@@ -589,8 +589,10 @@ describe "as a student" do
       end
 
       it "can open the record media modal for submission" do
-        scroll_to(StudentAssignmentPageV2.open_record_media_modal_button)
-        StudentAssignmentPageV2.open_record_media_modal_button.click
+        button = StudentAssignmentPageV2.open_record_media_modal_button
+        scroll_to(button)
+        wait_for_ajaximations
+        button.click
 
         expect(StudentAssignmentPageV2.record_media_modal_panel).to be_displayed
       end
