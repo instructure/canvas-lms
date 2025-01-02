@@ -25,7 +25,7 @@ import {
   type Lti1p3RegistrationOverlayState,
   createLti1p3RegistrationOverlayStore,
 } from '../Lti1p3RegistrationOverlayState'
-import {type InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
+import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {i18nLtiPrivacyLevelDescription} from '../../model/i18nLtiPrivacyLevel'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 
@@ -154,8 +154,6 @@ describe('Review Screen Wrapper', () => {
         },
       },
     )
-
-    screen.debug(undefined, 100000)
 
     expect(screen.getByText(/no nickname provided/i)).toBeInTheDocument()
   })

@@ -29,9 +29,6 @@ import {
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {PermissionConfirmationWrapper} from './components/PermissionConfirmationWrapper'
 import {PlacementsConfirmationWrapper} from './components/PlacementsConfirmationWrapper'
-import {Button} from '@instructure/ui-buttons'
-import {Modal} from '@instructure/ui-modal'
-import {Text} from '@instructure/ui-text'
 import {PrivacyConfirmationWrapper} from './components/PrivacyConfirmationWrapper'
 import {OverrideURIsConfirmation} from './components/OverrideURIsConfirmation'
 import {NamingConfirmationWrapper} from './components/NamingConfirmationWrapper'
@@ -42,9 +39,9 @@ import GenericErrorPage from '@canvas/generic-error-page/react'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import type {Lti1p3RegistrationWizardService} from './Lti1p3RegistrationWizardService'
-import {Heading} from '@instructure/ui-heading'
 import type {LtiRegistrationWithConfiguration} from '../model/LtiRegistration'
 import {toUndefined} from '../../common/lib/toUndefined'
+import {Footer} from '../registration_wizard_forms/Footer'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -97,55 +94,33 @@ export const Lti1p3RegistrationWizard = ({
     }
   }
 
-  const nextButtonLabel = store.state.reviewing ? I18n.t('Back to Review') : I18n.t('Next')
-
   switch (store.state._step) {
     case 'LaunchSettings':
       return (
         <LaunchSettings
           internalConfig={internalConfiguration}
           overlayStore={store.state.overlayStore}
-          unregister={unregister}
           reviewing={store.state.reviewing}
+          onPreviousClicked={unregister}
           onNextClicked={handleNextClicked('Permissions')}
         />
       )
     case 'Permissions':
-      // TODO: Handle the case where the internal config is undefined and allow for manual configuration
       return (
         <>
           <PermissionConfirmationWrapper
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
           />
-          <Modal.Footer>
-            <Button onClick={handlePreviousClicked('LaunchSettings')} margin="small">
-              {I18n.t('Previous')}
-            </Button>
-            <Button onClick={handleNextClicked('DataSharing')} color="primary" margin="small">
-              {nextButtonLabel}
-            </Button>
-          </Modal.Footer>
+          <Footer
+            currentScreen="intermediate"
+            reviewing={store.state.reviewing}
+            onPreviousClicked={handlePreviousClicked('LaunchSettings')}
+            onNextClicked={handleNextClicked('DataSharing')}
+          />
         </>
       )
     case 'DataSharing':
-      return (
-        <>
-          <PrivacyConfirmationWrapper
-            internalConfig={internalConfiguration}
-            appName={internalConfiguration.title}
-            overlayStore={store.state.overlayStore}
-          />
-          <Modal.Footer>
-            <Button onClick={handlePreviousClicked('Permissions')} margin="small">
-              {I18n.t('Previous')}
-            </Button>
-            <Button onClick={handleNextClicked('Placements')} color="primary" margin="small">
-              {nextButtonLabel}
-            </Button>
-          </Modal.Footer>
-        </>
-      )
     case 'Placements':
       return (
         <>
@@ -153,14 +128,12 @@ export const Lti1p3RegistrationWizard = ({
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
           />
-          <Modal.Footer>
-            <Button onClick={handlePreviousClicked('DataSharing')} margin="small">
-              {I18n.t('Previous')}
-            </Button>
-            <Button onClick={handleNextClicked('OverrideURIs')} color="primary" margin="small">
-              {nextButtonLabel}
-            </Button>
-          </Modal.Footer>
+          <Footer
+            currentScreen="intermediate"
+            reviewing={store.state.reviewing}
+            onPreviousClicked={handlePreviousClicked('DataSharing')}
+            onNextClicked={handleNextClicked('OverrideURIs')}
+          />
         </>
       )
     case 'OverrideURIs':
@@ -180,14 +153,12 @@ export const Lti1p3RegistrationWizard = ({
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
           />
-          <Modal.Footer>
-            <Button onClick={handlePreviousClicked('OverrideURIs')} margin="small">
-              {I18n.t('Previous')}
-            </Button>
-            <Button onClick={handleNextClicked('Icons')} color="primary" margin="small">
-              {nextButtonLabel}
-            </Button>
-          </Modal.Footer>
+          <Footer
+            currentScreen="intermediate"
+            reviewing={store.state.reviewing}
+            onPreviousClicked={handlePreviousClicked('OverrideURIs')}
+            onNextClicked={handleNextClicked('Icons')}
+          />
         </>
       )
     case 'Icons':
@@ -208,29 +179,24 @@ export const Lti1p3RegistrationWizard = ({
             internalConfig={internalConfiguration}
             transitionTo={store.setStep}
           />
-          <Modal.Footer>
-            <Button onClick={handlePreviousClicked('Icons')} margin="small">
-              {I18n.t('Previous')}
-            </Button>
-            <Button
-              onClick={() => {
-                if (existingRegistration) {
-                  store.update(
-                    onSuccessfulRegistration,
-                    accountId,
-                    existingRegistration.id,
-                    unifiedToolId,
-                  )
-                } else {
-                  store.install(onSuccessfulRegistration, accountId, unifiedToolId)
-                }
-              }}
-              color="primary"
-              margin="small"
-            >
-              {existingRegistration ? I18n.t('Update App') : I18n.t('Install App')}
-            </Button>
-          </Modal.Footer>
+          <Footer
+            currentScreen="last"
+            onPreviousClicked={handlePreviousClicked('Icons')}
+            updating={!!existingRegistration}
+            onNextClicked={() => {
+              if (existingRegistration) {
+                store.update(
+                  onSuccessfulRegistration,
+                  accountId,
+                  existingRegistration.id,
+                  unifiedToolId,
+                )
+              } else {
+                store.install(onSuccessfulRegistration, accountId, unifiedToolId)
+              }
+            }}
+            reviewing={store.state.reviewing}
+          />
         </>
       )
     case 'Installing':

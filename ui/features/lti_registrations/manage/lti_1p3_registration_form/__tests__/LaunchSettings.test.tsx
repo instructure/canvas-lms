@@ -39,7 +39,7 @@ describe('LaunchSettings', () => {
       <LaunchSettings
         internalConfig={config}
         overlayStore={overlayStore}
-        unregister={jest.fn()}
+        onPreviousClicked={jest.fn()}
         onNextClicked={jest.fn()}
         reviewing={false}
       />,
@@ -82,7 +82,7 @@ describe('LaunchSettings', () => {
       <LaunchSettings
         internalConfig={config}
         overlayStore={overlayStore}
-        unregister={jest.fn()}
+        onPreviousClicked={jest.fn()}
         onNextClicked={jest.fn()}
         reviewing={false}
       />,
@@ -137,7 +137,7 @@ describe('LaunchSettings', () => {
       <LaunchSettings
         internalConfig={config}
         overlayStore={overlayStore}
-        unregister={jest.fn()}
+        onPreviousClicked={jest.fn()}
         onNextClicked={jest.fn()}
         reviewing={false}
       />,

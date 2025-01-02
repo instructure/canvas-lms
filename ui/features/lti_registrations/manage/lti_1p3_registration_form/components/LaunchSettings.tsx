@@ -28,8 +28,7 @@ import {
   type Lti1p3RegistrationOverlayStore,
 } from '../Lti1p3RegistrationOverlayState'
 import {TextInput} from '@instructure/ui-text-input'
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {Modal} from '@instructure/ui-modal'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Popover} from '@instructure/ui-popover'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -37,14 +36,15 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import type {InternalLtiConfiguration} from '../../model/internal_lti_configuration/InternalLtiConfiguration'
 import {toUndefined} from '../../../common/lib/toUndefined'
+import {Footer} from '../../registration_wizard_forms/Footer'
 
 const I18n = createI18nScope('lti_registrations')
 
 export type LaunchSettingsProps = {
   overlayStore: Lti1p3RegistrationOverlayStore
   internalConfig: InternalLtiConfiguration
-  unregister: () => void
   reviewing: boolean
+  onPreviousClicked: () => void
   onNextClicked: () => void
 }
 
@@ -55,6 +55,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
     ...actions
   } = props.overlayStore()
 
+  const errors = useValidateLaunchSettings(launchSettings, config)
   const {
     redirectUrisMessages,
     targetLinkURIMessages,
@@ -62,11 +63,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
     jwkMessages,
     domainMessages,
     customFieldsMessages,
-  } = useValidateLaunchSettings(launchSettings, config)
-
-  const isNextDisabled = Object.values(useValidateLaunchSettings(launchSettings, config)).some(
-    messages => messages.length !== 0,
-  )
+  } = errors
 
   return (
     <>
@@ -198,19 +195,13 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
           </div>
         </Flex>
       </RegistrationModalBody>
-      <Modal.Footer>
-        <Button onClick={props.unregister} margin="small">
-          {I18n.t('Cancel')}
-        </Button>
-        <Button
-          color="primary"
-          onClick={props.onNextClicked}
-          disabled={isNextDisabled}
-          margin="small"
-        >
-          {props.reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
-        </Button>
-      </Modal.Footer>
+      <Footer
+        currentScreen="first"
+        disableNextButton={Object.values(errors).some(e => e.length > 0)}
+        reviewing={props.reviewing}
+        onNextClicked={props.onNextClicked}
+        onPreviousClicked={props.onPreviousClicked}
+      ></Footer>
     </>
   )
 }
