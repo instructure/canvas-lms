@@ -734,6 +734,27 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(f(".fc-event").text).to include("new assignment")
       end
+
+      it "student sees assignment on calendar when in section" do
+        @section1 = CourseSection.create!(name: "Section 1", course: @course)
+        @section2 = CourseSection.create!(name: "Section 2", course: @course)
+        student_in_section(@section1, user: @student)
+        @assignment = @course.assignments.create!(title: "new assignment")
+        @assignment.assignment_overrides.create!(due_at: 1.week.from_now, due_at_overridden: true, set_type: "CourseSection", set_id: @section2.id, title: @section2.name, workflow_state: "active")
+
+        module0 = ContextModule.create!(name: "Alpha Mod", context: @course)
+        module0.content_tags.create!(context: @course, content: @assignment, tag_type: "context_module")
+        AssignmentOverride.create!(set_type: "CourseSection", set_id: @section1.id, title: @section1.name, workflow_state: "active", context_module_id: module0.id)
+        AssignmentOverride.create!(set_type: "CourseSection", set_id: @section2.id, title: @section2.name, workflow_state: "active", context_module_id: module0.id)
+
+        get "/calendar2"
+        wait_for_ajaximations
+
+        f("#undated-events-button").click
+        wait_for_ajaximations
+        undated_events = ff("#undated-events > ul > li")
+        expect(undated_events.size).to eq 1
+      end
     end
   end
 end
