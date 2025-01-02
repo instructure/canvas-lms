@@ -349,9 +349,9 @@ class User < ActiveRecord::Base
   scope :not_fake_student, -> { where("enrollments.type <> 'StudentViewEnrollment'") }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id|
+  scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id, user_ids = nil|
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id).map(&:user_id)
+      visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:).map(&:user_id)
       if visible_user_id.any?
         where(id: visible_user_id)
       else

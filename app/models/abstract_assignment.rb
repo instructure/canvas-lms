@@ -1596,11 +1596,11 @@ class AbstractAssignment < ActiveRecord::Base
     overridden_users
   end
 
-  def students_with_visibility(scope = nil)
+  def students_with_visibility(scope = nil, user_ids = nil)
     scope ||= context.all_students.where("enrollments.workflow_state NOT IN ('inactive', 'rejected')")
     return scope unless differentiated_assignments_applies?
 
-    scope.able_to_see_assignment_in_course_with_da(id, context.id)
+    scope.able_to_see_assignment_in_course_with_da(id, context.id, user_ids)
   end
 
   def process_if_quiz
