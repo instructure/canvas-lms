@@ -26,10 +26,7 @@ import {Tray} from '@instructure/ui-tray'
 import {cloneDeep, isEmpty, isEqual} from 'lodash'
 import React, {useState} from 'react'
 import {confirmViewUngradedAsZero} from '../Gradebook.utils'
-import {
-  setCoursePostPolicy as apiSetCoursePostPolicy,
-  getAssignmentPostPolicies,
-} from '../PostPolicies/PostPolicyApi'
+import {setCoursePostPolicy as apiSetCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
 import {
   createLatePolicy,
   fetchLatePolicy,
@@ -79,9 +76,7 @@ export type GradebookSettingsModalProps = {
   open: boolean
   postPolicies: {
     coursePostPolicy: CoursePostPolicy
-    setAssignmentPostPolicies: (assignmentPostPolicies: {
-      assignmentPostPoliciesById: {[assignmentId: string]: {postManually: boolean}}
-    }) => void
+    setAssignmentPostPolicies: (postManually: boolean) => void
     setCoursePostPolicy: (coursePostPolicy: {courseId?: string; postManually: boolean}) => void
   }
 }
@@ -170,13 +165,9 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
       courseId: props.courseId,
       postManually: coursePostPolicy.postManually,
     })
-      .then(() => getAssignmentPostPolicies({courseId: props.courseId}))
-      .then((response: {assignmentPostPoliciesById: {[key: string]: {postManually: boolean}}}) => {
-        const {postManually} = coursePostPolicy
-        props.postPolicies.setCoursePostPolicy({postManually})
-
-        const {assignmentPostPoliciesById} = response
-        props.postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})
+      .then((postPolicy: {postManually: boolean}) => {
+        props.postPolicies.setCoursePostPolicy({postManually: postPolicy.postManually})
+        props.postPolicies.setAssignmentPostPolicies(postPolicy.postManually)
       })
       .catch(() => {
         const message = I18n.t('An error occurred while saving the course post policy')

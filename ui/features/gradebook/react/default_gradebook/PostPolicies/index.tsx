@@ -20,7 +20,7 @@
 import * as tz from '@instructure/moment-utils'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {getAssignmentColumnId} from '../Gradebook.utils'
+import {getAssignmentColumnId, postPolicyChangeable} from '../Gradebook.utils'
 import AsyncComponents from '../AsyncComponents'
 import type Gradebook from '../Gradebook'
 
@@ -104,10 +104,9 @@ export default class PostPolicies {
     const bindAssignmentPolicyTray = ref => {
       tray = ref
     }
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <AssignmentPostingPolicyTray ref={bindAssignmentPolicyTray} />,
-      $assignmentPolicyContainer
+      $assignmentPolicyContainer,
     )
 
     tray.show({
@@ -129,7 +128,7 @@ export default class PostPolicies {
     const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
     const studentsWithVisibility = Object.values(
-      this._gradebook.studentsThatCanSeeAssignment(assignment.id)
+      this._gradebook.studentsThatCanSeeAssignment(assignment.id),
     )
     const submissions = studentsWithVisibility.map(student => getSubmission(student, assignment.id))
 
@@ -140,7 +139,6 @@ export default class PostPolicies {
     const bindHideTray = ref => {
       tray = ref
     }
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
 
     tray.show({
@@ -162,7 +160,7 @@ export default class PostPolicies {
     const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
     const studentsWithVisibility = Object.values(
-      this._gradebook.studentsThatCanSeeAssignment(assignment.id)
+      this._gradebook.studentsThatCanSeeAssignment(assignment.id),
     )
     const submissions = studentsWithVisibility.map(student => getSubmission(student, assignment.id))
 
@@ -173,7 +171,6 @@ export default class PostPolicies {
     const bindPostTray = ref => {
       tray = ref
     }
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
 
     tray.show({
@@ -209,13 +206,12 @@ export default class PostPolicies {
     this._coursePostPolicy = {postManually}
   }
 
-  setAssignmentPostPolicies({assignmentPostPoliciesById}) {
-    Object.keys(assignmentPostPoliciesById).forEach(id => {
-      const assignment = this._gradebook.getAssignment(id)
-      if (assignment != null) {
-        assignment.post_manually = assignmentPostPoliciesById[id].postManually
+  setAssignmentPostPolicies(postManually: boolean) {
+    for (const assignment of Object.values(this._gradebook.assignments)) {
+      if (postPolicyChangeable(assignment)) {
+        assignment.post_manually = postManually
       }
-    })
+    }
 
     // The changed assignments may not all be visible, so update all column
     // headers rather than worrying about which ones are or aren't shown
