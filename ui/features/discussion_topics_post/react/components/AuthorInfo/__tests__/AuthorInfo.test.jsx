@@ -257,13 +257,20 @@ describe('AuthorInfo', () => {
       expect(container.queryByTestId('editedByText')).not.toBeInTheDocument()
     })
 
-    it('render the last edited date if it is past the posted date', () => {
-      const container = setup({
-        createdAt: new Date().toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}),
-        editedTimingDisplay: new Date(Date.now() - 86400000).toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}), // 1 day ago
-        delayedPostAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+    describe("when the edited date is after the posted date", () => {
+      const createdAt = new Date()
+      const delayedPostAt = new Date(createdAt.getTime() + 86400000) // One day after creation
+      const editedTimingDisplay = new Date(delayedPostAt.getTime() + 30000) // Edited 30s after posting
+
+      it('render the last edited date if it is past the posted date', () => {
+        const container = setup({
+          createdAt: createdAt.toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}),
+          editedTimingDisplay: editedTimingDisplay.toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true}),
+          delayedPostAt: delayedPostAt.toLocaleString('en-US', {month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true})
+        })
+
+        expect(container.queryByTestId('editedByText')).toBeInTheDocument()
       })
-      expect(container.queryByTestId('editedByText')).toBeInTheDocument()
     })
 
     it('duplicates the created date for teacher if instant post', () => {
