@@ -230,7 +230,11 @@ module Api::V1::CalendarEvent
     hash["url"] = api_v1_calendar_event_url("assignment_#{assignment.id}")
     if assignment.applied_overrides.present?
       all_overrides = assignment.applied_overrides.map { |o| assignment_override_json(o) }
-      hash["assignment_overrides"] = all_overrides.select { |o| o["context_module_id"].nil? }
+      hash["assignment_overrides"] = if all_overrides.size > 1
+                                       all_overrides.select { |o| o["context_module_id"].nil? }
+                                     else
+                                       all_overrides
+                                     end
     end
     hash["important_dates"] = assignment.important_dates
     hash
