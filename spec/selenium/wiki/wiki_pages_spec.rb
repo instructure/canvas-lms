@@ -153,8 +153,8 @@ describe "Wiki Pages" do
       end
 
       def wait_for_index_page_load
-        wait_for(method: nil, timeout: 5) { f(".paginatedLoadingIndicator").attribute("style").include?("display: none") == true }
-        wait_for(method: nil, timeout: 5) { f(".paginatedLoadingIndicator").attribute("style").include?("display: none") == false }
+        wait_for(method: nil, timeout: 5) { f(".paginatedLoadingIndicator").attribute("style").include?("display: none") }
+        wait_for_animations
       end
 
       context "top_navigation_placement feature flag is enabled" do
@@ -165,20 +165,21 @@ describe "Wiki Pages" do
         it "can scroll down to bottom of page to load more pages" do
           get "/courses/#{@course.id}/pages"
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 60
+          expect(ff(".wiki-page-link").length).to eq 60
+
           scroll_page_to_bottom
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 90
+          expect(ff(".wiki-page-link").length).to eq 90
         end
 
         it "can scroll and more pages after refreshing the page" do
           get "/courses/#{@course.id}/pages"
           refresh_page
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 60
+          expect(ff(".wiki-page-link").length).to eq 60
           scroll_page_to_bottom
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 90
+          expect(ff(".wiki-page-link").length).to eq 90
         end
       end
 
@@ -190,20 +191,20 @@ describe "Wiki Pages" do
         it "can scroll down to bottom of page to load more pages" do
           get "/courses/#{@course.id}/pages"
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 60
+          expect(ff(".wiki-page-link").length).to eq 60
           scroll_page_to_bottom
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 90
+          expect(ff(".wiki-page-link").length).to eq 90
         end
 
         it "can scroll and more pages after refreshing the page" do
           get "/courses/#{@course.id}/pages"
           refresh_page
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 60
+          expect(ff(".wiki-page-link").length).to eq 60
           scroll_page_to_bottom
           wait_for_index_page_load
-          expect(ff(".wiki-page-link").size).to eq 90
+          expect(ff(".wiki-page-link").length).to eq 90
         end
       end
     end
