@@ -131,12 +131,14 @@ describe "Rubric form page" do
   end
 
   it "does not save the rubric if cancel is selected" do
-    RubricsIndex.create_rubric_button.click
-    RubricsForm.rubric_title_input.send_keys("Rubric 4")
-    RubricsForm.cancel_rubric_button.click
+    RubricsIndex.rubric_popover(@rubric1.id).click
+    RubricsIndex.edit_rubric_button.click
+    RubricsForm.add_criterion_button.click
+    RubricsForm.cancel_criterion_button.click
     RubricsForm.warning_exit_rubric_button.click
+    RubricsForm.save_rubric_button.click
 
-    expect(RubricsIndex.saved_rubrics_panel).not_to include_text("Rubric 4")
+    expect(RubricsIndex.rubric_criterion_count(0)).to include_text("2")
   end
 
   it "allows rubrics to be created" do
@@ -228,6 +230,10 @@ describe "Rubric form page" do
     RubricsForm.rubric_title_input.send_keys("Rubric 4")
     RubricsForm.add_criterion_button.click
     RubricsForm.criterion_name_input.send_keys("Criterion 1")
+
+    expect(RubricsForm.criterion_rating_scales.length).to eq(5)
+    expect(RubricsForm.criterion_rating_scales[0]).to include_text("4")
+
     hover(RubricsForm.add_rating_row_button)
     RubricsForm.add_rating_row_button.click
     RubricsForm.rating_name_inputs[0].send_keys("new rating")
