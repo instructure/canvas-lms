@@ -2974,12 +2974,15 @@ class Submission < ActiveRecord::Base
           next
         end
 
-        scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive))
+        user_ids = user_grades.keys
+        uids_for_visiblity = Api.map_ids(user_ids, User, context.root_account, grader)
+
+        scope = assignment.students_with_visibility(context.students_visible_to(grader, include: :inactive),
+                                                    uids_for_visiblity)
         if section
           scope = scope.where(enrollments: { course_section_id: section })
         end
 
-        user_ids = user_grades.keys
         preloaded_users = scope.where(id: user_ids)
         preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 

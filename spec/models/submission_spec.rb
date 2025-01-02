@@ -5893,6 +5893,29 @@ describe Submission do
         end
       end
     end
+
+    context "with the cache" do
+      specs_require_cache(:redis_cache_store)
+
+      it "updates submissions with an assignment override shortly after updating the override" do
+        assignment = @course.assignments.create!(points_possible: 10, only_visible_to_overrides: true)
+        # Force the course wide cache to be set. In the normal course of process_bulk_update, the front end would get
+        # called to queue the delayed job update. In that flow, the cache gets set for the course, and assignment
+        # without specific users. This next line is to mimic that behavior for testing.
+        AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(course_ids: @course, assignment_ids: assignment)
+        assignment.assignment_overrides.create!(set_type: "CourseSection", set: @course.course_sections.first)
+
+        Submission.process_bulk_update(@progress, @course, nil, @teacher, {
+                                         assignment.id.to_s => {
+                                           @u1.id => { posted_grade: 5 },
+                                           @u2.id => { posted_grade: 10 }
+                                         }
+                                       })
+
+        expect(assignment.submission_for_student(@u1).grade).to eql "5"
+        expect(assignment.submission_for_student(@u2).grade).to eql "10"
+      end
+    end
   end
 
   describe "find_or_create_provisional_grade!" do
