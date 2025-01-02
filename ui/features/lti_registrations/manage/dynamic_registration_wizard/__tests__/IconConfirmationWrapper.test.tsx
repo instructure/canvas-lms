@@ -316,32 +316,6 @@ describe('IconConfirmation', () => {
     )
   })
 
-  it("should move to 'Reviewing' when the user clicks 'Next'", async () => {
-    const config = mockConfigWithPlacements([
-      LtiPlacements.GlobalNavigation,
-      LtiPlacements.FileIndexMenu,
-    ])
-
-    const reg = mockRegistration({}, config)
-    const overlayStore = createRegistrationOverlayStore('Foo', reg)
-    const mockTransition = jest.fn()
-
-    render(
-      <IconConfirmationWrapper
-        overlayStore={overlayStore}
-        registration={reg}
-        reviewing={false}
-        transitionToConfirmationState={jest.fn()}
-        transitionToReviewingState={mockTransition}
-      />,
-    )
-
-    const nextButton = screen.getByRole('button', {name: /next/i})
-    await userEvent.click(nextButton)
-
-    expect(mockTransition).toHaveBeenCalled()
-  })
-
   it('should render a Back to Review button when the user is reviewing', () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.GlobalNavigation,

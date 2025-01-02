@@ -39,8 +39,7 @@ import {i18nLtiPlacement} from '../../model/i18nLtiPlacement'
 import {RegistrationModalBody} from '../../registration_wizard/RegistrationModalBody'
 import {View} from '@instructure/ui-view'
 import {isValidHttpUrl} from '../../../common/lib/validators/isValidHttpUrl'
-import {Modal} from '@instructure/ui-modal'
-import {Button} from '@instructure/ui-buttons'
+import {Footer} from '../../registration_wizard_forms/Footer'
 
 const I18n = createI18nScope('lti_registration.wizard')
 
@@ -100,14 +99,13 @@ export const OverrideURIsConfirmation = ({
           )
         })}
       </RegistrationModalBody>
-      <Modal.Footer>
-        <Button onClick={onPreviousClicked} margin="small">
-          {I18n.t('Previous')}
-        </Button>
-        <Button onClick={onNextClicked} color="primary" margin="small" disabled={!allURIsValid}>
-          {reviewing ? I18n.t('Back to Review') : I18n.t('Next')}
-        </Button>
-      </Modal.Footer>
+      <Footer
+        currentScreen="intermediate"
+        reviewing={reviewing}
+        onNextClicked={onNextClicked}
+        onPreviousClicked={onPreviousClicked}
+        disableNextButton={!allURIsValid}
+      />
     </>
   )
 }
@@ -131,7 +129,7 @@ const messageTypeElement = (props: PlacementOverrideURIFormFieldProps) => {
         layout="columns"
         name={`${props.placement}_radio_input_group`}
         defaultValue={props.defaultMessageType}
-        onChange={(e, value) => {
+        onChange={(_, value) => {
           if (isLtiMessageType(value)) {
             props.onChangeMessageType(props.placement, value)
           }
