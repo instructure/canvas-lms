@@ -413,10 +413,7 @@ class DeveloperKey < ActiveRecord::Base
   # For now we will only allow this pattern for internal services in the
   # site admin account.
   def site_admin_service_auth?
-    Account.site_admin.feature_enabled?(:site_admin_service_auth) &&
-      service_user.present? &&
-      internal_service? &&
-      site_admin?
+    internal_service? && site_admin? && service_user.present?
   end
 
   def tool_configuration

@@ -139,8 +139,6 @@ describe DeveloperKey do
     let(:root_account) { account_model }
 
     context "when 'site_admin_service_auth' is enabled" do
-      before { Account.site_admin.enable_feature!(:site_admin_service_auth) }
-
       context "and the service user association is not set" do
         let(:key_attributes) { { service_user: nil } }
 
