@@ -20,25 +20,26 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import ManageTempEnrollButton from '../ManageTempEnrollButton'
+import type {ManageTempEnrollButtonProps} from '../ManageTempEnrollButton'
 
-const defaultProps = {
+const defaultProps: ManageTempEnrollButtonProps = {
   user: {
     id: '1',
     name: 'User',
   },
-  tempEnrollPermissions: {
-    canEdit: true,
-    canAdd: true,
-    canDelete: true,
-  },
-  can_read_sis: true,
-  roles: [],
-  enrollPerm: {
+  rolePermissions: {
     teacher: true,
     ta: true,
     student: true,
     observer: true,
     designer: true,
+  },
+  can_read_sis: true,
+  roles: [],
+  modifyPermissions: {
+    canEdit: true,
+    canAdd: true,
+    canDelete: true,
   },
 }
 
@@ -52,7 +53,6 @@ describe('ManageTempEnrollButton', () => {
       is_provider: true,
       is_recipient: true,
     })
-    // @ts-expect-error
     const {findByText} = render(<ManageTempEnrollButton {...defaultProps} />)
     const button = await findByText('Temporary Enrollments')
     expect(button).toBeInTheDocument()
@@ -63,7 +63,6 @@ describe('ManageTempEnrollButton', () => {
       is_provider: false,
       is_recipient: true,
     })
-    // @ts-expect-error
     const {queryByText} = render(<ManageTempEnrollButton {...defaultProps} />)
     const button = await waitFor(() => queryByText('Temporary Enrollments'))
     expect(button).not.toBeInTheDocument()
