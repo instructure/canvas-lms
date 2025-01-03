@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   generateDateTimeMessage,
   getDayBoundaries,
@@ -132,17 +133,15 @@ describe('helpers.ts', () => {
       const date = '2023-08-30T19:30:00.000Z' // July 30th, 2023 at 6:30 pm
 
       afterAll(() => {
-        // @ts-expect-error
-        window.ENV = {}
+        fakeENV.teardown()
       })
 
       it('returns only local time if the context timezone is null', () => {
-        window.ENV = {
-          // @ts-expect-error
+        fakeENV.setup({
           CONTEXT_TIMEZONE: null,
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const messages = generateDateTimeMessage(date, false)
         const messageText = messages.map(function (msg) {
           return msg.text
@@ -152,12 +151,11 @@ describe('helpers.ts', () => {
       })
 
       it('returns only local time if the context isnt account', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeENV.setup({
           CONTEXT_TIMEZONE: 'Asia/Brunei',
           context_asset_string: 'users_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const messages = generateDateTimeMessage(date, false)
         const messageText = messages.map(function (msg) {
           return msg.text
@@ -167,12 +165,11 @@ describe('helpers.ts', () => {
       })
 
       it('returns only local time if the context timezone is the same as the system timezone', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeENV.setup({
           CONTEXT_TIMEZONE: 'America/Denver',
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const messages = generateDateTimeMessage(date, false)
         const messageText = messages.map(function (msg) {
           return msg.text
@@ -182,12 +179,11 @@ describe('helpers.ts', () => {
       })
 
       it('returns local and account times', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeENV.setup({
           CONTEXT_TIMEZONE: 'Asia/Brunei',
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const messages = generateDateTimeMessage(date, false)
         const messageText = messages.map(function (msg) {
           return msg.text
@@ -198,12 +194,11 @@ describe('helpers.ts', () => {
       })
 
       it('returns error message if isInvalid', () => {
-        // @ts-expect-error
-        window.ENV = {
+        fakeENV.setup({
           CONTEXT_TIMEZONE: 'Asia/Brunei',
           context_asset_string: 'account_1',
           TIMEZONE: 'America/Denver',
-        }
+        })
         const messages = generateDateTimeMessage(date, true)
         const messageText = messages.map(function (msg) {
           return msg.text
