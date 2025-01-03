@@ -10,20 +10,19 @@
  * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
  * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.g
+ * details.
  *
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from '@canvas/parse-link-header'
-
+import parseLinkHeader, {type Links} from '@canvas/parse-link-header'
 import NetworkFake from '../../NetworkFake'
 import {sendGetRequest} from '../../specHelpers'
-import setPaginationLinkHeader from '../setPaginationLinkHeader'
+import setPaginationLinkHeader, {type Response} from '../setPaginationLinkHeader'
 
 describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLinkHeader()', () => {
-  let network
+  let network: NetworkFake
 
   beforeEach(() => {
     network = new NetworkFake()
@@ -34,18 +33,19 @@ describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLink
     network.restore()
   })
 
-  async function getResponse() {
+  async function getResponse(): Promise<Response> {
     await network.allRequestsReady()
     const [{response}] = network.getRequests()
     return response
   }
 
-  function getPaginationLinks(xhr) {
-    return parseLinkHeader(xhr.getResponseHeader('Link'))
+  function getPaginationLinks(xhr: XMLHttpRequest): Links | null {
+    const linkHeader = xhr.getResponseHeader('Link')
+    return linkHeader ? parseLinkHeader(linkHeader) : null
   }
 
   it('sets the "Link" header on the response', async () => {
-    const xhr = sendGetRequest('/example')
+    const xhr = sendGetRequest('/example', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {first: 2})
     response.send()
@@ -53,11 +53,11 @@ describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLink
   })
 
   it('optionally sets the "first" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {first: 2})
     response.send()
-    expect(getPaginationLinks(xhr).first.url).toEqual('http://www.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.first?.url).toEqual('http://www.example.com/data?page=2')
   })
 
   it('preserves params on the "first" page link', async () => {
@@ -65,31 +65,33 @@ describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLink
     const response = await getResponse()
     setPaginationLinkHeader(response, {first: 2})
     response.send()
-    expect(getPaginationLinks(xhr).first.url).toEqual('http://www.example.com/data?sort=asc&page=2')
+    expect(getPaginationLinks(xhr)?.first?.url).toEqual(
+      'http://www.example.com/data?sort=asc&page=2',
+    )
   })
 
   it('ensures the "first" page link has a full protocol and domain', async () => {
-    const xhr = sendGetRequest('/data')
+    const xhr = sendGetRequest('/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {first: 2})
     response.send()
-    expect(getPaginationLinks(xhr).first.url).toEqual('http://canvas.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.first?.url).toEqual('http://canvas.example.com/data?page=2')
   })
 
   it('optionally omits the "first" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {last: 2})
     response.send()
-    expect(getPaginationLinks(xhr).first).toBeUndefined()
+    expect(getPaginationLinks(xhr)?.first).toBeUndefined()
   })
 
   it('optionally sets the "current" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {current: 2})
     response.send()
-    expect(getPaginationLinks(xhr).current.url).toEqual('http://www.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.current?.url).toEqual('http://www.example.com/data?page=2')
   })
 
   it('preserves params on the "current" page link', async () => {
@@ -97,33 +99,33 @@ describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLink
     const response = await getResponse()
     setPaginationLinkHeader(response, {current: 2})
     response.send()
-    expect(getPaginationLinks(xhr).current.url).toEqual(
-      'http://www.example.com/data?sort=asc&page=2'
+    expect(getPaginationLinks(xhr)?.current?.url).toEqual(
+      'http://www.example.com/data?sort=asc&page=2',
     )
   })
 
   it('ensures the "current" page link has a full protocol and domain', async () => {
-    const xhr = sendGetRequest('/data')
+    const xhr = sendGetRequest('/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {current: 2})
     response.send()
-    expect(getPaginationLinks(xhr).current.url).toEqual('http://canvas.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.current?.url).toEqual('http://canvas.example.com/data?page=2')
   })
 
   it('optionally omits the "current" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {last: 2})
     response.send()
-    expect(getPaginationLinks(xhr).current).toBeUndefined()
+    expect(getPaginationLinks(xhr)?.current).toBeUndefined()
   })
 
   it('optionally sets the "next" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {next: 2})
     response.send()
-    expect(getPaginationLinks(xhr).next.url).toEqual('http://www.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.next?.url).toEqual('http://www.example.com/data?page=2')
   })
 
   it('preserves params on the "next" page link', async () => {
@@ -131,31 +133,33 @@ describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLink
     const response = await getResponse()
     setPaginationLinkHeader(response, {next: 2})
     response.send()
-    expect(getPaginationLinks(xhr).next.url).toEqual('http://www.example.com/data?sort=asc&page=2')
+    expect(getPaginationLinks(xhr)?.next?.url).toEqual(
+      'http://www.example.com/data?sort=asc&page=2',
+    )
   })
 
   it('ensures the "next" page link has a full protocol and domain', async () => {
-    const xhr = sendGetRequest('/data')
+    const xhr = sendGetRequest('/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {next: 2})
     response.send()
-    expect(getPaginationLinks(xhr).next.url).toEqual('http://canvas.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.next?.url).toEqual('http://canvas.example.com/data?page=2')
   })
 
   it('optionally omits the "next" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {last: 2})
     response.send()
-    expect(getPaginationLinks(xhr).next).toBeUndefined()
+    expect(getPaginationLinks(xhr)?.next).toBeUndefined()
   })
 
   it('optionally sets the "last" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {last: 2})
     response.send()
-    expect(getPaginationLinks(xhr).last.url).toEqual('http://www.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.last?.url).toEqual('http://www.example.com/data?page=2')
   })
 
   it('preserves params on the "last" page link', async () => {
@@ -163,22 +167,24 @@ describe('Shared > Network > NetworkFake > Response Helpers > .setPaginationLink
     const response = await getResponse()
     setPaginationLinkHeader(response, {last: 2})
     response.send()
-    expect(getPaginationLinks(xhr).last.url).toEqual('http://www.example.com/data?sort=asc&page=2')
+    expect(getPaginationLinks(xhr)?.last?.url).toEqual(
+      'http://www.example.com/data?sort=asc&page=2',
+    )
   })
 
   it('ensures the "last" page link has a full protocol and domain', async () => {
-    const xhr = sendGetRequest('/data')
+    const xhr = sendGetRequest('/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {last: 2})
     response.send()
-    expect(getPaginationLinks(xhr).last.url).toEqual('http://canvas.example.com/data?page=2')
+    expect(getPaginationLinks(xhr)?.last?.url).toEqual('http://canvas.example.com/data?page=2')
   })
 
   it('optionally omits the "last" page link', async () => {
-    const xhr = sendGetRequest('http://www.example.com/data')
+    const xhr = sendGetRequest('http://www.example.com/data', {})
     const response = await getResponse()
     setPaginationLinkHeader(response, {first: 2})
     response.send()
-    expect(getPaginationLinks(xhr).last).toBeUndefined()
+    expect(getPaginationLinks(xhr)?.last).toBeUndefined()
   })
 })

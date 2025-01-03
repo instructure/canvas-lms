@@ -18,14 +18,36 @@
 
 import qs from 'qs'
 
-export default function setPaginationLinkHeader(response, {first, current, next, last} = {}) {
+export interface Response {
+  request: {
+    _request: {
+      respond: (status: number, headers: Record<string, string>, body: string | null) => void
+    }
+    params: Record<string, unknown>
+    path: string
+  }
+  setHeader: (name: string, value: string) => void
+  send: () => void
+}
+
+interface PaginationLinks {
+  first?: string | number
+  current?: string | number
+  next?: string | number
+  last?: string | number
+}
+
+export default function setPaginationLinkHeader(
+  response: Response,
+  {first, current, next, last}: PaginationLinks = {},
+): void {
   const {params} = response.request
   let path = response.request.path
   if (!path.startsWith('http')) {
     path = `http://canvas.example.com${path}`
   }
 
-  const links = []
+  const links: string[] = []
 
   if (first) {
     const query = qs.stringify({...params, page: first})

@@ -21,7 +21,7 @@ import axios from '@canvas/axios'
 import NetworkFake from '../NetworkFake'
 
 describe('Shared > Network > NetworkFake', () => {
-  let network
+  let network: NetworkFake
 
   beforeEach(() => {
     network = new NetworkFake()
@@ -41,7 +41,7 @@ describe('Shared > Network > NetworkFake', () => {
       axios.get('/example')
       axios.get('/example')
       await network.allRequestsReady()
-      const readyStates = network.getRequests().map(request => request.isReady())
+      const readyStates: boolean[] = network.getRequests().map(request => request.isReady())
       expect(readyStates).toEqual([true, true])
     })
   })
@@ -51,7 +51,7 @@ describe('Shared > Network > NetworkFake', () => {
       axios.get('/example')
       axios.get('/sample')
       await network.allRequestsReady()
-      const requestPaths = network.getRequests().map(request => request.path)
+      const requestPaths: string[] = network.getRequests().map(request => request.path)
       expect(requestPaths).toEqual(['/example', '/sample'])
     })
   })

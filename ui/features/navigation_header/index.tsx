@@ -40,7 +40,6 @@ $('body').on('click', '#primaryNavToggle', function () {
   navCollapsed = !navCollapsed
   if (navCollapsed) {
     $('body').removeClass('primary-nav-expanded')
-    // @ts-expect-error
     $.ajaxJSON('/api/v1/users/self/settings', 'PUT', {collapse_global_nav: true})
     primaryNavToggleText = I18n.t('Expand global navigation')
     $(this).attr({title: primaryNavToggleText, 'aria-label': primaryNavToggleText})
@@ -52,7 +51,6 @@ $('body').on('click', '#primaryNavToggle', function () {
     }, 300)
   } else {
     $('body').removeClass('primary-nav-transitions').addClass('primary-nav-expanded')
-    // @ts-expect-error
     $.ajaxJSON('/api/v1/users/self/settings', 'PUT', {collapse_global_nav: false})
     primaryNavToggleText = I18n.t('Minimize global navigation')
     $(this).attr({title: primaryNavToggleText, 'aria-label': primaryNavToggleText})
@@ -81,7 +79,7 @@ ready(() => {
       sideNavRoot.render(
         <QueryProvider>
           <SideNav externalTools={getExternalTools()} />
-        </QueryProvider>
+        </QueryProvider>,
       )
 
       // Render MobileNavigation after SideNav
@@ -89,7 +87,7 @@ ready(() => {
       mobileNavRoot.render(
         <QueryProvider>
           <MobileNavigation navIsOpen={globalNavIsOpen} />
-        </QueryProvider>
+        </QueryProvider>,
       )
     }
   } else {
@@ -99,7 +97,7 @@ ready(() => {
       navigationRoot.render(
         <QueryProvider>
           <Navigation />
-        </QueryProvider>
+        </QueryProvider>,
       )
 
       const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
@@ -108,7 +106,7 @@ ready(() => {
         mobileNavRoot.render(
           <QueryProvider>
             <MobileNavigation />
-          </QueryProvider>
+          </QueryProvider>,
         )
       }
     }

@@ -20,44 +20,54 @@ import qs from 'qs'
 
 import Response from './Response'
 
+export interface SinonFakeXMLHttpRequest extends sinon.SinonFakeXMLHttpRequest {
+  url: string
+  requestHeaders: Record<string, string>
+  requestBody: string
+  respond: (status: number, headers: Record<string, string>, body: string | null) => void
+}
+
 export default class Request {
-  constructor(request) {
+  _request: SinonFakeXMLHttpRequest
+  _response: Response | null = null
+
+  constructor(request: SinonFakeXMLHttpRequest) {
     this._request = request
   }
 
-  get url() {
+  get url(): string {
     return this._request.url
   }
 
-  get path() {
+  get path(): string {
     return this.url.split('?')[0]
   }
 
-  get params() {
+  get params(): qs.ParsedQs {
     return qs.parse(this.url.split('?')[1])
   }
 
-  get headers() {
+  get headers(): Record<string, string> {
     return this._request.requestHeaders
   }
 
-  get requestBody() {
+  get requestBody(): string {
     return this._request.requestBody
   }
 
-  get formBody() {
+  get formBody(): qs.ParsedQs {
     return qs.parse(this.requestBody)
   }
 
-  get jsonBody() {
+  get jsonBody(): Record<string, unknown> | unknown[] {
     return JSON.parse(this.requestBody)
   }
 
-  get response() {
-    return (this._response = this._response || new Response(this))
+  get response(): Response {
+    return (this._response = this._response ?? new Response(this))
   }
 
-  isReady() {
+  isReady(): boolean {
     return this.url != null
   }
 }
