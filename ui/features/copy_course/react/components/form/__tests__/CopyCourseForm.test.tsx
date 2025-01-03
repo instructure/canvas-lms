@@ -22,12 +22,13 @@ import type {Course} from '../../../../../../api'
 import moment from 'moment-timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
-// @ts-ignore
-import tz from 'timezone'
-// @ts-ignore
-import chicago from 'timezone/America/Chicago'
-// @ts-ignore
-import detroit from 'timezone/America/Detroit'
+import type {default as Timezone} from 'timezone'
+import type {default as ChicagoTz} from 'timezone/America/Chicago'
+import type {default as DetroitTz} from 'timezone/America/Detroit'
+
+const tz = require('timezone') as typeof Timezone
+const chicago = require('timezone/America/Chicago') as typeof ChicagoTz
+const detroit = require('timezone/America/Detroit') as typeof DetroitTz
 
 describe('CourseCopyForm', () => {
   const currentYear = new Date().getFullYear()
