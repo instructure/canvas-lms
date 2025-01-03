@@ -68,6 +68,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "requirement_type": {
+#           "description": "Whether module requires all required items or one required item to be considered complete (one of 'all' or 'one')",
+#           "example": "all",
+#           "type": "string"
+#         },
 #         "prerequisite_module_ids": {
 #           "description": "IDs of Modules that must be completed before this one is unlocked",
 #           "example": [121, 122],

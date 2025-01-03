@@ -157,6 +157,7 @@ describe "Modules API", type: :request do
             "unlock_at" => nil,
             "position" => 1,
             "require_sequential_progress" => false,
+            "requirement_type" => "all",
             "prerequisite_module_ids" => [],
             "id" => @module1.id,
             "published" => true,
@@ -169,6 +170,7 @@ describe "Modules API", type: :request do
             "unlock_at" => @christmas.as_json,
             "position" => 2,
             "require_sequential_progress" => true,
+            "requirement_type" => "all",
             "prerequisite_module_ids" => [@module1.id],
             "id" => @module2.id,
             "published" => true,
@@ -181,6 +183,7 @@ describe "Modules API", type: :request do
             "unlock_at" => nil,
             "position" => 3,
             "require_sequential_progress" => false,
+            "requirement_type" => "all",
             "prerequisite_module_ids" => [],
             "id" => @module3.id,
             "published" => false,
@@ -417,6 +420,7 @@ describe "Modules API", type: :request do
                              "unlock_at" => @christmas.as_json,
                              "position" => 2,
                              "require_sequential_progress" => true,
+                             "requirement_type" => "all",
                              "prerequisite_module_ids" => [@module1.id],
                              "id" => @module2.id,
                              "published" => true,
@@ -480,6 +484,7 @@ describe "Modules API", type: :request do
                              "unlock_at" => nil,
                              "position" => 3,
                              "require_sequential_progress" => false,
+                             "requirement_type" => "all",
                              "prerequisite_module_ids" => [],
                              "id" => @module3.id,
                              "published" => false,
@@ -512,6 +517,18 @@ describe "Modules API", type: :request do
                         id: @module1.id.to_param,
                         include: %w[items])
         expect(json["items"]).to be_nil
+      end
+
+      it "indicates if the module requirement_type is 'one'" do
+        @module1.update!(requirement_count: 1)
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                        controller: "context_modules_api",
+                        action: "show",
+                        format: "json",
+                        course_id: @course.id.to_s,
+                        id: @module1.id.to_param)
+        expect(json["requirement_type"]).to eq "one"
       end
     end
 
