@@ -410,6 +410,8 @@ class GroupsController < ApplicationController
     find_group
     respond_to do |format|
       format.html do
+        head :unauthorized and return if @group.non_collaborative?
+
         if @group&.context
           add_crumb @group.context.short_name, named_context_url(@group.context, :context_url)
           add_crumb @group.short_name, named_context_url(@group, :context_url)
