@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -20,10 +19,10 @@
 import spacing from '../spacing'
 
 describe('spacing()', () => {
-  let content
+  let content: string
 
-  const parser = new DOMParser()
-  const subject = () => spacing(content, parser).replace(/\s/g, '')
+  const parser: DOMParser = new DOMParser()
+  const subject = (): string => spacing(content, parser).replace(/\s/g, '')
 
   describe('when the entire body has no text', () => {
     beforeEach(() => {
@@ -78,7 +77,7 @@ describe('spacing()', () => {
 
       it('does not remove the math element', () => {
         expect(subject()).toEqual(
-          '<div>keepme!<p><spanclass="math_equation_latex">text!</span></p></div>'
+          '<div>keepme!<p><spanclass="math_equation_latex">text!</span></p></div>',
         )
       })
     })
