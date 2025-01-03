@@ -19,6 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {SET_MODULE_ITEM_COMPLETION} from '@canvas/assignments/graphql/student/Mutations'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import {act, fireEvent, render} from '@testing-library/react'
@@ -109,14 +110,23 @@ describe('SubmissionManager', () => {
         errors: null,
       }
 
-      const failedResponse = {data: null, errors: 'yes'}
+      const failedResponse = {
+        errors: [
+          {
+            message: 'Failed to update module item completion',
+            extensions: {code: 'INTERNAL_SERVER_ERROR'},
+          },
+        ],
+      }
 
       beforeEach(async () => {
-        window.ENV.CONTEXT_MODULE_ITEM = {
-          done: false,
-          id: '1',
-          module_id: '2',
-        }
+        fakeENV.setup({
+          CONTEXT_MODULE_ITEM: {
+            done: false,
+            id: '1',
+            module_id: '2',
+          },
+        })
 
         props = await mockAssignmentAndSubmission({
           Assignment: {
@@ -126,7 +136,7 @@ describe('SubmissionManager', () => {
       })
 
       afterEach(() => {
-        delete window.ENV.CONTEXT_MODULE_ITEM
+        fakeENV.teardown()
       })
 
       it('is rendered as "Mark as done" if the value of "done" is false', async () => {
@@ -141,7 +151,13 @@ describe('SubmissionManager', () => {
       })
 
       it('is rendered as "Done" if the value of "done" is true', async () => {
-        window.ENV.CONTEXT_MODULE_ITEM.done = true
+        fakeENV.setup({
+          CONTEXT_MODULE_ITEM: {
+            done: true,
+            id: '1',
+            module_id: '2',
+          },
+        })
 
         const {getByTestId} = render(
           <MockedProvider>
