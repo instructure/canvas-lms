@@ -1,7 +1,9 @@
 {
   "name": "Resources - Sage",
   "description": "",
-  "tags": ["resource"],
+  "tags": [
+    "resource"
+  ],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
@@ -608,7 +610,8 @@
         "custom": {
           "isResizable": true,
           "isBlock": true,
-          "isExpanded": false
+          "isExpanded": false,
+          "displayName": "Simple Card"
         },
         "parent": "Fya1qXL7gQ",
         "hidden": false,
@@ -1052,7 +1055,8 @@
         "custom": {
           "isResizable": true,
           "isBlock": true,
-          "isExpanded": false
+          "isExpanded": false,
+          "displayName": "Simple Card"
         },
         "parent": "3na6knhGBo",
         "hidden": false,

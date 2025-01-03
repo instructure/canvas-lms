@@ -1,7 +1,9 @@
 {
   "name": "Resource Page",
   "description": "",
-  "tags": ["resource"],
+  "tags": [
+    "resource"
+  ],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
@@ -751,7 +753,8 @@
         "custom": {
           "isResizable": true,
           "isBlock": true,
-          "isExpanded": false
+          "isExpanded": false,
+          "displayName": "Card"
         },
         "parent": "dQnJdvfgFc",
         "hidden": false,
