@@ -23,6 +23,7 @@ import {useNode} from '@craftjs/core'
 import {ImageBlock, type ImageBlockProps} from '..'
 import {ImageBlockToolbar} from '../ImageBlockToolbar'
 import {RCSPropsContext} from '@canvas/block-editor/react/Contexts'
+import type {MockFile, MockImageData, MockTrayProps} from './types.d'
 
 // TODO: Better way to mock RCS data, see AddImageModal.test.tsx
 const files = [
@@ -78,13 +79,17 @@ const files = [
     uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
   },
 ]
-const imageData = {
+const imageData: MockImageData = {
   hasMore: false,
   isLoading: false,
   error: '',
   files,
+  colorSpace: 'srgb',
+  data: new Uint8ClampedArray(),
+  height: 100,
+  width: 100,
 }
-const mockTrayProps = {
+const mockTrayProps: MockTrayProps = {
   canvasOrigin: 'http://some.origin',
   canUploadFiles: true,
   containingContext: {
@@ -100,12 +105,12 @@ const mockTrayProps = {
   refreshToken: () => {},
   themeUrl: 'http://example.com/theme',
   source: {
-    initializeCollection() {},
-    initializeUpload() {},
-    initializeFlickr() {},
-    initializeImages() {},
-    initializeDocuments() {},
-    initializeMedia() {},
+    initializeCollection: () => {},
+    initializeUpload: () => {},
+    initializeFlickr: () => {},
+    initializeImages: () => {},
+    initializeDocuments: () => {},
+    initializeMedia: () => {},
     fetchImages: jest.fn().mockResolvedValue({files}),
     getSession: jest.fn().mockResolvedValue({usageRightsRequired: false}),
   },
@@ -119,7 +124,7 @@ const mockTrayProps = {
 
 let props: Partial<ImageBlockProps>
 
-const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+const mockSetProp = jest.fn((callback: (props: Partial<ImageBlockProps>) => void) => {
   callback(props)
 })
 
@@ -219,7 +224,7 @@ describe('ImageBlockToolbar', () => {
     expect(screen.getByText('Fixed size')).toBeInTheDocument()
     expect(screen.getByText('Percent size')).toBeInTheDocument()
     expect(
-      screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"')
+      screen.getByText('Auto').closest('li')?.querySelector('svg[name="IconCheck"'),
     ).toBeInTheDocument()
 
     fireEvent.click(screen.getByText('Fixed size'))
@@ -230,7 +235,7 @@ describe('ImageBlockToolbar', () => {
     render(
       <RCSPropsContext.Provider value={mockTrayProps}>
         <ImageBlockToolbar />
-      </RCSPropsContext.Provider>
+      </RCSPropsContext.Provider>,
     )
     fireEvent.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
     const courseImagesTab = await screen.findByText(/course images/i)
@@ -248,14 +253,14 @@ describe('ImageBlockToolbar', () => {
     render(
       <RCSPropsContext.Provider value={mockTrayProps}>
         <ImageBlockToolbar />
-      </RCSPropsContext.Provider>
+      </RCSPropsContext.Provider>,
     )
     fireEvent.click(screen.getByText(/upload image/i).closest('button') as HTMLButtonElement)
     fireEvent.click(await screen.findByText(/URL/i))
 
     const fileURLInput = (await screen.findByLabelText('File URL')) as unknown as HTMLInputElement
     const altInput = screen.getByPlaceholderText(
-      '(Describe the image)'
+      '(Describe the image)',
     ) as unknown as HTMLInputElement
 
     fireEvent.change(fileURLInput, {target: {value: 'https://whatever.net/whatevs.jpg'}})
