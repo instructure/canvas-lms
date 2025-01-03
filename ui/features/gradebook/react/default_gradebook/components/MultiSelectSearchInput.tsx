@@ -23,7 +23,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
-type Props = {
+export type Props = {
   id: string
   label: string
   'data-testid'?: string
