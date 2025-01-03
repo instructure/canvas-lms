@@ -17,29 +17,99 @@
  */
 
 import {isStudentConcluded} from '../jquery/speed_grader.utils'
-import type {Student} from '../../../api.d'
+import type {Student, Enrollment, WorkflowState} from '../../../api.d'
 
-// For the ts-expect-errors below... speedgrader does a lot of wacky things that don't fit our defined types, so the
-// enrollments that get added to Students are not the same shape Enrollments definition we have.
+type SpeedGraderEnrollment = Enrollment
+
 const students: Student[] = [
   {
     created_at: '',
-    email: '',
+    email: null,
     group_ids: [],
     id: '0',
     short_name: 'John',
+    integration_id: null,
+    login_id: 'john',
+    sis_import_id: null,
+    sis_user_id: null,
     enrollments: [
       {
-        user_id: '0',
-        // @ts-expect-error
-        workflow_state: 'active',
+        associated_user_id: null,
+        course_id: '1',
+        course_integration_id: null,
         course_section_id: '0',
+        created_at: '2023-01-01T00:00:00Z',
+        end_at: null,
+        enrollment_state: 'active',
+        grades: {
+          html_url: '',
+          current_score: null,
+          final_score: null,
+          current_grade: null,
+          final_grade: null,
+          unposted_current_score: null,
+          unposted_current_grade: null,
+          unposted_final_score: null,
+          unposted_final_grade: null
+        },
+        html_url: '',
+        id: '1',
+        last_activity_at: null,
+        limit_privileges_to_course_section: false,
+        role_id: '1',
+        root_account_id: '1',
+        section_integration_id: null,
+        sis_account_id: null,
+        sis_course_id: null,
+        sis_import_id: null,
+        sis_section_id: null,
+        sis_user_id: null,
+        start_at: null,
+        total_activity_time: 0,
+        type: 'StudentEnrollment',
+        updated_at: '2023-01-01T00:00:00Z',
+        user_id: '0',
+        workflow_state: 'active' as WorkflowState,
+        last_attended_at: null
       },
       {
-        user_id: '0',
-        // @ts-expect-error
-        workflow_state: 'active',
+        associated_user_id: null,
+        course_id: '1',
+        course_integration_id: null,
         course_section_id: '1',
+        created_at: '2023-01-01T00:00:00Z',
+        end_at: null,
+        enrollment_state: 'active',
+        grades: {
+          html_url: '',
+          current_score: null,
+          final_score: null,
+          current_grade: null,
+          final_grade: null,
+          unposted_current_score: null,
+          unposted_current_grade: null,
+          unposted_final_score: null,
+          unposted_final_grade: null
+        },
+        html_url: '',
+        id: '2',
+        last_activity_at: null,
+        last_attended_at: null,
+        limit_privileges_to_course_section: false,
+        role_id: '1',
+        root_account_id: '1',
+        section_integration_id: null,
+        sis_account_id: null,
+        sis_course_id: null,
+        sis_import_id: null,
+        sis_section_id: null,
+        sis_user_id: null,
+        start_at: null,
+        total_activity_time: 0,
+        type: 'StudentEnrollment',
+        updated_at: '2023-01-01T00:00:00Z',
+        user_id: '0',
+        workflow_state: 'active' as WorkflowState
       },
     ],
     first_name: 'Jim',
@@ -62,23 +132,27 @@ const students: Student[] = [
   },
   {
     created_at: '',
-    email: '',
+    email: null,
     group_ids: [],
     id: '1',
     short_name: 'John',
+    integration_id: null,
+    login_id: 'bob',
+    sis_import_id: null,
+    sis_user_id: null,
     enrollments: [
-      // @ts-expect-error
       {
         user_id: '1',
-        workflow_state: 'completed',
+        workflow_state: 'completed' as const,
         course_section_id: '0',
-      },
-      // @ts-expect-error
+        last_attended_at: null
+      } as SpeedGraderEnrollment,
       {
         user_id: '1',
-        workflow_state: 'completed',
+        workflow_state: 'completed' as const,
         course_section_id: '1',
-      },
+        last_attended_at: null
+      } as SpeedGraderEnrollment,
     ],
     first_name: 'Bob',
     last_name: 'Smith',
@@ -100,23 +174,93 @@ const students: Student[] = [
   },
   {
     created_at: '',
-    email: '',
+    email: null,
     group_ids: [],
     id: '2',
     short_name: 'John',
+    integration_id: null,
+    login_id: 'bob2',
+    sis_import_id: null,
+    sis_user_id: null,
     enrollments: [
       {
-        user_id: '2',
-        // @ts-expect-error
-        workflow_state: 'active',
+        associated_user_id: null,
+        course_id: '1',
+        course_integration_id: null,
         course_section_id: '0',
-      },
-      // @ts-expect-error
-      {
+        created_at: '2023-01-01T00:00:00Z',
+        end_at: null,
+        enrollment_state: 'active',
+        grades: {
+          html_url: '',
+          current_score: null,
+          final_score: null,
+          current_grade: null,
+          final_grade: null,
+          unposted_current_score: null,
+          unposted_current_grade: null,
+          unposted_final_score: null,
+          unposted_final_grade: null
+        },
+        html_url: '',
+        id: '3',
+        last_activity_at: null,
+        last_attended_at: null,
+        limit_privileges_to_course_section: false,
+        role_id: '1',
+        root_account_id: '1',
+        section_integration_id: null,
+        sis_account_id: null,
+        sis_course_id: null,
+        sis_import_id: null,
+        sis_section_id: null,
+        sis_user_id: null,
+        start_at: null,
+        total_activity_time: 0,
+        type: 'StudentEnrollment',
+        updated_at: '2023-01-01T00:00:00Z',
         user_id: '2',
-        workflow_state: 'completed',
-        course_section_id: '1',
+        workflow_state: 'active' as WorkflowState
       },
+      {
+        associated_user_id: null,
+        course_id: '1',
+        course_integration_id: null,
+        course_section_id: '1',
+        created_at: '2023-01-01T00:00:00Z',
+        end_at: null,
+        enrollment_state: 'completed',
+        grades: {
+          html_url: '',
+          current_score: null,
+          final_score: null,
+          current_grade: null,
+          final_grade: null,
+          unposted_current_score: null,
+          unposted_current_grade: null,
+          unposted_final_score: null,
+          unposted_final_grade: null
+        },
+        html_url: '',
+        id: '4',
+        last_activity_at: null,
+        last_attended_at: null,
+        limit_privileges_to_course_section: false,
+        role_id: '1',
+        root_account_id: '1',
+        section_integration_id: null,
+        sis_account_id: null,
+        sis_course_id: null,
+        sis_import_id: null,
+        sis_section_id: null,
+        sis_user_id: null,
+        start_at: null,
+        total_activity_time: 0,
+        type: 'StudentEnrollment',
+        updated_at: '2023-01-01T00:00:00Z',
+        user_id: '2',
+        workflow_state: 'completed' as WorkflowState
+      }
     ],
     first_name: 'Bob',
     last_name: 'Smith',
@@ -138,8 +282,8 @@ const students: Student[] = [
   },
 ]
 
-// @ts-ignore
-const keyBy = (array, key) => array.reduce((r, x) => ({...r, [key ? x[key] : x]: x}), {})
+const keyBy = <T extends Record<string, unknown>>(array: T[], key: keyof T): Record<string, T> => 
+  array.reduce((r, x) => ({...r, [String(x[key])]: x}), {})
 const studentMap = keyBy(students, 'id')
 
 describe('isStudentConcluded', () => {

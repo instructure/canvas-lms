@@ -23,9 +23,7 @@ import {white, black} from './constants'
 import {
   getContrastStatus,
   isTransparent,
-  // @ts-ignore
   getDefaultColors,
-  // @ts-ignore
   type ColorsInUse,
 } from '@instructure/canvas-rce'
 
@@ -63,7 +61,11 @@ const sortByBrightness = (a: string, b: string) => {
   return brightnessA - brightnessB
 }
 
-const getColorsInUse = (query: any) => {
+interface Query {
+  getSerializedNodes: () => Record<string, SerializedNode>
+}
+
+const getColorsInUse = (query: Query) => {
   const defaultColors = getDefaultColors()
 
   const colors: ColorsInUse = {
@@ -72,8 +74,8 @@ const getColorsInUse = (query: any) => {
     border: [],
   }
 
-  Object.values(query.getSerializedNodes()).forEach((value: any) => {
-    const n = value as SerializedNode
+  Object.values(query.getSerializedNodes()).forEach(value => {
+    const n = value
     if (n.props.color && n.props.color[0] === '#' && !isTransparent(n.props.color)) {
       const c = tinycolor(n.props.color).toHexString().toLowerCase()
       if (!(defaultColors.includes(c) || colors.foreground.includes(c))) {
