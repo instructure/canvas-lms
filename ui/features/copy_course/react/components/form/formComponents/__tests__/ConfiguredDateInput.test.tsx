@@ -23,11 +23,8 @@ import {ConfiguredDateInput} from '../ConfiguredDateInput'
 import moment from 'moment-timezone'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
-// @ts-ignore
 import tz from 'timezone'
-// @ts-ignore
 import chicago from 'timezone/America/Chicago'
-// @ts-ignore
 import detroit from 'timezone/America/Detroit'
 
 describe('ConfiguredDateInput', () => {
@@ -62,8 +59,11 @@ describe('ConfiguredDateInput', () => {
         renderScreenReaderLabelText={renderScreenReaderLabelText}
       />,
     )
-    const input = getByPlaceholderText(placeholder) as HTMLInputElement
+    const input = getByPlaceholderText(placeholder)
     expect(input).toBeInTheDocument()
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('Expected input to be an HTMLInputElement')
+    }
     expect(input.value).toBe('Jan 1 at 12am')
     expect(getByText(renderLabelText)).toBeInTheDocument()
     expect(getByText(renderScreenReaderLabelText)).toBeInTheDocument()
@@ -84,7 +84,7 @@ describe('ConfiguredDateInput', () => {
       />,
     )
 
-    const input = getByPlaceholderText(placeholder) as HTMLInputElement
+    const input = getByPlaceholderText(placeholder)
     await user.click(input)
     const jan15Button = getByText('15').closest('button')
     if (!jan15Button) {
@@ -108,7 +108,11 @@ describe('ConfiguredDateInput', () => {
         disabled={true}
       />,
     )
-    expect(getByDisplayValue('Jan 1 at 12am')).toBeDisabled()
+    const input = getByDisplayValue('Jan 1 at 12am')
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('Expected input to be an HTMLInputElement')
+    }
+    expect(input).toBeDisabled()
   })
 
   it('renders error message', () => {
