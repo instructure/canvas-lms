@@ -535,7 +535,8 @@
         "custom": {
           "isResizable": true,
           "isBlock": true,
-          "isExpanded": false
+          "isExpanded": false,
+          "displayName": "Card"
         },
         "parent": "hRpkvK4tc2",
         "hidden": false,

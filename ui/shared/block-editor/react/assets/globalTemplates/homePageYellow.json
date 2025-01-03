@@ -1,7 +1,9 @@
 {
   "name": "Course Home - Yellow",
   "description": "Home page with images, callout cards, buttons, and footer",
-  "tags": ["home"],
+  "tags": [
+    "home"
+  ],
   "workflow_state": "active",
   "editor_version": "0.3",
   "node_tree": {
@@ -378,7 +380,8 @@
         "custom": {
           "isResizable": true,
           "isBlock": true,
-          "isExpanded": false
+          "isExpanded": false,
+          "displayName": "Card"
         },
         "parent": "dQnJdvfgFc",
         "hidden": false,
