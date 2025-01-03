@@ -2941,4 +2941,33 @@ describe Account do
       expect(root_account.recaptcha_key).to be_nil
     end
   end
+
+  describe "#get_role_by_name" do
+    let(:account) { Account.default }
+    let(:role_name) { "Course Admin" }
+    let!(:active_role) do
+      account.roles.create(name: role_name, base_role_type: "TeacherEnrollment", workflow_state: "active")
+    end
+    let!(:inactive_role) do
+      account.roles.create(name: role_name, base_role_type: "TaEnrollment", workflow_state: "inactive")
+    end
+
+    it "returns the active role if both active and inactive roles are present" do
+      result = account.get_role_by_name(role_name)
+      expect(result).to eq(active_role)
+    end
+
+    it "returns the inactive role if no active role is present" do
+      active_role.destroy
+      result = account.get_role_by_name(role_name)
+      expect(result).to eq(inactive_role)
+    end
+
+    it "returns nil if no roles are present" do
+      active_role.destroy
+      inactive_role.destroy
+      result = account.get_role_by_name(role_name)
+      expect(result).to be_nil
+    end
+  end
 end
