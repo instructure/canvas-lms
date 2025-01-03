@@ -199,7 +199,7 @@ exports[`TopNavigationTools renders 1`] = `
             display="inline-block"
             height="1rem"
             onError={[Function]}
-            src=""
+            src="https://instructure.com/default-icon.png"
             withBlur={false}
             withGrayscale={false}
           />
@@ -389,7 +389,7 @@ exports[`TopNavigationTools renders with no pinned tools 1`] = `
             display="inline-block"
             height="1rem"
             onError={[Function]}
-            src="https://instructure.com"
+            src="https://instructure.com/default-icon.png"
             withBlur={false}
             withGrayscale={false}
           />
