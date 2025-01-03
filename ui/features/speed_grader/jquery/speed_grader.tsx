@@ -2056,7 +2056,6 @@ EG = {
     const method = 'POST'
     EG.toggleFullRubric('close')
 
-    // @ts-expect-error
     const promise = $.ajaxJSON(
       url,
       method,
@@ -2374,7 +2373,6 @@ EG = {
           event.preventDefault()
           $(this).prop('disabled', true).text(I18n.t('vericite.resubmitting', 'Resubmitting...'))
 
-          // @ts-expect-error
           $.ajaxJSON(resubmitUrl, 'POST', {}, () => {
             SpeedgraderHelpers.reloadPage()
           })
@@ -3582,7 +3580,6 @@ EG = {
     }
     $reassign_assignment.prop('disabled', true)
     $reassign_assignment.text(I18n.t('Reassigning ...'))
-    // @ts-expect-error
     $.ajaxJSON(
       url,
       method,
@@ -3689,7 +3686,6 @@ EG = {
         formError,
       )
     } else {
-      // @ts-expect-error
       $.ajaxJSON(url, method, formData, formSuccess, formError)
     }
 
@@ -3919,7 +3915,6 @@ EG = {
       }
     }
 
-    // @ts-expect-error
     $.ajaxJSON(url, method, formData, submissionSuccess, submissionError)
   },
 
@@ -4247,7 +4242,6 @@ EG = {
       }
     }
 
-    // @ts-expect-error
     $.ajaxJSON(selectGradeUrl, 'PUT', {}, submitSucceeded)
   },
 
@@ -4457,7 +4451,6 @@ function getGradingPeriods() {
   const dfd = $.Deferred()
   // treating failure as a success here since grading periods 404 when not
   // enabled
-  // @ts-expect-error
   $.ajaxJSON(
     `/api/v1/courses/${ENV.course_id}/grading_periods`,
     'GET',
@@ -4603,7 +4596,6 @@ export default {
     // @ts-expect-error
     window.jsonData = {}
     const speedGraderJSONUrl = `${window.location.pathname}.json${window.location.search}`
-    // @ts-expect-error
     const speedGraderJsonDfd = $.ajaxJSON(
       speedGraderJSONUrl,
       'GET',

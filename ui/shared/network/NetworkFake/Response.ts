@@ -16,41 +16,61 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default class Response {
-  constructor(request) {
-    this.request = request
+interface ResponseData {
+  body: string | null
+  headers: Record<string, string>
+  status: number
+}
 
+interface Request {
+  _request: {
+    respond: (status: number, headers: Record<string, string>, body: string | null) => void
+  }
+  params: Record<string, unknown>
+  path: string
+}
+
+export default class Response {
+  request: Request
+  responseData: ResponseData
+  sent: boolean
+
+  constructor(request: Request) {
+    this.request = {
+      ...request,
+      params: request.params || {},
+      path: request.path || '',
+    }
     this.responseData = {
       body: null,
       headers: {},
       status: 200,
     }
-
     this.sent = false
   }
 
-  setHeader(key, value) {
+  setHeader(key: string, value: string): void {
     this.responseData.headers[key] = value
   }
 
-  clearHeaders() {
+  clearHeaders(): void {
     this.responseData.headers = {}
   }
 
-  setStatus(status) {
+  setStatus(status: number): void {
     this.responseData.status = status
   }
 
-  setBody(body) {
+  setBody(body: string): void {
     this.responseData.body = body
   }
 
-  setJson(data) {
+  setJson(data: unknown): void {
     this.setHeader('Content-Type', 'application/json')
     this.setBody(JSON.stringify(data))
   }
 
-  send() {
+  send(): void {
     if (!this.sent) {
       const {body, headers, status} = this.responseData
       this.request._request.respond(status, headers, body)

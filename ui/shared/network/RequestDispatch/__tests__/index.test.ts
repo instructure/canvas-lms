@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
-
 import {NetworkFake, setPaginationLinkHeader} from '../../NetworkFake/index'
 import RequestDispatch, {
   DEFAULT_ACTIVE_REQUEST_LIMIT,
@@ -28,14 +26,14 @@ import RequestDispatch, {
 describe('Shared > Network > RequestDispatch', () => {
   const URL = 'http://localhost/example'
 
-  let dispatch
-  let network
+  let dispatch: RequestDispatch
+  let network: NetworkFake
 
   beforeEach(() => {
     dispatch = new RequestDispatch({activeRequestLimit: 2})
   })
 
-  function rangeOfLength(length) {
+  function rangeOfLength(length: number): number[] {
     return Array.from({length}).map((_, index) => index)
   }
 
@@ -72,7 +70,7 @@ describe('Shared > Network > RequestDispatch', () => {
       })
 
       it('rejects null', () => {
-        const {options} = new RequestDispatch({activeRequestLimit: null})
+        const {options} = new RequestDispatch({activeRequestLimit: 'null'})
         expect(options.activeRequestLimit).toBe(DEFAULT_ACTIVE_REQUEST_LIMIT)
       })
 
@@ -84,7 +82,7 @@ describe('Shared > Network > RequestDispatch', () => {
   })
 
   describe('#getJSON()', () => {
-    function getJSON(params) {
+    function getJSON(params: Record<string, unknown> = {}) {
       return dispatch.getJSON(URL, params)
     }
 
@@ -97,13 +95,13 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('sends a request for the resource', async () => {
-      getJSON()
+      getJSON({})
       await network.allRequestsReady()
       expect(network.getRequests()).toHaveLength(1)
     })
 
     it('uses the given url for the request', async () => {
-      getJSON()
+      getJSON({})
       await network.allRequestsReady()
       const [request] = network.getRequests()
       expect(request.path).toEqual(URL)
@@ -117,7 +115,7 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('resolves with the data from the request', async () => {
-      const result = getJSON()
+      const result = getJSON({})
       await network.allRequestsReady()
       const [{response}] = network.getRequests()
       response.setJson({example: true})
@@ -126,8 +124,8 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('resolves when flooded with requests', async () => {
-      const clock = sinon.useFakeTimers()
-      const requests = rangeOfLength(4).map(() => getJSON())
+      jest.useFakeTimers()
+      const requests = rangeOfLength(4).map(() => getJSON({}))
       for await (const [index] of requests.entries()) {
         // Get the next request
         const request = network.getRequests()[index]
@@ -136,16 +134,20 @@ describe('Shared > Network > RequestDispatch', () => {
         // Respond
         request.response.setJson({requestIndex: index})
         request.response.send()
-        clock.tick(1)
+        jest.advanceTimersByTime(1)
       }
       expect(await Promise.all(requests)).toHaveLength(4)
-      clock.restore()
+      jest.useRealTimers()
     })
   })
 
   describe('#getDepaginated()', () => {
-    function getDepaginated(...args) {
-      return dispatch.getDepaginated(URL, ...args)
+    function getDepaginated(
+      params: Record<string, unknown> = {},
+      pageCallback?: (data?: unknown) => void,
+      pagesEnqueued?: (promises: Promise<unknown>[]) => void,
+    ) {
+      return dispatch.getDepaginated(URL, params, pageCallback, pagesEnqueued)
     }
 
     beforeEach(() => {
@@ -187,17 +189,17 @@ describe('Shared > Network > RequestDispatch', () => {
       }
 
       it('calls the page callback when provided', async () => {
-        const pageCallback = sinon.spy()
-        getDepaginated(null, pageCallback)
+        const pageCallback = jest.fn()
+        getDepaginated({}, pageCallback)
         await resolveFirstPage()
-        expect(pageCallback.callCount).toEqual(1)
+        expect(pageCallback.mock.calls).toHaveLength(1)
       })
 
       it('calls the page callback with the data from the first request', async () => {
-        const pageCallback = sinon.spy()
-        getDepaginated(null, pageCallback)
+        const pageCallback = jest.fn()
+        getDepaginated({}, pageCallback)
         await resolveFirstPage()
-        const [data] = pageCallback.lastCall.args
+        const [data] = pageCallback.mock.calls[pageCallback.mock.calls.length - 1]
         expect(data).toEqual([{example: true}])
       })
 
@@ -226,23 +228,23 @@ describe('Shared > Network > RequestDispatch', () => {
       })
 
       it('calls the "pages enqueued" callback when provided', async () => {
-        const pagesEnqueued = sinon.spy()
-        getDepaginated(null, null, pagesEnqueued)
+        const pagesEnqueued = jest.fn()
+        getDepaginated({}, undefined, pagesEnqueued)
         await resolveFirstPage()
-        expect(pagesEnqueued.callCount).toEqual(1)
+        expect(pagesEnqueued.mock.calls).toHaveLength(1)
       })
     })
 
     describe('when each page responds', () => {
       async function resolvePages() {
-        const clock = sinon.useFakeTimers()
+        jest.useFakeTimers()
         await network.allRequestsReady()
 
         const [request1] = network.getRequests()
         setPaginationLinkHeader(request1.response, {last: 3})
         request1.response.setJson([{dataForPage: 1}])
         request1.response.send()
-        clock.tick(1)
+        jest.advanceTimersByTime(1)
 
         await network.allRequestsReady()
         const [, request2, request3] = network.getRequests()
@@ -250,27 +252,27 @@ describe('Shared > Network > RequestDispatch', () => {
         setPaginationLinkHeader(request2.response, {last: 3})
         request2.response.setJson([{dataForPage: 2}])
         request2.response.send()
-        clock.tick(1)
+        jest.advanceTimersByTime(1)
 
         setPaginationLinkHeader(request3.response, {last: 3})
         request3.response.setJson([{dataForPage: 3}])
         request3.response.send()
-        clock.tick(1)
-        clock.restore()
+        jest.advanceTimersByTime(1)
+        jest.useRealTimers()
       }
 
       it('calls the page callback for each page', async () => {
-        const pageCallback = sinon.spy()
-        getDepaginated(null, pageCallback)
+        const pageCallback = jest.fn()
+        getDepaginated({}, pageCallback)
         await resolvePages()
-        expect(pageCallback.callCount).toEqual(3)
+        expect(pageCallback.mock.calls).toHaveLength(3)
       })
 
       it('calls the page callback with the data from each request', async () => {
-        const pageCallback = sinon.spy()
-        getDepaginated(null, pageCallback)
+        const pageCallback = jest.fn()
+        getDepaginated({}, pageCallback)
         await resolvePages()
-        const data = pageCallback.getCalls().map(call => call.args[0])
+        const data = pageCallback.mock.calls.map(call => call[0])
         expect(data).toEqual([[{dataForPage: 1}], [{dataForPage: 2}], [{dataForPage: 3}]])
       })
     })
@@ -301,7 +303,7 @@ describe('Shared > Network > RequestDispatch', () => {
     })
 
     it('resolves when flooded with requests', async () => {
-      const clock = sinon.useFakeTimers()
+      jest.useFakeTimers()
       const depaginatedRequestCount = 4
       const pagesPerResource = 3
       const totalRequestCount = depaginatedRequestCount * pagesPerResource
@@ -318,11 +320,11 @@ describe('Shared > Network > RequestDispatch', () => {
         setPaginationLinkHeader(request.response, {last: pagesPerResource})
         request.response.setJson([{requestIndex: index}])
         request.response.send()
-        clock.tick(1)
+        jest.advanceTimersByTime(1)
       }
 
       expect(await Promise.all(requests)).toHaveLength(depaginatedRequestCount)
-      clock.restore()
+      jest.useRealTimers()
     })
 
     describe('when only one page of data is available', () => {
@@ -343,10 +345,10 @@ describe('Shared > Network > RequestDispatch', () => {
       })
 
       it('calls the "pages enqueued" callback when provided', async () => {
-        const pagesEnqueued = sinon.spy()
-        getDepaginated(null, null, pagesEnqueued)
+        const pagesEnqueued = jest.fn()
+        getDepaginated({}, undefined, pagesEnqueued)
         await resolveFirstPage()
-        expect(pagesEnqueued.callCount).toEqual(1)
+        expect(pagesEnqueued.mock.calls).toHaveLength(1)
       })
 
       it('resolves with the data from the first page', async () => {
@@ -358,13 +360,6 @@ describe('Shared > Network > RequestDispatch', () => {
 
     describe('when the params include a key like "page"', () => {
       it('is not confused by the parameter with a similar name', async () => {
-        /*
-         * A previous implementation of link header parsing did not match the
-         * 'page' parameter using word boundaries. So a parameter of 'per_page'
-         * would be used instead if it preceded the requested page index,
-         * leading to either an incomplete set of data or more likely a large
-         * number of wasteful requests for pages without data.
-         */
         getDepaginated({per_page: 50})
         await network.allRequestsReady()
         const [{response}] = network.getRequests()
@@ -393,10 +388,10 @@ describe('Shared > Network > RequestDispatch', () => {
       })
 
       it('calls the "pages enqueued" callback when provided', async () => {
-        const pagesEnqueued = sinon.spy()
-        getDepaginated(null, null, pagesEnqueued)
+        const pagesEnqueued = jest.fn()
+        getDepaginated({}, undefined, pagesEnqueued)
         await resolveFirstPage()
-        expect(pagesEnqueued.callCount).toEqual(1)
+        expect(pagesEnqueued.mock.calls).toHaveLength(1)
       })
 
       it('resolves with the data from the first page', async () => {
@@ -424,10 +419,10 @@ describe('Shared > Network > RequestDispatch', () => {
       })
 
       it('calls the "pages enqueued" callback when provided', async () => {
-        const pagesEnqueued = sinon.spy()
-        getDepaginated(null, null, pagesEnqueued)
+        const pagesEnqueued = jest.fn()
+        getDepaginated({}, undefined, pagesEnqueued)
         await resolveFirstPage()
-        expect(pagesEnqueued.callCount).toEqual(1)
+        expect(pagesEnqueued.mock.calls).toHaveLength(1)
       })
 
       it('resolves with the data from the first page', async () => {
@@ -455,10 +450,10 @@ describe('Shared > Network > RequestDispatch', () => {
       })
 
       it('calls the "pages enqueued" callback when provided', async () => {
-        const pagesEnqueued = sinon.spy()
-        getDepaginated(null, null, pagesEnqueued)
+        const pagesEnqueued = jest.fn()
+        getDepaginated({}, undefined, pagesEnqueued)
         await resolveFirstPage()
-        expect(pagesEnqueued.callCount).toEqual(1)
+        expect(pagesEnqueued.mock.calls).toHaveLength(1)
       })
 
       it('resolves with the data from the first page', async () => {

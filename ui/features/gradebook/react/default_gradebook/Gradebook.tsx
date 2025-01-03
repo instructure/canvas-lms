@@ -1012,7 +1012,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   saveColumnOrder = () => {
     if (!isInvalidSort(this.props.modules, this.gradebookColumnOrderSettings)) {
       const url = this.options.gradebook_column_order_settings_url
-      // @ts-expect-error
       $.ajaxJSON(url, 'POST', {
         column_order: getColumnOrder(this.props.modules, this.gradebookColumnOrderSettings),
       })
@@ -2466,7 +2465,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       UserSettings.contextSet('warned_about_totals_display', true)
     }
     this.options.show_total_grade_as_points = !this.options.show_total_grade_as_points
-    // @ts-expect-error
     $.ajaxJSON(this.options.setting_update_url, 'PUT', {
       show_total_grade_as_points: this.options.show_total_grade_as_points,
     })
@@ -2912,7 +2910,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       url = this.options.custom_column_datum_url
         .replace(/:id/, col_id?.[1] || '')
         .replace(/:user_id/, item.id)
-      // @ts-expect-error
       return $.ajaxJSON(url, 'PUT', {
         'column_data[content]': item[column.field],
       })
@@ -2926,7 +2923,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Persisted Gradebook Settings
   saveColumnWidthPreference = (id: string, newWidth: number) => {
     const url = this.options.gradebook_column_size_settings_url
-    // @ts-expect-error
     return $.ajaxJSON(url, 'POST', {
       column_id: id,
       column_size: newWidth,
@@ -2997,7 +2993,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return GradebookApi.saveUserSettings(this.options.context_id, gradebook_settings)
     } else {
       return new Promise((resolve, reject) => {
-        // @ts-expect-error
         $.ajaxJSON(
           this.options.settings_update_url,
           'PUT',

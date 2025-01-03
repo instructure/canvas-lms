@@ -20,17 +20,31 @@ import {find, isArray} from 'lodash'
 import parseLinkHeader from '@canvas/parse-link-header'
 import deferPromise from '@instructure/defer-promise'
 
+interface PageResponse {
+  data: any
+  xhr: XMLHttpRequest
+}
+
+interface DeferredPromise {
+  promise: Promise<any>
+  resolve: (value?: any) => void
+  reject: (reason?: any) => void
+}
+
 /*
  * Fires callback for paginated APIs in order
  *
  * @param callback
  * @param data - api data will be appended to this array (also in order)
  */
-function consumePagesInOrder(callback, data) {
-  const pendingResponses = []
+function consumePagesInOrder(
+  callback: ((response: any) => void) | null,
+  data: any[],
+): (response: any, page: number) => void {
+  const pendingResponses: Array<[any, number]> = []
   let wantedPage = 1
 
-  const orderedConsumer = (response, page) => {
+  const orderedConsumer = (response: any, page: number) => {
     if (page === wantedPage) {
       if (callback) callback(response)
       if (isArray(response)) {
@@ -67,14 +81,14 @@ function consumePagesInOrder(callback, data) {
  * @returns a Promise that will be resolved when all pages have been fetched
  */
 function cheaterDepaginate(
-  url,
-  params,
-  pageCallback,
-  pagesEnqueuedCallback = _deferred => {},
-  dispatch
-) {
-  const gotAllPagesDeferred = deferPromise()
-  const data = []
+  url: string,
+  params: Record<string, any>,
+  pageCallback: (response: any) => void,
+  pagesEnqueuedCallback: (promises: Promise<any>[]) => void = _deferred => {},
+  dispatch: any,
+): Promise<any[]> {
+  const gotAllPagesDeferred: DeferredPromise = deferPromise()
+  const data: any[] = []
   const errHandler = () => {
     pagesEnqueuedCallback([])
     gotAllPagesDeferred.reject()
@@ -83,11 +97,11 @@ function cheaterDepaginate(
 
   dispatch
     ._getJSON(url, params)
-    .then(({data: firstPageResponse, xhr}) => {
+    .then(({data: firstPageResponse, xhr}: PageResponse) => {
       orderedPageCallback(firstPageResponse, 1)
 
       const paginationLinks = xhr.getResponseHeader('Link')
-      const lastLink = parseLinkHeader(paginationLinks)?.last
+      const lastLink = paginationLinks ? parseLinkHeader(paginationLinks)?.last : null
       if (lastLink == null) {
         pagesEnqueuedCallback([])
         gotAllPagesDeferred.resolve(data)
@@ -103,15 +117,15 @@ function cheaterDepaginate(
 
       // At this point, there are multiple pages
 
-      function paramsForPage(page) {
+      function paramsForPage(page: number): Record<string, any> {
         return {page, ...params}
       }
 
-      function bindPageCallback(page) {
+      function bindPageCallback(page: number): (response: any) => void {
         return response => orderedPageCallback(response, page)
       }
 
-      const promises = []
+      const promises: Promise<any>[] = []
 
       for (let page = 2; page <= lastPage; page++) {
         const promise = dispatch.getJSON(url, paramsForPage(page)).then(bindPageCallback(page))

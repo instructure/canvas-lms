@@ -20,6 +20,7 @@ import MessageStudentsWhoHelper from './shared/grading/messageStudentsWhoHelper'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import {GlobalInst} from '@canvas/global/inst/GlobalInst'
 import {GlobalRemotes} from '@canvas/global/remotes/GlobalRemotes'
+import {ajaxJSON} from '@canvas/jquery/jquery.ajaxJSON'
 
 declare global {
   interface Global {
@@ -58,7 +59,7 @@ declare global {
 
     webkitSpeechRecognition: any
     messageStudents: (
-      options: ReturnType<typeof MessageStudentsWhoHelper.sendMessageStudentsWho>
+      options: ReturnType<typeof MessageStudentsWhoHelper.sendMessageStudentsWho>,
     ) => void
     updateGrades: () => void
 
@@ -93,7 +94,8 @@ declare global {
     (num?: number): JQuery<HTMLElement>
   }
 
-  interface JQuery {
+  interface JQuery<TResponse = any> {
+    responseJSON?: TResponse & CanvasApiErrorResponse
     scrollTo: (y: number, x?: number) => void
     confirmDelete: any
     datetime_field: () => JQuery<HTMLInputElement>
@@ -105,7 +107,7 @@ declare global {
     errorBox: (
       message: string,
       scroll?: boolean,
-      override_position?: string | number
+      override_position?: string | number,
     ) => JQuery<HTMLElement>
     getFormData: <T>(obj?: Record<string, unknown>) => T
     live: any
@@ -138,6 +140,15 @@ declare global {
     loadingImage: (str?: string) => void
   }
 
+  interface CanvasApiErrorResponse {
+    errors: {
+      [key: string]: Array<{
+        message: string
+        type?: string
+      }>
+    }
+  }
+
   interface JQueryStatic {
     subscribe: (topic: string, callback: (...args: any[]) => void) => void
     replaceTags: (text: string, name: string, value?: string) => string
@@ -146,6 +157,7 @@ declare global {
     datetimeString: any
     ajaxJSONFiles: any
     isPreviewable: any
+    ajaxJSON: typeof ajaxJSON
   }
 
   // due to overrides in packages/date-js/core.js
@@ -183,6 +195,7 @@ declare global {
     setTimezone(offset: string): Date
     setTimezoneOffset(offset: number): Date
     toString(format?: string): string
+    Deferred<T>(): JQueryDeferred<T>
   }
 }
 

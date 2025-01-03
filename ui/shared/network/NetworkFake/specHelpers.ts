@@ -18,7 +18,15 @@
 
 import qs from 'qs'
 
-export function sendGetRequest(url, params) {
+interface RequestParams {
+  [key: string]: string | number | boolean | null | undefined
+}
+
+interface JsonData {
+  [key: string]: unknown
+}
+
+export function sendGetRequest(url: string, params?: RequestParams): XMLHttpRequest {
   const request = new XMLHttpRequest()
   const query = qs.stringify(params)
   const fullUrl = query ? `${url}?${query}` : url
@@ -27,7 +35,11 @@ export function sendGetRequest(url, params) {
   return request
 }
 
-export function sendPostJsonRequest(url, params, data) {
+export function sendPostJsonRequest(
+  url: string,
+  params: RequestParams,
+  data: JsonData,
+): XMLHttpRequest {
   const request = new XMLHttpRequest()
   const query = qs.stringify(params)
   const fullUrl = query ? `${url}?${query}` : url
@@ -37,7 +49,11 @@ export function sendPostJsonRequest(url, params, data) {
   return request
 }
 
-export function sendPostFormRequest(url, params, data) {
+export function sendPostFormRequest(
+  url: string,
+  params: RequestParams | null,
+  data: RequestParams,
+): XMLHttpRequest {
   const request = new XMLHttpRequest()
   const query = qs.stringify(params)
   const fullUrl = query ? `${url}?${query}` : url

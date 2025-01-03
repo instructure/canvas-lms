@@ -26,11 +26,14 @@ import '@canvas/jquery/jquery.ajaxJSON'
  * @param callback
  * @param data - api data will be appended to this array (also in order)
  */
-function consumePagesInOrder(callback, data) {
-  const pendingResponses = []
+function consumePagesInOrder(
+  callback: (response: unknown) => void,
+  data: unknown[],
+): (response: unknown, page: number) => void {
+  const pendingResponses: Array<[unknown, number]> = []
   let wantedPage = 1
 
-  const orderedConsumer = (response, page) => {
+  const orderedConsumer = (response: unknown, page: number) => {
     if (page === wantedPage) {
       if (callback) callback(response)
       if (isArray(response)) {
@@ -66,15 +69,21 @@ function consumePagesInOrder(callback, data) {
  * @param pageCallback - called for each page of data
  * @returns a jQuery Deferred that will be resolved when all pages have been fetched
  */
-function cheaterDepaginate(
-  url,
-  params,
-  pageCallback,
-  pagesEnqueuedCallback = () => {},
-  dispatch = null
+function cheaterDepaginate<T>(
+  url: string,
+  params: Record<string, unknown>,
+  pageCallback: (data: unknown) => void,
+  pagesEnqueuedCallback: (deferreds: JQueryDeferred<T>[]) => void = () => {},
+  dispatch: {
+    getJSON: (
+      url: string,
+      params: Record<string, unknown>,
+      callback: (data: T) => void,
+    ) => JQueryDeferred<T>
+  } | null = null,
 ) {
-  const gotAllPagesDfd = $.Deferred()
-  const data = []
+  const gotAllPagesDfd = $.Deferred<T[]>()
+  const data: T[] = []
   const errHandler = () => {
     pagesEnqueuedCallback([])
     gotAllPagesDfd.reject()
@@ -85,18 +94,31 @@ function cheaterDepaginate(
     url,
     'GET',
     params,
-    (firstPageResponse, xhr) => {
+    (firstPageResponse: T, xhr: JQuery.jqXHR) => {
       orderedPageCallback(firstPageResponse, 1)
 
       const paginationLinks = xhr.getResponseHeader('Link')
-      const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
-      if (lastLink === null) {
+      if (!paginationLinks) {
         pagesEnqueuedCallback([])
         gotAllPagesDfd.resolve(data)
         return
       }
 
-      const lastPage = parseInt(lastLink[0].match(/page=(\d+)/)[1], 10)
+      const lastLink = paginationLinks.match(/<[^>]+>; *rel="last"/)
+      if (!lastLink) {
+        pagesEnqueuedCallback([])
+        gotAllPagesDfd.resolve(data)
+        return
+      }
+
+      const lastPageMatch = lastLink[0].match(/page=(\d+)/)
+      if (!lastPageMatch) {
+        pagesEnqueuedCallback([])
+        gotAllPagesDfd.resolve(data)
+        return
+      }
+
+      const lastPage = parseInt(lastPageMatch[1], 10)
       if (lastPage === 1) {
         pagesEnqueuedCallback([])
         gotAllPagesDfd.resolve(data)
@@ -105,18 +127,18 @@ function cheaterDepaginate(
 
       // At this point, there are multiple pages
 
-      function paramsForPage(page) {
+      function paramsForPage(page: number): Record<string, unknown> {
         return {page, ...params}
       }
 
-      function bindPageCallback(page) {
+      function bindPageCallback(page: number): (response: unknown) => void {
         return response => orderedPageCallback(response, page)
       }
 
-      const dfds = []
+      const dfds: JQueryDeferred<T>[] = []
 
       if (dispatch == null) {
-        const fetchPage = page =>
+        const fetchPage = (page: number) =>
           $.ajaxJSON(url, 'GET', paramsForPage(page), bindPageCallback(page))
 
         for (let page = 2; page <= lastPage; page++) {
@@ -132,7 +154,7 @@ function cheaterDepaginate(
 
       $.when(...dfds).then(() => gotAllPagesDfd.resolve(data), errHandler)
     },
-    errHandler
+    errHandler,
   )
 
   return gotAllPagesDfd

@@ -268,6 +268,7 @@
     "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18",
     "@types/react-slick": "^0.23.13",
+    "@types/sinon": "^17.0.3",
     "@types/tinycolor2": "^1.4.6",
     "@vitest/ui": "^1.0.4",
     "@yarnpkg/lockfile": "^1.0.2",

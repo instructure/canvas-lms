@@ -17,28 +17,33 @@
  */
 
 import sinon from 'sinon'
-
 import waitForCondition from './waitForCondition'
-import Request from './Request'
+import Request, {SinonFakeXMLHttpRequest} from './Request'
 
 export default class NetworkFake {
+  private fakeXhr: {
+    onCreate: (xhr: SinonFakeXMLHttpRequest) => void
+    restore: () => void
+  }
+  private requests: Request[]
+
   constructor() {
     this.fakeXhr = sinon.useFakeXMLHttpRequest()
-    this.fakeXhr.onCreate = request => {
+    this.fakeXhr.onCreate = (request: SinonFakeXMLHttpRequest) => {
       this.requests.push(new Request(request))
     }
     this.requests = []
   }
 
-  async allRequestsReady() {
+  async allRequestsReady(): Promise<void> {
     return waitForCondition(() => this.requests.every(request => request.isReady()))
   }
 
-  getRequests() {
+  getRequests(): Request[] {
     return this.requests
   }
 
-  restore() {
+  restore(): void {
     this.fakeXhr.restore()
   }
 }

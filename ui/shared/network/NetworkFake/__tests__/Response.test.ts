@@ -20,7 +20,7 @@ import NetworkFake from '../NetworkFake'
 import {sendGetRequest} from '../specHelpers'
 
 describe('Shared > Network > NetworkFake > Response', () => {
-  let network
+  let network: NetworkFake
 
   beforeEach(() => {
     network = new NetworkFake()
@@ -31,7 +31,7 @@ describe('Shared > Network > NetworkFake > Response', () => {
     network.restore()
   })
 
-  async function getResponse() {
+  async function getResponse(): Promise<import('../Response').default> {
     await network.allRequestsReady()
     const [{response}] = network.getRequests()
     return response
@@ -39,7 +39,7 @@ describe('Shared > Network > NetworkFake > Response', () => {
 
   describe('headers', () => {
     it('can be set using #setHeader()', async () => {
-      const xhr = sendGetRequest('/example')
+      const xhr: XMLHttpRequest = sendGetRequest('/example')
       const response = await getResponse()
       response.setHeader('Content-Type', 'text/plain')
       response.send()
@@ -112,7 +112,10 @@ describe('Shared > Network > NetworkFake > Response', () => {
     it('sets the body to stringified json', async () => {
       const xhr = sendGetRequest('/example')
       const response = await getResponse()
-      const json = {example: true, items: ['one', 2]}
+      const json: {example: boolean; items: (string | number)[]} = {
+        example: true,
+        items: ['one', 2],
+      }
       response.setJson(json)
       response.send()
       expect(JSON.parse(xhr.responseText)).toEqual(json)

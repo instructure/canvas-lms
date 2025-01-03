@@ -21,7 +21,7 @@ import Response from '../Response'
 import {sendGetRequest, sendPostFormRequest, sendPostJsonRequest} from '../specHelpers'
 
 describe('Shared > Network > NetworkFake > Request', () => {
-  let network
+  let network: NetworkFake
 
   beforeEach(() => {
     network = new NetworkFake()
@@ -83,14 +83,16 @@ describe('Shared > Network > NetworkFake > Request', () => {
   describe('#formBody', () => {
     it('is the parsed form body from the request', async () => {
       const formData = {
-        examples: [{one: 1, two: 'two'}],
+        example_one: 1,
+        example_two: 'two',
         sample: true,
       }
       sendPostFormRequest('/example', null, formData)
       await network.allRequestsReady()
       const [request] = network.getRequests()
       expect(request.formBody).toEqual({
-        examples: [{one: '1', two: 'two'}],
+        example_one: '1',
+        example_two: 'two',
         sample: 'true',
       })
     })
@@ -99,14 +101,16 @@ describe('Shared > Network > NetworkFake > Request', () => {
   describe('#jsonBody', () => {
     it('is the parsed form body from the request', async () => {
       const formData = {
-        examples: [{one: 1, two: 'two'}],
+        example_one: 1,
+        example_two: 'two',
         sample: true,
       }
-      sendPostJsonRequest('/example', null, formData)
+      sendPostJsonRequest('/example', {}, formData)
       await network.allRequestsReady()
       const [request] = network.getRequests()
       expect(request.jsonBody).toEqual({
-        examples: [{one: 1, two: 'two'}],
+        example_one: 1,
+        example_two: 'two',
         sample: true,
       })
     })
