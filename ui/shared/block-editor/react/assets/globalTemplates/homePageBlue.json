@@ -1,7 +1,9 @@
 {
   "name": "Course Home - Blue",
   "description": "Home page with images, navigation, callout cards, knowledge check, and footer",
-  "tags": ["home"],
+  "tags": [
+    "home"
+  ],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
@@ -350,7 +352,6 @@
           "href": "",
           "size": "medium",
           "variant": "text",
-          "color": "primary-inverse",
           "iconName": ""
         },
         "displayName": "Button",
@@ -372,7 +373,6 @@
           "href": "",
           "size": "medium",
           "variant": "text",
-          "color": "primary-inverse",
           "iconName": ""
         },
         "displayName": "Button",
@@ -394,7 +394,6 @@
           "href": "",
           "size": "medium",
           "variant": "text",
-          "color": "primary-inverse",
           "iconName": ""
         },
         "displayName": "Button",
@@ -416,7 +415,6 @@
           "href": "",
           "size": "medium",
           "variant": "text",
-          "color": "primary-inverse",
           "iconName": ""
         },
         "displayName": "Button",
