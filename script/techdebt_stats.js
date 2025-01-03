@@ -130,6 +130,35 @@ async function getRandomJqueryImportFile() {
   return null
 }
 
+async function countSinonImports() {
+  try {
+    const cmd =
+      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]sinon[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting Sinon imports: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomSinonImportFile() {
+  try {
+    const cmd =
+      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]sinon[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    if (files.length > 0) {
+      return normalizePath(files[Math.floor(Math.random() * files.length)])
+    }
+  } catch (error) {
+    console.error(colorize('red', `Error finding Sinon import example: ${error.message}`))
+  }
+  return null
+}
+
 async function countReactTestUtilsImports() {
   try {
     const cmd =
@@ -164,6 +193,16 @@ async function showJqueryImportStats() {
   const randomFile = await getRandomJqueryImportFile()
 
   console.log(colorize('yellow', `- Files with jQuery imports: ${bold(count)}`))
+  if (randomFile) {
+    console.log(colorize('gray', `  Example: ${randomFile}`))
+  }
+}
+
+async function showSinonImportStats() {
+  const count = await countSinonImports()
+  const randomFile = await getRandomSinonImportFile()
+
+  console.log(colorize('yellow', `- Files with Sinon imports: ${bold(count)}`))
   if (randomFile) {
     console.log(colorize('gray', `  Example: ${randomFile}`))
   }
@@ -373,6 +412,10 @@ async function printDashboard() {
     `${bold(colorize('white', 'JQuery Imports'))} ${colorize('gray', '(use native DOM)')}`,
   )
   await showJqueryImportStats()
+  console.log('')
+
+  console.log(`${bold(colorize('white', 'Sinon Imports'))} ${colorize('gray', '(use Jest)')}`)
+  await showSinonImportStats()
   console.log('')
 
   console.log(
