@@ -17,8 +17,9 @@
  */
 
 import {type Node} from '@craftjs/core'
+import {type NodeQuery} from './types'
 
-export function getNodeIndex(node: Node, query: any) {
+export function getNodeIndex(node: Node, query: NodeQuery) {
   const parentId = node.data.parent || 'ROOT'
   const siblings = query.node(parentId).descendants()
   const myIndex = siblings.indexOf(node.id)
@@ -26,7 +27,7 @@ export function getNodeIndex(node: Node, query: any) {
 }
 
 export type SectionLocation = 'top' | 'bottom' | 'middle' | 'alone'
-export function getSectionLocation(node: Node, query: any): SectionLocation {
+export function getSectionLocation(node: Node, query: NodeQuery): SectionLocation {
   const sections = query.node('ROOT').descendants()
   if (sections.length === 1) {
     return 'alone'
