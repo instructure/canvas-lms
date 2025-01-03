@@ -51,7 +51,7 @@ module Lti
       end
 
       def generate_member(user)
-        user_id = Lti::Asset.opaque_identifier_for(user, context:)
+        user_id = Lti::V1p1::Asset.opaque_identifier_for(user, context:)
         ::IMS::LTI::Models::MembershipService::LISPerson.new(
           name: user.name,
           given_name: user.first_name,

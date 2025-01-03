@@ -193,7 +193,7 @@ module Lti
         launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
         message = ::IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)
-        message.user_id = Lti::Asset.opaque_identifier_for(@current_user, context: @context)
+        message.user_id = Lti::V1p1::Asset.opaque_identifier_for(@current_user, context: @context)
         set_active_tab message_handler.asset_string
         @lti_launch.resource_url = message.launch_url
         @lti_launch.link_text = resource_handler.name

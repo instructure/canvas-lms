@@ -778,11 +778,11 @@ describe ContextExternalTool do
     end
 
     it "returns the correct deployment_id" do
-      expect(tool.deployment_id).to eq "#{tool.id}:#{Lti::Asset.opaque_identifier_for(tool.context)}"
+      expect(tool.deployment_id).to eq "#{tool.id}:#{Lti::V1p1::Asset.opaque_identifier_for(tool.context)}"
     end
 
     it "sends only 255 chars" do
-      allow(Lti::Asset).to receive(:opaque_identifier_for).and_return("a" * 256)
+      allow(Lti::V1p1::Asset).to receive(:opaque_identifier_for).and_return("a" * 256)
       expect(tool.deployment_id.size).to eq 255
     end
   end
@@ -3196,7 +3196,7 @@ describe ContextExternalTool do
     it "uses the global_asset_id for new assets that are stored in the db" do
       expect(@course.lti_context_id).to be_nil
       @tool = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      context_id = Lti::Asset.global_context_id_for(@course)
+      context_id = Lti::V1p1::Asset.global_context_id_for(@course)
       @tool.opaque_identifier_for(@course)
       @course.reload
       expect(@course.lti_context_id).to eq context_id

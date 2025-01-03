@@ -189,7 +189,7 @@ describe UsersController do
       end
 
       it 'sets the "login_hint" to the current user lti id' do
-        expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(user)
+        expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(user)
       end
 
       it "caches the LTI 1.3 launch" do

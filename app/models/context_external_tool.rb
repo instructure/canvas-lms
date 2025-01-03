@@ -303,7 +303,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def deployment_id
-    "#{id}:#{Lti::Asset.opaque_identifier_for(context)}"[0..254]
+    "#{id}:#{Lti::V1p1::Asset.opaque_identifier_for(context)}"[0..254]
   end
 
   def content_migration_configured?
@@ -1443,7 +1443,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
-      Lti::Asset.set_asset_context_id(asset, lti_context_id, context:)
+      Lti::V1p1::Asset.set_asset_context_id(asset, lti_context_id, context:)
     end
   end
 

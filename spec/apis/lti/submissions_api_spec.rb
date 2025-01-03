@@ -132,12 +132,12 @@ module Lti
                  "url" => nil,
                  "submitted_at" => now.iso8601,
                  "assignment_id" => assignment.id,
-                 "user_id" => Lti::Asset.opaque_identifier_for(student),
+                 "user_id" => Lti::V1p1::Asset.opaque_identifier_for(student),
                  "submission_type" => "online_upload",
                  "workflow_state" => "submitted",
                  "attempt" => 1,
                  "course_id" => assignment.context.global_id,
-                 "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+                 "lti_course_id" => Lti::V1p1::Asset.opaque_identifier_for(assignment.context),
                  "attachments" =>
                    [
                      {
@@ -189,12 +189,12 @@ module Lti
                 "url" => nil,
                 "submitted_at" => now.iso8601,
                 "assignment_id" => assignment.id,
-                "user_id" => Lti::Asset.opaque_identifier_for(student),
+                "user_id" => Lti::V1p1::Asset.opaque_identifier_for(student),
                 "submission_type" => "online_upload",
                 "workflow_state" => "submitted",
                 "attempt" => 1,
                 "course_id" => assignment.context.global_id,
-                "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
+                "lti_course_id" => Lti::V1p1::Asset.opaque_identifier_for(assignment.context),
                 "attachments" =>
                    [
                      {

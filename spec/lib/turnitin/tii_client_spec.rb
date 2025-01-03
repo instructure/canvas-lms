@@ -27,11 +27,11 @@ module Turnitin
 
     describe ".new" do
       it "set the user_id to the opaque identifier" do
-        expect(subject.lti_params["user_id"]).to eq Lti::Asset.opaque_identifier_for(lti_student)
+        expect(subject.lti_params["user_id"]).to eq Lti::V1p1::Asset.opaque_identifier_for(lti_student)
       end
 
       it "set the context_id to the opaque identifier" do
-        expect(subject.lti_params["context_id"]).to eq Lti::Asset.opaque_identifier_for(lti_assignment.context)
+        expect(subject.lti_params["context_id"]).to eq Lti::V1p1::Asset.opaque_identifier_for(lti_assignment.context)
       end
 
       it "set the context_title to the context Title" do

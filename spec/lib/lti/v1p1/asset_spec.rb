@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe Lti::Asset do
+describe Lti::V1p1::Asset do
   before do
     course_model
   end

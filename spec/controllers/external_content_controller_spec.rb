@@ -448,7 +448,7 @@ describe ExternalContentController do
       let(:iss) { tool.consumer_key }
       let(:jti) { SecureRandom.uuid }
       let(:params) { { oembed_token: } }
-      let(:sub) { Lti::Asset.opaque_identifier_for(user) }
+      let(:sub) { Lti::V1p1::Asset.opaque_identifier_for(user) }
 
       context "and an active user session" do
         before { user_session(user) }
