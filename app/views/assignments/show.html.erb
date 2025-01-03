@@ -282,4 +282,7 @@
 
 <% if !Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
   <%= render partial: "shared/rubrics_component" %>
+  <% if Rubric.rubric_self_assessment_enabled?(@context) %>
+    <div id="enhanced-rubric-self-assessment-edit"></div>
+  <% end %>
 <% end %>
