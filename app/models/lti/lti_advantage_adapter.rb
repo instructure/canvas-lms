@@ -190,7 +190,7 @@ module Lti
 
     def login_request(lti_params)
       message_hint = cache_payload(lti_params)
-      login_hint = Lti::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
+      login_hint = Lti::V1p1::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
       deployment_id_flag_on = @context.root_account.feature_enabled?(:lti_deployment_id_in_login_request)
 
       req_params = {

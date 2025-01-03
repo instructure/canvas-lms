@@ -129,7 +129,7 @@ module Lti::Messages
     end
 
     def add_context_claims!
-      @message.context.id = Lti::Asset.opaque_identifier_for(@context)
+      @message.context.id = Lti::V1p1::Asset.opaque_identifier_for(@context)
       @message.context.label = @context.course_code if @context.respond_to?(:course_code)
       @message.context.title = @context.name
       @message.context.type = [Lti::SubstitutionsHelper::LIS_V2_ROLE_MAP[@context.class] || @context.class.to_s]

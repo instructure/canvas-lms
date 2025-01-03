@@ -1242,7 +1242,7 @@ RSpec.describe ApplicationController do
 
               it 'sets the "login_hint" to the current user lti id' do
                 subject
-                expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(user)
+                expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(user)
               end
 
               it "does not use the oidc_initiation_url as the resource_url" do

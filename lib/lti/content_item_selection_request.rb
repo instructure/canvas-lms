@@ -53,7 +53,7 @@ module Lti
       lti_helper = Lti::SubstitutionsHelper.new(context, domain_root_account, user)
 
       params = {
-        context_id: Lti::Asset.opaque_identifier_for(context),
+        context_id: Lti::V1p1::Asset.opaque_identifier_for(context),
         tool_consumer_instance_guid: domain_root_account.lti_guid,
         roles: lti_helper.current_lis_roles,
         launch_presentation_locale: I18n.locale.to_s || I18n.default_locale.to_s,
@@ -62,7 +62,7 @@ module Lti
         oauth_callback: "about:blank"
       }
 
-      params[:user_id] = Lti::Asset.opaque_identifier_for(user, context:) if user
+      params[:user_id] = Lti::V1p1::Asset.opaque_identifier_for(user, context:) if user
       params
     end
 

@@ -37,7 +37,7 @@ describe Lti::IMS::AuthenticationController do
   let(:verifier) { SecureRandom.hex 64 }
   let(:client_id) { developer_key.global_id }
   let(:context) { account_model }
-  let(:login_hint) { Lti::Asset.opaque_identifier_for(user, context:) }
+  let(:login_hint) { Lti::V1p1::Asset.opaque_identifier_for(user, context:) }
   let(:nonce) { SecureRandom.uuid }
   let(:prompt) { "none" }
   let(:redirect_uri) { "https://redirect.tool.com?foo=bar" }

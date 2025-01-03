@@ -830,7 +830,7 @@ class ExternalToolsController < ApplicationController
                                                       # required params
                                                       lti_message_type: message_type,
                                                       lti_version: "LTI-1p0",
-                                                      resource_link_id: Lti::Asset.opaque_identifier_for(@context),
+                                                      resource_link_id: Lti::V1p1::Asset.opaque_identifier_for(@context),
                                                       content_items: content_item_response.to_json(lti_message_type: message_type),
                                                       launch_presentation_return_url: @return_url,
                                                       context_title: @context.name,

@@ -190,7 +190,7 @@ describe ExternalToolsController do
 
         it 'sets the "login_hint" to the current user lti id' do
           subject
-          expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::Asset.opaque_identifier_for(@teacher)
+          expect(assigns[:lti_launch].params["login_hint"]).to eq Lti::V1p1::Asset.opaque_identifier_for(@teacher)
         end
 
         it "caches the the LTI 1.3 launch" do
@@ -3305,9 +3305,9 @@ describe ExternalToolsController do
 
   def opaque_id(asset)
     if asset.respond_to?(:lti_context_id)
-      Lti::Asset.global_context_id_for(asset)
+      Lti::V1p1::Asset.global_context_id_for(asset)
     else
-      Lti::Asset.context_id_for(asset)
+      Lti::V1p1::Asset.context_id_for(asset)
     end
   end
 

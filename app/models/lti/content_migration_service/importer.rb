@@ -85,7 +85,7 @@ module Lti
 
       def start_import_post_body(content)
         {
-          context_id: Lti::Asset.opaque_identifier_for(@course),
+          context_id: Lti::V1p1::Asset.opaque_identifier_for(@course),
           data: content,
           tool_consumer_instance_guid: @root_account.lti_guid,
         }.merge(expanded_variables)

@@ -1417,7 +1417,7 @@ module Lti
 
               it "produces a comma-separated string of user UUIDs" do
                 expect(subject.split(",")).to match_array [
-                  Lti::Asset.opaque_identifier_for(student)
+                  Lti::V1p1::Asset.opaque_identifier_for(student)
                 ]
               end
 

@@ -223,7 +223,7 @@ describe Api do
 
     it "finds group by lti_context_id" do
       lti_group = Group.create!(context: course_factory)
-      Lti::Asset.opaque_identifier_for(lti_group)
+      Lti::V1p1::Asset.opaque_identifier_for(lti_group)
       expect(@api.api_find(Group, "lti_context_id:#{lti_group.lti_context_id}")).to eq lti_group
     end
 

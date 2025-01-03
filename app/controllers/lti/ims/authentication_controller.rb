@@ -143,7 +143,7 @@ module Lti
       def validate_current_user!
         return if public_course? && @current_user.blank?
 
-        if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
+        if !@current_user || Lti::V1p1::Asset.opaque_identifier_for(@current_user, context:) != oidc_params[:login_hint]
           set_oidc_error!("login_required", "Must have an active user session")
         end
       end

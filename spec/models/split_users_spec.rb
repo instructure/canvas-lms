@@ -160,7 +160,7 @@ describe SplitUsers do
       it "restores lti_id and uuid when these were overwritten by move_lti_ids" do
         restored_orig_lti_id = restored_user.lti_id
         restored_orig_uuid = restored_user.uuid
-        restored_lti_context_id = Lti::Asset.opaque_identifier_for(restored_user)
+        restored_lti_context_id = Lti::V1p1::Asset.opaque_identifier_for(restored_user)
         source_orig_lti_id = source_user.lti_id
         source_orig_uuid = source_user.uuid
         # (source_lti_context_id must be nil for this move to actually happen)

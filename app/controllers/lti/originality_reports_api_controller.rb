@@ -282,7 +282,7 @@ module Lti
     end
 
     def link_fragment
-      Lti::Asset.global_context_id_for(submission)
+      Lti::V1p1::Asset.global_context_id_for(submission)
     end
 
     def tool_proxy_associated?

@@ -81,7 +81,7 @@ module Lti::MembershipService
         end
 
         it "sends old_id when present" do
-          Lti::Asset.opaque_identifier_for(@teacher)
+          Lti::V1p1::Asset.opaque_identifier_for(@teacher)
           collator = CourseLisPersonCollator.new(@course, @teacher)
           UserPastLtiId.create!(user: @teacher, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: "old_lti_id", user_uuid: "old")
           memberships = collator.memberships
@@ -106,7 +106,7 @@ module Lti::MembershipService
 
     it "does not show enrollment roles from other courses" do
       collator = CourseLisPersonCollator.new(@course, @teacher)
-      Lti::Asset.opaque_identifier_for(@teacher, context: @course)
+      Lti::V1p1::Asset.opaque_identifier_for(@teacher, context: @course)
       course_with_student(user: @teacher)
       memberships = collator.memberships
       expect(memberships.map(&:role)).to eq([[::IMS::LIS::Roles::Context::URNs::Instructor]])
@@ -115,7 +115,7 @@ module Lti::MembershipService
     it "does not show past_lti_ids from other contexts" do
       collator = CourseLisPersonCollator.new(@course, @teacher)
       course_with_teacher(user: @teacher)
-      Lti::Asset.opaque_identifier_for(@teacher, context: @course)
+      Lti::V1p1::Asset.opaque_identifier_for(@teacher, context: @course)
       UserPastLtiId.create!(user_id: @teacher,
                             context: @course,
                             user_uuid: "old_uuid",
