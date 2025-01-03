@@ -47,6 +47,7 @@ import {
 } from '@canvas/rubrics/react/utils'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import { RubricSelfAssessmentSettingsWrapper } from './react/RubricSelfAssessmentSettingsWrapper'
 
 if (!('INST' in window)) window.INST = {}
 
@@ -352,14 +353,19 @@ $(() => {
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS.manage_rubrics}
-        canUpdateSelfAssessment={ENV.can_update_rubric_self_assessment}
         contextAssetString={ENV.context_asset_string}
         courseId={ENV.COURSE_ID}
-        rubricSelfAssessmentEnabled={ENV.rubric_self_assessment_enabled}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
       />,
     )
   }
+
+  createOrUpdateRoot(
+    'enhanced-rubric-self-assessment-edit',
+    <RubricSelfAssessmentSettingsWrapper
+      assignmentId={ENV.ASSIGNMENT_ID}
+    />,
+  )
 })
 
 $(() => {

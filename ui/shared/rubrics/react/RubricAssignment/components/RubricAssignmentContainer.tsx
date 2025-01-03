@@ -48,10 +48,8 @@ export type RubricAssignmentContainerProps = {
   assignmentRubric?: AssignmentRubric
   assignmentRubricAssociation?: RubricAssociation
   canManageRubrics: boolean
-  canUpdateSelfAssessment: boolean
   contextAssetString: string
   courseId: string
-  rubricSelfAssessmentEnabled: boolean
   rubricSelfAssessmentFFEnabled: boolean
 }
 export const RubricAssignmentContainer = ({
@@ -60,10 +58,8 @@ export const RubricAssignmentContainer = ({
   assignmentRubric,
   assignmentRubricAssociation,
   canManageRubrics,
-  canUpdateSelfAssessment,
   contextAssetString,
   courseId,
-  rubricSelfAssessmentEnabled,
   rubricSelfAssessmentFFEnabled,
 }: RubricAssignmentContainerProps) => {
   const [rubric, setRubric] = useState(assignmentRubric)
@@ -166,8 +162,7 @@ export const RubricAssignmentContainer = ({
                 <View as="hr" />
                 <RubricSelfAssessmentSettings
                   assignmentId={assignmentId}
-                  canUpdateSelfAssessment={canUpdateSelfAssessment}
-                  rubricSelfAssessmentEnabled={rubricSelfAssessmentEnabled}
+                  rubricId={rubric.id}
                 />
               </>
             )}
