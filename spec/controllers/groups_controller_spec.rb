@@ -1138,7 +1138,12 @@ describe GroupsController do
     end
 
     describe "GET show" do
-      it "denies access for users without any manage tags permissions when group is non-collaborative" do
+      it "denies access for users when group is non-collaborative" do
+        get "show", params: { id: @non_collaborative_group.id }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "denies access for users without any manage tags permissions when group is non-collaborative and request is json format" do
         RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
           @course.account.role_overrides.create!(
             permission:,
@@ -1147,12 +1152,12 @@ describe GroupsController do
           )
         end
 
-        get "show", params: { id: @non_collaborative_group.id }
-        expect(response).to have_http_status(:unauthorized)
+        get "show", params: { id: @non_collaborative_group.id }, format: :json
+        expect(response).to have_http_status(:forbidden)
       end
 
-      it "allows access for users with any manage tags permission when group is non-collaborative" do
-        get "show", params: { id: @non_collaborative_group.id }
+      it "allows access for users with any manage tags permission when group is non-collaborative and request is json format" do
+        get "show", params: { id: @non_collaborative_group.id }, format: :json
         expect(response).to be_successful
       end
 
