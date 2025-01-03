@@ -228,7 +228,7 @@ end
             </div>
           <% end %>
           <%= render :partial => 'shared/content_notices' if @has_content_notices && @show_left_side %>
-          <div id="content" class="ic-Layout-contentMain" role="main">
+          <div id="content" class="ic-Layout-contentMain" role="main" aria-label="<%= t("Global Content") %>">
             <%= yield %>
           </div>
         </div>
