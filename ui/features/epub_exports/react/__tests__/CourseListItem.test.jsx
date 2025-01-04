@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isNull} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import CourseListItem from '../CourseListItem'
 
-let props
+describe('CourseListItem', () => {
+  let props
 
-describe('CourseListItemSpec', () => {
   beforeEach(() => {
     props = {
       course: {
@@ -34,32 +32,25 @@ describe('CourseListItemSpec', () => {
     }
   })
 
-  test('getDisplayState', function () {
-    let CourseListItemElement = <CourseListItem {...props} />
-    let component = TestUtils.renderIntoDocument(CourseListItemElement)
-    // 'display state should be null without epub_export'
-    expect(isNull(component.getDisplayState())).toBeTruthy()
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
+  it('renders without epub_export', () => {
+    const {container} = render(<CourseListItem {...props} />)
+    expect(container.firstChild).toBeInTheDocument()
+    expect(container.querySelector('.epub-export-status')).toBeNull()
+  })
+
+  it('shows generating state when epub_export is generating', () => {
     props.course = {
       epub_export: {
         permissions: {},
         workflow_state: 'generating',
       },
     }
-    CourseListItemElement = <CourseListItem {...props} />
-    component = TestUtils.renderIntoDocument(CourseListItemElement)
-    // 'display state should not be null with epub_export'
-    expect(!isNull(component.getDisplayState())).toBeTruthy()
-    // 'should include workflow_state'
-    expect(component.getDisplayState().match('Generating')).toBeTruthy()
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
+    const {getByText} = render(<CourseListItem {...props} />)
+    expect(getByText(/generating/i)).toBeInTheDocument()
   })
 
-  test('render', function () {
-    const CourseListItemElement = <CourseListItem {...props} />
-    const component = TestUtils.renderIntoDocument(CourseListItemElement)
-    // 'should render with course'
-    expect(!isNull(ReactDOM.findDOMNode(component))).toBeTruthy()
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
+  it('renders with course information', () => {
+    const {container} = render(<CourseListItem {...props} />)
+    expect(container.firstChild).toBeInTheDocument()
   })
 })

@@ -17,56 +17,55 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import BreakdownBarComponent from '../breakdown-graph-bar'
 
-const equal = (value, expected) => expect(value).toEqual(expected)
-
-const renderComponent = props => TestUtils.renderIntoDocument(<BreakdownBarComponent {...props} />)
-
-const defaultProps = () => ({
+const defaultProps = {
   upperBound: '100',
   lowerBound: '70',
   rangeStudents: 50,
   totalStudents: 100,
   rangeIndex: 0,
-  selectRange: () => {},
-  openSidebar: () => {},
-})
+  selectRange: jest.fn(),
+  openSidebar: jest.fn(),
+}
 
 describe('Breakdown Stats Graph Bar', () => {
-  test('renders bar component correctly', () => {
-    const component = renderComponent(defaultProps())
+  it('renders the component with correct range bounds', () => {
+    const {getByTestId} = render(<BreakdownBarComponent {...defaultProps} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-bar__container'
-    )
-    equal(renderedList.length, 1, 'renders full component')
+    expect(getByTestId('range-bounds')).toHaveTextContent('70+ to 100')
   })
 
-  test('renders bar inner-components correctly', () => {
-    const component = renderComponent(defaultProps())
+  it('displays correct student count information', () => {
+    const {getByTestId} = render(<BreakdownBarComponent {...defaultProps} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    equal(renderedList.length, 1, 'renders full component')
+    expect(getByTestId('student-counts')).toHaveTextContent('50 out of 100 students')
   })
 
-  test('renders bounds correctly', () => {
-    const component = renderComponent(defaultProps())
+  it('calls selectRange and openSidebar when clicking the student counts button', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = render(<BreakdownBarComponent {...defaultProps} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-    equal(renderedList[0].textContent, '70+ to 100', 'renders full component')
+    await user.click(getByTestId('student-counts'))
+
+    expect(defaultProps.selectRange).toHaveBeenCalledWith(0)
+    expect(defaultProps.openSidebar).toHaveBeenCalled()
   })
 
-  test('renders students in range correctly', () => {
-    const component = renderComponent(defaultProps())
+  it('renders the progress bar with correct width based on student ratio', () => {
+    const {container} = render(<BreakdownBarComponent {...defaultProps} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    equal(
-      renderedList[0].textContent,
-      '50 out of 100 students',
-      'renders correct amount of students'
-    )
+    const progressBar = container.querySelector('.crs-bar__horizontal-inside-fill')
+    expect(progressBar).toHaveStyle({width: '50%'})
+  })
+
+  it('does not render progress bar when student count is 0', () => {
+    const props = {...defaultProps, rangeStudents: 0}
+    const {container} = render(<BreakdownBarComponent {...props} />)
+
+    const progressBar = container.querySelector('.crs-bar__horizontal-inside-fill')
+    expect(progressBar).toBeNull()
   })
 })

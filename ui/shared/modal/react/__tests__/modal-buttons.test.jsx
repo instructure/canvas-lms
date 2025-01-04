@@ -17,32 +17,51 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
-import $ from 'jquery'
+import {render} from '@testing-library/react'
 import ModalButtons from '../buttons'
 
 describe('ModalButtons', () => {
-  test('applies className', () => {
-    const ModalButtonsElement = <ModalButtons className="cat" footerClassName="dog" />
-    const component = TestUtils.renderIntoDocument(ModalButtonsElement)
-    const domNode = ReactDOM.findDOMNode(component)
+  it('applies custom class names correctly', () => {
+    const {container} = render(
+      <ModalButtons className="custom-class" footerClassName="footer-class" />,
+    )
 
-    expect($(domNode).hasClass('cat')).toBeTruthy()
-    expect($(domNode).find('.dog').length).toBe(1)
-    ReactDOM.unmountComponentAtNode(domNode.parentNode)
+    expect(container.firstChild).toHaveClass('custom-class')
+    expect(container.querySelector('.footer-class')).toBeInTheDocument()
   })
 
-  test('renders children', () => {
-    const mB = (
-      <ModalButtons>
-        <div className="cool_div" />
-      </ModalButtons>
-    )
-    const component = TestUtils.renderIntoDocument(mB)
-    const domNode = ReactDOM.findDOMNode(component)
+  it('uses default class names when not provided', () => {
+    const {container} = render(<ModalButtons />)
 
-    expect($(domNode).find('.cool_div').length).toBe(1)
-    ReactDOM.unmountComponentAtNode(domNode.parentNode)
+    expect(container.firstChild).toHaveClass('ReactModal__Footer')
+    expect(container.querySelector('.ReactModal__Footer-Actions')).toBeInTheDocument()
+  })
+
+  it('renders children inside the footer', () => {
+    const testId = 'test-child'
+    const {getByTestId} = render(
+      <ModalButtons>
+        <div data-testid={testId}>Child Content</div>
+      </ModalButtons>,
+    )
+
+    const child = getByTestId(testId)
+    expect(child).toBeInTheDocument()
+    expect(child.closest('.ReactModal__Footer-Actions')).toBeInTheDocument()
+  })
+
+  it('maintains proper nesting structure', () => {
+    const {container} = render(
+      <ModalButtons>
+        <button>Test Button</button>
+      </ModalButtons>,
+    )
+
+    const outerDiv = container.firstChild
+    const innerDiv = outerDiv?.firstChild
+
+    expect(outerDiv).toHaveClass('ReactModal__Footer')
+    expect(innerDiv).toHaveClass('ReactModal__Footer-Actions')
+    expect(innerDiv?.querySelector('button')).toBeInTheDocument()
   })
 })

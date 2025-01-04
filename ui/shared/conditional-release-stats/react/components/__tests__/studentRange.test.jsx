@@ -17,47 +17,85 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render, fireEvent} from '@testing-library/react'
 import StudentRange from '../student-range'
 
-const equal = (value, expected) => expect(value).toEqual(expected)
-
-const defaultProps = () => ({
-  range: {
-    scoring_range: {
-      id: 1,
-      rule_id: 1,
-      lower_bound: 0.7,
-      upper_bound: 1.0,
-      created_at: null,
-      updated_at: null,
-      position: null,
+describe('StudentRange', () => {
+  const defaultProps = (overrides = {}) => ({
+    range: {
+      scoring_range: {
+        id: 1,
+        rule_id: 1,
+        lower_bound: 0.7,
+        upper_bound: 1.0,
+        created_at: null,
+        updated_at: null,
+        position: null,
+      },
+      size: 0,
+      students: [
+        {
+          user: {name: 'Foo Bar', id: 1},
+        },
+        {
+          user: {name: 'Bar Foo', id: 2},
+        },
+      ],
     },
-    size: 0,
-    students: [
-      {
-        user: {name: 'Foo Bar', id: 1},
-      },
-      {
-        user: {name: 'Bar Foo', id: 2},
-      },
-    ],
-  },
-  loadStudent: () => {},
-  onStudentSelect: () => {},
-})
+    onStudentSelect: jest.fn(),
+    ...overrides,
+  })
 
-const renderComponent = props => TestUtils.renderIntoDocument(<StudentRange {...props} />)
-
-describe('Student Range', () => {
-  test('renders items correctly', () => {
+  it('renders all students in the range', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {getAllByRole} = render(<StudentRange {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-student-range__item'
-    )
-    equal(renderedList.length, props.range.students.length, 'renders full component')
+    const studentButtons = getAllByRole('button')
+    expect(studentButtons).toHaveLength(props.range.students.length)
+    expect(studentButtons[0]).toHaveTextContent('Foo Bar')
+    expect(studentButtons[1]).toHaveTextContent('Bar Foo')
+  })
+
+  it('renders nothing when there are no students', () => {
+    const props = defaultProps({
+      range: {
+        ...defaultProps().range,
+        students: [],
+      },
+    })
+    const {container} = render(<StudentRange {...props} />)
+    expect(container.firstChild).toBeEmptyDOMElement()
+  })
+
+  it('calls onStudentSelect with correct index when student is clicked', () => {
+    const props = defaultProps()
+    const {getByRole} = render(<StudentRange {...props} />)
+
+    const firstStudent = getByRole('button', {name: /select student foo bar/i})
+    fireEvent.click(firstStudent)
+    expect(props.onStudentSelect).toHaveBeenCalledWith(0)
+
+    const secondStudent = getByRole('button', {name: /select student bar foo/i})
+    fireEvent.click(secondStudent)
+    expect(props.onStudentSelect).toHaveBeenCalledWith(1)
+  })
+
+  it('renders students in correct order', () => {
+    const props = defaultProps()
+    const {getAllByRole} = render(<StudentRange {...props} />)
+
+    const studentButtons = getAllByRole('button')
+    studentButtons.forEach((button, index) => {
+      expect(button).toHaveTextContent(props.range.students[index].user.name)
+    })
+  })
+
+  it('renders with correct structure', () => {
+    const props = defaultProps()
+    const {container} = render(<StudentRange {...props} />)
+
+    expect(container.firstChild).toHaveClass('crs-student-range')
+    const items = container.getElementsByClassName('crs-student-range__item')
+    expect(items).toHaveLength(props.range.students.length)
   })
 })

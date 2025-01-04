@@ -50,7 +50,7 @@ class SubmissionProgressBars extends React.Component {
           html_url: PropTypes.string.isRequired,
           points_possible: PropTypes.number,
         }),
-      }).isRequired
+      }).isRequired,
     ).isRequired,
   }
 
@@ -102,7 +102,7 @@ class SubmissionProgressBars extends React.Component {
     return (
       <div>
         <span className="screenreader-only">{I18n.t('%{grade}', {grade})}</span>
-        <i className={iconClass} />
+        <i className={iconClass} data-testid={`submission-grade-icon-${grade}`} />
       </div>
     )
   }
@@ -111,39 +111,43 @@ class SubmissionProgressBars extends React.Component {
     const submissions = this.props.submissions.filter(s => s.grade != null)
     if (submissions.length > 0) {
       return (
-        <section className="StudentContextTray__Section StudentContextTray-Progress">
-          <Heading level="h4" as="h3" border="bottom">
+        <section
+          className="StudentContextTray__Section StudentContextTray-Progress"
+          data-testid="submission-progress-section"
+        >
+          <Heading level="h4" as="h3" border="bottom" data-testid="submission-progress-header">
             {I18n.t('Last %{length} Graded Items', {length: submissions.length})}
           </Heading>
-          {submissions.map(submission => {
-            return (
-              <div key={submission.id} className="StudentContextTray-Progress__Bar">
-                <Tooltip renderTip={submission.assignment.name} placement="top">
-                  <Link
-                    href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
-                    themeOverride={{textDecoration: 'none'}}
-                    display="block"
-                  >
-                    <ProgressBar
-                      size="small"
-                      successColor={false}
-                      label={I18n.t('Grade')}
-                      valueMax={submission.assignment.points_possible}
-                      valueNow={submission.score || 0}
-                      screenReaderLabel={SubmissionProgressBars.displayScreenreaderGrade(
-                        submission
-                      )}
-                      renderValue={() => (
-                        <Text size="x-small" color="secondary">
-                          {SubmissionProgressBars.displayGrade(submission)}
-                        </Text>
-                      )}
-                    />
-                  </Link>
-                </Tooltip>
-              </div>
-            )
-          })}
+          {submissions.map(submission => (
+            <div
+              key={submission.id}
+              className="StudentContextTray-Progress__Bar"
+              data-testid="submission-progress-bar"
+            >
+              <Tooltip renderTip={submission.assignment.name} placement="top">
+                <Link
+                  href={`${submission.assignment.html_url}/submissions/${submission.user._id}`}
+                  themeOverride={{textDecoration: 'none'}}
+                  display="block"
+                  data-testid="submission-link"
+                >
+                  <ProgressBar
+                    size="small"
+                    successColor={false}
+                    label={I18n.t('Grade')}
+                    valueMax={submission.assignment.points_possible}
+                    valueNow={submission.score || 0}
+                    screenReaderLabel={SubmissionProgressBars.displayScreenreaderGrade(submission)}
+                    renderValue={() => (
+                      <Text size="x-small" color="secondary" data-testid="submission-grade-text">
+                        {SubmissionProgressBars.displayGrade(submission)}
+                      </Text>
+                    )}
+                  />
+                </Link>
+              </Tooltip>
+            </div>
+          ))}
         </section>
       )
     } else {

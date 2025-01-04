@@ -73,7 +73,7 @@ describe('DraggableDashboardCard reordering', () => {
     const Box = getDroppableDashboardCardBox()
     const {getByText} = render(<Box cardComponent={DashboardCard} courseCards={CARDS} />)
     ;['DASH-101', 'DASH-201', 'DASH-301'].forEach(name =>
-      expect(getByText(name)).toBeInTheDocument()
+      expect(getByText(name)).toBeInTheDocument(),
     )
   })
 
@@ -85,7 +85,7 @@ describe('DraggableDashboardCard reordering', () => {
         connectDragSource={el => el}
         connectDropTarget={el => el}
         isDragging={true}
-      />
+      />,
     )
     expect(container.firstChild.style.opacity).toEqual('0')
   })
@@ -93,13 +93,13 @@ describe('DraggableDashboardCard reordering', () => {
   it('adjusts the position properly when a card is dragged', () => {
     const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
     const root = TestUtils.renderIntoDocument(
-      <Box cardComponent={DashboardCard} courseCards={CARDS} />
+      <Box cardComponent={DashboardCard} courseCards={CARDS} />,
     )
 
     const backend = root.getManager().getBackend()
     const renderedCardComponents = TestUtils.scryRenderedComponentsWithType(
       root,
-      DraggableDashboardCard
+      DraggableDashboardCard,
     )
     const sourceHandlerId = renderedCardComponents[0].getDecoratedComponentInstance().getHandlerId()
     const targetHandlerId = renderedCardComponents[1].getHandlerId()
@@ -110,7 +110,7 @@ describe('DraggableDashboardCard reordering', () => {
 
     const renderedAfterDragNDrop = TestUtils.scryRenderedDOMComponentsWithClass(
       root,
-      'ic-DashboardCard'
+      'ic-DashboardCard',
     )
 
     expect(renderedAfterDragNDrop[0].getAttribute('aria-label')).toEqual('Intermediate Dashcarding')

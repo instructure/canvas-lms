@@ -17,13 +17,10 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
-import ReactDOM from 'react-dom'
+import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Collaboration from '../Collaboration'
-import * as tz from '@instructure/moment-utils'
-
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toEqual(y)
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const props = {
   collaboration: {
@@ -42,59 +39,39 @@ const props = {
 }
 
 describe('Collaboration', () => {
-  test('renders a link to the user who created the collaboration', () => {
-    ENV.context_asset_string = 'courses_1'
-
-    const component = TestUtils.renderIntoDocument(<Collaboration {...props} />)
-    const link = ReactDOM.findDOMNode(
-      TestUtils.findRenderedDOMComponentWithClass(component, 'Collaboration-author')
-    )
-    ok(link.href.includes('/users/1'))
+  beforeEach(() => {
+    fakeENV.setup({context_asset_string: 'courses_1'})
   })
 
-  test('when the user clicks the trash button it opens the delete confirmation', () => {
-    ENV.context_asset_string = 'courses_1'
-
-    const component = TestUtils.renderIntoDocument(<Collaboration {...props} />)
-    const trashIcon = ReactDOM.findDOMNode(
-      TestUtils.findRenderedDOMComponentWithClass(component, 'icon-trash')
-    )
-    TestUtils.Simulate.click(trashIcon)
-    const deleteConfirmation = TestUtils.findRenderedDOMComponentWithClass(
-      component,
-      'DeleteConfirmation'
-    )
-    ok(deleteConfirmation)
+  afterEach(() => {
+    fakeENV.teardown()
   })
 
-  test('when the user clicks the cancel button on the delete confirmation it removes the delete confirmation', () => {
-    ENV.context_asset_string = 'courses_1'
-
-    const component = TestUtils.renderIntoDocument(<Collaboration {...props} />)
-    const trashIcon = ReactDOM.findDOMNode(
-      TestUtils.findRenderedDOMComponentWithClass(component, 'icon-trash')
-    )
-    TestUtils.Simulate.click(trashIcon)
-    const cancelButton = ReactDOM.findDOMNode(
-      TestUtils.scryRenderedDOMComponentsWithClass(component, 'Button')[1]
-    )
-    TestUtils.Simulate.click(cancelButton)
-    const deleteConfirmation = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'DeleteConfirmation'
-    )
-    equal(deleteConfirmation.length, 0)
+  it('renders a link to the user who created the collaboration', () => {
+    render(<Collaboration {...props} />)
+    const authorLink = screen.getByTestId('collaboration-author')
+    expect(authorLink).toBeInTheDocument()
+    expect(authorLink.href).toContain('/users/1')
   })
 
-  test('has an edit button that links to the proper url', () => {
-    ENV.context_asset_string = 'courses_1'
+  it('when the user clicks the trash button it opens the delete confirmation', async () => {
+    render(<Collaboration {...props} />)
+    await userEvent.click(screen.getByTestId('delete-collaboration'))
+    expect(screen.getByTestId('delete-confirmation')).toBeInTheDocument()
+  })
 
-    const component = TestUtils.renderIntoDocument(<Collaboration {...props} />)
-    const editIcon = TestUtils.findRenderedDOMComponentWithClass(component, 'icon-edit')
-    ok(
-      ReactDOM.findDOMNode(editIcon).href.includes(
-        `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${props.collaboration.id}&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`
-      )
+  it('when the user clicks the cancel button on the delete confirmation it removes the delete confirmation', async () => {
+    render(<Collaboration {...props} />)
+    await userEvent.click(screen.getByTestId('delete-collaboration'))
+    await userEvent.click(screen.getByRole('button', {name: /cancel/i}))
+    expect(screen.queryByTestId('delete-confirmation')).not.toBeInTheDocument()
+  })
+
+  it('has an edit button that links to the proper url', () => {
+    render(<Collaboration {...props} />)
+    const editLink = screen.getByTestId('edit-collaboration')
+    expect(editLink.href).toContain(
+      `/courses/1/lti_collaborations/external_tools/retrieve?content_item_id=${props.collaboration.id}&placement=collaboration&url=${props.collaboration.update_url}&display=borderless`,
     )
   })
 })

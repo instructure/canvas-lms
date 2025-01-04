@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import File from '../../../backbone/models/File'
 import DialogPreview from '../DialogPreview'
 import FilesystemObjectThumbnail from '../FilesystemObjectThumbnail'
@@ -28,28 +27,29 @@ describe('DialogPreview', () => {
     jest.restoreAllMocks()
   })
 
-  test('DP: single item rendered with FilesystemObjectThumbnail', () => {
+  it('renders a single item with FilesystemObjectThumbnail', () => {
     const file = new File({name: 'Test File', thumbnail_url: 'blah'})
     file.url = () => 'some_url'
-    const fsObjSpy = jest
+    jest
       .spyOn(FilesystemObjectThumbnail.prototype, 'render')
-      .mockReturnValue(<div />)
-    const dialogPreview = TestUtils.renderIntoDocument(<DialogPreview itemsToShow={[file]} />)
-    expect(fsObjSpy).toHaveBeenCalled()
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dialogPreview).parentNode)
+      .mockReturnValue(<div data-testid="mock-thumbnail" />)
+
+    const {getByTestId} = render(<DialogPreview itemsToShow={[file]} />)
+
+    expect(getByTestId('dialog-preview-container')).toBeInTheDocument()
+    expect(getByTestId('mock-thumbnail')).toBeInTheDocument()
   })
 
-  test('DP: multiple file items rendered in i elements', () => {
+  it('renders multiple file items with icons', () => {
     const url = () => 'some_url'
-    const file = new File({name: 'Test File', thumbnail_url: 'blah'})
-    const file2 = new File({name: 'Test File', thumbnail_url: 'blah'})
-    file.url = url
+    const file1 = new File({name: 'Test File 1', thumbnail_url: 'blah'})
+    const file2 = new File({name: 'Test File 2', thumbnail_url: 'blah'})
+    file1.url = url
     file2.url = url
-    const dialogPreview = TestUtils.renderIntoDocument(
-      <DialogPreview itemsToShow={[file, file2]} />,
-    )
-    // 'there are two files rendered'
-    expect(ReactDOM.findDOMNode(dialogPreview).getElementsByTagName('i')).toHaveLength(2)
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dialogPreview).parentNode)
+
+    const {getByTestId} = render(<DialogPreview itemsToShow={[file1, file2]} />)
+
+    expect(getByTestId('multi-thumbnail-0')).toBeInTheDocument()
+    expect(getByTestId('multi-thumbnail-1')).toBeInTheDocument()
   })
 })

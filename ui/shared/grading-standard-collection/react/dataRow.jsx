@@ -135,23 +135,32 @@ class DataRow extends React.Component {
   }
 
   renderViewMode = () => (
-    <tr className="grading_standard_row react_grading_standard_row" ref="viewContainer">
+    <tr
+      className="grading_standard_row react_grading_standard_row"
+      ref="viewContainer"
+      data-testid="grading-standard-row-view"
+    >
       <td className="insert_row_icon_container" />
       <td className="row_name_container">
-        <div className="name" ref="name">
+        <div className="name" ref="name" data-testid="row-name">
           {this.getRowData().name}
         </div>
       </td>
       <td className="row_cell max_score_cell" aria-label={I18n.t('Upper limit of range')}>
         <div>
-          <span className="max_score" ref="maxScore" title="Upper limit of range">
+          <span
+            className="max_score"
+            ref="maxScore"
+            title="Upper limit of range"
+            data-testid="max-score"
+          >
             {`${this.renderMaxScore()}%`}
           </span>
         </div>
       </td>
       <td className="row_cell">
         <div>
-          <span className="range_to" ref="minScore">
+          <span className="range_to" ref="minScore" data-testid="min-score">
             {I18n.t('to %{minScore}%', {minScore: this.renderMinScore()})}
           </span>
           <span className="min_score" />
@@ -169,6 +178,7 @@ class DataRow extends React.Component {
           : 'grading_standard_row react_grading_standard_row'
       }
       ref="editContainer"
+      data-testid="grading-standard-row-edit"
     >
       <td className="insert_row_icon_container">{this.renderInsertRowButton()}</td>
       <td className="row_name_container">
@@ -182,11 +192,12 @@ class DataRow extends React.Component {
             aria-label={I18n.t('Range name')}
             name={`grading_standard[standard_data][scheme_${this.props.uniqueId}[name]`}
             value={this.getRowData().name}
+            data-testid="name-input"
           />
         </div>
       </td>
       <td className="row_cell max_score_cell edit_max_score">
-        <span className="edit_max_score">
+        <span className="edit_max_score" data-testid="edit-max-score">
           {`${this.renderMaxScore()}%`}
           <span className="screenreader-only">{I18n.t('Upper limit of range')}</span>
         </span>
@@ -208,6 +219,7 @@ class DataRow extends React.Component {
             aria-label={I18n.t('Lower limit of range')}
             name={`grading_standard[standard_data][scheme_${this.props.uniqueId}][value]`}
             value={this.renderMinScore()}
+            data-testid="min-score-input"
           />
           <span aria-hidden="true"> % </span>
         </div>
