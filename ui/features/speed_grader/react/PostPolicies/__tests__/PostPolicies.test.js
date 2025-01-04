@@ -19,7 +19,6 @@
 import {unmountComponentAtNode} from 'react-dom'
 import PostPolicies from '../index'
 import SpeedGraderHelpers from '../../../jquery/speed_grader_helpers'
-import sinon from 'sinon'
 
 const ok = x => expect(x).toBeTruthy()
 const strictEqual = (x, y) => expect(x).toEqual(y)
@@ -54,8 +53,8 @@ describe('SpeedGrader PostPolicies', () => {
       {id: '2001', name: 'Hogwarts'},
       {id: '2002', name: 'Freshmen'},
     ]
-    afterUpdateSubmission = sinon.stub()
-    updateSubmission = sinon.stub()
+    afterUpdateSubmission = jest.fn()
+    updateSubmission = jest.fn()
     postPolicies = new PostPolicies({
       afterUpdateSubmission,
       assignment: expectedAssignment(),
@@ -100,16 +99,16 @@ describe('SpeedGrader PostPolicies', () => {
 
   describe('#showHideAssignmentGradesTray', () => {
     function hideGradesShowArgs() {
-      return postPolicies._hideAssignmentGradesTray.show.firstCall.args[0]
+      return postPolicies._hideAssignmentGradesTray.show.mock.calls[0][0]
     }
 
     beforeEach(() => {
-      sinon.stub(postPolicies._hideAssignmentGradesTray, 'show')
+      jest.spyOn(postPolicies._hideAssignmentGradesTray, 'show').mockImplementation(() => {})
     })
 
     test('calls "show" for the "Hide Assignment Grades" tray', () => {
       postPolicies.showHideAssignmentGradesTray({})
-      strictEqual(postPolicies._hideAssignmentGradesTray.show.callCount, 1)
+      expect(postPolicies._hideAssignmentGradesTray.show).toHaveBeenCalledTimes(1)
     })
 
     test('passes the assignment to "show"', () => {
@@ -135,7 +134,7 @@ describe('SpeedGrader PostPolicies', () => {
       })
       const {onHidden} = hideGradesShowArgs()
       onHidden({userIds: ['1']})
-      strictEqual(updateSubmission.callCount, 1)
+      expect(updateSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('passes afterUpdateSubmission to "show"', () => {
@@ -144,7 +143,7 @@ describe('SpeedGrader PostPolicies', () => {
       })
       const {onHidden} = hideGradesShowArgs()
       onHidden({userIds: ['1']})
-      strictEqual(afterUpdateSubmission.callCount, 1)
+      expect(afterUpdateSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('onHidden updates posted_at when assignment anonymousGrading is false', () => {
@@ -158,19 +157,19 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onHidden does not reload the page when assignment anonymousGrading is false', () => {
-      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: new Date().toISOString()},
       }
       postPolicies.showHideAssignmentGradesTray({submissionsMap})
       const {onHidden} = hideGradesShowArgs()
       onHidden({postedAt: null, userIds: ['1']})
-      strictEqual(reloadStub.callCount, 0)
-      reloadStub.restore()
+      expect(reloadStub).not.toHaveBeenCalled()
+      reloadStub.mockRestore()
     })
 
     test('onHidden reloads the page when assignment anonymousGrading is true', () => {
-      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: new Date().toISOString()},
       }
@@ -178,8 +177,8 @@ describe('SpeedGrader PostPolicies', () => {
       postPolicies.showHideAssignmentGradesTray({submissionsMap})
       const {onHidden} = hideGradesShowArgs()
       onHidden()
-      strictEqual(reloadStub.callCount, 1)
-      reloadStub.restore()
+      expect(reloadStub).toHaveBeenCalledTimes(1)
+      reloadStub.mockRestore()
     })
 
     test('onHidden ignores user IDs that do not match known students', () => {
@@ -195,16 +194,16 @@ describe('SpeedGrader PostPolicies', () => {
 
   describe('#showPostAssignmentGradesTray', () => {
     function postGradesShowArgs() {
-      return postPolicies._postAssignmentGradesTray.show.firstCall.args[0]
+      return postPolicies._postAssignmentGradesTray.show.mock.calls[0][0]
     }
 
     beforeEach(() => {
-      sinon.stub(postPolicies._postAssignmentGradesTray, 'show')
+      jest.spyOn(postPolicies._postAssignmentGradesTray, 'show').mockImplementation(() => {})
     })
 
     test('calls "show" for the "Post Assignment Grades" tray', () => {
       postPolicies.showPostAssignmentGradesTray({})
-      strictEqual(postPolicies._postAssignmentGradesTray.show.callCount, 1)
+      expect(postPolicies._postAssignmentGradesTray.show).toHaveBeenCalledTimes(1)
     })
 
     test('passes the assignment to "show"', () => {
@@ -248,14 +247,14 @@ describe('SpeedGrader PostPolicies', () => {
       postPolicies.showPostAssignmentGradesTray({submissionsMap: {1: {posted_at: null}}})
       const {onPosted} = postGradesShowArgs()
       onPosted({userIds: ['1']})
-      strictEqual(updateSubmission.callCount, 1)
+      expect(updateSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('passes afterUpdateSubmission to "show"', () => {
       postPolicies.showPostAssignmentGradesTray({submissionsMap: {1: {posted_at: null}}})
       const {onPosted} = postGradesShowArgs()
       onPosted({userIds: ['1']})
-      strictEqual(afterUpdateSubmission.callCount, 1)
+      expect(afterUpdateSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('onPosted updates posted_at when assignment anonymousGrading is false', () => {
@@ -270,7 +269,7 @@ describe('SpeedGrader PostPolicies', () => {
     })
 
     test('onPosted does not reload the page when assignment anonymousGrading is false', () => {
-      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: null},
       }
@@ -278,12 +277,12 @@ describe('SpeedGrader PostPolicies', () => {
       const postedAt = new Date().toISOString()
       const {onPosted} = postGradesShowArgs()
       onPosted({postedAt, userIds: ['1']})
-      strictEqual(reloadStub.callCount, 0)
-      reloadStub.restore()
+      expect(reloadStub).not.toHaveBeenCalled()
+      reloadStub.mockRestore()
     })
 
     test('onPosted reloads the page when assignment anonymousGrading is true', () => {
-      const reloadStub = sinon.stub(SpeedGraderHelpers, 'reloadPage')
+      const reloadStub = jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
       const submissionsMap = {
         1: {posted_at: null},
       }
@@ -291,8 +290,8 @@ describe('SpeedGrader PostPolicies', () => {
       postPolicies.showPostAssignmentGradesTray({submissionsMap})
       const {onPosted} = postGradesShowArgs()
       onPosted()
-      strictEqual(reloadStub.callCount, 1)
-      reloadStub.restore()
+      expect(reloadStub).toHaveBeenCalledTimes(1)
+      reloadStub.mockRestore()
     })
 
     test('onPosted ignores user IDs that do not match known students', () => {

@@ -19,7 +19,6 @@
 import actions from '../developerKeysActions'
 import storeCreator from '../../store/store'
 import axios from '@canvas/axios'
-import sinon from 'sinon'
 
 const store = storeCreator()
 
@@ -34,6 +33,10 @@ function thenStub() {
   }
 }
 describe('Developer key actions', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   test('listInheritedDeveloperKeysStart returns proper action', () => {
     const retVal = actions.listInheritedDeveloperKeysStart()
     equal(retVal.type, 'LIST_INHERITED_DEVELOPER_KEYS_START')
@@ -68,49 +71,44 @@ describe('Developer key actions', () => {
   })
 
   test('getDeveloperKeys retrieves account key data', () => {
-    const getStub = sinon.stub(axios, 'get').returns(thenStub())
+    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getDeveloperKeys('http://www.test.com', {})(
       () => {},
-      () => {}
+      () => {},
     )
-    ok(getStub.calledWith('http://www.test.com'))
-    axios.get.restore()
+    expect(getStub).toHaveBeenCalledWith('http://www.test.com')
   })
 
   test('getDeveloperKeys retrieves inherited account key data', () => {
-    const getStub = sinon.stub(axios, 'get').returns(thenStub())
+    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getDeveloperKeys('http://www.test.com', {})(
       () => {},
-      () => {}
+      () => {},
     )
-    ok(getStub.calledWith('http://www.test.com?inherited=true'))
-    axios.get.restore()
+    expect(getStub).toHaveBeenCalledWith('http://www.test.com?inherited=true')
   })
 
   test('getRemainingDeveloperKeys requests keys from the specified URL', () => {
-    const getStub = sinon.stub(axios, 'get').returns(thenStub())
+    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getRemainingDeveloperKeys('http://www.test.com', [])(
       () => {},
-      () => {}
+      () => {},
     )
-    ok(getStub.calledWith('http://www.test.com'))
-    axios.get.restore()
+    expect(getStub).toHaveBeenCalledWith('http://www.test.com')
   })
 
   test('getRemainingInheritedDeveloperKeys requests keys from the specified URL with inherited param', () => {
-    const getStub = sinon.stub(axios, 'get').returns(thenStub())
+    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.getRemainingInheritedDeveloperKeys('http://www.test.com', [])(
       () => {},
-      () => {}
+      () => {},
     )
-    ok(getStub.calledWith('http://www.test.com?inherited=true'))
-    axios.get.restore()
+    expect(getStub).toHaveBeenCalledWith('http://www.test.com?inherited=true')
   })
 
   test('listDeveloperKeyScopes makes a request to the scopes endpoint', () => {
-    const getStub = sinon.stub(axios, 'get').returns(thenStub())
+    const getStub = jest.spyOn(axios, 'get').mockReturnValue(thenStub())
     actions.listDeveloperKeyScopes(1)(store.dispatch)
-    ok(getStub.calledWith('/api/v1/accounts/1/scopes?group_by=resource_name'))
-    axios.get.restore()
+    expect(getStub).toHaveBeenCalledWith('/api/v1/accounts/1/scopes?group_by=resource_name')
   })
 })

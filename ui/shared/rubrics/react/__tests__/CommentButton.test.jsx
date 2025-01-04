@@ -15,14 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import sinon from 'sinon'
 import React from 'react'
 import {shallow} from 'enzyme'
 import CommentButton from '../CommentButton'
 
 describe('The CommentButton component', () => {
   const props = {
-    onClick: sinon.spy(),
+    onClick: jest.fn(),
   }
 
   const component = mods => shallow(<CommentButton {...{...props, ...mods}} />)
@@ -32,9 +31,9 @@ describe('The CommentButton component', () => {
   })
 
   it('passes through onClick', () => {
-    const onClick = sinon.spy()
+    const onClick = jest.fn()
     const el = component({onClick})
     el.find('IconButton').prop('onClick')()
-    expect(onClick.calledOnce).toEqual(true)
+    expect(onClick).toHaveBeenCalledTimes(1)
   })
 })

@@ -18,7 +18,6 @@
 
 import AssignmentCellFormatter from '../AssignmentCellFormatter'
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
-import sinon from 'sinon'
 
 describe('GradebookGrid AssignmentCellFormatter', () => {
   let fixture
@@ -42,9 +41,9 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
       ['F', 0.0],
     ]
     gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
-    sinon
-      .stub(gradebook, 'saveSettings')
-      .callsFake((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
+    gradebook.saveSettings = jest
+      .fn()
+      .mockImplementation((_context_id, gradebook_settings) => Promise.resolve(gradebook_settings))
 
     formatter = new AssignmentCellFormatter(gradebook)
     gradebook.setAssignments({
@@ -66,14 +65,19 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
     submissionState = {hideGrade: false}
 
     const getSubmissionState = gradebook.submissionStateMap.getSubmissionState.bind(
-      gradebook.submissionStateMap
+      gradebook.submissionStateMap,
     )
-    sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').callsFake(getSubmissionState)
-    gradebook.submissionStateMap.getSubmissionState.withArgs(submission).returns(submissionState)
+    jest
+      .spyOn(gradebook.submissionStateMap, 'getSubmissionState')
+      .mockImplementation(getSubmissionState)
+    gradebook.submissionStateMap.getSubmissionState.mockImplementation(sub => {
+      if (sub === submission) return submissionState
+      return getSubmissionState(sub)
+    })
   })
 
   afterEach(() => {
-    gradebook.submissionStateMap.getSubmissionState.restore()
+    jest.restoreAllMocks()
     fixture.remove()
   })
 
@@ -83,7 +87,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
       0, // cell
       submission, // value
       columnDef, // column definition
-      student // dataContext
+      student, // dataContext
     )
     return fixture.querySelector('.gradebook-cell')
   }
@@ -184,7 +188,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
     })
 
     test('renders an empty cell when the submission state is not defined', () => {
-      gradebook.submissionStateMap.getSubmissionState.withArgs(submission).returns(undefined)
+      gradebook.submissionStateMap.getSubmissionState.mockImplementation(() => undefined)
       renderCell()
       expect(getRenderedGrade().innerHTML).toBe('')
     })
@@ -235,35 +239,35 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         test('includes a warning icon when plagiarism data is in an "error" state', () => {
           plagiarismEntry.status = 'error'
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-warning')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-warning'),
           ).toBeTruthy()
         })
 
         test('includes a clock icon when plagiarism data is awaiting processing', () => {
           plagiarismEntry.status = 'pending'
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-clock')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-clock'),
           ).toBeTruthy()
         })
 
         test('includes a solid circle when above 60% similarity', () => {
           plagiarismEntry.similarity_score = 75
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-empty')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-empty'),
           ).toBeTruthy()
         })
 
         test('includes a half-filled circle when between 20% and 60% similarity', () => {
           plagiarismEntry.similarity_score = 45
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half'),
           ).toBeTruthy()
         })
 
         test('includes a "certified" icon when below 20% similarity', () => {
           plagiarismEntry.similarity_score = 10
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-certified')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-certified'),
           ).toBeTruthy()
         })
       })
@@ -279,35 +283,35 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         test('includes a warning icon when plagiarism data is in an "error" state', () => {
           plagiarismEntry.status = 'error'
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-warning')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-warning'),
           ).toBeTruthy()
         })
 
         test('includes a clock icon when plagiarism data is awaiting processing', () => {
           plagiarismEntry.status = 'pending'
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-clock')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-clock'),
           ).toBeTruthy()
         })
 
         test('includes a solid circle when above 60% similarity', () => {
           plagiarismEntry.similarity_score = 75
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-empty')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-empty'),
           ).toBeTruthy()
         })
 
         test('includes a half-filled circle when between 20% and 60% similarity', () => {
           plagiarismEntry.similarity_score = 45
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-oval-half'),
           ).toBeTruthy()
         })
 
         test('includes a "certified" icon when below 20% similarity', () => {
           plagiarismEntry.similarity_score = 10
           expect(
-            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-certified')
+            renderCell().querySelector('.Grid__GradeCell__OriginalityScore .icon-certified'),
           ).toBeTruthy()
         })
       })
@@ -371,11 +375,11 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
     })
 
     test('does not display an invalid grade indicator when no grade is pending', () => {
-      expect(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+      expect(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
     })
 
     test('does not display an unposted grade indicator', () => {
-      expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length).toBe(0)
+      expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade')).toHaveLength(0)
     })
 
     describe('when post assignment grades tray is open', () => {
@@ -385,29 +389,29 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
 
       test('displays an unposted grade indicator when grade is graded and unposted', () => {
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length).toBe(1)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade')).toHaveLength(1)
       })
 
       test('displays an unposted grade indicator when a submission comment exists and is unposted', () => {
         submission.hasPostableComments = true
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length).toBe(1)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade')).toHaveLength(1)
       })
 
       test('does not display an unposted grade indicator when grade is posted', () => {
         submission.posted_at = new Date()
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length).toBe(0)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade')).toHaveLength(0)
       })
 
       test('does not display an unposted grade indicator when submission has no grade nor comment', () => {
         submission.workflow_state = 'unsubmitted'
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length).toBe(0)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade')).toHaveLength(0)
       })
 
       test('does not display an unposted grade indicator when submission does not have a score nor postable comment', () => {
         submission.workflow_state = 'graded'
         submission.score = null
         submission.hasPostableComments = false
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade').length).toBe(0)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__UnpostedGrade')).toHaveLength(0)
       })
     })
 
@@ -461,7 +465,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
           valid: false,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(1)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(1)
       })
 
       test('does not display an invalid grade indicator when the pending grade is valid', () => {
@@ -473,7 +477,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
           valid: true,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        expect(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
     })
 
@@ -505,14 +509,14 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.score = null
         submission.workflow_state = 'graded'
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission is ungraded and pending review', () => {
@@ -520,7 +524,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.score = null
         submission.workflow_state = 'pending_review'
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
     })
 
@@ -538,20 +542,20 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission is ungraded and pending review', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders "Excused" when the submission is excused', () => {
@@ -575,20 +579,20 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission is ungraded and pending review', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders "Excused" when the submission is excused', () => {
@@ -621,20 +625,20 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission is ungraded and pending review', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders "Excused" when the submission is excused', () => {
@@ -653,14 +657,14 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
       })
 
       test('renders a checkmark when the grade is "complete"', () => {
-        expect(renderCell().querySelectorAll('i.icon-check.Grade--complete').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-check.Grade--complete')).toHaveLength(1)
       })
 
       test('renders an x-mark when the grade is "incomplete"', () => {
         submission.grade = 'Incomplete (i18n)'
         submission.rawGrade = 'incomplete'
         submission.score = 0
-        expect(renderCell().querySelectorAll('i.icon-x.Grade--incomplete').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-x.Grade--incomplete')).toHaveLength(1)
       })
 
       test('renders "–" (en dash) when the submission is unsubmitted', () => {
@@ -677,20 +681,20 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.rawGrade = null
         submission.score = null
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission is pending review', () => {
         submission.grade = null
         submission.rawGrade = null
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders "Excused" when the submission is excused', () => {
@@ -708,7 +712,7 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
           valid: true,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        expect(renderCell().querySelectorAll('i.icon-x.Grade--incomplete').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-x.Grade--incomplete')).toHaveLength(1)
       })
     })
 
@@ -727,20 +731,20 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission is pending review', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders "Excused" when the submission is excused', () => {
@@ -765,25 +769,25 @@ describe('GradebookGrid AssignmentCellFormatter', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'graded'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the "needs grading" icon when the submission was resubmitted', () => {
         submission.workflow_state = 'submitted'
         submission.grade_matches_current_submission = false
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the quiz icon when the submission is ungraded and pending review', () => {
         submission.grade = null
         submission.score = null
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders the quiz icon when the submission is partially graded and pending review', () => {
         submission.workflow_state = 'pending_review'
-        expect(renderCell().querySelectorAll('i.icon-not-graded').length).toBe(1)
+        expect(renderCell().querySelectorAll('i.icon-not-graded')).toHaveLength(1)
       })
 
       test('renders "Excused" when the submission is excused', () => {

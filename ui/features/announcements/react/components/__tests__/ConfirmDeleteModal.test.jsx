@@ -19,7 +19,6 @@
 import React from 'react'
 import {shallow} from 'enzyme'
 import merge from 'lodash/merge'
-import sinon from 'sinon'
 import ConfirmDeleteModal from '../ConfirmDeleteModal'
 
 const container = document.createElement('div')
@@ -38,46 +37,46 @@ const makeProps = (props = {}) =>
       selectedCount: 1,
       applicationElement: () => document.getElementById('fixtures'),
     },
-    props
+    props,
   )
 
 describe('ConfirmDeleteModal component', () => {
   test('should call onConfirm prop after confirming delete', done => {
-    const confirmSpy = sinon.spy()
+    const confirmSpy = jest.fn()
     const tree = shallow(<ConfirmDeleteModal {...makeProps({onConfirm: confirmSpy})} />)
     tree.find('#confirm_delete_announcements').simulate('click')
     setTimeout(() => {
-      equal(confirmSpy.callCount, 1)
+      expect(confirmSpy).toHaveBeenCalledTimes(1)
       done()
     })
   })
 
   test('should call onHide prop after confirming delete', done => {
-    const hideSpy = sinon.spy()
+    const hideSpy = jest.fn()
     const tree = shallow(<ConfirmDeleteModal {...makeProps({onHide: hideSpy})} />)
     tree.find('#confirm_delete_announcements').simulate('click')
     setTimeout(() => {
-      equal(hideSpy.callCount, 1)
+      expect(hideSpy).toHaveBeenCalledTimes(1)
       done()
     })
   })
 
   test('should call onCancel prop after cancelling', done => {
-    const cancelSpy = sinon.spy()
+    const cancelSpy = jest.fn()
     const tree = shallow(<ConfirmDeleteModal {...makeProps({onCancel: cancelSpy})} />)
     tree.find('#cancel_delete_announcements').simulate('click')
     setTimeout(() => {
-      equal(cancelSpy.callCount, 1)
+      expect(cancelSpy).toHaveBeenCalledTimes(1)
       done()
     })
   })
 
   test('should call onHide prop after cancelling', done => {
-    const hideSpy = sinon.spy()
+    const hideSpy = jest.fn()
     const tree = shallow(<ConfirmDeleteModal {...makeProps({onHide: hideSpy})} />)
     tree.find('#confirm_delete_announcements').simulate('click')
     setTimeout(() => {
-      equal(hideSpy.callCount, 1)
+      expect(hideSpy).toHaveBeenCalledTimes(1)
       done()
     })
   })

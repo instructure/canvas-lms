@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
 import store from '../AppCenterStore'
+import $ from 'jquery'
 
 const defaultApps = () => [
   {
@@ -104,25 +104,34 @@ const defaultApps = () => [
 ]
 
 describe('ExternalApps.AppCenterStore', () => {
-  let server
   let apps
-  let response
+  let ajaxSpy
 
   beforeEach(() => {
-    server = sinon.fakeServer.create()
     store.reset()
     apps = defaultApps()
-    response = [200, {'Content-Type': 'application/json'}, JSON.stringify(apps)]
+
+    // Setup jQuery ajax mock
+    ajaxSpy = jest.spyOn($, 'ajax').mockImplementation(({success}) => {
+      success(apps)
+      return {
+        success: callback => {
+          callback(apps)
+          return {error: () => {}}
+        },
+        error: () => {},
+      }
+    })
   })
 
   afterEach(() => {
-    server.restore()
     store.reset()
+    ajaxSpy.mockRestore()
   })
 
   test('findAppByShortName', () => {
     store.setState({apps})
-    expect(store.getState().apps.length).toBe(3)
+    expect(store.getState().apps).toHaveLength(3)
     const thisApp = store.findAppByShortName('aleks')
     expect(thisApp.id).toBe(66)
   })
@@ -138,17 +147,16 @@ describe('ExternalApps.AppCenterStore', () => {
 
   test('filteredApps', () => {
     store.setState({apps})
-    expect(store.filteredApps().length).toBe(3)
+    expect(store.filteredApps()).toHaveLength(3)
     store.setState({filterText: 'e'})
-    expect(store.filteredApps().length).toBe(2)
+    expect(store.filteredApps()).toHaveLength(2)
     store.setState({filter: 'not_installed'})
-    expect(store.filteredApps().length).toBe(1)
+    expect(store.filteredApps()).toHaveLength(1)
   })
 
-  test('fetch', () => {
-    server.respondWith('GET', /\/app_center\/apps/, response)
-    store.fetch()
-    server.respond()
-    expect(store.getState().apps.length).toBe(3)
+  test('fetch', async () => {
+    await store.fetch()
+    expect(ajaxSpy).toHaveBeenCalled()
+    expect(store.getState().apps).toHaveLength(3)
   })
 })

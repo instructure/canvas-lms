@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import sinon from 'sinon'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
 import EditableCell from '../EditableCell'
@@ -35,7 +34,7 @@ describe('GradebookGrid TotalGradeOverrideCellEditor EditableCell', () => {
       gradeEntry,
       gradeInfo: gradeEntry.parseValue('91%'),
       gradeIsUpdating: false,
-      onGradeUpdate: sinon.stub(),
+      onGradeUpdate: jest.fn(),
       pendingGradeInfo: null,
     }
   })
@@ -122,14 +121,14 @@ describe('GradebookGrid TotalGradeOverrideCellEditor EditableCell', () => {
     test('calls the .onGradeUpdate prop', () => {
       mountComponent()
       getInstance().applyValue()
-      expect(props.onGradeUpdate.callCount).toBe(1)
+      expect(props.onGradeUpdate.mock.calls).toHaveLength(1)
     })
 
     test('includes the current grade info when calling the .onGradeUpdate prop', () => {
       mountComponent()
       setTextInputValue('93%')
       getInstance().applyValue()
-      const [gradeInfo] = props.onGradeUpdate.lastCall.args
+      const [gradeInfo] = props.onGradeUpdate.mock.calls[0]
       const expected = props.gradeEntry.parseValue('93%')
       expect(gradeInfo).toEqual(expected)
     })

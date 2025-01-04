@@ -19,7 +19,6 @@
 import Subject from '../question_viewed'
 import K from '../../constants'
 import $ from 'jquery'
-import sinon from 'sinon'
 
 const equal = (x, y) => expect(x).toBe(y)
 const ok = x => expect(x).toBeTruthy()
@@ -59,13 +58,13 @@ describe('Quizzes::LogAuditing::EventTrackers::QuestionViewed', () => {
     equal(
       JSON.stringify(tracker.identifyVisibleQuestions()),
       JSON.stringify(['123']),
-      'it identifies currently visible questions'
+      'it identifies currently visible questions',
     )
   })
 
   test.skip('capturing: it works', () => {
     const tracker = new Subject({frequency: 0})
-    const capture = sinon.stub()
+    const capture = jest.fn()
     tracker.install(capture, scrollSelector)
     const offsetTop = 3500
     const $fakeQuestion = createQuestion('123')
@@ -74,13 +73,13 @@ describe('Quizzes::LogAuditing::EventTrackers::QuestionViewed', () => {
       'margin-top': offsetTop,
     })
     $scrollContainer.scrollTop(10).scroll()
-    ok(!capture.called, 'question should not be marked as viewed just yet')
+    expect(capture).not.toHaveBeenCalled()
     $scrollContainer.scrollTop(offsetTop).scroll()
-    ok(capture.called, 'question should now be marked as viewed after scrolling it into viewport')
-    capture.reset()
+    expect(capture).toHaveBeenCalled()
+    capture.mockClear()
     $scrollContainer.scrollTop(0).scroll()
-    ok(!capture.called)
+    expect(capture).not.toHaveBeenCalled()
     $scrollContainer.scrollTop(offsetTop).scroll()
-    ok(!capture.called, 'should not track the same question more than one time')
+    expect(capture).not.toHaveBeenCalled()
   })
 })

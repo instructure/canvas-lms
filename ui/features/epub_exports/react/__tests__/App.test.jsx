@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import App from '../App'
 import CourseEpubExportStore from '../CourseStore'
-import sinon from 'sinon'
 
 const ok = value => expect(value).toBeTruthy()
 const deepEqual = (value, expected) => expect(value).toEqual(expected)
@@ -41,11 +40,11 @@ describe('AppSpec', () => {
         id: 2,
       },
     }
-    sinon.stub(CourseEpubExportStore, 'getAll').returns(true)
+    jest.spyOn(CourseEpubExportStore, 'getAll').mockReturnValue(true)
   })
 
   afterEach(() => {
-    CourseEpubExportStore.getAll.restore()
+    jest.restoreAllMocks()
   })
 
   test('handeCourseStoreChange', function () {
@@ -56,7 +55,7 @@ describe('AppSpec', () => {
     deepEqual(
       component.state,
       CourseEpubExportStore.getState(),
-      'CourseEpubExportStore.setState should trigger component setState'
+      'CourseEpubExportStore.setState should trigger component setState',
     )
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
   })

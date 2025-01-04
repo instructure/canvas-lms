@@ -22,17 +22,20 @@ import TestUtils from 'react-dom/test-utils'
 import File from '../../../backbone/models/File'
 import DialogPreview from '../DialogPreview'
 import FilesystemObjectThumbnail from '../FilesystemObjectThumbnail'
-import sinon from 'sinon'
-
-const sandbox = sinon.createSandbox()
 
 describe('DialogPreview', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   test('DP: single item rendered with FilesystemObjectThumbnail', () => {
     const file = new File({name: 'Test File', thumbnail_url: 'blah'})
     file.url = () => 'some_url'
-    const fsObjStub = sandbox.stub(FilesystemObjectThumbnail.prototype, 'render').returns(<div />)
+    const fsObjSpy = jest
+      .spyOn(FilesystemObjectThumbnail.prototype, 'render')
+      .mockReturnValue(<div />)
     const dialogPreview = TestUtils.renderIntoDocument(<DialogPreview itemsToShow={[file]} />)
-    expect(fsObjStub.calledOnce).toBeTruthy()
+    expect(fsObjSpy).toHaveBeenCalled()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dialogPreview).parentNode)
   })
 
@@ -43,10 +46,10 @@ describe('DialogPreview', () => {
     file.url = url
     file2.url = url
     const dialogPreview = TestUtils.renderIntoDocument(
-      <DialogPreview itemsToShow={[file, file2]} />
+      <DialogPreview itemsToShow={[file, file2]} />,
     )
     // 'there are two files rendered'
-    expect(ReactDOM.findDOMNode(dialogPreview).getElementsByTagName('i').length).toBe(2)
+    expect(ReactDOM.findDOMNode(dialogPreview).getElementsByTagName('i')).toHaveLength(2)
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dialogPreview).parentNode)
   })
 })

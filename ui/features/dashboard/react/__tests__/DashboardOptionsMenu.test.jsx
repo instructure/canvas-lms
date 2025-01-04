@@ -23,7 +23,9 @@ import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DashboardOptionsMenu from '../DashboardOptionsMenu'
-import sinon from 'sinon'
+import axios from '@canvas/axios'
+
+jest.mock('@canvas/axios')
 
 const FakeDashboard = function (props) {
   return (
@@ -69,30 +71,38 @@ FakeDashboard.defaultProps = {
 }
 
 describe('Dashboard Options Menu', () => {
+  beforeEach(() => {
+    axios.post.mockResolvedValue({data: {}})
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   test('it renders', () => {
     const dashboardMenu = TestUtils.renderIntoDocument(
-      <DashboardOptionsMenu onDashboardChange={() => {}} />
+      <DashboardOptionsMenu onDashboardChange={() => {}} />,
     )
     expect(dashboardMenu).toBeTruthy()
   })
 
   test('it should call onDashboardChange when new view is selected', () => {
-    const onDashboardChangeSpy = sinon.spy()
+    const onDashboardChangeSpy = jest.fn()
 
     const wrapper = shallow(
-      <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChangeSpy} />
+      <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChangeSpy} />,
     )
 
     wrapper.instance().handleViewOptionSelect(null, ['cards'])
-    expect(onDashboardChangeSpy.callCount).toEqual(1)
-    expect(onDashboardChangeSpy.calledWith('cards')).toBeTruthy()
+    expect(onDashboardChangeSpy).toHaveBeenCalledTimes(1)
+    expect(onDashboardChangeSpy).toHaveBeenCalledWith('cards')
   })
 
   test('it should not call onDashboardChange when correct view is already set', async () => {
-    const onDashboardChangeSpy = sinon.spy()
+    const onDashboardChangeSpy = jest.fn()
 
     const wrapper = render(
-      <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChangeSpy} />
+      <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChangeSpy} />,
     )
     const button = wrapper.container.querySelector('button')
     const user = userEvent.setup({delay: null})
@@ -100,16 +110,16 @@ describe('Dashboard Options Menu', () => {
 
     const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
     const recentActivity = menuItems.filter(
-      menuItem => menuItem.textContent.trim() === 'Recent Activity'
+      menuItem => menuItem.textContent.trim() === 'Recent Activity',
     )[0]
     recentActivity.click()
 
-    expect(onDashboardChangeSpy.callCount).toEqual(0)
+    expect(onDashboardChangeSpy).not.toHaveBeenCalled()
   })
 
   test('it should include a List View menu item when Student Planner is enabled', async () => {
     const wrapper = render(
-      <DashboardOptionsMenu planner_enabled={true} onDashboardChange={() => {}} />
+      <DashboardOptionsMenu planner_enabled={true} onDashboardChange={() => {}} />,
     )
     const button = wrapper.container.querySelector('button')
     const user = userEvent.setup({delay: null})
@@ -121,7 +131,7 @@ describe('Dashboard Options Menu', () => {
 
   test('it should include an Homeroom View option when the Elementary dashboard is disabled', async () => {
     const wrapper = render(
-      <DashboardOptionsMenu canEnableElementaryDashboard={true} onDashboardChange={() => {}} />
+      <DashboardOptionsMenu canEnableElementaryDashboard={true} onDashboardChange={() => {}} />,
     )
     const button = wrapper.container.querySelector('button')
     const user = userEvent.setup({delay: null})
@@ -138,7 +148,7 @@ describe('Dashboard Options Menu', () => {
 
     const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
     const colorToggle = menuItems.filter(
-      menuItem => menuItem.textContent.trim() === 'Color Overlay'
+      menuItem => menuItem.textContent.trim() === 'Color Overlay',
     )[0]
 
     expect(colorToggle).toBeTruthy()
@@ -152,14 +162,13 @@ describe('Dashboard Options Menu', () => {
 
     const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
     const colorToggle = menuItems.filter(
-      menuItem => menuItem.textContent.trim() === 'Color Overlay'
+      menuItem => menuItem.textContent.trim() === 'Color Overlay',
     )[0]
 
     expect(colorToggle).toBeFalsy()
   })
 
   test('it should toggle color overlays', () => {
-    // sandbox.stub(DashboardOptionsMenu.prototype, 'postToggleColorOverlays')
     let dashboardMenu = null
     render(
       <FakeDashboard
@@ -167,23 +176,23 @@ describe('Dashboard Options Menu', () => {
           dashboardMenu = c
         }}
         dashboard_view="cards"
-      />
+      />,
     )
 
     dashboardMenu.handleColorOverlayOptionSelect(false)
     expect(
-      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity
+      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity,
     ).toEqual('0')
     expect(
-      document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity
+      document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity,
     ).toEqual('1')
 
     dashboardMenu.handleColorOverlayOptionSelect(true)
     expect(
-      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity
+      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity,
     ).toEqual('0.6')
     expect(
-      document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity
+      document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity,
     ).toEqual('0')
   })
 })

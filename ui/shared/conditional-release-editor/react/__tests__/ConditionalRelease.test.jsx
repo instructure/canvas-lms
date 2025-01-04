@@ -22,7 +22,6 @@ import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import 'jquery-migrate'
 import ConditionalRelease from '../index'
-import sinon from 'sinon'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
@@ -32,11 +31,11 @@ let editor = null
 class ConditionalReleaseEditor {
   constructor(env) {
     editor = {
-      attach: sinon.stub(),
-      updateAssignment: sinon.stub(),
-      saveRule: sinon.stub(),
-      getErrors: sinon.stub(),
-      focusOnError: sinon.stub(),
+      attach: jest.fn(),
+      updateAssignment: jest.fn(),
+      saveRule: jest.fn(),
+      getErrors: jest.fn(),
+      focusOnError: jest.fn(),
       env,
     }
     return editor
@@ -47,15 +46,15 @@ window.conditional_release_module = {ConditionalReleaseEditor}
 let component = null
 const createComponent = () => {
   component = TestUtils.renderIntoDocument(
-    <ConditionalRelease.Editor env={assignmentEnv} type="foo" />
+    <ConditionalRelease.Editor env={assignmentEnv} type="foo" />,
   )
   component.createNativeEditor()
 }
 
 const makePromise = () => {
   const promise = {}
-  promise.then = sinon.stub().returns(promise)
-  promise.catch = sinon.stub().returns(promise)
+  promise.then = jest.fn().mockReturnValue(promise)
+  promise.catch = jest.fn().mockReturnValue(promise)
   return promise
 }
 
@@ -64,7 +63,7 @@ const assignmentEnv = {assignment: {id: 1}, course_id: 1}
 
 describe('Conditional Release component', () => {
   beforeEach(() => {
-    ajax = sinon.stub($, 'ajax')
+    ajax = jest.spyOn($, 'ajax')
     createComponent()
   })
 
@@ -77,20 +76,20 @@ describe('Conditional Release component', () => {
     }
     component = null
     editor = null
-    ajax.restore()
+    jest.restoreAllMocks()
   })
 
   test('it creates a cyoe editor', () => {
-    ok(editor.attach.calledOnce)
+    expect(editor.attach.mock.calls).toHaveLength(1)
   })
 
   test('it forwards focusOnError', () => {
     component.focusOnError()
-    ok(editor.focusOnError.calledOnce)
+    expect(editor.focusOnError.mock.calls).toHaveLength(1)
   })
 
   test('it transforms validations', () => {
-    editor.getErrors.returns([
+    editor.getErrors.mockReturnValue([
       {index: 0, error: 'foo bar'},
       {index: 0, error: 'baz bat'},
       {index: 1, error: 'foo baz'},
@@ -100,38 +99,38 @@ describe('Conditional Release component', () => {
   })
 
   test('it returns null if no errors on validation', () => {
-    editor.getErrors.returns([])
+    editor.getErrors.mockReturnValue([])
     equal(null, component.validateBeforeSave())
   })
 
   test('it saves successfully when editor saves successfully', resolved => {
     const cyoePromise = makePromise()
 
-    editor.saveRule.returns(cyoePromise)
+    editor.saveRule.mockReturnValue(cyoePromise)
 
     const promise = component.save()
     promise.then(() => {
       ok(true)
       resolved()
     })
-    cyoePromise.then.args[0][0]()
+    cyoePromise.then.mock.calls[0][0]()
   })
 
   test('it fails when editor fails', resolved => {
     const cyoePromise = makePromise()
-    editor.saveRule.returns(cyoePromise)
+    editor.saveRule.mockReturnValue(cyoePromise)
 
     const promise = component.save()
     promise.fail(reason => {
       equal(reason, 'stuff happened')
       resolved()
     })
-    cyoePromise.catch.args[0][0]('stuff happened')
+    cyoePromise.catch.mock.calls[0][0]('stuff happened')
   })
 
   test('it times out', resolved => {
     const cyoePromise = makePromise()
-    editor.saveRule.returns(cyoePromise)
+    editor.saveRule.mockReturnValue(cyoePromise)
 
     const promise = component.save(2)
     promise.fail(reason => {
@@ -144,6 +143,6 @@ describe('Conditional Release component', () => {
     component.updateAssignment({
       points_possible: 100,
     })
-    ok(editor.updateAssignment.calledWithMatch({points_possible: 100}))
+    expect(editor.updateAssignment).toHaveBeenCalledWith({points_possible: 100})
   })
 })

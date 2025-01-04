@@ -21,18 +21,15 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {shallow} from 'enzyme'
 import BlueprintSidebar from '../BlueprintSidebar'
-import sinon from 'sinon'
-
 describe('BlueprintSidebar', () => {
-  let clock
   let wrapper
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers()
+    jest.useFakeTimers()
   })
 
   afterEach(() => {
-    clock.restore()
+    jest.useRealTimers()
   })
 
   test('renders the BlueprintSidebar component', () => {
@@ -46,7 +43,7 @@ describe('BlueprintSidebar', () => {
     const button = wrapper.container.querySelectorAll('.bcs__trigger button')[0]
     const user = userEvent.setup({delay: null})
     await user.click(button)
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(ref.current.state.isOpen).toEqual(true)
   })
 
@@ -54,9 +51,9 @@ describe('BlueprintSidebar', () => {
     const ref = React.createRef()
     wrapper = render(<BlueprintSidebar ref={ref} />)
     ref.current.open()
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     ref.current.closeBtn.click()
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(ref.current.state.isOpen).toEqual(false)
   })
 })

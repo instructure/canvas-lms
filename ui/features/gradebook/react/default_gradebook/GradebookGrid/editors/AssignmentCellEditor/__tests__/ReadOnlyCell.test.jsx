@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import sinon from 'sinon'
 import ReadOnlyCell from '../ReadOnlyCell'
 import {render} from '@testing-library/react'
 
@@ -170,17 +169,17 @@ describe('GradebookGrid ReadOnlyCell', () => {
 
   describe('"Toggle Tray" Button', () => {
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub()
+      props.onToggleSubmissionTrayOpen = jest.fn()
       mountComponent()
       wrapper.container.querySelector('.Grid__GradeCell__Options button').click()
-      expect(props.onToggleSubmissionTrayOpen.callCount).toBe(1)
+      expect(props.onToggleSubmissionTrayOpen).toHaveBeenCalledTimes(1)
     })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub()
+      props.onToggleSubmissionTrayOpen = jest.fn()
       mountComponent()
       wrapper.container.querySelector('.Grid__GradeCell__Options button').click()
-      expect(props.onToggleSubmissionTrayOpen.getCall(0).args).toStrictEqual(['1101', '2301'])
+      expect(props.onToggleSubmissionTrayOpen).toHaveBeenCalledWith('1101', '2301')
     })
   })
 })

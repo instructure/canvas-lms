@@ -19,21 +19,19 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import '../outerclick'
-import sinon from 'sinon'
-
 describe('outerclick', () => {
   it('should work', () => {
-    const handler = sinon.spy()
+    const handler = jest.fn()
     const $doc = $(document.body)
     const $foo = $('<b>hello <i>world</i></b>').appendTo($doc)
     $foo.on('outerclick', handler)
 
     $foo.click()
     $foo.find('i').click()
-    expect(!handler.called).toBeTruthy()
+    expect(handler).not.toHaveBeenCalled()
 
     $doc.click()
-    expect(handler.calledOnce).toBeTruthy()
+    expect(handler).toHaveBeenCalledTimes(1)
 
     $foo.remove()
   })

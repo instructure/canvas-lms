@@ -21,7 +21,6 @@ import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
 import ChildContent from '../ChildContent'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
-import sinon from 'sinon'
 
 describe('ChildContent app', () => {
   const defaultProps = () => ({
@@ -42,38 +41,38 @@ describe('ChildContent app', () => {
 
   test('clearRoutes removes blueprint path', () => {
     const props = defaultProps()
-    props.routeTo = sinon.spy()
+    props.routeTo = jest.fn()
     const tree = shallow(<ChildContent {...props} />)
     const instance = tree.instance()
     instance.clearRoutes()
-    expect(props.routeTo.getCall(0).args[0]).toEqual('#!/blueprint')
+    expect(props.routeTo).toHaveBeenCalledWith('#!/blueprint')
   })
 
   test('showChangeLog calls selectChangeLog prop with argument', () => {
     const props = defaultProps()
-    props.selectChangeLog = sinon.spy()
+    props.selectChangeLog = jest.fn()
     const tree = shallow(<ChildContent {...props} />)
     const instance = tree.instance()
     instance.showChangeLog('5')
-    expect(props.selectChangeLog.getCall(0).args[0]).toEqual('5')
+    expect(props.selectChangeLog).toHaveBeenCalledWith('5')
   })
 
   test('hideChangeLog calls selectChangeLog prop with null', () => {
     const props = defaultProps()
-    props.selectChangeLog = sinon.spy()
+    props.selectChangeLog = jest.fn()
     const tree = shallow(<ChildContent {...props} />)
     const instance = tree.instance()
     instance.hideChangeLog()
-    expect(props.selectChangeLog.getCall(0).args[0]).toEqual(null)
+    expect(props.selectChangeLog).toHaveBeenCalledWith(null)
   })
 
   test('realRef gets called with component instance on mount', () => {
     const props = defaultProps()
-    props.realRef = sinon.spy()
+    props.realRef = jest.fn()
     const ref = React.createRef()
     const tree = render(<ChildContent {...props} ref={ref} />)
     const instance = ref.current
-    expect(props.realRef.callCount).toEqual(1)
-    expect(props.realRef.getCall(0).args[0]).toEqual(instance)
+    expect(props.realRef).toHaveBeenCalledTimes(1)
+    expect(props.realRef).toHaveBeenCalledWith(instance)
   })
 })

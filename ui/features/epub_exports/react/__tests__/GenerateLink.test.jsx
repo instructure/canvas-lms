@@ -25,7 +25,6 @@ import TestUtils from 'react-dom/test-utils'
 import GenerateLink from '../GenerateLink'
 import CourseEpubExportStore from '../CourseStore'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import sinon from 'sinon'
 
 const I18n = createI18nScope('epub_exports')
 
@@ -60,24 +59,24 @@ describe('GenerateLink', () => {
   })
 
   test('state triggered', function () {
-    const clock = sinon.useFakeTimers()
-    sinon.stub(CourseEpubExportStore, 'create')
+    jest.useFakeTimers()
+    const createSpy = jest.spyOn(CourseEpubExportStore, 'create')
     const GenerateLinkElement = <GenerateLink {...props} />
     const component = TestUtils.renderIntoDocument(GenerateLinkElement)
     const node = ReactDOM.findDOMNode(component)
     TestUtils.Simulate.click(node)
     ok(component.state.triggered, 'should set state to triggered')
-    clock.tick(1005)
+    jest.advanceTimersByTime(1005)
     ok(!component.state.triggered, 'should toggle back to not triggered after 1000')
-    clock.restore()
-    CourseEpubExportStore.create.restore()
+    jest.useRealTimers()
+    createSpy.mockRestore()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
   })
 
   test('render', async function () {
     const user = userEvent.setup({delay: null})
-    const clock = sinon.useFakeTimers()
-    sinon.stub(CourseEpubExportStore, 'create')
+    jest.useFakeTimers()
+    const createSpy = jest.spyOn(CourseEpubExportStore, 'create')
 
     const ref = React.createRef()
     let wrapper = render(<GenerateLink {...props} ref={ref} />)
@@ -92,11 +91,11 @@ describe('GenerateLink', () => {
 
     props.course.epub_export = {permissions: {regenerate: true}}
     wrapper = render(<GenerateLink {...props} />)
-    clock.tick(2000)
+    jest.advanceTimersByTime(2000)
     equal(wrapper.container.querySelector('button').type, 'button', 'tag should be a button')
     ok(wrapper.getAllByText(I18n.t('Regenerate ePub')), 'should show regenerate text')
 
-    clock.restore()
-    CourseEpubExportStore.create.restore()
+    jest.useRealTimers()
+    createSpy.mockRestore()
   })
 })

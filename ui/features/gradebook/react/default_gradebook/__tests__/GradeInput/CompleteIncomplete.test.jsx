@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import sinon from 'sinon'
 import GradeInput from '../../components/GradeInput'
 import GradeInputDriver from './GradeInputDriver'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -50,7 +49,7 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       assignment,
       disabled: false,
       enterGradesAs: 'passFail',
-      onSubmissionUpdate: sinon.stub(),
+      onSubmissionUpdate: jest.fn(),
       pendingGradeInfo: null,
       submission,
     }
@@ -193,31 +192,26 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       })
 
       test('calls the onSubmissionUpdate prop', () => {
-        // checks if the onSubmissionUpdate prop was called once
-        expect(props.onSubmissionUpdate.callCount).toBe(1)
+        expect(props.onSubmissionUpdate).toHaveBeenCalledTimes(1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
-        const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-        // verifies the updated submission
+        const [updatedSubmission] = props.onSubmissionUpdate.mock.calls[0]
         expect(updatedSubmission).toBe(props.submission)
       })
 
       test('calls the onSubmissionUpdate prop with the grade form of the selected grade', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // checks the grade form
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.grade).toBe('complete')
       })
 
       test('calls the onSubmissionUpdate prop with the score form of the selected grade', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // verifies the score form
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.score).toBe(10)
       })
 
       test('calls the onSubmissionUpdate prop with the enteredAs set to "passFail"', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // checks the enteredAs field
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.enteredAs).toBe('passFail')
       })
     })
@@ -240,31 +234,26 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       })
 
       test('calls the onSubmissionUpdate prop', () => {
-        // checks if the onSubmissionUpdate prop was called once
-        expect(props.onSubmissionUpdate.callCount).toBe(1)
+        expect(props.onSubmissionUpdate).toHaveBeenCalledTimes(1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
-        const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-        // verifies the updated submission
+        const [updatedSubmission] = props.onSubmissionUpdate.mock.calls[0]
         expect(updatedSubmission).toBe(props.submission)
       })
 
       test('calls the onSubmissionUpdate prop with the entered grade', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // checks the entered grade
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.grade).toBe('incomplete')
       })
 
       test('calls the onSubmissionUpdate prop with the score form of the entered grade', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // verifies the score form
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.score).toBe(0)
       })
 
       test('calls the onSubmissionUpdate prop with the enteredAs set to "passFail"', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // checks the enteredAs field
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.enteredAs).toBe('passFail')
       })
     })
@@ -288,31 +277,26 @@ describe('Gradebook > Default Gradebook > Components > GradeInput', () => {
       })
 
       test('calls the onSubmissionUpdate prop', () => {
-        // checks if the onSubmissionUpdate prop was called once
-        expect(props.onSubmissionUpdate.callCount).toBe(1)
+        expect(props.onSubmissionUpdate).toHaveBeenCalledTimes(1)
       })
 
       test('calls the onSubmissionUpdate prop with the submission', () => {
-        const [updatedSubmission] = props.onSubmissionUpdate.lastCall.args
-        // verifies the updated submission
+        const [updatedSubmission] = props.onSubmissionUpdate.mock.calls[0]
         expect(updatedSubmission).toBe(props.submission)
       })
 
       test('calls the onSubmissionUpdate prop with a null grade form', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // checks the grade form
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.grade).toBeNull()
       })
 
       test('calls the onSubmissionUpdate prop with a null score form', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // verifies the score form
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.score).toBeNull()
       })
 
       test('calls the onSubmissionUpdate prop with the enteredAs set to null', () => {
-        const gradingData = props.onSubmissionUpdate.lastCall.args[1]
-        // checks the enteredAs field
+        const gradingData = props.onSubmissionUpdate.mock.calls[0][1]
         expect(gradingData.enteredAs).toBeNull()
       })
     })

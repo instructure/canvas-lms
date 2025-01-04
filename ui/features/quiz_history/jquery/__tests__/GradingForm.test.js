@@ -18,11 +18,6 @@
 
 import GradingForm from '../grading_form'
 import $ from 'jquery'
-import sinon from 'sinon'
-
-const ok = x => expect(x).toBeTruthy()
-const notOk = x => expect(x).toBeFalsy()
-const equal = (x, y) => expect(x).toEqual(y)
 
 const gradingFormHtml = `
   <form id='update_history_form'>
@@ -60,13 +55,13 @@ describe('GradingForm', () => {
     const keyupEvent = $.Event('keyup')
     keyupEvent.keyCode = 13
     $('.question_input').trigger(keyupEvent)
-    equal(submitCounter, 1)
+    expect(submitCounter).toBe(1)
   })
 
   // fails in Jest, passes in QUnit
   test.skip('handler passed in is called for key enter', function () {
     const scoringSnapshot = {}
-    const onInputChange = sinon.stub()
+    const onInputChange = jest.fn()
     const gradingForm = new GradingForm(scoringSnapshot)
     gradingForm.preventInsanity(onInputChange)
 
@@ -74,12 +69,12 @@ describe('GradingForm', () => {
     keydownEvent.keyCode = 13
     $('.question_input').trigger(keydownEvent)
 
-    ok(onInputChange.calledOnce)
+    expect(onInputChange).toHaveBeenCalledTimes(1)
   })
 
   test('handler paased in is not called for other keys', function () {
     const scoringSnapshot = {}
-    const onInputChange = sinon.stub()
+    const onInputChange = jest.fn()
     const gradingForm = new GradingForm(scoringSnapshot)
     gradingForm.preventInsanity(onInputChange)
 
@@ -87,7 +82,7 @@ describe('GradingForm', () => {
     keydownEvent.keyCode = 5
     $('.question_input').trigger(keydownEvent)
 
-    notOk(onInputChange.called)
+    expect(onInputChange).not.toHaveBeenCalled()
   })
 
   $('#fixtures').html('')
