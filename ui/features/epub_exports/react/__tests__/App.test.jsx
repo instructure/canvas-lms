@@ -16,19 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEmpty} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, act} from '@testing-library/react'
 import App from '../App'
 import CourseEpubExportStore from '../CourseStore'
 
-const ok = value => expect(value).toBeTruthy()
-const deepEqual = (value, expected) => expect(value).toEqual(expected)
+describe('EpubExportApp', () => {
+  let props
 
-let props
-
-describe('AppSpec', () => {
   beforeEach(() => {
     props = {
       1: {
@@ -40,23 +35,28 @@ describe('AppSpec', () => {
         id: 2,
       },
     }
-    jest.spyOn(CourseEpubExportStore, 'getAll').mockReturnValue(true)
+    jest.spyOn(CourseEpubExportStore, 'getAll').mockImplementation(() => {})
   })
 
   afterEach(() => {
     jest.restoreAllMocks()
   })
 
-  test('handeCourseStoreChange', function () {
-    const AppElement = <App />
-    const component = TestUtils.renderIntoDocument(AppElement)
-    ok(isEmpty(component.state), 'precondition')
-    CourseEpubExportStore.setState(props)
-    deepEqual(
-      component.state,
-      CourseEpubExportStore.getState(),
-      'CourseEpubExportStore.setState should trigger component setState',
-    )
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
+  it('initializes with empty state', () => {
+    const {container} = render(<App />)
+    expect(container.querySelectorAll('li')).toHaveLength(0)
+  })
+
+  it('updates state when CourseEpubExportStore changes', () => {
+    const {container} = render(<App />)
+    act(() => {
+      CourseEpubExportStore.setState(props)
+    })
+    expect(container.querySelectorAll('li')).toHaveLength(2)
+  })
+
+  it('fetches courses on mount', () => {
+    render(<App />)
+    expect(CourseEpubExportStore.getAll).toHaveBeenCalled()
   })
 })

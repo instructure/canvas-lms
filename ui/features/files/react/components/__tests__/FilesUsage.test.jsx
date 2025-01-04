@@ -17,78 +17,127 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, waitFor} from '@testing-library/react'
 import $ from 'jquery'
 import FilesUsage from '../FilesUsage'
-import sinon from 'sinon'
 
-const sandbox = sinon.createSandbox()
+describe('FilesUsage', () => {
+  let props
+  let mockGet
 
-let server
-let filesUsage
+  beforeEach(() => {
+    props = {
+      contextType: 'users',
+      contextId: 4,
+    }
 
-function filesUpdateTest(props, test) {
-  server = sinon.fakeServer.create()
-  filesUsage = TestUtils.renderIntoDocument(<FilesUsage {...props} />)
-  test()
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(filesUsage).parentNode)
-  server.restore()
-}
-
-describe('FilesUsage#update', () => {
-  test('makes a get request with contextType and contextId', function (done) {
-    sandbox.stub($, 'get')
-    filesUpdateTest(
-      {
-        contextType: 'users',
-        contextId: 4,
-      },
-      () => {
-        filesUsage.update()
-        // 'makes get request with correct params'
-        expect($.get.calledWith(filesUsage.url())).toBeTruthy()
-        done()
-      }
-    )
+    mockGet = jest.spyOn($, 'get')
   })
 
-  // passes in QUnit, fails in Jest
-  test.skip('sets state with ajax requests returned data', function (done) {
-    const data = {foo: 'bar'}
-    return filesUpdateTest(
-      {
-        contextType: 'users',
-        contextId: 4,
-      },
-      () => {
-        server.respondWith(filesUsage.url(), [
-          200,
-          {'Content-Type': 'application/json'},
-          JSON.stringify(data),
-        ])
-        sandbox.spy(filesUsage, 'setState')
-        filesUsage.update()
-        server.respond()
-        // 'called set state with returned get request data'
-        expect(filesUsage.setState.calledWith(data)).toBeTruthy()
-        done()
-      }
-    )
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
-  test('update called after component mounted', function () {
-    return filesUpdateTest(
-      {
-        contextType: 'users',
-        contextId: 4,
-      },
-      () => {
-        sandbox.stub(filesUsage, 'update').returns(true)
-        filesUsage.componentDidMount()
-        // 'called update after it mounted'
-        expect(filesUsage.update.calledOnce).toBeTruthy()
+  it('requests quota information from the correct API endpoint', async () => {
+    mockGet.mockImplementation(() => ({
+      done: () => ({fail: () => {}}),
+    }))
+
+    render(<FilesUsage {...props} />)
+    expect(mockGet.mock.calls[0][0]).toBe('/api/v1/users/4/files/quota')
+  })
+
+  it('displays correct quota usage information when data is loaded', async () => {
+    const quotaData = {
+      quota: 1024 * 1024 * 100, // 100MB
+      quota_used: 1024 * 1024 * 25, // 25MB
+    }
+
+    mockGet.mockImplementation((url, callback) => {
+      if (callback) callback(quotaData)
+      return {
+        done: cb => {
+          cb(quotaData)
+          return {fail: () => {}}
+        },
+        fail: () => {},
       }
-    )
+    })
+
+    const {getByTestId} = render(<FilesUsage {...props} />)
+
+    await waitFor(() => {
+      // Verify progress bar width is correctly calculated
+      const progressBar = getByTestId('progress-bar')
+      expect(progressBar).toHaveStyle({width: '25%'})
+
+      // Verify usage text shows correct percentage and formatted size
+      const usageText = getByTestId('usage-text')
+      expect(usageText).toHaveTextContent('25% of 104.9 MB used')
+
+      // Verify screenreader text includes full context
+      const srText = getByTestId('sr-usage-text')
+      expect(srText).toHaveTextContent('Files Quota: 25% of 104.9 MB used')
+    })
+  })
+
+  it('shows empty state when quota data is not yet loaded', () => {
+    mockGet.mockImplementation(() => ({
+      done: () => ({fail: () => {}}),
+    }))
+
+    const {container} = render(<FilesUsage {...props} />)
+    expect(container.firstChild).toBeEmptyDOMElement()
+  })
+
+  it('handles API errors gracefully', async () => {
+    mockGet.mockImplementation(() => ({
+      done: () => ({
+        fail: cb => {
+          cb({status: 500})
+          return {}
+        },
+      }),
+    }))
+
+    const {container} = render(<FilesUsage {...props} />)
+    expect(container.firstChild).toBeEmptyDOMElement()
+  })
+
+  it('fetches quota data immediately on mount', () => {
+    mockGet.mockImplementation(() => ({
+      done: () => ({fail: () => {}}),
+    }))
+
+    render(<FilesUsage {...props} />)
+    expect(mockGet).toHaveBeenCalledTimes(1)
+  })
+
+  it('formats large quota values correctly', async () => {
+    const quotaData = {
+      quota: 1024 * 1024 * 1024 * 2, // 2GB
+      quota_used: 1024 * 1024 * 512, // 512MB
+    }
+
+    mockGet.mockImplementation((url, callback) => {
+      if (callback) callback(quotaData)
+      return {
+        done: cb => {
+          cb(quotaData)
+          return {fail: () => {}}
+        },
+        fail: () => {},
+      }
+    })
+
+    const {getByTestId} = render(<FilesUsage {...props} />)
+
+    await waitFor(() => {
+      const progressBar = getByTestId('progress-bar')
+      expect(progressBar).toHaveStyle({width: '25%'})
+
+      const usageText = getByTestId('usage-text')
+      expect(usageText).toHaveTextContent('25% of 2.1 GB used')
+    })
   })
 })

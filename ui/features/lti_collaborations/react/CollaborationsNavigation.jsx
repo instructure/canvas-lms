@@ -37,11 +37,15 @@ class CollaborationsNavigation extends React.Component {
 
   render() {
     return (
-      <div className="ic-Action-header">
+      <div className="ic-Action-header" data-testid="collaborations-header">
         <div className="ic-Action-header__Primary">
-          <h1 className="screenreader-only">{I18n.t('Collaborations')}</h1>
+          <h1 className="screenreader-only" data-testid="collaborations-title">
+            {I18n.t('Collaborations')}
+          </h1>
         </div>
-        <div className="ic-Action-header__Secondary">{this.renderNewCollaborationsDropDown()}</div>
+        <div className="ic-Action-header__Secondary" data-testid="collaborations-actions">
+          {this.renderNewCollaborationsDropDown()}
+        </div>
       </div>
     )
   }

@@ -17,215 +17,180 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {Simulate} from 'react-dom/test-utils'
-import $ from 'jquery'
-import 'jquery-migrate'
+import {render, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import DataRow from '@canvas/grading-standard-collection/react/dataRow'
-import sinon from 'sinon'
 
-const sandbox = sinon.createSandbox()
-
-const ok = x => expect(x).toBeTruthy()
-const deepEqual = (x, y) => expect(x).toEqual(y)
-
-let dataRow
-let props
-
-const fixturesDiv = document.createElement('div')
-fixturesDiv.id = 'fixtures'
-document.body.appendChild(fixturesDiv)
+const renderInTable = ui => {
+  return render(
+    <table>
+      <tbody>{ui}</tbody>
+    </table>,
+  )
+}
 
 describe('DataRow not being edited, without a sibling', () => {
-  beforeEach(() => {
-    const props = {
-      key: 0,
-      uniqueId: 0,
-      row: ['A', 92.346],
-      editing: false,
-      round: number => Math.round(number * 100) / 100,
-      onRowMinScoreChange() {},
-    }
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-  })
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dataRow).parentNode)
-    $('#fixtures').empty()
+  const defaultProps = {
+    key: 0,
+    uniqueId: 0,
+    row: ['A', 92.346],
+    editing: false,
+    round: number => Math.round(number * 100) / 100,
+    onRowMinScoreChange: jest.fn(),
+  }
+
+  it('renders in "view" mode', () => {
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    expect(getByTestId('grading-standard-row-view')).toBeInTheDocument()
   })
 
-  test('renders in "view" mode (as opposed to "edit" mode)', function () {
-    ok(dataRow.refs.viewContainer)
+  it('returns the correct name from getRowData', () => {
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    expect(getByTestId('row-name')).toHaveTextContent('A')
   })
 
-  test('getRowData() returns the correct name', function () {
-    deepEqual(dataRow.getRowData().name, 'A')
+  it('sets max score to 100 if there is no sibling row', () => {
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    expect(getByTestId('max-score')).toHaveTextContent('100%')
   })
 
-  test('getRowData() sets max score to 100 if there is no sibling row', function () {
-    deepEqual(dataRow.getRowData().maxScore, 100)
-  })
-
-  test('renderMinScore() rounds the score if not in editing mode', function () {
-    deepEqual(dataRow.renderMinScore(), '92.35')
-  })
-
-  test("renderMaxScore() returns a max score of 100 without a '<' sign", function () {
-    deepEqual(dataRow.renderMaxScore(), '100')
+  it('rounds the score if not in editing mode', () => {
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    expect(getByTestId('min-score')).toHaveTextContent('to 92.35%')
   })
 })
 
 describe('DataRow being edited', () => {
-  beforeEach(() => {
-    props = {
-      key: 0,
-      uniqueId: 0,
-      row: ['A', 92.346],
-      editing: true,
-      round: number => Math.round(number * 100) / 100,
-      onRowMinScoreChange() {},
-      onRowNameChange() {},
-      onDeleteRow() {},
-    }
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
+  const defaultProps = {
+    key: 0,
+    uniqueId: 0,
+    row: ['A', 92.346],
+    editing: true,
+    round: number => Math.round(number * 100) / 100,
+    onRowMinScoreChange: jest.fn(),
+    onRowNameChange: jest.fn(),
+    onDeleteRow: jest.fn(),
+  }
+
+  it('renders in "edit" mode', () => {
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    expect(getByTestId('grading-standard-row-edit')).toBeInTheDocument()
   })
 
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dataRow).parentNode)
-    $('#fixtures').empty()
+  it('accepts arbitrary input and saves to state', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const input = getByTestId('min-score-input')
+
+    await user.clear(input)
+    await user.type(input, 'A')
+    expect(input).toHaveValue('A')
+
+    await user.clear(input)
+    await user.type(input, '*&@%!')
+    expect(input).toHaveValue('*&@%!')
+
+    await user.clear(input)
+    await user.type(input, '3B')
+    expect(input).toHaveValue('3B')
+
+    expect(defaultProps.onRowMinScoreChange).not.toHaveBeenCalled()
   })
 
-  test('renders in "edit" mode (as opposed to "view" mode)', function () {
-    ok(dataRow.refs.editContainer)
-  })
-
-  test('on change, accepts arbitrary input and saves to state', function () {
-    const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.change(dataRow.minScoreInput, {target: {value: 'A'}})
-    deepEqual(dataRow.renderMinScore(), 'A')
-    Simulate.change(dataRow.minScoreInput, {target: {value: '*&@%!'}})
-    deepEqual(dataRow.renderMinScore(), '*&@%!')
-    Simulate.change(dataRow.minScoreInput, {target: {value: '3B'}})
-    deepEqual(dataRow.renderMinScore(), '3B')
-    ok(changeMinScore.notCalled)
-    changeMinScore.restore()
-  })
-
-  test('screenreader text contains contextual label describing inserting row', () => {
-    const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
-    ok(
-      screenreaderTexts.find(
-        screenreaderText => screenreaderText.textContent === 'Insert row below A'
-      )
+  it('contains contextual screenreader text for inserting row', () => {
+    const {container} = renderInTable(<DataRow {...defaultProps} />)
+    const screenreaderTexts = container.getElementsByClassName('screenreader-only')
+    const insertText = Array.from(screenreaderTexts).find(
+      el => el.textContent === 'Insert row below A',
     )
+    expect(insertText).toBeInTheDocument()
   })
 
-  test('screenreader text contains contextual label describing removing row', () => {
-    const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
-    ok(screenreaderTexts.find(screenreaderText => screenreaderText.textContent === 'Remove row A'))
+  it('contains contextual screenreader text for removing row', () => {
+    const {container} = renderInTable(<DataRow {...defaultProps} />)
+    const screenreaderTexts = container.getElementsByClassName('screenreader-only')
+    const removeText = Array.from(screenreaderTexts).find(el => el.textContent === 'Remove row A')
+    expect(removeText).toBeInTheDocument()
   })
 
-  test('on blur, does not call onRowMinScoreChange if the input parsed value is less than 0', function () {
-    const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.change(dataRow.minScoreInput, {target: {value: '-1'}})
-    Simulate.blur(dataRow.minScoreInput)
-    ok(changeMinScore.notCalled)
-    changeMinScore.restore()
+  it('does not call onRowMinScoreChange if input value is less than 0', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const input = getByTestId('min-score-input')
+
+    await user.clear(input)
+    await user.type(input, '-1')
+    fireEvent.blur(input)
+
+    expect(defaultProps.onRowMinScoreChange).not.toHaveBeenCalled()
   })
 
-  test('on blur, does not call onRowMinScoreChange if the input parsed value is greater than 100', function () {
-    const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.change(dataRow.minScoreInput, {target: {value: '101'}})
-    Simulate.blur(dataRow.minScoreInput)
-    ok(changeMinScore.notCalled)
-    changeMinScore.restore()
+  it('does not call onRowMinScoreChange if input value is greater than 100', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const input = getByTestId('min-score-input')
+
+    await user.clear(input)
+    await user.type(input, '101')
+    fireEvent.blur(input)
+
+    expect(defaultProps.onRowMinScoreChange).not.toHaveBeenCalled()
   })
 
-  test('on blur, calls onRowMinScoreChange when input parsed value is between 0 and 100', function () {
-    const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.change(dataRow.minScoreInput, {target: {value: '88.'}})
-    Simulate.blur(dataRow.minScoreInput)
-    Simulate.change(dataRow.minScoreInput, {target: {value: ''}})
-    Simulate.blur(dataRow.minScoreInput)
-    Simulate.change(dataRow.minScoreInput, {target: {value: '100'}})
-    Simulate.blur(dataRow.minScoreInput)
-    Simulate.change(dataRow.minScoreInput, {target: {value: '0'}})
-    Simulate.blur(dataRow.minScoreInput)
-    Simulate.change(dataRow.minScoreInput, {target: {value: 'A'}})
-    Simulate.blur(dataRow.minScoreInput)
-    Simulate.change(dataRow.minScoreInput, {target: {value: '%*@#($'}})
-    Simulate.blur(dataRow.minScoreInput)
-    deepEqual(changeMinScore.callCount, 3)
-    changeMinScore.restore()
+  it('calls onRowMinScoreChange when input value is between 0 and 100', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const input = getByTestId('min-score-input')
+
+    await user.clear(input)
+    await user.type(input, '88')
+    fireEvent.blur(input)
+
+    await user.clear(input)
+    await user.type(input, '100')
+    fireEvent.blur(input)
+
+    await user.clear(input)
+    await user.type(input, '0')
+    fireEvent.blur(input)
+
+    expect(defaultProps.onRowMinScoreChange).toHaveBeenCalledTimes(3)
   })
 
-  test('on blur, does not call onRowMinScoreChange when input has not changed', function () {
-    const changeMinScore = sandbox.spy(props, 'onRowMinScoreChange')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.blur(dataRow.minScoreInput)
-    ok(changeMinScore.notCalled)
-    changeMinScore.restore()
+  it('calls onRowNameChange when input changes', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    const input = getByTestId('name-input')
+
+    await user.type(input, 'F')
+
+    expect(defaultProps.onRowNameChange).toHaveBeenCalledWith(0, 'AF')
   })
 
-  test('calls onRowNameChange when input changes', function () {
-    const changeMinScore = sandbox.spy(props, 'onRowNameChange')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.change(dataRow.refs.nameInput, {target: {value: 'F'}})
-    ok(changeMinScore.calledOnce)
-    changeMinScore.restore()
-  })
+  it('calls onDeleteRow when the delete button is clicked', async () => {
+    const user = userEvent.setup()
+    const {getByRole} = renderInTable(<DataRow {...defaultProps} />)
+    const deleteButton = getByRole('button', {name: 'Remove row A'})
 
-  test('calls onDeleteRow when the delete button is clicked', function () {
-    const deleteRow = sandbox.spy(props, 'onDeleteRow')
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-    Simulate.click(dataRow.deleteButtonRef)
-    ok(deleteRow.calledOnce)
+    await user.click(deleteButton)
+
+    expect(defaultProps.onDeleteRow).toHaveBeenCalledWith(0)
   })
 })
 
 describe('DataRow with a sibling', () => {
-  beforeEach(() => {
-    const props = {
-      key: 1,
-      row: ['A-', 90],
-      siblingRow: ['A', 92.346],
-      uniqueId: 1,
-      editing: false,
-      round: number => Math.round(number * 100) / 100,
-      onRowMinScoreChange() {},
-    }
-    const DataRowElement = <DataRow {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
-  })
+  const defaultProps = {
+    key: 1,
+    row: ['A-', 90],
+    siblingRow: ['A', 92.346],
+    uniqueId: 1,
+    editing: false,
+    round: number => Math.round(number * 100) / 100,
+    onRowMinScoreChange: jest.fn(),
+  }
 
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(dataRow).parentNode)
-    $('#fixtures').empty()
-  })
-
-  test("shows the max score as the sibling's min score", function () {
-    deepEqual(dataRow.renderMaxScore(), '< 92.35')
+  it("shows the max score as the sibling's min score", () => {
+    const {getByTestId} = renderInTable(<DataRow {...defaultProps} />)
+    expect(getByTestId('max-score')).toHaveTextContent('< 92.35%')
   })
 })

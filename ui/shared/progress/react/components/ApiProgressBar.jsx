@@ -119,7 +119,7 @@ class ApiProgressBar extends React.Component {
     }
 
     return (
-      <div style={{width: '300px'}}>
+      <div style={{width: '300px'}} data-testid="api-progress-bar">
         <ProgressBar progress={this.state.completion} />
       </div>
     )

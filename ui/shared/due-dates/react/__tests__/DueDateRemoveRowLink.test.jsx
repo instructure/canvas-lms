@@ -16,42 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import {Simulate} from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import DueDateRemoveRowLink from '../DueDateRemoveRowLink'
-import sinon from 'sinon'
-
-const sandbox = sinon.createSandbox()
-
-let handleClick
-let DueDateRemoveRowLink_
 
 describe('DueDateRemoveRowLink', () => {
-  beforeEach(() => {
-    const props = {
-      handleClick() {},
-    }
-    handleClick = sandbox.stub(props, 'handleClick')
-    const DueDateRemoveRowLinkElement = <DueDateRemoveRowLink {...props} />
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
-    DueDateRemoveRowLink_ = ReactDOM.render(
-      DueDateRemoveRowLinkElement,
-      $('<div>').appendTo('body')[0]
-    )
+  it('renders the remove dates button', () => {
+    const {getByRole} = render(<DueDateRemoveRowLink handleClick={() => {}} />)
+    expect(getByRole('button', {name: 'Remove These Dates'})).toBeInTheDocument()
   })
 
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(DueDateRemoveRowLink_).parentNode)
-  })
+  it('calls handleClick prop when clicked', async () => {
+    const handleClick = jest.fn()
+    const {getByRole} = render(<DueDateRemoveRowLink handleClick={handleClick} />)
 
-  it('renders', function () {
-    expect(DueDateRemoveRowLink_).toBeTruthy()
-  })
+    const removeButton = getByRole('button', {name: 'Remove These Dates'})
+    await userEvent.click(removeButton)
 
-  it('calls handleClick prop when clicked', function () {
-    Simulate.click(DueDateRemoveRowLink_.refs.removeRowIcon)
-    expect(handleClick.calledOnce).toBeTruthy()
+    expect(handleClick).toHaveBeenCalledTimes(1)
   })
 })

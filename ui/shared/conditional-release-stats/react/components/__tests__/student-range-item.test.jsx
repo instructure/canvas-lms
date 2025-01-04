@@ -17,72 +17,88 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render, fireEvent} from '@testing-library/react'
 import StudentRangeItem from '../student-range-item'
 
-describe('Student Range Item', () => {
-  const defaultProps = () => ({
+describe('StudentRangeItem', () => {
+  const defaultProps = (overrides = {}) => ({
     studentIndex: 0,
     student: {
-      user: {name: 'Foo Bar'},
+      user: {
+        name: 'Foo Bar',
+        avatar_image_url: '/test-avatar.jpg',
+      },
       trend: 0,
     },
-    selectStudent: () => {},
+    selectStudent: jest.fn(),
+    ...overrides,
   })
 
-  const renderComponent = props => TestUtils.renderIntoDocument(<StudentRangeItem {...props} />)
-
-  it('renders name correctly', () => {
-    const component = renderComponent(defaultProps())
-    const renderedList = TestUtils.findRenderedDOMComponentWithClass(component, 'crs-student__name')
-    expect(renderedList.textContent).toBe('Foo Bar')
-  })
-
-  it('renders no trend correctly', () => {
+  it('renders student name and avatar', () => {
     const props = defaultProps()
-    props.student.trend = null
-    const component = renderComponent(props)
+    const {getByRole, getByAltText} = render(<StudentRangeItem {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-student__trend-icon'
-    )
-    expect(renderedList.length).toBe(0)
+    const nameButton = getByRole('button', {name: 'Select student Foo Bar'})
+    expect(nameButton).toBeInTheDocument()
+    expect(nameButton).toHaveTextContent('Foo Bar')
+
+    const avatar = getByAltText('')
+    expect(avatar).toBeInTheDocument()
+    expect(avatar).toHaveAttribute('src', '/test-avatar.jpg')
   })
 
-  it('renders positive trend correctly', () => {
-    const props = defaultProps()
-    props.student.trend = 1
-    const component = renderComponent(props)
+  it('uses default avatar when none provided', () => {
+    const props = defaultProps({
+      student: {
+        user: {name: 'Foo Bar'},
+        trend: 0,
+      },
+    })
+    const {getByAltText} = render(<StudentRangeItem {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-student__trend-icon__positive'
-    )
-    expect(renderedList.length).toBe(1)
+    const avatar = getByAltText('')
+    expect(avatar).toHaveAttribute('src', '/images/messages/avatar-50.png')
   })
 
-  it('renders neutral trend correctly', () => {
+  it('calls selectStudent when name is clicked', () => {
     const props = defaultProps()
-    props.student.trend = 0
-    const component = renderComponent(props)
+    const {getByRole} = render(<StudentRangeItem {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-student__trend-icon__neutral'
-    )
-    expect(renderedList.length).toBe(1)
+    fireEvent.click(getByRole('button', {name: 'Select student Foo Bar'}))
+    expect(props.selectStudent).toHaveBeenCalledWith(props.studentIndex)
   })
 
-  it('renders negative trend correctly', () => {
+  it('calls selectStudent when avatar is clicked', () => {
     const props = defaultProps()
-    props.student.trend = -1
-    const component = renderComponent(props)
+    const {getByAltText} = render(<StudentRangeItem {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'crs-student__trend-icon__negative'
-    )
-    expect(renderedList.length).toBe(1)
+    fireEvent.click(getByAltText(''))
+    expect(props.selectStudent).toHaveBeenCalledWith(props.studentIndex)
+  })
+
+  describe('trend indicators', () => {
+    it('shows no trend indicator when trend is null', () => {
+      const props = defaultProps({student: {user: {name: 'Foo Bar'}, trend: null}})
+      const {container} = render(<StudentRangeItem {...props} />)
+      expect(container.querySelector('.crs-student__trend-icon')).not.toBeInTheDocument()
+    })
+
+    it('shows positive trend indicator', () => {
+      const props = defaultProps({student: {user: {name: 'Foo Bar'}, trend: 1}})
+      const {container} = render(<StudentRangeItem {...props} />)
+      expect(container.querySelector('.crs-student__trend-icon__positive')).toBeInTheDocument()
+    })
+
+    it('shows neutral trend indicator', () => {
+      const props = defaultProps({student: {user: {name: 'Foo Bar'}, trend: 0}})
+      const {container} = render(<StudentRangeItem {...props} />)
+      expect(container.querySelector('.crs-student__trend-icon__neutral')).toBeInTheDocument()
+    })
+
+    it('shows negative trend indicator', () => {
+      const props = defaultProps({student: {user: {name: 'Foo Bar'}, trend: -1}})
+      const {container} = render(<StudentRangeItem {...props} />)
+      expect(container.querySelector('.crs-student__trend-icon__negative')).toBeInTheDocument()
+    })
   })
 })

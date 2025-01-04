@@ -46,7 +46,7 @@ class Collaboration extends React.Component {
       },
       () => {
         ReactDOM.findDOMNode(this.deleteButtonRef).focus()
-      }
+      },
     )
   }
 
@@ -72,18 +72,25 @@ class Collaboration extends React.Component {
             href={`/${context}/${contextId}/collaborations/${collaboration.id}`}
             target="_blank"
             rel="noreferrer"
+            data-testid="collaboration-title"
           >
             {collaboration.title}
           </a>
-          <p className="Collaboration-description">{collaboration.description}</p>
-          <a className="Collaboration-author" href={`/users/${collaboration.user_id}`}>
+          <p className="Collaboration-description" data-testid="collaboration-description">
+            {collaboration.description}
+          </p>
+          <a
+            className="Collaboration-author"
+            href={`/users/${collaboration.user_id}`}
+            data-testid="collaboration-author"
+          >
             {collaboration.user_name},
           </a>
           <DatetimeDisplay datetime={collaboration.updated_at} format="%b %d, %l:%M %p" />
         </div>
         <div className="Collaboration-actions">
           {canEdit && (
-            <a className="icon-edit" href={editUrl}>
+            <a className="icon-edit" href={editUrl} data-testid="edit-collaboration">
               <span className="screenreader-only">{I18n.t('Edit Collaboration')}</span>
             </a>
           )}
@@ -94,6 +101,7 @@ class Collaboration extends React.Component {
               ref={c => (this.deleteButtonRef = c)}
               className="btn btn-link"
               onClick={this.openConfirmation}
+              data-testid="delete-collaboration"
             >
               <i className="icon-trash" />
               <span className="screenreader-only">{I18n.t('Delete Collaboration')}</span>
@@ -105,6 +113,7 @@ class Collaboration extends React.Component {
             collaboration={collaboration}
             onCancel={this.closeConfirmation}
             onDelete={this.deleteCollaboration}
+            data-testid="delete-confirmation"
           />
         )}
       </div>
