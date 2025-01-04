@@ -18,7 +18,6 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import sinon from 'sinon'
 import TotalGradeOverrideCellPropFactory from '../../editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
 import TotalGradeOverrideCellEditor from '../../editors/TotalGradeOverrideCellEditor/index'
 import GridEvent from '../../GridSupport/GridEvent'
@@ -41,8 +40,17 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
     }
 
     gradebook = createGradebook({final_grade_override_enabled: true})
-    sinon.stub(gradebook, 'isStudentGradeable').returns(true)
-    sinon.stub(gradebook, 'studentHasGradedSubmission').returns(true)
+    jest.spyOn(gradebook, 'isStudentGradeable').mockReturnValue(true)
+    jest.spyOn(gradebook, 'studentHasGradedSubmission').mockReturnValue(true)
+    jest.spyOn(gradebook, 'student').mockReturnValue({
+      enrollments: [
+        {
+          grades: {
+            html_url: 'https://canvas.instructure.com/courses/1101/grades',
+          },
+        },
+      ],
+    })
 
     editorOptions = {
       column: {
@@ -88,13 +96,13 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
     })
 
     test('renders a read-only cell when the student is not gradeable', () => {
-      gradebook.isStudentGradeable.withArgs('1101').returns(false)
+      gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
       expect($container.querySelector('.Grid__ReadOnlyCell')).toBeTruthy()
     })
 
     test('renders a read-only cell when the student has no graded submissions', () => {
-      gradebook.studentHasGradedSubmission.withArgs('1101').returns(false)
+      gradebook.studentHasGradedSubmission.mockReturnValue(false)
       createEditor()
       expect($container.querySelector('.Grid__ReadOnlyCell')).toBeTruthy()
     })
@@ -108,36 +116,35 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the component when triggered', () => {
       createEditor()
-      sinon.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      sinon.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      const [event] = editor.component.handleKeyDown.lastCall.args
-      expect(event).toBe(keyboardEvent)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledWith(keyboardEvent)
     })
 
     test('returns the return value from the component', () => {
       createEditor()
-      sinon.stub(editor.component, 'handleKeyDown').returns(false)
+      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when the student is not gradeable', () => {
-      gradebook.isStudentGradeable.returns(false)
+      gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
-      sinon.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -170,31 +177,31 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the component', () => {
       createEditor()
-      sinon.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when the student is not gradeable', () => {
-      gradebook.isStudentGradeable.returns(false)
+      gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
-      sinon.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the component', () => {
       createEditor()
-      sinon.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the student is not gradeable', () => {
-      gradebook.isStudentGradeable.returns(false)
+      gradebook.isStudentGradeable.mockReturnValue(false)
       createEditor()
-      sinon.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -224,9 +231,9 @@ describe('GradebookGrid TotalGradeOverrideCellEditor', () => {
   describe('#applyValue()', () => {
     test('calls .applyValue on the component', () => {
       createEditor()
-      sinon.stub(editor.component, 'applyValue')
+      jest.spyOn(editor.component, 'applyValue')
       editor.applyValue(/* SlickGrid API parameters are not used */)
-      expect(editor.component.applyValue.callCount).toBe(1)
+      expect(editor.component.applyValue).toHaveBeenCalledTimes(1)
     })
   })
 

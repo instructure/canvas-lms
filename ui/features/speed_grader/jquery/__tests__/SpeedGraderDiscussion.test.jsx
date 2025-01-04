@@ -70,8 +70,8 @@ describe('SpeedGrader Discussion', () => {
       },
     })
 
-    jest.spyOn(window.$, 'ajaxJSON').mockImplementation(() => ({always: () => {}}))
-    jest.spyOn(window.$, 'getJSON').mockImplementation(() => ({always: () => {}}))
+    jest.spyOn(window.$, 'ajaxJSON').mockImplementation(() => Promise.resolve({}))
+    jest.spyOn(window.$, 'getJSON').mockImplementation(() => Promise.resolve({}))
     jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
     $appendSpy = jest.spyOn(window.$.fn, 'append')
 
@@ -148,7 +148,7 @@ describe('SpeedGrader Discussion', () => {
     delete window.INST
   })
 
-  const awhile = (milliseconds = 2) => new Promise(resolve => setTimeout(resolve, milliseconds))
+  const awhile = (milliseconds = 50) => new Promise(resolve => setTimeout(resolve, milliseconds))
 
   it('does not show private comments for a group assignment', async () => {
     window.jsonData.GROUP_GRADING_MODE = true

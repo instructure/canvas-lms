@@ -18,7 +18,6 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import sinon from 'sinon'
 import WebZipExportApp from '../App'
 import {act, render, waitFor} from '@testing-library/react'
 
@@ -210,7 +209,7 @@ describe('Webzip export app', () => {
     ENV.context_asset_string = 'courses_2'
     const ref = React.createRef()
     const wrapper = render(<WebZipExportApp ref={ref} />)
-    const download = sinon.stub(ref.current, 'downloadLink')
+    const download = jest.spyOn(ref.current, 'downloadLink')
     act(() => {
       ref.current.getExports('126')
     })
@@ -218,7 +217,7 @@ describe('Webzip export app', () => {
       moxios.requests.mostRecent()
       expect(wrapper.queryByText('Loading')).toBeNull()
       expect(wrapper.getByText('Most recent export')).toBeInTheDocument()
-      download.restore()
+      download.mockRestore()
     })
   })
 
@@ -238,15 +237,15 @@ describe('Webzip export app', () => {
     ENV.context_asset_string = 'courses_2'
     const ref = React.createRef()
     const wrapper = render(<WebZipExportApp ref={ref} />)
-    const download = sinon.stub(ref.current, 'downloadLink')
+    const download = jest.spyOn(ref.current, 'downloadLink')
     act(() => {
       ref.current.getExports('126')
     })
     await waitFor(async () => {
       moxios.requests.mostRecent()
       expect(wrapper.queryByText('Loading')).toBeNull()
-      sinon.assert.calledOnce(download)
-      download.restore()
+      expect(download).toHaveBeenCalledTimes(1)
+      download.mockRestore()
     })
   })
 })

@@ -18,7 +18,6 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import sinon from 'sinon'
 import SpecificSections from '../SpecificSections'
 
 const ok = x => expect(x).toBeTruthy()
@@ -37,7 +36,7 @@ function getSectionToggleInput() {
 }
 
 function mountComponent() {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<SpecificSections {...context} />, $container)
 }
 
@@ -81,20 +80,20 @@ describe('SpecificSections', () => {
   })
 
   test('clicking the section toggle calls onCheck', () => {
-    const onCheckSpy = sinon.spy()
+    const onCheckSpy = jest.fn()
     context.onCheck = onCheckSpy
     mountComponent()
     getSectionToggleInput().click()
-    strictEqual(onCheckSpy.callCount, 1)
+    expect(onCheckSpy).toHaveBeenCalledTimes(1)
   })
 
   test('selecting a section calls sectionSelectionChanged', () => {
-    const sectionSelectionChangedSpy = sinon.spy()
+    const sectionSelectionChangedSpy = jest.fn()
     context.checked = true
     context.sectionSelectionChanged = sectionSelectionChangedSpy
     mountComponent()
     document.getElementById(getLabel('Sophomores').htmlFor).click()
-    strictEqual(sectionSelectionChangedSpy.callCount, 1)
+    expect(sectionSelectionChangedSpy).toHaveBeenCalledTimes(1)
   })
 
   describe('when disabled', () => {
@@ -114,11 +113,11 @@ describe('SpecificSections', () => {
     })
 
     test('clicking the section toggle does not call onCheck', () => {
-      const onCheckSpy = sinon.spy()
+      const onCheckSpy = jest.fn()
       context.onCheck = onCheckSpy
       mountComponent()
       getSectionToggleInput().click()
-      strictEqual(onCheckSpy.callCount, 0)
+      expect(onCheckSpy).not.toHaveBeenCalled()
     })
   })
 })

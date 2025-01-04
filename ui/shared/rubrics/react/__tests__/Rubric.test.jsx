@@ -19,7 +19,6 @@ import {clone, setWith} from 'lodash'
 import React from 'react'
 import Rubric from '../Rubric'
 import {rubric, assessments} from './fixtures'
-import sinon from 'sinon'
 import {shallow} from 'enzyme'
 import {Table} from '@instructure/ui-table'
 
@@ -36,14 +35,14 @@ describe('the Rubric component', () => {
         rubric={rubric}
         rubricAssessment={assessments.points}
         rubricAssociation={assessments.points.rubric_association}
-      />
+      />,
     )
     expect(modal).toMatchSnapshot()
   })
 
   it('renders properly with no assessment', () => {
     const modal = shallow(
-      <Rubric rubric={rubric} rubricAssociation={assessments.points.rubric_association} />
+      <Rubric rubric={rubric} rubricAssociation={assessments.points.rubric_association} />,
     )
     expect(modal).toMatchSnapshot()
   })
@@ -56,7 +55,7 @@ describe('the Rubric component', () => {
         rubric={rubric}
         rubricAssessment={hidden}
         rubricAssociation={hidden.rubric_association}
-      />
+      />,
     )
     expect(modal).toMatchSnapshot()
   })
@@ -64,7 +63,11 @@ describe('the Rubric component', () => {
   it('forbids comment saving on peer assessments', () => {
     const peer = setCloned(assessments.freeForm, 'assessment_type', 'peer_review')
     const el = shallow(
-      <Rubric rubric={rubric} rubricAssessment={peer} rubricAssociation={peer.rubric_association} />
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={peer}
+        rubricAssociation={peer.rubric_association}
+      />,
     )
     const criteria = findCriteria(el)
     const allow = c => c.prop('allowSavedComments')
@@ -72,7 +75,7 @@ describe('the Rubric component', () => {
   })
 
   it('updates the total score when an individual criterion point assessment changes', () => {
-    const onAssessmentChange = sinon.spy()
+    const onAssessmentChange = jest.fn()
     const renderAssessing = assessment =>
       shallow(
         <Rubric
@@ -80,14 +83,14 @@ describe('the Rubric component', () => {
           rubric={rubric}
           rubricAssessment={assessment}
           rubricAssociation={assessment.rubric_association}
-        />
+        />,
       )
 
     const el = renderAssessing(assessments.points)
     const updated = {...assessments.points.data[0], points: {valid: true, value: 2}}
     findCriteria(el).first().prop('onAssessmentChange')(updated)
 
-    expect(onAssessmentChange.args).toEqual([
+    expect(onAssessmentChange.mock.calls).toEqual([
       [
         {
           ...assessments.points,
@@ -97,13 +100,13 @@ describe('the Rubric component', () => {
       ],
     ])
 
-    expect(renderAssessing(onAssessmentChange.args[0][0])).toMatchSnapshot()
+    expect(renderAssessing(onAssessmentChange.mock.calls[0][0])).toMatchSnapshot()
   })
 
   describe('points column', () => {
     const hasPointsColumn = (
       expected,
-      {rubricProps = {}, assessmentProps = {}, associationProps = {}, ...otherProps}
+      {rubricProps = {}, assessmentProps = {}, associationProps = {}, ...otherProps},
     ) => {
       const el = shallow(
         <Rubric
@@ -112,7 +115,7 @@ describe('the Rubric component', () => {
           rubricAssociation={{...assessments.points.association, ...associationProps}}
           onAssessmentChange={() => {}}
           {...otherProps}
-        />
+        />,
       )
       expect(el.find(Table.ColHeader)).toHaveLength(expected ? 7 : 5)
       expect(findCriteria(el).at(0).prop('hasPointsColumn')).toBe(expected)
@@ -145,7 +148,7 @@ describe('the Rubric component', () => {
 
   it('ignores criteria scores when flagged as such', () => {
     const ignoreOutcomeScore = setCloned(rubric, 'criteria.1.ignore_for_scoring', true)
-    const onAssessmentChange = sinon.spy()
+    const onAssessmentChange = jest.fn()
     const ignored = {
       ...assessments.points.data[1],
       points: {value: 2, valid: true},
@@ -158,13 +161,13 @@ describe('the Rubric component', () => {
         rubric={ignoreOutcomeScore}
         rubricAssessment={assessment}
         rubricAssociation={assessment.rubric_association}
-      />
+      />,
     )
 
     const updated = {...assessment.data[1], points: 2}
     findCriteria(el).at(1).prop('onAssessmentChange')(updated)
 
-    expect(onAssessmentChange.args).toEqual([
+    expect(onAssessmentChange.mock.calls).toEqual([
       [
         {
           ...assessment,
@@ -181,7 +184,7 @@ describe('the Rubric component', () => {
         rubric={rubric}
         rubricAssessment={assessments.points}
         rubricAssociation={assessments.points.rubric_association}
-      />
+      />,
     )
     expect(modal.find('[data-testid="rubric-total"]').exists()).toBe(true)
     expect(modal.find('[data-testid="table-heading-points"]').exists()).toBe(true)
@@ -205,7 +208,7 @@ describe('the Rubric component', () => {
           rubric={rubric}
           rubricAssessment={assessments.points}
           rubricAssociation={assessments.points.rubric_association}
-        />
+        />,
       )
       expect(modal.find('[data-testid="rubric-total"]').exists()).toBe(false)
       expect(modal.find('[data-testid="table-heading-points"]').exists()).toBe(false)

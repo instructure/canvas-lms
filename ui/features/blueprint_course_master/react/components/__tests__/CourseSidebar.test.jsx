@@ -23,7 +23,6 @@ import {Provider} from 'react-redux'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import moxios from 'moxios'
-import sinon from 'sinon'
 
 import {ConnectedCourseSidebar} from '../CourseSidebar'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
@@ -33,7 +32,6 @@ import {createStore, applyMiddleware} from 'redux'
 import {thunk} from 'redux-thunk'
 import rootReducer from '@canvas/blueprint-courses/react/reducer'
 
-let clock
 let sidebarContentRef = null
 
 const initialState = {
@@ -68,7 +66,7 @@ function connect(props = defaultProps(), storeState = initialState) {
 
 describe('Course Sidebar component', () => {
   beforeEach(() => {
-    clock = sinon.useFakeTimers()
+    jest.useFakeTimers()
     moxios.install()
     moxios.stubRequest('/api/v1/courses/4/blueprint_templates/default/migrations', {
       status: 200,
@@ -78,7 +76,7 @@ describe('Course Sidebar component', () => {
 
   afterEach(() => {
     moxios.uninstall()
-    clock.restore()
+    jest.useRealTimers()
   })
 
   test('renders the closed CourseSidebar component', () => {
@@ -94,7 +92,7 @@ describe('Course Sidebar component', () => {
     const user = userEvent.setup({delay: null})
     await user.click(button)
 
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(sidebarContentRef).toBeTruthy()
 
     const sidebar = $(sidebarContentRef)
@@ -103,7 +101,7 @@ describe('Course Sidebar component', () => {
     // associations
     expect(rows.eq(0).find('button#mcSidebarAsscBtn').size()).toBeTruthy()
     expect(rows.eq(0).text().trim()).toEqual(
-      `Associations${initialState.existingAssociations.length}`
+      `Associations${initialState.existingAssociations.length}`,
     )
 
     // sync history
@@ -196,7 +194,7 @@ describe('Course Sidebar component', () => {
     const user = userEvent.setup({delay: null})
     await user.click(button)
 
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(sidebarContentRef).toBeTruthy()
     const sidebar = $(sidebarContentRef)
 
@@ -212,7 +210,7 @@ describe('Course Sidebar component', () => {
     const user = userEvent.setup({delay: null})
     await user.click(button)
 
-    clock.tick(500)
+    jest.advanceTimersByTime(500)
     expect(sidebarContentRef).toBeTruthy()
     const sidebar = $(sidebarContentRef)
 

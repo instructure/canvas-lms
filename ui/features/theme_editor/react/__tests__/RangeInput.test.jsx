@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import RangeInput from '../RangeInput'
-import sinon from 'sinon'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
@@ -35,13 +34,13 @@ describe('RangeInput Component', () => {
       defaultValue: 5,
       labelText: 'Input Label',
       name: 'input_name',
-      formatValue: sinon.stub(),
-      onChange: sinon.stub(),
+      formatValue: jest.fn(),
+      onChange: jest.fn(),
     }
   })
 
   test('renders range input', () => {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
     const input = component.rangeInput
     equal(input.type, 'range', 'renders range input')
@@ -50,27 +49,27 @@ describe('RangeInput Component', () => {
   })
 
   test('renders formatted output', done => {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
     const expected = 47
     const expectedFormatted = '47%'
-    props.formatValue.returns(expectedFormatted)
+    props.formatValue.mockReturnValue(expectedFormatted)
     component.setState({value: 47}, () => {
       const output = component.outputElement
       ok(output, 'renders the output element')
-      ok(props.formatValue.calledWith(expected), 'formats the value')
+      expect(props.formatValue).toHaveBeenCalledWith(expected)
       equal(output.textContent, expectedFormatted, 'outputs value')
       done()
     })
   })
 
   test('handleChange', () => {
-    // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+    // eslint-disable-next-line react/no-render-return-value
     const component = ReactDOM.render(<RangeInput {...props} />, elem)
-    sinon.spy(component, 'setState')
+    jest.spyOn(component, 'setState')
     const event = {target: {value: 8}}
     component.handleChange(event)
-    ok(component.setState.calledWithMatch({value: event.target.value}), 'updates value in state')
-    ok(props.onChange.calledWith(event.target.value), 'calls onChange with the new value')
+    expect(component.setState).toHaveBeenCalledWith({value: event.target.value})
+    expect(props.onChange).toHaveBeenCalledWith(event.target.value)
   })
 })

@@ -18,7 +18,6 @@
 
 import {createGradebook, setFixtureHtml} from '../../../__tests__/GradebookSpecHelper'
 import StudentCellFormatter from '../StudentCellFormatter'
-import sinon from 'sinon'
 
 describe('GradebookGrid StudentCellFormatter', () => {
   let $fixture
@@ -31,7 +30,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
     setFixtureHtml($fixture)
 
     gradebook = createGradebook({})
-    sinon.stub(gradebook, 'saveSettings')
+    gradebook.saveSettings = jest.fn()
     formatter = new StudentCellFormatter(gradebook)
 
     gradebook.setSections([
@@ -85,7 +84,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
       0, // cell
       null, // value
       null, // column definition
-      student // dataContext
+      student, // dataContext
     )
     return $fixture
   }
@@ -134,7 +133,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
     test('renders section names when secondary info is "section"', () => {
       gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
       expect(renderCell().querySelector('.secondary-info').innerText).toBe(
-        'Freshmen, Juniors, and Seniors'
+        'Freshmen, Juniors, and Seniors',
       )
     })
 
@@ -142,7 +141,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
       gradebook.sections[2001].name = '&lt;span&gt;Freshmen&lt;/span&gt;'
       gradebook.setSelectedSecondaryInfo('section', true) // skipRedraw
       expect(renderCell().querySelector('.secondary-info').innerHTML).toBe(
-        '&lt;span&gt;Freshmen&lt;/span&gt;, Juniors, and Seniors'
+        '&lt;span&gt;Freshmen&lt;/span&gt;, Juniors, and Seniors',
       )
     })
 
@@ -177,7 +176,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
     test('renders student group names when secondary info is "group"', () => {
       gradebook.setSelectedSecondaryInfo('group')
       expect(renderCell().querySelector('.secondary-info').innerText).toBe(
-        'First Category 1 and Second Category 2'
+        'First Category 1 and Second Category 2',
       )
     })
 
@@ -197,7 +196,7 @@ describe('GradebookGrid StudentCellFormatter', () => {
 
       gradebook.setSelectedSecondaryInfo('group')
       expect(renderCell().querySelector('.secondary-info').innerText).toBe(
-        '&lt;span&gt;First Category 1&lt;/span&gt; and Second Category 2'
+        '&lt;span&gt;First Category 1&lt;/span&gt; and Second Category 2',
       )
     })
 

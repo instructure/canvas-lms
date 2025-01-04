@@ -19,7 +19,6 @@
 
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import store from '../index'
-import sinon from 'sinon'
 
 describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   const gradingPeriodAssignmentsUrl = '/courses/1201/gradebook/grading_period_assignments'
@@ -29,6 +28,7 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   let network
 
   beforeEach(() => {
+    jest.useFakeTimers()
     exampleData = {
       gradingPeriodAssignments: {1401: ['2301'], 0: ['119']},
       assignmentGroups: [
@@ -58,15 +58,12 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   })
 
   describe('#loadGradingPeriodAssignments()', () => {
-    let clock
-
     beforeEach(() => {
-      clock = sinon.useFakeTimers()
       network = new NetworkFake()
     })
 
     afterEach(() => {
-      clock.restore()
+      jest.useRealTimers()
       network.restore()
     })
 
@@ -99,20 +96,20 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
         grading_period_assignments: exampleData.gradingPeriodAssignments,
       })
       request.response.send()
-      clock.tick()
+      jest.advanceTimersByTime(1)
     }
 
     function resolveAssignmentGroupRequest() {
       const [request] = getAssignmentGroupRequests()
       request.response.setJson(exampleData.assignmentGroups)
       request.response.send()
-      clock.tick()
+      jest.advanceTimersByTime(1)
     }
 
     test('sends the request using the given course id', async () => {
       await loadGradingPeriodAssignments()
       const requests = getGradingPeriodRequests()
-      expect(requests.length).toStrictEqual(1)
+      expect(requests).toHaveLength(1)
     })
 
     test('includes the loaded grading period assignments when updating the gradebook', async () => {
@@ -120,7 +117,7 @@ describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
       resolveGradingPeriodRequest()
       await loaded
       expect(store.getState().gradingPeriodAssignments).toStrictEqual(
-        exampleData.gradingPeriodAssignments
+        exampleData.gradingPeriodAssignments,
       )
     })
 

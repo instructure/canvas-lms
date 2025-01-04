@@ -17,7 +17,6 @@
  */
 
 import AuthenticationProviders from '../index'
-import sinon from 'sinon'
 
 const equal = (x, y) => expect(x).toBe(y)
 const strictEqual = (x, y) => expect(x).toStrictEqual(y)
@@ -29,9 +28,9 @@ document.body.appendChild(container)
 describe('AuthenticationProviders', () => {
   describe('.changedAuthType()', () => {
     let $container
-    let clock
 
     beforeEach(() => {
+      jest.useFakeTimers()
       $container = document.createElement('div')
       document.body.appendChild($container)
       $container.innerHTML = `
@@ -44,13 +43,11 @@ describe('AuthenticationProviders', () => {
           <input id="facebook-auth-input" />
         </form>
       `
-
-      clock = sinon.useFakeTimers()
     })
 
     afterEach(() => {
-      clock.tick(100)
-      clock.restore()
+      jest.advanceTimersByTime(100)
+      jest.useRealTimers()
       $container.remove()
     })
 
@@ -92,7 +89,7 @@ describe('AuthenticationProviders', () => {
     // doesn't work in Jest due to lack of support for focusable in jQuery UI
     test.skip('sets focus on the first focusable element of the visible form', () => {
       AuthenticationProviders.changedAuthType('google')
-      clock.tick(100)
+      jest.advanceTimersByTime(100)
       const $input = $container.querySelector('#google-auth-input')
       strictEqual(document.activeElement, $input)
     })

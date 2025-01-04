@@ -22,7 +22,6 @@ import TestUtils from 'react-dom/test-utils'
 import SubmissionProgressBars from '../SubmissionProgressBars'
 import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
-import sinon from 'sinon'
 
 const user = {_id: '1'}
 
@@ -78,15 +77,15 @@ describe('StudentContextTray/Progress', () => {
           excused: false,
           assignment: {points_possible: 25},
         }
-        spy = sinon.spy(SubmissionProgressBars, 'renderIcon')
+        spy = jest.spyOn(SubmissionProgressBars, 'renderIcon')
 
         SubmissionProgressBars.displayGrade({...submission, grade: 'complete'})
-        expect(spy.calledOnce).toBeTruthy()
-        spy.resetHistory()
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockClear()
 
         SubmissionProgressBars.displayGrade({...submission, grade: 'incomplete'})
-        expect(spy.calledOnce).toBeTruthy()
-        SubmissionProgressBars.renderIcon.restore()
+        expect(spy).toHaveBeenCalledTimes(1)
+        spy.mockRestore()
       })
     })
 
@@ -103,7 +102,7 @@ describe('StudentContextTray/Progress', () => {
           assignment: {points_possible: pointsPossible},
         }
         expect(SubmissionProgressBars.displayGrade(submission)).toEqual(
-          `${score}/${pointsPossible}`
+          `${score}/${pointsPossible}`,
         )
       })
     })
@@ -121,7 +120,7 @@ describe('StudentContextTray/Progress', () => {
           assignment: {points_possible: pointsPossible},
         }
         expect(SubmissionProgressBars.displayGrade(submission)).toEqual(
-          `${score}/${pointsPossible}`
+          `${score}/${pointsPossible}`,
         )
       })
     })
@@ -186,7 +185,7 @@ describe('StudentContextTray/Progress', () => {
           assignment: {points_possible: pointsPossible},
         }
         expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(
-          `${score}/${pointsPossible}`
+          `${score}/${pointsPossible}`,
         )
       })
     })
@@ -204,7 +203,7 @@ describe('StudentContextTray/Progress', () => {
           assignment: {points_possible: pointsPossible},
         }
         expect(SubmissionProgressBars.displayScreenreaderGrade(submission)).toEqual(
-          `15.57/${pointsPossible}`
+          `15.57/${pointsPossible}`,
         )
       })
     })
@@ -224,7 +223,7 @@ describe('StudentContextTray/Progress', () => {
                 user,
               },
             ]}
-          />
+          />,
         )
         tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
         expect(tag.className).toEqual('icon-check')
@@ -244,7 +243,7 @@ describe('StudentContextTray/Progress', () => {
                 user,
               },
             ]}
-          />
+          />,
         )
         tag = TestUtils.findRenderedDOMComponentWithTag(subject, 'i')
         expect(tag.className).toEqual('icon-x')
@@ -280,9 +279,9 @@ describe('StudentContextTray/Progress', () => {
       const wrapper = render(<SubmissionProgressBars submissions={submissions} />)
 
       const ProgressBarBars = wrapper.container.querySelectorAll(
-        '.StudentContextTray-Progress__Bar'
+        '.StudentContextTray-Progress__Bar',
       ) // Assuming ProgressBar is the name of the component
-      expect(ProgressBarBars.length).toEqual(submissions.length)
+      expect(ProgressBarBars).toHaveLength(submissions.length)
     })
 
     test('ignores submissions with null grades', () => {
@@ -304,7 +303,7 @@ describe('StudentContextTray/Progress', () => {
       ]
 
       const tray = shallow(<SubmissionProgressBars submissions={submissions} />)
-      expect(tray.find('ProgressBar').length).toEqual(1)
+      expect(tray.find('ProgressBar')).toHaveLength(1)
     })
 
     test('links to submission urls', () => {
@@ -323,7 +322,7 @@ describe('StudentContextTray/Progress', () => {
         tray
           .find('Link')
           .getElement()
-          .props.href.match(/submissions\/99/)
+          .props.href.match(/submissions\/99/),
       ).toBeTruthy()
     })
   })

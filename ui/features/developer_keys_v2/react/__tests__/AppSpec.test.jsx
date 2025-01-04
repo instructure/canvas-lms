@@ -21,7 +21,6 @@ import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import sinon from 'sinon'
 
 import DeveloperKeysApp from '../App'
 
@@ -136,7 +135,7 @@ describe('DevelopersKeyApp', () => {
   }
 
   test('requests more inherited dev keys when the inherited "show all" button is clicked', () => {
-    const callbackSpy = sinon.spy()
+    const callbackSpy = jest.fn()
     const overrides = {
       applicationState: initialApplicationState(generateKeyList(), generateKeyList(20)),
       actions: {
@@ -166,11 +165,11 @@ describe('DevelopersKeyApp', () => {
     clickInheritedTab(componentNode)
     clickShowAllButton(componentNode, 1)
 
-    expect(callbackSpy.called).toBeTruthy()
+    expect(callbackSpy).toHaveBeenCalled()
   })
 
   test('requests more account dev keys when the account "show all" button is clicked', () => {
-    const callbackSpy = sinon.spy()
+    const callbackSpy = jest.fn()
     const overrides = {
       applicationState: initialApplicationState(generateKeyList()),
       actions: {
@@ -199,11 +198,11 @@ describe('DevelopersKeyApp', () => {
     component.mainTableRef.setFocusCallback = callbackSpy
 
     clickShowAllButton(componentNode)
-    expect(callbackSpy.called).toBeTruthy()
+    expect(callbackSpy).toHaveBeenCalled()
   })
 
   test('calls the tables setFocusCallback after loading more account keys', () => {
-    const callbackSpy = sinon.spy()
+    const callbackSpy = jest.fn()
     const overrides = {
       applicationState: initialApplicationState(generateKeyList()),
       actions: {
@@ -231,16 +230,16 @@ describe('DevelopersKeyApp', () => {
     }
     const component = renderComponent(overrides)
     const componentNode = ReactDOM.findDOMNode(component)
-    const focusSpy = sinon.spy()
+    const focusSpy = jest.fn()
     component.mainTableRef.setFocusCallback = focusSpy
 
     clickShowAllButton(componentNode)
 
-    expect(focusSpy.called).toBeTruthy()
+    expect(focusSpy).toHaveBeenCalled()
   })
 
   test('calls the tables setFocusCallback after loading more inherited keys', () => {
-    const callbackSpy = sinon.spy()
+    const callbackSpy = jest.fn()
     const overrides = {
       applicationState: initialApplicationState(generateKeyList(), generateKeyList()),
       actions: {
@@ -268,14 +267,14 @@ describe('DevelopersKeyApp', () => {
     }
     const component = renderComponent(overrides)
     const componentNode = ReactDOM.findDOMNode(component)
-    const focusSpy = sinon.spy()
+    const focusSpy = jest.fn()
 
     clickInheritedTab(componentNode)
     component.inheritedTableRef.setFocusCallback = focusSpy
 
     clickShowAllButton(componentNode, 1)
 
-    expect(focusSpy.called).toBeTruthy()
+    expect(focusSpy).toHaveBeenCalled()
   })
 
   test('renders the correct keys in the inherited tab', () => {
@@ -284,8 +283,8 @@ describe('DevelopersKeyApp', () => {
     clickInheritedTab(componentNode)
     expect(
       Array.from(inheritedDeveloperKeyRows(componentNode, 1)[1].querySelectorAll('td div')).some(
-        n => n.textContent === '2'
-      )
+        n => n.textContent === '2',
+      ),
     ).toBeTruthy()
   })
 
@@ -293,7 +292,7 @@ describe('DevelopersKeyApp', () => {
     const component = renderComponent()
     const componentNode = ReactDOM.findDOMNode(component)
     clickInheritedTab(componentNode)
-    expect(inheritedDeveloperKeyRows(componentNode, 1).length).toEqual(2)
+    expect(inheritedDeveloperKeyRows(componentNode, 1)).toHaveLength(2)
   })
 
   test('renders the correct keys in the account tab', () => {
@@ -301,8 +300,8 @@ describe('DevelopersKeyApp', () => {
     const componentNode = ReactDOM.findDOMNode(component)
     expect(
       Array.from(developerKeyRows(componentNode, 0)[1].querySelectorAll('td div')).some(
-        n => n.textContent === '1'
-      )
+        n => n.textContent === '1',
+      ),
     ).toBeTruthy()
   })
 
@@ -310,7 +309,7 @@ describe('DevelopersKeyApp', () => {
     const component = renderComponent()
     const componentNode = ReactDOM.findDOMNode(component)
 
-    expect(developerKeyRows(componentNode, 0).length).toEqual(2)
+    expect(developerKeyRows(componentNode, 0)).toHaveLength(2)
   })
 
   test('renders the account keys tab', () => {
@@ -318,7 +317,7 @@ describe('DevelopersKeyApp', () => {
     const componentNode = ReactDOM.findDOMNode(component)
 
     expect(
-      componentNode.querySelector('div[role="tab"][aria-selected="true"]').textContent
+      componentNode.querySelector('div[role="tab"][aria-selected="true"]').textContent,
     ).toEqual('Account')
   })
 
@@ -383,7 +382,7 @@ describe('DevelopersKeyApp', () => {
 
     const component = renderComponent({applicationState})
     const renderedText = ReactDOM.findDOMNode(
-      TestUtils.findRenderedDOMComponentWithTag(component, 'table')
+      TestUtils.findRenderedDOMComponentWithTag(component, 'table'),
     ).innerHTML
     expect(renderedText.includes('111')).toBeTruthy()
   })
@@ -513,7 +512,7 @@ describe('DevelopersKeyApp', () => {
   })
 
   test('does not have the create button on inherited tab', () => {
-    const openSpy = sinon.spy()
+    const openSpy = jest.fn()
 
     const overrides = {
       applicationState: {
