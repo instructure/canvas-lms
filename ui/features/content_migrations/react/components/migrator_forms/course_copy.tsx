@@ -27,7 +27,6 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {
   CommonMigratorControls,
   RequiredFormLabel,
-  ErrorFormMessage,
 } from '@canvas/content-migrations'
 import type {onSubmitMigrationFormCallback} from '../types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
@@ -153,12 +152,8 @@ export const CourseCopyImporter = ({onSubmit, onCancel, isSubmitting}: CourseCop
             selectedCourseError
               ? [
                   {
-                    text: (
-                      <ErrorFormMessage>
-                        {I18n.t('You must select a course to copy content from')}
-                      </ErrorFormMessage>
-                    ),
-                    type: 'error',
+                    text: I18n.t('You must select a course to copy content from'),
+                    type: 'newError',
                   },
                 ]
               : []
