@@ -29,7 +29,6 @@ import {InfoButton} from './InfoButton'
 import {DateAdjustments} from './DateAdjustments'
 import type {onSubmitMigrationFormCallback, DateAdjustmentConfig} from './types'
 import {RequiredFormLabel} from './FormLabel'
-import {ErrorFormMessage} from '../errorFormMessage'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -283,13 +282,13 @@ export const CommonMigratorControls = ({
         <View as="div" margin="medium none none none" width="100%" maxWidth="28.75rem">
           <RadioInputGroup
             name={I18n.t('Selective import')}
-            layout="stacked"
             description={
               <RequiredFormLabel showErrorState={contentError}>
                 {I18n.t('Content')}
               </RequiredFormLabel>
             }
             defaultValue="non_selective"
+            messages={contentError ? [{text: I18n.t('You must choose a content option'), type: 'newError'}] : []}
           >
             <RadioInput
               name="selective_import"
@@ -329,11 +328,6 @@ export const CommonMigratorControls = ({
               disabled={isSubmitting}
             />
           </RadioInputGroup>
-          {contentError && (
-            <p>
-              <ErrorFormMessage>{I18n.t('You must choose a content option')}</ErrorFormMessage>
-            </p>
-          )}
         </View>
       )}
 

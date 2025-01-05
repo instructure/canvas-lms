@@ -41,8 +41,6 @@ export const ErrorFormMessage = ({children}: FormMessageProps) => {
 }
 
 export const noFileSelectedFormMessage: FormMessage = {
-  text: (
-    <ErrorFormMessage>{I18n.t('You must select a file to import content from')}</ErrorFormMessage>
-  ),
-  type: 'error',
+  text: I18n.t('You must select a file to import content from'),
+  type: 'newError',
 }
