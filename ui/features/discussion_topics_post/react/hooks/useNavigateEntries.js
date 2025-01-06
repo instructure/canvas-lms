@@ -28,7 +28,6 @@ export default function useNavigateEntries({
   expandedThreads,
   setExpandedThreads = () => {},
   setFocusSelector = () => {},
-  sort = 'desc',
   discussionID = '',
   perPage = 20,
 } = {}) {
@@ -49,13 +48,12 @@ export default function useNavigateEntries({
     discussionID,
     userSearchId: currentStudentId,
     perPage,
-    sort,
   }
 
   const studentTopicQuery = useQuery(STUDENT_DISCUSSION_QUERY, {
     variables: studentTopicVariables,
     fetchPolicy: 'cache-and-network',
-    skip: !(isInSpeedGrader && currentStudentId && studentTopicVariables.discussionID),
+    skip: !(isInSpeedGrader && currentStudentId && studentTopicVariables.discussionID)
   })
 
   const getStudentEntries = useCallback(() => {

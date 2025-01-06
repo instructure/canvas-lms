@@ -3858,4 +3858,41 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "#sort_order_for_user" do
+    before(:once) do
+      Account.site_admin.enable_feature! :discussion_default_sort
+      @topic = @course.discussion_topics.create!(sort_order: "asc")
+    end
+
+    it "returns the sort order of the topic" do
+      @topic.update!(sort_order: "asc", sort_order_locked: true)
+      @topic.update_or_create_participant(current_user: @student, sort_order: "desc")
+      expect(@topic.sort_order_for_user).to eq "asc"
+    end
+
+    context "when the sort order is not locked" do
+      before do
+        @topic.update!(sort_order_locked: false)
+      end
+
+      it "returns the participant's sort order if it exists" do
+        @topic.update_or_create_participant(current_user: @student, sort_order: "desc")
+        expect(@topic.sort_order_for_user(@student)).to eq "desc"
+      end
+
+      it "falls back to the topic's sort order if the participant's sort order is not set" do
+        expect(@topic.sort_order_for_user(@student)).to eq "asc"
+      end
+    end
+
+    context "when no feature flag is enabled" do
+      it "does not consider the sort_order_locked flag" do
+        Account.site_admin.disable_feature! :discussion_default_sort
+        @topic.update!(sort_order_locked: true, sort_order: "asc")
+        @topic.update_or_create_participant(current_user: @student, sort_order: "desc")
+        expect(@topic.sort_order_for_user(@student)).to eq "desc"
+      end
+    end
+  end
 end

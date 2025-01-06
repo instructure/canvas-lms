@@ -795,13 +795,13 @@ class DiscussionTopicsController < ApplicationController
         }
 
         entry = entry.highest_level_parent_or_self
-        participant = @topic.participant(current_user: @current_user)
-        sort_order = participant&.sort_order || @topic.sort_order || DiscussionTopic::SortOrder::DESC
+        sort_order = @topic.sort_order_for_user(@current_user)
         condition = (sort_order == DiscussionTopic::SortOrder::DESC) ? ">=" : "<="
-        count_before = @topic.root_discussion_entries
-                             .where(parent_id: nil)
-                             .where("created_at #{condition}?", entry.created_at).count
-        env_hash[:current_page] = ((1 + count_before) / env_hash[:per_page]).ceil
+        count_before = (sort_order == DiscussionTopic::SortOrder::ASC) ? 1 : 0
+        count_before += @topic.root_discussion_entries
+                              .where(parent_id: nil)
+                              .where("created_at #{condition}?", entry.created_at).count
+        env_hash[:current_page] = (count_before / env_hash[:per_page]).ceil
 
       end
       js_env(env_hash)

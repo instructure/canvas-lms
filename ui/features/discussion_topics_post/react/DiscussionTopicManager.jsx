@@ -211,7 +211,6 @@ const DiscussionTopicManager = props => {
     searchTerm,
     rootEntries: !searchTerm && filter === 'all',
     filter,
-    sort,
     unreadBefore,
   }
 

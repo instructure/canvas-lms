@@ -150,6 +150,7 @@ module Types
       load_association(:root_topic)
     end
 
+    # TODO : After VICE-4808 gets merged, the sort_order field should be removed, we kept it to not cause alerts on deploy
     field :discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
       argument :filter, Types::DiscussionFilterType, required: false
       argument :root_entries, Boolean, required: false
@@ -159,6 +160,7 @@ module Types
       argument :user_search_id, String, required: false
     end
     def discussion_entries_connection(**args)
+      args.delete(:sort_order)
       get_entries(**args)
     end
 
@@ -387,20 +389,18 @@ module Types
       object.subscription_hold(current_user, session)
     end
 
-    def get_entries(search_term: nil, filter: nil, sort_order: nil, root_entries: false, user_search_id: nil, unread_before: nil)
+    def get_entries(search_term: nil, filter: nil, root_entries: false, user_search_id: nil, unread_before: nil)
       return [] if object.initial_post_required?(current_user, session) || !available_for_user
 
-      resolve_sort_order(sort: sort_order).then do |resolved_sort_order|
-        Loaders::DiscussionEntryLoader.for(
-          current_user:,
-          search_term:,
-          filter:,
-          sort_order: resolved_sort_order,
-          root_entries:,
-          user_search_id:,
-          unread_before:
-        ).load(object)
-      end
+      Loaders::DiscussionEntryLoader.for(
+        current_user:,
+        search_term:,
+        filter:,
+        sort_order: object.sort_order_for_user(current_user),
+        root_entries:,
+        user_search_id:,
+        unread_before:
+      ).load(object)
     end
 
     field :sort_order, Types::DiscussionSortOrderType, null: true do
@@ -412,19 +412,8 @@ module Types
     end
 
     field :participant, Types::DiscussionParticipantType, null: true
-
     def participant
-      # TODO, if null, create one
-      object.participant(current_user:) || object.update_or_create_participant(current_user:)
-    end
-
-    private
-
-    def resolve_sort_order(sort: nil)
-      return object.sort_order.to_sym if Account.site_admin.feature_enabled?(:discussion_default_sort) && object.sort_order_locked
-      return sort.to_sym unless sort.nil?
-
-      object.participant(current_user:)&.sort_order&.to_sym || object.sort_order&.to_sym || DiscussionTopic::SortOrder::DESC.to_sym
+      object.participant(current_user) || object.update_or_create_participant(current_user:)
     end
   end
 end
