@@ -168,10 +168,17 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     this.$el.find('#important_dates').toggle(this.currentContextInfo.k5_course)
     // Set default due time if a value is set
     if (this.currentContextInfo.default_due_time) {
+      const assignmentDueDate = moment(this?.event?.assignment?.due_at)
       const currentDate = moment(this.$el.find('#assignment_due_at').val())
       const [hour, minute, second] = this.currentContextInfo.default_due_time.split(':')
       currentDate.set({hour, minute, second})
-      if (currentDate.isValid()) {
+
+      if (!this.event.isNewEvent() && assignmentDueDate.isValid()) {
+        this.$el
+          .find('#assignment_due_at')
+          .val(tz.format(fcUtil.unwrap(assignmentDueDate), 'date.formats.full_with_weekday'))
+          .change()
+      } else if (currentDate.isValid()) {
         this.$el
           .find('#assignment_due_at')
           .val(tz.format(fcUtil.unwrap(currentDate), 'date.formats.full_with_weekday'))
