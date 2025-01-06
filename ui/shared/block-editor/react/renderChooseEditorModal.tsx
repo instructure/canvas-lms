@@ -115,7 +115,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
             </Flex.Item>
             <Flex.Item>
               <Link
-                href="https://community.canvaslms.com/t5/Block-Editor-Beta/gh-p/block_editor"
+                href="https://productmarketing.instructuremedia.com/embed/464a6c68-1de4-4821-bc0c-08101a5bc819"
                 target="_blank"
               >
                 <IconExternalLinkLine />
