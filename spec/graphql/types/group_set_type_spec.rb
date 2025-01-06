@@ -53,6 +53,7 @@ describe Types::GroupSetType do
     expect(group_set_type.resolve("name")).to eq @group_set.name
     expect(group_set_type.resolve("selfSignup")).to eq "restricted"
     expect(group_set_type.resolve("autoLeader")).to eq "random"
+    expect(group_set_type.resolve("nonCollaborative")).to be false
     expect(group_set_type.resolve("groupsConnection { edges { node { _id } } }")).to eq [@group.id.to_s]
     expect(group_set_type.resolve("groups{  _id }")).to eq [@group.id.to_s]
   end
