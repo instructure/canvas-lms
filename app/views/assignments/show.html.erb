@@ -248,7 +248,7 @@
 
     <% if can_do(@assignment, @current_user, :update) %>
       <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
-        <div id="enhanced-rubric-assignment-edit"></div>
+        <div id="enhanced-rubric-assignment-edit-mount-point"></div>
       <% else %>
         <div class="content-box">
           <a
