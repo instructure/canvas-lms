@@ -52,6 +52,9 @@ type CommonMigratorControlsProps = {
   SubmittingLabel: ComponentType
   CancelLabel: ComponentType
 }
+const nqCheckboxId = "existing_quizzes_as_new_quizzes"
+const overwriteAssesmentCheckboxId = "overwrite_assessment_content"
+const adjustDatesCheckboxId = "adjust_dates[enabled]"
 
 const generateNewQuizzesLabel = () => {
   const isConvertQuizzes = ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS
@@ -137,7 +140,7 @@ export const CommonMigratorControls = ({
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
-  const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(false)
+  const [importAsNewQuizzes, setImportAsNewQuizzes] = useState<boolean>(!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT)
   const [overwriteAssessmentContent, setOverwriteAssessmentContent] = useState<boolean>(false)
   const [showAdjustDates, setShowAdjustDates] = useState<boolean>(false)
   const [dateAdjustmentConfig, setDateAdjustmentConfig] = useState<DateAdjustmentConfig>({
@@ -204,16 +207,21 @@ export const CommonMigratorControls = ({
     onSubmit,
   ])
 
+  const defaultChecks = []
+
+  if (ENV.NEW_QUIZZES_MIGRATION_DEFAULT) {
+    defaultChecks.push('existing_quizzes_as_new_quizzes')
+  }
+
   const options = [
     ...(canImportAsNewQuizzes
       ? [
           <Checkbox
-            key="existing_quizzes_as_new_quizzes"
-            name="existing_quizzes_as_new_quizzes"
-            value="existing_quizzes_as_new_quizzes"
+            key={nqCheckboxId}
+            name={nqCheckboxId}
+            value={nqCheckboxId}
             label={generateNewQuizzesLabel()}
-            disabled={!ENV.QUIZZES_NEXT_ENABLED || isSubmitting}
-            defaultChecked={!!ENV.NEW_QUIZZES_MIGRATION_DEFAULT}
+            disabled={!ENV.QUIZZES_NEXT_ENABLED || ENV.NEW_QUIZZES_MIGRATION_REQUIRED || isSubmitting}
             onChange={onCanImportAsNewQuizzesChange}
           />,
         ]
@@ -221,9 +229,9 @@ export const CommonMigratorControls = ({
     ...(canOverwriteAssessmentContent
       ? [
           <Checkbox
-            key="overwrite_assessment_content"
-            name="overwrite_assessment_content"
-            value="overwrite_assessment_content"
+            key={overwriteAssesmentCheckboxId}
+            name={overwriteAssesmentCheckboxId}
+            value={overwriteAssesmentCheckboxId}
             disabled={isSubmitting}
             label={generateOverwriteLabel()}
             onChange={e => setOverwriteAssessmentContent(e.target.checked)}
@@ -233,9 +241,9 @@ export const CommonMigratorControls = ({
     ...(canAdjustDates
       ? [
           <Checkbox
-            key="adjust_dates[enabled]"
-            name="adjust_dates[enabled]"
-            value="adjust_dates[enabled]"
+            key={adjustDatesCheckboxId}
+            name={adjustDatesCheckboxId}
+            value={adjustDatesCheckboxId}
             disabled={isSubmitting}
             label={I18n.t('Adjust events and due dates')}
             onChange={({target}) => {
@@ -332,6 +340,7 @@ export const CommonMigratorControls = ({
             name={I18n.t('Options')}
             layout="stacked"
             description={I18n.t('Options')}
+            defaultValue={defaultChecks}
           >
             {options}
           </CheckboxGroup>
