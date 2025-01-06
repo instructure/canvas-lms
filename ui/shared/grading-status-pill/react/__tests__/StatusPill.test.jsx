@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import StatusPill from '../index'
 
 describe('StatusPill', () => {
@@ -40,35 +40,43 @@ describe('StatusPill', () => {
     })
   }
 
-  it('renders missing pills with correct text', () => {
+  it('renders missing pills with correct text', async () => {
     addSpans('submission-missing-pill')
     StatusPill.renderPills()
-    const pills = screen.getAllByText('missing')
-    expect(pills).toHaveLength(3)
+    await waitFor(() => {
+      const pills = screen.getAllByText('missing')
+      expect(pills).toHaveLength(3)
+    })
   })
 
-  it('renders late pills with correct text', () => {
+  it('renders late pills with correct text', async () => {
     addSpans('submission-late-pill')
     StatusPill.renderPills()
-    const pills = screen.getAllByText('late')
-    expect(pills).toHaveLength(3)
+    await waitFor(() => {
+      const pills = screen.getAllByText('late')
+      expect(pills).toHaveLength(3)
+    })
   })
 
-  it('renders excused pills with correct text', () => {
+  it('renders excused pills with correct text', async () => {
     addSpans('submission-excused-pill')
     StatusPill.renderPills()
-    const pills = screen.getAllByText('excused')
-    expect(pills).toHaveLength(3)
+    await waitFor(() => {
+      const pills = screen.getAllByText('excused')
+      expect(pills).toHaveLength(3)
+    })
   })
 
-  it('renders extended pills with correct text', () => {
+  it('renders extended pills with correct text', async () => {
     addSpans('submission-extended-pill')
     StatusPill.renderPills()
-    const pills = screen.getAllByText('extended')
-    expect(pills).toHaveLength(3)
+    await waitFor(() => {
+      const pills = screen.getAllByText('extended')
+      expect(pills).toHaveLength(3)
+    })
   })
 
-  it('renders custom grade status pills with correct text', () => {
+  it('renders custom grade status pills with correct text', async () => {
     const statuses = [
       {id: '1', name: 'status one'},
       {id: '2', name: 'status two'},
@@ -83,9 +91,11 @@ describe('StatusPill', () => {
 
     StatusPill.renderPills(statuses)
 
-    statuses.forEach(status => {
-      const pills = screen.getAllByText(status.name)
-      expect(pills).toHaveLength(1)
+    await waitFor(() => {
+      statuses.forEach(status => {
+        const pills = screen.getAllByText(status.name)
+        expect(pills).toHaveLength(1)
+      })
     })
   })
 })
