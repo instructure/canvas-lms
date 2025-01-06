@@ -493,7 +493,7 @@ class FoldersController < ApplicationController
       end
       respond_to do |format|
         if @folder.save
-          flash[:notice] = t :folder_created, "Folder was successfully created."
+          flash.now[:notice] = t :folder_created, "Folder was successfully created."
           format.html { redirect_to named_context_url(@context, :context_files_url) }
           if api_request?
             format.json { render json: folder_json(@folder, @current_user, session) }

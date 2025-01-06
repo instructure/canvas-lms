@@ -22,14 +22,21 @@ import {render, screen} from '@testing-library/react'
 import {setupFilesEnv} from '../../../../fixtures/fakeFilesEnv'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {BrowserRouter} from 'react-router-dom'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {QueryClient} from '@tanstack/react-query'
 
 const renderComponent = () => {
+  const queryClient = new QueryClient()
+
   return render(
-    <BrowserRouter>
-      <AllMyFilesTable />
-    </BrowserRouter>
+    <MockedQueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AllMyFilesTable />
+      </BrowserRouter>
+    </MockedQueryClientProvider>,
   )
 }
+
 describe('AllMyFilesTable', () => {
   beforeAll(() => {
     setupFilesEnv(true)

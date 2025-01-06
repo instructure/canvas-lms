@@ -29,6 +29,10 @@ module FilesPage
     fxpath("//button[descendant::text()[contains(., 'All My Files')]]")
   end
 
+  def create_folder_button
+    f("[data-testid='create-folder-button']")
+  end
+
   def files_usage_text_selector
     "[data-testid='files-usage-text']"
   end
@@ -43,5 +47,9 @@ module FilesPage
 
   def table_rows
     ff("tbody tr")
+  end
+
+  def create_folder_input
+    f("[name='folderName']")
   end
 end

@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
@@ -31,6 +30,7 @@ import FilesUsageBar from './FilesUsageBar'
 import {useLoaderData} from 'react-router-dom'
 import {type Folder} from '../../interfaces/File'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {FileManagementContext} from './Contexts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -59,21 +59,23 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
 
   return (
-    <View as="div">
-      <FilesHeader size={size} isUserContext={isUserContext} />
-      <FileFolderTable
-        size={size}
-        folderId={folderId}
-        userCanEditFilesForContext={userCanEditFilesForContext}
-      />
-      {userCanManageFilesForContext && (
-        <Flex padding="small none none none">
-          <Flex.Item size="50%">
-            <FilesUsageBar contextId={contextId} contextType={contextType} />
-          </Flex.Item>
-        </Flex>
-      )}
-    </View>
+    <FileManagementContext.Provider value={{folderId, contextType, contextId}}>
+      <View as="div">
+        <FilesHeader size={size} isUserContext={isUserContext} />
+        <FileFolderTable
+          size={size}
+          folderId={folderId}
+          userCanEditFilesForContext={userCanEditFilesForContext}
+        />
+        {userCanManageFilesForContext && (
+          <Flex padding="small none none none">
+            <Flex.Item size="50%">
+              <FilesUsageBar contextId={contextId} contextType={contextType} />
+            </Flex.Item>
+          </Flex>
+        )}
+      </View>
+    </FileManagementContext.Provider>
   )
 }
 interface ResponsiveFilesAppProps {

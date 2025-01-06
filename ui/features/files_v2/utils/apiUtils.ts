@@ -22,7 +22,7 @@ export const generateFolderByPathUrl = (path: string) => {
   let contextType = filesEnv.contexts[0].contextType
   let contextId = filesEnv.contexts[0].contextId
   if (filesEnv.showingAllContexts) {
-    const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
+    const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^/]*/
     // users_1 or courses_102
     const pluralAssetString = path.split('/')[1]
     const context = filesEnv.contextsDictionary[pluralAssetString] || filesEnv.contexts[0]
@@ -37,4 +37,8 @@ export const generateFolderByPathUrl = (path: string) => {
 
 export const generateFilesQuotaUrl = (singularContextType: string, contextId: string) => {
   return `/api/v1/${singularContextType}s/${contextId}/files/quota`
+}
+
+export const generateFolderPostUrl = (parentFolderId: string) => {
+  return `/api/v1/folders/${parentFolderId}/folders`
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {generateFolderByPathUrl, generateFilesQuotaUrl} from '../apiUtils'
+import {generateFolderByPathUrl, generateFilesQuotaUrl, generateFolderPostUrl} from '../apiUtils'
 import {setupFilesEnv} from '../../fixtures/fakeFilesEnv'
 
 describe('generateFolderByPathUrl', () => {
@@ -57,5 +57,12 @@ describe('generateFilesQuotaUrl', () => {
   it('returns correct url for course context', () => {
     const url = generateFilesQuotaUrl('course', '1')
     expect(url).toBe('/api/v1/courses/1/files/quota')
+  })
+})
+
+describe('generateFolderPostUrl', () => {
+  it('returns correct url', () => {
+    const url = generateFolderPostUrl('1')
+    expect(url).toBe('/api/v1/folders/1/folders')
   })
 })
