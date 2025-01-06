@@ -1436,4 +1436,123 @@ describe "Outcome Reports" do
                            scope)
     end
   end
+
+  describe "#canvas_next?" do
+    let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+    let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+    let(:canvas) { { "student id" => 1, "course id" => 2, "learning outcome id" => 1 } }
+    let(:os_scope) { [{ "student id" => 1, "course id" => 2, "learning outcome id" => 1 }, { "student id" => 2, "course id" => 3, "learning outcome id" => 1 }] }
+    let(:os_index) { 0 }
+
+    it "returns true if os_index is out of bounds" do
+      expect(outcome_reports.send(:canvas_next?, canvas, os_scope, os_scope.length)).to be true
+    end
+
+    it "returns true if canvas[column] < os[column]" do
+      canvas["student id"] = 0
+      expect(outcome_reports.send(:canvas_next?, canvas, os_scope, os_index)).to be true
+    end
+
+    it "returns false if canvas[column] > os[column]" do
+      canvas["student id"] = 3
+      expect(outcome_reports.send(:canvas_next?, canvas, os_scope, os_index)).to be false
+    end
+
+    it "returns true if all columns are equal" do
+      expect(outcome_reports.send(:canvas_next?, canvas, os_scope, os_index)).to be true
+    end
+
+    it "returns true if all columns are equal and os_index is within bounds" do
+      os_index = 1
+      expect(outcome_reports.send(:canvas_next?, canvas, os_scope, os_index)).to be true
+    end
+  end
+
+  describe "write_outcomes_report" do
+    let(:account_report) { AccountReport.new(report_type: "outcome_results_csv", account: @root_account, user: @user1) }
+    let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+    let(:headers) { ["student name", "student id", "course id", "learning outcome id", "submission date"] }
+    let(:config_options) { {} }
+    let(:csv) { [] }
+    let(:canvas_scope) do
+      double("canvas_scope").tap do |scope|
+        allow(scope).to receive(:find_each) do |&block|
+          (1..3).each do |i|
+            record = double(attributes: {
+                              "student id" => i,
+                              "course id" => i,
+                              "learning outcome id" => i,
+                              "submission date" => Time.now.utc + i.days
+                            })
+            allow(record).to receive(:[]).with("student id").and_return(i)
+            allow(record).to receive(:[]).with("course id").and_return(i)
+            allow(record).to receive(:[]).with("learning outcome id").and_return(i)
+            allow(record).to receive(:[]).with("submission date").and_return(Time.now.utc + i.days)
+            block.call(record)
+          end
+        end
+        except_scope = double("except_scope")
+        allow(scope).to receive(:except).with(:select).and_return(except_scope)
+        allow(except_scope).to receive(:count).and_return(1)
+      end
+    end
+
+    def write_report(headers, _enable_i18n_features, _replica)
+      csv_mock = []
+      csv_mock << headers unless headers.nil?
+      yield csv_mock if block_given?
+      csv_mock
+    end
+
+    before do
+      allow(outcome_reports).to receive(:write_report) do |headers, enable_i18n_features, replica, &block|
+        csv_mock = write_report(headers, enable_i18n_features, replica, &block)
+        csv.concat(csv_mock)
+      end
+      allow(GuardRail).to receive(:activate).with(:primary).and_yield
+      allow(account_report).to receive(:update_attribute).with(:current_line, csv.length)
+    end
+
+    it "writes the report with the correct headers" do
+      outcome_reports.send(:write_outcomes_report, headers, canvas_scope, config_options)
+      expect(csv.first).to eq(headers)
+    end
+
+    it "Does not skip any record" do
+      outcome_reports.send(:write_outcomes_report, headers, canvas_scope, config_options)
+      expect(csv.length).to eq(4)
+    end
+
+    it "writes records from canvas_scope before os_scope by default" do
+      # Assigning OS scope
+      config_options[:new_quizzes_scope] = [{
+        "student name" => "OS John Doe",
+        "student id" => 1,
+        "course id" => 1,
+        "learning outcome id" => 1,
+        "submission date" => Time.now.utc
+      }]
+
+      # Execute the method
+      outcome_reports.send(:write_outcomes_report, headers, canvas_scope, config_options)
+
+      # All records should be present, record order should be Header, Canvas, OS, Canvas, ...
+      expect(csv.length).to eq(5)
+      # Canvas record #1
+      expect(csv[1][0]).to be_nil
+      expect(csv[1][1]).to eq(1)
+      # OS record
+      expect(csv[2]).to include("OS John Doe")
+      # Canvas record #2
+      expect(csv[3][0]).to be_nil
+      expect(csv[3][1]).to eq(2)
+    end
+
+    it "writes a message if no records are found" do
+      allow(canvas_scope).to receive(:find_each)
+      allow(canvas_scope.except(:select)).to receive(:count).and_return(0)
+      outcome_reports.send(:write_outcomes_report, headers, canvas_scope, config_options)
+      expect(csv.last).to eq(["No outcomes found"])
+    end
+  end
 end
