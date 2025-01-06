@@ -53,13 +53,15 @@ export const PageBlock = ({children}: PageBlockProps) => {
   // happens as the initial json is loaded.
   // This unselects whatever was last and scrolls to the top.
   useEffect(() => {
-    requestAnimationFrame(() => {
-      actions.selectNode()
-      const scrollingContainer = getScrollParent()
-      scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    if (enabled) {
+      requestAnimationFrame(() => {
+        actions.selectNode()
+        const scrollingContainer = getScrollParent()
+        scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+      })
+    }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
   const handlePagekey: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
     e => {
@@ -88,14 +90,16 @@ export const PageBlock = ({children}: PageBlockProps) => {
   // If a node is selected before the tree receives focus, focus is set on the selected node.
   const handleFocus: React.FocusEventHandler<HTMLDivElement> = useCallback(
     (e: React.FocusEvent) => {
-      if (e.target === pageRef.current) {
-        e.preventDefault()
-        actions.selectNode('ROOT')
-        const scrollingContainer = getScrollParent()
-        scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+      if (enabled) {
+        if (e.target === pageRef.current) {
+          e.preventDefault()
+          actions.selectNode('ROOT')
+          const scrollingContainer = getScrollParent()
+          scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
+        }
       }
     },
-    [actions]
+    [actions, enabled]
   )
 
   const handlePaste = useCallback((_e: React.ClipboardEvent<HTMLDivElement>) => {
