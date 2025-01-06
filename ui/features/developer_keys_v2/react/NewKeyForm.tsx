@@ -68,7 +68,7 @@ const validationMessage: {
 }[] = [{text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}]
 
 const clientCredentialsAudienceTooltip = I18n.t(
-  'Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?'
+  'Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?',
 )
 
 export default class NewKeyForm extends React.Component<NewKeyFormProps> {
@@ -172,6 +172,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                 }
               >
                 <TextInput
+                  data-testid="key-name-input"
                   renderLabel={I18n.t('Key Name:')}
                   name="developer_key[name]"
                   value={developerKey.name || ''}
@@ -179,12 +180,14 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   placeholder="Unnamed Tool"
                 />
                 <TextInput
+                  data-testid="owner-email-input"
                   renderLabel={I18n.t('Owner Email:')}
                   name="developer_key[email]"
                   value={developerKey.email || ''}
                   onChange={e => updateDeveloperKey('email', e.target.value)}
                 />
                 <TextArea
+                  data-testid="redirect-uris-input"
                   label={
                     isRedirectUriRequired ? I18n.t('* Redirect URIs:') : I18n.t('Redirect URIs:')
                   }
@@ -204,18 +207,21 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                 {!isLtiKey && (
                   <div>
                     <TextInput
+                      data-testid="legacy-redirect-uri-input"
                       renderLabel={I18n.t('Redirect URI (Legacy):')}
                       name="developer_key[redirect_uri]"
                       value={developerKey.redirect_uri || ''}
                       onChange={e => updateDeveloperKey('redirect_uri', e.target.value)}
                     />
                     <TextInput
+                      data-testid="vendor-code-input"
                       renderLabel={I18n.t('Vendor Code (LTI 2):')}
                       name="developer_key[vendor_code]"
                       value={developerKey.vendor_code || ''}
                       onChange={e => updateDeveloperKey('vendor_code', e.target.value)}
                     />
                     <TextInput
+                      data-testid="icon-url-input"
                       renderLabel={I18n.t('Icon URL:')}
                       name="developer_key[icon_url]"
                       value={developerKey.icon_url || ''}
@@ -224,6 +230,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                   </div>
                 )}
                 <TextArea
+                  data-testid="notes-input"
                   label={I18n.t('Notes:')}
                   name="developer_key[notes]"
                   value={developerKey.notes || ''}
@@ -232,6 +239,7 @@ export default class NewKeyForm extends React.Component<NewKeyFormProps> {
                 />
                 {ENV.enableTestClusterChecks && !isLtiKey ? (
                   <Checkbox
+                    data-testid="test-cluster-only-checkbox"
                     label={I18n.t('Test Cluster Only')}
                     name="developer_key[test_cluster_only]"
                     checked={Boolean(developerKey.test_cluster_only)}

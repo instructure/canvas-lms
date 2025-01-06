@@ -17,57 +17,83 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render, fireEvent} from '@testing-library/react'
 import SelectButton from '../select-button'
-
-const equal = (a, b) => expect(a).toBe(b)
 
 const defaultProps = () => ({
   isSelected: false,
   isDisabled: false,
-  onSelect: () => {},
+  onSelect: jest.fn(),
 })
 
-const renderComponent = props => TestUtils.renderIntoDocument(<SelectButton {...props} />)
-
-describe('Select Button', () => {
-  test('renders component', () => {
+describe('SelectButton', () => {
+  it('renders the button component', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {getByTestId} = render(<SelectButton {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-button')
-    equal(renderedList.length, 1, 'renders component')
+    const button = getByTestId('select-button')
+    expect(button).toBeInTheDocument()
   })
 
-  test('renders button when not selected or disabled', () => {
+  it('renders as primary button when not selected or disabled', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {getByTestId} = render(<SelectButton {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'btn-primary')
-    equal(renderedList.length, 1, 'renders as button')
+    const button = getByTestId('select-button')
+    expect(button).toHaveClass('btn-primary')
   })
 
-  test('renders selected badge when selected', () => {
+  it('shows selected state when selected', () => {
     const props = defaultProps()
     props.isSelected = true
-    const component = renderComponent(props)
+    const {getByTestId} = render(<SelectButton {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'cmp-button__selected'
-    )
-    equal(renderedList.length, 1, 'renders selected')
+    const button = getByTestId('select-button')
+    expect(button).toHaveClass('cmp-button__selected')
   })
 
-  test('renders disabled badge when disabled', () => {
+  it('shows disabled state when disabled', () => {
     const props = defaultProps()
     props.isDisabled = true
-    const component = renderComponent(props)
+    const {getByTestId} = render(<SelectButton {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'cmp-button__disabled'
-    )
-    equal(renderedList.length, 1, 'renders disabled')
+    const button = getByTestId('select-button')
+    expect(button).toHaveClass('cmp-button__disabled')
+  })
+
+  it('calls onSelect when clicked', () => {
+    const props = defaultProps()
+    const {getByTestId} = render(<SelectButton {...props} />)
+
+    const button = getByTestId('select-button')
+    fireEvent.click(button)
+    expect(props.onSelect).toHaveBeenCalled()
+  })
+
+  it('does not call onSelect when disabled', () => {
+    const props = defaultProps()
+    props.isDisabled = true
+    const {getByTestId} = render(<SelectButton {...props} />)
+
+    const button = getByTestId('select-button')
+    fireEvent.click(button)
+    expect(props.onSelect).not.toHaveBeenCalled()
+  })
+
+  it('has correct text content when selected', () => {
+    const props = defaultProps()
+    props.isSelected = true
+    const {getByTestId} = render(<SelectButton {...props} />)
+
+    const button = getByTestId('select-button')
+    expect(button).toHaveTextContent('Selected')
+  })
+
+  it('has correct text content when not selected', () => {
+    const props = defaultProps()
+    const {getByTestId} = render(<SelectButton {...props} />)
+
+    const button = getByTestId('select-button')
+    expect(button).toHaveTextContent('Select')
   })
 })

@@ -27,7 +27,6 @@ import type {QuestionBankSettings} from '../types'
 const I18n = createI18nScope('content_migrations_redesign')
 
 type QuestionBank = {
-   
   assessment_question_bank: {
     id: number
     title: string
@@ -62,7 +61,7 @@ const QuestionBankSelector = ({
         onChange({...questionBankSettings, question_bank_id: value})
       }
     },
-    [onChange, questionBankSettings]
+    [onChange, questionBankSettings],
   )
 
   useEffect(() => {
@@ -84,14 +83,23 @@ const QuestionBankSelector = ({
           disabled={disable}
           value={questionBankSettings?.question_bank_id || ''}
         >
-          <SimpleSelect.Option id="selectQuestion" value="">
+          <SimpleSelect.Option id="selectQuestion" value="" data-testid="selectQuestionOption">
             {I18n.t('Select question bank')}
           </SimpleSelect.Option>
-          <SimpleSelect.Option id="createQuestion" value="new_question_bank">
+          <SimpleSelect.Option
+            id="createQuestion"
+            value="new_question_bank"
+            data-testid="createQuestionOption"
+          >
             {I18n.t('Create new question bank...')}
           </SimpleSelect.Option>
           {questionBanks.map(({assessment_question_bank: {id, title}}: QuestionBank) => (
-            <SimpleSelect.Option key={id} id={id.toString()} value={id}>
+            <SimpleSelect.Option
+              key={id}
+              id={id.toString()}
+              value={id}
+              data-testid={`questionBankOption-${id}`}
+            >
               {title}
             </SimpleSelect.Option>
           ))}

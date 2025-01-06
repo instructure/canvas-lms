@@ -235,7 +235,8 @@ shared_context "in-process server selenium tests" do
         "Uncaught DOMException: play() failed because the user didn't interact with the document first.",
         "security - Refused to frame 'https://drive.google.com/' because an ancestor violates the following Content Security Policy directive: \"frame-ancestors https://docs.google.com\".",
         "This file should be served over HTTPS.", # tests are not run over https, this error is expected
-        "Uncaught DOMException: signal is aborted without reason" # Investigate as part of LX-2075
+        "Uncaught DOMException: signal is aborted without reason", # Investigate as part of LX-2075
+        "Support for string refs"
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

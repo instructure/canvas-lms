@@ -264,6 +264,7 @@ class AdminTable extends React.Component {
           />
         </Flex>
         <Table
+          data-testid={this.props.inherited ? 'inherited-table' : 'account-table'}
           data-automation="devKeyAdminTable"
           caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
           size="medium"

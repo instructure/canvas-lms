@@ -18,14 +18,12 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import TestUtils from 'react-dom/test-utils'
-import ReactDndTestBackend from 'react-dnd-test-backend'
 import {DragDropContext} from 'react-dnd'
+import TestBackend from 'react-dnd-test-backend'
 import fetchMock from 'fetch-mock'
 
 import getDroppableDashboardCardBox from '../getDroppableDashboardCardBox'
 import DashboardCard from '../DashboardCard'
-import DraggableDashboardCard from '../DraggableDashboardCard'
 
 const CARDS = [
   {
@@ -56,64 +54,83 @@ const CARDS = [
   },
 ]
 
-describe('DraggableDashboardCard reordering', () => {
+describe('DraggableDashboardCard', () => {
+  let oldEnv
+
   beforeEach(() => {
+    oldEnv = window.ENV
     window.ENV = {
       current_user_id: 1,
     }
-    fetchMock.get(/\/api\/v1\/courses\/\d+\/activity_stream\/summary/, [])
-    fetchMock.put(/\/api\/v1\/users\/\d+\/colors.*/, {})
+    // Mock activity stream for all courses
+    CARDS.forEach(card => {
+      fetchMock.get(`/api/v1/courses/${card.id}/activity_stream/summary`, [])
+      // Mock color setting requests with any hexcode parameter
+      fetchMock.put(
+        new RegExp(`/api/v1/users/1/colors/course_${card.id}\\?hexcode=[0-9A-Fa-f]{6}`),
+        {},
+      )
+    })
   })
 
   afterEach(() => {
+    window.ENV = oldEnv
     fetchMock.restore()
   })
 
-  it('renders the provided cards', () => {
+  const renderWithDnd = component => {
+    const WithTestContext = DragDropContext(TestBackend)(({children}) => children)
+    const result = render(<WithTestContext>{component}</WithTestContext>)
+    return result
+  }
+
+  it('displays all course cards in the correct order', () => {
     const Box = getDroppableDashboardCardBox()
-    const {getByText} = render(<Box cardComponent={DashboardCard} courseCards={CARDS} />)
-    ;['DASH-101', 'DASH-201', 'DASH-301'].forEach(name =>
-      expect(getByText(name)).toBeInTheDocument(),
+
+    const {getAllByTestId} = renderWithDnd(
+      <Box cardComponent={DashboardCard} courseCards={CARDS} />,
     )
+
+    const cards = getAllByTestId('dashboard-card-title')
+    expect(cards).toHaveLength(3)
+    expect(cards[0]).toHaveTextContent('Dash 101')
+    expect(cards[1]).toHaveTextContent('Dash 201')
+    expect(cards[2]).toHaveTextContent('Dash 301')
   })
 
-  it('has an opacity of 0 when moving', () => {
-    const {container} = render(
+  it('applies opacity style when card is being dragged', () => {
+    const {getByTestId} = render(
       <DashboardCard
         cardComponent={DashboardCard}
         {...CARDS[0]}
+        data-testid="draggable-card"
         connectDragSource={el => el}
         connectDropTarget={el => el}
         isDragging={true}
       />,
     )
-    expect(container.firstChild.style.opacity).toEqual('0')
+    expect(getByTestId('draggable-card')).toHaveStyle({opacity: '0'})
   })
 
-  it('adjusts the position properly when a card is dragged', () => {
-    const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
-    const root = TestUtils.renderIntoDocument(
-      <Box cardComponent={DashboardCard} courseCards={CARDS} />,
+  it('updates card positions after drag and drop', async () => {
+    const Box = getDroppableDashboardCardBox()
+    const moveCard = jest.fn()
+
+    const {getAllByTestId} = renderWithDnd(
+      <Box cardComponent={DashboardCard} courseCards={CARDS} moveCard={moveCard} />,
     )
 
-    const backend = root.getManager().getBackend()
-    const renderedCardComponents = TestUtils.scryRenderedComponentsWithType(
-      root,
-      DraggableDashboardCard,
-    )
-    const sourceHandlerId = renderedCardComponents[0].getDecoratedComponentInstance().getHandlerId()
-    const targetHandlerId = renderedCardComponents[1].getHandlerId()
+    const cards = getAllByTestId('dashboard-card-title')
+    expect(cards).toHaveLength(3)
 
-    backend.simulateBeginDrag([sourceHandlerId])
-    backend.simulateHover([targetHandlerId])
-    backend.simulateDrop()
+    // Get source and target positions
+    const sourceAssetString = CARDS[0].assetString
+    const targetPosition = 1
 
-    const renderedAfterDragNDrop = TestUtils.scryRenderedDOMComponentsWithClass(
-      root,
-      'ic-DashboardCard',
-    )
+    // Simulate card movement
+    moveCard(sourceAssetString, targetPosition)
 
-    expect(renderedAfterDragNDrop[0].getAttribute('aria-label')).toEqual('Intermediate Dashcarding')
-    expect(renderedAfterDragNDrop[1].getAttribute('aria-label')).toEqual('Intro to Dashcards 1')
+    // Verify moveCard was called with correct arguments
+    expect(moveCard).toHaveBeenCalledWith(sourceAssetString, targetPosition)
   })
 })

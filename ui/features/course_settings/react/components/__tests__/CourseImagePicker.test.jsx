@@ -17,60 +17,73 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, fireEvent} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import CourseImagePicker from '../CourseImagePicker'
-
-const ok = value => expect(value).toBeTruthy()
-
-const container = document.createElement('div')
-container.setAttribute('id', 'fixtures')
-document.body.appendChild(container)
-
-const wrapper = document.getElementById('fixtures')
-const reset_env = window.ENV
-
-function renderComponent(props = {}) {
-  let courseImagePicker
-  const element = React.createElement(CourseImagePicker, {
-    ref: node => {
-      courseImagePicker = node
-    },
-    courseId: 0,
-    ...props,
-  })
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(element, wrapper)
-  return courseImagePicker
-}
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('CourseImagePicker Component', () => {
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(wrapper)
-    window.ENV = reset_env
-  })
+  let oldEnv
 
-  test('calls the handleFileUpload prop when drop occurs', function (done) {
-    let called = false
-    const handleFileUploadFunc = () => {
-      called = true
-    }
-    const component = renderComponent({
-      courseId: '101',
-      handleFileUpload: handleFileUploadFunc,
-    })
-
-    const area = TestUtils.findRenderedDOMComponentWithTag(component, 'label') // FileDrop's wrapped in a label
-
-    TestUtils.Simulate.drop(area, {
-      dataTransfer: {
-        files: [{type: 'image/jpg', name: 'image.jpg', size: 10}],
+  beforeEach(() => {
+    oldEnv = fakeENV.setup({
+      COURSE_IMAGES_ENABLED: true,
+      FEATURES: {
+        course_images: true,
       },
     })
-    // there's some async activity in there
-    window.setTimeout(() => {
-      ok(called, 'handleFileUpload was called')
-      done()
-    }, 0)
+  })
+
+  afterEach(() => {
+    fakeENV.teardown(oldEnv)
+  })
+
+  const renderComponent = (props = {}) => {
+    return render(<CourseImagePicker courseId="101" handleFileUpload={jest.fn()} {...props} />)
+  }
+
+  it('calls the handleFileUpload prop when an image is selected', async () => {
+    const handleFileUpload = jest.fn()
+    const {getByTestId} = renderComponent({handleFileUpload})
+
+    const file = new File(['test image'], 'image.jpg', {type: 'image/jpeg'})
+    const dropZone = getByTestId('course-image-drop-zone')
+    await userEvent.upload(dropZone, file)
+
+    expect(handleFileUpload).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dataTransfer: {
+          files: [file],
+        },
+        preventDefault: expect.any(Function),
+        stopPropagagtion: expect.any(Function),
+      }),
+      '101',
+    )
+  })
+
+  it('shows an error message when a non-image file is dropped', async () => {
+    const handleFileUpload = jest.fn()
+    const {getByTestId, findByText} = renderComponent({handleFileUpload})
+
+    const file = new File(['test file'], 'test.txt', {type: 'text/plain'})
+    const dropZone = getByTestId('course-image-drop-zone')
+
+    // Trigger file drop rejection by simulating the change event
+    fireEvent.change(dropZone, {
+      target: {
+        files: [file],
+      },
+    })
+
+    // The FileDrop component will show the error message
+    const errorMessage = await findByText('File must be an image')
+    expect(errorMessage).toBeInTheDocument()
+    expect(handleFileUpload).not.toHaveBeenCalled()
+  })
+
+  it('shows a loading spinner when uploading', () => {
+    const {getByText} = renderComponent({uploadingImage: true})
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 })

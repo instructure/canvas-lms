@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// eslint-disable-next-line no-redeclare
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -40,9 +41,11 @@ describe('AssignmentPostingPolicyTray', () => {
 
   const getButton = name => screen.getByRole('button', {name})
   const getInput = name => {
-    const regex = new RegExp(name === 'Automatically' 
-      ? 'Automatically.*visible to students'
-      : 'Manually.*hidden by default')
+    const regex = new RegExp(
+      name === 'Automatically'
+        ? 'Automatically.*visible to students'
+        : 'Manually.*hidden by default',
+    )
     return screen.getByRole('radio', {name: regex})
   }
 
@@ -55,6 +58,7 @@ describe('AssignmentPostingPolicyTray', () => {
       },
       onAssignmentPostPolicyUpdated: jest.fn(),
       onExited: jest.fn(),
+      onDismiss: jest.fn(),
     }
 
     FlashAlert.showFlashAlert.mockReset()
@@ -177,7 +181,7 @@ describe('AssignmentPostingPolicyTray', () => {
             resolveRequest = () => {
               resolve({assignmentId: '2301', postManually: true})
             }
-          })
+          }),
       )
 
       renderTray()
@@ -231,7 +235,7 @@ describe('AssignmentPostingPolicyTray', () => {
             resolveRequest = () => {
               resolve({assignmentId: '2301', postManually: true})
             }
-          })
+          }),
       )
 
       await userEvent.click(getInput('Manually'))
@@ -268,7 +272,7 @@ describe('AssignmentPostingPolicyTray', () => {
       expect(Api.setAssignmentPostPolicy).toHaveBeenCalledWith(
         expect.objectContaining({
           assignmentId: '2301',
-        })
+        }),
       )
     })
 
@@ -277,7 +281,7 @@ describe('AssignmentPostingPolicyTray', () => {
       expect(Api.setAssignmentPostPolicy).toHaveBeenCalledWith(
         expect.objectContaining({
           postManually: true,
-        })
+        }),
       )
     })
 
@@ -295,7 +299,7 @@ describe('AssignmentPostingPolicyTray', () => {
           expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith(
             expect.objectContaining({
               message: 'Success! The post policy for Math 1.1 has been updated.',
-            })
+            }),
           )
         })
       })
@@ -313,7 +317,7 @@ describe('AssignmentPostingPolicyTray', () => {
           expect(context.onAssignmentPostPolicyUpdated).toHaveBeenCalledWith(
             expect.objectContaining({
               assignmentId: '2301',
-            })
+            }),
           )
         })
       })
@@ -324,7 +328,7 @@ describe('AssignmentPostingPolicyTray', () => {
           expect(context.onAssignmentPostPolicyUpdated).toHaveBeenCalledWith(
             expect.objectContaining({
               postManually: true,
-            })
+            }),
           )
         })
       })
@@ -348,7 +352,7 @@ describe('AssignmentPostingPolicyTray', () => {
           expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith(
             expect.objectContaining({
               message: 'An error occurred while saving the assignment post policy',
-            })
+            }),
           )
         })
       })

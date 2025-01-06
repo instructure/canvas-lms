@@ -51,7 +51,7 @@ class MoveToDialog extends React.Component<Props, State> {
   handleMove = () => {
     if (this.props.onMove) {
       // @ts-expect-error
-       
+
       this.props.onMove(this.refs.select.value)
     }
     this.handleRequestClose()
@@ -115,10 +115,19 @@ class MoveToDialog extends React.Component<Props, State> {
       >
         <Modal.Body>{this.renderBody()}</Modal.Body>
         <Modal.Footer>
-          <Button id="MoveToDialog__cancel" onClick={this.handleRequestClose}>
+          <Button
+            id="MoveToDialog__cancel"
+            data-testid="move-dialog-cancel-button"
+            onClick={this.handleRequestClose}
+          >
             {I18n.t('Cancel')}
           </Button>
-          <Button id="MoveToDialog__move" color="primary" onClick={this.handleMove}>
+          <Button
+            id="MoveToDialog__move"
+            data-testid="move-dialog-move-button"
+            color="primary"
+            onClick={this.handleMove}
+          >
             {I18n.t('Move')}
           </Button>
         </Modal.Footer>

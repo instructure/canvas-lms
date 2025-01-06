@@ -46,15 +46,23 @@ class CourseTabContainer extends React.Component {
       >
         <h1>{I18n.t('Grading')}</h1>
         <div className="ui-tabs-minimal">
-          <ul>
+          <ul data-testid="grading-tabs">
             <li>
-              <a href="#grading-periods-tab" className="grading_periods_tab">
+              <a
+                href="#grading-periods-tab"
+                className="grading_periods_tab"
+                data-testid="grading-periods-tab-link"
+              >
                 {' '}
                 {I18n.t('Grading Periods')}
               </a>
             </li>
             <li>
-              <a href="#grading-standards-tab" className="grading_standards_tab">
+              <a
+                href="#grading-standards-tab"
+                className="grading_standards_tab"
+                data-testid="grading-standards-tab-link"
+              >
                 {' '}
                 {I18n.t('Grading Schemes')}
               </a>

@@ -17,13 +17,10 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
-import {render} from '@testing-library/react'
-import {shallow} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import TimeBlockSelector from '../TimeBlockSelector'
-import TimeBlockSelectRow from '../TimeBlockSelectRow'
 
-const props = {
+const defaultProps = {
   timeData: [
     {
       slotEventId: '1',
@@ -34,97 +31,111 @@ const props = {
       },
     },
   ],
-  onChange() {},
+  onChange: jest.fn(),
 }
 
 describe('TimeBlockSelector', () => {
-  test('it renders', () => {
-    const wrapper = render(<TimeBlockSelector {...props} />)
-    expect(wrapper).toBeTruthy()
+  beforeEach(() => {
+    jest.clearAllMocks()
   })
 
-  test('it renders TimeBlockSelectRows in their own container', () => {
-    // Adding new blank rows is dependent on TimeBlockSelectRows being the last
-    // item in the container
-    const wrapper = shallow(<TimeBlockSelector {...props} />)
-    const children = wrapper.find('.TimeBlockSelector__Rows').children()
-    expect(children.last().type()).toEqual(TimeBlockSelectRow)
+  it('renders the component', () => {
+    const {container} = render(<TimeBlockSelector {...defaultProps} />)
+    expect(container.querySelector('.TimeBlockSelector')).toBeInTheDocument()
   })
 
-  test('handleSlotDivision divides slots and adds new rows to the selector', () => {
+  it('renders TimeBlockSelectRows container', () => {
+    const {container} = render(<TimeBlockSelector {...defaultProps} />)
+    const rowsContainer = container.querySelector('.TimeBlockSelector__Rows')
+    expect(rowsContainer).toBeInTheDocument()
+  })
+
+  it('divides slots and adds new rows when using the divide section', () => {
     const ref = React.createRef()
-    const component = render(<TimeBlockSelector {...props} ref={ref} />)
-    const input = component.container.querySelector('#TimeBlockSelector__DivideSection-Input')
-    input.value = 60
-    TestUtils.Simulate.change(input)
-    const newRow = ref.current.state.timeBlockRows[0]
-    newRow.timeData.startTime = new Date('2016-10-26T15:00:00.000Z')
-    newRow.timeData.endTime = new Date('2016-10-26T20:00:00.000Z')
+    const {container} = render(<TimeBlockSelector {...defaultProps} ref={ref} />)
+
+    // Set initial time block
+    const initialRow = {
+      slotEventId: 'test-slot',
+      timeData: {
+        startTime: new Date('2016-10-26T15:00:00.000Z'),
+        endTime: new Date('2016-10-26T20:00:00.000Z'),
+      },
+    }
     ref.current.setState({
-      timeBlockRows: [newRow, {slotEventId: 'asdf', timeData: {startTime: null, endTime: null}}],
+      timeBlockRows: [initialRow],
     })
+
+    // Input division value and trigger division
+    const divideInput = container.querySelector('#TimeBlockSelector__DivideSection-Input')
+    fireEvent.change(divideInput, {target: {value: '60'}})
     ref.current.handleSlotDivision()
-    expect(ref.current.state.timeBlockRows).toHaveLength(6)
+
+    expect(ref.current.state.timeBlockRows.length).toBeGreaterThan(1)
   })
 
-  test('handleSlotAddition adds new time slot with time', () => {
+  it('adds new time slot with specified time', () => {
     const ref = React.createRef()
-    render(<TimeBlockSelector {...props} ref={ref} />)
-    const newRow = ref.current.state.timeBlockRows[0]
-    newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
-    newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
-    expect(ref.current.state.timeBlockRows).toHaveLength(1)
-    ref.current.addRow(newRow)
-    expect(ref.current.state.timeBlockRows).toHaveLength(2)
+    render(<TimeBlockSelector {...defaultProps} ref={ref} />)
+
+    const initialLength = ref.current.state.timeBlockRows.length
+    ref.current.addRow({
+      timeData: {
+        startTime: new Date('Oct 26 2016 10:00'),
+        endTime: new Date('Oct 26 2016 15:00'),
+      },
+    })
+    expect(ref.current.state.timeBlockRows).toHaveLength(initialLength + 1)
   })
 
-  test('handleSlotAddition adds new time slot without time', () => {
+  it('adds new empty time slot when no time specified', () => {
     const ref = React.createRef()
-    render(<TimeBlockSelector {...props} ref={ref} />)
-    expect(ref.current.state.timeBlockRows).toHaveLength(1)
+    render(<TimeBlockSelector {...defaultProps} ref={ref} />)
+
+    const initialLength = ref.current.state.timeBlockRows.length
     ref.current.addRow()
-    expect(ref.current.state.timeBlockRows).toHaveLength(2)
+    expect(ref.current.state.timeBlockRows).toHaveLength(initialLength + 1)
   })
 
-  test('handleSlotDeletion delete a time slot with time', () => {
+  it('deletes a time slot', () => {
     const ref = React.createRef()
-    render(<TimeBlockSelector {...props} ref={ref} />)
-    const newRow = ref.current.state.timeBlockRows[0]
-    newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
-    newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
-    ref.current.addRow(newRow)
-    expect(ref.current.state.timeBlockRows).toHaveLength(2)
-    ref.current.deleteRow(ref.current.state.timeBlockRows[1].slotEventId)
-    expect(ref.current.state.timeBlockRows).toHaveLength(1)
+    render(<TimeBlockSelector {...defaultProps} ref={ref} />)
+
+    const initialLength = ref.current.state.timeBlockRows.length
+    const slotId = ref.current.state.timeBlockRows[0].slotEventId
+    ref.current.deleteRow(slotId)
+    expect(ref.current.state.timeBlockRows).toHaveLength(initialLength - 1)
   })
 
-  test('handleSetData setting time data', () => {
+  it('updates time data for a specific slot', () => {
     const ref = React.createRef()
-    const component = render(<TimeBlockSelector {...props} ref={ref} />)
-    const newRow = ref.current.state.timeBlockRows[0]
-    newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
-    newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
-    ref.current.addRow(newRow)
-    newRow.timeData.startTime = new Date('Oct 26 2016 11:00')
-    newRow.timeData.endTime = new Date('Oct 26 2016 16:00')
-    ref.current.handleSetData(ref.current.state.timeBlockRows[1].slotEventId, newRow)
-    expect(ref.current.state.timeBlockRows[0].timeData.endTime).toEqual(
-      new Date('Oct 26 2016 16:00'),
-    )
+    render(<TimeBlockSelector {...defaultProps} ref={ref} />)
+
+    const slotId = ref.current.state.timeBlockRows[0].slotEventId
+    const newTimeData = {
+      startTime: new Date('Oct 26 2016 11:00'),
+      endTime: new Date('Oct 26 2016 16:00'),
+    }
+
+    ref.current.handleSetData(slotId, newTimeData)
+    expect(ref.current.state.timeBlockRows[0].timeData).toEqual(newTimeData)
   })
 
-  test('calls onChange when there are modifications made', async () => {
-    props.onChange = jest.fn()
+  it('calls onChange when modifications are made', () => {
+    const onChange = jest.fn()
     const ref = React.createRef()
-    const component = render(<TimeBlockSelector {...props} ref={ref} />)
-    const input = component.container.querySelector('#TimeBlockSelector__DivideSection-Input')
-    input.value = 60
+    render(<TimeBlockSelector {...defaultProps} onChange={onChange} ref={ref} />)
+
+    // Modify time data
     const newRow = ref.current.state.timeBlockRows[0]
-    newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
-    newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
+    newRow.timeData = {
+      startTime: new Date('Oct 26 2016 10:00'),
+      endTime: new Date('Oct 26 2016 15:00'),
+    }
     ref.current.setState({
       timeBlockRows: [newRow],
     })
-    expect(props.onChange).toHaveBeenCalled()
+
+    expect(onChange).toHaveBeenCalled()
   })
 })

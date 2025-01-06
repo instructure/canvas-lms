@@ -19,7 +19,15 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {MockedProvider} from '@apollo/client/testing'
 import Layout from '../Layout'
+
+jest.mock('@canvas/apollo-v3', () => ({
+  createClient: () => ({
+    mutate: jest.fn().mockResolvedValue({}),
+  }),
+  gql: jest.fn(),
+}))
 
 describe('AssignmentPostingPolicyTray Layout', () => {
   let container
@@ -66,7 +74,11 @@ describe('AssignmentPostingPolicyTray Layout', () => {
       originalPostManually: true,
       selectedPostManually: false,
     }
-    const {container: renderedContainer} = render(<Layout {...context} />)
+    const {container: renderedContainer} = render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <Layout {...context} />
+      </MockedProvider>,
+    )
     container = renderedContainer
   })
 
@@ -76,6 +88,7 @@ describe('AssignmentPostingPolicyTray Layout', () => {
 
   it('clicking "Cancel" button calls the onDismiss prop', async () => {
     await userEvent.click(getCancelButton())
+    await new Promise(resolve => setTimeout(resolve, 0))
     expect(context.onDismiss).toHaveBeenCalledTimes(1)
   })
 

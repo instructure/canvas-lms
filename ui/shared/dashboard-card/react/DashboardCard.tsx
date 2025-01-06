@@ -309,6 +309,7 @@ export const DashboardCard = ({
       className="ic-DashboardCard"
       style={{opacity: isDragging ? 0 : 1}}
       aria-label={originalName}
+      data-testid="draggable-card"
     >
       <div className="ic-DashboardCard__header">
         <span className="screenreader-only">
@@ -326,7 +327,11 @@ export const DashboardCard = ({
         />
         <a href={href} className="ic-DashboardCard__link">
           <div className="ic-DashboardCard__header_content">
-            <h3 className="ic-DashboardCard__header-title ellipsis" title={originalName}>
+            <h3
+              className="ic-DashboardCard__header-title ellipsis"
+              title={originalName}
+              data-testid="dashboard-card-title"
+            >
               <span style={{color: backgroundColor}}>{nicknameInfo.nickname}</span>
             </h3>
             <div className="ic-DashboardCard__header-subtitle ellipsis" title={courseCode}>
