@@ -62,6 +62,14 @@ describe "files index page" do
         get "/courses/#{@course.id}/files"
         expect(files_usage_text.text).to include("50% of 50 MB used")
       end
+
+      it "Can create a new folder" do
+        get "/courses/#{@course.id}/files"
+        create_folder_button.click
+        create_folder_input.send_keys("new folder")
+        create_folder_input.send_keys(:return)
+        expect(f("#content")).to include_text("new folder")
+      end
     end
 
     context("as a student") do

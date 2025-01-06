@@ -19,16 +19,23 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {IconAddLine, IconUploadLine} from '@instructure/ui-icons'
+import {IconUploadLine} from '@instructure/ui-icons'
+import CreateFolderButton from './CreateFolderButton'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
   isUserContext: boolean
   size: string
   isDisabled: boolean
+  onCreateFolderButtonClick: () => void
 }
 
-const TopLevelButtons = ({isUserContext, size, isDisabled}: TopLevelButtonsProps) => {
+const TopLevelButtons = ({
+  isUserContext,
+  size,
+  isDisabled,
+  onCreateFolderButtonClick,
+}: TopLevelButtonsProps) => {
   const buttonDisplay = size === 'small' ? 'block' : 'inline-block'
 
   const uploadButton = () => {
@@ -41,20 +48,6 @@ const TopLevelButtons = ({isUserContext, size, isDisabled}: TopLevelButtonsProps
         disabled={isDisabled}
       >
         {I18n.t('Upload')}
-      </Button>
-    )
-  }
-
-  const addFolderButton = () => {
-    return (
-      <Button
-        color="secondary"
-        margin="none x-small small none"
-        renderIcon={<IconAddLine />}
-        display={buttonDisplay}
-        disabled={isDisabled}
-      >
-        {I18n.t('Folder')}
       </Button>
     )
   }
@@ -79,7 +72,11 @@ const TopLevelButtons = ({isUserContext, size, isDisabled}: TopLevelButtonsProps
     return (
       <>
         {uploadButton()}
-        {addFolderButton()}
+        <CreateFolderButton
+          buttonDisplay={buttonDisplay}
+          isDisabled={isDisabled}
+          onClick={onCreateFolderButtonClick}
+        />
         {allMyFilesButton()}
       </>
     )
@@ -88,7 +85,11 @@ const TopLevelButtons = ({isUserContext, size, isDisabled}: TopLevelButtonsProps
   return (
     <>
       {allMyFilesButton()}
-      {addFolderButton()}
+      <CreateFolderButton
+        buttonDisplay={buttonDisplay}
+        isDisabled={isDisabled}
+        onClick={onCreateFolderButtonClick}
+      />
       {uploadButton()}
     </>
   )

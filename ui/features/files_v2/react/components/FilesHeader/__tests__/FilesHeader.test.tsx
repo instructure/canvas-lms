@@ -19,19 +19,46 @@
 import React from 'react'
 import FilesHeader from '../FilesHeader'
 import {render, screen} from '@testing-library/react'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+import {QueryClient} from '@tanstack/react-query'
+import userEvent from '@testing-library/user-event'
+
+const defaultProps = {
+  isUserContext: false,
+  size: 'small' as 'small' | 'medium' | 'large',
+}
+
+const renderComponent = (props?: any) => {
+  const queryClient = new QueryClient()
+  return render(
+    <MockedQueryClientProvider client={queryClient}>
+      <FilesHeader {...defaultProps} {...props} />
+    </MockedQueryClientProvider>,
+  )
+}
 
 describe('FilesHeader', () => {
   it('renders "Files" when not in a user context', async () => {
-    render(<FilesHeader isUserContext={false} size="small" />)
+    renderComponent()
 
     const headingElement = await screen.findByText('Files', {exact: true})
     expect(headingElement).toBeInTheDocument()
   })
 
   it('renders "All My Files" when in a user context', async () => {
-    render(<FilesHeader isUserContext={true} size="small" />)
+    renderComponent({isUserContext: true})
 
     const headingElement = await screen.findByText(/All My Files/i)
     expect(headingElement).toBeInTheDocument()
+  })
+
+  it('opens the create folder modal when the create folder button is clicked', async () => {
+    const user = userEvent.setup()
+    renderComponent()
+
+    const createFolderButton = await screen.findByRole('button', {name: /Folder/i})
+    await user.click(createFolderButton)
+    const modalElement = await screen.findByRole('heading', {name: /create folder/i})
+    expect(modalElement).toBeInTheDocument()
   })
 })
