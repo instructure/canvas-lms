@@ -21,12 +21,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Assignment, Checkpoint} from '../../../api'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {datetimeString} from '@canvas/datetime/date-functions'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignment')
 
 const REPLY_TO_TOPIC = 'reply_to_topic'
 
-type AssignmentCheckpoints = Pick<Assignment, 'id' | 'checkpoints' | 'discussion_topic'>
+type AssignmentCheckpoints = Pick<Assignment, 'id' | 'checkpoints' | 'discussion_topic' | 'points_possible'>
 
 type TeacherCheckpointsInfoProps = {
   assignment: AssignmentCheckpoints
@@ -199,6 +200,12 @@ export const TeacherCheckpointsInfo: React.FC<TeacherCheckpointsInfoProps> = ({a
         dueDate={getCheckpointDueDates(requiredRepliesCheckpoint)}
         testId={`${assignment.id}_required_replies`}
       />
+      <Text size='x-small' data-testid={`${assignment.id}_points_possible`}>
+        { I18n.t('%{points_possible} pts', {
+           points_possible: assignment.points_possible,
+          })
+        }
+      </Text>
     </div>
   )
 }
