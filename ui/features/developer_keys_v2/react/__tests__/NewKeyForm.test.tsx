@@ -16,16 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-import TestUtils from 'react-dom/test-utils'
-import DeveloperKeyFormFields from '../NewKeyForm'
-import ToolConfigurationForm from '../ToolConfigurationForm'
-import Scopes from '../Scopes'
+import React from 'react'
 import {render} from '@testing-library/react'
+import DeveloperKeyFormFields from '../NewKeyForm'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import type {DeveloperKey} from 'features/developer_keys_v2/model/api/DeveloperKey'
 import type {NewKeyFormProps} from '../NewKeyForm'
-import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const developerKey: DeveloperKey = {
   access_token_count: 77,
@@ -50,7 +47,7 @@ const developerKey: DeveloperKey = {
   is_lti_registration: false,
 }
 
-function defaultProps() {
+function defaultProps(): NewKeyFormProps {
   return {
     availableScopes: {},
     availableScopesPending: false,
@@ -71,160 +68,178 @@ function defaultProps() {
     hasRedirectUris: false,
     syncRedirectUris: () => {},
     isRedirectUriRequired: false,
+    isLtiKey: false,
+    developerKey: {
+      access_token_count: 0,
+      account_name: '',
+      api_key: '',
+      created_at: '',
+      email: '',
+      icon_url: '',
+      id: '',
+      name: '',
+      notes: '',
+      redirect_uri: '',
+      redirect_uris: '',
+      vendor_code: '',
+      test_cluster_only: false,
+      allow_includes: false,
+      scopes: [],
+      require_scopes: null,
+      tool_configuration: null,
+      client_credentials_audience: null,
+      is_lti_key: false,
+      is_lti_registration: false,
+    },
   }
 }
 
-function renderWithTestUtils(
-  devKey: DeveloperKey,
-  isLtiKey: boolean
-): Component<DeveloperKeyFormFields> {
-  const props = {...defaultProps(), developerKey: devKey, isLtiKey}
-  return TestUtils.renderIntoDocument<DeveloperKeyFormFields>(
-    <DeveloperKeyFormFields {...props} />
-  ) as Component<DeveloperKeyFormFields>
-}
-
-function renderWithTestingLibrary(
+function renderComponent(
   devKey: DeveloperKey,
   isLtiKey: boolean,
-  extraProps: Partial<NewKeyFormProps> = {}
+  extraProps: Partial<NewKeyFormProps> = {},
 ) {
   const props = {...defaultProps(), developerKey: devKey, isLtiKey, ...extraProps}
   return render(<DeveloperKeyFormFields {...props} />)
 }
 
-// Our TS version/settings don't seem to support HTMLElementTagNameMap[T] ...
-function inputFieldOfName(devKey: DeveloperKey, name: string, isLtiKey: boolean = false) {
-  const component = renderWithTestUtils(devKey, isLtiKey)
-  const elem = TestUtils.scryRenderedDOMComponentsWithTag(component, 'input').find(
-    e => (e as HTMLInputElement).name === `developer_key[${name}]`
-  ) as HTMLInputElement
-  return elem
-}
+describe('DeveloperKeyFormFields', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      validLtiPlacements: ['course_navigation', 'account_navigation'],
+      validLtiScopes: {},
+    })
+  })
 
-function textareaFieldOfName(devKey: DeveloperKey, name: string, isLtiKey: boolean = false) {
-  const component = renderWithTestUtils(devKey, isLtiKey)
-  const elem = TestUtils.scryRenderedDOMComponentsWithTag(component, 'textarea').find(
-    e => (e as HTMLTextAreaElement).name === `developer_key[${name}]`
-  ) as HTMLTextAreaElement
-  return elem
-}
+  afterEach(() => {
+    fakeENV.teardown()
+  })
 
-let oldENV: GlobalEnv
+  it('populates the key name', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const input = getByTestId('key-name-input')
+    expect(input).toHaveValue(developerKey.name)
+  })
 
-beforeAll(() => {
-  oldENV = window.ENV
-  window.ENV = {
-    ...window.ENV,
-    validLtiPlacements: ['course_navigation', 'account_navigation'],
-    validLtiScopes: {},
-  }
-})
+  it('populates the key owner email', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const input = getByTestId('owner-email-input')
+    expect(input).toHaveValue(developerKey.email)
+  })
 
-afterAll(() => {
-  window.ENV = oldENV
-})
+  it('populates the key legacy redirect uri', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const input = getByTestId('legacy-redirect-uri-input')
+    expect(input).toHaveValue(developerKey.redirect_uri)
+  })
 
-it('populates the key name', () => {
-  const input = inputFieldOfName(developerKey, 'name')
-  expect(input!.value).toEqual(developerKey.name)
-})
+  it('populates the key redirect uris', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const textarea = getByTestId('redirect-uris-input')
+    expect(textarea).toHaveValue(developerKey.redirect_uris)
+  })
 
-it('populates the key owner email', () => {
-  const input = inputFieldOfName(developerKey, 'email')
-  expect(input!.value).toBe(developerKey.email)
-})
+  it('populates the key vendor code', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const input = getByTestId('vendor-code-input')
+    expect(input).toHaveValue(developerKey.vendor_code)
+  })
 
-it('populates the key legacy redirect uri', () => {
-  const input = inputFieldOfName(developerKey, 'redirect_uri')
-  expect(input!.value).toEqual(developerKey.redirect_uri)
-})
+  it('populates the key icon URL', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const input = getByTestId('icon-url-input')
+    expect(input).toHaveValue(developerKey.icon_url)
+  })
 
-it('populates the key redirect uris', () => {
-  const textarea = textareaFieldOfName(developerKey, 'redirect_uris')
-  expect(textarea!.value).toEqual(developerKey.redirect_uris)
-})
+  it('populates the key notes', () => {
+    const {getByTestId} = renderComponent(developerKey, false)
+    const textarea = getByTestId('notes-input')
+    expect(textarea).toHaveValue(developerKey.notes)
+  })
 
-it('populates the key vendor code', () => {
-  const input = inputFieldOfName(developerKey, 'vendor_code')
-  expect(input!.value).toEqual(developerKey.vendor_code)
-})
+  it('does not populate the key test_cluster_only without ENV set', () => {
+    const {queryByTestId} = renderComponent(developerKey, false)
+    expect(queryByTestId('test-cluster-only-checkbox')).not.toBeInTheDocument()
+  })
 
-it('populates the key icon URL', () => {
-  const input = inputFieldOfName(developerKey, 'icon_url')
-  expect(input!.value).toEqual(developerKey.icon_url)
-})
+  it('populates the key test_cluster_only when ENV is set', () => {
+    fakeENV.setup({
+      ...window.ENV,
+      enableTestClusterChecks: true,
+    })
+    const {getByTestId} = renderComponent(developerKey, false)
+    const checkbox = getByTestId('test-cluster-only-checkbox')
+    expect(checkbox).toBeInTheDocument()
+    expect(checkbox).not.toBeChecked()
+  })
 
-it('populates the key notes', () => {
-  const textarea = textareaFieldOfName(developerKey, 'notes')
-  expect(textarea!.value).toEqual(developerKey.notes)
-})
+  describe('when isLtiKey is true', () => {
+    it('does not include legacy redirect uri', () => {
+      const {queryByTestId} = renderComponent(developerKey, true)
+      expect(queryByTestId('legacy-redirect-uri-input')).not.toBeInTheDocument()
+    })
 
-it('does not populates the key test_cluster_only without ENV set', () => {
-  const input = inputFieldOfName(developerKey, 'test_cluster_only')
-  expect(input).toEqual(undefined)
-})
+    it('does not include vendor code', () => {
+      const {queryByTestId} = renderComponent(developerKey, true)
+      expect(queryByTestId('vendor-code-input')).not.toBeInTheDocument()
+    })
 
-it('populates the key test_cluster_only', () => {
-  window.ENV = {...window.ENV, enableTestClusterChecks: true}
-  const input = inputFieldOfName(developerKey, 'test_cluster_only')
-  expect(input!.checked).toEqual(developerKey.test_cluster_only)
-})
+    it('does not include icon URL', () => {
+      const {queryByTestId} = renderComponent(developerKey, true)
+      expect(queryByTestId('icon-url-input')).not.toBeInTheDocument()
+    })
 
-it('does not include legacy redirect uri if lti key', () => {
-  const input = inputFieldOfName(developerKey, 'redirect_uri', true)
-  expect(input).toBeUndefined()
-})
+    it('includes redirect uris', () => {
+      const {getByTestId} = renderComponent(developerKey, true)
+      expect(getByTestId('redirect-uris-input')).toBeInTheDocument()
+    })
 
-it('does not include vendor code if lti key', () => {
-  const input = inputFieldOfName(developerKey, 'vendor_code', true)
-  expect(input).toBeUndefined()
-})
+    it('includes key name', () => {
+      const {getByTestId} = renderComponent(developerKey, true)
+      const input = getByTestId('key-name-input')
+      expect(input).toHaveValue(developerKey.name)
+    })
 
-it('does not include icon URL if lti key', () => {
-  const input = inputFieldOfName(developerKey, 'icon_url', true)
-  expect(input).toBeUndefined()
-})
+    it('includes owner email', () => {
+      const {getByTestId} = renderComponent(developerKey, true)
+      const input = getByTestId('owner-email-input')
+      expect(input).toHaveValue(developerKey.email)
+    })
 
-it('populates the redirect uris if lti key', () => {
-  const textarea = textareaFieldOfName(developerKey, 'redirect_uris', true)
-  expect(textarea).not.toBeUndefined()
-})
+    it('includes notes', () => {
+      const {getByTestId} = renderComponent(developerKey, true)
+      const textarea = getByTestId('notes-input')
+      expect(textarea).toHaveValue(developerKey.notes)
+    })
 
-it('populates the key name when lti key', () => {
-  const input = inputFieldOfName(developerKey, 'name', true)
-  expect(input!.value).toBe(developerKey.name)
-})
+    it('renders the tool configuration form', () => {
+      const {getByText, getByRole} = renderComponent(developerKey, true)
+      expect(getByText('Developer Key Settings')).toBeInTheDocument()
+      expect(getByRole('combobox', {name: /method/i})).toBeInTheDocument()
+    })
+  })
 
-it('populates the key owner email when lti key', () => {
-  const input = inputFieldOfName(developerKey, 'email', true)
-  expect(input!.value).toBe(developerKey.email)
-})
+  describe('when isLtiKey is false', () => {
+    it('renders the developer key scopes form', () => {
+      const {getByTestId, getByText} = renderComponent(developerKey, false)
+      const enforceScopes = document.querySelector('[data-automation="enforce_scopes"]')
+      expect(enforceScopes).toBeInTheDocument()
+      expect(getByText(/when scope enforcement is disabled/i)).toBeInTheDocument()
+    })
+  })
 
-it('populates the key notes when lti key', () => {
-  const textarea = textareaFieldOfName(developerKey, 'notes', true)
-  expect(textarea!.value).toBe(developerKey.notes)
-})
+  describe('redirect URIs field', () => {
+    it('renders as optional when isRedirectUriRequired is false', () => {
+      const {getByText, queryByText} = renderComponent(developerKey, true, {
+        isRedirectUriRequired: false,
+      })
+      expect(getByText('Redirect URIs:')).toBeInTheDocument()
+      expect(queryByText('* Redirect URIs:')).not.toBeInTheDocument()
+    })
 
-it('renders the tool configuration form if isLtiKey is true', () => {
-  const component = renderWithTestUtils(developerKey, true)
-  const tcf = TestUtils.scryRenderedComponentsWithType(component, ToolConfigurationForm)
-  expect(tcf).toHaveLength(1)
-})
-
-it('renders the developer key scopes form if isLtiKey is false', () => {
-  const component = renderWithTestUtils(developerKey, false)
-  const scopes = TestUtils.scryRenderedComponentsWithType(component, Scopes)
-  expect(scopes).toHaveLength(1)
-})
-
-it('renders an optional `Redirect URIs:` field if isRedirectUriRequired is false', async () => {
-  const rendered = renderWithTestingLibrary(developerKey, true, {isRedirectUriRequired: false})
-  expect(await rendered.findByText('Redirect URIs:')).toBeInTheDocument()
-  expect(rendered.queryByText('* Redirect URIs:')).not.toBeInTheDocument()
-})
-
-it('render a require `* Redirect URIs:` field if isRedirectUriRequired is true', () => {
-  const rendered = renderWithTestingLibrary(developerKey, true, {isRedirectUriRequired: true})
-  expect(rendered.getByText('* Redirect URIs:')).toBeInTheDocument()
+    it('renders as required when isRedirectUriRequired is true', () => {
+      const {getByText} = renderComponent(developerKey, true, {isRedirectUriRequired: true})
+      expect(getByText('* Redirect URIs:')).toBeInTheDocument()
+    })
+  })
 })

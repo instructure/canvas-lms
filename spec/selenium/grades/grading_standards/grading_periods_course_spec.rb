@@ -39,22 +39,39 @@ describe "Course Grading Periods" do
     end
 
     it "allows grading periods to be deleted", priority: "1" do
-      grading_period_selector = ".grading-period"
       group = group_helper.legacy_create_for_course(@course)
       period_helper.create_with_weeks_for_group(group, 5, 3)
       period_helper.create_with_weeks_for_group(group, 3, 1)
       get "/courses/#{@course.id}/grading_standards"
-      expect(ff(grading_period_selector).length).to be 2
-      f(".icon-delete-grading-period").click
-      driver.switch_to.alert.accept
+
+      # Wait for the page to load and elements to be present
       wait_for_ajaximations
-      expect(ff(grading_period_selector).length).to be 1
+      expect(ff(".grading-period").length).to be 2
+
+      # Click the delete button and confirm deletion
+      delete_button = f(".icon-delete-grading-period")
+      expect(delete_button).to be_displayed
+      expect(delete_button).to be_enabled
+
+      driver.execute_script("window.confirm = function() { return true; }")
+      delete_button.click
+
+      # Wait for the delete operation to complete
+      wait_for_ajaximations
+      expect(ff(".grading-period").length).to be 1
     end
 
     it "allows updating grading periods", priority: "1" do
       period_helper.create_with_group_for_course(@course)
       get "/courses/#{@course.id}/grading_standards"
-      expect(f("#update-button")).to be_present
+
+      # Wait for the page to load and elements to be present
+      wait_for_ajaximations
+
+      # Wait for the update button to be present and enabled
+      update_button = f("#update-button")
+      expect(update_button).to be_displayed
+      expect(update_button).to be_enabled
     end
   end
 end

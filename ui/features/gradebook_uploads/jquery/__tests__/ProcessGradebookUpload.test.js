@@ -17,9 +17,6 @@
  */
 
 import _ from 'lodash'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
 import sinon from 'sinon'
 import ProcessGradebookUpload from '../process_gradebook_upload'
 import fakeENV from '@canvas/test-utils/fakeENV'

@@ -109,7 +109,7 @@ class GradingPeriodCollection extends React.Component {
         this.isTitleCompleted(period) &&
         this.areDatesValid(period) &&
         this.isStartDateBeforeEndDate(period) &&
-        this.areNoDatesOverlapping(period)
+        this.areNoDatesOverlapping(period),
     )
 
   areDatesOverlapping = targetPeriod => {
@@ -120,7 +120,7 @@ class GradingPeriodCollection extends React.Component {
       otherPeriods,
       period =>
         // http://c2.com/cgi/wiki?TestIfDateRangesOverlap
-        target.startDate < period.endDate && period.startDate < target.endDate
+        target.startDate < period.endDate && period.startDate < target.endDate,
     )
   }
 
@@ -165,7 +165,7 @@ class GradingPeriodCollection extends React.Component {
       true,
       {},
       updatedGradingPeriodComponent.props,
-      updatedGradingPeriodComponent.state
+      updatedGradingPeriodComponent.state,
     )
     const existingGradingPeriod = this.getPeriodById(attrs.id)
     const indexToUpdate = this.state.periods.indexOf(existingGradingPeriod)
@@ -254,7 +254,9 @@ class GradingPeriodCollection extends React.Component {
 
   render() {
     return (
-      <div>
+      <div
+        data-testid={periodsAreLoaded(this.state) ? 'grading-periods' : 'grading-periods-loading'}
+      >
         <div id="grading_periods" className="content-box">
           {this.renderGradingPeriods()}
         </div>

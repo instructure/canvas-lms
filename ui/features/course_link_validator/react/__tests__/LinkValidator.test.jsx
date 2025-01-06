@@ -17,91 +17,93 @@
  */
 
 import React from 'react'
-import {act} from 'react-dom/test-utils'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor, act} from '@testing-library/react'
 import LinkValidator from '../LinkValidator'
-import sinon from 'sinon'
 import $ from 'jquery'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.useFakeTimers()
+jest.mock('jquery')
 
 describe('LinkValidator', () => {
   describe('confetti', () => {
     describe('with no invalid links', () => {
-      let env, sandbox
       beforeEach(() => {
-        env = window.ENV
-        sandbox = sinon.createSandbox()
-        window.ENV = {
+        fakeENV.setup({
           validation_api_url: '/foo/bar',
           VALIDATION_CONFETTI_ENABLED: true,
-        }
-        sandbox.stub($, 'ajax').callsFake(params =>
+        })
+
+        // Mock jQuery selector and show/hide methods
+        const mockShow = jest.fn()
+        const mockHide = jest.fn()
+        $.mockImplementation(() => ({
+          show: mockShow,
+          hide: mockHide,
+        }))
+
+        $.ajax.mockImplementation(params =>
           params.success({
             workflow_state: 'completed',
             results: {
               version: 2,
               issues: [],
             },
-          })
+          }),
         )
       })
 
       afterEach(() => {
-        window.ENV = env
-        sandbox.restore()
+        fakeENV.teardown()
+        jest.clearAllMocks()
       })
 
-      it('renders confetti', () => {
+      it('renders confetti', async () => {
         const {getByTestId} = render(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
-        const promise = new Promise(resolve => {
-          setTimeout(resolve, 1)
-        })
+
         act(() => {
           fireEvent.click(getByTestId('validate-button'))
           jest.advanceTimersByTime(2000)
         })
-        return promise.then(() => {
-          expect(getByTestId('confetti-canvas')).toBeTruthy()
+
+        await waitFor(() => {
+          expect(getByTestId('confetti-canvas')).toBeInTheDocument()
         })
       })
 
       describe('with the VALIDATION_CONFETTI_ENABLED flag set to false', () => {
         beforeEach(() => {
-          window.ENV = {
+          fakeENV.setup({
             validation_api_url: '/foo/bar',
             VALIDATION_CONFETTI_ENABLED: false,
-          }
+          })
         })
 
-        it('does not render confetti', () => {
+        it('does not render confetti', async () => {
           const {getByTestId, queryByTestId} = render(
-            <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />
+            <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />,
           )
-          const promise = new Promise(resolve => {
-            setTimeout(resolve, 1)
-          })
+
           act(() => {
             fireEvent.click(getByTestId('validate-button'))
             jest.advanceTimersByTime(2000)
           })
-          return promise.then(() => {
-            expect(queryByTestId('confetti-canvas')).toBeNull()
+
+          await waitFor(() => {
+            expect(queryByTestId('confetti-canvas')).not.toBeInTheDocument()
           })
         })
       })
     })
 
     describe('with invalid links', () => {
-      let env, sandbox
       beforeEach(() => {
-        env = window.ENV
-        sandbox = sinon.createSandbox()
-        window.ENV = {
+        fakeENV.setup({
           validation_api_url: '/foo/bar',
           VALIDATION_CONFETTI_ENABLED: true,
-        }
-        sandbox.stub($, 'ajax').callsFake(params =>
+        })
+
+        $.ajax.mockImplementation(params =>
           params.success({
             workflow_state: 'completed',
             results: {
@@ -118,7 +120,6 @@ describe('LinkValidator', () => {
                       link_text: 'foo',
                     },
                     {
-                      // eslint-disable-next-line no-script-url
                       url: 'javascript:alert("lulz")',
                       reason: 'unreachable',
                       link_text: 'hehehh',
@@ -127,43 +128,41 @@ describe('LinkValidator', () => {
                 },
               ],
             },
-          })
+          }),
         )
       })
 
       afterEach(() => {
-        window.ENV = env
-        sandbox.restore()
+        fakeENV.teardown()
+        jest.clearAllMocks()
       })
 
-      it('does not render confetti', () => {
+      it('does not render confetti', async () => {
         const {getByTestId, queryByTestId} = render(
-          <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />
+          <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />,
         )
-        const promise = new Promise(resolve => {
-          setTimeout(resolve, 1)
-        })
+
         act(() => {
           fireEvent.click(getByTestId('validate-button'))
           jest.advanceTimersByTime(2000)
         })
-        return promise.then(() => {
-          expect(queryByTestId('confetti-canvas')).toBeNull()
+
+        await waitFor(() => {
+          expect(queryByTestId('confetti-canvas')).not.toBeInTheDocument()
         })
       })
 
-      it('sanitizes URLs', () => {
+      it('sanitizes URLs', async () => {
         const {getByText, getByTestId} = render(
-          <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />
+          <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />,
         )
-        const promise = new Promise(resolve => {
-          setTimeout(resolve, 1)
-        })
+
         act(() => {
           fireEvent.click(getByTestId('validate-button'))
           jest.advanceTimersByTime(2000)
         })
-        return promise.then(() => {
+
+        await waitFor(() => {
           expect(getByText('hehehh').href).toEqual('about:blank')
         })
       })

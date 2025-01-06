@@ -63,7 +63,13 @@ export default class SelectButton extends React.Component {
     }
 
     return (
-      <button type="button" className={btnClasses} onClick={this.onClick} disabled={isDisabled}>
+      <button
+        type="button"
+        className={btnClasses}
+        onClick={this.onClick}
+        disabled={isDisabled}
+        data-testid="select-button"
+      >
         {text}
       </button>
     )

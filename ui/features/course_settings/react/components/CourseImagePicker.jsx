@@ -47,7 +47,7 @@ export default class CourseImagePicker extends React.Component {
     fileDropMessages: null,
   }
 
-  handleTabChange = (event, {index}) => {
+  handleTabChange = (_event, {index}) => {
     this.setState({
       selectedIndex: index,
     })
@@ -61,7 +61,7 @@ export default class CourseImagePicker extends React.Component {
         preventDefault: () => {},
         stopPropagagtion: () => {},
       },
-      this.props.courseId
+      this.props.courseId,
     )
   }
 
@@ -82,6 +82,7 @@ export default class CourseImagePicker extends React.Component {
             </div>
           ) : (
             <FileDrop
+              data-testid="course-image-drop-zone"
               accept="image/*"
               renderLabel={
                 <Billboard

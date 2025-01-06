@@ -16,36 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isNull} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import ApiProgressBar from '../ApiProgressBar'
 import ProgressStore from '../../../stores/ProgressStore'
 
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toEqual(y)
+describe('ApiProgressBar', () => {
+  const defaultProgress = {
+    id: '1',
+    context_id: 1,
+    context_type: 'EpubExport',
+    user_id: 1,
+    tag: 'epub_export',
+    completion: 0,
+    workflow_state: 'queued',
+  }
 
-let progress_id
-let progress
-let store_state
+  const renderComponent = (props = {}) => {
+    return render(<ApiProgressBar {...props} />)
+  }
 
-describe('ApiProgressBarSpec', () => {
   beforeEach(() => {
     jest.useFakeTimers()
-    progress_id = '1'
-    progress = {
-      id: progress_id,
-      context_id: 1,
-      context_type: 'EpubExport',
-      user_id: 1,
-      tag: 'epub_export',
-      completion: 0,
-      workflow_state: 'queued',
-    }
-    store_state = {}
-    store_state[progress_id] = progress
-    jest.spyOn(ProgressStore, 'get').mockImplementation(() => ProgressStore.setState(store_state))
+    jest.spyOn(ProgressStore, 'get').mockImplementation(() => {
+      ProgressStore.setState({[defaultProgress.id]: defaultProgress})
+    })
   })
 
   afterEach(() => {
@@ -54,123 +49,101 @@ describe('ApiProgressBarSpec', () => {
     jest.useRealTimers()
   })
 
-  test('shouldComponentUpdate', function () {
-    let ApiProgressBarElement = <ApiProgressBar />
-    let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    ok(
-      component.shouldComponentUpdate({progress_id}, {}),
-      'should update when progress_id prop changes',
-    )
-    ok(
-      component.shouldComponentUpdate({}, {workflow_state: 'running'}),
-      'should update when workflow_state changes',
-    )
-    ok(
-      component.shouldComponentUpdate({}, {completion: 10}),
-      'should update when completion level changes',
-    )
-
-    ApiProgressBarElement = <ApiProgressBar progress_id={progress_id} />
-    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    component.setState({workflow_state: 'running'})
-    ok(
-      !component.shouldComponentUpdate(
-        {progress_id},
-        {
-          completion: component.state.completion,
-          workflow_state: component.state.workflow_state,
-        },
-      ),
-      'should not update if state & props are the same',
-    )
+  it('does not render initially when not in progress', () => {
+    const {container} = renderComponent()
+    expect(container.firstChild).toBeNull()
   })
 
-  test('componentDidUpdate', function () {
-    const onCompleteSpy = jest.fn()
-    const ApiProgressBarElement = (
-      <ApiProgressBar onComplete={onCompleteSpy} progress_id={progress_id} />
-    )
-    const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(!isNull(component.intervalID), 'should have interval id')
-    progress.workflow_state = 'running'
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(!isNull(component.intervalID), 'should have an inverval id after updating to running')
-    progress.workflow_state = 'completed'
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(isNull(component.intervalID), 'should not have an inverval id after updating to completed')
-    expect(onCompleteSpy).toHaveBeenCalled()
+  it('renders progress bar when in progress', () => {
+    const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
+    jest.advanceTimersByTime(1000)
+    expect(getByTestId('api-progress-bar')).toBeInTheDocument()
   })
 
-  test('handleStoreChange', function () {
-    const ApiProgressBarElement = <ApiProgressBar progress_id={progress_id} />
-    const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ;['completion', 'workflow_state'].forEach(stateName =>
-      equal(
-        component.state[stateName],
-        progress[stateName],
-        `component ${stateName} should equal progress ${stateName}`,
-      ),
-    )
-    progress.workflow_state = 'running'
-    progress.completion = 50
-    ProgressStore.setState(store_state)
-    ;['completion', 'workflow_state'].forEach(stateName =>
-      equal(
-        component.state[stateName],
-        progress[stateName],
-        `component ${stateName} should equal progress ${stateName}`,
-      ),
-    )
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
+  it('updates when progress state changes', () => {
+    const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
+    jest.advanceTimersByTime(1000)
+
+    // Update progress state to running
+    const updatedProgress = {...defaultProgress, workflow_state: 'running', completion: 50}
+    ProgressStore.setState({[defaultProgress.id]: updatedProgress})
+
+    const progressBar = getByTestId('api-progress-bar')
+    expect(progressBar).toBeInTheDocument()
+    expect(progressBar.querySelector('[role="progressbar"]')).toHaveAttribute('aria-valuenow', '50')
   })
 
-  test('isComplete', function () {
-    const ApiProgressBarElement = <ApiProgressBar progress_id={progress_id} />
-    const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(!component.isComplete(), 'is not complete if state is queued')
-    progress.workflow_state = 'running'
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(!component.isComplete(), 'is not complete if state is running')
-    progress.workflow_state = 'completed'
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(component.isComplete(), 'is complete if state is completed')
+  it('calls onComplete when progress is completed', () => {
+    const onComplete = jest.fn()
+    renderComponent({progress_id: defaultProgress.id, onComplete})
+    jest.advanceTimersByTime(1000)
+
+    // Update progress state to completed
+    const completedProgress = {...defaultProgress, workflow_state: 'completed', completion: 100}
+    ProgressStore.setState({[defaultProgress.id]: completedProgress})
+
+    expect(onComplete).toHaveBeenCalled()
   })
 
-  test('isInProgress', function () {
-    const ApiProgressBarElement = <ApiProgressBar progress_id={progress_id} />
-    const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(component.isInProgress(), 'is in progress if state is queued')
-    progress.workflow_state = 'running'
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(component.isInProgress(), 'is in progress if state is running')
-    progress.workflow_state = 'completed'
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(!component.isInProgress(), 'is not in progress if state is completed')
+  it('stops polling when progress is completed', () => {
+    const {queryByTestId} = renderComponent({progress_id: defaultProgress.id})
+    jest.advanceTimersByTime(1000)
+
+    // Update progress state to completed
+    const completedProgress = {...defaultProgress, workflow_state: 'completed', completion: 100}
+    ProgressStore.setState({[defaultProgress.id]: completedProgress})
+    jest.advanceTimersByTime(1000)
+
+    expect(queryByTestId('api-progress-bar')).not.toBeInTheDocument()
   })
 
-  test('poll', function () {
-    let ApiProgressBarElement = <ApiProgressBar />
-    let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    component.poll()
-    expect(ProgressStore.get).not.toHaveBeenCalled()
-
-    ApiProgressBarElement = <ApiProgressBar progress_id={progress_id} />
-    component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    component.poll()
+  it('starts polling when progress_id is provided', () => {
+    renderComponent({progress_id: defaultProgress.id})
+    jest.advanceTimersByTime(1000)
     expect(ProgressStore.get).toHaveBeenCalled()
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
   })
 
-  test('render', function () {
-    const ApiProgressBarElement = <ApiProgressBar progress_id={progress_id} />
-    const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-    ok(isNull(ReactDOM.findDOMNode(component)), 'should not render to DOM if is not in progress')
-    jest.advanceTimersByTime(component.props.delay + 5)
-    ok(!isNull(ReactDOM.findDOMNode(component)), 'should render to DOM if is not in progress')
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
+  it('does not start polling when no progress_id is provided', () => {
+    renderComponent()
+    jest.advanceTimersByTime(1000)
+    expect(ProgressStore.get).not.toHaveBeenCalled()
+  })
+
+  describe('progress states', () => {
+    it('shows progress bar in queued state', () => {
+      const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
+      jest.advanceTimersByTime(1000)
+      const progressBar = getByTestId('api-progress-bar')
+      expect(progressBar).toBeInTheDocument()
+      expect(progressBar.querySelector('[role="progressbar"]')).toHaveAttribute(
+        'aria-valuenow',
+        '0',
+      )
+    })
+
+    it('shows progress bar in running state', () => {
+      const {getByTestId} = renderComponent({progress_id: defaultProgress.id})
+      jest.advanceTimersByTime(1000)
+
+      const runningProgress = {...defaultProgress, workflow_state: 'running', completion: 75}
+      ProgressStore.setState({[defaultProgress.id]: runningProgress})
+
+      const progressBar = getByTestId('api-progress-bar')
+      expect(progressBar).toBeInTheDocument()
+      expect(progressBar.querySelector('[role="progressbar"]')).toHaveAttribute(
+        'aria-valuenow',
+        '75',
+      )
+    })
+
+    it('removes progress bar in completed state', () => {
+      const {queryByTestId} = renderComponent({progress_id: defaultProgress.id})
+      jest.advanceTimersByTime(1000)
+
+      const completedProgress = {...defaultProgress, workflow_state: 'completed', completion: 100}
+      ProgressStore.setState({[defaultProgress.id]: completedProgress})
+
+      expect(queryByTestId('api-progress-bar')).not.toBeInTheDocument()
+    })
   })
 })

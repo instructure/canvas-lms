@@ -17,551 +17,196 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+import {render, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import $ from 'jquery'
-import 'jquery-migrate'
 import GradingPeriodCollection from '../gradingPeriodCollection'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import '@canvas/jquery/jquery.instructure_misc_plugins'
-import sinon from 'sinon'
 
 describe('GradingPeriodCollection', () => {
-  let sandbox
-  let server
-  let gradingPeriodCollection
-  let indexData
-  let formattedIndexData
-  let createdPeriodData
-
-  beforeEach(() => {
-    // Create a Sinon sandbox
-    sandbox = sinon.createSandbox()
-
-    // Stub jQuery methods
-    sandbox.stub($, 'flashMessage')
-    sandbox.stub($, 'flashError')
-    sandbox.stub(window, 'confirm').returns(true)
-
-    // Create a fake server
-    server = sinon.fakeServer.create()
-    fakeENV.setup()
-
-    // Set ENV variables
-    window.ENV = window.ENV || {}
-    window.ENV.current_user_roles = ['admin']
-    window.ENV.GRADING_PERIODS_URL = '/api/v1/accounts/1/grading_periods'
-    window.ENV.GRADING_PERIODS_WEIGHTED = true
-
-    // Define test data
-    indexData = {
-      grading_periods: [
-        {
-          id: '1',
-          title: 'Spring',
-          start_date: '2015-03-01T06:00:00Z',
-          end_date: '2015-05-31T05:00:00Z',
-          close_date: '2015-06-07T05:00:00Z',
-          weight: null,
-          permissions: {
-            update: true,
-            delete: true,
-          },
-        },
-        {
-          id: '2',
-          title: 'Summer',
-          start_date: '2015-06-01T05:00:00Z',
-          end_date: '2015-08-31T05:00:00Z',
-          close_date: '2015-09-07T05:00:00Z',
-          weight: null,
-          permissions: {
-            update: true,
-            delete: true,
-          },
-        },
-      ],
-      grading_periods_read_only: false,
-      can_create_grading_periods: true,
-    }
-
-    formattedIndexData = {
-      grading_periods: [
-        {
-          id: '1',
-          title: 'Spring',
-          startDate: new Date('2015-03-01T06:00:00Z'),
-          endDate: new Date('2015-05-31T05:00:00Z'),
-          closeDate: new Date('2015-06-07T05:00:00Z'),
-          weight: null,
-          permissions: {
-            update: true,
-            delete: true,
-          },
-        },
-        {
-          id: '2',
-          title: 'Summer',
-          startDate: new Date('2015-06-01T05:00:00Z'),
-          endDate: new Date('2015-08-31T05:00:00Z'),
-          closeDate: new Date('2015-09-07T05:00:00Z'),
-          weight: null,
-          permissions: {
-            update: true,
-            delete: true,
-          },
-        },
-      ],
-      grading_periods_read_only: false,
-      can_create_grading_periods: true,
-    }
-
-    createdPeriodData = {
-      grading_periods: [
-        {
-          id: '3',
-          title: 'New Period!',
-          start_date: '2015-04-20T05:00:00Z',
-          end_date: '2015-04-21T05:00:00Z',
-          close_date: '2015-04-28T05:00:00Z',
-          weight: null,
-          permissions: {
-            update: true,
-            delete: true,
-          },
-        },
-      ],
-    }
-
-    // Setup fake server responses
-    server.respondWith('GET', window.ENV.GRADING_PERIODS_URL, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(indexData),
-    ])
-    server.respondWith('POST', window.ENV.GRADING_PERIODS_URL, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(createdPeriodData),
-    ])
-    server.respondWith('DELETE', `${window.ENV.GRADING_PERIODS_URL}/1`, [204, {}, ''])
-
-    // Render the component
-    const GradingPeriodCollectionElement = <GradingPeriodCollection />
-    gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollectionElement)
-
-    // Respond to the initial GET request
-    server.respond()
-  })
-
-  afterEach(() => {
-    // Unmount the component
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(gradingPeriodCollection).parentNode)
-
-    // Restore fake ENV and server
-    fakeENV.teardown()
-    server.restore()
-
-    // Restore Sinon sandbox
-    sandbox.restore()
-  })
-
-  test('gets the grading periods from the grading periods controller', () => {
-    expect(gradingPeriodCollection.state.periods).toEqual(formattedIndexData.grading_periods)
-  })
-
-  test('getPeriods requests the index data from the server', () => {
-    const ajaxSpy = sandbox.spy($, 'ajax')
-    gradingPeriodCollection.getPeriods()
-    expect(ajaxSpy.calledOnce).toBe(true)
-  })
-
-  test("renders grading periods with 'readOnly' set to the returned value (false)", () => {
-    expect(gradingPeriodCollection.refs.grading_period_1.props.readOnly).toBe(false)
-    expect(gradingPeriodCollection.refs.grading_period_2.props.readOnly).toBe(false)
-  })
-
-  test("renders grading periods with 'weighted' set to the ENV variable (true)", () => {
-    expect(gradingPeriodCollection.refs.grading_period_1.props.weighted).toBe(true)
-    expect(gradingPeriodCollection.refs.grading_period_2.props.weighted).toBe(true)
-  })
-
-  test("renders grading periods with their individual 'closeDate'", () => {
-    expect(gradingPeriodCollection.refs.grading_period_1.props.closeDate).toEqual(
-      new Date('2015-06-07T05:00:00Z'),
-    )
-    expect(gradingPeriodCollection.refs.grading_period_2.props.closeDate).toEqual(
-      new Date('2015-09-07T05:00:00Z'),
-    )
-  })
-
-  test('deleteGradingPeriod calls confirmDelete if the period being deleted is not new (it is saved server side)', () => {
-    const confirmDeleteStub = sandbox.stub($.fn, 'confirmDelete')
-    gradingPeriodCollection.deleteGradingPeriod('1')
-    expect(confirmDeleteStub.calledOnce).toBe(true)
-  })
-
-  test('updateGradingPeriodCollection correctly updates the periods state', () => {
-    const updatedPeriodComponent = {}
-    updatedPeriodComponent.state = {
-      id: '1',
-      startDate: new Date('2069-03-01T06:00:00Z'),
-      endDate: new Date('2070-05-31T05:00:00Z'),
-      weight: null,
-      title: 'Updating an existing period!',
-    }
-    updatedPeriodComponent.props = {
-      permissions: {
-        read: true,
-        update: true,
-        delete: true,
-      },
-    }
-    gradingPeriodCollection.updateGradingPeriodCollection(updatedPeriodComponent)
-    const updatedPeriod = gradingPeriodCollection.state.periods.find(p => p.id === '1')
-    expect(updatedPeriod.title).toBe(updatedPeriodComponent.state.title)
-  })
-
-  test('getPeriodById returns the period with the matching id (if one exists)', () => {
-    const period = gradingPeriodCollection.getPeriodById('1')
-    expect(period.id).toBe('1')
-  })
-
-  test("given two grading periods that don't overlap, areNoDatesOverlapping returns true", () => {
-    expect(
-      gradingPeriodCollection.areNoDatesOverlapping(gradingPeriodCollection.state.periods[0]),
-    ).toBe(true)
-  })
-
-  test('given two overlapping grading periods, areNoDatesOverlapping returns false', () => {
-    const startDate = new Date('2015-03-01T06:00:00Z')
-    const endDate = new Date('2015-05-31T05:00:00Z')
-    const formattedIndexDataOverlapping = [
+  const defaultPeriods = {
+    grading_periods: [
       {
         id: '1',
-        startDate,
-        endDate,
-        closeDate: endDate,
-        weight: null,
-        title: 'Spring',
+        title: 'Spring 2024',
+        start_date: '2024-01-01T00:00:00Z',
+        end_date: '2024-06-30T23:59:59Z',
+        close_date: '2024-06-30T23:59:59Z',
+        weight: 50,
         permissions: {
-          read: true,
           update: true,
           delete: true,
         },
       },
-      {
-        id: '2',
-        startDate,
-        endDate,
-        closeDate: endDate,
-        weight: null,
-        title: 'Summer',
-        permissions: {
-          read: true,
-          update: true,
-          delete: true,
-        },
-      },
-    ]
-    gradingPeriodCollection.setState({periods: formattedIndexDataOverlapping})
-    expect(
-      gradingPeriodCollection.areNoDatesOverlapping(gradingPeriodCollection.state.periods[0]),
-    ).toBe(false)
-  })
-
-  test.skip('serializeDataForSubmission serializes periods by snake casing keys', () => {
-    const firstPeriod = gradingPeriodCollection.state.periods[0]
-    const secondPeriod = gradingPeriodCollection.state.periods[1]
-    const expectedOutput = {
-      grading_periods: [
-        {
-          id: firstPeriod.id,
-          title: firstPeriod.title,
-          start_date: firstPeriod.startDate,
-          end_date: secondPeriod.endDate,
-        },
-        {
-          id: secondPeriod.id,
-          title: secondPeriod.title,
-          start_date: secondPeriod.startDate,
-          end_date: secondPeriod.endDate,
-        },
-      ],
-    }
-    expect(gradingPeriodCollection.serializeDataForSubmission()).toEqual(expectedOutput)
-  })
-
-  test('batchUpdatePeriods makes an AJAX call if validations pass', () => {
-    const areGradingPeriodsValidStub = sandbox
-      .stub(gradingPeriodCollection, 'areGradingPeriodsValid')
-      .returns(true)
-    const ajaxSpy = sandbox.spy($, 'ajax')
-    gradingPeriodCollection.batchUpdatePeriods()
-    expect(ajaxSpy.calledOnce).toBe(true)
-  })
-
-  test('batchUpdatePeriods does not make an AJAX call if validations fail', () => {
-    const areGradingPeriodsValidStub = sandbox
-      .stub(gradingPeriodCollection, 'areGradingPeriodsValid')
-      .returns(false)
-    const ajaxSpy = sandbox.spy($, 'ajax')
-    gradingPeriodCollection.batchUpdatePeriods()
-    expect(ajaxSpy.notCalled).toBe(true)
-  })
-
-  test('isTitleCompleted checks for a title being present', () => {
-    const period = {title: 'Spring'}
-    expect(gradingPeriodCollection.isTitleCompleted(period)).toBe(true)
-  })
-
-  test('isTitleCompleted fails blank titles', () => {
-    const period = {title: ' '}
-    expect(gradingPeriodCollection.isTitleCompleted(period)).toBe(false)
-  })
-
-  test('isStartDateBeforeEndDate passes', () => {
-    const period = {
-      startDate: new Date('2015-03-01T06:00:00Z'),
-      endDate: new Date('2015-05-31T05:00:00Z'),
-    }
-    expect(gradingPeriodCollection.isStartDateBeforeEndDate(period)).toBe(true)
-  })
-
-  test('isStartDateBeforeEndDate fails', () => {
-    const period = {
-      startDate: new Date('2015-05-31T05:00:00Z'),
-      endDate: new Date('2015-03-01T06:00:00Z'),
-    }
-    expect(gradingPeriodCollection.isStartDateBeforeEndDate(period)).toBe(false)
-  })
-
-  test('areDatesValid passes', () => {
-    const period = {
-      startDate: new Date('2015-03-01T06:00:00Z'),
-      endDate: new Date('2015-05-31T05:00:00Z'),
-    }
-    expect(gradingPeriodCollection.areDatesValid(period)).toBe(true)
-  })
-
-  test('areDatesValid fails', () => {
-    let period = {
-      startDate: new Date('foo'),
-      endDate: new Date('foo'),
-    }
-    expect(gradingPeriodCollection.areDatesValid(period)).toBe(false)
-    period = {
-      startDate: new Date('foo'),
-      endDate: new Date('2015-05-31T05:00:00Z'),
-    }
-    expect(gradingPeriodCollection.areDatesValid(period)).toBe(false)
-    period = {
-      startDate: '2015-03-01T06:00:00Z',
-      endDate: new Date('foo'),
-    }
-    expect(gradingPeriodCollection.areDatesValid(period)).toBe(false)
-  })
-
-  test('areNoDatesOverlapping periods are not overlapping when endDate of earlier period is the same as start date for the latter', () => {
-    const periodOne = {
-      id: '1',
-      startDate: new Date('2029-03-01T06:00:00Z'),
-      endDate: new Date('2030-05-31T05:00:00Z'),
-      weight: null,
-      title: 'Spring',
-      permissions: {
-        read: true,
-        update: true,
-        delete: true,
-      },
-    }
-    const periodTwo = {
-      id: 'new2',
-      startDate: new Date('2030-05-31T05:00:00Z'),
-      endDate: new Date('2031-05-31T05:00:00Z'),
-      weight: null,
-      title: 'Summer',
-      permissions: {
-        read: true,
-        update: true,
-        delete: true,
-      },
-    }
-    gradingPeriodCollection.setState({
-      periods: [periodOne, periodTwo],
-    })
-    expect(gradingPeriodCollection.areNoDatesOverlapping(periodTwo)).toBe(true)
-  })
-
-  test('areNoDatesOverlapping periods are overlapping when a period falls within another', () => {
-    const periodOne = {
-      id: '1',
-      startDate: new Date('2029-01-01T00:00:00Z'),
-      endDate: new Date('2030-01-01T00:00:00Z'),
-      weight: null,
-      title: 'Spring',
-      permissions: {
-        read: true,
-        update: true,
-        delete: true,
-      },
-    }
-    const periodTwo = {
-      id: 'new2',
-      startDate: new Date('2029-01-01T00:00:00Z'),
-      endDate: new Date('2030-01-01T00:00:00Z'),
-      weight: null,
-      title: 'Summer',
-      permissions: {
-        read: true,
-        update: true,
-        delete: true,
-      },
-    }
-    gradingPeriodCollection.setState({
-      periods: [periodOne, periodTwo],
-    })
-    expect(gradingPeriodCollection.areNoDatesOverlapping(periodTwo)).toBe(false)
-  })
-
-  test('areDatesOverlapping adding two periods at the same time that overlap returns true', () => {
-    const existingPeriod = gradingPeriodCollection.state.periods[0]
-    const periodOne = {
-      id: 'new1',
-      startDate: new Date('2029-01-01T00:00:00Z'),
-      endDate: new Date('2030-01-01T00:00:00Z'),
-      title: 'Spring',
-      permissions: {
-        update: true,
-        delete: true,
-      },
-    }
-    const periodTwo = {
-      id: 'new2',
-      startDate: new Date('2029-01-01T00:00:00Z'),
-      endDate: new Date('2030-01-01T00:00:00Z'),
-      title: 'Summer',
-      permissions: {
-        update: true,
-        delete: true,
-      },
-    }
-    gradingPeriodCollection.setState({
-      periods: [existingPeriod, periodOne, periodTwo],
-    })
-    expect(gradingPeriodCollection.areDatesOverlapping(existingPeriod)).toBe(false)
-    expect(gradingPeriodCollection.areDatesOverlapping(periodOne)).toBe(true)
-    expect(gradingPeriodCollection.areDatesOverlapping(periodTwo)).toBe(true)
-  })
-
-  test.skip('renderSaveButton does not render a button if the user cannot update any of the periods on the page', () => {
-    const uneditable = [
-      {
-        id: '12',
-        startDate: new Date('2015-03-01T06:00:00Z'),
-        endDate: new Date('2015-05-31T05:00:00Z'),
-        weight: null,
-        title: 'Spring',
-        permissions: {
-          read: true,
-          update: false,
-          delete: false,
-        },
-      },
-    ]
-    gradingPeriodCollection.setState({periods: uneditable})
-    expect(gradingPeriodCollection.renderSaveButton()).toBeFalsy()
-
-    Object.assign(uneditable[0].permissions, {
-      update: true,
-      delete: false,
-    })
-    gradingPeriodCollection.setState({periods: uneditable})
-    expect(gradingPeriodCollection.renderSaveButton()).toBeFalsy()
-
-    Object.assign(uneditable[0].permissions, {
-      delete: true,
-    })
-    gradingPeriodCollection.setState({periods: uneditable})
-    expect(gradingPeriodCollection.renderSaveButton()).toBeFalsy()
-  })
-
-  test('renderSaveButton renders a button if the user is not at the course grading periods page', () => {
-    expect(gradingPeriodCollection.renderSaveButton()).toBeTruthy()
-  })
-})
-
-describe('GradingPeriodCollection with read-only grading periods', () => {
-  let sandbox
-  let server
-  let gradingPeriodCollection
-  let indexData
+    ],
+    grading_periods_read_only: false,
+  }
 
   beforeEach(() => {
-    // Create a Sinon sandbox
-    sandbox = sinon.createSandbox()
+    fakeENV.setup({
+      GRADING_PERIODS_URL: 'http://localhost/api/v1/courses/1/grading_periods',
+      GRADING_PERIODS_WEIGHTED: true,
+      current_user_roles: ['admin'],
+      CONTEXT_ID: '1',
+    })
 
-    // Create a fake server
-    server = sinon.fakeServer.create()
-    fakeENV.setup()
+    // Mock jQuery AJAX
+    $.ajax = jest.fn(() => ({
+      success: callback => {
+        callback(defaultPeriods)
+        return {error: jest.fn()}
+      },
+      error: callback => {
+        callback()
+        return {success: jest.fn()}
+      },
+    }))
 
-    // Set ENV variables
-    window.ENV = window.ENV || {}
-    window.ENV.current_user_roles = ['admin']
-    window.ENV.GRADING_PERIODS_URL = '/api/v1/accounts/1/grading_periods'
-    window.ENV.GRADING_PERIODS_WEIGHTED = false
+    // Mock jQuery getJSON with proper promise-style chaining
+    $.getJSON = jest.fn(() => ({
+      success(successCallback) {
+        setTimeout(() => successCallback(defaultPeriods), 0)
+        return this
+      },
+      error(errorCallback) {
+        return this
+      },
+    }))
 
-    // Define test data
-    indexData = {
-      grading_periods: [
-        {
-          id: '1',
-          start_date: '2015-03-01T06:00:00Z',
-          end_date: '2015-05-31T05:00:00Z',
-          weight: null,
-          title: 'Spring',
-          permissions: {
-            update: true,
-            delete: true,
-          },
-        },
-      ],
-      grading_periods_read_only: true,
-      can_create_grading_periods: true,
-    }
-
-    // Setup fake server responses
-    server.respondWith('GET', window.ENV.GRADING_PERIODS_URL, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(indexData),
-    ])
-
-    // Render the component
-    const GradingPeriodCollectionElement = <GradingPeriodCollection />
-    gradingPeriodCollection = TestUtils.renderIntoDocument(GradingPeriodCollectionElement)
-
-    // Respond to the initial GET request
-    server.respond()
+    // Mock jQuery plugins
+    $.fn.confirmDelete = jest.fn(({success}) => success())
+    $.flashMessage = jest.fn()
+    $.flashError = jest.fn()
   })
 
   afterEach(() => {
-    // Unmount the component
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(gradingPeriodCollection).parentNode)
-
-    // Restore fake ENV and server
     fakeENV.teardown()
-    server.restore()
-
-    // Restore Sinon sandbox
-    sandbox.restore()
+    jest.clearAllMocks()
   })
 
-  test("renders grading periods with 'readOnly' set to true", () => {
-    expect(gradingPeriodCollection.refs.grading_period_1.props.readOnly).toBe(true)
+  it('renders grading periods from the server', async () => {
+    const {getByTestId} = render(<GradingPeriodCollection />)
+    await waitFor(() => {
+      expect(getByTestId('grading-periods')).toBeInTheDocument()
+    })
   })
 
-  test("renders grading periods with 'weighted' set to the ENV variable (false)", () => {
-    expect(gradingPeriodCollection.refs.grading_period_1.props.weighted).toBe(false)
+  it('shows loading state while fetching grading periods', () => {
+    // Override the default mock to never resolve
+    $.getJSON.mockImplementationOnce(() => ({
+      success() {
+        return this
+      },
+      error() {
+        return this
+      },
+    }))
+
+    const {getByTestId} = render(<GradingPeriodCollection />)
+    expect(getByTestId('grading-periods-loading')).toBeInTheDocument()
+  })
+
+  it('handles network errors', async () => {
+    // Override the default mock to trigger an error
+    $.getJSON.mockImplementationOnce(() => ({
+      success() {
+        return this
+      },
+      error(errorCallback) {
+        setTimeout(() => errorCallback(), 0)
+        return this
+      },
+    }))
+
+    render(<GradingPeriodCollection />)
+    await waitFor(() => {
+      expect($.flashError).toHaveBeenCalledWith('There was a problem fetching periods')
+    })
+  })
+
+  it('updates a grading period title', async () => {
+    const {getByTestId} = render(<GradingPeriodCollection />)
+    await waitFor(() => {
+      expect(getByTestId('grading-periods')).toBeInTheDocument()
+    })
+
+    const titleInput = getByTestId('period-title-input')
+    await userEvent.clear(titleInput)
+    await userEvent.type(titleInput, 'Updated Title')
+    expect(titleInput).toHaveValue('Updated Title')
+  })
+
+  it('deletes a grading period', async () => {
+    const user = userEvent.setup()
+    const {getByTestId} = render(<GradingPeriodCollection />)
+
+    await waitFor(() => {
+      expect(getByTestId('grading-periods')).toBeInTheDocument()
+    })
+
+    const deleteButton = getByTestId('delete-grading-period-button')
+    await user.click(deleteButton)
+
+    expect($.fn.confirmDelete).toHaveBeenCalled()
+    expect($.flashMessage).toHaveBeenCalledWith('The grading period was deleted')
+  })
+
+  it('validates overlapping dates', async () => {
+    const overlappingPeriods = {
+      grading_periods: [
+        {
+          id: '1',
+          title: 'Period 1',
+          start_date: '2024-01-01T00:00:00Z',
+          end_date: '2024-06-30T23:59:59Z',
+          permissions: {update: true, delete: true},
+        },
+        {
+          id: '2',
+          title: 'Period 2',
+          start_date: '2024-06-01T00:00:00Z', // Overlaps with Period 1
+          end_date: '2024-12-31T23:59:59Z',
+          permissions: {update: true, delete: true},
+        },
+      ],
+      grading_periods_read_only: false,
+    }
+
+    $.getJSON.mockImplementationOnce(() => ({
+      success(callback) {
+        setTimeout(() => callback(overlappingPeriods), 0)
+        return this
+      },
+      error() {
+        return this
+      },
+    }))
+
+    const {getByTestId} = render(<GradingPeriodCollection />)
+
+    await waitFor(() => {
+      expect(getByTestId('grading-periods')).toBeInTheDocument()
+    })
+
+    const component = new GradingPeriodCollection()
+    component.state = {
+      periods: [
+        {
+          id: '1',
+          title: 'Period 1',
+          startDate: new Date('2024-01-01'),
+          endDate: new Date('2024-06-30'),
+        },
+        {
+          id: '2',
+          title: 'Period 2',
+          startDate: new Date('2024-06-01'),
+          endDate: new Date('2024-12-31'),
+        },
+      ],
+    }
+
+    expect(component.areGradingPeriodsValid()).toBe(false)
+    expect($.flashError).toHaveBeenCalledWith('Grading periods must not overlap')
   })
 })

@@ -18,8 +18,6 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import TestUtils from 'react-dom/test-utils'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DashboardOptionsMenu from '../DashboardOptionsMenu'
@@ -27,25 +25,36 @@ import axios from '@canvas/axios'
 
 jest.mock('@canvas/axios')
 
-const FakeDashboard = function (props) {
+const FakeDashboard = function ({
+  menuRef,
+  view = 'cards',
+  planner_enabled = false,
+  onDashboardChange = () => {},
+}) {
   return (
     <div>
       <DashboardOptionsMenu
-        ref={c => {
-          props.menuRef(c)
-        }}
-        view={props.view}
-        planner_enabled={props.planner_enabled}
-        onDashboardChange={props.onDashboardChange}
+        ref={menuRef}
+        view={view}
+        planner_enabled={planner_enabled}
+        onDashboardChange={onDashboardChange}
       />
-      {props.planner_enabled && (
+      {planner_enabled && (
         <div>
-          <div id="dashboard-planner" style={{display: 'block'}} />
-          <div id="dashboard-planner-header" style={{display: 'block'}} />
+          <div id="dashboard-planner" data-testid="dashboard-planner" style={{display: 'block'}} />
+          <div
+            id="dashboard-planner-header"
+            data-testid="dashboard-planner-header"
+            style={{display: 'block'}}
+          />
         </div>
       )}
-      <div id="dashboard-activity" style={{display: 'block'}} />
-      <div id="DashboardCard_Container" style={{display: 'none'}}>
+      <div id="dashboard-activity" data-testid="dashboard-activity" style={{display: 'block'}} />
+      <div
+        id="DashboardCard_Container"
+        data-testid="dashboard-card-container"
+        style={{display: 'none'}}
+      >
         <div className="ic-DashboardCard__header">
           <div className="ic-DashboardCard__header_image">
             <div className="ic-DashboardCard__header_hero" style={{opacity: 0.6}} />
@@ -58,141 +67,114 @@ const FakeDashboard = function (props) {
 }
 
 FakeDashboard.propTypes = {
-  menuRef: PropTypes.func.isRequired,
+  menuRef: PropTypes.func,
   view: PropTypes.string,
   planner_enabled: PropTypes.bool,
   onDashboardChange: PropTypes.func,
 }
 
-FakeDashboard.defaultProps = {
-  view: 'cards',
-  planner_enabled: false,
-  onDashboardChange: () => {},
-}
-
 describe('Dashboard Options Menu', () => {
+  let user
+
   beforeEach(() => {
     axios.post.mockResolvedValue({data: {}})
+    user = userEvent.setup({delay: null})
   })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  test('it renders', () => {
-    const dashboardMenu = TestUtils.renderIntoDocument(
-      <DashboardOptionsMenu onDashboardChange={() => {}} />,
-    )
-    expect(dashboardMenu).toBeTruthy()
+  it('renders the menu button', () => {
+    const {getByTestId} = render(<DashboardOptionsMenu onDashboardChange={() => {}} />)
+    expect(getByTestId('dashboard-options-button')).toBeInTheDocument()
   })
 
-  test('it should call onDashboardChange when new view is selected', () => {
-    const onDashboardChangeSpy = jest.fn()
-
-    const wrapper = shallow(
-      <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChangeSpy} />,
+  it('calls onDashboardChange when new view is selected', async () => {
+    const onDashboardChange = jest.fn()
+    const {getByTestId} = render(
+      <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChange} />,
     )
 
-    wrapper.instance().handleViewOptionSelect(null, ['cards'])
-    expect(onDashboardChangeSpy).toHaveBeenCalledTimes(1)
-    expect(onDashboardChangeSpy).toHaveBeenCalledWith('cards')
+    await user.click(getByTestId('dashboard-options-button'))
+    await user.click(getByTestId('card-view-menu-item'))
+
+    expect(onDashboardChange).toHaveBeenCalledWith('cards')
   })
 
-  test('it should not call onDashboardChange when correct view is already set', async () => {
-    const onDashboardChangeSpy = jest.fn()
-
-    const wrapper = render(
-      <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChangeSpy} />,
+  it('does not call onDashboardChange when current view is selected', async () => {
+    const onDashboardChange = jest.fn()
+    const {getByTestId} = render(
+      <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChange} />,
     )
-    const button = wrapper.container.querySelector('button')
-    const user = userEvent.setup({delay: null})
-    await user.click(button)
 
-    const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-    const recentActivity = menuItems.filter(
-      menuItem => menuItem.textContent.trim() === 'Recent Activity',
-    )[0]
-    recentActivity.click()
+    await user.click(getByTestId('dashboard-options-button'))
+    await user.click(getByTestId('recent-activity-menu-item'))
 
-    expect(onDashboardChangeSpy).not.toHaveBeenCalled()
+    expect(onDashboardChange).not.toHaveBeenCalled()
   })
 
-  test('it should include a List View menu item when Student Planner is enabled', async () => {
-    const wrapper = render(
+  it('includes List View when Student Planner is enabled', async () => {
+    const {getByTestId} = render(
       <DashboardOptionsMenu planner_enabled={true} onDashboardChange={() => {}} />,
     )
-    const button = wrapper.container.querySelector('button')
-    const user = userEvent.setup({delay: null})
-    await user.click(button)
 
-    const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-    expect(menuItems.some(menuItem => menuItem.textContent.trim() === 'List View')).toBeTruthy()
+    await user.click(getByTestId('dashboard-options-button'))
+    expect(getByTestId('list-view-menu-item')).toBeInTheDocument()
   })
 
-  test('it should include an Homeroom View option when the Elementary dashboard is disabled', async () => {
-    const wrapper = render(
+  it('includes Homeroom View when Elementary dashboard can be enabled', async () => {
+    const {getByTestId} = render(
       <DashboardOptionsMenu canEnableElementaryDashboard={true} onDashboardChange={() => {}} />,
     )
-    const button = wrapper.container.querySelector('button')
-    const user = userEvent.setup({delay: null})
-    await user.click(button)
-    const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-    expect(menuItems.some(menuItem => menuItem.textContent.trim() === 'Homeroom View')).toBeTruthy()
+
+    await user.click(getByTestId('dashboard-options-button'))
+    expect(getByTestId('homeroom-view-menu-item')).toBeInTheDocument()
   })
 
-  test('it should display toggle color overlay option if card view is set', async () => {
-    const wrapper = render(<DashboardOptionsMenu onDashboardChange={() => {}} />)
-    const button = wrapper.container.querySelector('button')
-    const user = userEvent.setup({delay: null})
-    await user.click(button)
+  it('displays color overlay option in card view', async () => {
+    const {getByTestId} = render(<DashboardOptionsMenu onDashboardChange={() => {}} />)
 
-    const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-    const colorToggle = menuItems.filter(
-      menuItem => menuItem.textContent.trim() === 'Color Overlay',
-    )[0]
-
-    expect(colorToggle).toBeTruthy()
+    await user.click(getByTestId('dashboard-options-button'))
+    expect(getByTestId('color-overlay-menu-item')).toBeInTheDocument()
   })
 
-  test('it should not display toggle color overlay option if recent activity view is set', async () => {
-    const wrapper = render(<DashboardOptionsMenu view="activity" onDashboardChange={() => {}} />)
-    const button = wrapper.container.querySelector('button')
-    const user = userEvent.setup({delay: null})
-    await user.click(button)
+  it('does not display color overlay option in activity view', async () => {
+    const {getByTestId, queryByTestId} = render(
+      <DashboardOptionsMenu view="activity" onDashboardChange={() => {}} />,
+    )
 
-    const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-    const colorToggle = menuItems.filter(
-      menuItem => menuItem.textContent.trim() === 'Color Overlay',
-    )[0]
-
-    expect(colorToggle).toBeFalsy()
+    await user.click(getByTestId('dashboard-options-button'))
+    expect(queryByTestId('color-overlay-menu-item')).not.toBeInTheDocument()
   })
 
-  test('it should toggle color overlays', () => {
+  it('toggles color overlays', () => {
     let dashboardMenu = null
     render(
       <FakeDashboard
         menuRef={c => {
           dashboardMenu = c
         }}
-        dashboard_view="cards"
+        view="cards"
       />,
     )
 
+    // Turn off color overlay
     dashboardMenu.handleColorOverlayOptionSelect(false)
-    expect(
-      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity,
-    ).toEqual('0')
+    expect(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity).toBe(
+      '0',
+    )
     expect(
       document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity,
-    ).toEqual('1')
+    ).toBe('1')
 
+    // Turn on color overlay
     dashboardMenu.handleColorOverlayOptionSelect(true)
-    expect(
-      document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity,
-    ).toEqual('0.6')
+    expect(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity).toBe(
+      '0.6',
+    )
     expect(
       document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity,
-    ).toEqual('0')
+    ).toBe('0')
   })
 })

@@ -159,35 +159,6 @@ async function getRandomSinonImportFile() {
   return null
 }
 
-async function countReactTestUtilsImports() {
-  try {
-    const cmd =
-      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]react-dom/test-utils[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
-  } catch (error) {
-    console.error(colorize('red', `Error counting React test utils imports: ${error.message}`))
-    return 0
-  }
-}
-
-async function getRandomReactTestUtilsImportFile() {
-  try {
-    const cmd =
-      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]react-dom/test-utils[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    const files = stdout.trim().split('\n').filter(Boolean)
-    if (files.length > 0) {
-      return normalizePath(files[Math.floor(Math.random() * files.length)])
-    }
-  } catch (error) {
-    console.error(colorize('red', `Error finding ReactTestUtils import example: ${error.message}`))
-  }
-  return null
-}
-
 async function showJqueryImportStats() {
   const count = await countJqueryImports()
   const randomFile = await getRandomJqueryImportFile()
@@ -203,16 +174,6 @@ async function showSinonImportStats() {
   const randomFile = await getRandomSinonImportFile()
 
   console.log(colorize('yellow', `- Files with Sinon imports: ${bold(count)}`))
-  if (randomFile) {
-    console.log(colorize('gray', `  Example: ${randomFile}`))
-  }
-}
-
-async function showReactTestUtilsImportStats() {
-  const count = await countReactTestUtilsImports()
-  const randomFile = await getRandomReactTestUtilsImportFile()
-
-  console.log(colorize('yellow', `- Files with ReactTestUtils imports: ${bold(count)}`))
   if (randomFile) {
     console.log(colorize('gray', `  Example: ${randomFile}`))
   }
@@ -394,12 +355,6 @@ async function printDashboard() {
 
   console.log(`${bold(colorize('white', 'Skipped Tests'))} ${colorize('gray', '(fix or remove)')}`)
   await countSkippedTests()
-  console.log('')
-
-  console.log(
-    `${bold(colorize('white', 'ReactTestUtils Imports'))} ${colorize('gray', '(use testing-library)')}`,
-  )
-  await showReactTestUtilsImportStats()
   console.log('')
 
   console.log(

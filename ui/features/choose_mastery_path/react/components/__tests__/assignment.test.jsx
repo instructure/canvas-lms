@@ -17,10 +17,8 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-dom/test-utils'
+import {render} from '@testing-library/react'
 import Assignment from '../assignment'
-
-const equal = (x, y) => expect(x).toEqual(y)
 
 const defaultProps = () => ({
   isSelected: false,
@@ -38,65 +36,74 @@ const defaultProps = () => ({
   },
 })
 
-const renderComponent = props => TestUtils.renderIntoDocument(<Assignment {...props} />)
-
 describe('Assignment', () => {
-  test('renders component', () => {
+  it('renders the assignment component', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {container} = render(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-assignment')
-    equal(renderedList.length, 1, 'renders component')
+    const assignment = container.querySelector('.cmp-assignment')
+    expect(assignment).toBeInTheDocument()
   })
 
-  test('renders title', () => {
+  it('displays the assignment title correctly', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {getByText} = render(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'item_name')
-    equal(renderedList[0].textContent, 'Ch 2 Quiz', 'renders title')
+    expect(getByText('Ch 2 Quiz')).toBeInTheDocument()
   })
 
-  test('renders points', () => {
-    const pointyProps = defaultProps()
-    const component = renderComponent(pointyProps)
+  it('shows points when points_possible is provided', () => {
+    const props = defaultProps()
+    const {getByText} = render(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'points_possible_display'
-    )
-    equal(renderedList[0].textContent, '10 pts', 'renders points')
+    expect(getByText('10 pts')).toBeInTheDocument()
   })
 
-  test('omits points', () => {
-    const pointlessProps = defaultProps()
-    pointlessProps.assignment.points_possible = null
-    const component = renderComponent(pointlessProps)
+  it('hides points when points_possible is null', () => {
+    const props = defaultProps()
+    props.assignment.points_possible = null
+    const {container} = render(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'points_possible_display'
-    )
-    equal(renderedList.length, 0, 'omits points')
+    const pointsDisplay = container.querySelector('.points_possible_display')
+    expect(pointsDisplay).not.toBeInTheDocument()
   })
 
-  test('renders link title when selected', () => {
+  it('renders a link title when assignment is selected', () => {
     const props = defaultProps()
     props.isSelected = true
-    const component = renderComponent(props)
+    const {container} = render(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
-      component,
-      'cmp-assignment__title-link'
-    )
-    equal(renderedList.length, 1, 'renders link title')
+    const titleLink = container.querySelector('.cmp-assignment__title-link')
+    expect(titleLink).toBeInTheDocument()
   })
 
-  test('renders description', () => {
+  it('displays the assignment description', () => {
     const props = defaultProps()
-    const component = renderComponent(props)
+    const {container} = render(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'ig-description')
-    equal(renderedList.length, 1, 'renders link description')
+    const description = container.querySelector('.ig-description')
+    expect(description).toBeInTheDocument()
+  })
+
+  it('shows the assignment type icon', () => {
+    const props = defaultProps()
+    const {container} = render(<Assignment {...props} />)
+
+    const typeIcon = container.querySelector('.ig-type-icon')
+    expect(typeIcon).toBeInTheDocument()
+  })
+
+  it('shows the due date when provided', () => {
+    const props = defaultProps()
+    const {getByText} = render(<Assignment {...props} />)
+
+    expect(getByText('Due')).toBeInTheDocument()
+  })
+
+  it('shows the category label', () => {
+    const props = defaultProps()
+    const {getByTitle} = render(<Assignment {...props} />)
+
+    expect(getByTitle('Other')).toBeInTheDocument()
   })
 })

@@ -45,6 +45,8 @@ type State = {
 
   onExited?: () => void
 
+  onDismiss?: () => void
+
   onAssignmentPostPolicyUpdated?: ({
     assignmentId,
     postManually,
