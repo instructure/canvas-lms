@@ -225,57 +225,70 @@ async function checkOutdatedPackages() {
       stdio: ['pipe', 'pipe', 'pipe'],
       encoding: 'utf8',
     }).toString()
-
-    // Parse the output if we have it, regardless of exit code
-    if (output.trim()) {
-      const outdatedData = JSON.parse(output)
-      const majorOutdated = []
-
-      for (const packageName in outdatedData) {
-        const pkg = outdatedData[packageName]
-        // Skip if we don't have all the version information
-        if (!pkg.current || !pkg.latest) continue
-
-        const currentMajor = Number.parseInt((pkg.current || '0').split('.')[0], 10)
-        const latestMajor = Number.parseInt((pkg.latest || '0').split('.')[0], 10)
-
-        if (
-          !Number.isNaN(currentMajor) &&
-          !Number.isNaN(latestMajor) &&
-          latestMajor > currentMajor
-        ) {
-          majorOutdated.push({
-            packageName,
-            current: pkg.current,
-            wanted: pkg.wanted || pkg.current,
-            latest: pkg.latest,
-          })
-        }
+    handleOutdatedPackages(output)
+  } catch (error) {
+    // npm outdated exits with code 1 when it finds outdated packages
+    // This is expected behavior, so we should still try to parse the output
+    if (error.stdout) {
+      handleOutdatedPackages(error.stdout)
+    } else {
+      console.error(colorize('red', `Error running npm outdated: ${error.message}`))
+      if (error.stderr) {
+        console.error(colorize('red', `stderr: ${error.stderr}`))
       }
-
-      if (majorOutdated.length > 0) {
-        console.log(
-          colorize('yellow', `- Packages outdated by major version: ${bold(majorOutdated.length)}`),
-        )
-        const randomPackage = majorOutdated[Math.floor(Math.random() * majorOutdated.length)]
-        console.log(
-          colorize(
-            'gray',
-            `  Example: ${randomPackage.packageName} (current: ${randomPackage.current}, wanted: ${randomPackage.wanted}, latest: ${randomPackage.latest})`,
-          ),
-        )
-      } else {
-        console.log(
-          colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`),
-        )
+      if (error.status) {
+        console.error(colorize('red', `exit code: ${error.status}`))
       }
+      if (error.signal) {
+        console.error(colorize('red', `signal: ${error.signal}`))
+      }
+    }
+  }
+}
+
+function handleOutdatedPackages(output) {
+  if (output.trim()) {
+    const outdatedData = JSON.parse(output)
+    const majorOutdated = []
+
+    for (const packageName in outdatedData) {
+      const pkg = outdatedData[packageName]
+      // Skip if we don't have all the version information
+      if (!pkg.current || !pkg.latest) continue
+
+      const currentMajor = Number.parseInt((pkg.current || '0').split('.')[0], 10)
+      const latestMajor = Number.parseInt((pkg.latest || '0').split('.')[0], 10)
+
+      if (!Number.isNaN(currentMajor) && !Number.isNaN(latestMajor) && latestMajor > currentMajor) {
+        majorOutdated.push({
+          packageName,
+          current: pkg.current,
+          wanted: pkg.wanted || pkg.current,
+          latest: pkg.latest,
+        })
+      }
+    }
+
+    if (majorOutdated.length > 0) {
+      console.log(
+        colorize('yellow', `- Packages outdated by major version: ${bold(majorOutdated.length)}`),
+      )
+      const randomPackage = majorOutdated[Math.floor(Math.random() * majorOutdated.length)]
+      console.log(
+        colorize(
+          'gray',
+          `  Example: ${randomPackage.packageName} (current: ${randomPackage.current}, wanted: ${randomPackage.wanted}, latest: ${randomPackage.latest})`,
+        ),
+      )
     } else {
       console.log(
         colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`),
       )
     }
-  } catch (error) {
-    console.error(colorize('red', `Error running npm outdated: ${error.message}`))
+  } else {
+    console.log(
+      colorize('yellow', `- Packages outdated by major version: ${colorize('green', 'None')}`),
+    )
   }
 }
 
@@ -350,11 +363,193 @@ async function countReactClassComponentFiles() {
   }
 }
 
+async function countReactStringRefs() {
+  try {
+    // Use a more specific pattern that looks for ref=" but not href="
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "\\bref=\\"[^\\"]*\\""'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting React string refs: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomReactStringRefFile() {
+  try {
+    // Use same specific pattern as countReactStringRefs
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "\\bref=\\"[^\\"]*\\""'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    if (files.length > 0) {
+      return normalizePath(files[Math.floor(Math.random() * files.length)])
+    }
+  } catch (error) {
+    console.error(colorize('red', `Error finding React string ref example: ${error.message}`))
+  }
+  return null
+}
+
+async function showReactStringRefStats() {
+  const count = await countReactStringRefs()
+  const randomFile = await getRandomReactStringRefFile()
+
+  console.log(colorize('yellow', `- Files with React string refs: ${bold(count)}`))
+  if (randomFile) {
+    console.log(colorize('gray', `  Example: ${randomFile}`))
+  }
+}
+
+async function countPropTypesFiles() {
+  try {
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "\\.propTypes\\s*="'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting propTypes files: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomPropTypesFile() {
+  try {
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "\\.propTypes\\s*="'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    if (files.length > 0) {
+      return normalizePath(files[Math.floor(Math.random() * files.length)])
+    }
+  } catch (error) {
+    console.error(colorize('red', `Error finding propTypes example: ${error.message}`))
+  }
+  return null
+}
+
+async function showPropTypesStats() {
+  const count = await countPropTypesFiles()
+  const randomFile = await getRandomPropTypesFile()
+
+  console.log(colorize('yellow', `- Files with propTypes: ${bold(count)}`))
+  if (randomFile) {
+    console.log(colorize('gray', `  Example: ${randomFile}`))
+  }
+}
+
+async function countDefaultPropsFiles() {
+  try {
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "\\.defaultProps\\s*="'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting defaultProps files: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomDefaultPropsFile() {
+  try {
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "\\.defaultProps\\s*="'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    if (files.length > 0) {
+      return normalizePath(files[Math.floor(Math.random() * files.length)])
+    }
+  } catch (error) {
+    console.error(colorize('red', `Error finding defaultProps example: ${error.message}`))
+  }
+  return null
+}
+
+async function showDefaultPropsStats() {
+  const count = await countDefaultPropsFiles()
+  const randomFile = await getRandomDefaultPropsFile()
+
+  console.log(colorize('yellow', `- Files with defaultProps: ${bold(count)}`))
+  if (randomFile) {
+    console.log(colorize('gray', `  Example: ${randomFile}`))
+  }
+}
+
+async function countEnzymeImports() {
+  try {
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]enzyme[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting Enzyme imports: ${error.message}`))
+    return 0
+  }
+}
+
+async function getRandomEnzymeImportFile() {
+  try {
+    const cmd =
+      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]enzyme[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    if (files.length > 0) {
+      return normalizePath(files[Math.floor(Math.random() * files.length)])
+    }
+  } catch (error) {
+    console.error(colorize('red', `Error finding Enzyme import example: ${error.message}`))
+  }
+  return null
+}
+
+async function showEnzymeImportStats() {
+  const count = await countEnzymeImports()
+  const randomFile = await getRandomEnzymeImportFile()
+
+  console.log(colorize('yellow', `- Files with Enzyme imports: ${bold(count)}`))
+  if (randomFile) {
+    console.log(colorize('gray', `  Example: ${randomFile}`))
+  }
+}
+
 async function printDashboard() {
   console.log(bold(colorize('green', '\nTech Debt Summary\n')))
 
   console.log(`${bold(colorize('white', 'Skipped Tests'))} ${colorize('gray', '(fix or remove)')}`)
   await countSkippedTests()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'Enzyme Imports'))} ${colorize('gray', '(use testing-library)')}`,
+  )
+  await showEnzymeImportStats()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'React String Refs'))} ${colorize('gray', '(use createRef/useRef/forwardRef/callbackRef)')}`,
+  )
+  await showReactStringRefStats()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'PropTypes Usage'))} ${colorize('gray', '(use TypeScript interfaces/types)')}`,
+  )
+  await showPropTypesStats()
+  console.log('')
+
+  console.log(
+    `${bold(colorize('white', 'DefaultProps Usage'))} ${colorize('gray', '(use default parameters/TypeScript defaults)')}`,
+  )
+  await showDefaultPropsStats()
   console.log('')
 
   console.log(
