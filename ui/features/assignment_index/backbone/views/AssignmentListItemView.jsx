@@ -434,7 +434,6 @@ export default AssignmentListItemView = (function () {
       data.is_locked = this.model.isRestrictedByMasterCourse()
       data.isCheckpoint = this.model.get('checkpoints') && this.model.get('checkpoints').length > 0
       data.showAvailability =
-        !data.isCheckpoint &&
         !(this.model.inPacedCourse() && this.canManage()) &&
         (this.model.multipleDueDates() || !this.model.defaultDates().available())
       data.showDueDate =
@@ -495,7 +494,6 @@ export default AssignmentListItemView = (function () {
           return (tool.url = tool.base_url + `&assignments[]=${this.model.get('id')}`)
         })
       }
-
       if ((modules = this.model.get('modules'))) {
         const moduleName = modules[0]
         const has_modules = modules.length > 0
