@@ -213,7 +213,7 @@ const getFrozenFields = assignment => {
   const fields = []
 
   // Check if assignment is a child of blueprint course
-  if (assignmentJSON.is_master_course_child_content) {
+  if (assignmentJSON.is_master_course_child_content && assignmentJSON.master_course_restrictions) {
     const restrictions = assignmentJSON.master_course_restrictions
     Object.keys(restrictions).forEach(r => {
       switch (r) {

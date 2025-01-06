@@ -288,6 +288,22 @@ describe "blueprint courses assignments" do
       # Time
       expect(f("#Select_0")).to be_disabled
     end
+
+    it "does allow popup editing of non-restricted items" do
+      # restrict nothing
+      @tag.update(restrictions: {})
+
+      # This is a bit of a hack to get the assignment id
+      get "/courses/#{@copy_to.id}/assignments"
+      hover_and_click(".edit_assignment")
+
+      expect(f("[data-testid='assignment-name-input']")).not_to be_disabled
+      expect(f("[data-testid='points-input']")).not_to be_disabled
+      # Date
+      expect(f("#Selectable_0")).not_to be_disabled
+      # Time
+      expect(f("#Select_0")).not_to be_disabled
+    end
   end
 
   context "in the blueprint course" do
