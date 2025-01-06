@@ -99,11 +99,11 @@
 
   <% if can_do(@context, @current_user, :reset_content) && !MasterCourses::MasterTemplate.is_master_course?(@context) %>
     <%= link_to context_url(@context, :course_reset_url), :class => ' Button Button--link Button--link--has-divider Button--course-settings reset_course_content_button' do %>
-      <i class="icon-reset"></i><%= t('links.reset', 'Reset Course Content') %>
+      <i class="icon-reset"></i><%= t('links.reset', 'Delete Course Content') %>
     <% end %>
 
     <div <%= hidden(true) %> id="reset_course_content_dialog">
-      <p><%= mt('help.reset_course_content', 'Resetting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?') %></p>
+      <p><%= mt('help.reset_course_content', 'Deleting course content will permanently delete all associated assignments, discussions, quizzes, modules, rubrics, pages, files, learning outcomes, question banks, collaborations, conferences, or any other content. This action is irreversible, and the data *cannot* be recovered. Are you sure you wish to continue?') %></p>
 
       <%= form_for @context, :url => context_url(@context, :course_reset_url), :html => { :method => :post } do %>
         <div class="button-container">
@@ -111,7 +111,7 @@
             <%= t('#buttons.cancel', 'Cancel') %>
           </button>
           <button type="submit" class="btn btn-danger submit_button">
-            <%= t('buttons.reset', 'Reset Course Content') %>
+            <%= t('buttons.reset', 'Delete Course Content') %>
           </button>
         </div>
       <% end %>
