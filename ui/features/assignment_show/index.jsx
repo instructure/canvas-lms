@@ -329,7 +329,7 @@ $(() => {
 })
 
 $(() => {
-  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit')
+  const $mountPoint = document.getElementById('enhanced-rubric-assignment-edit-mount-point')
 
   if ($mountPoint) {
     const envRubric = ENV.assigned_rubric
@@ -345,7 +345,7 @@ $(() => {
       : undefined
 
     createOrUpdateRoot(
-      'rubric_assignment_container_mount_point',
+      'enhanced-rubric-assignment-edit-mount-point',
       <RubricAssignmentContainer
         accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}
         assignmentId={ENV.ASSIGNMENT_ID}
