@@ -85,7 +85,7 @@ mejs.MepDefaults.success = function (mediaElement, _domObject) {
       kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
     })
     .catch(error => {
-      console.log('Error importing kalturaAnalytics:', error)  
+      console.log('Error importing kalturaAnalytics:', error)
     })
   return mediaElement.play()
 }
@@ -115,15 +115,15 @@ export function getSourcesAndTracks(id, attachmentId) {
           return {
             src: source.url,
             label: `${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
-              Math.floor(source.bitrate / 1024)
+              Math.floor(source.bitrate / 1024),
             )} kbps`,
           }
         }
         // xsslint safeString.function sanitizeUrl
         return `<source type='${htmlEscape(source.content_type)}' src='${sanitizeUrl(
-          htmlEscape(source.url)
+          htmlEscape(source.url),
         )}' title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(
-          Math.floor(source.bitrate / 1024)
+          Math.floor(source.bitrate / 1024),
         )} kbps' />`
       })
 
@@ -139,9 +139,9 @@ export function getSourcesAndTracks(id, attachmentId) {
         }
       }
       return `<track kind='${htmlEscape(track.kind)}' label='${htmlEscape(
-        languageName
+        languageName,
       )}' src='${htmlEscape(track.url)}' srclang='${htmlEscape(
-        track.locale
+        track.locale,
       )}' data-inherited-track='${htmlEscape(track.inherited)}' />`
     })
 
@@ -164,7 +164,7 @@ function createMediaTag({sourcesAndTracks, mediaType, height, width, mediaPlayer
       {mode: 'auto'},
       mejs.MediaElementDefaults,
       mejs.MepDefaults,
-      mediaPlayerOptions
+      mediaPlayerOptions,
     )
     const element = MediaCommentUtils.getElement('audio', st_tags)
     const playback = mejs.HtmlMediaElementShim.determinePlayback(
@@ -172,7 +172,7 @@ function createMediaTag({sourcesAndTracks, mediaType, height, width, mediaPlayer
       opts,
       mejs.MediaFeatures.supportsMediaTag,
       !!'isMediaTag',
-      null
+      null,
     )
     return playback.method !== 'native'
   }
@@ -213,7 +213,7 @@ const mediaCommentActions = {
     mediaType = 'video',
     downloadUrl,
     attachmentId = null,
-    lockedMediaAttachment = false
+    lockedMediaAttachment = false,
   ) {
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
     const $holder = $(this).closest('.instructure_file_link_holder').andSelf().first()
@@ -266,8 +266,8 @@ const mediaCommentActions = {
           holder.text(
             I18n.t(
               'media_still_converting',
-              'Media is currently being converted, please try again in a little bit.'
-            )
+              'Media is currently being converted, please try again in a little bit.',
+            ),
           )
         }
       })
@@ -277,7 +277,7 @@ const mediaCommentActions = {
       const detailsUrl = downloadUrl.replace(/\/download.*/, '')
       const onError = () =>
         $holder.text(
-          I18n.t('Media has been queued for conversion, please try again in a little bit.')
+          I18n.t('Media has been queued for conversion, please try again in a little bit.'),
         )
       const onSuccess = function (data) {
         if (data.attachment && data.attachment.media_entry_id !== 'maybe') {
@@ -300,6 +300,8 @@ const mediaCommentActions = {
     mediaType = contentMapping(mediaType)
 
     const $this = $(this)
+
+    const studioMediaEnabled = ENV.studio_media_capture_enabled
 
     const dialog = $this.data('media_comment_dialog')
     if (dialog) {
@@ -331,6 +333,12 @@ const mediaCommentActions = {
 
           if (openingElement) {
             openingElement.focus()
+          }
+          if (studioMediaEnabled) {
+            $dialog.empty()
+            $this.data({
+              media_comment_dialog: null,
+            })
           }
         },
         open: event => {
@@ -368,9 +376,7 @@ const mediaCommentActions = {
               width,
             })
 
-            const studioMediaEnabled = ENV.studio_media_capture_enabled
             if (studioMediaEnabled) {
-               
               ReactDOM.render(mediaPlayer, $dialog[0])
             } else {
               $mediaTag.appendTo($dialog.html(''))
@@ -384,11 +390,11 @@ const mediaCommentActions = {
             $dialog.text(
               I18n.t(
                 'media_still_converting',
-                'Media is currently being converted, please try again in a little bit.'
-              )
+                'Media is currently being converted, please try again in a little bit.',
+              ),
             )
           }
-        })
+        }),
       )
     }
   },
@@ -396,7 +402,7 @@ const mediaCommentActions = {
 
 $.fn.mediaComment = function (command, ...restArgs) {
   if (!INST.kalturaSettings) {
-    return console.log('Kaltura has not been enabled for this account')  
+    return console.log('Kaltura has not been enabled for this account')
   } else {
     mediaCommentActions[command].apply(this, restArgs)
   }
