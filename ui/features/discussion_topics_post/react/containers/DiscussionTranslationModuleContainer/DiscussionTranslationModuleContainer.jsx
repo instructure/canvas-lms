@@ -34,6 +34,7 @@ export const DiscussionTranslationModuleContainer = () => {
   const [translationLanguageId, setTranslationLanguageId] = useState()
   const [isModalOpen, setModalOpen] = useState(false)
 
+  const translationControlsRef = React.createRef()
   const {translateTargetLanguage, setTranslateTargetLanguage, setShowTranslationControl} = useContext(
     DiscussionManagerUtilityContext,
   )
@@ -58,6 +59,10 @@ export const DiscussionTranslationModuleContainer = () => {
     setTranslateTargetLanguage(null)
   }
 
+  const resetTranslationsModule = () => {
+    translationControlsRef.current?.reset()
+    setTranslateTargetLanguage(null)
+  }
 
   const translateDiscussion = () => {
     setTranslateTargetLanguage(translationLanguageId)
@@ -100,6 +105,7 @@ export const DiscussionTranslationModuleContainer = () => {
       <Flex padding="medium 0 0 0" direction="row" alignItems="end" gap="small" wrap="wrap">
         <Flex.Item>
           <TranslationControls
+            ref={translationControlsRef}
             setTranslationLanguage={languageId => {
               setTranslationLanguageId(languageId)
             }}
@@ -114,7 +120,9 @@ export const DiscussionTranslationModuleContainer = () => {
           >
             {I18n.t('Translate')}
           </Button>
-          <Button renderIcon={<IconRefreshLine />}>{I18n.t('Reset')}</Button>
+          <Button onClick={resetTranslationsModule} renderIcon={<IconRefreshLine />}>
+            {I18n.t('Reset')}
+          </Button>
         </Flex.Item>
       </Flex>
     </View>
