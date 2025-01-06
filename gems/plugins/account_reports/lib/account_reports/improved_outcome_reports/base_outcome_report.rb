@@ -98,17 +98,37 @@ module AccountReports
             csv << headers.map { |h| row[h] }
           end
 
-          total = os_scope.length + canvas_scope.except(:select).count
-          GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+          # Use post_process_record function to execute any transformation logic on records
+          # Return processed record
+          # Raise ActiveRecord:RecordInvalid to skip record
+          post_process_record = config_options[:post_process_record]
+          # post_process_record_cache is provided on each loop for the post_process_record function.
+          # Use this hash to cache data between loops, e.g. skip querying data repeatedly from db
+          # the hash MUST to be changed in place, otherwise it will not save changes
+          post_process_record_cache = {}
+          omitted_row_count = 0
 
           os_index = 0
+
           canvas_scope.find_each do |canvas_row|
-            until canvas_next?(canvas_row, os_scope, os_index)
+            record_hash = canvas_row.attributes
+
+            begin
+              record_hash = post_process_record.call(record_hash, post_process_record_cache) if post_process_record
+            rescue ActiveRecord::RecordInvalid
+              omitted_row_count += 1
+              next
+            end
+
+            until canvas_next?(record_hash, os_scope, os_index)
               write_row.call(os_scope[os_index])
               os_index += 1
             end
-            write_row.call(canvas_row.attributes)
+            write_row.call(record_hash)
           end
+
+          total = os_scope.length + canvas_scope.except(:select).count - omitted_row_count
+          GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
           while os_index < os_scope.length
             write_row.call(os_scope[os_index])

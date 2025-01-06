@@ -162,6 +162,50 @@ describe "BaseOutcomeReport" do
       expect(csv.length).to eq(4)
     end
 
+    it "processes each record with post_process_record if provided" do
+      # Stub the post_process_record method
+      allow(self).to receive(:post_process_record).and_wrap_original do |_original_method, record, _cache|
+        record.merge("student name" => "Processed John Doe #{record["course id"]}")
+      end
+
+      # Assign the method to config_options
+      config_options[:post_process_record] = method(:post_process_record)
+
+      # Execute the method
+      report.send(:write_outcomes_report, headers, canvas_scope, config_options)
+
+      # Verify that the method was called exactly 3 times
+      expect(self).to have_received(:post_process_record).exactly(3).times
+
+      # Additional assertions
+      expect(csv.length).to eq(4)
+      expect(csv[1]).to include("Processed John Doe 1")
+      expect(csv[2]).to include("Processed John Doe 2")
+      expect(csv[3]).to include("Processed John Doe 3")
+    end
+
+    it "skips records that raise ActiveRecord::RecordInvalid" do
+      # Stub the post_process_record method
+      allow(self).to receive(:post_process_record).and_wrap_original do |_original_method, record, _cache|
+        raise ActiveRecord::RecordInvalid if record["course id"].odd?
+
+        record.merge("student name" => "Processed John Doe #{record["course id"]}")
+      end
+
+      # Assign the method to config_options
+      config_options[:post_process_record] = method(:post_process_record)
+
+      # Execute the method
+      report.send(:write_outcomes_report, headers, canvas_scope, config_options)
+
+      # Verify that the method was called exactly 3 times
+      expect(self).to have_received(:post_process_record).exactly(3).times
+
+      # Additional assertions
+      expect(csv.length).to eq(2) # Only headers and Record #2 should be present
+      expect(csv[1]).to include("Processed John Doe 2")
+    end
+
     it "writes records from canvas_scope before os_scope by default" do
       # Assigning OS scope
       config_options[:new_quizzes_scope] = [{

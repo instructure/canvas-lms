@@ -60,11 +60,26 @@ module AccountReports
       def generate
         write_outcomes_report(
           HEADERS,
-          scope
+          scope,
+          { post_process_record: method(:post_process_record) }
         )
       end
 
       private
+
+      def post_process_record(record_hash, cache)
+        # It used to be an INNER JOIN with `accounts` table thus if acc_id is nil, or
+        # account does not exist is invalid case (raise exception)
+
+        acc_id = record_hash["account id"]
+        raise ActiveRecord::RecordInvalid if acc_id.nil?
+
+        account = cache.fetch(acc_id) { Account.find_by(id: acc_id) }
+        raise ActiveRecord::RecordInvalid if account.nil?
+
+        cache[account.id] = account
+        record_hash.merge("account name" => account.name)
+      end
 
       def scope
         parameters = {
@@ -101,8 +116,7 @@ module AccountReports
                                  e.workflow_state       AS "enrollment state",
                                  lo.context_id          AS "outcome context id",
                                  lo.context_type        AS "outcome context type",
-                                 acct.id                AS "account id",
-                                 acct.name              AS "account name"
+                                 c.account_id           AS "account id"
                                SQL
                                .joins(Pseudonym.send(:sanitize_sql, [<<~SQL.squish, parameters]))
                                  INNER JOIN #{User.quoted_table_name} u ON pseudonyms.user_id = u.id
@@ -116,7 +130,7 @@ module AccountReports
                                  ) e ON pseudonyms.user_id = e.user_id
                                  INNER JOIN #{Course.quoted_table_name} c ON c.id = e.course_id
                                    AND c.root_account_id = :root_account_id
-                                 INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
+                                   AND c.account_id IS NOT NULL
                                  INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = e.course_section_id
                                  INNER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id
                                                                AND a.context_type = 'Course'
