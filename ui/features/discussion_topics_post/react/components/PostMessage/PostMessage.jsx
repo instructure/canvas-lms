@@ -60,7 +60,6 @@ export function PostMessage({...props}) {
   const {translateTargetLanguage} = useContext(DiscussionManagerUtilityContext)
   const [translatedTitle, setTranslatedTitle] = useState(null)
   const [translatedMessage, setTranslatedMessage] = useState(null)
-  const [, setLastTranslationResultLanguage] = useState(null)
   const [isTranslating, setIsTranslating] = useState(false)
 
   // Shouldn't fire if not feature flagged.
@@ -83,12 +82,10 @@ export function PostMessage({...props}) {
       .then(translations => {
         setTranslatedTitle(translations[0])
         setTranslatedMessage(translations[1])
-        setLastTranslationResultLanguage(translateTargetLanguage)
       })
       .catch(() => {
         setTranslatedTitle(null)
         setTranslatedMessage(null)
-        setLastTranslationResultLanguage(null)
       })
       .finally(() => setIsTranslating(false))
   }, [translateTargetLanguage, props.title, props.message])
