@@ -24,7 +24,11 @@ module AccountReports
     # enable the new report for all accounts with DataFixup::AddNewDefaultReport
 
     def self.student_assignment_outcome_map_csv(account_report)
-      OutcomeReports.new(account_report).student_assignment_outcome_map
+      if Account.site_admin.feature_enabled?(:improved_outcome_report_generation)
+        ImprovedOutcomeReports::StudentAssignmentOutcomeMapReport.new(account_report).generate
+      else
+        OutcomeReports.new(account_report).student_assignment_outcome_map
+      end
     end
 
     def self.outcome_results_csv(account_report)
