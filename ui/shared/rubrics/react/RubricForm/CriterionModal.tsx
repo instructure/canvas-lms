@@ -331,7 +331,7 @@ export const CriterionModal = ({
               <Flex.Item shouldGrow={true}>
                 {unassessed && criterionUseRangeEnabled && !hidePoints && (
                   <Checkbox
-                    label="Enable Range"
+                    label={I18n.t('Enable Range')}
                     checked={criterionUseRange}
                     onChange={e => setCriterionUseRange(e.target.checked)}
                     data-testid="enable-range-checkbox"
