@@ -26,6 +26,55 @@ require_relative "shared/setup"
 describe "StudentAssignmentOutcomeMapReport" do
   include ReportSpecHelper
 
+  describe AccountReports::ImprovedOutcomeReports::StudentAssignmentOutcomeMapReport do
+    before(:once) do
+      @root_account = Account.create(name: "New Account", default_time_zone: "UTC")
+      @user1 = user_with_managed_pseudonym(
+        active_all: true,
+        account: @root_account,
+        name: "John St. Clair",
+        sortable_name: "St. Clair, John",
+        username: "john@stclair.com",
+        sis_user_id: "user_sis_id_01"
+      )
+    end
+
+    let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+    let(:report) { described_class.new(account_report) }
+
+    describe "#post_process_record" do
+      let(:account) { Account.create!(name: "Test Account") }
+      let(:record_hash) { { "account id" => account.id } }
+      let(:cache) { {} }
+
+      context "when account id is nil" do
+        it "raises ActiveRecord::RecordInvalid" do
+          record_hash["account id"] = nil
+          expect { report.send(:post_process_record, record_hash, cache) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      context "when account is not found" do
+        it "raises ActiveRecord::RecordInvalid" do
+          record_hash["account id"] = -1
+          expect { report.send(:post_process_record, record_hash, cache) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+      end
+
+      context "when account is found" do
+        it "adds account name to record_hash" do
+          result = report.send(:post_process_record, record_hash, cache)
+          expect(result["account name"]).to eq(account.name)
+        end
+
+        it "caches the account" do
+          report.send(:post_process_record, record_hash, cache)
+          expect(cache[account.id]).to eq(account)
+        end
+      end
+    end
+  end
+
   describe "Student Competency report" do
     include ImprovedOutcomeReportsSpecHelpers
 
