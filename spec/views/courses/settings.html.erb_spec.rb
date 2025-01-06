@@ -54,6 +54,25 @@ describe "courses/settings" do
     end
   end
 
+  describe "crosslisted sections" do
+    it "does not display anything related to crosslisted sections" do
+      @course.course_sections.create!
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+      expect(response).not_to have_tag("div.course_section_crosslist")
+    end
+
+    it "display info on crosslisted sections" do
+      @course.course_sections.create!
+      @course.course_sections.last.update(nonxlist_course_id: @subaccount.courses.first.id)
+      view_context(@course, @user)
+      assign(:current_user, @user)
+      render
+      expect(response).to have_tag("div.course_section_crosslist")
+    end
+  end
+
   describe "sis_source_id edit box" do
     it "does not show to teacher" do
       view_context(@course, @user)
