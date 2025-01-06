@@ -428,6 +428,10 @@ describe "Outcome Reports" do
     let(:all_values) { [user2_values, user1_values] }
     let(:order) { [0, 2, 3, 15] }
 
+    before do
+      Account.site_admin.disable_feature!(:improved_outcome_report_generation)
+    end
+
     include_examples "common outcomes report behavior"
   end
 
