@@ -93,6 +93,7 @@ export const Discussion = {
         ...RootTopic
       }
       participant {
+        id
         sortOrder
         expanded
       }
@@ -154,6 +155,7 @@ export const Discussion = {
     entriesTotalPages: number,
     subscriptionDisabledForUser: bool,
     participant: shape({
+      id: string,
       sortOrder: string,
       expanded: bool,
     }),
@@ -210,6 +212,7 @@ export const Discussion = {
       __typename: 'DiscussionEntriesConnection',
     },
     participant = {
+      id: '1',
       sortOrder: 'desc',
       expanded: false,
       __typename: 'DiscussionParticipant',

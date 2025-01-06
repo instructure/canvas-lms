@@ -69,12 +69,13 @@ const DiscussionTopicToolbarContainer = props => {
     } else {
       newOrder = sort === 'asc' ? 'desc' : 'asc'
     }
-    setSort(newOrder)
     updateDiscussionSortOrder({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         sortOrder: newOrder,
       },
+    }).then(() => {
+      setSort(newOrder)
     })
   }
   const onExpandCollapseClick = bool => {

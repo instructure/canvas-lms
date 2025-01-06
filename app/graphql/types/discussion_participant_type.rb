@@ -22,18 +22,15 @@ module Types
   class DiscussionParticipantType < ApplicationObjectType
     graphql_name "DiscussionParticipant"
 
+    global_id_field :id
     field :expanded, Boolean, null: true
     def expanded
-      return object.discussion_topic.expanded if object.discussion_topic.expanded_locked && Account.site_admin.feature_enabled?(:discussion_default_expand)
-
-      object.expanded
+      object.discussion_topic.expanded_for_user(current_user)
     end
 
     field :sort_order, Types::DiscussionSortOrderType, null: true
     def sort_order
-      return object.discussion_topic.sort_order.to_sym || DiscussionTopic::SortOrder::DESC.to_sym if object.discussion_topic.sort_order_locked && Account.site_admin.feature_enabled?(:discussion_default_sort)
-
-      object.sort_order&.to_sym || DiscussionTopic::SortOrder::DESC.to_sym
+      object.discussion_topic.sort_order_for_user(current_user).to_sym
     end
   end
 end

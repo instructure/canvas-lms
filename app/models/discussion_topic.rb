@@ -747,8 +747,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
   protected :change_child_topic_subscribed_state
 
-  def participant(opts = {})
-    current_user = opts[:current_user] || self.current_user
+  def participant(current_user = nil)
+    current_user ||= self.current_user
     return nil unless current_user
 
     discussion_topic_participants.find_by(user_id: current_user)
@@ -2147,6 +2147,20 @@ class DiscussionTopic < ActiveRecord::Base
     all_overrides = overrides.to_a
     all_overrides += section_overrides if section_visibilities
     all_overrides
+  end
+
+  def sort_order_for_user(current_user = nil)
+    return sort_order if Account.site_admin.feature_enabled?(:discussion_default_sort) && sort_order_locked
+
+    current_user ||= self.current_user
+    participant(current_user)&.sort_order || sort_order || DiscussionTopic::SortOrder::DESC
+  end
+
+  def expanded_for_user(current_user = nil)
+    return expanded if Account.site_admin.feature_enabled?(:discussion_default_expand) && expanded_locked
+
+    current_user ||= self.current_user
+    participant(current_user)&.expanded || expanded || false
   end
 
   private
