@@ -157,6 +157,31 @@ describe "calendar2" do
         expect(@course.calendar_events.count).to eq(0)
       end
 
+      it "shows the correct suggestions when user and context timezones differ", :ignore_js_errors do
+        @user.time_zone = "America/Denver"
+        @user.save!
+        @course.time_zone = "America/New_York"
+        @course.save!
+
+        get "/courses/#{@course.id}/calendar_events/new"
+        wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
+        replace_content(f("#calendar_event_date"), "Apr 15, 2025")
+        # Blurs the date picker
+        f("#more_options_start_time").click
+
+        expect(
+          f("#editCalendarEventFull > .date_start_end_row .date_field_container .datetime_suggest").text
+        ).to eq "Tue, Apr 15, 2025"
+
+        expect(
+          f("#editCalendarEventFull #start_and_end_times > div:nth-child(1) > div:nth-child(3)").text
+        ).to eq "Local: 1:00 AM"
+
+        expect(
+          f("#editCalendarEventFull #start_and_end_times > div:nth-child(1) > div:nth-child(4)").text
+        ).to eq "Course: 3:00 AM"
+      end
+
       context "duplicate" do
         it "is not able to create an event with zero duplicate interval in edit event view", :ignore_js_errors do
           get "/courses/#{@course.id}/calendar_events/new"

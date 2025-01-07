@@ -406,17 +406,16 @@ export default class DatetimeField {
 
     let localText = this.formatSuggest()
     this.screenreaderAlert = localText
-    if (this.$contextSuggest) {
+    if (this.$contextSuggest && !this.invalid()) {
       let contextText = this.formatSuggestContext()
+      this.clearSuggestion()
       if (contextText) {
         localText = `${this.localLabel}: ${localText}`
         contextText = `${this.contextLabel}: ${contextText}`
         this.screenreaderAlert = `${localText}\n${contextText}`
       }
       this.$contextSuggest.text(contextText).show()
-    }
-
-    if (this.$options.newSuggestionDesign) return this.newSuggestion(show, localText)
+    } else if (this.$options.newSuggestionDesign) return this.newSuggestion(show, localText)
     this.defaultSuggestion(show, localText)
   }
 
@@ -460,6 +459,10 @@ export default class DatetimeField {
       this.$suggest.show()
       return
     }
+    this.clearSuggestion()
+  }
+
+  clearSuggestion() {
     this.$field.removeClass('error')
     this.$suggest.hide()
     if (this.$contextSuggest) this.$contextSuggest.hide()
