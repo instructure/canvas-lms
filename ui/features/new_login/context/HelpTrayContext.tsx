@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createContext, type ReactNode, useContext, useMemo, useState} from 'react'
+import React, {createContext, type ReactNode, useContext, useEffect, useMemo, useState} from 'react'
 
 interface HelpTrayContextType {
   isHelpTrayOpen: boolean
@@ -30,11 +30,39 @@ interface Props {
   children: ReactNode
 }
 
+const HELP_TRAY_HASH = 'help'
+
 export const HelpTrayProvider = ({children}: Props) => {
   const [isHelpTrayOpen, setHelpTrayOpen] = useState(false)
 
-  const openHelpTray = () => setHelpTrayOpen(true)
-  const closeHelpTray = () => setHelpTrayOpen(false)
+  const openHelpTray = () => {
+    setHelpTrayOpen(true)
+    if (window.location.hash !== `#${HELP_TRAY_HASH}`) {
+      window.location.hash = HELP_TRAY_HASH
+    }
+  }
+
+  const closeHelpTray = () => {
+    setHelpTrayOpen(false)
+    if (window.location.hash === `#${HELP_TRAY_HASH}`) {
+      history.pushState('', document.title, window.location.pathname + window.location.search)
+    }
+  }
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === `#${HELP_TRAY_HASH}`) {
+        setHelpTrayOpen(true)
+      } else {
+        setHelpTrayOpen(false)
+      }
+    }
+    // initialize state based on current hash
+    handleHashChange()
+    // listen for future hash changes
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   const value = useMemo(
     () => ({
