@@ -19,7 +19,7 @@
 
 import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import type doFetchApi from '@canvas/do-fetch-api-effect'
 import ContextModulesPublishMenu from '../ContextModulesPublishMenu'
 import {updateModulePendingPublishedStates} from '../../utils/publishAllModulesHelper'
 
@@ -33,6 +33,8 @@ jest.mock('../../utils/publishAllModulesHelper', () => {
   }
 })
 
+const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+
 const defaultProps = {
   courseId: '1',
   disabled: false,
@@ -41,14 +43,16 @@ const defaultProps = {
 
 describe('ContextModulesPublishMenu', () => {
   beforeEach(() => {
-    // @ts-expect-error
-    doFetchApi.mockResolvedValue({response: {ok: true}, json: [], link: null})
+    mockDoFetchApi.mockResolvedValue({
+      response: new Response('', {status: 200}),
+      json: [],
+      text: '',
+    })
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    // @ts-expect-error
-    doFetchApi.mockReset()
+    mockDoFetchApi.mockReset()
     document.body.innerHTML = ''
   })
 
@@ -66,28 +70,30 @@ describe('ContextModulesPublishMenu', () => {
     })
 
     it('renders a spinner when publish is in-flight', () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
         json: {
           id: 1234,
           completion: 100,
           workflow_state: 'completed',
         },
+        response: new Response('', {status: 200}),
+        text: '',
       })
       const {getByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+        <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
       )
       expect(getByText('Loading')).toBeInTheDocument()
     })
 
     it('updates all the modules when ready', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: 1234,
           completion: 100,
           workflow_state: 'completed',
         },
+        text: '',
       })
       render(<ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />)
       expect(updateModulePendingPublishedStates).not.toHaveBeenCalled()
@@ -97,80 +103,84 @@ describe('ContextModulesPublishMenu', () => {
 
     describe('progress', () => {
       it('renders a screenreader message with progress starts', async () => {
-        // @ts-expect-error
-        doFetchApi.mockResolvedValueOnce({
+        mockDoFetchApi.mockResolvedValueOnce({
+          response: new Response('', {status: 200}),
           json: {
             id: '17',
             completion: 0,
             workflow_state: 'running',
           },
+          text: '',
         })
         const {getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
         )
 
         await waitFor(() =>
-          expect(getByText('Publishing modules has started.')).toBeInTheDocument()
+          expect(getByText('Publishing modules has started.')).toBeInTheDocument(),
         )
       })
 
       it('renders a screenreader message with progress updates', async () => {
-        // @ts-expect-error
-        doFetchApi.mockResolvedValueOnce({
+        mockDoFetchApi.mockResolvedValueOnce({
+          response: new Response('', {status: 200}),
           json: {
             id: '17',
             completion: 33,
             workflow_state: 'running',
           },
+          text: '',
         })
         const {getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
         )
 
         await waitFor(() =>
-          expect(getByText('Publishing progress is 33 percent complete')).toBeInTheDocument()
+          expect(getByText('Publishing progress is 33 percent complete')).toBeInTheDocument(),
         )
       })
 
       it('renders a screenreader message when progress completes', async () => {
-        // @ts-expect-error
-        doFetchApi.mockResolvedValueOnce({
+        mockDoFetchApi.mockResolvedValueOnce({
+          response: new Response('', {status: 200}),
           json: {
             id: '17',
             completion: 100,
             workflow_state: 'completed',
           },
+          text: '',
         })
         const {getByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
         )
 
         await waitFor(() =>
           expect(
-            getByText('Publishing progress is complete. Refreshing item status.')
-          ).toBeInTheDocument()
+            getByText('Publishing progress is complete. Refreshing item status.'),
+          ).toBeInTheDocument(),
         )
       })
 
       it('renders message when publishing was canceled', async () => {
-        // @ts-expect-error
-        doFetchApi.mockResolvedValueOnce({
+        mockDoFetchApi.mockResolvedValueOnce({
           json: {
             id: '17',
             completion: 33,
             message: 'canceled',
             workflow_state: 'failed',
           },
+          response: new Response('', {status: 200}),
+          text: '',
         })
         const {getAllByText} = render(
-          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />
+          <ContextModulesPublishMenu {...defaultProps} runningProgressId="17" />,
         )
 
         await waitFor(
           () =>
             expect(
-              getAllByText('Your publishing job was canceled before it completed.')
-            ).toHaveLength(2) // visible + screenreader
+              getAllByText('Your publishing job was canceled before it completed.'),
+            ).toHaveLength(2), // visible + screenreader
         )
       })
     })
@@ -232,7 +242,7 @@ describe('ContextModulesPublishMenu', () => {
     it('closes the modal when stopping an action', () => {
       const stopButtonText = 'Stop button. Click to discontinue processing.Stop'
       const {queryByRole, getByRole, getByText, getByTestId} = render(
-        <ContextModulesPublishMenu {...defaultProps} />
+        <ContextModulesPublishMenu {...defaultProps} />,
       )
       const menuButton = getByRole('button')
       act(() => menuButton.click())
@@ -248,15 +258,15 @@ describe('ContextModulesPublishMenu', () => {
       expect(publishButton.textContent).toBe(stopButtonText)
       // closes the modal
       expect(
-        queryByRole('heading', {name: 'Publish all modules and items'})
+        queryByRole('heading', {name: 'Publish all modules and items'}),
       ).not.toBeInTheDocument()
     })
   })
 
   describe('error handling', () => {
     it('shows alert on successful publish', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           progress: {
             progress: {
@@ -264,20 +274,25 @@ describe('ContextModulesPublishMenu', () => {
             },
           },
         },
+        text: '',
       })
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'completed',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
-      // @ts-expect-error
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: [], link: null})
+      mockDoFetchApi.mockResolvedValue({
+        response: new Response('', {status: 200}),
+        json: [],
+        text: '',
+      })
 
       const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />
+        <ContextModulesPublishMenu {...defaultProps} />,
       )
       const menuButton = getByRole('button')
       act(() => menuButton.click())
@@ -290,11 +305,10 @@ describe('ContextModulesPublishMenu', () => {
 
     it('shows alert on failed publish', async () => {
       const whoops = new Error('whoops')
-      // @ts-expect-error
-      doFetchApi.mockRejectedValueOnce(whoops)
+      mockDoFetchApi.mockRejectedValueOnce(whoops)
 
       const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />
+        <ContextModulesPublishMenu {...defaultProps} />,
       )
       const menuButton = getByRole('button')
       act(() => menuButton.click())
@@ -303,13 +317,13 @@ describe('ContextModulesPublishMenu', () => {
       const continueButton = getByText('Continue')
       act(() => continueButton.click())
       await waitFor(() =>
-        expect(getAllByText('There was an error while saving your changes')).toHaveLength(2)
+        expect(getAllByText('There was an error while saving your changes')).toHaveLength(2),
       )
     })
 
     it('shows alert on failed poll for progress', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           progress: {
             progress: {
@@ -317,12 +331,12 @@ describe('ContextModulesPublishMenu', () => {
             },
           },
         },
+        text: '',
       })
-      // @ts-expect-error
-      doFetchApi.mockRejectedValueOnce(new Error('whoops'))
+      mockDoFetchApi.mockRejectedValueOnce(new Error('whoops'))
 
       const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />
+        <ContextModulesPublishMenu {...defaultProps} />,
       )
       const menuButton = getByRole('button')
       act(() => menuButton.click())
@@ -333,15 +347,15 @@ describe('ContextModulesPublishMenu', () => {
       await waitFor(() =>
         expect(
           getAllByText(
-            "Something went wrong monitoring the work's progress. Try refreshing the page."
-          )
-        ).toHaveLength(2)
+            "Something went wrong monitoring the work's progress. Try refreshing the page.",
+          ),
+        ).toHaveLength(2),
       )
     })
 
     it('shows alert when failing to update results', async () => {
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           progress: {
             progress: {
@@ -349,20 +363,21 @@ describe('ContextModulesPublishMenu', () => {
             },
           },
         },
+        text: '',
       })
-      // @ts-expect-error
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'completed',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
-      // @ts-expect-error
-      doFetchApi.mockRejectedValue(new Error('whoops'))
+      mockDoFetchApi.mockRejectedValue(new Error('whoops'))
 
       const {getByRole, getByText, getAllByText} = render(
-        <ContextModulesPublishMenu {...defaultProps} />
+        <ContextModulesPublishMenu {...defaultProps} />,
       )
       const menuButton = getByRole('button')
       act(() => menuButton.click())
@@ -373,9 +388,9 @@ describe('ContextModulesPublishMenu', () => {
       await waitFor(() =>
         expect(
           getAllByText(
-            'There was an error updating module and items publish status. Try refreshing the page.'
-          )
-        ).toHaveLength(2)
+            'There was an error updating module and items publish status. Try refreshing the page.',
+          ),
+        ).toHaveLength(2),
       )
     })
   })

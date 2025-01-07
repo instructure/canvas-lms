@@ -66,6 +66,7 @@ export type CanvasSelectProps = {
   noOptionsLabel?: string
   onChange: (event: ChangeEvent<HTMLSelectElement>, value: string) => void
   value: string
+  inputRef?: SelectProps['inputRef']
 }
 
 type State = {
@@ -261,7 +262,6 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
     })
   }
 
-   
   // Because handleShowOptions sets state.isShowingOptions:true
   // it's already in the value of state passed to the setState(updater)
   // by the time handleHighlightOption is called we miss the transition,
@@ -279,7 +279,6 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
       announcement: `${this.getOptionTextForScreenReaderById(id)} ${nowOpen}`,
     })
   }
-   
 
   handleSelectOption: SelectProps['onRequestSelectOption'] = (event, {id}) => {
     if (id === noOptionsOptionId) {
@@ -320,7 +319,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
   getOptionByFieldValue(
     field: string,
     value: string | undefined,
-    options = React.Children.toArray(this.props.children) as ReactElement[]
+    options = React.Children.toArray(this.props.children) as ReactElement[],
   ): ReactElement | null {
     if (!this.props.children) return null
 

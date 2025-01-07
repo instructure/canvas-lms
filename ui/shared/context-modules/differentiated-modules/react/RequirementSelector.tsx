@@ -114,7 +114,6 @@ export default function RequirementSelector({
         <View as="div" padding="0 0 small 0">
           <CanvasSelect
             id={`requirement-item-${index}`}
-            // @ts-expect-error
             inputRef={el => (dropdown.current = el)}
             value={requirement.name}
             label={<ScreenReaderContent>{I18n.t('Select Module Item')}</ScreenReaderContent>}
@@ -171,7 +170,7 @@ export default function RequirementSelector({
                 onChange={event => {
                   onUpdateRequirement(
                     {...requirement, minimumScore: event.target.value} as Requirement,
-                    index
+                    index,
                   )
                 }}
               />
