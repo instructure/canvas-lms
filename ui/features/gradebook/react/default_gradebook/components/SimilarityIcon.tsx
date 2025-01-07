@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {oneOf, number} from 'prop-types'
 import {
   IconCertifiedSolid,
   IconEmptySolid,
@@ -45,9 +44,4 @@ export default function SimilarityIcon({similarityScore, status}: SimilarityIcon
   }
 
   return <IconWarningLine data-testid="similarity-icon" />
-}
-
-SimilarityIcon.propTypes = {
-  similarityScore: number,
-  status: oneOf(['error', 'pending', 'scored']).isRequired,
 }

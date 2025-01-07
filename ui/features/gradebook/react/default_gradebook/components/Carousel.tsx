@@ -24,7 +24,7 @@ type CarouselProps = {
   disabled: boolean
   displayLeftArrow: boolean
   displayRightArrow: boolean
-  id: string
+  id?: string
   leftArrowDescription: string
   onLeftArrowClick: () => void
   onRightArrowClick: () => void
@@ -33,9 +33,8 @@ type CarouselProps = {
 }
 
 export default class Carousel extends Component<CarouselProps> {
-  leftArrow: HTMLElement | null = null
-
-  rightArrow: HTMLElement | null = null
+  leftArrow: InstanceType<typeof IconButton> | null = null
+  rightArrow: InstanceType<typeof IconButton> | null = null
 
   componentDidUpdate(prevProps: CarouselProps) {
     const selectedLast = prevProps.displayRightArrow && !this.props.displayRightArrow
@@ -64,8 +63,9 @@ export default class Carousel extends Component<CarouselProps> {
         data-testid="left-arrow-button"
         disabled={this.props.disabled}
         ref={button => {
-          // @ts-expect-error
-          this.leftArrow = button
+          if (button) {
+            this.leftArrow = button
+          }
         }}
         color="secondary"
         onClick={this.handleLeftArrowClick}
@@ -80,7 +80,6 @@ export default class Carousel extends Component<CarouselProps> {
         data-testid="right-arrow-button"
         disabled={this.props.disabled}
         ref={button => {
-          // @ts-expect-error
           this.rightArrow = button
         }}
         color="secondary"
@@ -105,9 +104,4 @@ export default class Carousel extends Component<CarouselProps> {
       </div>
     )
   }
-}
-
-// @ts-expect-error
-Carousel.defaultProps = {
-  id: null,
 }

@@ -27,6 +27,7 @@ import {cloneDeep, isEmpty, isEqual} from 'lodash'
 import React, {useState} from 'react'
 import {confirmViewUngradedAsZero} from '../Gradebook.utils'
 import {setCoursePostPolicy as apiSetCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
+import type {StatusColors} from '../constants/colors'
 import {
   createLatePolicy,
   fetchLatePolicy,
@@ -37,6 +38,7 @@ import type {
   GradebookViewOptions,
   LatePolicyCamelized,
   LatePolicyValidationErrors,
+  SortDirection,
 } from '../gradebook.d'
 import AdvancedTabPanel from './AdvancedTabPanel'
 import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
@@ -51,6 +53,11 @@ type CourseSettings = {
 
 type CoursePostPolicy = {
   postManually: boolean
+}
+
+type ViewOptionsColumnSort = {
+  criterion: string
+  direction: SortDirection
 }
 
 export type GradebookSettingsModalProps = {
@@ -268,10 +275,10 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
   return (
     <Tray
       label={I18n.t('Gradebook Settings')}
-      onEnter={fetchCourseLatePolicy} // before tray transitions in
-      onEntered={props.onEntered} // after tray finishes transitioning in
-      onDismiss={props.onRequestClose} // when tray is requesting to be closed
-      onExited={handleAfterClose} // after tray finishes transitioning out
+      onEnter={fetchCourseLatePolicy}
+      onEntered={props.onEntered}
+      onDismiss={props.onRequestClose}
+      onExited={handleAfterClose}
       open={props.open}
       placement="end"
       size="medium"
@@ -346,17 +353,14 @@ const GradebookSettingsModal = (props: GradebookSettingsModalProps) => {
                   columnSort={{
                     currentValue: viewOptions.columnSortSettings,
                     modulesEnabled: Boolean(props.allowSortingByModules),
-                    onChange: ({
-                      criterion,
-                      direction,
-                    }: GradebookViewOptions['columnSortSettings']) => {
+                    onChange: ({criterion, direction}: ViewOptionsColumnSort) => {
                       setViewOptions({...viewOptions, columnSortSettings: {criterion, direction}})
                     },
                   }}
                   finalGradeOverrideEnabled={props.courseFeatures.finalGradeOverrideEnabled}
                   statusColors={{
-                    currentValues: viewOptions.statusColors,
-                    onChange: (colors: GradebookViewOptions['statusColors']) => {
+                    currentValues: viewOptions.statusColors as StatusColors,
+                    onChange: (colors: StatusColors) => {
                       setViewOptions({...viewOptions, statusColors: colors})
                     },
                   }}
