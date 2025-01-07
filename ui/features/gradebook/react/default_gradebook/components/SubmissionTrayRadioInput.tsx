@@ -22,8 +22,7 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import classnames from 'classnames'
 import TimeLateInput from '@canvas/grading/TimeLateInput'
 
-// @ts-expect-error
-function styles({color, showNumberInput}) {
+function styles({color, showNumberInput}: {color?: string; showNumberInput: boolean}) {
   return {
     backgroundColor: color,
     height: showNumberInput ? '5rem' : '2rem',
@@ -39,13 +38,13 @@ type Props = {
   value: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   latePolicy: {
-    lateSubmissionInterval: string
+    lateSubmissionInterval: 'day' | 'hour'
   }
   submission: {
     id: string
     secondsLate: number
   }
-  updateSubmission: (submission: {secondsLate: number}) => void
+  updateSubmission: (submission: {secondsLateOverride: number}) => void
 }
 
 export default class SubmissionTrayRadioInput extends React.Component<Props> {
@@ -55,8 +54,7 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
     color: 'transparent',
   }
 
-  // @ts-expect-error
-  constructor(props) {
+  constructor(props: Props) {
     super(props)
 
     this.radioInputClasses = classnames('SubmissionTray__RadioInput', {
@@ -64,8 +62,7 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
     })
   }
 
-  // @ts-expect-error
-  handleRadioInputChange = event => {
+  handleRadioInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.props.onChange(event)
   }
 
@@ -88,12 +85,10 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
         <TimeLateInput
           key={(this.props.submission.id || 'none').toString()}
           disabled={this.props.disabled}
-          // @ts-expect-error
           lateSubmissionInterval={this.props.latePolicy.lateSubmissionInterval}
           locale={this.props.locale}
           secondsLate={this.props.submission.secondsLate}
           renderLabelBefore={false}
-          // @ts-expect-error
           onSecondsLateUpdated={this.props.updateSubmission}
           width="5rem"
           visible={showNumberInput}
