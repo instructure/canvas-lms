@@ -26,7 +26,7 @@ describe('ThemeEditorFileUpload', () => {
   const originalURL = window.URL
 
   beforeAll(() => {
-    // @ts-ignore
+    // @ts-expect-error
     window.URL = {
       ...originalURL,
       createObjectURL: mockCreateObjectURL,
@@ -143,7 +143,7 @@ describe('ThemeEditorFileUpload', () => {
       renderComponent()
       const input = screen.getByLabelText(/Select/i)
       expect(
-        input.parentElement.querySelector('.ThemeEditorFileUpload__fake-input')
+        input.parentElement.querySelector('.ThemeEditorFileUpload__fake-input'),
       ).toHaveTextContent('')
     })
 
@@ -151,7 +151,7 @@ describe('ThemeEditorFileUpload', () => {
       renderComponent({userInput: {val: 'blob:test'}, currentValue: 'test.jpg'})
       const input = screen.getByLabelText(/Select/i)
       expect(
-        input.parentElement.querySelector('.ThemeEditorFileUpload__fake-input')
+        input.parentElement.querySelector('.ThemeEditorFileUpload__fake-input'),
       ).toBeInTheDocument()
     })
 
@@ -159,7 +159,7 @@ describe('ThemeEditorFileUpload', () => {
       renderComponent({currentValue: 'current.jpg'})
       const input = screen.getByLabelText(/Select/i)
       expect(
-        input.parentElement.querySelector('.ThemeEditorFileUpload__fake-input')
+        input.parentElement.querySelector('.ThemeEditorFileUpload__fake-input'),
       ).toHaveTextContent('current.jpg')
     })
   })

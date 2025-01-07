@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -18,12 +19,12 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {Story, Meta} from '@storybook/react'
+import type {Story, Meta} from '@storybook/react'
 import moment from 'moment-timezone'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import CustomRecurrence, {CustomRecurrenceProps} from './CustomRecurrence'
-import RRuleHelper, {RRuleHelperSpec, ISODateToIcalDate} from '../RRuleHelper'
+import CustomRecurrence, {type CustomRecurrenceProps} from './CustomRecurrence'
+import RRuleHelper, {type RRuleHelperSpec, ISODateToIcalDate} from '../RRuleHelper'
 
 export default {
   title: 'Examples/Calendar/RecurringEvents/CustomRecurrence',
@@ -48,7 +49,7 @@ const makeValidEventStart = (eventStart: string, timezone: string): string => {
 const Template: Story<CustomRecurrenceProps> = args => {
   const {RRULE = '', eventStart, timezone, locale} = args
   const [currRRULESpec, setCurrRRULESpec] = useState<RRuleHelperSpec>(
-    new RRuleHelper(RRuleHelper.parseString(RRULE)).spec
+    new RRuleHelper(RRuleHelper.parseString(RRULE)).spec,
   )
   const [currEventStart, setCurrEventStart] = useState<string>(() => {
     return makeValidEventStart(eventStart, timezone)

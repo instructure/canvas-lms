@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -113,7 +114,7 @@ describe('queueUploads()', () => {
   it('applies categories to each resolved file option', () => {
     subject()
     expect(FileOptionsCollection.applyCategory).toHaveBeenCalledWith(
-      FileOptionsCollection.state.resolvedNames
+      FileOptionsCollection.state.resolvedNames,
     )
   })
 })

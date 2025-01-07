@@ -19,7 +19,6 @@
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-// @ts-ignore
 import ErrorShip from '@canvas/images/ErrorShip.svg'
 import {useMutation, useQuery} from '@canvas/query'
 import {assignLocation} from '@canvas/util/globalUtils'

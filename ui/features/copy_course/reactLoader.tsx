@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-// @ts-ignore
 import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
 import App from './react/App'
@@ -47,7 +46,7 @@ ready(() => {
         userTimeZone={userTimeZone}
         courseTimeZone={courseTimeZone}
         canImportAsNewQuizzes={canImportAsNewQuizzes}
-      />
+      />,
     )
   }
 })

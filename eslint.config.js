@@ -16,7 +16,14 @@ const projectRoot = __dirname
 /** @type {import('eslint').Linter.Config[]} */
 module.exports = [
   {
-    ignores: ['**/doc/**', '**/es/**', 'Jenkinsfile.js', '**/ui/shared/jquery/**', '**/*.config.*', '**/jest/**'],
+    ignores: [
+      '**/doc/**',
+      '**/es/**',
+      'Jenkinsfile.js',
+      '**/ui/shared/jquery/**',
+      '**/*.config.*',
+      '**/jest/**',
+    ],
   },
   {
     files: ['ui/**/*.{js,mjs,ts,jsx,tsx}', 'ui-build/**/*.{js,mjs,ts,jsx,tsx}'],
@@ -63,7 +70,14 @@ module.exports = [
   ...tseslint.configs.recommended,
   {
     rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/ban-ts-comment': [
+        'error',
+        {
+          'ts-nocheck': true,
+          'ts-ignore': true,
+          'ts-expect-error': false,
+        },
+      ],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {

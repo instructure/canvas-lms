@@ -277,7 +277,8 @@ describe('publishOneModuleHelper', () => {
 
       await batchUpdateOneModuleApiCall(1, 1, true, true, 'loading message', 'success message')
       expect(
-        getByText(document.querySelector('.ui-dialog')!, 'Requirements Changed'),
+        // @ts-expect-error
+        getByText(document.querySelector('.ui-dialog'), 'Requirements Changed'),
       ).toBeInTheDocument()
     })
   })

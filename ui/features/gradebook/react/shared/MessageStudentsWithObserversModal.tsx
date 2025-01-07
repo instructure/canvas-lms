@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
@@ -35,12 +36,11 @@ export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) =
     }
     const MessageStudentsWhoDialog = await AsyncComponents.loadMessageStudentsWithObserversDialog()
 
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <ApolloProvider client={createClient()}>
         <MessageStudentsWhoDialog {...dialogeProps} />
       </ApolloProvider>,
-      mountPoint
+      mountPoint,
     )
   }
 }

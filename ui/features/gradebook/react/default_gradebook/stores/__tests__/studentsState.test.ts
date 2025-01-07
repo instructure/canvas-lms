@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -95,7 +96,7 @@ describe('Gradebook > fetchStudentIds', () => {
     test('sends the request using the given course id', async () => {
       await fetchStudentIds()
       const requests = getRequestsForUserIds()
-      expect(requests.length).toStrictEqual(1)
+      expect(requests).toHaveLength(1)
     })
 
     describe('when student ids have been prefetched', () => {
@@ -112,7 +113,7 @@ describe('Gradebook > fetchStudentIds', () => {
       test('does not send a request for student ids', async () => {
         await fetchStudentIds()
         const requests = getRequestsForUserIds()
-        expect(requests.length).toStrictEqual(0)
+        expect(requests).toHaveLength(0)
       })
 
       test('removes the prefetch request', async () => {
