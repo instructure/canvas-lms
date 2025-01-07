@@ -148,7 +148,6 @@ a {
 #signup_teacher {
   &:hover, &:focus {
     background-position: 5px -60px;
-    outline: none;
   }
   #{direction(left)}: 67px;
 }
@@ -158,7 +157,6 @@ a {
   background-position: 5px -125px;
   &:hover, &:focus {
     background-position: 5px -190px;
-    outline: none;
   }
 }
 
