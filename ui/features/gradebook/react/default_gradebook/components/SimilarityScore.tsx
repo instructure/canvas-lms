@@ -32,7 +32,7 @@ type Props = {
   hasAdditionalData?: boolean
   reportUrl?: string
   similarityScore?: number
-  status: string
+  status: 'error' | 'pending' | 'scored'
 }
 
 export default class SimilarityScore extends PureComponent<Props> {
@@ -42,7 +42,7 @@ export default class SimilarityScore extends PureComponent<Props> {
     let statusMessage
     if (status === 'error') {
       statusMessage = I18n.t(
-        'Error submitting to plagiarism service. You may resubmit from SpeedGrader.'
+        'Error submitting to plagiarism service. You may resubmit from SpeedGrader.',
       )
     } else if (status === 'pending') {
       statusMessage = I18n.t('Submission is being processed by plagiarism service.')
@@ -82,7 +82,7 @@ export default class SimilarityScore extends PureComponent<Props> {
               {/* @ts-expect-error */}
               <Text as="p" size="x-small" lineHeight="condensed" margin="small auto auto auto">
                 {I18n.t(
-                  'This submission has plagiarism data for multiple attachments. To see all reports, open SpeedGrader.'
+                  'This submission has plagiarism data for multiple attachments. To see all reports, open SpeedGrader.',
                 )}
               </Text>
             </Grid.Col>

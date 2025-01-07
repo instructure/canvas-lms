@@ -29,7 +29,7 @@ import type {PaceContextTypes} from '../types'
 
 const I18n = createI18nScope('remove_pace_warning_modal')
 
-const {Body: ModalBody, Footer: ModalFooter} = Modal as any
+const {Body: ModalBody, Footer: ModalFooter} = Modal
 
 export type ComponentProps = {
   open: boolean
@@ -39,9 +39,10 @@ export type ComponentProps = {
   readonly paceName: string
 }
 
-const MODAL_HEADER_TEXT = {
+const MODAL_HEADER_TEXT: Record<PaceContextTypes, string> = {
   Section: I18n.t('Remove this Section Pace?'),
   Enrollment: I18n.t('Remove this Student Pace?'),
+  Course: I18n.t('Remove this Course Pace?'),
 }
 
 export const RemovePaceWarningModal = ({
@@ -55,15 +56,14 @@ export const RemovePaceWarningModal = ({
     contextType === 'Section'
       ? I18n.t(
           '%{paceName} Pace will be removed. This pace will revert back to the default pace.',
-          {paceName}
+          {paceName},
         )
       : I18n.t(
           '%{paceName} Pace will be removed. This pace will revert back to the previously assigned pace.',
-          {paceName}
+          {paceName},
         )
 
   return (
-    // @ts-expect-error
     <Modal size="small" open={open} onDismiss={onCancel} label={MODAL_HEADER_TEXT[contextType]}>
       <ModalBody>
         <View>
