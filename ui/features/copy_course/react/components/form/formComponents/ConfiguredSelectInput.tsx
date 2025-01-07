@@ -19,6 +19,7 @@
 import React, {type SyntheticEvent, useState} from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import type {FormMessage} from '@instructure/ui-form-field'
 
 const I18n = createI18nScope('content_copy_redesign')
 
@@ -30,12 +31,14 @@ export const ConfiguredSelectInput = ({
   options,
   onSelect,
   disabled = false,
+  messages = [],
 }: {
   label: string
   defaultInputValue?: string
   options: Array<Option>
   onSelect: (selectedId: string | null) => void
   disabled?: boolean
+  messages?: Array<FormMessage>
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultInputValue)
 
@@ -56,6 +59,7 @@ export const ConfiguredSelectInput = ({
       defaultValue={inputValue}
       onChange={handleSelectOption}
       interaction={disabled ? 'disabled' : 'enabled'}
+      messages={messages}
     >
       {options.map(option => {
         return (

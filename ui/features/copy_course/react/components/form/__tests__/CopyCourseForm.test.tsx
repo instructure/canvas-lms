@@ -73,6 +73,27 @@ describe('CourseCopyForm', () => {
     canImportAsNewQuizzes: true,
   }
 
+  const defaultExpectedOnSubmitCall = {
+    courseName: course.name,
+    courseCode: course.course_code,
+    newCourseStartDate: new Date(startAt),
+    newCourseEndDate: new Date(endAt),
+    selectedTerm: {id: '1', name: 'Option 1'},
+    settings: {import_quizzes_next: false},
+    selective_import: false,
+    adjust_dates: {enabled: 1, operation: 'shift_dates'},
+    errored: false,
+    date_shift_options: {
+      old_start_date: new Date(startAt).toISOString(),
+      new_start_date: new Date(startAt).toISOString(),
+      old_end_date: new Date(endAt).toISOString(),
+      new_end_date: new Date(endAt).toISOString(),
+      day_substitutions: [],
+    },
+    restrictEnrollmentsToCourseDates: course.restrict_enrollments_to_course_dates,
+    courseTimeZone: course.time_zone,
+  }
+
   beforeEach(() => {
     // Set timezone and mock current date
     const timezone = 'America/Denver'
@@ -108,33 +129,14 @@ describe('CourseCopyForm', () => {
 
   it('calls onSubmit with the correct arguments when the form is submitted', () => {
     const onSubmit = jest.fn()
-    const {getByRole, getByLabelText, getByText} = renderCopyCourseForm({onSubmit})
+    const {getByRole, getByText} = renderCopyCourseForm({onSubmit})
 
-    fireEvent.click(getByLabelText('Term'))
-    fireEvent.click(getByText('Option 1'))
+    fireEvent.click(getByText('Term'))
+    fireEvent.click(getByRole('option', {name: 'Option 1'}))
     fireEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
     fireEvent.click(getByRole('button', {name: 'Create course'}))
 
-    expect(onSubmit).toHaveBeenCalledWith({
-      courseName: course.name,
-      courseCode: course.course_code,
-      newCourseStartDate: new Date(startAt),
-      newCourseEndDate: new Date(endAt),
-      selectedTerm: {id: '1', name: 'Option 1'},
-      settings: {import_quizzes_next: false},
-      selective_import: false,
-      adjust_dates: {enabled: 1, operation: 'shift_dates'},
-      errored: false,
-      date_shift_options: {
-        old_start_date: new Date(startAt).toISOString(),
-        new_start_date: new Date(startAt).toISOString(),
-        old_end_date: new Date(endAt).toISOString(),
-        new_end_date: new Date(endAt).toISOString(),
-        day_substitutions: [],
-      },
-      restrictEnrollmentsToCourseDates: course.restrict_enrollments_to_course_dates,
-      courseTimeZone: course.time_zone,
-    })
+    expect(onSubmit).toHaveBeenCalledWith(defaultExpectedOnSubmitCall)
   })
 
   describe('validation', () => {
@@ -228,12 +230,14 @@ describe('CourseCopyForm', () => {
     })
 
     it('renders the terms', () => {
-      const {getByText, getByLabelText} = renderCopyCourseForm()
+      const {getByText, getAllByRole} = renderCopyCourseForm()
 
-      fireEvent.click(getByLabelText('Term'))
-      terms.forEach(option => {
-        expect(getByText(option.name)).toBeInTheDocument()
-      })
+      fireEvent.click(getByText('Term'))
+      const options = getAllByRole('option')
+      const optionTexts = options.map(option => option.textContent)
+      expect(optionTexts).toContain('Option 1')
+      expect(optionTexts).toContain('Option 2')
+      expect(optionTexts).toContain('Option 3')
     })
   })
 
@@ -255,6 +259,15 @@ describe('CourseCopyForm', () => {
 
           expect(getByDisplayValue('Feb 2 at 12am')).toBeDisabled()
         })
+
+        it('should render disable state explanation', () => {
+          const {getAllByText} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: false},
+          })
+
+          expect(getAllByText('Term start and end dates cannot be modified here, only on the Term Details page under Admin.'))
+            .toHaveLength(2)
+        })
       })
 
       describe('when restrictEnrollmentsToCourseDates is true', () => {
@@ -272,6 +285,15 @@ describe('CourseCopyForm', () => {
           })
 
           expect(getByDisplayValue('Jan 2 at 12am')).toBeEnabled()
+        })
+
+        it('should not render disable state explanation', () => {
+          const {queryByText} = renderCopyCourseForm({
+            course: {...course, restrict_enrollments_to_course_dates: true},
+          })
+
+          expect(queryByText('Term start and end dates cannot be modified here, only on the Term Details page under Admin.'))
+          .not.toBeInTheDocument()
         })
       })
     })
