@@ -62,15 +62,11 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
     <FileManagementContext.Provider value={{folderId, contextType, contextId}}>
       <View as="div">
         <FilesHeader size={size} isUserContext={isUserContext} />
-        <FileFolderTable
-          size={size}
-          folderId={folderId}
-          userCanEditFilesForContext={userCanEditFilesForContext}
-        />
+        <FileFolderTable size={size} userCanEditFilesForContext={userCanEditFilesForContext} />
         {userCanManageFilesForContext && (
           <Flex padding="small none none none">
             <Flex.Item size="50%">
-              <FilesUsageBar contextId={contextId} contextType={contextType} />
+              <FilesUsageBar />
             </Flex.Item>
           </Flex>
         )}

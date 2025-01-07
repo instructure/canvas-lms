@@ -24,6 +24,7 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import fetchMock from 'fetch-mock'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import FilesUsageBar from '../FilesUsageBar'
+import {FileManagementContext} from '../Contexts'
 
 const FILES_USAGE_RESULT = {
   quota_used: 500,
@@ -44,7 +45,7 @@ describe('FilesUsageBar', () => {
     fetchMock.restore()
   })
 
-  const renderComponent = (props = {}) => {
+  const renderComponent = () => {
     const queryClient = new QueryClient({
       logger: {
         log: () => {},
@@ -60,8 +61,12 @@ describe('FilesUsageBar', () => {
     })
     return render(
       <MockedQueryClientProvider client={queryClient}>
-        <FilesUsageBar contextType="course" contextId="2" {...props} />
-      </MockedQueryClientProvider>
+        <FileManagementContext.Provider
+          value={{contextType: 'course', contextId: '2', folderId: '1'}}
+        >
+          <FilesUsageBar />
+        </FileManagementContext.Provider>
+      </MockedQueryClientProvider>,
     )
   }
 
@@ -80,7 +85,7 @@ describe('FilesUsageBar', () => {
     renderComponent()
     await waitFor(() => {
       expect(showFlashError).toHaveBeenCalledWith(
-        'An error occurred while loading files usage data'
+        'An error occurred while loading files usage data',
       )
     })
   })

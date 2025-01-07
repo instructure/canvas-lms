@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo} from 'react'
+import React, {useState, useMemo, useContext} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -34,6 +34,7 @@ import NameLink from './NameLink'
 import PublishIconButton from './PublishIconButton'
 import RightsIconButton from './RightsIconButton'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {FileManagementContext} from '../Contexts'
 
 const I18n = createI18nScope('files_v2')
 
@@ -72,7 +73,7 @@ const columnRenderers: {
     userCanEditFilesForContext: boolean,
     size: 'small' | 'medium' | 'large',
     isSelected: boolean,
-    toggleSelect: () => void
+    toggleSelect: () => void,
   ) => React.ReactNode
 } = {
   name: (row, isStacked) => <NameLink isStacked={isStacked} item={row} />,
@@ -96,15 +97,15 @@ const columnRenderers: {
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
-  folderId: string
 }
 
-const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolderTableProps) => {
+const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProps) => {
+  const {folderId} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
   const queryKey = useMemo(() => ['files', folderId], [folderId])
 
   const {data, error, isLoading, isFetching} = useQuery<(File | Folder)[], unknown>(queryKey, () =>
-    fetchFilesAndFolders(folderId)
+    fetchFilesAndFolders(folderId),
   )
 
   if (error) {
@@ -133,7 +134,6 @@ const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolde
     } else {
       setSelectedRows(new Set(rows.map(row => row.id))) // Select all
     }
-
   }
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
   const someRowsSelected = selectedRows.size > 0 && !allRowsSelected
@@ -197,14 +197,17 @@ const FileFolderTable = ({size, userCanEditFilesForContext, folderId}: FileFolde
                     />
                   </Table.RowHeader>
                   {columnHeaders.map(column => (
-                    <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
+                    <Table.Cell
+                      key={column.id}
+                      textAlign={isStacked ? undefined : column.textAlign}
+                    >
                       {columnRenderers[column.id](
                         row,
                         isStacked,
                         userCanEditFilesForContext,
                         size,
                         isSelected,
-                        () => toggleRowSelection(row.id)
+                        () => toggleRowSelection(row.id),
                       )}
                     </Table.Cell>
                   ))}
