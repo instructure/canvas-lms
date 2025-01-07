@@ -17,10 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_relative "../helpers/selective_release_common"
 
 describe DiscussionTopic do
-  include SelectiveReleaseCommon
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -610,11 +608,7 @@ describe DiscussionTopic do
         end
       end
 
-      context "differentiated modules" do
-        before do
-          Account.site_admin.enable_feature! :selective_release_backend
-        end
-
+      describe "differentiated modules" do
         context "ungraded discussions" do
           before do
             @topic = discussion_topic_model(user: @teacher, context: @course)
@@ -1682,11 +1676,7 @@ describe DiscussionTopic do
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@topic)
     end
 
-    context "differentiated modules" do
-      before do
-        Account.site_admin.enable_feature! :selective_release_backend
-      end
-
+    describe "differentiated modules" do
       context "ungraded discussions" do
         before do
           @topic = discussion_topic_model(user: @teacher, context: @course)
@@ -2643,8 +2633,6 @@ describe DiscussionTopic do
 
     context "differentiated modules address_book_context_for" do
       before do
-        Account.site_admin.enable_feature! :selective_release_backend
-
         @topic = discussion_topic_model(user: @teacher, context: @course)
         @topic.update!(only_visible_to_overrides: true)
         @course_section = @course.course_sections.create
@@ -3363,7 +3351,6 @@ describe DiscussionTopic do
 
     describe "differentiated topics" do
       before :once do
-        Account.site_admin.enable_feature! :selective_release_backend
         @course = course_factory(active_course: true)
 
         @item_without_assignment = discussion_topic_model(user: @teacher)
@@ -3417,29 +3404,6 @@ describe DiscussionTopic do
         expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
       end
 
-      it "filters section specific topics properly for multiple users" do
-        differentiated_modules_off
-        course = course_factory(active_all: true)
-        section1 = course.course_sections.create!(name: "section 1")
-        section2 = course.course_sections.create!(name: "section 2")
-        topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
-        topic2 = course.discussion_topics.create!(title: "topic 2 (for section 2)")
-        topic3 = course.discussion_topics.create!(title: "topic 3 (for all sections)")
-        topic4 = course.discussion_topics.create!(title: "topic 4 (for section 2)")
-        add_section_to_topic(topic1, section1)
-        add_section_to_topic(topic2, section2)
-        add_section_to_topic(topic4, section2)
-        student = user_factory(active_all: true)
-        teacher = user_factory(active_all: true)
-        course.enroll_student(student, section: section2)
-        course.enroll_teacher(teacher, section: section1)
-        course.reload
-
-        vis_hash = DiscussionTopic.visible_ids_by_user(course_id: [course.id], user_id: [student.id, teacher.id], item_type: :discussion)
-        expect(vis_hash[student.id]).to contain_exactly(topic2.id, topic3.id, topic4.id)
-        expect(vis_hash[teacher.id]).to contain_exactly(topic1.id, topic3.id)
-      end
-
       it "properly filters section specific topics for deleted section visibilities" do
         course = course_factory(active_course: true)
         section1 = course.course_sections.create!(name: "section for student")
@@ -3481,10 +3445,6 @@ describe DiscussionTopic do
     end
 
     describe "differentiated modules" do
-      before do
-        Account.site_admin.enable_feature! :selective_release_backend
-      end
-
       it "filters based on adhoc overrides" do
         course = course_factory(active_course: true)
         student_specific_topic = course.discussion_topics.create!(title: "student specific topic 1")

@@ -26,7 +26,6 @@ require_relative "../../helpers/k5_common"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "page_objects/assignment_create_edit_page"
-require_relative "../../helpers/selective_release_common"
 
 describe "assignments" do
   include_context "in-process server selenium tests"
@@ -38,7 +37,6 @@ describe "assignments" do
   include CustomSeleniumActions
   include K5Common
   include ItemsAssignToTray
-  include SelectiveReleaseCommon
 
   # NOTE: due date testing can be found in assignments_overrides_spec
 
@@ -766,19 +764,7 @@ describe "assignments" do
         expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end
 
-      it "allows editing the due date even if completely frozen", priority: "2" do
-        differentiated_modules_off
-        old_due_at = @frozen_assign.due_at
-        run_assignment_edit(@frozen_assign) do
-          replace_and_proceed(f(".datePickerDateField[data-date-type='due_at']"), "Sep 20, 2012")
-        end
-
-        expect(f(".assignment_dates").text).to match(/Sep 20, 2012/)
-        # some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
-        expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
-      end
-
-      it "allows editing the due date even if completely frozen with SR on", :ignore_js_errors do
+      it "allows editing the due date even if completely frozen", :ignore_js_errors do
         old_due_at = @frozen_assign.due_at
         run_assignment_edit(@frozen_assign) do
           assign_to_due_date.send_keys(:control, "a", :backspace)

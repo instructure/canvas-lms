@@ -413,10 +413,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
         end
 
         context "module overrides" do
-          before do
-            Account.site_admin.enable_feature!(:selective_release_backend)
-          end
-
           it "includes everyone else if there no modules and no overrides" do
             assignment_with_false_only_visible_to_overrides
             ensure_user_sees_assignment
@@ -541,7 +537,6 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
         context "unassign item overrides" do
           before do
-            Account.site_admin.enable_feature!(:selective_release_backend)
             assignment_with_true_only_visible_to_overrides
           end
 
@@ -596,17 +591,10 @@ describe AssignmentVisibility::AssignmentVisibilityService do
             student_in_course_with_adhoc_override(@assignment, { unassign_item: "true" })
             ensure_user_does_not_see_assignment
           end
-
-          it "does not unassign if the flag is off" do
-            Account.site_admin.disable_feature!(:selective_release_backend)
-            student_in_course_with_adhoc_override(@assignment, { unassign: "true" })
-            ensure_user_sees_assignment
-          end
         end
 
         context "course overrides" do
           before do
-            Account.site_admin.enable_feature!(:selective_release_backend)
             assignment_with_true_only_visible_to_overrides
             give_course_due_date(@assignment)
           end

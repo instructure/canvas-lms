@@ -71,7 +71,6 @@ describe "observer k5 dashboard" do
     end
 
     it "shows the announcements for class observers with selective release" do
-      Account.site_admin.enable_feature!(:selective_release_backend)
       announcement_heading1 = "K5 Do this"
       announcement_content1 = "So happy to see all of you."
       new_announcement(@homeroom_course, announcement_heading1, announcement_content1)

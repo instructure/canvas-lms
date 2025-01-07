@@ -59,100 +59,68 @@ describe WikiPagesController do
         user_session(@student)
       end
 
-      context "with selective_release_backend enabled" do
-        before do
-          Account.site_admin.enable_feature! :selective_release_backend
-        end
-
-        context "regular pages" do
-          it "allows access by default" do
-            expect(response).to have_http_status :ok
-          end
-
-          it "does not allow access if page has only_visible_to_overrides=true" do
-            @page.update!(only_visible_to_overrides: true)
-            expect(response).to be_redirect
-            expect(response.location).to eq course_wiki_pages_url(@course)
-          end
-
-          it "allows access if only_visible_to_overrides=true but the user has an override" do
-            override = @page.assignment_overrides.create!
-            override.assignment_override_students.create!(user: @student)
-            expect(response).to have_http_status :ok
-          end
-
-          it "does not allow access if page has only_visible_to_overrides=false but user does not have module override" do
-            @page.update!(only_visible_to_overrides: false)
-            module1 = @course.context_modules.create!(name: "module1")
-            module1.add_item(id: @page.id, type: "wiki_page")
-            module1.assignment_overrides.create!(set_type: "ADHOC")
-
-            expect(response).to be_redirect
-            expect(response.location).to eq course_wiki_pages_url(@course)
-          end
-
-          it "allows access if page has only_visible_to_overrides=false and user does have module override" do
-            @page.update!(only_visible_to_overrides: false)
-            module1 = @course.context_modules.create!(name: "module1")
-            module1.add_item(id: @page.id, type: "wiki_page")
-
-            adhoc_override = module1.assignment_overrides.create!(set_type: "ADHOC")
-            adhoc_override.assignment_override_students.create!(user: @student)
-
-            expect(response).to have_http_status :ok
-          end
-        end
-
-        context "pages with an assignment" do
-          before do
-            assignment = @course.assignments.create!(
-              submission_types: "wiki_page",
-              only_visible_to_overrides: true
-            )
-            @page.assignment = assignment
-            @page.save!
-          end
-
-          it "does not allow access if assignment has only_visible_to_overrides=true" do
-            expect(response).to be_redirect
-            expect(response.location).to eq course_wiki_pages_url(@course)
-          end
-
-          it "allows access if assignment has only_visible_to_overrides=true but the user has an override" do
-            override = @page.assignment.assignment_overrides.create!
-            override.assignment_override_students.create!(user: @student)
-            expect(response).to have_http_status :ok
-          end
-
-          it "allows access if assignment has only_visible_to_overrides=false" do
-            @page.assignment.update!(only_visible_to_overrides: false)
-            expect(response).to have_http_status :ok
-          end
-        end
-      end
-
-      context "with selective_release_backend disabled" do
-        before do
-          Account.site_admin.disable_feature!(:selective_release_backend)
-          @assignment = @course.assignments.create!(submission_types: "wiki_page")
-          @page.assignment = @assignment
-          @page.save!
-        end
-
+      context "regular pages" do
         it "allows access by default" do
           expect(response).to have_http_status :ok
         end
 
-        it "does not allow access if assignment has only_visible_to_overrides=true and conditional release is enabled" do
-          allow(ConditionalRelease::Service).to receive(:service_configured?).and_return(true)
-          @course.update!(conditional_release: true)
-          @assignment.update!(only_visible_to_overrides: true)
+        it "does not allow access if page has only_visible_to_overrides=true" do
+          @page.update!(only_visible_to_overrides: true)
           expect(response).to be_redirect
           expect(response.location).to eq course_wiki_pages_url(@course)
         end
 
-        it "allows access if assignment has only_visible_to_overrides=true but conditional release is disabled" do
-          @assignment.update!(only_visible_to_overrides: true)
+        it "allows access if only_visible_to_overrides=true but the user has an override" do
+          override = @page.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student)
+          expect(response).to have_http_status :ok
+        end
+
+        it "does not allow access if page has only_visible_to_overrides=false but user does not have module override" do
+          @page.update!(only_visible_to_overrides: false)
+          module1 = @course.context_modules.create!(name: "module1")
+          module1.add_item(id: @page.id, type: "wiki_page")
+          module1.assignment_overrides.create!(set_type: "ADHOC")
+
+          expect(response).to be_redirect
+          expect(response.location).to eq course_wiki_pages_url(@course)
+        end
+
+        it "allows access if page has only_visible_to_overrides=false and user does have module override" do
+          @page.update!(only_visible_to_overrides: false)
+          module1 = @course.context_modules.create!(name: "module1")
+          module1.add_item(id: @page.id, type: "wiki_page")
+
+          adhoc_override = module1.assignment_overrides.create!(set_type: "ADHOC")
+          adhoc_override.assignment_override_students.create!(user: @student)
+
+          expect(response).to have_http_status :ok
+        end
+      end
+
+      context "pages with an assignment" do
+        before do
+          assignment = @course.assignments.create!(
+            submission_types: "wiki_page",
+            only_visible_to_overrides: true
+          )
+          @page.assignment = assignment
+          @page.save!
+        end
+
+        it "does not allow access if assignment has only_visible_to_overrides=true" do
+          expect(response).to be_redirect
+          expect(response.location).to eq course_wiki_pages_url(@course)
+        end
+
+        it "allows access if assignment has only_visible_to_overrides=true but the user has an override" do
+          override = @page.assignment.assignment_overrides.create!
+          override.assignment_override_students.create!(user: @student)
+          expect(response).to have_http_status :ok
+        end
+
+        it "allows access if assignment has only_visible_to_overrides=false" do
+          @page.assignment.update!(only_visible_to_overrides: false)
           expect(response).to have_http_status :ok
         end
       end

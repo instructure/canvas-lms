@@ -29,12 +29,9 @@ class AssignmentStudentVisibility < ActiveRecord::Base
     true
   end
 
+  # TODO: what to do here?
   def self.where_with_guard(*)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
-    end
-
-    where_without_guard(*)
+    raise StandardError, "AssignmentStudentVisibility view should not be used.  Use AssignmentVisibilityService instead"
   end
 
   class << self
@@ -42,51 +39,20 @@ class AssignmentStudentVisibility < ActiveRecord::Base
     alias_method :where, :where_with_guard
   end
 
-  def self.visible_assignment_ids_in_course_by_user(opts)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
-    end
-
-    visible_object_ids_in_course_by_user(:assignment_id, opts)
+  def self.visible_assignment_ids_in_course_by_user(opts) # rubocop:disable Lint/UnusedMethodArgument
+    raise StandardError, "AssignmentStudentVisibility view should not be used.  Use AssignmentVisibilityService instead"
   end
 
-  def self.assignments_with_user_visibilities(course, assignments)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
-    end
-
-    only_visible_to_overrides, visible_to_everyone = assignments.partition(&:only_visible_to_overrides)
-    assignment_visibilities = {}
-
-    if only_visible_to_overrides.any?
-      options = { course_id: course.id, assignment_id: only_visible_to_overrides.map(&:id) }
-      assignment_visibilities.merge!(users_with_visibility_by_assignment(options))
-    end
-
-    if visible_to_everyone.any?
-      assignment_visibilities.merge!(visible_to_everyone.map(&:id).index_with { [] })
-    end
-    assignment_visibilities
+  def self.assignments_with_user_visibilities(course, assignments) # rubocop:disable Lint/UnusedMethodArgument
+    raise StandardError, "AssignmentStudentVisibility view should not be used.  Use AssignmentVisibilityService instead"
   end
 
-  def self.users_with_visibility_by_assignment(opts)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
-    end
-
-    users_with_visibility_by_object_id(:assignment_id, opts)
+  def self.users_with_visibility_by_assignment(opts) # rubocop:disable Lint/UnusedMethodArgument
+    raise StandardError, "AssignmentStudentVisibility view should not be used.  Use AssignmentVisibilityService instead"
   end
 
-  def self.visible_assignment_ids_for_user(user_id, course_ids = nil)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      raise StandardError, "AssignmentStudentVisibility view should not be used when selective_release_backend site admin flag is on.  Use AssignmentVisibilityService instead"
-    end
-
-    opts = { user_id: }
-    if course_ids
-      opts[:course_id] = course_ids
-    end
-    where(opts).pluck(:assignment_id)
+  def self.visible_assignment_ids_for_user(user_id, course_ids = nil) # rubocop:disable Lint/UnusedMethodArgument
+    raise StandardError, "AssignmentStudentVisibility view should not be used.  Use AssignmentVisibilityService instead"
   end
 
   # readonly? is not checked in destroy though
