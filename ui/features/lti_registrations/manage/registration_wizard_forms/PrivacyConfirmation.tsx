@@ -22,7 +22,6 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
-import {htmlEscape} from '@instructure/html-escape'
 import {
   AllLtiPrivacyLevels,
   isLtiPrivacyLevel,
@@ -75,7 +74,7 @@ export const PrivacyConfirmation = ({
       <Text
         dangerouslySetInnerHTML={{
           __html: I18n.t('Select what data *%{toolName}* has access to.', {
-            toolName: htmlEscape(appName),
+            toolName: appName,
             wrapper: ['<strong>$1</strong>'],
           }),
         }}
