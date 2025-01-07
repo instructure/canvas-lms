@@ -2213,8 +2213,7 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:latest_announcement][:message]).to eq "Welcome to the grind"
       end
 
-      it "is set with most recent visible announcement for observers with selective_release_backend" do
-        Account.site_admin.enable_feature!(:selective_release_backend)
+      it "is set with most recent visible announcement for observers" do
         @observer = course_with_observer(course: @course, active_all: true).user
         user_session(@observer)
 

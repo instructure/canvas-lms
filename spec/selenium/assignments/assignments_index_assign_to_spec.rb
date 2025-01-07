@@ -20,7 +20,6 @@ require_relative "../../spec_helper"
 require_relative "page_objects/assignments_index_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
-require_relative "../../helpers/selective_release_common"
 
 shared_examples_for "selective_release assign to tray" do |context|
   include AssignmentsIndexPage
@@ -216,10 +215,8 @@ describe "assignments index menu tool placement" do
   include AssignmentsIndexPage
   include ItemsAssignToTray
   include ContextModulesCommon
-  include SelectiveReleaseCommon
 
   before :once do
-    differentiated_modules_on
     course_with_teacher(active_all: true)
     @assignment1 = @course.assignments.create(name: "test assignment", points_possible: 25)
 

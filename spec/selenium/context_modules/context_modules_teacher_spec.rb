@@ -21,7 +21,6 @@ require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
-require_relative "../../helpers/selective_release_common"
 require_relative "../helpers/items_assign_to_tray"
 
 describe "context modules" do
@@ -29,7 +28,6 @@ describe "context modules" do
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
-  include SelectiveReleaseCommon
   include ItemsAssignToTray
 
   context "as a teacher", priority: "1" do
@@ -331,7 +329,6 @@ describe "context modules" do
     end
 
     it "validates locking a module item display functionality with differentiated modules" do
-      differentiated_modules_on
       m1 = @course.context_modules.create!(name: "module 1")
 
       go_to_modules

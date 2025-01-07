@@ -28,7 +28,6 @@ require_relative "../common"
 require_relative "pages/discussion_page"
 require_relative "../assignments/page_objects/assignment_create_edit_page"
 require_relative "../discussions/discussion_helpers"
-require_relative "../../helpers/selective_release_common"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
@@ -40,7 +39,6 @@ describe "discussions" do
   include K5DashboardCommonPageObject
   include K5Common
   include K5ImportantDatesSectionPageObject
-  include SelectiveReleaseCommon
 
   def create_graded_discussion(discussion_course, assignment_options = {})
     default_assignment_options = {
@@ -137,29 +135,6 @@ describe "discussions" do
 
             expect_new_page_load { f(".form-actions button[type=submit]").click }
             expect(topic.reload.assignment.peer_reviews).to be true
-          end
-
-          it "allows editing the due dates", priority: "1" do
-            differentiated_modules_off
-            get url
-            wait_for_tiny(f("textarea[name=message]"))
-
-            due_at = 3.days.from_now
-            unlock_at = 2.days.from_now
-            lock_at = 4.days.from_now
-
-            # set due_at, lock_at, unlock_at
-            replace_content(f(".date_field[data-date-type='due_at']"), format_date_for_view(due_at), tab_out: true)
-            replace_content(f(".date_field[data-date-type='unlock_at']"), format_date_for_view(unlock_at), tab_out: true)
-            replace_content(f(".date_field[data-date-type='lock_at']"), format_date_for_view(lock_at), tab_out: true)
-            wait_for_ajaximations
-
-            expect_new_page_load { f(".form-actions button[type=submit]").click }
-
-            a = DiscussionTopic.last.assignment
-            expect(a.due_at.to_date).to eq due_at.to_date
-            expect(a.unlock_at.to_date).to eq unlock_at.to_date
-            expect(a.lock_at.to_date).to eq lock_at.to_date
           end
 
           it "adds an attachment to a graded topic", priority: "1" do

@@ -201,8 +201,8 @@ class DiscussionTopic < ActiveRecord::Base
   # This Method is used to help the messageable user calculator narrow down the scope of users to filter.
   # After the scope is narrowed down , the calculator uses the visible_for? method to reject users without visibility permissions
   def address_book_context_for(user)
-    # If the differentiated flag is on, and only section overrides are present
-    if Account.site_admin.feature_enabled?(:selective_release_backend) && only_visible_to_overrides && !all_assignment_overrides.active.where.not(set_type: "CourseSection").exists?
+    # If section overrides are present
+    if only_visible_to_overrides && !all_assignment_overrides.active.where.not(set_type: "CourseSection").exists?
       # Get all section overrides for the topic
       section_overrides = all_assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
 
@@ -799,16 +799,11 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      where.not(assignment_id: nil)
-           .joins_assignment_student_visibilities(user_ids, course_ids)
-           .union(
-             joins_ungraded_discussion_student_visibilities(user_ids, course_ids)
-           )
-    else
-      without_assignment_in_course(course_ids)
-        .union(joins_assignment_student_visibilities(user_ids, course_ids))
-    end
+    where.not(assignment_id: nil)
+         .joins_assignment_student_visibilities(user_ids, course_ids)
+         .union(
+           joins_ungraded_discussion_student_visibilities(user_ids, course_ids)
+         )
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
@@ -887,8 +882,6 @@ class DiscussionTopic < ActiveRecord::Base
   }
 
   scope :visible_to_ungraded_discussion_student_visibilities, lambda { |users, courses = nil|
-    return visible_to_student_sections(users) unless Account.site_admin.feature_enabled?(:selective_release_backend)
-
     observed_student_ids = []
     visible_topic_ids = []
 
@@ -1774,9 +1767,8 @@ class DiscussionTopic < ActiveRecord::Base
           next false unless section_visibilities.intersect?(course_section_ids)
         end
       end
-      # Verify that section limited teachers/ta's are properly restricted when selective_release_backend is enabled
-      if context.is_a?(Course) && (Account.site_admin.feature_enabled?(:selective_release_backend) &&
-         !visible_to_everyone && context.user_is_instructor?(user))
+      # Verify that section limited teachers/ta's are properly restricted
+      if context.is_a?(Course) && (!visible_to_everyone && context.user_is_instructor?(user))
 
         section_overrides = assignment_overrides.active.where(set_type: "CourseSection").pluck(:set_id)
         visible_sections_for_user = context.course_section_visibility(user)
@@ -1796,7 +1788,7 @@ class DiscussionTopic < ActiveRecord::Base
         next false unless assignment.visible_to_user?(user)
       # Announcements can be section specific, but that is already handled above.
       # Eventually is_section_specific will be replaced with assignment overrides, and then announcements will need to be handled
-      elsif !is_announcement && Account.site_admin.feature_enabled?(:selective_release_backend)
+      elsif !is_announcement
         next false unless visible_to_user?(user)
       end
 
@@ -1833,46 +1825,26 @@ class DiscussionTopic < ActiveRecord::Base
   def low_level_locked_for?(user, opts = {})
     return false if opts[:check_policies] && grants_right?(user, :read_as_admin)
 
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      RequestCache.cache(locked_request_cache_key(user)) do
-        locked = false
-        # get the topic's overridden availability dates for the user. If graded, the dates will be on the assignment.
-        topic_for_user = assignment.present? ? assignment.overridden_for(user) : overridden_for(user)
-        # prefer unlock_at, but fall back to delayed_post_at for DiscussionTopics until the latter is removed
-        overridden_unlock_at = topic_for_user.unlock_at
-        overridden_unlock_at ||= topic_for_user.delayed_post_at if topic_for_user.respond_to?(:delayed_post_at)
-        overridden_lock_at = topic_for_user.lock_at
-        if overridden_unlock_at && overridden_unlock_at > Time.zone.now
-          locked = { object: self, unlock_at: overridden_unlock_at }
-        elsif overridden_lock_at && overridden_lock_at < Time.zone.now
-          locked = { object: self, lock_at: overridden_lock_at, can_view: true }
-        elsif could_be_locked && (item = locked_by_module_item?(user, opts))
-          locked = { object: self, module: item.context_module }
-        elsif locked? # nothing more specific, it's just locked
-          locked = { object: self, can_view: true }
-        elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
-          locked = l
-        end
-        locked
+    RequestCache.cache(locked_request_cache_key(user)) do
+      locked = false
+      # get the topic's overridden availability dates for the user. If graded, the dates will be on the assignment.
+      topic_for_user = assignment.present? ? assignment.overridden_for(user) : overridden_for(user)
+      # prefer unlock_at, but fall back to delayed_post_at for DiscussionTopics until the latter is removed
+      overridden_unlock_at = topic_for_user.unlock_at
+      overridden_unlock_at ||= topic_for_user.delayed_post_at if topic_for_user.respond_to?(:delayed_post_at)
+      overridden_lock_at = topic_for_user.lock_at
+      if overridden_unlock_at && overridden_unlock_at > Time.zone.now
+        locked = { object: self, unlock_at: overridden_unlock_at }
+      elsif overridden_lock_at && overridden_lock_at < Time.zone.now
+        locked = { object: self, lock_at: overridden_lock_at, can_view: true }
+      elsif could_be_locked && (item = locked_by_module_item?(user, opts))
+        locked = { object: self, module: item.context_module }
+      elsif locked? # nothing more specific, it's just locked
+        locked = { object: self, can_view: true }
+      elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
+        locked = l
       end
-    else
-      RequestCache.cache(locked_request_cache_key(user)) do
-        locked = false
-        if delayed_post_at && delayed_post_at > Time.zone.now
-          locked = { object: self, unlock_at: delayed_post_at }
-        elsif lock_at && lock_at < Time.zone.now
-          locked = { object: self, lock_at:, can_view: true }
-        elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
-          locked = l
-        elsif could_be_locked && (item = locked_by_module_item?(user, opts))
-          locked = { object: self, module: item.context_module }
-        elsif locked? # nothing more specific, it's just locked
-          locked = { object: self, can_view: true }
-        elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
-          locked = l
-        end
-        locked
-      end
+      locked
     end
   end
 
@@ -2094,24 +2066,18 @@ class DiscussionTopic < ActiveRecord::Base
 
   def self.visible_ids_by_user(opts)
     # Discussions with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
-    plucked_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
-                             visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: opts[:user_id], course_ids: opts[:course_id])
-                             # map the visibilities to a hash of assignment_id => [user_ids]
-                             assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
-                               hash[visibility.assignment_id] << visibility.user_id
-                             end
-                             # this mimicks the format of the non-flagged group_by to pair each user_id to the correct visible discussion/discussion's assignment
-                             where(assignment_id: assignment_user_map.keys)
-                               .pluck(:id, :assignment_id)
-                               .flat_map { |discussion_id, assignment_id| assignment_user_map[assignment_id].map { |user_id| [discussion_id, assignment_id, user_id] } }
-                               .group_by { |_, _, user_id| user_id }
-                           else
-                             joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
-                               .pluck("discussion_topics.id", "discussion_topics.assignment_id", "assignment_student_visibilities.user_id")
-                               .group_by { |_, _, user_id| user_id }
-                           end
+    visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: opts[:user_id], course_ids: opts[:course_id])
+    # map the visibilities to a hash of assignment_id => [user_ids]
+    assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
+      hash[visibility.assignment_id] << visibility.user_id
+    end
+    # this mimicks the format of the non-flagged group_by to pair each user_id to the correct visible discussion/discussion's assignment
+    plucked_visibilities = where(assignment_id: assignment_user_map.keys)
+                           .pluck(:id, :assignment_id)
+                           .flat_map { |discussion_id, assignment_id| assignment_user_map[assignment_id].map { |user_id| [discussion_id, assignment_id, user_id] } }
+                           .group_by { |_, _, user_id| user_id }
+
     # Initialize dictionaries for different visibility scopes
-    ungraded_differentiated_topic_ids_per_user = {}
     ids_visible_to_all = []
 
     # Get Section specific discussions:
@@ -2133,17 +2099,10 @@ class DiscussionTopic < ActiveRecord::Base
     opts[:user_id].each { |user_id| topic_ids_per_user[user_id] = sections_per_user[user_id]&.map { |section_id| topic_ids_per_section[section_id] }&.flatten&.uniq&.compact }
     ids_visible_to_sections = topic_ids_per_user
 
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
-      eligible_topic_ids = DiscussionTopic.where(id: visible_topic_user_id_pairs.map(&:first)).where(assignment_id: nil).where.not(is_section_specific: true).pluck(:id)
-      eligible_visible_topic_user_id_pairs = visible_topic_user_id_pairs.select { |discussion_topic_id, _user_id| eligible_topic_ids.include?(discussion_topic_id) }
-      ungraded_differentiated_topic_ids_per_user = eligible_visible_topic_user_id_pairs.group_by(&:last).transform_values { |pairs| pairs.map(&:first) }
-    else
-      # Ungraded discussions are *normally* visible to all -- the exception is
-      # section-specific discussions, so here get the ones visible to everyone in the
-      # course, and below get the ones that are visible to the right section.
-      ids_visible_to_all = without_assignment_in_course(opts[:course_id]).where(is_section_specific: false).pluck(:id)
-    end
+    visible_topic_user_id_pairs = UngradedDiscussionVisibility::UngradedDiscussionVisibilityService.discussion_topics_visible(user_ids: opts[:user_id], course_ids: opts[:course_id]).map { |visibility| [visibility.discussion_topic_id, visibility.user_id] }
+    eligible_topic_ids = DiscussionTopic.where(id: visible_topic_user_id_pairs.map(&:first)).where(assignment_id: nil).where.not(is_section_specific: true).pluck(:id)
+    eligible_visible_topic_user_id_pairs = visible_topic_user_id_pairs.select { |discussion_topic_id, _user_id| eligible_topic_ids.include?(discussion_topic_id) }
+    ungraded_differentiated_topic_ids_per_user = eligible_visible_topic_user_id_pairs.group_by(&:last).transform_values { |pairs| pairs.map(&:first) }
 
     # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
     opts[:user_id].index_with do |student_id|

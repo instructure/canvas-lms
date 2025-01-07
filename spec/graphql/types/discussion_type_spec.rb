@@ -937,14 +937,6 @@ describe Types::DiscussionType do
       end
 
       context "visibility" do
-        before do
-          Account.site_admin.enable_feature! :selective_release_backend
-        end
-
-        after do
-          Account.site_admin.disable_feature! :selective_release_backend
-        end
-
         it "is visible only to the assigned student" do
           override = @topic.assignment_overrides.create!
           override.assignment_override_students.create!(user: @student1)

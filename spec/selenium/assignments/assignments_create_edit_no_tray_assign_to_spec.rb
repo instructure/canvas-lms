@@ -23,13 +23,11 @@ require_relative "page_objects/assignment_page"
 require_relative "../helpers/items_assign_to_tray"
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/groups_common"
-require_relative "../../helpers/selective_release_common"
 
 shared_examples_for "item assign to on page during assignment creation/update" do
   include AssignmentsIndexPage
   include ItemsAssignToTray
   include ContextModulesCommon
-  include SelectiveReleaseCommon
 
   it "assigns student and saves assignment" do
     AssignmentCreateEditPage.replace_assignment_name("new test assignment")
@@ -157,7 +155,6 @@ describe "override assignees" do
   include ItemsAssignToTray
   include ContextModulesCommon
   include GroupsCommon
-  include SelectiveReleaseCommon
 
   context "basic assignee overrides" do
     before :once do

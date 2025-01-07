@@ -24,7 +24,6 @@ require_relative "../../dashboard/pages/k5_dashboard_page"
 require_relative "../../dashboard/pages/k5_dashboard_common_page"
 require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/module_selective_release_shared_examples"
-require_relative "../../../helpers/selective_release_common"
 
 describe "selective_release module set up" do
   include_context "in-process server selenium tests"
@@ -34,11 +33,9 @@ describe "selective_release module set up" do
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
-  include SelectiveReleaseCommon
 
   context "using tray to update settings" do
     before(:once) do
-      differentiated_modules_on
       course_with_teacher(active_all: true)
       module_setup
     end
@@ -57,7 +54,6 @@ describe "selective_release module set up" do
 
   context "uses tray to update prerequisites" do
     before(:once) do
-      differentiated_modules_on
       course_with_teacher(active_all: true)
       module_setup
       @module2 = @course.context_modules.create!(name: "module2")
@@ -115,7 +111,6 @@ describe "selective_release module set up" do
 
   context "uses tray to update module requirements" do
     before(:once) do
-      differentiated_modules_on
       course_with_teacher(active_all: true)
       module_setup
       @module2 = @course.context_modules.create!(name: "module2")
@@ -257,7 +252,6 @@ describe "selective_release module set up" do
 
   context "uses tray to update assign to settings" do
     before(:once) do
-      differentiated_modules_on
       course_with_teacher(active_all: true)
       @section1 = @course.course_sections.create!(name: "section1")
       @section2 = @course.course_sections.create!(name: "section2")
@@ -390,7 +384,6 @@ describe "selective_release module set up" do
 
   context "uses tray to create modules" do
     before(:once) do
-      differentiated_modules_on
       course_with_teacher(active_all: true)
     end
 
@@ -452,7 +445,6 @@ describe "selective_release module set up" do
 
   context "Canvas for Elementary Modules Selective Release" do
     before :once do
-      differentiated_modules_on
       teacher_setup
       module_setup(@subject_course)
       @section1 = @subject_course.course_sections.create!(name: "section1")
@@ -477,7 +469,6 @@ describe "selective_release module set up" do
 
   context "Canvas for Elementary Modules Selective Release Limited Set Up" do
     before :once do
-      differentiated_modules_on
       teacher_setup
     end
 

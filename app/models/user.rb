@@ -350,28 +350,18 @@ class User < ActiveRecord::Base
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_assignment_in_course_with_da, lambda { |assignment_id, course_id, user_ids = nil|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:).map(&:user_id)
-      if visible_user_id.any?
-        where(id: visible_user_id)
-      else
-        none
-      end
+    visible_user_id = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(assignment_ids: assignment_id, course_ids: course_id, user_ids:).map(&:user_id)
+    if visible_user_id.any?
+      where(id: visible_user_id)
     else
-      joins(:assignment_student_visibilities)
-        .where(assignment_student_visibilities: { assignment_id:, course_id: })
+      none
     end
   }
 
   # NOTE: only use for courses with differentiated assignments on
   scope :able_to_see_quiz_in_course_with_da, lambda { |quiz_id, course_id|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      visible_user_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: quiz_id, course_ids: course_id).map(&:user_id)
-      where(id: visible_user_ids)
-    else
-      joins(:quiz_student_visibilities)
-        .where(quiz_student_visibilities: { quiz_id:, course_id: })
-    end
+    visible_user_ids = QuizVisibility::QuizVisibilityService.quizzes_visible_to_students(quiz_ids: quiz_id, course_ids: course_id).map(&:user_id)
+    where(id: visible_user_ids)
   }
 
   scope :observing_students_in_course, lambda { |observee_ids, course_ids|
@@ -407,11 +397,9 @@ class User < ActiveRecord::Base
       GuardRail.activate(:secondary) do
         visibilities = { assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
                          quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id) }
-        if Account.site_admin.feature_enabled?(:selective_release_backend)
-          visibilities[:context_module_ids] = DifferentiableAssignment.scope_filter(context.context_modules, self, context).pluck(:id)
-          visibilities[:discussion_topic_ids] = DifferentiableAssignment.scope_filter(context.discussion_topics, self, context).pluck(:id)
-          visibilities[:wiki_page_ids] = DifferentiableAssignment.scope_filter(context.wiki_pages, self, context).pluck(:id)
-        end
+        visibilities[:context_module_ids] = DifferentiableAssignment.scope_filter(context.context_modules, self, context).pluck(:id)
+        visibilities[:discussion_topic_ids] = DifferentiableAssignment.scope_filter(context.discussion_topics, self, context).pluck(:id)
+        visibilities[:wiki_page_ids] = DifferentiableAssignment.scope_filter(context.wiki_pages, self, context).pluck(:id)
         visibilities
       end
     end

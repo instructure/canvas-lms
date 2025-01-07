@@ -143,21 +143,6 @@ describe SubAssignment do
       result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [course2.id])
       expect(result).to be_empty
     end
-
-    it "works with selective release backend FF disabled" do
-      Account.site_admin.disable_feature!(:selective_release_backend)
-      result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
-      expect(result.size).to eq 2
-      expect(result.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
-    end
-
-    it "works with selective release backend FF enabled" do
-      Account.site_admin.enable_feature!(:selective_release_backend)
-      result = SubAssignment.visible_to_students_in_course_with_da([@student.id], [@course.id])
-      expect(result).not_to be_empty
-      expect(result.size).to eq 2
-      expect(result.pluck(:id)).to match_array([@reply_to_topic.id, @reply_to_entry.id])
-    end
   end
 
   describe "synchronization with parent assignment" do

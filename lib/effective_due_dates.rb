@@ -159,8 +159,7 @@ class EffectiveDueDates
   end
 
   def context_module_overrides
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "/* fetch all module overrides for this assignment */
+    "/* fetch all module overrides for this assignment */
       tags AS (
         SELECT
           t.id,
@@ -211,51 +210,37 @@ class EffectiveDueDates
         WHERE
            o.workflow_state = 'active' AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id) AND
            a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
-      ),"
-    else
-      ""
-    end
+    ),"
   end
 
   def visible_to_everyone
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (
-        SELECT 1 FROM modules m WHERE m.item_assignment_id = a.id AND m.id IS NOT NULL
-        ) OR EXISTS (
-        SELECT
-          *
-        FROM
-          tags t,
-          modules m
-        LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
-        WHERE
-          o.context_module_id IS NULL
-          AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
-          AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
-        )
-      )"
-    else
-      "a.only_visible_to_overrides IS NOT TRUE"
-    end
+    "a.only_visible_to_overrides IS NOT TRUE AND (NOT EXISTS (
+      SELECT 1 FROM modules m WHERE m.item_assignment_id = a.id AND m.id IS NOT NULL
+      ) OR EXISTS (
+      SELECT
+        *
+      FROM
+        tags t,
+        modules m
+      LEFT JOIN #{AssignmentOverride.quoted_table_name} o on o.context_module_id = m.id AND o.workflow_state = 'active'
+      WHERE
+        o.context_module_id IS NULL
+        AND a.id = COALESCE(t.content_id, t.quiz_assignment_id, t.discussion_assignment_id)
+        AND m.id = COALESCE(t.context_module_id, t.quiz_context_module_id, t.discussion_context_module_id)
+      )
+    )"
   end
 
   def union_all_overrides
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "overrides AS (
-        SELECT * FROM assignment_overrides
-        UNION ALL
-        SELECT * FROM module_overrides
-      ),"
-    else
-      "overrides AS (
-        SELECT * FROM assignment_overrides
-      ),"
-    end
+    "overrides AS (
+      SELECT * FROM assignment_overrides
+      UNION ALL
+      SELECT * FROM module_overrides
+    ),"
   end
 
   def course_overrides
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "/* fetch all students affected by course overrides */
+    "/* fetch all students affected by course overrides */
       override_course_students AS (
         SELECT
           e.user_id AS student_id,
@@ -276,28 +261,17 @@ class EffectiveDueDates
           e.workflow_state NOT IN ('rejected', 'deleted') AND
           e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
           #{filter_students_sql("e")}
-          ),"
-    else
-      ""
-    end
+    ),"
   end
 
   def union_course_overrides
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "UNION ALL
-       SELECT * FROM override_course_students"
-    else
-      ""
-    end
+    "UNION ALL
+     SELECT * FROM override_course_students"
   end
 
   def unassign_item
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "WHERE
-        unassign_item = FALSE"
-    else
-      ""
-    end
+    "WHERE
+      unassign_item = FALSE"
   end
 
   # This beauty of a method brings together assignment overrides,

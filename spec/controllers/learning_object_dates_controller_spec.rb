@@ -20,7 +20,6 @@
 
 describe LearningObjectDatesController do
   before :once do
-    Account.site_admin.enable_feature! :selective_release_backend
     Account.site_admin.enable_feature! :selective_release_ui_api
     Account.site_admin.enable_feature! :differentiated_files
     course_with_teacher(active_all: true)

@@ -21,11 +21,9 @@ require_relative "../common"
 require_relative "../../conditional_release_spec_helper"
 require_relative "../assignments/page_objects/assignments_index_page"
 require_relative "page_objects/conditional_release_objects"
-require_relative "../../helpers/selective_release_common"
 
 describe "native canvas conditional release" do
   include AssignmentsIndexPage
-  include SelectiveReleaseCommon
 
   include_context "in-process server selenium tests"
   before(:once) do
@@ -39,21 +37,6 @@ describe "native canvas conditional release" do
   end
 
   context "Pages as part of Mastery Paths" do
-    it "shows Allow in Mastery Paths for a Page when feature enabled" do
-      differentiated_modules_off
-      get "/courses/#{@course.id}/pages/new/edit"
-      expect(ConditionalReleaseObjects.conditional_content_exists?).to be(true)
-    end
-
-    it "does not show Allow in Mastery Paths when feature disabled" do
-      differentiated_modules_off
-      account = Account.default
-      account.settings[:conditional_release] = { value: false }
-      account.save!
-      get "/courses/#{@course.id}/pages/new/edit"
-      expect(ConditionalReleaseObjects.conditional_content_exists?).to be(false)
-    end
-
     it "is not included in the assignments page" do
       page_title = "MP Page to Verify"
       @new_page = @course.wiki_pages.create!(title: page_title)

@@ -1287,7 +1287,6 @@ describe UserLearningObjectScopes do
     end
 
     it "does not show wiki pages that are not visible to the user" do
-      Account.site_admin.enable_feature! :selective_release_backend
       @course_page.update!(todo_date: 1.day.from_now, only_visible_to_overrides: true)
       section2 = add_section("Section 2")
       student2 = student_in_section(section2)

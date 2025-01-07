@@ -82,20 +82,15 @@ class WikiPage < ActiveRecord::Base
   after_save :delete_lookups, if: -> { !Account.site_admin.feature_enabled?(:permanent_page_links) && saved_change_to_workflow_state? && deleted? }
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      # no assignment -> visible if wiki_page_visibilities has results
-      # assignment -> visible if assignment_visibilities has results
-      visible_wiki_page_ids = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids:, user_ids:).map(&:wiki_page_id)
+    # no assignment -> visible if wiki_page_visibilities has results
+    # assignment -> visible if assignment_visibilities has results
+    visible_wiki_page_ids = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids:, user_ids:).map(&:wiki_page_id)
 
-      if with_assignment_in_course(course_ids).exists?
-        without_assignment_in_course(course_ids).where(id: visible_wiki_page_ids)
-                                                .union(joins_assignment_student_visibilities(user_ids, course_ids))
-      else
-        without_assignment_in_course(course_ids).where(id: visible_wiki_page_ids)
-      end
+    if with_assignment_in_course(course_ids).exists?
+      without_assignment_in_course(course_ids).where(id: visible_wiki_page_ids)
+                                              .union(joins_assignment_student_visibilities(user_ids, course_ids))
     else
-      without_assignment_in_course(course_ids)
-        .union(joins_assignment_student_visibilities(user_ids, course_ids))
+      without_assignment_in_course(course_ids).where(id: visible_wiki_page_ids)
     end
   }
 
@@ -113,19 +108,16 @@ class WikiPage < ActiveRecord::Base
     wiki_ids += Course.where(id: course_ids).pluck(:wiki_id) if course_ids.any?
     wiki_ids += Group.where(id: group_ids).pluck(:wiki_id) if group_ids.any?
     context_pages = where(wiki_id: wiki_ids)
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      scope_assignments = context_pages.where.not(assignment_id: nil).pluck(:assignment_id)
-      visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(user_ids: user_id, course_ids:).map(&:wiki_page_id)
-      visible_assignments = if scope_assignments.empty?
-                              []
-                            else
-                              AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: user_id, assignment_ids: scope_assignments).map(&:assignment_id)
-                            end
-      context_pages.where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
-                   .or(context_pages.where("wiki_pages.assignment_id IS NOT NULL AND wiki_pages.assignment_id IN (?)", visible_assignments))
-    else
-      context_pages.where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
-    end
+
+    scope_assignments = context_pages.where.not(assignment_id: nil).pluck(:assignment_id)
+    visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(user_ids: user_id, course_ids:).map(&:wiki_page_id)
+    visible_assignments = if scope_assignments.empty?
+                            []
+                          else
+                            AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: user_id, assignment_ids: scope_assignments).map(&:assignment_id)
+                          end
+    context_pages.where("wiki_pages.assignment_id IS NULL AND (wiki_pages.id IN (?) OR wiki_pages.context_type = 'Group')", visible_wiki_pages)
+                 .or(context_pages.where("wiki_pages.assignment_id IS NOT NULL AND wiki_pages.assignment_id IN (?)", visible_assignments))
   }
 
   TITLE_LENGTH = 255
@@ -341,33 +333,19 @@ class WikiPage < ActiveRecord::Base
   scope :order_by_id, -> { order(:id) }
 
   def low_level_locked_for?(user, opts = {})
-    if Account.site_admin.feature_enabled?(:selective_release_backend)
-      return false if opts[:check_policies] && grants_right?(user, :update)
+    return false if opts[:check_policies] && grants_right?(user, :update)
 
-      RequestCache.cache(locked_request_cache_key(user)) do
-        locked = false
-        page_for_user = (assignment || self).overridden_for(user)
-        if page_for_user.unlock_at && page_for_user.unlock_at > Time.zone.now
-          locked = { object: page_for_user, unlock_at: page_for_user.unlock_at }
-        elsif could_be_locked && (item = locked_by_module_item?(user, opts))
-          locked = { object: self, module: item.context_module }
-        elsif page_for_user.lock_at && page_for_user.lock_at < Time.zone.now
-          locked = { object: page_for_user, lock_at: page_for_user.lock_at }
-        end
-        locked
+    RequestCache.cache(locked_request_cache_key(user)) do
+      locked = false
+      page_for_user = (assignment || self).overridden_for(user)
+      if page_for_user.unlock_at && page_for_user.unlock_at > Time.zone.now
+        locked = { object: page_for_user, unlock_at: page_for_user.unlock_at }
+      elsif could_be_locked && (item = locked_by_module_item?(user, opts))
+        locked = { object: self, module: item.context_module }
+      elsif page_for_user.lock_at && page_for_user.lock_at < Time.zone.now
+        locked = { object: page_for_user, lock_at: page_for_user.lock_at }
       end
-    else
-      return false unless could_be_locked
-
-      RequestCache.cache(locked_request_cache_key(user), opts[:deep_check_if_needed]) do
-        locked = false
-        if (item = locked_by_module_item?(user, opts))
-          locked = { object: self, module: item.context_module }
-          unlock_at = locked[:module].unlock_at
-          locked[:unlock_at] = unlock_at if unlock_at && unlock_at > Time.now.utc
-        end
-        locked
-      end
+      locked
     end
   end
 
@@ -678,7 +656,7 @@ class WikiPage < ActiveRecord::Base
   def self.visible_ids_by_user(opts)
     assignment_page_visibilities = if with_assignment_in_course(opts[:course_id]).empty?
                                      {}
-                                   elsif Account.site_admin.feature_enabled?(:selective_release_backend)
+                                   else
                                      visible_assignments = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids: opts[:user_id], course_ids: opts[:course_id])
                                      # map the visibilities to a hash of assignment_id => [user_ids]
                                      assignment_user_map = visible_assignments.each_with_object(Hash.new { |hash, key| hash[key] = [] }) do |visibility, hash|
@@ -689,30 +667,18 @@ class WikiPage < ActiveRecord::Base
                                        .pluck(:id, :assignment_id)
                                        .flat_map { |wiki_page_id, assignment_id| assignment_user_map[assignment_id].map { |user_id| [wiki_page_id, user_id] } }
                                        .group_by { |_, user_id| user_id }
-                                   else
-                                     joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
-                                       .pluck("wiki_pages.id", "assignment_student_visibilities.user_id")
-                                       .group_by { |_, user_id| user_id }
                                    end
     no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
-    no_assignment_page_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
-                                        visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids: opts[:course_id], user_ids: opts[:user_id])
-                                        visible_wiki_page_ids = visible_wiki_pages.map { |visibility| [visibility.wiki_page_id, visibility.user_id] }
 
-                                        no_assignment_page_visibilities
-                                          .where(id: visible_wiki_page_ids.map(&:first))
-                                          .pluck(:id).group_by { |id| visible_wiki_page_ids.find { |visibility| visibility.first == id }.last }
-                                      else
-                                        no_assignment_page_visibilities.pluck(:id)
-                                      end
+    visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids: opts[:course_id], user_ids: opts[:user_id])
+    visible_wiki_page_ids = visible_wiki_pages.map { |visibility| [visibility.wiki_page_id, visibility.user_id] }
+    no_assignment_page_visibilities = no_assignment_page_visibilities
+                                      .where(id: visible_wiki_page_ids.map(&:first))
+                                      .pluck(:id).group_by { |id| visible_wiki_page_ids.find { |visibility| visibility.first == id }.last }
 
     opts[:user_id].index_with do |user_id|
       page_ids_with_assignment = (assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
-      page_ids_no_assignment = if Account.site_admin.feature_enabled?(:selective_release_backend)
-                                 (no_assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
-                               else
-                                 no_assignment_page_visibilities
-                               end
+      page_ids_no_assignment = (no_assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
       page_ids_with_assignment.concat(page_ids_no_assignment)
     end
   end
