@@ -2656,6 +2656,7 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/course_pacing/:id", action: :destroy
       post "courses/:course_id/course_pacing/:id/publish", action: :publish
       post "courses/:course_id/course_pacing/compress_dates", action: :compress_dates
+      post "courses/:course_id/course_pacing/bulk_create_enrollment_paces", action: :bulk_create_enrollment_paces
     end
 
     scope(controller: :blackout_dates) do

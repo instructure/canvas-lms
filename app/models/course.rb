@@ -2346,6 +2346,27 @@ class Course < ActiveRecord::Base
                        .update_all(grade_publishing_status: "error", grade_publishing_message: "Timed out.")
   end
 
+  def run_bulk_assign_enrollment_paces_delayed_job(enrollment_ids, pace_create_params)
+    progress = Progress.create!(context: self, tag: "bulk_assign_paces")
+    progress.process_job(self,
+                         :bulk_assign_enrollment_paces,
+                         { priority: Delayed::HIGH_PRIORITY },
+                         enrollment_ids,
+                         pace_create_params.to_h)
+  end
+
+  def bulk_assign_enrollment_paces(_, enrollment_ids, pace_create_params)
+    Enrollment.where(id: enrollment_ids).find_each do |enrollment|
+      pace_create_params[:user_id] = enrollment.user_id
+      pace_create_params[:workflow_state] = "active"
+      pace = enrollment.course_paces.new(pace_create_params)
+
+      if pace.save
+        pace.create_publish_progress(run_at: Time.zone.now)
+      end
+    end
+  end
+
   def gradebook_to_csv_in_background(filename, user, options = {})
     progress = progresses.build(tag: "gradebook_to_csv", user:)
     progress.save!
