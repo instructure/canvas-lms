@@ -19,6 +19,7 @@
 import {render, screen} from '@testing-library/react'
 import React from 'react'
 import '@testing-library/jest-dom'
+import {waitFor} from '@testing-library/dom'
 import {HelpTrayProvider, useHelpTray} from '..'
 
 const TestComponent = () => {
@@ -37,6 +38,10 @@ const TestComponent = () => {
 }
 
 describe('HelpTrayContext', () => {
+  afterEach(() => {
+    window.location.hash = ''
+  })
+
   it('renders without crashing', () => {
     render(
       <HelpTrayProvider>
@@ -45,47 +50,125 @@ describe('HelpTrayContext', () => {
     )
   })
 
-  it('provides default value for isHelpTrayOpen as false', () => {
-    render(
-      <HelpTrayProvider>
-        <TestComponent />
-      </HelpTrayProvider>,
-    )
-    expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+  describe('initial state', () => {
+    it('provides default value for isHelpTrayOpen as false', () => {
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+    })
+
+    it('initializes isHelpTrayOpen to true if the hash is #help', () => {
+      window.location.hash = '#help'
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
+    })
+
+    it('initializes isHelpTrayOpen to false if the hash is not #help', () => {
+      window.location.hash = ''
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+    })
   })
 
-  it('allows openHelpTray to set isHelpTrayOpen to true', () => {
-    render(
-      <HelpTrayProvider>
-        <TestComponent />
-      </HelpTrayProvider>,
-    )
-    const openButton = screen.getByTestId('openTrayButton')
-    openButton.click()
-    expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
+  describe('state updates', () => {
+    it('allows openHelpTray to set isHelpTrayOpen to true', () => {
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      const openButton = screen.getByTestId('openTrayButton')
+      openButton.click()
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
+    })
+
+    it('allows closeHelpTray to set isHelpTrayOpen to false', () => {
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      const openButton = screen.getByTestId('openTrayButton')
+      const closeButton = screen.getByTestId('closeTrayButton')
+      openButton.click()
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
+      closeButton.click()
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+    })
   })
 
-  it('allows closeHelpTray to set isHelpTrayOpen to false', () => {
-    render(
-      <HelpTrayProvider>
-        <TestComponent />
-      </HelpTrayProvider>,
-    )
-    const openButton = screen.getByTestId('openTrayButton')
-    const closeButton = screen.getByTestId('closeTrayButton')
-    openButton.click()
-    expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
-    closeButton.click()
-    expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+  describe('hash synchronization', () => {
+    it('updates the hash to #help when openHelpTray is called', () => {
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      const openButton = screen.getByTestId('openTrayButton')
+      openButton.click()
+      expect(window.location.hash).toBe('#help')
+    })
+
+    it('removes the hash when closeHelpTray is called', () => {
+      window.location.hash = '#help'
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      const closeButton = screen.getByTestId('closeTrayButton')
+      closeButton.click()
+      expect(window.location.hash).toBe('')
+    })
+
+    it('updates isHelpTrayOpen to true when the hash changes to #help', async () => {
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+      window.location.hash = '#help'
+      await waitFor(() => {
+        expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
+      })
+    })
+
+    it('updates isHelpTrayOpen to false when the hash changes away from #help', async () => {
+      window.location.hash = '#help'
+      render(
+        <HelpTrayProvider>
+          <TestComponent />
+        </HelpTrayProvider>,
+      )
+      expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('true')
+      window.location.hash = ''
+      await waitFor(() => {
+        expect(screen.getByTestId('isHelpTrayOpen')).toHaveTextContent('false')
+      })
+    })
   })
 
-  it('throws an error if useHelpTray is used outside HelpTrayProvider', () => {
-    const OriginalConsoleError = console.error
-    console.error = jest.fn()
-    const renderOutsideProvider = () => {
-      render(<TestComponent />)
-    }
-    expect(renderOutsideProvider).toThrow('useHelpTray must be used within a HelpTrayProvider')
-    console.error = OriginalConsoleError
+  describe('error handling', () => {
+    it('throws an error if useHelpTray is used outside HelpTrayProvider', () => {
+      const OriginalConsoleError = console.error
+      console.error = jest.fn()
+      const renderOutsideProvider = () => {
+        render(<TestComponent />)
+      }
+      expect(renderOutsideProvider).toThrow('useHelpTray must be used within a HelpTrayProvider')
+      console.error = OriginalConsoleError
+    })
   })
 })
