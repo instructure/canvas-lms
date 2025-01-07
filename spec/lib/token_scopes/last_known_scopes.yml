@@ -792,6 +792,8 @@
 - verb: POST
   path: '/api/v1/courses/:course_id/course_pacing/:id/publish'
 - verb: POST
+  path: '/api/v1/courses/:course_id/course_pacing/bulk_create_enrollment_paces'
+- verb: POST
   path: '/api/v1/courses/:course_id/course_pacing/compress_dates'
 - verb: GET
   path: '/api/v1/courses/:course_id/course_pacing/new'

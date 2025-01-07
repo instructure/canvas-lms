@@ -894,6 +894,28 @@ describe CoursePacesController do
     end
   end
 
+  describe "POST #bulk_create_enrollment_paces" do
+    let(:create_params) { valid_update_params.merge(course_id: @course.id) }
+
+    it "creates enrollment paces for multiple students in a bulk operation" do
+      @student_1 = User.create!
+      @student_2 = User.create!
+      @student_3 = User.create!
+      @student_enrollment_1 = @course.enroll_student(@student_1, enrollment_state: "active", section: @course_section, allow_multiple_enrollments: true)
+      @student_enrollment_2 = @course.enroll_student(@student_2, enrollment_state: "active", section: @course_section, allow_multiple_enrollments: true)
+      @student_enrollment_3 = @course.enroll_student(@student_3, enrollment_state: "active", section: @course_section, allow_multiple_enrollments: true)
+
+      id_list = []
+      id_list.push(@student_enrollment_1[:id])
+      id_list.push(@student_enrollment_2[:id])
+      id_list.push(@student_enrollment_3[:id])
+
+      post :bulk_create_enrollment_paces, params: { course_id: @course.id, course_pace: create_params, enrollment_ids: id_list }
+      expect(response).to be_successful
+      expect(Progress.where(tag: "bulk_assign_paces").count).to eq(1)
+    end
+  end
+
   describe "POST #compress_dates" do
     let(:squishes_proportionally_course_pace_params) do
       @valid_params.merge(
