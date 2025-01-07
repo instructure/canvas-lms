@@ -24,11 +24,11 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import fetchMock from 'fetch-mock'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
+import {FileManagementContext} from '../../Contexts'
 
 const defaultProps = {
   size: 'large' as 'large' | 'small' | 'medium',
   userCanEditFilesForContext: true,
-  folderId: '1',
 }
 
 const renderComponent = (props = {}) => {
@@ -37,9 +37,13 @@ const renderComponent = (props = {}) => {
   return render(
     <BrowserRouter>
       <MockedQueryClientProvider client={queryClient}>
-        <FileFolderTable {...defaultProps} {...props} />
+        <FileManagementContext.Provider
+          value={{contextType: 'course', contextId: '1', folderId: '1'}}
+        >
+          <FileFolderTable {...defaultProps} {...props} />
+        </FileManagementContext.Provider>
       </MockedQueryClientProvider>
-    </BrowserRouter>
+    </BrowserRouter>,
   )
 }
 
@@ -70,7 +74,9 @@ describe('FileFolderTable', () => {
   it('renders stacked when not large', async () => {
     renderComponent({size: 'medium'})
 
-    expect(await screen.findAllByTestId('row-select-checkbox')).toHaveLength(FAKE_FOLDERS_AND_FILES.length)
+    expect(await screen.findAllByTestId('row-select-checkbox')).toHaveLength(
+      FAKE_FOLDERS_AND_FILES.length,
+    )
   })
 
   it('renders file/folder rows when results', async () => {
@@ -106,7 +112,7 @@ describe('FileFolderTable', () => {
 
   describe('FileFolderTable - selection behavior', () => {
     it('allows row selection and highlights selected rows', async () => {
-      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], { overwriteRoutes:true, delay: 0 })
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true, delay: 0})
       renderComponent()
 
       const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
@@ -118,7 +124,10 @@ describe('FileFolderTable', () => {
     })
 
     it('allows "Select All" functionality', async () => {
-      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], { overwriteRoutes:true, delay: 0 })
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
+        overwriteRoutes: true,
+        delay: 0,
+      })
       renderComponent()
 
       const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
@@ -134,7 +143,10 @@ describe('FileFolderTable', () => {
     })
 
     it('sets "Select All" checkbox to indeterminate when some rows are selected', async () => {
-      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], { overwriteRoutes:true, delay: 0 })
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
+        overwriteRoutes: true,
+        delay: 0,
+      })
       renderComponent()
 
       const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
@@ -150,7 +162,10 @@ describe('FileFolderTable', () => {
     })
 
     it('updates "Select All" checkbox correctly when all rows are selected', async () => {
-      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], { overwriteRoutes:true, delay: 0 })
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0], FAKE_FILES[1]], {
+        overwriteRoutes: true,
+        delay: 0,
+      })
       renderComponent()
 
       const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
