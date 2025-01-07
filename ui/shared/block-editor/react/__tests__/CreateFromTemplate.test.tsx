@@ -55,7 +55,7 @@ jest.mock('@craftjs/core', () => {
 })
 
 const renderComponent = async () => {
-  const rendered = render(<CreateFromTemplate course_id="1" />)
+  const rendered = render(<CreateFromTemplate course_id="1" noBlocks={true}/>)
 
   await waitFor(() => {
     expect(document.querySelectorAll('.block-template-preview-card')).toHaveLength(totalPages)

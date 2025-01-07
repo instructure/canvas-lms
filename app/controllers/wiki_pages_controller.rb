@@ -141,10 +141,6 @@ class WikiPagesController < ApplicationController
     end
   end
 
-  def create_block_editor
-    BlockEditor.create! root_account_id: @page.root_account_id, context: @page, editor_version: BlockEditor::LATEST_VERSION, blocks: BlockEditor.blank_page
-  end
-
   def revisions
     if @page.grants_right?(@current_user, session, :read_revisions)
       if (!@context.conditional_release? && !Account.site_admin.feature_enabled?(:selective_release_backend)) || enforce_assignment_visible(@page)

@@ -152,6 +152,7 @@ export default function BlockEditor({
   const [data] = useState<BlockEditorData>(() => {
     return transform(content)
   })
+  const noBlocks = content?.blocks == undefined
   const [toolboxOpen, setToolboxOpen] = useState(false)
   const [templateEditor, setTemplateEditor] = useState<TemplateEditor>(TemplateEditor.UNKNOWN)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
@@ -381,7 +382,7 @@ export default function BlockEditor({
             onClose={handleCloseToolbox}
             templates={blockTemplates}
           />
-          <CreateFromTemplate course_id={course_id} />
+          <CreateFromTemplate course_id={course_id} noBlocks={noBlocks} />
         </Editor>
       </ErrorBoundary>
     </View>

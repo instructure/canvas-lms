@@ -31,6 +31,7 @@ import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+import {LATEST_BLOCK_DATA_VERSION} from '@canvas/block-editor/react/utils'
 
 const I18n = createI18nScope('pages')
 
@@ -153,7 +154,10 @@ export default class WikiPageEditView extends ValidatedFormView {
     json.show_assign_to = this.enableAssignTo
     json.edit_with_block_editor = this.model.get('editor') === 'block_editor'
 
-    if (this.queryParams.get('editor') === 'block_editor' && this.model.get('body') == null) {
+    if (
+      (this.queryParams.get('editor') === 'block_editor' || window.ENV.text_editor_preference === "block_editor")
+      && this.model.get('body') == null
+    ) {
       json.edit_with_block_editor = true
     }
 
@@ -239,9 +243,14 @@ export default class WikiPageEditView extends ValidatedFormView {
       }
       renderAssignToTray(mountElement, {pageId, onSync, pageName})
     }
-    if (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) {
-      const BlockEditor = lazy(() => import('@canvas/block-editor'))
 
+    let chose_block_editor = window.location.href.split("?").filter((piece) => { return piece.indexOf('editor=block_editor') !== -1 }).length === 1
+    if(!chose_block_editor){
+      chose_block_editor = window.ENV.text_editor_preference === "block_editor" && this.model.get('body') == null
+    }
+
+    if ( (this.model.get('editor') === 'block_editor' && this.model.get('block_editor_attributes')) || chose_block_editor ) {
+      const BlockEditor = lazy(() => import('@canvas/block-editor'))
       const blockEditorData = this.model.get('block_editor_attributes')
 
       const container = document.getElementById('content')
@@ -255,7 +264,7 @@ export default class WikiPageEditView extends ValidatedFormView {
           <BlockEditor
             course_id={ENV.COURSE_ID}
             container={container}
-            content={blockEditorData}
+            content={blockEditorData || {version: LATEST_BLOCK_DATA_VERSION, blocks: undefined}}
             onCancel={this.cancel.bind(this)}
           />
         </Suspense>,
