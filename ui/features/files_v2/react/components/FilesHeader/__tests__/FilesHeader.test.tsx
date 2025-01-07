@@ -20,7 +20,7 @@ import React from 'react'
 import FilesHeader from '../FilesHeader'
 import {render, screen} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
 
 const defaultProps = {
@@ -29,7 +29,6 @@ const defaultProps = {
 }
 
 const renderComponent = (props?: any) => {
-  const queryClient = new QueryClient()
   return render(
     <MockedQueryClientProvider client={queryClient}>
       <FilesHeader {...defaultProps} {...props} />

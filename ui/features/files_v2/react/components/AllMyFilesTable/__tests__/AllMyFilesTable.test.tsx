@@ -23,11 +23,9 @@ import {setupFilesEnv} from '../../../../fixtures/fakeFilesEnv'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {BrowserRouter} from 'react-router-dom'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 
 const renderComponent = () => {
-  const queryClient = new QueryClient()
-
   return render(
     <MockedQueryClientProvider client={queryClient}>
       <BrowserRouter>
