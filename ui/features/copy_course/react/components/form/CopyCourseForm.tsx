@@ -90,12 +90,14 @@ export const CopyCourseForm = ({
   onSubmit: (data: CopyCourseFormSubmitData) => void
   onCancel: () => void
 }) => {
+  const dateOrNullStartAt = dateOrNull(course?.start_at)
+  const dateOrNullEndAt = dateOrNull(course?.end_at)
   const [courseName, setCourseName] = useState<string>(course.name)
   const [courseCode, setCourseCode] = useState<string>(course?.course_code || '')
   const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(
-    dateOrNull(course?.start_at),
+    dateOrNullStartAt
   )
-  const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(dateOrNull(course?.end_at))
+  const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(dateOrNullEndAt)
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(
     terms.find(term => term.id === course.enrollment_term_id.toString()) || null,
   )
@@ -157,10 +159,10 @@ export const CopyCourseForm = ({
   }
 
   const newStartDateToParse = restrictEnrollmentsToCourseDates
-    ? newCourseStartDate
+    ? dateOrNullStartAt
     : selectedTerm?.startAt
   const newEndDateToParse = restrictEnrollmentsToCourseDates
-    ? newCourseEndDate
+    ? dateOrNullEndAt
     : selectedTerm?.endAt
   const isoNewCourseStartDate = parseDateToISOString(newStartDateToParse)
   const isoNewCourseEndDate = parseDateToISOString(newEndDateToParse)
@@ -170,6 +172,9 @@ export const CopyCourseForm = ({
   const invalidNewCourseStartDateMessage = invalidForm.elements.newCourseStartDateErrorMsg
   const invalidCourseNameMessage = invalidForm.elements.courseNameErrorMsg
   const invalidCourseCodeMessage = invalidForm.elements.courseCodeErrorMsg
+  const disableStartEndDateMessage = !restrictEnrollmentsToCourseDates ?
+    I18n.t('Term start and end dates cannot be modified here, only on the Term Details page under Admin.') :
+    null
 
   return (
     <View as="div">
@@ -197,6 +202,15 @@ export const CopyCourseForm = ({
           />
         </View>
         <View as="div" margin="medium none none none">
+          <ConfiguredSelectInput
+            label={I18n.t('Term')}
+            defaultInputValue={selectedTerm?.name}
+            options={terms}
+            onSelect={handleSelectTerm}
+            disabled={isSubmitting}
+          />
+        </View>
+        <View as="div" margin="medium none none none">
           <ConfiguredDateInput
             selectedDate={isoNewCourseStartDate}
             onSelectedDateChange={setNewCourseStartDate}
@@ -207,6 +221,7 @@ export const CopyCourseForm = ({
             courseTimeZone={courseTimeZone}
             disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseStartDateMessage}
+            infoMessage={disableStartEndDateMessage}
           />
         </View>
         <View as="div" margin="medium none none none">
@@ -220,15 +235,7 @@ export const CopyCourseForm = ({
             courseTimeZone={courseTimeZone}
             disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseEndDateMessage}
-          />
-        </View>
-        <View as="div" margin="medium none none none">
-          <ConfiguredSelectInput
-            label={I18n.t('Term')}
-            defaultInputValue={selectedTerm?.name}
-            options={terms}
-            onSelect={handleSelectTerm}
-            disabled={isSubmitting}
+            infoMessage={disableStartEndDateMessage}
           />
         </View>
       </View>

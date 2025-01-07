@@ -131,6 +131,22 @@ describe('ConfiguredDateInput', () => {
     expect(getByText(errorMessage)).toBeInTheDocument()
   })
 
+  it('renders info message', () => {
+    const infoMessage = 'This is an info message'
+
+    const {getByText} = render(
+      <ConfiguredDateInput
+        selectedDate={`${currentYear}-01-01T00:00:00.000Z`}
+        onSelectedDateChange={() => {}}
+        placeholder={placeholder}
+        renderLabelText={renderLabelText}
+        renderScreenReaderLabelText={renderScreenReaderLabelText}
+        infoMessage={infoMessage}
+      />,
+    )
+    expect(getByText(infoMessage)).toBeInTheDocument()
+  })
+
   describe('course and user timezone', () => {
     beforeEach(() => {
       const timezone = 'America/Denver'

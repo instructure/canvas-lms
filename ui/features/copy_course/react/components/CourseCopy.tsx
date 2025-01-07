@@ -85,7 +85,7 @@ export const CourseCopy = ({
   }
 
   if (
-    courseQueryResult.isLoading ||
+    !courseQueryResult.isFetchedAfterMount ||
     termsQueryResult.isLoading ||
     (!termsQueryResult.isError && termsQueryResult.hasNextPage !== false)
   ) {
