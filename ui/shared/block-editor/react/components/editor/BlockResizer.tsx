@@ -75,14 +75,7 @@ const BlockResizer = ({mountPoint, sizeVariant}: BlockResizeProps) => {
         if (parent) {
           // assume all 4 sides have the same padding
           const padding = px(window.getComputedStyle(parent).getPropertyValue('padding'))
-          const {width, height} = percentSize(
-            parent.clientWidth - padding,
-            parent.clientHeight - padding,
-            newWidth,
-            newHeight
-          )
-          propWidth = width
-          propHeight = height
+          propWidth = percentSize(parent.clientWidth - padding, newWidth)
         }
       }
       setProp((props: any) => {
