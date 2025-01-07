@@ -37,6 +37,12 @@ describe Course do
       @course.enrollment_term = Account.default.default_enrollment_term
     end
 
+    context "moved_sections" do
+      describe "relationships" do
+        it { is_expected.to have_many(:moved_sections).class_name("CourseSection") }
+      end
+    end
+
     context "outcome imports" do
       include_examples "outcome import context examples"
 

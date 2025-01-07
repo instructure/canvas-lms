@@ -57,6 +57,7 @@ class Course < ActiveRecord::Base
 
   has_many :course_sections, inverse_of: :course
   has_many :active_course_sections, -> { where(workflow_state: "active") }, class_name: "CourseSection", inverse_of: :course
+  has_many :moved_sections, class_name: "CourseSection", foreign_key: "nonxlist_course_id", inverse_of: :course
   has_many :enrollments, -> { where("enrollments.workflow_state<>'deleted'") }, inverse_of: :course
 
   has_many :all_enrollments, class_name: "Enrollment", inverse_of: :course

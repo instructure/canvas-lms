@@ -796,9 +796,9 @@
         </div>
         <div class="clear"></div>
       </li>
-      <% @context.course_sections.active.order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
+      <% @context.course_sections.active.union(@context.moved_sections.active).order(CourseSection.best_unicode_collation_key('name')).each do |section| %>
         <li class="section">
-          <% if can_do section, @current_user, :read %>
+          <% if can_do(section, @current_user, :read) && section.course_id == @context.id %>
             <a href="<%= context_url(@context, :context_section_url, section) %>" class="name">
               <%= section.display_name %>
             </a>
@@ -814,38 +814,40 @@
               <% end %>
             )
           </span>
-          <span class="section_links">
-            <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
-              <a class="Button Button--icon-action edit_section_link"
-                role="button"
-                title="<%= t('links.title.edit_section', %{Edit Section}) %>"
-                href="<%= context_url(@context, :context_section_url, section) %>">
-                <i class="icon-edit" aria-hidden="true"></i>
-                <span class="screenreader-only"><%= t('Edit Section "%{name}"', :name => section.name) %></span>
-              </a>
-            <% end %>
-            <% if can_do(section, @current_user, :delete) %>
-              <% if section.deletable? %>
-                <a class="Button Button--icon-action delete_section_link"
+          <% if section.course_id == @context.id %>
+            <span class="section_links">
+              <% if can_do(section, @current_user, :update) && !section.defined_by_sis? %>
+                <a class="Button Button--icon-action edit_section_link"
                   role="button"
-                  title="<%= t('links.title.delete_section', %{Delete Section}) %>"
+                  title="<%= t('links.title.edit_section', %{Edit Section}) %>"
                   href="<%= context_url(@context, :context_section_url, section) %>">
-                  <i class="icon-end" aria-hidden="true"></i>
-                  <span class="screenreader-only">
-                    <%= t('Delete Section "%{name}"', :name => section.name) %>
-                  </span>
-                </a>
-              <% else %>
-                <a class="Button Button--icon-action cant_delete_section_link"
-                  role="button"
-                  href="#"
-                  title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>">
-                  <i class="icon-end" aria-hidden="true"></i>
-                  <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => section.name) %></span>
+                  <i class="icon-edit" aria-hidden="true"></i>
+                  <span class="screenreader-only"><%= t('Edit Section "%{name}"', :name => section.name) %></span>
                 </a>
               <% end %>
-            <% end %>
-          </span>
+              <% if can_do(section, @current_user, :delete) %>
+                <% if section.deletable? %>
+                  <a class="Button Button--icon-action delete_section_link"
+                    role="button"
+                    title="<%= t('links.title.delete_section', %{Delete Section}) %>"
+                    href="<%= context_url(@context, :context_section_url, section) %>">
+                    <i class="icon-end" aria-hidden="true"></i>
+                    <span class="screenreader-only">
+                      <%= t('Delete Section "%{name}"', :name => section.name) %>
+                    </span>
+                  </a>
+                <% else %>
+                  <a class="Button Button--icon-action cant_delete_section_link"
+                    role="button"
+                    href="#"
+                    title="<%= t('links.title.cant_delete', %{You can't delete sections that have users enrolled}) %>">
+                    <i class="icon-end" aria-hidden="true"></i>
+                    <span class="screenreader-only"><%= t('Delete Section "%{name}"', :name => section.name) %></span>
+                  </a>
+                <% end %>
+              <% end %>
+            </span>
+          <% end %>
           <div class="course_section_dates">
             <%= t('Start Date: %{start_date} | End Date: %{end_date}', {
               :start_date => format_course_section_date(section.start_at),
@@ -853,7 +855,11 @@
           </div>
           <% if section.nonxlist_course %>
             <div class="course_section_crosslist">
-              <span><%= t('Section Crosslisted From: ') %> <a href="<%= course_url(section.nonxlist_course_id) %>"> <%= section.nonxlist_course.name %> </a></span>
+              <% if section.course_id == @context.id %>
+                <span><%= t('Section Crosslisted From: ') %> <a href="<%= course_url(section.nonxlist_course_id) %>"> <%= section.nonxlist_course.name %> </a></span>
+              <% else %>
+                <span><%= t('Section Crosslisted To: ') %> <a href="<%= course_url(section.course_id) %>"> <%= section.course.name %> </a></span>
+              <% end %>
             </div>
           <% end %>
           <div class="clear"></div>
