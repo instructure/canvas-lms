@@ -26,8 +26,12 @@ import {
   IconWarningLine,
 } from '@instructure/ui-icons'
 
-// @ts-expect-error
-export default function SimilarityIcon({similarityScore, status}) {
+interface SimilarityIconProps {
+  similarityScore?: number
+  status: 'error' | 'pending' | 'scored'
+}
+
+export default function SimilarityIcon({similarityScore, status}: SimilarityIconProps) {
   if (status === 'scored' && similarityScore != null) {
     if (similarityScore <= 20) {
       return <IconCertifiedSolid color="success" data-testid="similarity-icon" />
