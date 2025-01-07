@@ -218,7 +218,7 @@ const ComposeModalManager = props => {
   }
 
   const updateCache = (cache, result) => {
-    if (result?.data?.addConversationMessage?.conversationMessage._id === '0') {
+    if (result?.data?.addConversationMessage?.conversationMessage?._id === '0') {
       // if the user sends another delayed message right now, we will have 2 0 id message in our stack, which will cause duplication
       // result.data.addConversationMessage.conversationMessage.id = Date.now().toString()
       window.location.reload()
@@ -245,7 +245,7 @@ const ComposeModalManager = props => {
     setSendingMessage(false)
     // success is true if there is no error message or if data === true
     const errorMessage = data?.errors
-    const success = errorMessage ? false : !!data
+    const success = errorMessage && errorMessage.length > 0 ? false : !!data
     if (success) {
       props.onDismiss()
       setOnSuccess(I18n.t('Message sent!'), false)
@@ -270,13 +270,13 @@ const ComposeModalManager = props => {
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data?.createConversation, data),
+    onCompleted: data => onConversationCreateComplete(data?.createConversation ?? {}, data),
     onError: data => onConversationCreateComplete(false, data),
   })
 
   const [addConversationMessage] = useMutation(ADD_CONVERSATION_MESSAGE, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data?.addConversationMessage, data),
+    onCompleted: data => onConversationCreateComplete(data?.addConversationMessage ?? {}, data),
     onError: data => onConversationCreateComplete(false, data),
   })
 
