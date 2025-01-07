@@ -27,7 +27,7 @@ import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {MediaPlayer} from '@instructure/ui-media-player'
+import {StudioPlayer} from '@instructure/studio-player'
 
 const I18n = createI18nScope('jquery_media_comments')
 
@@ -361,10 +361,10 @@ const mediaCommentActions = {
             }
 
             const mediaPlayer = (
-              <MediaPlayer
-                tracks={sourcesAndTracks.tracks}
-                sources={sourcesAndTracks.sources}
-                captionPosition="bottom"
+              <StudioPlayer
+                src={sourcesAndTracks.sources}
+                captions={sourcesAndTracks.tracks}
+                title={I18n.t('Play Media Comment')}
               />
             )
 
