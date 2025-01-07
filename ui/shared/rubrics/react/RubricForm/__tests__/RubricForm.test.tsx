@@ -72,7 +72,7 @@ describe('RubricForm Tests', () => {
           showAdditionalOptions={true}
           {...props}
         />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   }
 
@@ -210,7 +210,7 @@ describe('RubricForm Tests', () => {
             id: '1',
             useForGrading: true,
           },
-        })
+        }),
       )
       const {getByTestId} = renderComponent()
       const titleInput = getByTestId('rubric-form-title')
@@ -252,7 +252,7 @@ describe('RubricForm Tests', () => {
       const criteriaRowThresholds = queryAllByTestId('rubric-criteria-row-threshold')
       const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
       const criteriaRowIndexes = queryAllByTestId('rubric-criteria-row-index')
-      expect(criteriaRows.length).toEqual(2)
+      expect(criteriaRows).toHaveLength(2)
       expect(criteriaRowDescriptions[0]).toHaveTextContent(criteria[0].description)
       expect(criteriaRowDescriptions[1]).toHaveTextContent(criteria[1].longDescription ?? '')
       expect(criteriaRowLongDescriptions[0]).toHaveTextContent(criteria[0].longDescription ?? '')
@@ -260,7 +260,7 @@ describe('RubricForm Tests', () => {
       expect(criteriaRowPoints[1]).toHaveTextContent(criteria[1].points.toString())
       expect(criteriaRowIndexes[0]).toHaveTextContent('1.')
       expect(criteriaRowIndexes[1]).toHaveTextContent('2')
-      expect(criteriaRowThresholds.length).toEqual(1)
+      expect(criteriaRowThresholds).toHaveLength(1)
       expect(criteriaRowThresholds[0]).toHaveTextContent('Threshold: 3')
     })
 
@@ -271,8 +271,8 @@ describe('RubricForm Tests', () => {
       const criteriaRows = queryAllByTestId('rubric-criteria-row')
       const criteriaRowPoints = queryAllByTestId('rubric-criteria-row-points')
 
-      expect(criteriaRows.length).toEqual(1)
-      expect(criteriaRowPoints.length).toEqual(0)
+      expect(criteriaRows).toHaveLength(1)
+      expect(criteriaRowPoints).toHaveLength(0)
     })
 
     it('renders the criterion ratings accordion button', () => {
@@ -282,12 +282,12 @@ describe('RubricForm Tests', () => {
 
       const {queryAllByTestId} = renderComponent({rubricId: '1'})
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
-      expect(ratingScaleAccordion.length).toEqual(2)
+      expect(ratingScaleAccordion).toHaveLength(2)
       expect(ratingScaleAccordion[0]).toHaveTextContent(
-        `Rating Scale: ${criteria[0].ratings.length}`
+        `Rating Scale: ${criteria[0].ratings.length}`,
       )
       expect(ratingScaleAccordion[1]).toHaveTextContent(
-        `Rating Scale: ${criteria[0].ratings.length}`
+        `Rating Scale: ${criteria[0].ratings.length}`,
       )
     })
 
@@ -300,7 +300,7 @@ describe('RubricForm Tests', () => {
       const ratingScaleAccordion = queryAllByTestId('criterion-row-rating-accordion')
       fireEvent.click(ratingScaleAccordion[0])
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
-      expect(ratingScaleAccordionItems.length).toEqual(criteria[0].ratings.length)
+      expect(ratingScaleAccordionItems).toHaveLength(criteria[0].ratings.length)
     })
 
     it('does not render the criterion ratings accordion items when accordion is closed', () => {
@@ -312,7 +312,7 @@ describe('RubricForm Tests', () => {
       fireEvent.click(ratingScaleAccordion[0])
 
       const ratingScaleAccordionItems = queryAllByTestId('rating-scale-accordion-item')
-      expect(ratingScaleAccordionItems.length).toEqual(0)
+      expect(ratingScaleAccordionItems).toHaveLength(0)
     })
 
     it('should reorder all criteria after drag and drop, but keep original point values of criteria', () => {
@@ -404,7 +404,7 @@ describe('RubricForm Tests', () => {
       const {queryAllByTestId, getByTestId} = renderComponent({rubricId: '1'})
 
       const outcomeLockIcons = queryAllByTestId(/^outcome-lock-icon/)
-      expect(outcomeLockIcons.length).toEqual(1)
+      expect(outcomeLockIcons).toHaveLength(1)
 
       expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
     })
@@ -433,7 +433,7 @@ describe('RubricForm Tests', () => {
           },
         }
         jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
-          // @ts-ignore
+          // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
         queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
@@ -441,15 +441,15 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
 
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(3)
         expect(queryAllByTestId('rubric-criteria-row-description')[2]).toHaveTextContent(
-          'Sample description'
+          'Sample description',
         ) // removes p tags correctly
         expect(queryAllByTestId('rubric-criteria-outcome-subtitle')[1]).toHaveTextContent(
-          'Sample Outcome Display Name'
+          'Sample Outcome Display Name',
         )
         expect(queryAllByTestId('rubric-criteria-row-outcome-tag')[1]).toHaveTextContent(
-          'Sample Outcome Title'
+          'Sample Outcome Title',
         )
         expect(queryAllByTestId('rubric-points-possible-1')).toHaveTextContent('20 Points Possible')
       })
@@ -472,7 +472,7 @@ describe('RubricForm Tests', () => {
           },
         }
         jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
-          // @ts-ignore
+          // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
         queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
@@ -480,7 +480,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByTestId('create-from-outcome-button'))
         fireEvent.click(getByText('Import'))
 
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(3)
         expect(queryAllByTestId('rubric-points-possible-1')).toHaveTextContent('10 Points Possible')
       })
 
@@ -501,7 +501,7 @@ describe('RubricForm Tests', () => {
           },
         }
         jest.spyOn(FindDialog.prototype, 'import').mockImplementation(function () {
-          // @ts-ignore
+          // @ts-expect-error
           ;(this as FindDialog).trigger('import', {...outcomeData})
         })
         queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
@@ -510,7 +510,7 @@ describe('RubricForm Tests', () => {
         fireEvent.click(getByText('Import'))
 
         expect(
-          getAllByText('This Outcome has not been added as it already exists in this rubric.')[0]
+          getAllByText('This Outcome has not been added as it already exists in this rubric.')[0],
         ).toBeInTheDocument()
       })
     })
@@ -538,14 +538,14 @@ describe('RubricForm Tests', () => {
           target: {value: 'New Criterion Test'},
         })
         fireEvent.click(getByTestId('rubric-criterion-cancel'))
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
       })
 
       it('saves new criterion when the save button is clicked', async () => {
         queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
 
         fireEvent.click(getByTestId('add-criterion-button'))
         await new Promise(resolve => setTimeout(resolve, 0))
@@ -555,7 +555,7 @@ describe('RubricForm Tests', () => {
         })
         fireEvent.click(getByTestId('rubric-criterion-save'))
 
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(3)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(3)
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[2]).toHaveTextContent('New Criterion Test')
       })
@@ -564,7 +564,7 @@ describe('RubricForm Tests', () => {
         queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
 
         fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
         await new Promise(resolve => setTimeout(resolve, 0))
@@ -574,7 +574,7 @@ describe('RubricForm Tests', () => {
         })
         fireEvent.click(getByTestId('rubric-criterion-save'))
 
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[0]).toHaveTextContent('Updated Criterion Test')
       })
@@ -583,7 +583,7 @@ describe('RubricForm Tests', () => {
         queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
         const {getByTestId, queryAllByTestId} = renderComponent({rubricId: '1'})
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
 
         fireEvent.click(queryAllByTestId('rubric-criteria-row-edit-button')[0])
         await new Promise(resolve => setTimeout(resolve, 0))
@@ -593,7 +593,7 @@ describe('RubricForm Tests', () => {
         })
         fireEvent.click(getByTestId('rubric-criterion-cancel'))
 
-        expect(queryAllByTestId('rubric-criteria-row').length).toEqual(2)
+        expect(queryAllByTestId('rubric-criteria-row')).toHaveLength(2)
         const criteriaRowDescriptions = queryAllByTestId('rubric-criteria-row-description')
         expect(criteriaRowDescriptions[0]).not.toHaveTextContent('Updated Criterion Test')
       })
@@ -691,13 +691,13 @@ describe('RubricForm Tests', () => {
 
     it('renders correctly when open', () => {
       const {getByTestId, getByText} = render(
-        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />,
       )
 
       expect(getByTestId('rubric-assignment-exit-warning-modal')).toBeInTheDocument()
       expect(getByText('Warning')).toBeInTheDocument()
       expect(
-        getByText('You are about to exit the rubric editor. Any unsaved changes will be lost.')
+        getByText('You are about to exit the rubric editor. Any unsaved changes will be lost.'),
       ).toBeInTheDocument()
       expect(getByText('Exit')).toBeInTheDocument()
       expect(getByText('Cancel')).toBeInTheDocument()
@@ -705,7 +705,7 @@ describe('RubricForm Tests', () => {
 
     it('does not render when isOpen is false', () => {
       const {queryByTestId} = render(
-        <WarningModal isOpen={false} onDismiss={onDismissMock} onCancel={onCancelMock} />
+        <WarningModal isOpen={false} onDismiss={onDismissMock} onCancel={onCancelMock} />,
       )
 
       expect(queryByTestId('rubric-assignment-exit-warning-modal')).toBeNull()
@@ -713,7 +713,7 @@ describe('RubricForm Tests', () => {
 
     it('calls onDismiss when the close button is clicked', () => {
       const {getByText} = render(
-        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />,
       )
 
       fireEvent.click(getByText('Cancel'))
@@ -722,7 +722,7 @@ describe('RubricForm Tests', () => {
 
     it('calls onCancel when the Cancel button is clicked', () => {
       const {getByTestId} = render(
-        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />,
       )
 
       fireEvent.click(getByTestId('exit-rubric-warning-button'))
@@ -731,7 +731,7 @@ describe('RubricForm Tests', () => {
 
     it('calls onCancel and onDismiss when the Exit button is clicked', () => {
       const {getByText} = render(
-        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />
+        <WarningModal isOpen={true} onDismiss={onDismissMock} onCancel={onCancelMock} />,
       )
 
       fireEvent.click(getByText('Exit'))

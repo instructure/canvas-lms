@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -57,11 +58,11 @@ function getProps(column, gradebook: Gradebook, options) {
         ? scoreToScaledPoints(
             student[`assignment_group_${assignmentGroupId}`]?.score,
             student[`assignment_group_${assignmentGroupId}`]?.possible,
-            gradebook.options.grading_standard_scaling_factor
+            gradebook.options.grading_standard_scaling_factor,
           )
         : scoreToPercentage(
             student[`assignment_group_${assignmentGroupId}`]?.score,
-            student[`assignment_group_${assignmentGroupId}`]?.possible
+            student[`assignment_group_${assignmentGroupId}`]?.possible,
           ),
     }
   }
@@ -106,7 +107,7 @@ function getProps(column, gradebook: Gradebook, options) {
     weightedGroups: gradebook.weightedGroups(),
     getAllStudents: () =>
       Object.keys(gradebook.students).map(key =>
-        processStudent(gradebook.students[key], assignmentGroup.id)
+        processStudent(gradebook.students[key], assignmentGroup.id),
       ),
     courseId: gradebook.options.context_id,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
@@ -124,7 +125,7 @@ export default class AssignmentGroupColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
-    // eslint-disable-next-line no-restricted-properties
+
     ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
   }
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -333,7 +334,7 @@ describe('ViewOptionsTabPanel', () => {
       fireEvent.click(getByText(/Apply/))
 
       expect(onChange).toHaveBeenCalledWith(
-        expect.objectContaining({excused: defaultColors.salmon})
+        expect.objectContaining({excused: defaultColors.salmon}),
       )
     })
   })

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -32,7 +33,7 @@ function getProps(
     customColumnId: string
   },
   gradebook,
-  options
+  options,
 ) {
   const customColumn = gradebook.getCustomColumn(column.customColumnId)
 
@@ -51,7 +52,7 @@ export default class CustomColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
-     
+
     ReactDOM.render(<CustomColumnHeader {...props} />, $container)
   }
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -18,10 +19,10 @@
  */
 
 import React, {useCallback, useState} from 'react'
-import {Story, Meta} from '@storybook/react'
+import type {Story, Meta} from '@storybook/react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import WeekdayPicker, {WeekdayPickerProps, SelectedDaysArray} from './WeekdayPicker'
+import WeekdayPicker, {type WeekdayPickerProps, type SelectedDaysArray} from './WeekdayPicker'
 import I18n from '@canvas/i18n'
 
 // a hack to get Chinese day abbreviations to show up in the storybook

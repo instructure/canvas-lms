@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
@@ -24,7 +25,7 @@ import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
 import {darken, defaultColors} from '../../constants/colors'
 import Gradebook from '../../Gradebook'
 import store from '../../stores/index'
-import {AssignmentGroup, Student} from '../../../../../../api.d'
+import type {AssignmentGroup, Student} from '../../../../../../api.d'
 import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
@@ -91,7 +92,7 @@ describe('GridColor', () => {
       const node = document.createElement('div')
       const alert = {key: 'alert', message: 'Uh oh!', variant: 'error'}
       render(
-        <Gradebook {...defaultGradebookProps} flashAlerts={[alert]} flashMessageContainer={node} />
+        <Gradebook {...defaultGradebookProps} flashAlerts={[alert]} flashMessageContainer={node} />,
       )
       const {getByText} = within(node)
       expect(node).toContainElement(getByText(/Uh oh!/i))
@@ -200,13 +201,13 @@ describe('assignments-filter', () => {
         recentlyLoadedAssignmentGroups={{
           assignmentGroups: [],
         }}
-      />
+      />,
     )
 
     expect(getByText(/Assignment Names/)).toBeInTheDocument()
   })
 
-  it('disables the input if the grid has not yet rendered', function () {
+  it('disables the input if the grid has not yet rendered', () => {
     const {getByTestId, rerender} = render(<Gradebook {...defaultGradebookProps} />)
 
     rerender(
@@ -215,7 +216,7 @@ describe('assignments-filter', () => {
         recentlyLoadedAssignmentGroups={{
           assignmentGroups,
         }}
-      />
+      />,
     )
     expect(getByTestId('assignments-filter-select')).toBeDisabled()
   })
@@ -289,7 +290,7 @@ describe('student-names-filter', () => {
     },
   ]
 
-  it('disables the input if the grid has not yet rendered', function () {
+  it('disables the input if the grid has not yet rendered', () => {
     const {getByTestId, rerender} = render(<Gradebook {...defaultGradebookProps} />)
 
     rerender(<Gradebook {...defaultGradebookProps} recentlyLoadedStudents={students} />)
@@ -306,7 +307,7 @@ describe('ProgressBar for loading data', () => {
         isSubmissionDataLoaded={true}
         totalSubmissionsLoaded={0}
         totalStudentsToLoad={11}
-      />
+      />,
     )
 
     expect(queryByTestId('gradebook-submission-progress-bar')).not.toBeInTheDocument()
@@ -327,12 +328,12 @@ describe('ProgressBar for loading data', () => {
         isSubmissionDataLoaded={false}
         totalStudentsToLoad={300}
         totalSubmissionsLoaded={0}
-      />
+      />,
     )
 
     expect(getByRole('progressbar')).toHaveAttribute(
       'aria-label',
-      'Loading Gradebook submissions 0 / 60000'
+      'Loading Gradebook submissions 0 / 60000',
     )
   })
 })
@@ -356,7 +357,7 @@ describe('TotalGradeOverrideTrayProvider tests', () => {
         totalSubmissionsLoaded={0}
         totalStudentsToLoad={11}
         gradebookEnv={gradeBookEnv}
-      />
+      />,
     )
 
     await new Promise(resolve => setTimeout(resolve, 0))
@@ -381,7 +382,7 @@ describe('TotalGradeOverrideTrayProvider tests', () => {
         totalSubmissionsLoaded={0}
         totalStudentsToLoad={11}
         gradebookEnv={gradeBookEnv}
-      />
+      />,
     )
 
     await new Promise(resolve => setTimeout(resolve, 0))

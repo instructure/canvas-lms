@@ -26,7 +26,7 @@ describe.skip('SubmissionCommentsTray', () => {
   const attempts: SubmissionAttemptsComments = {
     attempts: {
       1: [
-        // @ts-ignore
+        // @ts-expect-error
         {
           id: '1',
           comment: 'this is a comment',

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {type ITopNavProps} from '@canvas/top-navigation/react/TopNav'
+import type {ITopNavProps} from '@canvas/top-navigation/react/TopNav'
 import {IconStudentViewLine} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from 'axios'
@@ -30,7 +30,7 @@ const I18n = createI18nScope('discussions_v2')
 const STUDENT_VIEW_URL_TEMPLATE = '/courses/{courseId}/student_view?redirect_to_referer=1'
 type EnvCommon = import('@canvas/global/env/EnvCommon').EnvCommon
 const isStudent = () => {
-  // @ts-ignore
+  // @ts-expect-error
   return window.ENV.current_user_roles?.includes('student') && !window.ENV.PERMISSIONS?.manage
 }
 
@@ -41,14 +41,13 @@ const handleStudentViewClick = (studentViewUrl: string) => {
       window.location.reload()
     })
     .catch(error => {
-       
       console.error('Error loading student view', error)
     })
 }
 
 const handleBreadCrumbSetter = (
   {getCrumbs, setCrumbs}: {getCrumbs: () => Crumb[]; setCrumbs: (crumbs: Crumb[]) => void},
-  currentPageName?: string
+  currentPageName?: string,
 ) => {
   const existingCrumbs: Crumb[] = getCrumbs()
   const allCrumbs = currentPageName
@@ -65,7 +64,7 @@ const addStudentViewActionItem = (courseId?: number) => {
     return null
   }
   const studentViewUrl = STUDENT_VIEW_URL_TEMPLATE.replace('{courseId}', String(cId))
-  // @ts-ignore
+  // @ts-expect-error
   const buttonLabel = window.ENV?.horizon_course
     ? I18n.t('View as Learner')
     : I18n.t('View as Student')
@@ -98,7 +97,6 @@ const addTutorialActionItem = () => {
 }
 
 const tutorialEnabled = () => {
-  // @ts-ignore
   const env = window.ENV
   // @ts-expect-error
   const new_user_tutorial_on_off = env?.NEW_USER_TUTORIALS_ENABLED_AT_ACCOUNT?.is_enabled
@@ -142,7 +140,6 @@ const withDefaults = (Component: React.FC<ITopNavProps>) => {
 const TopNavPortalWithDefaults = withDefaults(TopNavPortalBase)
 
 export const addCrumbs = (newCrumbs: Crumb[], oldCrumbs?: Crumb[]): Crumb[] => {
-  // @ts-ignore
   const crumbs: Crumb[] = oldCrumbs || window.ENV.breadcrumbs || []
   newCrumbs.forEach(crumb => {
     if (!crumbs.some(c => c.name === crumb.name)) {

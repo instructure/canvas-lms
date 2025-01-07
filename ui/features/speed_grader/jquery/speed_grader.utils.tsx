@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
@@ -129,14 +130,14 @@ export const configureRecognition = (
   }
   let final_transcript = ''
 
-  recognition.onstart = function () {
+  recognition.onstart = () => {
     $('#dialog_message').text(messages.recording)
     $('#record_button')
       .attr('recording', 'true')
       .attr('aria-label', I18n.t('dialog_button.aria_stop', 'Hit "Stop" to end recording.'))
   }
 
-  recognition.onresult = function (event) {
+  recognition.onresult = event => {
     let interim_transcript = ''
     for (let i = event.resultIndex; i < event.results.length; i++) {
       if (event.results[i].isFinal) {
@@ -149,21 +150,21 @@ export const configureRecognition = (
     }
   }
 
-  recognition.onaudiostart = function (_event) {
+  recognition.onaudiostart = _event => {
     // this call is required for onaudioend event to trigger
   }
 
-  recognition.onaudioend = function (_event) {
+  recognition.onaudioend = _event => {
     if ($('#final_results').text() !== '' || $('#interim_results').text() !== '') {
       $('#dialog_message').text(messages.recording_expired)
     }
   }
 
-  recognition.onend = function (_event) {
+  recognition.onend = _event => {
     final_transcript = ''
   }
 
-  recognition.onerror = function (event) {
+  recognition.onerror = event => {
     if (event.error === 'not-allowed') {
       $('#dialog_message').text(messages.mic_blocked)
     } else if (event.error === 'no-speech') {

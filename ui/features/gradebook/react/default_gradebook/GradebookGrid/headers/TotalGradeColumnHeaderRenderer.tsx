@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2017 - present Instructure, Inc.
@@ -41,7 +42,7 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
 
   const isInBack = columns.scrollable[columns.scrollable.length - 1]?.id === 'total_grade'
   const isInFront = columns.frozen.some(
-    (frozenColumn: {id: string}) => frozenColumn.id === 'total_grade'
+    (frozenColumn: {id: string}) => frozenColumn.id === 'total_grade',
   )
 
   let onApplyScoreToUngraded
@@ -63,11 +64,11 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
         ? scoreToScaledPoints(
             gradebook.calculatedGradesByStudentId[student.id]?.current.score,
             gradebook.calculatedGradesByStudentId[student.id]?.current.possible,
-            gradebook.options.grading_standard_scaling_factor
+            gradebook.options.grading_standard_scaling_factor,
           )
         : scoreToPercentage(
             gradebook.calculatedGradesByStudentId[student.id]?.current.score,
-            gradebook.calculatedGradesByStudentId[student.id]?.current.possible
+            gradebook.calculatedGradesByStudentId[student.id]?.current.possible,
           ),
     }
   }
@@ -139,7 +140,7 @@ export default class TotalGradeColumnHeaderRenderer {
 
   render(column, $container: HTMLElement, gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, gridSupport, options)
-    // eslint-disable-next-line no-restricted-properties
+
     ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
   }
 

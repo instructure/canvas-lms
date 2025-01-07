@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
@@ -39,7 +40,7 @@ export default class TotalGradeOverrideColumnHeaderRenderer {
 
   render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(options)
-    // eslint-disable-next-line no-restricted-properties
+
     ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
   }
 

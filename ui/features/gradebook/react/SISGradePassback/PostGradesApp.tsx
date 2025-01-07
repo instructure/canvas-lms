@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
@@ -23,7 +24,7 @@ import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import PostGradesDialog from './PostGradesDialog'
 import classnames from 'classnames'
-import PostGradesStore from './PostGradesStore'
+import type PostGradesStore from './PostGradesStore'
 
 const I18n = createI18nScope('modules')
 
@@ -73,7 +74,7 @@ class PostGradesApp extends React.Component<Props> {
     }
 
     store.reset()
-     
+
     ReactDOM.render(<PostGradesDialog store={store} closeDialog={closeDialog} />, $dialog[0])
   }
 

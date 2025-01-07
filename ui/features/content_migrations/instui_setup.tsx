@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
@@ -42,7 +43,7 @@ ready(() => {
       .catch(err => {
         throw new Error(
           'Error loading extension for ui/features/content_migrations/instui_setup.tsx',
-          err
+          err,
         )
       })
   }
