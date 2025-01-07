@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -43,22 +42,28 @@ const {renderContextModulesPublishIcon} = {
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('../utils/publishOneModuleHelper')
 
+const mockDoFetchApi = jest.fn() as jest.MockedFunction<typeof doFetchApi>
+
 describe('publishAllModulesHelper', () => {
   beforeEach(() => {
-    doFetchApi.mockResolvedValue({response: {ok: true}, json: {published: true}})
+    mockDoFetchApi.mockResolvedValue({
+      response: new Response('', {status: 200}),
+      json: {published: true},
+      text: '',
+    })
     initBody()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    doFetchApi.mockReset()
+    mockDoFetchApi.mockReset()
     document.body.innerHTML = ''
   })
 
   describe('batchUpdateAllModulesApiCall', () => {
     beforeEach(() => {
-      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
-      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
 
     it('PUTS the batch request', async () => {
@@ -77,13 +82,13 @@ describe('publishAllModulesHelper', () => {
             skip_content_tags: skipItems,
             async: true,
           },
-        })
+        }),
       )
     })
 
     it('returns a rejected promise on error', async () => {
       const whoops = new Error('whoops')
-      doFetchApi.mockRejectedValueOnce(whoops)
+      mockDoFetchApi.mockRejectedValueOnce(whoops)
       await expect(batchUpdateAllModulesApiCall(2, true, true)).rejects.toBe(whoops)
     })
   })
@@ -94,116 +99,139 @@ describe('publishAllModulesHelper', () => {
     })
 
     afterEach(() => {
-      doFetchApi.mockRestore()
+      mockDoFetchApi.mockRestore()
     })
 
     it('polls for progress until completed', async () => {
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'queued',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'running',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'completed',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
 
       const setCurrentProgress = jest.fn()
-      monitorProgress(3533, setCurrentProgress, () => {})
+      monitorProgress('3533', setCurrentProgress, () => {})
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+      expect(mockDoFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
-      expect(doFetchApi).toHaveBeenCalledTimes(2)
-      expect(doFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
+      expect(mockDoFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(3))
-      expect(doFetchApi).toHaveBeenCalledTimes(3)
-      expect(doFetchApi).toHaveBeenNthCalledWith(3, {path: '/api/v1/progress/3533'})
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(3)
+      expect(mockDoFetchApi).toHaveBeenNthCalledWith(3, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
     })
 
     it('polls for progress until failed', async () => {
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'queued',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
-      doFetchApi.mockResolvedValueOnce({
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: {
           id: '3533',
           workflow_state: 'failed',
           url: '/api/v1/progress/3533',
         },
+        text: '',
       })
 
       const setCurrentProgress = jest.fn()
-      monitorProgress(3533, setCurrentProgress, () => {})
+      monitorProgress('3533', setCurrentProgress, () => {})
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(1))
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+      expect(mockDoFetchApi).toHaveBeenNthCalledWith(1, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
       await waitFor(() => expect(setCurrentProgress).toHaveBeenCalledTimes(2))
-      expect(doFetchApi).toHaveBeenCalledTimes(2)
-      expect(doFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
+      expect(mockDoFetchApi).toHaveBeenNthCalledWith(2, {path: '/api/v1/progress/3533'})
       jest.runOnlyPendingTimers()
     })
 
     it('calls onProgressFail on a catestrophic failure', async () => {
       const err = new Error('whoops')
-      doFetchApi.mockRejectedValueOnce(err)
+      mockDoFetchApi.mockRejectedValueOnce(err)
       const onProgressFail = jest.fn()
-      monitorProgress(3533, () => {}, onProgressFail)
+      monitorProgress('3533', () => {}, onProgressFail)
       await waitFor(() => expect(onProgressFail).toHaveBeenCalledWith(err))
     })
   })
 
   describe('cancelBatchUpdate', () => {
     beforeEach(() => {
-      doFetchApi.mockResolvedValue({})
+      mockDoFetchApi.mockResolvedValue({
+        response: new Response('', {status: 200}),
+        json: {},
+        text: '',
+      })
     })
 
     it('bails out of no progress is provided', () => {
       const onCancelComplete = jest.fn()
       cancelBatchUpdate(undefined, onCancelComplete)
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
-      expect(doFetchApi).toHaveBeenCalledTimes(0)
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(0)
     })
 
     it('bails out if the progress has already completed', () => {
       const onCancelComplete = jest.fn()
-      cancelBatchUpdate({workflow_state: 'completed'}, onCancelComplete)
+      cancelBatchUpdate(
+        {id: '17', workflow_state: 'completed', message: 'completed', completion: 100},
+        onCancelComplete,
+      )
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
-      expect(doFetchApi).toHaveBeenCalledTimes(0)
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(0)
     })
 
     it('bails out if the progress has already failed', () => {
       const onCancelComplete = jest.fn()
-      cancelBatchUpdate({workflow_state: 'failed'}, onCancelComplete)
+      cancelBatchUpdate(
+        {id: '17', workflow_state: 'failed', message: 'failed', completion: 25},
+        onCancelComplete,
+      )
       expect(onCancelComplete).toHaveBeenCalledTimes(0)
-      expect(doFetchApi).toHaveBeenCalledTimes(0)
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(0)
     })
 
     it('cancels the progress', async () => {
       const onCancelComplete = jest.fn()
-      cancelBatchUpdate({id: '17', workflow_state: 'running'}, onCancelComplete)
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({
+      cancelBatchUpdate(
+        {id: '17', workflow_state: 'running', message: 'canceled', completion: 25},
+        onCancelComplete,
+      )
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+      expect(mockDoFetchApi).toHaveBeenCalledWith({
         method: 'POST',
         path: '/api/v1/progress/17/cancel',
         body: {message: 'canceled'},
@@ -214,11 +242,14 @@ describe('publishAllModulesHelper', () => {
     })
 
     it('calls onCancelComplete with the error on failure', async () => {
-      doFetchApi.mockRejectedValueOnce('whoops')
+      mockDoFetchApi.mockRejectedValueOnce('whoops')
       const onCancelComplete = jest.fn()
-      cancelBatchUpdate({id: '17', workflow_state: 'running'}, onCancelComplete)
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({
+      cancelBatchUpdate(
+        {id: '17', workflow_state: 'running', message: 'canceled', completion: 25},
+        onCancelComplete,
+      )
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+      expect(mockDoFetchApi).toHaveBeenCalledWith({
         method: 'POST',
         path: '/api/v1/progress/17/cancel',
         body: {message: 'canceled'},
@@ -231,46 +262,53 @@ describe('publishAllModulesHelper', () => {
 
   describe('fetchAllItemPublishedStates', () => {
     beforeEach(() => {
-      doFetchApi.mockReset()
-      doFetchApi.mockResolvedValue({response: {ok: true}, json: [], link: null})
+      mockDoFetchApi.mockReset()
+      mockDoFetchApi.mockResolvedValue({
+        response: new Response('', {status: 200}),
+        json: [],
+        text: '',
+      })
     })
     it('GETs the module item states', () => {
       fetchAllItemPublishedStates(7)
-      expect(doFetchApi).toHaveBeenCalledTimes(1)
-      expect(doFetchApi).toHaveBeenCalledWith({
+      expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
+      expect(mockDoFetchApi).toHaveBeenCalledWith({
         method: 'GET',
         path: '/api/v1/courses/7/modules?include[]=items',
       })
     })
     it('exhausts paginated responses', async () => {
-      doFetchApi.mockResolvedValueOnce({
-        response: {ok: true},
+      mockDoFetchApi.mockResolvedValueOnce({
+        response: new Response('', {status: 200}),
         json: [{id: 1, published: true, items: []}],
         link: {next: {url: '/another/page'}},
+        text: '',
       })
 
       fetchAllItemPublishedStates(7)
-      await waitFor(() => expect(doFetchApi).toHaveBeenCalledTimes(2))
-      expect(doFetchApi).toHaveBeenLastCalledWith({
+      await waitFor(() => expect(mockDoFetchApi).toHaveBeenCalledTimes(2))
+      expect(mockDoFetchApi).toHaveBeenLastCalledWith({
         method: 'GET',
         path: '/another/page',
       })
     })
     it('returns a rejected promise on error', async () => {
       const whoops = new Error('whoops')
-      doFetchApi.mockRejectedValueOnce(whoops)
+      mockDoFetchApi.mockRejectedValueOnce(whoops)
       await expect(fetchAllItemPublishedStates(7)).rejects.toBe(whoops)
     })
   })
 
   describe('updateModulePendingPublishedStates', () => {
-    let updateModuleSpy, updateItemsSpy
+    let updateModuleSpy: jest.SpyInstance
+    let updateItemsSpy: jest.SpyInstance
     beforeEach(() => {
-      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
-      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
     afterEach(() => {
       updateModuleSpy?.mockRestore()
+      updateItemsSpy?.mockRestore()
     })
 
     it('updates the modules and their items', () => {
@@ -285,13 +323,9 @@ describe('publishAllModulesHelper', () => {
   })
 
   describe('updateModulePublishedState', () => {
-    let spy
     beforeEach(() => {
-      makeModuleWithItems(1, 'Lesson 2', [117, 119], false)
-      makeModuleWithItems(2, 'Lesson 2', [217, 219], true)
-    })
-    afterEach(() => {
-      spy?.mockRestore()
+      makeModuleWithItems(1, [117, 119], false)
+      makeModuleWithItems(2, [217, 219], true)
     })
 
     it('updates the module', () => {

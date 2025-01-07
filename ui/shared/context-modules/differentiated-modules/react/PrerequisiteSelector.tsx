@@ -63,7 +63,6 @@ export default function PrerequisiteSelector({
       <Flex.Item shouldGrow={true} shouldShrink={true}>
         <CanvasSelect
           id={`prerequisite-${index}`}
-          // @ts-expect-error
           inputRef={el => (dropdown.current = el)}
           value={selection}
           label={<ScreenReaderContent>{I18n.t('Select Prerequisite')}</ScreenReaderContent>}

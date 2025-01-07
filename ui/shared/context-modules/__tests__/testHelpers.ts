@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -24,7 +23,7 @@ interface backboneSpan extends HTMLSpanElement {
   data?: any
 }
 
-function makeModel(type, id, module_item_id) {
+function makeModel(type: string, id: number, module_item_id: number) {
   return {
     attributes: {
       type,
@@ -37,7 +36,11 @@ function makeModel(type, id, module_item_id) {
   }
 }
 
-export function makeModuleItem(courseId, moduleId, {content_type, content_id}) {
+export function makeModuleItem(
+  courseId: number,
+  moduleId: number,
+  {content_type, content_id}: {content_type: string; content_id: number},
+) {
   const module_item_id = 1000 * moduleId + content_id
 
   const item = document.createElement('div')
@@ -50,8 +53,8 @@ export function makeModuleItem(courseId, moduleId, {content_type, content_id}) {
   item.appendChild(admin)
 
   const publishButton: backboneSpan = document.createElement('span')
-  publishButton.setAttribute('data-course-id', courseId)
-  publishButton.setAttribute('data-module-id', moduleId)
+  publishButton.setAttribute('data-course-id', courseId.toString())
+  publishButton.setAttribute('data-module-id', moduleId.toString())
   publishButton.setAttribute('data-module-item-id', `${module_item_id}`)
   publishButton.className = 'publish-icon'
   const $publishButton = $(publishButton) // sets up jquery's data()
@@ -67,11 +70,7 @@ export function makeModuleItem(courseId, moduleId, {content_type, content_id}) {
   return item
 }
 
-export function makeModule(
-  moduleId: number,
-  moduleName: string,
-  published: boolean = false
-): HTMLDivElement {
+export function makeModule(moduleId: number, published = false): HTMLDivElement {
   const module = document.createElement('div')
   module.id = `context_module_${moduleId}`
   module.className = 'context_module'
@@ -95,17 +94,12 @@ export function makeModule(
   return module
 }
 
-export function makeModuleWithItems(
-  moduleId: number,
-  moduleName: string,
-  itemIds: number[],
-  published: boolean = false
-): void {
-  makeModule(moduleId, moduleName, published)
+export function makeModuleWithItems(moduleId: number, itemIds: number[], published = false): void {
+  makeModule(moduleId, published)
   const moduleContent = document.getElementById(`context_module_content_${moduleId}`)
   itemIds.forEach(id => {
     moduleContent?.appendChild(
-      makeModuleItem(1, moduleId, {content_type: 'assignment', content_id: id})
+      makeModuleItem(1, moduleId, {content_type: 'assignment', content_id: id}),
     )
   })
 }
