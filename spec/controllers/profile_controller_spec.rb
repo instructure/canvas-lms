@@ -471,21 +471,21 @@ describe ProfileController do
         end
       end
 
-      context "is_eligible_for_token_regeneration" do
-        it "should be 'true' if the user is eligible for token regeneration" do
+      context "can_update_tokens" do
+        it "should be 'true' if the user has permission to update tokens" do
           user_session(@user)
           get "settings"
 
-          expect(assigns[:js_env][:is_eligible_for_token_regeneration]).to be true
+          expect(assigns[:js_env][:PERMISSIONS][:can_update_tokens]).to be true
         end
 
-        it "should be 'false' if the user is NOT eligible for token regeneration" do
+        it "should be 'false' if the user does not have permission to update tokens" do
           @user.account.change_root_account_setting!(:limit_personal_access_tokens, true)
           @user.account.enable_feature!(:admin_manage_access_tokens)
           user_session(@user)
           get "settings"
 
-          expect(assigns[:js_env][:is_eligible_for_token_regeneration]).to be false
+          expect(assigns[:js_env][:PERMISSIONS][:can_update_tokens]).to be false
         end
       end
 

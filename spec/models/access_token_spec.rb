@@ -705,6 +705,23 @@ describe AccessToken do
     end
   end
 
+  describe "#can_manually_regenerate?" do
+    it "returns true for manually created non-expired tokens" do
+      access_token = AccessToken.create!(user: user_model)
+      expect(access_token.can_manually_regenerate?).to be true
+    end
+
+    it "returns false for non-manually created tokens" do
+      access_token = AccessToken.create!(user: user_model, developer_key: DeveloperKey.create!)
+      expect(access_token.can_manually_regenerate?).to be false
+    end
+
+    it "returns false for expired manually created tokens" do
+      access_token = AccessToken.create!(user: user_model, permanent_expires_at: 1.day.ago)
+      expect(access_token.can_manually_regenerate?).to be false
+    end
+  end
+
   describe "#used!" do
     let_once(:access_token) { AccessToken.create!(user: user_model, developer_key: DeveloperKey.default) }
 
