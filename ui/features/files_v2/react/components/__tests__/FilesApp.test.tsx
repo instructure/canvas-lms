@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import FilesApp from '../FilesApp'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {setupFilesEnv} from '../../../fixtures/fakeFilesEnv'
@@ -41,7 +41,6 @@ describe('FilesApp', () => {
   })
 
   const renderComponent = (contextAssetString: string) => {
-    const queryClient = new QueryClient()
     const router = createMemoryRouter(
       [
         {
@@ -52,12 +51,12 @@ describe('FilesApp', () => {
           },
         },
       ],
-      {initialEntries: ['/']}
+      {initialEntries: ['/']},
     )
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
   }
 
@@ -66,7 +65,7 @@ describe('FilesApp', () => {
     renderComponent('course_12345')
 
     await waitFor(() => {
-      expect(fetchMock.calls().length).toBe(1)
+      expect(fetchMock.calls()).toHaveLength(1)
       expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
     })
   })

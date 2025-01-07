@@ -20,7 +20,7 @@ import React from 'react'
 import CreateFolderModal from '../CreateFolderModal'
 import {render, screen} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {QueryClient} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {FileManagementContext} from '../../Contexts'
@@ -31,7 +31,6 @@ const defaultProps = {
 }
 
 const renderComponent = (props = {}) => {
-  const queryClient = new QueryClient()
   return render(
     <FileManagementContext.Provider value={{folderId: '1', contextType: 'course', contextId: '1'}}>
       <MockedQueryClientProvider client={queryClient}>

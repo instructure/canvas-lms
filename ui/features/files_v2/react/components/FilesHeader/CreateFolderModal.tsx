@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
-import {useMutation, useQueryClient} from '@tanstack/react-query'
+import {useMutation, queryClient} from '@canvas/query'
 import {FileManagementContext} from '../Contexts'
 import {generateFolderPostUrl} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
@@ -37,7 +37,6 @@ interface AddFolderModalProps {
 
 const CreateFolderModal = ({isOpen, onRequestClose}: AddFolderModalProps) => {
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
-  const queryClient = useQueryClient()
   const {folderId: parentFolderId} = useContext(FileManagementContext)
 
   const createFolderMutation = useMutation({
@@ -59,7 +58,7 @@ const CreateFolderModal = ({isOpen, onRequestClose}: AddFolderModalProps) => {
     onSuccess: async () => {
       showFlashSuccess(I18n.t('Folder was successfully created.'))()
       onRequestClose()
-      await queryClient.invalidateQueries({queryKey: ['files']})
+      await queryClient.refetchQueries({queryKey: ['files', parentFolderId], type: 'active'})
     },
     onError: () => {
       showFlashError(I18n.t('There was an error creating the folder. Please try again.'))(

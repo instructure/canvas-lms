@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useMemo, useContext} from 'react'
+import React, {useState, useContext} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -25,7 +25,7 @@ import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {useQuery} from '@tanstack/react-query'
+import {useQuery} from '@canvas/query'
 
 import {type File, type Folder} from '../../../interfaces/File'
 import SubTableContent from './SubTableContent'
@@ -102,17 +102,18 @@ interface FileFolderTableProps {
 const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProps) => {
   const {folderId} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
-  const queryKey = useMemo(() => ['files', folderId], [folderId])
 
-  const {data, error, isLoading, isFetching} = useQuery<(File | Folder)[], unknown>(queryKey, () =>
-    fetchFilesAndFolders(folderId),
-  )
+  const {data, error, isLoading, isFetching} = useQuery({
+    queryKey: ['files', folderId],
+    queryFn: () => fetchFilesAndFolders(folderId),
+    staleTime: 0,
+  })
 
   if (error) {
     showFlashError(I18n.t('Failed to fetch files and folders'))
   }
 
-  const rows = !isFetching && data && data.length > 0 ? data : []
+  const rows: (File | Folder)[] = !isFetching && data && data.length > 0 ? data : []
 
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
 
