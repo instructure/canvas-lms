@@ -104,7 +104,7 @@ const ImageBlock = ({
     if (maintainAspectRatio) {
       sty.height = 'auto'
     } else {
-      sty.height = `${height}${unit}`
+      sty.height = `${height}px` // A set height is always px
     }
     setStyl(sty)
   }, [blockRef, height, maintainAspectRatio, sizeVariant, src, width])
