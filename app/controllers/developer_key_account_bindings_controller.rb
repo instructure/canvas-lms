@@ -19,7 +19,6 @@
 #
 
 # @API Developer Key Account Bindings
-# @internal
 # Developer key account bindings API for binding a developer key to a context and
 # specifying a workflow state for that relationship.
 #

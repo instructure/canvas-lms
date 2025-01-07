@@ -18,6 +18,173 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Developer Keys
+#
+# Manage Canvas API Keys, used for OAuth access to this API.
+# See <a href="oauth.html">the OAuth access docs</a> for usage of these keys.
+# Note that DeveloperKeys are also (currently) used for LTI 1.3 registration and OIDC access,
+# but this endpoint deals with Canvas API keys. See <a href="registration.html">LTI Registration</a>
+# for details.
+#
+# @model DeveloperKey
+#    {
+#      "id": "DeveloperKey",
+#      "description": "a Canvas API key (or LTI 1.3 registration)",
+#      "properties": {
+#        "id": {
+#          "description": "The Canvas ID of the DeveloperKey object",
+#          "example": 1,
+#          "type": "integer"
+#        },
+#        "name": {
+#          "description": "The display name",
+#          "example": "Test Key",
+#          "type": "string"
+#        },
+#        "created_at": {
+#          "description": "Timestamp of the key's creation",
+#          "example": "2025-05-30T17:09:18Z",
+#          "type": "datetime"
+#        },
+#        "updated_at": {
+#          "description": "Timestamp of the key's last update",
+#          "example": "2025-05-30T17:09:18Z",
+#          "type": "datetime"
+#        },
+#        "workflow_state": {
+#          "description": "The state of the key",
+#          "example": "active",
+#          "type": "string",
+#          "enum":
+#          [
+#            "active",
+#            "deleted"
+#          ]
+#        },
+#        "is_lti_key": {
+#          "description": "True if key represents an LTI 1.3 Registration. False for Canvas API keys",
+#          "example": false,
+#          "type": "boolean"
+#        },
+#        "email": {
+#          "description": "Contact email configured for key",
+#          "example": "test@example.com",
+#          "type": "string"
+#        },
+#        "icon_url": {
+#          "description": "URL for a small icon to display in key list",
+#          "example": "https://example.com/icon.png",
+#          "type": "string"
+#        },
+#        "notes": {
+#          "description": "User-provided notes about key",
+#          "example": "this key is for testing",
+#          "type": "string"
+#        },
+#        "vendor_code": {
+#          "description": "User-specified code representing the vendor that uses the key",
+#          "example": "Google",
+#          "type": "string"
+#        },
+#        "account_name": {
+#          "description": "The name of the account that owns the key",
+#          "example": "Test Account",
+#          "type": "string"
+#        },
+#        "visible": {
+#          "description": "True for all keys except Site Admin-level keys, which default to false. Controls visibility in the Inherited tab.",
+#          "example": true,
+#          "type": "boolean"
+#        },
+#        "scopes": {
+#          "description": "List of API endpoints key is allowed to access (API keys), or LTI 1.3 scopes (LTI keys)",
+#          "example": ["url:GET|/api/v1/accounts"],
+#          "type": "array",
+#          "items": { "type": "string" }
+#        },
+#        "redirect_uri": {
+#          "description": "Deprecated in favor of redirect_uris. Do not use.",
+#          "example": "no",
+#          "type": "string"
+#        },
+#        "redirect_uris": {
+#          "description": "List of URLs used during OAuth2 flow to validate given redirect URI (API keys), or to redirect to after login (LTI keys)",
+#          "example": ["https://mytool.com/oauth2/redirect", "https://mytool.com/1_3/launch"],
+#          "type": "array",
+#          "items": { "type": "string" }
+#        },
+#        "access_token_count": {
+#          "description": "(API keys only) The number of active access tokens associated with the key",
+#          "example": "42",
+#          "type": "integer"
+#        },
+#        "last_used_at": {
+#          "description": "(API keys only) The last time an access token for this key was used in an API request",
+#          "example": "2025-05-30T17:09:18Z",
+#          "type": "datetime"
+#        },
+#        "test_cluster_only": {
+#          "description": "(API keys only) If true, key is only usable in non-production environments (test, beta). Avoids problems with beta refresh.",
+#          "example": false,
+#          "type": "boolean"
+#        },
+#        "allow_includes": {
+#          "description": "(API keys only) If true, allows `includes` parameters in API requests that match the scopes of this key",
+#          "example": true,
+#          "type": "boolean"
+#        },
+#        "require_scopes": {
+#          "description": "(API keys only) If true, then token requests with this key must include scopes",
+#          "example": false,
+#          "type": "boolean"
+#        },
+#        "client_credentials_audience": {
+#          "description": "(API keys only) Used in OAuth2 client credentials flow to specify the audience for the access token",
+#          "example": "external",
+#          "type": "string"
+#        },
+#        "api_key": {
+#          "description": "(API keys only) The client secret used in the OAuth authorization_code flow.",
+#          "example": "sd45fg64....",
+#          "type": "string"
+#        },
+#        "tool_configuration": {
+#          "description": "(LTI keys only) The Canvas-style tool configuration for this key.",
+#           "example": { "type": "Lti::ToolConfiguration" },
+#           "$ref": "Lti::ToolConfiguration"
+#        },
+#        "public_jwk": {
+#          "description": "(LTI keys only) The tool's public JWK in JSON format. Discouraged in favor of a url hosting a JWK set.",
+#          "example": { "e": "AQAB", "etc": "etc" },
+#          "type": "object"
+#        },
+#        "public_jwk_url": {
+#          "description": "(LTI keys only) The tool-hosted URL containing its public JWK keyset.",
+#          "example": "https://mytool.com/1_3/jwks",
+#          "type": "string"
+#        },
+#        "lti_registration": {
+#          "description": "(LTI keys only) The LTI IMS Registration object for this key, if key was created via Dynamic Registration.",
+#          "example": { "type": "TODO Lti::IMS::Registration" },
+#          "type": "object"
+#        },
+#        "is_lti_registration": {
+#          "description": "(LTI keys only) Returns true if key was created via Dynamic Registration.",
+#          "example": false,
+#          "type": "boolean"
+#        },
+#        "user_name": {
+#          "description": "Unused.",
+#          "example": "",
+#          "type": "string"
+#        },
+#        "user_id": {
+#          "description": "Unused.",
+#          "example": "",
+#          "type": "string"
+#        }
+#      }
+#    }
 class DeveloperKeysController < ApplicationController
   before_action :set_key, only: [:update, :destroy]
   before_action :require_manage_developer_keys
@@ -25,6 +192,14 @@ class DeveloperKeysController < ApplicationController
 
   include Api::V1::DeveloperKey
 
+  # @API List Developer Keys
+  #
+  # List all developer keys created in the current account.
+  #
+  # @argument inherited [Optional, boolean] Defaults to false. If true, lists keys inherited from
+  #   Site Admin (and consortium parent account, if applicable).
+  #
+  # @returns [DeveloperKey]
   def index
     respond_to do |format|
       format.html do
@@ -59,6 +234,33 @@ class DeveloperKeysController < ApplicationController
     raise e
   end
 
+  # @API Create a Developer Key
+  #
+  # Create a new Canvas API key. Creating an LTI 1.3 registration is not supported here and
+  # should be done via the LTI Registration API.
+  #
+  # @argument developer_key [Required, json]
+  # @argument developer_key[auto_expire_tokens] [Optional, boolean] Defaults to false. If true, access tokens
+  #   generated by this key will expire after 1 hour.
+  # @argument developer_key[email] [Optional, string] Contact email for the key.
+  # @argument developer_key[icon_url] [Optional, string] URL for a small icon to display in key list.
+  # @argument developer_key[name] [Optional, string] The display name.
+  # @argument developer_key[notes] [Optional, string] User-provided notes about the key.
+  # @argument developer_key[redirect_uri] [Optional, string] Deprecated in favor of redirect_uris. Do not use.
+  # @argument developer_key[redirect_uris] [Optional, array] List of URLs used during OAuth2 flow to validate
+  #   given redirect URI.
+  # @argument developer_key[vendor_code] [Optional, string] User-specified code representing the vendor that uses the key.
+  # @argument developer_key[visible] [Optional, boolean] Defaults to true. If false, key will not be visible in the UI.
+  # @argument developer_key[test_cluster_only] [Optional, boolean] Defaults to false. If true, key is only usable in
+  #   non-production environments (test, beta). Avoids problems with beta refresh.
+  # @argument developer_key[client_credentials_audience] [Optional, string] Used in OAuth2 client credentials flow to
+  #   specify the audience for the access token.
+  # @argument developer_key[scopes] [Optional, array] List of API endpoints key is allowed to access.
+  # @argument developer_key[require_scopes] [Optional, boolean] If true, then token requests with this key must include scopes.
+  # @argument developer_key[allow_includes] [Optional, boolean] If true, allows `includes` parameters in API requests that
+  #   match the scopes of this key.
+  #
+  # @returns DeveloperKey
   def create
     @key = DeveloperKey.new(developer_key_params)
     @key.current_user = @current_user
@@ -74,6 +276,33 @@ class DeveloperKeysController < ApplicationController
     raise e
   end
 
+  # @API Update a Developer Key
+  #
+  # Update an existing Canvas API key. Updating an LTI 1.3 registration is not supported here and should
+  # be done via the LTI Registration API.
+  #
+  # @argument developer_key [Required, json]
+  # @argument developer_key[auto_expire_tokens] [Optional, boolean] Defaults to false. If true, access tokens
+  #   generated by this key will expire after 1 hour.
+  # @argument developer_key[email] [Optional, string] Contact email for the key.
+  # @argument developer_key[icon_url] [Optional, string] URL for a small icon to display in key list.
+  # @argument developer_key[name] [Optional, string] The display name.
+  # @argument developer_key[notes] [Optional, string] User-provided notes about the key.
+  # @argument developer_key[redirect_uri] [Optional, string] Deprecated in favor of redirect_uris. Do not use.
+  # @argument developer_key[redirect_uris] [Optional, array] List of URLs used during OAuth2 flow to validate
+  #   given redirect URI.
+  # @argument developer_key[vendor_code] [Optional, string] User-specified code representing the vendor that uses the key.
+  # @argument developer_key[visible] [Optional, boolean] Defaults to true. If false, key will not be visible in the UI.
+  # @argument developer_key[test_cluster_only] [Optional, boolean] Defaults to false. If true, key is only usable in
+  #   non-production environments (test, beta). Avoids problems with beta refresh.
+  # @argument developer_key[client_credentials_audience] [Optional, string] Used in OAuth2 client credentials flow to
+  #   specify the audience for the access token.
+  # @argument developer_key[scopes] [Optional, array] List of API endpoints key is allowed to access.
+  # @argument developer_key[require_scopes] [Optional, boolean] If true, then token requests with this key must include scopes.
+  # @argument developer_key[allow_includes] [Optional, boolean] If true, allows `includes` parameters in API requests that
+  #   match the scopes of this key.
+  #
+  # @returns DeveloperKey
   def update
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
     @key.attributes = developer_key_params unless params[:developer_key].empty?
@@ -88,6 +317,11 @@ class DeveloperKeysController < ApplicationController
     raise e
   end
 
+  # @API Delete a Developer Key
+  #
+  # Delete an existing Canvas API key. Deleting an LTI 1.3 registration should be done via the LTI Registration API.
+  #
+  # @returns DeveloperKey
   def destroy
     @key.destroy
     render json: developer_key_json(@key, @current_user, session, account_context)
