@@ -283,7 +283,7 @@ $('.show_token_link').click(function (event) {
   const url = $(this).attr('rel')
   const tokenElement = $(this).parents('.access_token')
   const token = tokenElement.data('token')
-  const isEligibleForTokenRegeneration = ENV.is_eligible_for_token_regeneration ?? false
+  const userCanUpdateTokens = ENV.PERMISSIONS.can_update_tokens ?? false
   const mountPoint = document.getElementById('access_token_details_mount_point')
   const root = createRoot(mountPoint)
 
@@ -291,7 +291,7 @@ $('.show_token_link').click(function (event) {
     <AccessTokenDetails
       url={url}
       loadedToken={token}
-      isEligibleForTokenRegeneration={isEligibleForTokenRegeneration}
+      userCanUpdateTokens={userCanUpdateTokens}
       onTokenLoad={loadedToken => {
         const data = {
           ...loadedToken,

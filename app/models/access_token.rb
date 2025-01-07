@@ -298,6 +298,10 @@ class AccessToken < ActiveRecord::Base
     save
   end
 
+  def can_manually_regenerate?
+    manually_created? && !expired?
+  end
+
   def visible_token
     if !manually_created?
       nil
