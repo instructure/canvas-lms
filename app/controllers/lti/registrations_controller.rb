@@ -19,7 +19,6 @@
 #
 
 # @API LTI Registrations
-# @internal
 # @beta
 #
 # API for accessing and configuring LTI registrations in a root account.
@@ -514,7 +513,7 @@
 #         "display_type": {
 #           "description": "The Canvas layout to use when launching the tool. See the Navigation Placement docs.",
 #           "example": "full_width_in_context",
-#           "type": "string"
+#           "type": "string",
 #           "enum": [
 #             "default",
 #             "full_width",
