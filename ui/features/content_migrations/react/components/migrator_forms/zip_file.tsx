@@ -294,7 +294,7 @@ const ZipFileImporter = ({
                 renderBeforeInput={<IconSearchLine inline={false} />}
                 renderAfterInput={renderClearButton()}
               />
-              <View as="div" height="320px" padding="xx-small" overflowY="auto" overflowX="visible">
+              <View as="div" maxHeight="20rem" padding="xx-small" overflowY="auto" overflowX="visible">
                 <TreeBrowser
                   collections={folderCollection()}
                   items={{}}
