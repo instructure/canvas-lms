@@ -21,49 +21,47 @@ class DataFixup::BackfillBodyWordCount
 
   def self.run
     GuardRail.activate(:secondary) do
-      Submission
-        .active
-        .where.not(body: nil)
-        .where.not(submission_type: "online_quiz")
-        .where(body_word_count: nil, updated_at: DATAFIX_CUTOFF..)
-        .find_each(strategy: :id) do |submission|
-          GuardRail.activate(:primary) do
-            delay_if_production(
-              priority: Delayed::LOWER_PRIORITY,
-              n_strand: "Datafix:BackfillBodyWordCount:ProcessSubmission#{Shard.current.database_server.id}"
-            ).process_submission(submission)
-          end
+      submissions_to_backfill.find_ids_in_ranges(batch_size: 1_000) do |min_id, max_id|
+        ids = submissions_to_backfill.where(id: min_id..max_id).pluck(:id)
+
+        GuardRail.activate(:primary) do
+          delay_if_production(
+            priority: Delayed::LOWER_PRIORITY,
+            n_strand: "Datafix:BackfillBodyWordCount:ProcessSubmissions#{Shard.current.database_server.id}"
+          ).process_submissions(ids)
         end
+      end
     end
   end
 
-  def self.process_submission(submission)
+  def self.submissions_to_backfill
+    Submission
+      .active
+      .where.not(body: nil)
+      .where.not(submission_type: "online_quiz")
+      .where(body_word_count: nil, updated_at: DATAFIX_CUTOFF..)
+  end
+
+  def self.process_submissions(ids)
     GuardRail.activate(:secondary) do
-      process_versions(submission)
-      body_word_count = submission.calc_body_word_count
-      GuardRail.activate(:primary) { submission.update_columns(body_word_count:) }
+      Submission.where(id: ids).find_each do |submission|
+        process_versions(submission)
+        body_word_count = submission.calc_body_word_count
+        GuardRail.activate(:primary) { submission.update_columns(body_word_count:) }
+      end
     end
   end
 
   def self.process_versions(submission)
     submission.versions.where(created_at: DATAFIX_CUTOFF..).find_each do |version|
-      GuardRail.activate(:primary) do
-        delay_if_production(
-          priority: Delayed::LOWER_PRIORITY,
-          n_strand: "Datafix:BackfillBodyWordCount:ProcessVersion#{Shard.current.database_server.id}"
-        ).process_version(version)
-      end
+      version_submission = version.model
+      return if version_submission.body.nil?
+      return if version_submission.body_word_count.present?
+      return if version_submission.submission_type == "online_quiz"
+
+      version_submission.body_word_count = version_submission.calc_body_word_count
+      yaml = version_submission.attributes.to_yaml
+      GuardRail.activate(:primary) { version.update_columns(yaml:) }
     end
-  end
-
-  def self.process_version(version)
-    submission = version.model
-    return if submission.body.nil?
-    return if submission.body_word_count.present?
-    return if submission.submission_type == "online_quiz"
-
-    submission.body_word_count = submission.calc_body_word_count
-    yaml = submission.attributes.to_yaml
-    version.update_columns(yaml:)
   end
 end
