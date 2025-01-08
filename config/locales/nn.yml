@@ -2319,6 +2319,7 @@ nn:
   add_outcomes_to_course_88ba09be: "Legg til Læringsmål til Emne"
   add_outcomes_to_groupname_8c33d118: "Legg til læringsmål til \"%{groupName}\""
   add_override_da70f198: "Legg til overstyring"
+  add_page_7ea7ee39: "Legg til side"
   add_people_7948b7da: "Legg til personar"
   add_people_7ee4b2ec: "Legg til personar"
   add_people_and_courses_to_canvas_5c4bfff9: "Legg til personar og emne på Canvas"
@@ -5456,6 +5457,7 @@ nn:
     edit: 
       confirm_delete_calendar_event: "Er du sikker på at du vil slette kalenderendinga?"
       errors: 
+        greater_or_equal: "Du må tillate at minst ein brukar deltek"
         start_date_required: "Du må oppgi ein dato"
         title_required: "Du må oppgi ein tittel"
       event_deleted: "%{event_title} sletta"
@@ -6873,6 +6875,7 @@ nn:
     unexpected_error: "Det oppstod ein uventa feil. Ta kontakt med brukarstøtte."
     unknown: Ukjent
     upload_timeout_error: "Filopplastingsprosessen hadde tidsavbrot"
+  content_migration_1f14de27: "Overføring av innhald"
   content_migration_queued_46c27790: "Kø i overføring av innhald"
   content_migration_running_percent_complete_4b00c024: "Overføring av innhald køyrer, %{percent}% fullført"
   content_migrations: 
@@ -11477,6 +11480,7 @@ nn:
   external_url_e9b87215: "Ekstern URL"
   external_urls_62082a38: "Eksterne URL-ar"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Det er ikkje tillate å gi ekstra utbyte for læringsmål. Resultat må justerast til det høgast moglege for %{outcome}"
+  extra_large_b6cdf1ff: "Ekstra stor"
   extract_error_error_file_names_a4989ed0: "Ekstraheringsfeil, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "EKSTREMT KRITISK NØDSTILFELLE!"
   faculty_journal_5634938e: Faglærarprotokoll
@@ -11811,6 +11815,7 @@ nn:
     titles: 
       bookmark_search: "Bokmerk søket: %{service_name}"
   find_8d605019: Finn
+  find_a_course_94301b4d: "Finn eit emne"
   find_an_existing_grading_scheme_d836ea: "Finn eit gjeldande karakterskjema"
   find_an_outcome_919328e6: "Finn eit læringsmål"
   find_appointment_85d6922e: "Finn avtale"
@@ -17504,6 +17509,7 @@ nn:
   mgp_grade_export_d29b471f: MGP-vurderingseksport
   miami_utilization_report_9c927880: "Miami utnyttelsesrapport"
   mic_a7f3d311: Mic
+  microphone_disabled_15c83130: "Mikrofon deaktivert"
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "Microsoft 365 tillet eit max antal på %{max} medlemar i eit team"
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "Microsoft 365 tillet eit max antal på %{max} eigarar i eit team"
   microsoft_group_enrollment_syncing_854b5ea2: "Microsoft gruppemedlemskap synkroniserar"
@@ -22970,6 +22976,7 @@ nn:
   save_login_bba1272: "Lagre pålogging"
   save_mastery_calculation_84fbeb0f: "Lagre ekspertiseberekning"
   save_mastery_scale_2b4dc13a: "Lagre ekspertisenivå"
+  save_media_cb9e786e: "Lagre media"
   save_name_796fa6a2: "Lagre \"%{name}\""
   save_publish_36440725: "Lagre og publiser"
   save_rubric_1e4f6a44: "Lagre vurderingsskjema"
@@ -23426,6 +23433,7 @@ nn:
   select_assignment_due_date_f6834ea7: "Vel frist for oppgåveinnlevering"
   select_assignment_title_4571ffcb: "Vel oppgåve: %{title}"
   select_audio_file_7d905cce: "Vel lydfil"
+  select_audio_source_21043cd5: "Vel lydkilde"
   select_by_date_range_c3af0101: "Vel med datointervall"
   select_calendars_d5fa50b6: "Vel kalendrar"
   select_calendars_to_retrieve_important_dates_from_26dc92b7: "Vel kalendrar du vil hente data frå"
@@ -23526,6 +23534,7 @@ nn:
   select_type_of_prerequisite_8d6fa902: "Vel type føresetnad"
   select_users_who_can_create_new_courses_75f92743: "Vel brukarar som kan opprette nye emne"
   select_video_file_35b61d4e: "Vel videofil"
+  select_video_source_1b5c9dbe: "Vel videokilde"
   select_view_a3fa73b3: "Vel visning"
   select_what_data_toolname_has_access_to_38001bf2: "Vel kva slags data *%{toolName}* har tilgang til"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Vel kva du vil vise på startsida."
@@ -28863,6 +28872,7 @@ nn:
   web_conferences_create_8a9869c3: "Webkonferanse - opprett"
   web_page_146f9102: Nettside
   web_url_d84feaf5: "Nettside URL"
+  webcam_disabled_30c66986: "Webkamera deaktivert"
   webcam_fe91b20f: Webkamera
   webcam_photo_ee55462c: "Bilde frå webkamera"
   webct_credentials: 
