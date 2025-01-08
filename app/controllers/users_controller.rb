@@ -3100,7 +3100,7 @@ class UsersController < ApplicationController
     @pseudonym = nil
     @user = nil
     if sis_user_id && value_to_boolean(params[:enable_sis_reactivation])
-      perform_sis_reactivation!(sis_user_id)
+      perform_sis_reactivation(sis_user_id)
     end
 
     if @pseudonym.nil?
@@ -3340,7 +3340,7 @@ class UsersController < ApplicationController
 
   def handle_instructure_identity(will_be_saving_user) end
 
-  def perform_sis_reactivation!(sis_user_id)
+  def perform_sis_reactivation(sis_user_id)
     @pseudonym = @context.pseudonyms.where(sis_user_id:, workflow_state: "deleted").first
     if @pseudonym
       @pseudonym.workflow_state = "active"
