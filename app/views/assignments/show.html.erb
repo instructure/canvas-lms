@@ -246,7 +246,7 @@
       </table>
     <% end %>
 
-    <% if can_do(@assignment, @current_user, :update) %>
+    <% if can_do(@assignment, @current_user, :update) && !@context.horizon_course? %>
       <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
         <div id="enhanced-rubric-assignment-edit-mount-point"></div>
       <% else %>
