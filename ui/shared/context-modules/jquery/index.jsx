@@ -904,6 +904,7 @@ modules.initModuleManagement = async function (duplicate) {
       .find('.context_module_items .context_module_item')
       .removeClass('progression_requirement')
       .removeClass('min_score_requirement')
+      .removeClass('min_percentage_requirement')
       .removeClass('max_score_requirement')
       .removeClass('must_view_requirement')
       .removeClass('must_mark_done_requirement')

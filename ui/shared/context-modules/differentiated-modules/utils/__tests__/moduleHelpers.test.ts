@@ -153,6 +153,15 @@ describe('parseModule', () => {
         minimumScore: '0',
         pointsPossible: null,
       },
+      {
+        id: '97',
+        name: 'Percentage item',
+        resource: 'quiz',
+        type: 'percentage',
+        graded: true,
+        minimumScore: '70',
+        pointsPossible: '47',
+      },
     ])
   })
 

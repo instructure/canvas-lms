@@ -400,6 +400,12 @@ $context_module_bg_color: $ic-color-light;
       display: block;
     }
   }
+  &.min_percentage_requirement {
+    .completion_requirement,
+    .min_percentage_requirement {
+      display: block;
+    }
+  }
   &.must_view_requirement {
     .completion_requirement,
     .must_view_requirement {

@@ -43,6 +43,7 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
     mark: 'must_mark_done',
     submit: 'must_submit',
     score: 'min_score',
+    percentage: 'min_percentage',
     contribute: 'must_contribute',
   }
 
@@ -61,16 +62,14 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
       prerequisites: moduleSettings.prerequisites
         .map(prerequisite => `module_${prerequisite.id}`)
         .join(','),
-      completion_requirements: moduleSettings.requirements.reduce(
-        (requirements, requirement) => {
-          requirements[requirement.id] = {
-            type: typeMap[requirement.type],
-            min_score: requirement.type === 'score' ? requirement.minimumScore : '',
-          }
-          return requirements
-        },
-        {} as Record<string, Record<string, string>>,
-      ),
+      completion_requirements: moduleSettings.requirements.reduce((requirements, requirement) => {
+        requirements[requirement.id] = {
+          type: typeMap[requirement.type],
+          min_score: requirement.type === 'score' ? requirement.minimumScore : '',
+          min_percentage: requirement.type === 'percentage' ? requirement.minimumScore : '',
+        }
+        return requirements
+      }, {} as Record<string, Record<string, string>>),
       requirement_count: moduleSettings.requirementCount === 'one' ? '1' : '',
       require_sequential_progress:
         moduleSettings.requirementCount === 'all' && moduleSettings.requireSequentialProgress,

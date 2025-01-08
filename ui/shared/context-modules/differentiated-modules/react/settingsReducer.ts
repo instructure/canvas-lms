@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Module, Requirement} from './types'
+import type {Module, PointsInputMessages, Requirement} from './types'
 
 export type SettingsPanelState = {
   moduleName: string
@@ -24,6 +24,7 @@ export type SettingsPanelState = {
   unlockAt: string
   lockUntilChecked: boolean
   nameInputMessages: Array<{type: 'error'; text: string}>
+  pointsInputMessages: PointsInputMessages
   lockUntilInputMessages: Array<{type: 'error'; text: string}>
   prerequisites: Module[]
   requirementCount: 'all' | 'one'
@@ -38,6 +39,7 @@ export const defaultState: SettingsPanelState = {
   unlockAt: '',
   lockUntilChecked: false,
   nameInputMessages: [],
+  pointsInputMessages: [],
   lockUntilInputMessages: [],
   prerequisites: [],
   requirementCount: 'all',
@@ -51,6 +53,7 @@ export const enum actions {
   SET_UNLOCK_AT = 'SET_UNLOCK_AT',
   SET_LOCK_UNTIL_CHECKED = 'SET_LOCK_UNTIL_CHECKED',
   SET_NAME_INPUT_MESSAGES = 'SET_NAME_INPUT_MESSAGES',
+  SET_POINTS_INPUT_MESSAGES = 'SET_POINTS_INPUT_MESSAGES',
   SET_LOCK_UNTIL_INPUT_MESSAGES = 'SET_LOCK_UNTIL_INPUT_MESSAGES',
   SET_PREREQUISITES = 'SET_PREREQUISITES',
   SET_REQUIREMENT_COUNT = 'SET_REQUIREMENT_COUNT',
@@ -72,6 +75,8 @@ export function reducer(
       return {...state, lockUntilChecked: action.payload}
     case actions.SET_NAME_INPUT_MESSAGES:
       return {...state, nameInputMessages: action.payload}
+    case actions.SET_POINTS_INPUT_MESSAGES:
+      return {...state, pointsInputMessages: action.payload}
     case actions.SET_LOCK_UNTIL_INPUT_MESSAGES:
       return {...state, lockUntilInputMessages: action.payload}
     case actions.SET_PREREQUISITES:

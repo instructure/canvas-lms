@@ -81,6 +81,10 @@ export function criterionMessage($mod_item) {
     return I18n.t('Must score at least a %{score}', {
       score: $mod_item.getTemplateData({textValues: ['min_score']}).min_score,
     })
+  } else if ($mod_item.hasClass('min_percentage_requirement')) {
+    return I18n.t('Must score at least a %{score}', {
+      score: $mod_item.getTemplateData({textValues: ['min_percentage']}).min_percentage,
+    })
   } else {
     return I18n.t('Not yet completed')
   }
