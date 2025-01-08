@@ -115,6 +115,21 @@ $(document).ready(function () {
     return nameErrors
   }
 
+  const validateSectionFormDates = () => {
+    const sectionStartAt =  $('.datetime_suggest')[0].textContent
+    const sectionEndAt = $('.datetime_suggest')[1].textContent
+    const dateErrors = []
+
+    if(sectionStartAt && sectionEndAt && (new Date(sectionStartAt) > new Date(sectionEndAt) ) ){
+      const error = {}
+      error.containerId = '#course_section_end_at'
+      error.errorsContainerId = '#course_section_end_at_errors'
+      error.errorText = I18n.t('End date cannot be before start date')
+      dateErrors.push(error)
+    }
+    return dateErrors
+  }
+
   // remove course_section_name errors if you begin to type.
   $edit_section_form.find('#course_section_name').on("input", function (e) {
     const container = $(this)
@@ -147,10 +162,40 @@ $(document).ready(function () {
     }
   })
 
+  $edit_section_form.find('.datetime_field').on("input", function (e) {
+    const container = $('#course_section_end_at')
+      if (container) {
+        container.css({
+          outline: '',
+          borderRadius: '',
+        })
+      }
+      errorRoots['#course_section_end_at']?.unmount()
+      errorRoots['#course_section_end_at'] = null
+  })
+
+  $edit_section_form.find('.datetime_field').blur(function (e) {
+    const validateFormErrors = validateSectionFormDates()
+    if(validateFormErrors.length > 0){
+      renderFormErrors(validateFormErrors)
+    }
+    else {
+      const container = $('#course_section_end_at')
+      if (container) {
+        container.css({
+          outline: '',
+          borderRadius: '',
+        })
+      }
+      errorRoots['#course_section_end_at']?.unmount()
+      errorRoots['#course_section_end_at'] = null
+    }
+  })
+
   $edit_section_form
     .formSubmit({
       beforeSubmit(data) {
-        const validateFormErrors = [...validateSectionFormName()];
+        const validateFormErrors = [...validateSectionFormName(), ...validateSectionFormDates()];
         if (validateFormErrors.length > 0){
           renderFormErrors(validateFormErrors, true)
           return false

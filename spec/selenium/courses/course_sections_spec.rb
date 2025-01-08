@@ -125,6 +125,21 @@ describe "course sections" do
 
       expect(f("#course_section_name_errors")).to include_text("Section name is too long")
     end
+
+    it "validates course_section start_at is before end_at" do
+      start_at = "Mar 7, 2025 at 1pm"
+      end_at = "Feb 19, 2025 at 12am"
+      get "/courses/#{@course.id}/sections/#{@section.id}"
+
+      f(".edit_section_link").click
+      edit_form = f("#edit_section_form")
+      replace_content(edit_form.find_element(:id, "course_section_start_at"), start_at)
+      replace_content(edit_form.find_element(:id, "course_section_end_at"), end_at)
+      submit_form(edit_form)
+      wait_for_ajaximations
+
+      expect(f("#course_section_end_at_errors")).to include_text("End date cannot be before start date")
+    end
   end
 
   context "account admin" do
