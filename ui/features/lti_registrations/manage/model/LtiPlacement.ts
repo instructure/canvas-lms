@@ -175,6 +175,12 @@ export const AllLtiPlacements = [
   LtiPlacements.WikiIndexMenu,
 ] as const
 
+export const InternalOnlyLtiPlacements = [
+  LtiPlacements.ConferenceSelection, // Locked behind a Site Admin FF that's off
+  LtiPlacements.SimilarityDetection, // Only really relevant for LTI 2
+  LtiPlacements.AnalyticsHub,
+] as const
+
 export const ZLtiPlacement = z.enum(AllLtiPlacements)
 export type LtiPlacement = z.infer<typeof ZLtiPlacement>
 

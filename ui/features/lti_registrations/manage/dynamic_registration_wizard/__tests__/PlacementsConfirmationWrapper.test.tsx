@@ -82,6 +82,35 @@ describe('PlacementsConfirmation', () => {
     })
   })
 
+  it("doesn't show the analytics hub placement if the tool has not requested it", () => {
+    const config = mockConfigWithPlacements([
+      LtiPlacements.CourseNavigation,
+      LtiPlacements.AccountNavigation,
+    ])
+    const reg = mockRegistration({}, config)
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+    const checkbox = screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.AnalyticsHub))
+    expect(checkbox).toBeNull()
+  })
+
+  it("shows the analytics hub placement if the tool has requested it", () => {
+    const config = mockConfigWithPlacements([
+      LtiPlacements.CourseNavigation,
+      LtiPlacements.AnalyticsHub,
+      LtiPlacements.AccountNavigation,
+    ])
+    const reg = mockRegistration({}, config)
+    const overlayStore = createRegistrationOverlayStore('Foo', reg)
+
+    render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
+
+    const checkbox = screen.queryByLabelText(i18nLtiPlacement(LtiPlacements.AnalyticsHub))
+    expect(checkbox).toBeTruthy()
+  })
+
   it("let's users toggle placements", async () => {
     const config = mockConfigWithPlacements([
       LtiPlacements.CourseNavigation,
