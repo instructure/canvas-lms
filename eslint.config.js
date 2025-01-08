@@ -182,6 +182,8 @@ module.exports = [
       },
     },
     rules: {
+      'react/jsx-uses-react': 'off',
+      'react/react-in-jsx-scope': 'off',
       'react/no-deprecated': 'warn',
       'react/prop-types': 'warn',
       'react/display-name': 'off',

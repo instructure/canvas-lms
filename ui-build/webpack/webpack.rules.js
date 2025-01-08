@@ -154,6 +154,13 @@ exports.swc = [
             syntax: 'typescript',
             tsx: true,
           },
+          transform: {
+            react: {
+              runtime: 'automatic',
+              development: process.env.NODE_ENV === 'development',
+              refresh: process.env.NODE_ENV === 'development',
+            },
+          },
           ...(isCrystalballEnabled
             ? {
                 experimental: {
@@ -165,19 +172,6 @@ exports.swc = [
         env: {
           targets: browserTargets,
         },
-        // Our coverage plugin gets really upset about the transform field, even
-        // if it's just react: {development: false, refresh: false}, so we only
-        // include it in development mode when crystalball is disabled.
-        ...(process.env.NODE_ENV === 'development' && !isCrystalballEnabled
-          ? {
-              transform: {
-                react: {
-                  development: process.env.NODE_ENV === 'development',
-                  refresh: process.env.NODE_ENV === 'development',
-                },
-              },
-            }
-          : {}),
       },
     },
   },
