@@ -1826,6 +1826,7 @@ uk:
   add_new_group_7ac49f31: "Додати нову групу"
   add_new_set_of_due_dates_e8e240f: "Додати новий набір фіксованих дат"
   add_new_term_d2217c0d: "Додати новий період"
+  add_page_7ea7ee39: "Додати сторінку"
   add_people_7948b7da: "Додати людей"
   add_people_7ee4b2ec: "Додати людей"
   add_people_to_coursename_5ea234e1: "Додати людей до : %{courseName}"
@@ -3490,6 +3491,7 @@ uk:
     edit: 
       confirm_delete_calendar_event: "Ви впевнені, що хочете видалити цю календарну подію?"
       errors: 
+        greater_or_equal: "Ви повинні дозволити принаймні одному користувачу прийняти участь"
         start_date_required: "Ви повинні ввести дату"
         title_required: "Ви повинні ввести назву"
       event_deleted: "%{event_title} видалено успішно"
@@ -4370,6 +4372,7 @@ uk:
     unexpected_error: "Сталася неочікувана помилка, зверніться до служби підтримки."
     unknown: Невідомий
     upload_timeout_error: "Час процесу завантаження файлу минув."
+  content_migration_1f14de27: "Міграція вмісту"
   content_migration_queued_46c27790: "Поставлено до черги міграції вмісту"
   content_migration_running_percent_complete_4b00c024: "Процес міграції вмісту триває, %{percent}% до кінця"
   content_migrations: 
@@ -7769,6 +7772,7 @@ uk:
     titles: 
       bookmark_search: "Знайти закладку: %{service_name}"
   find_8d605019: Знайти
+  find_a_course_94301b4d: "Пошук курсу"
   find_an_existing_grading_scheme_d836ea: "Знайти існуючу схему оцінювання"
   find_an_outcome_919328e6: "Знайти результат"
   find_appointment_85d6922e: "Знайти призначення"
@@ -11745,7 +11749,7 @@ uk:
     sure_you_want_to_mute: "Ви впевнені, що хочете вимкнути сповіщення для цього завдання? При вимкнені сповіщень для завдання, студенти не отримуватимуть нових повідомлень стосовно нього або зможуть побачити:"
   mute_unmute_assignment_62608e44: "Відключити/включити завдання"
   muted_283cfa0f: "(без звуку)"
-  muted_3ff94739: "Без звуку"
+  muted_3ff94739: "Вимкнено звук"
   muting_assignment_a9aeb5c7: "Відключення завдання ..."
   my_dashboard_8983c283: "Моя панель інструментів"
   my_dashboard_b724020: "Моя панель інструментів"
