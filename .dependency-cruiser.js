@@ -292,6 +292,7 @@ module.exports = {
     },
   ],
   options: {
+    skipAnalysisNotInRules: true,
     doNotFollow: {
       path: [
         'node_modules',
