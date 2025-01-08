@@ -1390,6 +1390,7 @@ ko:
   add_group_set_f9809e11: "그룹 집합 추가"
   add_message_10cc308c: "메시지 추가"
   add_module_5ad6fee2: "모듈 추가"
+  add_page_7ea7ee39: "페이지 추가"
   add_prerequisite_6409bd9: "필수 조건 추가"
   add_quiz_cebfa28b: "퀴즈 추가"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "이 포트폴리오의 섹션을 추가, 제거, 다시 배열 "
@@ -2647,6 +2648,7 @@ ko:
     edit: 
       confirm_delete_calendar_event: "이 행사를 삭제하시겠습니까?"
       errors: 
+        greater_or_equal: "한 명 이상의 참가자를 허용해야 함"
         start_date_required: "날짜를 입력해야 합니다."
         title_required: "제목을 입력해야 함"
       event_deleted: "%{event_title}을(를) 성공적으로 삭제함"
@@ -3352,6 +3354,7 @@ ko:
     unexpected_error: "예기치 않은 오류가 발생했습니다. 사용자 지원팀에 문의하시기 바랍니다."
     unknown: "알 수 없음"
     upload_timeout_error: "파일 업로드 프로세스가 제한 시간을 초과했습니다."
+  content_migration_1f14de27: "내용 마이그레이션"
   content_migrations: 
     angel_exporter: 
       content: 내용
@@ -6056,6 +6059,7 @@ ko:
       searching: "검색 중..."
     titles: 
       bookmark_search: "북마크 검색: %{service_name}"
+  find_a_course_94301b4d: "과목 찾기"
   find_flickr_image_view: 
     find_cc_on_flickr: "Flickr에서 크리에이티브 커먼즈 이미지 찾기"
     search: 검색
@@ -9518,6 +9522,7 @@ ko:
     students_will_see: "학생이 이 과제가 평점 비공개라는 것을 볼 수 있습니다."
     submission_comments: "제출물 의견"
     sure_you_want_to_mute: "이 과제의 평점을 비공개하시겠습니까? 과제가 평점 비공개 상태인 동안에는 학생이 다음 경우에 대한 알림을 받거나 볼 수 없습니다:"
+  muted_3ff94739: "평점 비공개"
   my_dashboard_8983c283: "내 대시보드"
   my_dashboard_b724020: "내 대시보드"
   my_files_2f621040: "내 파일"
