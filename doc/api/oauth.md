@@ -5,7 +5,7 @@ OAuth2
 
 <a href="http://oauth.net/2" target="_blank">OAuth2</a> is a protocol designed to let third-party applications
 authenticate to perform actions as a user, without getting the user's
-password. Canvas uses OAuth2 (specifically <a href="http://tools.ietf.org/html/rfc6749" target="_blank">RFC-6749</a>
+password. Canvas uses OAuth2 (specifically <a href="http://tools.ietf.org/html/rfc6749" target="_blank">RFC-6749</a>) 
 for authentication and authorization of the Canvas API. Additionally, Canvas uses OAuth2 for <a href="https://www.imsglobal.org/activity/learning-tools-interoperability" target="_blank">LTI Advantage</a> service authentication (as described in the <a href="https://www.imsglobal.org/spec/security/v1p0/" target="_blank">IMS Security Framework</a>).
 <a name="top"></a>
 
@@ -310,7 +310,7 @@ To logout, simply send a [DELETE request to login/oauth2/token](file.oauth_endpo
 <h4>Example JWK</h4>
 
   <pre class="example code prettyprint">
-   "public_jwk":{
+   "public_jwk": {
       "kty":"RSA",
       "alg":"RS256",
       "e":"AQAB",

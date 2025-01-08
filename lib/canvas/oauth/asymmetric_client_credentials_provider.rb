@@ -43,8 +43,8 @@ module Canvas::OAuth
 
     def error_message
       return "JWK Error: Invalid JSON" if @invalid_json
-      return "JWS signature invalid." if @invalid_key
       return "JWK Error: #{errors.first.message}" if errors.present?
+      return "JWS signature invalid." if @invalid_key
 
       validator.error_message
     end
