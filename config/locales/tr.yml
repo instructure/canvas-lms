@@ -2090,6 +2090,7 @@ tr:
   add_old_quiz_f4c546a: "Eski Kısa Sınav Ekle"
   add_outcomes_36272787: "Öğrenme Çıktısı Ekle"
   add_outcomes_to_account_4647776f: "Öğrenme Çıktılarını Hesaba Ekle"
+  add_page_7ea7ee39: "Sayfa Ekle"
   add_people_7948b7da: "Kullanıcı Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
   add_people_to_coursename_5ea234e1: "%{courseName}'e kişileri ekleyin"
@@ -4017,6 +4018,7 @@ tr:
     edit: 
       confirm_delete_calendar_event: "Bu takvim etkinliğini silmek istediğinize emin misiniz?"
       errors: 
+        greater_or_equal: "En az bir kullanıcının katılmasına izin vermelisiniz"
         start_date_required: "Bir tarih girmelisiniz"
         title_required: "Bir başlık girmelisiniz"
       event_deleted: "%{event_title} başarıyla silindi"
@@ -4991,6 +4993,7 @@ tr:
     unexpected_error: "Beklenmeyen bir hata oluştur, lütfen destek birimi ile iletişime geçin."
     unknown: Bilinmiyor
     upload_timeout_error: "Dosya yükleme işlemi zaman aşımına uğradı."
+  content_migration_1f14de27: "İçerik Geçişi"
   content_migration_queued_46c27790: "İçerik aktarımı sıraya konuldu"
   content_migration_running_percent_complete_4b00c024: "İçerik aktarımı başlatıldı, %{percent}% tamamlandı"
   content_migrations: 
@@ -8628,6 +8631,7 @@ tr:
   external_tools_6e77821: "Harici Araçlar"
   external_url_e9b87215: "Harici URL"
   external_urls_62082a38: "Harici Web adresleri"
+  extra_large_b6cdf1ff: "Ekstra Büyük"
   extreme_critical_emergency_80b3dbda: "ÇOK KRİTİK DURUM!"
   faculty_journal_5634938e: "Öğretim Üyesi Kaydı"
   faculty_journal_manage_entries_efc09599: "Öğretim Üyesi Günlüğü - girdileri yönet"
@@ -8842,6 +8846,7 @@ tr:
     titles: 
       bookmark_search: "Yer İmi Arama: %{service_name}"
   find_8d605019: Ara
+  find_a_course_94301b4d: "Ders Ara"
   find_an_existing_grading_scheme_d836ea: "Varolan Notlandırma Şeması Bul"
   find_an_outcome_919328e6: "Bir Öğrenme Çıktısı Ara"
   find_appointment_85d6922e: "Randevu Ara"
@@ -13326,6 +13331,7 @@ tr:
     submission_comments: "Gönderim yorumları"
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
   muted_283cfa0f: "(askıya alınmış)"
+  muted_3ff94739: Bekletiliyor
   my_dashboard_8983c283: "Kontrol Panelim"
   my_dashboard_b724020: "Kontrol Panelim"
   my_files_2f621040: Dosyalarım

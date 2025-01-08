@@ -1665,6 +1665,7 @@ hy:
     add_topic_to: "%{module}-ին ավելացնել քննարկման թեմաներ"
   add_new_group_7ac49f31: "Ավելացնել նոր խումբ"
   add_new_set_of_due_dates_e8e240f: "Ավելացնել կատարման ժամկետների նոր խմբեր"
+  add_page_7ea7ee39: "Ավելացնել էջ"
   add_people_7ee4b2ec: "Ավելացնել մարդկանց"
   add_prerequisite_6409bd9: "Ավելացնել նախնական պայման"
   add_quiz_cebfa28b: "Ավելացնել Թեստ"
@@ -3149,6 +3150,7 @@ hy:
     edit: 
       confirm_delete_calendar_event: "Դուք իսկապե՞ս ցանկանում եք ջնջել օրացուցային այս միջոցառումը:"
       errors: 
+        greater_or_equal: "Դուք պետք է թույլատրեք առնվազն մեկ օգտատիրոջ մասնակցությունը:"
         title_required: "Պետք է մուտքագրել վերնագիրը"
       event_deleted: "%{event_title} հաջողությամբ ջնջվել է"
       event_saved: "Միջոցառումը հաջողությամբ պահպանվել է"
@@ -3901,6 +3903,7 @@ hy:
     unexpected_error: "Անսպասելի սխալ է տեղի ունեցել, կապվեք օժանդակող ծառայության հետ:"
     unknown: "Անհայտ է"
     upload_timeout_error: "Ֆայլի ներբեռնման գործընթացի ժամանակը սպառվել է:"
+  content_migration_1f14de27: "Բովանդակության տեղափոխում"
   content_migration_queued_46c27790: "Բովանդակության տեղափոխման հերթագրում"
   content_migration_running_percent_complete_4b00c024: "Բովանդակության տեղափոխում, %{percent}% ավարտված է"
   content_migrations: 
@@ -7196,6 +7199,7 @@ hy:
       searching: "Որոնումը ընթացքում է..."
     titles: 
       bookmark_search: "Էջանիշի որոնում՝ %{service_name}"
+  find_a_course_94301b4d: "Գտնել դասընթաց"
   find_an_existing_grading_scheme_d836ea: "Գտնել առկա գնահատման համակարգը"
   find_flickr_image_view: 
     find_cc_on_flickr: "Գտնել Creative Commons պատկերներ Flickr-ում"
@@ -11258,6 +11262,7 @@ hy:
     submission_comments: "Ուղարկված աշխատանքների մեկնաբանություններ"
     sure_you_want_to_mute: "Դուք իսկապե՞ս ցանկանում եք միացնել հանձնարարության \"համր\" ֆունկցիան: Քանի դեռ հանձնարարության \"համր\" ֆունկցիան միացված է, ունկնդիրները չեն կարող ստանալ նոր ծանուցումներ կամ չեն կարող տեսնել՝"
   muted_283cfa0f: "(\"համր\" ֆունկցիան միացված է)"
+  muted_3ff94739: "\"Համր\" ֆունկցիան միացված է"
   my_dashboard_8983c283: "Իմ տեղեկատվական վահանակը"
   my_dashboard_b724020: "Իմ տեղեկատվական վահանակը"
   my_files_2f621040: "Իմ ֆայլերը"
