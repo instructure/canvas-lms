@@ -15063,7 +15063,7 @@ ga:
     cant_unpublish_when_students_submit: "Ní féidir é a dhífhoilsiú má tá uaslódálacha mac léinn ann"
     question_count: 
       one: "Ceist 1"
-      other: "%{count} Ceisteanna"
+      other: "%{count} (g)c(h)eist"
   modelsSection: 
     overrides: 
       everyone: "Gach duine"
@@ -16289,7 +16289,7 @@ ga:
   only_most_recent_grading_period_shown_f1ad6458: "*Taispeántar an tréimhse ghrádála is déanaí amháin."
   only_needed_if_enrollments_selected_ee620ce3: "Ní gá ach amháin má roghnaítear rolluithe"
   only_observerenrollments_may_have_an_associated_us_b2f78f8e: "Ní féidir le ObserverEnrollments amháin associated_user_id a bheith aige"
-  only_once_after_each_attempt_cc842738: "Uair amháin tar éis gach Iarrachta"
+  only_once_after_each_attempt_cc842738: "Uair Amháin Tar Éis Gach Iarracht"
   only_show_announcement_on_current_account_domain_fc341eea: "Ná taispeáin fógra ach ar fhearann an chuntais reatha"
   only_the_moderator_can_edit_this_assignment_a162b20d: "Ní féidir ach leis an modhnóir an tasc seo a chur in eagar"
   only_tid_oid_is_supported_with_the_common_tenant_3a250b01: "Ní thacaítear ach le \"tid+oid\" leis an tionónta \"coitianta\"."
@@ -18045,7 +18045,7 @@ ga:
       no_questions: "Gan Cheisteanna"
       question_count: 
         one: "Ceist 1"
-        other: "%{count} Ceist"
+        other: "%{count} (g)c(h)eist"
     question_teaser: 
       full_details: "Cliceáil chun sonraí iomlána na ceiste a thaispeáint"
       links: 
@@ -18536,7 +18536,7 @@ ga:
           calculated: "Ceist Foirmle"
           essay: "Ceist Aiste"
           file_upload: "Ceist Uaslódáil Comhad"
-          fill_in_multiple_blanks: "Líon isteach Bhearnaí Iolracha"
+          fill_in_multiple_blanks: "Líon Isteach Bearnaí Iolracha"
           matching: "Ag Meaitseáil"
           missing_word: "Focal ar Iarraidh"
           multiple_answers: "Freagraí Iolracha"
@@ -18726,7 +18726,7 @@ ga:
           due: Dlite
           points: Pointí
           questions: Ceisteanna
-          time_limit: "Teorainn ama"
+          time_limit: "Teorainn Ama"
         multiple_due_dates: "Dátaí Dlite Iolracha"
         no_due_date: "Níl dáta dlite"
         none: Dada
@@ -18773,7 +18773,7 @@ ga:
         for: "Le haghaidh"
         group: "Grúpa Taisc"
         label: 
-          time_limit: "Teorainn ama"
+          time_limit: "Teorainn Ama"
         multiple_attempts: "Iarrachtaí Iolracha"
         no_time_limit: "Gan Teorainn Ama"
         one_question_at_a_time: "Ceist amháin ag an am"
@@ -18784,7 +18784,7 @@ ga:
         require_lockdown_browser_monitor: "Ceamara Gréasáin de dhíth"
         score_to_keep: "Scór le Coimeád"
         show_correct_answers: "Taispeáin Freagraí Cearta"
-        shuffle_answers: "Mheasc Freagraí"
+        shuffle_answers: "Measc Freagraí"
         time_limit: 
           one: "Nóiméad 1"
           other: "%{count} Nóiméad"
@@ -19012,7 +19012,7 @@ ga:
   quizzes_index: 
     headers: 
       assignment_quizzes: "Tasc Quizeanna"
-      practice_quizzes: "Quizeanna le haghaidh Cleachtadh"
+      practice_quizzes: "Cleachtadh - Practice/ Quizeanna Cleachtadh"
       surveys: Suirbhéanna
     toggle_message: "scoránaigh infheictheacht quiz"
   quizzes_index_menu_1ce11b54: "Roghchlár Innéacs Quizeanna"
@@ -23390,7 +23390,7 @@ ga:
   time_2b5aac58: Am
   time_based_one_time_password_totp_qr_code_ec73b19a: "Cód MF pasfhocal aonuaire bunaithe ar am (PABA)"
   time_block_5a7cda5c: "Bloc Ama"
-  time_limit_a6f1a51e: "Teorainn ama"
+  time_limit_a6f1a51e: "Teorainn Ama"
   time_to_complete_9d264097: "Am le críochnú"
   time_zone_f56f5183: Amchrios
   time_zones: 
