@@ -3190,6 +3190,7 @@ class Course < ActiveRecord::Base
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
+  HORIZON_HIDDEN_TABS = [TAB_HOME, TAB_RUBRICS, TAB_OUTCOMES, TAB_COLLABORATIONS, TAB_COLLABORATIONS_NEW].freeze
 
   def self.default_tabs
     [{
@@ -3333,7 +3334,9 @@ class Course < ActiveRecord::Base
   end
 
   def self.horizon_course_nav_tabs
-    tabs = Course.default_tabs.reject { |tab| tab[:id] == TAB_HOME }
+    tabs = Course.default_tabs.reject do |tab|
+      HORIZON_HIDDEN_TABS.include?(tab[:id])
+    end
     tabs.find { |tab| tab[:id] == TAB_SYLLABUS }[:label] = t("Overview")
     tabs
   end
@@ -3400,8 +3403,12 @@ class Course < ActiveRecord::Base
                           })
     end
 
-    # Remove Home tab for Horizon courses
-    default_tabs.delete_at(0) if horizon_course?
+    # Remove already cached tabs for Horizon courses
+    if horizon_course?
+      default_tabs.delete_if do |tab|
+        HORIZON_HIDDEN_TABS.include?(tab[:id])
+      end
+    end
 
     opts[:include_external] = false if elementary_homeroom_course?
 
