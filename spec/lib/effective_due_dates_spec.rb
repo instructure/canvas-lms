@@ -76,12 +76,12 @@ describe Course do
   describe "#to_hash" do
     before(:once) do
       @now = Time.zone.now.change(sec: 0)
-      @student1_enrollment = student_in_course(course: @test_course, active_all: true)
+      @student1_enrollment = student_in_course(course: @test_course, active_all: true, name: "Student 1")
       @student1 = @student1_enrollment.user
-      @student2 = student_in_course(course: @test_course, active_all: true).user
-      @student3 = student_in_course(course: @test_course, active_all: true).user
+      @student2 = student_in_course(course: @test_course, active_all: true, name: "Student 2").user
+      @student3 = student_in_course(course: @test_course, active_all: true, name: "Student 3").user
       @other_course = Course.create!
-      @student_in_other_course = student_in_course(course: @other_course, active_all: true).user
+      @student_in_other_course = student_in_course(course: @other_course, active_all: true, name: "Student in other course").user
       @assignment1 = @test_course.assignments.create!(due_at: 2.weeks.from_now(@now))
       @assignment2 = @test_course.assignments.create!
       @assignment3 = @test_course.assignments.create!
@@ -1386,6 +1386,564 @@ describe Course do
                                       }
                                     })
         end
+
+        context "differentiation tag groups (aka non collaborative groups)" do
+          before do
+            @test_course.account.enable_feature!(:differentiation_tags)
+            @test_course.account.enable_feature!(:assign_to_differentiation_tags)
+            @test_course.account.settings[:allow_assign_to_differentiation_tags] = true
+            @test_course.account.save!
+            @test_course.account.reload
+            @assignment1.context.account.reload
+
+            @module3 = @test_course.context_modules.create!(name: "Module 3 for Non-Collaborative Group")
+            @student4 = student_in_course(active_all: true, course: @test_course, name: "Student 4").user
+
+            @group_category = @test_course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+            @group_category.create_groups(2)
+            @differentiation_tag_group_1 = @group_category.groups.first
+            @differentiation_tag_group_2 = @group_category.groups.second
+          end
+
+          it "applies group overrides for differentiation tag groups" do
+            @differentiation_tag_group_1.add_user(@student3)
+            @differentiation_tag_group_1.add_user(@student2)
+
+            override = @assignment1.assignment_overrides.create!(
+              due_at: 4.days.from_now(@now),
+              due_at_overridden: true,
+              set: @differentiation_tag_group_1
+            )
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student2.id => {
+                  due_at: 4.days.from_now(@now),
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: override.id,
+                  override_source: "Group"
+                },
+                @student3.id => {
+                  due_at: 4.days.from_now(@now),
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: override.id,
+                  override_source: "Group"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "does not apply group overrides for differentiation tag groups when the feature is off" do
+            @differentiation_tag_group_1.add_user(@student3)
+            @differentiation_tag_group_1.add_user(@student2)
+
+            @assignment1.assignment_overrides.create!(
+              due_at: 4.days.from_now(@now),
+              due_at_overridden: true,
+              set: @differentiation_tag_group_1
+            )
+
+            @test_course.account.disable_feature!(:assign_to_differentiation_tags)
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {}
+            expect(result).to eq expected
+          end
+
+          it "ignores overrides for soft-deleted groups" do
+            @differentiation_tag_group_1.add_user(@student3)
+            @differentiation_tag_group_1.add_user(@student2)
+
+            @assignment1.assignment_overrides.create!(
+              due_at: 4.days.from_now(@now),
+              due_at_overridden: true,
+              set: @differentiation_tag_group_1
+            )
+            @differentiation_tag_group_1.destroy!
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({})
+          end
+
+          it "does apply group overrides for differentiation tag groups when the account setting is off" do
+            # When the account setting is off and existing differentiation tag group overrides exist, we should still
+            # apply them until the instructor removes them manually or triggers a bulk update to delete all of them.
+            # See rollback plan: https://instructure.atlassian.net/wiki/spaces/EGGWIKI/pages/86942646273/Tech+Plan+Assign+To+Hidden+Groups#Rollback-Plan
+
+            @differentiation_tag_group_1.add_user(@student3)
+            @differentiation_tag_group_1.add_user(@student2)
+
+            override = @assignment1.assignment_overrides.create!(
+              due_at: 4.days.from_now(@now),
+              due_at_overridden: true,
+              set: @differentiation_tag_group_1
+            )
+
+            @test_course.account.settings[:allow_assign_to_differentiation_tags] = false
+            @test_course.account.save
+            @test_course.account.reload
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            result = edd.to_hash
+            expected = {
+              @assignment1.id => {
+                @student2.id => {
+                  due_at: 4.days.from_now(@now),
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: override.id,
+                  override_source: "Group"
+                },
+                @student3.id => {
+                  due_at: 4.days.from_now(@now),
+                  grading_period_id: nil,
+                  in_closed_grading_period: false,
+                  override_id: override.id,
+                  override_source: "Group"
+                }
+              }
+            }
+            expect(result).to eq expected
+          end
+
+          it "does not unassign students in the assigned group when they are deactivated" do
+            @differentiation_tag_group_1.add_user(@student1)
+
+            override = @assignment1.assignment_overrides.create!(
+              due_at: 4.days.from_now(@now),
+              due_at_overridden: true,
+              set: @differentiation_tag_group_1
+            )
+            @student1_enrollment.deactivate
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({
+                                        @assignment1.id => {
+                                          @student1.id => {
+                                            due_at: 4.days.from_now(@now),
+                                            grading_period_id: nil,
+                                            in_closed_grading_period: false,
+                                            override_id: override.id,
+                                            override_source: "Group"
+                                          }
+                                        }
+                                      })
+          end
+
+          it "does not unassign students in the assigned group when they are concluded" do
+            @differentiation_tag_group_1.add_user(@student1)
+
+            override = @assignment1.assignment_overrides.create!(
+              due_at: 4.days.from_now(@now),
+              due_at_overridden: true,
+              set: @differentiation_tag_group_1
+            )
+            @student1_enrollment.conclude
+
+            edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+            expect(edd.to_hash).to eq({
+                                        @assignment1.id => {
+                                          @student1.id => {
+                                            due_at: 4.days.from_now(@now),
+                                            grading_period_id: nil,
+                                            in_closed_grading_period: false,
+                                            override_id: override.id,
+                                            override_source: "Group"
+                                          }
+                                        }
+                                      })
+          end
+
+          describe "order of precedence" do
+            it "applies non-collaborative group overrides over section overrides" do
+              # differentiation tag group
+              @differentiation_tag_group_1.add_user(@student3)
+              @differentiation_tag_group_1.add_user(@student2)
+
+              non_collab_override = @assignment1.assignment_overrides.create!(
+                due_at: 4.days.from_now(@now),
+                due_at_overridden: true,
+                set: @differentiation_tag_group_1
+              )
+
+              # course section
+              section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+              student_in_section(section, user: @student2)
+              student_in_section(section, user: @student1)
+              section_override = @assignment1.assignment_overrides.create!(
+                due_at: 3.days.from_now(@now),
+                due_at_overridden: true,
+                set: section
+              )
+
+              edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+              result = edd.to_hash
+              expected = {
+                @assignment1.id => {
+                  @student1.id => {
+                    due_at: 3.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: section_override.id,
+                    override_source: "CourseSection"
+                  },
+                  @student2.id => {
+                    due_at: 4.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: non_collab_override.id,
+                    override_source: "Group"
+                  },
+                  @student3.id => {
+                    due_at: 4.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: non_collab_override.id,
+                    override_source: "Group"
+                  }
+                }
+              }
+              expect(result).to eq expected
+            end
+
+            it "applies individual student overrides over non-collaborative overrides" do
+              # individual / ADHOC
+              individual_override = @assignment1.assignment_overrides.create!(
+                due_at: 2.days.from_now(@now),
+                due_at_overridden: true,
+                set_type: "ADHOC"
+              )
+              individual_override.assignment_override_students.create!(user: @student2)
+
+              # differentiation tag group
+              @differentiation_tag_group_1.add_user(@student3)
+              @differentiation_tag_group_1.add_user(@student2)
+
+              non_collab_override = @assignment1.assignment_overrides.create!(
+                due_at: 4.days.from_now(@now),
+                due_at_overridden: true,
+                set: @differentiation_tag_group_1
+              )
+
+              edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+              result = edd.to_hash
+              expected = {
+                @assignment1.id => {
+                  @student2.id => {
+                    due_at: 2.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: individual_override.id,
+                    override_source: "ADHOC"
+                  },
+                  @student3.id => {
+                    due_at: 4.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: non_collab_override.id,
+                    override_source: "Group"
+                  }
+                }
+              }
+              expect(result).to eq expected
+            end
+
+            describe "selective release" do
+              before do
+                # differentiation tag group 1
+                @differentiation_tag_group_1.add_user(@student3)
+                @differentiation_tag_group_1.add_user(@student2)
+              end
+
+              it "doesn't assign group with overrides with unassign_item" do
+                @assignment1.assignment_overrides.create!(
+                  due_at: 4.days.from_now(@now),
+                  due_at_overridden: true,
+                  set: @differentiation_tag_group_1,
+                  unassign_item: true
+                )
+
+                edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+                result = edd.to_hash
+                expected = {}
+                expect(result).to eq expected
+              end
+
+              describe "applies non collaborative group override over course override" do
+                it "if the due dates are the same" do
+                  # if the due dates are the same - differentiation tag group override will take precedence
+                  course_override = @assignment1.assignment_overrides.create!(
+                    due_at: 4.days.from_now(@now),
+                    due_at_overridden: true,
+                    set_type: "Course",
+                    set_id: @test_course.id
+                  )
+
+                  non_collab_override_1 = @assignment1.assignment_overrides.create!(
+                    due_at: 4.days.from_now(@now),
+                    due_at_overridden: true,
+                    set: @differentiation_tag_group_1
+                  )
+
+                  edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+                  result = edd.to_hash
+                  expected = {
+                    @assignment1.id => {
+                      @student4.id => {
+                        due_at: 4.days.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: course_override.id,
+                        override_source: "Course"
+                      },
+                      @student1.id => {
+                        due_at: 4.days.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: course_override.id,
+                        override_source: "Course"
+                      },
+                      @student2.id => {
+                        due_at: 4.days.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: non_collab_override_1.id,
+                        override_source: "Group"
+                      },
+                      @student3.id => {
+                        due_at: 4.days.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: non_collab_override_1.id,
+                        override_source: "Group"
+                      }
+                    }
+                  }
+                  expect(result).to eq expected
+                end
+
+                it "if non collaborative group due date is later than course due date" do
+                  # if the due dates are the same - differentiation tag group override will take precedence
+                  course_override = @assignment1.assignment_overrides.create!(
+                    due_at: 1.day.from_now(@now),
+                    due_at_overridden: true,
+                    set_type: "Course",
+                    set_id: @test_course.id
+                  )
+
+                  non_collab_override_1 = @assignment1.assignment_overrides.create!(
+                    due_at: 4.days.from_now(@now),
+                    due_at_overridden: true,
+                    set: @differentiation_tag_group_1
+                  )
+
+                  edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+                  result = edd.to_hash
+                  expected = {
+                    @assignment1.id => {
+                      @student4.id => {
+                        due_at: 1.day.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: course_override.id,
+                        override_source: "Course"
+                      },
+                      @student1.id => {
+                        due_at: 1.day.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: course_override.id,
+                        override_source: "Course"
+                      },
+                      @student2.id => {
+                        due_at: 4.days.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: non_collab_override_1.id,
+                        override_source: "Group"
+                      },
+                      @student3.id => {
+                        due_at: 4.days.from_now(@now),
+                        grading_period_id: nil,
+                        in_closed_grading_period: false,
+                        override_id: non_collab_override_1.id,
+                        override_source: "Group"
+                      }
+                    }
+                  }
+                  expect(result).to eq expected
+                end
+              end
+
+              it "applies course override over non collaborative group override" do
+                # if course due date is longer than non collaborative group override due date
+                # the course override will take precedence
+                course_override = @assignment1.assignment_overrides.create!(
+                  due_at: 4.days.from_now(@now),
+                  due_at_overridden: true,
+                  set_type: "Course",
+                  set_id: @test_course.id
+                )
+
+                @assignment1.assignment_overrides.create!(
+                  due_at: 1.day.from_now(@now),
+                  due_at_overridden: true,
+                  set: @differentiation_tag_group_1
+                )
+
+                edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+                result = edd.to_hash
+                expected = {
+                  @assignment1.id => {
+                    @student4.id => {
+                      due_at: 4.days.from_now(@now),
+                      grading_period_id: nil,
+                      in_closed_grading_period: false,
+                      override_id: course_override.id,
+                      override_source: "Course"
+                    },
+                    @student1.id => {
+                      due_at: 4.days.from_now(@now),
+                      grading_period_id: nil,
+                      in_closed_grading_period: false,
+                      override_id: course_override.id,
+                      override_source: "Course"
+                    },
+                    @student2.id => {
+                      due_at: 4.days.from_now(@now),
+                      grading_period_id: nil,
+                      in_closed_grading_period: false,
+                      override_id: course_override.id,
+                      override_source: "Course"
+                    },
+                    @student3.id => {
+                      due_at: 4.days.from_now(@now),
+                      grading_period_id: nil,
+                      in_closed_grading_period: false,
+                      override_id: course_override.id,
+                      override_source: "Course"
+                    }
+                  }
+                }
+                expect(result).to eq expected
+              end
+            end
+          end
+
+          describe "picks the due date that gives the student the most time to submit" do
+            it "student is in more than 1 non collaborative group override" do
+              # differentiation tag group 1
+              @differentiation_tag_group_1.add_user(@student3)
+              @differentiation_tag_group_1.add_user(@student2)
+
+              non_collab_override_1 = @assignment1.assignment_overrides.create!(
+                due_at: 4.days.from_now(@now),
+                due_at_overridden: true,
+                set: @differentiation_tag_group_1
+              )
+
+              # differentiation tag group 2
+              non_collab_cat_2 = @test_course.group_categories.create!(name: "Non-Collaborative Group 2", non_collaborative: true)
+              non_collab_cat_2.create_groups(1)
+              differentiation_tag_group_2 = non_collab_cat_2.groups.first
+              differentiation_tag_group_2.add_user(@student2)
+
+              non_collab_override_2 = @assignment1.assignment_overrides.create!(
+                due_at: 6.days.from_now(@now),
+                due_at_overridden: true,
+                set: differentiation_tag_group_2
+              )
+
+              edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+              result = edd.to_hash
+              expected = {
+                @assignment1.id => {
+                  @student2.id => {
+                    due_at: 6.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: non_collab_override_2.id,
+                    override_source: "Group"
+                  },
+                  @student3.id => {
+                    due_at: 4.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: non_collab_override_1.id,
+                    override_source: "Group"
+                  }
+                }
+              }
+              expect(result).to eq expected
+            end
+
+            it "student is in more than one selected assignee designation (i.e. course section, diff tag group)" do
+              # differentiation tag group 1
+              @differentiation_tag_group_1.add_user(@student3)
+              @differentiation_tag_group_1.add_user(@student2)
+
+              non_collab_override_1 = @assignment1.assignment_overrides.create!(
+                due_at: 4.days.from_now(@now),
+                due_at_overridden: true,
+                set: @differentiation_tag_group_1
+              )
+
+              # course section 1
+              section1 = CourseSection.create!(name: "My Awesome Section", course: @test_course)
+              student_in_section(section1, user: @student2)
+              student_in_section(section1, user: @student1)
+              section1_override = @assignment1.assignment_overrides.create!(
+                due_at: 5.days.from_now(@now),
+                due_at_overridden: true,
+                set: section1
+              )
+
+              # course section 2
+              section2 = CourseSection.create!(name: "My Awesome Section 2", course: @test_course)
+              student_in_section(section2, user: @student2)
+              section2_override = @assignment1.assignment_overrides.create!(
+                due_at: 6.days.from_now(@now),
+                due_at_overridden: true,
+                set: section2
+              )
+
+              edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+              result = edd.to_hash
+              expected = {
+                @assignment1.id => {
+                  @student1.id => {
+                    due_at: 5.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: section1_override.id,
+                    override_source: "CourseSection"
+                  },
+                  @student2.id => {
+                    due_at: 6.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: section2_override.id,
+                    override_source: "CourseSection"
+                  },
+                  @student3.id => {
+                    due_at: 4.days.from_now(@now),
+                    grading_period_id: nil,
+                    in_closed_grading_period: false,
+                    override_id: non_collab_override_1.id,
+                    override_source: "Group"
+                  }
+                }
+              }
+              expect(result).to eq expected
+            end
+          end
+        end
       end
 
       context "when section overrides apply" do
@@ -2575,8 +3133,8 @@ describe Course do
     before(:once) do
       @now = Time.zone.now.change(sec: 0)
       @test_course = Course.create!
-      @student1 = student_in_course(course: @test_course, active_all: true).user
-      @student2 = student_in_course(course: @test_course, active_all: true).user
+      @student1 = student_in_course(course: @test_course, active_all: true, name: "Grading Periods Student 1").user
+      @student2 = student_in_course(course: @test_course, active_all: true, name: "Grading Periods Student 2").user
       @gp_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@test_course.account)
       @gp_group.enrollment_terms << @test_course.enrollment_term
       @grading_period = Factories::GradingPeriodHelper.new.create_for_group(
@@ -2731,7 +3289,7 @@ describe Course do
 
         it "returns false if the specified student does not have a due date for this assignment" do
           @other_course = Course.create!
-          @student_in_other_course = student_in_course(course: @other_course, active_all: true).user
+          @student_in_other_course = student_in_course(course: @other_course, active_all: true, name: "Grading Periods Student in other course").user
 
           expect(@edd.in_closed_grading_period?(@assignment2, @student_in_other_course)).to be false
           expect(@edd.in_closed_grading_period?(@assignment2, @student_in_other_course.id)).to be false
