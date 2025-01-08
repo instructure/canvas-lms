@@ -22,6 +22,7 @@ import type {LtiImsRegistration} from '../../model/lti_ims_registration/LtiImsRe
 import {PlacementsConfirmation} from '../../registration_wizard_forms/PlacementsConfirmation'
 import {useOverlayStore} from '../hooks/useOverlayStore'
 import {usePlacements} from '../hooks/usePlacements'
+import { InternalOnlyLtiPlacements } from '../../model/LtiPlacement'
 
 export type PlacementsConfirmationProps = {
   registration: LtiImsRegistration
@@ -33,7 +34,11 @@ export const PlacementsConfirmationWrapper = ({
   overlayStore,
 }: PlacementsConfirmationProps) => {
   const [overlayState, actions] = useOverlayStore(overlayStore)
+  const registrationPlacements = overlayState.registration.placements ?? []
+  const requestedPlacements = registrationPlacements.map(p => p.type)
   const placements = usePlacements(registration)
+    .filter(p => !InternalOnlyLtiPlacements.includes(p as any) || requestedPlacements.includes(p))
+
 
   return (
     <PlacementsConfirmation
