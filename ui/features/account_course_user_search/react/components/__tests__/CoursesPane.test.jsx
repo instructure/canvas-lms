@@ -50,6 +50,12 @@ describe('Account Course User Search CoursesPane View', () => {
     expect(spy).toHaveBeenCalled()
   })
 
+
+  test('it loads mores terms at once', () => {
+    const termsStore = stores.find(s => s.jsonKey === 'enrollment_terms')
+    expect(termsStore.lastParams).toHaveProperty('per_page', 100)
+  })
+
   test('have an h1 on the page', () => {
     //  'There is one H1 on the page'
     expect(wrapper.find('h1')).toHaveLength(1)
