@@ -2126,6 +2126,7 @@ fa:
   add_outcomes_to_course_88ba09be: "افزودن نتایج به درس"
   add_outcomes_to_groupname_8c33d118: "افزودن نتایج به \"%{groupName}\""
   add_override_da70f198: "اضافه کردن بازبینی"
+  add_page_7ea7ee39: "افزودن صفحه"
   add_people_7948b7da: "افزودن افراد"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_and_courses_to_canvas_5c4bfff9: "افراد و درس‌ها را به کانواس اضافه کنید"
@@ -4816,6 +4817,7 @@ fa:
     edit: 
       confirm_delete_calendar_event: "مطمئنید که می خواهید این رویداد تقویم حذف شود؟"
       errors: 
+        greater_or_equal: "باید حداقل به یک کاربر اجازه حضور بدهید"
         start_date_required: "باید یک تاریخ وارد کنید"
         title_required: "باید یک عنوان وارد کنید"
       event_deleted: "%{event_title} با موفقیت حذف شد"
@@ -6121,6 +6123,7 @@ fa:
     unexpected_error: "یک خطای پیش بینی نشده ای رخ داد، لطفا با پشتیبانی تماس بگیرید."
     unknown: ناشناس
     upload_timeout_error: "زمان مجاز برای بارگذاری فایل پایان یافته است."
+  content_migration_1f14de27: "انتقال محتوا"
   content_migration_queued_46c27790: "انتقال محتوا در صف قرار دارد"
   content_migration_running_percent_complete_4b00c024: "انتقال محتوا در حال اجراست, %{percent}% انجام شده است"
   content_migrations: 
@@ -10767,6 +10770,7 @@ fa:
     titles: 
       bookmark_search: "نشانه گذاری جستجو: %{service_name}"
   find_8d605019: یافتن
+  find_a_course_94301b4d: "یافتن یک درس"
   find_an_existing_grading_scheme_d836ea: "یافتن طرح نمره گذاری موجود"
   find_an_outcome_919328e6: "یافتن نتیجه"
   find_appointment_85d6922e: "یافتن قرار ملاقات"
