@@ -203,6 +203,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 
     &:focus {
       box-shadow: none;
+      outline: 2px solid var(--ic-brand-Login-Content-password-text-color);
       &::before {
         opacity: 1;
       }
