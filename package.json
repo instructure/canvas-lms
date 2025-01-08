@@ -300,7 +300,7 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "exports-loader": "^0.7",
     "fast-glob": "^3.2.4",
-    "fetch-mock": "^9",
+    "fetch-mock": "9.11.0",
     "file-loader": "^4",
     "find-up": "^5.0.0",
     "gglobby": "0.0.3",
