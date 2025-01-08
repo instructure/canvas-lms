@@ -2176,6 +2176,7 @@ hu:
   add_outcomes_to_course_88ba09be: "Eredmények hozzáadása a kurzushoz"
   add_outcomes_to_groupname_8c33d118: "Eredmények hozzáadása ehhez a csoporthoz: \"%{groupName}\" "
   add_override_da70f198: "Felülbírálás hozzáadása"
+  add_page_7ea7ee39: "Oldal hozzáadása"
   add_people_7948b7da: "Résztvevők hozzáadása"
   add_people_7ee4b2ec: "Résztvevők hozzáadása"
   add_people_and_courses_to_canvas_5c4bfff9: "Résztvevők ék kurzusok hozzáadása a Canvashoz"
@@ -4910,6 +4911,7 @@ hu:
     edit: 
       confirm_delete_calendar_event: "Biztos benne, hogy törli ezt a naptári eseményt?"
       errors: 
+        greater_or_equal: "Legalább egy felhasználónak engedélyeznie kell a részvételt"
         start_date_required: "Be kell írnia egy dátumot"
         title_required: "Be kell írnia egy címet"
       event_deleted: "%{event_title} sikeresen törölve"
@@ -6331,6 +6333,7 @@ hu:
     unexpected_error: "Nem várt hiba lépett fel, kérjük, vegye fel a kapcsolatot az üzemeltetőkkel."
     unknown: Ismeretlen
     upload_timeout_error: "A fájlfeltöltési művelet túllépte az időkeretet."
+  content_migration_1f14de27: Tartalommigrálás
   content_migration_asset_map_v2_f0f455f: "Tartalmi migrációs eszköztérkép v2"
   content_migration_queued_46c27790: "A tartalom migrálása várakozik"
   content_migration_running_percent_complete_4b00c024: "A tartalommigrálás folyamatban, %{percent}% kész"
@@ -10708,6 +10711,7 @@ hu:
   external_url_e9b87215: "Külső webcím"
   external_urls_62082a38: "Külső webcímek"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Extra jóváírás nem engedélyezett az eredményeknél, a pontszám a maximális lehetséges értékre igazítva: %{outcome}"
+  extra_large_b6cdf1ff: "Extra nagy"
   extract_error_error_file_names_a4989ed0: "Kibontás hiba, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: "RENDKÍVÜL SÜRGŐS!"
   faculty_journal_5634938e: "Intézményi hírlevél"
@@ -11067,6 +11071,7 @@ hu:
     titles: 
       bookmark_search: "Könyvjelző keresése: %{service_name}"
   find_8d605019: Keresés
+  find_a_course_94301b4d: "Kurzus keresése"
   find_a_recipient_of_temporary_enrollments_fcc649c9: "Az ideiglenes beiratkozások címzettjének keresése"
   find_a_recipient_of_temporary_enrollments_from_nam_3451f654: "%{name} ideiglenes beiratkozások címzettjének keresése"
   find_an_existing_grading_scheme_d836ea: "Létező osztályzási rendszer megkeresése"
@@ -16216,6 +16221,7 @@ hu:
   mgp_grade_export_d29b471f: "MGP Osztályzatexportálás"
   miami_utilization_report_9c927880: "Miami felhasználási jelentés"
   mic_a7f3d311: Mikrofon
+  microphone_disabled_15c83130: "Mikrofon letiltva"
   microsoft_365_allows_a_maximum_of_max_members_in_a_3acbd841: "A Microsoft 365 legfeljebb %{max} tagot engedélyez egy csapatban."
   microsoft_365_allows_a_maximum_of_max_owners_in_a__b448f5de: "A Microsoft 365 egy csapatban legfeljebb %{max} tulajdonost engedélyez."
   microsoft_group_enrollment_syncing_854b5ea2: "Microsoft csoportos beiratkozás szinkronizálása"
@@ -21513,6 +21519,7 @@ hu:
   save_login_bba1272: "Bejelentkezési adatok mentése"
   save_mastery_calculation_84fbeb0f: "Jártassági számítás mentése"
   save_mastery_scale_2b4dc13a: "Jártassági számítás mentése"
+  save_media_cb9e786e: "Média mentése"
   save_name_796fa6a2: "\"%{name} mentése\""
   save_publish_36440725: "Mentés és publikálás"
   save_rubric_1e4f6a44: "Értékelőtábla mentése"
@@ -21956,6 +21963,7 @@ hu:
   select_assignment_due_date_f6834ea7: "Válassza ki a feladat határidejét"
   select_assignment_title_4571ffcb: "Válassza ki a feladatot:%{title}"
   select_audio_file_7d905cce: "Audiófájl kiválasztása"
+  select_audio_source_21043cd5: "Audió forrás kijelölése"
   select_by_date_range_c3af0101: "Dátumtartomány szerinti kiválasztás"
   select_calendars_d5fa50b6: "Naptárak kiválasztása"
   select_calendars_to_retrieve_important_dates_from_26dc92b7: "Válassza ki a naptárakat a fontos dátumok lekérdezéséhez."
@@ -22048,6 +22056,7 @@ hu:
   select_type_of_prerequisite_8d6fa902: "Előfeltétel típusának kiválasztása"
   select_users_who_can_create_new_courses_75f92743: "Új kurzusokat létrehozni képes felhasználók kiválasztása"
   select_video_file_35b61d4e: "Videófájl kiválasztása"
+  select_video_source_1b5c9dbe: "Videó forrás kijelölése"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Válassza ki, hogy mit szeretne megjeleníteni kezdőlapként!"
   select_whether_to_post_for_all_submissions_or_only_b18d681f: |-
       Válassza ki, hogy az összes beadandót vagy csak az osztályozottakat kívánja-e
@@ -25322,6 +25331,7 @@ hu:
     yerevan: Jereván
     zagreb: Zágráb
     zurich: Zürich
+  timebar_a4d18443: Idősáv
   timeline_of_messages_between_the_student_and_instr_6dbd9ad3: "A hallgatók és az oktatók közötti üzenetek idővonala"
   timeline_showing_when_assignments_were_turned_in_bb44c8a1: "Az idővonal megmutatja, mikor lettek a feladatok feltöltve."
   timeout_when_searching_5c24ff9d: "Időtúllépés a keresés során"
@@ -26977,6 +26987,7 @@ hu:
   web_conferences_create_8a9869c3: "Webkonferenciák - létrehozás"
   web_page_146f9102: "Weboldal "
   web_url_d84feaf5: "Web URL"
+  webcam_disabled_30c66986: "Webkamera letiltva"
   webcam_fe91b20f: Webkamera
   webcam_photo_ee55462c: "Webkamera fotó"
   webct_credentials: 
