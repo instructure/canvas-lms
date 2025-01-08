@@ -1977,6 +1977,7 @@ he:
   add_new_group_7ac49f31: "הוספת קבוצה חדשה"
   add_new_set_of_due_dates_e8e240f: "הוספת סט של תאריכי יעד חדשים"
   add_new_term_d2217c0d: "הוספת תקופת לימודים חדשה"
+  add_page_7ea7ee39: "הוספת דף"
   add_people_7948b7da: "הוספת אנשים"
   add_people_7ee4b2ec: "הוספת אנשים"
   add_people_to_coursename_5ea234e1: "הוספת אנשים אל: %{courseName}"
@@ -3808,6 +3809,7 @@ he:
     edit: 
       confirm_delete_calendar_event: "בטוח/ה שרוצהלבטל את אירוע היומן הזה?"
       errors: 
+        greater_or_equal: "יש לאפשר לפחות למשתמש אחד להשתתף"
         title_required: "יש לספק כותרת"
       event_deleted: "%{event_title}  בוטל בהצלחה"
       event_saved: "האירוע נשמר בהצלחה"
@@ -4761,6 +4763,7 @@ he:
     unexpected_error: "אירעה שגיאה בלתי צפויה, ויש ליצור קשר עם צוות התמיכה."
     unknown: "לא מוכר"
     upload_timeout_error: "הזמן המוקצה לתהליך ההעלאה עבר."
+  content_migration_1f14de27: "הגירת תוכן"
   content_migration_queued_46c27790: "תהליך הגירת התוכן נכנס לתור העבודות לביצוע"
   content_migration_running_percent_complete_4b00c024: "תהליך הגירת התוכן רץ, %{percent}% הושלמו"
   content_migrations: 
@@ -8575,6 +8578,7 @@ he:
     titles: 
       bookmark_search: "סימון מאפייני החיפוש %{service_name} לגישה ישירה"
   find_8d605019: חיפוש
+  find_a_course_94301b4d: "מציאת קורס"
   find_an_existing_grading_scheme_d836ea: "מציאת סכימת הערכה קיימת"
   find_an_outcome_919328e6: "מציאת השגי למידה"
   find_appointment_85d6922e: "איתור פגישה"
@@ -13222,6 +13226,7 @@ he:
     sure_you_want_to_mute: "בטוח/ה שרוצה להשתיק משימה זו? כאשר היא אינה פעילה, תלמידים לא יקבלו התראות ולא יוכלו לעיין בה"
   mute_unmute_assignment_62608e44: "השתקת/הפעלת מטלה"
   muted_283cfa0f: (מושתק/ת)
+  muted_3ff94739: מושתק/ת
   my_dashboard_8983c283: "לוח המחוונים שלי "
   my_dashboard_b724020: "לוח המחוונים שלי"
   my_files_2f621040: "הקבצים שלי"
