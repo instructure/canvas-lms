@@ -149,6 +149,7 @@
         <!-- dead code? -->
         <span class="criterion <%= 'defined' if criterion %>">
           <span class="min_score" style="display: none;"><%= (criterion && criterion[:min_score]) || nbsp %></span>
+          <span class="min_percentage" style="display: none;"><%= (criterion && criterion[:min_percentage]) || nbsp %></span>
           <span class="criterion_type" style="display: none;"><%= (criterion && criterion[:type]) || nbsp %></span>
         </span>
         <!-- /dead code -->
@@ -177,6 +178,17 @@
               <span class="fulfilled">
                 <%= t 'min_score.fulfilled', 'Scored at least %{score}', :score => score_display %>
                 <span class="screenreader-only"><%= t 'Module item has been completed by scoring at least %{score}', :score => score_display %></span>
+              </span>
+            </span>
+            <span class="requirement_type min_percentage_requirement">
+              <% percentage_display = content_tag(:span, criterion && criterion[:min_percentage] || nbsp, class: 'min_percentage') %>
+              <span class="unfulfilled">
+                <%= t 'min_percentage.unfulfilled', 'Score at least %{score}%', :score => percentage_display %>
+                <span class="screenreader-only"><%= t 'Must score at least %{score}% to complete this module item', :score => percentage_display %></span>
+              </span>
+              <span class="fulfilled">
+                <%= t 'min_percentage.fulfilled', 'Scored at least %{score}%', :score => percentage_display %>
+                <span class="screenreader-only"><%= t 'Module item has been completed by scoring at least %{score}%', :score => percentage_display %></span>
               </span>
             </span>
             <span class="requirement_type must_view_requirement">

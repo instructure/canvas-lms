@@ -25,10 +25,11 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
-import type {Requirement, ModuleItem} from './types'
+import type {Requirement, ModuleItem, PointsInputMessages} from './types'
 import {requirementTypesForResource} from '../utils/miscHelpers'
 import {groupBy} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import ScoreSection from './ScoreSection'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -48,6 +49,7 @@ const requirementTypeLabelMap: Record<Requirement['type'], string> = {
   mark: I18n.t('Mark as done'),
   submit: I18n.t('Submit the assignment'),
   score: I18n.t('Score at least'),
+  percentage: I18n.t('Score at least'),
   contribute: I18n.t('Contribute to the page'),
 }
 
@@ -59,6 +61,8 @@ export interface RequirementSelectorProps {
   index: number
   focusDropdown?: boolean
   focusDeleteButton?: boolean
+  pointsInputMessages: PointsInputMessages
+  validatePointsInput: (requirement: Requirement) => void
 }
 
 export default function RequirementSelector({
@@ -69,6 +73,8 @@ export default function RequirementSelector({
   index,
   focusDropdown = false,
   focusDeleteButton = false,
+  pointsInputMessages,
+  validatePointsInput
 }: RequirementSelectorProps) {
   const removeButton = useRef<Element | null>(null)
   const dropdown = useRef<HTMLInputElement | null>(null)
@@ -80,6 +86,16 @@ export default function RequirementSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requirement.resource, requirement.graded])
 
+  const getRequirementTypeValue = (requirementType: string) => {
+    if (
+      window.ENV.FEATURES.modules_requirements_allow_percentage &&
+      requirementType === 'percentage'
+    ) {
+      return 'score'
+    }
+    return requirementType
+  }
+
   const options = useMemo(() => groupBy(moduleItems, 'resource'), [moduleItems])
 
   useEffect(() => {
@@ -90,6 +106,65 @@ export default function RequirementSelector({
   useEffect(() => {
     focusDropdown && dropdown.current?.focus()
   }, [focusDropdown, dropdown])
+
+  const scoreSection = useMemo(() => {
+    if (requirement.type !== "score" && requirement.type !== "percentage") return null
+
+    if (window.ENV.FEATURES.modules_requirements_allow_percentage) {
+      return (
+        <ScoreSection
+          requirement={requirement}
+          index={index}
+          onUpdateRequirement={onUpdateRequirement}
+          pointsInputMessages={pointsInputMessages}
+          validatePointsInput={validatePointsInput}
+        />
+      );
+    }
+
+    return (
+      <Flex padding="small 0">
+        <Flex.Item shouldShrink={true}>
+          <NumberInput
+            allowStringValue={true}
+            value={requirement.minimumScore}
+            width="4rem"
+            showArrows={false}
+            renderLabel={
+              <ScreenReaderContent>
+                {I18n.t("Minimum Score")}
+              </ScreenReaderContent>
+            }
+            onChange={(event) => {
+              onUpdateRequirement(
+                {
+                  ...requirement,
+                  minimumScore: event.target.value,
+                } as Requirement,
+                index
+              );
+            }}
+          />
+        </Flex.Item>
+        <Flex.Item shouldGrow={true} padding="0 0 0 small">
+          {requirement.pointsPossible && (
+            <View as="div">
+              <ScreenReaderContent>
+                {I18n.t("Points Possible")}
+              </ScreenReaderContent>
+              <Text data-testid="points-possible-value">{`/ ${requirement.pointsPossible}`}</Text>
+            </View>
+          )}
+        </Flex.Item>
+      </Flex>
+    );
+  }, [
+    requirement,
+    index,
+    onUpdateRequirement,
+    pointsInputMessages,
+    validatePointsInput
+  ]);
 
   return (
     <View data-testid="module-requirement-card" as="div" borderRadius="medium" borderWidth="small">
@@ -144,7 +219,7 @@ export default function RequirementSelector({
         </View>
         <CanvasSelect
           id={`requirement-type-${index}`}
-          value={requirement.type}
+          value={getRequirementTypeValue(requirement.type)}
           label={<ScreenReaderContent>{I18n.t('Select Requirement Type')}</ScreenReaderContent>}
           onChange={(_event, value) => {
             onUpdateRequirement({...requirement, type: value} as Requirement, index)
@@ -158,33 +233,7 @@ export default function RequirementSelector({
             )
           })}
         </CanvasSelect>
-        {requirement.type === 'score' && (
-          <Flex padding="small 0">
-            <Flex.Item shouldShrink={true}>
-              <NumberInput
-                allowStringValue={true}
-                value={requirement.minimumScore}
-                width="4rem"
-                showArrows={false}
-                renderLabel={<ScreenReaderContent>{I18n.t('Minimum Score')}</ScreenReaderContent>}
-                onChange={event => {
-                  onUpdateRequirement(
-                    {...requirement, minimumScore: event.target.value} as Requirement,
-                    index,
-                  )
-                }}
-              />
-            </Flex.Item>
-            <Flex.Item shouldGrow={true} padding="0 0 0 small">
-              {requirement.pointsPossible && (
-                <View as="div">
-                  <ScreenReaderContent>{I18n.t('Points Possible')}</ScreenReaderContent>
-                  <Text data-testid="points-possible-value">{`/ ${requirement.pointsPossible}`}</Text>
-                </View>
-              )}
-            </Flex.Item>
-          </Flex>
-        )}
+        {scoreSection}
       </View>
     </View>
   )

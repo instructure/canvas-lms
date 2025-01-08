@@ -325,7 +325,7 @@ context_modules_header_props = {
       <label class="screenreader-only" for="criterion_min_score"><%= t('Minimum Score') %></label>
       <input id="criterion_min_score" type="text" class="min_score" style="width: 30px; margin-<%= direction('right') %>: 5px;"/>
       <span class="points_possible_parent"><%= t 'assignment_points_possible', '/ %{points_possible}', :points_possible => '<span class="points_possible">&nbsp;</span>'.html_safe %></span>
-    </pan>
+    </span>
   </div>
   <%= image_tag "flagged_question_dim.png", :id => "criterion_image_min_score", :class => "image not_blank", :alt => t('images.alt.min_score', "minimum score"), :title => t('images.title.min_score', "Students must get at least a %{min_score} on this item before the module is considered complete", :min_score => "{{ min_score }}") %>
   <%= image_tag "preview_dim.png", :id => "criterion_image_must_view", :class => "image not_blank", :alt => t('images.alt.must_view', "must view"), :title => t('images.title.must_view', "Students must view this item before the module is considered complete") %>

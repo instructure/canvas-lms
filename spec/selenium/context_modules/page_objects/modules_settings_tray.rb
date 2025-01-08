@@ -149,6 +149,10 @@ module ModulesSettingsTray
     "//*[starts-with(@id, 'requirement-type-')]"
   end
 
+  def score_type_selector
+    "//*[starts-with(@id, 'score-type-')]"
+  end
+
   def sequential_order_checkbox_selector
     "//label[../input[@data-testid='sequential-progress-checkbox']]"
   end
@@ -306,6 +310,10 @@ module ModulesSettingsTray
     ffxpath(requirement_type_selector)
   end
 
+  def score_type
+    ffxpath(score_type_selector)
+  end
+
   def sequential_order_checkbox
     fxpath(sequential_order_checkbox_selector)
   end
@@ -429,6 +437,10 @@ module ModulesSettingsTray
 
   def select_requirement_type_option(item_number, option)
     click_option(requirement_type[item_number], option)
+  end
+
+  def select_score_type_option(item_number, option)
+    click_option(score_type[item_number], option)
   end
 
   def settings_tray_exists?
