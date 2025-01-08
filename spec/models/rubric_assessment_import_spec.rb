@@ -114,6 +114,20 @@ describe RubricAssessmentImport do
                    ])
     end
 
+    def csv_with_only_ratings
+      generate_csv([
+                     [@student1.id, "Test Student", "Exceed", "", "", "Meets", "", "Good job"],
+                     [@student2.id, "Test Student", "Exceed", "", "test comment", "Meets", "", "Great!"],
+                   ])
+    end
+
+    def csv_with_mixmatch_points_and_ratings
+      generate_csv([
+                     [@student1.id, "Test Student", "Meets", "4.0", "", "Exceeds", "3.0", "Good job"],
+                     [@student2.id, "Test Student", "Bad Job", "4.0", "test comment", "Poor", "3.0", "Great!"],
+                   ])
+    end
+
     it "should fail if the file is empty" do
       import = create_import_manually(StringIO.new("invalid csv"))
       import.run
@@ -204,6 +218,66 @@ describe RubricAssessmentImport do
       student2_second_assessment = student2_assessment.data[1]
       expect(student2_second_assessment[:points]).to be_nil
       expect(student2_second_assessment[:description]).to eq("Meets")
+      expect(student2_second_assessment[:comments]).to eq("Great!")
+    end
+
+    it "should assess rubrics setting points to the matching rating if hide_points is not enabled" do
+      @rubric_association.update!(hide_points: false)
+      import = create_import_manually(csv_with_only_ratings)
+      import.run
+
+      expect(import.workflow_state).to eq("succeeded")
+      expect(import.error_count).to eq(0)
+      expect(import.progress).to eq(100)
+
+      student1_assessment = RubricAssessment.find_by(user_id: @student1.id)
+      student1_first_assessment = student1_assessment.data[0]
+      expect(student1_first_assessment[:points]).to eq(4.0)
+      expect(student1_first_assessment[:description]).to eq("Exceed")
+      expect(student1_first_assessment[:comments]).to eq("")
+      student1_second_assessment = student1_assessment.data[1]
+      expect(student1_second_assessment[:points]).to eq(3.0)
+      expect(student1_second_assessment[:description]).to eq("Meets")
+      expect(student1_second_assessment[:comments]).to eq("Good job")
+
+      student2_assessment = RubricAssessment.find_by(user_id: @student2.id)
+      student2_first_assessment = student2_assessment.data[0]
+      expect(student2_first_assessment[:points]).to eq(4.0)
+      expect(student2_first_assessment[:description]).to eq("Exceed")
+      expect(student2_first_assessment[:comments]).to eq("test comment")
+      student2_second_assessment = student2_assessment.data[1]
+      expect(student2_second_assessment[:points]).to eq(3.0)
+      expect(student2_second_assessment[:description]).to eq("Meets")
+      expect(student2_second_assessment[:comments]).to eq("Great!")
+    end
+
+    it "should assess rubrics with priority of points over ratings if they differ" do
+      @rubric_association.update!(hide_points: false)
+      import = create_import_manually(csv_with_mixmatch_points_and_ratings)
+      import.run
+
+      expect(import.workflow_state).to eq("succeeded")
+      expect(import.error_count).to eq(0)
+      expect(import.progress).to eq(100)
+
+      student1_assessment = RubricAssessment.find_by(user_id: @student1.id)
+      student1_first_assessment = student1_assessment.data[0]
+      expect(student1_first_assessment[:points]).to eq(4.0)
+      expect(student1_first_assessment[:description]).to eq("Meets")
+      expect(student1_first_assessment[:comments]).to eq("")
+      student1_second_assessment = student1_assessment.data[1]
+      expect(student1_second_assessment[:points]).to eq(3.0)
+      expect(student1_second_assessment[:description]).to eq("Exceeds")
+      expect(student1_second_assessment[:comments]).to eq("Good job")
+
+      student2_assessment = RubricAssessment.find_by(user_id: @student2.id)
+      student2_first_assessment = student2_assessment.data[0]
+      expect(student2_first_assessment[:points]).to eq(4.0)
+      expect(student2_first_assessment[:description]).to eq("Bad Job")
+      expect(student2_first_assessment[:comments]).to eq("test comment")
+      student2_second_assessment = student2_assessment.data[1]
+      expect(student2_second_assessment[:points]).to eq(3.0)
+      expect(student2_second_assessment[:description]).to eq("Poor")
       expect(student2_second_assessment[:comments]).to eq("Great!")
     end
   end
