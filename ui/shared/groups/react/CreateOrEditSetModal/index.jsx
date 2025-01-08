@@ -17,6 +17,7 @@
  */
 
 import React, {useEffect, useRef, useReducer, useState} from 'react'
+import {createRoot} from 'react-dom/client'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
@@ -444,22 +445,20 @@ CreateOrEditSetModal.defaultProps = {
 // the API call process. Note that it must return a Promise that resolves to the same data
 // structure that doFetchApi returns.
 export function renderCreateDialog(div, mockApi) {
+  const root = createRoot(div)
   return new Promise(resolve => {
     function onDismiss(result) {
-       
-      ReactDOM.render(
+      root.render(
         <CreateOrEditSetModal
           allowSelfSignup={ENV.allow_self_signup}
           mockApi={mockApi}
           closed={true}
-        />,
-        div
+        />
       )
       resolve(result)
     }
     const context = ENV.context_asset_string.split('_')
-     
-    ReactDOM.render(
+    root.render(
       <CreateOrEditSetModal
         studentSectionCount={ENV.student_section_count}
         context={context[0]}
@@ -467,8 +466,7 @@ export function renderCreateDialog(div, mockApi) {
         allowSelfSignup={ENV.allow_self_signup}
         onDismiss={onDismiss}
         mockApi={mockApi}
-      />,
-      div
+      />
     )
   })
 }
