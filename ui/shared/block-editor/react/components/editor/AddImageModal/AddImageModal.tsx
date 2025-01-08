@@ -22,6 +22,7 @@ import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('block-editor')
 
@@ -49,8 +50,13 @@ const handleImageSubmit = async (
           uploadData?.usageRights?.usageRight === 'choose' ? undefined : uploadData?.usageRights,
       }
       const tabContext = 'documents'
-      const result = await storeProps?.startMediaUpload(tabContext, fileMetaData)
-      url = prepEmbedSrc(result.href || result.url)
+      try {
+        const result = await storeProps?.startMediaUpload(tabContext, fileMetaData)
+        url = prepEmbedSrc(result.href || result.url)
+      } catch(_err) {
+        url = ''
+        showFlashError(I18n.t('Failed to upload the image, please try again'))()
+      }
       break
     }
     case 'URL': {
