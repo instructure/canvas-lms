@@ -16,7 +16,7 @@
     ]
   },
   "dependencies": {
-    "@apollo/client": "~3.12.2",
+    "@apollo/client": "3.12.4",
     "@craftjs/core": "^0.2.10",
     "@hookform/resolvers": "^3.9.0",
     "@instructure/brandable_css": "^3",
