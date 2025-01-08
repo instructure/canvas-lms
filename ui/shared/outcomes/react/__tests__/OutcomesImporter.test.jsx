@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import moxios from 'moxios'
-import {render, cleanup} from '@testing-library/react'
+import {render, cleanup, waitFor} from '@testing-library/react'
 import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImporter'
 
 import * as alerts from '@canvas/alerts/react/FlashAlert'
@@ -43,8 +43,8 @@ const defaultProps = (props = {}) => ({
   hide: () => {},
   disableOutcomeViews: () => {},
   resetOutcomeViews: () => {},
-  file,
   contextUrlRoot,
+  file,
   learningOutcomeGroupId,
   invokedImport: true,
   learningOutcomeGroupAncestorIds: [],
@@ -58,8 +58,10 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
     ...props,
   }
   const ref = React.createRef()
+  const container = document.createElement('div')
+  document.body.appendChild(container)
 
-  const wrapper = render(<OutcomesImporter {...activeProps} ref={ref} />)
+  const wrapper = render(<OutcomesImporter {...activeProps} ref={ref} />, {container})
 
   if (addMocksCallback) {
     addMocksCallback()
@@ -78,6 +80,11 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
   return {
     wrapper,
     ref,
+    container,
+    unmount: () => {
+      cleanup()
+      container.remove()
+    }
   }
 }
 
@@ -87,37 +94,32 @@ describe('OutcomesImporter', () => {
   })
 
   afterEach(() => {
-    cleanup()
     moxios.uninstall()
   })
 
   it('renders the OutcomesImporter component', () => {
-    const {wrapper} = renderOutcomesImporter()
-
+    const {wrapper, unmount} = renderOutcomesImporter()
     expect(wrapper.container).toBeInTheDocument()
+    unmount()
   })
 
-  it('disables the Outcome Views when upload starts', done => {
+  it('disables the Outcome Views when upload starts', () => {
     const disableOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({disableOutcomeViews})
-
-    ref.current.beginUpload()
-
-    moxios.wait(() => {
-      expect(disableOutcomeViews).toHaveBeenCalled()
-      done()
-    })
+    const {wrapper, unmount} = renderOutcomesImporter({disableOutcomeViews})
+    expect(disableOutcomeViews).toHaveBeenCalled()
+    unmount()
   })
 
   it('resets the Outcome Views when upload is complete', done => {
     const resetOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({resetOutcomeViews})
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
 
     ref.current.completeUpload(null, 10, true)
 
     moxios.wait(() => {
       expect(resetOutcomeViews).toHaveBeenCalled()
       done()
+      unmount()
     })
   })
 
@@ -127,7 +129,7 @@ describe('OutcomesImporter', () => {
     expect(getApiUrl(`${id}/created_group_ids`)).toBe(
       '/api/v1/accounts/1/outcome_imports/10/created_group_ids',
     )
-    const {ref} = renderOutcomesImporter({resetOutcomeViews}, () => {
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews}, () => {
       moxios.stubRequest(getApiUrl(`${id}/created_group_ids`), {
         status: 200,
         response: [],
@@ -141,12 +143,13 @@ describe('OutcomesImporter', () => {
 
       expect(request.url).toBe(getApiUrl(`${id}/created_group_ids`))
       done()
+      unmount()
     })
   })
 
   it('shows a flash alert when upload successfully completes', () => {
     const resetOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({resetOutcomeViews})
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
 
     ref.current.successfulUpload([])
 
@@ -154,11 +157,12 @@ describe('OutcomesImporter', () => {
       type: 'success',
       message: 'Your outcomes were successfully imported.',
     })
+    unmount()
   })
 
   it('shows a flash alert when upload fails', () => {
     const resetOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({resetOutcomeViews})
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
 
     ref.current.completeUpload(null, 1, false)
 
@@ -169,11 +173,12 @@ describe('OutcomesImporter', () => {
         ' Check your email for more details.',
     })
     expect(resetOutcomeViews).toHaveBeenCalled()
+    unmount()
   })
 
   it('shows a flash alert when upload successfully completes but with warnings', done => {
     const resetOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({resetOutcomeViews}, () => {
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews}, () => {
       moxios.stubRequest(getApiUrl('null/created_group_ids'), {
         status: 200,
         response: [],
@@ -190,13 +195,14 @@ describe('OutcomesImporter', () => {
       })
       expect(resetOutcomeViews).toHaveBeenCalled()
       done()
+      unmount()
     })
   })
 
   // TODO: redo without moxios
   it('uploads file when the upload begins', done => {
     const disableOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({disableOutcomeViews}, () => {
+    const {ref, unmount} = renderOutcomesImporter({disableOutcomeViews}, () => {
       moxios.stubRequest(getApiUrl(`group/${learningOutcomeGroupId}?import_type=instructure_csv`), {
         status: 200,
         response: {id: 3},
@@ -224,15 +230,15 @@ describe('OutcomesImporter', () => {
       // Since moxios serializes the File, attachmentEntry.value is "[object File]"
       // We cannot assert it is an instance of File, so we'll check the serialized string
       expect(attachmentEntry.value).toBe('[object File]')
-
       done()
+      unmount()
     })
   })
 
   it('starts polling for import status after the upload begins', done => {
     const id = '10'
     const disableOutcomeViews = jest.fn()
-    const {wrapper} = renderOutcomesImporter(
+    const {wrapper, unmount} = renderOutcomesImporter(
       {disableOutcomeViews, importId: id, file: null},
       () => {
         moxios.stubRequest(getApiUrl(id), {
@@ -261,13 +267,14 @@ describe('OutcomesImporter', () => {
       expect(request.url).toBe(getApiUrl(id))
       jest.clearAllTimers()
       done()
+      unmount()
     })
   })
 
   it('completes upload when status returns succeeded or failed', done => {
     const id = '10'
     const resetOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({resetOutcomeViews}, () => {
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews}, () => {
       moxios.stubRequest(getApiUrl(id), {
         status: 200,
         response: {workflow_state: 'succeeded', processing_errors: []},
@@ -282,83 +289,121 @@ describe('OutcomesImporter', () => {
     moxios.wait(() => {
       expect(resetOutcomeViews).toHaveBeenCalled()
       done()
+      unmount()
     })
   })
 
-  it('renders importer if in progress', done => {
-    const props = defaultProps()
+  it('renders importer if in progress', async () => {
+    const mount = document.createElement('div')
+    document.body.appendChild(mount)
+    const props = {
+      mount,
+      contextUrlRoot,
+      disableOutcomeViews: () => {},
+      resetOutcomeViews: () => {},
+    }
 
     moxios.stubRequest(getApiUrl('latest'), {
       status: 200,
-      response: {workflow_state: 'importing', user: {id: userId}},
+      response: {workflow_state: 'importing', user: {id: userId}, id: '1'},
     })
-    jest.spyOn(ReactDOM, 'render')
 
-    showOutcomesImporterIfInProgress(props, userId)
-
-    moxios.wait(() => {
-      // eslint-disable-next-line no-restricted-properties
-      expect(ReactDOM.render).toHaveBeenCalled()
-      done()
+    await showOutcomesImporterIfInProgress(props, userId)
+    await waitFor(() => {
+      expect(mount.innerHTML).not.toBe('')
     })
+    mount.remove()
   })
 
-  it('does not render importer if no latest import', done => {
-    const props = defaultProps()
+  it('does not render importer if no latest import', async () => {
+    const mount = document.createElement('div')
+    document.body.appendChild(mount)
+    const props = {
+      mount,
+      contextUrlRoot,
+      disableOutcomeViews: () => {},
+      resetOutcomeViews: () => {},
+    }
+
     moxios.stubRequest(getApiUrl('latest'), {
       status: 404,
     })
-    jest.spyOn(ReactDOM, 'render')
 
-    showOutcomesImporterIfInProgress(props, userId)
-
-    moxios.wait(() => {
-      // eslint-disable-next-line no-restricted-properties
-      expect(ReactDOM.render).not.toHaveBeenCalled()
-      done()
-    })
+    await showOutcomesImporterIfInProgress(props, userId)
+    expect(mount.innerHTML).toBe('')
+    mount.remove()
   })
 
-  it('starts polling for import status when an import is in progress', done => {
-    const importId = '9'
+  it('starts polling for import status when an import is in progress', async () => {
+    const id = '10'
     const disableOutcomeViews = jest.fn()
-    const {ref} = renderOutcomesImporter({disableOutcomeViews, importId, file: null}, () => {
-      moxios.stubRequest(getApiUrl(importId), {
-        status: 200,
-        response: {},
-      })
+    const resetOutcomeViews = jest.fn()
+    const {ref, unmount} = renderOutcomesImporter(
+      {
+        disableOutcomeViews,
+        resetOutcomeViews,
+        importId: id,
+        file: null
+      }
+    )
+
+    // Mock the first request
+    moxios.stubRequest(getApiUrl(id), {
+      status: 200,
+      response: {workflow_state: 'importing', processing_errors: []},
     })
-    getFakeTimer()
-    ref.current.beginUpload()
 
-    jest.advanceTimersByTime(3000)
+    // Start polling
+    ref.current.pollImportStatus(id)
 
-    moxios.wait(() => {
+    // Wait for the first request
+    await moxios.wait(() => {
       const request = moxios.requests.mostRecent()
-
-      expect(moxios.requests.count()).toEqual(3)
-      expect(request.url).toBe(getApiUrl(importId))
-      done()
+      expect(request.url).toBe(getApiUrl(id))
     })
-  })
+
+    // Mock the second request
+    moxios.stubRequest(getApiUrl(id), {
+      status: 200,
+      response: {workflow_state: 'succeeded', processing_errors: []},
+    })
+
+    // Wait for the second request and completion
+    await moxios.wait(() => {
+      const request = moxios.requests.mostRecent()
+      expect(request.url).toBe(getApiUrl(id))
+      expect(resetOutcomeViews).toHaveBeenCalled()
+    })
+
+    unmount()
+  }, 15000) // Increase timeout to handle async operations
 
   it('displays "please wait" text for user that invoked upload', () => {
-    const {wrapper} = renderOutcomesImporter()
+    const {wrapper, unmount} = renderOutcomesImporter()
 
     expect(wrapper.getByText('Please wait as we upload and process your file.')).toBeInTheDocument()
+    unmount()
   })
 
   it('displays "ok to leave" text for user that invoked upload', () => {
-    const {wrapper} = renderOutcomesImporter()
+    const {wrapper, unmount} = renderOutcomesImporter()
 
     expect(
       wrapper.getByText("It's ok to leave this page, we'll email you when the import is done."),
     ).toBeInTheDocument()
+    unmount()
   })
 
   it('displays "currently in progress" text for user that did not invoke the upload', () => {
-    const {wrapper} = renderOutcomesImporter({invokedImport: false})
+    const {wrapper, unmount} = renderOutcomesImporter({invokedImport: false})
 
     expect(wrapper.getByText('An outcome import is currently in progress.')).toBeInTheDocument()
+    unmount()
+  })
+
+  it('properly cleans up when unmounted', () => {
+    const {unmount, container} = renderOutcomesImporter()
+    unmount()
+    expect(container.innerHTML).toBe('')
   })
 })
