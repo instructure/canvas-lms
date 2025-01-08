@@ -21,7 +21,7 @@ jobs:
     steps:
     - name: Github REST API Call
       env:
-        CI_TOKEN: ${{ secrets.CI_TOKEN }}
+        CI_TOKEN: ${{ secrets.DEVOPS_GH_TOKEN }}
         PARENT_REPO: StrongMind/canvas-docker
         PARENT_BRANCH: main
         WORKFLOW_ID: 37283728
