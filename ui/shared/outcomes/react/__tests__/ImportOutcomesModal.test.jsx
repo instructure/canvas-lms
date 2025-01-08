@@ -20,9 +20,11 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import ImportOutcomesModal from '../ImportOutcomesModal'
 
-const element = () => ({
-  trigger: jest.fn(),
-})
+const element = () => {
+  const el = document.createElement('div')
+  el.trigger = jest.fn()
+  return el
+}
 
 it('renders the ConfirmOutcomeEditModal component', () => {
   const modal = shallow(<ImportOutcomesModal toolbar={element()} />)
