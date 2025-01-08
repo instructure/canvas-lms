@@ -212,7 +212,7 @@
     "swc-loader": "^0.2.6",
     "swc-plugin-coverage-instrument": "^0.0.21",
     "swfobject": "^2.2.1",
-    "tablesorter": "^2.28.5",
+    "tablesorter": "2.32.0",
     "timezone": "npm:@instructure/timezone@1.0.30",
     "tinycolor2": "^1.6.0",
     "twitter-text": "^3.1.0",
