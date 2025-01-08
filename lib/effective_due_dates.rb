@@ -284,8 +284,8 @@ class EffectiveDueDates
 
   def union_course_overrides
     if Account.site_admin.feature_enabled?(:selective_release_backend)
-      "SELECT * FROM override_course_students
-        UNION ALL"
+      "UNION ALL
+       SELECT * FROM override_course_students"
     else
       ""
     end
@@ -294,7 +294,7 @@ class EffectiveDueDates
   def unassign_item
     if Account.site_admin.feature_enabled?(:selective_release_backend)
       "WHERE
-        overrides.unassign_item = FALSE"
+        unassign_item = FALSE"
     else
       ""
     end
@@ -469,15 +469,40 @@ class EffectiveDueDates
           ),
 
           /* join all these students together into a single table */
-          override_all_students AS (
+          /* these queries are separated to ensure unassign_item overrides are properly removed when sorting the overrides */
+          override_adhoc_everyoneelse_students AS (
+            SELECT * FROM override_everyonelse_students
+            UNION ALL
             SELECT * FROM override_adhoc_students
+          ),
+
+          calculated_adhoc_overrides AS (
+            SELECT DISTINCT ON (student_id, assignment_id)
+              *
+            FROM override_adhoc_everyoneelse_students
+            ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
+          ),
+
+          override_group_section_students AS (
+            SELECT * FROM calculated_adhoc_overrides
+            #{unassign_item}
             UNION ALL
             SELECT * FROM override_groups_students
             UNION ALL
             SELECT * FROM override_sections_students
-            UNION ALL
+          ),
+
+          calculated_group_section_overrides AS (
+            SELECT DISTINCT ON (student_id, assignment_id)
+              *
+            FROM override_group_section_students
+            ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
+          ),
+
+          override_all_students AS (
+            SELECT * FROM calculated_group_section_overrides
+            #{unassign_item}
             #{union_course_overrides}
-            SELECT * FROM override_everyonelse_students
           ),
 
           /* and pick the latest override date as the effective due date */
@@ -562,7 +587,6 @@ class EffectiveDueDates
           /* match the effective due date with its grading period */
           LEFT OUTER JOIN applied_grading_periods periods ON
               periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date
-          #{unassign_item}
         SQL
       end
     end

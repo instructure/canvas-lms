@@ -577,14 +577,14 @@ describe Course do
           expect(result).to eq expected
         end
 
-        it "doesn't apply adhoc overrides with unassign_item" do
+        it "doesn't apply adhoc overrides with unassign_item but does apply section override" do
           Account.site_admin.enable_feature!(:selective_release_backend)
           override = @assignment1.assignment_overrides.create!(due_at: 3.days.from_now(@now), due_at_overridden: true)
           override.assignment_override_students.create!(user: @student1)
 
           section = CourseSection.create!(name: "My Awesome Section", course: @test_course)
           student_in_section(section, user: @student1)
-          @assignment1.assignment_overrides.create!(
+          section_override = @assignment1.assignment_overrides.create!(
             due_at: 1.day.from_now(@now),
             due_at_overridden: true,
             set: section
@@ -595,7 +595,17 @@ describe Course do
 
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           result = edd.to_hash
-          expected = {}
+          expected = {
+            @assignment1.id => {
+              @student1.id => {
+                due_at: 1.day.from_now(@now),
+                grading_period_id: nil,
+                in_closed_grading_period: false,
+                override_id: section_override.id,
+                override_source: "CourseSection"
+              }
+            }
+          }
           expect(result).to eq expected
         end
 
@@ -1672,6 +1682,18 @@ describe Course do
           edd = EffectiveDueDates.for_course(@test_course, @assignment1)
           result = edd.to_hash
           expect(result).to eq({})
+        end
+
+        it "does not unassign students with unassign_item override when course override exists" do
+          unassigned_override = @assignment1.assignment_overrides.create!(
+            due_at: 2.days.from_now(@now),
+            due_at_overridden: true,
+            set_type: "ADHOC",
+            unassign_item: true
+          )
+          unassigned_override.assignment_override_students.create!(user: @student1)
+          edd = EffectiveDueDates.for_course(@test_course, @assignment1)
+          expect(edd.to_hash).to eq @expected
         end
 
         it "includes context module course overrides" do
