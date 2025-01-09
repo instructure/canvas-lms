@@ -68,7 +68,17 @@ describe "files index page" do
         create_folder_button.click
         create_folder_input.send_keys("new folder")
         create_folder_input.send_keys(:return)
-        expect(f("#content")).to include_text("new folder")
+        expect(content).to include_text("new folder")
+      end
+
+      it "Can paginate through files" do
+        51.times do |i|
+          attachment_model(content_type: "application/pdf", context: @course, display_name: "file#{i}.pdf")
+        end
+        get "/courses/#{@course.id}/files"
+        pagination_button_by_index(1).click
+        # that's just how sorting works
+        expect(content).to include_text("file9.pdf")
       end
     end
 

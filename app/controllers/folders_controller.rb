@@ -181,8 +181,8 @@ class FoldersController < ApplicationController
       ["folders", folders_collection],
       ["files", files_collection]
     ]
-
-    combined = Api.paginate(BookmarkedCollection.concat(*collections), self, api_v1_list_folders_and_files_url)
+    per_page = Api.per_page_for(self, default: 50)
+    combined = Api.paginate(BookmarkedCollection.concat(*collections), self, api_v1_list_folders_and_files_url, { per_page: })
     render json: folders_or_files_json(combined, @current_user, session, opts)
   end
 

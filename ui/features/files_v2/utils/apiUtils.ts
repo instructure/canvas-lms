@@ -42,3 +42,16 @@ export const generateFilesQuotaUrl = (singularContextType: string, contextId: st
 export const generateFolderPostUrl = (parentFolderId: string) => {
   return `/api/v1/folders/${parentFolderId}/folders`
 }
+
+export const parseLinkHeader = (header: string | null) => {
+  if (!header) return {}
+  const links: Record<string, string> = {}
+  header.split(',').forEach(part => {
+    const match = part.match(/<(.*?)>; rel="(.*?)"/)
+    if (match) {
+      const [, url, rel] = match
+      links[rel] = url
+    }
+  })
+  return links
+}

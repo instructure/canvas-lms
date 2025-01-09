@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import filesEnv from '@canvas/files_v2/react/modules/filesEnv'
 import {Flex} from '@instructure/ui-flex'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {Responsive} from '@instructure/ui-responsive'
+import {Pagination} from '@instructure/ui-pagination'
 
 import FilesHeader from './FilesHeader'
 import FileFolderTable from './FileFolderTable'
@@ -40,11 +41,30 @@ interface FilesAppProps {
 }
 
 const FilesApp = ({isUserContext, size}: FilesAppProps) => {
+  const [isTableLoading, setIsTableLoading] = useState(true)
+  const [currentPageNumber, setCurrentPageNumber] = useState(1)
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
+  const [discoveredPages, setDiscoveredPages] = useState<{[key: number]: string}>({})
   const folders = useLoaderData() as Folder[] | null
+
+  // the useEffect is necessary to protect against folders being empty
+  useEffect(() => {
+    if (!folders || folders.length === 0) return
+
+    const currentFolder = folders[folders.length - 1]
+    const folderId = currentFolder.id
+    const initialUrl = `/api/v1/folders/${folderId}/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string`
+
+    setCurrentUrl(initialUrl)
+    setDiscoveredPages({1: initialUrl})
+  }, [folders])
+
   if (!folders || folders.length === 0) {
     showFlashError(I18n.t('Failed to retrieve folder information'))
     return null
   }
+
+  const totalPageNumber = Object.keys(discoveredPages).length
   const currentFolder = folders[folders.length - 1]
   const folderId = currentFolder.id
   const contextId = currentFolder.context_id
@@ -57,28 +77,60 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
   const userCanManageFilesForContext =
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
-  const usageRightsRequiredForContext = filesEnv.contextFor({contextType, contextId}).usage_rights_required || false
+  const usageRightsRequiredForContext =
+    filesEnv.contextFor({contextType, contextId}).usage_rights_required || false
+
+  const handleTableLoadingStatusChange = (isLoading: boolean) => {
+    setIsTableLoading(isLoading)
+  }
+
+  const handlePaginationLinkChange = (links: Record<string, string>) => {
+    if (links.next && !discoveredPages[currentPageNumber + 1]) {
+      setDiscoveredPages(prev => ({...prev, [currentPageNumber + 1]: links.next}))
+    }
+  }
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPageNumber(pageNumber)
+    setCurrentUrl(discoveredPages[pageNumber])
+  }
 
   return (
     <FileManagementContext.Provider value={{folderId, contextType, contextId}}>
       <View as="div">
         <FilesHeader size={size} isUserContext={isUserContext} />
-        <FileFolderTable
-          size={size}
-          userCanEditFilesForContext={userCanEditFilesForContext}
-          usageRightsRequiredForContext={usageRightsRequiredForContext}
-        />
-        {userCanManageFilesForContext && (
-          <Flex padding="small none none none">
-            <Flex.Item size="50%">
-              <FilesUsageBar />
-            </Flex.Item>
-          </Flex>
+        {currentUrl && (
+          <FileFolderTable
+            size={size}
+            userCanEditFilesForContext={userCanEditFilesForContext}
+            usageRightsRequiredForContext={usageRightsRequiredForContext}
+            currentUrl={currentUrl}
+            onPaginationLinkChange={handlePaginationLinkChange}
+            onLoadingStatusChange={handleTableLoadingStatusChange}
+          />
         )}
+        <Flex padding="small none none none" justifyItems="space-between">
+          <Flex.Item size="50%">{userCanManageFilesForContext && <FilesUsageBar />}</Flex.Item>
+          <Flex.Item size="auto" padding="none medium none none">
+            {!isTableLoading && totalPageNumber > 1 && (
+              <Pagination
+                as="nav"
+                labelNext="Next page"
+                labelPrev="Previous page"
+                variant="compact"
+                currentPage={currentPageNumber}
+                totalPageNumber={totalPageNumber}
+                onPageChange={handlePageChange}
+                data-testid="files-pagination"
+              />
+            )}
+          </Flex.Item>
+        </Flex>
       </View>
     </FileManagementContext.Provider>
   )
 }
+
 interface ResponsiveFilesAppProps {
   contextAssetString: string
 }
@@ -102,4 +154,5 @@ const ResponsiveFilesApp = ({contextAssetString}: ResponsiveFilesAppProps) => {
     />
   )
 }
+
 export default ResponsiveFilesApp

@@ -30,6 +30,11 @@ const defaultProps = {
   size: 'large' as 'large' | 'small' | 'medium',
   userCanEditFilesForContext: true,
   usageRightsRequiredForContext: false,
+  paginationLinks: {},
+  onLoadingStatusChange: jest.fn(),
+  currentUrl:
+    '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string',
+  onPaginationLinkChange: jest.fn(),
 }
 
 const renderComponent = (props = {}) => {
@@ -199,7 +204,7 @@ describe('FileFolderTable', () => {
       renderComponent({usageRightsRequiredForContext: true})
 
       const rows = await screen.findAllByTestId('table-row')
-      expect(rows[0].getElementsByTagName("td")[5]).toBeEmptyDOMElement()
+      expect(rows[0].getElementsByTagName('td')[5]).toBeEmptyDOMElement()
     })
 
     it('renders rights column and icons when usage rights are required', async () => {
@@ -209,7 +214,9 @@ describe('FileFolderTable', () => {
       expect(await screen.findByTestId('rights')).toBeInTheDocument()
 
       const rows = await screen.findAllByTestId('table-row')
-      expect(rows[0].getElementsByTagName("td")[5].getElementsByTagName('button')[0]).toBeInTheDocument()
+      expect(
+        rows[0].getElementsByTagName('td')[5].getElementsByTagName('button')[0],
+      ).toBeInTheDocument()
     })
   })
 })
