@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
@@ -122,7 +120,7 @@ GroupCategorySelector.prototype.groupCategorySelected = function () {
     this.$groupCategoryID.val(selected_group_category_id)
     error_message.innerText = I18n.t(
       'You must remove any groups belonging to %{group} from the Assign Access section before you can change to another Group Set.',
-      {group: this.$groupCategoryID[0].options[this.$groupCategoryID[0].selectedIndex].text}
+      {group: this.$groupCategoryID[0].options[this.$groupCategoryID[0].selectedIndex].text},
     )
     error_message.style.display = 'block'
     return
@@ -157,7 +155,7 @@ GroupCategorySelector.prototype.showGroupCategoryCreateDialog = function () {
             return _this.$groupCategory.toggleAccessibly(true)
           }
         }
-      })(this)
+      })(this),
     )
 }
 
@@ -300,7 +298,7 @@ GroupCategorySelector.prototype._validateGroupCategoryID = function (data, error
 GroupCategorySelector.prototype.hasGroupOverrides = function (selected_group_category_id) {
   if (!selected_group_category_id) return undefined
   return this.parentModel?.attributes?.assignment_overrides?.models?.find(
-    override => override.attributes.group_category_id === selected_group_category_id
+    override => override.attributes.group_category_id === selected_group_category_id,
   )
 }
 

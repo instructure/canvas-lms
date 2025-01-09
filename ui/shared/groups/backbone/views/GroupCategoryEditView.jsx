@@ -165,7 +165,7 @@ GroupCategoryEditView.prototype.toJSON = function () {
         '<input name="group_limit"\n        type="number"\n        min="2"\n        class="input-micro"\n        value="' +
         h((ref = json.group_limit) != null ? ref : '') +
         '">',
-    }
+    },
   )
 }
 

@@ -48,7 +48,7 @@ const ObserverOptions = ({
   renderLabel,
 }) => {
   const [observedUsers, setObservedUsers] = useState(() =>
-    parseObservedUsersList(observedUsersList)
+    parseObservedUsersList(observedUsersList),
   )
   const [selectSearchValue, setSelectSearchValue] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
@@ -63,7 +63,7 @@ const ObserverOptions = ({
       handleChangeObservedUser(user.id)
       saveObservedId(currentUser.id, user.id)
     },
-    [currentUser.id, handleChangeObservedUser]
+    [currentUser.id, handleChangeObservedUser],
   )
 
   const handleUserSelected = useCallback(
@@ -71,7 +71,7 @@ const ObserverOptions = ({
       const user = observedUsers.find(u => u.id === id)
       updateObservedUser(user)
     },
-    [observedUsers, updateObservedUser]
+    [observedUsers, updateObservedUser],
   )
 
   useEffect(() => {
@@ -153,7 +153,7 @@ const ObserverOptions = ({
       .filter(
         u =>
           u.name.toLowerCase().includes(selectSearchValue.toLowerCase()) ||
-          selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase()
+          selectedUser.name.toLowerCase() === selectSearchValue.toLowerCase(),
       )
       .map(u => (
         <CanvasAsyncSelect.Option
@@ -224,7 +224,7 @@ export const ObservedUsersListShape = PropTypes.arrayOf(
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     avatar_url: PropTypes.string,
-  })
+  }),
 )
 
 export const shouldShowObserverOptions = (observedUsersList, currentUser) =>

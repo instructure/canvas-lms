@@ -102,7 +102,7 @@ describe('TempEnrollSearchConfirmation', () => {
     userDetailsUriMock('1', oneUser)
     userDetailsUriMock('21', twoUser)
     const {findByText} = render(
-      <TempEnrollSearchConfirmation {...props} foundUsers={[oneUser, twoUser]} />
+      <TempEnrollSearchConfirmation {...props} foundUsers={[oneUser, twoUser]} />,
     )
 
     expect(await findByText('user1@email.com')).toBeInTheDocument()
@@ -113,7 +113,7 @@ describe('TempEnrollSearchConfirmation', () => {
   it('render one set of duplicates', async () => {
     const duplicateObj = {sis_2: [twoBrotherUser, twoSisterUser]}
     const {getByText} = render(
-      <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />
+      <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 
     expect(getByText('sister_2')).toBeInTheDocument()
@@ -128,14 +128,14 @@ describe('TempEnrollSearchConfirmation', () => {
     }
     const {getByText, getAllByText} = render(
       // @ts-expect-error
-      <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />
+      <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 
     expect(
-      getAllByText('Possible matches for "sis_2". Select the desired one below.')[0]
+      getAllByText('Possible matches for "sis_2". Select the desired one below.')[0],
     ).toBeInTheDocument()
     expect(
-      getAllByText('Possible matches for "sis_3". Select the desired one below.')[0]
+      getAllByText('Possible matches for "sis_3". Select the desired one below.')[0],
     ).toBeInTheDocument()
     expect(getByText(/No users are ready/)).toBeInTheDocument()
   })
@@ -147,7 +147,7 @@ describe('TempEnrollSearchConfirmation', () => {
     }
     const {getByLabelText, getByText} = render(
       // @ts-expect-error
-      <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />
+      <TempEnrollSearchConfirmation {...props} duplicateUsers={duplicateObj} />,
     )
 
     expect(getByText(/No users are ready/)).toBeInTheDocument()

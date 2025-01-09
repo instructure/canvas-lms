@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
@@ -45,7 +43,7 @@ Pseudonym.prototype.errorMap = function (policy) {
         'May only contain letters, numbers, or the following: %{characters}',
         {
           characters: '. + - _ @ =',
-        }
+        },
       ),
       taken: I18n.t('errors.taken', 'Already in use'),
       bad_credentials: I18n.t('errors.bad_credentials', 'Invalid username or password'),
@@ -69,14 +67,14 @@ Pseudonym.prototype.errorMap = function (policy) {
         "Can't have the same character more than %{max} times in a row",
         {
           max: policy?.max_repeats,
-        }
+        },
       ),
       sequence: I18n.t(
         'errors.sequence',
         "Can't incude a run of more than %{max} characters (e.g. abcdef)",
         {
           max: policy?.max_sequence,
-        }
+        },
       ),
       common: I18n.t('errors.common', 'Can\'t use common passwords (e.g. "password")'),
       no_digits: I18n.t('errors.no_digits', 'Must include at least one number'),
@@ -84,7 +82,7 @@ Pseudonym.prototype.errorMap = function (policy) {
       confirmation: I18n.t('errors.mismatch', "Doesn't match"),
       unexpected: I18n.t(
         'errors.unexpected',
-        'An unexpected error occurred. Please try again later.'
+        'An unexpected error occurred. Please try again later.',
       ),
     },
     password_confirmation: {

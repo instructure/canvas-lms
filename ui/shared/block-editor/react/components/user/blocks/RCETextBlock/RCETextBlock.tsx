@@ -81,7 +81,7 @@ export const RCETextBlock = ({text, width, height, sizeVariant = 'auto'}: RCETex
         prps.text = content
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const handleKey = useCallback(
@@ -99,7 +99,7 @@ export const RCETextBlock = ({text, width, height, sizeVariant = 'auto'}: RCETex
         setEditable(true)
       }
     },
-    [editable]
+    [editable],
   )
 
   const renderContent = () => {

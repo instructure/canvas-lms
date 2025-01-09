@@ -62,10 +62,9 @@ export default class UploadMediaTrackForm {
         zIndex: 1000,
       })
 
-     
     ReactDOM.render(
       <CopyToClipboard interaction="readonly" name="video_url" value={video_url} />,
-      document.getElementById('media-track-video-url-container')
+      document.getElementById('media-track-video-url-container'),
     )
   }
 
@@ -98,13 +97,13 @@ export default class UploadMediaTrackForm {
             $.flashMessage(
               I18n.t(
                 'track_uploaded_successfully',
-                'Track uploaded successfully; please refresh your browser.'
-              )
+                'Track uploaded successfully; please refresh your browser.',
+              ),
             )
           },
           () => {
             submitDfd.reject()
-          }
+          },
         )
       })
   }

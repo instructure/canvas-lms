@@ -35,7 +35,7 @@ describe('contentEditable', () => {
           <span id="test"> @
             <span data-testid="mentions-marker" id="mentions-marker">wes</span>
           </span>
-        </div>`
+        </div>`,
       )
     })
 
@@ -76,7 +76,7 @@ describe('contentEditable', () => {
           <span id="test"> @
             <span data-testid="mentions-marker" id="mentions-marker" contenteditable="true">wes</span>
           </span>
-        </div>`
+        </div>`,
       )
     })
 

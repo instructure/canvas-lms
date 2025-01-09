@@ -71,10 +71,10 @@ export default function CanvasMediaPlayer(props) {
   // for example:
   // ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS=2, ENV.MAX_MEDIA_SOURCE_RETRY_ATTEMPTS=4, 0
   const [MAX_RETRY_ATTEMPTS] = useState(
-    ENV.MAX_MEDIA_SOURCE_RETRY_ATTEMPTS || props.MAX_RETRY_ATTEMPTS
+    ENV.MAX_MEDIA_SOURCE_RETRY_ATTEMPTS || props.MAX_RETRY_ATTEMPTS,
   )
   const [SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS] = useState(
-    ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS || props.SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS
+    ENV.SHOW_MEDIA_SOURCE_BE_PATIENT_MSG_AFTER_ATTEMPTS || props.SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,
   )
   const [auto_cc_track] = useState(getAutoTrack(tracks))
 
@@ -112,10 +112,10 @@ export default function CanvasMediaPlayer(props) {
         props.type,
         boundingBox(),
         window.frameElement || playerParent,
-        props.resizeContainer
+        props.resizeContainer,
       )
     },
-    [boundingBox, props.resizeContainer, props.type]
+    [boundingBox, props.resizeContainer, props.type],
   )
 
   const handlePlayerSize = useCallback(
@@ -127,10 +127,10 @@ export default function CanvasMediaPlayer(props) {
         props.type,
         boundingBox(),
         window.frameElement || playerParent,
-        props.resizeContainer
+        props.resizeContainer,
       )
     },
-    [props.type, props.resizeContainer, boundingBox]
+    [props.type, props.resizeContainer, boundingBox],
   )
 
   const fetchSources = useCallback(
@@ -143,7 +143,6 @@ export default function CanvasMediaPlayer(props) {
         setMediaObjNetworkErr(null)
         resp = await asJson(fetch(url, defaultFetchOptions()))
       } catch (e) {
-         
         console.warn(`Error getting ${url}`, e.message)
         setMediaObjNetworkErr(e)
         return
@@ -154,7 +153,7 @@ export default function CanvasMediaPlayer(props) {
         setRetryAttempt(retryAttempt + 1)
       }
     },
-    [props.attachment_id, props.media_id, retryAttempt]
+    [props.attachment_id, props.media_id, retryAttempt],
   )
 
   useEffect(() => {
@@ -162,9 +161,12 @@ export default function CanvasMediaPlayer(props) {
     // and we don't have its media_sources yet
     let retryTimerId = 0
     if (!media_sources.length && retryAttempt <= MAX_RETRY_ATTEMPTS) {
-      retryTimerId = setTimeout(() => {
-        fetchSources()
-      }, 2 ** retryAttempt * 1000)
+      retryTimerId = setTimeout(
+        () => {
+          fetchSources()
+        },
+        2 ** retryAttempt * 1000,
+      )
     }
 
     return () => {
@@ -206,7 +208,7 @@ export default function CanvasMediaPlayer(props) {
       return (
         <Alert key="giveupalert" variant="info" margin="x-small" liveRegion={liveRegion}>
           {I18n.t(
-            'Giving up on retrieving media sources. This issue will probably resolve itself eventually.'
+            'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
           )}
         </Alert>
       )

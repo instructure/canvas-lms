@@ -27,19 +27,19 @@ export const useGradingSchemeSummaries = (): {
   loadGradingSchemeSummaries: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    assignmentId?: string | null
+    assignmentId?: string | null,
   ) => Promise<GradingSchemeSummary[]>
   loadGradingSchemeSummariesStatus: string
 } => {
   const [loadGradingSchemeSummariesStatus, setLoadGradingSchemeSummariesStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const loadGradingSchemeSummaries = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      assignmentId = null
+      assignmentId = null,
     ): Promise<GradingSchemeSummary[]> => {
       setLoadGradingSchemeSummariesStatus(ApiCallStatus.NOT_STARTED)
 
@@ -64,7 +64,7 @@ export const useGradingSchemeSummaries = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

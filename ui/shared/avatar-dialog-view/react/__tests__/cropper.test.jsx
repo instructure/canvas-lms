@@ -40,7 +40,7 @@ describe('CanvasCropper', () => {
 
   test('getImage returns cropped image object', async () => {
     const done = jest.fn()
-    // eslint-disable-next-line promise/catch-or-return, jest/valid-expect-in-promise
+     
     ref.current.crop().then(image => {
       expect(image instanceof Blob).toBeTruthy()
       expect(done).toHaveBeenCalledTimes(1)
@@ -62,4 +62,5 @@ function dataURItoBlob(dataURI) {
 }
 
 // Simple 1x1 transparent PNG
-const filedata = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+const filedata =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='

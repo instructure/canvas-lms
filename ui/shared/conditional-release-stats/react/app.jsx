@@ -50,12 +50,12 @@ export default class CRSApp {
       selectRange: this.actions.selectRange,
     }
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Provider store={this.store}>
         <Graphs {...actions} />
       </Provider>,
-      root
+      root,
     )
   }
 
@@ -66,12 +66,12 @@ export default class CRSApp {
       closeSidebar: this.actions.closeSidebar,
     }
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Provider store={this.store}>
         <Details {...detailActions} />
       </Provider>,
-      root
+      root,
     )
   }
 }

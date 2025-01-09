@@ -29,7 +29,7 @@ export class ScrollToNewActivity extends Animation {
     return nais.reverse().find(indicator => {
       return this.animator().isAboveScreen(
         indicator.component.getScrollable(),
-        this.manager().totalOffset()
+        this.manager().totalOffset(),
       )
     })
   }

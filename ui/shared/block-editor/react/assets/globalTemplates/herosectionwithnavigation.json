@@ -38,9 +38,7 @@
         },
         "parent": "mS6aCZz96y",
         "hidden": false,
-        "nodes": [
-          "ZRSwwtRGiP"
-        ],
+        "nodes": ["ZRSwwtRGiP"],
         "linkedNodes": {}
       },
       "ZRSwwtRGiP": {
@@ -85,12 +83,7 @@
         },
         "parent": "ZRSwwtRGiP",
         "hidden": false,
-        "nodes": [
-          "yienRwKKOl",
-          "Dr0yzz_J6V",
-          "hA6Efedaqe",
-          "PeLuAkh_l4"
-        ],
+        "nodes": ["yienRwKKOl", "Dr0yzz_J6V", "hA6Efedaqe", "PeLuAkh_l4"],
         "linkedNodes": {}
       },
       "yienRwKKOl": {

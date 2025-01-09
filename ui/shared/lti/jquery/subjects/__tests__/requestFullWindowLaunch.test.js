@@ -43,14 +43,14 @@ describe('requestFullWindowLaunch', () => {
     it('pulls out client_id if provided', () => {
       handler({message: {data: 'http://localhost/test?client_id=hello'}})
       expect(assignLocation).toHaveBeenCalledWith(
-        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fclient_id%3Dhello%26platform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1&client_id=hello'
+        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fclient_id%3Dhello%26platform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1&client_id=hello',
       )
     })
 
     it('pulls out assignment_id if provided', () => {
       handler({message: {data: 'http://localhost/test?client_id=hello&assignment_id=50'}})
       expect(assignLocation).toHaveBeenCalledWith(
-        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fclient_id%3Dhello%26assignment_id%3D50%26platform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1&client_id=hello&assignment_id=50'
+        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fclient_id%3Dhello%26assignment_id%3D50%26platform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1&client_id=hello&assignment_id=50',
       )
     })
   })
@@ -63,7 +63,7 @@ describe('requestFullWindowLaunch', () => {
     it('uses launch type same_window by default', () => {
       handler({message: {data: {url: 'http://localhost/test'}}})
       expect(assignLocation).toHaveBeenCalledWith(
-        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1'
+        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1',
       )
     })
 
@@ -71,7 +71,7 @@ describe('requestFullWindowLaunch', () => {
       handler({message: {data: {url: 'http://localhost/test', launchType: 'new_window'}}})
       expect(openWindow).toHaveBeenCalledWith(
         'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1',
-        'newWindowLaunch'
+        'newWindowLaunch',
       )
     })
 
@@ -80,20 +80,20 @@ describe('requestFullWindowLaunch', () => {
       expect(openWindow).toHaveBeenCalledWith(
         'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1',
         'popupLaunch',
-        expect.stringMatching(/toolbar=no.*width=800,height=600/)
+        expect.stringMatching(/toolbar=no.*width=800,height=600/),
       )
     })
 
     it('errors on unknown launch type', () => {
       expect(() =>
-        handler({message: {data: {url: 'http://localhost/test', launchType: 'unknown'}}})
+        handler({message: {data: {url: 'http://localhost/test', launchType: 'unknown'}}}),
       ).toThrow()
     })
 
     it('uses placement to add to launch url', () => {
       handler({message: {data: {url: 'http://localhost/test', placement: 'course_navigation'}}})
       expect(assignLocation).toHaveBeenCalledWith(
-        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1&placement=course_navigation'
+        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1&placement=course_navigation',
       )
     })
 
@@ -113,21 +113,21 @@ describe('requestFullWindowLaunch', () => {
       expect(openWindow).toHaveBeenCalledWith(
         'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1',
         'popupLaunch',
-        expect.stringMatching(/toolbar=no.*width=420,height=400/)
+        expect.stringMatching(/toolbar=no.*width=420,height=400/),
       )
     })
 
     it('uses display type borderless by default', () => {
       handler({message: {data: {url: 'http://localhost/test'}}})
       expect(assignLocation).toHaveBeenCalledWith(
-        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1'
+        'http://localhost/accounts/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1',
       )
     })
 
     it('allows display type to be overridden', () => {
       handler({message: {data: {url: 'http://localhost/test', display: 'full_width_in_context'}}})
       expect(assignLocation).toHaveBeenCalledWith(
-        'http://localhost/accounts/1/external_tools/retrieve?display=full_width_in_context&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1'
+        'http://localhost/accounts/1/external_tools/retrieve?display=full_width_in_context&url=http%3A%2F%2Flocalhost%2Ftest%3Fplatform_redirect_url%3Dhttp%253A%252F%252Flocalhost%252F%26full_win_launch_requested%3D1',
       )
     })
   })

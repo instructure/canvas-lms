@@ -30,7 +30,7 @@ describe('The Points component', () => {
       component({
         assessment: {...id, points: validPoints('1')},
         pointsPossible: 2,
-      })
+      }),
     ).toMatchSnapshot()
   })
 
@@ -40,7 +40,7 @@ describe('The Points component', () => {
         assessment: {...id, points: validPoints('1')},
         assessing: true,
         pointsPossible: 2,
-      })
+      }),
     ).toMatchSnapshot()
   })
 
@@ -51,7 +51,7 @@ describe('The Points component', () => {
         pointsPossible: 2,
       })
         .find('div')
-        .text()
+        .text(),
     ).toEqual('1.1 / 2 pts')
   })
 
@@ -62,7 +62,7 @@ describe('The Points component', () => {
         pointsPossible: 2,
       })
         .find('div')
-        .text()
+        .text(),
     ).toEqual('1.26 / 2 pts')
   })
 
@@ -74,7 +74,7 @@ describe('The Points component', () => {
         pointsPossible: 2,
       })
         .find('TextInput')
-        .prop('messages')
+        .prop('messages'),
     ).toHaveLength(0)
   })
 
@@ -86,7 +86,7 @@ describe('The Points component', () => {
         pointsPossible: 2,
       })
         .find('div')
-        .text()
+        .text(),
     ).toEqual('2 pts')
   })
 
@@ -114,7 +114,7 @@ describe('The Points component', () => {
   it('renders no error when valid is true', () => {
     const expectNoErrorsWith = (text, value) =>
       expect(
-        withPoints({text, valid: true, value}).find('TextInput').prop('messages')
+        withPoints({text, valid: true, value}).find('TextInput').prop('messages'),
       ).toHaveLength(0)
 
     expectNoErrorsWith('')

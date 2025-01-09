@@ -38,7 +38,7 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this course with this title.')
+        getByText('There is already a page in this course with this title.'),
       ).toBeInTheDocument()
     })
 
@@ -47,7 +47,7 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this group with this title.')
+        getByText('There is already a page in this group with this title.'),
       ).toBeInTheDocument()
     })
   })

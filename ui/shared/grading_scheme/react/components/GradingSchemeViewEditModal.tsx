@@ -91,7 +91,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
       })
       .catch(error => {
         showFlashError(
-          I18n.t('There was an error while loading the default canvas grading scheme')
+          I18n.t('There was an error while loading the default canvas grading scheme'),
         )(error)
       })
     return () => {
@@ -111,7 +111,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
           points_based: gradingSchemeFormInput.pointsBased,
           scaling_factor: gradingSchemeFormInput.scalingFactor,
           id: gradingScheme.id,
-        }
+        },
       )
 
       setEditing(false)
@@ -135,9 +135,8 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
 
     // TODO: is there a good inst ui component for confirmation dialog?
     if (
-       
       !window.confirm(
-        I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?')
+        I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?'),
       )
     ) {
       return
@@ -146,7 +145,7 @@ export const GradingSchemeViewEditModal: React.FC<GradingSchemeViewEditModalProp
       await deleteGradingScheme(
         gradingScheme.context_type,
         gradingScheme.context_id,
-        gradingScheme.id
+        gradingScheme.id,
       )
       showFlashSuccess(I18n.t('Grading scheme was successfully removed.'))()
       if (onDelete) {

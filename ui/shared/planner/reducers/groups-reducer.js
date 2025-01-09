@@ -21,5 +21,5 @@ export default handleActions(
   {
     INITIAL_OPTIONS: (state, action) => action.payload.env.STUDENT_PLANNER_GROUPS,
   },
-  []
+  [],
 )

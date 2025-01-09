@@ -84,7 +84,7 @@ describe('Turnitin', () => {
     const tii_data = Turnitin.extractDataForTurnitin(
       submissionWithReport,
       'attachment_103',
-      '/courses/2'
+      '/courses/2',
     )
 
     expect(tii_data.score).toBe('0%')
@@ -102,17 +102,17 @@ describe('Turnitin', () => {
     submissionWithReport.submission_type = 'online_text_entry'
 
     const plagiarismData = Turnitin.extractDataTurnitin(submissionWithReport)
-    expect(plagiarismData.items.length).toBe(1)
+    expect(plagiarismData.items).toHaveLength(1)
   })
 
   test('uses originality_report type in url if submission has an OriginalityReport', () => {
     const tii_data = Turnitin.extractDataForTurnitin(
       submissionWithReport,
       'attachment_103',
-      '/courses/2'
+      '/courses/2',
     )
     expect(tii_data.reportUrl).toBe(
-      '/courses/2/assignments/52/submissions/2/originality_report/attachment_103'
+      '/courses/2/assignments/52/submissions/2/originality_report/attachment_103',
     )
   })
 
@@ -121,10 +121,10 @@ describe('Turnitin', () => {
     const tii_data = Turnitin.extractDataForTurnitin(
       submissionWithReport,
       'attachment_103',
-      '/courses/2'
+      '/courses/2',
     )
     expect(tii_data.reportUrl).toBe(
-      '/courses/2/assignments/52/submissions/2/turnitin/attachment_103'
+      '/courses/2/assignments/52/submissions/2/turnitin/attachment_103',
     )
   })
 
@@ -136,10 +136,10 @@ describe('Turnitin', () => {
     const tii_data = Turnitin.extractDataForTurnitin(
       submissionWithReport,
       'attachment_103',
-      '/courses/2'
+      '/courses/2',
     )
     expect(tii_data.reportUrl).toBe(
-      '/courses/2/assignments/52/submissions/2/vericite/attachment_103'
+      '/courses/2/assignments/52/submissions/2/vericite/attachment_103',
     )
   })
 
@@ -148,7 +148,7 @@ describe('Turnitin', () => {
     const tii_data = Turnitin.extractDataForTurnitin(
       submissionWithReport,
       'attachment_103',
-      '/courses/2'
+      '/courses/2',
     )
     expect(tii_data.score).toBeUndefined()
   })
@@ -157,7 +157,7 @@ describe('Turnitin', () => {
     const tii_data = Turnitin.extractDataForTurnitin(
       submissionWithReport,
       'attachment_103',
-      '/courses/2'
+      '/courses/2',
     )
     expect(tii_data.score).toBe('0.8%')
   })

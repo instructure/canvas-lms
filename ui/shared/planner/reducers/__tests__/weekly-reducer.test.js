@@ -80,7 +80,7 @@ it('adds new week data to state', () => {
     Actions.weekLoaded({
       weekDays: ['next week data'],
       weekStart: initState.weekStart.clone().add(7, 'days'),
-    })
+    }),
   )
 
   expect(newerState.weeks).toMatchObject({

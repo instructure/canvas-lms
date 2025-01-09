@@ -62,7 +62,7 @@ describe('ModuleAssignments', () => {
     render(
       <MockedQueryProvider>
         <ModuleAssignments {...props} {...overrides} />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
 
   it('displays sections and students as options', async () => {
@@ -142,6 +142,6 @@ describe('ModuleAssignments', () => {
     const {getAllByTestId, getByText} = renderComponent({defaultValues})
     expect(getByText(defaultValues[0].value)).toBeInTheDocument()
     expect(getByText(defaultValues[1].value)).toBeInTheDocument()
-    expect(getAllByTestId('assignee_selector_selected_option').length).toBe(defaultValues.length)
+    expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(defaultValues.length)
   })
 })

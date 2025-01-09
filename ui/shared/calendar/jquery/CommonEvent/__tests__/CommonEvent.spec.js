@@ -53,7 +53,7 @@ describe('CommonEvent', () => {
         start_at: '2016-02-25T23:30:00Z',
         end_at: '2016-02-26T00:30:00Z',
       },
-      ['course_1']
+      ['course_1'],
     )
     expect(event.end.date()).toBe(26)
     expect(event.end.hours()).toBe(0)
@@ -67,7 +67,7 @@ describe('CommonEvent', () => {
         start_at: '2016-02-25T23:30:00Z',
         all_context_codes: 'course_1,course_23',
       },
-      ['course_1', 'course_23']
+      ['course_1', 'course_23'],
     )
     expect(event.isOnCalendar('course_1')).toBeTruthy()
     expect(event.isOnCalendar('course_23')).toBeTruthy()
@@ -88,7 +88,7 @@ describe('CommonEvent', () => {
         appointment_group_url: 'http://localhost:3000/api/v1/appointment_groups/2',
         own_reservation: true,
       },
-      [{asset_string: 'course_2'}]
+      [{asset_string: 'course_2'}],
     )
     expect(event).not.toBeNull()
   })
@@ -110,7 +110,7 @@ describe('CommonEvent#iconType', () => {
         start_at: '2016-12-01T12:30:00Z',
         appointment_group_url: 'http://some_url',
       },
-      ['course_1']
+      ['course_1'],
     )
     expect(event.iconType()).toBe('calendar-add')
   })
@@ -123,7 +123,7 @@ describe('CommonEvent#iconType', () => {
         appointment_group_url: 'http://some_url',
         child_events: [{}],
       },
-      ['course_1']
+      ['course_1'],
     )
     expect(event.iconType()).toBe('calendar-reserved')
   })
@@ -135,7 +135,7 @@ describe('CommonEvent#iconType', () => {
         start_at: '2016-12-01T12:30:00Z',
         appointment_group_url: 'http://some_url',
       },
-      ['course_1']
+      ['course_1'],
     )
     event.appointmentGroupEventStatus = 'Reserved'
     expect(event.iconType()).toBe('calendar-reserved')
@@ -147,7 +147,7 @@ describe('CommonEvent#iconType', () => {
         title: 'some title',
         start_at: '2016-12-01T12:30:00Z',
       },
-      ['course_1']
+      ['course_1'],
     )
     expect(event.iconType()).toBe('calendar-month')
   })
@@ -159,7 +159,7 @@ describe('CommonEvent#iconType', () => {
         plannable_type: 'discussion_topic',
         plannable: {id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
       },
-      [{asset_string: 'course_1', can_update_discussion_topic: false, can_update_todo_date: false}]
+      [{asset_string: 'course_1', can_update_discussion_topic: false, can_update_todo_date: false}],
     )
     expect(event.iconType()).toBe('discussion')
     expect(event.can_edit).toBe(false)
@@ -174,7 +174,7 @@ describe('CommonEvent#iconType', () => {
         plannable_type: 'wiki_page',
         plannable: {url: 'some_title', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
       },
-      [{asset_string: 'course_1', can_update_wiki_page: false, can_update_todo_date: false}]
+      [{asset_string: 'course_1', can_update_wiki_page: false, can_update_todo_date: false}],
     )
     expect(event.iconType()).toBe('document')
     expect(event.can_edit).toBe(false)
@@ -190,7 +190,7 @@ describe('CommonEvent#iconType', () => {
         html_url: 'http://example.org/courses/1/discussion_topics/123',
         plannable: {id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
       },
-      [{asset_string: 'course_1', can_update_discussion_topic: true, can_update_todo_date: true}]
+      [{asset_string: 'course_1', can_update_discussion_topic: true, can_update_todo_date: true}],
     )
     expect(event.can_edit).toBe(true)
     expect(event.can_delete).toBe(true)
@@ -207,7 +207,7 @@ describe('CommonEvent#iconType', () => {
         html_url: 'http://example.org/courses/1/pages/some-page',
         plannable: {url: 'some_page', title: 'some page', todo_date: '2016-12-01T12:30:00Z'},
       },
-      [{asset_string: 'course_1', can_update_wiki_page: true, can_update_todo_date: true}]
+      [{asset_string: 'course_1', can_update_wiki_page: true, can_update_todo_date: true}],
     )
     expect(event.iconType()).toBe('document')
     expect(event.can_edit).toBe(true)

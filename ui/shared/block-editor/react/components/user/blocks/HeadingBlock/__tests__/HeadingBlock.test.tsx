@@ -31,7 +31,7 @@ const renderBlock = (enabled: boolean, props: Partial<HeadingBlockProps> = {}) =
           <HeadingBlock text="A Heading" {...props} />
         </Frame>
       </Editor>
-    </>
+    </>,
   )
 }
 

@@ -35,7 +35,7 @@ import {useBreadcrumbStore} from './useBreadcrumbStore'
  */
 export const useAppendBreadcrumbsToDefaults = (
   breadcrumbs: Breadcrumb | Breadcrumb[],
-  enabled = true
+  enabled = true,
 ) => {
   const appendCrumbs = useBreadcrumbStore(s => s.appendBreadcrumbsToDefaults)
 

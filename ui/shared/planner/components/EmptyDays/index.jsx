@@ -70,7 +70,7 @@ export default class EmptyDays extends Component {
       this.style.classNames.root,
       this.style.classNames[this.props.responsiveSize],
       'planner-empty-days',
-      {'planner-today': includesToday}
+      {'planner-today': includesToday},
     )
 
     return (

@@ -37,7 +37,7 @@ describe('SelectMediaModal', () => {
     return render(
       <RCSPropsContext.Provider value={mockTrayProps}>
         <SelectMediaModal {...defaultProps} {...props} />
-      </RCSPropsContext.Provider>
+      </RCSPropsContext.Provider>,
     )
   }
 

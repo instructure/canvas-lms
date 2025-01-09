@@ -99,7 +99,7 @@ class PeopleValidationIssues extends React.Component {
       <div className="peopleValidationissues__duplicates">
         <Alert variant="warning">
           {I18n.t(
-            'There were several possible matches with the import. Please resolve them below.'
+            'There were several possible matches with the import. Please resolve them below.',
           )}
         </Alert>
         {duplicateAddresses.map(address => {
@@ -127,7 +127,7 @@ class PeopleValidationIssues extends React.Component {
     }
     const alertText = this.props.inviteUsersURL
       ? I18n.t(
-          'We were unable to find matches below. Select any you would like to create as new users. Unselected will be skipped at this time.'
+          'We were unable to find matches below. Select any you would like to create as new users. Unselected will be skipped at this time.',
         )
       : I18n.t('We were unable to find matches below.')
 

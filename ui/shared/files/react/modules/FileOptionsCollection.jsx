@@ -129,7 +129,7 @@ class FileOptionsCollection {
 
   handleFilesInputChange(_e) {
     const selectedFiles = this.toFilesOptionArray(
-      ReactDOM.findDOMNode(this.refs.addFileInput).files
+      ReactDOM.findDOMNode(this.refs.addFileInput).files,
     )
     const {resolved, collisions, zips} = this.segregateOptionBuckets(selectedFiles)
     this.setState({nameCollisions: collisions, resolvedNames: resolved, zipOptions: zips})

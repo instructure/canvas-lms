@@ -154,7 +154,7 @@ const CardActions = {
     }
     const overrideToRemove = find(
       overridesFromRow,
-      override => override[selector] == assigneeToRemove[selector]
+      override => override[selector] == assigneeToRemove[selector],
     )
     return difference(overridesFromRow, [overrideToRemove])
   },
@@ -176,7 +176,7 @@ const CardActions = {
       ...adhocOverride,
       student_ids: newStudentIds,
       students: adhocOverride.students.filter(
-        student => student.id !== assigneeToRemove.student_id
+        student => student.id !== assigneeToRemove.student_id,
       ),
     }
     delete newOverride.title

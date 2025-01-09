@@ -21,7 +21,7 @@ import {fireEvent} from '@testing-library/dom'
 export default class ContentFilterDriver {
   static findWithLabelText(labelText, $parent = document.body) {
     const $label = [...$parent.querySelectorAll('label')].find(
-      $el => $el.textContent.trim() === labelText
+      $el => $el.textContent.trim() === labelText,
     )
 
     if ($label == null) {

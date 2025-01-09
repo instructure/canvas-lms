@@ -111,7 +111,7 @@ export default class DashboardCardMenu extends React.Component<Props, State> {
       index,
     }: {
       index: number
-    }
+    },
   ) => {
     this.setState({
       selectedIndex: index,

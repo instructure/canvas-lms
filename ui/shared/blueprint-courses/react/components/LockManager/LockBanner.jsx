@@ -55,7 +55,7 @@ export default class LockBanner extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.isLocked && !prevProps.isLocked) {
       $.screenReaderFlashMessage(
-        I18n.t('%{attributes} locked', {attributes: formatLockObject(this.props.itemLocks)})
+        I18n.t('%{attributes} locked', {attributes: formatLockObject(this.props.itemLocks)}),
       )
     }
   }

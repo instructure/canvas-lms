@@ -49,7 +49,7 @@ export default class OutcomeView extends OutcomeContentBase {
         'change .calculation_method': 'updateCalcMethod',
         'keyup .mastery_points': 'changeMasteryPoints',
       },
-      OutcomeContentBase.prototype.events
+      OutcomeContentBase.prototype.events,
     )
 
     this.prototype.validations = lodashExtend(
@@ -68,7 +68,7 @@ export default class OutcomeView extends OutcomeContentBase {
           }
         },
       },
-      OutcomeContentBase.prototype.validations
+      OutcomeContentBase.prototype.validations,
     )
   }
 
@@ -131,7 +131,7 @@ export default class OutcomeView extends OutcomeContentBase {
     } else {
       data.mastery_points = numberHelper.parse(data.mastery_points)
       data.ratings = map(data.ratings, rating =>
-        lodashExtend(rating, {points: numberHelper.parse(rating.points)})
+        lodashExtend(rating, {points: numberHelper.parse(rating.points)}),
       )
       if (['highest', 'latest'].includes(data.calculation_method)) {
         delete data.calculation_int
@@ -251,8 +251,8 @@ export default class OutcomeView extends OutcomeContentBase {
       raw(
         I18n.t('%{points_possible} Points', {
           points_possible: I18n.n(total, {precision: 2, strip_insignificant_zeros: true}),
-        })
-      )
+        }),
+      ),
     )
     return this.model.set({
       points_possible: total,
@@ -275,8 +275,8 @@ export default class OutcomeView extends OutcomeContentBase {
             lodashExtend(data, {
               calculationMethods: this.model.calculationMethods(),
               hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES,
-            })
-          )
+            }),
+          ),
         )
 
         if (!ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
@@ -305,7 +305,7 @@ export default class OutcomeView extends OutcomeContentBase {
           }
           if (ENV.MASTERY_SCALE?.outcome_calculation_method) {
             const methodModel = new CalculationMethodContent(
-              ENV.MASTERY_SCALE.outcome_calculation_method
+              ENV.MASTERY_SCALE.outcome_calculation_method,
             )
             lodashExtend(data, ENV.MASTERY_SCALE.outcome_calculation_method, methodModel.present())
           }
@@ -330,8 +330,8 @@ export default class OutcomeView extends OutcomeContentBase {
                 !this.readOnly() &&
                 (this.model.outcomeLink.assessed ||
                   (this.model.isNative() && this.model.get('assessed'))),
-            })
-          )
+            }),
+          ),
         )
       }
     }

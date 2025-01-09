@@ -58,7 +58,7 @@ export const SelectMediaModal = ({
     _accept: string,
     _selectedPanel: any,
     uploadData: UploadData,
-    _storeProps: any
+    _storeProps: any,
   ) => {
     setUploading(true)
     const {attachment_id, iframe_url} = await handleMediaSubmit(uploadData)

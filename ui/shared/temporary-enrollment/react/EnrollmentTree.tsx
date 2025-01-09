@@ -110,7 +110,7 @@ export function EnrollmentTree(props: Props) {
     let courseEnrollmentMap: Map<string | number, Enrollment> | undefined
     if (props.tempEnrollmentsPairing) {
       courseEnrollmentMap = new Map(
-        props.tempEnrollmentsPairing.map(enrollment => [enrollment.course_id, enrollment])
+        props.tempEnrollmentsPairing.map(enrollment => [enrollment.course_id, enrollment]),
       )
     }
     // populate a data structure with the information needed for each row
@@ -136,7 +136,7 @@ export function EnrollmentTree(props: Props) {
         let roleNode: NodeStructure = {
           id: roleId,
           label: roleData?.label,
-           
+
           children: new Array<NodeStructure>(),
           isToggle: false,
           isMixed: false,
@@ -327,7 +327,7 @@ export function EnrollmentTree(props: Props) {
           >
             {[...tree[role].children]}
           </EnrollmentTreeGroup>
-        </Flex.Item>
+        </Flex.Item>,
       )
     }
     return (
@@ -340,7 +340,7 @@ export function EnrollmentTree(props: Props) {
   const selectedEnrollments = handleCollectSelectedEnrollments(
     tree,
     props.enrollmentsByCourse,
-    props.selectedRole
+    props.selectedRole,
   )
   const isError = selectedEnrollments.length === 0
   if (loading) {

@@ -130,7 +130,7 @@ export default class DashboardCardBox extends React.Component<Props, State> {
         if (typeof cb === 'function') {
           cb()
         }
-      }
+      },
     )
   }
 
@@ -149,7 +149,7 @@ export default class DashboardCardBox extends React.Component<Props, State> {
         if (newCards.length === 0) {
           showNoFavoritesAlert()
         }
-      }
+      },
     )
   }
 

@@ -69,7 +69,7 @@ describe('useGradingSchemeCreateHook', () => {
     const createdGradingScheme = await result.current.createGradingScheme(
       'Course',
       courseId,
-      gradingSchemeTemplate
+      gradingSchemeTemplate,
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
@@ -109,7 +109,7 @@ describe('useGradingSchemeCreateHook', () => {
     const createdGradingScheme = await result.current.createGradingScheme(
       'Account',
       accountId,
-      gradingSchemeTemplate
+      gradingSchemeTemplate,
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()

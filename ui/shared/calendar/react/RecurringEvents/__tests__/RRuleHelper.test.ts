@@ -60,7 +60,7 @@ describe('RRuleHelper', () => {
 
     it('parses a weekly rule', () => {
       const spec = RRuleHelper.parseString(
-        'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;UNTIL=20201231T000000Z'
+        'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,WE,FR;UNTIL=20201231T000000Z',
       )
       expect(spec.freq).toEqual('WEEKLY')
       expect(spec.interval).toEqual(1)
@@ -75,7 +75,7 @@ describe('RRuleHelper', () => {
 
     it('parses a monthly by date rule', () => {
       const spec = RRuleHelper.parseString(
-        'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=17;BYMONTH=12;UNTIL=20201231T000000Z'
+        'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=17;BYMONTH=12;UNTIL=20201231T000000Z',
       )
       expect(spec.freq).toEqual('MONTHLY')
       expect(spec.interval).toEqual(1)

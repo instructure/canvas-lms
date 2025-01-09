@@ -96,7 +96,7 @@ export const RubricAssignmentContainer = ({
         courseId,
         assignmentId,
         rubricId,
-        updatedAssociation
+        updatedAssociation,
       )
       setRubric(response.rubric)
       setCanUpdateRubric(response.rubric.can_update)

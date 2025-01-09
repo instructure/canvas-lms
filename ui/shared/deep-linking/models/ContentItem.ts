@@ -35,7 +35,7 @@ export type ContentItem =
 
 const assertNever = (item: never): void => {
   const errorMessage = 'Could not process content item'
-  // eslint-disable-next-line no-console
+   
   console.error(errorMessage, item)
   captureException(new Error(errorMessage))
 }
@@ -54,7 +54,7 @@ export const contentItemToHtmlString =
         return resourceLinkContentItemToHtmlString(
           item,
           context.ltiEndpoint,
-          context.editorSelection
+          context.editorSelection,
         )
       default:
         assertNever(item)

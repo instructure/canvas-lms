@@ -55,8 +55,8 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
         showFlashError(
           I18n.t(
             "Couldn't track assigning students to groups, but it's still happening! Check the result manually later. (%{errorMessage})",
-            {errorMessage: e.message}
-          )
+            {errorMessage: e.message},
+          ),
         )()
         onCompletion(null)
       }
@@ -94,12 +94,12 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
             <Text as="div">
               <p>
                 {I18n.t(
-                  'We are currently assigning your students into groups per your selections. This can take a while.'
+                  'We are currently assigning your students into groups per your selections. This can take a while.',
                 )}
               </p>
               <p>
                 {I18n.t(
-                  "You can close this dialog box to continue working if you don't want to wait; assigning will continue in the background."
+                  "You can close this dialog box to continue working if you don't want to wait; assigning will continue in the background.",
                 )}
               </p>
             </Text>

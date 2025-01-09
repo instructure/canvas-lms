@@ -65,7 +65,7 @@ const roundToTwoDecimalPlaces = (num: number) => {
 export const findCriterionMatchingRatingIndex = (
   ratings: RubricRating[],
   points?: number,
-  criterionUseRange = false
+  criterionUseRange = false,
 ): number => {
   if (points == null) {
     return -1
@@ -78,7 +78,7 @@ export const findCriterionMatchingRatingIndex = (
 export const findCriterionMatchingRatingId = (
   ratings: RubricRating[],
   criterionUseRange: boolean,
-  rubricAssessmentData?: RubricAssessmentData
+  rubricAssessmentData?: RubricAssessmentData,
 ) => {
   const {id, points} = rubricAssessmentData || {}
   if (points == null) {

@@ -81,7 +81,7 @@ describe('useGradingSchemeUpdateHook', () => {
     const updatedGradingScheme = await result.current.updateGradingScheme(
       'Course',
       courseId,
-      gradingSchemeUpdateRequest
+      gradingSchemeUpdateRequest,
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()
@@ -126,7 +126,7 @@ describe('useGradingSchemeUpdateHook', () => {
     const updatedGradingScheme = await result.current.updateGradingScheme(
       'Account',
       accountId,
-      gradingSchemeUpdateRequest
+      gradingSchemeUpdateRequest,
     )
     // @ts-expect-error
     const lastCall = doFetchApi.mock.calls.pop()

@@ -68,7 +68,7 @@ const doRequest = (
   data: any,
   onSuccess: (res: Record<string, any>) => void,
   successMessage: string,
-  errorMessage: string
+  errorMessage: string,
 ) =>
   doFetchApi({
     path,
@@ -92,7 +92,7 @@ const doRequest = (
       showFlashAlert({
         err: e,
         message: errorMessage,
-      })
+      }),
     )
 
 export const updateModule = ({moduleId, moduleElement, data}: any) => {
@@ -113,7 +113,7 @@ export const updateModule = ({moduleId, moduleElement, data}: any) => {
     I18n.t('%{moduleName} settings updated successfully.', {
       moduleName: data.moduleName,
     }),
-    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName})
+    I18n.t('Error updating %{moduleName} settings.', {moduleName: data.moduleName}),
   )
 }
 
@@ -126,7 +126,7 @@ export const createModule = ({moduleElement, addModuleUI, data}: any) =>
     I18n.t('%{moduleName} created successfully.', {
       moduleName: data.moduleName,
     }),
-    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName})
+    I18n.t('Error creating %{moduleName}.', {moduleName: data.moduleName}),
   )
 
 export default function SettingsPanel({
@@ -221,7 +221,7 @@ export default function SettingsPanel({
     const handleRequest = moduleId ? updateModule : createModule
 
     setLoading(true)
-     
+
     handleRequest({moduleId, moduleElement, addModuleUI, data: state})
       .finally(() => setLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))
@@ -238,7 +238,7 @@ export default function SettingsPanel({
   // Sends data to parent when unmounting
   useEffect(
     () => () => updateParentData?.(state, !_.isEqual(initialState.current, state)),
-    [state, updateParentData]
+    [state, updateParentData],
   )
 
   return (

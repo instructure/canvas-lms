@@ -33,7 +33,7 @@ export default class QuizArrowApplicator {
     this.rightAnswers = this.$questions.find('.selected_answer.correct_answer')
     this.wrongAnswers = this.$questions.find('.selected_answer.wrong_answer')
     this.correctAnswers = this.$questions.find(
-      '.question:not(.short_answer_question, .numerical_question, .matching_question) .correct_answer:not(.selected_answer)'
+      '.question:not(.short_answer_question, .numerical_question, .matching_question) .correct_answer:not(.selected_answer)',
     )
     this.editableMatches = $('#quiz_edit_wrapper')
       .find(this.$questions.selector)
@@ -44,17 +44,17 @@ export default class QuizArrowApplicator {
     this.shortAnswers = this.$questions
       .filter(':not(.survey_results)')
       .find(
-        '.short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers'
+        '.short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers',
       )
     this.unansweredQ = $('.question.unanswered .header .question_name')
     this.creditPartial = $(
-      '#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name'
+      '#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name',
     )
     this.creditFull = $(
-      '#questions.suppress_correct_answers:not(.survey_results) .question.correct .header .question_name'
+      '#questions.suppress_correct_answers:not(.survey_results) .question.correct .header .question_name',
     )
     this.creditNone = $(
-      '#questions.suppress_correct_answers:not(.survey_results) .question.incorrect:not(.unanswered) .header .question_name'
+      '#questions.suppress_correct_answers:not(.survey_results) .question.incorrect:not(.unanswered) .header .question_name',
     )
     this.surveyAnswers = $('#questions.survey_results .selected_answer')
     this.rightTpl = $('<span />', {class: 'answer_arrow correct'})
@@ -73,13 +73,13 @@ export default class QuizArrowApplicator {
       [this.rightTpl, this.wrongTpl, this.correctTpl, this.shortTpl, this.surveyAnswerTpl],
       function () {
         this.css({[direction('left')]: -128, top: 5})
-      }
+      },
     )
     $.each(
       [this.unansweredTpl, this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl],
       function () {
         this.css({[direction('left')]: -108, top: 9})
-      }
+      },
     )
   }
 

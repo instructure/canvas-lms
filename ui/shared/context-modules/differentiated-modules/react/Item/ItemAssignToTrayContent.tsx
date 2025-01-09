@@ -121,7 +121,7 @@ const ItemAssignToCardMemo = memo(
       prevProps.contextModuleName === nextProps.contextModuleName &&
       !shouldValidatePostToSIS
     )
-  }
+  },
 )
 
 const ItemAssignToTrayContent = ({
@@ -199,7 +199,7 @@ const ItemAssignToTrayContent = ({
         }
         while (url && pageCount < MAX_PAGES) {
           // @ts-expect-error
-           
+
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
           // @ts-expect-error
@@ -218,7 +218,7 @@ const ItemAssignToTrayContent = ({
               ...(response.blueprint_date_locks || []),
             ],
           }),
-          {}
+          {},
         )
         // @ts-expect-error
         setBlueprintDateLocks(combinedResponse.blueprint_date_locks)
@@ -320,7 +320,7 @@ const ItemAssignToTrayContent = ({
         }
         while (url && pageCount < MAX_PAGES) {
           // @ts-expect-error
-           
+
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
           // @ts-expect-error
@@ -342,7 +342,7 @@ const ItemAssignToTrayContent = ({
               ...(response.blueprint_date_locks || []),
             ],
           }),
-          {}
+          {},
         )
 
         const dateDetailsApiResponse = combinedResponse
@@ -421,7 +421,7 @@ const ItemAssignToTrayContent = ({
             if (override.context_module_id && override.student_ids) {
               filteredStudents = filteredStudents?.filter(
                 // @ts-expect-error
-                student => !overriddenTargets?.students?.includes(student.id)
+                student => !overriddenTargets?.students?.includes(student.id),
               )
               removeCard = override.student_ids?.length > 0 && filteredStudents?.length === 0
             }
@@ -552,7 +552,7 @@ const ItemAssignToTrayContent = ({
       onCardRemove?.(cardId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onCardRemove, setAssignToCards]
+    [onCardRemove, setAssignToCards],
   )
 
   const handleCardValidityChange = useCallback(
@@ -565,17 +565,17 @@ const ItemAssignToTrayContent = ({
         }
       }
       const cards = assignToCardsRef.current.map(card =>
-        card.key === cardId ? {...card, isValid} : card
+        card.key === cardId ? {...card, isValid} : card,
       )
       setAssignToCards(cards)
     },
-    [assignToCardsRef, setAssignToCards]
+    [assignToCardsRef, setAssignToCards],
   )
 
   const handleCustomAssigneesChange = useCallback(
     (cardId: string, assignees: AssigneeOption[], deletedAssignees: string[]) => {
       const newSelectedOption = assignees.filter(
-        assignee => !disabledOptionIdsRef.current.includes(assignee.id)
+        assignee => !disabledOptionIdsRef.current.includes(assignee.id),
       )[0]
       const idData = newSelectedOption?.id?.split('-')
       const isEveryoneOption = newSelectedOption?.id === everyoneOption.id
@@ -633,7 +633,7 @@ const ItemAssignToTrayContent = ({
       hasModuleOverrides,
       isLoadingAssignees,
       onAssigneesChange,
-    ]
+    ],
   )
 
   const handleCardAssignment = useCallback(
@@ -660,7 +660,7 @@ const ItemAssignToTrayContent = ({
               hasAssignees: assignees.length > 0,
               hasInitialOverride: hasInitialAssignees,
             }
-          : card
+          : card,
       )
       if (onAssigneesChange) {
         handleCustomAssigneesChange(cardId, assignees, deletedAssignees)
@@ -668,7 +668,7 @@ const ItemAssignToTrayContent = ({
         const allSelectedOptions = [...disabledOptionIdsRef.current, ...assignees.map(({id}) => id)]
         const uniqueOptions = [...new Set(allSelectedOptions)]
         const newDisabled = uniqueOptions.filter(id =>
-          deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true
+          deletedAssignees.length > 0 ? !deletedAssignees.includes(id) : true,
         )
         disabledOptionIdsRef.current = newDisabled
       }
@@ -682,7 +682,7 @@ const ItemAssignToTrayContent = ({
       initialCards,
       onAssigneesChange,
       setAssignToCards,
-    ]
+    ],
   )
 
   const handleDatesChange = useCallback(
@@ -690,7 +690,7 @@ const ItemAssignToTrayContent = ({
       const newDate = dateValue // === null ? undefined : dateValue
       const initialCard = initialCards.find(card => card.key === cardId)
       const currentCardProps = assignToCardsRef.current.find(
-        card => card.key === cardId
+        card => card.key === cardId,
       ) as ItemAssignToCardSpec
       const currentCard = {...currentCardProps, [dateAttribute]: newDate}
       const priorCard = assignToCardsRef.current.find(card => card.key === cardId)
@@ -708,7 +708,7 @@ const ItemAssignToTrayContent = ({
       setAssignToCards(cards)
       onDatesChange?.(cardId, dateAttribute, newDate ?? '')
     },
-    [assignToCardsRef, initialCards, onDatesChange, setAssignToCards]
+    [assignToCardsRef, initialCards, onDatesChange, setAssignToCards],
   )
 
   const allCardsAssigned = () => {
@@ -798,7 +798,7 @@ const ItemAssignToTrayContent = ({
       postToSIS,
       disabledOptionIdsRef,
       defaultGroupCategoryId,
-    ]
+    ],
   )
 
   const shouldShowAddCard = useMemo(() => {

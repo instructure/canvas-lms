@@ -62,7 +62,7 @@ describe('handleDeepLinking', () => {
   function mockNewCollaborationElement() {
     jest
       .spyOn(document, 'querySelector')
-      .mockReturnValue({getAttribute: key => ({action: '/collaborations'}[key])})
+      .mockReturnValue({getAttribute: key => ({action: '/collaborations'})[key]})
   }
 
   function expectAJAXWithContentItems(url, method) {
@@ -148,7 +148,7 @@ describe('onExternalContentReady', () => {
       'POST',
       expect.anything(),
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     )
   })
 
@@ -160,7 +160,7 @@ describe('onExternalContentReady', () => {
         'PUT',
         expect.anything(),
         expect.anything(),
-        expect.anything()
+        expect.anything(),
       )
     })
   })

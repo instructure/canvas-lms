@@ -112,7 +112,7 @@ class FriendlyDatetime extends Component<Props> {
         </span>
       )
     },
-    () => this.props.dateTime
+    () => this.props.dateTime,
   )
 }
 

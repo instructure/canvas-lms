@@ -96,7 +96,7 @@ describe('TempEnrollUsersListRow', () => {
       fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: false, can_provide: true})
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
-        await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`)
+        await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`),
       ).toBeTruthy()
     })
 
@@ -104,7 +104,7 @@ describe('TempEnrollUsersListRow', () => {
       fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: true, can_provide: false})
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
-        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`)
+        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`),
       ).toBeTruthy()
     })
 
@@ -112,7 +112,7 @@ describe('TempEnrollUsersListRow', () => {
       fetchMock.get(STATUS_URL, {is_provider: true, is_recipient: false, can_provide: true})
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
-        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`)
+        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`),
       ).toBeTruthy()
     })
 
@@ -120,10 +120,10 @@ describe('TempEnrollUsersListRow', () => {
       fetchMock.get(STATUS_URL, {is_provider: false, is_recipient: true, can_provide: true})
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
-        await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`)
+        await findAllByText(`Create Temporary Enrollment Pairing for ${defaultProps.user.name}`),
       ).toBeTruthy()
       expect(
-        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`)
+        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`),
       ).toBeTruthy()
     })
 
@@ -131,10 +131,10 @@ describe('TempEnrollUsersListRow', () => {
       fetchMock.get(STATUS_URL, {is_provider: true, is_recipient: true, can_provide: true})
       const {findAllByText} = render(<TempEnrollUsersListRow {...defaultProps} />)
       expect(
-        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`)
+        await findAllByText(`Manage Temporary Enrollment Recipients for ${defaultProps.user.name}`),
       ).toBeTruthy()
       expect(
-        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`)
+        await findAllByText(`Manage Temporary Enrollment Providers for ${defaultProps.user.name}`),
       ).toBeTruthy()
     })
   })
@@ -150,7 +150,7 @@ describe('TempEnrollUsersListRow', () => {
 
     it('renders all tooltips when permissions true', async () => {
       const {findAllByTestId} = render(<TempEnrollUsersListRow {...defaultProps} />)
-      expect((await findAllByTestId('user-list-row-tooltip')).length).toBe(2)
+      expect((await findAllByTestId('user-list-row-tooltip'))).toHaveLength(2)
     })
 
     it('renders no tooltips when permissions are false', async () => {

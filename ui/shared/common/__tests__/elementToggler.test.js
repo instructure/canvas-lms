@@ -245,7 +245,7 @@ describe('elementToggler', () => {
 
   it('checkboxes can be used as trigger', async () => {
     const trigger = $(
-      '<input type="checkbox" class="element_toggler" aria-controls="thing">'
+      '<input type="checkbox" class="element_toggler" aria-controls="thing">',
     ).appendTo('#fixtures')
     const target = $('<div id="thing" style="display:none">thing</div>').appendTo('#fixtures')
 
@@ -260,7 +260,7 @@ describe('elementToggler', () => {
 
   it('toggles multiple elements separated by spaces', async () => {
     const trigger = $(
-      '<input type="checkbox" class="element_toggler" aria-controls="one two" />'
+      '<input type="checkbox" class="element_toggler" aria-controls="one two" />',
     ).appendTo('#fixtures')
 
     const target1 = $('<div id="one" style="display:none">one</div>').appendTo('#fixtures')

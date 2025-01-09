@@ -66,7 +66,7 @@ describe('RequirementSelector', () => {
     getByText('Module 2').click()
     expect(props.onUpdateRequirement).toHaveBeenCalledWith(
       {id: '2', name: 'Module 2', resource: 'page', type: 'view'},
-      0
+      0,
     )
   })
 
@@ -76,7 +76,7 @@ describe('RequirementSelector', () => {
     getByText('Contribute to the page').click()
     expect(props.onUpdateRequirement).toHaveBeenCalledWith(
       {id: '1', name: 'Module 1', resource: 'page', type: 'contribute'},
-      0
+      0,
     )
   })
 
@@ -115,7 +115,7 @@ describe('RequirementSelector', () => {
         minimumScore: '10',
         pointsPossible: '10',
       },
-      0
+      0,
     )
   })
 

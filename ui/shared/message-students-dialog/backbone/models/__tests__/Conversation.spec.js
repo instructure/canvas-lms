@@ -33,7 +33,7 @@ describe('Conversation', () => {
       conversation.validate({
         body: 'body',
         recipients: [{}],
-      })
+      }),
     ).toBeUndefined()
   })
 

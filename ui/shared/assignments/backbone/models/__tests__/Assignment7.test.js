@@ -92,27 +92,27 @@ describe('Assignment', () => {
       fakeENV.teardown()
     })
 
-    it('returns url from assignment\'s external tool attributes', () => {
+    it("returns url from assignment's external tool attributes", () => {
       const url = assignment.externalToolUrl()
       expect(url).toBe('http://lti13testtool.docker/launch')
     })
 
-    it('returns external data from assignment\'s external tool attributes', () => {
+    it("returns external data from assignment's external tool attributes", () => {
       const data = assignment.externalToolData()
       expect(data.key1).toBe('val1')
       expect(assignment.externalToolDataStringified()).toBe(JSON.stringify(externalData))
     })
 
-    it('returns custom params from assignment\'s external tool attributes', () => {
+    it("returns custom params from assignment's external tool attributes", () => {
       expect(assignment.externalToolCustomParams()).toBe(customParams)
     })
 
-    it('returns custom params stringified from assignment\'s external tool attributes', () => {
+    it("returns custom params stringified from assignment's external tool attributes", () => {
       const data = assignment.externalToolCustomParamsStringified()
       expect(data).toBe(JSON.stringify(customParams))
     })
 
-    it('returns new tab from assignment\'s external tool attributes', () => {
+    it("returns new tab from assignment's external tool attributes", () => {
       expect(assignment.externalToolNewTab()).toBe('0')
     })
   })

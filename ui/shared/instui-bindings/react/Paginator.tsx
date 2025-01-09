@@ -44,7 +44,6 @@ const Paginator = ({loadPage, page, pageCount, ...paginationProps}: Props): Reac
       {...paginationProps}
     >
       {Array.from(Array(pageCount)).map((v, i) => (
-         
         <Page onClick={() => loadPage(i + 1)} key={i + 1} current={page === i + 1}>
           <PresentationContent>{i + 1}</PresentationContent>
           <ScreenReaderContent>{I18n.t('Page %{page}', {page: i + 1})}</ScreenReaderContent>

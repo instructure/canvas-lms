@@ -52,18 +52,18 @@ export function DueDateTimeInput({
     // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const timeInputRef = useCallback(
     // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const onBlur = useMemo(() => handleBlur(key), [handleBlur])
   const messages = useMemo(
     () => generateMessages(dueDate, validationErrors[key] ?? null, unparsedFieldKeys.has(key)),
-    [dueDate, validationErrors, unparsedFieldKeys]
+    [dueDate, validationErrors, unparsedFieldKeys],
   )
 
   const dueDateProps = {

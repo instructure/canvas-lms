@@ -186,7 +186,7 @@ describe('action handling', () => {
       })
       const {manager} = createManagerWithMocks()
       manager.handleAction(
-        gotItemsSuccess([{uniqueId: 'day-1-group-1-item-0'}, {uniqueId: 'day-1-group-0-item-0'}])
+        gotItemsSuccess([{uniqueId: 'day-1-group-1-item-0'}, {uniqueId: 'day-1-group-0-item-0'}]),
       )
       expect(srAlertMock).toHaveBeenCalled()
     })

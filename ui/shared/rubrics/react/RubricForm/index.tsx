@@ -175,7 +175,7 @@ export const RubricForm = ({
       }
       validateField(key, value)
     },
-    [setRubricForm]
+    [setRubricForm],
   )
 
   const formValid = () => {
@@ -308,12 +308,12 @@ export const RubricForm = ({
         const criteria = [...criteriaRef.current]
         // Check if the outcome has already been added to this rubric
         const hasDuplicateLearningOutcomeId = criteria.some(
-          criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId
+          criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId,
         )
 
         if (hasDuplicateLearningOutcomeId) {
           showFlashError(
-            I18n.t('This Outcome has not been added as it already exists in this rubric.')
+            I18n.t('This Outcome has not been added as it already exists in this rubric.'),
           )()
 
           return
@@ -395,7 +395,7 @@ export const RubricForm = ({
               data-testid="rubric-limited-edit-mode-alert"
             >
               {I18n.t(
-                'Editing is limited for this rubric as it has already been used for grading.'
+                'Editing is limited for this rubric as it has already been used for grading.',
               )}
             </Alert>
           </Flex.Item>

@@ -37,7 +37,7 @@ describe('CriterionModal tests', () => {
         onSave={() => {}}
         hidePoints={false}
         {...props}
-      />
+      />,
     )
   }
 
@@ -83,7 +83,7 @@ describe('CriterionModal tests', () => {
       fireEvent.click(addRatingRow.firstChild as Element)
 
       const totalRatingNames = queryAllByTestId('rating-name')
-      expect(totalRatingNames.length).toEqual(DEFAULT_RUBRIC_RATINGS.length + 1)
+      expect(totalRatingNames).toHaveLength(DEFAULT_RUBRIC_RATINGS.length + 1)
 
       const ratingName = totalRatingNames[1] as HTMLInputElement
       const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
@@ -101,7 +101,7 @@ describe('CriterionModal tests', () => {
       fireEvent.click(addRatingRow.firstChild as Element)
 
       const totalRatingNames = queryAllByTestId('rating-name')
-      expect(totalRatingNames.length).toEqual(DEFAULT_RUBRIC_RATINGS.length + 1)
+      expect(totalRatingNames).toHaveLength(DEFAULT_RUBRIC_RATINGS.length + 1)
 
       const newLastIndex = totalRatingNames.length - 1
       const ratingName = totalRatingNames[newLastIndex] as HTMLInputElement
@@ -119,11 +119,11 @@ describe('CriterionModal tests', () => {
       fireEvent.click(removeRating)
 
       const totalRatingNames = queryAllByTestId('rating-name')
-      expect(totalRatingNames.length).toEqual(DEFAULT_RUBRIC_RATINGS.length - 1)
+      expect(totalRatingNames).toHaveLength(DEFAULT_RUBRIC_RATINGS.length - 1)
 
       const removedRating = totalRatingNames.find(
         ratingName =>
-          (ratingName as HTMLInputElement).value === DEFAULT_RUBRIC_RATINGS[2].description
+          (ratingName as HTMLInputElement).value === DEFAULT_RUBRIC_RATINGS[2].description,
       )
       expect(removedRating).toBeUndefined()
     })
@@ -347,8 +347,8 @@ describe('CriterionModal tests', () => {
       const {queryByTestId, queryAllByTestId} = renderComponent({unassessed: false})
 
       expect(queryByTestId('enable-range-checkbox')).toBeNull()
-      expect(queryAllByTestId('rating-points').length).toEqual(0)
-      expect(queryAllByTestId('rating-points-assessed').length).toEqual(5)
+      expect(queryAllByTestId('rating-points')).toHaveLength(0)
+      expect(queryAllByTestId('rating-points-assessed')).toHaveLength(5)
     })
 
     it('should not add a new rating if the rubric is assessed', () => {
@@ -373,8 +373,8 @@ describe('CriterionModal tests', () => {
       const {queryByTestId, queryAllByTestId} = renderComponent({hidePoints: true})
 
       expect(queryByTestId('enable-range-checkbox')).toBeNull()
-      expect(queryAllByTestId('rating-points').length).toEqual(0)
-      expect(queryAllByTestId('rating-points-assessed').length).toEqual(0)
+      expect(queryAllByTestId('rating-points')).toHaveLength(0)
+      expect(queryAllByTestId('rating-points-assessed')).toHaveLength(0)
     })
 
     it('does not render points read-only text if hidePoints is true', () => {
@@ -384,8 +384,8 @@ describe('CriterionModal tests', () => {
       })
 
       expect(queryByTestId('enable-range-checkbox')).toBeNull()
-      expect(queryAllByTestId('rating-points').length).toEqual(0)
-      expect(queryAllByTestId('rating-points-assessed').length).toEqual(0)
+      expect(queryAllByTestId('rating-points')).toHaveLength(0)
+      expect(queryAllByTestId('rating-points-assessed')).toHaveLength(0)
     })
   })
 
@@ -431,7 +431,7 @@ describe('CriterionModal tests', () => {
       })
 
       const longDescriptionInput = getByTestId(
-        'rubric-criterion-description-input'
+        'rubric-criterion-description-input',
       ) as HTMLInputElement
       fireEvent.change(longDescriptionInput, {target: {value: 'Modified Long Description'}})
 

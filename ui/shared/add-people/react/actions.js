@@ -96,7 +96,7 @@ actions.resolveValidationIssues = () => (dispatch, getState) => {
 
   const newUsers = resolveValidationIssues(
     state.userValidationResult.duplicates,
-    state.userValidationResult.missing
+    state.userValidationResult.missing,
   )
 
   // the list of users to be enrolled
@@ -121,7 +121,7 @@ actions.resolveValidationIssues = () => (dispatch, getState) => {
           user.user_name = u.name
           user.address = u.email
           return user
-        })
+        }),
       )
       dispatch(actions.enqueueUsersToBeEnrolled(usersToBeEnrolled))
     })

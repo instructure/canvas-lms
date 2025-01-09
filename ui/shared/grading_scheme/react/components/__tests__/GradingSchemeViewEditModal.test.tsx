@@ -49,7 +49,7 @@ describe('Grading Schemes View Edit Tests', () => {
         onUpdate={() => {}}
         onDelete={() => {}}
         {...props}
-      />
+      />,
     )
   }
 

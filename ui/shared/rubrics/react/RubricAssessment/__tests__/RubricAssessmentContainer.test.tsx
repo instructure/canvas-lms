@@ -40,7 +40,7 @@ describe('RubricAssessmentContainer Tests', () => {
         onDismiss={jest.fn()}
         onSubmit={jest.fn()}
         {...props}
-      />
+      />,
     )
   }
 
@@ -88,7 +88,7 @@ describe('RubricAssessmentContainer Tests', () => {
       expect(getByTestId('rubric-rating-button-self-assessment-selected-1')).toBeInTheDocument()
       const ratingDiv = getByTestId('rating-button-2-2')
       expect(
-        ratingDiv.querySelector('div[data-testid="rubric-rating-button-selected"]')
+        ratingDiv.querySelector('div[data-testid="rubric-rating-button-selected"]'),
       ).toBeInTheDocument()
 
       const firstDetailsDiv = getByTestId('rating-details-2')

@@ -29,7 +29,7 @@ const makeProps = (props = {}) =>
       pageCount: 0,
       parent: {},
     },
-    props
+    props,
   )
 
 describe('Paginator component', () => {
@@ -45,6 +45,6 @@ describe('Paginator component', () => {
 
   test('renders two pagination buttons when pageCount is 2', () => {
     const pager = shallow(<Paginator {...makeProps({page: 1, pageCount: 2})} />)
-    expect(pager.find('PaginationButton').length).toBe(2)
+    expect(pager.find('PaginationButton')).toHaveLength(2)
   })
 })

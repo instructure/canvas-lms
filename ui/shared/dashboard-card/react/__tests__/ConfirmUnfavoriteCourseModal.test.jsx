@@ -45,7 +45,7 @@ describe('ConfirmUnfavoriteCourseModal', () => {
           modalRef = ref
         }}
         {...mergedProps}
-      />
+      />,
     )
   }
 

@@ -41,7 +41,7 @@ describe('UploadRecordMediaModal', () => {
     return render(
       <RCSPropsContext.Provider value={mockTrayProps}>
         <UploadRecordMediaModal {...defaultProps} {...props} />
-      </RCSPropsContext.Provider>
+      </RCSPropsContext.Provider>,
     )
   }
 

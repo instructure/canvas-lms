@@ -37,7 +37,7 @@ const syncReducer = (state, action) => {
       const newSecondsRemaining = secondsUntilEditable(
         group,
         state.coolDownSeconds,
-        state.canBypassCooldown
+        state.canBypassCooldown,
       )
 
       return {
@@ -82,7 +82,7 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
     secondsRemaining: secondsUntilEditable(
       group,
       ENV.MANUAL_MSFT_SYNC_COOLDOWN,
-      ENV.MSFT_SYNC_CAN_BYPASS_COOLDOWN
+      ENV.MSFT_SYNC_CAN_BYPASS_COOLDOWN,
     ),
     readyForManualSync: readyStates.includes(group.workflow_state),
     showCountdown: coolDownRequiredStates.includes(group.workflow_state),
@@ -116,11 +116,11 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
         () => {
           onInfo(
             I18n.t(
-              'A sync is currently running. Please wait for current sync to finish before starting another.'
-            )
+              'A sync is currently running. Please wait for current sync to finish before starting another.',
+            ),
           )
         },
-        recentlyScheduled ? 5000 : 0 // Give time for the success message to show
+        recentlyScheduled ? 5000 : 0, // Give time for the success message to show
       )
       return
     }
@@ -133,8 +133,8 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
           {
             coolDown: Math.round(state.coolDownSeconds / 60),
             minutesRemaining: Math.round(state.secondsRemaining / 60),
-          }
-        )
+          },
+        ),
       )
       return
     }

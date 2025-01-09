@@ -57,7 +57,7 @@ export function getRandomInt(limit: number, floor = false): number {
 
 export function getWeightedPropIndex(
   props: (string | ConfettiObject)[],
-  totalWeight: number
+  totalWeight: number,
 ): number {
   let rand = Math.random() * totalWeight
   for (const i in props) {
@@ -77,11 +77,11 @@ export function getWeightedPropIndex(
 export function generateParticle(
   props: (string | ConfettiObject)[],
   colors: number[][],
-  speed: number
+  speed: number,
 ): Particle {
   const totalWeight = props.reduce(
     (weight, prop) => weight + (typeof prop === 'string' ? 1 : prop.weight || 1),
-    0
+    0,
   )
   const prop = props[getWeightedPropIndex(props, totalWeight)]
   return {
@@ -140,7 +140,7 @@ export function getRandomConfettiFlavor() {
     return generateConfettiObject(flavor)
   } catch (e) {
     if (e instanceof Error) {
-      // eslint-disable-next-line no-console
+       
       console.error(e.stack)
     }
     return null

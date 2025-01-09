@@ -93,7 +93,7 @@ class MissingPeopleSection extends React.Component {
       // The link was rendered with the attribute data-address=address for this row.
       // Use it to find the checkbox with the matching value.
       const checkbox = document.querySelector(
-        `input[type="checkbox"][value="${event.currentTarget.getAttribute('data-address')}"]`
+        `input[type="checkbox"][value="${event.currentTarget.getAttribute('data-address')}"]`,
       )
       if (checkbox) {
         checkbox.focus()
@@ -124,7 +124,7 @@ class MissingPeopleSection extends React.Component {
     this.setState({selectAll: event.currentTarget.checked})
     if (event.currentTarget.checked) {
       Object.keys(this.props.missing).forEach(address =>
-        this.onSelectNewForMissingByAddress(address)
+        this.onSelectNewForMissingByAddress(address),
       )
     } else {
       Object.keys(this.props.missing).forEach(address => this.onUncheckUserByAddress(address))

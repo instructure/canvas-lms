@@ -35,7 +35,7 @@ afterEach(() => {
 })
 
 it('does not render with null status', () => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<SubmissionStatusPill />, document.getElementById('fixtures'))
   const excusedPill = $('[data-testid="excused-pill"]')
   const missingPill = $('[data-testid="missing-pill"]')
@@ -46,17 +46,17 @@ it('does not render with null status', () => {
 })
 
 it('renders excused when given excused only', () => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<SubmissionStatusPill excused={true} />, document.getElementById('fixtures'))
   const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
 })
 
 it('renders only excused even when submission is also missing', () => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SubmissionStatusPill excused={true} submissionStatus="missing" />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
@@ -65,10 +65,10 @@ it('renders only excused even when submission is also missing', () => {
 })
 
 it('renders only excused even when submission is also late', () => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SubmissionStatusPill excused={true} submissionStatus="late" />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const excusedPill = $('[data-testid="excused-pill"]')
   expect(excusedPill.text()).toEqual('Excused')
@@ -77,10 +77,10 @@ it('renders only excused even when submission is also late', () => {
 })
 
 it('renders late when given late', () => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SubmissionStatusPill submissionStatus="late" />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const latePill = $('[data-testid="late-pill"]')
   expect(latePill.text()).toEqual('Late')
@@ -89,10 +89,10 @@ it('renders late when given late', () => {
 })
 
 it('renders missing when given missing', () => {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <SubmissionStatusPill submissionStatus="missing" />,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const missingPill = $('[data-testid="missing-pill"]')
   expect(missingPill.text()).toEqual('Missing')

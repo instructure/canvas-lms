@@ -42,7 +42,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
         'click .move_button': 'move',
         'keyup input.outcome_title': 'updateTitle',
       },
-      ValidatedFormView.prototype.events
+      ValidatedFormView.prototype.events,
     )
 
     // A validation key is the field name to validate.
@@ -91,7 +91,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
             this.state = opts.state
             return this.render()
           },
-        })
+        }),
       )
     }
     return super.initialize(...arguments)
@@ -131,7 +131,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
 
   fail() {
     return $.flashError(
-      I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
+      I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.'),
     )
   }
 
@@ -153,7 +153,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
           default:
             return 'edit'
         }
-      })()
+      })(),
     )
   }
 
@@ -201,7 +201,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
 
   delete(e) {
     e.preventDefault()
-     
+
     if (!window.confirm(I18n.t('confirm.delete', 'Are you sure you want to delete?'))) return
     this.state = 'delete'
     this.setModelUrl()
@@ -216,25 +216,25 @@ export default class OutcomeContentBase extends ValidatedFormView {
         error: (_model, response) => {
           if (
             response.responseText.match(
-              /Outcome.*cannot be deleted because it is aligned to content/
+              /Outcome.*cannot be deleted because it is aligned to content/,
             )
           ) {
             $.flashError(
               I18n.t(
                 'flash.userDeleteError',
-                'Outcome Group contains one or more Outcomes that are currently aligned to content.'
-              )
+                'Outcome Group contains one or more Outcomes that are currently aligned to content.',
+              ),
             )
           } else {
             $.flashError(
               I18n.t(
                 'flash.unexpectedDeleteError',
-                'Something went wrong. Unable to delete at this time.'
-              )
+                'Something went wrong. Unable to delete at this time.',
+              ),
             )
           }
         },
-      })
+      }),
     )
   }
 
@@ -272,7 +272,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
     const localElExists = this.$el.find('[name="description"]').length > 0
     const editorElExists = RichContentEditor.callOnRCE(
       this.$el.find('[name="description"]'),
-      'exists?'
+      'exists?',
     )
     return localElExists && editorElExists
   }

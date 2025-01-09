@@ -157,7 +157,7 @@ const useTreeBrowser = queryVariables => {
           collections: collectionsByParentId[g._id] || [],
         },
       }),
-      {}
+      {},
     )
   }, [groups])
 
@@ -620,7 +620,7 @@ export const useFindOutcomeModal = open => {
                 _id: ACCOUNT_GROUP_ID,
                 __typename: 'LearningOutcomeGroup',
               },
-            })
+            }),
           ),
           ...extractGroups({
             _id: ROOT_GROUP_ID,

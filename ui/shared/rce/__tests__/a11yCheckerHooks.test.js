@@ -85,7 +85,7 @@ describe('a11yCheckerHooks', () => {
         expect(true).toBe(true)
         done()
       })
-      
+
       // Simulate all stylesheets loading
       const links = fixturesContainer.querySelectorAll('link')
       links.forEach(link => link.onload())
@@ -106,9 +106,9 @@ describe('a11yCheckerHooks', () => {
             removeChild: node => {
               removeChildMock(node)
               return node
-            }
-          }
-        }
+            },
+          },
+        },
       })
 
       fakeEditor.dom.doc.styleSheets = {
@@ -117,17 +117,21 @@ describe('a11yCheckerHooks', () => {
         2: createStyleSheet(true, 'nonHC2.css'),
         3: createStyleSheet(false, '/base/spec/fixtures/a11yCheckerTest1.css'),
         4: createStyleSheet(false, '/base/spec/fixtures/a11yCheckerTest2.css'),
-        length: 5
+        length: 5,
       }
     })
 
     it('removes only high contrast stylesheets', () => {
       afterCheck(fakeEditor)
-      
+
       expect(removeChildMock).toHaveBeenCalledTimes(2)
       const calls = removeChildMock.mock.calls
-      expect(calls.some(call => call[0].href === '/base/spec/fixtures/a11yCheckerTest1.css')).toBe(true)
-      expect(calls.some(call => call[0].href === '/base/spec/fixtures/a11yCheckerTest2.css')).toBe(true)
+      expect(calls.some(call => call[0].href === '/base/spec/fixtures/a11yCheckerTest1.css')).toBe(
+        true,
+      )
+      expect(calls.some(call => call[0].href === '/base/spec/fixtures/a11yCheckerTest2.css')).toBe(
+        true,
+      )
     })
 
     it('enables all previously disabled stylesheets', () => {

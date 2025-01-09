@@ -169,7 +169,7 @@ export default function BlockEditor({
           showFlashError(I18n.t('Cannot get block custom templates'))(err)
         })
     },
-    [course_id]
+    [course_id],
   )
 
   const getTemplateEditor = useCallback(() => {
@@ -228,7 +228,7 @@ export default function BlockEditor({
           showFlashError(I18n.t('Failed saving template'))(err)
         })
     },
-    [blockTemplates, course_id]
+    [blockTemplates, course_id],
   )
 
   const deleteBlockTemplate = useCallback(
@@ -244,7 +244,7 @@ export default function BlockEditor({
           showFlashError(I18n.t('Failed deleting template'))(err)
         })
     },
-    [blockTemplates, course_id]
+    [blockTemplates, course_id],
   )
 
   const handleSaveTemplate = useCallback(
@@ -262,7 +262,7 @@ export default function BlockEditor({
         saveBlockTemplate(template)
       }
     },
-    [saveBlockTemplate]
+    [saveBlockTemplate],
   )
 
   const handleDeleteTemplate = useCallback(
@@ -271,7 +271,7 @@ export default function BlockEditor({
       const templateId = deleteTemplateEvent.detail
       deleteBlockTemplate(templateId)
     },
-    [deleteBlockTemplate]
+    [deleteBlockTemplate],
   )
 
   useEffect(() => {
@@ -296,7 +296,6 @@ export default function BlockEditor({
 
   useEffect(() => {
     if (data.version !== LATEST_BLOCK_DATA_VERSION) {
-       
       alert(I18n.t('Unknown block data version "%{v}", mayhem may ensue', {v: data.version}))
     }
   }, [data.version])
@@ -312,7 +311,7 @@ export default function BlockEditor({
         }),
       })
     },
-    [data.id]
+    [data.id],
   )
 
   const handleCloseToolbox = useCallback(() => {

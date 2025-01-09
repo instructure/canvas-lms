@@ -169,7 +169,7 @@ I18n.strftime = function (date, format) {
           R: '%H:%M',
           T: '%H:%M:%S',
           v: '%e-%b-%Y',
-        }[p1])
+        })[p1],
     )
     .replace(/%(%|\-?[a-zA-Z]|3N)/g, (str, p1) => {
       // check to see if we need an options object
@@ -293,10 +293,10 @@ I18n.pluralize = function (count, scope, options) {
         translation.zero != null
           ? translation.zero
           : translation.none != null
-          ? translation.none
-          : translation.other != null
-          ? translation.other
-          : this.missingTranslation(scope, 'zero')
+            ? translation.none
+            : translation.other != null
+              ? translation.other
+              : this.missingTranslation(scope, 'zero')
       break
     case 1:
       message = translation.one != null ? translation.one : this.missingTranslation(scope, 'one')

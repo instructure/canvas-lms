@@ -39,7 +39,7 @@ describe('lti.showAlert handler', () => {
     it('sends bad request postMessage', () => {
       handler({message, responseMessages})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
-        "Missing required 'body' field"
+        "Missing required 'body' field",
       )
     })
   })
@@ -52,7 +52,7 @@ describe('lti.showAlert handler', () => {
     it('sends bad request postMessage', () => {
       handler({message, responseMessages})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
-        "Unsupported value for 'alertType' field"
+        "Unsupported value for 'alertType' field",
       )
     })
   })

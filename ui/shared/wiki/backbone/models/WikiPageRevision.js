@@ -37,7 +37,7 @@ const I18n = createI18nScope('pages')
 
 const pageRevisionOptions = ['contextAssetString', 'page', 'pageUrl', 'latest', 'summary']
 
-export default WikiPageRevision = (function () {
+export default (WikiPageRevision = (function () {
   WikiPageRevision = class WikiPageRevision extends Backbone.Model {
     constructor(...args) {
       super(...args)
@@ -151,7 +151,7 @@ export default WikiPageRevision = (function () {
 
     restore() {
       const d = $.ajaxJSON(this.url(), 'POST').fail(() =>
-        $.flashError(I18n.t('restore_failed', 'Failed to restore page revision'))
+        $.flashError(I18n.t('restore_failed', 'Failed to restore page revision')),
       )
       $('#wiki_page_revisions').disableWhileLoading($.Deferred())
       return d
@@ -159,4 +159,4 @@ export default WikiPageRevision = (function () {
   }
   WikiPageRevision.initClass()
   return WikiPageRevision
-})()
+})())

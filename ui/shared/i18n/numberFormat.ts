@@ -24,7 +24,7 @@ const numberFormat = {
     options: {
       precision?: number
       strip_insignificant_zeros?: boolean
-    }
+    },
   ) {
     if (typeof n !== 'number' || Number.isNaN(Number(n))) {
       return n

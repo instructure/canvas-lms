@@ -59,13 +59,13 @@ export default function RequirementForm({
   } | null>()
   const availableRequirements: Requirement[] = useMemo(
     () => requirements.filter(requirement => requirement.resource !== undefined),
-    [requirements]
+    [requirements],
   )
 
   const availableModuleItems = useMemo(() => {
     const requirementIds = new Set(availableRequirements.map(requirement => requirement.id))
     const validModuleItems = moduleItems.filter(
-      module => !requirementIds.has(module.id) && module.resource !== undefined
+      module => !requirementIds.has(module.id) && module.resource !== undefined,
     )
     return validModuleItems
   }, [moduleItems, availableRequirements])
@@ -114,7 +114,7 @@ export default function RequirementForm({
       {availableRequirements.map((requirement, index) => (
         <RequirementSelector
           // This is needed to keep focus in the component after re-rendering when module changed
-           
+
           key={`requirement-${index}`}
           requirement={requirement}
           moduleItems={[requirement, ...availableModuleItems]}

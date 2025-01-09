@@ -125,7 +125,7 @@ function mergeDefaultOptions(options) {
 
 function getCourseColor(
   {assetString, color},
-  {K5_USER, K5_SUBJECT_COURSE, PREFERENCES: {custom_colors = {}}}
+  {K5_USER, K5_SUBJECT_COURSE, PREFERENCES: {custom_colors = {}}},
 ) {
   if (K5_USER || K5_SUBJECT_COURSE) {
     return color || '#394B58'
@@ -185,7 +185,7 @@ export async function initializePlanner(options) {
 
       if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
         throw new Error(
-          'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner'
+          'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner',
         )
       }
 
@@ -222,7 +222,7 @@ export async function initializePlanner(options) {
           'item',
           externalFocusableWrapper(options.externalFallbackFocusable),
           -1,
-          [specialFallbackFocusId('item')]
+          [specialFallbackFocusId('item')],
         )
       }
 
@@ -292,7 +292,7 @@ export function createPlannerApp() {
 createPlannerApp.scrollEventsRegistered = false
 
 function renderApp(element) {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(createPlannerApp(), element)
 }
 
@@ -301,7 +301,7 @@ function renderHeader(element, auxElement) {
   const ariaHideElement = document.getElementById('application')
 
   // Using this pattern because default params don't merge objects
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
@@ -317,7 +317,7 @@ function renderHeader(element, auxElement) {
         </Suspense>
       </Provider>
     </DynamicUiProvider>,
-    element
+    element,
   )
 }
 
@@ -333,7 +333,7 @@ export function renderToDoSidebar(element) {
     initializedOptions.env.current_user_roles.includes('teacher') &&
     initializedOptions.env.current_user_roles.includes('student')
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <Provider store={store}>
       <Suspense fallback={loading()}>
@@ -346,7 +346,7 @@ export function renderToDoSidebar(element) {
         />
       </Suspense>
     </Provider>,
-    element
+    element,
   )
 }
 

@@ -48,7 +48,7 @@ const KnowledgeCheckSectionToolbar = () => {
       })
       setModalOpen(false)
     },
-    [setProp]
+    [setProp],
   )
 
   return (

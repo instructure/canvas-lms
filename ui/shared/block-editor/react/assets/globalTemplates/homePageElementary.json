@@ -18,12 +18,7 @@
           "displayName": "Course Home - Elementary"
         },
         "hidden": false,
-        "nodes": [
-          "yue4mpUChN",
-          "oAMNQAESb2",
-          "Rztq3QJmgX",
-          "YQTjRM5pw4"
-        ],
+        "nodes": ["yue4mpUChN", "oAMNQAESb2", "Rztq3QJmgX", "YQTjRM5pw4"],
         "linkedNodes": {}
       },
       "yue4mpUChN": {
@@ -58,10 +53,7 @@
         },
         "parent": "yue4mpUChN",
         "hidden": false,
-        "nodes": [
-          "13kQFSc-L3",
-          "603nuIRHjG"
-        ],
+        "nodes": ["13kQFSc-L3", "603nuIRHjG"],
         "linkedNodes": {}
       },
       "13kQFSc-L3": {
@@ -108,10 +100,7 @@
         },
         "parent": "13kQFSc-L3",
         "hidden": false,
-        "nodes": [
-          "fnCfTyiE5O",
-          "bYsw-u-rVy"
-        ],
+        "nodes": ["fnCfTyiE5O", "bYsw-u-rVy"],
         "linkedNodes": {}
       },
       "fnCfTyiE5O": {
@@ -194,9 +183,7 @@
         },
         "parent": "603nuIRHjG",
         "hidden": false,
-        "nodes": [
-          "tUF84HE2cn"
-        ],
+        "nodes": ["tUF84HE2cn"],
         "linkedNodes": {}
       },
       "tUF84HE2cn": {
@@ -256,9 +243,7 @@
         },
         "parent": "oAMNQAESb2",
         "hidden": false,
-        "nodes": [
-          "aMrYCmAs5a"
-        ],
+        "nodes": ["aMrYCmAs5a"],
         "linkedNodes": {}
       },
       "aMrYCmAs5a": {
@@ -305,12 +290,7 @@
         },
         "parent": "aMrYCmAs5a",
         "hidden": false,
-        "nodes": [
-          "-73g57b2gx",
-          "KYY4tXFySz",
-          "x7XqulwDDi",
-          "-zeN1MQN3w"
-        ],
+        "nodes": ["-73g57b2gx", "KYY4tXFySz", "x7XqulwDDi", "-zeN1MQN3w"],
         "linkedNodes": {}
       },
       "-73g57b2gx": {
@@ -433,10 +413,7 @@
         },
         "parent": "Rztq3QJmgX",
         "hidden": false,
-        "nodes": [
-          "E2-qOwLGHV",
-          "Z6x8A4Itr0"
-        ],
+        "nodes": ["E2-qOwLGHV", "Z6x8A4Itr0"],
         "linkedNodes": {}
       },
       "E2-qOwLGHV": {
@@ -482,9 +459,7 @@
         },
         "parent": "E2-qOwLGHV",
         "hidden": false,
-        "nodes": [
-          "2dG8NCQo6D"
-        ],
+        "nodes": ["2dG8NCQo6D"],
         "linkedNodes": {}
       },
       "2dG8NCQo6D": {
@@ -552,9 +527,7 @@
         },
         "parent": "Z6x8A4Itr0",
         "hidden": false,
-        "nodes": [
-          "Sqmp4IL7Q6"
-        ],
+        "nodes": ["Sqmp4IL7Q6"],
         "linkedNodes": {}
       },
       "Sqmp4IL7Q6": {
@@ -605,10 +578,7 @@
         },
         "parent": "YQTjRM5pw4",
         "hidden": false,
-        "nodes": [
-          "C7KW-M9RFn",
-          "HKTRAv_Wh_"
-        ],
+        "nodes": ["C7KW-M9RFn", "HKTRAv_Wh_"],
         "linkedNodes": {}
       },
       "C7KW-M9RFn": {
@@ -654,9 +624,7 @@
         },
         "parent": "C7KW-M9RFn",
         "hidden": false,
-        "nodes": [
-          "HhTY7HrDAO"
-        ],
+        "nodes": ["HhTY7HrDAO"],
         "linkedNodes": {}
       },
       "HhTY7HrDAO": {
@@ -726,9 +694,7 @@
         },
         "parent": "HKTRAv_Wh_",
         "hidden": false,
-        "nodes": [
-          "D88xFgUhM0"
-        ],
+        "nodes": ["D88xFgUhM0"],
         "linkedNodes": {}
       },
       "D88xFgUhM0": {

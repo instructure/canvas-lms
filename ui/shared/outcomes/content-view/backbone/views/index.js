@@ -138,7 +138,7 @@ export default class ContentView extends Backbone.View {
         return moveDialog.model.on('finishedMoving', () => dialogWindow.dialog('close'))
       } else {
         return $.flashError(
-          I18n.t("No directory is selected, please select a directory before clicking 'move'")
+          I18n.t("No directory is selected, please select a directory before clicking 'move'"),
         )
       }
     })
@@ -146,7 +146,7 @@ export default class ContentView extends Backbone.View {
     $(moveDialog.window).dialog(
       'option',
       'title',
-      I18n.t('Where would you like to move %{title}?', {title: outcomeItem.get('title')})
+      I18n.t('Where would you like to move %{title}?', {title: outcomeItem.get('title')}),
     )
     $('.ui-dialog :button').blur()
     setTimeout(() => moveDialog.tree.focusOnOpen(), 200)
@@ -191,7 +191,7 @@ export default class ContentView extends Backbone.View {
       this.$el.empty()
     }
     const noOutcomesLinkLabel = I18n.t(
-      'You have no outcomes. Click here to go to the outcomes page.'
+      'You have no outcomes. Click here to go to the outcomes page.',
     )
     return this.$el != null
       ? this.$el.append(
@@ -199,8 +199,8 @@ export default class ContentView extends Backbone.View {
             noOutcomesWarning({
               addOutcomesUrl: `/${this._contextPath()}/outcomes`,
               noOutcomesLinkLabel,
-            })
-          )
+            }),
+          ),
         )
       : undefined
   }

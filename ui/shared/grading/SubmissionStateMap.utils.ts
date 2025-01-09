@@ -58,12 +58,12 @@ export function isHiddenFromStudent(assignment: Assignment, student: Student) {
 export function gradingPeriodInfoForCell(
   assignment: Assignment,
   student: Student,
-  selectedGradingPeriodID: string
+  selectedGradingPeriodID: string,
 ) {
   const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
   const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
     assignment,
-    student
+    student,
   )
   const inNoGradingPeriod = !gradingPeriodID
   const inOtherGradingPeriod =
@@ -80,12 +80,12 @@ export function cellMappingsForMultipleGradingPeriods(
   assignment: Assignment,
   student: Student,
   selectedGradingPeriodID: string,
-  isAdmin: boolean
+  isAdmin: boolean,
 ) {
   const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
   const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
     assignment,
-    student
+    student,
   )
   const gradingPeriodInfo = gradingPeriodInfoForCell(assignment, student, selectedGradingPeriodID)
   let cellMapping
@@ -106,7 +106,7 @@ export function cellMapForSubmission(
   student: Student,
   hasGradingPeriods: boolean,
   selectedGradingPeriodID: string,
-  isAdmin: boolean
+  isAdmin: boolean,
 ): Cell {
   if (!assignment.published || assignment.anonymize_students) {
     return {locked: true, hideGrade: true}
@@ -119,7 +119,7 @@ export function cellMapForSubmission(
       assignment,
       student,
       selectedGradingPeriodID,
-      isAdmin
+      isAdmin,
     )
   } else {
     return {locked: false, hideGrade: false}

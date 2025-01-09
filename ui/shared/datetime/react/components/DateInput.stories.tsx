@@ -64,14 +64,14 @@ const Template: Story<typeof CanvasDateInput> = (args: UnknownSubset<CanvasDateI
   const [locale, setLocale] = useState(args.locale || 'en')
   const [timezone, setTimezone] = useState(args.timezone || 'UTC')
   const [date, setDate] = useState<Date | null>(
-    args.selectedDate ? new Date(args.selectedDate) : null
+    args.selectedDate ? new Date(args.selectedDate) : null,
   )
 
   const [messages] = useState<FormMessage[]>([
     {type: 'hint', text: "Default date will be today's date"},
   ])
   const [dateFormatter, setDateFormatter] = useState<(date: Date) => string>(() =>
-    createDateFormatter(locale, timezone)
+    createDateFormatter(locale, timezone),
   )
 
   useEffect(() => {
@@ -105,7 +105,7 @@ const Template: Story<typeof CanvasDateInput> = (args: UnknownSubset<CanvasDateI
         setDateFormatterError(null)
       }
     },
-    []
+    [],
   )
 
   return (

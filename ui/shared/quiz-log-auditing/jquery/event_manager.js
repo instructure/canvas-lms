@@ -129,7 +129,7 @@ export default class EventManager {
       () =>
         // reset the events state, we'll try to deliver them again with the next
         // batch:
-        eventSet.markPendingDelivery()
+        eventSet.markPendingDelivery(),
     )
 
     const untrackDelivery = () => eraseFromArray(deliveries, delivery)
@@ -148,7 +148,7 @@ export default class EventManager {
 
     if (this.isDelivering() && !force) {
       console.warn(
-        'You are attempting to stop the QuizLogAuditing module while a delivery is in progress.'
+        'You are attempting to stop the QuizLogAuditing module while a delivery is in progress.',
       )
 
       return jWhen(state.deliveries).done(this.stop.bind(this, true))
@@ -170,7 +170,7 @@ export default class EventManager {
   _startDeliveryAgent() {
     return (this._state.deliveryAgent = setInterval(
       this.deliver.bind(this),
-      this.options.autoDeliveryFrequency
+      this.options.autoDeliveryFrequency,
     ))
   }
 

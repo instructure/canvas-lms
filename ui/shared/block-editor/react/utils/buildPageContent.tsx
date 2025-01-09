@@ -33,7 +33,7 @@ export const buildPageContent = (
   query: any,
   selectedSections: any[],
   _paletteName: string,
-  _fontName: string
+  _fontName: string,
 ) => {
   if (selectedSections.length === 0) {
     selectedSections.push('blank')

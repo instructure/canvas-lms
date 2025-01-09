@@ -124,7 +124,9 @@ describe('PostAssignmentGradesTray', () => {
       await userEvent.click(screen.getByLabelText('Freshmen'))
       await userEvent.click(screen.getByRole('button', {name: 'Post'}))
 
-      expect(Api.postAssignmentGradesForSections).toHaveBeenCalledWith('2301', ['2001'], {gradedOnly: false})
+      expect(Api.postAssignmentGradesForSections).toHaveBeenCalledWith('2301', ['2001'], {
+        gradedOnly: false,
+      })
     })
   })
 

@@ -51,7 +51,7 @@ describe('OutcomeCriterionModal', () => {
         isOpen={true}
         onDismiss={onDismissMock}
         {...props}
-      />
+      />,
     )
   }
 
@@ -74,29 +74,29 @@ describe('OutcomeCriterionModal', () => {
     const {queryAllByTestId} = renderComponent()
 
     expect(queryAllByTestId('outcome-rating-points')[0].textContent).toEqual(
-      criterion.ratings[0].points.toString()
+      criterion.ratings[0].points.toString(),
     )
     expect(queryAllByTestId('outcome-rating-points')[1].textContent).toEqual(
-      criterion.ratings[1].points.toString()
+      criterion.ratings[1].points.toString(),
     )
     expect(queryAllByTestId('outcome-rating-points')[2].textContent).toEqual(
-      criterion.ratings[2].points.toString()
+      criterion.ratings[2].points.toString(),
     )
     expect(queryAllByTestId('outcome-rating-points')[3].textContent).toEqual(
-      criterion.ratings[3].points.toString()
+      criterion.ratings[3].points.toString(),
     )
 
     expect(queryAllByTestId('outcome-rating-description')[0].textContent).toEqual(
-      criterion.ratings[0].description
+      criterion.ratings[0].description,
     )
     expect(queryAllByTestId('outcome-rating-description')[1].textContent).toEqual(
-      criterion.ratings[1].description
+      criterion.ratings[1].description,
     )
     expect(queryAllByTestId('outcome-rating-description')[2].textContent).toEqual(
-      criterion.ratings[2].description
+      criterion.ratings[2].description,
     )
     expect(queryAllByTestId('outcome-rating-description')[3].textContent).toEqual(
-      criterion.ratings[3].description
+      criterion.ratings[3].description,
     )
   })
 })

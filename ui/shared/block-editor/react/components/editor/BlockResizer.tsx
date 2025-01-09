@@ -83,7 +83,7 @@ const BlockResizer = ({mountPoint, sizeVariant}: BlockResizeProps) => {
         props.height = propHeight
       })
     },
-    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp, sizeVariant]
+    [currSz.height, currSz.width, maintainAspectRatio, node.dom, setProp, sizeVariant],
   )
 
   const handleResizeKeys = useCallback(
@@ -122,7 +122,7 @@ const BlockResizer = ({mountPoint, sizeVariant}: BlockResizeProps) => {
         setNewSize(newWidth, newHeight)
       }
     },
-    [node.dom, currSz.width, currSz.height, setNewSize]
+    [node.dom, currSz.width, currSz.height, setNewSize],
   )
 
   useEffect(() => {

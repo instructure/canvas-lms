@@ -51,7 +51,7 @@ it('sets focus to the saved item', () => {
   expect(registry.getComponent).toHaveBeenCalledWith('item', 'some-item')
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'fixed-element',
-    'position-memo'
+    'position-memo',
   )
   expect(mockRegistryEntries[0].component.getFocusable).toHaveBeenCalledWith('update')
   expect(animator.focusElement).toHaveBeenCalledWith('i1-focusable')
@@ -66,7 +66,7 @@ it('leaves focus alone (on the checkbox) if the item was toggled', () => {
   expect(animator.focusElement).not.toHaveBeenCalled()
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'fixed-element',
-    'position-memo'
+    'position-memo',
   )
   expect(animator.scrollTo).toHaveBeenCalledWith('i1-scrollable', 34)
 })

@@ -26,7 +26,7 @@ const renderBlock = (props: Partial<MediaBlockProps> = {}) => {
       <Frame>
         <MediaBlock {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 describe('MediaBlock', () => {

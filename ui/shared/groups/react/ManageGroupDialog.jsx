@@ -28,7 +28,6 @@ import '@canvas/jquery/jquery.instructure_forms'
 
 const I18n = createI18nScope('student_groups')
 
- 
 const ManageGroupDialog = createReactClass({
   displayName: 'ManageGroupDialog',
   mixins: [BackboneState, InfiniteScroll],
@@ -113,7 +112,7 @@ const ManageGroupDialog = createReactClass({
               </tr>
               <tr>
                 <td>
-                  { }
+                  {}
                   <label aria-live="polite" aria-atomic="true">
                     {I18n.t('Members')} {inviteLimit}
                   </label>

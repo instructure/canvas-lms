@@ -127,11 +127,11 @@ function Body({
   const footerHeight = '63'
   const panelHeight = useMemo(
     (): string => calculatePanelHeight(moduleId !== undefined),
-    [moduleId]
+    [moduleId],
   )
   const bodyHeight = useMemo(
     (): string => `calc(${panelHeight} - ${footerHeight}px)`,
-    [panelHeight]
+    [panelHeight],
   )
 
   const handleSubmitMissingTabs = () => {
@@ -141,7 +141,6 @@ function Body({
       assignToData.current &&
       moduleId
     ) {
-       
       updateModuleAssignees({
         courseId,
         moduleId,
@@ -154,7 +153,7 @@ function Body({
       settingsData.current
     ) {
       const performRequest = moduleId === undefined ? createModule : updateModule
-       
+
       performRequest({
         moduleId,
         moduleElement,

@@ -100,7 +100,7 @@ function* loadingLoop(fromMomentFunction, actionCreator, opts = {}) {
       // make sure we got a boolean like we expect.
       if (typeof stopLoading !== 'boolean') {
         throw new Error(
-          `saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`
+          `saga error invoking action ${actionCreator.name}. It returned a non-boolean: ${stopLoading}`,
         )
       }
       continueLoading = !stopLoading

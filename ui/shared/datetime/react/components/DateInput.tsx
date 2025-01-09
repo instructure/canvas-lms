@@ -187,7 +187,7 @@ export default function CanvasDateInput({
   const todayMoment = moment().tz(timezone)
 
   const [selectedMoment, setSelectedMoment] = useState(
-    selectedDate ? moment.tz(selectedDate, timezone) : null
+    selectedDate ? moment.tz(selectedDate, timezone) : null,
   )
   const [inputValue, setInputValue] = useState('')
   const [isShowingCalendar, setIsShowingCalendar] = useState(false)
@@ -215,7 +215,7 @@ export default function CanvasDateInput({
       const changedValue = firstMoment && firstMoment.isValid() && !firstMoment.isSame(secondMoment)
       return changedNull || changedValue
     },
-    []
+    [],
   )
 
   const syncInput = useCallback(
@@ -225,7 +225,7 @@ export default function CanvasDateInput({
       setInternalMessages([])
       setRenderedMoment(newMoment || todayMoment)
     },
-    [formatDate, todayMoment]
+    [formatDate, todayMoment],
   )
 
   useEffect(() => {
@@ -244,7 +244,7 @@ export default function CanvasDateInput({
   function generateMonthMoments() {
     const firstMoment = moment.tz(renderedMoment, timezone).startOf('month').startOf('week')
     return [...Array(Calendar.DAY_COUNT).keys()].map(index =>
-      firstMoment.clone().add(index, 'days')
+      firstMoment.clone().add(index, 'days'),
     )
   }
 
@@ -396,7 +396,7 @@ export default function CanvasDateInput({
 
   function modifySelectedMoment(
     step: moment.DurationInputArg1,
-    type?: moment.unitOfTime.DurationConstructor
+    type?: moment.unitOfTime.DurationConstructor,
   ) {
     // If we do not have a selectedMoment, we'll just select the first day of
     // the currently rendered month.
@@ -409,7 +409,7 @@ export default function CanvasDateInput({
 
   function modifyRenderedMoment(
     step: moment.DurationInputArg1,
-    type?: moment.unitOfTime.DurationConstructor
+    type?: moment.unitOfTime.DurationConstructor,
   ) {
     setRenderedMoment(renderedMoment.clone().add(step, type).startOf('day'))
   }

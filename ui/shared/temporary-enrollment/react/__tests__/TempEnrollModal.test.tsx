@@ -120,7 +120,7 @@ const enrollmentsByCourse = [
 ]
 
 const ENROLLMENTS_URI = encodeURI(
-  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`
+  `/api/v1/users/${modalProps.user.id}/courses?enrollment_state=active&include[]=sections&include[]=term&per_page=${MAX_ALLOWED_COURSES_PER_PAGE}&account_id=${enrollmentsByCourse[0].account_id}`,
 )
 
 // user_list did not match the encoded url (hence user_list[])
@@ -169,7 +169,7 @@ describe('TempEnrollModal', () => {
     render(
       <TempEnrollModal {...modalProps}>
         <p>child_element</p>
-      </TempEnrollModal>
+      </TempEnrollModal>,
     )
 
     expect(screen.queryByText('Find recipients of Temporary Enrollments')).toBeNull()
@@ -188,7 +188,7 @@ describe('TempEnrollModal', () => {
       const {findByTestId} = render(
         <TempEnrollModal {...modalProps}>
           <p>child_element</p>
-        </TempEnrollModal>
+        </TempEnrollModal>,
       )
 
       // trigger the modal to open and display the search screen (page 1)
@@ -210,7 +210,7 @@ describe('TempEnrollModal', () => {
       // wait for the modal to close (including animation)
       await waitFor(() => {
         expect(
-          screen.queryByText('Find recipients of Temporary Enrollments')
+          screen.queryByText('Find recipients of Temporary Enrollments'),
         ).not.toBeInTheDocument()
       })
     })
@@ -276,7 +276,7 @@ describe('TempEnrollModal', () => {
       // click next to go to the search results screen (page 2)
       await userEvent.click(next)
       expect(
-        await screen.findByText(/One user is ready to be assigned temporary enrollments/)
+        await screen.findByText(/One user is ready to be assigned temporary enrollments/),
       ).toBeInTheDocument()
 
       // click next to go to the assign screen (page 3)

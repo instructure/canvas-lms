@@ -36,7 +36,7 @@ export default function stubRouterContext(Component, props, stubs) {
       getCurrentQuery() {},
       isActive() {},
     },
-    stubs
+    stubs,
   )
   return class extends React.Component {
     static childContextTypes = {

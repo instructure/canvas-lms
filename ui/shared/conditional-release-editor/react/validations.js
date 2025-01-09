@@ -93,7 +93,7 @@ export const validateScores = (scores, scoringInfo) => {
     case GradingTypes.gpa_scale.key:
       checks.push(
         checkInGradingScheme.bind(null, scoringInfo.get('grading_scheme')),
-        checkBounds.bind(null, 0, 1.0)
+        checkBounds.bind(null, 0, 1.0),
       )
       break
     case GradingTypes.points.key:

@@ -44,7 +44,7 @@ describe('feature_flags:util', () => {
           enabled: 'allowed_on',
           disabled: 'allowed',
           lock: 'off',
-        })
+        }),
       )
     })
 
@@ -54,7 +54,7 @@ describe('feature_flags:util', () => {
           enabled: 'allowed_on',
           disabled: 'allowed',
           lock: 'on',
-        })
+        }),
       )
     })
 
@@ -63,7 +63,7 @@ describe('feature_flags:util', () => {
         expect.objectContaining({
           enabled: 'on',
           disabled: 'off',
-        })
+        }),
       )
     })
   })
@@ -71,61 +71,61 @@ describe('feature_flags:util', () => {
   describe('buildDescription', () => {
     it('generates the right things with allowsDefaults for context type account', () => {
       expect(util.buildDescription(sampleData.offFeature.feature_flag, true, 'Account')).toEqual(
-        'Disabled for all subaccounts'
+        'Disabled for all subaccounts',
       )
       expect(
-        util.buildDescription(sampleData.allowedFeature.feature_flag, true, 'Account')
+        util.buildDescription(sampleData.allowedFeature.feature_flag, true, 'Account'),
       ).toEqual('Allowed for subaccounts, default off')
       expect(
-        util.buildDescription(sampleData.allowedOnFeature.feature_flag, true, 'Account')
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, true, 'Account'),
       ).toEqual('Allowed for subaccounts, default on')
       expect(util.buildDescription(sampleData.onFeature.feature_flag, true, 'Account')).toEqual(
-        'Enabled for all subaccounts'
+        'Enabled for all subaccounts',
       )
     })
 
     it('generates the right things with allowsDefaults for context type course', () => {
       expect(util.buildDescription(sampleData.offFeature.feature_flag, true, 'Course')).toEqual(
-        'Disabled for all courses'
+        'Disabled for all courses',
       )
       expect(util.buildDescription(sampleData.allowedFeature.feature_flag, true, 'Course')).toEqual(
-        'Allowed for courses, default off'
+        'Allowed for courses, default off',
       )
       expect(
-        util.buildDescription(sampleData.allowedOnFeature.feature_flag, true, 'Course')
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, true, 'Course'),
       ).toEqual('Allowed for courses, default on')
       expect(util.buildDescription(sampleData.onFeature.feature_flag, true, 'Course')).toEqual(
-        'Enabled for all courses'
+        'Enabled for all courses',
       )
     })
 
     it('generates the right things with no allowsDefaults for context type account', () => {
       expect(util.buildDescription(sampleData.offFeature.feature_flag, false, 'Account')).toEqual(
-        'Disabled'
+        'Disabled',
       )
       expect(
-        util.buildDescription(sampleData.allowedFeature.feature_flag, false, 'Account')
+        util.buildDescription(sampleData.allowedFeature.feature_flag, false, 'Account'),
       ).toEqual('Disabled')
       expect(
-        util.buildDescription(sampleData.allowedOnFeature.feature_flag, false, 'Account')
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, false, 'Account'),
       ).toEqual('Enabled')
       expect(util.buildDescription(sampleData.onFeature.feature_flag, false, 'Account')).toEqual(
-        'Enabled'
+        'Enabled',
       )
     })
 
     it('generates the right things with no allowsDefaults for context type course', () => {
       expect(util.buildDescription(sampleData.offFeature.feature_flag, false, 'Course')).toEqual(
-        'Disabled'
+        'Disabled',
       )
       expect(
-        util.buildDescription(sampleData.allowedFeature.feature_flag, false, 'Course')
+        util.buildDescription(sampleData.allowedFeature.feature_flag, false, 'Course'),
       ).toEqual('Optional in course, default off')
       expect(
-        util.buildDescription(sampleData.allowedOnFeature.feature_flag, false, 'Course')
+        util.buildDescription(sampleData.allowedOnFeature.feature_flag, false, 'Course'),
       ).toEqual('Optional in course, default on')
       expect(util.buildDescription(sampleData.onFeature.feature_flag, false, 'Course')).toEqual(
-        'Enabled'
+        'Enabled',
       )
     })
   })
@@ -137,7 +137,7 @@ describe('feature_flags:util', () => {
       expect(util.doesAllowDefaults(sampleData.allowedFeature.feature_flag)).toBe(true)
       expect(util.doesAllowDefaults(sampleData.allowedOnFeature.feature_flag)).toBe(true)
       expect(util.doesAllowDefaults(sampleData.allowedOnRootAccountFeature.feature_flag)).toBe(
-        false
+        false,
       )
       expect(util.doesAllowDefaults(sampleData.allowedOnCourseFeature.feature_flag)).toBe(false)
     })
@@ -151,8 +151,8 @@ describe('feature_flags:util', () => {
       const {getByText} = render(message)
       expect(
         getByText(
-          'You are currently in the test-env environment. This will affect every customer. Are you sure?'
-        )
+          'You are currently in the test-env environment. This will affect every customer. Are you sure?',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -163,8 +163,8 @@ describe('feature_flags:util', () => {
       const {queryByText} = render(message)
       expect(
         queryByText(
-          'You are currently in the development environment. This will affect every customer. Are you sure?'
-        )
+          'You are currently in the development environment. This will affect every customer. Are you sure?',
+        ),
       ).not.toBeInTheDocument()
     })
 
@@ -175,8 +175,8 @@ describe('feature_flags:util', () => {
       const {queryByText} = render(message)
       expect(
         queryByText(
-          'You are currently in the test-env environment. This will affect every customer. Are you sure?'
-        )
+          'You are currently in the test-env environment. This will affect every customer. Are you sure?',
+        ),
       ).not.toBeInTheDocument()
     })
 
@@ -187,8 +187,8 @@ describe('feature_flags:util', () => {
       const {queryByText} = render(message)
       expect(
         queryByText(
-          'You are currently in the development environment. This will affect every customer. Are you sure?'
-        )
+          'You are currently in the development environment. This will affect every customer. Are you sure?',
+        ),
       ).not.toBeInTheDocument()
     })
   })

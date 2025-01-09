@@ -36,8 +36,8 @@ describe('edit_rubric', () => {
           ' <div class="rubric">' +
           '   <span class="toggle_for_hide_points">Hello</span>' +
           ' </div>' +
-          '</div>'
-      )
+          '</div>',
+      ),
     )
     rubricEditing.hidePoints($('.rubric'))
     expect($('.toggle_for_hide_points').hasClass('hidden')).toBe(true)
@@ -50,27 +50,27 @@ describe('edit_rubric', () => {
           ' <div class="rubric">' +
           '   <span class="toggle_for_hide_points hidden">Hello</span>' +
           ' </div>' +
-          '</div>'
-      )
+          '</div>',
+      ),
     )
     rubricEditing.showPoints($('.rubric'))
     expect($('.toggle_for_hide_points').hasClass('hidden')).toBe(false)
   })
 
   const rubricHtml =
-  '<div class="edit_rubric_test">' +
-  ' <div class="rubric">' +
-  '  <form id="edit_rubric_form">' +
-  '   <input type="checkbox" id="hide_points" class="hide_points_checkbox" />' +
-  '   <div class="rubric_grading" style="">' +
-  '    <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" />' +
-  '   </div>' +
-  '   <div class="totalling_rubric">' +
-  '    <input type="checkbox" id="totalling_rubric" class="totalling_rubric_checkbox" />' +
-  '   </div>' +
-  '  </form>' +
-  ' </div>' +
-  '</div>'
+    '<div class="edit_rubric_test">' +
+    ' <div class="rubric">' +
+    '  <form id="edit_rubric_form">' +
+    '   <input type="checkbox" id="hide_points" class="hide_points_checkbox" />' +
+    '   <div class="rubric_grading" style="">' +
+    '    <input type="checkbox" id="grading_rubric" class="grading_rubric_checkbox" />' +
+    '   </div>' +
+    '   <div class="totalling_rubric">' +
+    '    <input type="checkbox" id="totalling_rubric" class="totalling_rubric_checkbox" />' +
+    '   </div>' +
+    '  </form>' +
+    ' </div>' +
+    '</div>'
 
   it('opening new rubric from assignment page displays "use this rubric for assignment editing" right away', () => {
     $(document.body).append($(rubricHtml))
@@ -126,50 +126,50 @@ describe('edit_rubric', () => {
   })
 
   const criterionHtml =
-  '<tr id="criterion_blank" class="criterion">' +
-  '  <td style="padding: 0;">' +
-  '    <table class="ratings">' +
-  '      <tbody>' +
-  '        <tr>' +
-  '          <td class="rating">' +
-  '            <div class="container">' +
-  '              <div class="rating-main">' +
-  '                <span class="points">4</span>' +
-  '                <div class="description rating_description_value">Full Marks</div>' +
-  '                <span class="rating_id" style="display: none;">58_3952</span>' +
-  '              </div>' +
-  '            </div>' +
-  '          </td>' +
-  '          <td class="rating">' +
-  '            <div class="container">' +
-  '              <div class="rating-main">' +
-  '                <span class="points">2</span>' +
-  '                <div class="description rating_description_value">Partial Marks</div>' +
-  '                <span class="rating_id" style="display: none;">58_4365</span>' +
-  '              </div>' +
-  '            </div>' +
-  '          </td>' +
-  '          <td class="rating">' +
-  '            <div class="container">' +
-  '              <div class="rating-main">' +
-  '                <span class="points">0</span>' +
-  '                <div class="description rating_description_value">No Marks</div>' +
-  '                <span class="rating_id" style="display: none;">58_4372</span>' +
-  '              </div>' +
-  '            </div>' +
-  '          </td>' +
-  '        </tr>' +
-  '      </tbody>' +
-  '    </table>' +
-  '  </td>' +
-  '  <td class="nobr points_form toggle_for_hide_points">' +
-  '    <div class="editing" style="white-space: normal">' +
-  '      <input type="text" aria-label="Points" value="4" class="criterion_points span1 no-margin-bottom">' +
-  '      pts' +
-  '      </span><br>' +
-  '    </div>' +
-  '  </td>' +
-  '</tr>'
+    '<tr id="criterion_blank" class="criterion">' +
+    '  <td style="padding: 0;">' +
+    '    <table class="ratings">' +
+    '      <tbody>' +
+    '        <tr>' +
+    '          <td class="rating">' +
+    '            <div class="container">' +
+    '              <div class="rating-main">' +
+    '                <span class="points">4</span>' +
+    '                <div class="description rating_description_value">Full Marks</div>' +
+    '                <span class="rating_id" style="display: none;">58_3952</span>' +
+    '              </div>' +
+    '            </div>' +
+    '          </td>' +
+    '          <td class="rating">' +
+    '            <div class="container">' +
+    '              <div class="rating-main">' +
+    '                <span class="points">2</span>' +
+    '                <div class="description rating_description_value">Partial Marks</div>' +
+    '                <span class="rating_id" style="display: none;">58_4365</span>' +
+    '              </div>' +
+    '            </div>' +
+    '          </td>' +
+    '          <td class="rating">' +
+    '            <div class="container">' +
+    '              <div class="rating-main">' +
+    '                <span class="points">0</span>' +
+    '                <div class="description rating_description_value">No Marks</div>' +
+    '                <span class="rating_id" style="display: none;">58_4372</span>' +
+    '              </div>' +
+    '            </div>' +
+    '          </td>' +
+    '        </tr>' +
+    '      </tbody>' +
+    '    </table>' +
+    '  </td>' +
+    '  <td class="nobr points_form toggle_for_hide_points">' +
+    '    <div class="editing" style="white-space: normal">' +
+    '      <input type="text" aria-label="Points" value="4" class="criterion_points span1 no-margin-bottom">' +
+    '      pts' +
+    '      </span><br>' +
+    '    </div>' +
+    '  </td>' +
+    '</tr>'
 
   it('sets the first rating value to the points input initially when a criterion id is "blank"', () => {
     $(document.body).append($(rubricHtml))

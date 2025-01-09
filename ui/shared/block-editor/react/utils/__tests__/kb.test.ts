@@ -155,7 +155,7 @@ describe('keyboard utilities', () => {
       document.body.appendChild(div)
       setCaretToEnd(div)
       expect(shouldAddNewNode(makeKeyboardEvent({key: 'Enter', currentTarget: div}), 'Enter')).toBe(
-        true
+        true,
       )
     })
 
@@ -164,7 +164,7 @@ describe('keyboard utilities', () => {
       document.body.appendChild(div)
       setCaretToEnd(div)
       expect(shouldAddNewNode(makeKeyboardEvent({key: 'Enter', currentTarget: div}), 'Enter')).toBe(
-        false
+        false,
       )
     })
 
@@ -176,8 +176,8 @@ describe('keyboard utilities', () => {
       expect(
         shouldAddNewNode(
           makeKeyboardEvent({key: 'Enter', currentTarget: div, ctrlKey: true}),
-          'Enter'
-        )
+          'Enter',
+        ),
       ).toBe(false)
     })
 
@@ -193,7 +193,7 @@ describe('keyboard utilities', () => {
       sel?.removeAllRanges()
       sel?.addRange(range)
       expect(shouldAddNewNode(makeKeyboardEvent({key: 'Enter', currentTarget: div}), 'Enter')).toBe(
-        false
+        false,
       )
     })
 
@@ -203,7 +203,7 @@ describe('keyboard utilities', () => {
       document.body.appendChild(div)
       setCaretToEnd(div)
       expect(shouldAddNewNode(makeKeyboardEvent({key: 'Enter', currentTarget: div}), 'a')).toBe(
-        false
+        false,
       )
     })
   })
@@ -260,7 +260,7 @@ describe('keyboard utilities', () => {
       div.innerHTML = 'hello world'
       document.body.appendChild(div)
       expect(shouldDeleteNode(makeKeyboardEvent({key: 'Backspace', currentTarget: div}))).toBe(
-        false
+        false,
       )
     })
   })

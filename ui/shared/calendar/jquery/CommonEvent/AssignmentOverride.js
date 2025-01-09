@@ -27,7 +27,7 @@ const I18n = createI18nScope('calendar')
 
 const deleteConfirmation = I18n.t(
   'prompts.delete_override',
-  'Are you sure you want to delete this assignment override?'
+  'Are you sure you want to delete this assignment override?',
 )
 
 extend(AssignmentOverride, CommonEvent)
@@ -101,7 +101,7 @@ Object.assign(AssignmentOverride.prototype, {
     return this.save(
       {'assignment_override[due_at]': this.start ? fcUtil.unwrap(this.start).toISOString() : ''},
       success,
-      error
+      error,
     )
   },
 

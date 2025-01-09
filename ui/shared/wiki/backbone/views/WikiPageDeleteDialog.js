@@ -71,7 +71,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
         $.flashMessage(
           I18n.t('notices.page_deleted', 'The page "%{title}" has been deleted.', {
             title: page_title,
-          })
+          }),
         )
         dfd.resolve()
         return this.close()
@@ -82,7 +82,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
       $.flashError(
         I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', {
           title: page_title,
-        })
+        }),
       )
       return dfd.reject()
     })

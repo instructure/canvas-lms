@@ -84,7 +84,7 @@ export function clearPrefetchedXHRs() {
  */
 export function asAxios<T>(
   fetchRequest: Promise<Response>,
-  type: 'json' | 'text' = 'json'
+  type: 'json' | 'text' = 'json',
 ):
   | Promise<{
       data: T
@@ -104,7 +104,7 @@ export function asAxios<T>(
           data,
           headers: {link: res.headers.get('Link')},
         }
-      })
+      }),
   )
 }
 
@@ -153,7 +153,7 @@ type DefaultFetchOptionsOptions = {
  * @returns
  */
 export const defaultFetchOptions = (
-  options: DefaultFetchOptionsOptions = {}
+  options: DefaultFetchOptionsOptions = {},
 ): {
   credentials: 'include' | 'omit' | 'same-origin'
   headers: Record<string, string>

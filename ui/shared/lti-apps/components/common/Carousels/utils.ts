@@ -19,7 +19,7 @@
 import type {Badges, Product} from '../../../models/Product'
 
 interface Settings {
-  [key: string]: number | boolean | Array<number> | Object
+  [key: string]: number | boolean | Array<number> | object
 }
 
 export const settings = (items: string[] | Badges[] | Product[]): Settings => {
@@ -53,7 +53,7 @@ export const calculateArrowDisableIndex = (
   items: string[] | Badges[] | Product[],
   isDesktop: boolean,
   isTablet: boolean,
-  isMobile: boolean
+  isMobile: boolean,
 ): {type: number} => {
   const total = items.length
   if (isMobile && total === 2) {

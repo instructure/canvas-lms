@@ -27,7 +27,7 @@ const inlineMediaComment = {
     $(
       `<a href="#" style="font-size: 0.8em;">
       ${htmlEscape(I18n.t('links.minimize_embedded_kaltura_content', 'Minimize embedded content'))}
-    </a>`
+    </a>`,
     ),
 
   buildCommentHolder: _$link =>
@@ -77,9 +77,8 @@ const resizeContainingTd = $link => {
 $(document).on('click', 'a.instructure_inline_media_comment', function (event) {
   event.preventDefault()
   if (!INST.kalturaSettings) {
-     
     window.alert(
-      I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site')
+      I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'),
     )
     return
   }

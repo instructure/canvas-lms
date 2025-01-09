@@ -82,7 +82,7 @@ export default function ContentTypeExternalToolDrawer({
         MutexManager.releaseMutex(initDrawerLayoutMutex)
       }
     },
-    [pageContent, initDrawerLayoutMutex]
+    [pageContent, initDrawerLayoutMutex],
   )
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function ContentTypeExternalToolDrawer({
   useEffect(
     // returns cleanup function:
     () => handleExternalContentMessages({ready: onExternalContentReady}),
-    [onExternalContentReady]
+    [onExternalContentReady],
   )
 
   return (

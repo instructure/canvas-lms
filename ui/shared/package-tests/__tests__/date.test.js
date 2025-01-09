@@ -95,25 +95,25 @@ describe('Date', () => {
       date
         .clone()
         .addMilliseconds(1)
-        .equals(new Date(date.clone().setUTCMilliseconds(1000)))
+        .equals(new Date(date.clone().setUTCMilliseconds(1000))),
     ).toBe(true)
     expect(
       date
         .clone()
         .addSeconds(1)
-        .equals(new Date(date.clone().setUTCSeconds(60)))
+        .equals(new Date(date.clone().setUTCSeconds(60))),
     ).toBe(true)
     expect(
       date
         .clone()
         .addMinutes(1)
-        .equals(new Date(date.clone().setUTCMinutes(60)))
+        .equals(new Date(date.clone().setUTCMinutes(60))),
     ).toBe(true)
     expect(
       date
         .clone()
         .addHours(1)
-        .equals(new Date(date.clone().setUTCHours(date.getUTCHours() + 1)))
+        .equals(new Date(date.clone().setUTCHours(date.getUTCHours() + 1))),
     ).toBe(true)
   })
 

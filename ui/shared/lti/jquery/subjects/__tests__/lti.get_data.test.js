@@ -50,7 +50,7 @@ describe('lti.get_data handler', () => {
     it('sends bad request error postMessage', () => {
       handler({message, responseMessages, event})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
-        "Missing required 'key' field"
+        "Missing required 'key' field",
       )
     })
   })
@@ -63,7 +63,7 @@ describe('lti.get_data handler', () => {
     it('sends bad request error postMessage', () => {
       handler({message, responseMessages, event})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
-        "Missing required 'message_id' field"
+        "Missing required 'message_id' field",
       )
     })
   })

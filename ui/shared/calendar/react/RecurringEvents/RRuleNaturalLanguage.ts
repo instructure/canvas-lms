@@ -137,7 +137,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
         {
           count: interval,
           times,
-        }
+        },
       )
     } else if (until_date) {
       return I18n.t(
@@ -148,7 +148,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
         {
           count: interval,
           until: format_date(until_date),
-        }
+        },
       )
     }
     return ''
@@ -178,7 +178,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
         {
           count: interval,
           times,
-        }
+        },
       )
     } else if (until_date) {
       I18n.t(
@@ -189,7 +189,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
         {
           count: interval,
           until: format_date(until_date),
-        }
+        },
       )
     }
     return ''
@@ -213,7 +213,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           count: interval,
           byday: by_day,
           times,
-        }
+        },
       )
     } else if (until_date) {
       return I18n.t(
@@ -225,7 +225,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           count: interval,
           byday: by_day,
           until: format_date(until_date),
-        }
+        },
       )
     }
     return ''
@@ -261,7 +261,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
             ord: ordinalize(pos),
             days: days_of_week,
             times,
-          }
+          },
         )
       }
     } else if (until_date) {
@@ -276,7 +276,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
             ord: ordinalize(pos),
             days: days_of_week,
             until: format_date(until_date),
-          }
+          },
         )
       }
     }
@@ -299,7 +299,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           count: interval,
           days: days_of_month,
           times,
-        }
+        },
       )
     } else if (until_date) {
       return I18n.t(
@@ -311,7 +311,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           count: interval,
           days: days_of_month,
           until: format_date(until_date),
-        }
+        },
       )
     } else {
       return ''
@@ -351,7 +351,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
             days: days_of_week,
             month,
             times,
-          }
+          },
         )
       }
     } else if (until_date) {
@@ -366,7 +366,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           days: days_of_week,
           month,
           until: format_date(until_date),
-        }
+        },
       )
     }
     return ''
@@ -393,7 +393,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           count: interval,
           date,
           times,
-        }
+        },
       )
     } else if (until_date) {
       return I18n.t(
@@ -405,7 +405,7 @@ export default function RRuleToNaturalLanguage(rrule: string, locale: string, ti
           count: interval,
           date,
           until: format_date(until_date),
-        }
+        },
       )
     } else {
       return ''

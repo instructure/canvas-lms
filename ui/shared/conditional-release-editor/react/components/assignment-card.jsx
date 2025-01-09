@@ -109,7 +109,7 @@ class AssignmentCard extends React.Component {
         <div className="cr-assignment-card__content" ref={this.contentRef} aria-label={label}>
           <i
             className={`cr-assignment-card__icon icon-${this.itemClass(
-              this.props.assignment.get('category')
+              this.props.assignment.get('category'),
             )}`}
           />
           <p className="cr-assignment-card__points">{points}</p>
@@ -138,9 +138,9 @@ class AssignmentCard extends React.Component {
           {this.renderContent()}
           {this.renderMenu()}
         </div>,
-        {dropEffect: 'move'}
+        {dropEffect: 'move'},
       ),
-      {captureDraggingState: true}
+      {captureDraggingState: true},
     )
   }
 }

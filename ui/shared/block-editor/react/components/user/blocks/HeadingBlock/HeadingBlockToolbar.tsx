@@ -61,19 +61,19 @@ const HeadingBlockToolbar = () => {
       _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       const level = value as HeadingBlockProps['level']
       setProp((prps: HeadingBlockProps) => (prps.level = level))
     },
-    [setProp]
+    [setProp],
   )
   const handleFontSizeChange = useCallback(
     (
       _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       if (value === 'default') {
         setProp((prps: HeadingBlockProps) => delete prps.fontSize)
@@ -81,7 +81,7 @@ const HeadingBlockToolbar = () => {
         setProp((prps: HeadingBlockProps) => (prps.fontSize = value as string))
       }
     },
-    [setProp]
+    [setProp],
   )
 
   return (

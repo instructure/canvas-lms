@@ -49,7 +49,7 @@ describe('Focus Handling', () => {
         apiState={{
           error: 'Some random error',
         }}
-      />
+      />,
     )
 
     expect(within(document.activeElement).queryByText('Cancel')).toBeInTheDocument()

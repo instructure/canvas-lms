@@ -31,7 +31,7 @@ const items = handleActions(
     DELETED_PLANNER_ITEM: deleteItem,
     CLEAR_SIDEBAR: () => [],
   },
-  []
+  [],
 )
 
 function deleteItem(state, action) {
@@ -49,7 +49,7 @@ const nextUrl = handleActions(
     SIDEBAR_ITEMS_LOADED: (state, action) => action.payload.nextUrl,
     CLEAR_SIDEBAR: () => null,
   },
-  null
+  null,
 )
 
 const loading = handleActions(
@@ -60,7 +60,7 @@ const loading = handleActions(
     SIDEBAR_ITEMS_LOADING_FAILED: () => false,
     CLEAR_SIDEBAR: () => false,
   },
-  false
+  false,
 )
 
 const loaded = handleActions(
@@ -68,7 +68,7 @@ const loaded = handleActions(
     SIDEBAR_ENOUGH_ITEMS_LOADED: () => true,
     CLEAR_SIDEBAR: () => false,
   },
-  false
+  false,
 )
 
 const loadingError = handleActions(
@@ -80,7 +80,7 @@ const loadingError = handleActions(
       return error
     },
   },
-  null
+  null,
 )
 
 const range = handleActions(
@@ -91,7 +91,7 @@ const range = handleActions(
     },
     CLEAR_SIDEBAR: () => ({}),
   },
-  {}
+  {},
 )
 
 const combinedReducer = combineReducers({

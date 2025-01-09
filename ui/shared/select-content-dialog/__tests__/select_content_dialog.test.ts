@@ -107,7 +107,7 @@ describe('SelectContentDialog', () => {
     $dialog.dialog('close')
     expect(window.confirm).toHaveBeenCalledTimes(1)
     expect(window.confirm).toHaveBeenCalledWith(
-      expect.stringMatching(/Changes you made may not be saved/)
+      expect.stringMatching(/Changes you made may not be saved/),
     )
   })
 
@@ -317,7 +317,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
   }
   const makeDeepLinkingEvent = (additionalContentItemFields = {}, omitFields: string[] = []) => {
     const omittedContentItem = Object.fromEntries(
-      Object.entries(contentItem).filter(([key]) => !omitFields.includes(key))
+      Object.entries(contentItem).filter(([key]) => !omitFields.includes(key)),
     )
     return {
       data: {
@@ -354,8 +354,8 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
         {
           title: 'My Tool',
         },
-        ['url']
-      ) as MessageEvent
+        ['url'],
+      ) as MessageEvent,
     )
     expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/tool-url')
   })
@@ -367,8 +367,8 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
         {
           title: 'My Tool',
         },
-        ['url']
-      ) as MessageEvent
+        ['url'],
+      ) as MessageEvent,
     )
     expect($('#external_tool_create_url').val()).toEqual('https://www.my-tool.com/tool-url')
   })
@@ -428,10 +428,10 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
     expect(data['item[iframe][height]']).toEqual('456')
     expect(data['item[line_item]']).toEqual('{"scoreMaximum":4}')
     expect(data['item[available]']).toEqual(
-      '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-22T00:00:00.000Z"}'
+      '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-22T00:00:00.000Z"}',
     )
     expect(data['item[submission]']).toEqual(
-      '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-21T00:00:00.000Z"}'
+      '{"startDateTime":"2023-04-12T00:00:00.000Z","endDateTime":"2023-04-21T00:00:00.000Z"}',
     )
     expect(data['item[description]']).toEqual('Description text')
     expect(data['item[preserveExistingAssignmentName]']).toEqual('true')
@@ -446,7 +446,7 @@ describe('SelectContentDialog: deepLinkingResponseHandler', () => {
 
   it('checks the new tab checkbox if content item window.targetName is _blank', async () => {
     deepLinkingResponseHandler(
-      makeDeepLinkingEvent({window: {targetName: '_blank'}}) as MessageEvent
+      makeDeepLinkingEvent({window: {targetName: '_blank'}}) as MessageEvent,
     )
 
     const data = extractContextExternalToolItemData()

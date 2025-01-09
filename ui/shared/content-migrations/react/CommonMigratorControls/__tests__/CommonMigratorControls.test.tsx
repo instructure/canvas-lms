@@ -35,7 +35,7 @@ const renderComponent = (overrideProps?: any) =>
       SubmitLabel={TextLabel}
       CancelLabel={TextCancelLabel}
       SubmittingLabel={TextSubmittingLabel}
-    />
+    />,
   )
 
 const TextLabel = () => <Text>Add to Import Queue</Text>
@@ -59,15 +59,13 @@ describe('CommonMigratorControls', () => {
   it('calls onSubmit with import_quizzes_next', async () => {
     const {getByRole} = renderComponent({canImportAsNewQuizzes: true})
 
-    await userEvent.click(
-      expectNqCheckbox(getByRole)
-    )
+    await userEvent.click(expectNqCheckbox(getByRole))
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({import_quizzes_next: true}),
-      })
+      }),
     )
   })
 
@@ -75,14 +73,14 @@ describe('CommonMigratorControls', () => {
     renderComponent({canOverwriteAssessmentContent: true})
 
     await userEvent.click(
-      screen.getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
+      screen.getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/}),
     )
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({overwrite_quizzes: true}),
-      })
+      }),
     )
   })
 
@@ -101,7 +99,7 @@ describe('CommonMigratorControls', () => {
           old_end_date: '',
           old_start_date: '',
         },
-      })
+      }),
     )
   })
 
@@ -117,14 +115,14 @@ describe('CommonMigratorControls', () => {
   it('calls onSubmit with import_blueprint_settings', async () => {
     renderComponent({canSelectContent: true, canImportBPSettings: true})
     await userEvent.click(
-      await screen.getByRole('checkbox', {name: 'Import Blueprint Course settings'})
+      await screen.getByRole('checkbox', {name: 'Import Blueprint Course settings'}),
     )
     await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
 
     expect(onSubmit).toHaveBeenCalledWith(
       expect.objectContaining({
         settings: expect.objectContaining({import_blueprint_settings: true}),
-      })
+      }),
     )
   })
 
@@ -196,7 +194,7 @@ describe('CommonMigratorControls', () => {
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
         CancelLabel={TextCancelLabel}
-      />
+      />,
     )
     expect(getByRole('radio', {name: 'Shift dates'})).toBeInTheDocument()
     expect(getByRole('radio', {name: 'Shift dates'})).toBeDisabled()
@@ -232,12 +230,12 @@ describe('CommonMigratorControls', () => {
         SubmitLabel={TextLabel}
         SubmittingLabel={TextSubmittingLabel}
         CancelLabel={TextCancelLabel}
-      />
+      />,
     )
     expect(getByRole('checkbox', {name: 'Import Blueprint Course settings'})).toBeDisabled()
     expect(expectNqCheckbox(getByRole)).toBeDisabled()
     expect(
-      getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/})
+      getByRole('checkbox', {name: /Overwrite assessment content with matching IDs/}),
     ).toBeDisabled()
   })
 
@@ -368,7 +366,10 @@ describe('CommonMigratorControls', () => {
           window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = false
           renderComponent({canImportAsNewQuizzes: true})
           await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-          expect(onSubmit).toHaveBeenCalledWith({errored: false, settings: {import_quizzes_next: false}})
+          expect(onSubmit).toHaveBeenCalledWith({
+            errored: false,
+            settings: {import_quizzes_next: false},
+          })
         })
       })
 
@@ -383,7 +384,10 @@ describe('CommonMigratorControls', () => {
           window.ENV.NEW_QUIZZES_MIGRATION_DEFAULT = true
           renderComponent({canImportAsNewQuizzes: true})
           await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
-          expect(onSubmit).toHaveBeenCalledWith({errored: false, settings: {import_quizzes_next: true}})
+          expect(onSubmit).toHaveBeenCalledWith({
+            errored: false,
+            settings: {import_quizzes_next: true},
+          })
         })
       })
     })
@@ -393,7 +397,7 @@ describe('CommonMigratorControls', () => {
         featureFlag: boolean,
         labelText: string,
         headerText: string,
-        bodyText: string
+        bodyText: string,
       ) => {
         window.ENV.NEW_QUIZZES_UNATTACHED_BANK_MIGRATIONS = featureFlag
         renderComponent({canImportAsNewQuizzes: true})
@@ -411,11 +415,11 @@ describe('CommonMigratorControls', () => {
         await userEvent.click(infoButton)
 
         within(screen.getByLabelText('Import assessment as New Quizzes Help Modal')).getByText(
-          headerText
+          headerText,
         )
         expect(screen.getByText(bodyText)).toBeInTheDocument()
         expect(
-          screen.getByText('To learn more, please contact your system administrator or visit')
+          screen.getByText('To learn more, please contact your system administrator or visit'),
         ).toBeInTheDocument()
         expect(screen.getByText('Canvas Instructor Guide')).toBeInTheDocument()
       }
@@ -425,7 +429,7 @@ describe('CommonMigratorControls', () => {
           true,
           'Convert content to New Quizzes',
           'Convert Quizzes',
-          'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.'
+          'Existing question banks and classic quizzes will be imported as Item Banks and New Quizzes.',
         )
       })
 
@@ -434,7 +438,7 @@ describe('CommonMigratorControls', () => {
           false,
           'Import existing quizzes as New Quizzes',
           'New Quizzes',
-          'New Quizzes is the new assessment engine for Canvas.'
+          'New Quizzes is the new assessment engine for Canvas.',
         )
       })
     })

@@ -125,7 +125,7 @@ export default class CalculationMethodContent {
     // We can pass in a straight object or a backbone model
     each(
       ['calculation_method', 'calculation_int', 'mastery_points', 'is_individual_outcome'],
-      attr => (this[attr] = model.get != null ? model.get(attr) : model[attr])
+      attr => (this[attr] = model.get != null ? model.get(attr) : model[attr]),
     )
   }
 
@@ -136,7 +136,7 @@ export default class CalculationMethodContent {
   decayingAverage() {
     return new DecayingAverage(
       this.calculation_int,
-      this.exampleScoreIntegers().slice(0, 7)
+      this.exampleScoreIntegers().slice(0, 7),
     ).value()
   }
 
@@ -148,7 +148,7 @@ export default class CalculationMethodContent {
     return new NMastery(
       this.calculation_int,
       this.mastery_points,
-      this.exampleScoreIntegers()
+      this.exampleScoreIntegers(),
     ).value()
   }
 
@@ -297,7 +297,7 @@ export default class CalculationMethodContent {
         {
           calculation_int: I18n.n(this.calculation_int, {percentage: true}),
           remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
-        }
+        },
       ),
       exampleScores: this.exampleScoreIntegers().join(', '),
       exampleResult: numberFormat.outcomeScore(this.weightedAverage()),
@@ -318,7 +318,7 @@ export default class CalculationMethodContent {
             {
               calculation_int: I18n.n(this.calculation_int, {percentage: true}),
               remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
-            }
+            },
           ),
           exampleScores: this.exampleScoreIntegers().join(', '),
           exampleResult: numberFormat.outcomeScore(this.weightedAverage()),
@@ -336,7 +336,7 @@ export default class CalculationMethodContent {
             {
               calculation_int: I18n.n(this.calculation_int, {percentage: true}),
               remainder: I18n.n(100 - this.calculation_int, {percentage: true}),
-            }
+            },
           ),
           exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
           exampleResult: numberFormat.outcomeScore(this.decayingAverage()),
@@ -359,7 +359,7 @@ export default class CalculationMethodContent {
           },
           {
             count: this.calculation_int,
-          }
+          },
         ),
         friendlyCalculationMethod: I18n.t('n Number of Times'),
         calculationIntLabel: alternativeCalculationValues.n_mastery.calculationIntLabel,
@@ -372,7 +372,7 @@ export default class CalculationMethodContent {
           },
           {
             count: this.calculation_int,
-          }
+          },
         ),
         exampleScores: this.exampleScoreIntegers().join(', '),
         exampleResult: numberFormat.outcomeScore(this.nMastery()),
@@ -390,7 +390,7 @@ export default class CalculationMethodContent {
         method: I18n.t('Highest Score'),
         friendlyCalculationMethod: I18n.t('Highest Score'),
         exampleText: I18n.t(
-          'Mastery score reflects the highest score of a graded assignment or quiz.'
+          'Mastery score reflects the highest score of a graded assignment or quiz.',
         ),
         exampleScores: alternativeCalculationValues.highest.exampleScores,
         exampleResult: alternativeCalculationValues.highest.exampleResult,
@@ -399,14 +399,14 @@ export default class CalculationMethodContent {
         method: alternativeCalculationValues.average.method,
         friendlyCalculationMethod: I18n.t('Average'),
         exampleText: I18n.t(
-          'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
+          'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.',
         ),
         exampleWarning: I18n.t(
-          'Average is not a good fit for most outcomes-based or mastery-based learning use cases because students may need time to reach mastery of an outcome and early poorer performance can bring down an average.'
+          'Average is not a good fit for most outcomes-based or mastery-based learning use cases because students may need time to reach mastery of an outcome and early poorer performance can bring down an average.',
         ),
         exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
         exampleResult: numberFormat.outcomeScore(
-          this.average(this.exampleScoreIntegers().slice(0, 7))
+          this.average(this.exampleScoreIntegers().slice(0, 7)),
         ),
       },
     })

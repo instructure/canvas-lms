@@ -40,7 +40,7 @@ export default function RoleMismatchToolTip(props: Props) {
     <View as="div" textAlign="center" maxWidth={TOOLTIP_MAX_WIDTH}>
       <Text size="small">
         {I18n.t(
-          'Enrolling the recipient in these courses will grant them different permissions from the provider of the enrollments'
+          'Enrolling the recipient in these courses will grant them different permissions from the provider of the enrollments',
         )}
       </Text>
     </View>

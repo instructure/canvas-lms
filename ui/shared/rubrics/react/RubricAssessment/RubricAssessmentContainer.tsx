@@ -94,11 +94,11 @@ export const RubricAssessmentContainer = ({
   const isTraditionalView = viewMode === 'traditional'
   const instructorPoints = rubricAssessmentDraftData.reduce(
     (prev, curr) => prev + (!curr.ignoreForScoring && curr.points ? curr.points : 0),
-    0
+    0,
   )
 
   const [validationErrors, setValidationErrors] = useState<string[]>([])
-  
+
   const selfAssessmentData: RubricAssessmentData[] = useMemo(() => {
     if (!showSelfAssessment) {
       return []
@@ -214,7 +214,7 @@ export const RubricAssessmentContainer = ({
   const onUpdateAssessmentData = (params: UpdateAssessmentData) => {
     const {criterionId, points, comments = '', saveCommentsForLater, ratingId} = params
     const existingAssessmentIndex = rubricAssessmentDraftData.findIndex(
-      a => a.criterionId === criterionId
+      a => a.criterionId === criterionId,
     )
     const matchingCriteria = criteria?.find(c => c.id === criterionId)
     const ignoreForScoring = matchingCriteria?.ignoreForScoring || false
@@ -225,7 +225,7 @@ export const RubricAssessmentContainer = ({
           findCriterionMatchingRatingIndex(
             matchingCriteria?.ratings ?? [],
             points,
-            matchingCriteria?.criterionUseRange
+            matchingCriteria?.criterionUseRange,
           )
         ]
     const matchingRatingId = matchingRating?.id ?? ''
@@ -257,8 +257,8 @@ export const RubricAssessmentContainer = ({
                 description: ratingDescription,
                 saveCommentsForLater,
               }
-            : a
-        )
+            : a,
+        ),
       )
     }
   }

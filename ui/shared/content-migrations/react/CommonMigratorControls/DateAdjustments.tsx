@@ -172,7 +172,7 @@ export const DateAdjustments = ({
                       messages={timeZonedFormMessages(
                         courseTimeZone,
                         userTimeZone,
-                        start_from_date
+                        start_from_date,
                       )}
                       dataTestid="old_start_date"
                     />
@@ -264,7 +264,7 @@ export const DateAdjustments = ({
                         interaction={disabled ? 'disabled' : 'enabled'}
                         onChange={(
                           _e: React.SyntheticEvent<Element, Event>,
-                          data: {value?: string | number | undefined; id?: string | undefined}
+                          data: {value?: string | number | undefined; id?: string | undefined},
                         ) => {
                           setSubstitution(substitution.id, data, 'from')
                         }}
@@ -289,7 +289,7 @@ export const DateAdjustments = ({
                       <SimpleSelect
                         onChange={(
                           _e: React.SyntheticEvent<Element, Event>,
-                          data: {value?: string | number | undefined; id?: string | undefined}
+                          data: {value?: string | number | undefined; id?: string | undefined},
                         ) => {
                           setSubstitution(substitution.id, data, 'to')
                         }}
@@ -311,7 +311,7 @@ export const DateAdjustments = ({
                           const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
                           tmp.date_shift_options.day_substitutions =
                             tmp.date_shift_options.day_substitutions.filter(
-                              (sub: DaySub) => sub.id !== substitution.id
+                              (sub: DaySub) => sub.id !== substitution.id,
                             )
                           setDateAdjustments(tmp)
                         }}

@@ -41,7 +41,7 @@ export const InstructorApps = () => {
   const {queryParams, setQueryParams, updateQueryParams} = useDiscoverQueryParams()
   const isFilterApplied = useMemo(
     () => Object.values(queryParams.filters).flat().length > 0 || queryParams.search.length > 0,
-    [queryParams]
+    [queryParams],
   )
   const {isDesktop} = useBreakpoints()
   const I18n = createI18nScope('lti_registrations')

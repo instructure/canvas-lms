@@ -33,7 +33,7 @@ export function clearDashboardCache() {
 export const useFetchDashboardCards = (
   userID: string | null,
   observedUserID: string | null,
-  observerSettled?: boolean
+  observerSettled?: boolean,
 ) => {
   return useQuery({
     queryKey: ['dashboard_cards', {userID, observedUserID}] as DashboardQueryKey,
@@ -70,7 +70,7 @@ interface ActivityStreamSummaryQueryKeyParams {
 }
 
 export async function fetchActivityStreamSummariesAsync(
-  params: ActivityStreamSummaryQueryKeyParams
+  params: ActivityStreamSummaryQueryKeyParams,
 ): Promise<any> {
   const {userID} = params
   if (!userID) {

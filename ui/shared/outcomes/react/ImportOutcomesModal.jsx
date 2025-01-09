@@ -42,7 +42,7 @@ export function showImportOutcomesModal(props) {
   }
 
   root.render(
-    <ImportOutcomesModal {...props} parent={parent} root={root} ref={showImportOutcomesRef} />
+    <ImportOutcomesModal {...props} parent={parent} root={root} ref={showImportOutcomesRef} />,
   )
 }
 
@@ -53,12 +53,12 @@ export default class ImportOutcomesModal extends Component {
     onFileDrop: PropTypes.func,
     learningOutcomeGroup: PropTypes.instanceOf(Object),
     learningOutcomeGroupAncestorIds: PropTypes.arrayOf(PropTypes.any),
-    root: PropTypes.object
+    root: PropTypes.object,
   }
 
   static defaultProps = {
     parent: null,
-    root: null
+    root: null,
   }
 
   state = {

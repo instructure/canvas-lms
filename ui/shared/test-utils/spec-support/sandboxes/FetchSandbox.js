@@ -61,7 +61,7 @@ export default class FetchSandbox {
     this._fetchMock.catch(requestPath => {
       const test = qunit.config.current
       test.pushFailure(
-        `Unexpected fetch with path "${requestPath}". This probably means you made an unmocked \`fetch\` request in your tests. See the fetch-mock docs (http://www.wheresrhys.co.uk/fetch-mock/#api-mockingmock) for how to mock this request.`
+        `Unexpected fetch with path "${requestPath}". This probably means you made an unmocked \`fetch\` request in your tests. See the fetch-mock docs (http://www.wheresrhys.co.uk/fetch-mock/#api-mockingmock) for how to mock this request.`,
       )
     })
   }

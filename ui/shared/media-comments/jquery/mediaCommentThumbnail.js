@@ -19,8 +19,8 @@ import $ from 'jquery'
 import {mediaCommentThumbnail} from '@instructure/canvas-rce'
 
 // public API
-export default $.fn.mediaCommentThumbnail = function (size = 'normal', keepOriginalText) {
+export default ($.fn.mediaCommentThumbnail = function (size = 'normal', keepOriginalText) {
   return this.each(function () {
     return mediaCommentThumbnail(this, size, keepOriginalText, INST.kalturaSettings, $(this).data())
   })
-}
+})

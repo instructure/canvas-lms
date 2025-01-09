@@ -90,7 +90,7 @@ describe('DueDateRow with realistic props and canDelete false', () => {
   const props = {
     overrides: [
       {
-        get: attr => ({course_section_id: 1}[attr]),
+        get: attr => ({course_section_id: 1})[attr],
       },
     ],
     sections: {1: {name: 'section name'}},

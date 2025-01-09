@@ -80,7 +80,7 @@ const KnowledgeCheckSection = ({id, entry}: KnowledgeCheckSectionProps) => {
       setQuestion(newQuestion.entry)
       setModalOpen(false)
     },
-    [setProp]
+    [setProp],
   )
 
   const renderFeedback = () => {

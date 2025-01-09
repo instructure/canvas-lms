@@ -84,7 +84,7 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
     unmount: () => {
       cleanup()
       container.remove()
-    }
+    },
   }
 }
 
@@ -338,14 +338,12 @@ describe('OutcomesImporter', () => {
     const id = '10'
     const disableOutcomeViews = jest.fn()
     const resetOutcomeViews = jest.fn()
-    const {ref, unmount} = renderOutcomesImporter(
-      {
-        disableOutcomeViews,
-        resetOutcomeViews,
-        importId: id,
-        file: null
-      }
-    )
+    const {ref, unmount} = renderOutcomesImporter({
+      disableOutcomeViews,
+      resetOutcomeViews,
+      importId: id,
+      file: null,
+    })
 
     // Mock the first request
     moxios.stubRequest(getApiUrl(id), {

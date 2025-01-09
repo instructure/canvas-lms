@@ -77,7 +77,7 @@ describe('lti.getPageContent handler', () => {
             <div>
               page content2c
             </div>
-          </div>`
+          </div>`,
       )
     })
   })

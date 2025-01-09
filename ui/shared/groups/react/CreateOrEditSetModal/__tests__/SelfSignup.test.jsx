@@ -39,7 +39,7 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
       it(`tracks ${v} Self Signup`, () => {
         const state = {selfSignup: checked, bySection: false}
         const {getByTestId, queryByTestId} = render(
-          <Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />
+          <Wrapper state={state} props={{...defaultProps, selfSignupEndDateEnabled: true}} />,
         )
         expect(getByTestId('checkbox-allow-self-signup').checked).toBe(checked)
         expect(getByTestId('checkbox-same-section').disabled).toBe(!checked)

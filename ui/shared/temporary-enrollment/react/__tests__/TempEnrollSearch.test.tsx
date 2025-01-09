@@ -58,19 +58,19 @@ describe('TempEnrollSearch', () => {
   it('changes label when different search type is chosen', () => {
     const {getAllByText, getByText} = render(<TempEnrollSearch page={0} {...props} />)
     expect(
-      getByText('Enter the email addresses of the users you would like to temporarily enroll')
+      getByText('Enter the email addresses of the users you would like to temporarily enroll'),
     ).toBeInTheDocument()
 
     const sis = getAllByText('SIS ID')[0]
     sis.click()
     expect(
-      getByText('Enter the SIS IDs of the users you would like to temporarily enroll')
+      getByText('Enter the SIS IDs of the users you would like to temporarily enroll'),
     ).toBeInTheDocument()
 
     const login = getAllByText('Login ID')[0]
     login.click()
     expect(
-      getByText('Enter the login IDs of the users you would like to temporarily enroll')
+      getByText('Enter the login IDs of the users you would like to temporarily enroll'),
     ).toBeInTheDocument()
   })
 

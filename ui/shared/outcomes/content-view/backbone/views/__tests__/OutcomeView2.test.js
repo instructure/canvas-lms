@@ -90,7 +90,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -114,7 +114,7 @@ describe('OutcomeView', () => {
           {
             assessed: true,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -129,7 +129,7 @@ describe('OutcomeView', () => {
             assessed: false,
             native: true,
           },
-          {can_unlink: true}
+          {can_unlink: true},
         ),
         state: 'show',
       })
@@ -219,19 +219,19 @@ describe('OutcomeView', () => {
       })
       view.$('#calculation_method').val('n_mastery').trigger('change')
       expect(view.$('#calculation_int').val()).toBe('5')
-      
+
       view.$('#calculation_method').val('decaying_average').trigger('change')
       expect(view.$('#calculation_int').val()).toBe('65')
-      
+
       view.$('#calculation_method').val('n_mastery').trigger('change')
       expect(view.$('#calculation_int').val()).toBe('5')
-      
+
       view.$('#calculation_int').val('4')
       expect(view.$('#calculation_int').val()).toBe('4')
-      
+
       view.$('#calculation_method').val('decaying_average').trigger('change')
       expect(view.$('#calculation_int').val()).toBe('65')
-      
+
       view.$('#calculation_method').val('highest').trigger('change')
       view.$('#calculation_method').val('decaying_average').trigger('change')
       expect(view.$('#calculation_int').val()).toBe('65')
@@ -265,7 +265,7 @@ describe('OutcomeView', () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
-          {can_unlink: true}
+          {can_unlink: true},
         ),
         state: 'edit',
       })
@@ -289,7 +289,7 @@ describe('OutcomeView', () => {
       const view = createView({
         model: newOutcome(
           {assessed: false, native: true, has_updateable_rubrics: false},
-          {can_unlink: true}
+          {can_unlink: true},
         ),
         state: 'edit',
       })

@@ -67,8 +67,8 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
   const revieweeUsername = !assessment.available
     ? I18n.t('Not Available')
     : assignment?.anonymous_peer_reviews
-    ? I18n.t('Anonymous Student')
-    : assessment.user_name
+      ? I18n.t('Anonymous Student')
+      : assessment.user_name
 
   const {workflow_state} = assessment
 

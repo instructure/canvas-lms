@@ -58,7 +58,7 @@ ImportQuizzesNextView.prototype.updateQuestionBank = function (checked) {
   if (this.questionBank != null) {
     return this.questionBank.setEnabled(
       !checked,
-      I18n.t('This option is not compatible with New Quizzes')
+      I18n.t('This option is not compatible with New Quizzes'),
     )
   }
 }

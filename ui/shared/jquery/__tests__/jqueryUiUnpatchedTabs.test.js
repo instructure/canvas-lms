@@ -64,7 +64,7 @@ describe('tabs widget', () => {
     equal(
       $tabs.find('.ui-tabs-active a').attr('href'),
       '#tab-2',
-      'Second tab is active after clicking'
+      'Second tab is active after clicking',
     )
   })
 

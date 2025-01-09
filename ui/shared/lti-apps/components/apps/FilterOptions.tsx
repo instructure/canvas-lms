@@ -47,7 +47,7 @@ export default function FilterOptions(props: {
         {props.options
           .slice(
             0,
-            props.limit ? (showMore ? props.options.length : props.limit) : props.options.length
+            props.limit ? (showMore ? props.options.length : props.limit) : props.options.length,
           )
           .map(option => {
             return (

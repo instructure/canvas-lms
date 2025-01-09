@@ -59,7 +59,7 @@ class TeacherFeedbackForm extends React.Component {
       required: ['recipients[]', 'body'],
       processData: data => {
         const selectedCourseId = document.querySelector(
-          'select[name="recipients[]"] option:checked'
+          'select[name="recipients[]"] option:checked',
         ).dataset.courseId
         const subject = this.state.courses.find(c => c.id === selectedCourseId).name
         const extraData = {
@@ -116,7 +116,7 @@ class TeacherFeedbackForm extends React.Component {
       <form ref={c => (this.form = c)} action="/api/v1/conversations" method="POST">
         <fieldset className="ic-Form-group ic-HelpDialog__form-fieldset">
           <legend className="screenreader-only">{I18n.t('Ask your instructor a question')}</legend>
-          { }
+          {}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Which course is this question about?')}</span>
             <select
@@ -131,11 +131,11 @@ class TeacherFeedbackForm extends React.Component {
             </select>
             <span className="ic-Form-help-text">
               {I18n.t(
-                'Message will be sent to all the teachers and teaching assistants in the course.'
+                'Message will be sent to all the teachers and teaching assistants in the course.',
               )}
             </span>
           </label>
-          { }
+          {}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Message')}</span>
             <textarea className="ic-Input" required={true} aria-required="true" name="body" />

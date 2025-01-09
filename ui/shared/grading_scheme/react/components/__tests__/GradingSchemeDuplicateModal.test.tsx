@@ -32,7 +32,7 @@ function renderGradingSchemeDuplicateModal() {
       selectedGradingScheme={DefaultGradingScheme}
       handleCloseDuplicateModal={handleCloseDuplicateModal}
       handleDuplicateScheme={handleDuplicateScheme}
-    />
+    />,
   )
 
   return {
@@ -58,7 +58,7 @@ describe('GradingSchemeDuplicateModal', () => {
   it('should render the title of the grading scheme in the modal', () => {
     const {getByTestId} = renderGradingSchemeDuplicateModal()
     expect(getByTestId('grading-scheme-duplicate-modal-title')).toHaveTextContent(
-      `Duplicate ${DefaultGradingScheme.title}`
+      `Duplicate ${DefaultGradingScheme.title}`,
     )
   })
 

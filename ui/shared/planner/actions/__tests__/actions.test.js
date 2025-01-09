@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable promise/catch-or-return */
+ 
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import {isPromise, moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
@@ -363,7 +363,7 @@ describe('api actions', () => {
         () => {},
         () => {
           return {timeZone: 'America/Halifax'}
-        }
+        },
       )
       return moxiosWait(request => {
         expect(request.config.method).toBe('post')
@@ -381,7 +381,7 @@ describe('api actions', () => {
         () => {},
         () => {
           return {timeZone: 'America/Halifax'}
-        }
+        },
       )
       return moxiosWait(request => {
         expect(request.config.method).toBe('put')
@@ -416,7 +416,7 @@ describe('api actions', () => {
       return moxiosRespond(
         {some: 'data', id: '42'}, // notice the response has no override data
         savePromise,
-        {status: 200}
+        {status: 200},
       ).then(result => {
         expect(result).toMatchObject({
           // yet the resolved item does have override data
@@ -482,7 +482,7 @@ describe('api actions', () => {
       return moxiosRespond({some: 'response data'}, deletePromise, {status: 500}).then(
         __staticRouterHydrationDataresult => {
           expect(fakeAlert).toHaveBeenCalled()
-        }
+        },
       )
     })
   })
@@ -494,7 +494,7 @@ describe('api actions', () => {
       const savingItem = {...plannerItem, show: true, toggleAPIPending: true}
       const savePromise = Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
-        getBasicState
+        getBasicState,
       )
       expect(isPromise(savePromise)).toBe(true)
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -552,11 +552,11 @@ describe('api actions', () => {
       const plannerItem = simpleItem({planner_override: {id: 'override_id', marked_complete: true}})
       const togglePromise = Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
-        getBasicState
+        getBasicState,
       )
       return moxiosRespond(
         {some: 'response data', id: 'override_id', marked_complete: false},
-        togglePromise
+        togglePromise,
       ).then(result => {
         expect(result).toMatchObject({
           wasToggled: true,
@@ -583,7 +583,7 @@ describe('api actions', () => {
       }
       const togglePromise = Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
-        getBasicState
+        getBasicState,
       )
       return moxiosRespond({some: 'response data'}, togglePromise, {status: 500}).then(result => {
         expect(fakeAlert).toHaveBeenCalled()

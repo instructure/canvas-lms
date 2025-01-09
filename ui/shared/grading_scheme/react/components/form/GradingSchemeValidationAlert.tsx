@@ -68,13 +68,13 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
             {formData.pointsBased ? (
               <>
                 {I18n.t(
-                  "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+                  "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
                 )}
               </>
             ) : (
               <>
                 {I18n.t(
-                  "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+                  "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.",
                 )}
               </>
             )}
@@ -82,13 +82,13 @@ export const GradingSchemeValidationAlert: React.FC<ComponentProps> = ({onClose,
         ) : !rowDataIsValid(formData) ? (
           <>
             {I18n.t(
-              "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
+              "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.",
             )}
           </>
         ) : !rowNamesAreValid(formData) ? (
           <>
             {I18n.t(
-              "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+              "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.",
             )}
           </>
         ) : !formData.title ? (

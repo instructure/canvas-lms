@@ -146,7 +146,7 @@ it('updates the item on SAVED_PLANNER_ITEM', () => {
     initialState,
     savedPlannerItem({
       item: {...initialState.items[1], completed: true},
-    })
+    }),
   )
   expect(nextState.items).toMatchObject([
     {uniqueId: '41', completed: false},
@@ -184,7 +184,7 @@ it('adds a new planner item in order if it is within range', () => {
     initialState,
     savedPlannerItem({
       item: {uniqueId: '43', completed: false, date: moment.tz('2018-01-02', 'UTC')},
-    })
+    }),
   )
   expect(nextState.items).toMatchObject([{uniqueId: '41'}, {uniqueId: '43'}, {uniqueId: '42'}])
 })
@@ -200,7 +200,7 @@ it('does not add a planner item if it is out of range', () => {
     initialState,
     savedPlannerItem({
       item: {uniqueId: '43', completed: false, date: moment.tz('2018-01-05', 'UTC')},
-    })
+    }),
   )
   expect(nextState.items).toMatchObject([{uniqueId: '41'}, {uniqueId: '42'}])
 })
@@ -214,7 +214,7 @@ it('removes a planner item if its new date falls outside of the range', () => {
   })
   const nextState = reducer(
     initialState,
-    savedPlannerItem({item: {uniqueId: '42', date: moment.tz('2018-01-05', 'UTC')}})
+    savedPlannerItem({item: {uniqueId: '42', date: moment.tz('2018-01-05', 'UTC')}}),
   )
   expect(nextState.items).toMatchObject([{uniqueId: '41'}])
 })
@@ -230,7 +230,7 @@ it('reorders planner items if the date has changed', () => {
     initialState,
     savedPlannerItem({
       item: {uniqueId: '41', completed: false, date: moment.tz('2018-01-03', 'UTC')},
-    })
+    }),
   )
   expect(nextState.items).toMatchObject([{uniqueId: '42'}, {uniqueId: '41'}])
 })
@@ -246,7 +246,7 @@ it('reorders planner items if the title has changed', () => {
     initialState,
     savedPlannerItem({
       item: {uniqueId: '41', title: 'ccc', completed: false, date: moment.tz('2018-01-01', 'UTC')},
-    })
+    }),
   )
   expect(nextState.items).toMatchObject([{uniqueId: '42'}, {uniqueId: '41'}])
 })

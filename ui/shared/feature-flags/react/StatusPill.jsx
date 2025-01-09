@@ -37,7 +37,7 @@ export default function StatusPill({feature, updatedState}) {
                 `This feature option is only visible to users with Site Admin access.
                             End users will not see it until enabled by a Site Admin user.
                             Before enabling for an institution, please be sure you fully understand
-                            the functionality and possible impacts to users.`
+                            the functionality and possible impacts to users.`,
               )}
             </View>
           }
@@ -53,7 +53,7 @@ export default function StatusPill({feature, updatedState}) {
             <View as="div" width="600px">
               {I18n.t(
                 `This feature option is only visible to users with Site Admin access. It is similar to
-                          "Hidden", but end users will not see it even if enabled by a Site Admin user.`
+                          "Hidden", but end users will not see it even if enabled by a Site Admin user.`,
               )}
             </View>
           }
@@ -66,7 +66,7 @@ export default function StatusPill({feature, updatedState}) {
       {feature.beta && (
         <Tooltip
           renderTip={I18n.t(
-            'Feature preview — opting in includes ongoing updates outside the regular release schedule'
+            'Feature preview — opting in includes ongoing updates outside the regular release schedule',
           )}
         >
           <Pill color="info" margin="0 0 0 x-small" themeOverride={{maxWidth: 'none'}}>

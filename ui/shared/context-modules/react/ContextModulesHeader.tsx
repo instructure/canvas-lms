@@ -52,7 +52,7 @@ type MenuToolsProps = {
       class: string
       icon: string
       title: string
-    }
+    },
   ]
   visible: boolean
 }
@@ -164,7 +164,7 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
         ...prev,
         disabled: e.detail.disabled,
       }))
-      // eslint-disable-next-line no-undef
+       
     }) as EventListener)
   }, [])
 

@@ -56,7 +56,7 @@ function submission(overrides = {}): {
 describe('originalityReportSubmissionKey', () => {
   it('returns the key for the submission', () => {
     expect(originalityReportSubmissionKey(submission())).toEqual(
-      'submission_1_2011-10-05T14:48:00Z'
+      'submission_1_2011-10-05T14:48:00Z',
     )
   })
 
@@ -70,7 +70,7 @@ describe('originalityReportSubmissionKey', () => {
     })
     // @ts-expect-error
     expect(originalityReportSubmissionKey(gqlSubmission)).toEqual(
-      'submission_1_2011-10-05T14:48:00Z'
+      'submission_1_2011-10-05T14:48:00Z',
     )
   })
 
@@ -100,7 +100,7 @@ describe('originalityReportVisibility', () => {
 
   it('returns false if visiblity setting is set to after_grading and the submisison has not been graded', () => {
     expect(isOriginalityReportVisible('after_grading', Date.now.toString(), 'needs_grading')).toBe(
-      false
+      false,
     )
   })
 

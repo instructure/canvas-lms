@@ -113,7 +113,7 @@ export function TempEnrollSearch(props: Props) {
     // FOUND USERS
     if (containsProvider(foundUserList)) {
       setMessage(
-        I18n.t('One of the users found matches the provider. Please search for a different user.')
+        I18n.t('One of the users found matches the provider. Please search for a different user.'),
       )
       props.searchFail()
       return
@@ -168,7 +168,7 @@ export function TempEnrollSearch(props: Props) {
     case 'cc_path':
       exampleText = 'lsmith@myschool.edu, mfoster@myschool.edu'
       descText = I18n.t(
-        'Enter the email addresses of the users you would like to temporarily enroll'
+        'Enter the email addresses of the users you would like to temporarily enroll',
       )
       labelText = I18n.t('Email Addresses')
       break

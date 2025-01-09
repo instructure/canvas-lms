@@ -42,7 +42,7 @@ const AdminConsentLink = props => {
           <View display="block" margin="small 0 0 0">
             <Text>
               {I18n.t(
-                'After completing the above configuration, please use the following link to grant Canvas access to your Microsoft tenant:'
+                'After completing the above configuration, please use the following link to grant Canvas access to your Microsoft tenant:',
               )}
             </Text>
           </View>

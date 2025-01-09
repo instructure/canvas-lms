@@ -52,7 +52,7 @@ const TagSelect = ({onChange, selectedTags, interaction}: TagSelectProps) => {
         onChange(selectedTags.filter(t => t !== tag))
       }
     },
-    [onChange, selectedTags]
+    [onChange, selectedTags],
   )
 
   return (

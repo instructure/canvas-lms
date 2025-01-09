@@ -56,14 +56,14 @@ TestComponent.propTypes = {
         id: PropTypes.string.isRequired,
       }),
       PropTypes.string,
-    ])
+    ]),
   ).isRequired,
   getResult: PropTypes.func,
 }
 
 const renderHook = (defaultTab, tabs, getResult) => {
   const {container} = render(
-    <TestComponent defaultTab={defaultTab} tabs={tabs} getResult={getResult} />
+    <TestComponent defaultTab={defaultTab} tabs={tabs} getResult={getResult} />,
   )
   return container.querySelector('.test-wrapper').innerHTML
 }

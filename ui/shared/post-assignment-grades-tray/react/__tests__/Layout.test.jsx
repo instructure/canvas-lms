@@ -29,7 +29,7 @@ describe('PostAssignmentGradesTray Layout', () => {
 
   function getHeader() {
     return [...$container.querySelectorAll('h3')].find($header =>
-      $header.textContent.includes('Post Grades')
+      $header.textContent.includes('Post Grades'),
     )
   }
 
@@ -76,7 +76,7 @@ describe('PostAssignmentGradesTray Layout', () => {
   }
 
   function mountComponent(props = {}) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<Layout {...layoutProps(props)} />, $container)
   }
 

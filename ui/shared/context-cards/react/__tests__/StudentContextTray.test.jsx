@@ -38,14 +38,16 @@ describe('StudentContextTray', () => {
     user = {
       _id: '1',
       short_name: 'wooper',
-      enrollments: [{
-        state: 'active',
-        section: {name: 'Section 1'},
-        grades: {
-          current_grade: 'A',
-          current_score: 95,
+      enrollments: [
+        {
+          state: 'active',
+          section: {name: 'Section 1'},
+          grades: {
+            current_grade: 'A',
+            current_score: 95,
+          },
         },
-      }],
+      ],
       avatar_url: 'avatar.jpg',
     }
 
@@ -86,7 +88,7 @@ describe('StudentContextTray', () => {
     const button = document.createElement('button')
     button.id = 'someButton'
     document.getElementById('fixtures').appendChild(button)
-    
+
     props.returnFocusTo = () => {
       const $button = $(button)
       $button.focus = () => {
@@ -96,14 +98,14 @@ describe('StudentContextTray', () => {
       $button.is = () => true
       return [$button]
     }
-    
+
     const userWithAnalytics = {...user, analytics}
     props.data = {loading: false, user: userWithAnalytics, course}
-    
+
     const {getByRole} = render(<StudentContextTray {...props} />)
     const closeButton = getByRole('button', {name: 'Close'})
     fireEvent.click(closeButton)
-    
+
     expect(document.activeElement).toBe(button)
   })
 
@@ -154,7 +156,7 @@ describe('StudentContextTray', () => {
       const analyticsButton = getByText('Analytics Beta')
       expect(analyticsButton).toBeTruthy()
       expect(analyticsButton.closest('a').href).toBe(
-        'http://example.com/courses/1/external_tools/29?launch_type=student_context_card&student_id=1'
+        'http://example.com/courses/1/external_tools/29?launch_type=student_context_card&student_id=1',
       )
     })
 

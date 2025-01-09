@@ -18,7 +18,9 @@
 
 import type {Rubric, RubricAssessmentData, RubricCriterion} from '../../types/rubric'
 
-export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder' | 'pointsPossible'> & {criteria: RubricCriterion[]} = {
+export const RUBRIC_DATA: Pick<Rubric, 'title' | 'ratingOrder' | 'pointsPossible'> & {
+  criteria: RubricCriterion[]
+} = {
   title: 'Rubric Title',
   pointsPossible: 14,
   criteria: [

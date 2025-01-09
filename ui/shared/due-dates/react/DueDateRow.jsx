@@ -71,14 +71,14 @@ class DueDateRow extends React.Component {
         } else {
           return 'adhocOverrides'
         }
-      }
+      },
     )
 
     return union(
       this.tokenizedSections(sectionOverrides),
       this.tokenizedGroups(groupOverrides),
       this.tokenizedAdhoc(adhocOverrides),
-      this.tokenizedNoop(noopOverrides)
+      this.tokenizedNoop(noopOverrides),
     )
   }
 
@@ -110,7 +110,7 @@ class DueDateRow extends React.Component {
         const tokensForStudents = map(ov.get('student_ids'), this.tokenFromStudentId.bind(this))
         return overrideTokens.concat(tokensForStudents)
       },
-      []
+      [],
     )
   }
 

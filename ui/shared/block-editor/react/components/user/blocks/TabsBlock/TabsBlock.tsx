@@ -67,7 +67,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
   const handleTabChange = useCallback(
     (
       _event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>,
-      tabData: {index: number}
+      tabData: {index: number},
     ) => {
       if (tabData.index === activeTabIndex) return
       setActiveTabIndex(tabData.index)
@@ -81,7 +81,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         }
       }, 10)
     },
-    [actions, activeTabIndex, node.dom, node.id]
+    [actions, activeTabIndex, node.dom, node.id],
   )
 
   const handleTabTitleChange = useCallback(
@@ -92,7 +92,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         props.tabs[activeTabIndex].title = e.target.value
       })
     },
-    [activeTabIndex, setProp]
+    [activeTabIndex, setProp],
   )
 
   const handleTabTitleKey = useCallback(
@@ -110,7 +110,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         e.stopPropagation()
       }
     },
-    [activeTabIndex, tabs]
+    [activeTabIndex, tabs],
   )
 
   const handleTabTitleFocus = useCallback(
@@ -118,7 +118,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
       setActiveTabIndex(tabIndex)
       actions.selectNode(node.id)
     },
-    [actions, node.id]
+    [actions, node.id],
   )
 
   const handleDeleteTab = useCallback(
@@ -130,7 +130,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         props.tabs = newTabs
       })
     },
-    [setProp, tabs]
+    [setProp, tabs],
   )
 
   const handleKey = useCallback(
@@ -152,7 +152,7 @@ const TabsBlock = ({tabs, variant}: TabsBlockProps) => {
         }
       }
     },
-    [blockid, editable, selected, tabs]
+    [blockid, editable, selected, tabs],
   )
 
   let color: string | undefined

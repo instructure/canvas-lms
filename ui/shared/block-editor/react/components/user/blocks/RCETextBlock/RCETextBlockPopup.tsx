@@ -58,7 +58,7 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
       const html = rceRef.current?.getCode()
       onSave(html)
     },
-    [onSave]
+    [onSave],
   )
 
   const handleClose = useCallback(
@@ -67,7 +67,7 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
         | React.UIEvent
         | React.FocusEvent
         | React.KeyboardEvent<ViewProps>
-        | React.MouseEvent<ViewProps>
+        | React.MouseEvent<ViewProps>,
     ) => {
       e.stopPropagation()
       // The RCE may open popups (e.g. ColorPopup) that need to know to close
@@ -75,7 +75,7 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
       document.dispatchEvent(evt)
       onClose()
     },
-    [onClose]
+    [onClose],
   )
 
   const handleFullscreen = useCallback(() => {
@@ -110,7 +110,7 @@ const RCETextBlockPopup = ({nodeId, content, onClose, onSave}: RCETextBlockPopup
         }
       }
     },
-    [handleFullscreen, isFullscreen, mountNode]
+    [handleFullscreen, isFullscreen, mountNode],
   )
 
   const handleContentChange = useCallback((newcontent: string) => {

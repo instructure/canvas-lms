@@ -68,13 +68,13 @@ export async function fetchTitleAvailability(title: string): Promise<boolean> {
 
 export async function checkForTitleConflict(
   title: string,
-  callback: (messages: Message[]) => void
+  callback: (messages: Message[]) => void,
 ) {
   try {
     const conflict = await fetchTitleAvailability(title)
     conflict ? callback([conflictMessage()]) : callback([])
   } catch (error) {
-    console.log(error)  
+    console.log(error)
     callback([])
   }
 }

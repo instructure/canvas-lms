@@ -100,7 +100,7 @@ Object.assign(PlannerNote.prototype, {
         type: 'planner_note',
       },
       success,
-      error
+      error,
     )
   },
 

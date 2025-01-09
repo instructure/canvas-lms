@@ -27,19 +27,19 @@ export const useGradingSchemeUpdate = (): {
   updateGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeUpdateRequest: GradingSchemeUpdateRequest
+    gradingSchemeUpdateRequest: GradingSchemeUpdateRequest,
   ) => Promise<GradingScheme>
   updateGradingSchemeStatus: string
 } => {
   const [updateGradingSchemeStatus, setUpdateGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const updateGradingScheme = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeUpdateRequest: GradingSchemeUpdateRequest
+      gradingSchemeUpdateRequest: GradingSchemeUpdateRequest,
     ): Promise<GradingScheme> => {
       setUpdateGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
 
@@ -63,7 +63,7 @@ export const useGradingSchemeUpdate = (): {
         throw err
       }
     },
-    []
+    [],
   )
   return {
     updateGradingScheme,

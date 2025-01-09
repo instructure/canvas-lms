@@ -1,9 +1,7 @@
 {
   "name": "Course Home - Blue",
   "description": "Home page with images, navigation, callout cards, knowledge check, and footer",
-  "tags": [
-    "home"
-  ],
+  "tags": ["home"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
@@ -60,10 +58,7 @@
         },
         "parent": "yue4mpUChN",
         "hidden": false,
-        "nodes": [
-          "13kQFSc-L3",
-          "603nuIRHjG"
-        ],
+        "nodes": ["13kQFSc-L3", "603nuIRHjG"],
         "linkedNodes": {}
       },
       "13kQFSc-L3": {
@@ -109,11 +104,7 @@
         },
         "parent": "13kQFSc-L3",
         "hidden": false,
-        "nodes": [
-          "aD3hUbn_Jg",
-          "LPpW_bGKYj",
-          "bYsw-u-rVy"
-        ],
+        "nodes": ["aD3hUbn_Jg", "LPpW_bGKYj", "bYsw-u-rVy"],
         "linkedNodes": {}
       },
       "aD3hUbn_Jg": {
@@ -224,9 +215,7 @@
         },
         "parent": "603nuIRHjG",
         "hidden": false,
-        "nodes": [
-          "tUF84HE2cn"
-        ],
+        "nodes": ["tUF84HE2cn"],
         "linkedNodes": {}
       },
       "tUF84HE2cn": {
@@ -286,9 +275,7 @@
         },
         "parent": "oAMNQAESb2",
         "hidden": false,
-        "nodes": [
-          "aMrYCmAs5a"
-        ],
+        "nodes": ["aMrYCmAs5a"],
         "linkedNodes": {}
       },
       "aMrYCmAs5a": {
@@ -334,12 +321,7 @@
         },
         "parent": "aMrYCmAs5a",
         "hidden": false,
-        "nodes": [
-          "-73g57b2gx",
-          "KYY4tXFySz",
-          "x7XqulwDDi",
-          "-zeN1MQN3w"
-        ],
+        "nodes": ["-73g57b2gx", "KYY4tXFySz", "x7XqulwDDi", "-zeN1MQN3w"],
         "linkedNodes": {}
       },
       "-73g57b2gx": {
@@ -459,9 +441,7 @@
         },
         "parent": "w_sfxmcr8y",
         "hidden": false,
-        "nodes": [
-          "05qy9UmPTY"
-        ],
+        "nodes": ["05qy9UmPTY"],
         "linkedNodes": {}
       },
       "05qy9UmPTY": {
@@ -508,11 +488,7 @@
         },
         "parent": "05qy9UmPTY",
         "hidden": false,
-        "nodes": [
-          "vL05Yvobhk",
-          "JQiOmeUBc8",
-          "_v3FA7OUF_"
-        ],
+        "nodes": ["vL05Yvobhk", "JQiOmeUBc8", "_v3FA7OUF_"],
         "linkedNodes": {}
       },
       "vL05Yvobhk": {
@@ -560,12 +536,7 @@
         },
         "parent": "vL05Yvobhk",
         "hidden": false,
-        "nodes": [
-          "5BJd2jc_2K",
-          "M3HMeqReOm",
-          "h7p9kpI14l",
-          "SeFhBWA5J8"
-        ],
+        "nodes": ["5BJd2jc_2K", "M3HMeqReOm", "h7p9kpI14l", "SeFhBWA5J8"],
         "linkedNodes": {}
       },
       "5BJd2jc_2K": {
@@ -689,12 +660,7 @@
         },
         "parent": "JQiOmeUBc8",
         "hidden": false,
-        "nodes": [
-          "OEqBcvev5g",
-          "y9rOpUKjMp",
-          "pqn2LgOkdy",
-          "5HzOJAMFIH"
-        ],
+        "nodes": ["OEqBcvev5g", "y9rOpUKjMp", "pqn2LgOkdy", "5HzOJAMFIH"],
         "linkedNodes": {}
       },
       "OEqBcvev5g": {
@@ -818,12 +784,7 @@
         },
         "parent": "_v3FA7OUF_",
         "hidden": false,
-        "nodes": [
-          "qZyvKE10y9",
-          "1ddKt8cAUW",
-          "NwlpTZ1-wV",
-          "7NNLDDfC3t"
-        ],
+        "nodes": ["qZyvKE10y9", "1ddKt8cAUW", "NwlpTZ1-wV", "7NNLDDfC3t"],
         "linkedNodes": {}
       },
       "qZyvKE10y9": {
@@ -950,10 +911,7 @@
         },
         "parent": "YQTjRM5pw4",
         "hidden": false,
-        "nodes": [
-          "C7KW-M9RFn",
-          "HKTRAv_Wh_"
-        ],
+        "nodes": ["C7KW-M9RFn", "HKTRAv_Wh_"],
         "linkedNodes": {}
       },
       "C7KW-M9RFn": {
@@ -999,9 +957,7 @@
         },
         "parent": "C7KW-M9RFn",
         "hidden": false,
-        "nodes": [
-          "HhTY7HrDAO"
-        ],
+        "nodes": ["HhTY7HrDAO"],
         "linkedNodes": {}
       },
       "HhTY7HrDAO": {
@@ -1071,9 +1027,7 @@
         },
         "parent": "HKTRAv_Wh_",
         "hidden": false,
-        "nodes": [
-          "D88xFgUhM0"
-        ],
+        "nodes": ["D88xFgUhM0"],
         "linkedNodes": {}
       },
       "D88xFgUhM0": {

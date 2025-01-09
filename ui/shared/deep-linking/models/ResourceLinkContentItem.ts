@@ -51,7 +51,7 @@ const ltiEndpointParams = (lookupUuid?: string | null | undefined) => {
 }
 
 export const resourceLinkContentItem = (
-  options: Omit<ResourceLinkContentItem, 'type'>
+  options: Omit<ResourceLinkContentItem, 'type'>,
 ): ResourceLinkContentItem => ({
   type: 'ltiResourceLink',
   ...options,
@@ -60,7 +60,7 @@ export const resourceLinkContentItem = (
 export const resourceLinkContentItemToHtmlString = (
   item: ResourceLinkContentItem,
   ltiEndpoint?: string,
-  editorSelection?: string
+  editorSelection?: string,
 ) => {
   const url = safeUrl(`${ltiEndpoint}?${ltiEndpointParams(item.lookup_uuid)}`)
   if (typeof item.iframe !== 'undefined') {
@@ -84,7 +84,7 @@ export const resourceLinkContentItemToHtmlString = (
         ...item,
         url,
       },
-      linkBody(itemWithText)
+      linkBody(itemWithText),
     )
   }
 }

@@ -96,7 +96,7 @@ const ColumnsSectionToolbar = () => {
         prps.background = bgcolor
       })
     },
-    [setProp]
+    [setProp],
   )
 
   return (

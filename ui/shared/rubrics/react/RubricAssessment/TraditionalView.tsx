@@ -142,10 +142,10 @@ export const TraditionalView = ({
 
       {criteria.map((criterion, index) => {
         const criterionAssessment = rubricAssessmentData.find(
-          data => data.criterionId === criterion.id
+          data => data.criterionId === criterion.id,
         )
         const criterionSelfAssessment = selfAssessment?.find(
-          data => data.criterionId === criterion.id
+          data => data.criterionId === criterion.id,
         )
 
         const isLastIndex = criteria.length - 1 === index
@@ -153,7 +153,7 @@ export const TraditionalView = ({
         return (
           <CriterionRow
             // we use the array index because rating may not have an id
-             
+
             key={`criterion-${criterion.id}-${index}`}
             criterion={criterion}
             criterionAssessment={criterionAssessment}
@@ -265,12 +265,12 @@ const CriterionRow = ({
   const selectedRatingId = findCriterionMatchingRatingId(
     criterion.ratings,
     criterion.criterionUseRange,
-    criterionAssessment
+    criterionAssessment,
   )
   const selectedSelfAssessmentRatingId = findCriterionMatchingRatingId(
     criterion.ratings,
     criterion.criterionUseRange,
-    criterionSelfAssessment
+    criterionSelfAssessment,
   )
 
   return (
@@ -433,7 +433,7 @@ const CriterionRow = ({
                       align="stretch"
                       shouldGrow={true}
                       // we use the array index because rating may not have an id
-                       
+
                       key={`criterion-${criterion.id}-ratings-${index}`}
                       width={ratingsColumnMinWidth / criterionRatings.length + 'rem'}
                     >
@@ -500,7 +500,7 @@ const CriterionRow = ({
                                 <Text
                                   size="small"
                                   dangerouslySetInnerHTML={escapeNewLineText(
-                                    rating.longDescription
+                                    rating.longDescription,
                                   )}
                                 />
                               </View>

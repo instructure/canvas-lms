@@ -143,7 +143,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
         }
       }
     },
-    [currFocusedIndex, currentToolbarRef, focusable]
+    [currFocusedIndex, currentToolbarRef, focusable],
   )
 
   const handleKey = useCallback(
@@ -171,7 +171,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
         focusable[focusedIndex]?.focus()
       }
     },
-    [arrowNext, arrowPrev, currFocusedIndex, currentToolbarRef, focusable, node.dom]
+    [arrowNext, arrowPrev, currFocusedIndex, currentToolbarRef, focusable, node.dom],
   )
 
   const handleGoUp = useCallback(
@@ -182,7 +182,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
         query.node(upnodeId).get()?.dom?.focus()
       }
     },
-    [actions, query, upnodeId]
+    [actions, query, upnodeId],
   )
 
   const handleGoDown = useCallback(
@@ -193,7 +193,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
         query.node(downnodeId).get()?.dom?.focus()
       }
     },
-    [actions, query, downnodeId]
+    [actions, query, downnodeId],
   )
 
   const handleDeleteNode = useCallback(
@@ -208,7 +208,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
         actions.selectNode(parentId || 'ROOT')
       })
     },
-    [actions, node.id, query]
+    [actions, node.id, query],
   )
 
   const handleSave = useCallback(
@@ -223,7 +223,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
       setTemplateType(type)
       setShowEditTemplateModal(true)
     },
-    [node.data.custom.isSection, node.data.name]
+    [node.data.custom.isSection, node.data.name],
   )
 
   const handleSaveTemplate = useCallback(
@@ -245,7 +245,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
       if (globalTemplate) {
         // for now, we have to extract images from the template and save as files
         const imgmap: ImagesMapping = await saveTemplateImages(
-          query.node(node.id)?.get().dom as HTMLElement
+          query.node(node.id)?.get().dom as HTMLElement,
         )
 
         // update ImageBlocks to point to the saved images
@@ -269,7 +269,7 @@ const BlockToolbar = ({templateEditor}: BlockToolbarProps) => {
       })
       dispatchTemplateEvent(saveTemplateEvent)
     },
-    [node.dom, node.id, query, templateType]
+    [node.dom, node.id, query, templateType],
   )
 
   if (node.data?.custom?.noToolbar) return null

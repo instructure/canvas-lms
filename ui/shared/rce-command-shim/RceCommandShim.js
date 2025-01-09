@@ -30,7 +30,7 @@
 import {registerJQueryValueHandler} from '@canvas/serialize-form'
 
 export const RCELOADED_EVENT_NAME = 'RceLoaded'
-// eslint-disable-next-line import/no-mutable-exports
+ 
 export let tmce
 
 function delaySend($target, methodName, ...args) {
@@ -42,7 +42,7 @@ function delaySend($target, methodName, ...args) {
     },
     (e, remoteEditor) => {
       remoteEditor.call(e.data.method_name, ...e.data.args)
-    }
+    },
   )
 }
 
@@ -86,9 +86,9 @@ export function send($target, methodName, ...args) {
   } else if (methodName === 'get_code') {
     return $target.val()
   } else {
-    // eslint-disable-next-line no-console
+     
     console.warn(
-      `called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`
+      `called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`,
     )
     delaySend($target, methodName, ...args)
   }

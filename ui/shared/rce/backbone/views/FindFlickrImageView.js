@@ -78,8 +78,8 @@ FindFlickrImageView.prototype.searchFlickr = function (event) {
             const photos = data.photos.photo
             return _this.renderResults(photos)
           }
-        })(this)
-      ))
+        })(this),
+      )),
     )
 }
 
@@ -90,7 +90,7 @@ FindFlickrImageView.prototype.renderResults = function (photos) {
       return function (photo) {
         return photo.needs_interstitial === 1
       }
-    })(this)
+    })(this),
   ).map(function (photo) {
     return resultTemplate({
       thumb:

@@ -57,7 +57,7 @@ const ColumnCountPopup = ({columns}: ColumnCountPopupProps) => {
       setCols(ncols)
       setProp((prps: ColumnsSectionProps) => (prps.columns = ncols))
     },
-    [setProp]
+    [setProp],
   )
 
   return (

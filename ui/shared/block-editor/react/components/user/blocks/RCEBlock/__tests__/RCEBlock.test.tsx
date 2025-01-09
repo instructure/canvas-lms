@@ -57,7 +57,7 @@ const renderBlock = (enabled: boolean, props: Partial<RCEBlockProps> = {}) => {
           <RCEBlock {...props} />
         </Frame>
       </Editor>
-    </div>
+    </div>,
   )
 }
 
@@ -99,7 +99,7 @@ describe('RCEBlock', () => {
           expect(container.querySelector('.rce-wrapper')).toHaveTextContent('This is text')
         })
         const rcetextarea = container.querySelector(
-          `#rceblock_text-${props.id}`
+          `#rceblock_text-${props.id}`,
         ) as HTMLTextAreaElement
         expect(rcetextarea).toHaveValue('This is text')
       })

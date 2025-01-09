@@ -41,7 +41,7 @@ const IconBlockToolbar = () => {
     props: node.data.props,
   }))
   const [effectiveBgColor] = useState<string>(
-    getEffectiveBackgroundColor(nodeDomNode as HTMLElement)
+    getEffectiveBackgroundColor(nodeDomNode as HTMLElement),
   )
   const [effectiveColor] = useState<string>(getEffectiveColor(nodeDomNode as HTMLElement))
 
@@ -50,11 +50,11 @@ const IconBlockToolbar = () => {
       _e: React.MouseEvent,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       setProp((prps: IconBlockProps) => (prps.size = value as IconSize))
     },
-    [setProp]
+    [setProp],
   )
 
   const handleColorChange = useCallback(
@@ -67,7 +67,7 @@ const IconBlockToolbar = () => {
         }
       })
     },
-    [effectiveColor, setProp]
+    [effectiveColor, setProp],
   )
 
   return (

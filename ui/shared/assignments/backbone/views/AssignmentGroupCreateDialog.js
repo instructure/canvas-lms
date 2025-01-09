@@ -64,7 +64,7 @@ AssignmentGroupCreateDialog.prototype.render = function () {
         return function () {
           return _this.cancel()
         }
-      })(this)
+      })(this),
     )
   return this
 }
@@ -84,7 +84,7 @@ AssignmentGroupCreateDialog.prototype.createAssignmentGroup = function (event) {
         _this.closeDialog()
         return _this.trigger('assignmentGroup:created', data.assignment_group)
       }
-    })(this)
+    })(this),
   )
 }
 

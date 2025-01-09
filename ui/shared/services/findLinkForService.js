@@ -58,7 +58,7 @@ export function getUserServices(service_types, success, error) {
       if (error) {
         error(data)
       }
-    }
+    },
   )
 }
 
@@ -72,7 +72,7 @@ export function findLinkForService(service_type, callback) {
         "<form id='bookmark_search_form' style='margin-bottom: 5px;'>" +
         "<img src='/images/blank.png'/>&nbsp;&nbsp;" +
         "<button class='btn search_button' type='submit'>"
-      }${htmlEscape(I18n.t('buttons.search', 'Search'))}</button></form>`
+      }${htmlEscape(I18n.t('buttons.search', 'Search'))}</button></form>`,
     )
     $dialog.append("<div class='results' style='max-height: 200px; overflow: auto;'/>")
     $dialog.find('form').submit(event => {
@@ -81,9 +81,12 @@ export function findLinkForService(service_type, callback) {
       const now = new Date()
       if (service_type === 'diigo' && lastLookup && now - lastLookup < 15000) {
         // let the user know we have to take things slow because of Diigo
-        setTimeout(() => {
-          $dialog.find('form').submit()
-        }, 15000 - (now - lastLookup))
+        setTimeout(
+          () => {
+            $dialog.find('form').submit()
+          },
+          15000 - (now - lastLookup),
+        )
         $dialog
           .find('.results')
           .empty()
@@ -91,9 +94,9 @@ export function findLinkForService(service_type, callback) {
             htmlEscape(
               I18n.t(
                 'status.diigo_search_throttling',
-                'Diigo limits users to one search every ten seconds.  Please wait...'
-              )
-            )
+                'Diigo limits users to one search every ten seconds.  Please wait...',
+              ),
+            ),
           )
         return
       }
@@ -115,7 +118,7 @@ export function findLinkForService(service_type, callback) {
           }
           for (const idx in data) {
             data[idx].short_title = data[idx].title
-             
+
             if (data[idx].title == data[idx].description) {
               data[idx].short_title = truncateText(data[idx].description, {max: 30})
             }
@@ -127,12 +130,12 @@ export function findLinkForService(service_type, callback) {
                     href: data[idx].url,
                     title: data[idx].title,
                   })
-                  .text(data[idx].short_title)
+                  .text(data[idx].short_title),
               )
               .append(
                 $("<div style='margin: 5px 10px; font-size: 0.8em;'/>").text(
-                  data[idx].description || I18n.t('no_description', 'No description')
-                )
+                  data[idx].description || I18n.t('no_description', 'No description'),
+                ),
               )
           }
         },
@@ -141,7 +144,7 @@ export function findLinkForService(service_type, callback) {
             .find('.results')
             .empty()
             .append(htmlEscape(I18n.t('errors.search_failed', 'Search failed, please try again.')))
-        }
+        },
       )
     })
     $dialog.on('click', '.bookmark_link', function (event) {

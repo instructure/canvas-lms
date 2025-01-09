@@ -93,7 +93,7 @@ describe('OutcomeView', () => {
           {
             assessed: true,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -114,7 +114,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -135,7 +135,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: false,
-          }
+          },
         ),
         state: 'show',
       })
@@ -156,7 +156,7 @@ describe('OutcomeView', () => {
           {
             assessed: true,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -177,7 +177,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -200,7 +200,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -230,7 +230,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -255,7 +255,7 @@ describe('OutcomeView', () => {
           {
             assessed: false,
             can_unlink: true,
-          }
+          },
         ),
         state: 'show',
       })
@@ -317,7 +317,7 @@ describe('OutcomeView', () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
-          {can_unlink: true}
+          {can_unlink: true},
         ),
         state: 'edit',
       })
@@ -340,7 +340,7 @@ describe('OutcomeView', () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: true},
-          {can_unlink: true}
+          {can_unlink: true},
         ),
         state: 'edit',
       })
@@ -362,7 +362,7 @@ describe('OutcomeView', () => {
       const view = createView({
         model: newOutcome(
           {assessed: true, native: true, has_updateable_rubrics: false},
-          {can_unlink: true}
+          {can_unlink: true},
         ),
         state: 'edit',
       })

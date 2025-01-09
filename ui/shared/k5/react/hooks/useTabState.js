@@ -50,7 +50,7 @@ export default function useTabState(defaultTab, tabs = []) {
 
   const findCurrentTab = useCallback(
     () => getTabFromHash(hash, tabs) || defaultTab || tabs[0]?.id,
-    [defaultTab, hash, tabs]
+    [defaultTab, hash, tabs],
   )
   // This ref is used to pass the current tab to the planner's getActiveApp()
   // function-- we can't use currentTab directly because that gets stuck in

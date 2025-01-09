@@ -103,7 +103,7 @@ describe('DirectShareCoursePanel', () => {
       <DirectShareCoursePanel
         sourceCourseId="42"
         contentSelection={{discussion_topics: ['1123']}}
-      />
+      />,
     )
     const input = getByLabelText(/select a course/i)
     fireEvent.click(input)
@@ -136,7 +136,7 @@ describe('DirectShareCoursePanel', () => {
       <DirectShareCoursePanel
         sourceCourseId="42"
         contentSelection={{discussion_topics: ['1123']}}
-      />
+      />,
     )
     const courseSelector = getByText(/select a course/i)
     fireEvent.click(courseSelector)
@@ -161,14 +161,14 @@ describe('DirectShareCoursePanel', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()  
     })
 
     it('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', 400)
       fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
       const {getByText, getByLabelText, queryByText} = render(
-        <DirectShareCoursePanel sourceCourseId="42" />
+        <DirectShareCoursePanel sourceCourseId="42" />,
       )
       const input = getByLabelText(/select a course/i)
       fireEvent.click(input)

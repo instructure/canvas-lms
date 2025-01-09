@@ -37,7 +37,7 @@ export default function FilterTags(props: {
       Object.entries(props.queryParams.filters).map(([key, value]) => [
         key,
         (value as FilterItem[]).filter(f => f.id !== filter.id),
-      ])
+      ]),
     )
     props.updateQueryParams({
       filters: newFilters,

@@ -47,7 +47,7 @@ const MatchingQuestion = ({question, onAnswerChange}: MatchingQuestionProps) => 
           [curr.id]: undefined,
         }
       },
-      {} as MatchingQuestionAnswers
+      {} as MatchingQuestionAnswers,
     )
   })
 
@@ -57,7 +57,7 @@ const MatchingQuestion = ({question, onAnswerChange}: MatchingQuestionProps) => 
       data: {
         value?: string | number
         id?: string
-      }
+      },
     ) => {
       if (!data.id || !data.value) return
 
@@ -68,7 +68,7 @@ const MatchingQuestion = ({question, onAnswerChange}: MatchingQuestionProps) => 
       const isCorrect = Object.keys(currAnswers).every((id: string) => id === currAnswers[id])
       onAnswerChange(isCorrect)
     },
-    [answers, onAnswerChange, setAnswers]
+    [answers, onAnswerChange, setAnswers],
   )
 
   const renderChoices = () => {

@@ -226,7 +226,7 @@ export default class ModuleFileDrop extends React.Component {
   renameFileMessage = nameToUse => {
     return I18n.t(
       'A file named "%{name}" already exists. Do you want to replace the existing file?',
-      {name: nameToUse}
+      {name: nameToUse},
     )
   }
 

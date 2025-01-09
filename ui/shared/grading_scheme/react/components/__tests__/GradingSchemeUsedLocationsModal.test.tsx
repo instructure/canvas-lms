@@ -49,7 +49,7 @@ describe('UsedLocationsModal', () => {
         return Promise.resolve({
           response: {ok: true},
           json: DefaultAssignmentUsedLocations.map(location =>
-            JSON.parse(JSON.stringify(location))
+            JSON.parse(JSON.stringify(location)),
           ),
           link: {next: {url: 'nextPageAssignment'}},
         })
@@ -104,7 +104,7 @@ describe('UsedLocationsModal', () => {
         handleClose={handleClose}
         gradingScheme={DefaultGradingScheme}
         {...props}
-      />
+      />,
     )
 
     return {
@@ -149,10 +149,10 @@ describe('UsedLocationsModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('used-locations-modal')).toBeInTheDocument()
       expect(
-        getByTestId(`used-locations-modal-course-${DefaultUsedLocations[0].id}`)
+        getByTestId(`used-locations-modal-course-${DefaultUsedLocations[0].id}`),
       ).toBeInTheDocument()
       expect(
-        getByTestId(`used-locations-modal-course-${secondUsedLocations[0].id}`)
+        getByTestId(`used-locations-modal-course-${secondUsedLocations[0].id}`),
       ).toBeInTheDocument()
     })
   })
@@ -163,7 +163,7 @@ describe('UsedLocationsModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(getByTestId('used-locations-modal')).toBeInTheDocument()
       expect(
-        getByTestId(`used-locations-modal-account-${DefaultAccountUsedLocations[0].id}`)
+        getByTestId(`used-locations-modal-account-${DefaultAccountUsedLocations[0].id}`),
       ).toBeInTheDocument()
     })
   })
@@ -177,7 +177,7 @@ describe('UsedLocationsModal', () => {
         expect(getByTestId(`used-locations-modal-course-${location.id}`)).toBeInTheDocument()
         location.assignments.forEach(assignment => {
           expect(
-            getByTestId(`used-locations-modal-assignment-${assignment.id}`)
+            getByTestId(`used-locations-modal-assignment-${assignment.id}`),
           ).toBeInTheDocument()
         })
       })
@@ -190,18 +190,18 @@ describe('UsedLocationsModal', () => {
       const filterInput = getByTestId('used-locations-modal-search-input')
       fireEvent.change(filterInput, {target: {value: DefaultUsedLocations[0].name}})
       expect(
-        getByTestId(`used-locations-modal-course-${DefaultUsedLocations[0].id}`)
+        getByTestId(`used-locations-modal-course-${DefaultUsedLocations[0].id}`),
       ).toBeInTheDocument()
       DefaultUsedLocations[0].assignments.forEach(assignment => {
         expect(getByTestId(`used-locations-modal-assignment-${assignment.id}`)).toBeInTheDocument()
       })
       expect(
-        queryByTestId(`used-locations-modal-course-${DefaultUsedLocations[1].id}`)
+        queryByTestId(`used-locations-modal-course-${DefaultUsedLocations[1].id}`),
       ).not.toBeInTheDocument()
       expect(
         queryByTestId(
-          `used-locations-modal-assignment-${DefaultUsedLocations[1].assignments[0].id}`
-        )
+          `used-locations-modal-assignment-${DefaultUsedLocations[1].assignments[0].id}`,
+        ),
       ).not.toBeInTheDocument()
     })
 
@@ -212,13 +212,13 @@ describe('UsedLocationsModal', () => {
       const filterInput = getByTestId('used-locations-modal-search-input')
       fireEvent.change(filterInput, {target: {value: DefaultUsedLocations[0].assignments[0].title}})
       expect(
-        getByTestId(`used-locations-modal-course-${DefaultUsedLocations[0].id}`)
+        getByTestId(`used-locations-modal-course-${DefaultUsedLocations[0].id}`),
       ).toBeInTheDocument()
       expect(
-        getByTestId(`used-locations-modal-assignment-${DefaultUsedLocations[0].assignments[0].id}`)
+        getByTestId(`used-locations-modal-assignment-${DefaultUsedLocations[0].assignments[0].id}`),
       ).toBeInTheDocument()
       expect(
-        queryByTestId(`used-locations-modal-course-${DefaultUsedLocations[1].id}`)
+        queryByTestId(`used-locations-modal-course-${DefaultUsedLocations[1].id}`),
       ).not.toBeInTheDocument()
     })
 
@@ -231,24 +231,24 @@ describe('UsedLocationsModal', () => {
       DefaultUsedLocations.find(location => location.name === 'Same Name')?.assignments.forEach(
         assignment => {
           expect(
-            getByTestId(`used-locations-modal-assignment-${assignment.id}`)
+            getByTestId(`used-locations-modal-assignment-${assignment.id}`),
           ).toBeInTheDocument()
-        }
+        },
       )
       const sameNameAssignmentCourse = DefaultUsedLocations.find(
-        location => location.name === 'Course with name assignment'
+        location => location.name === 'Course with name assignment',
       )
       expect(
-        getByTestId(`used-locations-modal-course-${sameNameAssignmentCourse?.id}`)
+        getByTestId(`used-locations-modal-course-${sameNameAssignmentCourse?.id}`),
       ).toBeInTheDocument()
       sameNameAssignmentCourse?.assignments.forEach(assignment => {
         if (assignment.title === 'Same Name') {
           expect(
-            getByTestId(`used-locations-modal-assignment-${assignment.id}`)
+            getByTestId(`used-locations-modal-assignment-${assignment.id}`),
           ).toBeInTheDocument()
         } else {
           expect(
-            queryByTestId(`used-locations-modal-assignment-${assignment.id}`)
+            queryByTestId(`used-locations-modal-assignment-${assignment.id}`),
           ).not.toBeInTheDocument()
         }
       })
@@ -259,7 +259,9 @@ describe('UsedLocationsModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(
-        getByTestId(`used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`)
+        getByTestId(
+          `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`,
+        ),
       ).toBeInTheDocument()
     })
 
@@ -268,7 +270,7 @@ describe('UsedLocationsModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       await new Promise(resolve => setTimeout(resolve, 0))
       const button = getByTestId(
-        `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`
+        `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`,
       )
       fireEvent.click(button)
       await new Promise(resolve => setTimeout(resolve, 0))
@@ -282,7 +284,7 @@ describe('UsedLocationsModal', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       await new Promise(resolve => setTimeout(resolve, 0))
       const button = getByTestId(
-        `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`
+        `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`,
       )
       fireEvent.click(button)
       await new Promise(resolve => setTimeout(resolve, 0))
@@ -296,8 +298,8 @@ describe('UsedLocationsModal', () => {
       })
       expect(
         queryByTestId(
-          `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`
-        )
+          `used-locations-modal-load-assignments-button-${courseWithAsyncAssignments.id}`,
+        ),
       ).not.toBeInTheDocument()
     })
   })

@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {possibleString, possibleStringRange} from '../Points'
-import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton';
+import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 const {shamrock} = colors
 
@@ -55,7 +55,7 @@ export const HorizontalButtonDisplay = ({
   const selectedRating = ratings.find(rating => rating.id && rating.id === selectedRatingId)
   const selectedRatingIndex = selectedRating ? ratings.indexOf(selectedRating) : -1
   const selectedSelfAssessmentRating = ratings.find(
-    rating => rating.id && rating.id === selectedSelfAssessmentRatingId
+    rating => rating.id && rating.id === selectedSelfAssessmentRatingId,
   )
   const selectedSelfAssessmentRatingIndex = selectedSelfAssessmentRating
     ? ratings.indexOf(selectedSelfAssessmentRating)
@@ -101,7 +101,7 @@ export const HorizontalButtonDisplay = ({
               size="x-small"
               themeOverride={{paragraphMargin: 0}}
               dangerouslySetInnerHTML={escapeNewLineText(
-                selectedRatingDescription?.longDescription
+                selectedRatingDescription?.longDescription,
               )}
             />
           </View>

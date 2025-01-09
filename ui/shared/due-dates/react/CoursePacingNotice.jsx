@@ -41,7 +41,6 @@ const CoursePacingNotice = props => {
 }
 
 export function renderCoursePacingNotice(mountPoint, courseId) {
-   
   ReactDOM.render(<CoursePacingNotice courseId={courseId} />, mountPoint)
 }
 

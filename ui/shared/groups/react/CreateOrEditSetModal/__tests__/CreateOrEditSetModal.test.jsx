@@ -116,8 +116,8 @@ describe('CreateOrEditSetModal', () => {
     beforeEach(() => {
       window.ENV = {
         FEATURES: {
-          differentiation_tags: true
-        }
+          differentiation_tags: true,
+        },
       }
     })
 
@@ -127,19 +127,21 @@ describe('CreateOrEditSetModal', () => {
 
     it('renders the differentiation tag checkbox when feature flag is enabled', () => {
       const {getByLabelText, getByText} = render(
-        <CreateOrEditSetModal allowSelfSignup={true} contextId="1" />
+        <CreateOrEditSetModal allowSelfSignup={true} contextId="1" />,
       )
 
       expect(getByLabelText('Is Differentiation Tag')).toBeInTheDocument()
       expect(
-        getByText('When enabled, this group set will be marked as a differentiation tag, and both self-signup and group structure options will be hidden.')
+        getByText(
+          'When enabled, this group set will be marked as a differentiation tag, and both self-signup and group structure options will be hidden.',
+        ),
       ).toBeInTheDocument()
     })
 
     it('does not render the differentiation tag checkbox when feature flag is disabled', () => {
       window.ENV.FEATURES.differentiation_tags = false
       const {queryByLabelText} = render(
-        <CreateOrEditSetModal allowSelfSignup={true} contextId="1" />
+        <CreateOrEditSetModal allowSelfSignup={true} contextId="1" />,
       )
 
       expect(queryByLabelText('Is Differentiation Tag')).not.toBeInTheDocument()
@@ -147,7 +149,7 @@ describe('CreateOrEditSetModal', () => {
 
     it('hides self-signup and Group structure when differentiation tag is checked', () => {
       const {getByLabelText, queryByTestId} = render(
-        <CreateOrEditSetModal allowSelfSignup={true} contextId="1" />
+        <CreateOrEditSetModal allowSelfSignup={true} contextId="1" />,
       )
 
       const checkbox = getByLabelText('Is Differentiation Tag')
@@ -161,16 +163,16 @@ describe('CreateOrEditSetModal', () => {
       const contextId = '1'
       fetchMock.postOnce(`/api/v1/accounts/${contextId}/group_categories`, {
         status: 200,
-        body: {}
+        body: {},
       })
 
       const {getByLabelText, getByText, getByPlaceholderText} = render(
-        <CreateOrEditSetModal allowSelfSignup={true} contextId={contextId} />
+        <CreateOrEditSetModal allowSelfSignup={true} contextId={contextId} />,
       )
 
       // Fill required name field
       fireEvent.input(getByPlaceholderText('Enter Group Set Name'), {
-        target: {value: 'Test Group'}
+        target: {value: 'Test Group'},
       })
 
       // Check differentiation tag

@@ -46,7 +46,7 @@ it('includes course_id in call loadItems prop on mount', () => {
   const fakeLoadItems = jest.fn()
   const course_id = '17'
   render(
-    <ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} forCourse={course_id} />
+    <ToDoSidebar {...defaultProps} sidebarLoadInitialItems={fakeLoadItems} forCourse={course_id} />,
   )
   expect(fakeLoadItems).toHaveBeenCalled()
   expect(fakeLoadItems.mock.calls[0][1]).toEqual(course_id)
@@ -68,7 +68,7 @@ it('renders out ToDoItems for each item', () => {
     },
   ]
   const {container, getAllByText} = render(<ToDoSidebar {...defaultProps} items={items} />)
-  expect(container.querySelectorAll('.ToDoSidebarItem').length).toBe(items.length)
+  expect(container.querySelectorAll('.ToDoSidebarItem')).toHaveLength(items.length)
   expect(getAllByText(items[0].title).length).toBeGreaterThan(0)
   expect(getAllByText(items[1].title).length).toBeGreaterThan(0)
 })
@@ -147,7 +147,7 @@ it('invokes change dashboard view when link is clicked', async () => {
     },
   ]
   const {getByText} = render(
-    <ToDoSidebar {...defaultProps} items={items} changeDashboardView={changeDashboardView} />
+    <ToDoSidebar {...defaultProps} items={items} changeDashboardView={changeDashboardView} />,
   )
   const link = getByText('Show All')
   await userEvent.click(link)

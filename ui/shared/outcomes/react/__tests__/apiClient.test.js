@@ -42,26 +42,26 @@ describe('apiClient', () => {
 
     it('calls the correct route for createImport without specifying a group', () => {
       executeTest(`${apiRouteRoot}?import_type=instructure_csv`, () =>
-        apiClient.createImport(contextRoot, new File())
+        apiClient.createImport(contextRoot, new File()),
       )
     })
 
     it('calls the correct route for createImport within a group', () => {
       executeTest(
         `${apiRouteRoot}/group/${learningOutcomeGroupId}?import_type=instructure_csv`,
-        () => apiClient.createImport(contextRoot, new File(), learningOutcomeGroupId)
+        () => apiClient.createImport(contextRoot, new File(), learningOutcomeGroupId),
       )
     })
 
     it('calls the correct route for queryImportStatus', () => {
       executeTest(`${apiRouteRoot}/outcome_imports/${outcomeImportId}`, () =>
-        apiClient.queryImportStatus(contextRoot, outcomeImportId)
+        apiClient.queryImportStatus(contextRoot, outcomeImportId),
       )
     })
 
     it('calls the correct route for queryImportCreatedGroupIds', () => {
       executeTest(`${apiRouteRoot}/outcome_imports/${outcomeImportId}/created_group_ids`, () =>
-        apiClient.queryImportCreatedGroupIds(contextRoot, outcomeImportId)
+        apiClient.queryImportCreatedGroupIds(contextRoot, outcomeImportId),
       )
     })
 

@@ -75,7 +75,7 @@ const QuestionSelect: React.FC<QuestionSelectProps> = ({onSelect, questions}) =>
       ? questions.filter(
           question =>
             question.entry.title?.toLowerCase().includes(value.toLowerCase()) ||
-            question.entry.item_body?.toLowerCase().includes(value.toLowerCase())
+            question.entry.item_body?.toLowerCase().includes(value.toLowerCase()),
         )
       : questions
 

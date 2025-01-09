@@ -142,6 +142,6 @@ export default function useDateTimeFormat(formatName, timeZone, locale) {
         throw e
       }
     },
-    [formatter]
+    [formatter],
   )
 }

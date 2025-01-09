@@ -151,10 +151,10 @@ export default class AvatarDialogView extends DialogBaseView {
         const message = isString(errors.base)
           ? errors.base
           : isArray(errors.base)
-          ? errors.base.reduce(errorReducer, '')
-          : I18n.t(
-              'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
-            )
+            ? errors.base.reduce(errorReducer, '')
+            : I18n.t(
+                'Your profile photo could not be uploaded. You may have exceeded your upload limit.',
+              )
 
         $.flashError(message)
         return this.enableSelectButton()
@@ -203,7 +203,7 @@ export default class AvatarDialogView extends DialogBaseView {
             errors: {
               base: I18n.t('Profile photo save failed too many times'),
             },
-          })
+          }),
         )
       }
     })

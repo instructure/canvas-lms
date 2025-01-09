@@ -112,7 +112,7 @@ describe('MoveItemTray', () => {
         groupId: '5',
         itemId: undefined,
         itemIds: ['2'],
-      })
+      }),
     )
   })
 

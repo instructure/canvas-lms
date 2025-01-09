@@ -176,7 +176,7 @@ async function makeMocks(overrides = [], sameStudent = false) {
   const resultQuery = (await mockGraphqlQuery(
     OBSERVER_ENROLLMENTS_QUERY,
     allOverrides,
-    variables
+    variables,
   )) as {data: ObserverEnrollmentQueryResult}
 
   const nodes = resultQuery.data?.course.enrollmentsConnection.nodes
@@ -230,7 +230,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {queryByRole} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     await waitFor(() => {
       expect(queryByRole('table')).not.toBeInTheDocument()
@@ -243,7 +243,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {getByRole, getAllByRole, findByRole} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const button = await findByRole('button', {name: 'Show all recipients'})
@@ -267,7 +267,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {findByRole, getByRole, getAllByRole} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const button = await findByRole('button', {name: 'Show all recipients'})
@@ -291,7 +291,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {findByRole, getByRole, getAllByRole} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const button = await findByRole('button', {name: 'Show all recipients'})
     fireEvent.click(button)
@@ -314,7 +314,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {findByRole} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('4 Students')
   })
@@ -325,7 +325,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {findByRole, findByTestId, findAllByTestId} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('4 Students')
@@ -347,7 +347,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {findByRole} = render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
   })
@@ -358,7 +358,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     const {findByRole, findByTestId, findAllByTestId} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <MessageStudentsWhoDialog {...makeProps()} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('0 Observers')
@@ -381,7 +381,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -400,7 +400,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByLabelText, getAllByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -419,7 +419,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: ungradedAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -435,7 +435,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -450,7 +450,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: unsubmittableAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -465,7 +465,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -479,7 +479,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -493,7 +493,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: ungradedAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -507,7 +507,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: unsubmittableAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
@@ -523,7 +523,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getByRole, findByTestId, getByTestId, queryByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       await waitFor(() => {
         expect(queryByTestId('cutoff-input')).not.toBeInTheDocument()
@@ -550,7 +550,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByTestId, getByText, getByTestId, queryByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       await waitFor(() => {
@@ -588,7 +588,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByLabelText, getByText, findByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(await findByTestId('total-student-checkbox')).toHaveAccessibleName('0 Students')
       expect(await findByTestId('total-observer-checkbox')).toHaveAccessibleName('0 Observers')
@@ -611,7 +611,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {getByTestId, findByLabelText, getByText, getAllByRole, getByRole} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -639,7 +639,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {findByLabelText, getByText, getAllByRole, getByRole, getByTestId} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -668,7 +668,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {findByLabelText, getByText, getAllByRole, getByRole, getByTestId} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -693,7 +693,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {getByTestId, findByLabelText, getByText} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -715,7 +715,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -747,7 +747,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -778,7 +778,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const button = await findByLabelText(/For students who/)
@@ -805,7 +805,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, findByLabelText, getByText, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -832,7 +832,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -859,7 +859,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -887,7 +887,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -914,7 +914,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -943,7 +943,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
       const button = await findByLabelText(/For students who/)
@@ -976,7 +976,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         render(
           <MockedProvider mocks={mocks} cache={createCache()}>
             <MessageStudentsWhoDialog {...makeProps()} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
       const button = await findByLabelText(/For students who/)
@@ -1006,7 +1006,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             <MessageStudentsWhoDialog
               {...makeProps({assignment: null, pointsBasedGradingScheme: false})}
             />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
       const button = await findByLabelText(/For students who/)
@@ -1037,7 +1037,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
             <MessageStudentsWhoDialog
               {...makeProps({assignment: null, pointsBasedGradingScheme: false})}
             />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
       const button = await findByLabelText(/For students who/)
@@ -1063,7 +1063,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, getByText, findByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -1092,7 +1092,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {getAllByRole, getByRole, findByLabelText, getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -1122,7 +1122,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const subjectInput = await findByTestId('subject-input')
@@ -1134,7 +1134,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByLabelText, getByText, findByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -1150,7 +1150,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByLabelText, getByText, findByTestId, getByLabelText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByLabelText(/For students who/)
@@ -1185,7 +1185,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1200,7 +1200,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1219,7 +1219,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1242,7 +1242,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1275,7 +1275,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({students: []})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1296,7 +1296,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1314,7 +1314,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1342,7 +1342,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1357,7 +1357,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1379,7 +1379,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1400,7 +1400,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1441,7 +1441,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({students: [newStudent]})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1462,7 +1462,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1479,7 +1479,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const button = await findByRole('button', {name: 'Show all recipients'})
@@ -1499,7 +1499,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1518,7 +1518,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1537,7 +1537,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1556,7 +1556,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps()} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1585,7 +1585,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1610,7 +1610,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1635,7 +1635,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1654,7 +1654,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       fireEvent.click(sendButton)
 
       expect(onSend).toHaveBeenCalledWith(
-        expect.objectContaining({recipientsIds: ['101', '102', '103']})
+        expect.objectContaining({recipientsIds: ['101', '102', '103']}),
       )
       expect(onClose).toHaveBeenCalled()
     })
@@ -1665,7 +1665,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const {findByRole, getByRole, getByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
@@ -1688,7 +1688,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       fireEvent.click(sendButton)
 
       const observerIds = mocks[0].result.data?.course.enrollmentsConnection.nodes.map(
-        node => node.user._id
+        node => node.user._id,
       )
       expect(onSend).toHaveBeenCalledWith(expect.objectContaining({recipientsIds: observerIds}))
       expect(onClose).toHaveBeenCalled()

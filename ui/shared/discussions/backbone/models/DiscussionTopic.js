@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
@@ -165,7 +163,7 @@ DiscussionTopic.prototype.duplicate = function (context_type, context_id, callba
           '/discussion_topics/' +
           this.id +
           '/duplicate',
-        {}
+        {},
       )
       // eslint-disable-next-line promise/no-callback-in-promise
       .then(callback)
@@ -190,7 +188,7 @@ DiscussionTopic.prototype.unreadTooltip = function () {
     },
     {
       count: this.get('unread_count'),
-    }
+    },
   )
 }
 
@@ -204,7 +202,7 @@ DiscussionTopic.prototype.replyTooltip = function () {
     },
     {
       count: this.get('discussion_subentry_count'),
-    }
+    },
   )
 }
 
@@ -225,7 +223,7 @@ DiscussionTopic.prototype.fetchEntries = function () {
         // TODO: handle nested replies and 'new_entries' here
         return _this.entries.reset(entries)
       }
-    })(this)
+    })(this),
   )
 }
 

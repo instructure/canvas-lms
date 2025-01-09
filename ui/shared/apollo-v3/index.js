@@ -18,7 +18,14 @@
 
 import getCookie from '@instructure/get-cookie'
 import possibleTypes from '@canvas/apollo-v3/possibleTypes.json'
-import {ApolloClient, ApolloProvider, InMemoryCache, HttpLink, ApolloLink, gql} from '@apollo/client'
+import {
+  ApolloClient,
+  ApolloProvider,
+  InMemoryCache,
+  HttpLink,
+  ApolloLink,
+  gql,
+} from '@apollo/client'
 import {Query} from '@apollo/client/react/components'
 import {persistCache} from 'apollo3-cache-persist'
 import {onError} from '@apollo/client/link/error'
@@ -29,7 +36,7 @@ function createConsoleErrorReportLink() {
   return onError(({graphQLErrors, networkError}) => {
     if (graphQLErrors)
       graphQLErrors.map(({message, locations, path}) =>
-        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
+        console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
       )
     if (networkError) console.log(`[Network error]: ${networkError}`)
   })

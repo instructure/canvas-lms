@@ -29,7 +29,7 @@ export const alertForMatchingAccounts = (results, showDefault) => {
         one: 'Showing 1 account calendar',
         other: 'Showing %{count} account calendars.',
       },
-      {count: results}
+      {count: results},
     )
     return $.screenReaderFlashMessageExclusive(msg, polite)
   }
@@ -39,7 +39,7 @@ export const alertForMatchingAccounts = (results, showDefault) => {
       other: '%{count} account calendars found.',
       zero: 'No matching account calendars found.',
     },
-    {count: results}
+    {count: results},
   )
   $.screenReaderFlashMessageExclusive(msg, polite)
 }

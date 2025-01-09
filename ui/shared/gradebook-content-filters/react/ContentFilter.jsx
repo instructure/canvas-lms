@@ -25,7 +25,7 @@ import natcompare from '@canvas/util/natcompare'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope(
-  'gradebook_default_gradebook_components_content_filters_content_filter'
+  'gradebook_default_gradebook_components_content_filters_content_filter',
 )
 
 function renderItem(option, {disabled, highlightedItemId, selectedItemId}) {
@@ -130,12 +130,12 @@ ContentFilter.propTypes = {
         shape({
           id: string.isRequired,
           name: string.isRequired,
-        })
+        }),
       ),
 
       id: string.isRequired,
       name: string.isRequired,
-    })
+    }),
   ).isRequired,
 
   onSelect: func.isRequired,

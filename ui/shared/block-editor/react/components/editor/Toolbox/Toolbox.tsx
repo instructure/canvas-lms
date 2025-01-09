@@ -84,7 +84,6 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
   }, [onClose])
 
   const handleDeleteTemplate = useCallback((templateId: string) => {
-     
     if (window.confirm(I18n.t('Are you sure you want to delete this template?'))) {
       const event = new CustomEvent(DeleteTemplateEvent, {
         detail: templateId,
@@ -100,7 +99,7 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
         setEditTemplate(template)
       }
     },
-    [templates]
+    [templates],
   )
 
   const handleSaveTemplate: OnSaveTemplateCallback = useCallback(
@@ -112,7 +111,7 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
       dispatchTemplateEvent(event)
       setEditTemplate(null)
     },
-    [editTemplate]
+    [editTemplate],
   )
 
   const handleTabChange: OnRequestTabChangeHandler = useCallback((_e, tabData) => {

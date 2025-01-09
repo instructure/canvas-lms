@@ -34,5 +34,5 @@ export default handleActions(
         ? defaultState.usersToBeEnrolled
         : state,
   },
-  defaultState.usersToBeEnrolled
+  defaultState.usersToBeEnrolled,
 )

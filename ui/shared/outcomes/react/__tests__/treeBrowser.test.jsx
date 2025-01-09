@@ -51,7 +51,7 @@ describe('useManageOutcomes', () => {
   it('works with initialGroupId', async () => {
     const {result} = renderHook(
       () => useManageOutcomes({collection: 'test', initialGroupId: '400'}),
-      {wrapper}
+      {wrapper},
     )
     await act(async () => jest.runAllTimers())
     expect(result.current.selectedGroupId).toBe('400')

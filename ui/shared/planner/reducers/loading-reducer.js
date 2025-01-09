@@ -89,7 +89,7 @@ function gotDaysSuccess(state, action) {
   newState.partialPastDays = purgeDuplicateDays(state.partialPastDays, action.payload.internalDays)
   newState.partialFutureDays = purgeDuplicateDays(
     state.partialFutureDays,
-    action.payload.internalDays
+    action.payload.internalDays,
   )
   newState.partialWeekDays = purgeDuplicateDays(state.partialWeekDays, action.payload.internalDays)
   return loadingState(state, newState)
@@ -233,5 +233,5 @@ export default handleActions(
     },
     CLEAR_LOADING: (_state, _action) => INITIAL_STATE,
   },
-  loadingState({}, INITIAL_STATE)
+  loadingState({}, INITIAL_STATE),
 )

@@ -64,7 +64,7 @@ interface Props {
 export default function EnrollmentStateSelect(props: Props) {
   const placeholder = props.placeholder || I18n.t('Begin typing to search')
   const [selectedOption, setSelectedOption] = useState<EnrollmentStateOption>(
-    props.value || 'deleted'
+    props.value || 'deleted',
   )
 
   const handleSelect = (event: React.SyntheticEvent, data: SelectData) => {

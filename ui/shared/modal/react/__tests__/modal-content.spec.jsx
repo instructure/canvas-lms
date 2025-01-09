@@ -30,7 +30,7 @@ describe('ModalContent', () => {
     const wrapper = shallow(
       <ModalContent>
         <div className="my_fun_div" />
-      </ModalContent>
+      </ModalContent>,
     )
     expect(wrapper.find('.my_fun_div').exists()).toBe(true)
   })

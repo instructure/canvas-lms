@@ -54,7 +54,7 @@ function transform({course}: any): AssignmentItem[] {
       id: assignment.id,
       name: assignment.name,
       rubric_id: assignment.rubricAssociation?._id,
-    })
+    }),
   )
 }
 

@@ -43,7 +43,7 @@ interface ForwardRefContainerComponent
 const Container = forwardRef<HTMLElement, ContainerProps>(
   (
     {id, className, background, style, onKeyDown, children, ...rest}: ContainerProps,
-    ref: React.Ref<HTMLElement | null>
+    ref: React.Ref<HTMLElement | null>,
   ) => {
     const {
       connectors: {connect, drag},
@@ -78,7 +78,7 @@ const Container = forwardRef<HTMLElement, ContainerProps>(
         {children}
       </div>
     )
-  }
+  },
 ) as ForwardRefContainerComponent
 
 Container.craft = {

@@ -51,7 +51,7 @@ const ToolbarColor = ({tabs, onChange}: ToolbarColorProps) => {
       setIsShowingContent(false)
       onChange(newcolors)
     },
-    [onChange]
+    [onChange],
   )
 
   const handleKey = useCallback((e: React.KeyboardEvent) => {

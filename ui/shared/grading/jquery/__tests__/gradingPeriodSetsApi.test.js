@@ -147,7 +147,7 @@ describe('gradingPeriodSetsApi', () => {
     fakeENV.setup()
     ENV.GRADING_PERIOD_SETS_URL = 'api/grading_period_sets'
     ENV.GRADING_PERIOD_SET_UPDATE_URL = 'api/grading_period_sets/${id}'
-    
+
     mockGetDepaginated = jest.fn()
     NaiveRequestDispatch.mockImplementation(() => ({
       getDepaginated: mockGetDepaginated,
@@ -169,7 +169,7 @@ describe('gradingPeriodSetsApi', () => {
           }
         },
       })
-      
+
       await api.list()
       expect(mockGetDepaginated).toHaveBeenCalledWith('api/grading_period_sets')
     })

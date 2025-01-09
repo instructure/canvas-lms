@@ -82,7 +82,7 @@ const renderBlock = (props: Partial<GroupBlockProps> = {}) => {
       <Frame>
         <GroupBlock {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 

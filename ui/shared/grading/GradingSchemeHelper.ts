@@ -21,7 +21,7 @@ import type {DeprecatedGradingScheme} from './grading.d'
 
 export function indexOfGrade(
   grade: null | string | number,
-  gradingSchemes: DeprecatedGradingScheme[]
+  gradingSchemes: DeprecatedGradingScheme[],
 ) {
   // @ts-expect-error
   const matches = (entry, key) => entry[0].toLowerCase() === key
@@ -73,7 +73,7 @@ export function gradeToScoreUpperBound(grade: number, gradingSchemes: Deprecated
 
 export function gradeToScoreLowerBound(
   grade: null | number,
-  gradingSchemes: DeprecatedGradingScheme[]
+  gradingSchemes: DeprecatedGradingScheme[],
 ) {
   const index = indexOfGrade(grade, gradingSchemes)
 
@@ -90,7 +90,7 @@ export function gradeToScoreLowerBound(
 
 export function gradePointsToPercentage(
   grade: null | number,
-  gradingScheme: DeprecatedGradingScheme
+  gradingScheme: DeprecatedGradingScheme,
 ) {
   if (gradingScheme.pointsBased && grade != null) {
     return (grade / gradingScheme.scalingFactor) * 100

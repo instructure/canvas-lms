@@ -48,7 +48,7 @@ describe('MissingPeopleSection', () => {
         inviteUsersURL={inviteUsersURL}
         missing={missingLogins}
         onChange={noop}
-      />
+      />,
     )
     expect(wrapper.getByTestId('addpeople__missing-namelist')).toBeInTheDocument()
   })
@@ -60,7 +60,7 @@ describe('MissingPeopleSection', () => {
         inviteUsersURL={inviteUsersURL}
         missing={missingLogins}
         onChange={noop}
-      />
+      />,
     )
     const missingPeopleSection = wrapper.container.querySelector('.namelist')
 
@@ -80,7 +80,7 @@ describe('MissingPeopleSection', () => {
         inviteUsersURL={undefined}
         missing={missingLogins}
         onChange={noop}
-      />
+      />,
     )
     const missingPeopleSection = wrapper.container.querySelector('.namelist')
     expect(missingPeopleSection.querySelectorAll('button')).toHaveLength(0) // create new user button
@@ -93,7 +93,7 @@ describe('MissingPeopleSection', () => {
         inviteUsersURL={inviteUsersURL}
         missing={missingEmails}
         onChange={noop}
-      />
+      />,
     )
     const missingPeopleSection = wrapper.container.querySelector('.namelist')
 
@@ -118,7 +118,7 @@ describe('MissingPeopleSection', () => {
         inviteUsersURL={inviteUsersURL}
         missing={missing}
         onChange={noop}
-      />
+      />,
     )
     expect(container.querySelector('input[type="checkbox"][value="addr1"]').checked).toBe(false)
 
@@ -126,7 +126,7 @@ describe('MissingPeopleSection', () => {
     fireEvent.click(clickToAddNameLink)
 
     waitFor(() =>
-      expect(container.querySelector('input[type="checkbox"][value="addr1"]').checked).toBe(true)
+      expect(container.querySelector('input[type="checkbox"][value="addr1"]').checked).toBe(true),
     )
   })
 })

@@ -39,7 +39,7 @@ export function originalityReportSubmissionKey(submission: {
 export function isOriginalityReportVisible(
   originalityReportVisibility: string | null,
   dueAt: string | null,
-  gradingStatus: string | null
+  gradingStatus: string | null,
 ): boolean {
   switch (originalityReportVisibility) {
     case 'immediate':
@@ -72,7 +72,7 @@ export function getOriginalityData(
     submittedAt?: null | string | Date
     submitted_at?: null | string | Date
   },
-  index: number
+  index: number,
 ): false | OriginalityData {
   let data: null | SubmissionOriginalityData = null
   if (submission.submissionType === 'online_text_entry') {

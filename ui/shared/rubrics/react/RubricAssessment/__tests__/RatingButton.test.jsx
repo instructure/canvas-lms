@@ -46,7 +46,7 @@ describe('RatingButton', () => {
   it('includes selected state in screen reader label when selected', () => {
     renderRatingButton({isSelected: true})
     expect(screen.getByRole('button', {hidden: true})).toHaveAccessibleName(
-      '5 Rating Button 5 Selected'
+      '5 Rating Button 5 Selected',
     )
   })
 

@@ -49,7 +49,7 @@ describe('Heading Menu', () => {
     const onSelectFilterMock = jest.fn()
 
     const {queryByTestId, getByTestId} = render(
-      <HeadingMenu {...defaultProps()} onSelectFilter={onSelectFilterMock} />
+      <HeadingMenu {...defaultProps()} onSelectFilter={onSelectFilterMock} />,
     )
 
     const filterMenu = queryByTestId('filter-menu')
@@ -69,7 +69,7 @@ describe('Heading Menu', () => {
       () => {
         expect(onSelectFilterMock).toHaveBeenCalledWith({id: 'all', value: 'all'})
       },
-      {timeout: DEFAULT_SEARCH_DELAY}
+      {timeout: DEFAULT_SEARCH_DELAY},
     )
   })
 })

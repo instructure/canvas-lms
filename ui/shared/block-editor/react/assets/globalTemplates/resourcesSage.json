@@ -1,9 +1,7 @@
 {
   "name": "Resources - Sage",
   "description": "",
-  "tags": [
-    "resource"
-  ],
+  "tags": ["resource"],
   "workflow_state": "active",
   "node_tree": {
     "rootNodeId": "ROOT",
@@ -60,10 +58,7 @@
         },
         "parent": "yue4mpUChN",
         "hidden": false,
-        "nodes": [
-          "13kQFSc-L3",
-          "603nuIRHjG"
-        ],
+        "nodes": ["13kQFSc-L3", "603nuIRHjG"],
         "linkedNodes": {}
       },
       "13kQFSc-L3": {
@@ -109,10 +104,7 @@
         },
         "parent": "13kQFSc-L3",
         "hidden": false,
-        "nodes": [
-          "mnhgUEW8Pc",
-          "7sVuxHkZjV"
-        ],
+        "nodes": ["mnhgUEW8Pc", "7sVuxHkZjV"],
         "linkedNodes": {}
       },
       "mnhgUEW8Pc": {
@@ -195,9 +187,7 @@
         },
         "parent": "603nuIRHjG",
         "hidden": false,
-        "nodes": [
-          "tUF84HE2cn"
-        ],
+        "nodes": ["tUF84HE2cn"],
         "linkedNodes": {}
       },
       "tUF84HE2cn": {
@@ -257,9 +247,7 @@
         },
         "parent": "ldhLGm3zpo",
         "hidden": false,
-        "nodes": [
-          "v_VBeuh3Pp"
-        ],
+        "nodes": ["v_VBeuh3Pp"],
         "linkedNodes": {}
       },
       "v_VBeuh3Pp": {
@@ -450,10 +438,7 @@
         },
         "parent": "ynZ6p8hU3v",
         "hidden": false,
-        "nodes": [
-          "H7RhkplaHI",
-          "pMi7YXCYOT"
-        ],
+        "nodes": ["H7RhkplaHI", "pMi7YXCYOT"],
         "linkedNodes": {}
       },
       "H7RhkplaHI": {
@@ -498,10 +483,7 @@
         },
         "parent": "H7RhkplaHI",
         "hidden": false,
-        "nodes": [
-          "WmDLy5VIjZ",
-          "Xu6mA8abpD"
-        ],
+        "nodes": ["WmDLy5VIjZ", "Xu6mA8abpD"],
         "linkedNodes": {}
       },
       "WmDLy5VIjZ": {
@@ -583,11 +565,7 @@
         },
         "parent": "pMi7YXCYOT",
         "hidden": false,
-        "nodes": [
-          "jS3uL8BMCd",
-          "DGp0RRhYxD",
-          "Fx9-EIE-1C"
-        ],
+        "nodes": ["jS3uL8BMCd", "DGp0RRhYxD", "Fx9-EIE-1C"],
         "linkedNodes": {}
       },
       "jS3uL8BMCd": {
@@ -635,10 +613,7 @@
         },
         "parent": "jS3uL8BMCd",
         "hidden": false,
-        "nodes": [
-          "h_agtSxFv3",
-          "_SMspOamMu"
-        ],
+        "nodes": ["h_agtSxFv3", "_SMspOamMu"],
         "linkedNodes": {}
       },
       "h_agtSxFv3": {
@@ -726,10 +701,7 @@
         },
         "parent": "DGp0RRhYxD",
         "hidden": false,
-        "nodes": [
-          "iEMlev1i-B",
-          "m5awo54rtK"
-        ],
+        "nodes": ["iEMlev1i-B", "m5awo54rtK"],
         "linkedNodes": {}
       },
       "iEMlev1i-B": {
@@ -817,10 +789,7 @@
         },
         "parent": "Fx9-EIE-1C",
         "hidden": false,
-        "nodes": [
-          "0QIK1cwJqV",
-          "GpSbSoFa1O"
-        ],
+        "nodes": ["0QIK1cwJqV", "GpSbSoFa1O"],
         "linkedNodes": {}
       },
       "0QIK1cwJqV": {
@@ -895,10 +864,7 @@
         },
         "parent": "STtBwVjWwP",
         "hidden": false,
-        "nodes": [
-          "L6Am8FvLL8",
-          "eX1-hLBdht"
-        ],
+        "nodes": ["L6Am8FvLL8", "eX1-hLBdht"],
         "linkedNodes": {}
       },
       "L6Am8FvLL8": {
@@ -944,10 +910,7 @@
         },
         "parent": "L6Am8FvLL8",
         "hidden": false,
-        "nodes": [
-          "-UXV1wigkR",
-          "ki1B54yz7J"
-        ],
+        "nodes": ["-UXV1wigkR", "ki1B54yz7J"],
         "linkedNodes": {}
       },
       "-UXV1wigkR": {
@@ -1028,11 +991,7 @@
         },
         "parent": "eX1-hLBdht",
         "hidden": false,
-        "nodes": [
-          "sCiwJExAy_",
-          "97V0RnqntH",
-          "C6VV3zZufw"
-        ],
+        "nodes": ["sCiwJExAy_", "97V0RnqntH", "C6VV3zZufw"],
         "linkedNodes": {}
       },
       "sCiwJExAy_": {
@@ -1080,10 +1039,7 @@
         },
         "parent": "sCiwJExAy_",
         "hidden": false,
-        "nodes": [
-          "PfQuwGmPgj",
-          "KO1icbS3xx"
-        ],
+        "nodes": ["PfQuwGmPgj", "KO1icbS3xx"],
         "linkedNodes": {}
       },
       "PfQuwGmPgj": {
@@ -1171,10 +1127,7 @@
         },
         "parent": "97V0RnqntH",
         "hidden": false,
-        "nodes": [
-          "ju9jlUQc0N",
-          "3XDmNqdA3G"
-        ],
+        "nodes": ["ju9jlUQc0N", "3XDmNqdA3G"],
         "linkedNodes": {}
       },
       "ju9jlUQc0N": {
@@ -1262,10 +1215,7 @@
         },
         "parent": "C6VV3zZufw",
         "hidden": false,
-        "nodes": [
-          "ghB0xWw86Z",
-          "KYUYM-M3nh"
-        ],
+        "nodes": ["ghB0xWw86Z", "KYUYM-M3nh"],
         "linkedNodes": {}
       },
       "ghB0xWw86Z": {
@@ -1340,10 +1290,7 @@
         },
         "parent": "YQTjRM5pw4",
         "hidden": false,
-        "nodes": [
-          "C7KW-M9RFn",
-          "HKTRAv_Wh_"
-        ],
+        "nodes": ["C7KW-M9RFn", "HKTRAv_Wh_"],
         "linkedNodes": {}
       },
       "C7KW-M9RFn": {
@@ -1389,9 +1336,7 @@
         },
         "parent": "C7KW-M9RFn",
         "hidden": false,
-        "nodes": [
-          "j2sSk-oJyK"
-        ],
+        "nodes": ["j2sSk-oJyK"],
         "linkedNodes": {}
       },
       "j2sSk-oJyK": {
@@ -1455,9 +1400,7 @@
         },
         "parent": "HKTRAv_Wh_",
         "hidden": false,
-        "nodes": [
-          "1kZX69hcaz"
-        ],
+        "nodes": ["1kZX69hcaz"],
         "linkedNodes": {}
       },
       "1kZX69hcaz": {

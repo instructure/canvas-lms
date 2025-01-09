@@ -57,7 +57,7 @@ export default function AssignmentPicker({courseId, onAssignmentSelected}: Assig
       return allAssignments
     }
     return allAssignments.filter(assignment =>
-      assignment.name.toLowerCase().startsWith(value.toLowerCase())
+      assignment.name.toLowerCase().startsWith(value.toLowerCase()),
     )
   }
 

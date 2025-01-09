@@ -34,7 +34,7 @@ const renderView = async (props: any) => {
     result = render(
       <MockedQueryProvider>
         <TempEnrollView {...props} />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   })
   return result
@@ -160,7 +160,7 @@ describe('TempEnrollView component', () => {
       await renderView(newProps)
 
       expect(
-        await waitFor(() => screen.queryByText('Temporary enrollment option links'))
+        await waitFor(() => screen.queryByText('Temporary enrollment option links')),
       ).not.toBeInTheDocument()
     })
   })
@@ -326,7 +326,7 @@ describe('TempEnrollView component', () => {
       beforeEach(() => {
         fetchMock.deleteOnce(
           `/api/v1/courses/${defaultEnrollment.course_id}/enrollments/${defaultEnrollment.id}?task=delete`,
-          {}
+          {},
         )
         window.confirm = jest.fn(() => true)
       })
@@ -349,8 +349,8 @@ describe('TempEnrollView component', () => {
         await waitFor(() => fireEvent.click(screen.getByTestId('delete-button')))
         await waitFor(() =>
           expect(
-            screen.queryAllByText('1 enrollments deleted successfully.')[0]
-          ).toBeInTheDocument()
+            screen.queryAllByText('1 enrollments deleted successfully.')[0],
+          ).toBeInTheDocument(),
         )
       })
     })

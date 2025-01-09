@@ -127,7 +127,7 @@ GroupBlock.craft = {
     canMoveIn: (incomingNodes: Node[]) => {
       return !incomingNodes.some(
         (incomingNode: Node) =>
-          incomingNode.data.custom.isSection || incomingNode.data.name === 'GroupBlock'
+          incomingNode.data.custom.isSection || incomingNode.data.name === 'GroupBlock',
       )
     },
   },

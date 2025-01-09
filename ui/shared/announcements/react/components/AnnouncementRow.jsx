@@ -88,7 +88,7 @@ export default function AnnouncementRow({
           <ScreenReaderContent>
             {I18n.t('Delete announcement %{title}', {title: announcement.title})}
           </ScreenReaderContent>
-        </Menu.Item>
+        </Menu.Item>,
       )
     }
     if (!announcementsLocked) {
@@ -114,7 +114,7 @@ export default function AnnouncementRow({
               ? I18n.t('Allow comments for %{title}', {title: announcement.title})
               : I18n.t('Disallow comments for %{title}', {title: announcement.title})}
           </ScreenReaderContent>
-        </Menu.Item>
+        </Menu.Item>,
       )
     }
     return menuList

@@ -68,8 +68,8 @@ const AssignmentHeader: React.FC<HeaderProps> = ({type, assignment, breakpoints}
             {type === ASSIGNMENT_VIEW_TYPES.EDIT
               ? I18n.t('Edit Assignment')
               : type === ASSIGNMENT_VIEW_TYPES.CREATE
-              ? I18n.t('Create Assignment')
-              : assignment.name}
+                ? I18n.t('Create Assignment')
+                : assignment.name}
           </Heading>
           <Flex id="submission-status">
             {isSavedView && assignment.hasSubmittedSubmissions && (

@@ -85,7 +85,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
         focus: true,
         tinyOptions: this.options.tinyOptions || {},
       },
-      this.options.rceOptions
+      this.options.rceOptions,
     )
     if (this.options.editorBoxLabel) {
       opts.tinyOptions.aria_label = this.options.editorBoxLabel
@@ -189,8 +189,8 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
               RichContentEditor.closeRCE(this.textArea)
               this.display()
               this.editButton && this.editButton.focus()
-            })
-          )
+            }),
+          ),
       )
   },
 
@@ -200,7 +200,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
   createSwitchViews() {
     const component = <SwitchEditorControl textarea={this.textArea} />
     const $container = $("<div class='switch-views'></div>")
-     
+
     ReactDOM.render(component, $container[0])
     return $container
   },

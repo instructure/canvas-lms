@@ -81,10 +81,10 @@ export const ModernView = ({
     <View as="div" margin="0" overflowX="hidden">
       {criteria.map((criterion, index) => {
         const criterionAssessment = rubricAssessmentData.find(
-          data => data.criterionId === criterion.id
+          data => data.criterionId === criterion.id,
         )
         const criterionSelfAssessment = selfAssessment?.find(
-          data => data.criterionId === criterion.id
+          data => data.criterionId === criterion.id,
         )
 
         return (
@@ -163,12 +163,12 @@ export const CriterionRow = ({
   const selectedRatingId = findCriterionMatchingRatingId(
     criterion.ratings,
     criterion.criterionUseRange,
-    criterionAssessment
+    criterionAssessment,
   )
   const selectedSelfAssessmentRatingId = findCriterionMatchingRatingId(
     criterion.ratings,
     criterion.criterionUseRange,
-    criterionSelfAssessment
+    criterionSelfAssessment,
   )
 
   useEffect(() => {
@@ -262,7 +262,7 @@ export const CriterionRow = ({
   const totalPointsValue = criterion.points.toString()
   const instructorPointsText = I18n.t(
     'Instructor Points %{pointsInputValue} out of %{totalPointsValue}',
-    {pointsInputValue, totalPointsValue}
+    {pointsInputValue, totalPointsValue},
   )
 
   const grabFailedValidationMessage = () => {

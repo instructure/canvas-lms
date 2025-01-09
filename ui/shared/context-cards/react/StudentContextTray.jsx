@@ -62,7 +62,7 @@ export default class StudentContextTray extends React.Component {
       PropTypes.shape({
         base_url: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-      })
+      }),
     ),
   }
 
@@ -139,7 +139,7 @@ export default class StudentContextTray extends React.Component {
       },
       () => {
         this.messageStudentsButton.focus()
-      }
+      },
     )
   }
 
@@ -159,7 +159,7 @@ export default class StudentContextTray extends React.Component {
           I18n.t('View grades for %{name}', {name: user.short_name}),
           `/courses/${this.props.courseId}/grades/${this.props.studentId}`,
 
-          () => course.permissions.manage_grades || course.permissions.view_all_grades
+          () => course.permissions.manage_grades || course.permissions.view_all_grades,
         )}
         {
           // only include analytics 1 link if analytics 2 is not among the external tool links
@@ -171,7 +171,7 @@ export default class StudentContextTray extends React.Component {
                 I18n.t('Analytics'),
                 I18n.t('View analytics for %{name}', {name: user.short_name}),
                 `/courses/${this.props.courseId}/analytics/users/${this.props.studentId}`,
-                () => course.permissions.view_analytics && user.analytics
+                () => course.permissions.view_analytics && user.analytics,
               )
         }
         {this.props.externalTools
@@ -181,7 +181,7 @@ export default class StudentContextTray extends React.Component {
                 tool.title,
                 tool.title,
                 `${tool.base_url}&student_id=${this.props.studentId}`,
-                () => true
+                () => true,
               )
             })
           : null}

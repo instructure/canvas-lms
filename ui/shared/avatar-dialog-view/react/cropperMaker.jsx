@@ -45,7 +45,7 @@ class CanvasCropperMaker {
   }
 
   render() {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <CanvasCropper
         height={this.height}
@@ -56,7 +56,7 @@ class CanvasCropperMaker {
         }}
         width={this.width}
       />,
-      this.root
+      this.root,
     )
   }
 

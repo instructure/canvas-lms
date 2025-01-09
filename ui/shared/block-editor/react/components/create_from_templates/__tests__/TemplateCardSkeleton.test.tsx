@@ -35,7 +35,7 @@ const renderComponent = (props = {}) => {
       quickLookAction={jest.fn()}
       inLayout="grid"
       {...props}
-    />
+    />,
   )
 }
 

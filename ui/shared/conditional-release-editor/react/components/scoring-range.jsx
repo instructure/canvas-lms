@@ -94,7 +94,7 @@ class ScoringRange extends React.Component {
       return this.renderScoreLabel(
         this.props.range.get('lower_bound'),
         I18n.t('Lower Bound'),
-        false
+        false,
       )
     } else {
       return (
@@ -133,7 +133,7 @@ class ScoringRange extends React.Component {
   removeAssignment(path, asg) {
     this.props.removeAssignment({path})
     this.props.setAriaAlert(
-      I18n.t('Removed assignment %{assignment_name}', {assignment_name: asg.get('name')})
+      I18n.t('Removed assignment %{assignment_name}', {assignment_name: asg.get('name')}),
     )
     setTimeout(() => this.titleRef.current.focus(), 1)
   }
@@ -167,12 +167,12 @@ class ScoringRange extends React.Component {
     const upperBound = transformScore(
       this.props.range.get('upper_bound'),
       this.props.triggerAssignment,
-      true
+      true,
     )
     const lowerBound = transformScore(
       this.props.range.get('lower_bound'),
       this.props.triggerAssignment,
-      false
+      false,
     )
 
     const rangeTitle = I18n.t('Scoring range %{upperBound} to %{lowerBound}', {

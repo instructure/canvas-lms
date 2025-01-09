@@ -140,7 +140,7 @@ FormContent.propTypes = {
     shape({
       id: string.isRequired,
       name: string.isRequired,
-    })
+    }),
   ).isRequired,
   sectionSelectionChanged: func.isRequired,
   selectedSectionIds: arrayOf(string).isRequired,

@@ -44,7 +44,7 @@ function renderComponent(overrideProps = {}) {
   return render(
     <MockedProvider>
       <ProxyUploadModal {...props} />
-    </MockedProvider>
+    </MockedProvider>,
   )
 }
 

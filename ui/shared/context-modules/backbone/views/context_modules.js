@@ -93,7 +93,6 @@ ContextModules.prototype.success = function (response) {
 //   if there was an error.
 // @api private
 ContextModules.prototype.error = function (_response) {
-   
   window.alert('This module could not be published')
   return this.$context_module.loadingImage('remove')
 }

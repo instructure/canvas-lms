@@ -117,7 +117,7 @@ const ICONS: Record<ItemType, ComponentClass<any>> = {
 const updateChildrenToNextCheckState = (
   item: CheckboxTreeNode,
   newState: Record<string, CheckboxTreeNode>,
-  nextCheckState: CheckboxState
+  nextCheckState: CheckboxState,
 ) => {
   const updateChild = (currentItem: CheckboxTreeNode) => {
     currentItem.childrenIds.forEach(childId => {
@@ -132,7 +132,7 @@ const updateChildrenToNextCheckState = (
 
 const updateParentsWithoutKnowAboutChildren = (
   item: CheckboxTreeNode,
-  newState: Record<string, CheckboxTreeNode>
+  newState: Record<string, CheckboxTreeNode>,
 ) => {
   let itemForParentTraversal = item
 
@@ -156,7 +156,7 @@ const updateParentsWithoutKnowAboutChildren = (
 
 const uncheckAllChildrenAction = (
   state: Record<string, CheckboxTreeNode>,
-  id: string
+  id: string,
 ): Record<string, CheckboxTreeNode> => {
   const newState = {...state}
   const item = newState[id]
@@ -174,7 +174,7 @@ const uncheckAllChildrenAction = (
 
 const toggleCheckBoxByIdAction = (
   state: Record<string, CheckboxTreeNode>,
-  id: string
+  id: string,
 ): Record<string, CheckboxTreeNode> => {
   const newState = {...state}
   const item = newState[id]
@@ -191,7 +191,7 @@ const toggleCheckBoxByIdAction = (
 
 const reducer = (
   state: Record<string, CheckboxTreeNode>,
-  action: {type: CheckboxState; payload: string}
+  action: {type: CheckboxState; payload: string},
 ) => {
   switch (action.type) {
     case 'unchecked':
@@ -204,16 +204,23 @@ const reducer = (
   }
 }
 
-const filterChildrenByParentId = (items: Record<string, CheckboxTreeNode>, childrenIds: string[]) => {
-  return Object.values(items)
-    .filter(item => childrenIds.includes(item.id))
-    .map(item => item) || []
+const filterChildrenByParentId = (
+  items: Record<string, CheckboxTreeNode>,
+  childrenIds: string[],
+) => {
+  return (
+    Object.values(items)
+      .filter(item => childrenIds.includes(item.id))
+      .map(item => item) || []
+  )
 }
 
 const filterParents = (items: Record<string, CheckboxTreeNode>) => {
-  return Object.values(items)
-    .filter(item => item.parentId === undefined)
-    .map(item => item) || []
+  return (
+    Object.values(items)
+      .filter(item => item.parentId === undefined)
+      .map(item => item) || []
+  )
 }
 
 const isParentItem = (item: CheckboxTreeNode) => {
@@ -231,7 +238,11 @@ const areEqualParent = (prevProps: ItemProps, nextProps: ItemProps) => {
   const prevNodes = prevProps.checkboxTreeNodes || {}
   const nextNodes = nextProps.checkboxTreeNodes || {}
 
-  const hasChildCheckboxStateChangedRecursive = (currentItem: CheckboxTreeNode, prevNodes: Record<string, CheckboxTreeNode>, nextNodes: Record<string, CheckboxTreeNode>): boolean => {
+  const hasChildCheckboxStateChangedRecursive = (
+    currentItem: CheckboxTreeNode,
+    prevNodes: Record<string, CheckboxTreeNode>,
+    nextNodes: Record<string, CheckboxTreeNode>,
+  ): boolean => {
     return currentItem.childrenIds.some(childId => {
       const child = prevNodes[childId]
       if (child.childrenIds.length > 0) {
@@ -241,7 +252,11 @@ const areEqualParent = (prevProps: ItemProps, nextProps: ItemProps) => {
     })
   }
 
-  const hasChildCheckboxStateChanged = hasChildCheckboxStateChangedRecursive(prevProps.currentItem, prevNodes, nextNodes)
+  const hasChildCheckboxStateChanged = hasChildCheckboxStateChangedRecursive(
+    prevProps.currentItem,
+    prevNodes,
+    nextNodes,
+  )
 
   return (
     !hasChildCheckboxStateChanged &&
@@ -285,92 +300,98 @@ const Child = memo(({currentItem, dispatch}: ItemProps) => {
   )
 }, areEqualChild)
 
-const Parent = memo(({currentItem, dispatch, checkboxTreeNodes = {}, expanded = false}: ItemProps) => {
-  const [expandedState, setExpandedState] = useState<boolean>(expanded)
-  const I18n = useI18nScope('collapsable_list')
-  const {id, label, type, childrenIds, checkboxState} = currentItem
+const Parent = memo(
+  ({currentItem, dispatch, checkboxTreeNodes = {}, expanded = false}: ItemProps) => {
+    const [expandedState, setExpandedState] = useState<boolean>(expanded)
+    const I18n = useI18nScope('collapsable_list')
+    const {id, label, type, childrenIds, checkboxState} = currentItem
 
-  const ParentIcon = ICONS[type] || ICONS.assignment_groups
+    const ParentIcon = ICONS[type] || ICONS.assignment_groups
 
-  const childItems = filterChildrenByParentId(checkboxTreeNodes, childrenIds)
+    const childItems = filterChildrenByParentId(checkboxTreeNodes, childrenIds)
 
-  const handleCheckboxChange = () => {
-    const updateOnlyLastChildItems = (items: CheckboxTreeNode[]) => {
-      items.forEach(item => {
-        if (isParentItem(item)) {
-          const nestedChildItems = item.childrenIds.map(childId => checkboxTreeNodes[childId])
-          updateOnlyLastChildItems(nestedChildItems)
-        } else {
-          dispatch({type: checkboxState, payload: item.id})
-          if (item.linkedId) {
-            dispatch({type: checkboxState, payload: item.linkedId})
+    const handleCheckboxChange = () => {
+      const updateOnlyLastChildItems = (items: CheckboxTreeNode[]) => {
+        items.forEach(item => {
+          if (isParentItem(item)) {
+            const nestedChildItems = item.childrenIds.map(childId => checkboxTreeNodes[childId])
+            updateOnlyLastChildItems(nestedChildItems)
+          } else {
+            dispatch({type: checkboxState, payload: item.id})
+            if (item.linkedId) {
+              dispatch({type: checkboxState, payload: item.linkedId})
+            }
           }
-        }
-      })
+        })
+      }
+
+      // We not call toggle on current Parent element only on last children in the tree,
+      // because the children state update will determine the parents state as bubbling up the state
+      updateOnlyLastChildItems(childItems)
+    }
+    const handleExpand = () => {
+      setExpandedState(!expandedState)
     }
 
-    // We not call toggle on current Parent element only on last children in the tree,
-    // because the children state update will determine the parents state as bubbling up the state
-    updateOnlyLastChildItems(childItems)
-  }
-  const handleExpand = () => {
-    setExpandedState(!expandedState)
-  }
-
-  return (
-    <Flex margin="xxx-small 0 0 0" width="100%" direction="column">
-      <FlexItem shouldShrink={true}>
-        <ToggleGroup
-          data-testid={`toggle-${id}`}
-          toggleLabel={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
-          expanded={expandedState}
-          onToggle={handleExpand}
-          border={false}
-          summary={
-            <Flex>
-              <FlexItem padding="x-small xx-small" shouldShrink={true}>
-                <Checkbox
-                  checked={checkboxState === 'checked'}
-                  indeterminate={checkboxState === 'indeterminate'}
-                  onChange={handleCheckboxChange}
-                  label={<ScreenReaderContent>{label}</ScreenReaderContent>}
-                  data-testid={`checkbox-${id}`}
-                />
-              </FlexItem>
-              {ParentIcon && (
-                <FlexItem shouldShrink={true}>
-                  <ParentIcon size="small" />
+    return (
+      <Flex margin="xxx-small 0 0 0" width="100%" direction="column">
+        <FlexItem shouldShrink={true}>
+          <ToggleGroup
+            data-testid={`toggle-${id}`}
+            toggleLabel={I18n.t('%{label}, Navigate inside to interact with the checkbox', {label})}
+            expanded={expandedState}
+            onToggle={handleExpand}
+            border={false}
+            summary={
+              <Flex>
+                <FlexItem padding="x-small xx-small" shouldShrink={true}>
+                  <Checkbox
+                    checked={checkboxState === 'checked'}
+                    indeterminate={checkboxState === 'indeterminate'}
+                    onChange={handleCheckboxChange}
+                    label={<ScreenReaderContent>{label}</ScreenReaderContent>}
+                    data-testid={`checkbox-${id}`}
+                  />
                 </FlexItem>
-              )}
-              <FlexItem padding="0 small" shouldShrink={true}>
-                <Text aria-hidden="true">{label}</Text>
-              </FlexItem>
-            </Flex>
-          }
-        >
-          {childItems.map(childItem => {
-            return isParentItem(childItem) ? (
-              <Flex key={childItem.id} margin="0 0 0 large">
-                <Parent
-                  currentItem={childItem}
-                  checkboxTreeNodes={checkboxTreeNodes}
-                  dispatch={dispatch}
-                  expanded={false}
-                />
+                {ParentIcon && (
+                  <FlexItem shouldShrink={true}>
+                    <ParentIcon size="small" />
+                  </FlexItem>
+                )}
+                <FlexItem padding="0 small" shouldShrink={true}>
+                  <Text aria-hidden="true">{label}</Text>
+                </FlexItem>
               </Flex>
-            ) : (
-              <Flex key={childItem.id} margin="0 0 0 large">
-                <Child key={childItem.id} currentItem={childItem} dispatch={dispatch} />
-              </Flex>
-            )
-          })}
-        </ToggleGroup>
-      </FlexItem>
-    </Flex>
-  )
-}, areEqualParent)
+            }
+          >
+            {childItems.map(childItem => {
+              return isParentItem(childItem) ? (
+                <Flex key={childItem.id} margin="0 0 0 large">
+                  <Parent
+                    currentItem={childItem}
+                    checkboxTreeNodes={checkboxTreeNodes}
+                    dispatch={dispatch}
+                    expanded={false}
+                  />
+                </Flex>
+              ) : (
+                <Flex key={childItem.id} margin="0 0 0 large">
+                  <Child key={childItem.id} currentItem={childItem} dispatch={dispatch} />
+                </Flex>
+              )
+            })}
+          </ToggleGroup>
+        </FlexItem>
+      </Flex>
+    )
+  },
+  areEqualParent,
+)
 
-export const TreeSelector = ({checkboxTreeNodes: initCheckboxTreeNodes, onChange}: TreeSelectorProps) => {
+export const TreeSelector = ({
+  checkboxTreeNodes: initCheckboxTreeNodes,
+  onChange,
+}: TreeSelectorProps) => {
   const [checkboxTreeNodes, checkDispatch] = useReducer(reducer, initCheckboxTreeNodes)
 
   useEffect(() => {

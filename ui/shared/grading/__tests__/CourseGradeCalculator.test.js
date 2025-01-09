@@ -36,7 +36,7 @@ function calculateWithoutGradingPeriods(weightingScheme, ignoreUnpostedAnonymous
     submissions,
     assignmentGroups,
     weightingScheme,
-    ignoreUnpostedAnonymous
+    ignoreUnpostedAnonymous,
   )
 }
 
@@ -47,7 +47,7 @@ function calculateWithGradingPeriods(weightingScheme, ignoreUnpostedAnonymous = 
     weightingScheme,
     ignoreUnpostedAnonymous,
     gradingPeriodSet,
-    effectiveDueDates
+    effectiveDueDates,
   )
 }
 
@@ -262,22 +262,19 @@ describe('CourseGradeCalculator.calculate with some assignments and submissions'
     equal(grades.assignmentGroups[301].final.possible, 91)
   })
 
-  test(
-    'includes assignments that are anonymizing students in total calculations when' +
-      '"grade calc ignore unposted anonymous" flag is disabled',
-    () => {
-      assignments[0].anonymize_students = true
-      const grades = calculateWithoutGradingPeriods('points', false)
-      equal(grades.assignmentGroups[301].current.score, 142)
-      equal(grades.assignmentGroups[301].final.score, 142)
-      equal(grades.assignmentGroups[301].current.possible, 191)
-      equal(grades.assignmentGroups[301].final.possible, 191)
-      equal(grades.assignmentGroups[302].current.score, 17)
-      equal(grades.assignmentGroups[302].final.score, 17)
-      equal(grades.assignmentGroups[302].current.possible, 93)
-      equal(grades.assignmentGroups[302].final.possible, 1093)
-    }
-  )
+  test('includes assignments that are anonymizing students in total calculations when' +
+    '"grade calc ignore unposted anonymous" flag is disabled', () => {
+    assignments[0].anonymize_students = true
+    const grades = calculateWithoutGradingPeriods('points', false)
+    equal(grades.assignmentGroups[301].current.score, 142)
+    equal(grades.assignmentGroups[301].final.score, 142)
+    equal(grades.assignmentGroups[301].current.possible, 191)
+    equal(grades.assignmentGroups[301].final.possible, 191)
+    equal(grades.assignmentGroups[302].current.score, 17)
+    equal(grades.assignmentGroups[302].final.score, 17)
+    equal(grades.assignmentGroups[302].current.possible, 93)
+    equal(grades.assignmentGroups[302].final.possible, 1093)
+  })
 
   test('includes all assignment group grades regardless of weight', () => {
     assignmentGroups[0].group_weight = 200
@@ -310,7 +307,7 @@ describe('CourseGradeCalculator.calculate with some assignments and submissions'
     equal(
       grades.current.score,
       46.31,
-      'current score is weighted using points from graded assignments'
+      'current score is weighted using points from graded assignments',
     )
     equal(grades.final.score, 37.95, 'final score is weighted using points from all assignments')
   })
@@ -329,7 +326,7 @@ describe('CourseGradeCalculator.calculate with some assignments and submissions'
     equal(
       grades.current.score,
       46.31,
-      'current score is weighted using points from graded assignments'
+      'current score is weighted using points from graded assignments',
     )
     equal(grades.final.score, 37.95, 'final score is weighted using points from all assignments')
   })
@@ -351,7 +348,7 @@ describe('CourseGradeCalculator.calculate with some assignments and submissions'
     equal(
       grades.current.score,
       60.33,
-      'current score is weighted using points from graded assignments'
+      'current score is weighted using points from graded assignments',
     )
     equal(grades.final.score, 56.15, 'final score is weighted using points from all assignments')
   })
@@ -362,7 +359,7 @@ describe('CourseGradeCalculator.calculate with some assignments and submissions'
     equal(
       grades.current.score,
       40.7,
-      'current score is weighted using points from graded assignments'
+      'current score is weighted using points from graded assignments',
     )
     equal(grades.final.score, 30.67, 'final score is weighted using points from all assignments')
   })
@@ -465,7 +462,7 @@ describe('CourseGradeCalculator.calculate with only ungraded submissions', () =>
     equal(
       grades.current.possible,
       0,
-      'current possible is 0 when all assignment points are excluded'
+      'current possible is 0 when all assignment points are excluded',
     )
   })
 
@@ -480,12 +477,12 @@ describe('CourseGradeCalculator.calculate with only ungraded submissions', () =>
     equal(
       grades.current.score,
       null,
-      'current score cannot be calculated when all submissions are excluded'
+      'current score cannot be calculated when all submissions are excluded',
     )
     equal(
       grades.current.possible,
       0,
-      'current possible is 0 when all assignment points are excluded'
+      'current possible is 0 when all assignment points are excluded',
     )
   })
 
@@ -494,7 +491,7 @@ describe('CourseGradeCalculator.calculate with only ungraded submissions', () =>
     equal(
       grades.final.score,
       0,
-      'final score cannot be calculated when all submissions are excluded'
+      'final score cannot be calculated when all submissions are excluded',
     )
     equal(grades.final.possible, 100, 'final possible is 100 percent')
   })
@@ -597,24 +594,24 @@ describe('CourseGradeCalculator.calculate with unweighted grading periods', () =
     equal(
       grades.gradingPeriods[701].current.score,
       75,
-      'one assignment group is in this grading period'
+      'one assignment group is in this grading period',
     )
     equal(
       grades.gradingPeriods[701].final.score,
       75,
-      'one assignment group is in this grading period'
+      'one assignment group is in this grading period',
     )
     equal(grades.gradingPeriods[701].current.possible, 100, 'current possible is 100 percent')
     equal(grades.gradingPeriods[701].final.possible, 100, 'final possible is 100 percent')
     equal(
       grades.gradingPeriods[702].current.score,
       50,
-      'two assignment groups are in this grading period'
+      'two assignment groups are in this grading period',
     )
     equal(
       grades.gradingPeriods[702].final.score,
       50,
-      'two assignment groups are in this grading period'
+      'two assignment groups are in this grading period',
     )
     equal(grades.gradingPeriods[702].current.possible, 100, 'current possible is 100 percent')
     equal(grades.gradingPeriods[702].final.possible, 100, 'final possible is 100 percent')
@@ -625,42 +622,42 @@ describe('CourseGradeCalculator.calculate with unweighted grading periods', () =
     equal(
       grades.gradingPeriods[701].current.score,
       15,
-      'current score is sum of scores in grading period 701'
+      'current score is sum of scores in grading period 701',
     )
     equal(
       grades.gradingPeriods[701].final.score,
       15,
-      'final score is sum of scores in grading period 701'
+      'final score is sum of scores in grading period 701',
     )
     equal(
       grades.gradingPeriods[701].current.possible,
       20,
-      'current possible is sum of points in grading period 701'
+      'current possible is sum of points in grading period 701',
     )
     equal(
       grades.gradingPeriods[701].final.possible,
       20,
-      'final possible is sum of points in grading period 701'
+      'final possible is sum of points in grading period 701',
     )
     equal(
       grades.gradingPeriods[702].current.score,
       28,
-      'current score is sum of scores in grading period 702'
+      'current score is sum of scores in grading period 702',
     )
     equal(
       grades.gradingPeriods[702].final.score,
       28,
-      'final score is sum of scores in grading period 702'
+      'final score is sum of scores in grading period 702',
     )
     equal(
       grades.gradingPeriods[702].current.possible,
       60,
-      'current possible is sum of points in grading period 702'
+      'current possible is sum of points in grading period 702',
     )
     equal(
       grades.gradingPeriods[702].final.possible,
       60,
-      'final possible is sum of points in grading period 702'
+      'final possible is sum of points in grading period 702',
     )
   })
 
@@ -693,13 +690,13 @@ describe('CourseGradeCalculator.calculate with unweighted grading periods', () =
     equal(
       grades.current.score,
       43,
-      'assignment group scores are totaled per grading period as points'
+      'assignment group scores are totaled per grading period as points',
     )
     equal(grades.current.possible, 80, 'current possible is sum of all assignment points')
     equal(
       grades.final.score,
       43,
-      'assignment group scores are totaled per grading period as points'
+      'assignment group scores are totaled per grading period as points',
     )
     equal(grades.final.possible, 80, 'final possible is sum of all assignment points')
   })
@@ -832,24 +829,24 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.gradingPeriods[701].current.score,
       75,
-      'one assignment group is in this grading period'
+      'one assignment group is in this grading period',
     )
     equal(
       grades.gradingPeriods[701].final.score,
       75,
-      'one assignment group is in this grading period'
+      'one assignment group is in this grading period',
     )
     equal(grades.gradingPeriods[701].current.possible, 100, 'current possible is 100 percent')
     equal(grades.gradingPeriods[701].final.possible, 100, 'final possible is 100 percent')
     equal(
       grades.gradingPeriods[702].current.score,
       50,
-      'two assignment groups are in this grading period'
+      'two assignment groups are in this grading period',
     )
     equal(
       grades.gradingPeriods[702].final.score,
       50,
-      'two assignment groups are in this grading period'
+      'two assignment groups are in this grading period',
     )
     equal(grades.gradingPeriods[702].current.possible, 100, 'current possible is 100 percent')
     equal(grades.gradingPeriods[702].final.possible, 100, 'final possible is 100 percent')
@@ -860,42 +857,42 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.gradingPeriods[701].current.score,
       15,
-      'current score is sum of scores in grading period 701'
+      'current score is sum of scores in grading period 701',
     )
     equal(
       grades.gradingPeriods[701].final.score,
       15,
-      'final score is sum of scores in grading period 701'
+      'final score is sum of scores in grading period 701',
     )
     equal(
       grades.gradingPeriods[701].current.possible,
       20,
-      'current possible is sum of points in grading period 701'
+      'current possible is sum of points in grading period 701',
     )
     equal(
       grades.gradingPeriods[701].final.possible,
       20,
-      'final possible is sum of points in grading period 701'
+      'final possible is sum of points in grading period 701',
     )
     equal(
       grades.gradingPeriods[702].current.score,
       28,
-      'current score is sum of scores in grading period 702'
+      'current score is sum of scores in grading period 702',
     )
     equal(
       grades.gradingPeriods[702].final.score,
       28,
-      'final score is sum of scores in grading period 702'
+      'final score is sum of scores in grading period 702',
     )
     equal(
       grades.gradingPeriods[702].current.possible,
       60,
-      'current possible is sum of points in grading period 702'
+      'current possible is sum of points in grading period 702',
     )
     equal(
       grades.gradingPeriods[702].final.possible,
       60,
-      'final possible is sum of points in grading period 702'
+      'final possible is sum of points in grading period 702',
     )
   })
 
@@ -912,12 +909,12 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.current.score,
       60.83,
-      'assignment group scores are totaled per grading period as points'
+      'assignment group scores are totaled per grading period as points',
     )
     equal(
       grades.final.score,
       60.83,
-      'assignment group scores are totaled per grading period as points'
+      'assignment group scores are totaled per grading period as points',
     )
     equal(grades.current.possible, 100, 'current possible is 100 percent')
     equal(grades.final.possible, 100, 'final possible is 100 percent')
@@ -1013,7 +1010,7 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.current.score,
       75.0,
-      'the grading period with a score is weighted as 100% of the overall score'
+      'the grading period with a score is weighted as 100% of the overall score',
     )
     equal(grades.current.possible, 100)
   })
@@ -1024,7 +1021,7 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.final.score,
       37.5,
-      'the grading period with a score is weighted as 50% of the overall score'
+      'the grading period with a score is weighted as 50% of the overall score',
     )
     equal(grades.final.possible, 100)
   })
@@ -1044,13 +1041,13 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.current.score,
       50,
-      'grading period 702 score of 50 effectively has 100 percent weight'
+      'grading period 702 score of 50 effectively has 100 percent weight',
     )
     equal(grades.current.possible, 100, 'current possible remains 100 percent')
     equal(
       grades.final.score,
       50,
-      'grading period 702 score of 50 effectively has 100 percent weight'
+      'grading period 702 score of 50 effectively has 100 percent weight',
     )
     equal(grades.final.possible, 100, 'final possible remains 100 percent')
   })
@@ -1062,7 +1059,7 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.current.score,
       0,
-      'grading period 702 score of 50 effectively has 0 percent weight'
+      'grading period 702 score of 50 effectively has 0 percent weight',
     )
     equal(grades.current.possible, 100, 'current possible remains 100 percent')
     equal(grades.final.score, 0, 'grading period 702 score of 50 effectively has 0 percent weight')
@@ -1085,25 +1082,25 @@ describe('CourseGradeCalculator.calculate with weighted grading periods', () => 
     equal(
       grades.gradingPeriods[701].current.score,
       75,
-      'one assignment group is in grading period 701'
+      'one assignment group is in grading period 701',
     )
     equal(grades.gradingPeriods[701].current.possible, 100, 'current possible is 100 percent')
     equal(
       grades.gradingPeriods[701].final.score,
       75,
-      'one assignment group is in grading period 701'
+      'one assignment group is in grading period 701',
     )
     equal(grades.gradingPeriods[701].final.possible, 100, 'final possible is 100 percent')
     equal(
       grades.gradingPeriods[702].current.score,
       50,
-      'two assignment groups are in grading period 702'
+      'two assignment groups are in grading period 702',
     )
     equal(grades.gradingPeriods[702].current.possible, 100, 'current possible is 100 percent')
     equal(
       grades.gradingPeriods[702].final.score,
       50,
-      'two assignment groups are in grading period 702'
+      'two assignment groups are in grading period 702',
     )
     equal(grades.gradingPeriods[702].final.possible, 100, 'final possible is 100 percent')
   })
@@ -1245,22 +1242,22 @@ describe('CourseGradeCalculator.calculate with assignment groups across multiple
     equal(
       grades.gradingPeriods[701].current.score,
       100,
-      'grading period 701 scores include only assignment 201'
+      'grading period 701 scores include only assignment 201',
     )
     equal(
       grades.gradingPeriods[701].final.score,
       100,
-      'grading period 701 scores include only assignment 201'
+      'grading period 701 scores include only assignment 201',
     )
     equal(
       grades.gradingPeriods[702].current.score,
       40,
-      'grading period 702 scores include assignments 202 & 203'
+      'grading period 702 scores include assignments 202 & 203',
     )
     equal(
       grades.gradingPeriods[702].final.score,
       40,
-      'grading period 702 scores include assignments 202 & 203'
+      'grading period 702 scores include assignments 202 & 203',
     )
   })
 
@@ -1279,13 +1276,13 @@ describe('CourseGradeCalculator.calculate with assignment groups across multiple
     equal(
       grades.current.score,
       55,
-      'lower-scoring grading periods with higher weight decrease the current score'
+      'lower-scoring grading periods with higher weight decrease the current score',
     )
     equal(grades.current.possible, 100, 'current possible is 100 percent')
     equal(
       grades.final.score,
       55,
-      'lower-scoring grading periods with higher weight decrease the final score'
+      'lower-scoring grading periods with higher weight decrease the final score',
     )
     equal(grades.final.possible, 100, 'final possible is 100 percent')
   })

@@ -82,7 +82,7 @@ export const CourseDashboardCard = {
         icon: string,
         hidden: bool,
         cssClass: string,
-      })
+      }),
     ),
     longName: string,
     observee: string,

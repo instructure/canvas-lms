@@ -77,8 +77,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
     startSendOperation()
       .then(sendSuccessful)
       .catch(err => {
-        console.error(err)  
-        if (err.response) console.error(err.response)  
+        console.error(err)
+        if (err.response) console.error(err.response)
         setPostStatus('error')
         captureException(err)
       })

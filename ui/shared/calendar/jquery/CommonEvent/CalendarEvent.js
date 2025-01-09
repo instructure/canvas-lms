@@ -111,7 +111,7 @@ Object.assign(CalendarEvent.prototype, {
       return replaceTags(
         this.contextInfo.calendar_event_url,
         'id',
-        this.calendarEvent.parent_event_id || this.calendarEvent.id
+        this.calendarEvent.parent_event_id || this.calendarEvent.id,
       )
     }
   },
@@ -146,7 +146,7 @@ Object.assign(CalendarEvent.prototype, {
         'calendar_event[all_day]': this.allDay,
       },
       success,
-      error
+      error,
     )
   },
 
@@ -211,7 +211,7 @@ Object.assign(CalendarEvent.prototype, {
           return child_event.group.name
         }
         return null
-      }
+      },
     )
     let sorted = names.sort((a, b) => natcompare.strings(a, b))
 

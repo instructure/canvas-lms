@@ -55,7 +55,7 @@ export default function BlockEditorVideoOptionsTray({
 
     doFetchApi({
       path: `/api/v1/media_attachments/${attachmentId}?user_entered_title=${encodeURIComponent(
-        titleText
+        titleText,
       )}`,
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
@@ -82,12 +82,12 @@ export default function BlockEditorVideoOptionsTray({
           cb(event?.data?.payload)
         }
       },
-      {signal: _subtitleListener.signal}
+      {signal: _subtitleListener.signal},
     )
 
     videoContainer?.contentWindow?.postMessage(
       {subject: 'media_tracks_request'},
-      window.location.toString()
+      window.location.toString(),
     )
   }
 

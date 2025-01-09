@@ -1,4 +1,4 @@
-/* eslint-disable react/jsx-pascal-case */
+ 
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -22,7 +22,7 @@ import {render} from '@testing-library/react'
 import AssignmentExternalTools from '../AssignmentExternalTools'
 import fetchMock from 'fetch-mock'
 
-// eslint-disable-next-line no-var
+ 
 var toolDefinitions = [
   {
     definition_type: 'ContextExternalTool',
@@ -91,7 +91,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     expect(wrapper.container).toBeInTheDocument()
   })
@@ -106,7 +106,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     expect(ref.current.getDefinitionsUrl()).toEqual(correctUrl)
   })
@@ -119,11 +119,11 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('.tool_launch').length).toEqual(
-      toolDefinitions.length
+    expect(wrapper.container.querySelectorAll('.tool_launch')).toHaveLength(
+      toolDefinitions.length,
     )
   })
 
@@ -135,7 +135,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
@@ -155,7 +155,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelector('.before_external_content_info_alert').focus()
@@ -171,7 +171,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelector('.after_external_content_info_alert').focus()
@@ -187,7 +187,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelector('.before_external_content_info_alert').focus()
@@ -204,7 +204,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelector('.after_external_content_info_alert').focus()
@@ -221,7 +221,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_edit"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
@@ -237,10 +237,10 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_view"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('.tool_launch').length).toEqual(2)
+    expect(wrapper.container.querySelectorAll('.tool_launch')).toHaveLength(2)
   })
 
   test('it sets correct placement in launch url', () => {
@@ -251,7 +251,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_view"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
@@ -271,7 +271,7 @@ describe('AssignmentExternalTools', () => {
         placement="assignment_view"
         courseId={1}
         assignmentId={1}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     wrapper.container.querySelectorAll('.tool_launch').forEach(iframe => {

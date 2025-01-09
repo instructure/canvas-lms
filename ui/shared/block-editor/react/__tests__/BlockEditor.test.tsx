@@ -42,7 +42,7 @@ function renderEditor(props: Partial<BlockEditorProps> = {}) {
       content={{version: LATEST_BLOCK_DATA_VERSION, blocks: JSON.parse(blank_page)}}
       {...props}
     />,
-    {container}
+    {container},
   )
 }
 
@@ -107,7 +107,7 @@ describe('BlockEditor', () => {
       expect(domGetByText(previewModal, 'this is text.', {exact: true})).toBeInTheDocument()
 
       const closeButton = domGetByText(previewModal, 'Close', {exact: true}).closest(
-        'button'
+        'button',
       ) as HTMLButtonElement
       await user.click(closeButton)
 

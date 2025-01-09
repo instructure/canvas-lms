@@ -127,7 +127,7 @@ const RCELoader = {
         memo[attr.name] = attr.value
         return memo
       },
-      {}
+      {},
     )
 
     return pick(attrs, validAttrs)

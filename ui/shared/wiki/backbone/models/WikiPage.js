@@ -37,7 +37,7 @@ const I18n = createI18nScope('pages')
 
 const pageOptions = ['contextAssetString', 'revision']
 
-export default WikiPage = (function () {
+export default (WikiPage = (function () {
   WikiPage = class WikiPage extends Backbone.Model {
     static initClass() {
       this.mixin(DefaultUrlMixin)
@@ -69,7 +69,7 @@ export default WikiPage = (function () {
       } else {
         return this.set(
           'publishableMessage',
-          I18n.t('cannot_unpublish_front_page', 'Cannot unpublish the front page')
+          I18n.t('cannot_unpublish_front_page', 'Cannot unpublish the front page'),
         )
       }
     }
@@ -156,7 +156,7 @@ export default WikiPage = (function () {
         `/api/v1/courses/${courseId}/pages/${this.id}/duplicate`,
         'POST',
         {},
-        callback
+        callback,
       )
     }
 
@@ -202,4 +202,4 @@ export default WikiPage = (function () {
   }
   WikiPage.initClass()
   return WikiPage
-})()
+})())

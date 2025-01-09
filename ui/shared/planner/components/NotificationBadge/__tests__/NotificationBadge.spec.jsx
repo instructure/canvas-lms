@@ -26,7 +26,7 @@ it('renders an indicator', () => {
   const wrapper = shallow(
     <NotificationBadge>
       <NewActivityIndicator title="blah" itemIds={['first', 'second']} />
-    </NotificationBadge>
+    </NotificationBadge>,
   )
   expect(wrapper).toMatchSnapshot()
 })

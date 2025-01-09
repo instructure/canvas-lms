@@ -68,7 +68,7 @@ $(document).ready(() => {
       url,
       message: I18n.t(
         'confirm.delete_grading_scheme',
-        'Are you sure you want to delete this grading scheme?'
+        'Are you sure you want to delete this grading scheme?',
       ),
       success(_data) {
         $(this).slideUp(function () {
@@ -79,8 +79,8 @@ $(document).ready(() => {
         $.flashError(
           I18n.t(
             'errors.cannot_delete_grading_scheme',
-            'There was a problem deleting this grading scheme'
-          )
+            'There was a problem deleting this grading scheme',
+          ),
         )
       },
     })
@@ -91,12 +91,12 @@ $(document).ready(() => {
   })
   $('.grading_standard .remove_grading_standard_link').click(function (event) {
     event.preventDefault()
-     
+
     const result = window.confirm(
       I18n.t(
         'confirm.unlink_grading_scheme',
-        'Are you sure you want to unlink this grading scheme?'
-      )
+        'Are you sure you want to unlink this grading scheme?',
+      ),
     )
     if (!result) {
       return false
@@ -145,8 +145,8 @@ $(document).ready(() => {
         $.flashError(
           I18n.t(
             'errors.cannot_remove_grading_scheme',
-            'There was a problem removing this grading scheme.  Please reload the page and try again.'
-          )
+            'There was a problem removing this grading scheme.  Please reload the page and try again.',
+          ),
         )
       })
     } else {
@@ -187,7 +187,7 @@ $(document).ready(() => {
     event.preventDefault()
     const id = $(this).getTemplateData({textValues: ['id']}).id
     $('.grading_standard .grading_standards_select .grading_standard_select').removeClass(
-      'selected_side_tab'
+      'selected_side_tab',
     )
     $(this).addClass('selected_side_tab')
     $('.grading_standard .grading_standards .grading_standard_brief').hide()
@@ -264,45 +264,45 @@ $(document).ready(() => {
             $find
               .find('.loading_message')
               .text(I18n.t('Loading Grading Schemes Failed.  Please Try Again'))
-          }
+          },
         )
       }
     })
-  $('.grading_standard .grading_standard_brief .select_grading_standard_link').click(function (
-    event
-  ) {
-    event.preventDefault()
-    const $brief = $(this).parents('.grading_standard_brief')
-    const brief = $brief.getTemplateData({
-      textValues: ['id', 'title'],
-      dataValues: ['context_code'],
-    })
-    const id = brief.id
-    const title = brief.title
-    const data = []
-    $(this)
-      .parents('.grading_standard_brief')
-      .find('.details_row:not(.blank)')
-      .each(function () {
-        const name = $(this).find('.name').text()
-        let val = numberHelper.parse($(this).find('.next_value').text()) / 100.0
-        if (Number.isNaN(Number(val))) {
-          val = ''
-        }
-        data.push([name, val])
+  $('.grading_standard .grading_standard_brief .select_grading_standard_link').click(
+    function (event) {
+      event.preventDefault()
+      const $brief = $(this).parents('.grading_standard_brief')
+      const brief = $brief.getTemplateData({
+        textValues: ['id', 'title'],
+        dataValues: ['context_code'],
       })
-    $(this).parents('.grading_standard').triggerHandler('grading_standard_updated', {
-      id,
-      data,
-      title,
-    })
-    const current_context_code = $('#edit_letter_grades_form').data().context_code
-    $(this)
-      .parents('.grading_standard')
-      .find('.edit_grading_standard_link')
-      .toggleClass('read_only', current_context_code !== brief.context_code)
-    $(this).parents('.find_grading_standard').find('.cancel_find_grading_standard_link').click()
-  })
+      const id = brief.id
+      const title = brief.title
+      const data = []
+      $(this)
+        .parents('.grading_standard_brief')
+        .find('.details_row:not(.blank)')
+        .each(function () {
+          const name = $(this).find('.name').text()
+          let val = numberHelper.parse($(this).find('.next_value').text()) / 100.0
+          if (Number.isNaN(Number(val))) {
+            val = ''
+          }
+          data.push([name, val])
+        })
+      $(this).parents('.grading_standard').triggerHandler('grading_standard_updated', {
+        id,
+        data,
+        title,
+      })
+      const current_context_code = $('#edit_letter_grades_form').data().context_code
+      $(this)
+        .parents('.grading_standard')
+        .find('.edit_grading_standard_link')
+        .toggleClass('read_only', current_context_code !== brief.context_code)
+      $(this).parents('.find_grading_standard').find('.cancel_find_grading_standard_link').click()
+    },
+  )
   $('.grading_standard .cancel_button').click(function (_event) {
     $(this)
       .parents('.grading_standard')
@@ -392,10 +392,10 @@ $(document).ready(() => {
           data => {
             $('#course_form .grading_scheme_set').text(
               (data && data.course && data.course.grading_standard_title) ||
-                I18n.t('grading_scheme_currently_set', 'Currently Set')
+                I18n.t('grading_scheme_currently_set', 'Currently Set'),
             )
           },
-          () => {}
+          () => {},
         )
       }
     } else {
@@ -405,7 +405,7 @@ $(document).ready(() => {
   $('.grading_standard .save_button').click(function (_event) {
     const $standard = $(this).parents('.grading_standard')
     let url = $(
-      '#edit_letter_grades_form .create_grading_standard_url,#create_grading_standard_url'
+      '#edit_letter_grades_form .create_grading_standard_url,#create_grading_standard_url',
     ).attr('href')
     let method = 'POST'
     if (
@@ -452,7 +452,7 @@ $(document).ready(() => {
           .prop('disabled', false)
           .filter('.save_button')
           .text(I18n.t('errors.save_failed', 'Save Failed'))
-      }
+      },
     )
   })
   $('.grading_standard thead').mouseover(function (_event) {
@@ -535,7 +535,7 @@ $(document).ready(() => {
   $(".grading_standard input[type='text']").bind('blur change', function () {
     const $standard = $(this).parents('.grading_standard')
     let val = numberHelper.parse(
-      $(this).parents('.grading_standard_row').find('.standard_value').val()
+      $(this).parents('.grading_standard_row').find('.standard_value').val(),
     )
     val = round(val, 2)
     $(this).parents('.grading_standard_row').find('.standard_value').val(I18n.n(val))

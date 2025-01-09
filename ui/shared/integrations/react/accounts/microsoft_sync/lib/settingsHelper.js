@@ -83,7 +83,7 @@ export function getTenantErrorMessages(state) {
     return [
       {
         text: I18n.t(
-          'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.'
+          'Please provide a valid tenant domain. Check your Azure Active Directory settings to find it.',
         ),
         type: 'error',
       },
@@ -104,7 +104,7 @@ export function getSuffixErrorMessages(state) {
     return [
       {
         text: I18n.t(
-          'A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again.'
+          'A suffix cannot be longer than 255 characters. Please use a shorter suffix and try again.',
         ),
         type: 'error',
       },

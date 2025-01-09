@@ -81,7 +81,7 @@ describe('DuplicateSection', () => {
           element.tagName.toLowerCase() === 'span' &&
           content.includes('Create a new user for "addr1"')
         )
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -132,7 +132,7 @@ describe('DuplicateSection', () => {
           element.tagName.toLowerCase() === 'span' &&
           content.includes('Create a new user for "addr1"')
         )
-      })
+      }),
     ).not.toBeInTheDocument()
   })
 })

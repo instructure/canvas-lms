@@ -72,7 +72,7 @@ const renderComponent = (props = {}) => {
       onDeleteTemplate={() => {}}
       onEditTemplate={() => {}}
       {...props}
-    />
+    />,
   )
 }
 

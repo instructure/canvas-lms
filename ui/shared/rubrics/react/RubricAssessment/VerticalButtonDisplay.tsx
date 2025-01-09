@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {possibleString, possibleStringRange} from '../Points'
 import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
-import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton';
+import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 const {shamrock} = colors
 
@@ -79,7 +79,7 @@ export const VerticalButtonDisplay = ({
         }
 
         const buttonAriaLabel = `${rating.description} ${rating.longDescription} ${getPossibleText(
-          rating.points
+          rating.points,
         )}`
 
         return (

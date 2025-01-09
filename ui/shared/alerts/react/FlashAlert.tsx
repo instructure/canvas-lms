@@ -239,7 +239,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
       alertContainer.id = messageHolderId
       alertContainer.setAttribute(
         'style',
-        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+        'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;',
       )
       document.body.appendChild(alertContainer)
     }
@@ -247,7 +247,6 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
   }
 
   function renderAlert(parent: Element) {
-     
     ReactDOM.render(
       <FlashAlert
         message={message}
@@ -258,7 +257,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
         screenReaderOnly={srOnly}
         liveRegionPoliteness={politeness}
       />,
-      parent
+      parent,
     )
   }
 

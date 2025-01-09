@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-console */
+ 
 import React, {useState} from 'react'
 import awaitElement from '@canvas/await-element'
 import {renderCreateDialog, CreateOrEditSetModal} from './index'
@@ -64,7 +64,7 @@ function mockApi({path, body, method}) {
     const url = `/api/v1/progress/${id}`
     if (context_id !== mockApiConfig.groupsetId)
       return Promise.reject(
-        new Error(`groupset id mismatch ${context_id} != ${mockApiConfig.groupsetId}`)
+        new Error(`groupset id mismatch ${context_id} != ${mockApiConfig.groupsetId}`),
       )
     if (mockApiConfig.failAssign)
       return Promise.reject(new Error('commanded member assignment failure'))
@@ -138,7 +138,7 @@ const Wrapper = () => {
     if (modalIsOpen) return
     reminder = false
     setModalIsOpen(true)
-    // eslint-disable-next-line promise/catch-or-return
+     
     awaitElement('placeholder')
       .then(div => {
         mockApiConfig = {failCreate, failAssign, assignTime}

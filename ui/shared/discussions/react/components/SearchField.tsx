@@ -58,9 +58,9 @@ export const SearchField: React.FC<Props> = ({
       {
         leading: false,
         trailing: true,
-      }
+      },
     ),
-    [onSearchEvent]
+    [onSearchEvent],
   )
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {

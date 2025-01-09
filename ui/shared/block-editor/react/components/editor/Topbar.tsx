@@ -55,7 +55,7 @@ export const Topbar = ({toolboxOpen, onToolboxChange}: TopbarProps) => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       onToolboxChange(e.target.checked)
     },
-    [onToolboxChange]
+    [onToolboxChange],
   )
 
   return (

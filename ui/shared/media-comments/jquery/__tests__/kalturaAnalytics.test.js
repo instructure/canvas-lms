@@ -69,16 +69,16 @@ describe('kaltura analytics helper', () => {
     if (window.location.protocol === 'http:') {
       equal(
         ka.iframes[0].queue[0].indexOf(
-          'http://example.com/api_v3/index.php?service=stats&action=collect&event%3AentryId=1&event'
+          'http://example.com/api_v3/index.php?service=stats&action=collect&event%3AentryId=1&event',
         ),
-        0
+        0,
       )
     } else {
       equal(
         ka.iframes[0].queue[0].indexOf(
-          'https://example.com/api_v3/index.php?service=stats&action=collect&event%3AentryId=1&event'
+          'https://example.com/api_v3/index.php?service=stats&action=collect&event%3AentryId=1&event',
         ),
-        0
+        0,
       )
     }
     ok(ka.iframes[0].queue[0].match(/eventType=oioi/))

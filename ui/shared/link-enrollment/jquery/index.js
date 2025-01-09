@@ -69,7 +69,7 @@ window.link_enrollment = (function () {
             $dialog
               .find('.loading_message')
               .text(I18n.t('errors.load_failed', 'Loading Students Failed, please try again'))
-          }
+          },
         )
       } else {
         link_enrollment.updateDialog($dialog, enrollment_id, current_user_id)

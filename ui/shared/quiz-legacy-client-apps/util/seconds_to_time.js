@@ -85,7 +85,7 @@ secondsToTime.toReadableString = function (seconds) {
         one: '1 second',
         other: '%{count} seconds',
       },
-      {count: Math.floor(seconds)}
+      {count: Math.floor(seconds)},
     )
   } else if (seconds < 3600) {
     minutes = Math.floor(seconds / 60)
@@ -97,7 +97,7 @@ secondsToTime.toReadableString = function (seconds) {
         one: '1 minute',
         other: '%{count} minutes',
       },
-      {count: minutes}
+      {count: minutes},
     )
 
     strSeconds = I18n.t(
@@ -108,7 +108,7 @@ secondsToTime.toReadableString = function (seconds) {
       },
       {
         count: seconds,
-      }
+      },
     )
 
     return I18n.t('duration_in_minutes_and_seconds', '%{minutes} and %{seconds}', {
@@ -127,7 +127,7 @@ secondsToTime.toReadableString = function (seconds) {
       },
       {
         count: minutes,
-      }
+      },
     )
 
     strHours = I18n.t(
@@ -138,7 +138,7 @@ secondsToTime.toReadableString = function (seconds) {
       },
       {
         count: hours,
-      }
+      },
     )
 
     return I18n.t('duration_in_hours_and_minutes', '%{hours} and %{minutes}', {

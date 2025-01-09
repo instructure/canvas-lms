@@ -48,7 +48,7 @@ describe('resizeHelpers', () => {
 
   describe('percentSize', () => {
     it('returns the percentage of the parent width and height that the element occupies', () => {
-      expect(percentSize(200, 100,)).toEqual(50)
+      expect(percentSize(200, 100)).toEqual(50)
     })
 
     it('returns 100% if the element is within 7px of the parent width', () => {

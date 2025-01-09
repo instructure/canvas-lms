@@ -101,7 +101,7 @@ describe('ExternalToolModalLauncher', () => {
     const {getByTitle} = render(<ExternalToolModalLauncher {...generateProps({isOpen: true})} />)
     const iframe = getByTitle('Modal Title')
     await waitFor(() =>
-      expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+      expect(iframe).toHaveAttribute('allow', ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')),
     )
   })
 

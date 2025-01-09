@@ -41,7 +41,7 @@ test('parses datetime from a Date', () => {
 
 test('renders the prefix if a prefix is supplied', () => {
   const {container} = render(
-    <FriendlyDatetime dateTime="1970-01-17" prefix="foobar " prefixMobile="foobaz " />
+    <FriendlyDatetime dateTime="1970-01-17" prefix="foobar " prefixMobile="foobaz " />,
   )
   expect(container.querySelector('.visible-desktop').textContent).toBe('foobar Jan 17, 1970')
   expect(container.querySelector('.hidden-desktop').textContent).toBe('foobaz 1/17/1970')
@@ -49,7 +49,7 @@ test('renders the prefix if a prefix is supplied', () => {
 
 test('will automatically put a space on the prefix if necessary', () => {
   const {container} = render(
-    <FriendlyDatetime dateTime="1970-01-17" prefix="foobar" prefixMobile="foobaz" />
+    <FriendlyDatetime dateTime="1970-01-17" prefix="foobar" prefixMobile="foobaz" />,
   )
   expect(container.querySelector('.visible-desktop').textContent).toBe('foobar Jan 17, 1970')
   expect(container.querySelector('.hidden-desktop').textContent).toBe('foobaz 1/17/1970')

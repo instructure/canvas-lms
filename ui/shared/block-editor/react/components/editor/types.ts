@@ -39,5 +39,5 @@ export type ResizableProps = {
 
 export type OnRequestTabChangeHandler = (
   event: React.MouseEvent<ViewOwnProps, MouseEvent> | React.KeyboardEvent<ViewOwnProps>,
-  tabData: {index: number; id?: string | undefined}
+  tabData: {index: number; id?: string | undefined},
 ) => void

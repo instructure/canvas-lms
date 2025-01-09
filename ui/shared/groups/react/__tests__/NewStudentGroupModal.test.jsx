@@ -52,7 +52,7 @@ describe('NewStudentGroupModal', () => {
         onSave={onSave}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(queryByLabelText(/New Student Group/i)).toBeVisible()
     expect(queryByLabelText(/Group Name/i)).toBeVisible()
@@ -69,7 +69,7 @@ describe('NewStudentGroupModal', () => {
         onSave={onSave}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(getByText(/Submit/i)).toBeVisible()
     expect(getByText(/Cancel/i)).toBeVisible()
@@ -83,7 +83,7 @@ describe('NewStudentGroupModal', () => {
         onSave={onSave}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     fireEvent.input(getByLabelText('Group Name *'), {
       target: {value: 'Dat new new'},
@@ -97,7 +97,7 @@ describe('NewStudentGroupModal', () => {
         onSave={onSave}
         open={false}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(getByLabelText('Group Name *')).toHaveValue('')
   })
@@ -111,7 +111,7 @@ describe('NewStudentGroupModal', () => {
           onSave={onSave}
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(queryByText('A group name is required.')).not.toBeInTheDocument()
       getByText('Submit').closest('button').click()
@@ -126,7 +126,7 @@ describe('NewStudentGroupModal', () => {
           onSave={onSave}
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(queryByText('A group name is required.')).not.toBeInTheDocument()
       fireEvent.input(getByLabelText('Group Name *'), {
@@ -144,7 +144,7 @@ describe('NewStudentGroupModal', () => {
           onSave={onSave}
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       expect(queryByText('Group name must be less than 255 characters.')).not.toBeInTheDocument()
       fireEvent.input(getByLabelText('Group Name *'), {
@@ -162,7 +162,7 @@ describe('NewStudentGroupModal', () => {
           onSave={onSave}
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       fireEvent.input(getByLabelText('Group Name *'), {
         target: {value: 'name'},
@@ -180,7 +180,7 @@ describe('NewStudentGroupModal', () => {
         onSave={onSave}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     fireEvent.input(getByLabelText('Group Name *'), {
       target: {value: 'name'},
@@ -209,7 +209,7 @@ describe('NewStudentGroupModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()  
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -221,7 +221,7 @@ describe('NewStudentGroupModal', () => {
           onSave={onSave}
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       fireEvent.input(getByLabelText('Group Name *'), {
         target: {value: 'name'},

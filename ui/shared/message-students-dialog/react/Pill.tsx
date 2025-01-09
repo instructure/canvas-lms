@@ -39,7 +39,7 @@ const truncate = (text: string) => (text.length > 14 ? text.slice(0, 13) + ellip
 function renderText(
   text: string,
   truncatedText: string,
-  textColor: TextProps['color']
+  textColor: TextProps['color'],
 ): JSX.Element {
   const isTruncated = text.length > truncatedText.length
   if (isTruncated) {

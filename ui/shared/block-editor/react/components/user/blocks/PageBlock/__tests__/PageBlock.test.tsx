@@ -28,7 +28,7 @@ const renderBlock = (children: React.ReactNode | null = null) => {
       <Frame>
         <PageBlock>{children}</PageBlock>
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 

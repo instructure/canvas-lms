@@ -123,7 +123,6 @@ export const Products = (props: {
           >
             {Array.from(Array(numberOfPages)).map((_, i) => (
               <Pagination.Page
-                 
                 key={i}
                 current={i === queryParams.page - 1}
                 onClick={() => updateQueryParams({page: i + 1})}
