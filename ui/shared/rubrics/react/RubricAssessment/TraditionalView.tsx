@@ -392,6 +392,7 @@ const CriterionRow = ({
               as="div"
               padding="0"
               margin="0"
+              height="100%"
               borderWidth={hasValidationError ? 'medium' : 'none'}
               borderColor={hasValidationError ? 'danger' : 'transparent'}
               borderRadius="medium"
