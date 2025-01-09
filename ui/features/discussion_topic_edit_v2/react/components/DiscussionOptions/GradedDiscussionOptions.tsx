@@ -88,7 +88,7 @@ export const GradedDiscussionOptions = ({
     }
     return (
       <>
-        <Text size="large">{I18n.t('Assignment Settings')}</Text>
+        <Text size="large" as="h2">{I18n.t('Assignment Settings')}</Text>
         {isPacedDiscussion ? (
           <CoursePacingNotice courseId={ENV.COURSE_ID} />
         ) : (
