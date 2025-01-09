@@ -157,7 +157,7 @@ describe('SubmissionComments', () => {
         expect.objectContaining({
           text_comment: 'a comment',
           group_comment: 0,
-        })
+        }),
       )
     })
 
@@ -173,7 +173,7 @@ describe('SubmissionComments', () => {
         expect.anything(),
         expect.objectContaining({
           attempt: 3,
-        })
+        }),
       )
     })
 
@@ -184,7 +184,7 @@ describe('SubmissionComments', () => {
 
         const createSubmissionCommentSpy = jest.spyOn(
           SubmissionCommentApi,
-          'createSubmissionComment'
+          'createSubmissionComment',
         )
         await gradebook.apiCreateSubmissionComment('a comment')
 
@@ -194,7 +194,7 @@ describe('SubmissionComments', () => {
           expect.anything(),
           expect.objectContaining({
             group_comment: 1,
-          })
+          }),
         )
       })
     })

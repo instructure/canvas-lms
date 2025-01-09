@@ -52,12 +52,12 @@ export default class ColumnHeaderRenderer {
       student_lastname: new StudentColumnHeaderRenderer(
         gradebook,
         StudentLastNameColumnHeader,
-        'student_lastname'
+        'student_lastname',
       ),
       student_firstname: new StudentColumnHeaderRenderer(
         gradebook,
         StudentFirstNameColumnHeader,
-        'student_firstname'
+        'student_firstname',
       ),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
       total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook),

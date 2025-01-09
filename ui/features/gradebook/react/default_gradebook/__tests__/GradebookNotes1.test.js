@@ -31,20 +31,20 @@ describe('Gradebook > Teacher Notes', () => {
   const setupGradebook = (options = {}) => {
     gradebook = createGradebook({
       context_id: '1201',
-      ...options
+      ...options,
     })
     gradebook.gradebookGrid.grid = {
       getColumns: () => [],
       getOptions: () => ({
-        numberOfColumnsToFreeze: 0
+        numberOfColumnsToFreeze: 0,
       }),
       invalidate: jest.fn(),
       setColumns: jest.fn(),
       setNumberOfColumnsToFreeze: jest.fn(),
-      destroy: jest.fn()
+      destroy: jest.fn(),
     }
     gradebook.gradebookGrid.gridSupport = {
-      destroy: jest.fn()
+      destroy: jest.fn(),
     }
     gradebook.renderViewOptionsMenu = jest.fn()
     gradebook.flashError = jest.fn()
@@ -53,13 +53,13 @@ describe('Gradebook > Teacher Notes', () => {
   describe('showing teacher notes', () => {
     beforeEach(() => {
       promise = Promise.resolve({
-        data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+        data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
       })
       GradebookApi.updateTeacherNotesColumn.mockResolvedValue(promise)
       setupGradebook()
       gradebook.gradebookContent.customColumns = [
         {id: '2401', teacher_notes: true, hidden: true, title: 'Notes'},
-        {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'}
+        {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'},
       ]
     })
 
@@ -90,7 +90,9 @@ describe('Gradebook > Teacher Notes', () => {
 
     it('calls GradebookApi.updateTeacherNotesColumn with correct parameters', () => {
       gradebook.setTeacherNotesHidden(false)
-      expect(GradebookApi.updateTeacherNotesColumn).toHaveBeenCalledWith('1201', '2401', {hidden: false})
+      expect(GradebookApi.updateTeacherNotesColumn).toHaveBeenCalledWith('1201', '2401', {
+        hidden: false,
+      })
     })
 
     it('shows the notes column after request resolves', async () => {
@@ -138,11 +140,11 @@ describe('Gradebook > Teacher Notes', () => {
   describe('hiding teacher notes', () => {
     beforeEach(() => {
       promise = Promise.resolve({
-        data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
+        data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true},
       })
       GradebookApi.updateTeacherNotesColumn.mockResolvedValue(promise)
       setupGradebook({
-        teacher_notes: {id: '2401', teacher_notes: true, hidden: false}
+        teacher_notes: {id: '2401', teacher_notes: true, hidden: false},
       })
     })
 
@@ -173,7 +175,9 @@ describe('Gradebook > Teacher Notes', () => {
 
     it('calls GradebookApi.updateTeacherNotesColumn with correct parameters', () => {
       gradebook.setTeacherNotesHidden(true)
-      expect(GradebookApi.updateTeacherNotesColumn).toHaveBeenCalledWith('1201', '2401', {hidden: true})
+      expect(GradebookApi.updateTeacherNotesColumn).toHaveBeenCalledWith('1201', '2401', {
+        hidden: true,
+      })
     })
 
     it('hides the notes column after request resolves', async () => {

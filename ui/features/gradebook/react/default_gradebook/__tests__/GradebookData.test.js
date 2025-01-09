@@ -164,7 +164,7 @@ describe('Gradebook#updateStudentHeadersAndReloadData', () => {
   it('makes a call to update column headers', () => {
     const updateColumnHeaders = jest.spyOn(
       gradebook.gradebookGrid.gridSupport.columns,
-      'updateColumnHeaders'
+      'updateColumnHeaders',
     )
     gradebook.updateStudentHeadersAndReloadData()
     expect(updateColumnHeaders).toHaveBeenCalledTimes(1)
@@ -173,7 +173,7 @@ describe('Gradebook#updateStudentHeadersAndReloadData', () => {
   it('updates the student column header', () => {
     const updateColumnHeaders = jest.spyOn(
       gradebook.gradebookGrid.gridSupport.columns,
-      'updateColumnHeaders'
+      'updateColumnHeaders',
     )
     gradebook.updateStudentHeadersAndReloadData()
     const [columnHeadersToUpdate] = updateColumnHeaders.mock.calls[0]
@@ -362,7 +362,7 @@ describe('Gradebook Assignment Student Visibility', () => {
       saveSettingsStub = jest
         .spyOn(gradebook, 'saveSettings')
         .mockImplementation((_context_id, gradebook_settings) =>
-          Promise.resolve(gradebook_settings)
+          Promise.resolve(gradebook_settings),
         )
     })
 

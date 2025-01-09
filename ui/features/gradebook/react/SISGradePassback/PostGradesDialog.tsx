@@ -197,10 +197,10 @@ class PostGradesDialog extends React.Component<Props> {
         const assignments = store.getState().assignments
         // TODO: fix this as Array<AssignmentWithOverride> cast
         const postCount = assignmentUtils.notIgnored(
-          assignments as Array<AssignmentWithOverride>
+          assignments as Array<AssignmentWithOverride>,
         ).length
         const needsGradingCount = assignmentUtils.needsGrading(
-          assignments as Array<AssignmentWithOverride>
+          assignments as Array<AssignmentWithOverride>,
         ).length
         return (
           <PostGradesDialogSummaryPage
@@ -216,7 +216,7 @@ class PostGradesDialog extends React.Component<Props> {
 
         // TODO: fix this as Array<AssignmentWithOverride> cast
         const needsGrading = assignmentUtils.needsGrading(
-          assignments as Array<AssignmentWithOverride>
+          assignments as Array<AssignmentWithOverride>,
         )
         return (
           <PostGradesDialogNeedsGradingPage

@@ -70,7 +70,7 @@ export default function Layout(props: LayoutProps) {
         <View as="div">
           <Text size="small" as="p">
             {I18n.t(
-              'While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:'
+              'While the grades for this assignment are set to manual, students will not receive new notifications about or be able to see:',
             )}
           </Text>
 

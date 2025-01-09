@@ -49,7 +49,7 @@ class ScoreToUngradedManager {
 
   constructor(
     existingProcess?: ProgressCamelized,
-    pollingInterval: number = ScoreToUngradedManager.DEFAULT_POLLING_INTERVAL
+    pollingInterval: number = ScoreToUngradedManager.DEFAULT_POLLING_INTERVAL,
   ) {
     this.pollingInterval = pollingInterval
     this.monitoringBaseUrl = ScoreToUngradedManager.DEFAULT_MONITORING_BASE_URL

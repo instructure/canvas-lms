@@ -495,7 +495,7 @@ describe('Gradebook Grid Column Widths', () => {
       const originalWidth = gridSpecHelper.getColumn('assignment_2304').width
       resizeColumn('assignment_2304', -20)
       expect(gradebook.gradebookGrid.gridData.columns.definitions.assignment_2304.width).toBe(
-        originalWidth - 20
+        originalWidth - 20,
       )
     })
 

@@ -35,7 +35,7 @@ describe('isInvalidSort', () => {
       isInvalidSort(modules, {
         sortType: 'module_position',
         direction: 'ascending',
-      })
+      }),
     ).toBe(false)
   })
 
@@ -43,7 +43,7 @@ describe('isInvalidSort', () => {
     expect(
       isInvalidSort(modules, {
         sortType: 'custom',
-      })
+      }),
     ).toBe(true)
   })
 
@@ -52,7 +52,7 @@ describe('isInvalidSort', () => {
       isInvalidSort(modules, {
         sortType: 'custom',
         customOrder: ['1', '2', '3'],
-      })
+      }),
     ).toBe(false)
   })
 })
@@ -66,7 +66,7 @@ describe('getColumnOrder', () => {
         direction: 'descending',
         freezeTotalGrade: false,
         sortType: 'module_position',
-      })
+      }),
     ).toMatchObject({
       direction: 'ascending',
     })
@@ -78,7 +78,7 @@ describe('getColumnOrder', () => {
         direction: 'descending',
         freezeTotalGrade: false,
         sortType: 'module_position',
-      })
+      }),
     ).toMatchObject({
       sortType: 'assignment_group',
     })
@@ -90,7 +90,7 @@ describe('getColumnOrder', () => {
         direction: 'descending',
         freezeTotalGrade: true,
         sortType: 'due_date',
-      })
+      }),
     ).toMatchObject({
       freezeTotalGrade: true,
     })
@@ -102,7 +102,7 @@ describe('getColumnOrder', () => {
         direction: 'descending',
         freezeTotalGrade: false,
         sortType: 'due_date',
-      })
+      }),
     ).toMatchObject({
       freezeTotalGrade: false,
     })
@@ -113,7 +113,7 @@ describe('getColumnOrder', () => {
       getColumnOrder([], {
         direction: 'descending',
         sortType: 'due_date',
-      })
+      }),
     ).not.toMatchObject({
       freezeTotalGrade: false,
     })
@@ -212,7 +212,7 @@ describe('listRowIndicesForStudentIds', () => {
   expect(
     listRowIndicesForStudentIds(
       [{id: '1101'}, {id: '1102'}, {id: '1103'}, {id: '1104'}],
-      ['1102', '1104']
-    )
+      ['1102', '1104'],
+    ),
   ).toStrictEqual([1, 3])
 })

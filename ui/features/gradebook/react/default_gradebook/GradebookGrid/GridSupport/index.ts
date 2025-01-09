@@ -50,7 +50,7 @@ export default class GridSupport {
 
   constructor(
     grid: slickgrid.Grid,
-    options: GridSupportOptions = {rows: [], activeBorderColor: ''}
+    options: GridSupportOptions = {rows: [], activeBorderColor: ''},
   ) {
     this.grid = grid
     this.options = options

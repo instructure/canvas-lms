@@ -96,7 +96,7 @@ describe('SubmissionCommentApi.createSubmissionComment', () => {
       courseId,
       assignmentId,
       studentId,
-      commentData
+      commentData,
     )
     const {requestBody} = server.requests[0]
     expect(JSON.parse(requestBody)).toEqual({comment: {group_comment: 0, text_comment: 'comment!'}})

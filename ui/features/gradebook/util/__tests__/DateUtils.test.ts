@@ -33,7 +33,7 @@ describe('DateUtils', () => {
         const result = isoDateFromInput(
           'start-date',
           new Date('2022-02-05T10:18:34'),
-          'Europe/Budapest'
+          'Europe/Budapest',
         )
         expect(result).toEqual('2022-02-04T23:00:00.000Z')
       })

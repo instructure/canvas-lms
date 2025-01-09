@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
 const I18n = createI18nScope(
-  'gradebook_default_gradebook_components_content_filters_grading_period_filter'
+  'gradebook_default_gradebook_components_content_filters_grading_period_filter',
 )
 
 // @ts-expect-error
@@ -61,7 +61,7 @@ GradingPeriodFilter.propTypes = {
     shape({
       id: string.isRequired,
       title: string.isRequired,
-    })
+    }),
   ).isRequired,
 
   selectedGradingPeriodId: string,

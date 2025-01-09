@@ -33,7 +33,7 @@ export const DEFAULT_LATE_POLICY_DATA: LatePolicyCamelized = {
 
 function camelizeLatePolicyResponseData(latePolicyResponseData: {late_policy: LatePolicy}) {
   const camelizedData = camelizeProperties(
-    latePolicyResponseData.late_policy
+    latePolicyResponseData.late_policy,
   ) as LatePolicyCamelized
   return {latePolicy: camelizedData}
 }
@@ -85,7 +85,7 @@ export function updateCourseSettings(
   courseId: string,
   settings: {
     allowFinalGradeOverride: boolean
-  }
+  },
 ) {
   return doFetchApi<CourseSettingsType>({
     path: `/api/v1/courses/${courseId}/settings`,

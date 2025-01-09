@@ -27,20 +27,20 @@ describe('Gradebook > Teacher Notes', () => {
   const setupGradebook = (options = {}) => {
     gradebook = createGradebook({
       context_id: '1201',
-      ...options
+      ...options,
     })
     gradebook.gradebookGrid.grid = {
       getColumns: () => [],
       getOptions: () => ({
-        numberOfColumnsToFreeze: 0
+        numberOfColumnsToFreeze: 0,
       }),
       invalidate: jest.fn(),
       setColumns: jest.fn(),
       setNumberOfColumnsToFreeze: jest.fn(),
-      destroy: jest.fn()
+      destroy: jest.fn(),
     }
     gradebook.gradebookGrid.gridSupport = {
-      destroy: jest.fn()
+      destroy: jest.fn(),
     }
     gradebook.renderViewOptionsMenu = jest.fn()
     gradebook.flashError = jest.fn()
@@ -61,7 +61,7 @@ describe('Gradebook > Teacher Notes', () => {
     beforeEach(() => {
       setupGradebook()
       Object.defineProperty(gradebook.gridReady, 'state', {
-        get: () => 'unresolved'
+        get: () => 'unresolved',
       })
     })
 
@@ -79,7 +79,7 @@ describe('Gradebook > Teacher Notes', () => {
 
     it('disabled is false when the grid is ready', () => {
       Object.defineProperty(gradebook.gridReady, 'state', {
-        get: () => 'resolved'
+        get: () => 'resolved',
       })
       const props = gradebook.getTeacherNotesViewOptionsMenuProps()
       expect(props.disabled).toBe(false)
@@ -87,7 +87,7 @@ describe('Gradebook > Teacher Notes', () => {
 
     it('disabled is true if the teacher notes column is updating', () => {
       Object.defineProperty(gradebook.gridReady, 'state', {
-        get: () => 'resolved'
+        get: () => 'resolved',
       })
       gradebook.setTeacherNotesColumnUpdating(true)
       const props = gradebook.getTeacherNotesViewOptionsMenuProps()
@@ -96,7 +96,7 @@ describe('Gradebook > Teacher Notes', () => {
 
     it('disabled is false if the teacher notes column is not updating', () => {
       Object.defineProperty(gradebook.gridReady, 'state', {
-        get: () => 'resolved'
+        get: () => 'resolved',
       })
       gradebook.setTeacherNotesColumnUpdating(false)
       const props = gradebook.getTeacherNotesViewOptionsMenuProps()
@@ -105,7 +105,7 @@ describe('Gradebook > Teacher Notes', () => {
 
     describe('onSelect', () => {
       it('calls createTeacherNotes if there are no teacher notes', () => {
-        const mockPromise = Promise.resolve({ data: {} })
+        const mockPromise = Promise.resolve({data: {}})
         GradebookApi.createTeacherNotesColumn.mockReturnValue(mockPromise)
         gradebook = createGradebook({teacher_notes: null})
         jest.spyOn(gradebook, 'createTeacherNotes')
@@ -117,7 +117,13 @@ describe('Gradebook > Teacher Notes', () => {
       it('calls setTeacherNotesHidden with false if teacher notes are hidden', () => {
         const mockPromise = Promise.resolve()
         GradebookApi.updateTeacherNotesColumn.mockReturnValue(mockPromise)
-        const teacherNotes = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
+        const teacherNotes = {
+          id: '2401',
+          title: 'Notes',
+          position: 1,
+          teacher_notes: true,
+          hidden: true,
+        }
         gradebook = createGradebook({teacher_notes: teacherNotes})
         jest.spyOn(gradebook, 'setTeacherNotesHidden')
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
@@ -128,7 +134,13 @@ describe('Gradebook > Teacher Notes', () => {
       it('calls setTeacherNotesHidden with true if teacher notes are visible', () => {
         const mockPromise = Promise.resolve()
         GradebookApi.updateTeacherNotesColumn.mockReturnValue(mockPromise)
-        const teacherNotes = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+        const teacherNotes = {
+          id: '2401',
+          title: 'Notes',
+          position: 1,
+          teacher_notes: true,
+          hidden: false,
+        }
         gradebook = createGradebook({teacher_notes: teacherNotes})
         jest.spyOn(gradebook, 'setTeacherNotesHidden')
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
@@ -145,14 +157,26 @@ describe('Gradebook > Teacher Notes', () => {
       })
 
       it('is false if teacher notes are hidden', () => {
-        const teacherNotes = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
+        const teacherNotes = {
+          id: '2401',
+          title: 'Notes',
+          position: 1,
+          teacher_notes: true,
+          hidden: true,
+        }
         gradebook = createGradebook({teacher_notes: teacherNotes})
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
         expect(props.selected).toBe(false)
       })
 
       it('is true if teacher notes are visible', () => {
-        const teacherNotes = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+        const teacherNotes = {
+          id: '2401',
+          title: 'Notes',
+          position: 1,
+          teacher_notes: true,
+          hidden: false,
+        }
         gradebook = createGradebook({teacher_notes: teacherNotes})
         const props = gradebook.getTeacherNotesViewOptionsMenuProps()
         expect(props.selected).toBe(true)
@@ -166,7 +190,7 @@ describe('Gradebook > Teacher Notes', () => {
     beforeEach(() => {
       setupGradebook()
       promise = Promise.resolve({
-        data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+        data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
       })
       GradebookApi.createTeacherNotesColumn.mockResolvedValue(promise)
       jest.spyOn(gradebook, 'showNotesColumn')
@@ -199,20 +223,22 @@ describe('Gradebook > Teacher Notes', () => {
         title: 'Notes',
         position: 1,
         teacher_notes: true,
-        hidden: false
+        hidden: false,
       })
     })
 
     it('updates custom columns with response data after request resolves', async () => {
       gradebook.createTeacherNotes()
       await promise
-      expect(gradebook.gradebookContent.customColumns).toEqual([{
-        id: '2401',
-        title: 'Notes',
-        position: 1,
-        teacher_notes: true,
-        hidden: false
-      }])
+      expect(gradebook.gradebookContent.customColumns).toEqual([
+        {
+          id: '2401',
+          title: 'Notes',
+          position: 1,
+          teacher_notes: true,
+          hidden: false,
+        },
+      ])
     })
 
     it('shows the notes column after request resolves', async () => {

@@ -127,7 +127,7 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
         ref(ref) {
           component = ref
         },
-      }
+      },
     )
   }
 

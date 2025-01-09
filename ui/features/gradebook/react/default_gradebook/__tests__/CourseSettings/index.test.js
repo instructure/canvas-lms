@@ -78,7 +78,7 @@ describe('Gradebook CourseSettings', () => {
           {
             allowFinalGradeOverride: true,
           },
-          () => {}
+          () => {},
         )
       })
 
@@ -94,7 +94,7 @@ describe('Gradebook CourseSettings', () => {
           {
             allowFinalGradeOverride: false,
           },
-          () => {}
+          () => {},
         )
       })
 

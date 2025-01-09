@@ -25,7 +25,7 @@ describe('ReuploadSubmissionsDialogManager', () => {
         {id: 'the_id'},
         'the_{{ assignment_id }}_url',
         'user_22',
-        {}
+        {},
       )
 
       expect(manager.reuploadUrl).toBe('the_the_id_url')
@@ -70,7 +70,7 @@ describe('ReuploadSubmissionsDialogManager', () => {
         {id: 'the_id'},
         'the_{{ assignment_id }}_url',
         'user_22',
-        {}
+        {},
       )
       manager.showDialog()
 
@@ -82,7 +82,7 @@ describe('ReuploadSubmissionsDialogManager', () => {
         {id: 'the_id'},
         'the_{{ assignment_id }}_url',
         'user_22',
-        {}
+        {},
       )
       const dialog = attrMock().dialog
       manager.showDialog()

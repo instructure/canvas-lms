@@ -37,7 +37,7 @@ export function getSecondaryDisplayInfo(
   },
   secondaryInfo: string,
   // @ts-expect-error
-  options
+  options,
 ) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
     const sectionNames: string[] = (student?.sections || [])
@@ -48,7 +48,7 @@ export function getSecondaryDisplayInfo(
 
   if (options.shouldShowGroups() && secondaryInfo === 'group') {
     const groupNames: string[] = student.group_ids.map(
-      (groupId: string) => options.getGroup(groupId).name
+      (groupId: string) => options.getGroup(groupId).name,
     )
     return listFormatter.format(groupNames.sort())
   }

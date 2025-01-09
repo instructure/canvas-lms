@@ -50,7 +50,7 @@ export type StudentsState = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): StudentsState => ({
   studentIds: [],
 
@@ -147,7 +147,7 @@ export default (
     const submissionRequests: Promise<void>[] = []
     const studentIdChunks: string[][] = chunk(
       studentIdsToLoad,
-      performanceControls.studentsChunkSize
+      performanceControls.studentsChunkSize,
     )
     set({
       totalStudentsToLoad: studentIdsToLoad.length,
@@ -160,7 +160,7 @@ export default (
           acc[student.id] = student
           return acc
         },
-        {...get().studentMap}
+        {...get().studentMap},
       )
       set({
         recentlyLoadedStudents: students,
@@ -171,7 +171,7 @@ export default (
 
     const gotSubmissionsChunk = (recentlyLoadedSubmissions: UserSubmissionGroup[]) => {
       const flattenedSubmissions = recentlyLoadedSubmissions.flatMap(
-        userSubmissionGroup => userSubmissionGroup.submissions || []
+        userSubmissionGroup => userSubmissionGroup.submissions || [],
       )
       // merge the submissions into the existing map
       const assignmentUserSubmissionMap: AssignmentUserSubmissionMap = flattenedSubmissions.reduce(
@@ -184,7 +184,7 @@ export default (
             },
           }
         },
-        {...get().assignmentUserSubmissionMap}
+        {...get().assignmentUserSubmissionMap},
       )
       set({
         recentlyLoadedSubmissions,
@@ -205,11 +205,11 @@ export default (
             performanceControls.submissionsChunkSize,
             performanceControls.submissionsPerPage,
             gotChunkOfStudents,
-            gotSubmissionsChunk
+            gotSubmissionsChunk,
           )
 
           // when the current chunk requests are all enqueued
-           
+
           chunkRequestDatum.allEnqueued.then(() => {
             submissionRequests.push(...chunkRequestDatum.submissionRequests)
             studentRequests.push(chunkRequestDatum.studentRequest)

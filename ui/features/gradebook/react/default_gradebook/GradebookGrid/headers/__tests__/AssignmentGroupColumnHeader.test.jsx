@@ -61,8 +61,8 @@ describe('GradebookGrid AssignmentGroupColumnHeader', () => {
       },
 
       getAllStudents: () => [
-        { id: '1', name: 'Student 1' },
-        { id: '2', name: 'Student 2' }
+        {id: '1', name: 'Student 1'},
+        {id: '2', name: 'Student 2'},
       ],
 
       isRunningScoreToUngraded: false,

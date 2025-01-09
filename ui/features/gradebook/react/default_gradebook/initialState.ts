@@ -39,10 +39,10 @@ export function getInitialGradebookContent(options: {teacher_notes: null | Custo
 
 export function getInitialGridDisplaySettings(
   settings: GradebookSettings,
-  colors: StatusColors
+  colors: StatusColors,
 ): GridDisplaySettings {
   const selectedPrimaryInfo = studentRowHeaderConstants.primaryInfoKeys.includes(
-    settings.student_column_display_as
+    settings.student_column_display_as,
   )
     ? settings.student_column_display_as
     : studentRowHeaderConstants.defaultPrimaryInfo

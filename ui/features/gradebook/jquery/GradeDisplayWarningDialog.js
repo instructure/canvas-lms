@@ -29,11 +29,11 @@ function GradeDisplayWarningDialog(options) {
   this.options = options
   const points_warning = I18n.t(
     'grade_display_warning.points_text',
-    'Students will also see their final grade as points. Are you sure you want to continue?'
+    'Students will also see their final grade as points. Are you sure you want to continue?',
   )
   const percent_warning = I18n.t(
     'grade_display_warning.percent_text',
-    'Students will also see their final grade as a percentage. Are you sure you want to continue?'
+    'Students will also see their final grade as a percentage. Are you sure you want to continue?',
   )
   const locals = {
     warning_text: this.options.showing_points ? percent_warning : points_warning,

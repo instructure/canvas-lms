@@ -100,11 +100,11 @@ export function TotalGradeOverrideTray({
   const selectedCustomStatusId = gradeOverrideCustomStatus(
     finalGradeOverrides,
     studentId,
-    selectedGradingPeriodId
+    selectedGradingPeriodId,
   )
 
   const selectedCustomStatus = customGradeStatuses.find(
-    status => status.id === selectedCustomStatusId
+    status => status.id === selectedCustomStatusId,
   )
 
   const {name, avatarUrl, gradesUrl, enrollmentId} = studentInfo

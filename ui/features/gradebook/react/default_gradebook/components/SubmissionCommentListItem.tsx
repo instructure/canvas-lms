@@ -66,7 +66,7 @@ export default class SubmissionCommentListItem extends React.Component<Props> {
 
   handleDeleteComment = () => {
     const message = I18n.t('Are you sure you want to delete this comment?')
-     
+
     if (confirm(message)) {
       this.props.deleteSubmissionComment(this.props.id)
     }

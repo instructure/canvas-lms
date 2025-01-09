@@ -313,7 +313,7 @@ const PostGradesStore = (initialState: {
     saveAssignments() {
       // TODO: fix this as Array<AssignmentWithOverride> cast
       const assignments = assignmentUtils.withOriginalErrorsNotIgnored(
-        this.getAssignments() as Array<AssignmentWithOverride>
+        this.getAssignments() as Array<AssignmentWithOverride>,
       )
       const course_id = store.getState().course?.id
       each(assignments, a => {
@@ -327,7 +327,7 @@ const PostGradesStore = (initialState: {
     postGrades() {
       // TODO: fix this as Array<AssignmentWithOverride> cast
       const assignments = assignmentUtils.notIgnored(
-        this.getAssignments() as Array<AssignmentWithOverride>
+        this.getAssignments() as Array<AssignmentWithOverride>,
       )
       const selected = store.getState().selected
       if (typeof selected !== 'undefined') {
@@ -342,10 +342,10 @@ const PostGradesStore = (initialState: {
       } else {
         // TODO: fix this as Array<AssignmentWithOverride> cast
         const originals = assignmentUtils.withOriginalErrors(
-          this.getAssignments() as Array<AssignmentWithOverride>
+          this.getAssignments() as Array<AssignmentWithOverride>,
         )
         const withErrorsCount = keys(
-          assignmentUtils.withErrors(this.getAssignments() as Array<AssignmentWithOverride>)
+          assignmentUtils.withErrors(this.getAssignments() as Array<AssignmentWithOverride>),
         ).length
         if (withErrorsCount === 0 && (state.pleaseShowSummaryPage || originals.length === 0)) {
           return 'summary'
