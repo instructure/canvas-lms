@@ -6080,6 +6080,7 @@ ko:
       invalid_recursion: "폴더는 자신의 부모가 될 수 없음"
     folder_created: "\"%{name}\" 폴더 만듦"
   folder_705fd2d7: 폴더
+  folder_was_successfully_created_8de6a282: "폴더를 성공적으로 만들었습니다."
   folders: 
     event_updated: "행사를 성공적으로 업데이트했습니다."
     file_zip_in_process: "파일 압축 진행 중..."
