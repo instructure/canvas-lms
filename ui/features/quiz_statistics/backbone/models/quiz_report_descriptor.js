@@ -68,7 +68,7 @@ export default {
     if (!report.generatable) {
       return I18n.t(
         'non_generatable_report_notice',
-        'Report can not be generated for Survey Quizzes.'
+        'Report can not be generated for Survey Quizzes.',
       )
     } else if (report.isGenerated) {
       return I18n.t('generated_at', 'Generated: %{date}', {

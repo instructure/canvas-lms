@@ -31,6 +31,6 @@ export default function renderAssignmentsApp(env, elt) {
         assignmentLid={ENV.ASSIGNMENT_ID.toString()}
         messageAttachmentUploadFolderId={null} // This needs to be defined before this view can be enabled
       />
-    </ApolloProvider>
+    </ApolloProvider>,
   )
 }

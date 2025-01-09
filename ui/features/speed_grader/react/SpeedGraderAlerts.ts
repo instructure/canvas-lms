@@ -36,21 +36,21 @@ function showStudentGroupChangeAlert({
   if (reasonForChange === 'student_not_in_selected_group') {
     groupText = I18n.t(
       `The group "%{groupName}" was selected because the student you requested is not in the previously-selected group. You can change the selected group in the Gradebook.`,
-      {groupName}
+      {groupName},
     )
   } else if (reasonForChange === 'no_students_in_group') {
     groupText = I18n.t(
       `The group "%{groupName}" was selected because the previously-selected group contains no students. You can change the selected group in the Gradebook.`,
-      {groupName}
+      {groupName},
     )
   } else if (reasonForChange === 'no_group_selected') {
     groupText = I18n.t(
       `The group "%{groupName}" was automatically selected because no group was previously chosen. You can change the selected group in the Gradebook.`,
-      {groupName}
+      {groupName},
     )
   } else if (reasonForChange === 'student_in_no_groups') {
     groupText = I18n.t(
-      `The selected group was cleared because the student you requested is not part of any groups. You can select a group in the Gradebook.`
+      `The selected group was cleared because the student you requested is not part of any groups. You can select a group in the Gradebook.`,
     )
   }
 

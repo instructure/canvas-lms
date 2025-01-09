@@ -158,7 +158,7 @@ export const AddressBookItem = ({
       observerEnrollments,
       isOnObserverSubmenu,
       observeesAreTruncated,
-    ]
+    ],
   )
 }
 

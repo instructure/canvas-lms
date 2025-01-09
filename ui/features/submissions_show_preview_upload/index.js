@@ -34,7 +34,7 @@ $(document).ready(() => {
       false,
       null,
       {wmode: 'opaque'},
-      null
+      null,
     )
     return false
   })
@@ -54,7 +54,7 @@ $(document).ready(() => {
     $('.submission_annotation.unread_indicator').hide()
     $('.file-upload-submission-attachment .modal_preview_link').attr(
       'title',
-      I18n.t('Preview your submission and view teacher feedback, if available')
+      I18n.t('Preview your submission and view teacher feedback, if available'),
     )
     return false
   })

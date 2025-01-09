@@ -24,7 +24,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('account_course_user_search')
 
 const errorLoadingMessage = I18n.t(
-  'There was an error with your query; please try a different search'
+  'There was an error with your query; please try a different search',
 )
 const noCoursesFoundMessage = I18n.t('No courses found')
 const noUsersFoundMessage = I18n.t('No users found')

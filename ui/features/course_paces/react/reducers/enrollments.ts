@@ -39,7 +39,7 @@ export const getSortedEnrollments = createSelector(
     const sortedEnrollments = Object.values(enrollments)
     sortedEnrollments.sort(natcompare.byKey('sortable_name'))
     return sortedEnrollments
-  }
+  },
 )
 
 /* Reducers */

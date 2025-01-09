@@ -91,14 +91,14 @@ export const AccountTree = ({
           } else {
             receivedAccountData(accountData)
             loadingCollectionIds.current = loadingCollectionIds.current.filter(
-              id => id !== accountId
+              id => id !== accountId,
             )
             setLoadingCollectionIdState(loadingCollectionIds.current)
           }
         })
         .catch(showFlashError(I18n.t("Couldn't load account calendar settings")))
     },
-    [receivedAccountData]
+    [receivedAccountData],
   )
 
   useEffect(() => {
@@ -122,7 +122,7 @@ export const AccountTree = ({
       }
       onAccountExpandedToggled(account.id, expanded)
     },
-    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId]
+    [collections, fetchAccountData, fetchInFlight, onAccountExpandedToggled, originAccountId],
   )
 
   if (!collections[originAccountId]) {

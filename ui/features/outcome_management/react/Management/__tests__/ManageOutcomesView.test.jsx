@@ -71,13 +71,13 @@ describe('ManageOutcomesView', () => {
 
   const renderWithContext = (children, {canManage = true} = {}) => {
     return render(
-      <OutcomesContext.Provider value={{env: {canManage}}}>{children}</OutcomesContext.Provider>
+      <OutcomesContext.Provider value={{env: {canManage}}}>{children}</OutcomesContext.Provider>,
     )
   }
 
   it('renders loading indicator', () => {
     const {queryByTestId} = render(
-      <ManageOutcomesView {...defaultProps({outcomeGroup: null, loading: true})} />
+      <ManageOutcomesView {...defaultProps({outcomeGroup: null, loading: true})} />,
     )
     expect(queryByTestId('loading')).toBeInTheDocument()
   })
@@ -96,9 +96,9 @@ describe('ManageOutcomesView', () => {
     const {getAllByText} = render(<ManageOutcomesView {...defaultProps({outcomeGroup})} />)
     expect(
       getAllByText(
-        'Partition circles and rectangle into two, three, or four equal share. Partition circles and rectangle into two, three, or four equal share.'
-      ).length
-    ).not.toBe(0)
+        'Partition circles and rectangle into two, three, or four equal share. Partition circles and rectangle into two, three, or four equal share.',
+      ),
+    ).not.toHaveLength(0)
   })
 
   it('does not render component if outcomeGroup not provided', () => {
@@ -129,7 +129,7 @@ describe('ManageOutcomesView', () => {
 
   it('render a message when the group has no outcomes', () => {
     const {getByText, getByTestId} = render(
-      <ManageOutcomesView {...defaultProps({searchString: ''})} />
+      <ManageOutcomesView {...defaultProps({searchString: ''})} />,
     )
     expect(getByTestId('no-outcomes-svg')).toBeInTheDocument()
     expect(getByText('There are no outcomes in this group.')).toBeInTheDocument()
@@ -162,7 +162,7 @@ describe('ManageOutcomesView', () => {
             outcomes: {edges: [], pageInfo: {hasNextPage: true}},
           },
         })}
-      />
+      />,
     )
 
     mockContainer(scrollContainer, 'scrollTop', 600)
@@ -181,7 +181,7 @@ describe('ManageOutcomesView', () => {
         {...defaultProps({
           scrollContainer,
         })}
-      />
+      />,
     )
 
     mockContainer(scrollContainer, 'scrollTop', 600)

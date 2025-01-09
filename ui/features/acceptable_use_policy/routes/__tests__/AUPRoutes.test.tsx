@@ -38,7 +38,7 @@ describe('AUPRoutes', () => {
     render(
       <MemoryRouter initialEntries={['/acceptable_use_policy']}>
         <Routes>{AUPRoutes}</Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -50,7 +50,7 @@ describe('AUPRoutes', () => {
     render(
       <MemoryRouter initialEntries={['/acceptable_use_policy']}>
         <Routes>{AUPRoutes}</Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
     expect(screen.getByTitle('Loading page')).toBeInTheDocument()
     await waitFor(() => {
@@ -67,7 +67,7 @@ describe('AUPRoutes', () => {
         <Routes>
           <Route path="/acceptable_use_policy" element={<AUPLayout>Test Layout</AUPLayout>} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     )
     expect(screen.getByText('Test Layout')).toBeInTheDocument()
   })

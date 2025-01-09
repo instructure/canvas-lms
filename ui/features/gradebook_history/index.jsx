@@ -22,12 +22,11 @@ import GradebookHistoryApp from './react/GradebookHistoryApp'
 import ready from '@instructure/ready'
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <GradebookHistoryApp
       courseUrl={ENV.COURSE_URL}
       learningMasteryEnabled={ENV.OUTCOME_GRADEBOOK_ENABLED}
     />,
-    document.getElementById('content')
+    document.getElementById('content'),
   )
 })

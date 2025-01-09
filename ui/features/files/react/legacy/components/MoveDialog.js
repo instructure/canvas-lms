@@ -104,7 +104,7 @@ export default {
       {
         count: this.props.thingsToMove.length,
         item: this.props.thingsToMove[0] && this.props.thingsToMove[0].displayName(),
-      }
+      },
     )
   },
 }

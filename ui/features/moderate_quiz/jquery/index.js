@@ -1,5 +1,3 @@
- 
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -108,7 +106,7 @@ window.moderation = {
     const $student = $('#student_' + submission.user_id)
     if (updateLastUpdatedAt) {
       moderation.lastUpdatedAt = new Date(
-        Math.max(Date.parse(submission.updated_at), moderation.lastUpdatedAt)
+        Math.max(Date.parse(submission.updated_at), moderation.lastUpdatedAt),
       )
     }
     let state_text = ''
@@ -164,12 +162,12 @@ $(document).ready(function (_event) {
     if (bool) {
       $updating_img.attr(
         'src',
-        $updating_img.attr('src').replace('ajax-reload.gif', 'ajax-reload-animated.gif')
+        $updating_img.attr('src').replace('ajax-reload.gif', 'ajax-reload-animated.gif'),
       )
     } else {
       $updating_img.attr(
         'src',
-        $updating_img.attr('src').replace('ajax-reload-animated.gif', 'ajax-reload.gif')
+        $updating_img.attr('src').replace('ajax-reload-animated.gif', 'ajax-reload.gif'),
       )
     }
   }
@@ -208,8 +206,8 @@ $(document).ready(function (_event) {
           $.flashMessage(
             I18n.t(
               'errors.server_communication_failed',
-              'There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page'
-            )
+              'There was a problem communicating with the server.  The system will try again in five minutes, or you can reload the page',
+            ),
           )
           updateErrors = 0
           if (repeat) {
@@ -222,7 +220,7 @@ $(document).ready(function (_event) {
             updateSubmissions(true)
           }, 120000)
         }
-      }
+      },
     )
   }
   setTimeout(() => {
@@ -272,8 +270,8 @@ $(document).ready(function (_event) {
       I18n.t(
         'extensions_for_students',
         {one: 'Extensions for 1 Student', other: 'Extensions for %{count} Students'},
-        {count: student_ids.length}
-      )
+        {count: student_ids.length},
+      ),
     )
     $('#moderate_student_form').fillFormData(data)
     $('#moderate_student_dialog')
@@ -300,7 +298,7 @@ $(document).ready(function (_event) {
     $('#moderate_student_form').data('ids', [$student.attr('data-user-id')])
     $('#moderate_student_form').find('button').prop('disabled', false)
     $('#moderate_student_dialog h2').text(
-      I18n.t('extensions_for_student', 'Extensions for %{student}', {student: name})
+      I18n.t('extensions_for_student', 'Extensions for %{student}', {student: name}),
     )
 
     openModerateStudentDialog($('#moderate_student_dialog'), DIALOG_WIDTH)
@@ -314,20 +312,20 @@ $(document).ready(function (_event) {
   $('#extension_extra_time')
     .on('invalid:not_a_number', function (_e) {
       $(this).errorBox(
-        I18n.t('errors.quiz_submission_extra_time_not_a_number', 'Extra time must be a number.')
+        I18n.t('errors.quiz_submission_extra_time_not_a_number', 'Extra time must be a number.'),
       )
     })
     .on('invalid:greater_than', function (_e) {
       $(this).errorBox(
-        I18n.t('errors.quiz_submission_extra_time_too_short', 'Extra time must be greater than 0.')
+        I18n.t('errors.quiz_submission_extra_time_too_short', 'Extra time must be greater than 0.'),
       )
     })
     .on('invalid:less_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_time_too_long',
-          'Extra time must be less than than 10080.'
-        )
+          'Extra time must be less than than 10080.',
+        ),
       )
     })
 
@@ -336,24 +334,24 @@ $(document).ready(function (_event) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_not_a_number',
-          'Extra attempts must be a number.'
-        )
+          'Extra attempts must be a number.',
+        ),
       )
     })
     .on('invalid:greater_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_short',
-          'Extra attempts must be greater than 0.'
-        )
+          'Extra attempts must be greater than 0.',
+        ),
       )
     })
     .on('invalid:less_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_long',
-          'Extra attempts must be less than than 1000.'
-        )
+          'Extra attempts must be less than than 1000.',
+        ),
       )
     })
 
@@ -430,8 +428,8 @@ $(document).ready(function (_event) {
                 I18n.t(
                   'buttons.save_failed_n_updates_lost',
                   'Save Failed, %{n} Students were not updated',
-                  {n: errors}
-                )
+                  {n: errors},
+                ),
               )
           }
         } else {
@@ -451,18 +449,18 @@ $(document).ready(function (_event) {
         url,
         'POST',
         formData,
-         
+
         data => {
           finished++
           moderation.updateSubmission(data)
           checkIfFinished()
         },
-         
+
         _data => {
           finished++
           errors++
           checkIfFinished()
-        }
+        },
       )
     }
   })
@@ -513,12 +511,11 @@ $(document).ready(function (_event) {
         data.time_type === 'extend_from_now' &&
         data.time < $dialog.data('row').data('minutes_left')
       ) {
-         
         const result = window.confirm(
           I18n.t(
             'confirms.taking_time_away',
-            'That would be less time than the student currently has.  Continue anyway?'
-          )
+            'That would be less time than the student currently has.  Continue anyway?',
+          ),
         )
         if (!result) {
           return
@@ -533,7 +530,7 @@ $(document).ready(function (_event) {
       const url = replaceTags(
         $('.extension_url').attr('href'),
         'user_id',
-        $dialog.data('row').attr('data-user-id')
+        $dialog.data('row').attr('data-user-id'),
       )
       $.ajaxJSON(
         url,
@@ -554,7 +551,7 @@ $(document).ready(function (_event) {
             .prop('disabled', false)
             .filter('.save_button')
             .text(I18n.t('buttons.time_extension_failed', 'Extend Time Failed, please try again'))
-        }
+        },
       )
     })
 
@@ -635,7 +632,7 @@ $(document).ready(function (_event) {
             this.closeDialog()
             updateSubmissions()
           }
-        }.bind(this)
+        }.bind(this),
       )
     },
     cleanUpEventListeners() {

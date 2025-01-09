@@ -91,7 +91,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
             }
           />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>,
     )
   }
 
@@ -126,7 +126,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       expect(gradebookExportLink).toBeInTheDocument()
       expect(gradebookExportLink).toHaveAttribute(
         'href',
-        'https://www.testattachment.com/attachment'
+        'https://www.testattachment.com/attachment',
       )
       expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
 
@@ -134,7 +134,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
 
       const contentSelectionStudent = await findByTestId(
-        'learning-mastery-content-selection-student'
+        'learning-mastery-content-selection-student',
       )
       expect(contentSelectionStudent).toBeInTheDocument()
       expect(within(contentSelectionStudent).getByText('Student 1')).toBeInTheDocument()
@@ -188,7 +188,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       expect(gradebookExportLink).toBeInTheDocument()
       expect(gradebookExportLink).toHaveAttribute(
         'href',
-        'https://www.testattachment.com/attachment'
+        'https://www.testattachment.com/attachment',
       )
       expect(gradebookExportLink).toHaveTextContent('Download Scores Generated on')
 
@@ -196,7 +196,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
 
       const contentSelectionStudent = await findByTestId(
-        'learning-mastery-content-selection-student'
+        'learning-mastery-content-selection-student',
       )
       expect(contentSelectionStudent).toBeInTheDocument()
       expect(within(contentSelectionStudent).getByText('Student 1')).toBeInTheDocument()
@@ -225,15 +225,15 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       const outcomeInformationTitle = getByTestId('outcome-information-calculation-method')
       expect(outcomeInformationTitle).toBeInTheDocument()
       expect(
-        within(outcomeInformationTitle).getByText('Calculation Method: Decaying Average - 65%/35%')
+        within(outcomeInformationTitle).getByText('Calculation Method: Decaying Average - 65%/35%'),
       ).toBeInTheDocument()
 
       const outcomeInformationExample = getByTestId('outcome-information-example')
       expect(outcomeInformationExample).toBeInTheDocument()
       expect(
         within(outcomeInformationExample).getByText(
-          'Example: Most recent result counts as 65% of mastery weight, average of all other results count as 35% of weight. If there is only one result, the single score will be returned.'
-        )
+          'Example: Most recent result counts as 65% of mastery weight, average of all other results count as 35% of weight. If there is only one result, the single score will be returned.',
+        ),
       ).toBeInTheDocument()
       // outcome-information-total-result
     })
@@ -265,7 +265,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
 
       // Content selection
       const contentSelectionStudent = await findByTestId(
-        'learning-mastery-content-selection-student'
+        'learning-mastery-content-selection-student',
       )
       expect(within(contentSelectionStudent).getByText('No Student Selected')).toBeInTheDocument()
 
@@ -275,21 +275,21 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       // Outcome Result
       const outcomeResult = getByTestId('student-outcome-results-empty')
       expect(
-        within(outcomeResult).getByText('Select a student and an outcome to view results.')
+        within(outcomeResult).getByText('Select a student and an outcome to view results.'),
       ).toBeInTheDocument()
 
       // Student Information
       const studentInformation = getByTestId('student-information-empty')
       expect(
         within(studentInformation).getByText(
-          'Select a student to view additional information here.'
-        )
+          'Select a student to view additional information here.',
+        ),
       ).toBeInTheDocument()
 
       // Outcome Information
       const outcomeInformation = getByTestId('outcome-information-empty')
       expect(
-        within(outcomeInformation).getByText('Select a outcome to view additional information')
+        within(outcomeInformation).getByText('Select a outcome to view additional information'),
       ).toBeInTheDocument()
     })
   })
@@ -341,28 +341,28 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
       expect(within(contentSelectionStudent).getByText('No Student Selected')).toBeInTheDocument()
       const contentSelectionAssignment = getByTestId('content-selection-assignment')
       expect(
-        within(contentSelectionAssignment).getByText('No Assignment Selected')
+        within(contentSelectionAssignment).getByText('No Assignment Selected'),
       ).toBeInTheDocument()
 
       const gradingResults = getByTestId('grading-results-empty')
       expect(
         within(gradingResults).getByText(
-          'Select a student and an assignment to view and edit grades.'
-        )
+          'Select a student and an assignment to view and edit grades.',
+        ),
       ).toBeInTheDocument()
 
       const studentInformation = getByTestId('student-information-empty')
       expect(
         within(studentInformation).getByText(
-          'Select a student to view additional information here.'
-        )
+          'Select a student to view additional information here.',
+        ),
       ).toBeInTheDocument()
 
       const assignmentInformation = getByTestId('assignment-information-empty')
       expect(
         within(assignmentInformation).getByText(
-          'Select an assignment to view additional information here.'
-        )
+          'Select an assignment to view additional information here.',
+        ),
       ).toBeInTheDocument()
     })
   })

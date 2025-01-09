@@ -57,7 +57,7 @@ export default class Assignment extends React.Component {
     const assgClasses = classNames(
       'cmp-assignment',
       'context_module_item',
-      this.props.assignment.category.contentTypeClass
+      this.props.assignment.category.contentTypeClass,
     )
 
     return (

@@ -30,7 +30,7 @@ function renderAdminSplit() {
         {id: '2', display_name: 'split1', html_url: 'http://example.com/users/2'},
         {id: '3', display_name: 'split2', html_url: 'http://example.com/users/3'},
       ]}
-    />
+    />,
   )
 }
 
@@ -53,7 +53,7 @@ describe('admin split ui', () => {
       'POST',
       {},
       expect.any(Function),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 })

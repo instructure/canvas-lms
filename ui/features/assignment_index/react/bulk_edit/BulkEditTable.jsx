@@ -281,7 +281,7 @@ export default function BulkEditTable({
 
   const handleSelectAllAssignments = useCallback(
     () => selectAllAssignments(!allAssignmentsSelected),
-    [allAssignmentsSelected, selectAllAssignments]
+    [allAssignmentsSelected, selectAllAssignments],
   )
 
   const handleRevertClick = (assignment, override, event) => {

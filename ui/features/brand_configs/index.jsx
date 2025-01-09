@@ -24,9 +24,9 @@ import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 ready(() => {
   initializeTopNavPortal()
-  // eslint-disable-next-line no-restricted-properties
+
   ReactDOM.render(
     <CollectionView {...window.ENV.brandConfigStuff} />,
-    document.getElementById('content')
+    document.getElementById('content'),
   )
 })

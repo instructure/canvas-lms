@@ -36,9 +36,7 @@ import {Flex} from '@instructure/ui-flex'
 import {hideStudentNames} from '../../utils'
 import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
 import {breakpointsShape} from '@canvas/with-breakpoints'
-import {
-  DiscussionTranslationModuleContainer
-} from '../DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
+import {DiscussionTranslationModuleContainer} from '../DiscussionTranslationModuleContainer/DiscussionTranslationModuleContainer'
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
@@ -208,7 +206,9 @@ const DiscussionTopicToolbarContainer = props => {
           }
         />
       )}
-      {showTranslationControl && ENV.ai_translation_improvements && <DiscussionTranslationModuleContainer />}
+      {showTranslationControl && ENV.ai_translation_improvements && (
+        <DiscussionTranslationModuleContainer />
+      )}
       {showTranslationControl && !ENV.ai_translation_improvements && <TranslationControls />}
     </View>
   )

@@ -43,7 +43,7 @@ const MobileNavigation: React.FC<{navIsOpen?: boolean}> = ({navIsOpen = false}) 
   const [contextNavIsOpen, setContextNavIsOpen] = useState(false)
 
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const {data: unreadConversationsCount, isSuccess: hasUnreadConversationsCount} = useQuery({

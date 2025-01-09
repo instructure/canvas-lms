@@ -115,7 +115,7 @@ describe('EditView', () => {
     length,
     maxNameLengthRequiredForAccount,
     maxNameLength,
-    postToSis
+    postToSis,
   ) => {
     ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT = maxNameLengthRequiredForAccount
     ENV.MAX_NAME_LENGTH = maxNameLength
@@ -131,7 +131,7 @@ describe('EditView', () => {
         set_assignment: '1',
         assignment,
       },
-      errors
+      errors,
     )
     if (
       length > 256 ||

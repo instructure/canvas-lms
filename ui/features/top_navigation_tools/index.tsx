@@ -49,7 +49,6 @@ ready(() => {
   }
 
   function renderExternalToolDrawer(): void {
-     
     ReactDOM.render(
       <ContentTypeExternalToolDrawer
         tool={selectedTool}
@@ -64,25 +63,23 @@ ready(() => {
         onResize={handleResize}
         open={!!selectedTool}
       />,
-      drawerLayoutMountPoint
+      drawerLayoutMountPoint,
     )
   }
 
   function renderTopNavigationTools(): void {
-     
     ReactDOM.render(
       <TopNavigationTools tools={ENV.top_navigation_tools} handleToolLaunch={handleToolLaunch} />,
-      topNavToolsMountPoint
+      topNavToolsMountPoint,
     )
 
     if (mobileTopNavToolsMountPoint) {
-       
       ReactDOM.render(
         <MobileTopNavigationTools
           tools={ENV.top_navigation_tools}
           handleToolLaunch={handleToolLaunch}
         />,
-        mobileTopNavToolsMountPoint
+        mobileTopNavToolsMountPoint,
       )
     }
   }

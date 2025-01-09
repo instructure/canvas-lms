@@ -37,7 +37,7 @@ ready(() => {
         moduleName={moduleName}
         published={published}
         isPublishing={false}
-      />
+      />,
     )
   })
 })

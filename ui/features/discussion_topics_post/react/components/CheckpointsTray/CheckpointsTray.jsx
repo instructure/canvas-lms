@@ -46,10 +46,10 @@ export function CheckpointsTray({...props}) {
       : I18n.t('Due: No Due Date')
   }
   const replyToTopicCheckpoint = props.checkpoints?.find(
-    checkpoint => checkpoint.tag === REPLY_TO_TOPIC
+    checkpoint => checkpoint.tag === REPLY_TO_TOPIC,
   )
   const replyToEntryCheckpoint = props.checkpoints?.find(
-    checkpoint => checkpoint.tag === REPLY_TO_ENTRY
+    checkpoint => checkpoint.tag === REPLY_TO_ENTRY,
   )
 
   const renderSubmissionStatus = (submission = {}) => {

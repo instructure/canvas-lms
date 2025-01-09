@@ -55,7 +55,7 @@ const PeopleTray = () => (
       shows the list of users in your course. Depending on your permissions,
       you may be able to add students, teacher assistants, and observers to
       your course. You can also create student groups to house group assignments,
-      discussions, and files.`
+      discussions, and files.`,
     )}
   </TutorialTrayContent>
 )

@@ -31,6 +31,5 @@ const CoursePage = () => (
 )
 
 ready(() => {
-   
   ReactDOM.render(<CoursePage />, document.getElementById('course_paces'))
 })

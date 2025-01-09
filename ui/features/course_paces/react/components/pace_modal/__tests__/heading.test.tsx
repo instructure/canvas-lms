@@ -44,12 +44,12 @@ const defaultProps = {
 describe('PaceModalHeading', () => {
   it('renders course variant', () => {
     const {getByTestId} = renderConnected(
-      <PaceModalHeading {...defaultProps} contextName={PRIMARY_PACE.name || ''} />
+      <PaceModalHeading {...defaultProps} contextName={PRIMARY_PACE.name || ''} />,
     )
     expect(getByTestId('pace-type').textContent).toBe('Default Course Pace')
     expect(getByTestId('section-name').textContent).toBe(PRIMARY_PACE.name)
     expect(getByTestId('pace-info').textContent).toBe(
-      `Students enrolled in this course${coursePaceContext.associated_student_count}`
+      `Students enrolled in this course${coursePaceContext.associated_student_count}`,
     )
   })
   it('renders section variant', () => {
@@ -59,12 +59,12 @@ describe('PaceModalHeading', () => {
         contextName="My custom section pace"
         coursePace={SECTION_PACE}
         paceContext={sectionPaceContext}
-      />
+      />,
     )
     expect(getByTestId('pace-type').textContent).toBe('Section Pace')
     expect(getByTestId('section-name').textContent).toBe('My custom section pace')
     expect(getByTestId('pace-info').textContent).toBe(
-      `Students enrolled in this section${sectionPaceContext.associated_student_count}`
+      `Students enrolled in this section${sectionPaceContext.associated_student_count}`,
     )
   })
   it('renders student variant', () => {
@@ -73,7 +73,7 @@ describe('PaceModalHeading', () => {
         {...defaultProps}
         coursePace={STUDENT_PACE}
         paceContext={studentPaceContext}
-      />
+      />,
     )
     expect(getByTestId('pace-type').textContent).toBe('Student Pace')
     expect(getByTestId('section-name').textContent).toBe(SECTION_1.name)

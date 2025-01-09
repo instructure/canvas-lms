@@ -17,9 +17,9 @@
  */
 
 .acceptableUsePolicy {
-    hyphens: auto;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 /*
@@ -29,18 +29,18 @@
  * with that of the previous RoR/ERB template styling
  */
 .acceptableUsePolicy__content {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    color: var(--ic-brand-font-color-dark);
-    font-size: 1rem;
-    font-weight: normal;
-    line-height: 1.5;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  color: var(--ic-brand-font-color-dark);
+  font-size: 1rem;
+  font-weight: normal;
+  line-height: 1.5;
 }
 
 .acceptableUsePolicy__content > *:first-child {
-    margin-top: 0;
+  margin-top: 0;
 }
 
 .acceptableUsePolicy__content > *:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }

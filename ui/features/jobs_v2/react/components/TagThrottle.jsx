@@ -45,11 +45,11 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
   const [searchResult, setSearchResult] = useState({})
   const {searchTerm: debouncedTerm, setSearchTerm: setDebouncedTerm} = useDebouncedSearchTerm(
     term,
-    {timeout: 250}
+    {timeout: 250},
   )
   const {searchTerm: debouncedShardId, setSearchTerm: setDebouncedShardId} = useDebouncedSearchTerm(
     shardId,
-    {timeout: 250}
+    {timeout: 250},
   )
 
   const handleClose = () => setModalOpen(false)
@@ -72,7 +72,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
       err => {
         setSaving(false)
         setError(err)
-      }
+      },
     )
   }
 
@@ -89,7 +89,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
       success: setSearchResult,
       forceResult: modalOpen ? undefined : {},
     },
-    [modalOpen]
+    [modalOpen],
   )
 
   const enableSubmit = () => !loading && !saving && term.length > 1 && searchResult.matched_jobs > 1
@@ -182,7 +182,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
               <Flex.Item>
                 <Text>
                   {I18n.t(
-                    'After throttling the selected jobs, the newly created strand will be selected.'
+                    'After throttling the selected jobs, the newly created strand will be selected.',
                   )}
                 </Text>
               </Flex.Item>

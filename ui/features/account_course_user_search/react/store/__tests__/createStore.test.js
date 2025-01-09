@@ -34,8 +34,8 @@ describe('account course user search createStore', () => {
         new Promise((resolve, reject) =>
           setTimeout(() => {
             reject(new Error('should never get here because it should have been aborted'))
-          }, 10)
-        )
+          }, 10),
+        ),
     )
     store.load({})
     store.load({})

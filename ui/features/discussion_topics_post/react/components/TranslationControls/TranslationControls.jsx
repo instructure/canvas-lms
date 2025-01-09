@@ -28,7 +28,7 @@ const I18n = createI18nScope('discussion_posts')
 // TODO: Translate the language co> ntrols into the canvas target locale.
 export const TranslationControls = props => {
   const {translationLanguages, setTranslateTargetLanguage} = useContext(
-    DiscussionManagerUtilityContext
+    DiscussionManagerUtilityContext,
   )
   const [input, setInput] = useState(translationLanguages.current?.[0]?.name || '')
   const [selected, setSelected] = useState(null)
@@ -44,7 +44,7 @@ export const TranslationControls = props => {
     setInput(result.name)
     setSelected(result.id)
 
-    if(props.setTranslationLanguage) {
+    if (props.setTranslationLanguage) {
       props.setTranslationLanguage(result.id)
     } else {
       setTranslateTargetLanguage(result.id)
@@ -57,7 +57,7 @@ export const TranslationControls = props => {
     }
 
     return translationLanguages.current.filter(({name}) =>
-      name.toLowerCase().startsWith(input.toLowerCase())
+      name.toLowerCase().startsWith(input.toLowerCase()),
     )
   }, [translationLanguages, input])
 
@@ -81,5 +81,5 @@ export const TranslationControls = props => {
 }
 
 TranslationControls.propTypes = {
-  setTranslationLanguage: PropTypes.func
+  setTranslationLanguage: PropTypes.func,
 }

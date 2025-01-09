@@ -235,7 +235,7 @@ CreateGroupView.prototype.messages = shimGetterShorthand(
     name_too_long_error() {
       return I18n.t('Name is too long')
     },
-  }
+  },
 )
 
 export default CreateGroupView

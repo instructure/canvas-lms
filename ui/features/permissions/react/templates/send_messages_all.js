@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'Allows user to send a message to “All in [course name]” or "All in [course group]".'
+        'Allows user to send a message to “All in [course name]” or "All in [course group]".',
       ),
     },
   ],
@@ -35,9 +35,9 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'Allows user to send a message to “All in [course name],” or “All in [course group].”'
+        'Allows user to send a message to “All in [course name],” or “All in [course group].”',
       ),
     },
   ],
-  []
+  [],
 )

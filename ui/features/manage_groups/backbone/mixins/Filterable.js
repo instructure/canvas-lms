@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable object-shorthand */
-
 import {some} from 'lodash'
 
 // Mixin to make your (Paginated)CollectionView filterable on the client
@@ -45,10 +43,10 @@ export default {
           return function () {
             return _this.setFilter(_this.$filter.val())
           }
-        })(this)
+        })(this),
       )
     }
-    // eslint-disable-next-line no-void
+
     return (ref1 = this.$filter) != null ? ref1.trigger('input') : void 0
   },
   setFilter: function (filter) {
@@ -68,7 +66,7 @@ export default {
         !this.collection.fetchingPage &&
         this.collection.length > 0 &&
         this.$list.children(':visible').length === 0
-      )
+      ),
     )
   },
   attachItemView: function (model, view) {
@@ -95,7 +93,7 @@ export default {
           return function (col) {
             return model.get(col).toLowerCase().indexOf(_this.filter) >= 0
           }
-        })(this)
+        })(this),
       )
     ) {
       return false

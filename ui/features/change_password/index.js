@@ -29,7 +29,7 @@ $form.formSubmit({
       errors,
       ENV.PASSWORD_POLICIES[pseudonymId] != null
         ? ENV.PASSWORD_POLICIES[pseudonymId]
-        : ENV.PASSWORD_POLICY
+        : ENV.PASSWORD_POLICY,
     )
   },
   success() {

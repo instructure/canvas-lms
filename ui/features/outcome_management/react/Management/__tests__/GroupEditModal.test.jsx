@@ -52,14 +52,14 @@ describe('GroupEditModal', () => {
       contextType = 'Account',
       contextId = '1',
       mocks = [updateOutcomeGroupMock({description: group.description})],
-    } = {}
+    } = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -129,12 +129,12 @@ describe('GroupEditModal', () => {
     rerender(
       <MockedProvider>
         <GroupEditModal {...defaultProps({isOpen: false})} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     rerender(
       <MockedProvider>
         <GroupEditModal {...defaultProps({isOpen: true})} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     expect(getByDisplayValue('Group title')).toBeInTheDocument()
   })

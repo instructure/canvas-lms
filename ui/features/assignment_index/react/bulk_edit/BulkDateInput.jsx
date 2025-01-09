@@ -68,7 +68,7 @@ function BulkDateInput({
 
   const setDate = useCallback(
     newDate => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
-    [updateAssignmentDate, dateKey, assignmentId, overrideId]
+    [updateAssignmentDate, dateKey, assignmentId, overrideId],
   )
 
   const handleSelectedDateChange = useCallback(
@@ -109,7 +109,7 @@ function BulkDateInput({
         setDate(newMoment.toDate())
       }
     },
-    [fancyMidnight, defaultTime, selectedDateString, setDate, timezone]
+    [fancyMidnight, defaultTime, selectedDateString, setDate, timezone],
   )
 
   const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])

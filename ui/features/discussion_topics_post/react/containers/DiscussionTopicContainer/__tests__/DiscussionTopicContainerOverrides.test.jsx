@@ -44,7 +44,7 @@ describe('DiscussionTopicContainer', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <DiscussionTopicContainer {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -87,6 +87,6 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(showDueDatesButton)
     const assignmentOverrides = await container.findAllByTestId('assignment-override-row')
 
-    expect(assignmentOverrides.length).toBe(overrides.length + 1)
+    expect(assignmentOverrides).toHaveLength(overrides.length + 1)
   })
 })

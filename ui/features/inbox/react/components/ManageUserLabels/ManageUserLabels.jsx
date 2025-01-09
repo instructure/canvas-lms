@@ -59,7 +59,7 @@ export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) =>
 
   const addLabel = () => {
     const labelExists = internalLabels.find(
-      label => label.name.trim().toLowerCase() === newLabel.trim().toLowerCase()
+      label => label.name.trim().toLowerCase() === newLabel.trim().toLowerCase(),
     )
 
     if (labelExists) {

@@ -41,7 +41,7 @@ describe('AppsTableInner', () => {
           }}
           responsiveProps={undefined}
         />
-      </BrowserRouter>
+      </BrowserRouter>,
     )
 
     const kebabMenuIcon = await wrapper.findAllByText('More Registration Options')
@@ -75,7 +75,7 @@ describe('AppsTableInner', () => {
               '14',
               '15',
               '16',
-              '17'
+              '17',
             ),
             dir: 'asc',
             sort: 'name',
@@ -85,7 +85,7 @@ describe('AppsTableInner', () => {
           }}
           responsiveProps={undefined}
         />
-      </BrowserRouter>
+      </BrowserRouter>,
     )
     await waitFor(() => {
       expect(wrapper.getByText('16 - 17 of 17 displayed')).toBeInTheDocument()
@@ -109,7 +109,7 @@ describe('AppsTableInner', () => {
           }}
           responsiveProps={undefined}
         />
-      </BrowserRouter>
+      </BrowserRouter>,
     )
 
     expect(wrapper.getByTestId(`actions-menu-1`)).toBeInTheDocument()

@@ -324,7 +324,7 @@ function SubmissionGradeForm({
         const index = passFailStatusOptions.findIndex(
           passFailStatusOption =>
             passFailStatusOption.value === correctSubmission.grade ||
-            (passFailStatusOption.value === 'EX' && correctSubmission.excused)
+            (passFailStatusOption.value === 'EX' && correctSubmission.excused),
         )
 
         const passFailStatusIndexSetter = getPassFailStatusIndexSetter(subAssignmentTag)
@@ -348,7 +348,7 @@ function SubmissionGradeForm({
         gradeInputSetter(correctSubmission.grade)
       }
     },
-    [assignment, submission]
+    [assignment, submission],
   )
 
   useEffect(() => {
@@ -382,14 +382,14 @@ function SubmissionGradeForm({
         replyToTopicSubmission,
         replyToTopicGradeInput,
         submitScoreUrl,
-        REPLY_TO_TOPIC
+        REPLY_TO_TOPIC,
       )
       await submit(
         assignment,
         replyToEntrySubmission,
         replyToEntryGradeInput,
         submitScoreUrl,
-        REPLY_TO_ENTRY
+        REPLY_TO_ENTRY,
       )
     }
 
@@ -399,43 +399,43 @@ function SubmissionGradeForm({
   const handleChangePassFailStatusWrapper = (
     value: string | number | undefined,
     setterForGradeInput: (value: ((prevState: string) => string) | string) => void,
-    setterForPassFailStatusIndex: (value: ((prevState: number) => number) | number) => void
+    setterForPassFailStatusIndex: (value: ((prevState: number) => number) | number) => void,
   ) => {
     if (typeof value === 'string') {
       setterForGradeInput(value)
 
       setterForPassFailStatusIndex(
-        passFailStatusOptions.findIndex(option => option.value === value)
+        passFailStatusOptions.findIndex(option => option.value === value),
       )
     }
   }
 
   const handleChangePassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number}
+    data: {value?: string | number},
   ) => {
     handleChangePassFailStatusWrapper(data.value, setGradeInput, setPassFailStatusIndex)
   }
 
   const handleChangeReplyToTopicPassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number | undefined}
+    data: {value?: string | number | undefined},
   ) => {
     handleChangePassFailStatusWrapper(
       data.value,
       setReplyToTopicGradeInput,
-      setReplyToTopicPassFailStatusIndex
+      setReplyToTopicPassFailStatusIndex,
     )
   }
 
   const handleChangeReplyToEntryPassFailStatus = (
     event: React.SyntheticEvent,
-    data: {value?: string | number | undefined}
+    data: {value?: string | number | undefined},
   ) => {
     handleChangePassFailStatusWrapper(
       data.value,
       setReplyToEntryGradeInput,
-      setReplyToEntryPassFailStatusIndex
+      setReplyToEntryPassFailStatusIndex,
     )
   }
 

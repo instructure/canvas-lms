@@ -92,7 +92,7 @@ describe('MessageDetailContainer', () => {
             />
           </ConversationContext.Provider>
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </ApolloProvider>,
     )
 
   describe('conversation messages', () => {
@@ -115,7 +115,7 @@ describe('MessageDetailContainer', () => {
 
         expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
         expect(
-          await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body)
+          await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body),
         ).toBeInTheDocument()
       })
 
@@ -145,7 +145,7 @@ describe('MessageDetailContainer', () => {
         const replyButtons = await container.findAllByTestId('message-reply')
         fireEvent.click(replyButtons[1])
         expect(mockOnReply.mock.calls[0][0]._id).toBe(
-          mockConversation.conversationMessagesConnection.nodes[1]._id
+          mockConversation.conversationMessagesConnection.nodes[1]._id,
         )
       })
 
@@ -158,7 +158,7 @@ describe('MessageDetailContainer', () => {
         fireEvent.click(moreOptionsButtons[1])
         fireEvent.click(container.getByText('Forward'))
         expect(mockOnForward.mock.calls[0][0]._id).toBe(
-          mockConversation.conversationMessagesConnection.nodes[1]._id
+          mockConversation.conversationMessagesConnection.nodes[1]._id,
         )
       })
 
@@ -171,7 +171,7 @@ describe('MessageDetailContainer', () => {
         fireEvent.click(moreOptionsButtons[1])
         fireEvent.click(container.getByText('Reply All'))
         expect(mockOnReplyAll.mock.calls[0][0]._id).toBe(
-          mockConversation.conversationMessagesConnection.nodes[1]._id
+          mockConversation.conversationMessagesConnection.nodes[1]._id,
         )
       })
 
@@ -223,7 +223,7 @@ describe('MessageDetailContainer', () => {
         })
         expect(container).toBeTruthy()
         await waitFor(() =>
-          expect(container.getByTestId('submission-comment-header-line')).toBeTruthy()
+          expect(container.getByTestId('submission-comment-header-line')).toBeTruthy(),
         )
       })
 

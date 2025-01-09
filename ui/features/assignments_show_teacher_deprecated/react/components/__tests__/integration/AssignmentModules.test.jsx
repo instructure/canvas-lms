@@ -121,7 +121,7 @@ describe('AssignmentModules', () => {
           onChangeMode={() => {}}
           readOnly={false}
         />
-      </MockedProvider>
+      </MockedProvider>,
     )
     // The modules are loded when Select removes its spinner
     await waitForNoElement(() => getByText('Loading...'))

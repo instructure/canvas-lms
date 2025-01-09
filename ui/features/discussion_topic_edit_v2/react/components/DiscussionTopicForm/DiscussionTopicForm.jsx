@@ -148,7 +148,7 @@ function DiscussionTopicForm({
         key: 'announcement-course-unpublished-alert',
         variant: 'warning',
         text: I18n.t(
-          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Available from option and set to publish on a future date.'
+          'Notifications will not be sent retroactively for announcements created before publishing your course or before the course start date. You may consider using the Available from option and set to publish on a future date.',
         ),
       }
     } else {
@@ -159,7 +159,7 @@ function DiscussionTopicForm({
   const allSectionsOption = {id: 'all', name: 'All Sections'}
 
   const checkpointsToolTipText = I18n.t(
-    'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.'
+    'Checkpoints can be set to have different due dates and point values for the initial response and the subsequent replies.',
   )
 
   const inputWidth = '100%'
@@ -182,7 +182,7 @@ function DiscussionTopicForm({
   const isRceContentChanged = () => {
     const originalContent = new DOMParser().parseFromString(
       currentDiscussionTopic?.message || '',
-      'text/html'
+      'text/html',
     ).body.innerHTML
     const newContent = new DOMParser().parseFromString(rceContent, 'text/html').body.innerHTML
 
@@ -203,33 +203,33 @@ function DiscussionTopicForm({
   const [sectionIdsToPostTo, setSectionIdsToPostTo] = useState(sectionsDefault)
 
   const [discussionAnonymousState, setDiscussionAnonymousState] = useState(
-    currentDiscussionTopic?.anonymousState || 'off'
+    currentDiscussionTopic?.anonymousState || 'off',
   )
   // default anonymousAuthorState to true, since it is the default selection for partial anonymity
   // otherwise, it is just ignored anyway
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
-    currentDiscussionTopic?.isAnonymousAuthor || true
+    currentDiscussionTopic?.isAnonymousAuthor || true,
   )
   const [isThreaded, setIsThreaded] = useState(
     currentDiscussionTopic?.discussionType === 'threaded' ||
       (currentDiscussionTopic?.discussionType === 'side_comment' &&
         ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.has_threaded_replies) ||
-      Object.keys(currentDiscussionTopic).length === 0
+      Object.keys(currentDiscussionTopic).length === 0,
   )
   const [requireInitialPost, setRequireInitialPost] = useState(
-    currentDiscussionTopic?.requireInitialPost || false
+    currentDiscussionTopic?.requireInitialPost || false,
   )
   const [enablePodcastFeed, setEnablePodcastFeed] = useState(
-    currentDiscussionTopic?.podcastEnabled || false
+    currentDiscussionTopic?.podcastEnabled || false,
   )
   const [includeRepliesInFeed, setIncludeRepliesInFeed] = useState(
-    currentDiscussionTopic?.podcastHasStudentPosts || false
+    currentDiscussionTopic?.podcastHasStudentPosts || false,
   )
   const [isGraded, setIsGraded] = useState(!!currentDiscussionTopic?.assignment || false)
 
   const [allowLiking, setAllowLiking] = useState(currentDiscussionTopic?.allowRating || false)
   const [onlyGradersCanLike, setOnlyGradersCanLike] = useState(
-    currentDiscussionTopic?.onlyGradersCanRate || false
+    currentDiscussionTopic?.onlyGradersCanRate || false,
   )
   const [addToTodo, setAddToTodo] = useState(!!currentDiscussionTopic?.todoDate || false)
   const [todoDate, setTodoDate] = useState(currentDiscussionTopic?.todoDate || null)
@@ -237,14 +237,14 @@ function DiscussionTopicForm({
   const [addToStudentToDoTimeRef, setAddToStudentToDoTimeRef] = useState()
 
   const [isGroupDiscussion, setIsGroupDiscussion] = useState(
-    !!currentDiscussionTopic?.groupSet || false
+    !!currentDiscussionTopic?.groupSet || false,
   )
   const [groupCategoryId, setGroupCategoryId] = useState(
-    currentDiscussionTopic?.groupSet?._id || null
+    currentDiscussionTopic?.groupSet?._id || null,
   )
   const [groupCategorySelectError, setGroupCategorySelectError] = useState([])
   const [locked, setLocked] = useState(
-    isAnnouncement ? currentDiscussionTopic.locked ?? !ENV.CREATE_ANNOUNCEMENTS_UNLOCKED : false
+    isAnnouncement ? (currentDiscussionTopic.locked ?? !ENV.CREATE_ANNOUNCEMENTS_UNLOCKED) : false,
   )
   const [availableFrom, setAvailableFrom] = useState(currentDiscussionTopic?.delayedPostAt || null)
   const [availableUntil, setAvailableUntil] = useState(currentDiscussionTopic?.lockAt || null)
@@ -254,13 +254,13 @@ function DiscussionTopicForm({
   ])
 
   const [pointsPossible, setPointsPossible] = useState(
-    currentDiscussionTopic?.assignment?.pointsPossible || 0
+    currentDiscussionTopic?.assignment?.pointsPossible || 0,
   )
   const [displayGradeAs, setDisplayGradeAs] = useState(
-    currentDiscussionTopic?.assignment?.gradingType || 'points'
+    currentDiscussionTopic?.assignment?.gradingType || 'points',
   )
   const [assignmentGroup, setAssignmentGroup] = useState(
-    currentDiscussionTopic?.assignment?.assignmentGroup?._id || ''
+    currentDiscussionTopic?.assignment?.assignmentGroup?._id || '',
   )
   const [peerReviewAssignment, setPeerReviewAssignment] = useState(() => {
     if (currentDiscussionTopic?.assignment?.peerReviews?.enabled) {
@@ -272,19 +272,19 @@ function DiscussionTopicForm({
   })
 
   const [peerReviewsPerStudent, setPeerReviewsPerStudent] = useState(
-    currentDiscussionTopic?.assignment?.peerReviews?.count || 1
+    currentDiscussionTopic?.assignment?.peerReviews?.count || 1,
   )
   const [peerReviewDueDate, setPeerReviewDueDate] = useState(
-    currentDiscussionTopic?.assignment?.peerReviews?.dueAt || ''
+    currentDiscussionTopic?.assignment?.peerReviews?.dueAt || '',
   )
   const [assignedInfoList, setAssignedInfoList] = useState(
-    isEditing ? buildAssignmentOverrides(currentDiscussionTopic) : buildDefaultAssignmentOverride()
+    isEditing ? buildAssignmentOverrides(currentDiscussionTopic) : buildDefaultAssignmentOverride(),
   )
 
   const [gradedDiscussionRefMap, setGradedDiscussionRefMap] = useState(new Map())
 
   const [importantDates, setImportantDates] = useState(
-    currentDiscussionTopic?.assignment?.importantDates || false
+    currentDiscussionTopic?.assignment?.importantDates || false,
   )
 
   const [abGuid, setAbGuid] = useState(null)
@@ -292,23 +292,23 @@ function DiscussionTopicForm({
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     (currentDiscussionTopic?.assignment?.hasSubAssignments && ENV.DISCUSSION_CHECKPOINTS_ENABLED) ||
-      false
+      false,
   )
 
   const getCheckpointsPointsPossible = checkpointLabel => {
     const checkpoint = currentDiscussionTopic?.assignment?.checkpoints?.find(
-      c => c.tag === checkpointLabel
+      c => c.tag === checkpointLabel,
     )
     return checkpoint ? checkpoint.pointsPossible : 0
   }
   const [pointsPossibleReplyToTopic, setPointsPossibleReplyToTopic] = useState(
-    getCheckpointsPointsPossible(REPLY_TO_TOPIC)
+    getCheckpointsPointsPossible(REPLY_TO_TOPIC),
   )
   const [pointsPossibleReplyToEntry, setPointsPossibleReplyToEntry] = useState(
-    getCheckpointsPointsPossible(REPLY_TO_ENTRY)
+    getCheckpointsPointsPossible(REPLY_TO_ENTRY),
   )
   const [replyToEntryRequiredCount, setReplyToEntryRequiredCount] = useState(
-    currentDiscussionTopic?.replyToEntryRequiredCount || 1
+    currentDiscussionTopic?.replyToEntryRequiredCount || 1,
   )
 
   const [showGroupCategoryModal, setShowGroupCategoryModal] = useState(false)
@@ -317,21 +317,21 @@ function DiscussionTopicForm({
   const [attachmentToUpload, setAttachmentToUpload] = useState(false)
 
   const [usageRightsData, setUsageRightsData] = useState(
-    currentDiscussionTopic?.attachment?.usageRights || {}
+    currentDiscussionTopic?.attachment?.usageRights || {},
   )
   const [usageRightsErrorState, setUsageRightsErrorState] = useState(false)
 
   const [postToSis, setPostToSis] = useState(
-    !!currentDiscussionTopic?.assignment?.postToSis || false
+    !!currentDiscussionTopic?.assignment?.postToSis || false,
   )
 
   const [gradingSchemeId, setGradingSchemeId] = useState(
-    currentDiscussionTopic?.assignment?.gradingStandard?._id || undefined
+    currentDiscussionTopic?.assignment?.gradingStandard?._id || undefined,
   )
 
   const [intraGroupPeerReviews, setIntraGroupPeerReviews] = useState(
     // intra_group_peer_reviews
-    !!currentDiscussionTopic?.assignment?.peerReviews?.intraReviews || false
+    !!currentDiscussionTopic?.assignment?.peerReviews?.intraReviews || false,
   )
 
   const [lastShouldPublish, setLastShouldPublish] = useState(false)
@@ -348,7 +348,7 @@ function DiscussionTopicForm({
   }
   const hasGroupOverrides = () =>
     assignedInfoList.some(
-      info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined
+      info => info.assignedList.find(assetCode => assetCode.includes('group')) !== undefined,
     )
   const assignmentDueDateContext = {
     assignedInfoList,
@@ -378,12 +378,9 @@ function DiscussionTopicForm({
 
   useEffect(() => {
     // Expects to force the focus the errors on re-render once
-    if (
-      shouldForceFocusAfterRenderRef.current &&
-      ENV.FEATURES.selective_release_ui_api
-    ) {
+    if (shouldForceFocusAfterRenderRef.current && ENV.FEATURES.selective_release_ui_api) {
       const sectionViewRef = document.getElementById(
-        'manage-assign-to-container'
+        'manage-assign-to-container',
       )?.reactComponentInstance
       if (sectionViewRef?.focusErrors()) {
         shouldForceFocusAfterRenderRef.current = false
@@ -427,7 +424,7 @@ function DiscussionTopicForm({
         document.querySelector('#assignment_external_tools'),
         'assignment_edit',
         parseInt(ENV.context_id, 10),
-        parseInt(currentDiscussionTopic?.assignment?._id, 10)
+        parseInt(currentDiscussionTopic?.assignment?._id, 10),
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -443,7 +440,7 @@ function DiscussionTopicForm({
     }
 
     window.dispatchEvent(
-      new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}})
+      new CustomEvent('triggerMasteryPathsUpdateAssignment', {detail: {assignmentInfo}}),
     )
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
 
@@ -482,7 +479,7 @@ function DiscussionTopicForm({
     isEditing,
     isStudent,
     published,
-    isCheckpoints
+    isCheckpoints,
   )
 
   const canGroupDiscussion = !isEditing || currentDiscussionTopic?.canGroup || false
@@ -527,14 +524,14 @@ function DiscussionTopicForm({
         masteryPathsOption,
         importantDates,
         isCheckpoints,
-        currentDiscussionTopic?.assignment
+        currentDiscussionTopic?.assignment,
       ),
       checkpoints: prepareCheckpointsPayload(
         assignedInfoList,
         pointsPossibleReplyToTopic,
         pointsPossibleReplyToEntry,
         replyToEntryRequiredCount,
-        isCheckpoints
+        isCheckpoints,
       ),
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
@@ -562,8 +559,8 @@ function DiscussionTopicForm({
           assignedInfoList,
           defaultEveryoneOption,
           defaultEveryoneElseOption,
-          masteryPathsOption
-        )
+          masteryPathsOption,
+        ),
       )
     } else if (
       isGraded &&
@@ -576,7 +573,7 @@ function DiscussionTopicForm({
         assignedInfoList,
         defaultEveryoneOption,
         defaultEveryoneElseOption,
-        masteryPathsOption
+        masteryPathsOption,
       )
       Object.assign(payload, {delayedPostAt, lockAt})
     }
@@ -643,7 +640,7 @@ function DiscussionTopicForm({
       sectionIdsToPostTo,
       assignedInfoList,
       postToSis,
-      showPostToSisFlashAlert('manage-assign-to', false)
+      showPostToSisFlashAlert('manage-assign-to', false),
     )
 
   const continueSubmitForm = (shouldPublish, shouldNotifyUsers = false) => {
@@ -667,7 +664,7 @@ function DiscussionTopicForm({
       const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
       if (!isPacedDiscussion) {
         sectionViewRef = document.getElementById(
-          'manage-assign-to-container'
+          'manage-assign-to-container',
         )?.reactComponentInstance
         // Runs custom validation for all cards with the current post to sis selection without re-renders
         formIsValid =
@@ -709,7 +706,7 @@ function DiscussionTopicForm({
         assignedTo =>
           assignedTo === defaultEveryoneOption.assetCode ||
           assignedTo === defaultEveryoneElseOption.assetCode ||
-          assignedTo == `course_${ENV.context_id}`
+          assignedTo == `course_${ENV.context_id}`,
       )
 
       if (!isEveryoneOrEveryoneElseSelected) {
@@ -718,7 +715,7 @@ function DiscussionTopicForm({
           .map(assignedTo => assignedTo.split('_')[2])
 
         const missingSectionObjs = sections.filter(
-          section => !selectedSectionIds.includes(section.id)
+          section => !selectedSectionIds.includes(section.id),
         )
 
         if (missingSectionObjs.length > 0 && isGraded) {
@@ -993,7 +990,7 @@ function DiscussionTopicForm({
                 label={I18n.t('Post to')}
                 messages={postToValidationMessages}
                 assistiveText={I18n.t(
-                  'Select sections to post to. Type or use arrow keys to navigate. Multiple selections are allowed.'
+                  'Select sections to post to. Type or use arrow keys to navigate. Multiple selections are allowed.',
                 )}
                 selectedOptionIds={sectionIdsToPostTo}
                 onChange={handlePostToSelect}
@@ -1072,7 +1069,7 @@ function DiscussionTopicForm({
                 <Checkbox
                   data-testid="require-initial-post-checkbox"
                   label={I18n.t(
-                    'Participants must respond to the topic before viewing other replies'
+                    'Participants must respond to the topic before viewing other replies',
                   )}
                   value="must-respond-before-viewing-replies"
                   inline={true}
@@ -1227,7 +1224,7 @@ function DiscussionTopicForm({
                       {
                         type: 'error',
                         text: I18n.t(
-                          'You must remove any groups from the Assign Access section to change this setting.'
+                          'You must remove any groups from the Assign Access section to change this setting.',
                         ),
                       },
                     ])
@@ -1256,9 +1253,9 @@ function DiscussionTopicForm({
                             'You must remove any groups belonging to %{groupCategory} from the Assign Access section before you can change to another Group Set.',
                             {
                               groupCategory: groupCategories.find(
-                                groupCategory => groupCategory._id === groupCategoryId
+                                groupCategory => groupCategory._id === groupCategoryId,
                               )?.name,
-                            }
+                            },
                           ),
                         },
                       ])
@@ -1328,7 +1325,7 @@ function DiscussionTopicForm({
                 <View display="block" data-testid="group-category-not-editable">
                   <Alert variant="warning" margin="small none small none">
                     {I18n.t(
-                      'Students have already submitted to this discussion, so group settings cannot be changed.'
+                      'Students have already submitted to this discussion, so group settings cannot be changed.',
                     )}
                   </Alert>
                 </View>

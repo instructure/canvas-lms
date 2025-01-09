@@ -42,7 +42,7 @@ export default function createPermissionsIndex(root, data = {}) {
         <Provider store={store}>
           <ConnectedPermissionsIndex />
         </Provider>
-      </>
+      </>,
     )
   }
 

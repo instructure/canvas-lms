@@ -79,7 +79,7 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
       // @ts-expect-error
       lockCallback: locked => {
         this.props.setBlueprintLocked(
-          locked && this.isCourseLevelPace && this.lockManager.state.isChildContent
+          locked && this.isCourseLevelPace && this.lockManager.state.isChildContent,
         )
         // @ts-expect-error
         window.ENV.MASTER_COURSE_DATA.restricted_by_master_course = locked
@@ -87,7 +87,7 @@ export class BlueprintLock extends React.Component<PassedProps & StoreProps & Di
     })
 
     this.props.setBlueprintLocked(
-      this.lockManager.state.isChildContent && this.lockManager.state.isLocked
+      this.lockManager.state.isChildContent && this.lockManager.state.isLocked,
     )
     this.isLocked = this.lockManager.state.isChildContent && this.lockManager.state.isLocked
     this.isChild = this.lockManager.state.isChildContent

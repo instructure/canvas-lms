@@ -97,7 +97,7 @@ export const App = ({
     setBlueprintLocked(
       window.ENV.MASTER_COURSE_DATA?.restricted_by_master_course &&
         window.ENV.MASTER_COURSE_DATA?.is_master_course_child_content &&
-        coursePace.context_type === 'Course'
+        coursePace.context_type === 'Course',
     )
   }, [])
 

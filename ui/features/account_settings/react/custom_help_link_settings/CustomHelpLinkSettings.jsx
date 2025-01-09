@@ -91,7 +91,7 @@ export default class CustomHelpLinkSettings extends React.Component {
     this.move(
       link,
       -1,
-      link.index === 1 ? this.focusPreviousComponent : this.focus.bind(this, link.id, 'moveUp')
+      link.index === 1 ? this.focusPreviousComponent : this.focus.bind(this, link.id, 'moveUp'),
     )
   }
 
@@ -159,7 +159,7 @@ export default class CustomHelpLinkSettings extends React.Component {
 
   focusPreviousComponent = () => {
     $(
-      '#custom_help_link_settings input[name="account[settings][help_link_icon]"]:checked'
+      '#custom_help_link_settings input[name="account[settings][help_link_icon]"]:checked',
     )[0].focus()
   }
 
@@ -168,7 +168,7 @@ export default class CustomHelpLinkSettings extends React.Component {
       {
         editing: null,
       },
-      this.focus.bind(this, link.id, 'edit')
+      this.focus.bind(this, link.id, 'edit'),
     )
   }
 
@@ -177,88 +177,97 @@ export default class CustomHelpLinkSettings extends React.Component {
       {
         editing: link.id,
       },
-      this.focus.bind(this, link.id)
+      this.focus.bind(this, link.id),
     )
   }
 
   add = link => {
     const id = link.id || `link${this.nextLinkIndex(this.state.links)}`
-    this.setState(state => {
-      const links = [...state.links]
-      const hasFeatured = links[0]?.is_featured
-      let insertIndex = 0
-      if (hasFeatured) {
-        if (link.is_featured) {
-          links[0].is_featured = false
-        } else {
-          insertIndex = 1
+    this.setState(
+      state => {
+        const links = [...state.links]
+        const hasFeatured = links[0]?.is_featured
+        let insertIndex = 0
+        if (hasFeatured) {
+          if (link.is_featured) {
+            links[0].is_featured = false
+          } else {
+            insertIndex = 1
+          }
         }
-      }
-      links.splice(insertIndex, 0, {
-        ...link,
-        state: link.type === 'default' ? link.state : 'new',
-        id,
-        type: link.type || 'custom',
-      })
+        links.splice(insertIndex, 0, {
+          ...link,
+          state: link.type === 'default' ? link.state : 'new',
+          id,
+          type: link.type || 'custom',
+        })
 
-      return {
-        links,
-        editing: link.type === 'default' ? state.editing : id,
-      }
-    }, this.focus.bind(this, id))
+        return {
+          links,
+          editing: link.type === 'default' ? state.editing : id,
+        }
+      },
+      this.focus.bind(this, id),
+    )
   }
 
   update = savedLink => {
-    this.setState(state => {
-      const links = state.links.map(link => ({...link}))
+    this.setState(
+      state => {
+        const links = state.links.map(link => ({...link}))
 
-      if (savedLink.is_featured) {
-        links.forEach((link, ix) => {
-          if (ix !== savedLink.index) {
-            link.is_featured = false
-            link.feature_headline = null
-          }
-        })
-      }
+        if (savedLink.is_featured) {
+          links.forEach((link, ix) => {
+            if (ix !== savedLink.index) {
+              link.is_featured = false
+              link.feature_headline = null
+            }
+          })
+        }
 
-      if (savedLink.is_new) {
-        links.forEach((link, ix) => {
-          if (ix !== savedLink.index) {
-            link.is_new = false
-          }
-        })
-      }
+        if (savedLink.is_new) {
+          links.forEach((link, ix) => {
+            if (ix !== savedLink.index) {
+              link.is_new = false
+            }
+          })
+        }
 
-      links[savedLink.index] = {
-        ...savedLink,
-        state: savedLink.text ? 'active' : savedLink.state,
-      }
+        links[savedLink.index] = {
+          ...savedLink,
+          state: savedLink.text ? 'active' : savedLink.state,
+        }
 
-      if (savedLink.is_featured && savedLink.index !== 0) {
-        const removed = links.splice(savedLink.index, 1)
-        links.unshift(...removed)
-        $.screenReaderFlashMessage(I18n.t('The featured link was moved to the top of list.'))
-      }
+        if (savedLink.is_featured && savedLink.index !== 0) {
+          const removed = links.splice(savedLink.index, 1)
+          links.unshift(...removed)
+          $.screenReaderFlashMessage(I18n.t('The featured link was moved to the top of list.'))
+        }
 
-      return {
-        links,
-        editing: null,
-      }
-    }, this.focus.bind(this, savedLink.id, 'edit'))
+        return {
+          links,
+          editing: null,
+        }
+      },
+      this.focus.bind(this, savedLink.id, 'edit'),
+    )
   }
 
   remove = link => {
-    this.setState(state => {
-      const links = [...state.links]
-      const editing = state.editing
+    this.setState(
+      state => {
+        const links = [...state.links]
+        const editing = state.editing
 
-      links.splice(link.index, 1)
+        links.splice(link.index, 1)
 
-      return {
-        links,
-        editing: editing === link.id ? null : editing,
-      }
-    }, this.focus.bind(this, this.nextFocusable(link.index), 'remove'))
+        return {
+          links,
+          editing: editing === link.id ? null : editing,
+        }
+      },
+      this.focus.bind(this, this.nextFocusable(link.index), 'remove'),
+    )
   }
 
   move = (link, change, callback) => {
@@ -281,8 +290,8 @@ export default class CustomHelpLinkSettings extends React.Component {
     ) {
       $.flashError(
         I18n.t(
-          'Please enter a valid URL. Protocol is required (e.g. http://, https://, ftp://, tel:, mailto:).'
-        )
+          'Please enter a valid URL. Protocol is required (e.g. http://, https://, ftp://, tel:, mailto:).',
+        ),
       )
       return false
     } else if (!link.available_to || link.available_to.length < 1) {

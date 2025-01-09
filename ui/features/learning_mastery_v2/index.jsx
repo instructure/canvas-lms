@@ -22,9 +22,8 @@ import ready from '@instructure/ready'
 import LearningMastery from './react'
 
 ready(() => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <LearningMastery courseId={ENV.GRADEBOOK_OPTIONS.context_id} />,
-    document.getElementById('learning_mastery_gradebook')
+    document.getElementById('learning_mastery_gradebook'),
   )
 })

@@ -29,5 +29,5 @@ export const template = generateActionTemplates(
       title: I18n.t('Block Editor Templates - edit'),
       description: I18n.t('Allows user to create and edit templates from within the Block Editor.'),
     },
-  ]
+  ],
 )

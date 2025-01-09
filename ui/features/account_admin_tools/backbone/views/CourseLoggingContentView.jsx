@@ -63,7 +63,7 @@ Object.assign(CourseLoggingContentView.prototype, {
         onSubmit={data => {
           this.updateCollection(data)
         }}
-      />
+      />,
     )
   },
 
@@ -74,14 +74,12 @@ Object.assign(CourseLoggingContentView.prototype, {
 
     const model = this.collection.get(id)
     if (model === null || typeof model === 'undefined') {
-      // eslint-disable-next-line no-console
       console.warn(`Could not find model for event ${id}.`)
       return
     }
 
     const type = model.get('event_type')
     if (type === null || typeof type === 'undefined') {
-      // eslint-disable-next-line no-console
       console.warn(`Could not find type for event ${id}.`)
       return
     }

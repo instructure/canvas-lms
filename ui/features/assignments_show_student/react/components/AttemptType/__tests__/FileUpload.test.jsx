@@ -98,7 +98,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const emptyRender = getByTestId('upload-box')
 
@@ -111,7 +111,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileDrop = getByTestId('input-file-drop')
 
@@ -126,7 +126,7 @@ describe.skip('FileUpload', () => {
         <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
           <FileUpload {...props} />
         </StudentViewContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileDrop = getByTestId('input-file-drop')
 
@@ -139,7 +139,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const inputFileDrop = getByTestId('input-file-drop')
 
@@ -153,7 +153,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const inputFileDrop = getByTestId('input-file-drop')
 
@@ -170,7 +170,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId, getAllByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(getAllByText('foobarbaz')[0])
@@ -185,7 +185,7 @@ describe.skip('FileUpload', () => {
     const {container, getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(container.querySelector('img[alt="foobarbaz preview"]'))
@@ -201,7 +201,7 @@ describe.skip('FileUpload', () => {
     const {container, getByTestId} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const uploadRender = getByTestId('upload-pane')
 
@@ -222,7 +222,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
@@ -237,7 +237,7 @@ describe.skip('FileUpload', () => {
             expect.objectContaining({preview: 'http://example.com/whatever'}),
             expect.objectContaining({preview: 'http://example.com/whatever'}),
           ],
-        })
+        }),
       )
     })
   })
@@ -256,7 +256,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
@@ -280,7 +280,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     fireEvent(
@@ -296,7 +296,7 @@ describe.skip('FileUpload', () => {
             },
           ],
         },
-      })
+      }),
     )
 
     await waitFor(() => {
@@ -309,7 +309,7 @@ describe.skip('FileUpload', () => {
               url: 'http://lemon.com',
             },
           ],
-        })
+        }),
       )
     })
   })
@@ -327,7 +327,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     fireEvent(
@@ -343,7 +343,7 @@ describe.skip('FileUpload', () => {
             },
           ],
         },
-      })
+      }),
     )
 
     await waitFor(() => {
@@ -356,7 +356,7 @@ describe.skip('FileUpload', () => {
               url: 'http://lemon.com',
             },
           ],
-        })
+        }),
       )
     })
   })
@@ -370,7 +370,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnFailure}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     fireEvent(
@@ -380,7 +380,7 @@ describe.skip('FileUpload', () => {
           subject: 'A2ExternalContentReady',
           content_items: [],
         },
-      })
+      }),
     )
 
     expect(setOnFailure).toHaveBeenCalledWith('Error adding files to submission draft')
@@ -395,7 +395,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnFailure}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const errormsg = 'oooh eeee this is an error message'
@@ -406,7 +406,7 @@ describe.skip('FileUpload', () => {
           subject: 'LtiDeepLinkingResponse',
           errormsg,
         },
-      })
+      }),
     )
 
     expect(setOnFailure).toHaveBeenCalledWith(errormsg)
@@ -421,7 +421,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnFailure}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const errormsg = 'oooh eeee this is an error message'
@@ -439,7 +439,7 @@ describe.skip('FileUpload', () => {
           ],
           errormsg,
         },
-      })
+      }),
     )
 
     expect(props.onUploadRequested).not.toHaveBeenCalled()
@@ -455,7 +455,7 @@ describe.skip('FileUpload', () => {
     const {container, getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const button = container.querySelector('button[id="1"]')
 
@@ -478,7 +478,7 @@ describe.skip('FileUpload', () => {
     const {container, getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     attachmentOverrides.forEach(attachment => {
@@ -497,7 +497,7 @@ describe.skip('FileUpload', () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getByText(/^c+\.{3}c+$/)).toBeInTheDocument()
@@ -514,7 +514,7 @@ describe.skip('FileUpload', () => {
     const {getAllByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(getAllByText(filename)[0]).toBeInTheDocument()
@@ -526,7 +526,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId, findByRole} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const emptyRender = getByTestId('upload-box')
 
@@ -541,7 +541,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const emptyRender = getByTestId('upload-box')
 
@@ -554,7 +554,7 @@ describe.skip('FileUpload', () => {
     const {getByTestId, queryByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const emptyRender = getByTestId('upload-box')
 
@@ -569,7 +569,7 @@ describe.skip('FileUpload', () => {
     const {container, getByText} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
@@ -590,7 +590,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
     const fileInput = container.querySelector('input[id="inputFileDrop"]')
     const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
@@ -615,7 +615,7 @@ describe.skip('FileUpload', () => {
         <AlertManagerContext.Provider value={{setOnSuccess}}>
           <FileUpload {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
     const uploadRender = getByTestId('upload-pane')
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconComplete"]'))
@@ -632,7 +632,7 @@ describe.skip('FileUpload', () => {
     const {getAllByRole} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     const progressBars = getAllByRole('progressbar')
@@ -643,7 +643,7 @@ describe.skip('FileUpload', () => {
     expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
     expect(progressBars[0]).toHaveAttribute(
       'aria-label',
-      'Upload progress for file1.pdf 10 percent'
+      'Upload progress for file1.pdf 10 percent',
     )
 
     expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
@@ -651,7 +651,7 @@ describe.skip('FileUpload', () => {
     expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
     expect(progressBars[1]).toHaveAttribute(
       'aria-label',
-      'Upload progress for file2.pdf 20 percent'
+      'Upload progress for file2.pdf 20 percent',
     )
   })
 
@@ -663,7 +663,7 @@ describe.skip('FileUpload', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks}>
           <FileUpload {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
       expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
@@ -678,7 +678,7 @@ describe.skip('FileUpload', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks}>
           <FileUpload {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
       expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
@@ -693,7 +693,7 @@ describe.skip('FileUpload', () => {
       const {findByRole, queryByRole} = render(
         <MockedProvider mocks={mocks}>
           <FileUpload {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
       expect(queryByRole('button', {name: /Webcam/})).not.toBeInTheDocument()

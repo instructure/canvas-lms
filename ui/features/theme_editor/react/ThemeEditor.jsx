@@ -96,7 +96,7 @@ export default class ThemeEditor extends React.Component {
         ...acc,
         ...{[next.variable_name]: next.default},
       }),
-      {}
+      {},
     )
 
     this.originalThemeProperties = {...theme, ...brandConfig.variables}
@@ -126,7 +126,7 @@ export default class ThemeEditor extends React.Component {
 
   onSubAccountProgress = data => {
     const newSubAccountProgs = map(this.state.activeSubAccountProgresses, progress =>
-      progress.tag == data.tag ? data : progress
+      progress.tag == data.tag ? data : progress,
     )
 
     this.filterAndSetActive(newSubAccountProgs)
@@ -228,7 +228,7 @@ export default class ThemeEditor extends React.Component {
       (change, key) =>
         // null means revert an unsaved change (should revert to saved brand config or fallback to default and not flag as a change)
         // '' means clear a brand config value (should set to schema default and flag as a change)
-        change.val === '' || (change.val !== this.getDefault(key) && change.val !== null)
+        change.val === '' || (change.val !== this.getDefault(key) && change.val !== null),
     )
 
   displayedMatchesSaved = () =>
@@ -254,7 +254,7 @@ export default class ThemeEditor extends React.Component {
   handleCancelClicked = () => {
     if (this.somethingHasChanged() || !this.displayedMatchesSaved()) {
       const msg = I18n.t(
-        'You are about to lose any unsaved changes.\n\nWould you still like to proceed?'
+        'You are about to lose any unsaved changes.\n\nWould you still like to proceed?',
       )
       if (!window.confirm(msg)) return
     }
@@ -266,7 +266,7 @@ export default class ThemeEditor extends React.Component {
     submitHtmlForm(
       `/accounts/${this.props.accountID}/brand_configs/save_to_user_session`,
       'POST',
-      md5
+      md5,
     )
   }
 
@@ -341,7 +341,7 @@ export default class ThemeEditor extends React.Component {
 
   handleApplyClicked = () => {
     const msg = I18n.t(
-      'This will apply this theme to your entire account. Would you like to proceed?'
+      'This will apply this theme to your entire account. Would you like to proceed?',
     )
     if (window.confirm(msg)) {
       this.kickOffSubAcountCompilation()
@@ -369,7 +369,7 @@ export default class ThemeEditor extends React.Component {
           this.openSubAccountProgressModal()
           this.filterAndSetActive(resp.subAccountProgresses)
           return resp.subAccountProgresses.map(prog =>
-            new Progress(prog).poll().progress(this.onSubAccountProgress)
+            new Progress(prog).poll().progress(this.onSubAccountProgress),
           )
         }
       })
@@ -477,7 +477,7 @@ export default class ThemeEditor extends React.Component {
     let tooltipForWhyApplyIsDisabled = null
     if (this.somethingHasChanged()) {
       tooltipForWhyApplyIsDisabled = I18n.t(
-        'You need to "Preview Changes" before you can apply this to your account'
+        'You need to "Preview Changes" before you can apply this to your account',
       )
     } else if (!this.props.isDefaultConfig && !this.displayedMatchesSaved()) {
       tooltipForWhyApplyIsDisabled = I18n.t('You need to "Save" before applying to this account')
@@ -503,7 +503,7 @@ export default class ThemeEditor extends React.Component {
                   'To preview Theme Editor branding, you will need to *turn off High Contrast UI*.',
                   {
                     wrappers: ['<a href="/profile/settings">$1</a>'],
-                  }
+                  },
                 ),
               }}
             />

@@ -67,9 +67,9 @@ $(document).ready(() => {
 
   $('.cant_delete_term_link').click(event => {
     event.preventDefault()
-     
+
     window.alert(
-      I18n.t('messages.classes_in_term', "You can't delete a term that still has classes in it.")
+      I18n.t('messages.classes_in_term', "You can't delete a term that still has classes in it."),
     )
   })
 
@@ -139,11 +139,11 @@ $(document).ready(() => {
           dateString(override.end_at, dateOpts) || I18n.t('date.term_end', 'term end')
         term[`enrollment_term[overrides][${type_string}][start_at]`] = dateString(
           override.start_at,
-          dateOpts
+          dateOpts,
         )
         term[`enrollment_term[overrides][${type_string}][end_at]`] = dateString(
           override.end_at,
-          dateOpts
+          dateOpts,
         )
       }
       term.start_at = dateString(term.start_at, dateOpts) || I18n.t('date.unspecified', 'whenever')

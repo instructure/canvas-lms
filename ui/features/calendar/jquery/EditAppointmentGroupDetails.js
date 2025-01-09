@@ -81,10 +81,10 @@ export default class EditAppointmentGroupDetails {
           min="1"
           style="width: 40px"
           aria-label="${htmlEscape(
-            I18n.t('Maximum number of appointments a participant can attend')
+            I18n.t('Maximum number of appointments a participant can attend'),
           )}"
         />`,
-      })
+      }),
     )
 
     this.contextsHash = {}
@@ -93,14 +93,14 @@ export default class EditAppointmentGroupDetails {
     this.form = $(selector).find('form')
     // disallow courses in foreign shards
     const editableContexts = this.contexts.filter(
-      c => !c.concluded && (c.id || '').toString().length < 14
+      c => !c.concluded && (c.id || '').toString().length < 14,
     )
     this.contextSelector = new ContextSelector(
       '.ag-menu-container',
       this.apptGroup,
       editableContexts,
       this.contextsChanged,
-      this.toggleContextsMenu
+      this.toggleContextsMenu,
     )
 
     if (this.editing()) {
@@ -136,7 +136,7 @@ export default class EditAppointmentGroupDetails {
       this.form.find('.time-block-list-body'),
       this.form.find('.splitter'),
       timeBlocks,
-      {date: this.event && this.event.date}
+      {date: this.event && this.event.date},
     )
 
     this.form.find('[name="slot_duration"]').change(e => {
@@ -214,7 +214,7 @@ export default class EditAppointmentGroupDetails {
     const slotLimit = parseInt(input.val(), 10)
     return this.helpIconShowIf(
       checkbox,
-      some(this.apptGroup.appointments, a => a.child_events_count > slotLimit)
+      some(this.apptGroup.appointments, a => a.child_events_count > slotLimit),
     )
   }
 
@@ -231,7 +231,7 @@ export default class EditAppointmentGroupDetails {
       })
     return this.helpIconShowIf(
       checkbox,
-      some(apptCounts, (count, _userId) => count > apptLimit)
+      some(apptCounts, (count, _userId) => count > apptLimit),
     )
   }
 
@@ -290,7 +290,7 @@ export default class EditAppointmentGroupDetails {
     if (data.max_appointments_per_participant_option === '1') {
       if (data.max_appointments_per_participant < 1) {
         $('[name="max_appointments_per_participant"]').errorBox(
-          I18n.t('bad_max_appts', 'You must allow at least one appointment per participant')
+          I18n.t('bad_max_appts', 'You must allow at least one appointment per participant'),
         )
         return false
       } else {
@@ -315,7 +315,7 @@ export default class EditAppointmentGroupDetails {
     if (data.per_slot_option === '1') {
       if (data.participants_per_appointment < 1) {
         $('[name="participants_per_appointment"]').errorBox(
-          I18n.t('bad_per_slot', 'You must allow at least one appointment per time slot')
+          I18n.t('bad_per_slot', 'You must allow at least one appointment per time slot'),
         )
         return false
       } else {
@@ -344,7 +344,7 @@ export default class EditAppointmentGroupDetails {
     const contextCodes = this.contextSelector.selectedContexts()
     if (contextCodes.length === 0) {
       $('.ag_contexts_selector').errorBox(
-        I18n.t('context_required', 'You need to select a calendar')
+        I18n.t('context_required', 'You need to select a calendar'),
       )
       return
     } else {

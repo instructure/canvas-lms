@@ -47,7 +47,7 @@ class Layout extends Component {
     graders: arrayOf(
       shape({
         graderId: string.isRequired,
-      })
+      }),
     ).isRequired,
     loadStudents: func.isRequired,
     provisionalGrades: shape({}).isRequired,
@@ -56,7 +56,7 @@ class Layout extends Component {
     students: arrayOf(
       shape({
         id: string.isRequired,
-      })
+      }),
     ).isRequired,
   }
 

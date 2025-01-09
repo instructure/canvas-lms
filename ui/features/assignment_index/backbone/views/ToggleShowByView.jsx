@@ -149,7 +149,6 @@ export default class ToggleShowByView extends Backbone.View {
   }
 
   renderToggle() {
-     
     ReactDOM.render(
       ENV.FEATURES?.instui_nav ? (
         <Menu trigger={this.showByMenuTrigger()} onToggle={() => this.toggleMenu()}>
@@ -183,7 +182,7 @@ export default class ToggleShowByView extends Backbone.View {
           <RadioInput id="show_by_type" label={I18n.t('Show by Type')} value="type" context="off" />
         </RadioInputGroup>
       ),
-      this.el
+      this.el,
     )
   }
 

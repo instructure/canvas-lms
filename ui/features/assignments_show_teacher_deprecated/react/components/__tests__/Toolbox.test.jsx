@@ -32,7 +32,7 @@ function renderToolbox(assignment) {
         onValidate={() => true}
         invalidMessage={() => undefined}
       />
-    </MockedProvider>
+    </MockedProvider>,
   )
 }
 

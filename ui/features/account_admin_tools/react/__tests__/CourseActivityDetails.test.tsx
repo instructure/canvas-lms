@@ -78,7 +78,7 @@ describe('CourseActivityDetails', () => {
       expect(copiedToLabel).toBeInTheDocument()
       expect(copiedToValue).toBeInTheDocument()
       expect(copiedToValue).toHaveAttribute('href', `/courses/${course.id}`)
-    }
+    },
   )
 
   describe('when the source is SIS', () => {

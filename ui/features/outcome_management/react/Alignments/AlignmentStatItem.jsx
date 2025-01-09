@@ -42,7 +42,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
       },
       {
         count: count || 0,
-      }
+      },
     )
     statType = I18n.t('Coverage')
     statDescription = I18n.t('Avg. Alignments per Outcome')
@@ -54,7 +54,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
       },
       {
         count: count || 0,
-      }
+      },
     )
     statType = I18n.t('With Alignments')
     statDescription = I18n.t('Avg. Alignments per Artifact')
@@ -62,7 +62,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
 
   const renderTooltip = () => {
     const tooltipText = I18n.t(
-      'Assessable artifacts include assignments, quizzes, and graded discussions'
+      'Assessable artifacts include assignments, quizzes, and graded discussions',
     )
     return (
       <Tooltip

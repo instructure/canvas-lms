@@ -87,13 +87,9 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
 
   const handleTabChange = (_, {index}) => {
     if (hasUnsavedChangesRef.current) {
-       
-       
       if (
         confirm(I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'))
       ) {
-         
-         
         setHasUnsavedChanges(false)
         setSelectedIndex(index)
       }
@@ -137,7 +133,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             contextUrlRoot: ENV.CONTEXT_URL_ROOT,
             onSuccessfulCreateOutcome,
           },
-          ENV.current_user.id
+          ENV.current_user.id,
         )
       }
     })()

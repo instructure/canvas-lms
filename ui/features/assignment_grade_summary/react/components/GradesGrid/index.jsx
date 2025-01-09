@@ -57,8 +57,8 @@ function studentsToPages(props) {
     const pageStudents = students.slice(pageStart, pageStart + ROWS_PER_PAGE)
     pages.push(
       pageStudents.map((student, studentIndex) =>
-        studentToRow(student, pageStart, studentIndex, rowOptions)
-      )
+        studentToRow(student, pageStart, studentIndex, rowOptions),
+      ),
     )
   }
 
@@ -80,7 +80,7 @@ export default class GradesGrid extends Component {
       shape({
         graderName: string,
         graderId: string.isRequired,
-      })
+      }),
     ).isRequired,
     grades: shape({}).isRequired,
     onGradeSelect: func,
@@ -89,7 +89,7 @@ export default class GradesGrid extends Component {
       shape({
         displayName: string,
         id: string.isRequired,
-      }).isRequired
+      }).isRequired,
     ).isRequired,
   }
 

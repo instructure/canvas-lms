@@ -58,10 +58,10 @@ const setup = (props = defaultProps) => {
           props.setOpenRubricDetailIds,
           props.openRubricDetailIds,
           props.setActiveWhatIfScores,
-          props.activeWhatIfScores
+          props.activeWhatIfScores,
         )}
       </Table.Body>
-    </Table>
+    </Table>,
   )
 }
 

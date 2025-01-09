@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'Allows user to manage the Visibility options in Course Settings or when creating a new course.'
+        'Allows user to manage the Visibility options in Course Settings or when creating a new course.',
       ),
     },
   ],
@@ -35,9 +35,9 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'Allows user to manage the Visibility options in Course Settings or when creating a new course.'
+        'Allows user to manage the Visibility options in Course Settings or when creating a new course.',
       ),
     },
   ],
-  []
+  [],
 )

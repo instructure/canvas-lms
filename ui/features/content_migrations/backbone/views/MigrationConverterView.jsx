@@ -64,7 +64,7 @@ MigrationConverterView.prototype.events = lodashExtend(
   {
     'change #chooseMigrationConverter': 'selectConverter',
     'click .cancelBtn': 'resetForm',
-  }
+  },
 )
 
 MigrationConverterView.prototype.toJSON = function (json) {
@@ -86,7 +86,7 @@ MigrationConverterView.prototype.renderConverter = function (converter) {
           _this.$converter.html(converter.render().$el)
           return _this.trigger('converterRendered')
         }
-      })(this)
+      })(this),
     )
   } else {
     this.resetForm()
@@ -127,7 +127,7 @@ MigrationConverterView.prototype.submit = function (_event) {
         return function () {
           return _this.exitUploadingState()
         }
-      })(this)
+      })(this),
     )
     return dfd.done(
       (function (_this) {
@@ -136,7 +136,7 @@ MigrationConverterView.prototype.submit = function (_event) {
           _this.model.resetModel()
           return _this.resetForm()
         }
-      })(this)
+      })(this),
     )
   } else {
     return this.exitUploadingState()
@@ -164,7 +164,7 @@ MigrationConverterView.prototype.enterUploadingState = function () {
   $(window).on('beforeunload', function () {
     return I18n.t(
       'upload_warning',
-      'Navigating away from this page will cancel the upload process.'
+      'Navigating away from this page will cancel the upload process.',
     )
   })
   if (this.model.get('migration_type') === 'course_copy_importer') {
@@ -192,7 +192,7 @@ MigrationConverterView.prototype.afterRender = function () {
   // eslint-disable-next-line react/no-children-prop
   const alert = React.createElement(Alert, {
     children: I18n.t(
-      'Importing the same course content more than once will overwrite any existing content in the course.'
+      'Importing the same course content more than once will overwrite any existing content in the course.',
     ),
     variant: 'warning',
     hasShadow: false,

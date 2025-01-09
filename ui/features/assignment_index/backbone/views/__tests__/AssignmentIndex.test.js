@@ -125,15 +125,15 @@ describe('AssignmentIndex', () => {
     const view = createAssignmentIndex()
     $('#search_term').val('foo')
     view.filterResults()
-    expect(view.$el.find('.assignment').not('.hidden').length).toBe(1)
+    expect(view.$el.find('.assignment').not('.hidden')).toHaveLength(1)
 
     $('#search_term').val('BooBerry')
     view.filterResults()
-    expect(view.$el.find('.assignment').not('.hidden').length).toBe(0)
+    expect(view.$el.find('.assignment').not('.hidden')).toHaveLength(0)
 
     $('#search_term').val('name')
     view.filterResults()
-    expect(view.$el.find('.assignment').not('.hidden').length).toBe(2)
+    expect(view.$el.find('.assignment').not('.hidden')).toHaveLength(2)
   })
 
   it('should have search disabled on render', () => {
@@ -203,20 +203,20 @@ describe('AssignmentIndex', () => {
     // Check multiple modules
     const $firstRow = view.$('#assignment_1')
     const $firstModules = $firstRow.find('.ig-details__item--wrap-text.modules')
-    expect($firstModules.length).toBe(1)
+    expect($firstModules).toHaveLength(1)
     expect($firstModules.find('a').attr('title')).toBe('Module One,Module Two')
 
     // Check single module
     const $secondRow = view.$('#assignment_2')
     const $secondModules = $secondRow.find('.ig-details__item--wrap-text.modules')
-    expect($secondModules.length).toBe(1)
+    expect($secondModules).toHaveLength(1)
     expect($secondModules.text().trim().replace(/\s+/g, ' ')).toBe(
-      'Single Module Module Single Module'
+      'Single Module Module Single Module',
     )
 
     // Check no modules
     const $thirdRow = view.$('#assignment_3')
-    expect($thirdRow.find('.ig-details__item--wrap-text.modules').length).toBe(0)
+    expect($thirdRow.find('.ig-details__item--wrap-text.modules')).toHaveLength(0)
 
     fakeENV.teardown()
   })
@@ -225,13 +225,13 @@ describe('AssignmentIndex', () => {
     ENV.QUIZ_LTI_ENABLED = true
     const view = createAssignmentIndex({withAssignmentSettings: true})
     const $button = view.$('#new_quiz_lti')
-    expect($button.length).toBe(1)
+    expect($button).toHaveLength(1)
     expect($button.attr('href')).toMatch(/\?quiz_lti$/)
   })
 
   it("should not show 'Add Quiz/Test' button if quiz lti is not enabled", () => {
     ENV.QUIZ_LTI_ENABLED = false
     const view = createAssignmentIndex({withAssignmentSettings: true})
-    expect(view.$('#new_quiz_lti').length).toBe(0)
+    expect(view.$('#new_quiz_lti')).toHaveLength(0)
   })
 })

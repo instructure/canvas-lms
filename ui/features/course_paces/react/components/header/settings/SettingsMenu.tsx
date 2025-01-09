@@ -70,7 +70,7 @@ export const SettingsMenu = (props: ComponentProps) => {
         props.isSyncing,
         props.showBlackoutDatesModal,
         props.toggleShowSettingsPopover,
-        props.coursePace.context_type
+        props.coursePace.context_type,
       )}
     </MainMenu>
   )

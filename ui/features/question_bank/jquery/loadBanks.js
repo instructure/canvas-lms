@@ -49,6 +49,6 @@ export default function loadBanks() {
     },
     _data => {
       $dialog.find('li.message').text(I18n.t('error_loading_banks', 'Error loading banks'))
-    }
+    },
   )
 }

@@ -71,7 +71,7 @@ describe('IndexHeader', () => {
 
   it('lets me add an announcement when I have the permission', () => {
     render(
-      <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />
+      <IndexHeader {...defaultProps()} permissions={{...defaultPermissions(), create: true}} />,
     )
     expect(screen.getByText('Add Announcement')).toBeInTheDocument()
   })
@@ -82,7 +82,7 @@ describe('IndexHeader', () => {
         {...defaultProps()}
         isToggleLocking={true}
         permissions={{...defaultPermissions(), manage_course_content_edit: true}}
-      />
+      />,
     )
     expect(screen.getByText('Lock Selected Announcements')).toBeInTheDocument()
   })
@@ -92,7 +92,7 @@ describe('IndexHeader', () => {
       <IndexHeader
         {...defaultProps()}
         permissions={{...defaultPermissions(), manage_course_content_edit: true}}
-      />
+      />,
     )
     expect(screen.getByText('Unlock Selected Announcements')).toBeInTheDocument()
   })
@@ -102,7 +102,7 @@ describe('IndexHeader', () => {
       <IndexHeader
         {...defaultProps()}
         permissions={{...defaultPermissions(), manage_course_content_delete: true}}
-      />
+      />,
     )
     expect(screen.getByText('Delete Selected Announcements')).toBeInTheDocument()
   })
@@ -137,7 +137,7 @@ describe('IndexHeader', () => {
 
       const filterMenu = screen.getAllByRole('menu')[1]
       const allKeys = filterMenu.querySelectorAll('li')
-      expect(allKeys.length).toBe(2)
+      expect(allKeys).toHaveLength(2)
 
       await user.click(allKeys[1])
       expect(screen.getByText('Unread Announcements')).toBeInTheDocument()

@@ -133,7 +133,7 @@ const SkipSelectedDaysMenu = (props: SkipSelectedDaysMenuProps & StoreProps) => 
             props.isSyncing,
             props.showBlackoutDatesModal,
             props.toggleShowSettingsPopover,
-            props.coursePace.context_type
+            props.coursePace.context_type,
           )}
         </MainMenu>
       )}

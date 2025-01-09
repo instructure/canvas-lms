@@ -64,7 +64,7 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
         one: 'One permission found',
         other: '%{count} permissions found',
       },
-      {count: numDisplayedPermissions}
+      {count: numDisplayedPermissions},
     )
     $.screenReaderFlashMessageExclusive(message)
   }
@@ -85,7 +85,7 @@ actions.createNewRole = function (label, baseRole, context) {
         dispatch(actions.displayRoleTray({role: createdRole}))
         const newSelectedRoles = [...selectedRoles, createdRole]
         dispatch(
-          actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: roleContext})
+          actions.updateRoleFilters({selectedRoles: newSelectedRoles, contextType: roleContext}),
         )
         dispatch(actions.filterNewRole(createdRole))
       })
@@ -193,7 +193,7 @@ actions.deleteRole = function (role, successCallback, failCallback) {
         failCallback()
         setTimeout(
           () => showFlashError(I18n.t('Failed to delete role %{label}', {label: role.label}))(),
-          500
+          500,
         )
       })
   }

@@ -38,7 +38,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Gradebook'),
       description: I18n.t(
-        'Allows user to export the Gradebook to a comma separated values (CSV) file.'
+        'Allows user to export the Gradebook to a comma separated values (CSV) file.',
       ),
     },
     {
@@ -59,7 +59,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'Allows user to view student results, view quiz statistics, and access a quiz in SpeedGrader.'
+        'Allows user to view student results, view quiz statistics, and access a quiz in SpeedGrader.',
       ),
     },
     {
@@ -75,7 +75,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Grade Change Logs)'),
       description: I18n.t(
-        'To search grade change logs, Grades - view change logs must also be enabled.'
+        'To search grade change logs, Grades - view change logs must also be enabled.',
       ),
     },
     {
@@ -88,7 +88,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.'
+        'If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.',
       ),
     },
     {
@@ -98,13 +98,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'To view module progression, Grades - view all grades must also be enabled.'
+        'To view module progression, Grades - view all grades must also be enabled.',
       ),
     },
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To access the Student Interactions report, Reports - manage must also be enabled.'
+        'To access the Student Interactions report, Reports - manage must also be enabled.',
       ),
     },
     {
@@ -131,7 +131,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to export the Gradebook to a comma separated values (CSV) file.'
+        'Allows user to export the Gradebook to a comma separated values (CSV) file.',
       ),
     },
     {
@@ -152,7 +152,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'Allows user to view student results, view quiz statistics, and access a quiz in SpeedGrader.'
+        'Allows user to view student results, view quiz statistics, and access a quiz in SpeedGrader.',
       ),
     },
     {
@@ -172,7 +172,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Gradebook'),
       description: I18n.t(
-        'If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.'
+        'If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation.',
       ),
     },
     {
@@ -182,18 +182,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'To view module progression, Grades - view all grades must also be enabled.'
+        'To view module progression, Grades - view all grades must also be enabled.',
       ),
     },
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To access the Student Interactions report, Reports - manage must also be enabled.'
+        'To access the Student Interactions report, Reports - manage must also be enabled.',
       ),
     },
     {
       title: I18n.t('Student Context Card'),
       description: I18n.t('Student Context Cards must be enabled for an account by an admin.'),
     },
-  ]
+  ],
 )

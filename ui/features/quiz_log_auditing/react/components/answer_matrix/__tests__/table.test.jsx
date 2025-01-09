@@ -38,7 +38,7 @@ describe('canvas_quizzes/events/views/answer_matrix/table', () => {
         submission={{
           startedAt: '2014-11-16T13:37:19Z',
         }}
-      />
+      />,
     )
   })
 
@@ -57,7 +57,7 @@ describe('canvas_quizzes/events/views/answer_matrix/table', () => {
         submission={{
           startedAt: '2014-11-16T13:37:19Z',
         }}
-      />
+      />,
     )
 
     assertChange({

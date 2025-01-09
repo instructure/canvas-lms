@@ -91,7 +91,7 @@ export const assignmentRow = (
   setOpenRubricDetailIds,
   openRubricDetailIds,
   setActiveWhatIfScores,
-  activeWhatIfScores
+  activeWhatIfScores,
 ) => {
   const handleAssignmentDetailOpen = () => {
     if (!openAssignmentDetailIds.includes(assignment._id)) {

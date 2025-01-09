@@ -54,12 +54,12 @@ export default class RandomlyAssignMembersView extends DialogFormView {
     if (some(groups, group => group.usersCount() > 0 || !!group.get('max_membership'))) {
       return this.disableCheckbox(
         this.$group_by_section,
-        I18n.t('Cannot restrict by section unless groups are empty and not limited in size')
+        I18n.t('Cannot restrict by section unless groups are empty and not limited in size'),
       )
     } else if (ENV.student_section_count && ENV.student_section_count > groups.length) {
       return this.disableCheckbox(
         this.$group_by_section,
-        I18n.t('Must have at least 1 group per section')
+        I18n.t('Must have at least 1 group per section'),
       )
     } else {
       return this.enableCheckbox(this.$group_by_section)

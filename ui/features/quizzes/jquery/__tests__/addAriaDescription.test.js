@@ -32,7 +32,7 @@ describe('Add aria descriptions', () => {
         <div class="editAnswerId"></div>
         <div class="commentAnswerId"></div>
         <div class="selectAsCorrectAnswerId"></div>
-      </div>`
+      </div>`,
     )
     $('#fixtures').append($elem)
   })

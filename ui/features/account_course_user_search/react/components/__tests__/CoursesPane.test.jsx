@@ -50,7 +50,6 @@ describe('Account Course User Search CoursesPane View', () => {
     expect(spy).toHaveBeenCalled()
   })
 
-
   test('it loads mores terms at once', () => {
     const termsStore = stores.find(s => s.jsonKey === 'enrollment_terms')
     expect(termsStore.lastParams).toHaveProperty('per_page', 100)

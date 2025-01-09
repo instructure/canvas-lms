@@ -34,7 +34,10 @@ describe('PrivacyConfirmationWrapper', () => {
     const overlayStore = createRegistrationOverlayStore(registration.client_name, registration)
 
     render(
-      <PrivacyConfirmationWrapper overlayStore={overlayStore} toolName={registration.client_name} />
+      <PrivacyConfirmationWrapper
+        overlayStore={overlayStore}
+        toolName={registration.client_name}
+      />,
     )
 
     expect(screen.getByText('Data Sharing')).toBeInTheDocument()
@@ -63,21 +66,24 @@ describe('PrivacyConfirmationWrapper', () => {
             },
           },
         ],
-      }
+      },
     )
     const overlayStore = createRegistrationOverlayStore(registration.client_name, registration)
     render(
-      <PrivacyConfirmationWrapper overlayStore={overlayStore} toolName={registration.client_name} />
+      <PrivacyConfirmationWrapper
+        overlayStore={overlayStore}
+        toolName={registration.client_name}
+      />,
     )
     expect(screen.getByLabelText(/User Data Shared With This App/i)).toHaveValue(
-      i18nLtiPrivacyLevel('public')
+      i18nLtiPrivacyLevel('public'),
     )
 
     await userEvent.click(screen.getByLabelText(/User Data Shared With This App/i))
     await userEvent.click(screen.getByText(i18nLtiPrivacyLevel('public')))
 
     expect(screen.getByLabelText(/User Data Shared With This App/i)).toHaveValue(
-      i18nLtiPrivacyLevel('public')
+      i18nLtiPrivacyLevel('public'),
     )
   })
 
@@ -104,11 +110,14 @@ describe('PrivacyConfirmationWrapper', () => {
             },
           },
         ],
-      }
+      },
     )
     const overlayStore = createRegistrationOverlayStore(registration.client_name, registration)
     render(
-      <PrivacyConfirmationWrapper overlayStore={overlayStore} toolName={registration.client_name} />
+      <PrivacyConfirmationWrapper
+        overlayStore={overlayStore}
+        toolName={registration.client_name}
+      />,
     )
 
     expect(screen.getByText(i18nLtiPrivacyLevelDescription('public'))).toBeInTheDocument()

@@ -59,7 +59,7 @@ export function DiscussionDetails({...props}) {
             {
               count: pointsPossible,
               formattedPoints,
-            }
+            },
           ),
           textSize: 'x-small',
         },
@@ -72,7 +72,7 @@ export function DiscussionDetails({...props}) {
             {
               count: pointsPossible,
               formattedPoints,
-            }
+            },
           ),
           textSize: 'small',
         },

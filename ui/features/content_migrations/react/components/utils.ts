@@ -37,7 +37,7 @@ export const timeout = (delay: number) => {
 export const generateSelectiveDataResponse = (
   migrationId: string,
   userId: string,
-  checkboxTreeNodes: Record<string, CheckboxTreeNode>
+  checkboxTreeNodes: Record<string, CheckboxTreeNode>,
 ): SelectiveDataRequest => {
   const nonRootElements: Record<string, Record<string, '1'>> = {}
   const rootElements: Record<string, '1'> = {}
@@ -69,7 +69,10 @@ export const generateSelectiveDataResponse = (
   }
 }
 
-export const mapToCheckboxTreeNodes = (items: Item[], parentId?: string): Record<string, CheckboxTreeNode> => {
+export const mapToCheckboxTreeNodes = (
+  items: Item[],
+  parentId?: string,
+): Record<string, CheckboxTreeNode> => {
   const checkboxTreeNodes: Record<string, CheckboxTreeNode> = {}
 
   items.forEach(item => {
@@ -102,14 +105,10 @@ export const mapToCheckboxTreeNodes = (items: Item[], parentId?: string): Record
   return checkboxTreeNodes
 }
 
-export const responseToItem = ({
-  type,
-  title,
-  property,
-  sub_items,
-  linked_resource,
-  migration_id,
-}: GenericItemResponse, translator: { t: Function }): Item => {
+export const responseToItem = (
+  {type, title, property, sub_items, linked_resource, migration_id}: GenericItemResponse,
+  translator: {t: Function},
+): Item => {
   const base: Item = {
     id: property,
     label:

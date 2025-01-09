@@ -23,10 +23,10 @@ import type {PeerReviewSubheader} from '../components/PeerReviewPromptModal'
 const I18n = createI18nScope('assignments_2_peer_review')
 
 export const getRedirectUrlToFirstPeerReview = (
-  assignedAssessments: AssignedAssessments[] = []
+  assignedAssessments: AssignedAssessments[] = [],
 ) => {
   const assessment = assignedAssessments.find(assignedAssessment =>
-    isAvailableToReview(assignedAssessment)
+    isAvailableToReview(assignedAssessment),
   )
   if (!assessment) {
     return
@@ -49,7 +49,7 @@ export const availableReviewCount = (assignedAssessments: AssignedAssessments[] 
 }
 
 export const assignedAssessmentsCount = (
-  assignedAssessments: AssignedAssessments[] = []
+  assignedAssessments: AssignedAssessments[] = [],
 ): number => {
   return assignedAssessments.filter(assessment => assessment.workflowState === 'assigned').length
 }
@@ -60,7 +60,7 @@ type AvailableAndUnavailableCounts = {
 }
 
 export const availableAndUnavailableCounts = (
-  assignedAssessments: AssignedAssessments[] = []
+  assignedAssessments: AssignedAssessments[] = [],
 ): AvailableAndUnavailableCounts => {
   return assignedAssessments.reduce(
     (prev, curr) => {
@@ -74,7 +74,7 @@ export const availableAndUnavailableCounts = (
 
       return prev
     },
-    {availableCount: 0, unavailableCount: 0}
+    {availableCount: 0, unavailableCount: 0},
   )
 }
 
@@ -86,14 +86,14 @@ export const COMPLETED_PEER_REVIEW_TEXT = I18n.t('You have completed your Peer R
 
 export const getPeerReviewHeaderText = (
   availableCount: number,
-  unavailableCount: number
+  unavailableCount: number,
 ): string[] => {
   const headerText =
     availableCount > 0
       ? headerTextTemplate(availableCount)
       : unavailableCount > 0
-      ? headerTextTemplate(unavailableCount)
-      : COMPLETED_PEER_REVIEW_TEXT
+        ? headerTextTemplate(unavailableCount)
+        : COMPLETED_PEER_REVIEW_TEXT
   return [headerText]
 }
 
@@ -103,13 +103,13 @@ const headerTextTemplate = (count: number): string => {
       one: 'You have 1 more Peer Review to complete.',
       other: 'You have %{count} more Peer Reviews to complete.',
     },
-    {count}
+    {count},
   )
 }
 
 export const getPeerReviewSubHeaderText = (
   availableCount: number,
-  unavailableCount: number
+  unavailableCount: number,
 ): PeerReviewSubheader[] => {
   if (!availableCount && unavailableCount) {
     return [
@@ -129,7 +129,7 @@ export const getPeerReviewSubHeaderText = (
 
 export const getPeerReviewButtonText = (
   availableCount: number,
-  unavailableCount: number
+  unavailableCount: number,
 ): string | null => {
   return availableCount || unavailableCount ? I18n.t('Next Peer Review') : null
 }

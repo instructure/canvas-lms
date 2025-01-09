@@ -102,7 +102,7 @@ class CoursesPane extends React.Component {
         filters: {...oldState.filters, page},
         previousCourses: CoursesStore.get(oldState.filters),
       }),
-      this.fetchCourses
+      this.fetchCourses,
     )
   }
 
@@ -112,7 +112,7 @@ class CoursesPane extends React.Component {
         errors: {},
         draftFilters: {...oldState.draftFilters, ...newFilters, page: null},
       }),
-      this.debouncedApplyFilters
+      this.debouncedApplyFilters,
     )
   }
 

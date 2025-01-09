@@ -121,7 +121,7 @@ describe('addDomainAction', () => {
 
   it('creates an ADD_DOMAIN_OPTIMISTIC action when optimistic option is given', () => {
     expect(
-      Actions.addDomainAction('instructure.com', 'account', {optimistic: true})
+      Actions.addDomainAction('instructure.com', 'account', {optimistic: true}),
     ).toMatchSnapshot()
   })
 })
@@ -186,14 +186,14 @@ describe('addDomainBulkAction', () => {
             },
           ],
         },
-      })
+      }),
     ).toMatchSnapshot()
   })
   it('creates an error action if passed an invalid domainMap', () => {
     expect(
       Actions.addDomainBulkAction({
         lti: ['google.com'],
-      })
+      }),
     ).toMatchSnapshot()
   })
 })
@@ -468,7 +468,7 @@ describe('copyInheritedIfNeeded', () => {
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeAxios.post).toHaveBeenCalledWith(
       '/api/v1/accounts/1/csp_settings/domains/batch_create',
-      {domains: ['canvaslms.com', 'instructure.com']}
+      {domains: ['canvaslms.com', 'instructure.com']},
     )
   })
 
@@ -487,7 +487,7 @@ describe('copyInheritedIfNeeded', () => {
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeAxios.post).toHaveBeenCalledWith(
       '/api/v1/accounts/1/csp_settings/domains/batch_create',
-      {domains: ['canvaslms.com']}
+      {domains: ['canvaslms.com']},
     )
   })
 })

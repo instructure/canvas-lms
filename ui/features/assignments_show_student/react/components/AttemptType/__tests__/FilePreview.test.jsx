@@ -103,12 +103,12 @@ describe('FilePreview', () => {
 
     // renders a thumbnail for the file with a preview url
     expect(getByTestId('uploaded_files_table')).toContainElement(
-      container.querySelector('img[alt="file_1.png preview"]')
+      container.querySelector('img[alt="file_1.png preview"]'),
     )
 
     // renders an icon for the file without a preview url
     expect(getByTestId('uploaded_files_table')).toContainElement(
-      container.querySelector('svg[name="IconPaperclip"]')
+      container.querySelector('svg[name="IconPaperclip"]'),
     )
   })
 
@@ -132,7 +132,7 @@ describe('FilePreview', () => {
     const {getAllByTestId} = render(<FilePreview {...props} />)
     const reports = getAllByTestId('originality_report')
 
-    expect(reports.length).toBe(2)
+    expect(reports).toHaveLength(2)
     expect(reports[0].textContent).toBe('75%')
     expect(reports[1].textContent).toBe('10%')
   })

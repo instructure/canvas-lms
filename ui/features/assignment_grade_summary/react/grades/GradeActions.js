@@ -114,7 +114,7 @@ function apiUpdateProvisionalGrade(state, gradeInfo) {
       ...gradeInfo,
       graderId: gradeInfo.graderId || currentUser.graderId,
       id: updatedSubmission.provisionalGradeId,
-    })
+    }),
   )
 }
 

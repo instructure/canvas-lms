@@ -71,7 +71,7 @@ describe('waitForProcessing', () => {
 
     return waitForProcessing(progress.queued, 0).then(gb => {
       expect(gb).toBe(gradeBook)
-      expect(mock_ajax.mock.calls.length).toBe(3) // 2x progress, 1x gradebook
+      expect(mock_ajax.mock.calls).toHaveLength(3) // 2x progress, 1x gradebook
     })
   })
 
@@ -81,14 +81,14 @@ describe('waitForProcessing', () => {
       .mockImplementation(delayedProcessingSimulator(2, progress.failed))
 
     return waitForProcessing(progress.queued, 0).catch(() => {
-      expect(mock_ajax.mock.calls.length).toBe(2) // 2x progress, 0x gradebook
+      expect(mock_ajax.mock.calls).toHaveLength(2) // 2x progress, 0x gradebook
     })
   })
 
   it('handles unknown errors', () => {
     return waitForProcessing(progress.failed).catch(error => {
       expect(error.message).toBe(
-        'An unknown error has occurred. Verify the CSV file or try again later.'
+        'An unknown error has occurred. Verify the CSV file or try again later.',
       )
     })
   })

@@ -149,7 +149,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
     }
   }
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
 
   const brandConfig =
@@ -261,7 +261,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                         one: 'One unread share.',
                         other: '%{count} unread shares.',
                       },
-                      {count}
+                      {count},
                     )}
                   >
                     {count}
@@ -372,7 +372,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                         one: 'One unread message.',
                         other: '%{count} unread messages.',
                       },
-                      {count}
+                      {count},
                     )}
                   >
                     {count}
@@ -450,7 +450,7 @@ const SideNav: React.FC<ISideNav> = ({externalTools = []}) => {
                         one: 'One unread release note.',
                         other: '%{count} unread release notes.',
                       },
-                      {count}
+                      {count},
                     )}
                   >
                     {count}

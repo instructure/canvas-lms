@@ -151,7 +151,7 @@ describe('ConfigurationForm', () => {
           privacyLevel: 'anonymous',
           verifyUniqueness: 'true',
         },
-        expect.any(Object)
+        expect.any(Object),
       )
     })
 
@@ -199,7 +199,7 @@ describe('ConfigurationForm', () => {
           configUrl: 'http://example.com',
           verifyUniqueness: 'true',
         },
-        expect.any(Object)
+        expect.any(Object),
       )
     })
 
@@ -247,7 +247,7 @@ describe('ConfigurationForm', () => {
           xml: 'some xml',
           verifyUniqueness: 'true',
         },
-        expect.any(Object)
+        expect.any(Object),
       )
     })
 
@@ -276,7 +276,7 @@ describe('ConfigurationForm', () => {
         {
           registrationUrl: 'https://lti-tool-provider-example..com/register',
         },
-        expect.any(Object)
+        expect.any(Object),
       )
     })
   })

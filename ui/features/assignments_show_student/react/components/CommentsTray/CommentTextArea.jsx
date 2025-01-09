@@ -148,7 +148,7 @@ export default class CommentTextArea extends Component {
       }
       let attachmentIds = []
       const filesWithoutMediaObject = this.state.currentFiles.filter(
-        file => file !== this.state.mediaObject
+        file => file !== this.state.mediaObject,
       )
 
       if (filesWithoutMediaObject.length) {
@@ -156,7 +156,7 @@ export default class CommentTextArea extends Component {
           const attachments = await submissionCommentAttachmentsUpload(
             filesWithoutMediaObject,
             this.props.assignment.env.courseId,
-            this.props.assignment._id
+            this.props.assignment._id,
           )
           attachmentIds = attachments.map(attachment => attachment.id)
         } catch (err) {
@@ -189,7 +189,7 @@ export default class CommentTextArea extends Component {
           if (this._commentTextBox) {
             this._commentTextBox.focus()
           }
-        }
+        },
       )
       this.props.onSendCommentSuccess?.()
     })
@@ -208,7 +208,7 @@ export default class CommentTextArea extends Component {
         if (this._commentTextBox) {
           this._commentTextBox.focus()
         }
-      }
+      },
     )
   }
 
@@ -233,7 +233,7 @@ export default class CommentTextArea extends Component {
         } else {
           refs[this.state.currentFiles[fileIndex - 1].id].focus()
         }
-      }
+      },
     )
   }
 

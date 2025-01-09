@@ -91,7 +91,7 @@ describe('CourseTemplateDetails::', () => {
     it('renders a checked box if a template, with the right message for zero associations', async () => {
       setRoute(route2)
       const {getByTestId, getByText, container} = render(
-        <CourseTemplateDetails isEditable={true} />
+        <CourseTemplateDetails isEditable={true} />,
       )
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
@@ -105,7 +105,7 @@ describe('CourseTemplateDetails::', () => {
     it('renders the right message for multiple associations', async () => {
       setRoute(route3)
       const {getByTestId, getByText, container} = render(
-        <CourseTemplateDetails isEditable={true} />
+        <CourseTemplateDetails isEditable={true} />,
       )
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
@@ -144,7 +144,7 @@ describe('CourseTemplateDetails::', () => {
       await waitFor(() => expect(getByTestId('result-modal')).toBeInTheDocument())
       const modal = getByTestId('result-modal')
       const listElements = modal.querySelectorAll('ul li')
-      expect(listElements.length).toBe(5)
+      expect(listElements).toHaveLength(5)
     })
 
     it('shows the right overflow text if more than ten associated accounts', async () => {
@@ -156,7 +156,7 @@ describe('CourseTemplateDetails::', () => {
       await waitFor(() => expect(getByTestId('result-modal')).toBeInTheDocument())
       const modal = getByTestId('result-modal')
       const listElements = modal.querySelectorAll('ul li')
-      expect(listElements.length).toBe(10)
+      expect(listElements).toHaveLength(10)
       getByTextFromElement(modal, '(more not shown)') // should not throw
     })
   })

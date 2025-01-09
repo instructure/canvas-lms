@@ -77,7 +77,7 @@ describe('DiscussionTopicRepliesContainer', () => {
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <DiscussionTopicRepliesContainer {...props} />
         </AlertManagerContext.Provider>
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 

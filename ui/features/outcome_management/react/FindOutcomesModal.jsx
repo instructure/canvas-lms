@@ -125,8 +125,8 @@ const FindOutcomesModal = ({
     const newlyImportedGroupIds = new Set(
       Object.entries(importGroupsStatus).reduce(
         (acc, [gid, importStatus]) => (importStatus === IMPORT_COMPLETED ? [...acc, gid] : acc),
-        []
-      )
+        [],
+      ),
     )
     for (const importedGroupId of importedGroupIds) {
       newlyImportedGroupIds.delete(importedGroupId)
@@ -138,7 +138,7 @@ const FindOutcomesModal = ({
       const newRhsGroupIdsToRefetch = [...newlyImportedGroupIds].reduce(
         (acc, groupId) =>
           importedGroupAncestors[groupId] ? [...acc, ...importedGroupAncestors[groupId]] : acc,
-        []
+        [],
       )
 
       setTargetGroupIdsToRefetch([
@@ -155,8 +155,8 @@ const FindOutcomesModal = ({
     const newlyImportedOutcomesIds = new Set(
       Object.entries(importOutcomesStatus).reduce(
         (acc, [oid, importStatus]) => (importStatus === IMPORT_COMPLETED ? [...acc, oid] : acc),
-        []
-      )
+        [],
+      ),
     )
     for (const importedOutcomeId of importedOutcomesIds) {
       newlyImportedOutcomesIds.delete(importedOutcomeId)
@@ -167,8 +167,8 @@ const FindOutcomesModal = ({
         Object.entries(importsTargetGroup).reduce(
           (acc, [oid, targetGroupId]) =>
             newlyImportedOutcomesIds.has(oid) ? [...acc, targetGroupId] : acc,
-          []
-        )
+          [],
+        ),
       )
       setImportedOutcomesIds(importedOids => [
         ...new Set([...importedOids, ...newlyImportedOutcomesIds]),
@@ -242,12 +242,12 @@ const FindOutcomesModal = ({
         groupName: targetGroup.title,
       })
     : isCourse
-    ? I18n.t('Add Outcomes to Course')
-    : I18n.t('Add Outcomes to Account')
+      ? I18n.t('Add Outcomes to Course')
+      : I18n.t('Add Outcomes to Account')
 
   const selfOrParentBeingImported =
     getOutcomeGroupAncestorsWithSelf(collections, selectedGroupId).find(
-      gid => importGroupsStatus[gid]
+      gid => importGroupsStatus[gid],
     ) || selectedGroupId
 
   const findOutcomesView = (

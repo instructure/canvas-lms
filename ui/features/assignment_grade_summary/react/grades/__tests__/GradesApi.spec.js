@@ -61,7 +61,7 @@ describe('GradeSummary GradesApi', () => {
     test('does not catch failures', async () => {
       server.for(url).respond({status: 500, body: {error: 'server error'}})
       await expect(
-        GradesApi.bulkSelectProvisionalGrades('1201', '2301', ['4601', '4602'])
+        GradesApi.bulkSelectProvisionalGrades('1201', '2301', ['4601', '4602']),
       ).rejects.toThrow('500')
     })
   })

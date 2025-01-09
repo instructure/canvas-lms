@@ -25,7 +25,7 @@ describe('SimilarityPledge', () => {
     const onChange = jest.fn()
 
     const {getByRole} = render(
-      <SimilarityPledge checked={true} eulaUrl="http://some.url" onChange={onChange} />
+      <SimilarityPledge checked={true} eulaUrl="http://some.url" onChange={onChange} />,
     )
     const checkbox = getByRole('checkbox', {name: /I agree/})
     act(() => {
@@ -44,18 +44,18 @@ describe('SimilarityPledge', () => {
         comments={comments}
         eulaUrl="http://some.url"
         onChange={jest.fn()}
-      />
+      />,
     )
 
     const commentsContainer = getByTestId('similarity-pledge-comments')
     expect(commentsContainer.innerHTML).toEqual(
-      expect.stringMatching(/<p>Here are some comments<\/p>\s*<p>And some more<\/p>/)
+      expect.stringMatching(/<p>Here are some comments<\/p>\s*<p>And some more<\/p>/),
     )
   })
 
   it('includes a link to the supplied eulaUrl when one is provided', () => {
     const {getByRole} = render(
-      <SimilarityPledge checked={true} eulaUrl="http://some.url/" onChange={jest.fn()} />
+      <SimilarityPledge checked={true} eulaUrl="http://some.url/" onChange={jest.fn()} />,
     )
 
     const eulaLink = getByRole('link', {name: 'End-User License Agreement'})
@@ -68,7 +68,7 @@ describe('SimilarityPledge', () => {
         checked={true}
         pledgeText="a grave and solemn pledge"
         onChange={jest.fn()}
-      />
+      />,
     )
 
     const checkbox = getByLabelText('a grave and solemn pledge')
@@ -82,7 +82,7 @@ describe('SimilarityPledge', () => {
         eulaUrl="http://some.url"
         pledgeText="a grave and solemn pledge"
         onChange={jest.fn()}
-      />
+      />,
     )
 
     expect(getByLabelText(/I agree to the tool's End-User License Agreement/)).toBeInTheDocument()
@@ -95,7 +95,7 @@ describe('SimilarityPledge', () => {
         eulaUrl="http://some.url"
         pledgeText="a grave and solemn pledge"
         onChange={jest.fn()}
-      />
+      />,
     )
 
     expect(getByLabelText(/a grave and solemn pledge/)).toBeInTheDocument()
@@ -103,7 +103,7 @@ describe('SimilarityPledge', () => {
 
   it('checks the checkbox if "checked" is true', () => {
     const {getByLabelText} = render(
-      <SimilarityPledge checked={true} onChange={jest.fn()} pledgeText="a grave and solemn oath" />
+      <SimilarityPledge checked={true} onChange={jest.fn()} pledgeText="a grave and solemn oath" />,
     )
 
     const checkbox = getByLabelText('a grave and solemn oath')
@@ -112,7 +112,7 @@ describe('SimilarityPledge', () => {
 
   it('does not check the checkbox if "checked" is false"', () => {
     const {getByLabelText} = render(
-      <SimilarityPledge checked={false} onChange={jest.fn()} pledgeText="a grave and solemn vow" />
+      <SimilarityPledge checked={false} onChange={jest.fn()} pledgeText="a grave and solemn vow" />,
     )
 
     const checkbox = getByLabelText('a grave and solemn vow')

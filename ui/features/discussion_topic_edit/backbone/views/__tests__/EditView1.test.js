@@ -155,7 +155,7 @@ describe('EditView', () => {
     ENV.CANCEL_TO = currentOrigin + '/foo'
     const view = editView()
     expect(view.locationAfterCancel({return_to: currentOrigin + '/bar'})).toBe(
-      currentOrigin + '/bar'
+      currentOrigin + '/bar',
     )
   })
 
@@ -163,7 +163,7 @@ describe('EditView', () => {
     ENV.CANCEL_TO = currentOrigin + '/foo'
     const view = editView()
     expect(view.locationAfterCancel({return_to: 'javascript:alert(1)'})).toBe(
-      currentOrigin + '/foo'
+      currentOrigin + '/foo',
     )
   })
 

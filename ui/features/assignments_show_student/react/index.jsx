@@ -36,7 +36,6 @@ const client = createClient()
 const I18n = createI18nScope('assignments_2')
 
 export default function renderAssignmentsApp(env, elt) {
-   
   ReactDOM.render(
     <ApolloProvider client={client}>
       <ErrorBoundary
@@ -56,12 +55,11 @@ export default function renderAssignmentsApp(env, elt) {
         </AlertManager>
       </ErrorBoundary>
     </ApolloProvider>,
-    elt
+    elt,
   )
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
-     
     ReactDOM.render(
       <View as="div" maxWidth="12em">
         <ObserverOptions
@@ -74,7 +72,7 @@ export default function renderAssignmentsApp(env, elt) {
           renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
         />
       </View>,
-      observerPickerContainer
+      observerPickerContainer,
     )
   }
 }

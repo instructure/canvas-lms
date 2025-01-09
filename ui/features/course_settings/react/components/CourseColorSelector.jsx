@@ -90,7 +90,7 @@ function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}) {
     <View as="section" onKeyDown={handleOptionNavigation(focusedColorIndex, onChangeFocus)}>
       <ScreenReaderContent>
         {I18n.t(
-          'Set course color to a preset hexadecimal color code. Use the left and right arrow keys to navigate presets.'
+          'Set course color to a preset hexadecimal color code. Use the left and right arrow keys to navigate presets.',
         )}
       </ScreenReaderContent>
       {COLOR_OPTIONS.map((option, i) => (

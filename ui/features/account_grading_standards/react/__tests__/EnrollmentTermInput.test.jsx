@@ -161,10 +161,10 @@ describe('EnrollmentTermInput', () => {
         endAt: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
         workflowState: 'active',
         displayName: 'Past Term',
-      }
+      },
     ]
 
-    renderComponent({ enrollmentTerms: terms, selectedIDs: [] })
+    renderComponent({enrollmentTerms: terms, selectedIDs: []})
     await user.click(screen.getByTestId('enrollment-term-select'))
 
     expect(screen.getByText('Active')).toBeInTheDocument()

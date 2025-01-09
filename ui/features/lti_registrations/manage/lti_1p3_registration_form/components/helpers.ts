@@ -20,7 +20,7 @@ import type {LtiPlacement} from '../../model/LtiPlacement'
 
 export const getDefaultPlacementTextFromConfig = (
   placement: LtiPlacement,
-  internalConfig: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration,
 ) => {
   return (
     internalConfig.placements.find(pl => pl.placement === placement)?.text ||

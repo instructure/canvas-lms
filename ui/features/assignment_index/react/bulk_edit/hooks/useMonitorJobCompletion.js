@@ -48,7 +48,7 @@ export default function useMonitorJobCompletion({progressUrl, pollingInterval = 
       setJobErrors({
         message: await extractFetchErrorMessage(
           err,
-          I18n.t('There was an error retrieving job progress')
+          I18n.t('There was an error retrieving job progress'),
         ),
       })
     }

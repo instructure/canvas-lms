@@ -100,21 +100,25 @@ const ComposeModalManager = props => {
 
     if (props.isReply || props.isReplyAll || props.isForward) {
       const conversation = legacyNode.conversationsConnection.nodes.find(
-        c => c.conversation._id === props.conversation._id
+        c => c.conversation._id === props.conversation._id,
       ).conversation
 
       if (result.data?.addConversationMessage?.conversationMessage) {
         conversation.conversationMessagesConnection.nodes.unshift(
-          result.data.addConversationMessage.conversationMessage
+          result.data.addConversationMessage.conversationMessage,
         )
       } else {
-        captureException(new Error('There is no value for addConversationMessage.conversationMessage in updateConversationsCache'))
+        captureException(
+          new Error(
+            'There is no value for addConversationMessage.conversationMessage in updateConversationsCache',
+          ),
+        )
       }
 
       conversation.conversationMessagesCount++
     } else {
       legacyNode.conversationsConnection.nodes.unshift(
-        ...result.data.createConversation.conversations
+        ...result.data.createConversation.conversations,
       )
     }
 
@@ -137,8 +141,8 @@ const ComposeModalManager = props => {
                 createdBefore: props.conversationMessage?.createdAt,
               }),
             },
-          })
-        )
+          }),
+        ),
       )
 
       if (!replyQueryResult) {
@@ -147,10 +151,14 @@ const ComposeModalManager = props => {
 
       if (result.data?.addConversationMessage?.conversationMessage) {
         replyQueryResult.legacyNode.conversationMessagesConnection.nodes.unshift(
-          result.data.addConversationMessage.conversationMessage
+          result.data.addConversationMessage.conversationMessage,
         )
       } else {
-        captureException(new Error('There is no value for addConversationMessage.conversationMessage in updateReplyConversationsCache'))
+        captureException(
+          new Error(
+            'There is no value for addConversationMessage.conversationMessage in updateReplyConversationsCache',
+          ),
+        )
       }
 
       cache.writeQuery({
@@ -181,7 +189,11 @@ const ComposeModalManager = props => {
           ...data.legacyNode.conversationMessagesConnection.nodes,
         ]
       } else {
-        captureException(new Error('There is no value for addConversationMessage.conversationMessage in updateConversationMessagesCache'))
+        captureException(
+          new Error(
+            'There is no value for addConversationMessage.conversationMessage in updateConversationMessagesCache',
+          ),
+        )
       }
 
       cache.writeQuery({...queryToUpdate, data})
@@ -200,7 +212,7 @@ const ComposeModalManager = props => {
       const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
       data.legacyNode.commentsConnection.nodes.unshift(
-        result.data.createSubmissionComment.submissionComment
+        result.data.createSubmissionComment.submissionComment,
       )
       cache.writeQuery({...queryToUpdate, data})
     }
@@ -220,10 +232,10 @@ const ComposeModalManager = props => {
     }
 
     const submissionToUpdate = data.legacyNode.viewableSubmissionsConnection.nodes.find(
-      c => c._id === props.conversation._id
+      c => c._id === props.conversation._id,
     )
     submissionToUpdate.commentsConnection.nodes.unshift(
-      result.data.createSubmissionComment.submissionComment
+      result.data.createSubmissionComment.submissionComment,
     )
 
     cache.writeQuery({...queryToUpdate, data})
@@ -345,7 +357,7 @@ const ComposeModalManager = props => {
     if (courses) {
       courses.enrollments = courses?.enrollments.filter(enrollment => !enrollment?.concluded)
       courses.favoriteGroupsConnection.nodes = courses?.favoriteGroupsConnection?.nodes.filter(
-        group => group?.canMessage
+        group => group?.canMessage,
       )
     }
 

@@ -203,7 +203,7 @@ class ContextSelector extends React.Component {
     if (contextSet.size > 1) {
       return I18n.t(
         {one: '%{contextName} and %{count} other', other: '%{contextName} and %{count} others'},
-        {contextName, count: contextSet.size - 1}
+        {contextName, count: contextSet.size - 1},
       )
     }
     return contextName
@@ -241,7 +241,7 @@ class ContextSelector extends React.Component {
                   this.toggleSection(
                     context.asset_string,
                     section.asset_string,
-                    !this.isSubContextChecked(context.asset_string, section.asset_string)
+                    !this.isSubContextChecked(context.asset_string, section.asset_string),
                   )
                 }
                 ref={checkbox => {
@@ -269,7 +269,7 @@ class ContextSelector extends React.Component {
     const filteredContexts = this.props.contexts.filter(
       context =>
         context.can_create_appointment_groups ||
-        context.sections?.some(section => section.can_create_appointment_groups)
+        context.sections?.some(section => section.can_create_appointment_groups),
     )
     return (
       <div>
@@ -301,7 +301,7 @@ class ContextSelector extends React.Component {
                   onChange={() =>
                     this.toggleCourse(
                       context.asset_string,
-                      !this.isContextChecked(context.asset_string)
+                      !this.isContextChecked(context.asset_string),
                     )
                   }
                   value={context.asset_string}

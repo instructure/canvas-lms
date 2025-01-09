@@ -85,7 +85,7 @@ export default class EditableHeading extends React.Component {
       if (this._inputRef) {
         fontSize = parseInt(
           window.getComputedStyle(this._inputRef).getPropertyValue('font-size'),
-          10
+          10,
         )
       }
     } catch (_ignore) {
@@ -143,7 +143,6 @@ export default class EditableHeading extends React.Component {
   }
 
   renderView = () => {
-    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableHeading.propTypes, ['mode'])
     return (
       <div>
@@ -161,7 +160,6 @@ export default class EditableHeading extends React.Component {
   }
 
   renderEditor = ({onBlur, editorRef}) => {
-    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableHeading.propTypes, ['mode'])
     // move it a bit so it doesn't move on edit
     const sty = {

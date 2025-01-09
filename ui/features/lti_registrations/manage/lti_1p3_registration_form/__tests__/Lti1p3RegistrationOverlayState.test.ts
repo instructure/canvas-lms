@@ -53,7 +53,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
           ...prev,
           state: emptyState,
         }),
-        true
+        true,
       )
     })
 
@@ -62,7 +62,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.custom_fields).toEqual({
@@ -78,7 +78,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.redirect_uris).toEqual([
@@ -92,7 +92,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.oidc_initiation_url).toBe('https://example.com/oidc')
@@ -104,7 +104,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.public_jwk_url).toBe('https://example.com/jwk')
@@ -117,7 +117,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.public_jwk).toEqual(JSON.parse(jwk))
@@ -128,7 +128,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.domain).toBe('example2.com')
@@ -139,7 +139,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.privacy_level).toBe('public')
@@ -150,7 +150,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
       // An empty state should result in both placements being disabled.
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.disabled_placements).toEqual(['course_navigation', 'global_navigation'])
@@ -165,7 +165,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.placements).toEqual({
@@ -184,7 +184,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.placements?.course_navigation?.default).toBe('disabled')
@@ -195,7 +195,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {config: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       expect(result.scopes).toEqual(['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'])
@@ -207,7 +207,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       const expectedNonExistentProperties: Omit<keyof LtiConfigurationOverlay, 'title'>[] = [
@@ -241,7 +241,7 @@ describe('Lti1p3RegistrationOverlayState', () => {
 
       const {overlay: result} = convertToLtiConfigurationOverlay(
         state.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       const expectedNonExistentProperties: Omit<keyof LtiConfigurationOverlay, 'title'>[] = [

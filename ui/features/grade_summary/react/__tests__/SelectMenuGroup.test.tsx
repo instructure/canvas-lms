@@ -89,7 +89,7 @@ describe('SelectMenuGroup', () => {
       <SelectMenuGroup
         {...props}
         students={[{id: '11', name: 'Jane Doe', sortable_name: 'Doe, Jane'}]}
-      />
+      />,
     )
     expect(wrapper.container.querySelector('#student_select_menu')).not.toBeInTheDocument()
   })
@@ -136,7 +136,7 @@ describe('SelectMenuGroup', () => {
       <SelectMenuGroup
         {...props}
         courses={[{id: '2', nickname: 'Autos', url: '/courses/2/grades'}]}
-      />
+      />,
     )
     expect(wrapper.container.querySelector('#course_select_menu')).not.toBeInTheDocument()
   })

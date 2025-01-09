@@ -64,7 +64,7 @@ export default class PronounsInput extends React.Component {
 
   render() {
     const infoToolTip = I18n.t(
-      'These pronouns will be available to Canvas users in your account to choose from.'
+      'These pronouns will be available to Canvas users in your account to choose from.',
     )
     return (
       <TextInput

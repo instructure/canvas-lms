@@ -31,7 +31,7 @@ describe('Models.QuestionAnsweredEventDecorator', () => {
           {
             questionType,
           },
-          record
+          record,
         )
       }
 

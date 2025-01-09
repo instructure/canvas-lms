@@ -95,7 +95,7 @@ describe('Other Calendars modal ', () => {
 
   it('renders "calendarsPerRequest" number of account calendars when open', async () => {
     const {getByText, queryByText, getByTestId, findByText} = render(
-      <AccountCalendarsModal {...getProps()} />
+      <AccountCalendarsModal {...getProps()} />,
     )
     const addCalendarButton = getByTestId('add-other-calendars-button')
     await openModal(addCalendarButton)
@@ -116,8 +116,8 @@ describe('Other Calendars modal ', () => {
     const user = userEvent.setup({delay: null})
     const onSaveUrl = encodeURI(
       SAVE_PREFERENCES_ENDPOINT.concat(
-        `?enabled_account_calendars[]=${page1Results[0].id}&enabled_account_calendars[]=${page1Results[1].id}`
-      )
+        `?enabled_account_calendars[]=${page1Results[0].id}&enabled_account_calendars[]=${page1Results[1].id}`,
+      ),
     )
     fetchMock.post(onSaveUrl, {body: {status: 'ok'}})
     const {findByTestId, getByTestId} = render(<AccountCalendarsModal {...getProps()} />)
@@ -144,7 +144,7 @@ describe('Other Calendars modal ', () => {
 
   it('does not render the "Show more" option when all the calendars have been fetched', async () => {
     const {queryByText, getByTestId, findByTestId} = render(
-      <AccountCalendarsModal {...getProps({calendarsPerRequest: 5})} />
+      <AccountCalendarsModal {...getProps({calendarsPerRequest: 5})} />,
     )
     const addCalendarButton = getByTestId('add-other-calendars-button')
     await openModal(addCalendarButton)
@@ -203,14 +203,14 @@ describe('Other Calendars modal ', () => {
             Link: '</api/v1/account_calendars?&per_page=2&page=2>; rel="next"',
           },
         },
-        {overwriteRoutes: true}
+        {overwriteRoutes: true},
       )
       const {getByTestId, findByTestId} = render(
         <AccountCalendarsModal
           {...getProps({
             getSelectedOtherCalendars: () => searchResponse.account_calendars,
           })}
-        />
+        />,
       )
       const addCalendarButton = getByTestId('add-other-calendars-button')
       await openModal(addCalendarButton)
@@ -231,14 +231,14 @@ describe('Other Calendars modal ', () => {
             Link: '</api/v1/account_calendars?&per_page=2&page=2>; rel="next"',
           },
         },
-        {overwriteRoutes: true}
+        {overwriteRoutes: true},
       )
       const {getByTestId, getByText, findByText} = render(
         <AccountCalendarsModal
           {...getProps({
             getSelectedOtherCalendars: () => searchResponse.account_calendars,
           })}
-        />
+        />,
       )
       const addCalendarButton = getByTestId('add-other-calendars-button')
       await openModal(addCalendarButton)
@@ -281,7 +281,7 @@ describe('Other Calendars modal ', () => {
 
     it('shows an empty state if no calendar was found', async () => {
       const {findByTestId, findByText, getByTestId} = render(
-        <AccountCalendarsModal {...getProps()} />
+        <AccountCalendarsModal {...getProps()} />,
       )
       const addCalendarButton = getByTestId('add-other-calendars-button')
       await openModal(addCalendarButton)

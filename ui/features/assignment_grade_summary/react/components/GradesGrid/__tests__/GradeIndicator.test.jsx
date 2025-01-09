@@ -57,7 +57,7 @@ describe('GradeSummary GradeIndicator', () => {
     render(<GradeIndicator {...props} />)
     const originalRender = screen.getAllByText('10')[0]
     const backgroundColorBefore = window.getComputedStyle(
-      originalRender.parentElement
+      originalRender.parentElement,
     ).backgroundColor
     const textColorBefore = window.getComputedStyle(originalRender).color
 

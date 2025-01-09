@@ -70,7 +70,7 @@ describe('"Mark as Done" button', () => {
     return render(
       <MockedProvider mocks={mocks}>
         <MarkAsDoneButton {...propsToRender} />
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 

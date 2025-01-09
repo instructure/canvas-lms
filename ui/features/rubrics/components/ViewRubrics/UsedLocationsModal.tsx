@@ -74,7 +74,7 @@ export const UsedLocationsModal = ({
         setUsedLocations(prevLocations => {
           if (newLocations.usedLocations[0]?.id === prevLocations[prevLocations.length - 1]?.id) {
             prevLocations[prevLocations.length - 1].assignments.push(
-              ...newLocations.usedLocations[0].assignments
+              ...newLocations.usedLocations[0].assignments,
             )
             newLocations.usedLocations.shift()
           }
@@ -117,7 +117,7 @@ export const UsedLocationsModal = ({
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       observer.observe(sentinelRef.current)
@@ -170,7 +170,7 @@ export const UsedLocationsModal = ({
               filteredAssignments = course.assignments
             } else {
               filteredAssignments = course.assignments.filter(assignment =>
-                assignment.title.toLowerCase().includes(filter.toLowerCase())
+                assignment.title.toLowerCase().includes(filter.toLowerCase()),
               )
               // if no assignments match the filter nor the course name,
               // don't render the course in the list

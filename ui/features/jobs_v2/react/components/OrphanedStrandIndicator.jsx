@@ -133,7 +133,7 @@ export default function OrphanedStrandIndicator({name, type, onComplete}) {
         )}
         <Text>
           {I18n.t(
-            'This will set next_in_strand on the appropriate number of jobs to unblock the strand or singleton.'
+            'This will set next_in_strand on the appropriate number of jobs to unblock the strand or singleton.',
           )}
         </Text>
         <LoadingFeedback />

@@ -126,7 +126,7 @@ function SectionList(props: Props) {
             <IconSortLine />
             {I18n.t('Move to...')}
           </Flex>
-        </Menu.Item>
+        </Menu.Item>,
       )
       options.push(
         <Menu.Item
@@ -138,7 +138,7 @@ function SectionList(props: Props) {
             <IconTrashLine />
             {I18n.t('Delete')}
           </Flex>
-        </Menu.Item>
+        </Menu.Item>,
       )
     }
     return (

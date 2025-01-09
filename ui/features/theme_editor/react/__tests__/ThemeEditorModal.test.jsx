@@ -34,12 +34,12 @@ describe('ThemeEditorModal Component', () => {
 
     // Test when modal is open due to `showProgressModal`
     expect(
-      shallow(<ThemeEditorModal {...defaultProps} showProgressModal={true} />).prop('open')
+      shallow(<ThemeEditorModal {...defaultProps} showProgressModal={true} />).prop('open'),
     ).toBeTruthy()
 
     // Test when modal is open due to `showSubAccountProgress`
     expect(
-      shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />).prop('open')
+      shallow(<ThemeEditorModal {...defaultProps} showSubAccountProgress={true} />).prop('open'),
     ).toBeTruthy()
   })
 

@@ -81,7 +81,7 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
     assessment: AssignedAssessments,
     index: number,
     testId: string,
-    peerReviewStatus: string
+    peerReviewStatus: string,
   ) => {
     return (
       <Menu.Item
@@ -139,8 +139,8 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
               assessment,
               index,
               'peer-review-ready',
-              I18n.t('Ready to Review')
-            )
+              I18n.t('Ready to Review'),
+            ),
         )}
 
         <Menu.Group label={I18n.t('Not Yet Submitted')} />
@@ -151,8 +151,8 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
               assessment,
               index,
               'peer-review-not-submitted',
-              I18n.t('Peer Review Not Yet Submitted')
-            )
+              I18n.t('Peer Review Not Yet Submitted'),
+            ),
         )}
 
         <Menu.Group label={I18n.t('Completed Peer Reviews')} />
@@ -164,8 +164,8 @@ export default ({assignedAssessments, currentAssessmentIndex}: PeerReviewNavigat
               assessment,
               index,
               'peer-review-completed',
-              I18n.t('Peer Review Completed')
-            )
+              I18n.t('Peer Review Completed'),
+            ),
         )}
       </Menu>
     </Popover>

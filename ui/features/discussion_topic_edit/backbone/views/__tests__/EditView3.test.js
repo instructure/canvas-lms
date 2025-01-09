@@ -64,7 +64,7 @@ describe('EditView', () => {
         .get('http://api/folders?contextType=user&contextId=1', 200)
         .get('path:/api/session', 200)
         .get('path:/api/v1/courses/1/lti_apps/launch_definitions', {
-          tools: []
+          tools: [],
         })
         .get('*', 200) // Catch any other requests
     })

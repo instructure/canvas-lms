@@ -36,7 +36,7 @@ describe('canvas_quizzes/events/views/event_stream', () => {
             },
           ]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

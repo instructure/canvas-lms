@@ -30,7 +30,7 @@ const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
       r.outcomeRollups.map(or => ({
         studentId: r.studentId,
         ...or,
-      }))
+      })),
     )
     return keyBy(outcomeRollups, ({studentId, outcomeId}) => `${studentId}_${outcomeId}`)
   }, [rollups])
@@ -42,7 +42,6 @@ const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
           {outcomes.map((outcome, index) => (
             <Flex.Item
               size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
-              // eslint-disable-next-line react/no-array-index-key
               key={`${student.id}${outcome.id}${index}`}
             >
               <View

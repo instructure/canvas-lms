@@ -85,7 +85,7 @@ export default class Scopes extends React.Component {
                 margin="xx-large"
                 readOnly={true}
                 heading={I18n.t(
-                  'When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.'
+                  'When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.',
                 )}
               />
             )}
@@ -100,7 +100,7 @@ export default class Scopes extends React.Component {
     const {developerKey, updateDeveloperKey} = this.props
     const includeTooltip = I18n.t(
       'Permit usage of all “includes” parameters for this developer key. "Includes"' +
-        ' parameters may grant access to additional data not included in the scopes selected below.'
+        ' parameters may grant access to additional data not included in the scopes selected below.',
     )
 
     return (
@@ -166,8 +166,8 @@ Scopes.propTypes = {
       PropTypes.shape({
         resource: PropTypes.string,
         scope: PropTypes.string,
-      })
-    )
+      }),
+    ),
   ).isRequired,
   availableScopesPending: PropTypes.bool.isRequired,
   dispatch: PropTypes.func.isRequired,

@@ -91,7 +91,7 @@ export class SecurityPanel extends Component {
                automatically and do not count against your 50 domain limit.`,
               {
                 max_domains: this.props.maxDomains,
-              }
+              },
             )}
           </Text>
         </View>

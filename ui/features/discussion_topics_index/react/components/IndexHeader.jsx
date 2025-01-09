@@ -158,7 +158,7 @@ export default class IndexHeader extends Component {
         window.location.reload()
       }
     }
-     
+
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}
@@ -170,7 +170,7 @@ export default class IndexHeader extends Component {
         onDismiss={handleDismiss}
         open={tool !== null}
       />,
-      document.getElementById('external-tool-mount-point')
+      document.getElementById('external-tool-mount-point'),
     )
   }
 
@@ -253,7 +253,7 @@ export default class IndexHeader extends Component {
                       debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
                         leading: false,
                         trailing: true,
-                      })
+                      }),
                     )
                   }
                 >
@@ -337,5 +337,5 @@ const selectedActions = [
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = WithBreakpoints(
-  connect(connectState, connectActions)(IndexHeader)
+  connect(connectState, connectActions)(IndexHeader),
 )

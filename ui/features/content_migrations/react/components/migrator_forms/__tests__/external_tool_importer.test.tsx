@@ -44,7 +44,7 @@ describe('ExternalToolImporter', () => {
         {...overrideProps}
         title={modalTitle}
         value="external_tool_1"
-      />
+      />,
     )
 
   function sendPostMessage(data: unknown) {
@@ -53,7 +53,7 @@ describe('ExternalToolImporter', () => {
       new MessageEvent('message', {
         data,
         origin: env.DEEP_LINKING_POST_MESSAGE_ORIGIN,
-      })
+      }),
     )
   }
 

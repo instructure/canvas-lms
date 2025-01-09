@@ -50,7 +50,7 @@ const validationSchema = z.object({
       NAME_MAX_LENGTH,
       I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
         nameMaxLength: NAME_MAX_LENGTH,
-      })
+      }),
     ),
   isPublic: z.boolean(),
 })

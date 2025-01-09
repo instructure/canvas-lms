@@ -57,8 +57,8 @@ export default {
     const errors = isArray(responseText.errors)
       ? this.translateErrors(responseText.errors)
       : responseText.errors && responseText.errors.base
-      ? [{message: `${responseText.errors.base}, ${responseText.status}`}]
-      : [{message}]
+        ? [{message: `${responseText.errors.base}, ${responseText.status}`}]
+        : [{message}]
 
     this.setState({errors})
     $.screenReaderFlashMessageExclusive(map(errors, error => error.message).join(' '))
@@ -98,7 +98,7 @@ export default {
         $.screenReaderFlashMessageExclusive(
           I18n.t('results_count', 'Showing %{num_results} search results', {
             num_results: this.state.collection.length,
-          })
+          }),
         )
       }
       return (

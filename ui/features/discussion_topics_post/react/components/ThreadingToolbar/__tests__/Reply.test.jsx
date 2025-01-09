@@ -43,7 +43,7 @@ beforeEach(() => {
 
 const setup = props => {
   return render(
-    <Reply onClick={Function.prototype} delimiterKey="reply" authorName="Nikita" {...props} />
+    <Reply onClick={Function.prototype} delimiterKey="reply" authorName="Nikita" {...props} />,
   )
 }
 
@@ -61,9 +61,9 @@ describe('Reply', () => {
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
     const {getByText} = setup({onClick: onClickMock})
-    expect(onClickMock.mock.calls.length).toBe(0)
+    expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getByText('Reply'))
-    expect(onClickMock.mock.calls.length).toBe(1)
+    expect(onClickMock.mock.calls).toHaveLength(1)
   })
 
   it('shows icon on desktop view', () => {
@@ -83,7 +83,7 @@ describe('Reply', () => {
       const container = setup()
 
       expect(container.getByTestId('threading-toolbar-reply').parentNode).toHaveStyle(
-        'margin: 0px 0.375rem 0px 0px'
+        'margin: 0px 0.375rem 0px 0px',
       )
     })
 

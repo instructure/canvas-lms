@@ -84,10 +84,10 @@ export default class CSPSelectionBox extends Component {
               {
                 disabled: initialState,
               },
-              showFlashError(I18n.t('Saving the CSP status failed, please try again.'))
+              showFlashError(I18n.t('Saving the CSP status failed, please try again.')),
             )
           })
-      }
+      },
     )
   }
 

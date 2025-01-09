@@ -89,9 +89,9 @@ export const DiscussionTopicRepliesContainer = props => {
         const entries = JSON.parse(
           JSON.stringify(
             props.discussionTopic.discussionEntriesConnection.nodes.filter(
-              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false
-            )
-          )
+              entry => entryIds.includes(entry._id) && entry.entryParticipant?.read === false,
+            ),
+          ),
         )
         entries.forEach(entry => (entry.entryParticipant.read = true))
         setDiscussionEntriesToUpdate(new Set())
@@ -159,7 +159,7 @@ export const DiscussionTopicRepliesContainer = props => {
           setPage={setPage}
           selectedPage={Math.ceil(
             atob(props.discussionTopic.discussionEntriesConnection.pageInfo.startCursor) /
-              ENV.per_page
+              ENV.per_page,
           )}
           totalPages={props.discussionTopic.entriesTotalPages}
         />

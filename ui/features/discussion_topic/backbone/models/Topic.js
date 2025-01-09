@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend as extend1} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -103,11 +101,11 @@ MaterializedDiscussionTopic.prototype.fetch = function (options) {
             baseInterval: 2000,
             maxAttempts: 12,
             backoffFactor: 1.6,
-          }
+          },
         )
         return loader.start()
       }
-    })(this)
+    })(this),
   )
 }
 

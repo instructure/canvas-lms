@@ -47,7 +47,7 @@ describe('InternalSettingsView', () => {
     const {findAllByText} = render(
       <MockedProvider mocks={internalSettingMocks} cache={createCache()}>
         <InternalSettingsView />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     // graphql-tools mocks most strings as "Hello World", so we have to use findAll
@@ -56,7 +56,7 @@ describe('InternalSettingsView', () => {
       internalSettingMocks[0].result.data!.internalSettings.flatMap(internalSetting => [
         findAllByText(internalSetting.name),
         internalSetting.secret ? [] : findAllByText(internalSetting.value!),
-      ])
+      ]),
     )
 
     // @ts-expect-error

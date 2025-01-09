@@ -161,12 +161,12 @@ const renderDueDates = lockedItems => {
 
 const clickSetCorrect = I18n.t(
     'titles.click_to_set_as_correct',
-    'Click to set this answer as correct'
+    'Click to set this answer as correct',
   ),
   isSetCorrect = I18n.t('titles.set_as_correct', 'This answer is set as correct'),
   clickUnsetCorrect = I18n.t(
     'titles.click_to_unset_as_correct',
-    'Click to unset this answer as correct'
+    'Click to unset this answer as correct',
   ),
   correctAnswerLabel = I18n.t('labels.correct_answer', 'Correct Answer'),
   possibleAnswerLabel = I18n.t('labels.possible_answer', 'Possible Answer')
@@ -259,7 +259,7 @@ function getChangeMultiFunc($questionContent, questionType, $select) {
       $select.append(
         "<option class='shown_when_no_other_options_available' value='0'>" +
           htmlEscape(I18n.t('enter_answer_variable_above', '[ Enter Answer Variables Above ]')) +
-          '</option>'
+          '</option>',
       )
     }
     $select.find('option.to_be_removed').remove()
@@ -288,7 +288,7 @@ export const quiz = (window.quiz = {
   // Determines whether or not to show the "show question details" link.
   checkShowDetails() {
     const hasQuestions = this.$questions.find(
-      'div.display_question:not(.essay_question, .file_upload_question, .text_only_question)'
+      'div.display_question:not(.essay_question, .file_upload_question, .text_only_question)',
     ).length
     this.$showDetailsWrap[hasQuestions ? 'show' : 'hide'](200)
   },
@@ -381,10 +381,10 @@ export const quiz = (window.quiz = {
       match_id: answer.match_id,
     }
     templateData.comments_header = I18n.beforeLabel(
-      I18n.t('labels.comments_on_answer', 'Comments, if the user chooses this answer')
+      I18n.t('labels.comments_on_answer', 'Comments, if the user chooses this answer'),
     )
     templateData.short_answer_header = I18n.beforeLabel(
-      I18n.t('labels.possible_answer', 'Possible Answer')
+      I18n.t('labels.possible_answer', 'Possible Answer'),
     )
 
     $answer
@@ -393,18 +393,18 @@ export const quiz = (window.quiz = {
         'title',
         I18n.t(
           'titles.click_to_enter_comments_on_answer',
-          'Click to enter comments for the student if they choose this answer'
-        )
+          'Click to enter comments for the student if they choose this answer',
+        ),
       )
 
     if (question_type === 'essay_question' || question_type === 'file_upload_question') {
       templateData.comments_header = I18n.beforeLabel(
-        I18n.t('labels.comments_on_question', 'Comments for this question')
+        I18n.t('labels.comments_on_question', 'Comments for this question'),
       )
     } else if (question_type === 'matching_question') {
       templateData.answer_match_left_html = answer.answer_match_left_html
       templateData.comments_header = I18n.beforeLabel(
-        I18n.t('labels.comments_on_wrong_match', 'Comments if the user gets this match wrong')
+        I18n.t('labels.comments_on_wrong_match', 'Comments if the user gets this match wrong'),
       )
       $answer
         .find('.comment_focus')
@@ -412,19 +412,19 @@ export const quiz = (window.quiz = {
           'title',
           I18n.t(
             'titles.click_to_enter_comments_on_wrong_match',
-            'Click to enter comments for the student if they miss this match'
-          )
+            'Click to enter comments for the student if they miss this match',
+          ),
         )
     } else if (question_type === 'missing_word_question') {
       templateData.short_answer_header = I18n.beforeLabel(
-        I18n.t('labels.answer_text', 'Answer text')
+        I18n.t('labels.answer_text', 'Answer text'),
       )
     } else if (question_type === 'multiple_choice_question') {
       templateData.answer_html = answer.answer_html
     } else if (question_type === 'multiple_answers_question') {
       templateData.answer_html = answer.answer_html
       templateData.short_answer_header = I18n.beforeLabel(
-        I18n.t('labels.answer_text', 'Answer text')
+        I18n.t('labels.answer_text', 'Answer text'),
       )
     } else if (question_type === 'fill_in_multiple_blanks_question') {
       templateData.blank_id = answer.blank_id
@@ -517,13 +517,13 @@ export const quiz = (window.quiz = {
           tinyOptions: {
             aria_label: I18n.t(
               'label.question.instructions',
-              'Question instructions, rich text area'
+              'Question instructions, rich text area',
             ),
           },
         },
         () => {
           quiz.rebindMultiChange(questionType, $questionContent[0].id, $select)
-        }
+        },
       )
       $form
         .find('.text_after_answers')
@@ -773,7 +773,7 @@ export const quiz = (window.quiz = {
       $text.html("<span class='text_before_answers'>" + raw(question.question_text) + '</span> ')
       $text.append($select)
       $text.append(
-        " <span class='text_after_answers'>" + raw(question.text_after_answers) + '</span>'
+        " <span class='text_after_answers'>" + raw(question.text_after_answers) + '</span>',
       )
     } else if (
       question.question_type === 'multiple_dropdowns_question' ||
@@ -824,12 +824,12 @@ export const quiz = (window.quiz = {
         $text.append(
           htmlEscape(
             I18n.beforeLabel(
-              I18n.t('labels.other_incorrect_matches', 'Other Incorrect Match Options')
-            )
+              I18n.t('labels.other_incorrect_matches', 'Other Incorrect Match Options'),
+            ),
           ) +
             "<ul class='matching_answer_incorrect_matches_list'>" +
             codeHtml +
-            '</ul>'
+            '</ul>',
         )
       }
     }
@@ -846,7 +846,7 @@ export const quiz = (window.quiz = {
         quiz.defaultQuestionData.question_type = question_type
         quiz.defaultQuestionData.answer_count = Math.min(
           $question.find('.answers .answer').length,
-          4
+          4,
         )
       }
     }
@@ -856,7 +856,7 @@ export const quiz = (window.quiz = {
       .showIf(
         !$question.closest('.question_holder').hasClass('group') &&
           !$('#questions').hasClass('survey_quiz') &&
-          question.question_type !== 'text_only_question'
+          question.question_type !== 'text_only_question',
       )
     $question.find('.unsupported_question_type_message').remove()
     quiz.updateDisplayComments()
@@ -947,7 +947,7 @@ export const quiz = (window.quiz = {
       .showIf(
         !$formQuestion.closest('.question_holder').hasClass('group') &&
           !$('#questions').hasClass('survey_quiz') &&
-          question_type !== 'text_only_question'
+          question_type !== 'text_only_question',
       )
 
     const options = {
@@ -1289,8 +1289,8 @@ scoreValidation = {
         $(this).errorBox(
           I18n.t(
             'errors.quiz_score_not_a_number',
-            'Score must be a number between 0 and 2,000,000,000.'
-          )
+            'Score must be a number between 0 and 2,000,000,000.',
+          ),
         )
       })
       .on('invalid:greater_than', function (e) {
@@ -1298,7 +1298,7 @@ scoreValidation = {
       })
       .on('invalid:less_than', function (e) {
         $(this).errorBox(
-          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.')
+          I18n.t('errors.quiz_score_too_long', 'Score must be less than 2,000,000,000.'),
         )
       })
     $('input#quiz_points_possible').change(this.validatePoints)
@@ -1398,7 +1398,10 @@ correctAnswerVisibility = {
 
     that.$toggler.on('invalid:bad_range', () => {
       $('#quiz_hide_correct_answers_at').errorBox(
-        I18n.t('errors.invalid_show_correct_answers_range', 'Hide date cannot be before show date.')
+        I18n.t(
+          'errors.invalid_show_correct_answers_range',
+          'Hide date cannot be before show date.',
+        ),
       )
 
       return true
@@ -1546,7 +1549,7 @@ function makeQuestion(data) {
     {},
     quiz.defaultQuestionData,
     {question_name: I18n.t('default_quesiton_name', 'Question')},
-    data
+    data,
   )
   const $question = $('#question_template').clone(true)
   $question.attr('id', '').find('.question').attr('id', 'question_new')
@@ -1870,8 +1873,8 @@ function questionLimitReached(inclusiveLimit) {
         I18n.t(
           'question_limit_reached',
           'You have reached the maximum number of questions allowed for a quiz (%{count}/%{limit}).\n\nAs a workaround, consider spreading the material across multiple quizzes.',
-          {count: numQuestions, limit: QUESTION_LIMIT}
-        )
+          {count: numQuestions, limit: QUESTION_LIMIT},
+        ),
       )
     })
     return true
@@ -1946,7 +1949,7 @@ ready(function () {
       $('#assignment_external_tools')[0],
       'assignment_edit',
       parseInt(ENV.COURSE_ID, 10),
-      parseInt(ENV.ASSIGNMENT_ID, 10)
+      parseInt(ENV.ASSIGNMENT_ID, 10),
     )
   }
 
@@ -2064,7 +2067,7 @@ ready(function () {
       if (!data['quiz[ip_filter]']) {
         erratic = true
         $('#quiz_ip_filter').errorBox(
-          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address')
+          I18n.t('errors.missing_ip_filter', 'You must enter a valid IP Address'),
         )
       }
     }
@@ -2073,7 +2076,7 @@ ready(function () {
       if (!data['quiz[access_code]']) {
         erratic = true
         $('#quiz_access_code').errorBox(
-          I18n.t('errors.missing_access_code', 'You must enter an access code')
+          I18n.t('errors.missing_access_code', 'You must enter an access code'),
         )
       }
     }
@@ -2137,7 +2140,7 @@ ready(function () {
           $dialog
             .find('.searching_message')
             .text(I18n.t('errors.retrieving_filters_failed', 'Retrieving Filters Failed'))
-        }
+        },
       )
     }
   })
@@ -2159,8 +2162,8 @@ ready(function () {
       alert(
         I18n.t(
           'quiz_short_answer_length_error',
-          'Answers for fill in the blank questions must be under 80 characters long'
-        )
+          'Answers for fill in the blank questions must be under 80 characters long',
+        ),
       )
       $(this).val(answerValue.substring(0, 80))
     }
@@ -2182,8 +2185,8 @@ ready(function () {
           alert(
             I18n.t(
               'quiz_attempts_length_error',
-              'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left'
-            )
+              'Quiz attempts are limited to 3 digits, if you would like to give your students unlimited attempts, do not check Allow Multiple Attempts box to the left',
+            ),
           )
           $attempts.val('')
         }
@@ -2237,7 +2240,7 @@ ready(function () {
         valid = false
         const headerOffset = $('#quiz_title')
           .errorBox(
-            I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1})
+            I18n.t('The Quiz name must be under %{length} characters', {length: maxNameLength + 1}),
           )
           .offset()
         $('html,body').scrollTo({top: headerOffset.top, left: 0})
@@ -2256,7 +2259,7 @@ ready(function () {
       data['quiz[title]'] = quiz_title
 
       data['quiz[points_possible'] = numberHelper.parse(
-        $("input[name='quiz[points_possible]']").val()
+        $("input[name='quiz[points_possible]']").val(),
       )
 
       if (!lockedItems.content) {
@@ -2452,7 +2455,7 @@ ready(function () {
   $('.start_over_link').click(event => {
     event.preventDefault()
     const result = confirm(
-      I18n.t('confirms.scrap_and_restart', 'Scrap this quiz and start from scratch?')
+      I18n.t('confirms.scrap_and_restart', 'Scrap this quiz and start from scratch?'),
     )
     if (result) {
       location.href += '?fresh=1'
@@ -2481,25 +2484,25 @@ ready(function () {
         event.target.value === 'assignment' || event.target.value === 'graded_survey'
       $('#post_to_sis_option').showIf(gradedQuiz)
       $('#quiz_options_form .quiz_survey_setting').showIf(
-        assignment_id && assignment_id.match(/survey/)
+        assignment_id && assignment_id.match(/survey/),
       )
       $('#quiz_points_possible').showIf(assignment_id === 'graded_survey')
       $('#survey_instructions').showIf(
-        assignment_id === 'survey' || assignment_id === 'graded_survey'
+        assignment_id === 'survey' || assignment_id === 'graded_survey',
       )
       $('#quiz_assignment_group_id')
         .closest('.control-group')
         .showIf(assignment_id === 'assignment' || assignment_id === 'graded_survey')
       $('#questions').toggleClass(
         'survey_quiz',
-        assignment_id === 'survey' || assignment_id === 'graded_survey'
+        assignment_id === 'survey' || assignment_id === 'graded_survey',
       )
       $('#quiz_display_points_possible').showIf(
-        assignment_id !== 'survey' && assignment_id !== 'graded_survey'
+        assignment_id !== 'survey' && assignment_id !== 'graded_survey',
       )
       $('#quiz_options_holder').toggleClass(
         'survey_quiz',
-        assignment_id === 'survey' || assignment_id === 'graded_survey'
+        assignment_id === 'survey' || assignment_id === 'graded_survey',
       )
       const url = $('#quiz_urls .update_quiz_url').attr('href')
       $('#quiz_title_input').val(quiz_title)
@@ -2533,7 +2536,7 @@ ready(function () {
               'class',
               $(this)
                 .attr('class')
-                .replace(/answer_for_[A-Za-z0-9]+/g, '')
+                .replace(/answer_for_[A-Za-z0-9]+/g, ''),
             )
             $(this).addClass('answer_for_' + variable)
           })
@@ -2561,7 +2564,7 @@ ready(function () {
         url: $(this).parents('.question_holder').find('.update_question_url').attr('href'),
         message: I18n.t(
           'confirms.delete_question',
-          'Are you sure you want to delete this question?'
+          'Are you sure you want to delete this question?',
         ),
         success(data) {
           $(this).remove()
@@ -2673,7 +2676,7 @@ ready(function () {
           $td.text(I18n.n(question.answers[idx].variables[jdx].value))
           $td.attr(
             'aria-labelledby',
-            'possible_solution_' + question.answers[idx].variables[jdx].name
+            'possible_solution_' + question.answers[idx].variables[jdx].name,
           )
           $tr.append($td)
         }
@@ -2736,14 +2739,14 @@ ready(function () {
 
     if (REGRADE_OPTIONS[questionID]) {
       const regradeOption = $(QuizRegradeView.prototype.template()).find(
-        'input[value=' + REGRADE_OPTIONS[questionID] + ']'
+        'input[value=' + REGRADE_OPTIONS[questionID] + ']',
       )
       const newAnswer = $form.find('.correct_answer')
       toggleAnswer($question, {regradeOption, newAnswer})
     }
     toggleSelectAnswerAltText(
       $('.form_answers .answer'),
-      quiz.answerSelectionType(question.question_type)
+      quiz.answerSelectionType(question.question_type),
     )
     togglePossibleCorrectAnswerLabel($('.form_answers .answer'))
   })
@@ -3025,7 +3028,7 @@ ready(function () {
       const msg = I18n.t(
         'confirms.delete_answer',
         'Are you sure? Deleting answers from a question with submissions ' +
-          'disables the option to regrade this question.'
+          'disables the option to regrade this question.',
       )
       if (!confirm(msg)) {
         return
@@ -3049,7 +3052,7 @@ ready(function () {
     $('.question_form .submit_button:visible,.quiz_group_form .submit_button:visible').each(
       function () {
         $(this).parents('form').trigger('submit')
-      }
+      },
     )
     const $group_top = $('#group_top_template').clone(true).attr('id', 'group_top_new')
     const $group_bottom = $('#group_bottom_template').clone(true).attr('id', 'group_bottom_new')
@@ -3139,10 +3142,10 @@ ready(function () {
             .text(
               I18n.t(
                 'errors.loading_banks_failed',
-                'Question Banks failed to load, please try again'
-              )
+                'Question Banks failed to load, please try again',
+              ),
             )
-        }
+        },
       )
     }
     $dialog.find('.bank.selected').removeClass('selected')
@@ -3221,10 +3224,10 @@ ready(function () {
             .text(
               I18n.t(
                 'errors.loading_banks_failed',
-                'Question Banks failed to load, please try again'
-              )
+                'Question Banks failed to load, please try again',
+              ),
             )
-        }
+        },
       )
     }
     $dialog.data('add_source', '')
@@ -3346,7 +3349,7 @@ ready(function () {
           .prop('disabled', false)
           .filter('.submit_button')
           .text(I18n.t('errors.creating_group_failed', 'Create Group Failed, Please Try Again'))
-      }
+      },
     )
   })
 
@@ -3466,13 +3469,13 @@ ready(function () {
             .text(
               I18n.t(
                 'errors.loading_questions_failed',
-                'Questions failed to load, please try again'
-              )
+                'Questions failed to load, please try again',
+              ),
             )
           $findQuestionDialog
             .find('.page_link')
             .text(I18n.t('errors.loading_more_questions_failed', 'loading more questions failed'))
-        }
+        },
       )
     })
     .on('click', '.select_all_link', event => {
@@ -3555,9 +3558,9 @@ ready(function () {
             .prop('disabled', false)
             .filter('.submit_button')
             .text(
-              I18n.t('errors.adding_questions_failed', 'Adding Questions Failed, please try again')
+              I18n.t('errors.adding_questions_failed', 'Adding Questions Failed, please try again'),
             )
-        }
+        },
       )
     })
 
@@ -3573,7 +3576,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3586,7 +3589,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3598,7 +3601,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_response_to_essay',
-            'Response to show student after they submit an answer'
+            'Response to show student after they submit an answer',
           ),
         },
       ]
@@ -3609,7 +3612,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_response_to_file_upload',
-            'Response to show student after they submit an answer'
+            'Response to show student after they submit an answer',
           ),
         },
       ]
@@ -3620,7 +3623,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_comments_on_wrong_match',
-            'Response if the user misses this match'
+            'Response if the user misses this match',
           ),
         },
       ]
@@ -3632,7 +3635,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3647,7 +3650,7 @@ ready(function () {
           answer_precision: '10',
           comments: I18n.t(
             'default_answer_comments_on_match',
-            'Response if the student matches this answer'
+            'Response if the student matches this answer',
           ),
         },
       ]
@@ -3659,7 +3662,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3671,7 +3674,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3682,7 +3685,7 @@ ready(function () {
         {
           comments: I18n.t(
             'default_answer_comments',
-            'Response if the student chooses this answer'
+            'Response if the student chooses this answer',
           ),
         },
       ]
@@ -3745,14 +3748,14 @@ ready(function () {
       if ($form.find('.combinations_holder .combinations tbody tr').length === 0) {
         error_text = I18n.t(
           'errors.no_possible_solution',
-          'Please generate at least one possible solution'
+          'Please generate at least one possible solution',
         )
       }
     } else if ($answers.length === 0 || $answers.filter('.correct_answer').length === 0) {
       if (
         $answers.length === 0 &&
         !['essay_question', 'file_upload_question', 'text_only_question'].includes(
-          questionData.question_type
+          questionData.question_type,
         )
       ) {
         error_text = I18n.t('errors.no_answer', 'Please add at least one answer')
@@ -3789,7 +3792,7 @@ ready(function () {
         })
       } else {
         const $validAnswers = $answers.filter(
-          "div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer"
+          "div[class*='answer_for_none'], div[class*='answer_idx_'], div.fill_in_blank_answer",
         )
         const $validInputs = $validAnswers
           .find($("input[name='answer_text']"))
@@ -3883,7 +3886,7 @@ ready(function () {
       question.formula_decimal_places =
         numberHelper.parse($question.find('.decimal_places .round').val()) || 0
       question.answer_tolerance = parseFloatOrPercentage(
-        $question.find('.combination_answer_tolerance').val()
+        $question.find('.combination_answer_tolerance').val(),
       )
       question.answerDecimalPoints =
         numberHelper.parse($question.find('.combination_error_margin').val()) || 0
@@ -3941,7 +3944,7 @@ ready(function () {
     }
     if ($('#assessment_question_bank_id').length > 0) {
       questionData['assessment_question[assessment_question_bank_id]'] = $(
-        '#assessment_question_bank_id'
+        '#assessment_question_bank_id',
       ).text()
     }
     $displayQuestion.loadingImage()
@@ -3981,7 +3984,7 @@ ready(function () {
       },
       data => {
         $displayQuestion.formErrors(data)
-      }
+      },
     )
   })
 
@@ -4051,7 +4054,7 @@ ready(function () {
             $teaser
               .find('.teaser.question_text')
               .text(I18n.t('errors.loading_question_failed', 'Loading Question Failed...'))
-          }
+          },
         )
       } else {
         showQuestion(question_data)
@@ -4278,10 +4281,10 @@ ready(function () {
       if (this.intoGroups.length > 0) {
         options = $.map(
           this.intoGroups,
-          g => '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>'
+          g => '<option value="' + g.id + '">' + htmlEscape(g.name) + '</option>',
         )
         options.unshift(
-          '<option value="top">' + htmlEscape(I18n.t('top_level', '-- Top level --')) + '</option>'
+          '<option value="top">' + htmlEscape(I18n.t('top_level', '-- Top level --')) + '</option>',
         )
 
         moveWrapper.show()
@@ -4312,12 +4315,12 @@ ready(function () {
           item.id +
           '">' +
           htmlEscape(I18n.t('before_quiz_item', 'before %{name}', {name: item.name})) +
-          '</option>'
+          '</option>',
       )
       options.push(
         '<option value="last">' +
           htmlEscape(I18n.t('at_the_bottom', '-- at the bottom --')) +
-          '</option>'
+          '</option>',
       )
       this.$form.find('#move_select_question').html(raw(options.join('')))
     },
@@ -4325,7 +4328,7 @@ ready(function () {
     itemsInGroup(group) {
       return $.grep(
         this.items,
-        item => item.id != this.selected.id && (group === 'top' ? item.top : item.group == group)
+        item => item.id != this.selected.id && (group === 'top' ? item.top : item.group == group),
       )
     },
 
@@ -4457,7 +4460,7 @@ ready(function () {
           this.$questions.loadingImage('remove')
         },
         {},
-        {contentType: 'application/json'}
+        {contentType: 'application/json'},
       )
     },
 
@@ -4525,7 +4528,7 @@ ready(function () {
         ui.placeholder.append(
           "<div class='question_placeholder' style='height: " +
             raw(ui.helper.height() - 10) +
-            "px;'>&nbsp;</div>"
+            "px;'>&nbsp;</div>",
         )
       }
     },
@@ -4582,7 +4585,7 @@ ready(function () {
       }
 
       let url = $('#quiz_urls .reorder_questions_url, #bank_urls .reorder_questions_url').attr(
-        'href'
+        'href',
       )
       var data = {}
       let $container = $('#questions')
@@ -4626,7 +4629,7 @@ ready(function () {
           $container.loadingImage('remove')
         },
         {},
-        {contentType: 'application/json'}
+        {contentType: 'application/json'},
       )
     },
   })
@@ -4776,7 +4779,7 @@ ready(function () {
     conditionalRelease.editor = ConditionalRelease.attach(
       $('#conditional_release_target').get(0),
       I18n.t('quiz'),
-      ENV.CONDITIONAL_RELEASE_ENV
+      ENV.CONDITIONAL_RELEASE_ENV,
     )
 
     $('#questions').on('change DOMNodeRemoved DOMNodeInserted', () => {
@@ -4839,7 +4842,7 @@ $.fn.multipleAnswerSetsQuestion = function () {
               'class',
               $(this)
                 .attr('class')
-                .replace(/answer_idx_\d+/g, '')
+                .replace(/answer_idx_\d+/g, ''),
             )
           })
           .addClass('answer_idx_' + i)
@@ -4963,8 +4966,8 @@ $.fn.formulaQuestion = function () {
         alert(
           I18n.t(
             'alerts.no_valid_combinations',
-            'The system could not generate any valid combinations for the parameters given'
-          )
+            'The system could not generate any valid combinations for the parameters given',
+          ),
         )
       } else if (succeeded < cnt) {
         alert(
@@ -4975,8 +4978,8 @@ $.fn.formulaQuestion = function () {
               other:
                 'The system could only generate %{count} valid combinations for the parameters given',
             },
-            {count: succeeded}
-          )
+            {count: succeeded},
+          ),
         )
       }
       $question.triggerHandler('settings_change', false)
@@ -4988,14 +4991,14 @@ $.fn.formulaQuestion = function () {
       $tbody = $table.find('tbody')
     $question.find('.supercalc').superCalc('cache_finds')
     const answer_tolerance = parseFloatOrPercentage(
-      $question.find('.combination_answer_tolerance').val()
+      $question.find('.combination_answer_tolerance').val(),
     )
     var next = function () {
       $button.text(
         I18n.t('buttons.generating_combinations_progress', 'Generating... (%{done}/%{total})', {
           done: succeeded,
           total: cnt,
-        })
+        }),
       )
       const fragment = document.createDocumentFragment()
       for (let idx = 0; idx < 5 && succeeded < cnt && failedCount < 25; idx++) {
@@ -5044,7 +5047,7 @@ $.fn.formulaQuestion = function () {
         I18n.t('buttons.generating_combinations_progress', 'Generating... (%{done}/%{total})', {
           done: succeeded,
           total: cnt,
-        })
+        }),
       )
       if (combinationIndex >= cnt || succeeded >= cnt || failedCount >= 25) {
         finished()
@@ -5175,7 +5178,7 @@ $.fn.formulaQuestion = function () {
                     "<td><div style='width: 70%;'><select aria-labelledby='" +
                     label_id +
                     " equation_var_precision' name='round' class='float_value round variable_setting'><option>0</option><option>1</option><option>2</option><option>3</option></div></td>" +
-                    "<td aria-labelledby='equation_var_example' class='value'></td></tr>"
+                    "<td aria-labelledby='equation_var_example' class='value'></td></tr>",
                 )
 
                 $question.find('.variables tbody').append($variable)

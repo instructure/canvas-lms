@@ -30,7 +30,6 @@ export default {
 const withForm = (children, opts = {}) => {
   return (
     <Form
-      // eslint-disable-next-line no-console
       onSubmit={values => console.log(values)}
       initialValues={opts.initialValues}
       render={({handleSubmit}) => (
@@ -50,7 +49,7 @@ const Template = () => withForm(<LabeledRceField name="field" label="Normal Fiel
 
 export const withRequiredValidator = () =>
   withForm(
-    <LabeledRceField name="field" label="With Required Validator" validate={requiredValidator} />
+    <LabeledRceField name="field" label="With Required Validator" validate={requiredValidator} />,
   )
 
 export const withInitialValues = () =>

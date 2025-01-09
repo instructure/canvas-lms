@@ -25,7 +25,7 @@ describe('ConfiguredTextInput', () => {
 
   it('renders with the correct label and value', () => {
     const {getByLabelText, getByDisplayValue} = render(
-      <ConfiguredTextInput label={label} inputValue={inputValue} onChange={() => {}} />
+      <ConfiguredTextInput label={label} inputValue={inputValue} onChange={() => {}} />,
     )
 
     expect(getByLabelText(label)).toBeInTheDocument()
@@ -37,7 +37,7 @@ describe('ConfiguredTextInput', () => {
     const handleChange = jest.fn()
 
     const {getByLabelText} = render(
-      <ConfiguredTextInput label={label} inputValue={inputValue} onChange={handleChange} />
+      <ConfiguredTextInput label={label} inputValue={inputValue} onChange={handleChange} />,
     )
 
     const input = getByLabelText(label)
@@ -53,7 +53,7 @@ describe('ConfiguredTextInput', () => {
         inputValue={inputValue}
         onChange={() => {}}
         disabled={true}
-      />
+      />,
     )
     expect(getByDisplayValue(inputValue)).toBeDisabled()
   })

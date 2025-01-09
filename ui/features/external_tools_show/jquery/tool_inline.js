@@ -65,11 +65,14 @@ ready(() => {
 
     // Firefox remembers disabled state after page reloads
     $button.prop('disabled', false)
-    setTimeout(() => {
-      // LTI links have a time component in the signature and will
-      // expire after a few minutes.
-      $button.prop('disabled', true).text($button.data('expired_message'))
-    }, 60 * 2.5 * 1000)
+    setTimeout(
+      () => {
+        // LTI links have a time component in the signature and will
+        // expire after a few minutes.
+        $button.prop('disabled', true).text($button.data('expired_message'))
+      },
+      60 * 2.5 * 1000,
+    )
 
     submitForm(function () {
       $(this).find('.load_tab,.tab_loaded').toggle()
@@ -117,7 +120,7 @@ ready(() => {
   const toolResizer = new ToolLaunchResizer(tool_height)
 
   const $external_content_info_alerts = $tool_content_wrapper.find(
-    '.before_external_content_info_alert, .after_external_content_info_alert'
+    '.before_external_content_info_alert, .after_external_content_info_alert',
   )
 
   $external_content_info_alerts.on('focus', function () {
@@ -166,7 +169,7 @@ ready(() => {
             // module item navigation from PLAT-1687
             const sequenceFooterHeight = $('#sequence_footer').outerHeight(true) || 0
             toolResizer.resize_tool_content_wrapper(
-              $window.height() - canvas_chrome_height - sequenceFooterHeight
+              $window.height() - canvas_chrome_height - sequenceFooterHeight,
             )
           }
         }

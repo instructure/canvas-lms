@@ -40,7 +40,7 @@ const renderTutorialTray = (props = {}) => {
         children: <span>This is the children</span>,
       })}
       ref={ref}
-    />
+    />,
   )
 
   return {

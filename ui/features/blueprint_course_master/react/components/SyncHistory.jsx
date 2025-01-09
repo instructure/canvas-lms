@@ -127,7 +127,7 @@ const connectState = state => {
       'isLoadingAssociations',
       ['existingAssociations', 'associations'],
     ]),
-    historyState
+    historyState,
   )
 }
 const connectActions = dispatch => bindActionCreators(actions, dispatch)

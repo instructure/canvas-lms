@@ -114,8 +114,8 @@ describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
           title: 'Assignment 1',
           grading_type: 'points',
           points_possible: 10,
-          previous_id: '1'
-        }
+          previous_id: '1',
+        },
       ],
       original_submissions: [
         {
@@ -123,8 +123,8 @@ describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
           grade: '10',
           gradeable: true,
           original_grade: '10',
-          user_id: '1'
-        }
+          user_id: '1',
+        },
       ],
       students: [
         {
@@ -137,11 +137,11 @@ describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
               assignment_id: '1',
               grade: '10',
               gradeable: true,
-              original_grade: '10'
-            }
-          ]
-        }
-      ]
+              original_grade: '10',
+            },
+          ],
+        },
+      ],
     }
     waitForProcessing.waitForProcessing.mockResolvedValue(uploadedGradebook)
 
@@ -154,7 +154,9 @@ describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
   it.skip('recognizes that there are changed assignments when original grade was ungraded', async () => {
     const uploadedGradebook = {
       ...defaultUploadedGradebook,
-      assignments: [{grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'}],
+      assignments: [
+        {grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'},
+      ],
       original_submissions: [{assignment_id: '73', gradeable: true, score: '0.0', user_id: '1'}],
       students: [
         {
@@ -162,7 +164,9 @@ describe('gradebook_uploads#handleThingsNeedingToBeResolved', () => {
           last_name_first: 'Efron, Zac',
           name: 'Zac Efron',
           previous_id: '1',
-          submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: '0.0'}],
+          submissions: [
+            {assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: '0.0'},
+          ],
         },
       ],
     }

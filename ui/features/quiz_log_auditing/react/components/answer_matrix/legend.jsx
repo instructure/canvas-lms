@@ -49,7 +49,7 @@ const Legend = () => (
       <Emblem answered={true} last={true} />
       {I18n.t(
         'legend.filled_circle_desc',
-        'The final answer for the question, the one that counts.'
+        'The final answer for the question, the one that counts.',
       )}
     </dd>
   </dl>

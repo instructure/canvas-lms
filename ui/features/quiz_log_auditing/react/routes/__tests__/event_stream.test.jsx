@@ -26,7 +26,7 @@ describe('canvas_quizzes/events/routes/event_stream', () => {
     render(
       <MemoryRouter>
         <EventStreamRoute />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

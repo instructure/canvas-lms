@@ -29,7 +29,6 @@ export default class EditCalendarEventDetails {
     }
 
     if (formHolder) {
-      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <CalendarEventDetailsForm
           event={event}
@@ -37,7 +36,7 @@ export default class EditCalendarEventDetails {
           contextChangeCB={contextChangeCB}
           setSetContextCB={this.setSetContextCB}
         />,
-        formHolder
+        formHolder,
       )
     }
   }

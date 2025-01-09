@@ -51,7 +51,7 @@ function FinalGradeOverrideContainer({
     const updatedScore = await updateFinalGradeOverride(
       enrollmentId,
       gradingPeriodId,
-      castedEnteredGrade
+      castedEnteredGrade,
     )
     setApiCallStatus(ApiCallStatus.COMPLETED)
     if (updatedScore) {

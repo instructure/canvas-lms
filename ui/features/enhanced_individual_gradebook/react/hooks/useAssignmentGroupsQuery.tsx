@@ -34,7 +34,7 @@ export const useAssignmentGroupsQuery = (courseId: string) => {
 
   const assignmentGroups = useMemo(
     () => data?.pages.flatMap(page => page.course.assignmentGroupsConnection.nodes) ?? [],
-    [data]
+    [data],
   )
 
   return {

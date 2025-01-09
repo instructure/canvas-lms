@@ -53,8 +53,8 @@ export default class ResendInvitationsView extends View {
       () => $.flashMessage(I18n.t('invitations_re_sent', 'Invitations sent successfully')),
       () =>
         $.flashError(
-          I18n.t('error_sending_invitations', 'Error sending invitation. Please try again.')
-        )
+          I18n.t('error_sending_invitations', 'Error sending invitation. Please try again.'),
+        ),
     )
     return $.when(xhr).always(() => (this.sending = false), this.render.bind(this))
   }

@@ -63,10 +63,8 @@ const RenderViewsSelector = ({
   }
 
   useEffect(() => {
-     
     document.addEventListener('calendar:header:select_view', handleViewChange as EventListener)
     return () =>
-       
       document.removeEventListener('calendar:header:select_view', handleViewChange as EventListener)
   }, [view])
 
@@ -176,7 +174,7 @@ const RenderContent = ({
               <div className="recommend_agenda screenreader-only">
                 <button id="use_agenda" className="accessibility-warning" type="button">
                   {I18n.t(
-                    'Warning: For improved accessibility, please use the "Agenda view" Calendar.'
+                    'Warning: For improved accessibility, please use the "Agenda view" Calendar.',
                   )}
                 </button>
               </div>

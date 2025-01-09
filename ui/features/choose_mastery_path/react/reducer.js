@@ -26,7 +26,7 @@ export default combineReducers({
     {
       [actions.SET_ERROR]: (state, action) => action.payload,
     },
-    ''
+    '',
   ),
   options: handleActions(
     {
@@ -43,13 +43,13 @@ export default combineReducers({
         return options
       },
     },
-    []
+    [],
   ),
   selectedOption: handleActions(
     {
       [actions.SELECT_OPTION]: (state, action) => action.payload,
     },
-    null
+    null,
   ),
   courseId: (state = '', _action) => state,
   moduleId: (state = '', _action) => state,

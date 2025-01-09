@@ -60,13 +60,13 @@ const ExternalToolImporter = ({
   const [urlError, setUrlError] = React.useState(false)
   const [titleValue, setTitleValue] = React.useState('')
 
-  const { contextType, contextId, selectedToolid } = useMemo(() => {
-    const contextInfo = ENV?.context_asset_string?.split('_');
-    const contextType = contextInfo[0];
-    const contextId = parseInt(contextInfo[1], 10);
-    const selectedToolid = value.split('_').pop();
-    return { contextType, contextId, selectedToolid };
-  }, [value]);
+  const {contextType, contextId, selectedToolid} = useMemo(() => {
+    const contextInfo = ENV?.context_asset_string?.split('_')
+    const contextType = contextInfo[0]
+    const contextId = parseInt(contextInfo[1], 10)
+    const selectedToolid = value.split('_').pop()
+    return {contextType, contextId, selectedToolid}
+  }, [value])
 
   useEffect(() => {
     window.addEventListener('message', processMigrationContentItem)
@@ -85,7 +85,7 @@ const ExternalToolImporter = ({
       }
       onSubmit(formData)
     },
-    [url, onSubmit]
+    [url, onSubmit],
   )
 
   const handleExternalContentReady = (data: handleExternalContentReadyParam) => {

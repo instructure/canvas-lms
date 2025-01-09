@@ -40,7 +40,7 @@ export const getContextQuery = contextType => {
 
 export const addNewGroupCategoryToCache = (cache, newCategory) => {
   const {contextQueryToUse, contextQueryVariables} = getContextQuery(
-    ENV.context_is_not_group ? 'Course' : 'Group'
+    ENV.context_is_not_group ? 'Course' : 'Group',
   )
 
   const data = JSON.parse(
@@ -48,8 +48,8 @@ export const addNewGroupCategoryToCache = (cache, newCategory) => {
       cache.readQuery({
         query: contextQueryToUse,
         variables: contextQueryVariables,
-      })
-    )
+      }),
+    ),
   )
 
   const relevantGroupCategoryData = {
@@ -123,7 +123,7 @@ export const buildAssignmentOverrides = discussion => {
     })) || []
 
   const hasCourseOverride = overrides.some(obj =>
-    obj.assignedList.some(item => item.includes('course') && !item.includes('section'))
+    obj.assignedList.some(item => item.includes('course') && !item.includes('section')),
   )
 
   let checkpointOverrides = []
@@ -139,7 +139,7 @@ export const buildAssignmentOverrides = discussion => {
 
       discussion.assignment.checkpoints.forEach(checkpoint => {
         // select the correct checkpoint override for the assignee;
-        // eslint-disable-next-line @typescript-eslint/no-shadow
+
         const override = checkpoint.assignmentOverrides.nodes.filter(override => {
           return JSON.stringify(assignee) === JSON.stringify(getAssignedList(override))
         })[0]
@@ -161,10 +161,10 @@ export const buildAssignmentOverrides = discussion => {
     })
 
     const topicCheckpoint = discussion.assignment.checkpoints.find(
-      checkpoint => checkpoint.tag === REPLY_TO_TOPIC
+      checkpoint => checkpoint.tag === REPLY_TO_TOPIC,
     )
     const replyCheckpoint = discussion.assignment.checkpoints.find(
-      checkpoint => checkpoint.tag === REPLY_TO_ENTRY
+      checkpoint => checkpoint.tag === REPLY_TO_ENTRY,
     )
 
     if (topicCheckpoint.dueAt || topicCheckpoint.unlockAt || topicCheckpoint.lockAt) {
@@ -211,7 +211,7 @@ const getCheckpointAssignees = checkpoints => {
     let allAssignees = []
     checkpoints.forEach(checkpoint => {
       const checkpointAssignees = checkpoint.assignmentOverrides?.nodes.map(override =>
-        getAssignedList(override)
+        getAssignedList(override),
       )
       allAssignees = [...new Set([...allAssignees, ...checkpointAssignees])]
     })

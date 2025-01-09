@@ -159,7 +159,7 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
                   <RolePillContainer
                     discussionRoles={resolveAuthorRoles(
                       props.isTopicAuthor,
-                      props.author?.courseRoles
+                      props.author?.courseRoles,
                     )}
                     data-testid="pill-container"
                   />
@@ -295,7 +295,7 @@ const Timestamps = props => {
               editorName: userNameToShow(
                 props.editor.displayName || props.editor.shortName,
                 props.author._id,
-                props.editor.courseRoles
+                props.editor.courseRoles,
               ),
               editedTimingDisplay: props.editedTimingDisplay,
             })

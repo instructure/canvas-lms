@@ -67,7 +67,7 @@ describe('AssessmentAuditTray CreatorEventGroup', () => {
       beforeEach(() => {
         const event = buildAssignmentUpdatedEvent(
           {createdAt: '2018-09-01T13:00:00Z', id: '4904'},
-          {anonymous_grading: [true, false]}
+          {anonymous_grading: [true, false]},
         )
         auditEvents.splice(1, 0, event)
       })
@@ -80,7 +80,9 @@ describe('AssessmentAuditTray CreatorEventGroup', () => {
       // FOO-3825
       it.skip('displays a tooltip', () => {
         renderComponent()
-        expect(screen.getByText(`${users[0].name} performed actions while anonymous was off`)).toBeInTheDocument()
+        expect(
+          screen.getByText(`${users[0].name} performed actions while anonymous was off`),
+        ).toBeInTheDocument()
       })
     })
 

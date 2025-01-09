@@ -192,10 +192,9 @@ class Popup extends React.Component {
 
     const Content = this.props.content
 
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Content ref={this.contentRef} {...this.getContentProps(this.props)} />,
-      $container[0]
+      $container[0],
     )
 
     this.setState({
@@ -221,11 +220,10 @@ class Popup extends React.Component {
     if (this.contentRef.current && this.state.container) {
       const Content = this.props.content
 
-      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <Content ref={this.contentRef} {...this.getContentProps(this.props)} />,
         this.state.container,
-        this.contentDidUpdate.bind(this)
+        this.contentDidUpdate.bind(this),
       )
     }
   }
@@ -296,7 +294,7 @@ class Popup extends React.Component {
         console.warn(
           'Popup anchor was not found, defaulting to $(this).',
           'Selector: %s',
-          this.props.anchorSelector
+          this.props.anchorSelector,
         )
       }
       $anchor = $this
@@ -363,7 +361,7 @@ class Popup extends React.Component {
           hide: this.__onHide.bind(this),
         },
       },
-      this.props.popupOptions
+      this.props.popupOptions,
     )
 
     // Default targets are the popup anchor

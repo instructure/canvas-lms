@@ -68,7 +68,7 @@ export const AssignmentDueDatesManager = () => {
 
   const handleAssignedInfoChange = (newInfo, dueDateId) => {
     const updatedInfoList = assignedInfoList.map(info =>
-      info.dueDateId === dueDateId ? {...info, ...newInfo} : info
+      info.dueDateId === dueDateId ? {...info, ...newInfo} : info,
     )
     setAssignedInfoList(updatedInfoList)
   }
@@ -123,7 +123,7 @@ export const AssignmentDueDatesManager = () => {
     setListOptions({
       '': getDefaultBaseOptions(
         ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED,
-        showEveryoneElseOption ? defaultEveryoneElseOption : defaultEveryoneOption
+        showEveryoneElseOption ? defaultEveryoneElseOption : defaultEveryoneOption,
       ),
       'Course Sections': sections.map(section => {
         return {assetCode: `course_section_${section?.id}`, label: section?.name}

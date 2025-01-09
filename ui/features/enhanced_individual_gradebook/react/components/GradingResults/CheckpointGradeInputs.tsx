@@ -46,11 +46,11 @@ type Props = {
   handleSubmitGrade?: (subAssignmentTag: string) => void
   handleChangeReplyToTopicPassFailStatus: (
     e: React.SyntheticEvent<Element, Event>,
-    data: {value?: string | number}
+    data: {value?: string | number},
   ) => void
   handleChangeReplyToEntryPassFailStatus: (
     e: React.SyntheticEvent<Element, Event>,
-    data: {value?: string | number}
+    data: {value?: string | number},
   ) => void
   elementWrapper?: 'span' | 'div'
   margin?: Spacing
@@ -66,7 +66,7 @@ const findCheckpoint = (assignment: AssignmentConnection, tag: string) => {
 
 const buildCheckpointAssignment = (
   assignment: AssignmentConnection,
-  checkpointTag: string
+  checkpointTag: string,
 ): AssignmentConnection => {
   const checkpoint = findCheckpoint(assignment, checkpointTag)
   return {
@@ -85,7 +85,7 @@ const findSubAssignmentSubmission = (submission: GradebookUserSubmissionDetails,
 
 const buildSubAssignmentSubmission = (
   submission: GradebookUserSubmissionDetails,
-  tag: string
+  tag: string,
 ): GradebookUserSubmissionDetails => {
   const subAssignmentSubmission = findSubAssignmentSubmission(submission, tag)
   return {

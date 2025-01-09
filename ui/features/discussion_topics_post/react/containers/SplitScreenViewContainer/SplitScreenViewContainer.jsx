@@ -101,7 +101,7 @@ export const SplitScreenViewContainer = props => {
 
   const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
     onEntryCreationCompletion,
-    updateCache
+    updateCache,
   )
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
@@ -134,7 +134,7 @@ export const SplitScreenViewContainer = props => {
       ...(splitScreenEntryNewerDirection.data?.legacyNode?.discussionSubentriesConnection?.nodes ||
         []),
     ].find(
-      oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id
+      oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id,
     )
     if (
       entry &&
@@ -151,7 +151,7 @@ export const SplitScreenViewContainer = props => {
       updateDiscussionEntryRootEntryCounts(
         cache,
         result.data.updateDiscussionEntryParticipant.discussionEntry,
-        discussionUnreadCountChange
+        discussionUnreadCountChange,
       )
     }
   }
@@ -189,7 +189,6 @@ export const SplitScreenViewContainer = props => {
   }
 
   const onDelete = discussionEntry => {
-     
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
@@ -233,8 +232,8 @@ export const SplitScreenViewContainer = props => {
       parentEntryDepth === 3
         ? parentIdOfParentEntry
         : parentEntryDepth > 3
-        ? rootTopicReplyId
-        : parentId
+          ? rootTopicReplyId
+          : parentId
     const variables = {
       discussionTopicId: props.discussionTopic._id,
       parentEntryId: createdEntryParentId,
@@ -250,7 +249,7 @@ export const SplitScreenViewContainer = props => {
       rootEntryId: rootTopicReplyId,
       quotedEntry: buildQuotedReply(
         splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection?.nodes,
-        replyFromId
+        replyFromId,
       ),
       isAnonymous:
         !!props.discussionTopic.anonymousState && props.discussionTopic.canReplyAnonymously,
@@ -272,7 +271,7 @@ export const SplitScreenViewContainer = props => {
               data-mention={splitScreenEntryOlderDirection?.data?.legacyNode.author?._id}
             >
               @{getDisplayName(splitScreenEntryOlderDirection.data.legacyNode)}
-            </span>
+            </span>,
           )
         : ''
 
@@ -352,8 +351,8 @@ export const SplitScreenViewContainer = props => {
             client.readQuery({
               query: DISCUSSION_SUBENTRIES_QUERY,
               variables: splitScreenEntryOlderDirectionVariables,
-            })
-          )
+            }),
+          ),
         )
 
         queryResult.legacyNode.discussionSubentriesConnection.nodes = [
@@ -423,7 +422,7 @@ export const SplitScreenViewContainer = props => {
     ) {
       const isOnSubentries =
         splitScreenEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection?.nodes.some(
-          entry => entry._id === props.highlightEntryId
+          entry => entry._id === props.highlightEntryId,
         )
 
       if (!isOnSubentries && hasMoreOlderReplies) {
@@ -493,7 +492,7 @@ export const SplitScreenViewContainer = props => {
                     ...splitScreenEntryOlderDirection.data?.legacyNode
                       ?.discussionSubentriesConnection?.nodes,
                   ].filter(item => item),
-                  replyFromId
+                  replyFromId,
                 )}
                 value={getRCEStartingValue()}
                 onInit={() => {

@@ -84,7 +84,7 @@ export default class AddExternalFeed extends React.Component {
       {
         isOpen: expanded,
       },
-      this.focusOnToggleHeader
+      this.focusOnToggleHeader,
     )
   }
 
@@ -220,7 +220,7 @@ export default class AddExternalFeed extends React.Component {
               this.state.phrase,
               I18n.t('Enter specific phrase'),
               this.handleTextInputSetPhrase,
-              'external-rss-feed__phrase-input'
+              'external-rss-feed__phrase-input',
             )}
         </View>
       </div>
@@ -252,7 +252,7 @@ export default class AddExternalFeed extends React.Component {
                 this.state.feedURL,
                 I18n.t('Feed url'),
                 this.handleTextInputSetFeedURL,
-                'external-rss-feed__url-input'
+                'external-rss-feed__url-input',
               )}
               {this.renderEmbeddedSelection()}
               {this.renderSpecificHeaderPhrase()}

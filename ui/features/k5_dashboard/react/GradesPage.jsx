@@ -47,7 +47,7 @@ export const getGradingPeriodsFromCourses = courses =>
 export const overrideCourseGradingPeriods = (
   courses,
   selectedGradingPeriodId,
-  specificPeriodGrades
+  specificPeriodGrades,
 ) =>
   courses &&
   courses
@@ -84,7 +84,7 @@ export const getCoursesByObservee = (courses, observedUserId, currentUser) => {
     // If the observed user is the current user, only non-observer enrollments
     // will be considered
     coursesByObservee = courses.filter(c =>
-      c.enrollments?.find(e => e.type !== 'observer' && e.user_id === currentUserId)
+      c.enrollments?.find(e => e.type !== 'observer' && e.user_id === currentUserId),
     )
   } else if (observedUserId) {
     // Filtering courses by the observed User
@@ -94,8 +94,8 @@ export const getCoursesByObservee = (courses, observedUserId, currentUser) => {
           e =>
             e.type === 'observer' &&
             e.user_id === currentUserId &&
-            e.associated_user_id === observedUserId
-        )
+            e.associated_user_id === observedUserId,
+        ),
       )
       .map(course => {
         // observer enrollments don't include observee grades information,
@@ -139,7 +139,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
           setLoading(false)
         }
       },
-      [currentUser] // eslint-disable-line react-hooks/exhaustive-deps
+      [currentUser], // eslint-disable-line react-hooks/exhaustive-deps
     ),
     error: useCallback(err => {
       showFlashError(I18n.t('Failed to load the grades tab'))(err)
@@ -195,7 +195,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
   const selectedCourses = overrideCourseGradingPeriods(
     coursesByUser,
     selectedGradingPeriodId,
-    specificPeriodGrades
+    specificPeriodGrades,
   )
 
   // Only show the grading period selector if the user has student role

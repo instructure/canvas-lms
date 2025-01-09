@@ -64,17 +64,16 @@ ready(function () {
 
   // Add screen reader message for student annotation assignments
   const accessibilityAlert = I18n.t(
-    'The student annotation tab includes the document for the assignment. Tabs with additional submission types may also be available.'
+    'The student annotation tab includes the document for the assignment. Tabs with additional submission types may also be available.',
   )
   const alertMount = () => document.getElementById('annotated-screenreader-alert')
 
   if (alertMount()) {
-     
     ReactDOM.render(
       <Alert screenReaderOnly={true} liveRegion={alertMount} liveRegionPoliteness="assertive">
         {accessibilityAlert}
       </Alert>,
-      alertMount()
+      alertMount(),
     )
   }
 
@@ -90,17 +89,15 @@ ready(function () {
 
       const $emojiPicker = $container.find('.emoji-picker-container')
       if ($emojiPicker.length) {
-         
         ReactDOM.render(<EmojiPicker insertEmoji={insertEmoji.bind(this)} />, $emojiPicker[0])
         $emojiPicker.show()
       }
 
       const $emojiQuickPicker = $container.find('.emoji-quick-picker-container')
       if ($emojiQuickPicker.length) {
-         
         ReactDOM.render(
           <EmojiQuickPicker insertEmoji={insertEmoji.bind(this)} />,
-          $emojiQuickPicker[0]
+          $emojiQuickPicker[0],
         )
         $emojiQuickPicker.show()
       }
@@ -187,7 +184,6 @@ ready(function () {
           const mountPoint = document.getElementById('progress_indicator')
 
           if (mountPoint) {
-             
             ReactDOM.render(
               <ProgressCircle
                 screenReaderLabel={I18n.t('Uploading Progress')}
@@ -199,7 +195,7 @@ ready(function () {
                   I18n.t('%{percent}% complete', {percent: Math.round((valueNow * 100) / valueMax)})
                 }
               />,
-              mountPoint
+              mountPoint,
             )
           }
         }
@@ -208,7 +204,10 @@ ready(function () {
       // warn user if they haven't uploaded any files
       if (fileElements.length === 0 && uploadedAttachmentIds === '') {
         $.flashError(
-          I18n.t('#errors.no_attached_file', 'You must attach at least one file to this assignment')
+          I18n.t(
+            '#errors.no_attached_file',
+            'You must attach at least one file to this assignment',
+          ),
         )
         reenableSubmitButton()
         return false
@@ -239,8 +238,8 @@ ready(function () {
                 I18n.t(
                   '#errors.wrong_file_extension',
                   'The file you selected with extension "%{extension}", is not authorized for submission',
-                  {extension: ext}
-                )
+                  {extension: ext},
+                ),
               )
             }
           }
@@ -295,7 +294,7 @@ ready(function () {
     if ($('#submit_assignment:visible').length > 0 && !submitting) {
       e.returnValue = I18n.t(
         'messages.not_submitted_yet',
-        'You haven\'t finished submitting your assignment.  You still need to click "Submit" to finish turning it in.  Do you want to leave this page anyway?'
+        'You haven\'t finished submitting your assignment.  You still need to click "Submit" to finish turning it in.  Do you want to leave this page anyway?',
       )
       return e.returnValue
     }
@@ -325,17 +324,18 @@ ready(function () {
     if (late && !skipConfirmation) {
       let result
       if ($('.resubmit_link').length > 0) {
-         
         result = window.confirm(
           I18n.t(
             'messages.now_overdue',
-            'This assignment is now overdue.  Any new submissions will be marked as late.  Continue anyway?'
-          )
+            'This assignment is now overdue.  Any new submissions will be marked as late.  Continue anyway?',
+          ),
         )
       } else {
-         
         result = window.confirm(
-          I18n.t('messages.overdue', 'This assignment is overdue.  Do you still want to submit it?')
+          I18n.t(
+            'messages.overdue',
+            'This assignment is overdue.  Do you still want to submit it?',
+          ),
         )
       }
       if (!result) {
@@ -405,7 +405,7 @@ ready(function () {
         $('#submission_attachment_ids').val(fileInfo.id)
         $('#submission_attachment_ids').data(String(fileInfo.id), fileInfo.name)
         $.screenReaderFlashMessageExclusive(
-          I18n.t('selected %{filename}', {filename: fileInfo.name})
+          I18n.t('selected %{filename}', {filename: fileInfo.name}),
         )
       }}
       allowUpload={false}
@@ -418,7 +418,7 @@ ready(function () {
     const fileEl = $('#uploaded_files')
     if (fileEl.is(':hidden')) {
       $.screenReaderFlashMessage(I18n.t('File tree expanded'))
-       
+
       ReactDOM.render(fileBrowser, document.getElementById('uploaded_files'))
     } else {
       $.screenReaderFlashMessage(I18n.t('File tree collapsed'))
@@ -438,7 +438,7 @@ ready(function () {
       const wrapperDom = clone.find('.attachment_wrapper')[0]
       if (wrapperDom) {
         const index = ++submissionAttachmentIndex
-         
+
         ReactDOM.render(
           <Attachment
             index={index}
@@ -446,7 +446,7 @@ ready(function () {
               webcamBlobs[index] = blob
             }}
           />,
-          wrapperDom
+          wrapperDom,
         )
       }
       toggleRemoveAttachmentLinks()
@@ -468,10 +468,9 @@ ready(function () {
           type: 'event',
           payload: 'done',
         },
-        window.opener.location.toString()
+        window.opener.location.toString(),
       )
     } catch (e) {
-       
       console.error(e)
       captureException(e)
     }
@@ -480,14 +479,14 @@ ready(function () {
   function toggleRemoveAttachmentLinks() {
     $('#submit_online_upload_form .remove_attachment_link').showIf(
       $('#submit_online_upload_form .submission_attachment:not(#submission_attachment_blank)')
-        .length > 1
+        .length > 1,
     )
   }
   function checkAllowUploadSubmit() {
     // disable the submit button if any extensions are bad
     $('#submit_online_upload_form button[type=submit]').prop(
       'disabled',
-      !!$('.bad_ext_msg:visible').length
+      !!$('.bad_ext_msg:visible').length,
     )
   }
   function getFilename(fileInput) {
@@ -530,7 +529,7 @@ ready(function () {
       })
       .catch(error => {
         annotatedDocumentSubmission.replaceWith(
-          `<div>${I18n.t('There was an error loading the document.')}</div>`
+          `<div>${I18n.t('There was an error loading the document.')}</div>`,
         )
 
         return error

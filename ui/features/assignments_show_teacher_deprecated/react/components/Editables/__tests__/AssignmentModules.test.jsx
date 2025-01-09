@@ -47,7 +47,7 @@ describe('AssignmentModulesUI', () => {
         onChangeMode={() => {}}
         moduleList={moduleList}
         selectedModules={moduleList.slice(0, 2)}
-      />
+      />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     expect(getByText('Module 1 | Module 2')).toBeInTheDocument()
@@ -63,7 +63,7 @@ describe('AssignmentModulesUI', () => {
         onChangeMode={() => {}}
         moduleList={moduleList}
         selectedModules={moduleList.slice(1, 3)}
-      />
+      />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     expect(getByText(moduleList[1].name)).toBeInTheDocument()
@@ -79,7 +79,7 @@ describe('AssignmentModulesUI', () => {
         onChange={() => {}}
         onChangeMode={() => {}}
         moduleList={moduleList}
-      />
+      />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     expect(getByText('No Module Assigned')).toBeInTheDocument()
@@ -94,7 +94,7 @@ describe('AssignmentModulesUI', () => {
         onChange={() => {}}
         onChangeMode={() => {}}
         moduleList={moduleList}
-      />
+      />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     // I don't know of any other way to test this w/o peeking into SelectMultiple's impl
@@ -119,7 +119,7 @@ describe('AssignmentModulesUI', () => {
         <span id="focus-me" tabIndex="-1">
           just here to get focus
         </span>
-      </div>
+      </div>,
     )
 
     const input = container.querySelectorAll('input')[1] // SelectMultiple has 2 inputs
@@ -145,7 +145,7 @@ describe('AssignmentModulesUI', () => {
           just here to get focus
         </span>
       </div>,
-      {container}
+      {container},
     )
     expect(onchange).toHaveBeenCalledWith(moduleList.slice(0, 2))
   })

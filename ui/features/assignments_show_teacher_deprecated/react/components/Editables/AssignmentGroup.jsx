@@ -42,12 +42,12 @@ const AssignmentGroupPropTypes = {
   readOnly: bool,
 }
 // eslint doesn't deal with the prop types being defined this way
- 
+
 const AssignmentGroupDefaultProps = {
   assignmentGroupList: [],
   readOnly: false,
 }
- 
+
 const assignmentGroupPlaceholder = I18n.t('No Assignment Group Assigned')
 
 class AssignmentGroupUI extends React.Component {
@@ -197,7 +197,7 @@ function mergeThePage(previousResult, {fetchMoreResult}) {
     r = set(
       r,
       'course.assignmentGroupsConnection.nodes',
-      previousResult.course.assignmentGroupsConnection.nodes.concat(newGroups)
+      previousResult.course.assignmentGroupsConnection.nodes.concat(newGroups),
     )
     return r
   })

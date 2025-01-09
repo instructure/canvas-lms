@@ -116,15 +116,14 @@ ready(() => {
 
   const node = document.querySelector('.loadingIndicator')
   if (node instanceof HTMLElement) {
-     
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,
-      node
+      node,
     )
   }
-   
+
   getPrefetchedXHR('assignment_groups_url')
     .then(res =>
       res.json().then(data => {
@@ -138,7 +137,7 @@ ready(() => {
         if (!assignmentGroups.loadedAll) {
           return assignmentGroups.fetch({page: 'next'})
         }
-      })
+      }),
     )
     .then(() => {
       if (ENV.HAS_GRADING_PERIODS) {

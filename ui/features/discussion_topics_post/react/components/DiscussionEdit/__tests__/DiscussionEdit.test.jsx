@@ -80,7 +80,7 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps({onCancel: onCancelMock}))
       const cancelButton = getByTestId('DiscussionEdit-cancel')
       fireEvent.click(cancelButton)
-      expect(onCancelMock.mock.calls.length).toBe(1)
+      expect(onCancelMock.mock.calls).toHaveLength(1)
     })
 
     it('should fire onSubmit when clicked', () => {
@@ -88,7 +88,7 @@ describe('DiscussionEdit', () => {
       const {getByTestId} = setup(defaultProps({onSubmit: onSubmitMock}))
       const submitButton = getByTestId('DiscussionEdit-submit')
       fireEvent.click(submitButton)
-      expect(onSubmitMock.mock.calls.length).toBe(1)
+      expect(onSubmitMock.mock.calls).toHaveLength(1)
     })
 
     it('should trigger error on submit when value is too long', () => {
@@ -100,9 +100,9 @@ describe('DiscussionEdit', () => {
       fireEvent.click(submitButton)
       expect(flashStub).toHaveBeenCalledWith(
         'The message size has exceeded the maximum text length.',
-        2000
+        2000,
       )
-      expect(onSubmitMock.mock.calls.length).toBe(0)
+      expect(onSubmitMock.mock.calls).toHaveLength(0)
     })
   })
 
@@ -114,14 +114,14 @@ describe('DiscussionEdit', () => {
     describe('Topic is anonymous', () => {
       it('should render when can reply anonymously', () => {
         const container = setup(
-          defaultProps({canReplyAnonymously: true, discussionAnonymousState: 'full_anonymity'})
+          defaultProps({canReplyAnonymously: true, discussionAnonymousState: 'full_anonymity'}),
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeTruthy()
       })
 
       it('should not render when cannot reply anonymously', () => {
         const container = setup(
-          defaultProps({canReplyAnonymously: false, discussionAnonymousState: 'full_anonymity'})
+          defaultProps({canReplyAnonymously: false, discussionAnonymousState: 'full_anonymity'}),
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
       })
@@ -146,7 +146,7 @@ describe('DiscussionEdit', () => {
             canReplyAnonymously: true,
             discussionAnonymousState: 'partial_anonymity',
             isEdit: true,
-          })
+          }),
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeNull()
       })

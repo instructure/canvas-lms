@@ -41,21 +41,18 @@ describe('RegistrationWizardModal', () => {
     // instui logs an error when we render a component
     // immediately under Modal
 
-    // eslint-disable-next-line no-console
     error = console.error
-    // eslint-disable-next-line no-console
+
     warn = console.warn
 
-    // eslint-disable-next-line no-console
     console.error = jest.fn()
-    // eslint-disable-next-line no-console
+
     console.warn = jest.fn()
   })
 
   afterAll(() => {
-    // eslint-disable-next-line no-console
     console.error = error
-    // eslint-disable-next-line no-console
+
     console.warn = warn
   })
 
@@ -165,7 +162,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={jsonUrlWizardService}
-        />
+        />,
       )
       screen.getByTestId('json-url-input').focus()
 
@@ -175,7 +172,7 @@ describe('RegistrationWizardModal', () => {
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {url: 'https://example.com/json'},
-        accountId
+        accountId,
       )
     })
 
@@ -184,7 +181,7 @@ describe('RegistrationWizardModal', () => {
       const fetchThirdPartyToolConfiguration = jest
         .fn()
         .mockResolvedValue(
-          genericError('An error occurred while fetching the third party tool configuration.')
+          genericError('An error occurred while fetching the third party tool configuration.'),
         )
 
       const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
@@ -194,7 +191,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={jsonUrlWizardService}
-        />
+        />,
       )
       screen.getByTestId('json-url-input').focus()
 
@@ -204,13 +201,13 @@ describe('RegistrationWizardModal', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/An error occurred. Please try again./i, {ignore: 'title'})
+          screen.getByText(/An error occurred. Please try again./i, {ignore: 'title'}),
         ).toBeInTheDocument()
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {url: 'https://example.com/json'},
-        accountId
+        accountId,
       )
     })
 
@@ -228,7 +225,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={jsonUrlWizardService}
-        />
+        />,
       )
       screen.getByTestId('json-url-input').focus()
 
@@ -240,14 +237,14 @@ describe('RegistrationWizardModal', () => {
         expect(
           screen.getByText(
             /The configuration is invalid. Please reach out to the app provider for assistance./i,
-            {ignore: 'title'}
-          )
+            {ignore: 'title'},
+          ),
         ).toBeInTheDocument()
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {url: 'https://example.com/json'},
-        accountId
+        accountId,
       )
     })
   })
@@ -281,7 +278,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={jsonUrlWizardService}
-        />
+        />,
       )
       screen.getByTestId('json-code-input').focus()
 
@@ -291,7 +288,7 @@ describe('RegistrationWizardModal', () => {
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {lti_configuration: {}},
-        accountId
+        accountId,
       )
     })
 
@@ -300,7 +297,7 @@ describe('RegistrationWizardModal', () => {
       const fetchThirdPartyToolConfiguration = jest
         .fn()
         .mockResolvedValue(
-          genericError('An error occurred while fetching the third party tool configuration.')
+          genericError('An error occurred while fetching the third party tool configuration.'),
         )
 
       const jsonUrlWizardService = mockJsonUrlWizardService({fetchThirdPartyToolConfiguration})
@@ -310,7 +307,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={jsonUrlWizardService}
-        />
+        />,
       )
       screen.getByTestId('json-code-input').focus()
 
@@ -320,13 +317,13 @@ describe('RegistrationWizardModal', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/An error occurred. Please try again./i, {ignore: 'title'})
+          screen.getByText(/An error occurred. Please try again./i, {ignore: 'title'}),
         ).toBeInTheDocument()
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {lti_configuration: {}},
-        accountId
+        accountId,
       )
     })
 
@@ -344,7 +341,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={jsonUrlWizardService}
-        />
+        />,
       )
       screen.getByTestId('json-code-input').focus()
 
@@ -356,14 +353,14 @@ describe('RegistrationWizardModal', () => {
         expect(
           screen.getByText(
             /The configuration is invalid. Please reach out to the app provider for assistance./i,
-            {ignore: 'title'}
-          )
+            {ignore: 'title'},
+          ),
         ).toBeInTheDocument()
       })
 
       expect(fetchThirdPartyToolConfiguration).toHaveBeenCalledWith(
         {lti_configuration: {}},
-        accountId
+        accountId,
       )
     })
   })
@@ -392,7 +389,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={mockJsonUrlWizardService()}
-        />
+        />,
       )
       screen.getByTestId('manual-name-input').focus()
 
@@ -413,7 +410,7 @@ describe('RegistrationWizardModal', () => {
           accountId={accountId}
           {...emptyServices}
           jsonUrlWizardService={mockJsonUrlWizardService()}
-        />
+        />,
       )
       screen.getByTestId('manual-name-input').focus()
 

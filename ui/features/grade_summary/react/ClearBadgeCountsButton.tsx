@@ -31,7 +31,7 @@ type ClearBadgeCountsButtonProps = {
 
 function ClearBadgeCountsButton({courseId, userId}: ClearBadgeCountsButtonProps) {
   const [interaction, setInteraction] = useState<'enabled' | 'disabled' | 'readonly' | undefined>(
-    'enabled'
+    'enabled',
   )
   const handleClick = async () => {
     setInteraction('disabled')

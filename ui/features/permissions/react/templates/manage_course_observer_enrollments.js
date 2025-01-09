@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Observers - add'),
       description: I18n.t(
-        'Allows user to add observers to a course from the account Courses page.'
+        'Allows user to add observers to a course from the account Courses page.',
       ),
     },
     {
@@ -44,7 +44,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
-        'If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Courses page via email address or login ID even if an observer does not already have a Canvas account.'
+        'If the Open Registration account setting is enabled, users with this permission can add observers to a course from the Courses page via email address or login ID even if an observer does not already have a Canvas account.',
       ),
     },
     {
@@ -52,13 +52,13 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
+        'To access the account Courses page, Courses - view list must be enabled.',
       ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'If an enrollment is created via SIS, only admins can remove the enrollment from a course.'
+        'If an enrollment is created via SIS, only admins can remove the enrollment from a course.',
       ),
     },
     {
@@ -82,7 +82,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'If the Open Registration account setting is enabled, users with this permission can add observers to a course from the People page via email address or login ID even if an observer does not already have a Canvas account.'
+        'If the Open Registration account setting is enabled, users with this permission can add observers to a course from the People page via email address or login ID even if an observer does not already have a Canvas account.',
       ),
     },
     {
@@ -90,11 +90,11 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'If an enrollment is created via SIS, only admins can remove the enrollment from a course.'
+        'If an enrollment is created via SIS, only admins can remove the enrollment from a course.',
       ),
     },
     {
       description: I18n.t('To remove a user via SIS ID, SIS Data - manage must also be enabled.'),
     },
-  ]
+  ],
 )

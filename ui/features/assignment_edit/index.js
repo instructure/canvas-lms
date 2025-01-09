@@ -52,7 +52,7 @@ ready(() => {
     const dueDateList = new DueDateList(
       assignment.get('assignment_overrides'),
       sectionList,
-      assignment
+      assignment,
     )
 
     const assignmentGroupSelector = new AssignmentGroupSelector({

@@ -116,7 +116,7 @@ const MigrationIssuesModal = ({
           setHaveNextPage(json.length < migration_issues_count)
         })
         .catch(() => setHasErrors(true)),
-    [migration_issues_url, migration_issues_count]
+    [migration_issues_url, migration_issues_count],
   )
 
   useEffect(() => {

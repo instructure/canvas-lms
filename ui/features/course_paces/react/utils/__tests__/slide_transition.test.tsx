@@ -25,7 +25,7 @@ const renderComponent = (props: Omit<ComponentProps, 'size' | 'children'>) =>
   render(
     <SlideTransition size={100} {...props}>
       <span>Hey look it&apos;s me!</span>
-    </SlideTransition>
+    </SlideTransition>,
   )
 
 describe('SlideTransition', () => {

@@ -95,7 +95,7 @@ export default function StrandManager({strand, jobs, onUpdate}) {
       _error => {
         setLoading(false)
         setError(true)
-      }
+      },
     )
   }
 

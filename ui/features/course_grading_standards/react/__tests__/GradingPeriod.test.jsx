@@ -182,7 +182,7 @@ describe('GradingPeriod', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('textbox', {name: /grading period name/i})).toHaveValue(
-        'MXP: Most Xtreme Primate'
+        'MXP: Most Xtreme Primate',
       )
     })
   })
@@ -223,7 +223,7 @@ describe('GradingPeriod', () => {
     renderGradingPeriod()
 
     expect(screen.getByRole('textbox', {name: /grading period name/i})).not.toHaveAttribute(
-      'readonly'
+      'readonly',
     )
     expect(screen.getByRole('textbox', {name: /start date/i})).not.toHaveAttribute('readonly')
     expect(screen.getByRole('textbox', {name: /end date/i})).not.toHaveAttribute('readonly')

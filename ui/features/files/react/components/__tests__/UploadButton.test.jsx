@@ -29,7 +29,7 @@ function renderUploadButton(overrides) {
       contextId="1"
       contextType="user"
       {...overrides}
-    />
+    />,
   )
 }
 describe('Files UploadButton', () => {

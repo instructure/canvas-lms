@@ -67,7 +67,7 @@ NeverDrop.prototype.afterRender = function () {
           _this.$('select').focus()
           return _this.model.unset('focus')
         }
-      })(this)
+      })(this),
     )
   }
 }

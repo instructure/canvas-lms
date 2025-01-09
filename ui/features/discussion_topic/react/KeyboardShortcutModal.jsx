@@ -29,7 +29,7 @@ export default class KeyboardShortcutModal extends React.Component {
       shape({
         keycode: string.isRequired,
         description: string.isRequired,
-      })
+      }),
     ),
   }
 
@@ -73,7 +73,7 @@ export default class KeyboardShortcutModal extends React.Component {
           <div className="keyboard_navigation">
             <span className="screenreader-only">
               {I18n.t(
-                'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts'
+                'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts',
               )}
             </span>
             <ul className="navigation_list">

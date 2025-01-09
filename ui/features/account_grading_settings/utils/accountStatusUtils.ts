@@ -40,7 +40,7 @@ export const statusesTitleMap: {
 } as const
 
 export const mapCustomStatusQueryResults = (
-  customStatuses: GradingStatusQueryResult[]
+  customStatuses: GradingStatusQueryResult[],
 ): GradeStatus[] => {
   return customStatuses.map((status: GradingStatusQueryResult) => ({
     id: status.id,
@@ -52,7 +52,7 @@ export const mapCustomStatusQueryResults = (
 
 export const mapStandardStatusQueryResults = (
   standardStatuses: GradingStatusQueryResult[],
-  isExtendedStatusEnabled?: boolean
+  isExtendedStatusEnabled?: boolean,
 ): GradeStatus[] => {
   const defaultStandardStatuses = {...DefaultStandardStatusesMap}
 

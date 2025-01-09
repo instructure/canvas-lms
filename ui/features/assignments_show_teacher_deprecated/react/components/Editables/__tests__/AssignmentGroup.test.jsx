@@ -46,7 +46,7 @@ describe('AssignmenGroupUI', () => {
         onChangeMode={() => {}}
         assignmentGroupList={groupList}
         selectedAssignmentGroup={groupList[1]}
-      />
+      />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     expect(getByText(groupList[1].name)).toBeInTheDocument()
@@ -61,7 +61,7 @@ describe('AssignmenGroupUI', () => {
         onChangeMode={() => {}}
         assignmentGroupList={groupList}
         selectedAssignmentGroup={groupList[1]}
-      />
+      />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     expect(document.querySelector('input').value).toBe(groupList[1].name)
@@ -69,7 +69,7 @@ describe('AssignmenGroupUI', () => {
 
   it('renders the placeholder when not given a value', () => {
     const {getByText, getByTestId} = render(
-      <AssignmentGroup mode="view" onChange={() => {}} onChangeMode={() => {}} />
+      <AssignmentGroup mode="view" onChange={() => {}} onChangeMode={() => {}} />,
     )
     expect(getByTestId('SelectableText')).toBeInTheDocument()
     expect(getByText('No Assignment Group Assigned')).toBeInTheDocument()
@@ -92,7 +92,7 @@ describe('AssignmenGroupUI', () => {
         <span id="focus-me" tabIndex="-1">
           just here to get focus
         </span>
-      </div>
+      </div>,
     )
     const input = container.querySelector('input')
     input.click()
@@ -116,7 +116,7 @@ describe('AssignmenGroupUI', () => {
           just here to get focus
         </span>
       </div>,
-      {container}
+      {container},
     )
     expect(onchange).toHaveBeenCalledWith(groupList[1])
   })

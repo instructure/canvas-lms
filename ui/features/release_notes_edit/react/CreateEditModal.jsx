@@ -135,7 +135,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
         <CanvasMultiSelect
           label={I18n.t('Available to')}
           assistiveText={I18n.t(
-            'Select target groups. Type or use arrow keys to navigate. Multiple selections are allowed.'
+            'Select target groups. Type or use arrow keys to navigate. Multiple selections are allowed.',
           )}
           selectedOptionIds={state.target_roles}
           onChange={newValue =>

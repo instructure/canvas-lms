@@ -26,7 +26,7 @@ export const renderManageBlackoutDates = (
   isSyncing: boolean,
   showBlackoutDatesModal: () => void,
   toggleShowSettingsPopover: (show: boolean) => void,
-  context_type: string
+  context_type: string,
 ) => {
   if (!window.ENV.FEATURES.course_paces_redesign || context_type === 'Course') {
     return (

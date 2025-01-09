@@ -47,7 +47,7 @@ export default class PageNavigation extends Component {
           }}
         >
           {I18n.n(i)}
-        </Pagination.Page>
+        </Pagination.Page>,
       )
     }
 

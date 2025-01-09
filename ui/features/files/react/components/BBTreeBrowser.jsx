@@ -50,7 +50,7 @@ class BBTreeBrowser extends React.Component {
       },
       {
         element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
-      }
+      },
     ).index
 
     window.setTimeout(() => {

@@ -53,7 +53,7 @@ describe('AssessmentAuditTray', () => {
         }}
         {...props}
       />,
-      {container}
+      {container},
     )
     return rendered
   }
@@ -67,7 +67,7 @@ describe('AssessmentAuditTray', () => {
       () =>
         new Promise(resolve => {
           onEntered = resolve
-        })
+        }),
     )
 
     context = {...defaultContext}
@@ -114,7 +114,7 @@ describe('AssessmentAuditTray', () => {
         expect(api.loadAssessmentAuditTrail).toHaveBeenCalledWith(
           '1201',
           expect.anything(),
-          expect.anything()
+          expect.anything(),
         )
       })
 
@@ -122,7 +122,7 @@ describe('AssessmentAuditTray', () => {
         expect(api.loadAssessmentAuditTrail).toHaveBeenCalledWith(
           expect.anything(),
           '2301',
-          expect.anything()
+          expect.anything(),
         )
       })
 
@@ -130,7 +130,7 @@ describe('AssessmentAuditTray', () => {
         expect(api.loadAssessmentAuditTrail).toHaveBeenCalledWith(
           expect.anything(),
           expect.anything(),
-          '2501'
+          '2501',
         )
       })
     })

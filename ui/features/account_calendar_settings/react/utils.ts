@@ -34,7 +34,7 @@ export const castIdsToInt = (accounts: AccountData[]): Account[] =>
 
 export const addAccountsToTree = (
   accountData: AccountData[],
-  collections: Collection
+  collections: Collection,
 ): Collection => {
   const accounts = castIdsToInt(accountData)
   const allAccounts = JSON.parse(JSON.stringify(collections))

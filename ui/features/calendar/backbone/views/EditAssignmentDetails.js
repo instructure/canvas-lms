@@ -77,7 +77,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       this.$el.attr('method', 'PUT')
       return this.$el.attr(
         'action',
-        replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id)
+        replaceTags(this.event.contextInfo.assignment_url, 'id', this.event.object.id),
       )
     }
   }
@@ -318,7 +318,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       dueDate = moment(this.event.start)
       if (!withinMomentDates(dueDate, startDate, endDate)) {
         const rangeErrorMessage = I18n.t(
-          'Assignment has a locked date. Due date cannot be set outside of locked date range.'
+          'Assignment has a locked date. Due date cannot be set outside of locked date range.',
         )
         errors.lock_range = [{message: rangeErrorMessage}]
         showFlashAlert({

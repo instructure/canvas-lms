@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -107,7 +106,7 @@ const quizSubmission = (function () {
 
       if (quizSubmission.submitting && !repeat) {
         console.log(
-          '[updateSubmission] Aborting because submission is in process and repeat is disabled'
+          '[updateSubmission] Aborting because submission is in process and repeat is disabled',
         )
         return
       }
@@ -144,7 +143,7 @@ const quizSubmission = (function () {
           $lastSaved.text(
             I18n.t('saving_not_needed', 'No new data to save. Last checked at %{t}', {
               t: friendlyDatetime(new Date()),
-            })
+            }),
           )
 
           quizSubmission.currentlyBackingUp = false
@@ -162,7 +161,7 @@ const quizSubmission = (function () {
           data => {
             lastSuccessfulSubmissionData = thisSubmissionData
             $lastSaved.text(
-              I18n.t('saved_at', 'Quiz saved at %{t}', {t: friendlyDatetime(new Date())})
+              I18n.t('saved_at', 'Quiz saved at %{t}', {t: friendlyDatetime(new Date())}),
             )
             quizSubmission.currentlyBackingUp = false
             quizSubmission.inBackground = false
@@ -232,10 +231,10 @@ const quizSubmission = (function () {
                     I18n.t(
                       'errors.connection_lost',
                       "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.",
-                      {host: window.location.host}
-                    )
+                      {host: window.location.host},
+                    ),
                   )
-                }
+                },
               )
             }
 
@@ -247,7 +246,7 @@ const quizSubmission = (function () {
           },
           {
             timeout: 15000,
-          }
+          },
         )
       })(data)
     },
@@ -335,8 +334,8 @@ const quizSubmission = (function () {
         $.flashMessage(
           I18n.t(
             'notices.due_date_one_minute_left',
-            'One Minute Left Before Quiz Will Be Marked Late'
-          )
+            'One Minute Left Before Quiz Will Be Marked Late',
+          ),
         )
       } else if (
         currentTimeToDueDate > 250000 &&
@@ -347,8 +346,8 @@ const quizSubmission = (function () {
         $.flashMessage(
           I18n.t(
             'notices.due_date_five_minutes_left',
-            'Five Minutes Left Before Quiz Will Be Marked Late'
-          )
+            'Five Minutes Left Before Quiz Will Be Marked Late',
+          ),
         )
       } else if (
         currentTimeToDueDate > 1770000 &&
@@ -359,8 +358,8 @@ const quizSubmission = (function () {
         $.flashMessage(
           I18n.t(
             'notices.due_date_thirty_minutes_left',
-            'Thirty Minutes Left Before Quiz Will Be Marked Late'
-          )
+            'Thirty Minutes Left Before Quiz Will Be Marked Late',
+          ),
         )
       }
     },
@@ -369,7 +368,7 @@ const quizSubmission = (function () {
         quizSubmission.oneMinuteDeadline = true
         $.flashWarning(
           I18n.t('notices.submission_one_minute_left', 'This Quiz Will Be Submitted In One Minute'),
-          5000
+          5000,
         )
       } else if (
         currentTimeLeft > 250000 &&
@@ -380,9 +379,9 @@ const quizSubmission = (function () {
         $.flashWarning(
           I18n.t(
             'notices.submission_five_minutes_left',
-            'This Quiz Will Be Submitted In Five Minutes'
+            'This Quiz Will Be Submitted In Five Minutes',
           ),
-          5000
+          5000,
         )
       } else if (
         currentTimeLeft > 1770000 &&
@@ -393,9 +392,9 @@ const quizSubmission = (function () {
         $.flashWarning(
           I18n.t(
             'notices.submission_thirty_minutes_left',
-            'This Quiz Will Be Submitted In Thirty Minutes'
+            'This Quiz Will Be Submitted In Thirty Minutes',
           ),
-          5000
+          5000,
         )
       }
     },
@@ -465,8 +464,8 @@ const quizSubmission = (function () {
         $('.time_running').css('color', '#EA0611')
         $timeRunningFunc().text(
           I18n.t(
-            "Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt."
-          )
+            "Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt.",
+          ),
         )
         return
       }
@@ -489,7 +488,7 @@ const quizSubmission = (function () {
       // the first time we set the time limit on the page, announce it via screenreader
       if (quizSubmission.hasTimeLimit && !$timeRunningFunc().text()) {
         $.screenReaderFlashMessage(
-          I18n.t('time_remaining', 'You have %{time} remaining', {time: times.join(', ')})
+          I18n.t('time_remaining', 'You have %{time} remaining', {time: times.join(', ')}),
         )
       }
       $timeRunningFunc().text(times.join(', '))
@@ -583,7 +582,7 @@ $(function () {
           unloadWarned = true
           e.returnValue = I18n.t(
             'confirms.unfinished_quiz',
-            "You're about to leave the quiz unfinished.  Continue anyway?"
+            "You're about to leave the quiz unfinished.  Continue anyway?",
           )
           return e.returnValue
         }
@@ -609,7 +608,7 @@ $(function () {
         // since this is sync, a callback never fires to reset this
         quizSubmission.currentlyBackingUp = false
       },
-      false
+      false,
     )
 
     $(document).on('click', 'a', function (event) {
@@ -632,8 +631,8 @@ $(function () {
         const result = window.confirm(
           I18n.t(
             'confirms.navigate_away',
-            "You're about to navigate away from this page.  Continue anyway?"
-          )
+            "You're about to navigate away from this page.  Continue anyway?",
+          ),
         )
         if (!result) {
           event.preventDefault()
@@ -721,7 +720,9 @@ $(function () {
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
         $this.val(
-          Number.isNaN(Number(val)) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true})
+          Number.isNaN(Number(val))
+            ? ''
+            : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}),
         )
       }
       if ($this.hasClass('precision_question_input')) {
@@ -734,7 +735,7 @@ $(function () {
             : I18n.n(precisionQuestionInputVal.toPrecision(precision), {
                 strip_insignificant_zeros: true,
                 precision,
-              })
+              }),
         )
       }
       if (update !== false) {
@@ -765,7 +766,7 @@ $(function () {
       if ($('#list_' + $question.attr('id')).hasClass('marked')) {
         markedText = I18n.t(
           'titles.come_back_later',
-          'You marked this question to come back to later'
+          'You marked this question to come back to later',
         )
       } else {
         markedText = ''
@@ -874,7 +875,7 @@ $(function () {
       if (!$('.question').hasClass('answered')) {
         warningMessage = I18n.t(
           'confirms.cant_go_back_blank',
-          "You can't come back to this question once you hit next. Are you sure you want to leave it blank?"
+          "You can't come back to this question once you hit next. Are you sure you want to leave it blank?",
         )
       }
     }
@@ -891,7 +892,7 @@ $(function () {
               one: "There is still 1 question you haven't seen yet.  Submit anyway?",
               other: "There are still %{count} questions you haven't seen yet.  Submit anyway?",
             },
-            {count: unseen}
+            {count: unseen},
           )
         }
       } else {
@@ -904,7 +905,7 @@ $(function () {
               other:
                 'You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?',
             },
-            {count: unanswered}
+            {count: unanswered},
           )
         }
       }
@@ -913,7 +914,7 @@ $(function () {
     if ($('#fileupload_in_progress[value="true"]', $questions).length !== 0) {
       warningMessage = I18n.t(
         'confirms.file_upload_in_progress',
-        'File upload is in progress. You may lose your answer before it is complete.'
+        'File upload is in progress. You may lose your answer before it is complete.',
       )
     }
 

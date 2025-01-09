@@ -40,7 +40,7 @@ export const ReviewScreenWrapper = ({
 }: ReviewScreenWrapperProps) => {
   const [overlayState] = useOverlayStore(overlayStore)
   const scopes = registration.scopes.filter(
-    s => !overlayState.registration.disabledScopes?.includes(s)
+    s => !overlayState.registration.disabledScopes?.includes(s),
   )
 
   // The API sometimes returns null for some fields, but the types are
@@ -52,17 +52,20 @@ export const ReviewScreenWrapper = ({
   const placements =
     canvasPlatformSettings(registration.tool_configuration)
       ?.settings.placements.filter(
-        p => !overlayState.registration.disabledPlacements?.includes(p.placement)
+        p => !overlayState.registration.disabledPlacements?.includes(p.placement),
       )
       ?.map(p => p.placement) ?? []
 
   const toolName = overlayState.adminNickname ?? registration.client_name ?? ''
   const description = overlayState.registration.description ?? undefined
   const labels =
-    overlayState.registration.placements?.reduce((acc, p) => {
-      acc[p.type] = p.label !== null ? p.label : undefined
-      return acc
-    }, {} as Partial<Record<LtiPlacement, string>>) ?? {}
+    overlayState.registration.placements?.reduce(
+      (acc, p) => {
+        acc[p.type] = p.label !== null ? p.label : undefined
+        return acc
+      },
+      {} as Partial<Record<LtiPlacement, string>>,
+    ) ?? {}
 
   const defaultIconUrl =
     canvasPlatformSettings(registration.tool_configuration)?.settings.icon_url ?? undefined
@@ -72,13 +75,16 @@ export const ReviewScreenWrapper = ({
         acc[p.placement] = p.icon_url !== null ? p.icon_url : undefined
         return acc
       },
-      {} as Partial<Record<LtiPlacement, string>>
+      {} as Partial<Record<LtiPlacement, string>>,
     ) ?? {}
   const iconUrls =
-    placements?.reduce((acc, p) => {
-      acc[p] = placementInState(overlayState, p)?.icon_url ?? undefined
-      return acc
-    }, {} as Partial<Record<LtiPlacement, string>>) ?? {}
+    placements?.reduce(
+      (acc, p) => {
+        acc[p] = placementInState(overlayState, p)?.icon_url ?? undefined
+        return acc
+      },
+      {} as Partial<Record<LtiPlacement, string>>,
+    ) ?? {}
 
   return (
     <ReviewScreen

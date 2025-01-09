@@ -63,12 +63,12 @@ export const OverrideURIsConfirmation = ({
 
   const allURIsValid = React.useMemo(
     () => Object.values(state.override_uris.placements).every(p => !p.uri || isValidHttpUrl(p.uri)),
-    [state.override_uris.placements]
+    [state.override_uris.placements],
   )
 
   const placements = React.useMemo(
     () => (state.placements.placements || internalConfig.placements.map(p => p.placement)).sort(),
-    [state.placements.placements, internalConfig.placements]
+    [state.placements.placements, internalConfig.placements],
   )
   const overrides = state.override_uris.placements
   return (
@@ -79,7 +79,7 @@ export const OverrideURIsConfirmation = ({
         </Heading>
         <Text>
           {I18n.t(
-            'Choose to override Default Target Link URIs for each placement. For Deep Linking support, first check with your app vendor to ensure they support this functionality. (Optional)'
+            'Choose to override Default Target Link URIs for each placement. For Deep Linking support, first check with your app vendor to ensure they support this functionality. (Optional)',
           )}
         </Text>
         {placements.map(p => {

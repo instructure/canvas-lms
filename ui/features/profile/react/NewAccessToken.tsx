@@ -55,7 +55,7 @@ const validationSchema = z.object({
       PURPOSE_MAX_LENGTH,
       I18n.t('Exceeded the maximum length (%{purposeMaxLength} characters).', {
         purposeMaxLength: PURPOSE_MAX_LENGTH,
-      })
+      }),
     ),
   expires_at: z.string().optional(),
 })
@@ -130,8 +130,8 @@ const NewAccessToken = ({onSubmit, onClose}: NewAccessTokenProps) => {
                   {
                     wrapper:
                       '<a href="https://canvas.instructure.com/doc/api/index.html" class="external" target="_blank" rel="noreferrer noopener">$1</a>',
-                  }
-                )
+                  },
+                ),
               ),
             }}
           />

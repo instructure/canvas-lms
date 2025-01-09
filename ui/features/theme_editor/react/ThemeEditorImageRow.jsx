@@ -65,7 +65,7 @@ export default class ThemeEditorImageRow extends Component {
     } else {
       this.props.handleThemeStateChange(
         this.props.varDef.variable_name,
-        inputElementOrNewValue.files[0]
+        inputElementOrNewValue.files[0],
       )
       chosenValue = window.URL.createObjectURL(inputElementOrNewValue.files[0])
     }
@@ -103,7 +103,7 @@ export default class ThemeEditorImageRow extends Component {
                 value={this.props.userInput.val === '' ? '' : this.props.currentValue}
               />
 
-              { }
+              {}
               <label className="Theme__editor-image_upload-label">
                 <span className="screenreader-only">{this.props.varDef.human_name}</span>
                 <input

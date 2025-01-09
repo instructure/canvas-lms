@@ -94,10 +94,10 @@ describe('PaceContextsContent', () => {
   it('shows section contexts by default', async () => {
     const {findByText} = renderConnected(<PaceContent />)
     expect(
-      await findByText(PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0].name)
+      await findByText(PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0].name),
     ).toBeInTheDocument()
     expect(
-      await findByText(PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[1].name)
+      await findByText(PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[1].name),
     ).toBeInTheDocument()
   })
 
@@ -118,7 +118,7 @@ describe('PaceContextsContent', () => {
     await user.click(studentsTab)
     expect(await findByText(firstStudent.name)).toBeInTheDocument()
     expect(
-      await findByText(PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[1].name)
+      await findByText(PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[1].name),
     ).toBeInTheDocument()
   })
 
@@ -132,7 +132,7 @@ describe('PaceContextsContent', () => {
         expect(getAllByText(header)[0]).toBeInTheDocument()
       })
       expect(
-        getByText(`${sectionPaceContext.associated_student_count} Students`)
+        getByText(`${sectionPaceContext.associated_student_count} Students`),
       ).toBeInTheDocument()
       expect(getAllByText('Section')[0]).toBeInTheDocument()
     })
@@ -154,7 +154,7 @@ describe('PaceContextsContent', () => {
 
     it('filters results by search term', async () => {
       const {findByText, queryByText, getByRole, getByPlaceholderText, getByText} = renderConnected(
-        <PaceContent />
+        <PaceContent />,
       )
       const searchInput = getByPlaceholderText('Search for sections')
       const searchButton = getByRole('button', {name: 'Search'})
@@ -174,7 +174,7 @@ describe('PaceContextsContent', () => {
       fetchMock.get(
         SEARCH_SECTION_CONTEXTS_API,
         {pace_contexts: [], total_entries: 0},
-        {overwriteRoutes: true}
+        {overwriteRoutes: true},
       )
       const {findAllByText, getByText, getByPlaceholderText} = renderConnected(<PaceContent />)
       const searchInput = getByPlaceholderText('Search for sections')
@@ -199,7 +199,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(
           SECTION_CONTEXTS_API,
           {pace_contexts: [justModifiedPace]},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
 
         const {findByText} = renderConnected(<PaceContent />)
@@ -211,7 +211,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(
           SECTION_CONTEXTS_API,
           {pace_contexts: [modifiedPace]},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
 
         const {findByText} = renderConnected(<PaceContent />)
@@ -223,7 +223,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(
           SECTION_CONTEXTS_API,
           {pace_contexts: [modifiedPace]},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
 
         const {findByText} = renderConnected(<PaceContent />)
@@ -235,7 +235,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(
           SECTION_CONTEXTS_API,
           {pace_contexts: [modifiedPace]},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
 
         const {findByText} = renderConnected(<PaceContent />)
@@ -247,7 +247,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(
           SECTION_CONTEXTS_API,
           {pace_contexts: [modifiedPace]},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
 
         const {findByText} = renderConnected(<PaceContent />)
@@ -262,7 +262,7 @@ describe('PaceContextsContent', () => {
         fetchMock.get(
           SECTION_CONTEXTS_API,
           {pace_contexts: [modifiedPace]},
-          {overwriteRoutes: true}
+          {overwriteRoutes: true},
         )
 
         const {findByText} = renderConnected(<PaceContent />)
@@ -331,10 +331,10 @@ describe('PaceContextsContent', () => {
         const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
         const {findByTestId} = renderConnected(<PaceContent />, state)
         expect(
-          await findByTestId(`publishing-pace-${firstSection.item_id}-indicator`)
+          await findByTestId(`publishing-pace-${firstSection.item_id}-indicator`),
         ).toBeInTheDocument()
         expect(
-          await findByTestId(`publishing-pace-${secondSection.item_id}-indicator`)
+          await findByTestId(`publishing-pace-${secondSection.item_id}-indicator`),
         ).toBeInTheDocument()
       })
 
@@ -358,7 +358,7 @@ describe('PaceContextsContent', () => {
         const studentsTab = getByRole('tab', {name: 'Students'})
         await user.click(studentsTab)
         expect(
-          await findByTestId(`publishing-pace-${firstStudent.item_id}-indicator`)
+          await findByTestId(`publishing-pace-${firstStudent.item_id}-indicator`),
         ).toBeInTheDocument()
         expect(fetchMock.called(INIT_PACE_PROGRESS_STATUS_POLL, 'GET')).toBe(true)
       })

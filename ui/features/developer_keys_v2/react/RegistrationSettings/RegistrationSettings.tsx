@@ -151,7 +151,7 @@ type RegistrationOverlayFormWrapperProps = {
 
 const RegistrationOverlayFormWrapper = (props: RegistrationOverlayFormWrapperProps) => {
   const store = React.useRef(
-    createRegistrationOverlayStore(props.developerKeyName, props.ltiRegistration)
+    createRegistrationOverlayStore(props.developerKeyName, props.ltiRegistration),
   ).current
   const [saving, setSaving] = React.useState(false)
   return (
@@ -176,7 +176,7 @@ const RegistrationOverlayFormWrapper = (props: RegistrationOverlayFormWrapperPro
               updateRegistrationOverlay(
                 props.contextId,
                 props.ltiRegistration.id,
-                store.getState().state.registration
+                store.getState().state.registration,
               )
                 .then(() => {
                   page(`/accounts/${props.contextId}/developer_keys`)

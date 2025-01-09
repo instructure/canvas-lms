@@ -69,7 +69,7 @@ export default {
         sum += p($el.css('paddingBottom'))
         return (sum += p($el.css('borderBottomWidth')))
       },
-      0
+      0,
     )
     this._resize = function () {
       const offsetTop = this.$el.offset().top

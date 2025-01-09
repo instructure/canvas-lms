@@ -95,7 +95,7 @@ const setup = (props, overrides = [], pointsPossible = 7) => {
         assignment: Assignment.mock({assignmentOverrides: {nodes: overrides}, pointsPossible}),
       })}
       {...props}
-    />
+    />,
   )
 }
 

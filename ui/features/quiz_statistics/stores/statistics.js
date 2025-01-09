@@ -62,7 +62,7 @@ const store = new Store(
           function onLoad(payload) {
             this.populate(payload)
             this.setState({loading: false})
-          }.bind(this)
+          }.bind(this),
         )
     },
 
@@ -135,7 +135,7 @@ const store = new Store(
           function onLoad(payload) {
             this.populate(payload)
             this.setState({loading: false})
-          }.bind(this)
+          }.bind(this),
         )
     },
 
@@ -144,7 +144,7 @@ const store = new Store(
       return Store.prototype.__reset__.call(this)
     },
   },
-  Dispatcher
+  Dispatcher,
 )
 
 export default store

@@ -113,7 +113,7 @@ export default class PermissionButton extends Component {
         permissionName: this.props.permissionName,
         roleId: this.props.roleId,
         inTray: this.props.inTray,
-      })
+      }),
     )
   }
 
@@ -321,7 +321,7 @@ function mapStateToProps(state, ownProps) {
     (state.nextFocus.targetArea === 'tray' && ownProps.inTray) ||
     (state.nextFocus.targetArea === 'table' && !ownProps.inTray)
   const apiBusy = state.apiBusy.some(
-    elt => elt.id === ownProps.roleId && elt.name === ownProps.permissionName
+    elt => elt.id === ownProps.roleId && elt.name === ownProps.permissionName,
   )
 
   const stateProps = {apiBusy, setFocus: targetFocusButton && targetFocusArea}
@@ -336,5 +336,5 @@ const mapDispatchToProps = {
 
 export const ConnectedPermissionButton = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(PermissionButton)

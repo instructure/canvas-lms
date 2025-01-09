@@ -77,7 +77,7 @@ describe('App', () => {
         <App
           {...defaultProps}
           coursePace={{...PRIMARY_PACE, id: undefined, context_type: 'Course'}}
-        />
+        />,
       )
       const getStartedButton = getByRole('button', {name: 'Get Started'})
       expect(getStartedButton).toBeInTheDocument()

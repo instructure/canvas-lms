@@ -48,10 +48,10 @@ export const CourseListItemContent = ({course}: {course: Course}) => {
             courseSisId: course.sis_course_id,
           })
       : course.enrollment_term_id > 1
-      ? I18n.t('Term: %{termName}', {
-          termName: course.term.name,
-        })
-      : null
+        ? I18n.t('Term: %{termName}', {
+            termName: course.term.name,
+          })
+        : null
 
   return (
     <>

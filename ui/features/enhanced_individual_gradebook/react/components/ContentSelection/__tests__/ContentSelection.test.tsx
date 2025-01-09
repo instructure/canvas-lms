@@ -36,7 +36,7 @@ describe('Content Selection', () => {
     return render(
       <MockedQueryProvider>
         <ContentSelection {...props} />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
   }
 

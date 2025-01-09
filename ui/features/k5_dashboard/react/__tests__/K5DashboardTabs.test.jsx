@@ -43,7 +43,7 @@ function findTabByName(tabName, opts) {
 
   if (actualSelectedValue !== expectedSelectedValue) {
     throw new Error(
-      `tab ${tabName} found in DOM, but had incorrect selected state of ${expectedSelectedValue} (was: ${actualSelectedValue})`
+      `tab ${tabName} found in DOM, but had incorrect selected state of ${expectedSelectedValue} (was: ${actualSelectedValue})`,
     )
   }
 
@@ -68,7 +68,7 @@ describe('K5Dashboard Tabs', () => {
     const {getByText} = render(<K5Dashboard {...defaultProps} />)
     await waitFor(() => {
       ;['Homeroom', 'Schedule', 'Grades', 'Resources'].forEach(label =>
-        expect(getByText(label)).toBeInTheDocument()
+        expect(getByText(label)).toBeInTheDocument(),
       )
     })
   })

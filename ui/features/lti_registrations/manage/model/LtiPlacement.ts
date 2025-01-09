@@ -258,7 +258,7 @@ export const LtiPlacementsByMessageType = {
 export const DeepLinkingRequestPlacements = LtiPlacementsByMessageType.LtiDeepLinkingRequest
 
 export const supportsDeepLinkingRequest = (
-  placement: LtiPlacement
+  placement: LtiPlacement,
 ): placement is (typeof DeepLinkingRequestPlacements)[number] => {
   return DeepLinkingRequestPlacements.includes(placement as any)
 }
@@ -268,7 +268,7 @@ export const supportsDeepLinkingRequest = (
  */
 export const ResourceLinkRequestPlacements = LtiPlacementsByMessageType.LtiResourceLinkRequest
 export const supportsResourceLinkRequest = (
-  placement: LtiPlacement
+  placement: LtiPlacement,
 ): placement is (typeof ResourceLinkRequestPlacements)[number] => {
   return ResourceLinkRequestPlacements.includes(placement as any)
 }

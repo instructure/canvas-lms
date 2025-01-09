@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Impact - Manage'),
       description: I18n.t(
-        'Allows an account administrator to manage the Impact service integration.'
+        'Allows an account administrator to manage the Impact service integration.',
       ),
     },
   ],
@@ -35,5 +35,5 @@ export const template = generateActionTemplates(
       title: I18n.t('Impact'),
       description: I18n.t('Impact is an add-on to Canvas LMS. Contact your CSM if interested.'),
     },
-  ]
+  ],
 )

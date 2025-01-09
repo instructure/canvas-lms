@@ -141,7 +141,7 @@ export const ProjectedDates = ({
                   one: '1 assignment',
                   other: '%{count} assignments',
                 },
-                {count: assignments}
+                {count: assignments},
               )}
             </Text>
           </View>
@@ -155,7 +155,7 @@ export const ProjectedDates = ({
                   one: '1 week',
                   other: '%{count} weeks',
                 },
-                {count: paceDuration.weeks}
+                {count: paceDuration.weeks},
               )}
               {NBSP}
               {I18n.t(
@@ -163,7 +163,7 @@ export const ProjectedDates = ({
                   one: '1 day',
                   other: '%{count} days',
                 },
-                {count: paceDuration.days}
+                {count: paceDuration.days},
               )}{' '}
             </Text>
           </View>
@@ -187,7 +187,7 @@ export const ProjectedDates = ({
                 I18n.t('Start Date'),
                 startDateValue,
                 startHelpText,
-                'coursepace-start-date'
+                'coursepace-start-date',
               )}
             </Flex.Item>
             <Flex.Item margin="0 medium medium 0" shouldGrow={true}>

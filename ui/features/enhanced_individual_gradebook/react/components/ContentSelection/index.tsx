@@ -86,7 +86,7 @@ export default function ContentSelection({
 
     if (selectedStudentId) {
       const studentIndex = studentDropdownOptions.findIndex(
-        studentOption => studentOption.id === selectedStudentId
+        studentOption => studentOption.id === selectedStudentId,
       )
 
       if (studentIndex !== -1) {
@@ -105,7 +105,7 @@ export default function ContentSelection({
 
     if (selectedAssignmentId) {
       const assignmentIndex = assignmentDropdownOptions.findIndex(
-        assignmentOption => assignmentOption.id === selectedAssignmentId
+        assignmentOption => assignmentOption.id === selectedAssignmentId,
       )
 
       if (assignmentIndex >= 0) {
@@ -143,7 +143,7 @@ export default function ContentSelection({
 
   const handleChangeAssignment = (
     event?: React.ChangeEvent<HTMLSelectElement>,
-    newIndex?: number
+    newIndex?: number,
   ) => {
     const selectedIndex = (event ? event.target.selectedIndex : newIndex) ?? 0
     setSelectedAssignmentIndex(selectedIndex)

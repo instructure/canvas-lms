@@ -50,7 +50,7 @@ const defaultInvalidForm = {elements: {}, isInvalid: false}
 
 const validationReducer = (
   state: InvalidForm,
-  action: {type: string; payload?: InvalidFormElements}
+  action: {type: string; payload?: InvalidFormElements},
 ) => {
   switch (action.type) {
     case 'invalidate':
@@ -93,11 +93,11 @@ export const CopyCourseForm = ({
   const [courseName, setCourseName] = useState<string>(course.name)
   const [courseCode, setCourseCode] = useState<string>(course?.course_code || '')
   const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(
-    dateOrNull(course?.start_at)
+    dateOrNull(course?.start_at),
   )
   const [newCourseEndDate, setNewCourseEndDate] = useState<Date | null>(dateOrNull(course?.end_at))
   const [selectedTerm, setSelectedTerm] = useState<Term | null>(
-    terms.find(term => term.id === course.enrollment_term_id.toString()) || null
+    terms.find(term => term.id === course.enrollment_term_id.toString()) || null,
   )
   const [invalidForm, dispatchForm] = useReducer(validationReducer, defaultInvalidForm)
   const restrictEnrollmentsToCourseDates = course.restrict_enrollments_to_course_dates

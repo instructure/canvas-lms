@@ -23,12 +23,14 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import GradeSummary from '../index'
 import useStore from '../../react/stores'
 
-const $fixtures = document.getElementById('fixtures') || (() => {
-  const fixturesDiv = document.createElement('div')
-  fixturesDiv.id = 'fixtures'
-  document.body.appendChild(fixturesDiv)
-  return fixturesDiv
-})()
+const $fixtures =
+  document.getElementById('fixtures') ||
+  (() => {
+    const fixturesDiv = document.createElement('div')
+    fixturesDiv.id = 'fixtures'
+    document.body.appendChild(fixturesDiv)
+    return fixturesDiv
+  })()
 
 describe('GradeSummary', () => {
   describe('getSelectedGradingPeriodId', () => {
@@ -109,7 +111,9 @@ describe('GradeSummary', () => {
         ['Name', 'title'],
       ]
 
-      expect(GradeSummary.getSelectMenuGroupProps().assignmentSortOptions).toEqual(ENV.assignment_sort_options)
+      expect(GradeSummary.getSelectMenuGroupProps().assignmentSortOptions).toEqual(
+        ENV.assignment_sort_options,
+      )
     })
 
     it('sets courses to camelized version of courses_with_grades', () => {
@@ -160,7 +164,9 @@ describe('GradeSummary', () => {
 
     it('sets selectedAssignmentSortOrder to the current_assignment_sort_order environment variable', () => {
       ENV.current_assignment_sort_order = 'due_at'
-      expect(GradeSummary.getSelectMenuGroupProps().selectedAssignmentSortOrder).toBe(ENV.current_assignment_sort_order)
+      expect(GradeSummary.getSelectMenuGroupProps().selectedAssignmentSortOrder).toBe(
+        ENV.current_assignment_sort_order,
+      )
     })
 
     it('sets selectedCourseID to the context id', () => {
@@ -169,7 +175,9 @@ describe('GradeSummary', () => {
 
     it('sets selectedGradingPeriodID to the current_grading_period_id environment variable', () => {
       ENV.current_grading_period_id = '3'
-      expect(GradeSummary.getSelectMenuGroupProps().selectedGradingPeriodID).toBe(ENV.current_grading_period_id)
+      expect(GradeSummary.getSelectMenuGroupProps().selectedGradingPeriodID).toBe(
+        ENV.current_grading_period_id,
+      )
     })
 
     it('sets selectedStudentID to the student_id environment variable', () => {
@@ -195,7 +203,7 @@ describe('GradeSummary', () => {
           assignment_url: '/courses/1/assignments/22',
         },
       ]
-      
+
       // Set up the DOM for comments thread
       $fixtures.innerHTML = `
         <div id="comments_thread_22">
@@ -293,16 +301,18 @@ describe('GradeSummary', () => {
       })
 
       it('should handle comments with attempts', () => {
-        ENV.submissions = [{
-          assignment_id: '22',
-          submission_comments: [
-            {id: 1, attempt: 1, comment: 'First attempt'},
-            {id: 2, attempt: 1, comment: 'Also first attempt'},
-            {id: 3, attempt: 2, comment: 'Second attempt'},
-            {id: 4, attempt: null, comment: 'No attempt specified'},
-          ],
-          assignment_url: '/courses/1/assignments/22',
-        }]
+        ENV.submissions = [
+          {
+            assignment_id: '22',
+            submission_comments: [
+              {id: 1, attempt: 1, comment: 'First attempt'},
+              {id: 2, attempt: 1, comment: 'Also first attempt'},
+              {id: 3, attempt: 2, comment: 'Second attempt'},
+              {id: 4, attempt: null, comment: 'No attempt specified'},
+            ],
+            assignment_url: '/courses/1/assignments/22',
+          },
+        ]
 
         jest.spyOn(useStore, 'setState')
 

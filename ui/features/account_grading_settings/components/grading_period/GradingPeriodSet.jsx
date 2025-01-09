@@ -45,7 +45,7 @@ const anyPeriodsOverlap = function (periods) {
   const overlapping = some(
     otherPeriods,
     otherPeriod =>
-      otherPeriod.startDate < firstPeriod.endDate && firstPeriod.startDate < otherPeriod.endDate
+      otherPeriod.startDate < firstPeriod.endDate && firstPeriod.startDate < otherPeriod.endDate,
   )
   return overlapping || anyPeriodsOverlap(otherPeriods)
 }
@@ -66,7 +66,7 @@ const validatePeriods = function (periods, weighted) {
   const validDates = every(
     periods,
     period =>
-      isValidDate(period.startDate) && isValidDate(period.endDate) && isValidDate(period.closeDate)
+      isValidDate(period.startDate) && isValidDate(period.endDate) && isValidDate(period.closeDate),
   )
 
   if (!validDates) {

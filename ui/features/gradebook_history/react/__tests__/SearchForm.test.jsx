@@ -153,11 +153,11 @@ describe('GradebookHistory::SearchFormComponent', () => {
           items: [],
           nextPage: 'https://nextpage.example.com',
         }}
-      />
+      />,
     )
     expect(getSearchOptionsNextPage).toHaveBeenCalledWith(
       'students',
-      'https://nextpage.example.com'
+      'https://nextpage.example.com',
     )
   })
 })

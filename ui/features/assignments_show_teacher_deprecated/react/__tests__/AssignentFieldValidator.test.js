@@ -53,15 +53,15 @@ describe('Assignment field validators', () => {
 
   it('gets the proper invalid date-time message', () => {
     expect(afv.getInvalidDateTimeMessage({rawDateValue: 'jibberish', rawTimeValue: ''})).toBe(
-      'The date is not valid.'
+      'The date is not valid.',
     )
 
     expect(afv.getInvalidDateTimeMessage({rawDateValue: '', rawTimeValue: 'jibberish'})).toBe(
-      'You must provide a date with a time.'
+      'You must provide a date with a time.',
     )
 
     expect(afv.getInvalidDateTimeMessage({rawDateValue: '', rawTimeValue: ''})).toBe(
-      'Invalid date or time'
+      'Invalid date or time',
     )
   })
 

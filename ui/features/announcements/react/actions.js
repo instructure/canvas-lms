@@ -35,7 +35,7 @@ function fetchAnnouncements(dispatch, getState, payload) {
       .getAnnouncements(getState(), payload)
       .then(res => {
         $.screenReaderFlashMessageExclusive(
-          I18n.t('%{count} announcements found.', {count: res.data.length})
+          I18n.t('%{count} announcements found.', {count: res.data.length}),
         )
         resolve(res)
       })
@@ -100,7 +100,7 @@ actions.getExternalFeeds = function () {
           actions.loadingExternalFeedFail({
             message: I18n.t('Failed to Load External Feeds'),
             err,
-          })
+          }),
         )
       })
   }
@@ -125,7 +125,7 @@ actions.deleteExternalFeed = function ({feedId}) {
             actions.deleteExternalFeedFail({
               message: failMessage,
               err,
-            })
+            }),
           )
         })
     }
@@ -143,13 +143,15 @@ actions.toggleAnnouncementsLock =
           dispatch(actions.lockAnnouncementsSuccess({res, locked: isLocking}))
           if (isLocking) {
             dispatch(
-              notificationActions.notifyInfo({message: I18n.t('Announcements locked successfully')})
+              notificationActions.notifyInfo({
+                message: I18n.t('Announcements locked successfully'),
+              }),
             )
           } else {
             dispatch(
               notificationActions.notifyInfo({
                 message: I18n.t('Announcements unlocked successfully'),
-              })
+              }),
             )
           }
         } else if (res.failures.length) {
@@ -157,7 +159,7 @@ actions.toggleAnnouncementsLock =
             actions.lockAnnouncementsFail({
               err: res.failures,
               message: I18n.t('An error occurred while updating announcements locked state.'),
-            })
+            }),
           )
         }
       })
@@ -166,7 +168,7 @@ actions.toggleAnnouncementsLock =
           actions.lockAnnouncementsFail({
             err,
             message: I18n.t('An error occurred while locking announcements.'),
-          })
+          }),
         )
       })
   }
@@ -185,7 +187,7 @@ actions.announcementSelectionChangeStart =
     // if any of the selected items are unlocked, we lock everything
     const hasUnlockedItems = selectedItems.reduce(
       (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
-      false
+      false,
     )
 
     dispatch(actions.setAnnouncementsIsLocking(hasUnlockedItems))
@@ -202,7 +204,7 @@ actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
   // if any of the selected items are unlocked, we lock everything
   const hasUnlockedItems = selectedItems.reduce(
     (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
-    false
+    false,
   )
 
   actions.toggleAnnouncementsLock(state.selectedAnnouncements, hasUnlockedItems)(dispatch, getState)
@@ -222,11 +224,11 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
         dispatch(
           actions.clearAnnouncementsPage({
             pages: range(pageState.currentPage, pageState.lastPage + 1),
-          })
+          }),
         )
 
         dispatch(
-          notificationActions.notifyInfo({message: I18n.t('Announcements deleted successfully')})
+          notificationActions.notifyInfo({message: I18n.t('Announcements deleted successfully')}),
         )
 
         // reload current page after deleting items
@@ -236,7 +238,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
           actions.deleteAnnouncementsFail({
             err: res.failures,
             message: I18n.t('An error occurred while deleting announcements.'),
-          })
+          }),
         )
       }
     })
@@ -245,7 +247,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
         actions.deleteAnnouncementsFail({
           err,
           message: I18n.t('An error occurred while deleting announcements.'),
-        })
+        }),
       )
     })
 }
@@ -273,7 +275,7 @@ actions.addExternalFeed = function (payload) {
           actions.addExternalFeedFail({
             message: failMessage,
             err,
-          })
+          }),
         )
       })
   }
@@ -290,19 +292,19 @@ actions.markAllAnnouncementRead = function () {
       dispatch(
         notificationActions.notifyInfo({
           message: I18n.t('Announcements marked as read successfully'),
-        })
+        }),
       )
       dispatch(
         actions.clearAnnouncementsPage({
           pages: range(pageState.currentPage, pageState.lastPage + 1),
-        })
+        }),
       )
       dispatch(actions.markAllAnnouncementsReadSuccess())
       dispatch(actions.getAnnouncements({page: pageState.currentPage, select: true}))
     } catch (error) {
       dispatch(actions.markAllAnnouncementsReadFail())
       dispatch(
-        notificationActions.notifyError({message: I18n.t('Failed to mark announcements as read')})
+        notificationActions.notifyError({message: I18n.t('Failed to mark announcements as read')}),
       )
     }
   }
@@ -310,7 +312,7 @@ actions.markAllAnnouncementRead = function () {
 
 const actionTypes = types.reduce(
   (typesMap, actionType) => Object.assign(typesMap, {[actionType]: actionType}),
-  {}
+  {},
 )
 
 export {actionTypes, actions as default}

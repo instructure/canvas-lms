@@ -36,7 +36,7 @@ $(document).ready(() => {
 
   $('.context_module_item').width(maxWidth)
   $(
-    '#modules .context_module_item.attachment a.title,#modules .context_module_item.external_url a.title'
+    '#modules .context_module_item.attachment a.title,#modules .context_module_item.external_url a.title',
   ).each(function () {
     $(this).attr('href', `${$(this).attr('href')}?already_inline=1`)
   })

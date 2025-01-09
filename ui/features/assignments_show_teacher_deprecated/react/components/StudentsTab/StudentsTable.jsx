@@ -223,7 +223,7 @@ export default class StudentsTable extends React.Component {
     const chosenId = button.dataset.studentId
     this.setState(prevState => {
       const selectedStudentIndex = prevState.studentData.findIndex(
-        aStudent => aStudent.lid === chosenId
+        aStudent => aStudent.lid === chosenId,
       )
       return {
         trayOpen: true,

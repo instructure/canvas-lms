@@ -62,7 +62,7 @@ describe('ReleaseNotesList', () => {
     expect(queryByText(releaseNotes[0].title)).toBeInTheDocument()
     expect(getByRole('link', {name: releaseNotes[0].title})).toHaveAttribute(
       'href',
-      releaseNotes[0].url
+      releaseNotes[0].url,
     )
     expect(queryByText(releaseNotes[0].description)).toBeInTheDocument()
     expect(queryByText('Apr 26')).toBeInTheDocument()
@@ -70,7 +70,7 @@ describe('ReleaseNotesList', () => {
     expect(queryByText(releaseNotes[1].title)).toBeInTheDocument()
     expect(getByRole('link', {name: releaseNotes[1].title})).toHaveAttribute(
       'href',
-      releaseNotes[1].url
+      releaseNotes[1].url,
     )
     expect(queryByText(releaseNotes[1].description)).toBeInTheDocument()
     expect(queryByText('Apr 27')).toBeInTheDocument()

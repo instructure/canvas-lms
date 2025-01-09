@@ -57,7 +57,7 @@ describe('ExternalApps Lti2Iframe', () => {
     const {container} = render(
       <Lti2Iframe {...props}>
         <div id="test-child" />
-      </Lti2Iframe>
+      </Lti2Iframe>,
     )
     expect(container.querySelector('#test-child')).toBeInTheDocument()
   })

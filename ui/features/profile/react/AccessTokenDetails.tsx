@@ -82,7 +82,7 @@ const AccessTokenDetails = ({
         handleError()
       }
     },
-    [onTokenLoad, url]
+    [onTokenLoad, url],
   )
 
   const handleSubmit: FormEventHandler = async event => {
@@ -90,8 +90,8 @@ const AccessTokenDetails = ({
 
     const isConfirmed = window.confirm(
       I18n.t(
-        'Are you sure you want to regenerate this token?  Anything using this token will have to be updated.'
-      )
+        'Are you sure you want to regenerate this token?  Anything using this token will have to be updated.',
+      ),
     )
     if (!isConfirmed) {
       return
@@ -140,8 +140,8 @@ const AccessTokenDetails = ({
                   __html: raw(
                     I18n.t(
                       "*Copy this token down now*. Once you leave this page you won't be able to retrieve the full token anymore, you'll have to regenerate it to get a new value.",
-                      {wrapper: '<b>$1</b>'}
-                    )
+                      {wrapper: '<b>$1</b>'},
+                    ),
                   ),
                 }}
               />
@@ -201,8 +201,8 @@ const AccessTokenDetails = ({
                   {
                     wrapper:
                       '<a href="https://canvas.instructure.com/doc/api/index.html" class="external" target="_blank" rel="noreferrer noopener">$1</a>',
-                  }
-                )
+                  },
+                ),
               ),
             }}
           />

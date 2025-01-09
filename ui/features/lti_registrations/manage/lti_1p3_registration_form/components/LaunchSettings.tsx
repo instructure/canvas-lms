@@ -65,7 +65,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
   } = useValidateLaunchSettings(launchSettings, config)
 
   const isNextDisabled = Object.values(useValidateLaunchSettings(launchSettings, config)).some(
-    messages => messages.length !== 0
+    messages => messages.length !== 0,
   )
 
   return (
@@ -82,7 +82,7 @@ export const LaunchSettings = (props: LaunchSettingsProps) => {
                     wrapper: [
                       '<a href="https://canvas.instructure.com/doc/api/file.lti_dev_key_config.html" target="_blank">$1</a>',
                     ],
-                  }
+                  },
                 ),
               }}
             />

@@ -29,11 +29,12 @@ import LoadingIndicator from '@canvas/loading-indicator'
 
 const I18n = createI18nScope('assignment')
 
-const FileBrowser = React.lazy(() =>
-  import(
-    /* webpackChunkName: "[request]" */
-    '@canvas/rce/FileBrowser'
-  )
+const FileBrowser = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "[request]" */
+      '@canvas/rce/FileBrowser'
+    ),
 )
 
 const attachmentNameStyle = {

@@ -50,7 +50,7 @@ const students: Student[] = [
           unposted_current_score: null,
           unposted_current_grade: null,
           unposted_final_score: null,
-          unposted_final_grade: null
+          unposted_final_grade: null,
         },
         html_url: '',
         id: '1',
@@ -70,7 +70,7 @@ const students: Student[] = [
         updated_at: '2023-01-01T00:00:00Z',
         user_id: '0',
         workflow_state: 'active' as WorkflowState,
-        last_attended_at: null
+        last_attended_at: null,
       },
       {
         associated_user_id: null,
@@ -89,7 +89,7 @@ const students: Student[] = [
           unposted_current_score: null,
           unposted_current_grade: null,
           unposted_final_score: null,
-          unposted_final_grade: null
+          unposted_final_grade: null,
         },
         html_url: '',
         id: '2',
@@ -109,7 +109,7 @@ const students: Student[] = [
         type: 'StudentEnrollment',
         updated_at: '2023-01-01T00:00:00Z',
         user_id: '0',
-        workflow_state: 'active' as WorkflowState
+        workflow_state: 'active' as WorkflowState,
       },
     ],
     first_name: 'Jim',
@@ -145,13 +145,13 @@ const students: Student[] = [
         user_id: '1',
         workflow_state: 'completed' as const,
         course_section_id: '0',
-        last_attended_at: null
+        last_attended_at: null,
       } as SpeedGraderEnrollment,
       {
         user_id: '1',
         workflow_state: 'completed' as const,
         course_section_id: '1',
-        last_attended_at: null
+        last_attended_at: null,
       } as SpeedGraderEnrollment,
     ],
     first_name: 'Bob',
@@ -200,7 +200,7 @@ const students: Student[] = [
           unposted_current_score: null,
           unposted_current_grade: null,
           unposted_final_score: null,
-          unposted_final_grade: null
+          unposted_final_grade: null,
         },
         html_url: '',
         id: '3',
@@ -220,7 +220,7 @@ const students: Student[] = [
         type: 'StudentEnrollment',
         updated_at: '2023-01-01T00:00:00Z',
         user_id: '2',
-        workflow_state: 'active' as WorkflowState
+        workflow_state: 'active' as WorkflowState,
       },
       {
         associated_user_id: null,
@@ -239,7 +239,7 @@ const students: Student[] = [
           unposted_current_score: null,
           unposted_current_grade: null,
           unposted_final_score: null,
-          unposted_final_grade: null
+          unposted_final_grade: null,
         },
         html_url: '',
         id: '4',
@@ -259,8 +259,8 @@ const students: Student[] = [
         type: 'StudentEnrollment',
         updated_at: '2023-01-01T00:00:00Z',
         user_id: '2',
-        workflow_state: 'completed' as WorkflowState
-      }
+        workflow_state: 'completed' as WorkflowState,
+      },
     ],
     first_name: 'Bob',
     last_name: 'Smith',
@@ -282,7 +282,7 @@ const students: Student[] = [
   },
 ]
 
-const keyBy = <T extends Record<string, unknown>>(array: T[], key: keyof T): Record<string, T> => 
+const keyBy = <T extends Record<string, unknown>>(array: T[], key: keyof T): Record<string, T> =>
   array.reduce((r, x) => ({...r, [String(x[key])]: x}), {})
 const studentMap = keyBy(students, 'id')
 

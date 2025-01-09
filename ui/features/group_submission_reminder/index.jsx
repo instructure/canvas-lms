@@ -42,10 +42,9 @@ GroupSubmissionAlert.propTypes = {
 
 ready(() => {
   $('.group_submission_alert').each((idx, alertContainer) => {
-     
     ReactDOM.render(
       <GroupSubmissionAlert groupType={alertContainer.getAttribute('data-group-type')} />,
-      alertContainer
+      alertContainer,
     )
   })
 })

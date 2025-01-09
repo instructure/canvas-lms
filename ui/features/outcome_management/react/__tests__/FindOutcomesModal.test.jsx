@@ -47,7 +47,7 @@ const delayImportOutcomesProgress = () => {
   resolveProgress.mockReturnValueOnce(
     new Promise(resolve => {
       realResolve = resolve
-    })
+    }),
   )
 
   return realResolve
@@ -129,7 +129,7 @@ describe.skip('FindOutcomesModal', () => {
       globalRootId = '',
       rootOutcomeGroup = {id: '0'},
       rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId],
-    } = {}
+    } = {},
   ) => {
     return renderer(
       <OutcomesContext.Provider
@@ -149,7 +149,7 @@ describe.skip('FindOutcomesModal', () => {
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -180,7 +180,7 @@ describe.skip('FindOutcomesModal', () => {
         />,
         {
           contextType: 'Course',
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       expect(getByText('Add Outcomes to "The Group Title"')).toBeInTheDocument()
@@ -261,7 +261,7 @@ describe.skip('FindOutcomesModal', () => {
         <FindOutcomesModal {...defaultProps()} />,
         {
           mocks: [...findModalMocks(), ...findOutcomesMocks()],
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
@@ -322,7 +322,7 @@ describe.skip('FindOutcomesModal', () => {
         <FindOutcomesModal {...defaultProps()} />,
         {
           mocks: [...findModalMocks(), ...findOutcomesMocks()],
-        }
+        },
       )
       await act(async () => jest.runAllTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
@@ -441,8 +441,8 @@ describe.skip('FindOutcomesModal', () => {
         expect(setTargetGroupIdsToRefetchMock).toHaveBeenCalledTimes(1)
         expect(
           getAllByText(
-            'All outcomes from Group 300 have been successfully added to this account.'
-          )[0]
+            'All outcomes from Group 300 have been successfully added to this account.',
+          )[0],
         ).toBeInTheDocument()
       })
 
@@ -472,8 +472,8 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
           getAllByText(
-            'All outcomes from Group 300 have been successfully added to this course.'
-          )[0]
+            'All outcomes from Group 300 have been successfully added to this course.',
+          )[0],
         ).toBeInTheDocument()
       })
 
@@ -589,19 +589,19 @@ describe.skip('FindOutcomesModal', () => {
                 targetContextType: 'Course',
               }),
             ],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
-        expect(getAllByText('Add').length).toBe(2)
+        expect(getAllByText('Add')).toHaveLength(2)
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
-        expect(getAllByText('Loading').length).toBe(2)
+        expect(getAllByText('Loading')).toHaveLength(2)
         await act(async () => doResolveProgress())
         expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(2)
+        expect(getAllByText('Added')).toHaveLength(2)
       })
 
       it('replaces Add buttons of individual outcomes with loading spinner during group import or a parent group', async () => {
@@ -619,7 +619,7 @@ describe.skip('FindOutcomesModal', () => {
                 targetContextType: 'Course',
               }),
             ],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -628,15 +628,15 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
 
         // loading for outcome 1, 2, 3
-        expect(getAllByText('Loading').length).toBe(3)
+        expect(getAllByText('Loading')).toHaveLength(3)
         await clickEl(getByText('Group 300'))
         await clickEl(getByText('Group 400'))
 
         // loading for outcome 1
-        expect(getAllByText('Loading').length).toBe(1)
+        expect(getAllByText('Loading')).toHaveLength(1)
         await act(async () => doResolveProgress())
         expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(1)
+        expect(getAllByText('Added')).toHaveLength(1)
 
         // disables Add All Outcomes button for child groups
         expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
@@ -661,7 +661,7 @@ describe.skip('FindOutcomesModal', () => {
                 targetContextType: 'Course',
               }),
             ],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -671,12 +671,12 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 200'))
         await clickEl(getByText('Group 300'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(getAllByText('Loading').length).toBe(3)
+        expect(getAllByText('Loading')).toHaveLength(3)
 
         // finish import
         await act(async () => doResolveProgress())
         expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(3)
+        expect(getAllByText('Added')).toHaveLength(3)
 
         // select parent/ancestor group
         await clickEl(getByText('Group 200'))
@@ -698,7 +698,7 @@ describe.skip('FindOutcomesModal', () => {
                 targetContextType: 'Course',
               }),
             ],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -708,12 +708,12 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 200'))
         await clickEl(getByText('Group 300'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
-        expect(getAllByText('Loading').length).toBe(3)
+        expect(getAllByText('Loading')).toHaveLength(3)
 
         // finish import
         await act(async () => doResolveProgress())
         expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(3)
+        expect(getAllByText('Added')).toHaveLength(3)
         expect(queryByText('All Refetched Group 200 Outcomes')).not.toBeInTheDocument()
       })
 
@@ -734,7 +734,7 @@ describe.skip('FindOutcomesModal', () => {
           {
             contextType: 'Course',
             mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -746,10 +746,10 @@ describe.skip('FindOutcomesModal', () => {
 
         await clickEl(getByText('Group 300'))
         // group 300 is loading. length 3 means outcome 1, 2, 3
-        expect(getAllByText('Loading').length).toBe(3)
+        expect(getAllByText('Loading')).toHaveLength(3)
         await act(async () => doResolveProgress())
         expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(getAllByText('Added').length).toBe(3)
+        expect(getAllByText('Added')).toHaveLength(3)
         // resets latestImport after progress is resolved
         expect(localStorage.latestImport).toBeUndefined()
       })
@@ -769,10 +769,10 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Account Standards'))
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
-        expect(getAllByText('Add').length).toBe(2)
+        expect(getAllByText('Add')).toHaveLength(2)
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
-        expect(getAllByText('Added').length).toBe(2)
+        expect(getAllByText('Added')).toHaveLength(2)
       })
 
       it('displays flash confirmation with proper message if group import to Course succeeds', async () => {
@@ -794,8 +794,8 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Import Anyway'))
         expect(
           getAllByText(
-            'All outcomes from Group 300 have been successfully added to this course.'
-          )[0]
+            'All outcomes from Group 300 have been successfully added to this course.',
+          )[0],
         ).toBeInTheDocument()
       })
 
@@ -816,8 +816,8 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
           getAllByText(
-            'All outcomes from Group 300 have been successfully added to this account.'
-          )[0]
+            'All outcomes from Group 300 have been successfully added to this account.',
+          )[0],
         ).toBeInTheDocument()
       })
 
@@ -839,7 +839,7 @@ describe.skip('FindOutcomesModal', () => {
               ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
               ...importGroupMocks({groupId: '300', targetGroupId: '1'}),
             ],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -848,8 +848,8 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         expect(
           getAllByText(
-            'All outcomes from Group 300 have been successfully added to The Group Title.'
-          )[0]
+            'All outcomes from Group 300 have been successfully added to The Group Title.',
+          )[0],
         ).toBeInTheDocument()
       })
 
@@ -872,7 +872,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
         expect(
-          getAllByText('An error occurred while importing these outcomes: Network error.')[0]
+          getAllByText('An error occurred while importing these outcomes: Network error.')[0],
         ).toBeInTheDocument()
       })
 
@@ -895,7 +895,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Add All Outcomes').closest('button'))
         await clickEl(getByText('Import Anyway'))
         expect(
-          getAllByText('An error occurred while importing these outcomes.')[0]
+          getAllByText('An error occurred while importing these outcomes.')[0],
         ).toBeInTheDocument()
       })
     })
@@ -917,7 +917,7 @@ describe.skip('FindOutcomesModal', () => {
           {
             contextType: 'Course',
             mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -927,11 +927,11 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 400'))
 
         // No loading since we've imported group 300
-        expect(queryAllByText('Loading').length).toBe(1)
+        expect(queryAllByText('Loading')).toHaveLength(1)
 
         await act(async () => doResolveProgress())
         expect(queryByText('Loading')).not.toBeInTheDocument()
-        expect(queryAllByText('Added').length).toBe(1)
+        expect(queryAllByText('Added')).toHaveLength(1)
         // resets latestImport after progress is resolved
         expect(localStorage.activeImports).toEqual('[]')
         delete localStorage.activeImports
@@ -953,7 +953,7 @@ describe.skip('FindOutcomesModal', () => {
                 sourceContextType: 'Account',
               }),
             ],
-          }
+          },
         )
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -1118,7 +1118,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getAllByText('Add')[0].closest('button'))
         expect(
-          getAllByText('An error occurred while importing this outcome: Network error.')[0]
+          getAllByText('An error occurred while importing this outcome: Network error.')[0],
         ).toBeInTheDocument()
       })
 
@@ -1142,7 +1142,7 @@ describe.skip('FindOutcomesModal', () => {
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getAllByText('Add')[0].closest('button'))
         expect(
-          getAllByText('An error occurred while importing this outcome.')[0]
+          getAllByText('An error occurred while importing this outcome.')[0],
         ).toBeInTheDocument()
       })
     })

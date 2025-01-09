@@ -32,22 +32,22 @@ const I18n = createI18nScope('discussion_posts')
 export const DiscussionTopicAlertManager = props => {
   const getAnonymousAlertText = () => {
     const teacherFullAnonAlert = I18n.t(
-      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.'
+      'This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members. Mentions have also been disabled.',
     )
     const studentFullAnonAlert = I18n.t(
-      'This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.'
+      'This is an anonymous Discussion. Your name and profile picture will be hidden from other course members. Mentions have also been disabled.',
     )
     const observerFullAnonAlert = I18n.t(
-      'This is an anonymous Discussion. Student names and profile pictures are hidden.'
+      'This is an anonymous Discussion. Student names and profile pictures are hidden.',
     )
     const teacherPartialAnonAlert = I18n.t(
-      'When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members. Mentions have also been disabled.'
+      'When creating a reply, students will have the option to show their name and profile picture or remain anonymous. Your name and profile picture will be visible to all course members. Mentions have also been disabled.',
     )
     const studentPartialAnonAlert = I18n.t(
-      'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled.'
+      'When creating a reply, you will have the option to show your name and profile picture to other course members or remain anonymous. Mentions have also been disabled.',
     )
     const observerPartialAnonAlert = I18n.t(
-      'Students have the option to reply anonymously. Some names and profile pictures may be hidden.'
+      'Students have the option to reply anonymously. Some names and profile pictures may be hidden.',
     )
     const isObserver = ENV.current_user_roles?.includes('observer')
 
@@ -86,10 +86,10 @@ export const DiscussionTopicAlertManager = props => {
             <Alert key="post-required" renderCloseButtonLabel="Close" margin="0 0 x-small">
               <Text data-testid="post-required" size={responsiveProps?.alert?.textSize}>
                 {I18n.t(
-                  'You must post before seeing replies. Edit history will be available to instructors.'
+                  'You must post before seeing replies. Edit history will be available to instructors.',
                 )}
               </Text>
-            </Alert>
+            </Alert>,
           )
         }
 
@@ -109,10 +109,10 @@ export const DiscussionTopicAlertManager = props => {
                 size={responsiveProps?.alert?.textSize}
               >
                 {I18n.t(
-                  'Note: for differentiated group topics, some threads may not have any students assigned.'
+                  'Note: for differentiated group topics, some threads may not have any students assigned.',
                 )}
               </Text>
-            </Alert>
+            </Alert>,
           )
         }
 
@@ -126,11 +126,11 @@ export const DiscussionTopicAlertManager = props => {
               <Text data-testid="delayed-until" size={responsiveProps?.alert?.textSize}>
                 {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
                   delayedPostAt: DateHelper.formatDatetimeForDiscussions(
-                    props.discussionTopic.delayedPostAt
+                    props.discussionTopic.delayedPostAt,
                   ),
                 })}
               </Text>
-            </Alert>
+            </Alert>,
           )
         }
 
@@ -140,7 +140,7 @@ export const DiscussionTopicAlertManager = props => {
               <Text data-testid="locked-for-user" size={responsiveProps?.alert?.textSize}>
                 {props.discussionTopic.lockInformation}
               </Text>
-            </Alert>
+            </Alert>,
           )
         }
 
@@ -150,7 +150,7 @@ export const DiscussionTopicAlertManager = props => {
               <Text data-testid="anon-conversation" size={responsiveProps?.alert?.textSize}>
                 {getAnonymousAlertText()}
               </Text>
-            </Alert>
+            </Alert>,
           )
         }
 
@@ -166,10 +166,10 @@ export const DiscussionTopicAlertManager = props => {
                 size={responsiveProps?.alert?.textSize}
               >
                 {I18n.t(
-                  'This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.'
+                  'This discussion includes graded checkpoints, but the Discussion Checkpoints feature flag is currently disabled at the root account level. To enable this functionality, please contact an administrator to activate the feature flag.',
                 )}
               </Text>
-            </Alert>
+            </Alert>,
           )
         }
 

@@ -153,7 +153,7 @@ const ComposeModalContainer = props => {
         list.map(option => ({
           assetString: option.assetString,
           contextName: option.contextName,
-        }))
+        })),
       )
     }
 
@@ -236,7 +236,7 @@ const ComposeModalContainer = props => {
     } finally {
       setAttachmentsToUpload(prev => {
         const attachmentsStillUploading = prev.filter(
-          file => !newAttachmentsToUpload.includes(file)
+          file => !newAttachmentsToUpload.includes(file),
         )
         return attachmentsStillUploading
       })
@@ -377,7 +377,7 @@ const ComposeModalContainer = props => {
           attachmentIds: attachments.map(a => a.id),
           body,
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
-            c => c._id
+            c => c._id,
           ),
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
           mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type,
@@ -389,7 +389,7 @@ const ComposeModalContainer = props => {
           attachmentIds: attachments.map(a => a.id),
           body,
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
-            c => c._id
+            c => c._id,
           ),
           recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,

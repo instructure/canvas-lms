@@ -93,10 +93,12 @@ export default {
         error: (model, response) => {
           if (response.status === 409)
             $.flashError(
-              I18n.t('A file named %{itemName} already exists in this folder.', {itemName: newName})
+              I18n.t('A file named %{itemName} already exists in this folder.', {
+                itemName: newName,
+              }),
             )
         },
-      }
+      },
     )
   },
 

@@ -75,7 +75,7 @@ export type Submission = SubAssignmentSubmission & {
 
 const fetchAssignment = async (
   courseId: string,
-  assignmentId: string
+  assignmentId: string,
 ): Promise<Assignment | null> => {
   const path = `/api/v1/courses/${courseId}/assignments/${assignmentId}?include=checkpoints`
 
@@ -91,7 +91,7 @@ const fetchAssignment = async (
 const fetchSubmission = async (
   courseId: string,
   assignmentId: string,
-  studentId: string
+  studentId: string,
 ): Promise<Submission | null> => {
   const path = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}?include=sub_assignment_submissions`
 
@@ -241,7 +241,7 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
     const {points_possible: pointsPossible} = getAssignmentWithPropsFromCheckpoints(
       // @ts-expect-error
       assignment,
-      lastSubmission
+      lastSubmission,
     )
     const outlierScoreHelper = new OutlierScoreHelper(score, pointsPossible)
 
@@ -313,10 +313,9 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
   }
 
   const getAssignmentWithPropsFromCheckpoints = (
-     
     assignment: Assignment,
-     
-    submission: SubAssignmentSubmission
+
+    submission: SubAssignmentSubmission,
   ) => {
     return {
       ...assignment,

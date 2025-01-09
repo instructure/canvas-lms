@@ -71,7 +71,7 @@ describe('TagThrottle', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/throttle/check',
         params: {term: 'foobar', shard_id: '101'},
-      })
+      }),
     )
     await jest.runOnlyPendingTimers()
 
@@ -83,7 +83,7 @@ describe('TagThrottle', () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const onUpdate = jest.fn()
     const {getByText, getByLabelText} = render(
-      <TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />
+      <TagThrottle tag="foobar" jobs={fakeJobs} onUpdate={onUpdate} />,
     )
     await user.click(getByText('Throttle tag "foobar"', {selector: 'button span'}))
     await jest.runOnlyPendingTimers()
@@ -99,7 +99,7 @@ describe('TagThrottle', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/throttle/check',
         params: {term: 'foo', shard_id: ''},
-      })
+      }),
     )
 
     expect(getByText('Matched 27 jobs with 3 tags')).toBeInTheDocument()

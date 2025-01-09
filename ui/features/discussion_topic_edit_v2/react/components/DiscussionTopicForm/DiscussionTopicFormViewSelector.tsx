@@ -46,7 +46,7 @@ export const DiscussionTopicFormViewSelector = ({
 }) => {
   const handleTabChange = (
     event: React.MouseEvent<ViewOwnProps> | React.KeyboardEvent<ViewOwnProps>,
-    tabData: {index: number; id?: string}
+    tabData: {index: number; id?: string},
   ) => {
     setSelectedView(tabData.index)
   }

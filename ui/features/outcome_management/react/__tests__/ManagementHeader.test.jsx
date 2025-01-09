@@ -48,7 +48,7 @@ const render = (
     canImport = true,
     renderer = rtlRender,
     mocks = [],
-  } = {}
+  } = {},
 ) => {
   return renderer(
     <OutcomesContext.Provider
@@ -57,7 +57,7 @@ const render = (
       <MockedProvider cache={cache} mocks={mocks}>
         {children}
       </MockedProvider>
-    </OutcomesContext.Provider>
+    </OutcomesContext.Provider>,
   )
 }
 

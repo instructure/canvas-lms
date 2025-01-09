@@ -87,10 +87,10 @@ export const DiscussionThreadContainer = props => {
     useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {replyFromId, setReplyFromId, usedThreadingToolbarChildRef} = useContext(
-    DiscussionManagerUtilityContext
+    DiscussionManagerUtilityContext,
   )
   const [expandReplies, setExpandReplies] = useState(
-    defaultExpandedReplies(props.discussionEntry._id)
+    defaultExpandedReplies(props.discussionEntry._id),
   )
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
@@ -138,7 +138,7 @@ export const DiscussionThreadContainer = props => {
 
   const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
     onEntryCreationCompletion,
-    updateCache
+    updateCache,
   )
 
   const [deleteDiscussionEntry] = useMutation(DELETE_DISCUSSION_ENTRY, {
@@ -215,7 +215,7 @@ export const DiscussionThreadContainer = props => {
     const responsiveLeftPadding = responsiveProp.padding.split(' ')[1] || ''
     // The flex component uses the notation xx-small but the canvas theme saves the value as xxSmall
     const camelCaseResponsiveLeftPadding = responsiveLeftPadding.replace(/-(.)/g, (_, nextLetter) =>
-      nextLetter.toUpperCase()
+      nextLetter.toUpperCase(),
     )
     // Retrieve the css value based on the canvas theme variable
     const discussionEditLeftPadding = theme.spacing[camelCaseResponsiveLeftPadding] || '0'
@@ -278,7 +278,7 @@ export const DiscussionThreadContainer = props => {
               props.onOpenSplitView(props.discussionEntry._id, true)
             }
           }}
-        />
+        />,
       )
     }
     if (
@@ -294,7 +294,7 @@ export const DiscussionThreadContainer = props => {
           isLiked={!!props.discussionEntry.entryParticipant?.rating}
           likeCount={props.discussionEntry.ratingSum || 0}
           interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
-        />
+        />,
       )
     }
 
@@ -306,7 +306,7 @@ export const DiscussionThreadContainer = props => {
           isRead={props.discussionEntry.entryParticipant?.read}
           authorName={getDisplayName(props.discussionEntry)}
           onClick={toggleUnread}
-        />
+        />,
       )
     }
 
@@ -314,7 +314,6 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onDelete = () => {
-     
     if (window.confirm(I18n.t('Are you sure you want to delete this entry?'))) {
       deleteDiscussionEntry({
         variables: {
@@ -339,7 +338,7 @@ export const DiscussionThreadContainer = props => {
   const onOpenInSpeedGrader = () => {
     window.open(
       getSpeedGraderUrl(props.discussionEntry.author._id, props.discussionEntry._id),
-      '_blank'
+      '_blank',
     )
   }
 
@@ -356,7 +355,7 @@ export const DiscussionThreadContainer = props => {
       data.entryParticipant.read = !data.entryParticipant?.read
       updateLoadedSubentry(data)
     },
-    [props, updateLoadedSubentry]
+    [props, updateLoadedSubentry],
   )
 
   useEffect(() => {
@@ -375,7 +374,7 @@ export const DiscussionThreadContainer = props => {
           root: null,
           rootMargin: '0px',
           threshold: 0.0,
-        }
+        },
       )
 
       if (threadRefCurrent) observer.observe(threadRefCurrent)
@@ -571,20 +570,20 @@ export const DiscussionThreadContainer = props => {
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
                     createdAt={props.discussionEntry.createdAt}
                     timingDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.createdAt
+                      props.discussionEntry.createdAt,
                     )}
                     editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
                       props.discussionEntry.deleted
                         ? props.discussionEntry.updatedAt
-                        : props.discussionEntry.editedAt
+                        : props.discussionEntry.editedAt,
                     )}
                     lastReplyAtDisplay={DateHelper.formatDatetimeForDiscussions(
-                      props.discussionEntry.lastReply?.createdAt
+                      props.discussionEntry.lastReply?.createdAt,
                     )}
                     deleted={props.discussionEntry.deleted}
                     isTopicAuthor={isTopicAuthor(
                       props.discussionTopic.author,
-                      props.discussionEntry.author
+                      props.discussionEntry.author,
                     )}
                     attachment={props.discussionEntry.attachment}
                     quotedEntry={props.discussionEntry.quotedEntry}
@@ -668,7 +667,7 @@ export const DiscussionThreadContainer = props => {
                             data-mention={props.discussionEntry.author?._id}
                           >
                             @{getDisplayName(props.discussionEntry)}
-                          </span>
+                          </span>,
                         )
                       : ''
                   }

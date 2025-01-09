@@ -44,7 +44,7 @@ describe('OutcomeDescriptionModal', () => {
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
-      pick(rating, ['description', 'points', 'color', 'mastery'])
+      pick(rating, ['description', 'points', 'color', 'mastery']),
     ),
   }
 
@@ -60,7 +60,7 @@ describe('OutcomeDescriptionModal', () => {
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
-      pick(rating, ['description', 'points', 'color', 'mastery'])
+      pick(rating, ['description', 'points', 'color', 'mastery']),
     ),
   }
 
@@ -76,7 +76,7 @@ describe('OutcomeDescriptionModal', () => {
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
-      pick(rating, ['description', 'points', 'color', 'mastery'])
+      pick(rating, ['description', 'points', 'color', 'mastery']),
     ),
   }
 
@@ -99,7 +99,7 @@ describe('OutcomeDescriptionModal', () => {
     return render(
       <LMGBContext.Provider value={{env}}>
         <OutcomeDescriptionModal {...defaultProps(outcome)} {...overrides} />
-      </LMGBContext.Provider>
+      </LMGBContext.Provider>,
     )
   }
 

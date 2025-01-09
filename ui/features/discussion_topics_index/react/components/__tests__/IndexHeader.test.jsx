@@ -48,7 +48,7 @@ describe('IndexHeader', () => {
         selectedCount: 0,
         applicationElement: () => document.getElementById('fixtures'),
       },
-      props
+      props,
     )
 
   it('renders the component', () => {

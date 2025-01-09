@@ -77,8 +77,8 @@ export default class CoursePicker extends React.Component {
             one: 'Loading courses complete: one course found',
             other: 'Loading courses complete: %{count} courses found',
           },
-          {count: nextProps.courses.length}
-        )
+          {count: nextProps.courses.length},
+        ),
       )
     }
   }

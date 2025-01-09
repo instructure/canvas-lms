@@ -46,7 +46,7 @@ export default function MissingPrereqs(props) {
           <Flex.Item>
             <Text weight="normal" data-testid="assignments-2-pre-req-title" margin="small">
               {I18n.t(
-                'This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.'
+                'This assignment is currently unavailable because you have not yet completed prerequisites set by your instructor.',
               )}
             </Text>
           </Flex.Item>

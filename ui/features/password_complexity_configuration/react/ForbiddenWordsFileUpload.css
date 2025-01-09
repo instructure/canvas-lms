@@ -28,7 +28,7 @@
  * body, but that has the side effect of cropping the FileDrop’s focus outline)
  */
 #fileDropContainer {
-    overflow: hidden;
-    width: 0.0625rem;
-    height: 0.0625rem;
+  overflow: hidden;
+  width: 0.0625rem;
+  height: 0.0625rem;
 }

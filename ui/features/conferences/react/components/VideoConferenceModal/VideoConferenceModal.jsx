@@ -56,27 +56,27 @@ export const VideoConferenceModal = ({
   const defaultName = ENV.context_name ? `${ENV.context_name} Conference` : 'Conference'
   const [name, setName] = useState(isEditing ? props.name : defaultName)
   const [conferenceType, setConferenceType] = useState(
-    isEditing ? props.type : window.ENV.conference_type_details[0].type
+    isEditing ? props.type : window.ENV.conference_type_details[0].type,
   )
   const [duration, setDuration] = useState(isEditing ? props.duration : 60)
   const [options, setOptions] = useState(isEditing ? props.options : OPTIONS_DEFAULT)
 
   const [description, setDescription] = useState(isEditing ? props.description : '')
   const [invitationOptions, setInvitationOptions] = useState(
-    isEditing ? props.invitationOptions : INVITATION_OPTIONS_DEFAULT
+    isEditing ? props.invitationOptions : INVITATION_OPTIONS_DEFAULT,
   )
   const [attendeesOptions, setAttendeesOptions] = useState(
-    isEditing ? props.attendeesOptions : ATTENDEES_OPTIONS_DEFAULT
+    isEditing ? props.attendeesOptions : ATTENDEES_OPTIONS_DEFAULT,
   )
   const [showAddressBook, setShowAddressBook] = useState(false)
   const [selectedAttendees, setSelectedAttendees] = useState(
-    props.selectedAttendees ? props.selectedAttendees : []
+    props.selectedAttendees ? props.selectedAttendees : [],
   )
   const [startCalendarDate, setStartCalendarDate] = useState(
-    props.startCalendarDate ? props.startCalendarDate : new Date().toISOString()
+    props.startCalendarDate ? props.startCalendarDate : new Date().toISOString(),
   )
   const [endCalendarDate, setEndCalendarDate] = useState(
-    props.endCalendarDate ? props.endCalendarDate : new Date().toISOString()
+    props.endCalendarDate ? props.endCalendarDate : new Date().toISOString(),
   )
 
   const [showCalendarOptions, setShowCalendarOptions] = useState(false)

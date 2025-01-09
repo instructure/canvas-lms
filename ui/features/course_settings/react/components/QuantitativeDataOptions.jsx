@@ -38,7 +38,7 @@ export default function QuantitativeDataOptions({canManage}) {
   const getFormValue = id => document.getElementById(id).value
 
   const [viewQuantitativeData, setViewQuantitativeData] = useState(
-    getFormValue(FORM_IDS.RESTRICT_QUANTITATIVE_DATA) === 'true'
+    getFormValue(FORM_IDS.RESTRICT_QUANTITATIVE_DATA) === 'true',
   )
 
   return (

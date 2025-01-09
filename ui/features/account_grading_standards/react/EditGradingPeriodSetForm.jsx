@@ -97,7 +97,7 @@ class GradingPeriodSetForm extends React.Component {
 
   changeDisplayTotals = e => {
     this.setState(
-      replaceSetAttr(this.state.set, 'displayTotalsForAllGradingPeriods', e.target.checked)
+      replaceSetAttr(this.state.set, 'displayTotalsForAllGradingPeriods', e.target.checked),
     )
   }
 

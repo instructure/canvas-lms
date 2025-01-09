@@ -92,7 +92,7 @@ export default class Placements extends React.Component {
         <CanvasMultiSelect
           label={I18n.t('Placements')}
           assistiveText={I18n.t(
-            'Select Placements. Type or use arrow keys to navigate. Multiple selections are allowed.'
+            'Select Placements. Type or use arrow keys to navigate. Multiple selections are allowed.',
           )}
           selectedOptionIds={this.placements(placements)}
           onChange={this.handlePlacementSelect}
@@ -124,7 +124,7 @@ Placements.propTypes = {
   placements: PropTypes.arrayOf(
     PropTypes.shape({
       placement: PropTypes.string.isRequired,
-    })
+    }),
   ),
 }
 

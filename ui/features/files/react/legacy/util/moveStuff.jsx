@@ -33,7 +33,7 @@ function moveItem(item, destinationFolder, options = {}) {
     (jqXHR, _textStatus, _errorThrown) => {
       if (jqXHR.status === 409) {
         // file already exists: prompt and retry
-         
+
         ReactDOM.render(
           React.createFactory(FileRenameForm)({
             onClose() {},
@@ -45,16 +45,16 @@ function moveItem(item, destinationFolder, options = {}) {
             onNameConflictResolved: opts =>
               moveItem(item, destinationFolder, opts).then(
                 data => dfd.resolve(data),
-                () => dfd.reject()
+                () => dfd.reject(),
               ),
           }),
-          $('<div>').appendTo('body')[0]
+          $('<div>').appendTo('body')[0],
         )
       } else {
         // some other error: fail
         return dfd.reject()
       }
-    }
+    },
   )
   return dfd
 }
@@ -73,8 +73,8 @@ export default function moveStuff(filesAndFolders, destinationFolder) {
           count: filesAndFolders.length,
           item: filesAndFolders[0] && filesAndFolders[0].displayName(),
           destinationFolder: destinationFolder.displayName(),
-        }
-      )
+        },
+      ),
     )
   })
 }

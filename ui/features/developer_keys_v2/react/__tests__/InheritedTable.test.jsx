@@ -76,7 +76,7 @@ describe('InheritedTable', () => {
           },
         }}
         {...props}
-      />
+      />,
     )
   }
 

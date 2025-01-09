@@ -54,7 +54,7 @@ export default class ThemeEditorAccordion extends React.Component {
       },
       () => {
         this.setStoredAccordionIndex(index)
-      }
+      },
     )
   }
 

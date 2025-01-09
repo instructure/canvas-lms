@@ -117,7 +117,7 @@ Suggestions.propTypes = {
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
       _id: PropTypes.string.isRequired,
-    })
+    }),
   ).isRequired,
   showResults: PropTypes.bool.isRequired,
   setComment: PropTypes.func.isRequired,

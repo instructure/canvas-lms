@@ -41,7 +41,7 @@ const STUDENT_SETTINGS = [
 
 export default class DiscussionSettings extends Component {
   static propTypes = {
-    courseSettings: propTypes.courseSettings,  
+    courseSettings: propTypes.courseSettings,
     isSavingSettings: bool.isRequired,
     isSettingsModalOpen: bool.isRequired,
     permissions: propTypes.permissions.isRequired,
@@ -68,7 +68,7 @@ export default class DiscussionSettings extends Component {
 
   defaultStudentSettingsValues = props => {
     const defaultChecked = Object.keys(props.courseSettings).filter(
-      key => props.courseSettings[key] === true && STUDENT_SETTINGS.includes(key)
+      key => props.courseSettings[key] === true && STUDENT_SETTINGS.includes(key),
     )
     return defaultChecked
   }
@@ -76,7 +76,7 @@ export default class DiscussionSettings extends Component {
   handleSavedClick = () => {
     if (this.props.permissions.change_settings) {
       const falseSettings = STUDENT_SETTINGS.filter(
-        item => !this.state.studentSettings.includes(item)
+        item => !this.state.studentSettings.includes(item),
       )
       const falseUpdateSettings = falseSettings.reduce((accumulator, key) => {
         const accumulatorCopy = accumulator
@@ -90,7 +90,7 @@ export default class DiscussionSettings extends Component {
       }, {})
       this.props.saveSettings(
         {markAsRead: this.state.markAsRead},
-        Object.assign(trueUpdateSettings, falseUpdateSettings)
+        Object.assign(trueUpdateSettings, falseUpdateSettings),
       )
     } else {
       this.props.saveSettings({markAsRead: this.state.markAsRead})

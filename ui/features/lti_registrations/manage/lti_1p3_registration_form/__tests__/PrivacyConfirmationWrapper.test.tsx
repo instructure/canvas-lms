@@ -37,7 +37,7 @@ describe('PrivacyConfirmationWrapper', () => {
         overlayStore={overlayStore}
         appName={appName}
         internalConfig={internalConfig}
-      />
+      />,
     )
 
     expect(screen.getByText(/Data Sharing/i)).toBeInTheDocument()
@@ -54,7 +54,7 @@ describe('PrivacyConfirmationWrapper', () => {
         overlayStore={overlayStore}
         appName={appName}
         internalConfig={internalConfig}
-      />
+      />,
     )
 
     const select = screen.getByLabelText(/User Data Shared With This App/i)
@@ -70,7 +70,7 @@ describe('PrivacyConfirmationWrapper', () => {
         overlayStore={overlayStore}
         appName={appName}
         internalConfig={internalConfig}
-      />
+      />,
     )
 
     const select = screen.getByLabelText(/User Data Shared With This App/i)

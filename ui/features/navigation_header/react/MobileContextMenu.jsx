@@ -112,7 +112,7 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
 
   useFetchApi({
     path: `/api/v1/${encodeURIComponent(contextType || defaultContextType)}/${encodeURIComponent(
-      contextId || defaultContextId
+      contextId || defaultContextId,
     )}/tabs`,
     success: useCallback(r => setTabs(r), []),
   })

@@ -45,14 +45,14 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
         return userNameToShow(
           editor.displayName || editor.shortName,
           author._id,
-          editor.courseRoles
+          editor.courseRoles,
         )
       }
       if (anonymousAuthor) {
         return userNameToShow(
           editor.displayName || editor.shortName,
           anonymousAuthor._id,
-          editor.courseRoles
+          editor.courseRoles,
         )
       }
     } else {

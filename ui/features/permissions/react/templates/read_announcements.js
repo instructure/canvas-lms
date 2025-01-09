@@ -36,18 +36,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Announcements'),
       description: I18n.t(
-        'To view recent announcements on the home page, Course content - view must be enabled, and the Show recent announcements on Course home page checkbox must be selected in Course Settings.'
+        'To view recent announcements on the home page, Course content - view must be enabled, and the Show recent announcements on Course home page checkbox must be selected in Course Settings.',
       ),
     },
     {
       description: I18n.t(
-        'To manage course announcements, Discussions - moderate ​must also be enabled.'
+        'To manage course announcements, Discussions - moderate ​must also be enabled.',
       ),
     },
     {
       title: I18n.t('Global Announcements'),
       description: I18n.t(
-        'This permission only affects course announcements; to manage global announcements, Global Announcements - add / edit / delete​ must be enabled.'
+        'This permission only affects course announcements; to manage global announcements, Global Announcements - add / edit / delete​ must be enabled.',
       ),
     },
   ],
@@ -70,8 +70,8 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To view recent announcements on the home page, the Show recent announcements on Course home page checkbox must be selected in Course Settings.'
+        'To view recent announcements on the home page, the Show recent announcements on Course home page checkbox must be selected in Course Settings.',
       ),
     },
-  ]
+  ],
 )

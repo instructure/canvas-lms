@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Analytics'),
       description: I18n.t(
-        'Allows user to view, drill into, and export Admin Analytics data in the Overview, Course, and Student tabs.'
+        'Allows user to view, drill into, and export Admin Analytics data in the Overview, Course, and Student tabs.',
       ),
     },
   ],
@@ -34,8 +34,8 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
-        'The Admin Analytics feature must be enabled in Account Settings to view Admin Analytics dashboards.'
+        'The Admin Analytics feature must be enabled in Account Settings to view Admin Analytics dashboards.',
       ),
     },
-  ]
+  ],
 )

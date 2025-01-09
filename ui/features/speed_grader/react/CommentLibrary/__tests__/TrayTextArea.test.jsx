@@ -74,7 +74,7 @@ describe('TrayTextArea', () => {
 
     it('focuses on the text input and clears the input after isAdding changes to false', () => {
       const {getByLabelText, rerender} = render(
-        <TrayTextArea {...defaultProps({isAdding: true})} />
+        <TrayTextArea {...defaultProps({isAdding: true})} />,
       )
       const input = getByLabelText('Add comment to library')
       fireEvent.change(input, {target: {value: 'test comment'}})

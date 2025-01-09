@@ -395,8 +395,8 @@ class ProficiencyRating extends React.Component {
           isMobileView
             ? '0 0 small 0'
             : individualOutcome
-            ? '0 small small 0'
-            : '0 small small small'
+              ? '0 small small 0'
+              : '0 small small small'
         }`}
         width="100%"
         alignItems={isMobileView ? 'center' : 'start'}

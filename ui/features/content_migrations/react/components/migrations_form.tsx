@@ -59,13 +59,15 @@ type MigratorProps = {
 
 const renderMigrator = (props: MigratorProps) => {
   if (props.value.startsWith('context_external_tool_')) {
-    return <ExternalToolImporter
-      value={props.value}
-      onSubmit={props.onSubmit}
-      onCancel={props.onCancel}
-      isSubmitting={props.isSubmitting}
-      title={props.externalToolTitle || ''}
-    />
+    return (
+      <ExternalToolImporter
+        value={props.value}
+        onSubmit={props.onSubmit}
+        onCancel={props.onCancel}
+        isSubmitting={props.isSubmitting}
+        title={props.externalToolTitle || ''}
+      />
+    )
   }
   switch (props.value) {
     case 'zip_file_importer':
@@ -132,7 +134,7 @@ export const ContentMigrationsForm = ({
     ({loaded, total}: AttachmentProgressResponse) => {
       setFileUploadProgress(Math.trunc((loaded / total) * 100))
     },
-    [setFileUploadProgress]
+    [setFileUploadProgress],
   )
 
   const onSubmitForm: onSubmitMigrationFormCallback = useCallback(
@@ -146,7 +148,7 @@ export const ContentMigrationsForm = ({
       const requestBody: MigrationCreateRequestBody = convertFormDataToMigrationCreateRequest(
         formData,
         courseId,
-        chosenMigrator
+        chosenMigrator,
       )
 
       const {json} = await doFetchApi({
@@ -176,7 +178,7 @@ export const ContentMigrationsForm = ({
         setMigrations(prevMigrations => [overriddenJson].concat(prevMigrations))
       }
     },
-    [chosenMigrator, handleFileProgress, onResetForm, setMigrations]
+    [chosenMigrator, handleFileProgress, onResetForm, setMigrations],
   )
 
   useEffect(() => {
@@ -189,8 +191,8 @@ export const ContentMigrationsForm = ({
         const filteredMigrators = response.json.filter((m: Migrator) => m.type !== 'webct_scraper')
         setMigrators(
           filteredMigrators.sort((a: Migrator, _: Migrator) =>
-            a.type === 'course_copy_importer' || a.type === 'canvas_cartridge_importer' ? -1 : 0
-          )
+            a.type === 'course_copy_importer' || a.type === 'canvas_cartridge_importer' ? -1 : 0,
+          ),
         )
       })
       .catch(showFlashError(I18n.t("Couldn't load migrators")))
@@ -203,12 +205,12 @@ export const ContentMigrationsForm = ({
       </Heading>
       <Text>
         {I18n.t(
-          'Use the Import Content tool to migrate course materials from other sources into this course.'
+          'Use the Import Content tool to migrate course materials from other sources into this course.',
         )}
       </Text>
       <Alert variant="warning">
         {I18n.t(
-          'Importing the same course content more than once will overwrite any existing content in the course.'
+          'Importing the same course content more than once will overwrite any existing content in the course.',
         )}
       </Alert>
       <hr role="presentation" aria-hidden="true" />

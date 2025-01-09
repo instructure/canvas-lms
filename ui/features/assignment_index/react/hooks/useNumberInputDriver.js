@@ -27,7 +27,7 @@ export default function useNumberInputDriver({
   // numberValue may be null to indicate the input is not a valid number
   const [numberValue, setNumberValue] = useState(initialNumberValue)
   const [inputValue, setInputValue] = useState(
-    initialNumberValue ? initialNumberValue.toString() : ''
+    initialNumberValue ? initialNumberValue.toString() : '',
   )
 
   const isSameSideAndCloserToZeroThanRange = useCallback(
@@ -41,7 +41,7 @@ export default function useNumberInputDriver({
         return false
       }
     },
-    [maxNumberValue, minNumberValue]
+    [maxNumberValue, minNumberValue],
   )
 
   const isInRange = useCallback(
@@ -52,7 +52,7 @@ export default function useNumberInputDriver({
       if (maxNumberValue !== null) isBelowMax = newNumberValue <= maxNumberValue
       return isAboveMin && isBelowMax
     },
-    [maxNumberValue, minNumberValue]
+    [maxNumberValue, minNumberValue],
   )
 
   const onChange = useCallback(
@@ -84,7 +84,7 @@ export default function useNumberInputDriver({
         setInputValue(newNumberValue.toString())
       }
     },
-    [isInRange, isSameSideAndCloserToZeroThanRange, minNumberValue]
+    [isInRange, isSameSideAndCloserToZeroThanRange, minNumberValue],
   )
 
   // We want 1, 0, or the in range value closest to 0

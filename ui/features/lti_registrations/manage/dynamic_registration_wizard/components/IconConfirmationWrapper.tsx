@@ -48,9 +48,9 @@ export const IconConfirmationWrapper = ({
   const iconPlacements = React.useMemo(
     () =>
       placements.filter((p): p is LtiPlacementWithIcon =>
-        LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
+        LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon),
       ),
-    [placements]
+    [placements],
   )
   const placementsWithUrls = iconPlacements.reduce((acc, placement) => {
     const iconUrl = overlayState.registration.placements?.find(p => p.type === placement)?.icon_url

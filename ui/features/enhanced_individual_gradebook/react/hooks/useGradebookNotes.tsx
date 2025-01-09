@@ -31,10 +31,10 @@ export const useGradebookNotes = (
   studentNotesColumnId?: string | null,
   getCustomColumnsUrl?: string | null,
   getCustomColumnDataUrl?: string | null,
-  updateCustomColumnDataUrl?: string | null
+  updateCustomColumnDataUrl?: string | null,
 ) => {
   const [submitNotesStatus, setSubmitNotesStatus] = useState<ApiCallStatus>(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
   const [getNotesStatus, setGetNotesStatus] = useState<ApiCallStatus>(ApiCallStatus.NOT_STARTED)
   const [submitNotesError, setSubmitNotesError] = useState<string>('')
@@ -54,7 +54,6 @@ export const useGradebookNotes = (
       const notesMap: NotesMap = {}
       let path: string = getCustomColumnDataUrl.replace(':id', studentNotesColumnId)
       while (path) {
-         
         const {data, link} = await executeApiRequest<CustomColumnDatum[]>({
           method: 'GET',
           path,

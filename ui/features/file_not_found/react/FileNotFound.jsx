@@ -25,7 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('file_not_found')
 
 const LABEL_TEXT = I18n.t(
-  'Please let them know which page you were viewing and the link you clicked on.'
+  'Please let them know which page you were viewing and the link you clicked on.',
 )
 
 class FileNotFound extends React.Component {
@@ -42,7 +42,7 @@ class FileNotFound extends React.Component {
       subject: I18n.t('Broken file link found in your course'),
       recipients: this.props.contextCode + '_teachers',
       body: `${I18n.t(
-        'This most likely happened because you imported course content without its associated files.'
+        'This most likely happened because you imported course content without its associated files.',
       )}
 
         ${I18n.t('This student wrote:')} ${ReactDOM.findDOMNode(this.refs.message).value}`,

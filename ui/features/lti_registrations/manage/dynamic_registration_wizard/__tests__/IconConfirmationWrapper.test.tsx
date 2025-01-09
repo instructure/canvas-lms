@@ -52,7 +52,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     expect(screen.getByText('Icon URLs')).toBeInTheDocument()
@@ -73,7 +73,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     for (const placement of LtiPlacementsWithIcons) {
@@ -81,7 +81,7 @@ describe('IconConfirmation', () => {
     }
 
     expect(
-      screen.queryByText(i18nLtiPlacement(LtiPlacements.CourseNavigation))
+      screen.queryByText(i18nLtiPlacement(LtiPlacements.CourseNavigation)),
     ).not.toBeInTheDocument()
   })
 
@@ -98,7 +98,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     const iconUrl = 'http://example.com/icon.png'
@@ -130,7 +130,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     for (const defaultIconPlacement of defaultIconPlacements) {
@@ -140,11 +140,11 @@ describe('IconConfirmation', () => {
 
       expect(input).toHaveValue('')
       expect(
-        screen.getByAltText(`${i18nLtiPlacement(defaultIconPlacement)} icon`)
+        screen.getByAltText(`${i18nLtiPlacement(defaultIconPlacement)} icon`),
       ).toBeInTheDocument()
     }
     expect(screen.getAllByText(/default icon resembling the one displayed/i)).toHaveLength(
-      defaultIconPlacements.length
+      defaultIconPlacements.length,
     )
   })
 
@@ -155,7 +155,7 @@ describe('IconConfirmation', () => {
     ])
     config.extensions![0].settings.icon_url = 'http://example.com/icon.png'
     config.extensions![0].settings.placements.find(
-      p => p.placement === 'file_index_menu'
+      p => p.placement === 'file_index_menu',
     )!.icon_url = 'http://example.com/icon2.png'
     const reg = mockRegistration({}, config)
     const overlayStore = createRegistrationOverlayStore('Foo', reg)
@@ -166,7 +166,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     const iconPlacement = LtiPlacements.GlobalNavigation
@@ -177,7 +177,7 @@ describe('IconConfirmation', () => {
     expect(input).toHaveValue('')
     expect(screen.getByAltText('Global Navigation icon')).toHaveProperty(
       'src',
-      'http://example.com/icon.png'
+      'http://example.com/icon.png',
     )
     expect(screen.getByText(/the tool's default icon/i)).toBeInTheDocument()
   })
@@ -196,7 +196,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     const iconPlacement = LtiPlacements.GlobalNavigation
@@ -227,7 +227,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     const iconPlacement = LtiPlacements.GlobalNavigation
@@ -259,7 +259,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
     const iconPlacement = LtiPlacements.GlobalNavigation
     const input = screen.getByLabelText(new RegExp(i18nLtiPlacement(iconPlacement)), {
@@ -273,7 +273,7 @@ describe('IconConfirmation', () => {
     expect(input).toHaveValue('http://example.com/icon.png')
     expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
       'src',
-      'http://example.com/icon.png'
+      'http://example.com/icon.png',
     )
     const nextButton = screen.getByRole('button', {name: /next/i})
     await userEvent.click(nextButton)
@@ -295,7 +295,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={mockTransitionToConfirmationState}
         transitionToReviewingState={mockTransitionToReviewingState}
-      />
+      />,
     )
 
     const iconPlacement = LtiPlacements.GlobalNavigation
@@ -312,7 +312,7 @@ describe('IconConfirmation', () => {
     expect(input).toHaveValue('http://example.com/icon.png')
     expect(screen.getByAltText('Global Navigation icon')).toHaveAttribute(
       'src',
-      'http://example.com/icon.png'
+      'http://example.com/icon.png',
     )
   })
 
@@ -333,7 +333,7 @@ describe('IconConfirmation', () => {
         reviewing={false}
         transitionToConfirmationState={jest.fn()}
         transitionToReviewingState={mockTransition}
-      />
+      />,
     )
 
     const nextButton = screen.getByRole('button', {name: /next/i})
@@ -359,7 +359,7 @@ describe('IconConfirmation', () => {
         reviewing={true}
         transitionToConfirmationState={jest.fn()}
         transitionToReviewingState={mockTransition}
-      />
+      />,
     )
 
     const backButton = screen.getByRole('button', {name: /back to review/i})

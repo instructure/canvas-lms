@@ -50,7 +50,7 @@ describe('GroupView', () => {
           sortable_name: 'joe',
         },
       ],
-      {group}
+      {group},
     )
     users.loaded = true
     users.loadedAll = true
@@ -124,7 +124,7 @@ describe('GroupView', () => {
       },
       runOnly: ['wcag2a', 'wcag2aa'],
     })
-    expect(results.violations.length).toBe(0)
+    expect(results.violations).toHaveLength(0)
   })
 
   it('renders in collapsed state initially', () => {

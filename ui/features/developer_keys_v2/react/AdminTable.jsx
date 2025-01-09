@@ -203,13 +203,13 @@ class AdminTable extends React.Component {
     if (ref === undefined) {
       srMsg = I18n.t(
         'Developer key %{developerKeyId} deleted. Focus moved to add developer key button.',
-        {developerKeyId}
+        {developerKeyId},
       )
       this.focusDevKeyButton()
     } else {
       srMsg = I18n.t(
         'Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.',
-        {developerKeyId}
+        {developerKeyId},
       )
       ref.focusDeleteLink()
     }
@@ -224,7 +224,7 @@ class AdminTable extends React.Component {
       developerKeysList: this.sortedDeveloperKeys(),
       developerKeyRef: this.developerKeyRef,
       srMsg: I18n.t(
-        'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
+        'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.',
       ),
       handleRef: ref => ref && ref.focusDeleteLink(),
     })

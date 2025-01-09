@@ -34,7 +34,7 @@ interface Delta {
 
 interface TileData {
   value: number
-  position: number  
+  position: number
   x: number
   y: number
   translation: string
@@ -89,7 +89,7 @@ function tryMove(tiles: TileData[], move: string): boolean {
   const emptyTile = tiles.find(tile => tile.value === GRID_SIZE * GRID_SIZE)!
   const {xOffset, yOffset} = DeltaMap[move]
   const tileToMove = tiles.find(
-    tile => tile.x === emptyTile.x + xOffset && tile.y === emptyTile.y + yOffset
+    tile => tile.x === emptyTile.x + xOffset && tile.y === emptyTile.y + yOffset,
   )
   if (tileToMove) {
     swapTiles(emptyTile, tileToMove)

@@ -63,7 +63,7 @@ export const ratingsShape = PropTypes.arrayOf(
   PropTypes.shape({
     description: PropTypes.string,
     points: PropTypes.number.isRequired,
-  })
+  }),
 )
 
 export const outcomeEditShape = PropTypes.shape({

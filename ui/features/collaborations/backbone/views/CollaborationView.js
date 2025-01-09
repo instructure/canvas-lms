@@ -78,8 +78,8 @@ CollaborationView.prototype.formTemplate = function (arg) {
       extend(data, {
         action,
         id: this.id,
-      })
-    )
+      }),
+    ),
   )
   return $form.on(
     'keydown',
@@ -90,7 +90,7 @@ CollaborationView.prototype.formTemplate = function (arg) {
           return _this.onCloseForm(e)
         }
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -101,7 +101,7 @@ CollaborationView.prototype.iframeTemplate = function (arg) {
       id: this.id,
       url,
       allowances: iframeAllowances(),
-    })
+    }),
   )
   return $iframe.on(
     'keydown',
@@ -112,7 +112,7 @@ CollaborationView.prototype.iframeTemplate = function (arg) {
           return _this.onCloseForm(e)
         }
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -149,7 +149,7 @@ CollaborationView.prototype.delete = function () {
       return function () {
         return _this.$el.remove()
       }
-    })(this)
+    })(this),
   )
   this.trigger('delete', this)
   const otherDeleteLinks = $('.delete_collaboration_link').toArray()

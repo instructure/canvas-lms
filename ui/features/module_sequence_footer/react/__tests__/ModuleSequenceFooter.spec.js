@@ -103,7 +103,7 @@ describe('renderModuleSequenceFooter', () => {
     test('rendered select dropdown contains group categories', () => {
       renderModuleSequenceFooter()
       const groupCategoryNames = [...getSelect().querySelectorAll('optgroup')].map(
-        optgroup => optgroup.label
+        optgroup => optgroup.label,
       )
       expect(groupCategoryNames).toEqual(['group category 1'])
     })

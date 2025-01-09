@@ -177,7 +177,6 @@ export const AccountStatusManagement = ({
                 const editStatusId = getEditStatusId(index.toString(), 'new')
                 return (
                   <CustomStatusNewItem
-                     
                     key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
                     handleSave={handleSaveCustomStatus}
                     index={index}

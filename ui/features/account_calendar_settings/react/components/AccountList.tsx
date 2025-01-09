@@ -89,11 +89,11 @@ export const AccountList = ({
     },
     success: useCallback(
       (accountData: AccountData[]) => setAccounts(castIdsToInt(accountData)),
-      []
+      [],
     ),
     error: useCallback(
       (error: Error) => showFlashError(I18n.t('Unable to load results'))(error),
-      []
+      [],
     ),
     loading: setLoading,
   })

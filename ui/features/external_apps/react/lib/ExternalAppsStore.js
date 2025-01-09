@@ -84,7 +84,7 @@ store.fetchWithDetails = function (tool) {
         's/' +
         tool.context_id +
         '/external_tools/' +
-        tool.app_id
+        tool.app_id,
     )
   } else {
     // DOES NOT EXIST YET

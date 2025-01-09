@@ -123,7 +123,6 @@ class StepItem extends Component {
       <span
         className={classNames(classes)}
         data-testid="step-item-step"
-         
         {...omitProps(this.props, StepItem.propTypes)}
       >
         <span

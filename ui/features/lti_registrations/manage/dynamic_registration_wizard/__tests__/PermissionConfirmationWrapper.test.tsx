@@ -35,12 +35,12 @@ describe('PermissionConfirmationWrapper', () => {
 
   it('renders the PermissionConfirmation component with the correct props', () => {
     render(
-      <PermissionConfirmationWrapper registration={registration} overlayStore={overlayStore} />
+      <PermissionConfirmationWrapper registration={registration} overlayStore={overlayStore} />,
     )
 
     expect(screen.getByText('Permissions')).toBeInTheDocument()
     expect(
-      screen.getByText(/is requesting permission to perform the following actions/i)
+      screen.getByText(/is requesting permission to perform the following actions/i),
     ).toBeInTheDocument()
 
     registration.scopes.forEach(s => {
@@ -51,12 +51,12 @@ describe('PermissionConfirmationWrapper', () => {
 
   it('toggles the scope when a checkbox is clicked', async () => {
     render(
-      <PermissionConfirmationWrapper registration={registration} overlayStore={overlayStore} />
+      <PermissionConfirmationWrapper registration={registration} overlayStore={overlayStore} />,
     )
 
     const lineItemCheckbox = screen.getByLabelText(i18nLtiScope(LtiScopes.AgsLineItem))
     const lineItemReadonlyCheckbox = screen.getByLabelText(
-      i18nLtiScope(LtiScopes.AgsLineItemReadonly)
+      i18nLtiScope(LtiScopes.AgsLineItemReadonly),
     )
     const resultReadonlyCheckbox = screen.getByLabelText(i18nLtiScope(LtiScopes.AgsResultReadonly))
 
@@ -79,7 +79,7 @@ describe('PermissionConfirmationWrapper', () => {
       <PermissionConfirmationWrapper
         registration={mockRegistration({scopes: []})}
         overlayStore={overlayStore}
-      />
+      />,
     )
 
     expect(screen.getByText('Permissions')).toBeInTheDocument()

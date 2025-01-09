@@ -179,12 +179,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 if (!props.registrationId) {
                   const result = await dynamicRegistrationWizardState.deleteKey(
                     state._type,
-                    state.registration.developer_key_id
+                    state.registration.developer_key_id,
                   )
                   if (isUnsuccessful(result)) {
                     showFlashAlert({
                       message: I18n.t(
-                        'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.'
+                        'Something went wrong deleting the registration. The registration can still be deleted manually on the Manage page.',
                       ),
                       type: 'error',
                     })
@@ -202,12 +202,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 if (state.reviewing) {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'Reviewing'
+                    'Reviewing',
                   )
                 } else {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'PrivacyLevelConfirmation'
+                    'PrivacyLevelConfirmation',
                   )
                 }
               }}
@@ -236,7 +236,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 dynamicRegistrationWizardState.transitionToConfirmationState(
                   state._type,
                   'PermissionConfirmation',
-                  false
+                  false,
                 )
               }}
             >
@@ -250,12 +250,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 if (state.reviewing) {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'Reviewing'
+                    'Reviewing',
                   )
                 } else {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'PlacementsConfirmation'
+                    'PlacementsConfirmation',
                   )
                 }
               }}
@@ -284,7 +284,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 dynamicRegistrationWizardState.transitionToConfirmationState(
                   state._type,
                   'PrivacyLevelConfirmation',
-                  false
+                  false,
                 )
               }}
             >
@@ -298,12 +298,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 if (state.reviewing) {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'Reviewing'
+                    'Reviewing',
                   )
                 } else {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'NamingConfirmation'
+                    'NamingConfirmation',
                   )
                 }
               }}
@@ -332,7 +332,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 dynamicRegistrationWizardState.transitionToConfirmationState(
                   state._type,
                   'PlacementsConfirmation',
-                  false
+                  false,
                 )
               }}
             >
@@ -346,12 +346,12 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 if (state.reviewing) {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'Reviewing'
+                    'Reviewing',
                   )
                 } else {
                   dynamicRegistrationWizardState.transitionToConfirmationState(
                     state._type,
-                    'IconConfirmation'
+                    'IconConfirmation',
                   )
                 }
               }}
@@ -395,7 +395,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                 dynamicRegistrationWizardState.transitionToConfirmationState(
                   state._type,
                   'IconConfirmation',
-                  false
+                  false,
                 )
               }}
             >
@@ -414,7 +414,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                     state.overlayStore.getState().state.registration,
                     state.overlayStore.getState().state.adminNickname ??
                       state.registration.client_name,
-                    props.onSuccessfulRegistration
+                    props.onSuccessfulRegistration,
                   )
                 } else {
                   dynamicRegistrationWizardState.enableAndClose(
@@ -425,7 +425,7 @@ export const DynamicRegistrationWizard = (props: DynamicRegistrationWizardProps)
                     state.overlayStore.getState().state.registration,
                     state.overlayStore.getState().state.adminNickname ??
                       state.registration.client_name,
-                    props.onSuccessfulRegistration
+                    props.onSuccessfulRegistration,
                   )
                 }
               }}

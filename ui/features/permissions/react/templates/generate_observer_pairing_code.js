@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'Allows user to generate a pairing code on behalf of a student to share with an observer.'
+        'Allows user to generate a pairing code on behalf of a student to share with an observer.',
       ),
     },
   ],
@@ -34,22 +34,22 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'To generate a pairing code from a student`s User Settings page, the User - act as permission must also be enabled.'
+        'To generate a pairing code from a student`s User Settings page, the User - act as permission must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To generate a pairing code from a student`s User Details page, the Users - allow administrative actions in courses permission must also be enabled.'
+        'To generate a pairing code from a student`s User Details page, the Users - allow administrative actions in courses permission must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'Pairing codes are only supported when self registration is enabled for the account.'
+        'Pairing codes are only supported when self registration is enabled for the account.',
       ),
     },
     {
       description: I18n.t(
-        'QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps. To disable QR code logins for all users in your account, please contact your Customer Success Manager.'
+        'QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps. To disable QR code logins for all users in your account, please contact your Customer Success Manager.',
       ),
     },
   ],
@@ -57,7 +57,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'Allows user to generate a pairing code on behalf of a student to share with an observer.'
+        'Allows user to generate a pairing code on behalf of a student to share with an observer.',
       ),
     },
   ],
@@ -65,18 +65,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To generate a pairing code from a student`s User Details page, the Users - allow administrative actions in courses permission must also be enabled.'
+        'To generate a pairing code from a student`s User Details page, the Users - allow administrative actions in courses permission must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'Pairing codes are only supported when self registration is enabled for the course.'
+        'Pairing codes are only supported when self registration is enabled for the course.',
       ),
     },
     {
       description: I18n.t(
-        'QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps.'
+        'QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps.',
       ),
     },
-  ]
+  ],
 )

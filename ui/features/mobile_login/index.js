@@ -78,7 +78,7 @@ function setupForgotPassword() {
       type: 'POST',
       url: '/forgot_password',
       data: `authenticity_token=${encodeURIComponent(
-        $forgot_password_form.querySelector('input[name=authenticity_token]').value
+        $forgot_password_form.querySelector('input[name=authenticity_token]').value,
       )}
             &pseudonym_session%5Bunique_id_forgot%5D=${encodeURIComponent(uniqueIdValue)}`,
       success() {

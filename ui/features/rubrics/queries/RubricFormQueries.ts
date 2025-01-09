@@ -96,7 +96,7 @@ export type SaveRubricResponse = {
 }
 export const saveRubric = async (
   rubric: RubricFormProps,
-  assignmentId?: string
+  assignmentId?: string,
 ): Promise<SaveRubricResponse> => {
   const {
     id,

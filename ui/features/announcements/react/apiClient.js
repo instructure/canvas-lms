@@ -24,7 +24,7 @@ const MAX_CONCURRENT_REQS = 5
 
 export function getAnnouncements(
   {contextType, contextId, announcements, announcementsSearch},
-  {page}
+  {page},
 ) {
   const {term, filter} = announcementsSearch
   const params = [
@@ -54,7 +54,7 @@ export function lockAnnouncements({contextType, contextId}, announcements, locke
     },
     {
       poolSize: MAX_CONCURRENT_REQS,
-    }
+    },
   )
 }
 
@@ -67,7 +67,7 @@ export function deleteAnnouncements({contextType, contextId}, announcements) {
     },
     {
       poolSize: MAX_CONCURRENT_REQS,
-    }
+    },
   )
 }
 

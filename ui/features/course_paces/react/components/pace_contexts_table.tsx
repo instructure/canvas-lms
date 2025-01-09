@@ -240,7 +240,7 @@ const PaceContextsTable = ({
 
   const renderLastModified = (type: string, contextId?: string, lastModified: string = '') => {
     const publishingContextCodes = contextsPublishing.map(
-      ({pace_context}) => `${pace_context.type}${pace_context.item_id}`
+      ({pace_context}) => `${pace_context.type}${pace_context.item_id}`,
     )
     const contextCode = `${type}${contextId}`
     if (contextId && publishingContextCodes.includes(contextCode)) {
@@ -248,7 +248,7 @@ const PaceContextsTable = ({
         `publishing-pace-${contextId}-indicator`,
         I18n.t('Publishing pace...'),
         'x-small',
-        'start'
+        'start',
       )
     }
 
@@ -266,7 +266,7 @@ const PaceContextsTable = ({
             one: '1 Student',
             other: '%{count} Students',
           },
-          {count: paceContext.associated_student_count}
+          {count: paceContext.associated_student_count},
         )
         values = [
           renderContextLink(paceContext),
@@ -374,7 +374,6 @@ const PaceContextsTable = ({
     const cells = getValuesByContextType(paceContext).map((cell, index) => (
       <Table.Cell
         data-testid="course-pace-item"
-         
         key={`contexts-table-cell-${index}`}
         themeOverride={{padding: '0.7rem'}}
       >
@@ -434,7 +433,6 @@ const PaceContextsTable = ({
           </Flex>
         )}
         {headers.map(({content: title}, index) => (
-           
           <Flex key={`mobile-context-row-${index}`} as="div" width="100%" margin="medium 0">
             <Flex.Item size="50%">
               <Text weight="bold">{title}</Text>
@@ -480,7 +478,7 @@ const PaceContextsTable = ({
     dataTestId: string,
     title: string,
     size: SpinnerProps['size'] = 'large',
-    align: ViewProps['textAlign'] = 'center'
+    align: ViewProps['textAlign'] = 'center',
   ) => (
     <View data-testid={dataTestId} as="div" textAlign={align}>
       <Spinner size={size} renderTitle={title} margin="none" />

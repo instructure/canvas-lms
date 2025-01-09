@@ -70,16 +70,16 @@ export const IconConfirmation = ({
   const placementsWithIcons = React.useMemo(
     () =>
       allPlacements.filter((p): p is LtiPlacementWithIcon =>
-        LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon)
+        LtiPlacementsWithIcons.includes(p as LtiPlacementWithIcon),
       ),
-    [allPlacements]
+    [allPlacements],
   )
 
   const [actualInputValues, setActualInputValues] =
     React.useState<Partial<Record<LtiPlacementWithIcon, string>>>(placementIconOverrides)
   const [debouncedUpdate, _, callPending] = useDebouncedCallback(
     (placement: LtiPlacementWithIcon, value: string) => setPlacementIconUrl(placement, value),
-    500
+    500,
   )
 
   const updateIconUrl = React.useCallback(
@@ -87,7 +87,7 @@ export const IconConfirmation = ({
       setActualInputValues(prev => ({...prev, [placement]: value}))
       debouncedUpdate(placement, value)
     },
-    [setActualInputValues, debouncedUpdate]
+    [setActualInputValues, debouncedUpdate],
   )
 
   React.useEffect(() => {
@@ -189,7 +189,7 @@ const IconOverrideInput = React.memo(
         {
           type: 'hint',
           text: I18n.t(
-            'If left blank, a default icon resembling the one displayed will be provided. Color may vary.'
+            'If left blank, a default icon resembling the one displayed will be provided. Color may vary.',
           ),
         },
       ]
@@ -259,5 +259,5 @@ const IconOverrideInput = React.memo(
         />
       </div>
     )
-  }
+  },
 )

@@ -91,7 +91,7 @@ describe('student view integration tests', () => {
             request: {query, variables},
             result,
           }
-        })
+        }),
       )
       return mockResults
     }
@@ -102,7 +102,7 @@ describe('student view integration tests', () => {
       const {findByTestId} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(await findByTestId('assignments-2-student-view')).toBeInTheDocument()
     }, 10000)
@@ -112,7 +112,7 @@ describe('student view integration tests', () => {
       const {getByTitle} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(getByTitle('Loading')).toBeInTheDocument()
@@ -124,7 +124,7 @@ describe('student view integration tests', () => {
       const {getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
@@ -150,7 +150,7 @@ describe('student view integration tests', () => {
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const files = [new File(['foo'], 'test.jpg', {type: 'image/jpg'})]
@@ -184,7 +184,7 @@ describe('student view integration tests', () => {
           <MockedProvider mocks={mocks} cache={createCache()}>
             <StudentViewQuery assignmentLid="1" submissionID="1" />
           </MockedProvider>
-        </AlertManagerContext.Provider>
+        </AlertManagerContext.Provider>,
       )
 
       const files = [
@@ -215,7 +215,7 @@ describe('student view integration tests', () => {
       const {findAllByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect((await findAllByText('Test Assignment'))[0]).toBeInTheDocument()
     })
@@ -229,7 +229,7 @@ describe('student view integration tests', () => {
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(await findByRole('button', {name: 'View Rubric'})).toBeInTheDocument()
@@ -241,7 +241,7 @@ describe('student view integration tests', () => {
       const {queryByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" />
-        </MockedProvider>
+        </MockedProvider>,
       )
 
       expect(queryByRole('button', {name: 'View Rubric'})).not.toBeInTheDocument()
@@ -277,7 +277,7 @@ describe('student view integration tests', () => {
             request: {query, variables},
             result,
           }
-        })
+        }),
       )
       return mockResults
     }
@@ -290,10 +290,10 @@ describe('student view integration tests', () => {
       const {findByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        await findByText('You must submit your own work before you can review your peers.')
+        await findByText('You must submit your own work before you can review your peers.'),
       ).toBeInTheDocument()
     })
 
@@ -305,10 +305,10 @@ describe('student view integration tests', () => {
       const {findByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        await findByText('There are no submissions available to review just yet.')
+        await findByText('There are no submissions available to review just yet.'),
       ).toBeInTheDocument()
     })
 
@@ -320,13 +320,13 @@ describe('student view integration tests', () => {
       const {queryByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        queryByText('You must submit your own work before you can review your peers.')
+        queryByText('You must submit your own work before you can review your peers.'),
       ).not.toBeInTheDocument()
       expect(
-        queryByText('There are no submissions available to review just yet.')
+        queryByText('There are no submissions available to review just yet.'),
       ).not.toBeInTheDocument()
     })
 
@@ -338,13 +338,13 @@ describe('student view integration tests', () => {
       const {queryByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
           <StudentViewQuery assignmentLid="1" submissionID="1" reviewerSubmissionID="2" />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(
-        queryByText('You must submit your own work before you can review your peers.')
+        queryByText('You must submit your own work before you can review your peers.'),
       ).not.toBeInTheDocument()
       expect(
-        queryByText('There are no submissions available to review just yet.')
+        queryByText('There are no submissions available to review just yet.'),
       ).not.toBeInTheDocument()
     })
   })

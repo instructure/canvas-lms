@@ -31,7 +31,7 @@ const setup = ({onSaveUsageRights = () => {}, isOpen = true, currentUsageRights 
       initialUsageRights={currentUsageRights}
       creativeCommonsOptions={defaultCreativeOptions}
       usageRightsOptions={defaultUsageRights}
-    />
+    />,
   )
 }
 

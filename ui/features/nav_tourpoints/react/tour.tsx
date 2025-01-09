@@ -114,7 +114,7 @@ const Tour = ({roles}: ITour) => {
         }
       }
     },
-    [setHasOpened, softClose]
+    [setHasOpened, softClose],
   )
 
   React.useEffect(() => {

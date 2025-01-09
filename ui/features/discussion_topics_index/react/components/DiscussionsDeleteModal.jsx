@@ -77,7 +77,7 @@ export default class DiscussionDeleteModal extends Component {
               one: 'You are about to delete 1 discussion. Are you sure?',
               other: 'You are about to delete %{count} discussions. Are you sure?',
             },
-            {count: this.props.selectedCount}
+            {count: this.props.selectedCount},
           )}
         </Modal.Body>
         <Modal.Footer>

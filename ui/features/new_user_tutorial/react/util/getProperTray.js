@@ -73,7 +73,7 @@ const getProperTray = (path = window.location.pathname) => {
     return generateObject(
       CollaborationsTray,
       I18n.t('Collaborations Tutorial Tray'),
-      'collaborations'
+      'collaborations',
     )
   } else if (path.includes('content_migrations')) {
     return generateObject(ImportTray, I18n.t('Import Tutorial Tray'), 'collaborations')
@@ -94,7 +94,7 @@ const getProperTray = (path = window.location.pathname) => {
       return generateObject(
         NewAnalyticsTray,
         I18n.t('New Analytics Tutorial Tray'),
-        'new-analytics'
+        'new-analytics',
       )
     }
     // Return null if we don't have a tutorial tray

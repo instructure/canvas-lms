@@ -51,7 +51,7 @@ export default class MiniCalendar {
           eventDrop: this.drop,
           eventReceive: this.drop,
         },
-        calendarDefaults
+        calendarDefaults,
       ),
       $.subscribe({
         'Calendar/visibleContextListChanged': this.visibleContextListChanged,
@@ -60,7 +60,7 @@ export default class MiniCalendar {
         'CommonEvent/eventDeleted': this.eventSaved,
         'CommonEvent/eventSaved': this.eventSaved,
         'CommonEvent/eventsSavedFromSeries': this.eventsSavedFromSeries,
-      })
+      }),
     )
   }
 

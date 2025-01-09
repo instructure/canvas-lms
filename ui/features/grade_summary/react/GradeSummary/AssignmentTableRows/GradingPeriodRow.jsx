@@ -32,11 +32,11 @@ export const gradingPeriodRow = (
   gradingPeriod,
   queryData,
   calculateOnlyGradedAssignments = false,
-  courseLevelGrades = {}
+  courseLevelGrades = {},
 ) => {
   const filterByGradingPeriod = filteredAssignments(
     queryData,
-    calculateOnlyGradedAssignments
+    calculateOnlyGradedAssignments,
   ).filter(assignment => {
     return assignment?.gradingPeriodId === gradingPeriod?._id
   })
@@ -50,7 +50,7 @@ export const gradingPeriodRow = (
     gradingPeriod,
     filterByGradingPeriod,
     queryData?.assignmentGroupsConnection?.nodes,
-    queryData?.applyGroupWeights
+    queryData?.applyGroupWeights,
   )
 
   const letterGrade =

@@ -54,8 +54,8 @@ const createRating = (description, points, color, mastery = false, focusField = 
 const configToState = data => {
   const rows = List(
     data.proficiencyRatingsConnection.nodes.map(rating =>
-      fromJS(createRating(rating.description, rating.points, rating.color, rating.mastery))
-    )
+      fromJS(createRating(rating.description, rating.points, rating.color, rating.mastery)),
+    ),
   )
   return {
     rows,
@@ -100,7 +100,7 @@ class ProficiencyTable extends React.Component {
     if (this.fieldWithFocus()) {
       this.setState(
         ({rows}) => ({rows: rows.map(row => row.delete('focusField'))}),
-        this.notifyPendingChanges
+        this.notifyPendingChanges,
       )
     }
   }
@@ -142,7 +142,7 @@ class ProficiencyTable extends React.Component {
           type: 'success',
           srOnly: true,
         })
-      }
+      },
     )
   }
 
@@ -172,7 +172,7 @@ class ProficiencyTable extends React.Component {
             showFlashAlert({
               message: I18n.t('Mastery scale saved'),
               type: 'success',
-            })
+            }),
           )
           .catch(e => {
             showFlashAlert({
@@ -183,7 +183,7 @@ class ProficiencyTable extends React.Component {
             })
             this.setState({savedRows: oldRows}, this.notifyPendingChanges)
           })
-      }
+      },
     )
   }
 
@@ -223,7 +223,7 @@ class ProficiencyTable extends React.Component {
       ({rows}) => ({
         rows: rows.update(index, row => row.set('color', unformatColor(value))),
       }),
-      this.notifyPendingChanges
+      this.notifyPendingChanges,
     )
   })
 
@@ -249,7 +249,7 @@ class ProficiencyTable extends React.Component {
         {
           rows: rows.setIn([index - 1, 'focusField'], 'trash'),
         },
-        this.notifyPendingChanges
+        this.notifyPendingChanges,
       )
     }
     showFlashAlert({
@@ -264,7 +264,7 @@ class ProficiencyTable extends React.Component {
       row =>
         this.invalidPoints(row.get('points')) ||
         row.get('points') < 0 ||
-        this.invalidDescription(row.get('description'))
+        this.invalidDescription(row.get('description')),
     )
 
   stateToConfig = () => ({
@@ -349,11 +349,11 @@ class ProficiencyTable extends React.Component {
     const {contextType} = this.props
     if (contextType === 'Course') {
       return I18n.t(
-        'This will update all rubrics aligned to outcomes within this course that have not yet been assessed.'
+        'This will update all rubrics aligned to outcomes within this course that have not yet been assessed.',
       )
     }
     return I18n.t(
-      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.'
+      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.',
     )
   }
 

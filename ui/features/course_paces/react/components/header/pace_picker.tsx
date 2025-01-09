@@ -189,16 +189,16 @@ export const PacePicker = ({
         {sections.length > 0 &&
           renderSubMenu(
             sections.map(s =>
-              renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`)
+              renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`),
             ),
             'course-pace-section-menu',
-            I18n.t('Sections')
+            I18n.t('Sections'),
           )}
         {enrollments.length > 0 &&
           renderSubMenu(
             enrollments.map(e => renderStudentOption(e)),
             'course-pace-student-menu',
-            I18n.t('Students')
+            I18n.t('Students'),
           )}
       </Menu>
       <UnpublishedWarningModal

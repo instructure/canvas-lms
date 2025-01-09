@@ -40,7 +40,7 @@ describe('cspEnabled', () => {
     'with %p action and %p value the cspEnabled state becomes %p',
     (action, initialState, expectedState) => {
       expect(cspEnabled(initialState, action)).toEqual(expectedState)
-    }
+    },
   )
 })
 
@@ -57,7 +57,7 @@ describe('whitelistedDomains', () => {
     'with %p action and %p payload the whitelistedDomains state becomes %p',
     (action, initialState, expectedState) => {
       expect(whitelistedDomains(initialState, action)).toEqual(expectedState)
-    }
+    },
   )
 
   it('does not allow duplicate domains with ADD_DOMAIN actions', () => {
@@ -223,7 +223,7 @@ describe('cspInherited', () => {
     'with %p action and %p value the cspInherited state becomes %p',
     (action, initialState, expectedState) => {
       expect(cspInherited(initialState, action)).toEqual(expectedState)
-    }
+    },
   )
 })
 
@@ -235,6 +235,6 @@ describe('setDirty', () => {
     'with %p action and %p initial state the isDirty state becomes %p',
     (action, initialState, expectedState) => {
       expect(isDirty(initialState, action)).toEqual(expectedState)
-    }
+    },
   )
 })

@@ -67,7 +67,7 @@ describe('CourseImportPanel', () => {
     expect(
       getByText(/import/i)
         .closest('button')
-        .getAttribute('disabled')
+        .getAttribute('disabled'),
     ).toBe('')
   })
 
@@ -92,7 +92,7 @@ describe('CourseImportPanel', () => {
     expect(
       getByText(/import/i)
         .closest('button')
-        .getAttribute('disabled')
+        .getAttribute('disabled'),
     ).toBe('')
   })
 
@@ -110,7 +110,7 @@ describe('CourseImportPanel', () => {
       ])
     })
     const {getByText, getAllByText, getByLabelText, queryByText} = render(
-      <CourseImportPanel contentShare={share} onImport={onImport} />
+      <CourseImportPanel contentShare={share} onImport={onImport} />,
     )
     fireEvent.click(getByLabelText(/select a course/i))
     fireEvent.click(getByText('abc'))
@@ -144,7 +144,7 @@ describe('CourseImportPanel', () => {
       ])
     })
     const {getByText, getByLabelText, queryByText} = render(
-      <CourseImportPanel contentShare={share} />
+      <CourseImportPanel contentShare={share} />,
     )
     const courseSelector = getByText(/select a course/i)
     fireEvent.click(courseSelector)
@@ -169,7 +169,7 @@ describe('CourseImportPanel', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -178,7 +178,7 @@ describe('CourseImportPanel', () => {
       const share = mockShare()
       const onImport = jest.fn()
       const {getByText, getByLabelText, queryByText} = render(
-        <CourseImportPanel contentShare={share} onImport={onImport} />
+        <CourseImportPanel contentShare={share} onImport={onImport} />,
       )
       const input = getByLabelText(/select a course/i)
       fireEvent.click(input)

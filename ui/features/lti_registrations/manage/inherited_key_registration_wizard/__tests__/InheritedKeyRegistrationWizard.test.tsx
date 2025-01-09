@@ -36,21 +36,18 @@ describe('RegistrationWizardModal', () => {
     // instui logs an error when we render a component
     // immediately under Modal
 
-    // eslint-disable-next-line no-console
     error = console.error
-    // eslint-disable-next-line no-console
+
     warn = console.warn
 
-    // eslint-disable-next-line no-console
     console.error = jest.fn()
-    // eslint-disable-next-line no-console
+
     console.warn = jest.fn()
   })
 
   afterAll(() => {
-    // eslint-disable-next-line no-console
     console.error = error
-    // eslint-disable-next-line no-console
+
     console.warn = warn
   })
 
@@ -98,8 +95,8 @@ describe('RegistrationWizardModal', () => {
                 text: 'An_Example_App',
               },
             ],
-          })
-        )
+          }),
+        ),
       )
       render(<InheritedKeyRegistrationWizard accountId={accountId} service={inheritedKeyService} />)
       const headerText = screen.getByRole('heading', {
@@ -132,8 +129,8 @@ describe('RegistrationWizardModal', () => {
                 text: 'An_Example_App',
               },
             ],
-          })
-        )
+          }),
+        ),
       )
       render(<InheritedKeyRegistrationWizard accountId={accountId} service={inheritedKeyService} />)
       const installButton = screen.getByRole('button', {

@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -138,7 +137,7 @@ $update_profile_form
         const pseudonymId = $(this).find('#profile_pseudonym_id').val()
         errors = Pseudonym.prototype.normalizeErrors(
           errors,
-          ENV.PASSWORD_POLICIES[pseudonymId] || ENV.PASSWORD_POLICY
+          ENV.PASSWORD_POLICIES[pseudonymId] || ENV.PASSWORD_POLICY,
         )
       }
       $update_profile_form.loadingImage('remove').formErrors(errors)
@@ -174,7 +173,7 @@ $('#unregistered_services li.service').click(function (event) {
         document.location.reload()
       }}
       onClose={() => root.unmount()}
-    />
+    />,
   )
 })
 $('#registered_services li.service .delete_service_link').click(function (event) {
@@ -184,7 +183,7 @@ $('#registered_services li.service .delete_service_link').click(function (event)
     .confirmDelete({
       message: I18n.t(
         'confirms.unregister_service',
-        'Are you sure you want to unregister this service?'
+        'Are you sure you want to unregister this service?',
       ),
       url: $(this).attr('href'),
       success() {
@@ -202,7 +201,7 @@ $('.service').hover(
   },
   function () {
     $(this).removeClass('service-hover')
-  }
+  },
 )
 $('#show_user_services').change(function () {
   $.ajaxJSON(
@@ -210,7 +209,7 @@ $('#show_user_services').change(function () {
     'PUT',
     {'user[show_user_services]': $(this).prop('checked')},
     _data => {},
-    _data => {}
+    _data => {},
   )
 })
 $('#disable_inbox').change(function () {
@@ -219,7 +218,7 @@ $('#disable_inbox').change(function () {
     'POST',
     {'user[disable_inbox]': $(this).prop('checked')},
     _data => {},
-    _data => {}
+    _data => {},
   )
 })
 $('.delete_pseudonym_link').click(function (event) {
@@ -248,7 +247,7 @@ $('.delete_key_link').click(function (event) {
     url: $(this).attr('rel'),
     message: I18n.t(
       'confirms.delete_access_key',
-      'Are you sure you want to delete this access key?'
+      'Are you sure you want to delete this access key?',
     ),
     success() {
       $(this).remove()
@@ -274,7 +273,7 @@ $('.access_token .activate_token_link').click(function () {
       $button
         .text(I18n.t('errors.activating_token_failed', 'Activating Token Failed'))
         .prop('disabled', false)
-    }
+    },
   )
 })
 $('.show_token_link').click(function (event) {
@@ -304,7 +303,7 @@ $('.show_token_link').click(function (event) {
         tokenElement.data('token', data)
       }}
       onClose={() => root.unmount()}
-    />
+    />,
   )
 })
 
@@ -337,7 +336,7 @@ $('.add_access_token_link').click(function (event) {
         $token.find('.show_token_link').click()
       }}
       onClose={() => root.unmount()}
-    />
+    />,
   )
 })
 $(document)

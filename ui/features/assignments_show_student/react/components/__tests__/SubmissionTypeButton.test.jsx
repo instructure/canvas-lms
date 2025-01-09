@@ -27,17 +27,17 @@ describe('SubmissionTypeButton', () => {
   describe('when selected', () => {
     it('renders a read-only button', () => {
       const {getByRole} = render(
-        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={true} />
+        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={true} />,
       )
       expect(getByRole('button')).toBeDisabled()
     })
 
     it('shows screen-reader content indicating the type is selected', () => {
       const {getByRole} = render(
-        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={true} />
+        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={true} />,
       )
       expect(getByRole('button')).toHaveTextContent(
-        'Submission type Carrier Pigeon, currently selected'
+        'Submission type Carrier Pigeon, currently selected',
       )
     })
   })
@@ -45,14 +45,14 @@ describe('SubmissionTypeButton', () => {
   describe('when not selected', () => {
     it('renders an enabled button', () => {
       const {getByRole} = render(
-        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={false} />
+        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={false} />,
       )
       expect(getByRole('button')).toBeEnabled()
     })
 
     it('shows screen-reader content indicating the type can be selected', () => {
       const {getByRole} = render(
-        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={false} />
+        <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} selected={false} />,
       )
       expect(getByRole('button')).toHaveTextContent('Select submission type Carrier Pigeon')
     })
@@ -61,7 +61,7 @@ describe('SubmissionTypeButton', () => {
   it('calls the onSelected property when clicked', () => {
     const onSelected = jest.fn()
     const {getByRole} = render(
-      <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} onSelected={onSelected} />
+      <SubmissionTypeButton displayName="Carrier Pigeon" icon={icon} onSelected={onSelected} />,
     )
     fireEvent.click(getByRole('button'))
     expect(onSelected).toHaveBeenCalled()

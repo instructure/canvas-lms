@@ -55,11 +55,11 @@ export const Footer = ({
     path: `/api/v1/accounts/${originAccountId}/visible_calendars_count`,
     success: useCallback(
       (response: {count: number}) => setInitialEnabledCalendarsCount(response.count),
-      []
+      [],
     ),
     error: useCallback(
       (error: Error) => showFlashError(I18n.t('Unable to load calendar count'))(error),
-      []
+      [],
     ),
   })
 
@@ -86,7 +86,7 @@ export const Footer = ({
                 initialEnabledCalendarsCount +
                 visibilityChanges.filter(c => c.visible).length -
                 visibilityChanges.filter(c => !c.visible).length,
-            }
+            },
           )}
         </Text>
       )}

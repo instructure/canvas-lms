@@ -82,7 +82,7 @@ describe('permissions::PermissionButton', () => {
 
   it('displays the disabled state', () => {
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE})} />
+      <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -95,7 +95,7 @@ describe('permissions::PermissionButton', () => {
 
   it('displays the partially-enabled state', () => {
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL})} />
+      <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -119,7 +119,7 @@ describe('permissions::PermissionButton', () => {
 
   it('displays disabled and locked', () => {
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE, locked: true})} />
+      <PermissionButton {...buildProps({enabled: ENABLED_FOR_NONE, locked: true})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -132,7 +132,7 @@ describe('permissions::PermissionButton', () => {
 
   it('displays partially-enabled and locked', () => {
     const {container, getByText} = render(
-      <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL, locked: true})} />
+      <PermissionButton {...buildProps({enabled: ENABLED_FOR_PARTIAL, locked: true})} />,
     )
     const {check, x, oval, locked} = getThings(container)
 
@@ -141,7 +141,7 @@ describe('permissions::PermissionButton', () => {
     expect(oval).not.toBeNull()
     expect(locked).not.toBeNull()
     expect(
-      getByText(`Partially enabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`)
+      getByText(`Partially enabled and Locked ${PERM_LABEL} ${ROLE_LABEL}`),
     ).toBeInTheDocument()
   })
 

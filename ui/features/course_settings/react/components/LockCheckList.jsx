@@ -52,7 +52,7 @@ export default class LockCheckList extends React.Component {
       {
         locks,
       },
-      () => this.props.onChange(locks)
+      () => this.props.onChange(locks),
     )
   }
 

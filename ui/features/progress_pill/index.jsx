@@ -42,7 +42,6 @@ ready(() => {
   for (let i = 0; i < progressElements.length; i++) {
     const icon = progressIcon(presenter[i])
     if (icon !== null) {
-       
       ReactDOM.render(<Tooltip renderTip={icon[1]}>{icon[0]}</Tooltip>, progressElements[i])
     }
   }

@@ -35,18 +35,18 @@ export default class DeveloperKeyStateControl extends React.Component {
         newState === 'on'
           ? I18n.t('Turn On Developer Key')
           : newState === 'off'
-          ? I18n.t('Turn Off Developer Key')
-          : newState === 'allow'
-          ? I18n.t('Set Developer Key to "Allow"')
-          : undefined,
+            ? I18n.t('Turn Off Developer Key')
+            : newState === 'allow'
+              ? I18n.t('Set Developer Key to "Allow"')
+              : undefined,
       confirmButtonLabel:
         newState === 'on'
           ? I18n.t('Switch to On')
           : newState === 'off'
-          ? I18n.t('Switch to Off')
-          : newState === 'allow'
-          ? I18n.t('Switch to Allow')
-          : I18n.t('Confirm'),
+            ? I18n.t('Switch to Off')
+            : newState === 'allow'
+              ? I18n.t('Switch to Allow')
+              : I18n.t('Confirm'),
       message: keyName
         ? I18n.t('Are you sure you want to change the state of the developer key "%{keyName}"?', {
             keyName,
@@ -65,8 +65,8 @@ export default class DeveloperKeyStateControl extends React.Component {
       this.props.actions.setBindingWorkflowState(
         this.props.developerKey,
         this.props.ctx.params.contextId,
-        newValue
-      )
+        newValue,
+      ),
     )
   }
 

@@ -75,7 +75,7 @@ describe.skip('WebcamModal', () => {
     mediaUtils.getUserMedia = jest.fn(() =>
       Promise.resolve({
         getTracks: () => [{stop}],
-      })
+      }),
     )
     let result
     await act(async () => {
@@ -129,7 +129,7 @@ describe.skip('WebcamModal', () => {
     expect(props.onSelectImage).toHaveBeenCalledWith(
       expect.objectContaining({
         blob: mockedBlob,
-      })
+      }),
     )
   })
 })

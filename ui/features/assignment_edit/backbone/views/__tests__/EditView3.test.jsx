@@ -35,7 +35,7 @@ let fixtures
 
 jest.mock('@canvas/user-settings', () => ({
   contextGet: jest.fn(),
-  contextSet: jest.fn()
+  contextSet: jest.fn(),
 }))
 
 const userSettingsMock = require('@canvas/user-settings')
@@ -46,7 +46,7 @@ jest.mock('@canvas/sections/backbone/collections/SectionCollection', () => {
     length: 1,
     add: jest.fn(),
     models: [],
-    courseSectionID: '1'
+    courseSectionID: '1',
   }))
 })
 
@@ -56,14 +56,14 @@ jest.mock('@canvas/due-dates/backbone/models/DueDateList', () => {
     sections: {
       length: 1,
       add: jest.fn(),
-      models: []
+      models: [],
     },
     overrides: {
       length: 0,
-      models: []
+      models: [],
     },
     courseSectionID: '1',
-    _addOverrideForDefaultSectionIfNeeded: jest.fn()
+    _addOverrideForDefaultSectionIfNeeded: jest.fn(),
   }))
 })
 
@@ -80,7 +80,7 @@ describe('EditView', () => {
       LOCALE: 'en',
       MODERATED_GRADING_MAXIMUM_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
-      COURSE_ID: 1
+      COURSE_ID: 1,
     })
 
     // Stub RCE initialization since it's async and hard to test
@@ -101,7 +101,7 @@ describe('EditView', () => {
       peer_reviews: false,
       automatic_peer_reviews: false,
       points_possible: 10,
-      ...assignmentOpts
+      ...assignmentOpts,
     }
 
     const assignment = new Assignment(defaultAssignment)
@@ -117,8 +117,8 @@ describe('EditView', () => {
       peerReviewsSelector: new PeerReviewsSelector({parentModel: assignment}),
       dueDateList,
       views: {
-        'js-assignment-overrides': dueDateList
-      }
+        'js-assignment-overrides': dueDateList,
+      },
     })
 
     view.assignment = assignment
@@ -141,7 +141,7 @@ describe('EditView', () => {
     // Mock getFormData to return a simple object
     view.getFormData = jest.fn().mockReturnValue({
       name: 'Test Assignment',
-      peer_reviews: false
+      peer_reviews: false,
     })
 
     // Mock conditional release editor
@@ -149,7 +149,7 @@ describe('EditView', () => {
       updateAssignment: jest.fn(),
       validateBeforeSave: jest.fn().mockReturnValue('foo'),
       save: jest.fn().mockResolvedValue(),
-      focusOnError: jest.fn()
+      focusOnError: jest.fn(),
     }
 
     view.$conditionalReleaseTarget = $('<div>').append($('<div>'))
@@ -157,34 +157,40 @@ describe('EditView', () => {
     // Mock EditView.__super__.saveFormData
     EditView.__super__ = {
       saveFormData: jest.fn().mockReturnValue({
-        pipe: jest.fn().mockReturnValue(Promise.resolve())
-      })
+        pipe: jest.fn().mockReturnValue(Promise.resolve()),
+      }),
     }
 
     // Mock prototype methods
-    view.checkboxAccessibleAdvisory = jest.fn().mockReturnValue({ text: jest.fn() })
+    view.checkboxAccessibleAdvisory = jest.fn().mockReturnValue({text: jest.fn()})
     view.setImplicitCheckboxValue = jest.fn()
     view.onChange = jest.fn()
 
     // Implement setDefaultsIfNew
-    view.setDefaultsIfNew = function() {
+    view.setDefaultsIfNew = function () {
       const defaults = userSettingsMock.contextGet('new_assignment_settings') || {}
       Object.entries(defaults).forEach(([key, value]) => {
         if (key === 'peer_reviews') {
           value = parseInt(value, 10)
         }
-        if (!this.assignment.get(key) || (Array.isArray(this.assignment.get(key)) && this.assignment.get(key).length === 0)) {
+        if (
+          !this.assignment.get(key) ||
+          (Array.isArray(this.assignment.get(key)) && this.assignment.get(key).length === 0)
+        ) {
           this.assignment.set(key, value)
         }
       })
 
-      if (!this.assignment.get('submission_types') || this.assignment.get('submission_types').length === 0) {
+      if (
+        !this.assignment.get('submission_types') ||
+        this.assignment.get('submission_types').length === 0
+      ) {
         this.assignment.set('submission_types', ['online'])
       }
     }
 
     // Implement cacheAssignmentSettings
-    view.cacheAssignmentSettings = function() {
+    view.cacheAssignmentSettings = function () {
       const formData = this.getFormData()
       const newSettings = {}
       Object.entries(formData).forEach(([key, value]) => {
@@ -199,7 +205,7 @@ describe('EditView', () => {
 
     // Track conditional release update calls
     let hasBeenModified = false
-    view.updateConditionalRelease = function() {
+    view.updateConditionalRelease = function () {
       if (!hasBeenModified) {
         this.conditionalReleaseEditor.updateAssignment(this.getFormData())
         hasBeenModified = true
@@ -207,25 +213,25 @@ describe('EditView', () => {
     }
 
     // Implement validateBeforeSave
-    view.validateBeforeSave = function() {
-      return { conditional_release: this.conditionalReleaseEditor.validateBeforeSave() }
+    view.validateBeforeSave = function () {
+      return {conditional_release: this.conditionalReleaseEditor.validateBeforeSave()}
     }
 
     // Implement saveFormData
-    view.saveFormData = async function() {
+    view.saveFormData = async function () {
       await EditView.__super__.saveFormData.call(this)
       await this.conditionalReleaseEditor.save()
     }
 
     // Implement showErrors
-    view.showErrors = function(errors) {
+    view.showErrors = function (errors) {
       if (errors.conditional_release) {
         this.conditionalReleaseEditor.focusOnError()
       }
     }
 
     // Implement enableCheckbox
-    view.enableCheckbox = function($el) {
+    view.enableCheckbox = function ($el) {
       if (this.assignment.inClosedGradingPeriod()) return
       $el.prop('disabled', false)
       $el.parent().attr('title', '')
@@ -273,7 +279,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn().mockReturnValue([]),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['foo'])
@@ -284,7 +290,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn(),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('peer_reviews', 1)
@@ -295,7 +301,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn().mockReturnValue(22),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).not.toHaveBeenCalledWith('assignment_group_id', 99)
@@ -306,7 +312,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn().mockReturnValue([]),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['online'])
@@ -317,7 +323,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn().mockReturnValue(['external_tool']),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).not.toHaveBeenCalledWith('submission_types', ['online'])
@@ -328,7 +334,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn().mockReturnValue([]),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['foo'])
@@ -355,7 +361,7 @@ describe('EditView', () => {
       const view = createEditView()
       view.assignment = {
         get: jest.fn().mockReturnValue([]),
-        set: jest.fn()
+        set: jest.fn(),
       }
       view.setDefaultsIfNew()
       expect(view.assignment.set).toHaveBeenCalledWith('submission_types', ['online'])
@@ -382,7 +388,9 @@ describe('EditView', () => {
       jest.spyOn(view, 'getFormData').mockReturnValue({points_possible: 34})
       userSettingsMock.contextGet.mockReturnValue({})
       view.cacheAssignmentSettings()
-      expect(userSettingsMock.contextSet).toHaveBeenCalledWith('new_assignment_settings', {points_possible: 34})
+      expect(userSettingsMock.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
+        points_possible: 34,
+      })
     })
 
     it('rejects invalid attributes when caching', () => {
@@ -390,7 +398,9 @@ describe('EditView', () => {
       jest.spyOn(view, 'getFormData').mockReturnValue({invalid_attribute_example: 30})
       userSettingsMock.contextGet.mockReturnValue({})
       view.cacheAssignmentSettings()
-      expect(userSettingsMock.contextSet).toHaveBeenCalledWith('new_assignment_settings', {invalid_attribute_example: null})
+      expect(userSettingsMock.contextSet).toHaveBeenCalledWith('new_assignment_settings', {
+        invalid_attribute_example: null,
+      })
     })
   })
 
@@ -409,11 +419,11 @@ describe('EditView', () => {
         VALID_DATE_RANGE: {},
         COURSE_ID: 1,
       })
-      
+
       $(document).on('submit', () => false)
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve([])
+        json: () => Promise.resolve([]),
       })
     })
 
@@ -463,14 +473,14 @@ describe('EditView', () => {
       const view = createEditView()
       const superPromise = Promise.resolve()
       const crPromise = Promise.resolve()
-      
+
       jest.spyOn(EditView.__super__, 'saveFormData').mockReturnValue({
-        pipe: jest.fn().mockReturnValue(superPromise)
+        pipe: jest.fn().mockReturnValue(superPromise),
       })
       const saveSpy = jest.spyOn(view.conditionalReleaseEditor, 'save').mockReturnValue(crPromise)
-      
+
       await view.saveFormData()
-      
+
       expect(EditView.__super__.saveFormData).toHaveBeenCalled()
       expect(saveSpy).toHaveBeenCalledTimes(1)
     })
@@ -496,10 +506,10 @@ describe('EditView', () => {
         VALID_DATE_RANGE: {},
         COURSE_ID: 1,
       })
-      
+
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
-        json: () => Promise.resolve([])
+        json: () => Promise.resolve([]),
       })
     })
 
@@ -514,10 +524,10 @@ describe('EditView', () => {
         automatic_peer_reviews: '1',
       })
       const view = createEditView()
-      
+
       view.render()
       view.$el.appendTo(fixtures)
-      
+
       const $intraGroupPeerReviews = view.$('#intra_group_peer_reviews')
       expect($intraGroupPeerReviews.prop('checked')).toBe(true)
     })

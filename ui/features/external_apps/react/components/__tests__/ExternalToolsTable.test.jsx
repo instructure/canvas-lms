@@ -20,12 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {ExternalToolsTable, countFavorites} from '../ExternalToolsTable'
 
-function renderTable(
-  canAdd = true,
-  canEdit = true,
-  canDelete = true,
-  FEATURES = {}
-) {
+function renderTable(canAdd = true, canEdit = true, canDelete = true, FEATURES = {}) {
   window.ENV = {
     context_asset_string: 'account_1',
     ACCOUNT: {
@@ -41,7 +36,7 @@ function renderTable(
       canEdit={canEdit}
       canDelete={canDelete}
       setFocusAbove={setFocusAbove}
-    />
+    />,
   )
 }
 

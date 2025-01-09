@@ -116,7 +116,7 @@ const thunkActions = {
           searchTerm,
           sortBy,
           orderType,
-        })
+        }),
       )
       if (afterFetch) {
         afterFetch(response.pace_contexts)
@@ -130,7 +130,7 @@ const thunkActions = {
       const contextsToLoad = contextsPublishing.filter(
         ({pace_context, polling}) =>
           (restart || !polling) &&
-          loadedCodes.includes(`${pace_context.type}${pace_context.item_id}`)
+          loadedCodes.includes(`${pace_context.type}${pace_context.item_id}`),
       )
       const updatedPaceContextsProgress = contextsToLoad.map(context => ({
         ...context,
@@ -139,7 +139,7 @@ const thunkActions = {
       contextsToLoad.forEach(({pace_context}) => {
         const contextType = CONTEXT_TYPE_MAP[pace_context.type]
         dispatch(
-          coursePaceActions.loadLatestPaceByContext(contextType, pace_context.item_id, null, false)
+          coursePaceActions.loadLatestPaceByContext(contextType, pace_context.item_id, null, false),
         )
         dispatch(regularActions.updatePublishingPaces(updatedPaceContextsProgress))
       })
@@ -153,20 +153,20 @@ const thunkActions = {
       dispatch(
         createAction<Constants, PaceContextsAsyncActionPayload>(
           Constants.SET_DEFAULT_PACE_CONTEXT,
-          {result: response}
-        )
+          {result: response},
+        ),
       )
     }
   },
   refreshPublishedContext: (
-    progressContextId: string
+    progressContextId: string,
   ): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       const {selectedContextType, contextsPublishing} = getState().paceContexts
       const {course_id: courseId} = getState().coursePace
       // We only need to refresh the pace context if the user is seeing the affected tab
       const contextToRefresh = contextsPublishing.find(
-        context => context.progress_context_id === progressContextId
+        context => context.progress_context_id === progressContextId,
       )
       if (contextToRefresh) {
         const {pace_contexts: updatedPaceContexts} = await Api.getPaceContexts({

@@ -93,7 +93,7 @@ describe('DiscussionsContainer', () => {
     return render(
       <Provider store={mockStore(storeState)}>
         <DiscussionsContainer {...props} />
-      </Provider>
+      </Provider>,
     )
   }
 

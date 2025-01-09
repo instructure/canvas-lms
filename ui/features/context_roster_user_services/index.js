@@ -41,7 +41,7 @@ $(document).ready(() => {
       'PUT',
       {'user[show_user_services]': $(this).prop('checked')},
       _data => {},
-      _data => {}
+      _data => {},
     )
   })
 })

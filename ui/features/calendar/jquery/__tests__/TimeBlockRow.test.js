@@ -78,7 +78,7 @@ describe('TimeBlockRow', () => {
     const timeBlockRow = new TimeBlockRow(timeBlockList, {start, end})
     expect(timeBlockRow.$date.val().trim()).toBe(tz.format(unfudged_start, 'date.formats.default'))
     expect(timeBlockRow.$start_time.val().trim()).toBe(
-      tz.format(unfudged_start, 'time.formats.tiny')
+      tz.format(unfudged_start, 'time.formats.tiny'),
     )
     expect(timeBlockRow.$end_time.val().trim()).toBe(tz.format(unfudged_end, 'time.formats.tiny'))
   })

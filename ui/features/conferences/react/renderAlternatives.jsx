@@ -66,7 +66,6 @@ function ConferenceProvider({imageSource, title, text, responsiveSize}) {
         </Text>
         <Text size="small">
           {text.map((content, i) => (
-             
             <View key={i} as="div" padding="x-small 0">
               {content}
             </View>
@@ -91,12 +90,12 @@ const Zoom = props => (
     title={I18n.t('Zoom')}
     text={[
       I18n.t(
-        'Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE).'
+        'Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE).',
       ),
       [
         <Link href={visitZoomUrl}>{I18n.t('Visit Zoom')}</Link>,
         I18n.t(
-          'to create a link you can use in Canvas. You’ll need to sign-up for a Zoom account if you don’t already have one.'
+          'to create a link you can use in Canvas. You’ll need to sign-up for a Zoom account if you don’t already have one.',
         ),
       ],
       // <Link href={learnZoomUrl}>{I18n.t('Learn how to use Zoom in Canvas.')}</Link>
@@ -111,12 +110,12 @@ const Meet = props => (
     title={I18n.t('Google Meet')}
     text={[
       I18n.t(
-        'Paste Google Meet links into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE)'
+        'Paste Google Meet links into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE)',
       ),
       [
         <Link href={visitMeetUrl}>{I18n.t('Visit Google Meet')}</Link>,
         I18n.t(
-          'to create a link you can use in Canvas. You’ll need a Google account to use Google Meet.'
+          'to create a link you can use in Canvas. You’ll need a Google account to use Google Meet.',
         ),
       ],
       <Link href={I18n.t('#community.admin_hangouts_meet_lti')}>
@@ -133,7 +132,7 @@ const Teams = props => (
     title={I18n.t('Microsoft Teams')}
     text={[
       I18n.t(
-        'If your school uses Microsoft Teams, you can use the Enhanced Rich Content Editor (RCE) to easily add a Team room while creating Calendar Events, Announcements, discussions posts and more.'
+        'If your school uses Microsoft Teams, you can use the Enhanced Rich Content Editor (RCE) to easily add a Team room while creating Calendar Events, Announcements, discussions posts and more.',
       ),
       <Link href={I18n.t('#community.admin_teams_meetings')}>
         {I18n.t('Learn how to use Microsoft Teams in Canvas')}

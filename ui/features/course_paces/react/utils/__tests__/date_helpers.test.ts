@@ -130,7 +130,7 @@ describe('date_helpers', () => {
             const end = addDays(moment(start_date), daysToAdd, excludeWeekends, skipDays, blackouts)
             expect(end).toEqual(expected)
           })
-        }
+        },
       )
     }
 
@@ -233,11 +233,11 @@ describe('date_helpers', () => {
               excludeWeekends,
               skipDays,
               blackouts,
-              inclusive
+              inclusive,
             )
             expect(count).toEqual(expected)
           })
-        }
+        },
       )
     }
 
@@ -254,7 +254,7 @@ describe('date_helpers', () => {
     it('counts days', () => {
       const count = rawDaysBetweenInclusive(
         moment('2022-05-16T00:00:00-06:00'), // monday
-        moment('2022-05-20T00:00:00-06:00') // friday
+        moment('2022-05-20T00:00:00-06:00'), // friday
       )
       expect(count).toEqual(5)
     })
@@ -262,7 +262,7 @@ describe('date_helpers', () => {
     it('handles start == end', () => {
       const count = rawDaysBetweenInclusive(
         moment('2022-05-16T00:00:00-06:00'), // monday
-        moment('2022-05-16T00:00:00-06:00') // friday
+        moment('2022-05-16T00:00:00-06:00'), // friday
       )
       expect(count).toEqual(1)
     })

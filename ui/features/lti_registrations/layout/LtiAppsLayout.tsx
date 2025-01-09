@@ -43,7 +43,7 @@ export const LtiAppsLayout = React.memo(() => {
     (_: any, tab: {id?: string}) => {
       navigate(tab.id === 'manage' ? '/manage' : '/')
     },
-    [navigate]
+    [navigate],
   )
 
   const open = React.useCallback(() => {
@@ -88,7 +88,7 @@ export const LtiAppsLayout = React.memo(() => {
       </Flex>
       <Text>
         {I18n.t(
-          'Enhance your Canvas experience with apps that offer content libraries, collaboration tools, analytics, and more. This page is your hub for all app features! Use the Discover page to find and install new apps, and the Manage page to review and modify your installed apps.'
+          'Enhance your Canvas experience with apps that offer content libraries, collaboration tools, analytics, and more. This page is your hub for all app features! Use the Discover page to find and install new apps, and the Manage page to review and modify your installed apps.',
         )}
       </Text>
       {isMobile ? (

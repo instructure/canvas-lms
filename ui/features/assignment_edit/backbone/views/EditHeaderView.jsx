@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
@@ -75,7 +73,6 @@ EditHeaderView.prototype.afterRender = function () {
   }
   // EVAL-3711 Remove ICE feature flag
   if (ENV.FEATURES?.instui_nav) {
-     
     ReactDOM.render(
       <Pill
         renderIcon={this.model.published() ? <IconPublishSolid /> : <IconUnpublishedLine />}
@@ -83,7 +80,7 @@ EditHeaderView.prototype.afterRender = function () {
       >
         {this.model.published() ? 'Published' : 'Not Published'}
       </Pill>,
-      this.$el.find('.published-assignment-container')[0]
+      this.$el.find('.published-assignment-container')[0],
     )
   }
 }
@@ -102,7 +99,6 @@ EditHeaderView.prototype.canDelete = function () {
 EditHeaderView.prototype.onDelete = function (e) {
   e.preventDefault()
   if (this.canDelete()) {
-     
     if (window.confirm(this.messages.confirm)) {
       return this.delete()
     } else {
@@ -115,7 +111,6 @@ EditHeaderView.prototype.delete = function () {
   let destroyDfd
   const disablingDfd = new $.Deferred()
   if ((destroyDfd = this.model.destroy())) {
-     
     destroyDfd.then(this.onDeleteSuccess.bind(this))
     destroyDfd.fail(function () {
       return disablingDfd.reject()
@@ -170,8 +165,8 @@ EditHeaderView.prototype.renderHeaderTitle = function () {
       ? 'Edit Quiz'
       : 'Edit Assignment'
     : this.model.isQuizLTIAssignment()
-    ? 'Create Quiz'
-    : 'Create New Assignment'
+      ? 'Create Quiz'
+      : 'Create New Assignment'
 }
 
 EditHeaderView.prototype.toJSON = function () {

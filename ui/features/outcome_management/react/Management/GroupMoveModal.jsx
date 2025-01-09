@@ -86,7 +86,6 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandle
           </Text>
           <TargetGroupSelector
             groupId={groupId}
-             
             setTargetGroup={({targetGroup}) => setTargetGroup(targetGroup)}
             starterGroupId={parentGroup.id}
           />

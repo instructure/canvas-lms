@@ -41,7 +41,7 @@ describe('PageEditModal', () => {
 
   it('sets focus on blank text input', () => {
     const {getByTestId, getByText} = render(
-      <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />
+      <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />,
     )
     const textInput = getByTestId('add-field')
     const saveButton = getByText('Save')
@@ -52,7 +52,7 @@ describe('PageEditModal', () => {
   describe('delete', () => {
     it('does not delete on cancel', async () => {
       const {getByText} = render(
-        <PageEditModal {...props} modalType="delete" page={page} pageList={pageList} />
+        <PageEditModal {...props} modalType="delete" page={page} pageList={pageList} />,
       )
       const path = encodeURI('/eportfolios/0/entries/2')
       fetchMock.delete(path, {status: 200})
@@ -66,7 +66,7 @@ describe('PageEditModal', () => {
 
     it('deletes when clicking delete button', async () => {
       const {getByText} = render(
-        <PageEditModal {...props} modalType="delete" page={page} pageList={pageList} />
+        <PageEditModal {...props} modalType="delete" page={page} pageList={pageList} />,
       )
       const path = encodeURI('/eportfolios/0/entries/2')
       fetchMock.delete(path, {status: 200})
@@ -82,10 +82,10 @@ describe('PageEditModal', () => {
   describe('add', () => {
     it('does not add page on cancel', async () => {
       const {getByText, getByTestId} = render(
-        <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />
+        <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />,
       )
       const path = encodeURI(
-        '/eportfolios/0/entries?eportfolio_entry[name]=Third Page&eportfolio_entry[eportfolio_category_id]=100'
+        '/eportfolios/0/entries?eportfolio_entry[name]=Third Page&eportfolio_entry[eportfolio_category_id]=100',
       )
       fetchMock.post(path, {status: 200})
 
@@ -100,10 +100,10 @@ describe('PageEditModal', () => {
 
     it('adds page when clicking save button', async () => {
       const {getByText, getByTestId} = render(
-        <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />
+        <PageEditModal {...props} modalType="add" page={null} pageList={pageList} />,
       )
       const path = encodeURI(
-        '/eportfolios/0/entries?eportfolio_entry[name]=Third Page&eportfolio_entry[eportfolio_category_id]=100'
+        '/eportfolios/0/entries?eportfolio_entry[name]=Third Page&eportfolio_entry[eportfolio_category_id]=100',
       )
       fetchMock.post(path, {status: 200})
 
@@ -119,10 +119,10 @@ describe('PageEditModal', () => {
   describe('rename', () => {
     it('does not rename page on cancel', async () => {
       const {getByText} = render(
-        <PageEditModal {...props} modalType="rename" page={page} pageList={pageList} />
+        <PageEditModal {...props} modalType="rename" page={page} pageList={pageList} />,
       )
       const path = encodeURI(
-        '/eportfolios/0/entries/2?eportfolio_entry[name]=Second Page&eportfolio_entry[eportfolio_category_id]=100'
+        '/eportfolios/0/entries/2?eportfolio_entry[name]=Second Page&eportfolio_entry[eportfolio_category_id]=100',
       )
       fetchMock.put(path, {status: 200})
 
@@ -135,10 +135,10 @@ describe('PageEditModal', () => {
 
     it('renames page when clicking save button', async () => {
       const {getByText} = render(
-        <PageEditModal {...props} modalType="rename" page={page} pageList={pageList} />
+        <PageEditModal {...props} modalType="rename" page={page} pageList={pageList} />,
       )
       const path = encodeURI(
-        '/eportfolios/0/entries/2?eportfolio_entry[name]=Second Page&eportfolio_entry[eportfolio_category_id]=100'
+        '/eportfolios/0/entries/2?eportfolio_entry[name]=Second Page&eportfolio_entry[eportfolio_category_id]=100',
       )
       fetchMock.put(path, {status: 200})
 
@@ -152,7 +152,7 @@ describe('PageEditModal', () => {
   describe('move to', () => {
     it('does not move page on cancel', async () => {
       const {getByText, getByTestId} = render(
-        <PageEditModal {...props} modalType="move" page={page} pageList={pageList} />
+        <PageEditModal {...props} modalType="move" page={page} pageList={pageList} />,
       )
       // encodeURIComponent encodes the slashes
       // encodeURI enocdes the commas
@@ -172,7 +172,7 @@ describe('PageEditModal', () => {
 
     it('move page when clicking save button', async () => {
       const {getByText, getByTestId} = render(
-        <PageEditModal {...props} modalType="move" page={page} pageList={pageList} />
+        <PageEditModal {...props} modalType="move" page={page} pageList={pageList} />,
       )
       const path = '/eportfolios/0/100/reorder_entries?order=2%2C1'
       fetchMock.post(path, {status: 200})

@@ -63,7 +63,7 @@ function renderAttempts(assignment) {
                     one: '1 Attempt',
                     other: '%{count} Attempts',
                   },
-                  {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0}
+                  {count: totalAllowedAttempts(assignment, context.latestSubmission) || 0},
                 )}
               </Pill>
             </>

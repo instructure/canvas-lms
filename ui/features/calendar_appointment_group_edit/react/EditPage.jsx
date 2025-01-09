@@ -111,7 +111,7 @@ class EditPage extends React.Component {
   componentDidMount() {
     axios
       .get(
-        `/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`
+        `/api/v1/appointment_groups/${this.props.appointment_group_id}?include[]=appointments&include[]=child_events`,
       )
       .then(response => {
         const formValues = parseFormValues(response.data)
@@ -125,18 +125,18 @@ class EditPage extends React.Component {
           () => {
             // Handle setting some pesky values
             $('.EditPage__Options-LimitUsersPerSlot', this.optionFields).val(
-              formValues.limitUsersPerSlot
+              formValues.limitUsersPerSlot,
             )
             $('.EditPage__Options-LimitSlotsPerUser', this.optionFields).val(
-              formValues.limitSlotsPerUser
+              formValues.limitSlotsPerUser,
             )
-          }
+          },
         )
       })
 
     axios.get('/api/v1/calendar_events/visible_contexts').then(response => {
       const contexts = response.data.contexts.filter(context =>
-        context.asset_string.match(/^course_/)
+        context.asset_string.match(/^course_/),
       )
       this.setState({
         contexts,
@@ -183,7 +183,7 @@ class EditPage extends React.Component {
     [...this.state.selectedContexts].every(
       context_code =>
         this.state.contexts.find(c => c.asset_string === context_code)
-          ?.allow_observers_in_appointment_groups
+          ?.allow_observers_in_appointment_groups,
     )
 
   deleteGroup = () => {
@@ -379,7 +379,7 @@ class EditPage extends React.Component {
               </div>
               <Checkbox
                 label={I18n.t(
-                  'Allow students to see who was signed up for time slots that are still available'
+                  'Allow students to see who was signed up for time slots that are still available',
                 )}
                 checked={this.state.formValues.allowStudentsToView}
                 name="allowStudentsToView"

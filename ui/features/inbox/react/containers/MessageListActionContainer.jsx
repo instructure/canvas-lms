@@ -41,7 +41,7 @@ const MessageListActionContainer = props => {
 
   const selectedReadStates = () => {
     const selectedStates = props.selectedConversations.map(
-      conversation => conversation?.workflowState
+      conversation => conversation?.workflowState,
     )
     return selectedStates
   }
@@ -60,7 +60,7 @@ const MessageListActionContainer = props => {
 
   const uniqueCourses = reduceDuplicateCourses(
     data?.legacyNode?.enrollments,
-    data?.legacyNode?.favoriteCoursesConnection?.nodes
+    data?.legacyNode?.favoriteCoursesConnection?.nodes,
   )
 
   const moreCourses = []

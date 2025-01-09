@@ -35,5 +35,5 @@ export const template = generateActionTemplates(
   ],
   [
     // course "OTHER CONSIDERATIONS"
-  ]
+  ],
 )

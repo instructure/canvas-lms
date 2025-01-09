@@ -85,16 +85,16 @@ describe('MessageDetailParticipants', () => {
         `, ${participantList
           .map(person => person.name)
           .slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
-          .join(', ')}`
-      )
+          .join(', ')}`,
+      ),
     ).toBeInTheDocument()
     expect(
-      container.queryByText(`, ${participantList.map(person => person.name).join(', ')}`)
+      container.queryByText(`, ${participantList.map(person => person.name).join(', ')}`),
     ).toBeNull()
     const expandBtn = container.getByTestId('expand-participants-button')
     fireEvent.click(expandBtn)
     expect(
-      container.getByText(`, ${participantList.map(person => person.name).join(', ')}`)
+      container.getByText(`, ${participantList.map(person => person.name).join(', ')}`),
     ).toBeInTheDocument()
   })
 })

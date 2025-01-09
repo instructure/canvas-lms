@@ -35,7 +35,7 @@ import {
 export const initialOverlayStateFromInternalConfig = (
   internalConfig: InternalLtiConfiguration,
   adminNickname?: string,
-  existingOverlay?: LtiConfigurationOverlay
+  existingOverlay?: LtiConfigurationOverlay,
 ): Lti1p3RegistrationOverlayState => {
   const placements = internalConfig.placements
     .map(p => p.placement)
@@ -56,11 +56,11 @@ export const initialOverlayStateFromInternalConfig = (
       JwkMethod: internalConfig.public_jwk_url ? 'public_jwk_url' : 'public_jwk',
       JwkURL: toUndefined(internalConfig.public_jwk_url),
       Jwk: toUndefined(
-        internalConfig.public_jwk ? JSON.stringify(internalConfig.public_jwk, null, 2) : undefined
+        internalConfig.public_jwk ? JSON.stringify(internalConfig.public_jwk, null, 2) : undefined,
       ),
       domain: existingOverlay?.domain || toUndefined(internalConfig.domain),
       customFields: formatCustomFields(
-        existingOverlay?.custom_fields || internalConfig.custom_fields
+        existingOverlay?.custom_fields || internalConfig.custom_fields,
       ),
     },
     permissions: {
@@ -74,39 +74,48 @@ export const initialOverlayStateFromInternalConfig = (
       courseNavigationDefaultDisabled,
     },
     override_uris: {
-      placements: placements.reduce((acc, p) => {
-        acc[p] = {
-          message_type:
-            existingOverlay?.placements?.[p]?.message_type ||
-            internalConfig?.placements.find(i => i.placement === p)?.message_type,
-          uri:
-            existingOverlay?.placements?.[p]?.target_link_uri ||
-            internalConfig?.placements.find(i => i.placement === p)?.target_link_uri,
-        }
-        return acc
-      }, {} as Record<LtiPlacement, {message_type?: LtiMessageType; uri?: string}>),
+      placements: placements.reduce(
+        (acc, p) => {
+          acc[p] = {
+            message_type:
+              existingOverlay?.placements?.[p]?.message_type ||
+              internalConfig?.placements.find(i => i.placement === p)?.message_type,
+            uri:
+              existingOverlay?.placements?.[p]?.target_link_uri ||
+              internalConfig?.placements.find(i => i.placement === p)?.target_link_uri,
+          }
+          return acc
+        },
+        {} as Record<LtiPlacement, {message_type?: LtiMessageType; uri?: string}>,
+      ),
     },
     naming: {
       nickname: adminNickname,
       description: existingOverlay?.description || toUndefined(internalConfig.description),
       placements:
-        placements.reduce((acc, p) => {
-          acc[p] =
-            existingOverlay?.placements?.[p]?.text ||
-            internalConfig?.placements.find(i => i.placement === p)?.text
-          return acc
-        }, {} as Record<LtiPlacement, string | undefined>) ?? [],
+        placements.reduce(
+          (acc, p) => {
+            acc[p] =
+              existingOverlay?.placements?.[p]?.text ||
+              internalConfig?.placements.find(i => i.placement === p)?.text
+            return acc
+          },
+          {} as Record<LtiPlacement, string | undefined>,
+        ) ?? [],
     },
     icons: {
-      placements: placements.reduce((acc, p) => {
-        if (isLtiPlacementWithIcon(p)) {
-          acc[p] =
-            existingOverlay?.placements?.[p]?.icon_url ||
-            internalConfig.placements.find(i => i.placement === p)?.icon_url
+      placements: placements.reduce(
+        (acc, p) => {
+          if (isLtiPlacementWithIcon(p)) {
+            acc[p] =
+              existingOverlay?.placements?.[p]?.icon_url ||
+              internalConfig.placements.find(i => i.placement === p)?.icon_url
+            return acc
+          }
           return acc
-        }
-        return acc
-      }, {} as Partial<Record<LtiPlacementWithIcon, string | undefined>>),
+        },
+        {} as Partial<Record<LtiPlacementWithIcon, string | undefined>>,
+      ),
     },
   }
 }
@@ -123,7 +132,7 @@ export const initialOverlayStateFromInternalConfig = (
  */
 export const convertToLtiConfigurationOverlay = (
   state: Lti1p3RegistrationOverlayState,
-  internalConfig: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration,
 ): {overlay: LtiConfigurationOverlay; config: InternalLtiConfiguration} => {
   const placements = state.placements.placements?.reduce((acc, placement) => {
     const internalPlacement = internalConfig.placements.find(p => p.placement === placement)
@@ -213,7 +222,7 @@ export const convertToLtiConfigurationOverlay = (
 
 const computeOverlayedCustomFields = (
   state: Lti1p3RegistrationOverlayState,
-  internalConfig: InternalLtiConfiguration
+  internalConfig: InternalLtiConfiguration,
 ) => {
   const customFieldsState = state.launchSettings.customFields
     ? Object.fromEntries(
@@ -223,7 +232,7 @@ const computeOverlayedCustomFields = (
           .map(customField => {
             const [key, value] = customField.split('=')
             return [key, value]
-          })
+          }),
       )
     : undefined
 

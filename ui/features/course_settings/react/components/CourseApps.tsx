@@ -38,7 +38,7 @@ export const CourseApps = () => {
         element: <ProductDetail />,
       },
     ],
-    {basename: getBasename(instructorAppsRoute)}
+    {basename: getBasename(instructorAppsRoute)},
   )
   const queryClient = new QueryClient()
 

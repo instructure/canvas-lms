@@ -389,7 +389,7 @@ describe('GradeSummary::GradeSelect', () => {
   it('does not include a custom grade option when no custom grade exists for the final grader', async () => {
     const {menu} = await mountAndClick(props)
     expect(optionsInList(menu).map(opt => opt.textContent)).toEqual(
-      ['frizz', 'robin', 'feeny'].map(labelForGrader)
+      ['frizz', 'robin', 'feeny'].map(labelForGrader),
     )
   })
 
@@ -397,7 +397,7 @@ describe('GradeSummary::GradeSelect', () => {
     it('does not include a custom grade option', async () => {
       const {menu} = await mountAndClick({...props, finalGrader: null})
       expect(optionsInList(menu).map(opt => opt.textContent)).toEqual(
-        ['frizz', 'robin', 'feeny'].map(labelForGrader)
+        ['frizz', 'robin', 'feeny'].map(labelForGrader),
       )
     })
 

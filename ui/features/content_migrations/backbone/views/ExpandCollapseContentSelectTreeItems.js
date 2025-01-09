@@ -98,7 +98,7 @@ ExpandCollapseContentSelectTreeItems.prototype.triggerTreeItemFetches = function
 // Trigger linked resources for checkboxes.
 // Exclude the checkbox that you all ready clicked on
 ExpandCollapseContentSelectTreeItems.prototype.triggerLinkedResourcesCheckboxes = function (
-  excludedType
+  excludedType,
 ) {
   const types = without(linkedResourceTypes, excludedType)
   each(
@@ -109,7 +109,7 @@ ExpandCollapseContentSelectTreeItems.prototype.triggerLinkedResourcesCheckboxes 
           silent: true,
         })
       }
-    })(this)
+    })(this),
   )
 }
 

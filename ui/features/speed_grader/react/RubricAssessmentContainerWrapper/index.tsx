@@ -84,7 +84,7 @@ export default ({
 
   const mappedRubric = mapRubricUnderscoredKeysToCamelCase(rubric, rubricOutcomeData)
   const mappedAssessmentData = mapRubricAssessmentDataUnderscoredKeysToCamelCase(
-    studentAssessment?.data ?? []
+    studentAssessment?.data ?? [],
   )
 
   const mappedSelfAssessment = selfAssessment

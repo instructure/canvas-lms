@@ -516,7 +516,9 @@ describe('EditView', () => {
         url: 'http://example.com/launch',
       })
       expect(view.$('#assignment_name').val()).toBe('Tool Resource')
-      expect(view.$('#assignment_external_tool_tag_attributes_url').val()).toBe('http://example.com/launch')
+      expect(view.$('#assignment_external_tool_tag_attributes_url').val()).toBe(
+        'http://example.com/launch',
+      )
     })
 
     it('when a submission_type_selection tool is chosen and a resource w/o title selected: sets selectedTool and sets content type to ltiResourceLink', () => {
@@ -528,7 +530,9 @@ describe('EditView', () => {
         type: 'ltiResourceLink',
         url: 'http://example.com/launch',
       })
-      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe('ltiResourceLink')
+      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe(
+        'ltiResourceLink',
+      )
     })
 
     it('when a submission_type_selection tool chosen, a resource selected, and the resource removed: keeps selectedTool but clears out title and content type', () => {
@@ -564,7 +568,9 @@ describe('EditView', () => {
       view.$('#assignment_submission_type').val('external_tool')
       view.$('#assignment_submission_type').trigger('change')
       expect(view.$('#assignment_external_tool_tag_attributes_url').val()).toBe('')
-      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe('context_external_tool')
+      expect(view.$('#assignment_external_tool_tag_attributes_content_type').val()).toBe(
+        'context_external_tool',
+      )
     })
   })
 

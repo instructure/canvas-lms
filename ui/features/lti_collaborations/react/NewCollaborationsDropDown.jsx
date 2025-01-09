@@ -22,7 +22,6 @@ import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = createI18nScope('react_collaborations')
 
- 
 class NewCollaborationsDropDown extends React.Component {
   render() {
     const [context, contextId] = splitAssetString(ENV.context_asset_string)

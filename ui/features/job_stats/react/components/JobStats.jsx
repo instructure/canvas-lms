@@ -46,16 +46,16 @@ export default function JobStats() {
       error: setError,
       fetchAllPages: true,
     },
-    []
+    [],
   )
 
   const updateRow = useCallback(
     (shard_id, data) => {
       setClusters(
-        clusters.map(cluster => (cluster.id === shard_id ? {...cluster, ...data} : cluster))
+        clusters.map(cluster => (cluster.id === shard_id ? {...cluster, ...data} : cluster)),
       )
     },
-    [clusters]
+    [clusters],
   )
 
   const onRefresh = useCallback(
@@ -72,7 +72,7 @@ export default function JobStats() {
           updateRow(shard_id, {loading: false, error: e})
         })
     },
-    [updateRow]
+    [updateRow],
   )
 
   const addUnstuckJob = (shard_id, progress_url) => {
@@ -85,7 +85,7 @@ export default function JobStats() {
       delete newQueue[shard_id]
       setUnstuckQueue(newQueue)
     },
-    [unstuckQueue]
+    [unstuckQueue],
   )
 
   const confirmUnblock = async shard_id => {

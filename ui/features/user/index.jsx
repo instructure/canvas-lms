@@ -46,20 +46,18 @@ ready(() => {
   const roles = Array.prototype.slice.call(ENV.COURSE_ROLES)
 
   if (pairing_container) {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
-      pairing_container
+      pairing_container,
     )
   }
 
   if (modifyPermissions.canView !== undefined) {
     const temp_enrollments_container = document.getElementById(
-      'manage-temp-enrollments-mount-point'
+      'manage-temp-enrollments-mount-point',
     )
 
     if (temp_enrollments_container) {
-      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <ManageTempEnrollButton
           user={{id: ENV.USER_ID, name: ENV.CONTEXT_USER_DISPLAY_NAME}}
@@ -68,7 +66,7 @@ ready(() => {
           rolePermissions={rolePermissions}
           can_read_sis={permissions.can_read_sis}
         />,
-        temp_enrollments_container
+        temp_enrollments_container,
       )
     }
   }

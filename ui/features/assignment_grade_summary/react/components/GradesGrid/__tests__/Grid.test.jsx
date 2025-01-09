@@ -118,8 +118,8 @@ describe('GradeSummary Grid', () => {
     expect(
       screen
         .getAllByRole('columnheader')
-        .filter(header => header.textContent.match(/Miss Frizzle|Mr. Keating/)).length
-    ).toBe(2)
+        .filter(header => header.textContent.match(/Miss Frizzle|Mr. Keating/)),
+    ).toHaveLength(2)
   })
 
   test('includes a column header for the final grade column', () => {
@@ -138,26 +138,26 @@ describe('GradeSummary Grid', () => {
   test('includes a GridRow for each student', () => {
     render(<Grid {...props} />)
     const rows = within(screen.getAllByRole('rowgroup')[1]).getAllByRole('row')
-    expect(rows.length).toBe(4)
+    expect(rows).toHaveLength(4)
   })
 
   test('sends disabledCustomGrade to each GridRow', () => {
     render(<Grid {...props} />)
     const rowCalls = GridRow.mock.calls.filter(call => !call[0].disabledCustomGrade)
-    expect(rowCalls.length).toBe(4)
+    expect(rowCalls).toHaveLength(4)
   })
 
   test('sends finalGrader to each GridRow', () => {
     render(<Grid {...props} />)
     const rowCalls = GridRow.mock.calls.filter(call => !!call[0].finalGrader)
-    expect(rowCalls.length).toBe(4)
+    expect(rowCalls).toHaveLength(4)
   })
 
   test('sends graders to each GridRow', () => {
     render(<Grid {...props} />)
     const rowCalls = GridRow.mock.calls
     expect(
-      rowCalls.map(row => row[0].graders.map(grader => grader.graderName)).flat()
+      rowCalls.map(row => row[0].graders.map(grader => grader.graderName)).flat(),
     ).toStrictEqual([
       'Miss Frizzle',
       'Mr. Keating',
@@ -173,7 +173,7 @@ describe('GradeSummary Grid', () => {
   test('sends onGradeSelect to each GridRow', () => {
     render(<Grid {...props} />)
     const rowCalls = GridRow.mock.calls.filter(call => !!call[0].onGradeSelect)
-    expect(rowCalls.length).toBe(4)
+    expect(rowCalls).toHaveLength(4)
   })
 
   test('sends student-specific grades to each GridRow', () => {
@@ -185,14 +185,14 @@ describe('GradeSummary Grid', () => {
   test('sends student-specific select provisional grade statuses to each GridRow', () => {
     render(<Grid {...props} />)
     const rowCalls = GridRow.mock.calls.filter(
-      call => call[0].selectProvisionalGradeStatus == STARTED
+      call => call[0].selectProvisionalGradeStatus == STARTED,
     )
-    expect(rowCalls.length).toBe(1)
+    expect(rowCalls).toHaveLength(1)
   })
 
   test('sends the related row to each GridRow', () => {
     render(<Grid {...props} />)
     const rowCalls = GridRow.mock.calls.filter(call => !!call[0].row)
-    expect(rowCalls.length).toBe(4)
+    expect(rowCalls).toHaveLength(4)
   })
 })

@@ -84,7 +84,7 @@ export function Like({...props}) {
                       one: 'Like',
                       other: 'Likes',
                     },
-                    {count: props.likeCount}
+                    {count: props.likeCount},
                   )}`}
               </Text>
             </PresentationContent>

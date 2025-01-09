@@ -76,7 +76,7 @@ describe('CustomForbiddenWordsSection Component', () => {
           onCustomForbiddenWordsEnabledChange={() => {}}
           currentAttachmentId={123}
           passwordPolicyHashExists={true}
-        />
+        />,
       )
       const uploadButton = await screen.findByTestId('uploadButton')
       expect(uploadButton).toBeInTheDocument()

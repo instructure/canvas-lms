@@ -56,13 +56,13 @@ const HomeroomPage = ({
         setDashboardCards(
           createDashboardCards(cards.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
             headingLevel: 'h3',
-          })
+          }),
         )
       }
     },
     [cards],
     // Need to do deep comparison on cards to only re-trigger if they actually changed
-    {deep: true}
+    {deep: true},
   )
 
   const skeletonCard = props => (

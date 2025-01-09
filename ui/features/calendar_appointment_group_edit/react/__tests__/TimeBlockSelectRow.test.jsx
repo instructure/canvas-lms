@@ -132,7 +132,7 @@ describe('TimeBlockSelectRow', () => {
         date: expect.any(Date),
         startTime: expect.any(Date),
         endTime: expect.any(Date),
-      })
+      }),
     )
   })
 
@@ -142,7 +142,7 @@ describe('TimeBlockSelectRow', () => {
       <div>
         <TimeBlockSelectRow slotEventId="1" {...props} onBlur={firstOnBlur} />
         <TimeBlockSelectRow slotEventId="2" {...props} />
-      </div>
+      </div>,
     )
     const lastRowDateInput = container.querySelectorAll('.TimeBlockSelectorRow__Date')[1]
     await userEvent.click(lastRowDateInput)

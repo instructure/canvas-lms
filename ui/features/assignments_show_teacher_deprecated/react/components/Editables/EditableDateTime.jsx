@@ -129,7 +129,7 @@ export default class EditableDateTime extends React.Component {
       const t = window.setTimeout(() => {
         this._timers.splice(
           this._timers.findIndex(tid => tid === t),
-          1
+          1,
         )
         handler(event)
       }, 100)
@@ -153,7 +153,7 @@ export default class EditableDateTime extends React.Component {
         const t = window.setTimeout(() => {
           this._timers.splice(
             this._timers.findIndex(tid => tid === t),
-            1
+            1,
           )
           this.props.onChangeMode('view')
         }, 100)
@@ -174,7 +174,7 @@ export default class EditableDateTime extends React.Component {
               this.props.value,
               this.props.locale,
               this.props.timeZone,
-              this.props.displayFormat
+              this.props.displayFormat,
             )
           : ''
         return <Text>{dt}</Text>

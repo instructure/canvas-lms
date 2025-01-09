@@ -41,7 +41,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     expect(screen.getByText(/Override URIs/i)).toBeInTheDocument()
@@ -65,12 +65,12 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const state = overlayStore.getState().state
     const placements = state.placements.placements || []
-    expect(screen.getAllByText(/^Override URI$/i).length).toBe(placements.length)
+    expect(screen.getAllByText(/^Override URI$/i)).toHaveLength(placements.length)
   })
 
   it('allows users to change the redirect URIs for a placement', async () => {
@@ -88,7 +88,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const state = overlayStore.getState().state
@@ -101,7 +101,7 @@ describe('OverrideURIsConfirmation', () => {
     await userEvent.paste('https://new-uri.com')
 
     expect(overlayStore.getState().state.override_uris.placements[placement]!.uri).toBe(
-      'https://new-uri.com'
+      'https://new-uri.com',
     )
   })
 
@@ -120,7 +120,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const input = screen.getByPlaceholderText('https://example.com')
@@ -146,7 +146,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const input = screen.getByPlaceholderText('https://example.com')
@@ -172,7 +172,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const input = screen.getByPlaceholderText('https://example.com')
@@ -198,7 +198,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const radio = screen.getByLabelText(LtiDeepLinkingRequest)
@@ -222,7 +222,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     expect(screen.queryByLabelText(LtiDeepLinkingRequest)).not.toBeInTheDocument()
@@ -247,7 +247,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const state = overlayStore.getState().state
@@ -262,7 +262,7 @@ describe('OverrideURIsConfirmation', () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByText(i18nLtiPlacement(LtiPlacements.CourseNavigation))
+        screen.queryByText(i18nLtiPlacement(LtiPlacements.CourseNavigation)),
       ).not.toBeInTheDocument()
     })
   })
@@ -282,7 +282,7 @@ describe('OverrideURIsConfirmation', () => {
         onNextClicked={onNextClicked}
         onPreviousClicked={onPreviousClicked}
         reviewing={false}
-      />
+      />,
     )
 
     const newPlacement = LtiPlacements.AccountNavigation

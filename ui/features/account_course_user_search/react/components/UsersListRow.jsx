@@ -162,7 +162,7 @@ UsersListRow.propTypes = {
     shape({
       id: string.isRequired,
       label: string.isRequired,
-    })
+    }),
   ).isRequired,
   includeDeletedUsers: string,
 }

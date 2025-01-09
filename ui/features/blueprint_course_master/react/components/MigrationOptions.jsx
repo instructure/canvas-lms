@@ -65,7 +65,7 @@ export default class MigrationOptions extends React.Component {
         I18n.t('%{count} of %{max} maximum characters', {
           count: newProps.notificationMessage.length,
           max: MAX_NOTIFICATION_MESSAGE_LENGTH,
-        })
+        }),
       )
     }
   }
@@ -92,7 +92,7 @@ export default class MigrationOptions extends React.Component {
         $.screenReaderFlashMessage(
           I18n.t('You have reached the limit of %{len} characters in the notification message', {
             len: MAX_NOTIFICATION_MESSAGE_LENGTH,
-          })
+          }),
         )
       }, 600)
     }

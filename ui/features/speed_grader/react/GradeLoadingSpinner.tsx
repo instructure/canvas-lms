@@ -40,7 +40,7 @@ export default function GradeLoadingSpinner({onLoadingChange}: Props) {
       currentStudentId: state.currentStudentId,
       gradesLoading: state.gradesLoading,
     }),
-    loadingStateChanged
+    loadingStateChanged,
   )
 
   useEffect(() => {

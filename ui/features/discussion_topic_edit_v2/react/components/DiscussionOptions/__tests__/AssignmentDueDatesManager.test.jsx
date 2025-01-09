@@ -72,7 +72,7 @@ const setup = ({
       }}
     >
       <AssignmentDueDatesManager />
-    </DiscussionDueDatesContext.Provider>
+    </DiscussionDueDatesContext.Provider>,
   )
 }
 
@@ -94,14 +94,14 @@ describe('AssignmentDueDatesManager', () => {
       expect.arrayContaining([
         expect.objectContaining({dueDateId: expect.any(String)}),
         expect.objectContaining({dueDateId: expect.any(String)}),
-      ])
+      ]),
     )
   })
 
   it('shows Close button when there is more than one AssignmentDueDate', () => {
     setup({assignedInfoList: [{dueDateId: 'uniqueID'}, {dueDateId: 'uniqueID2'}]})
     // Assuming the CloseButton has a specific label or text
-    expect(screen.getAllByText('Close').length).toBe(2)
+    expect(screen.getAllByText('Close')).toHaveLength(2)
   })
 
   it('removes an AssignmentDueDate when Close is clicked', () => {
@@ -113,14 +113,14 @@ describe('AssignmentDueDatesManager', () => {
 
     // Verifying that a due date components exist
     const assignmentDueDates = screen.getAllByTestId('assignment-due-date')
-    expect(assignmentDueDates.length).toBe(2)
+    expect(assignmentDueDates).toHaveLength(2)
 
     // Verifying that there is a close button
     const closeButtons = screen.getAllByText('Close')
     fireEvent.click(closeButtons[0])
 
     expect(setAssignedInfoList).toHaveBeenCalledWith(
-      expect.arrayContaining([expect.objectContaining({dueDateId: expect.any(String)})])
+      expect.arrayContaining([expect.objectContaining({dueDateId: expect.any(String)})]),
     )
   })
 
@@ -158,13 +158,13 @@ describe('AssignmentDueDatesManager', () => {
     // There are 13 options by default
     // 1 option is selected in the other menu
     // therefore, there will only be 12 options available
-    expect(availableOptions.length).toBe(12)
+    expect(availableOptions).toHaveLength(12)
 
     // 2 options are selected in the other menu
     // therefore, there will only be 11 options available
     fireEvent.click(assignToOptionTwo)
     availableOptions = screen.getAllByTestId('assign-to-select-option')
-    expect(availableOptions.length).toBe(11)
+    expect(availableOptions).toHaveLength(11)
   })
 
   describe('important dates', () => {
@@ -270,7 +270,7 @@ describe('AssignmentDueDatesManager', () => {
 
       const availableOptions = screen.getAllByTestId('assign-to-select-option')
       expect(
-        availableOptions.map(o => o.textContent).includes(defaultEveryoneElseOption.label)
+        availableOptions.map(o => o.textContent).includes(defaultEveryoneElseOption.label),
       ).toBe(true)
     })
   })
@@ -283,7 +283,7 @@ describe('AssignmentDueDatesManager', () => {
       fireEvent.click(assignToOptionOne)
 
       const availableOptions = screen.getAllByTestId('assign-to-select-option')
-      expect(availableOptions.length).toBe(13)
+      expect(availableOptions).toHaveLength(13)
       expect(availableOptions.map(o => o.textContent).includes('Group 1')).toBe(true)
       expect(availableOptions.map(o => o.textContent).includes('Group 2')).toBe(true)
       expect(availableOptions.map(o => o.textContent).includes('Group 3')).toBe(true)
@@ -296,7 +296,7 @@ describe('AssignmentDueDatesManager', () => {
       fireEvent.click(assignToOptionOne)
 
       const availableOptions = screen.getAllByTestId('assign-to-select-option')
-      expect(availableOptions.length).toBe(10)
+      expect(availableOptions).toHaveLength(10)
       expect(availableOptions.map(o => o.textContent).includes('Group 1')).toBe(false)
     })
 
@@ -308,7 +308,7 @@ describe('AssignmentDueDatesManager', () => {
       }
       setup()
       const coursePacingNotice = screen.getByText(
-        'This course is using Course Pacing. Go to Course Pacing to manage due dates.'
+        'This course is using Course Pacing. Go to Course Pacing to manage due dates.',
       )
       const addAssignmentOption = screen.queryByText('Add Assignment')
 

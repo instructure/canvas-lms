@@ -58,7 +58,7 @@ describe('permissions::GranularCheckbox', () => {
 
   it('displays the disabled state', () => {
     const {container, getByText, queryByText} = render(
-      <GranularCheckbox {...buildProps({enabled: ENABLED_FOR_NONE})} />
+      <GranularCheckbox {...buildProps({enabled: ENABLED_FOR_NONE})} />,
     )
     const checkbox = container.querySelector('input')
 
@@ -70,7 +70,7 @@ describe('permissions::GranularCheckbox', () => {
 
   it('displays the readonly state', () => {
     const {container, getByText, queryByText} = render(
-      <GranularCheckbox {...buildProps({readonly: true})} />
+      <GranularCheckbox {...buildProps({readonly: true})} />,
     )
     const checkbox = container.querySelector('input')
 

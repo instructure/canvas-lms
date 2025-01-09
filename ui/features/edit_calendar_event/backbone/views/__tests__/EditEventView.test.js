@@ -182,7 +182,7 @@ describe('EditEventView', () => {
       render()
       await waitForRender()
       expect(
-        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false}),
       ).toBeInTheDocument()
     })
 
@@ -191,7 +191,7 @@ describe('EditEventView', () => {
       render()
       await waitForRender()
       expect(
-        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false}),
       ).toBeInTheDocument()
     })
 
@@ -200,7 +200,7 @@ describe('EditEventView', () => {
       render()
       await waitForRender()
       expect(
-        within(document.body).getByLabelText('Mark as Important Date', {exact: false})
+        within(document.body).getByLabelText('Mark as Important Date', {exact: false}),
       ).toBeInTheDocument()
     })
 
@@ -240,7 +240,7 @@ describe('EditEventView', () => {
       expect(
         within(document.body).getByLabelText('Add to Course Pacing blackout dates', {
           exact: false,
-        })
+        }),
       ).toBeInTheDocument()
     })
 
@@ -291,7 +291,7 @@ describe('EditEventView', () => {
 
       expect(document.body.querySelector('#weekly-day')).toHaveTextContent('Weekly on Tuesday')
       expect(document.body.querySelector('#monthly-nth-day')).toHaveTextContent(
-        'Monthly on the second Tuesday'
+        'Monthly on the second Tuesday',
       )
       expect(document.body.querySelector('#annually')).toHaveTextContent('Annually on May 12')
 
@@ -302,7 +302,7 @@ describe('EditEventView', () => {
 
       expect(document.body.querySelector('#weekly-day')).toHaveTextContent('Weekly on Thursday')
       expect(document.body.querySelector('#monthly-nth-day')).toHaveTextContent(
-        'Monthly on the second Thursday'
+        'Monthly on the second Thursday',
       )
       expect(document.body.querySelector('#annually')).toHaveTextContent('Annually on April 12')
     })
@@ -369,8 +369,8 @@ describe('EditEventView', () => {
 
       await waitFor(() =>
         expect(
-          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
-        ).toHaveBeenCalledWith(expect.objectContaining(view.model.attributes))
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog,
+        ).toHaveBeenCalledWith(expect.objectContaining(view.model.attributes)),
       )
     })
 
@@ -381,8 +381,8 @@ describe('EditEventView', () => {
 
       await waitFor(() =>
         expect(
-          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
-        ).not.toHaveBeenCalled()
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog,
+        ).not.toHaveBeenCalled(),
       )
     })
 
@@ -395,8 +395,8 @@ describe('EditEventView', () => {
 
       await waitFor(() =>
         expect(
-          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog
-        ).not.toHaveBeenCalled()
+          UpdateCalendarEventDialogModule.renderUpdateCalendarEventDialog,
+        ).not.toHaveBeenCalled(),
       )
     })
 

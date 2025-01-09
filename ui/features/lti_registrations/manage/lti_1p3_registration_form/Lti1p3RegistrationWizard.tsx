@@ -219,7 +219,7 @@ export const Lti1p3RegistrationWizard = ({
                     onSuccessfulRegistration,
                     accountId,
                     existingRegistration.id,
-                    unifiedToolId
+                    unifiedToolId,
                   )
                 } else {
                   store.install(onSuccessfulRegistration, accountId, unifiedToolId)

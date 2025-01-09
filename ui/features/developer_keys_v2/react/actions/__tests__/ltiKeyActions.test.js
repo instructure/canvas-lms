@@ -57,7 +57,7 @@ describe('saveLtiToolConfiguration', () => {
           id: 100000000087,
           name: 'test key',
           tool_configuration: {test: 'config'},
-        })
+        }),
       )
     })
   })
@@ -92,7 +92,7 @@ describe('saveLtiToolConfiguration', () => {
         save().finally(() => {
           expect($.flashError).toHaveBeenCalledTimes(2)
           expect(dispatch).toHaveBeenCalledWith(actions.setEditingDeveloperKey(false))
-        })
+        }),
       ).rejects.toEqual(error)
     })
   })
@@ -128,7 +128,7 @@ describe('updateLtiKey', () => {
       disabledPlacements,
       developerKeyId,
       toolConfiguration,
-      customFields
+      customFields,
     )
   }
 
@@ -150,7 +150,7 @@ describe('updateLtiKey', () => {
           settings: toolConfiguration,
           custom_fields: customFields,
         },
-      }
+      },
     )
   })
 })

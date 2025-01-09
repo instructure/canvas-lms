@@ -52,10 +52,9 @@ export const adjustFooterWidth = () => {
 
 ready(() => {
   setTimeout(() => {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />,
-      $('<div class="discussion-redesign-layout"/>').appendTo('#content')[0]
+      $('<div class="discussion-redesign-layout"/>').appendTo('#content')[0],
     )
   })
 

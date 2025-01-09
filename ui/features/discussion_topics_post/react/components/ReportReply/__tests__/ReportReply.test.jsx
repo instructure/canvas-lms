@@ -47,12 +47,12 @@ describe('Report Reply', () => {
       const container = setup(mockProps({errorSubmitting: true}))
 
       expect(
-        container.findByText('We experienced an issue. This reply was not reported.')
+        container.findByText('We experienced an issue. This reply was not reported.'),
       ).toBeTruthy()
 
       setTimeout(() => {
         expect(
-          container.findByText('We experienced an issue. This reply was not reported.')
+          container.findByText('We experienced an issue. This reply was not reported.'),
         ).toBeFalsy()
       }, 5000)
     })
@@ -64,7 +64,7 @@ describe('Report Reply', () => {
     const cancelButton = await container.findByTestId('report-reply-cancel-modal-button')
     expect(cancelButton).toBeTruthy()
     await container.user.click(cancelButton)
-    expect(onCloseReportModalMock.mock.calls.length).toBe(1)
+    expect(onCloseReportModalMock.mock.calls).toHaveLength(1)
   })
 
   it('should call onCloseReportModal from the close button', async () => {
@@ -73,7 +73,7 @@ describe('Report Reply', () => {
     const cancelButton = await container.findByText('Close')
     expect(cancelButton).toBeTruthy()
     await container.user.click(cancelButton)
-    expect(onCloseReportModalMock.mock.calls.length).toBe(1)
+    expect(onCloseReportModalMock.mock.calls).toHaveLength(1)
   })
 
   it('should call onSubmit', async () => {
@@ -85,7 +85,7 @@ describe('Report Reply', () => {
     const submitButton = await container.findByTestId('report-reply-submit-button')
     expect(submitButton).toBeTruthy()
     await userEvent.click(submitButton)
-    expect(onSubmitMock.mock.calls.length).toBe(1)
+    expect(onSubmitMock.mock.calls).toHaveLength(1)
     expect(onSubmitMock).toHaveBeenCalledWith('other')
   })
 

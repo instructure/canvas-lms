@@ -36,7 +36,7 @@ const setup = (props = defaultProps) => {
       <Table.Body>
         {rubricRow(props.assignment, props.setOpenRubricDetailIds, props.openRubricDetailIds)}
       </Table.Body>
-    </Table>
+    </Table>,
   )
 }
 

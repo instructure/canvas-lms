@@ -71,7 +71,7 @@ describe('responseToItem', () => {
         return key.replace(/%\{(\w+)\}/g, (_: any, k: any) => params[k])
       }
       return key
-    })
+    }),
   }
 
   it('converts a GenericItemResponse to an Item with sub_items and linked_resource', () => {
@@ -248,8 +248,8 @@ describe('mapToCheckboxTreeNodes', () => {
       ...expectedFlatItems,
       '1': {
         ...expectedFlatItems['1'],
-        parentId: 'topParentId'
-      }
+        parentId: 'topParentId',
+      },
     }
     expect(mapToCheckboxTreeNodes(items, 'topParentId')).toStrictEqual(modifiedExceptedFlatItems)
   })
@@ -305,13 +305,13 @@ describe('generateSelectiveDataResponse', () => {
 
   it('generates a selective data request on root and non root element', () => {
     expect(
-      generateSelectiveDataResponse('migration_1', 'user_1', flatItemsWithRootAndNonRoot)
+      generateSelectiveDataResponse('migration_1', 'user_1', flatItemsWithRootAndNonRoot),
     ).toStrictEqual(expectedResponseWithRootAndNonRoot)
   })
 
   it('assigns the waiting_for_select workflow_state', () => {
     expect(generateSelectiveDataResponse('migration_1', 'user_1', {}).workflow_state).toBe(
-      'waiting_for_select'
+      'waiting_for_select',
     )
   })
 
@@ -345,7 +345,7 @@ describe('generateSelectiveDataResponse', () => {
 
     it('generates a selective data request on 1 [] containing id', () => {
       expect(generateSelectiveDataResponse('migration_1', 'user_1', flatItems)).toStrictEqual(
-        expectedResponse
+        expectedResponse,
       )
     })
 
@@ -354,11 +354,11 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          id: 'copy[all_discussions][no_matter]'
-        }
+          id: 'copy[all_discussions][no_matter]',
+        },
       }
       expect(
-        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
       ).toStrictEqual(expectedResponse)
     })
 
@@ -367,10 +367,12 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          id: 'copy'
-        }
+          id: 'copy',
+        },
       }
-      expect(generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)).toStrictEqual({
+      expect(
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
+      ).toStrictEqual({
         ...expectedResponse,
         copy: {},
       })
@@ -381,10 +383,12 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          checkboxState: 'unchecked'
-        }
+          checkboxState: 'unchecked',
+        },
       }
-      expect(generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)).toStrictEqual({
+      expect(
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
+      ).toStrictEqual({
         ...expectedResponse,
         copy: {},
       })
@@ -395,10 +399,12 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          checkboxState: 'indeterminate'
-        }
+          checkboxState: 'indeterminate',
+        },
       }
-      expect(generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)).toStrictEqual({
+      expect(
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
+      ).toStrictEqual({
         ...expectedResponse,
         copy: {},
       })
@@ -409,11 +415,12 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          migrationId: 'migrationId'
-        }
+          migrationId: 'migrationId',
+        },
       }
       expect(
-        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems).copy.all_discussions
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems).copy
+          .all_discussions,
       ).toBeUndefined()
     })
   })
@@ -443,7 +450,7 @@ describe('generateSelectiveDataResponse', () => {
 
     it('generates a selective data request for groups type on checked state', () => {
       expect(generateSelectiveDataResponse('migration_1', 'user_1', flatItems)).toStrictEqual(
-        expectedResponse
+        expectedResponse,
       )
     })
 
@@ -452,11 +459,11 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          checkboxState: 'indeterminate'
-        }
+          checkboxState: 'indeterminate',
+        },
       }
       expect(
-        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
       ).toStrictEqual(expectedResponse)
     })
 
@@ -465,11 +472,11 @@ describe('generateSelectiveDataResponse', () => {
         ...flatItems,
         '1': {
           ...flatItems['1'],
-          checkboxState: 'unchecked'
-        }
+          checkboxState: 'unchecked',
+        },
       }
       expect(
-        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
       ).toStrictEqual({
         ...expectedResponse,
         copy: {},
@@ -480,7 +487,7 @@ describe('generateSelectiveDataResponse', () => {
       const modifiedFlatItems = {...flatItems}
       delete modifiedFlatItems['1'].migrationId
       expect(
-        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems)
+        generateSelectiveDataResponse('migration_1', 'user_1', modifiedFlatItems),
       ).toStrictEqual({
         ...expectedResponse,
         copy: {},

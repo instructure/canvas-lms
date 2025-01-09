@@ -101,7 +101,7 @@ export default class StudentTray extends React.Component {
     const courseLid = this.props.assignment.course.lid
     const studentLid = this.props.student.lid
     const speedgraderLink = encodeURI(
-      `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}#{"student_id":"${studentLid}"}`
+      `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}#{"student_id":"${studentLid}"}`,
     )
     return (
       <Link
@@ -119,7 +119,6 @@ export default class StudentTray extends React.Component {
   }
 
   handleSubmitForStudent = () => {
-     
     window.confirm('Submit for Student is not implemented yet')
   }
 
@@ -138,13 +137,13 @@ export default class StudentTray extends React.Component {
       },
       () => {
         this.messageStudentsButton.focus()
-      }
+      },
     )
   }
 
   onChangeDueAt = (_event, newValue) => {
     // Should we be using this.state.dueAt with <DateTimeInput> below?
-     
+
     this.setState({dueAt: newValue})
   }
 

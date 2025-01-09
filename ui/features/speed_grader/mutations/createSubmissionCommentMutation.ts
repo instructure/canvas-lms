@@ -104,7 +104,7 @@ export async function createSubmissionComment({
       files,
       courseId,
       assignmentId,
-      userId
+      userId,
     )
     fileIds = attachments.map(attachment => attachment.id)
   }

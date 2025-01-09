@@ -32,7 +32,7 @@ describe('EportfolioSection -> fetchContent', () => {
         "  <textarea class='edit_section'>" +
         '    Some HTML Content' +
         '  </textarea>' +
-        '</div>'
+        '</div>',
     )
   })
 

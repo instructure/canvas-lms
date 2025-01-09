@@ -35,7 +35,7 @@ export default class GridRow extends Component {
       shape({
         graderName: string,
         graderId: string.isRequired,
-      })
+      }),
     ).isRequired,
     grades: shape({}),
     onGradeSelect: func,

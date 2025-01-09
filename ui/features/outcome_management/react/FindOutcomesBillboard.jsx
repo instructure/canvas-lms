@@ -71,7 +71,7 @@ const FindOutcomesBillboard = () => {
               <Text size="large" color="primary">
                 {isCourse
                   ? I18n.t(
-                      'Save yourself a lot of time by only adding the outcomes that are specific to your course content.'
+                      'Save yourself a lot of time by only adding the outcomes that are specific to your course content.',
                     )
                   : I18n.t('Select a group to reveal outcomes here.')}
               </Text>

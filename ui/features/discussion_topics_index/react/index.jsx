@@ -32,12 +32,11 @@ export default function createDiscussionsIndex(root, data = {}) {
   }
 
   function render() {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <Provider store={store}>
         <ConnectedDiscussionsIndex />
       </Provider>,
-      root
+      root,
     )
   }
 

@@ -38,7 +38,7 @@ $(document).ready(() => {
       'PUT',
       {'user[show_user_services]': $(this).prop('checked')},
       _data => {},
-      _data => {}
+      _data => {},
     )
   })
 
@@ -85,10 +85,13 @@ $(document).ready(() => {
       },
       _data => {
         $.flashError(
-          I18n.t('enrollment_change_failed', 'Enrollment privilege change failed, please try again')
+          I18n.t(
+            'enrollment_change_failed',
+            'Enrollment privilege change failed, please try again',
+          ),
         )
         $user.loadingImage('remove')
-      }
+      },
     )
     event.preventDefault()
   })
@@ -100,7 +103,7 @@ $(document).ready(() => {
       .confirmDelete({
         message: I18n.t(
           'confirm.delete_enrollment',
-          'Are you sure you want to delete this enrollment?'
+          'Are you sure you want to delete this enrollment?',
         ),
         url: $(this).attr('href'),
         success(_data) {
@@ -122,10 +125,9 @@ $(document).ready(() => {
 
   const container = document.querySelector('#pairing-code')
   if (container != null) {
-     
     ReactDOM.render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
-      container
+      container,
     )
   }
 })

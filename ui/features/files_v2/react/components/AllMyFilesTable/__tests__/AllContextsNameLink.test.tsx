@@ -31,7 +31,7 @@ const renderComponent = (props: any) => {
   return render(
     <BrowserRouter>
       <AllContextsNameLink {...defaultProps} {...props} />
-    </BrowserRouter>
+    </BrowserRouter>,
   )
 }
 

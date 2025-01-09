@@ -74,7 +74,7 @@ export default function ContentSelection({
 
     if (selectedOutcomeId) {
       const outcomeIndex = outcomeDropdownOptions.findIndex(
-        outcomeOption => outcomeOption.id === selectedOutcomeId
+        outcomeOption => outcomeOption.id === selectedOutcomeId,
       )
 
       if (outcomeIndex !== -1) {
@@ -93,7 +93,7 @@ export default function ContentSelection({
 
     if (selectedStudentId) {
       const studentIndex = studentDropdownOptions.findIndex(
-        studentOption => studentOption.id === selectedStudentId
+        studentOption => studentOption.id === selectedStudentId,
       )
 
       if (studentIndex !== -1) {

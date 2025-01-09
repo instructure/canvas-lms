@@ -47,7 +47,7 @@ export default function SubmissionDownloadModal({downloadSubmissionsUrl}: Props)
         <View as="span" margin="0 0 0 xx-small">
           <Text weight="bold">{I18n.t('Your student submissions are being gathered')} </Text>
           {I18n.t(
-            'and compressed into a zip file. This may take some time, depending on the size and number of submission files.'
+            'and compressed into a zip file. This may take some time, depending on the size and number of submission files.',
           )}
         </View>
         <View as="div" className="progress" margin="small" />

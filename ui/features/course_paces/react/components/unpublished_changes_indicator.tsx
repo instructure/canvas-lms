@@ -61,7 +61,7 @@ const text = (changeCount: number) => {
       one: '1 unsaved change',
       other: '%{count} unsaved changes',
     },
-    {count: changeCount}
+    {count: changeCount},
   )
 }
 

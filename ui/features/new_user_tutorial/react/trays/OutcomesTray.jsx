@@ -51,7 +51,7 @@ const HomeTray = () => (
       },
       {
         label: I18n.t(
-          'How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?'
+          'How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?',
         ),
         href: I18n.t('#community.instructor_use_mastery_gradebook'),
       },
@@ -61,7 +61,7 @@ const HomeTray = () => (
       `Set up outcomes in your course as measured by pedagogical goals or desired objectives.
       Help students learn skills and activities, rather than just focusing on grades as a measure of their success.
       Assess student progress through calculation methods, and measure progress directly in the Learning Mastery Gradebook.
-      Import existing account and state outcomes to your course. You can also align outcomes in course rubrics.`
+      Import existing account and state outcomes to your course. You can also align outcomes in course rubrics.`,
     )}
   </TutorialTrayContent>
 )

@@ -77,7 +77,7 @@ export const getBlueprintLocked = (state: StoreState) => state.ui.blueprintLocke
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
   getCoursePaceType,
-  (showProjections, coursePaceType) => showProjections || coursePaceType === 'Enrollment'
+  (showProjections, coursePaceType) => showProjections || coursePaceType === 'Enrollment',
 )
 
 /* Reducers */

@@ -152,7 +152,7 @@ export default class ContextSelector {
     const $contextsList = this.$menu.find('.ag-contexts')
 
     subscribe('/contextSelector/changed', () =>
-      contextsChangedCB(this.selectedContexts(), this.selectedSections())
+      contextsChangedCB(this.selectedContexts(), this.selectedSections()),
     )
 
     this.contextSelectorItems = {}

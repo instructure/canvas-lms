@@ -169,7 +169,7 @@ RosterCard.propTypes = {
           _id: string.isRequired,
           name: string.isRequired,
         }),
-      })
+      }),
     ),
     loginId: string,
     avatarUrl: string,
