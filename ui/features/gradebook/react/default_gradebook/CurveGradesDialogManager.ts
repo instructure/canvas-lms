@@ -37,7 +37,7 @@ const CurveGradesDialogManager = {
       isAdmin?: boolean
       contextUrl?: string
       submissionsLoaded?: boolean
-    } = {}
+    } = {},
   ) {
     const {
       grading_type: gradingType,
@@ -60,8 +60,8 @@ const CurveGradesDialogManager = {
           return $.flashError(
             I18n.t(
               'Unable to curve grades because this assignment is due in a closed ' +
-                'grading period for at least one student'
-            )
+                'grading period for at least one student',
+            ),
           )
         }
 

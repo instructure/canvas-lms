@@ -79,7 +79,7 @@ describe('SetDefaultGradeDialogManager#isDialogEnabled', () => {
       true,
       'selectedSection',
       false,
-      true
+      true,
     )
 
     expect(manager.isDialogEnabled()).toBe(true)
@@ -93,7 +93,7 @@ describe('SetDefaultGradeDialogManager#isDialogEnabled', () => {
       true,
       'selectedSection',
       false,
-      false
+      false,
     )
 
     expect(manager.isDialogEnabled()).toBe(false)
@@ -107,7 +107,7 @@ describe('SetDefaultGradeDialogManager#isDialogEnabled', () => {
       true,
       'selectedSection',
       false,
-      true
+      true,
     )
 
     expect(manager.isDialogEnabled()).toBe(false)
@@ -118,7 +118,7 @@ describe('SetDefaultGradeDialogManager#showDialog', () => {
   let flashErrorMock
   let loadSetDefaultGradeDialogMock
 
-  const setupDialogManager = (opts) => {
+  const setupDialogManager = opts => {
     const assignment = {
       ...createAssignmentProp(),
       inClosedGradingPeriod: opts.inClosedGradingPeriod,
@@ -131,7 +131,7 @@ describe('SetDefaultGradeDialogManager#showDialog', () => {
       true,
       'selectedSection',
       opts.isAdmin,
-      true
+      true,
     )
   }
 

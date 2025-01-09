@@ -40,7 +40,7 @@ function formatGrade(
   // @ts-expect-error
   scalingFactor,
   // @ts-expect-error
-  pendingGradeInfo
+  pendingGradeInfo,
 ) {
   if (pendingGradeInfo) {
     return GradeFormatHelper.formatGradeInfo(pendingGradeInfo, {defaultValue: ''})
@@ -84,7 +84,7 @@ export default class GradingSchemeInput extends Component {
       shape({
         text: string.isRequired,
         type: string.isRequired,
-      })
+      }),
     ).isRequired,
     onMenuDismiss: func,
     onMenuShow: func,
@@ -146,7 +146,7 @@ export default class GradingSchemeInput extends Component {
       gradingScheme,
       pointsBasedGradingScheme,
       scalingFactor,
-      pendingGradeInfo
+      pendingGradeInfo,
     )
 
     this.state = {
@@ -158,7 +158,7 @@ export default class GradingSchemeInput extends Component {
         gradingScheme,
         pointsBasedGradingScheme,
         scalingFactor,
-        pendingGradeInfo
+        pendingGradeInfo,
       ),
     }
   }
@@ -182,7 +182,7 @@ export default class GradingSchemeInput extends Component {
         gradingScheme,
         pointsBasedGradingScheme,
         scalingFactor,
-        pendingGradeInfo
+        pendingGradeInfo,
       )
 
       this.setState({
@@ -193,7 +193,7 @@ export default class GradingSchemeInput extends Component {
           gradingScheme,
           pointsBasedGradingScheme,
           scalingFactor,
-          pendingGradeInfo
+          pendingGradeInfo,
         ),
       })
     }
@@ -286,7 +286,7 @@ export default class GradingSchemeInput extends Component {
       assignment,
       gradingScheme,
       pointsBasedGradingScheme,
-      scalingFactor
+      scalingFactor,
     )
 
     // @ts-expect-error

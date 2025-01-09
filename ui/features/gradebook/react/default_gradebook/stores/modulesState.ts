@@ -32,7 +32,7 @@ export type ModulesState = {
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): ModulesState => ({
   modules: [],
 

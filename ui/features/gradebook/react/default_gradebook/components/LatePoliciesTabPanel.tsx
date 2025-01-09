@@ -82,7 +82,7 @@ function messages(names, validationErrors) {
   return errors.reduce(
     // @ts-expect-error
     (acc, error) => (error ? acc.concat([{text: error, type: 'error'}]) : acc),
-    []
+    [],
   )
 }
 
@@ -247,7 +247,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
 
       const changes = this.calculateChanges(
         {[name]: decimal},
-        {[nameDisplayValue]: inputDisplayValue}
+        {[nameDisplayValue]: inputDisplayValue},
       )
       this.props.changeLatePolicy({...this.props.latePolicy, changes})
     })
@@ -375,7 +375,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       }
                       value={this.currentInputDisplayValue(
                         'missingSubmissionDeduction',
-                        MAX_PERCENTAGE_INPUT
+                        MAX_PERCENTAGE_INPUT,
                       )}
                       onBlur={_event => this.handleBlur('missingSubmissionDeduction')}
                       onChange={(_event, val) =>
@@ -444,7 +444,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       }
                       value={this.currentInputDisplayValue(
                         'lateSubmissionDeduction',
-                        MIN_PERCENTAGE_INPUT
+                        MIN_PERCENTAGE_INPUT,
                       )}
                       onBlur={_event => this.handleBlur('lateSubmissionDeduction')}
                       onChange={(_event, val) => this.handleChange('lateSubmissionDeduction', val)}
@@ -491,7 +491,7 @@ class LatePoliciesTabPanel extends React.Component<Props, State> {
                       renderLabel={I18n.t('Lowest possible grade')}
                       value={this.currentInputDisplayValue(
                         'lateSubmissionMinimumPercent',
-                        MIN_PERCENTAGE_INPUT
+                        MIN_PERCENTAGE_INPUT,
                       )}
                       disabled={
                         !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||

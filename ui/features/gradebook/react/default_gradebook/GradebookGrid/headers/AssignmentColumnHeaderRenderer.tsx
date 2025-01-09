@@ -89,7 +89,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
   // all loaded students, regardless of any active filters.
   const studentsThatCanSeeAssignment = gradebook.studentsThatCanSeeAssignment(assignmentId)
   const allStudents: PartialStudent[] = Object.keys(studentsThatCanSeeAssignment).map(key =>
-    processStudent(studentsThatCanSeeAssignment[key])
+    processStudent(studentsThatCanSeeAssignment[key]),
   )
 
   // For the "Message Students Who" window, we only want to show students who
@@ -100,7 +100,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
   }
 
   const hasGradesOrPostableComments = allStudents.some(
-    student => isGraded(student.submission) || student.submission.hasPostableComments
+    student => isGraded(student.submission) || student.submission.hasPostableComments,
   )
 
   return {
@@ -137,7 +137,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       },
       selected: gradebook.getEnterGradesAsSetting(assignmentId),
       showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes(
-        'gradingScheme'
+        'gradingScheme',
       ),
     },
     getCurrentlyShownStudents,
@@ -230,7 +230,7 @@ export default class AssignmentColumnHeaderRenderer {
   // @ts-expect-error
   render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 

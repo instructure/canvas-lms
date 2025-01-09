@@ -55,7 +55,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
     if (value === AUTOMATIC_POST && this.props.anonymousAssignmentsPresent) {
       showFlashAlert({
         message: I18n.t(
-          'Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.'
+          'Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.',
         ),
         type: 'warning',
         err: null,
@@ -98,7 +98,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
           <View as="div">
             <Text size="small" as="p">
               {I18n.t(
-                'While the grades for an assignment are set to manual, students will not receive new notifications about or be able to see:'
+                'While the grades for an assignment are set to manual, students will not receive new notifications about or be able to see:',
               )}
             </Text>
 
@@ -112,7 +112,7 @@ export default class GradePostingPolicyTabPanel extends Component<Props> {
 
             <Text size="small" as="p">
               {I18n.t(
-                'Once a grade is posted manually, it will automatically send new notifications and be visible to students.'
+                'Once a grade is posted manually, it will automatically send new notifications and be visible to students.',
               )}
             </Text>
           </View>

@@ -101,9 +101,9 @@ describe('GradebookGrid AssignmentGradeInput', () => {
     test('renders a button trigger for the menu', () => {
       mountComponent()
       const button = wrapper.container.querySelectorAll(
-        '.Grid__GradeCell__CompleteIncompleteMenu button'
+        '.Grid__GradeCell__CompleteIncompleteMenu button',
       )
-      expect(button.length).toBe(1)
+      expect(button).toHaveLength(1)
     })
 
     test('sets the input value to "–" when the submission is not graded and not excused', () => {
@@ -148,7 +148,7 @@ describe('GradebookGrid AssignmentGradeInput', () => {
 
     test('renders a text input', () => {
       mountComponent()
-      expect(wrapper.container.querySelectorAll('input[type="text"]').length).toBe(1)
+      expect(wrapper.container.querySelectorAll('input[type="text"]')).toHaveLength(1)
     })
 
     test('optionally disables the input', () => {
@@ -202,7 +202,7 @@ describe('GradebookGrid AssignmentGradeInput', () => {
 
     test('renders a text input', () => {
       mountComponent()
-      expect(wrapper.container.querySelectorAll('input[type="text"]').length).toBe(1)
+      expect(wrapper.container.querySelectorAll('input[type="text"]')).toHaveLength(1)
     })
 
     test('optionally disables the input', () => {

@@ -47,7 +47,7 @@ function formatGrade(
   // @ts-expect-error
   enterGradesAs,
   // @ts-expect-error
-  scalingFactor
+  scalingFactor,
 ) {
   const formatOptions = {
     defaultValue: '–',
@@ -199,8 +199,8 @@ export default class ReadOnlyCell extends Component {
             gradingScheme,
             pointsBasedGradingScheme,
             enterGradesAs,
-            scalingFactor
-          )
+            scalingFactor,
+          ),
         )
       }
     }

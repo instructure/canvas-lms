@@ -87,9 +87,9 @@ jest.mock('../GradebookGrid', () => {
 // Mock Gradebook class
 jest.mock('../Gradebook', () => {
   const contextModules = {
-    2601: { id: '2601', position: 3, name: 'Final Module' },
-    2602: { id: '2602', position: 2, name: 'Second Module' },
-    2603: { id: '2603', position: 1, name: 'First Module' },
+    2601: {id: '2601', position: 3, name: 'Final Module'},
+    2602: {id: '2602', position: 2, name: 'Second Module'},
+    2603: {id: '2603', position: 1, name: 'First Module'},
   }
 
   const assignments = {
@@ -124,8 +124,8 @@ jest.mock('../Gradebook', () => {
   }
 
   const assignmentGroups = {
-    2201: { id: '2201', position: 2, name: 'Homework' },
-    2202: { id: '2202', position: 1, name: 'Quizzes' },
+    2201: {id: '2201', position: 2, name: 'Homework'},
+    2202: {id: '2202', position: 1, name: 'Quizzes'},
   }
 
   return {
@@ -143,7 +143,9 @@ jest.mock('../Gradebook', () => {
           assignments,
           assignmentGroups,
         },
-        getAssignment: jest.fn().mockImplementation(id => assignments[id.replace('assignment_', '')]),
+        getAssignment: jest
+          .fn()
+          .mockImplementation(id => assignments[id.replace('assignment_', '')]),
         getAssignmentGroup: jest.fn().mockImplementation(id => assignmentGroups[id]),
         getEnterGradesAsSetting: jest.fn(),
         getAssignmentGradingScheme: jest.fn(),
@@ -164,7 +166,7 @@ jest.mock('../Gradebook', () => {
         updateContextModules: jest.fn(),
         gotCustomColumns: jest.fn(),
         updateAssignmentGroups: jest.fn(),
-        arrangeColumnsBy: jest.fn().mockImplementation(function({sortType, direction}) {
+        arrangeColumnsBy: jest.fn().mockImplementation(function ({sortType, direction}) {
           const columns = instance.gradebookGrid.grid.getColumns()
           let sortedColumns
 
@@ -394,7 +396,7 @@ describe('Gradebook Grid Column Ordering', () => {
       const columns = gradebook.gradebookGrid.grid.getColumns()
       const filteredColumns = columns.filter(column => column.id !== 'assignment_2303')
       gradebook.gradebookGrid.grid.setColumns(filteredColumns)
-      
+
       arrangeColumnsBy('module_position', 'ascending')
       const expectedOrder = [
         'assignment_2304', // First Module

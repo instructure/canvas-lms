@@ -47,7 +47,7 @@ describe('GradebookGrid AssignmentGroupCellFormatter', () => {
       0, // cell
       grade, // value
       null, // column definition
-      null // dataContext
+      null, // dataContext
     )
     return container
   }

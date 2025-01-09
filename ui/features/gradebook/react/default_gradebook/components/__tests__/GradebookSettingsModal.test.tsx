@@ -120,7 +120,7 @@ describe('GradebookSettingsModal', () => {
     it('creates a late policy when "Apply Settings" is clicked and then closes the modal, if no late policy exists', async () => {
       const createPolicyStub = fetchMock.postOnce(latePolicyUrl, response)
       const {findByTestId, findByLabelText, getByTestId} = render(
-        <GradebookSettingsModal {...props} />
+        <GradebookSettingsModal {...props} />,
       )
 
       const updateButton = getByTestId('gradebook-settings-update-button')
@@ -147,7 +147,7 @@ describe('GradebookSettingsModal', () => {
             missing_submission_deduction_enabled: true,
             missing_submission_deduction: 75,
           },
-        })
+        }),
       )
 
       expect(props.onRequestClose).toHaveBeenCalled()
@@ -159,12 +159,12 @@ describe('GradebookSettingsModal', () => {
         {
           late_policy: {...DEFAULT_LATE_POLICY_DATA, id: '8', newRecord: false},
         },
-        {overwriteRoutes: true}
+        {overwriteRoutes: true},
       )
 
       const updatePolicyStub = fetchMock.patchOnce(latePolicyUrl, 204)
       const {findByTestId, findByLabelText, getByTestId} = render(
-        <GradebookSettingsModal {...props} />
+        <GradebookSettingsModal {...props} />,
       )
 
       const updateButton = getByTestId('gradebook-settings-update-button')
@@ -191,7 +191,7 @@ describe('GradebookSettingsModal', () => {
             missing_submission_deduction_enabled: true,
             missing_submission_deduction: 75,
           },
-        })
+        }),
       )
 
       expect(props.onRequestClose).toHaveBeenCalled()
@@ -218,7 +218,7 @@ describe('GradebookSettingsModal', () => {
               },
             },
           },
-          {name: 'setCoursePolicy'}
+          {name: 'setCoursePolicy'},
         )
         .post(
           (url, opts) => {
@@ -232,7 +232,7 @@ describe('GradebookSettingsModal', () => {
                 __typename: 'Course',
               },
             },
-          }
+          },
         )
 
       const {findByText, findByTestId, getByTestId} = render(<GradebookSettingsModal {...props} />)
@@ -307,12 +307,12 @@ describe('GradebookSettingsModal', () => {
 
       const updateSettingsStub = fetchMock.put(
         `/api/v1/courses/${props.courseId}/settings`,
-        settingsResponse
+        settingsResponse,
       )
 
       props.courseFeatures.finalGradeOverrideEnabled = true
       const {findByText, findByLabelText, getByTestId} = render(
-        <GradebookSettingsModal {...props} />
+        <GradebookSettingsModal {...props} />,
       )
 
       const tab = await findByText('Advanced')
@@ -338,7 +338,7 @@ describe('GradebookSettingsModal', () => {
   describe('"View Options" tab', () => {
     it('updates view options when "Apply Settings" is clicked and then closes the modal', async () => {
       const {findByText, findByLabelText, getByTestId} = render(
-        <GradebookSettingsModal {...props} />
+        <GradebookSettingsModal {...props} />,
       )
 
       const tab = await findByText('View Options')
@@ -355,7 +355,7 @@ describe('GradebookSettingsModal', () => {
 
       await user.click(updateButton)
       expect(props.onViewOptionsUpdated).toHaveBeenCalledWith(
-        expect.objectContaining({showNotes: true})
+        expect.objectContaining({showNotes: true}),
       )
 
       expect(props.onRequestClose).toHaveBeenCalled()

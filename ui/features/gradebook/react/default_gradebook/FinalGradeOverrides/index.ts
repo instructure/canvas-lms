@@ -99,7 +99,7 @@ export default class FinalGradeOverrides {
     } else {
       showFlashAlert({
         message: I18n.t(
-          'You have entered an invalid grade for this student. Check the value and the grading type and try again.'
+          'You have entered an invalid grade for this student. Check the value and the grading type and try again.',
         ),
         type: 'error',
         err: null,

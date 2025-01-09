@@ -450,7 +450,7 @@ export default class SubmissionTray extends React.Component<
       ? assignmentParam
       : `${assignmentParam}&${studentParam}`
     const speedGraderUrl = encodeURI(
-      `/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`
+      `/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`,
     )
 
     const submissionCommentsProps = {
@@ -486,7 +486,7 @@ export default class SubmissionTray extends React.Component<
       this.setState(prevState => {
         return {
           checkpointStates: prevState.checkpointStates.map(checkpoint =>
-            checkpoint.label === subAssignmentTag ? {...checkpoint, [field]: value} : checkpoint
+            checkpoint.label === subAssignmentTag ? {...checkpoint, [field]: value} : checkpoint,
           ),
         }
       })
@@ -534,12 +534,12 @@ export default class SubmissionTray extends React.Component<
     const checkLatePolicyStatus = (submission, gradeInfo) => {
       // @ts-expect-error
       const {status, secondsLate} = this.state.checkpointStates.find(
-        e => e.label === gradeInfo.subAssignmentTag
+        e => e.label === gradeInfo.subAssignmentTag,
       )
       // @ts-expect-error
       const subAssignmentFromProps = this.props.submission.subAssignmentSubmissions.find(
         // @ts-expect-error
-        e => e.sub_assignment_tag === gradeInfo.subAssignmentTag
+        e => e.sub_assignment_tag === gradeInfo.subAssignmentTag,
       )
       if (status !== subAssignmentFromProps.late_policy_status) {
         const data: PendingUpdateData = {
@@ -572,7 +572,7 @@ export default class SubmissionTray extends React.Component<
       // @ts-expect-error
       submission,
       // @ts-expect-error
-      header
+      header,
     ) => {
       return (
         <InputsForCheckpoints
@@ -607,7 +607,7 @@ export default class SubmissionTray extends React.Component<
 
       const subAssignmentSubmission = submission.subAssignmentSubmissions.find(
         // @ts-expect-error
-        sub => sub.sub_assignment_tag === subAssignmentTag
+        sub => sub.sub_assignment_tag === subAssignmentTag,
       )
 
       return {
@@ -627,12 +627,12 @@ export default class SubmissionTray extends React.Component<
     const replyToTopicSubmission = getSubAssignmentSubmission(
       hasCheckpoints,
       this.props.submission,
-      REPLY_TO_TOPIC
+      REPLY_TO_TOPIC,
     )
     const replyToEntrySubmission = getSubAssignmentSubmission(
       hasCheckpoints,
       this.props.submission,
-      REPLY_TO_ENTRY
+      REPLY_TO_ENTRY,
     )
 
     const onRequestClose = () => {
@@ -648,7 +648,7 @@ export default class SubmissionTray extends React.Component<
         assignmentEnhancementsEnabled: this.props.assignmentEnhancementsEnabled,
         stickersEnabled: this.props.stickersEnabled,
       },
-      this.props.assignment
+      this.props.assignment,
     )
 
     return (
@@ -745,14 +745,14 @@ export default class SubmissionTray extends React.Component<
                     this.props,
                     REPLY_TO_TOPIC,
                     replyToTopicSubmission,
-                    I18n.t('Reply to Topic')
+                    I18n.t('Reply to Topic'),
                   )}
                   {renderInputsForCheckpoints(
                     hasCheckpoints,
                     this.props,
                     REPLY_TO_ENTRY,
                     replyToEntrySubmission,
-                    I18n.t('Required Replies')
+                    I18n.t('Required Replies'),
                   )}
                 </View>
                 <Flex

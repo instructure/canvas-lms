@@ -98,7 +98,7 @@ describe('Gradebook > showAnonymousSpeedGraderAlertForURL', () => {
     expect(gradebook.renderAnonymousSpeedGraderAlert).toHaveBeenCalledWith(
       expect.objectContaining({
         speedGraderUrl: 'http://test.url:3000',
-      })
+      }),
     )
   })
 })

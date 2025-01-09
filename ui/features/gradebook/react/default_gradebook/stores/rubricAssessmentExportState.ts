@@ -34,13 +34,13 @@ export type RubricAssessmentExportState = {
   toggleRubricAssessmentExportModal: (
     isOpen?: boolean,
     studentsCount?: number,
-    assignment?: ExportAssignment
+    assignment?: ExportAssignment,
   ) => void
 }
 
 export default (
   set: StoreApi<GradebookStore>['setState'],
-  get: StoreApi<GradebookStore>['getState']
+  get: StoreApi<GradebookStore>['getState'],
 ): RubricAssessmentExportState => ({
   rubricAssessmentExportModalProps: {
     isOpen: false,
@@ -51,7 +51,7 @@ export default (
   toggleRubricAssessmentExportModal: (
     isOpen?: boolean,
     studentsCount?: number,
-    assignment?: ExportAssignment
+    assignment?: ExportAssignment,
   ): void => {
     const existingProps = get().rubricAssessmentExportModalProps
     set({

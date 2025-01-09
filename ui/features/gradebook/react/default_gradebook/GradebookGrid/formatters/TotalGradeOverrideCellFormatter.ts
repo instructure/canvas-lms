@@ -40,7 +40,7 @@ function render(formattedGrade, gradeInfo, studentId, selectedGradingPeriodId) {
   const customGradeStatusId = gradeOverrideCustomStatus(
     finalGradeOverrides,
     studentId,
-    selectedGradingPeriodId
+    selectedGradingPeriodId,
   )
   const colorClass = customGradeStatusId ? `custom-grade-status-${customGradeStatusId}` : ''
 

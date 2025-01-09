@@ -159,7 +159,9 @@ describe('listHiddenAssignments', () => {
 
   it('excludes "not_graded" assignments even when submission is postable', () => {
     const hiddenAssignments = gradebook.listHiddenAssignments('1101')
-    expect(hiddenAssignments.find(assignment => assignment.id === notGradedAssignment.id)).toBeFalsy()
+    expect(
+      hiddenAssignments.find(assignment => assignment.id === notGradedAssignment.id),
+    ).toBeFalsy()
   })
 
   it('ignores assignments excluded by the current set of filters', () => {

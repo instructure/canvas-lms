@@ -206,7 +206,7 @@ export default class GradeInput extends Component<Props, State> {
         if (hasGradeChanged(this.props, this.state)) {
           this.handleGradeChange()
         }
-      }
+      },
     )
   }
 

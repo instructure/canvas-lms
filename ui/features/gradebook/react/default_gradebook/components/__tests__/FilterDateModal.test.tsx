@@ -30,7 +30,7 @@ describe('FilterDateModal', () => {
         onCloseDateModal={() => {}}
         onSelectDates={() => {}}
         startDate={new Date().toISOString()}
-      />
+      />,
     )
     expect(getByText('Start & End Dates')).toBeInTheDocument()
     expect(getByLabelText('Start Date')).toBeInTheDocument()
@@ -47,7 +47,7 @@ describe('FilterDateModal', () => {
         onCloseDateModal={() => {}}
         onSelectDates={() => {}}
         startDate={startDate}
-      />
+      />,
     )
     const startDateInput = getByLabelText('Start Date') as HTMLInputElement
 

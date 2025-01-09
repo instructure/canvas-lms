@@ -28,7 +28,7 @@ import {
 } from '../GradebookSettingsModalApi'
 import type {LatePolicyCamelized} from '../../gradebook.d'
 
-const latePolicyData: LatePolicyCamelized & { id: string } = {
+const latePolicyData: LatePolicyCamelized & {id: string} = {
   id: '15',
   missingSubmissionDeductionEnabled: false,
   missingSubmissionDeduction: 76.0,

@@ -176,14 +176,14 @@ describe('SubmissionCommentUpdateForm', () => {
   test('"Submit" button label reads "Update Comment"', () => {
     wrapper = mountComponent()
     expect(screen.getByTestId('comment-submit-button').getAttribute('label')).toEqual(
-      'Update Comment'
+      'Update Comment',
     )
   })
 
   test('"Cancel" button label reads "Cancel Updating Comment"', () => {
     wrapper = mountComponent()
     expect(screen.getByTestId('comment-cancel-button').getAttribute('label')).toEqual(
-      'Cancel Updating Comment'
+      'Cancel Updating Comment',
     )
   })
 
@@ -195,7 +195,7 @@ describe('SubmissionCommentUpdateForm', () => {
 
   test('TextArea has a label', () => {
     wrapper = mountComponent()
-    const textarea = wrapper.getByRole('textbox', { name: 'Leave a comment' })
+    const textarea = wrapper.getByRole('textbox', {name: 'Leave a comment'})
     expect(textarea).toBeInTheDocument()
   })
 

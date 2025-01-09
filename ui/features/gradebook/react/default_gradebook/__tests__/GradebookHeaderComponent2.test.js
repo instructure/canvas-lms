@@ -83,7 +83,13 @@ describe('Gradebook React Header Component References', () => {
 
   describe('Custom Columns', () => {
     it('includes teacher notes in custom columns when provided', () => {
-      const teacherNotes = {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+      const teacherNotes = {
+        id: '2401',
+        title: 'Notes',
+        position: 1,
+        teacher_notes: true,
+        hidden: false,
+      }
       gradebook = createGradebook({teacher_notes: teacherNotes})
       expect(gradebook.gradebookContent.customColumns).toEqual([teacherNotes])
     })

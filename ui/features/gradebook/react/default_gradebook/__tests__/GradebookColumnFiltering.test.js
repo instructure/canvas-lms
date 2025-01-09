@@ -68,9 +68,9 @@ jest.mock('../GradebookGrid', () => {
 // Mock Gradebook class
 jest.mock('../Gradebook', () => {
   const contextModules = {
-    2601: { id: '2601', position: 3, name: 'Final Module' },
-    2602: { id: '2602', position: 2, name: 'Second Module' },
-    2603: { id: '2603', position: 1, name: 'First Module' },
+    2601: {id: '2601', position: 3, name: 'Final Module'},
+    2602: {id: '2602', position: 2, name: 'Second Module'},
+    2603: {id: '2603', position: 1, name: 'First Module'},
   }
 
   const assignments = {
@@ -113,8 +113,8 @@ jest.mock('../Gradebook', () => {
   }
 
   const assignmentGroups = {
-    2201: { id: '2201', position: 2, name: 'Homework' },
-    2202: { id: '2202', position: 1, name: 'Quizzes' },
+    2201: {id: '2201', position: 2, name: 'Homework'},
+    2202: {id: '2202', position: 1, name: 'Quizzes'},
   }
 
   return {
@@ -132,7 +132,9 @@ jest.mock('../Gradebook', () => {
           assignments,
           assignmentGroups,
         },
-        getAssignment: jest.fn().mockImplementation(id => assignments[id.replace('assignment_', '')]),
+        getAssignment: jest
+          .fn()
+          .mockImplementation(id => assignments[id.replace('assignment_', '')]),
         getAssignmentGroup: jest.fn().mockImplementation(id => assignmentGroups[id]),
         getEnterGradesAsSetting: jest.fn(),
         getAssignmentGradingScheme: jest.fn(),
@@ -153,17 +155,17 @@ jest.mock('../Gradebook', () => {
         updateContextModules: jest.fn(),
         gotCustomColumns: jest.fn(),
         updateAssignmentGroups: jest.fn(),
-        toggleUnpublishedAssignments: jest.fn().mockImplementation(function(show) {
+        toggleUnpublishedAssignments: jest.fn().mockImplementation(function (show) {
           const columns = instance.gradebookGrid.grid.getColumns()
-          const filteredColumns = show 
-            ? columns 
+          const filteredColumns = show
+            ? columns
             : columns.filter(column => {
                 const assignment = assignments[column.id.replace('assignment_', '')]
                 return assignment.published
               })
           instance.gradebookGrid.grid.setColumns(filteredColumns)
         }),
-        toggleOnlyAttendanceAssignments: jest.fn().mockImplementation(function(show) {
+        toggleOnlyAttendanceAssignments: jest.fn().mockImplementation(function (show) {
           const columns = instance.gradebookGrid.grid.getColumns()
           const filteredColumns = show
             ? columns.filter(column => {
@@ -176,7 +178,7 @@ jest.mock('../Gradebook', () => {
               })
           instance.gradebookGrid.grid.setColumns(filteredColumns)
         }),
-        updateCurrentAssignmentGroup: jest.fn().mockImplementation(function(groupIds) {
+        updateCurrentAssignmentGroup: jest.fn().mockImplementation(function (groupIds) {
           const columns = instance.gradebookGrid.grid.getColumns()
           const filteredColumns = groupIds
             ? columns.filter(column => {
@@ -186,7 +188,7 @@ jest.mock('../Gradebook', () => {
             : columns
           instance.gradebookGrid.grid.setColumns(filteredColumns)
         }),
-        updateCurrentModule: jest.fn().mockImplementation(function(moduleIds) {
+        updateCurrentModule: jest.fn().mockImplementation(function (moduleIds) {
           const columns = instance.gradebookGrid.grid.getColumns()
           const filteredColumns = moduleIds
             ? columns.filter(column => {
@@ -196,12 +198,14 @@ jest.mock('../Gradebook', () => {
             : columns
           instance.gradebookGrid.grid.setColumns(filteredColumns)
         }),
-        updateCurrentGradingPeriod: jest.fn().mockImplementation(function(gradingPeriodId) {
+        updateCurrentGradingPeriod: jest.fn().mockImplementation(function (gradingPeriodId) {
           const columns = instance.gradebookGrid.grid.getColumns()
           const filteredColumns = gradingPeriodId
             ? columns.filter(column => {
                 const assignmentId = column.id.replace('assignment_', '')
-                return instance.courseContent.gradingPeriodAssignments[gradingPeriodId].includes(assignmentId)
+                return instance.courseContent.gradingPeriodAssignments[gradingPeriodId].includes(
+                  assignmentId,
+                )
               })
             : columns
           instance.gradebookGrid.grid.setColumns(filteredColumns)

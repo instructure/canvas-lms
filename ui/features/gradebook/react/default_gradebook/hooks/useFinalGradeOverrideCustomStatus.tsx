@@ -48,7 +48,7 @@ export const useFinalGradeOverrideCustomStatus = () => {
   const saveFinalOverrideCustomStatus = async (
     customGradeStatusId: string | null,
     enrollmentId: string,
-    gradingPeriodId?: string | null
+    gradingPeriodId?: string | null,
   ) => {
     setSaveCallStatus(ApiCallStatus.PENDING)
     try {

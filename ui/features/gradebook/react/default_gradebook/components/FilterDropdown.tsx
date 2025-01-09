@@ -90,7 +90,7 @@ const FilterDropdown = ({
       }
       return acc
     },
-    []
+    [],
   )
 
   const isRoot = currentItemId === 'savedFilterPresets'
@@ -322,11 +322,11 @@ const FilterDropdown = ({
 
                   if (items[updated[0]].isSelected) {
                     changeAnnouncement(
-                      I18n.t('Removed %{filterName} Filter', {filterName: items[updated[0]].name})
+                      I18n.t('Removed %{filterName} Filter', {filterName: items[updated[0]].name}),
                     )
                   } else {
                     changeAnnouncement(
-                      I18n.t('Added %{filterName} Filter', {filterName: items[updated[0]].name})
+                      I18n.t('Added %{filterName} Filter', {filterName: items[updated[0]].name}),
                     )
                   }
                   items[updated[0]].onToggle?.()
@@ -346,11 +346,11 @@ const FilterDropdown = ({
 
                         if (item.isSelected) {
                           changeAnnouncement(
-                            I18n.t('Removed %{filterName} Filter', {filterName: item.name})
+                            I18n.t('Removed %{filterName} Filter', {filterName: item.name}),
                           )
                         } else {
                           changeAnnouncement(
-                            I18n.t('Added %{filterName} Filter', {filterName: item.name})
+                            I18n.t('Added %{filterName} Filter', {filterName: item.name}),
                           )
                         }
 

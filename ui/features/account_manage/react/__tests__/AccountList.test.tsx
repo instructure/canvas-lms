@@ -49,7 +49,7 @@ describe('AccountLists', () => {
     const {queryByText} = render(
       <MockedQueryProvider>
         <AccountList />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
     await waitFor(() => expect(queryByText('acc1')).toBeTruthy())
   })
@@ -60,12 +60,12 @@ describe('AccountLists', () => {
       '/api/v1/accounts?include=course_count,sub_account_count&per_page=50&page=1',
       () => {
         throw Object.assign(new Error('mocked error'), {code: 402})
-      }
+      },
     )
     const {queryByText} = render(
       <MockedQueryProvider>
         <AccountList />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
     await waitFor(() => expect(queryByText('Accounts could not be found')).toBeTruthy())
   })
@@ -80,7 +80,7 @@ describe('AccountLists', () => {
     const {queryByText} = render(
       <MockedQueryProvider>
         <AccountList />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
     await waitFor(() => expect(queryByText('acc1')).toBeTruthy())
   })

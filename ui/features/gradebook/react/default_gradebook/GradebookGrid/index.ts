@@ -71,7 +71,7 @@ export default class GradebookGrid {
     }
 
     const columns = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable].map(
-      columnId => this.gridData.columns.definitions[columnId]
+      columnId => this.gridData.columns.definitions[columnId],
     )
 
     this.grid = new slickgrid.Grid(this.options.$container, this.gridData.rows, columns, options)

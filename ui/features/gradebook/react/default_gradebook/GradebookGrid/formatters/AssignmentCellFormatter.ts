@@ -55,7 +55,7 @@ type Getters = {
   }): ReturnType<Gradebook['getPendingGradeInfo']>
   getStudent(studentId: string): ReturnType<Gradebook['student']>
   getSubmissionState(
-    submission: Submission
+    submission: Submission,
   ): ReturnType<Gradebook['submissionStateMap']['getSubmissionState']>
   showUpdatedSimilarityScore(): boolean
 }
@@ -203,7 +203,7 @@ export default class AssignmentCellFormatter {
     columnDef: {
       postAssignmentGradesTrayOpenForAssignmentId?: string
     },
-    student: Student
+    student: Student,
   ) => {
     let submissionState
     if (submission) {

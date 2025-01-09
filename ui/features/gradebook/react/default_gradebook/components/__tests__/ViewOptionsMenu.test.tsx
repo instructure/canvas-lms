@@ -319,7 +319,7 @@ describe('ViewOptionsMenu', () => {
       criterion = 'due_date',
       direction = 'ascending',
       disabled = false,
-      modulesEnabled = true
+      modulesEnabled = true,
     ) {
       return {
         ...defaultProps(),
@@ -375,7 +375,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Due Date - Oldest to Newest'
+        'Due Date - Oldest to Newest',
       )
       expect(menuItem.getAttribute('aria-checked')).toEqual('true')
     })
@@ -386,7 +386,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Due Date - Newest to Oldest'
+        'Due Date - Newest to Oldest',
       )
       expect(menuItem.getAttribute('aria-checked')).toEqual('true')
     })
@@ -397,7 +397,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Points - Lowest to Highest'
+        'Points - Lowest to Highest',
       )
       expect(menuItem.getAttribute('aria-checked')).toEqual('true')
     })
@@ -408,7 +408,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Points - Highest to Lowest'
+        'Points - Highest to Lowest',
       )
       expect(menuItem.getAttribute('aria-checked')).toEqual('true')
     })
@@ -431,7 +431,7 @@ describe('ViewOptionsMenu', () => {
       props = sortingProps('default', 'ascending', false, false)
       wrapper = mountAndOpenOptions()
       expect(getMenuItem(ref.current.menuContent, 'Arrange By', 'Module - First to Last')).toBe(
-        undefined
+        undefined,
       )
     })
 
@@ -439,7 +439,7 @@ describe('ViewOptionsMenu', () => {
       props = sortingProps('default', 'ascending', false, false)
       wrapper = mountAndOpenOptions()
       expect(getMenuItem(ref.current.menuContent, 'Arrange By', 'Module - Last to First')).toBe(
-        undefined
+        undefined,
       )
     })
 
@@ -474,7 +474,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Due Date - Oldest to Newest'
+        'Due Date - Oldest to Newest',
       )
       expect(menuItem.getAttribute('aria-disabled')).toEqual('true')
     })
@@ -486,7 +486,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Due Date - Newest to Oldest'
+        'Due Date - Newest to Oldest',
       )
       expect(menuItem.getAttribute('aria-disabled')).toEqual('true')
     })
@@ -498,7 +498,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Points - Lowest to Highest'
+        'Points - Lowest to Highest',
       )
       expect(menuItem.getAttribute('aria-disabled')).toEqual('true')
     })
@@ -510,7 +510,7 @@ describe('ViewOptionsMenu', () => {
       const menuItem = getMenuItem(
         ref.current.menuContent,
         'Arrange By',
-        'Points - Highest to Lowest'
+        'Points - Highest to Lowest',
       )
       expect(menuItem.getAttribute('aria-disabled')).toEqual('true')
     })
@@ -556,7 +556,7 @@ describe('ViewOptionsMenu', () => {
       props = sortingProps()
       wrapper = mountAndOpenOptions()
       fireEvent.click(
-        getMenuItem(ref.current.menuContent, 'Arrange By', 'Due Date - Oldest to Newest')
+        getMenuItem(ref.current.menuContent, 'Arrange By', 'Due Date - Oldest to Newest'),
       )
       expect(props.columnSortSettings.onSortByDueDateAscending).toHaveBeenCalledTimes(1)
     })
@@ -565,7 +565,7 @@ describe('ViewOptionsMenu', () => {
       props = sortingProps()
       wrapper = mountAndOpenOptions()
       fireEvent.click(
-        getMenuItem(ref.current.menuContent, 'Arrange By', 'Due Date - Newest to Oldest')
+        getMenuItem(ref.current.menuContent, 'Arrange By', 'Due Date - Newest to Oldest'),
       )
       expect(props.columnSortSettings.onSortByDueDateDescending).toHaveBeenCalledTimes(1)
     })
@@ -574,7 +574,7 @@ describe('ViewOptionsMenu', () => {
       props = sortingProps()
       wrapper = mountAndOpenOptions()
       fireEvent.click(
-        getMenuItem(ref.current.menuContent, 'Arrange By', 'Points - Lowest to Highest')
+        getMenuItem(ref.current.menuContent, 'Arrange By', 'Points - Lowest to Highest'),
       )
       expect(props.columnSortSettings.onSortByPointsAscending).toHaveBeenCalledTimes(1)
     })
@@ -583,7 +583,7 @@ describe('ViewOptionsMenu', () => {
       props = sortingProps()
       wrapper = mountAndOpenOptions()
       fireEvent.click(
-        getMenuItem(ref.current.menuContent, 'Arrange By', 'Points - Highest to Lowest')
+        getMenuItem(ref.current.menuContent, 'Arrange By', 'Points - Highest to Lowest'),
       )
       expect(props.columnSortSettings.onSortByPointsDescending).toHaveBeenCalledTimes(1)
     })

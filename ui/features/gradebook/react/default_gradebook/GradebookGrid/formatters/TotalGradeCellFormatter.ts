@@ -43,7 +43,7 @@ function buildHiddenAssignmentsWarning() {
   return {
     icon: 'icon-off',
     warningText: I18n.t(
-      "This grade may differ from the student's view of the grade because some assignment grades are not yet posted"
+      "This grade may differ from the student's view of the grade because some assignment grades are not yet posted",
     ),
   }
 }
@@ -58,7 +58,7 @@ function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups: {name: str
     {
       count: names.length,
       groups: listFormatter.format(names),
-    }
+    },
   )
 
   return {
@@ -180,7 +180,7 @@ export default class TotalGradeCellFormatter {
     const scheme = this.options.getGradingStandard()
     if (grade.possible && scheme) {
       letterGrade = GradeFormatHelper.replaceDashWithMinus(
-        scoreToGrade(percentage, scheme.data, scheme.pointsBased, scheme.scalingFactor)
+        scoreToGrade(percentage, scheme.data, scheme.pointsBased, scheme.scalingFactor),
       )
     }
 
@@ -202,7 +202,7 @@ export default class TotalGradeCellFormatter {
 
         const scaledPercentage = getGradePercentage(scaledScore, scaledPossible)
         letterGrade = GradeFormatHelper.replaceDashWithMinus(
-          scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased, scheme.scalingFactor)
+          scoreToGrade(scaledPercentage, scheme.data, scheme.pointsBased, scheme.scalingFactor),
         )
       }
     }

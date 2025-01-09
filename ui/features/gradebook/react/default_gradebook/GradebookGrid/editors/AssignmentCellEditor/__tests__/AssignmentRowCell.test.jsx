@@ -92,13 +92,13 @@ describe('GradebookGrid AssignmentRowCell', () => {
 
       test('renders a AssignmentGradeInput', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__PointsInput').length).toBe(1)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__PointsInput')).toHaveLength(1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__PointsInput input:focus')
+          wrapper.container.querySelector('.Grid__GradeCell__PointsInput input:focus'),
         ).toBeInTheDocument()
       })
 
@@ -106,13 +106,13 @@ describe('GradebookGrid AssignmentRowCell', () => {
         props.submissionIsUpdating = true
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__PointsInput input').disabled
+          wrapper.container.querySelector('.Grid__GradeCell__PointsInput input').disabled,
         ).toBe(true)
       })
 
       test('renders end text', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__EndText').length).toBe(1)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__EndText')).toHaveLength(1)
       })
 
       test('renders points possible in the end text', () => {
@@ -129,25 +129,25 @@ describe('GradebookGrid AssignmentRowCell', () => {
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(1)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
 
       test('does not render a SimilarityIndicator when no similarity data is present', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(0)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(0)
       })
 
       test('does not render a SimilarityIndicator when data is present but the pending grade is invalid', () => {
@@ -155,22 +155,22 @@ describe('GradebookGrid AssignmentRowCell', () => {
         props.submission.similarityInfo = {status: 'pending'}
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(0)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(0)
       })
 
       test('renders a SimilarityIndicator when similarity data is present and the pending grade is not invalid', () => {
         props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(1)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(1)
       })
 
       test('renders the GradeCell div with the "points" class', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('points')
+          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('points'),
         ).toBe(true)
       })
     })
@@ -182,13 +182,13 @@ describe('GradebookGrid AssignmentRowCell', () => {
 
       test('renders a AssignmentGradeInput', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__PercentInput').length).toBe(1)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__PercentInput')).toHaveLength(1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__PercentInput input:focus')
+          wrapper.container.querySelector('.Grid__GradeCell__PercentInput input:focus'),
         ).toBeInTheDocument()
       })
 
@@ -196,32 +196,32 @@ describe('GradebookGrid AssignmentRowCell', () => {
         props.submissionIsUpdating = true
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__PercentInput input').disabled
+          wrapper.container.querySelector('.Grid__GradeCell__PercentInput input').disabled,
         ).toBe(true)
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(1)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
 
       test('does not render a SimilarityIndicator when no similarity data is present', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(0)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(0)
       })
 
       test('does not render a SimilarityIndicator when data is present but the pending grade is invalid', () => {
@@ -229,22 +229,22 @@ describe('GradebookGrid AssignmentRowCell', () => {
         props.submission.similarityInfo = {status: 'pending'}
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(0)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(0)
       })
 
       test('renders a SimilarityIndicator when similarity data is present and the pending grade is not invalid', () => {
         props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(1)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(1)
       })
 
       test('renders the GradeCell div with the "percent" class', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('percent')
+          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('percent'),
         ).toBe(true)
       })
     })
@@ -257,14 +257,14 @@ describe('GradebookGrid AssignmentRowCell', () => {
       test('renders a AssignmentGradeInput', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__GradingSchemeInput').length
-        ).toBe(1)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__GradingSchemeInput'),
+        ).toHaveLength(1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__GradingSchemeInput input:focus')
+          wrapper.container.querySelector('.Grid__GradeCell__GradingSchemeInput input:focus'),
         ).toBeInTheDocument()
       })
 
@@ -272,37 +272,37 @@ describe('GradebookGrid AssignmentRowCell', () => {
         props.submissionIsUpdating = true
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__GradingSchemeInput input').disabled
+          wrapper.container.querySelector('.Grid__GradeCell__GradingSchemeInput input').disabled,
         ).toBe(true)
       })
 
       test('does not render end text', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__EndText').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__EndText')).toHaveLength(0)
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(1)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__InvalidGrade')).toHaveLength(0)
       })
 
       test('does not render a SimilarityIndicator when no similarity data is present', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(0)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(0)
       })
 
       test('does not render a SimilarityIndicator when data is present but the pending grade is invalid', () => {
@@ -310,22 +310,22 @@ describe('GradebookGrid AssignmentRowCell', () => {
         props.submission.similarityInfo = {status: 'pending'}
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(0)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(0)
       })
 
       test('renders a SimilarityIndicator when similarity data is present and the pending grade is not invalid', () => {
         props.submission.similarityInfo = {similarityScore: 60, status: 'scored'}
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore').length
-        ).toBe(1)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__OriginalityScore'),
+        ).toHaveLength(1)
       })
 
       test('renders the GradeCell div with the "gradingScheme" class', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('gradingScheme')
+          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('gradingScheme'),
         ).toBe(true)
       })
     })
@@ -338,26 +338,26 @@ describe('GradebookGrid AssignmentRowCell', () => {
       test('renders a AssignmentGradeInput', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelectorAll('.Grid__GradeCell__CompleteIncompleteInput').length
-        ).toBe(1)
+          wrapper.container.querySelectorAll('.Grid__GradeCell__CompleteIncompleteInput'),
+        ).toHaveLength(1)
       })
 
       test('sets focus on the button', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteInput button:focus')
+          wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteInput button:focus'),
         ).toBeInTheDocument()
       })
 
       test('does not render end text', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__EndText').length).toBe(0)
+        expect(wrapper.container.querySelectorAll('.Grid__GradeCell__EndText')).toHaveLength(0)
       })
 
       test('renders the GradeCell div with the "passFail" class', () => {
         wrapper = render(<AssignmentRowCell {...props} />)
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('passFail')
+          wrapper.container.querySelector('.Grid__GradeCell').classList.contains('passFail'),
         ).toBe(true)
       })
     })
@@ -485,7 +485,7 @@ describe('GradebookGrid AssignmentRowCell', () => {
         wrapper = render(<AssignmentRowCell {...props} ref={ref} />)
         ref.current.focus()
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__PointsInput input:focus')
+          wrapper.container.querySelector('.Grid__GradeCell__PointsInput input:focus'),
         ).toBeInTheDocument()
       })
 
@@ -495,7 +495,7 @@ describe('GradebookGrid AssignmentRowCell', () => {
         wrapper = render(<AssignmentRowCell {...props} ref={ref} />)
         ref.current.focus()
         expect(
-          wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteInput button:focus')
+          wrapper.container.querySelector('.Grid__GradeCell__CompleteIncompleteInput button:focus'),
         ).toBeInTheDocument()
       })
     })
@@ -530,13 +530,13 @@ describe('GradebookGrid AssignmentRowCell', () => {
       test('is rendered when the assignment grading type is "points"', () => {
         props.assignment.gradingType = 'points'
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll(buttonSelector).length).toBe(1)
+        expect(wrapper.container.querySelectorAll(buttonSelector)).toHaveLength(1)
       })
 
       test('is rendered when the "enter grades as" setting is "passFail"', () => {
         props.enterGradesAs = 'passFail'
         wrapper = render(<AssignmentRowCell {...props} />)
-        expect(wrapper.container.querySelectorAll(buttonSelector).length).toBe(1)
+        expect(wrapper.container.querySelectorAll(buttonSelector)).toHaveLength(1)
       })
 
       test('calls onToggleSubmissionTrayOpen when clicked', () => {

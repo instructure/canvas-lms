@@ -281,7 +281,7 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
     test('.submissionIsUpdating is true when a valid pending grade exists', () => {
       gradebook.addPendingGradeInfo(
         {assignmentId: '2301', userId: '1101'},
-        {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
+        {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true},
       )
       expect(getProps().submissionIsUpdating).toBe(true)
     })
@@ -289,7 +289,7 @@ describe('GradebookGrid AssignmentRowCellPropFactory', () => {
     test('.submissionIsUpdating is false when an invalid pending grade exists', () => {
       gradebook.addPendingGradeInfo(
         {assignmentId: '2301', userId: '1101'},
-        {enteredAs: null, excused: false, grade: null, score: null, valid: false}
+        {enteredAs: null, excused: false, grade: null, score: null, valid: false},
       )
       expect(getProps().submissionIsUpdating).toBe(false)
     })

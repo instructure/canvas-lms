@@ -308,28 +308,28 @@ describe('wrapColumnSortFn', () => {
   it('returns 1 if first argument is of type total_grade_override', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
     expect(
-      sortFn({id: '1', type: 'total_grade_override'} as GridColumn, {id: '2'} as GridColumn)
+      sortFn({id: '1', type: 'total_grade_override'} as GridColumn, {id: '2'} as GridColumn),
     ).toBe(1)
   })
 
   it('returns -1 if second argument is of type total_grade_override', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
     expect(
-      sortFn({id: '1'} as GridColumn, {id: '2', type: 'total_grade_override'} as GridColumn)
+      sortFn({id: '1'} as GridColumn, {id: '2', type: 'total_grade_override'} as GridColumn),
     ).toBe(-1)
   })
 
   it('returns -1 if second argument is an assignment_group and the first is not', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
     expect(sortFn({id: '1'} as GridColumn, {id: '2', type: 'assignment_group'} as GridColumn)).toBe(
-      -1
+      -1,
     )
   })
 
   it('returns 1 if first arg is an assignment_group and second arg is not', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
     expect(sortFn({id: '1', type: 'assignment_group'} as GridColumn, {id: '2'} as GridColumn)).toBe(
-      1
+      1,
     )
   })
 

@@ -107,7 +107,7 @@ export default function ({
       items = [blankItem].concat(
         sections
           .sort((s1, s2) => natcompare.strings(s1.name, s2.name))
-          .map(({id, name}) => [id, name])
+          .map(({id, name}) => [id, name]),
       )
       break
     }
@@ -115,7 +115,7 @@ export default function ({
       items = [blankItem]
       itemGroups = Object.values(studentGroupCategories)
         .sort((c1: StudentGroupCategory, c2: StudentGroupCategory) =>
-          natcompare.strings(c1.name, c2.name)
+          natcompare.strings(c1.name, c2.name),
         )
         .map((c: StudentGroupCategory) => [
           c.id,

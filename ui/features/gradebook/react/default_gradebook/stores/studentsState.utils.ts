@@ -42,7 +42,6 @@ export function flashSubmissionLoadError(): void {
 
 // @ts-expect-error
 export function reportCatch(error) {
-   
   console.warn(error)
 }
 
@@ -84,7 +83,7 @@ export const submissionsParams = {
 export function getStudentsChunk(
   courseId: string,
   studentIds: string[],
-  dispatch: RequestDispatch
+  dispatch: RequestDispatch,
 ) {
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
@@ -102,7 +101,7 @@ export function getSubmissionsForStudents(
   studentIds: string[],
   // @ts-expect-error
   allEnqueued,
-  dispatch: RequestDispatch
+  dispatch: RequestDispatch,
 ) {
   return new Promise((resolve, reject) => {
     const url = `/api/v1/courses/${courseId}/students/submissions`
@@ -125,7 +124,7 @@ export function getContentForStudentIdChunk(
   submissionsChunkSize: number,
   submissionsPerPage: number,
   gotChunkOfStudents: (students: Student[]) => void,
-  gotSubmissionsChunk: (student_submission_groups: UserSubmissionGroup[]) => void
+  gotSubmissionsChunk: (student_submission_groups: UserSubmissionGroup[]) => void,
 ) {
   // @ts-expect-error
   let resolveEnqueued
@@ -148,7 +147,7 @@ export function getContentForStudentIdChunk(
       submissionRequestChunkIds,
       // @ts-expect-error
       resolveEnqueued,
-      dispatch
+      dispatch,
     )
       .then(subs => (submissions = subs))
       // within the main Gradebook object, students must be received before

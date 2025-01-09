@@ -49,7 +49,7 @@ describe('TotalGradeOverrideTray Tests', () => {
     return render(
       <MockedProvider>
         <TotalGradeOverrideTray {...trayProps} />
-      </MockedProvider>
+      </MockedProvider>,
     )
   }
 
@@ -261,7 +261,7 @@ describe('TotalGradeOverrideTray Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
       expect(
-        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
+        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId,
       ).toEqual('1')
     })
 
@@ -286,7 +286,7 @@ describe('TotalGradeOverrideTray Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
       expect(
-        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
+        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId,
       ).toEqual('1')
     })
 
@@ -318,7 +318,7 @@ describe('TotalGradeOverrideTray Tests', () => {
       await new Promise(resolve => setTimeout(resolve, 0))
       const updatedFinalGradeOverrides = useStore.getState().finalGradeOverrides
       expect(
-        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId
+        updatedFinalGradeOverrides['1'].gradingPeriodGrades?.['2']?.customGradeStatusId,
       ).toEqual('1')
     })
 

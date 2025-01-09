@@ -54,7 +54,7 @@ export default class PostGradesFrameDialog {
     this.$dialog = $(
       postGradesFrameDialog({
         allowances: iframeAllowances(),
-      })
+      }),
     )
 
     this.$iframe = this.$dialog.find('.post-grades-frame')

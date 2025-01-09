@@ -81,7 +81,7 @@ describe('AssignmentGroupFilter', () => {
       await user.click(screen.getByRole('combobox', {name: 'Assignment Group Filter'}))
       expect(screen.getByRole('option', {name: 'Homework'})).toHaveAttribute(
         'aria-disabled',
-        'true'
+        'true',
       )
     })
   })

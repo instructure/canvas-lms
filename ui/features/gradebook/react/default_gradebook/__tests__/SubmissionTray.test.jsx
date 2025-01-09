@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { screen, waitFor } from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import '@testing-library/jest-dom'
 import $ from 'jquery'
-import { createGradebook } from './GradebookSpecHelper'
+import {createGradebook} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
 import ReactDOM from 'react-dom'
 import moxios from 'moxios'
@@ -58,7 +58,7 @@ describe('Gradebook#renderSubmissionTray', () => {
     gradebook.gradebookGrid = {
       gridSupport: {
         state: {
-          getActiveLocation: () => ({ cell: 'grade_1101_2301' }),
+          getActiveLocation: () => ({cell: 'grade_1101_2301'}),
         },
         helper: {
           commitCurrentEdit: jest.fn(),
@@ -75,7 +75,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         },
       },
       grid: {
-        getActiveCell: () => ({ row: 0 }),
+        getActiveCell: () => ({row: 0}),
       },
     }
 
@@ -97,22 +97,20 @@ describe('Gradebook#renderSubmissionTray', () => {
         post_manually: false,
       },
     })
-    gradebook.setAssignmentGroups({ 9000: { group_weight: 100 } })
+    gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     gradebook.options.course_settings = {
       filter_speed_grader_by_student_group: true,
     }
 
     gradebook.gridData = {
-      rows: [{ id: '1101' }],
+      rows: [{id: '1101'}],
     }
 
     gradebook.students = {
       1101: {
         id: '1101',
         name: 'Test Student',
-        enrollments: [
-          { type: 'StudentEnrollment', grades: { html_url: 'http://gradesUrl/' } },
-        ],
+        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://gradesUrl/'}}],
         assignment_2301: {
           assignment_id: '2301',
           id: '2301',
@@ -132,7 +130,7 @@ describe('Gradebook#renderSubmissionTray', () => {
     const submission = gradebook.getSubmission('1101', '2301')
     jest
       .spyOn(gradebook, 'updateSubmissionAndRenderSubmissionTray')
-      .mockResolvedValue({ data: { all_submissions: [submission] } })
+      .mockResolvedValue({data: {all_submissions: [submission]}})
 
     jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
     jest.spyOn(gradebook, 'updateRowAndRenderSubmissionTray').mockImplementation(() => {})
@@ -154,7 +152,7 @@ describe('Gradebook#renderSubmissionTray', () => {
 
     it('on success the correct updated submission data is returned', async () => {
       const submission = gradebook.getSubmission('1101', '2301')
-      const updateResult = await gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      const updateResult = await gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       expect(updateResult.data.all_submissions).toEqual([submission])
     })
 
@@ -182,14 +180,14 @@ describe('Gradebook#renderSubmissionTray', () => {
   describe('Gradebook#getSubmissionTrayProps - Grading Period States', () => {
     describe('isInOtherGradingPeriod', () => {
       it('isInOtherGradingPeriod is true when the SubmissionStateMap returns true', () => {
-        submissionStateMapStub.mockReturnValue({ inOtherGradingPeriod: true })
+        submissionStateMapStub.mockReturnValue({inOtherGradingPeriod: true})
         gradebook.setSubmissionTrayState(true, '1101', '2301')
         const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
         expect(props.isInOtherGradingPeriod).toBe(true)
       })
 
       it('isInOtherGradingPeriod is false when the SubmissionStateMap returns false', () => {
-        submissionStateMapStub.mockReturnValue({ inOtherGradingPeriod: false })
+        submissionStateMapStub.mockReturnValue({inOtherGradingPeriod: false})
         gradebook.setSubmissionTrayState(true, '1101', '2301')
         const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
         expect(props.isInOtherGradingPeriod).toBe(false)
@@ -205,14 +203,14 @@ describe('Gradebook#renderSubmissionTray', () => {
 
     describe('isInClosedGradingPeriod', () => {
       it('isInClosedGradingPeriod is true when the SubmissionStateMap returns true', () => {
-        submissionStateMapStub.mockReturnValue({ inClosedGradingPeriod: true })
+        submissionStateMapStub.mockReturnValue({inClosedGradingPeriod: true})
         gradebook.setSubmissionTrayState(true, '1101', '2301')
         const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
         expect(props.isInClosedGradingPeriod).toBe(true)
       })
 
       it('isInClosedGradingPeriod is false when the SubmissionStateMap returns false', () => {
-        submissionStateMapStub.mockReturnValue({ inClosedGradingPeriod: false })
+        submissionStateMapStub.mockReturnValue({inClosedGradingPeriod: false})
         gradebook.setSubmissionTrayState(true, '1101', '2301')
         const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
         expect(props.isInClosedGradingPeriod).toBe(false)
@@ -228,14 +226,14 @@ describe('Gradebook#renderSubmissionTray', () => {
 
     describe('isInNoGradingPeriod', () => {
       it('isInNoGradingPeriod is true when the SubmissionStateMap returns true', () => {
-        submissionStateMapStub.mockReturnValue({ inNoGradingPeriod: true })
+        submissionStateMapStub.mockReturnValue({inNoGradingPeriod: true})
         gradebook.setSubmissionTrayState(true, '1101', '2301')
         const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
         expect(props.isInNoGradingPeriod).toBe(true)
       })
 
       it('isInNoGradingPeriod is false when the SubmissionStateMap returns false', () => {
-        submissionStateMapStub.mockReturnValue({ inNoGradingPeriod: false })
+        submissionStateMapStub.mockReturnValue({inNoGradingPeriod: false})
         gradebook.setSubmissionTrayState(true, '1101', '2301')
         const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
         expect(props.isInNoGradingPeriod).toBe(false)
@@ -327,7 +325,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         score: null,
         valid: true,
       }
-      const submission = { assignmentId: '2301', userId: '1101' }
+      const submission = {assignmentId: '2301', userId: '1101'}
 
       gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
       gradebook.setSubmissionTrayState(true, '1101', '2301')
@@ -348,7 +346,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         score: null,
         valid: true,
       }
-      const submission = { assignmentId: '2302', userId: '1101' }
+      const submission = {assignmentId: '2302', userId: '1101'}
 
       gradebook.addPendingGradeInfo(submission, pendingGradeInfo)
       gradebook.setSubmissionTrayState(true, '1101', '2301')
@@ -360,14 +358,14 @@ describe('Gradebook#renderSubmissionTray', () => {
 
   describe('Gradebook#getSubmissionTrayProps - gradingDisabled', () => {
     it('gradingDisabled is true when the submission state is locked', () => {
-      submissionStateMapStub.mockReturnValue({ locked: true })
+      submissionStateMapStub.mockReturnValue({locked: true})
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
       expect(props.gradingDisabled).toBe(true)
     })
 
     it('gradingDisabled is false when the submission state is not locked', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
       expect(props.gradingDisabled).toBe(false)
@@ -382,7 +380,7 @@ describe('Gradebook#renderSubmissionTray', () => {
     })
 
     it('gradingDisabled is true when the student enrollment is concluded', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       gradebook.student('1101').isConcluded = true
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
@@ -390,7 +388,7 @@ describe('Gradebook#renderSubmissionTray', () => {
     })
 
     it('gradingDisabled is false when the student enrollment is not concluded', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       gradebook.student('1101').isConcluded = false
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
@@ -400,7 +398,7 @@ describe('Gradebook#renderSubmissionTray', () => {
 
   describe('Gradebook#getSubmissionTrayProps - onGradeSubmission', () => {
     it('onGradeSubmission is the Gradebook "gradeSubmission" method', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
       expect(props.onGradeSubmission).toBe(gradebook.gradeSubmission)
@@ -409,14 +407,14 @@ describe('Gradebook#renderSubmissionTray', () => {
 
   describe('Gradebook#getSubmissionTrayProps - student properties', () => {
     it('student has valid gradesUrl', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
       expect(props.student.gradesUrl).toBe('http://gradesUrl/#tab-assignments')
     })
 
     it('student has html decoded name', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       gradebook.students[1101].name = 'Test&#x27; Student'
       gradebook.setSubmissionTrayState(true, '1101', '2301')
       const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
@@ -424,7 +422,7 @@ describe('Gradebook#renderSubmissionTray', () => {
     })
 
     it('student has isConcluded property', () => {
-      submissionStateMapStub.mockReturnValue({ locked: false })
+      submissionStateMapStub.mockReturnValue({locked: false})
       const student = gradebook.student('1101')
       student.isConcluded = true
       gradebook.setSubmissionTrayState(true, '1101', '2301')
@@ -438,16 +436,16 @@ describe('Gradebook#renderSubmissionTray', () => {
       const studentGroups = [
         {
           groups: [
-            { id: '1', name: 'First Group Set 1' },
-            { id: '2', name: 'First Group Set 2' },
+            {id: '1', name: 'First Group Set 1'},
+            {id: '2', name: 'First Group Set 2'},
           ],
           id: '1',
           name: 'First Group Set',
         },
         {
           groups: [
-            { id: '3', name: 'Second Group Set 1' },
-            { id: '4', name: 'Second Group Set 2' },
+            {id: '3', name: 'Second Group Set 1'},
+            {id: '4', name: 'Second Group Set 2'},
           ],
           id: '2',
           name: 'Second Group Set',
@@ -616,7 +614,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       const openStateBefore = gradebook.getSubmissionTrayState().open
       gradebook.toggleSubmissionTrayOpen('1', '2')
       const openStateAfter = gradebook.getSubmissionTrayState().open
-      expect({ before: openStateBefore, after: openStateAfter }).toEqual({
+      expect({before: openStateBefore, after: openStateAfter}).toEqual({
         before: false,
         after: true,
       })
@@ -627,7 +625,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       const openStateBefore = gradebook.getSubmissionTrayState().open
       gradebook.toggleSubmissionTrayOpen('1', '2')
       const openStateAfter = gradebook.getSubmissionTrayState().open
-      expect({ before: openStateBefore, after: openStateAfter }).toEqual({
+      expect({before: openStateBefore, after: openStateAfter}).toEqual({
         before: true,
         after: false,
       })
@@ -635,8 +633,8 @@ describe('Gradebook#renderSubmissionTray', () => {
 
     it('sets the studentId and assignmentId state for the tray', () => {
       gradebook.toggleSubmissionTrayOpen('1', '2')
-      const { studentId, assignmentId } = gradebook.getSubmissionTrayState()
-      expect({ studentId, assignmentId }).toEqual({ studentId: '1', assignmentId: '2' })
+      const {studentId, assignmentId} = gradebook.getSubmissionTrayState()
+      expect({studentId, assignmentId}).toEqual({studentId: '1', assignmentId: '2'})
     })
   })
 
@@ -651,7 +649,7 @@ describe('Gradebook#renderSubmissionTray', () => {
           commitCurrentEdit: jest.fn(),
         },
       }
-      gradebook.students = { 1101: { id: '1101' } }
+      gradebook.students = {1101: {id: '1101'}}
 
       promise = {
         then(thenFn) {
@@ -664,7 +662,7 @@ describe('Gradebook#renderSubmissionTray', () => {
         },
       }
 
-      submission = { assignmentId: '2301', latePolicyStatus: 'none', userId: '1101' }
+      submission = {assignmentId: '2301', latePolicyStatus: 'none', userId: '1101'}
       gradebook.updateSubmission({
         assignment_id: '2301',
         entered_grade: 'A',
@@ -681,57 +679,61 @@ describe('Gradebook#renderSubmissionTray', () => {
 
     it('stores the pending grade info before sending the request', () => {
       jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       expect(gradebook.submissionIsUpdating(submission)).toBe(true)
     })
 
     it('includes "grade" when storing the pending grade info', () => {
       jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       const pendingGradeInfo = gradebook.getPendingGradeInfo(submission)
       expect(pendingGradeInfo.grade).toBe('A')
     })
 
     it('includes "score" when storing the pending grade info', () => {
       jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       const pendingGradeInfo = gradebook.getPendingGradeInfo(submission)
       expect(pendingGradeInfo.score).toBe(9.5)
     })
 
     it('includes "excused" when storing the pending grade info', () => {
       jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       const pendingGradeInfo = gradebook.getPendingGradeInfo(submission)
       expect(pendingGradeInfo.excused).toBe(false)
     })
 
     it('includes "valid" when storing the pending grade info', () => {
       jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       const pendingGradeInfo = gradebook.getPendingGradeInfo(submission)
       expect(pendingGradeInfo.valid).toBe(true)
     })
 
     it('renders the tray before sending the request', () => {
-      const renderTraySpy = jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+      const renderTraySpy = jest
+        .spyOn(gradebook, 'renderSubmissionTray')
+        .mockImplementation(() => {})
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
       expect(renderTraySpy).toHaveBeenCalledTimes(1)
     })
 
     it('on success the pending grade info is removed', () => {
       jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
       jest.spyOn(gradebook, 'updateSubmissionsFromExternal').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
-      promise.thenFn({ data: { all_submissions: [{ id: '293', ...submission }] } })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
+      promise.thenFn({data: {all_submissions: [{id: '293', ...submission}]}})
       expect(gradebook.getPendingGradeInfo(submission)).toBeNull()
     })
 
     it('on success the tray has been rendered a second time', () => {
-      const renderTraySpy = jest.spyOn(gradebook, 'renderSubmissionTray').mockImplementation(() => {})
+      const renderTraySpy = jest
+        .spyOn(gradebook, 'renderSubmissionTray')
+        .mockImplementation(() => {})
       jest.spyOn(gradebook, 'updateSubmissionsFromExternal').mockImplementation(() => {})
-      gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
-      promise.thenFn({ data: { all_submissions: [{ id: '293', ...submission }] } })
+      gradebook.updateSubmissionAndRenderSubmissionTray({submission})
+      promise.thenFn({data: {all_submissions: [{id: '293', ...submission}]}})
       expect(renderTraySpy).toHaveBeenCalledTimes(2)
     })
 
@@ -745,14 +747,14 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       it('on failure the pending grade info is removed', async () => {
-        gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+        gradebook.updateSubmissionAndRenderSubmissionTray({submission})
         await promise.catchFn(new Error('A failure')).catch(() => {
           expect(gradebook.getPendingGradeInfo(submission)).toBeNull()
         })
       })
 
       it('on failure the student row is updated', async () => {
-        gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+        gradebook.updateSubmissionAndRenderSubmissionTray({submission})
         const updateRowSpy = jest
           .spyOn(gradebook, 'updateRowCellsForStudentIds')
           .mockImplementation(() => {})
@@ -763,7 +765,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       it('includes the student id when updating its row on failure', async () => {
-        gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+        gradebook.updateSubmissionAndRenderSubmissionTray({submission})
         const updateRowSpy = jest
           .spyOn(gradebook, 'updateRowCellsForStudentIds')
           .mockImplementation(() => {})
@@ -775,7 +777,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       it('on failure the submission has been rendered a second time', async () => {
-        gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+        gradebook.updateSubmissionAndRenderSubmissionTray({submission})
         await promise.catchFn(new Error('A failure')).catch(() => {
           expect(renderSubmissionTrayStub).toHaveBeenCalledTimes(2)
         })
@@ -783,7 +785,7 @@ describe('Gradebook#renderSubmissionTray', () => {
 
       it('on failure a flash error is triggered', async () => {
         const flashErrorStub = jest.spyOn($, 'flashError').mockImplementation(() => {})
-        gradebook.updateSubmissionAndRenderSubmissionTray({ submission })
+        gradebook.updateSubmissionAndRenderSubmissionTray({submission})
         await promise.catchFn(new Error('A failure')).catch(() => {
           expect(flashErrorStub).toHaveBeenCalledTimes(1)
         })
@@ -801,7 +803,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       moxios.install()
       moxios.stubRequest(/.*/, {
         status: 200,
-        response: { submission_comments: [] },
+        response: {submission_comments: []},
       })
 
       gradebook = createGradebook()
@@ -824,7 +826,7 @@ describe('Gradebook#renderSubmissionTray', () => {
           post_manually: false,
         },
       })
-      gradebook.setAssignmentGroups({ 9000: { group_weight: 100 } })
+      gradebook.setAssignmentGroups({9000: {group_weight: 100}})
 
       gradebook.students = {
         1101: {
@@ -837,14 +839,12 @@ describe('Gradebook#renderSubmissionTray', () => {
             excused: false,
             workflow_state: 'submitted',
           },
-          enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+          enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
           isConcluded: false,
         },
       }
 
-      jest.spyOn(gradebook, 'listRows').mockImplementation(() => [
-        gradebook.students[1101],
-      ])
+      jest.spyOn(gradebook, 'listRows').mockImplementation(() => [gradebook.students[1101]])
 
       gradebook.gradebookGrid.gridSupport = {
         helper: {
@@ -852,7 +852,7 @@ describe('Gradebook#renderSubmissionTray', () => {
           focus: jest.fn(),
         },
         state: {
-          getActiveLocation: () => ({ region: 'body', cell: 0, row: 0 }),
+          getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
         },
         grid: {
           getColumns: () => [],
@@ -873,8 +873,8 @@ describe('Gradebook#renderSubmissionTray', () => {
       jest.spyOn(global, 'fetch').mockImplementation(() =>
         Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ submission_comments: [] }),
-        })
+          json: () => Promise.resolve({submission_comments: []}),
+        }),
       )
     })
 
@@ -933,12 +933,12 @@ describe('Gradebook#renderSubmissionTray', () => {
       activeStudentId = '1101'
 
       gradebook.gridData = {
-        rows: [{ id: activeStudentId }],
+        rows: [{id: activeStudentId}],
       }
 
       gradebook.gradebookGrid = {
         grid: {
-          getActiveCell: () => ({ row: 0 }),
+          getActiveCell: () => ({row: 0}),
         },
         gridSupport: {
           helper: {
@@ -972,7 +972,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       moxios.install()
       moxios.stubRequest(/.*\/api\/v1\/courses\/.*/, {
         status: 200,
-        response: { submission_comments: [] },
+        response: {submission_comments: []},
       })
 
       gradebook = createGradebook()
@@ -995,7 +995,7 @@ describe('Gradebook#renderSubmissionTray', () => {
           post_manually: false,
         },
       })
-      gradebook.setAssignmentGroups({ 9000: { group_weight: 100 } })
+      gradebook.setAssignmentGroups({9000: {group_weight: 100}})
 
       gradebook.students = {
         1100: {
@@ -1008,7 +1008,7 @@ describe('Gradebook#renderSubmissionTray', () => {
             excused: false,
             workflow_state: 'submitted',
           },
-          enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+          enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
           isConcluded: false,
         },
         1101: {
@@ -1021,7 +1021,7 @@ describe('Gradebook#renderSubmissionTray', () => {
             excused: false,
             workflow_state: 'submitted',
           },
-          enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+          enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
           isConcluded: false,
         },
         1102: {
@@ -1034,16 +1034,18 @@ describe('Gradebook#renderSubmissionTray', () => {
             excused: false,
             workflow_state: 'submitted',
           },
-          enrollments: [{ grades: { html_url: 'http://gradesUrl/' } }],
+          enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
           isConcluded: false,
         },
       }
 
-      jest.spyOn(gradebook, 'listRows').mockImplementation(() => [
-        gradebook.students[1100],
-        gradebook.students[1101],
-        gradebook.students[1102],
-      ])
+      jest
+        .spyOn(gradebook, 'listRows')
+        .mockImplementation(() => [
+          gradebook.students[1100],
+          gradebook.students[1101],
+          gradebook.students[1102],
+        ])
 
       gradebook.gradebookGrid.gridSupport = {
         helper: {
@@ -1051,7 +1053,7 @@ describe('Gradebook#renderSubmissionTray', () => {
           focus: jest.fn(),
         },
         state: {
-          getActiveLocation: () => ({ region: 'body', cell: 0, row: 0 }),
+          getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
         },
         grid: {
           getColumns: () => [],
@@ -1086,9 +1088,9 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       const prevArrowButtons = document.querySelectorAll(
-        '#student-carousel .left-arrow-button-container button'
+        '#student-carousel .left-arrow-button-container button',
       )
-      expect(prevArrowButtons.length).toBe(0)
+      expect(prevArrowButtons).toHaveLength(0)
     })
 
     it('shows the next student arrow for the first student', async () => {
@@ -1105,9 +1107,9 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       const nextArrowButtons = document.querySelectorAll(
-        '#student-carousel .right-arrow-button-container button'
+        '#student-carousel .right-arrow-button-container button',
       )
-      expect(nextArrowButtons.length).toBe(1)
+      expect(nextArrowButtons).toHaveLength(1)
     })
 
     it('does not show the next student arrow for the last student', async () => {
@@ -1124,9 +1126,9 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       const nextArrowButtons = document.querySelectorAll(
-        '#student-carousel .right-arrow-button-container button'
+        '#student-carousel .right-arrow-button-container button',
       )
-      expect(nextArrowButtons.length).toBe(0)
+      expect(nextArrowButtons).toHaveLength(0)
     })
 
     it('shows the previous student arrow for the last student', async () => {
@@ -1143,9 +1145,9 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       const prevArrowButtons = document.querySelectorAll(
-        '#student-carousel .left-arrow-button-container button'
+        '#student-carousel .left-arrow-button-container button',
       )
-      expect(prevArrowButtons.length).toBe(1)
+      expect(prevArrowButtons).toHaveLength(1)
     })
 
     it('clicking the next student arrow calls loadTrayStudent with "next"', async () => {
@@ -1166,7 +1168,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       const nextButton = document.querySelector(
-        '#student-carousel .right-arrow-button-container button'
+        '#student-carousel .right-arrow-button-container button',
       )
       nextButton.click()
 
@@ -1192,7 +1194,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       })
 
       const prevButton = document.querySelector(
-        '#student-carousel .left-arrow-button-container button'
+        '#student-carousel .left-arrow-button-container button',
       )
       prevButton.click()
 
