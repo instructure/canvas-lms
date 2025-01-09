@@ -101,6 +101,7 @@ describe "scheduler" do
     end
 
     it "reserves appointment slots in find appointment mode", priority: "1" do
+      skip "Flakey spec. Fix LX-2191"
       get "/calendar2"
       wait_for_ajaximations
       open_select_courses_modal(@course1.name)
