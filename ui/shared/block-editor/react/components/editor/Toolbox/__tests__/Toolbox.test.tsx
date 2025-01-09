@@ -28,11 +28,16 @@ import {testTemplates} from './testTemplates'
 const user = userEvent.setup()
 
 const defaultProps: ToolboxProps = {
+  toolboxShortcutManager: {
+    defaultFocusRef: {current: null},
+    keyDownHandler: _e => {},
+  },
   open: true,
   container: document.createElement('div'),
   templateEditor: TemplateEditor.NONE,
   templates: testTemplates,
-  onClose: () => {},
+  onDismiss: () => {},
+  onOpened: () => {},
 }
 
 const renderComponent = (props: Partial<ToolboxProps> = {}) => {
@@ -88,13 +93,13 @@ describe('Toolbox', () => {
     expect(getByText('block template 2')).toBeInTheDocument()
   })
 
-  it('calls onClose when close button is clicked', async () => {
-    const onClose = jest.fn()
-    const {getByText} = renderComponent({onClose})
+  it('calls onDismiss when close button is clicked', async () => {
+    const onDismiss = jest.fn()
+    const {getByText} = renderComponent({onDismiss})
 
     await user.click(getByText('Close').closest('button') as HTMLButtonElement)
 
-    expect(onClose).toHaveBeenCalled()
+    expect(onDismiss).toHaveBeenCalled()
   })
 
   describe('when editing templates', () => {

@@ -306,5 +306,31 @@ describe "Block Editor", :ignore_js_errors do
       end
     end
   end
+
+  describe("focus management") do
+    it "focuses the page title when creating a new page" do
+      create_wiki_page(@course)
+      fj("button:contains('New Blank Page')").click
+      wait_for_block_editor
+      expect(f("#wikipage-title-input")).to eq(driver.switch_to.active_element)
+    end
+
+    it "focuses the page title when editing an existing page" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      expect(f("#wikipage-title-input")).to eq(driver.switch_to.active_element)
+    end
+
+    it "switches focus from the editor to the toolbox and back on ctrl-b" do
+      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
+      wait_for_block_editor
+      f(".icon-block").click
+      expect(f(".icon-block")).to eq(driver.switch_to.active_element)
+      f(".icon-block").send_keys(:control, "b")
+      expect(fj("button:contains('Close')")).to eq(driver.switch_to.active_element)
+      fj("button:contains('Close')").send_keys(:control, "b")
+      expect(f(".icon-block")).to eq(driver.switch_to.active_element)
+    end
+  end
 end
 # rubocop:enable Specs/NoNoSuchElementError, Specs/NoExecuteScript

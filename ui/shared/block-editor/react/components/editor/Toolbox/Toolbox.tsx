@@ -42,7 +42,15 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('block-editor')
 
-export const Toolbox = ({open, container, templateEditor, templates, onClose}: ToolboxProps) => {
+export const Toolbox = ({
+  toolboxShortcutManager,
+  open,
+  container,
+  templateEditor,
+  templates,
+  onDismiss,
+  onOpened,
+}: ToolboxProps) => {
   const [trayRef, setTrayRef] = useState<HTMLElement | null>(null)
   const [containerStyle] = useState<Partial<CSSStyleDeclaration>>(() => {
     if (container) {
@@ -57,6 +65,19 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
   const [editTemplate, setEditTemplate] = useState<BlockTemplate | null>(null)
   const [activeTab, setActiveTab] = useState('sections')
   const trayHeadingRef = useRef<HTMLElement | null>(null)
+  const {defaultFocusRef, keyDownHandler} = toolboxShortcutManager
+
+  useEffect(() => {
+    if (trayRef) {
+      trayRef.addEventListener('keydown', keyDownHandler)
+    }
+
+    return () => {
+      if (trayRef) {
+        trayRef.removeEventListener('keydown', keyDownHandler)
+      }
+    }
+  }, [keyDownHandler, trayRef])
 
   useEffect(() => {
     const shrinking_selector = '.edit-content' // '.block-editor-editor'
@@ -80,8 +101,8 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
   }, [containerStyle, open, trayRef])
 
   const handleCloseTray = useCallback(() => {
-    onClose()
-  }, [onClose])
+    onDismiss()
+  }, [onDismiss])
 
   const handleDeleteTemplate = useCallback((templateId: string) => {
     if (window.confirm(I18n.t('Are you sure you want to delete this template?'))) {
@@ -131,18 +152,29 @@ export const Toolbox = ({open, container, templateEditor, templates, onClose}: T
         open={open}
         placement="end"
         size="small"
-        shouldContainFocus={true}
+        shouldContainFocus={false}
         onClose={handleCloseTray}
+        onOpen={onOpened}
       >
         <Flex as="div" direction="column" padding="small" height="100vh">
           <Flex
             margin="0 0 small"
             gap="medium"
             elementRef={el => {
-              el && (trayHeadingRef.current = el as HTMLElement)
+              if (el) trayHeadingRef.current = el as HTMLElement
             }}
           >
-            <CloseButton placement="end" onClick={handleCloseTray} screenReaderLabel="Close" />
+            <CloseButton
+              placement="end"
+              onClick={handleCloseTray}
+              screenReaderLabel="Close"
+              elementRef={el => {
+                if (typeof defaultFocusRef === 'function') defaultFocusRef(el as HTMLElement)
+                else if (defaultFocusRef)
+                  (defaultFocusRef as React.MutableRefObject<HTMLElement | null>).current =
+                    el as HTMLElement
+              }}
+            />
             <Heading level="h3">{I18n.t('Add Content')}</Heading>
           </Flex>
           <Flex.Item shouldShrink={true} overflowX="hidden">

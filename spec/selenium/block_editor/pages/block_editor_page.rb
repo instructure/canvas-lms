@@ -125,7 +125,11 @@ module BlockEditorPage
   end
 
   def open_block_toolbox_to_tab(tab_name)
-    block_toolbox_toggle.click
+    begin
+      expect(f("#tab-#{tab_name}")).to be_displayed
+    rescue Selenium::WebDriver::Error::NoSuchElementError # rubocop:disable Specs/NoNoSuchElementError
+      block_toolbox_toggle.click
+    end
     f("#tab-#{tab_name}").click
   end
 
