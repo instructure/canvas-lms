@@ -11131,7 +11131,9 @@ hu:
   folder_browsing_tree_1f00a3ae: "Mappaböngészés fanézetben"
   folder_icon_29017021: Mappaikon
   folder_locked_b91cd0c4: "Mappa zárolva"
+  folder_name_b28488c2: "Mappa neve"
   folder_tree_fbab0726: Könyvtárfa
+  folder_was_successfully_created_8de6a282: "A mappa sikeresen létrehozva"
   folders: 
     event_updated: "Az esemény sikeresen frissült"
     folder_created: "A mappa sikeresen létrehozva"
