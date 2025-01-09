@@ -10825,7 +10825,9 @@ fa:
   folder_705fd2d7: پوشه
   folder_browsing_tree_1f00a3ae: "درخت مرور پوشه"
   folder_icon_29017021: "نماد پوشه"
+  folder_name_b28488c2: "نام پوشه"
   folder_tree_fbab0726: "درخت پوشه"
+  folder_was_successfully_created_8de6a282: "پوشه با موفقیت ایجاد شد."
   folders: 
     event_updated: "رویداد با موفقیت بهنگام سازی شد"
     file_zip_in_process: "فشرده سازی فایل هنوز در حال انجام است..."
