@@ -409,6 +409,19 @@ describe('RubricForm Tests', () => {
       expect(getByTestId('outcome-lock-icon-2')).toBeInTheDocument()
     })
 
+    describe('freeFormCriterionComments', () => {
+      it('does not render accordion when rubric is free form comments', () => {
+        queryClient.setQueryData(['fetch-rubric', '1'], {
+          ...RUBRICS_QUERY_RESPONSE,
+          freeFormCriterionComments: true,
+        })
+
+        const {queryAllByTestId, queryAllByText} = renderComponent({rubricId: '1'})
+        expect(queryAllByTestId('criterion-row-rating-accordion')).toHaveLength(0)
+        expect(queryAllByText('This area will be used by the assessor to leave comments related to this criterion.')).toHaveLength(2)
+      })
+    })
+
     /**
      * EVAL-4246
      * This test is skipped because it is dependent on a legacy FindDialog backbone component

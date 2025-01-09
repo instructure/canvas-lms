@@ -126,13 +126,17 @@ export const RubricCriteriaRow = ({
                       {/* html sanitized by server */}
                       <Text dangerouslySetInnerHTML={{__html: longDescription ?? ''}} />
                     </View>
-                    <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-row-threshold">
-                      <Text>
-                        {I18n.t('Threshold: %{threshold}', {
-                          threshold: possibleString(masteryPoints),
-                        })}
-                      </Text>
-                    </View>
+                    {
+                      !hidePoints && (
+                        <View as="div" margin="small 0 0 0" data-testid="rubric-criteria-row-threshold">
+                          <Text>
+                            {I18n.t('Threshold: %{threshold}', {
+                              threshold: possibleString(masteryPoints),
+                            })}
+                          </Text>
+                        </View>
+                      )
+                    }
                   </>
                 ) : (
                   <>
@@ -148,6 +152,19 @@ export const RubricCriteriaRow = ({
                     </View>
                   </>
                 )}
+                {
+                  freeFormCriterionComments && (
+                    <View
+                      as="div"
+                      margin="small 0 0 0"
+                      data-testid="rubric-criteria-row-freeform-comment"
+                    >
+                      <Text>
+                        {I18n.t('This area will be used by the assessor to leave comments related to this criterion.')}
+                      </Text>
+                    </View>
+                  )
+                }
               </Flex.Item>
               <Flex.Item align="start">
                 {!ignoreForScoring && !hidePoints && (
@@ -215,11 +232,15 @@ export const RubricCriteriaRow = ({
                 )}
               </Flex.Item>
             </Flex>
-            <RatingScaleAccordion
-              hidePoints={hidePoints || freeFormCriterionComments}
-              ratings={criterion.ratings}
-              criterionUseRange={criterion.criterionUseRange}
-            />
+            {
+              !freeFormCriterionComments && (
+                <RatingScaleAccordion
+                  hidePoints={hidePoints}
+                  ratings={criterion.ratings}
+                  criterionUseRange={criterion.criterionUseRange}
+                />
+              )
+            }
             <View
               as="hr"
               margin="medium 0 medium 0"
