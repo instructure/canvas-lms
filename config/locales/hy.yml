@@ -7226,6 +7226,8 @@ hy:
       invalid_root_folder_name: "Արմատային թղթապանակի անունը հնարավոր չէ փոխել"
     folder_created: " \"%{name}\" թղթապանակը ստեղծված է"
   folder_705fd2d7: Թղթապանակ
+  folder_name_b28488c2: "Թղթապանակի անվանում"
+  folder_was_successfully_created_8de6a282: "Թղթապանակը հաջողությամբ ստեղծված է:"
   folders: 
     event_updated: "Միջոցառումը հաջողությամբ թարմացվել է"
     file_zip_in_process: "Ֆայլի արխիվացումը ընթացքի մեջ է..."
