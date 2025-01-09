@@ -167,32 +167,42 @@ const Columns: ReadonlyArray<Column> = [
     header: I18n.t('Installed By'),
     width: '132px',
     sortable: true,
-    render: r =>
-      r.created_by ? (
-        <div style={ellispsisStyles}>{r.created_by.short_name}</div>
-      ) : (
-        <div>
-          <Tooltip renderTip={I18n.t('Historical data lacks records for "installed by."')}>
-            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
-          </Tooltip>
-        </div>
-      ),
+    render: r => {
+      if (r.created_by === 'Instructure') {
+        return <div style={ellispsisStyles}>{I18n.t('Instructure')}</div>
+      } else if (r.created_by) {
+        return <div style={ellispsisStyles}>{r.created_by.short_name}</div>
+      } else {
+        return (
+          <div>
+            <Tooltip renderTip={I18n.t('Historical data lacks records for "installed by."')}>
+              <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
+            </Tooltip>
+          </div>
+        )
+      }
+    },
   },
   {
     id: 'updated_by',
     header: I18n.t('Updated By'),
     width: '132px',
     sortable: true,
-    render: r =>
-      r.updated_by ? (
-        <div style={ellispsisStyles}>{r.updated_by.short_name}</div>
-      ) : (
-        <div>
-          <Tooltip renderTip={I18n.t('Historical data lacks records for "updated by."')}>
-            <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
-          </Tooltip>
-        </div>
-      ),
+    render: r => {
+      if (r.updated_by === 'Instructure') {
+        return <div style={ellispsisStyles}>{I18n.t('Instructure')}</div>
+      } else if (r.updated_by) {
+        return <div style={ellispsisStyles}>{r.updated_by.short_name}</div>
+      } else {
+        return (
+          <div>
+            <Tooltip renderTip={I18n.t('Historical data lacks records for "updated by."')}>
+              <div style={{fontStyle: 'oblique', textAlign: 'center'}}>{I18n.t('N/A')}</div>
+            </Tooltip>
+          </div>
+        )
+      }
+    },
   },
   {
     id: 'on',

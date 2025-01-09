@@ -413,6 +413,18 @@ RSpec.describe Lti::RegistrationsController do
           subject
           expect(response_data.pluck(:id)).to include(site_admin_registration.global_id)
         end
+
+        it "says that it was created by Instructure" do
+          subject
+          site_admin_json = response_data.find { |r| r[:id] == site_admin_registration.global_id }
+          expect(site_admin_json[:created_by]).to eq("Instructure")
+        end
+
+        it "says that it was updated by Instructure" do
+          subject
+          site_admin_json = response_data.find { |r| r[:id] == site_admin_registration.global_id }
+          expect(site_admin_json[:updated_by]).to eq("Instructure")
+        end
       end
 
       context "with cross-shard inherited on registration" do
@@ -668,6 +680,20 @@ RSpec.describe Lti::RegistrationsController do
         subject
         expect(response_json[:overlay]).to have_key(:versions)
         expect(response_json[:overlay][:versions].length).to eq(5)
+      end
+    end
+
+    context "with a site admin registration" do
+      let(:registration) { lti_registration_model(account: Account.site_admin) }
+
+      it "says that it was created by Instructure" do
+        subject
+        expect(response_json[:created_by]).to eq("Instructure")
+      end
+
+      it "says that it was updated by Instructure" do
+        subject
+        expect(response_json[:updated_by]).to eq("Instructure")
       end
     end
   end
