@@ -58,10 +58,15 @@ module Api::V1::Lti::Registration
       json["ims_registration_id"] = registration.ims_registration&.id
       json["manual_configuration_id"] = registration.manual_configuration&.id
 
-      if registration.created_by.present?
+      if registration.site_admin?
+        json["created_by"] = "Instructure"
+      elsif registration.created_by.present?
         json["created_by"] = user_json(registration.created_by, user, session, [], context, nil, ["pseudonym"])
       end
-      if registration.updated_by.present?
+
+      if registration.site_admin?
+        json["updated_by"] = "Instructure"
+      elsif registration.updated_by.present?
         json["updated_by"] = user_json(registration.updated_by, user, session, [], context, nil, ["pseudonym"])
       end
 

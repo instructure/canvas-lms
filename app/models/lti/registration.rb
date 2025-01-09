@@ -51,6 +51,7 @@ class Lti::Registration < ActiveRecord::Base
   validates :name, presence: true
 
   scope :active, -> { where(workflow_state: "active") }
+  scope :site_admin, -> { where(account: Account.site_admin) }
 
   resolves_root_account through: :account
 
@@ -200,6 +201,8 @@ class Lti::Registration < ActiveRecord::Base
   def inherited_for?(account)
     account != self.account
   end
+
+  delegate :site_admin?, to: :account
 
   # TODO: this will eventually need to account for 1.1 registrations
   def icon_url
