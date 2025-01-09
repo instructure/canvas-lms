@@ -29,6 +29,7 @@ import {FileManagementContext} from '../../Contexts'
 const defaultProps = {
   size: 'large' as 'large' | 'small' | 'medium',
   userCanEditFilesForContext: true,
+  usageRightsRequiredForContext: false,
 }
 
 const renderComponent = (props = {}) => {
@@ -182,6 +183,33 @@ describe('FileFolderTable', () => {
         expect(selectAllCheckbox).not.toBeChecked()
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
       })
+    })
+  })
+
+  describe('FileFolderTable - rights column', () => {
+    it('does not render rights column when usage rights are not required', async () => {
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true})
+      renderComponent({usageRightsRequiredForContext: false})
+
+      expect(screen.queryByTestId('rights')).toBeNull()
+    })
+
+    it('does not render the icon if it is a folder', async () => {
+      fetchMock.get(/.*\/folders/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
+      renderComponent({usageRightsRequiredForContext: true})
+
+      const rows = await screen.findAllByTestId('table-row')
+      expect(rows[0].getElementsByTagName("td")[5]).toBeEmptyDOMElement()
+    })
+
+    it('renders rights column and icons when usage rights are required', async () => {
+      fetchMock.get(/.*\/folders/, [FAKE_FILES[0]], {overwriteRoutes: true})
+      renderComponent({usageRightsRequiredForContext: true})
+
+      expect(await screen.findByTestId('rights')).toBeInTheDocument()
+
+      const rows = await screen.findAllByTestId('table-row')
+      expect(rows[0].getElementsByTagName("td")[5].getElementsByTagName('button')[0]).toBeInTheDocument()
     })
   })
 })
