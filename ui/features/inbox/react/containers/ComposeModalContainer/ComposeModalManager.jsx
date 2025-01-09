@@ -103,9 +103,14 @@ const ComposeModalManager = props => {
         c => c.conversation._id === props.conversation._id
       ).conversation
 
-      conversation.conversationMessagesConnection.nodes.unshift(
-        result.data.addConversationMessage.conversationMessage
-      )
+      if (result.data?.addConversationMessage?.conversationMessage) {
+        conversation.conversationMessagesConnection.nodes.unshift(
+          result.data.addConversationMessage.conversationMessage
+        )
+      } else {
+        captureException(new Error('There is no value for addConversationMessage.conversationMessage in updateConversationsCache'))
+      }
+
       conversation.conversationMessagesCount++
     } else {
       legacyNode.conversationsConnection.nodes.unshift(
@@ -140,9 +145,13 @@ const ComposeModalManager = props => {
         return
       }
 
-      replyQueryResult.legacyNode.conversationMessagesConnection.nodes.unshift(
-        result.data.addConversationMessage.conversationMessage
-      )
+      if (result.data?.addConversationMessage?.conversationMessage) {
+        replyQueryResult.legacyNode.conversationMessagesConnection.nodes.unshift(
+          result.data.addConversationMessage.conversationMessage
+        )
+      } else {
+        captureException(new Error('There is no value for addConversationMessage.conversationMessage in updateReplyConversationsCache'))
+      }
 
       cache.writeQuery({
         query: REPLY_CONVERSATION_QUERY,
@@ -166,11 +175,14 @@ const ComposeModalManager = props => {
       }
       const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
-      if (result.data?.addConversationMessage.conversationMessage)
+      if (result.data?.addConversationMessage?.conversationMessage) {
         data.legacyNode.conversationMessagesConnection.nodes = [
           result.data.addConversationMessage.conversationMessage,
           ...data.legacyNode.conversationMessagesConnection.nodes,
         ]
+      } else {
+        captureException(new Error('There is no value for addConversationMessage.conversationMessage in updateConversationMessagesCache'))
+      }
 
       cache.writeQuery({...queryToUpdate, data})
     }
