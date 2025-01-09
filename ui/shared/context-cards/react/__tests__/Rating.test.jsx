@@ -48,7 +48,7 @@ describe('StudentContextTray/Rating', () => {
           metric={{
             level: participationsLevel,
           }}
-        />
+        />,
       )
       expect(wrapper.queryByText(`${label} ${formatedValueText}`)).toBeInTheDocument()
     })

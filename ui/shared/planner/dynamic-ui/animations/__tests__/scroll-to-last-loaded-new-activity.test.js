@@ -37,7 +37,7 @@ function createReadyAnimation(withNa = true) {
           {uniqueId: 'item-4'},
         ],
       ],
-    ])
+    ]),
   )
   return result
 }
@@ -54,16 +54,16 @@ it('scrolls to the last newly loaded item with new activity', () => {
 
   expect(registry.getLastComponent).toHaveBeenCalledWith(
     'day',
-    expect.objectContaining(['item-2', 'item-3'])
+    expect.objectContaining(['item-2', 'item-3']),
   )
   expect(registry.getLastComponent).toHaveBeenCalledWith(
     'new-activity-indicator',
-    expect.objectContaining(['item-2', 'item-3'])
+    expect.objectContaining(['item-2', 'item-3']),
   )
 
   expect(animator.maintainViewportPositionFromMemo).toHaveBeenCalledWith(
     'fixed-element',
-    'position-memo'
+    'position-memo',
   )
   expect(animator.scrollTo).toHaveBeenCalledWith('nai-scrollable', 42)
   expect(animator.focusElement).toHaveBeenCalledWith('nai-focusable')

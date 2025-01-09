@@ -99,7 +99,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       hideRequest = hideAssignmentGradesForSections(assignment.id, selectedSectionIds)
       successMessage = I18n.t(
         'Success! Grades have been hidden for the selected sections of %{assignmentName}.',
-        {assignmentName: assignment.name}
+        {assignmentName: assignment.name},
       )
     } else {
       hideRequest = hideAssignmentGrades(assignment.id)
@@ -139,7 +139,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
     } else {
       this.setState({
         selectedSectionIds: selectedSectionIds.filter(
-          selectedSection => selectedSection !== sectionId
+          selectedSection => selectedSection !== sectionId,
         ),
       })
     }

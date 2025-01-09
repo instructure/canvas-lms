@@ -160,7 +160,7 @@ const Comments = props => {
         <CommentText
           assessment={assessment}
           placeholder={I18n.t(
-            'This area will be used by the assessor to leave comments related to this criterion.'
+            'This area will be used by the assessor to leave comments related to this criterion.',
           )}
           weight="normal"
         />

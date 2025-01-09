@@ -62,7 +62,7 @@ $.fn.fillTemplateData = function (options) {
         }
         const $found_all = this.find('.' + item)
         const avoid = options.avoid || ''
-        // eslint-disable-next-line no-loop-func
+         
         $found_all.each(function () {
           const $found = $(this)
           if ($found.length > 0 && $found.closest(avoid).length === 0) {
@@ -159,7 +159,7 @@ $.fn.getTemplateData = function (options) {
   if (options.htmlValues) {
     for (const item in options.htmlValues) {
       const $elem = this.find(
-        '.' + options.htmlValues[item].replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ':first'
+        '.' + options.htmlValues[item].replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ':first',
       )
       let val = null
       if ($elem.hasClass('user_content') && $elem.data('unenhanced_content_html')) {

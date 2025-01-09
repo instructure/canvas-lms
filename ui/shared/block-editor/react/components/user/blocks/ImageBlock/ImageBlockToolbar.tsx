@@ -54,7 +54,7 @@ const ImageBlockToolbar = () => {
       _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       const constraint = value as ImageConstraint | 'aspect-ratio'
       if (constraint === 'aspect-ratio') {
@@ -69,7 +69,7 @@ const ImageBlockToolbar = () => {
         })
       }
     },
-    [setProp]
+    [setProp],
   )
 
   const handleChangeSzVariant = useCallback(
@@ -77,7 +77,7 @@ const ImageBlockToolbar = () => {
       _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       setProp((prps: ImageBlockProps) => {
         prps.sizeVariant = value as SizeVariant
@@ -89,7 +89,7 @@ const ImageBlockToolbar = () => {
         }
       })
     },
-    [node.dom, setProp]
+    [node.dom, setProp],
   )
 
   const handleShowUploadModal = useCallback(() => {
@@ -108,7 +108,7 @@ const ImageBlockToolbar = () => {
       })
       setShowUploadModal(false)
     },
-    [setProp]
+    [setProp],
   )
 
   const handleAltChange = useCallback(
@@ -117,7 +117,7 @@ const ImageBlockToolbar = () => {
         prps.alt = e.target.value
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const [showingAltTextMenu, setShowingAltTextMenu] = useState(false)

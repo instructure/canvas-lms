@@ -59,7 +59,7 @@ export function alert(alertProps: AlertProps): Promise<void> {
       alertContainer.removeChild(container)
       resolve()
     }
-     
+
     ReactDOM.render(<AlertModal {...alertProps} onOk={handleOk} />, container)
   })
 }
@@ -112,7 +112,7 @@ function getAlertContainer() {
     alertContainer.id = messageHolderId
     alertContainer.setAttribute(
       'style',
-      'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;'
+      'position: fixed; top: 0; left: 0; width: 100%; z-index: 100000;',
     )
     document.body.appendChild(alertContainer)
   }

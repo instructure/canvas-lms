@@ -27,7 +27,7 @@ const setup = props => {
       onReplace={Function.prototype}
       onDelete={Function.prototype}
       {...props}
-    />
+    />,
   )
 }
 
@@ -35,19 +35,19 @@ describe('Attachment', () => {
   it('calls onReplace on double click', () => {
     const onReplaceMock = jest.fn()
     const {getByTestId} = setup({onReplace: onReplaceMock})
-    expect(onReplaceMock.mock.calls.length).toBe(0)
+    expect(onReplaceMock.mock.calls).toHaveLength(0)
     fireEvent.dblClick(getByTestId('attachment'))
     fireEvent.change(getByTestId('replacement-input'))
-    expect(onReplaceMock.mock.calls.length).toBe(1)
+    expect(onReplaceMock.mock.calls).toHaveLength(1)
   })
 
   it('calls onDelete when clicking the remove button', () => {
     const onDeleteMock = jest.fn()
     const {getByTestId} = setup({onDelete: onDeleteMock})
-    expect(onDeleteMock.mock.calls.length).toBe(0)
+    expect(onDeleteMock.mock.calls).toHaveLength(0)
     fireEvent.mouseOver(getByTestId('attachment'))
     fireEvent.click(getByTestId('remove-button'))
-    expect(onDeleteMock.mock.calls.length).toBe(1)
+    expect(onDeleteMock.mock.calls).toHaveLength(1)
   })
 
   describe('attachment preview', () => {

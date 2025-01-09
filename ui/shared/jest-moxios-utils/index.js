@@ -44,6 +44,6 @@ export function moxiosRespond(response, requestPromise, opts = {}) {
     request.respondWith({status: 200, headers: {}, response, ...opts})
   })
   return Promise.all([waitPromise, requestPromise]).then(
-    ([_waitResult, requestResult]) => requestResult
+    ([_waitResult, requestResult]) => requestResult,
   )
 }

@@ -49,7 +49,7 @@ const RCETextBlockToolbar = () => {
       _e: any,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       setProp((prps: RCETextBlockProps) => {
         prps.sizeVariant = value as SizeVariant
@@ -61,7 +61,7 @@ const RCETextBlockToolbar = () => {
         }
       })
     },
-    [node.dom, setProp]
+    [node.dom, setProp],
   )
 
   return (

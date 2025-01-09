@@ -26,9 +26,9 @@ import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {itemShape, sizeShape, userShape} from '../plannerPropTypes'
 import {getDynamicFullDate, getFriendlyDate, isToday} from '../../utilities/dateUtils'
 import buildStyle from './style'
- 
+
 import MissingAssignments from '../MissingAssignments'
- 
+
 import Grouping from '../Grouping'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {animatable} from '../../dynamic-ui'
@@ -84,7 +84,7 @@ export class Day extends Component {
       'day',
       this,
       nextProps.animatableIndex,
-      this.itemUniqueIds(nextProps)
+      this.itemUniqueIds(nextProps),
     )
   }
 
@@ -170,7 +170,9 @@ export class Day extends Component {
               <Text data-testid="today-text" as="div" size="large" weight="bold">
                 {this.friendlyName}
               </Text>
-              <div data-testid="today-date" className={this.style.classNames.secondary}>{this.date}</div>
+              <div data-testid="today-date" className={this.style.classNames.secondary}>
+                {this.date}
+              </div>
             </>
           ) : (
             <div data-testid="not-today" className={this.style.classNames.secondary}>

@@ -118,7 +118,7 @@ class GradingStandardCollection extends React.Component {
     })
       .success(function (updatedStandard) {
         updatedStandard.grading_standard.data = this.formatStandardData(
-          updatedStandard.grading_standard.data
+          updatedStandard.grading_standard.data,
         )
         newStandards[indexToUpdate] = updatedStandard
         this.setState({standards: newStandards}, () => {

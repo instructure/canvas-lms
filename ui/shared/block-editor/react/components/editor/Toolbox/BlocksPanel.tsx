@@ -73,7 +73,7 @@ const BlocksPanel = ({
         })
       return candidateId
     },
-    [query]
+    [query],
   )
 
   // if a node is selected, find where w/in that node to add the new block
@@ -94,14 +94,14 @@ const BlocksPanel = ({
       event.preventDefault()
       const parentId = getBlockTargetParent()
       if (!parentId) {
-        // eslint-disable-next-line no-alert
+         
         window.alert("I don't know where to put this block")
         return
       }
       const node_tree = query.parseReactElement(element).toNodeTree()
       actions.addNodeTree(node_tree, parentId)
     },
-    [actions, getBlockTargetParent, query]
+    [actions, getBlockTargetParent, query],
   )
 
   const handleAddBlockKey = useCallback(
@@ -110,7 +110,7 @@ const BlocksPanel = ({
         handleAddBlock(element, e)
       }
     },
-    [handleAddBlock]
+    [handleAddBlock],
   )
 
   const handleAddBlockTemplate = useCallback(
@@ -125,7 +125,7 @@ const BlocksPanel = ({
         actions.addNodeTree(node_tree, parentId)
       }
     },
-    [actions, getBlockTargetParent, query, templates]
+    [actions, getBlockTargetParent, query, templates],
   )
 
   const handleAddBlockTemplateKey = useCallback(
@@ -134,7 +134,7 @@ const BlocksPanel = ({
         handleAddBlockTemplate(id)
       }
     },
-    [handleAddBlockTemplate]
+    [handleAddBlockTemplate],
   )
 
   const renderBox = (label: string, icon: string, element: JSX.Element) => {

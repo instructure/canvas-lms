@@ -110,7 +110,7 @@ const CreateEditAssignmentModal = ({
 
   // Modal state values
   const [assignmentType, setAssignmentType] = useState<string>(
-    isEditMode ? assignment.type : 'none'
+    isEditMode ? assignment.type : 'none',
   )
   const [name, setName] = useState<string>(isEditMode ? assignment.name : '')
   const [dueAt, setDueAt] = useState<string>(isEditMode && assignment.dueAt ? assignment.dueAt : '')
@@ -344,7 +344,7 @@ const CreateEditAssignmentModal = ({
         points,
         syncToSIS,
       },
-      isNewAssignment
+      isNewAssignment,
     )
   }
 

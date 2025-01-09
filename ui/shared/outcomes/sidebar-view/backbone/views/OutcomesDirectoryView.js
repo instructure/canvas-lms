@@ -130,7 +130,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
     function onFail(_m, _r) {
       disablingDfd.reject()
       return $.flashError(
-        I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
+        I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.'),
       )
     }
 
@@ -157,7 +157,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
     function onFail(_m, _r) {
       disablingDfd.reject()
       return $.flashError(
-        I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
+        I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.'),
       )
     }
 
@@ -224,7 +224,7 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
     }
 
     this._views = this._viewsFor(this.groups.models, OutcomeGroupIconView).concat(
-      this._viewsFor(this.outcomes.models, OutcomeIconView)
+      this._viewsFor(this.outcomes.models, OutcomeIconView),
     )
     for (const v of this._views) {
       v.on('select', this.triggerSelect.bind(this))

@@ -96,7 +96,7 @@ export default async function doFetchApi<T = unknown>({
   })
   if (!response.ok) {
     const err = new Error(
-      `doFetchApi received a bad response: ${response.status} ${response.statusText}`
+      `doFetchApi received a bad response: ${response.status} ${response.statusText}`,
     )
     Object.assign(err, {response}) // in case anyone wants to check it for something
     throw err
@@ -120,7 +120,7 @@ export type SafelyFetchResults<T> = {
 
 export async function safelyFetch<T = unknown>(
   {path, method = 'GET', headers = {}, params = {}, signal, body}: DoFetchApiOpts,
-  schema: z.Schema<T>
+  schema: z.Schema<T>,
 ): Promise<SafelyFetchResults<T>> {
   if (!schema) {
     throw new Error('safelyFetch requires a schema')

@@ -19,7 +19,12 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {type CheckboxTreeNode, type ItemType, TreeSelector, type TreeSelectorProps} from '../TreeSelector'
+import {
+  type CheckboxTreeNode,
+  type ItemType,
+  TreeSelector,
+  type TreeSelectorProps,
+} from '../TreeSelector'
 
 const defaultProps: TreeSelectorProps = {
   checkboxTreeNodes: {
@@ -204,9 +209,12 @@ const parentWith1ConnectedChildAnd2SubChild: Record<string, CheckboxTreeNode> = 
 const assertFlatItemsCheckBoxStates = (
   mock: any,
   checkedList: string[],
-  indeterminateList: string[]
+  indeterminateList: string[],
 ) => {
-  const lastState = mock.mock.calls[mock.mock.calls.length - 1][0] as Record<string, CheckboxTreeNode>
+  const lastState = mock.mock.calls[mock.mock.calls.length - 1][0] as Record<
+    string,
+    CheckboxTreeNode
+  >
   Object.values(lastState).forEach(item => {
     if (checkedList.includes(item.id)) {
       expect(item.checkboxState).toBe('checked')
@@ -338,7 +346,7 @@ describe('TreeSelector', () => {
       assertFlatItemsCheckBoxStates(
         onChangeMock,
         ['parent-item-1', 'child-item-1', 'sub-child-item-1'],
-        []
+        [],
       )
 
       await userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
@@ -365,7 +373,7 @@ describe('TreeSelector', () => {
       assertFlatItemsCheckBoxStates(
         onChangeMock,
         ['sub-child-item-1'],
-        ['parent-item-1', 'child-item-1']
+        ['parent-item-1', 'child-item-1'],
       )
     })
 
@@ -382,7 +390,7 @@ describe('TreeSelector', () => {
       assertFlatItemsCheckBoxStates(
         onChangeMock,
         ['parent-item-1', 'child-item-1', 'sub-child-item-1', 'sub-child-item-2'],
-        []
+        [],
       )
       // Turn off 1 element in the graph
       await userEvent.click(component.getByTestId('checkbox-sub-child-item-1'))
@@ -394,7 +402,7 @@ describe('TreeSelector', () => {
       assertFlatItemsCheckBoxStates(
         onChangeMock,
         ['sub-child-item-2'],
-        ['child-item-1', 'parent-item-1']
+        ['child-item-1', 'parent-item-1'],
       )
 
       // Click indeterminate top parent
@@ -427,7 +435,7 @@ describe('TreeSelector', () => {
       assertFlatItemsCheckBoxStates(
         defaultProps.onChange,
         ['child-item-4', 'sub-child-item-3', 'parent-item-2'],
-        ['parent-item-1', 'child-item-3']
+        ['parent-item-1', 'child-item-3'],
       )
 
       // Click linked checkbox other side
@@ -465,7 +473,7 @@ describe('TreeSelector', () => {
           'sub-child-item-2',
           'sub-child-item-3',
         ],
-        []
+        [],
       )
       // Uncheck 1 element in parent-item-1 graph
       await userEvent.click(component.getByTestId('checkbox-child-item-1'))
@@ -485,7 +493,7 @@ describe('TreeSelector', () => {
           'sub-child-item-2',
           'sub-child-item-3',
         ],
-        ['parent-item-1']
+        ['parent-item-1'],
       )
 
       // Click on the top parent element with indeterminate state

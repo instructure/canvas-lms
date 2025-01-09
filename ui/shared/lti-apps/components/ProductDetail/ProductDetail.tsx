@@ -87,7 +87,7 @@ const ProductDetail = (props: ProductDetailProps) => {
   }
 
   const excludeCurrentProduct = otherProductsByCompany?.tools.filter(
-    (otherProducts: Product) => otherProducts.global_product_id !== currentProductId
+    (otherProducts: Product) => otherProducts.global_product_id !== currentProductId,
   )
 
   const ltiConfiguration = product?.tool_integration_configurations
@@ -354,7 +354,7 @@ const ProductDetail = (props: ProductDetailProps) => {
               {hasIntegrationResources
                 ? renderIntegrationResources()
                 : I18n.t(
-                    'The tool provider did not include implementation resources for this tool.'
+                    'The tool provider did not include implementation resources for this tool.',
                   )}
             </Flex>
             {(excludeCurrentProduct?.length ?? 0) > 0 && (

@@ -42,7 +42,7 @@ const IconPicker = ({iconName, onSelect, onClose}: IconPickerProps) => {
     (newIconName: string) => {
       onSelect(newIconName)
     },
-    [onSelect]
+    [onSelect],
   )
 
   const handleKey = useCallback(
@@ -63,7 +63,7 @@ const IconPicker = ({iconName, onSelect, onClose}: IconPickerProps) => {
         ;(event.currentTarget.previousElementSibling as HTMLElement)?.focus()
       }
     },
-    [arrowNext, arrowPrev, handleSelectIcon, onClose]
+    [arrowNext, arrowPrev, handleSelectIcon, onClose],
   )
 
   const renderNoIcon = () => {

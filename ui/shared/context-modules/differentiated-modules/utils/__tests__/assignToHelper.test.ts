@@ -198,7 +198,7 @@ describe('generateDateDetailsPayload', () => {
       only_visible_to_overrides: true,
     }
     expect(generateDateDetailsPayload(cards, true, ['section-2', 'student-1'])).toEqual(
-      expectedPayload
+      expectedPayload,
     )
   })
 

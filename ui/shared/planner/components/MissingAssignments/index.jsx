@@ -54,14 +54,14 @@ export const getMissingItemsText = (isExpanded, count) => {
           one: 'Hide 1 missing item',
           other: 'Hide %{count} missing items',
         },
-        {count}
+        {count},
       )
     : I18n.t(
         {
           one: 'Show 1 missing item',
           other: 'Show %{count} missing items',
         },
-        {count}
+        {count},
       )
 }
 

@@ -61,7 +61,7 @@ it('does not show the editor modal when todoItem is null', () => {
 it('shows the editor modal when todoItem is set', () => {
   const mockOnEdit = jest.fn()
   const {getByTestId} = render(
-    <TodoEditorModal {...defaultProps({onEdit: mockOnEdit, todoItem: simpleTodoItem()})} />
+    <TodoEditorModal {...defaultProps({onEdit: mockOnEdit, todoItem: simpleTodoItem()})} />,
   )
   expect(getByTestId('todo-editor-modal')).toBeInTheDocument()
   expect(mockOnEdit).toHaveBeenCalled()

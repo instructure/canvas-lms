@@ -39,7 +39,7 @@ const renderComponent = (props: Partial<ToolboxProps> = {}) => {
   return render(
     <Editor>
       <Toolbox {...defaultProps} {...props} />
-    </Editor>
+    </Editor>,
   )
 }
 
@@ -110,7 +110,7 @@ describe('Toolbox', () => {
       expect(dispatchEvent).toHaveBeenCalledWith(
         expect.objectContaining({
           detail: '2',
-        })
+        }),
       )
     })
 

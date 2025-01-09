@@ -38,7 +38,7 @@ const NotificationPreferences = props => {
   // let's use the component state to reflect the change faster
   const [stagedEnabled, setStagedEnabled] = useState(enabled)
   const [sendObservedNamesEnabled, setSendObservedNames] = useState(
-    props.notificationPreferences?.sendObservedNamesInNotifications
+    props.notificationPreferences?.sendObservedNamesInNotifications,
   )
   const contextSelectable = useContext(NotificationPreferencesContext) !== null
 
@@ -69,10 +69,10 @@ const NotificationPreferences = props => {
             <Text>
               {stagedEnabled
                 ? I18n.t(
-                    'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
+                    'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.',
                   )
                 : I18n.t(
-                    'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.'
+                    'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.',
                   )}
             </Text>
           </Flex.Item>
@@ -95,10 +95,10 @@ const NotificationPreferences = props => {
       <Alert transition="none" variant="info" renderCloseButtonLabel={I18n.t('Close')}>
         {props.contextType === 'course'
           ? I18n.t(
-              'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.'
+              'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.',
             )
           : I18n.t(
-              'Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.'
+              'Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.',
             )}
       </Alert>
     </Flex.Item>
@@ -112,7 +112,7 @@ const NotificationPreferences = props => {
         weekday: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.weekday,
         start_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.start_time,
         end_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.end_time,
-      }
+      },
     )
     return (
       ENV.NOTIFICATION_PREFERENCES_OPTIONS?.daily_notification_time &&
@@ -139,7 +139,7 @@ const NotificationPreferences = props => {
           onDismiss={() => props.updatePreference({hasReadPrivacyNotice: true})}
         >
           {I18n.t(
-            'Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system.'
+            'Notice: Some notifications may contain confidential information. Selecting to receive notifications at an email other than your institution provided address may result in sending sensitive Canvas course and group information outside of the institutional system.',
           )}
         </Alert>
       </Flex.Item>
@@ -191,8 +191,8 @@ const NotificationPreferences = props => {
           {contextSelectable
             ? I18n.t('Notification Settings')
             : props.contextType === 'course'
-            ? I18n.t('Course Notification Settings')
-            : I18n.t('Account Notification Settings')}
+              ? I18n.t('Course Notification Settings')
+              : I18n.t('Account Notification Settings')}
         </Heading>
       </Flex.Item>
       {renderNotificationInfoAlert()}

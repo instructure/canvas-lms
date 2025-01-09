@@ -17,9 +17,7 @@
           "displayName": "Blank Page"
         },
         "hidden": false,
-        "nodes": [
-          "yue4mpUChN"
-        ],
+        "nodes": ["yue4mpUChN"],
         "linkedNodes": {}
       },
       "yue4mpUChN": {
@@ -53,9 +51,7 @@
         },
         "parent": "yue4mpUChN",
         "hidden": false,
-        "nodes": [
-          "13kQFSc-L3"
-        ],
+        "nodes": ["13kQFSc-L3"],
         "linkedNodes": {}
       },
       "13kQFSc-L3": {

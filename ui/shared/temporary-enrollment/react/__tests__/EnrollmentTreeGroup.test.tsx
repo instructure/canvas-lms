@@ -179,7 +179,7 @@ describe('EnrollmentTreeGroup', () => {
           },
         ]
         expect(constructLabel('Default Course', undefined, children)).toBe(
-          'Default Course - Section 1'
+          'Default Course - Section 1',
         )
       })
 
@@ -194,7 +194,7 @@ describe('EnrollmentTreeGroup', () => {
           },
         ]
         expect(constructLabel('Default Course', 'Fall 2021', children)).toBe(
-          'Default Course - Fall 2021'
+          'Default Course - Fall 2021',
         )
       })
 
@@ -216,7 +216,7 @@ describe('EnrollmentTreeGroup', () => {
           },
         ]
         expect(constructLabel('Default Course', 'Fall 2021', children)).toBe(
-          'Default Course - Section 1 - Fall 2021'
+          'Default Course - Section 1 - Fall 2021',
         )
       })
     })
@@ -234,7 +234,7 @@ describe('EnrollmentTreeGroup', () => {
           },
         ]
         expect(constructLabel('Default Course', 'Fall 2021', children)).toBe(
-          'Default Course - Section 1 - Fall 2021'
+          'Default Course - Section 1 - Fall 2021',
         )
       })
     })

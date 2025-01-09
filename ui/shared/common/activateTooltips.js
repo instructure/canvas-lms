@@ -146,7 +146,7 @@ function using(position, feedback) {
         // if tooltip was positioned mostly above/below trigger then: "vertical"
         // else since the tooltip was positioned more to the left or right: "horizontal"
         feedback.important,
-      ].join(' ')
+      ].join(' '),
     )
 }
 

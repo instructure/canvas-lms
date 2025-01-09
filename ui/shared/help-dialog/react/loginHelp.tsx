@@ -86,12 +86,12 @@ export function renderLoginHelp(loginLink: Element): void {
   const wrapper = document.createElement('span')
   anchorElement.replaceWith(wrapper)
   wrapper.appendChild(anchorElement)
-   
+
   const root = createRoot(wrapper)
   root.render(
     <QueryProvider>
       <LoginHelp linkText={anchorElement.innerText} />
-    </QueryProvider>
+    </QueryProvider>,
   )
 }
 

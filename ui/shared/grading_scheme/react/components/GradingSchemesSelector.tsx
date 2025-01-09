@@ -91,13 +91,13 @@ export const GradingSchemesSelector = ({
     GradingSchemeSummary[] | undefined
   >(undefined)
   const [selectedGradingScheme, setSelectedGradingScheme] = useState<GradingScheme | undefined>(
-    undefined
+    undefined,
   )
   const [defaultCanvasGradingScheme, setDefaultCanvasGradingScheme] = useState<
     GradingScheme | undefined
   >(undefined)
   const [selectedGradingSchemeId, setSelectedGradingSchemeId] = useState<string | undefined>(
-    initiallySelectedGradingSchemeId
+    initiallySelectedGradingSchemeId,
   )
   const {loadGradingSchemeSummaries /* loadGradingSchemesStatus */} = useGradingSchemeSummaries()
   const {loadDefaultGradingScheme /* loadGradingSchemesStatus */} = useDefaultGradingScheme()
@@ -111,7 +111,7 @@ export const GradingSchemesSelector = ({
         const summaries = await loadGradingSchemeSummaries(
           contextType,
           contextId,
-          archivedGradingSchemesEnabled ? assignmentId : null
+          archivedGradingSchemesEnabled ? assignmentId : null,
         )
         setGradingSchemeSummaries(summaries)
         const defaultScheme = await loadDefaultGradingScheme(contextType, contextId)
@@ -134,7 +134,7 @@ export const GradingSchemesSelector = ({
 
   if (gradingSchemeSummaries && selectedGradingSchemeId) {
     const matchSelect = gradingSchemeSummaries.filter(
-      summary => summary.id === selectedGradingSchemeId
+      summary => summary.id === selectedGradingSchemeId,
     )
     if (matchSelect.length === 0) {
       handleChangeSelectedGradingSchemeId(undefined)
@@ -151,7 +151,7 @@ export const GradingSchemesSelector = ({
 
   function handleCreatedGradingScheme(
     gradingSchemeSummary: GradingSchemeSummary,
-    gradingScheme?: GradingScheme
+    gradingScheme?: GradingScheme,
   ) {
     if (!gradingSchemeSummaries) return
     closeGradingSchemeViewEditModal()
@@ -164,7 +164,7 @@ export const GradingSchemesSelector = ({
   }
   function handleUpdatedGradingScheme(
     updatedGradingSchemeSummary: GradingSchemeSummary,
-    updatedGradingScheme?: GradingScheme
+    updatedGradingScheme?: GradingScheme,
   ) {
     if (!gradingSchemeSummaries) return
     closeGradingSchemeViewEditModal()
@@ -175,7 +175,7 @@ export const GradingSchemesSelector = ({
         } else {
           return updatedGradingSchemeSummary
         }
-      })
+      }),
     )
     if (archivedGradingSchemesEnabled && updatedGradingScheme) {
       setSelectedGradingScheme(updatedGradingScheme)
@@ -194,8 +194,8 @@ export const GradingSchemesSelector = ({
     }
     setGradingSchemeSummaries(
       gradingSchemeSummaries.filter(
-        gradingSchemeSummary => gradingSchemeSummary.id !== gradingSchemeId
-      )
+        gradingSchemeSummary => gradingSchemeSummary.id !== gradingSchemeId,
+      ),
     )
   }
 
@@ -208,7 +208,7 @@ export const GradingSchemesSelector = ({
     _event: React.SyntheticEvent<Element, Event>,
     data: {
       value?: string | number | undefined
-    }
+    },
   ) => {
     const newGradingSchemeId = String(data.value)
     handleChangeSelectedGradingSchemeId(newGradingSchemeId)
@@ -234,7 +234,7 @@ export const GradingSchemesSelector = ({
             contextType,
             contextId,
             schemeId,
-            archivedGradingSchemesEnabled ? assignmentId : null
+            archivedGradingSchemesEnabled ? assignmentId : null,
           )
         : defaultCanvasGradingScheme
       setSelectedGradingScheme(scheme)
@@ -268,11 +268,11 @@ export const GradingSchemesSelector = ({
     loadGradingSchemeSummaries(
       contextType,
       contextId,
-      archivedGradingSchemesEnabled ? assignmentId : null
+      archivedGradingSchemesEnabled ? assignmentId : null,
     )
       .then(loadedGradingSchemes => {
         const matchingSelectedId = loadedGradingSchemes.filter(
-          gradingSchemeSummary => gradingSchemeSummary.id === selectedGradingSchemeId
+          gradingSchemeSummary => gradingSchemeSummary.id === selectedGradingSchemeId,
         )
         if (matchingSelectedId.length === 0) {
           handleChangeSelectedGradingSchemeId(undefined)
@@ -286,7 +286,7 @@ export const GradingSchemesSelector = ({
 
   const handleUpdateScheme = async (
     gradingSchemeFormInput: GradingSchemeEditableData,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => {
     try {
       const updatedGradingScheme = await updateGradingScheme(contextType, contextId, {
@@ -338,7 +338,7 @@ export const GradingSchemesSelector = ({
       await deleteGradingScheme(
         schemeToDelete.context_type,
         schemeToDelete.context_id,
-        gradingSchemeId
+        gradingSchemeId,
       )
       showFlashSuccess(I18n.t('Grading scheme was successfully removed.'))()
       handleDeletedGradingScheme(gradingSchemeId)
@@ -357,7 +357,7 @@ export const GradingSchemesSelector = ({
     if (courseDefaultSchemeId) {
       // look for a matching grading scheme id to get the 'default' scheme title
       const matchingSummaries = gradingSchemeSummaries.filter(
-        gradingSchemeSummary => gradingSchemeSummary.id === courseDefaultSchemeId
+        gradingSchemeSummary => gradingSchemeSummary.id === courseDefaultSchemeId,
       )
       if (courseDefaultSchemeId === '0') {
         defaultSchemeLabel = I18n.t('Canvas Grading Scheme (course default)')

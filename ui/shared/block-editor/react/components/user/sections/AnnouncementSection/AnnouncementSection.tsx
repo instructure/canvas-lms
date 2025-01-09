@@ -67,7 +67,7 @@ const AnnouncementSection = ({announcementId}: AnnouncementSectionProps) => {
       })
       setModalOpen(false)
     },
-    [setProp]
+    [setProp],
   )
   const renderAnnouncement = () => {
     if (announcement) {

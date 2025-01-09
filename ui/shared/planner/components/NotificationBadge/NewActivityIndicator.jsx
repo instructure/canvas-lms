@@ -44,7 +44,7 @@ export class NewActivityIndicator extends Component {
       'new-activity-indicator',
       this,
       this.props.animatableIndex,
-      this.props.itemIds
+      this.props.itemIds,
     )
   }
 
@@ -54,7 +54,7 @@ export class NewActivityIndicator extends Component {
       'new-activity-indicator',
       this,
       newProps.animatableIndex,
-      newProps.itemIds
+      newProps.itemIds,
     )
   }
 

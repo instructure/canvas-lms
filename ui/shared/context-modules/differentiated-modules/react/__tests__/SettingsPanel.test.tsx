@@ -179,7 +179,7 @@ describe('SettingsPanel', () => {
         requirements: [],
         unlockAt: '',
       },
-      true
+      true,
     )
   })
 
@@ -200,7 +200,7 @@ describe('SettingsPanel', () => {
         requirements: [],
         unlockAt: '',
       },
-      false
+      false,
     )
   })
 
@@ -237,7 +237,7 @@ describe('SettingsPanel', () => {
           path: '/courses/1/modules/1',
           method: 'PUT',
           body: expect.anything(),
-        })
+        }),
       )
     })
 

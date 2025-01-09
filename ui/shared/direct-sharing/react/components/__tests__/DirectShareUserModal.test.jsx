@@ -29,7 +29,7 @@ jest.mock('../../effects/useContentShareUserSearchApi')
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
-    // eslint-disable-next-line no-await-in-loop
+     
     await act(async () => {
       jest.runAllTimers()
     })
@@ -81,7 +81,7 @@ describe('DirectShareUserModal', () => {
 
   it('enables the send button only when a user is selected UNDER TEST', async () => {
     const {getByText, getAllByText, findByLabelText} = render(
-      <DirectShareUserModal open={true} courseId="1" />
+      <DirectShareUserModal open={true} courseId="1" />,
     )
     await selectUser(getByText, findByLabelText)
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe(null)
@@ -92,7 +92,7 @@ describe('DirectShareUserModal', () => {
 
   it('disables the send button when a search has started UNDER TEST', async () => {
     const {getByText, findByLabelText} = render(
-      <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />
+      <DirectShareUserModal open={true} courseId="1" onDismiss={Function.prototype} />,
     )
     await selectUser(getByText, findByLabelText)
     fireEvent.click(getByText('Send'))
@@ -108,7 +108,7 @@ describe('DirectShareUserModal', () => {
         courseId="1"
         contentShare={{content_type: 'discussion_topic', content_id: '42'}}
         onDismiss={onDismiss}
-      />
+      />,
     )
     await selectUser(getByText, findByLabelText)
     fireEvent.click(getByText('Send'))
@@ -128,7 +128,7 @@ describe('DirectShareUserModal', () => {
   it('clears user selection when the modal is closed', async () => {
     fetchMock.get('*', [{id: 'abc', name: 'abc'}])
     const {queryByText, getByText, findByLabelText, rerender} = render(
-      <DirectShareUserModal open={true} courseId="1" />
+      <DirectShareUserModal open={true} courseId="1" />,
     )
     await selectUser(getByText, findByLabelText)
     rerender(<DirectShareUserModal open={false} courseId="1" />)
@@ -142,7 +142,7 @@ describe('DirectShareUserModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()  
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -152,7 +152,7 @@ describe('DirectShareUserModal', () => {
           open={true}
           courseId="1"
           contentShare={{content_type: 'discussion_topic', content_id: '42'}}
-        />
+        />,
       )
       await selectUser(getByText, findByLabelText)
       fireEvent.click(getByText('Send'))

@@ -42,7 +42,7 @@ const BLANK_BODY_ERR = I18n.t('cannot_be_empty', 'Message cannot be blank')
 
 const NO_RECIPIENTS_ERR = I18n.t(
   'no_recipients_choose_another_group',
-  'No recipients are in this group. Please choose another group.'
+  'No recipients are in this group. Please choose another group.',
 )
 
 Conversation.prototype.validate = function (attrs, options) {
@@ -64,7 +64,6 @@ Conversation.prototype.validate = function (attrs, options) {
   if (Object.keys(errors).length) {
     return errors
   } else {
-     
     return void 0
   }
 }

@@ -52,7 +52,7 @@ type ToolbarAlignmentProps = {
   onSave: (
     layout: GroupLayout,
     alignment: GroupHorizontalAlignment,
-    verticalAlignment: GroupAlignment
+    verticalAlignment: GroupAlignment,
   ) => void
 }
 
@@ -65,10 +65,10 @@ const ToolbarAlignment = ({
   const [isOpen, setIsOpen] = useState(false)
   const [currLayout, setCurrLayout] = useState<GroupLayout>(layout || defaultAlignment.layout)
   const [currAlignment, setCurrAlignment] = useState<GroupHorizontalAlignment>(
-    alignment || defaultAlignment.alignment
+    alignment || defaultAlignment.alignment,
   )
   const [currVerticalAlignment, setCurrVerticalAlignment] = useState<GroupAlignment>(
-    verticalAlignment || defaultAlignment.verticalAlignment
+    verticalAlignment || defaultAlignment.verticalAlignment,
   )
   const [menuKey, setMenuKey] = useState(Date.now())
 

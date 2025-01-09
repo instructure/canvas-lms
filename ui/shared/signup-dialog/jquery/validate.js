@@ -34,7 +34,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('validate')
 
-export default $.fn.validate = function () {
+export default ($.fn.validate = function () {
   const errors = {}
 
   this.find('[required]').each(function () {
@@ -58,4 +58,4 @@ export default $.fn.validate = function () {
     this.data('errors', null)
     return true
   }
-}
+})

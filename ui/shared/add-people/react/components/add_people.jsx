@@ -95,7 +95,7 @@ export default class AddPeople extends React.Component {
       arrayOf(
         shape({
           enrollment: shape(newUserShape),
-        })
+        }),
       ),
     ]), // it IS used in componentWillReceiveProps.
   }
@@ -276,7 +276,7 @@ export default class AddPeople extends React.Component {
         readyForNext = this.props.inputParams.nameList.length > 0
         panelLabel = I18n.t('User search panel')
         panelDescription = I18n.t(
-          'Use this panel to search for people you wish to add to this course.'
+          'Use this panel to search for people you wish to add to this course.',
         )
         break
       case PEOPLEVALIDATIONISSUES:
@@ -294,7 +294,7 @@ export default class AddPeople extends React.Component {
         readyForNext = arePeopleValidationIssuesResolved(this.props)
         panelLabel = I18n.t('User vaildation issues panel')
         panelDescription = I18n.t(
-          'Use this panel to resolve duplicate results or people not found with your search.'
+          'Use this panel to resolve duplicate results or people not found with your search.',
         )
         break
       case PEOPLEREADYLIST:

@@ -45,7 +45,7 @@ describe('DialogFormView', () => {
     closeSpy = jest.spyOn(DialogFormView.prototype, 'close')
     server = {
       respond: jest.fn(),
-      restore: jest.fn()
+      restore: jest.fn(),
     }
     model = new Backbone.Model({
       id: 1,
@@ -56,7 +56,7 @@ describe('DialogFormView', () => {
     trigger = $('<button title="Edit Stuff" />').appendTo($('#fixtures'))
 
     // Mock jQuery UI dialog
-    $.fn.dialog = function(options) {
+    $.fn.dialog = function (options) {
       if (typeof options === 'string') {
         if (options === 'close') {
           this.trigger('dialogclose')
@@ -85,8 +85,9 @@ describe('DialogFormView', () => {
           .append('<div class="ui-dialog-titlebar">')
           .append(this)
           .appendTo('body')
-        
-        $dialog.find('.ui-dialog-titlebar')
+
+        $dialog
+          .find('.ui-dialog-titlebar')
           .append(`<span class="ui-dialog-title">${options.title}</span>`)
           .append('<button class="ui-dialog-titlebar-close">close</button>')
 
@@ -107,7 +108,7 @@ describe('DialogFormView', () => {
             }
           },
           focusable: $('.ui-dialog-titlebar-close'),
-          isOpen: () => $dialog.css('display') !== 'none'
+          isOpen: () => $dialog.css('display') !== 'none',
         })
 
         // Initially hide the dialog
@@ -117,7 +118,7 @@ describe('DialogFormView', () => {
       return this
     }
 
-    $.fn.fixDialogButtons = function() {
+    $.fn.fixDialogButtons = function () {
       return this
     }
 
@@ -169,18 +170,18 @@ describe('DialogFormView', () => {
     jest.useFakeTimers()
     openDialog()
     expect(view.model.get('is_awesome')).toBe(true)
-    
+
     // Simulate checkbox click and form submission
     view.$('label').simulate('click')
     view.$('button[type=submit]').simulate('click')
-    
+
     // Mock the server response
     model.set('is_awesome', false)
     sendResponse('PUT', {
       id: 1,
       is_awesome: false,
     })
-    
+
     jest.advanceTimersByTime(1)
     expect(view.model.get('is_awesome')).toBe(false)
     jest.useRealTimers()

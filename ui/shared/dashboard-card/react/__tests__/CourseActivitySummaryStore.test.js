@@ -116,7 +116,7 @@ describe('CourseActivitySummaryStore', () => {
           clone: () => ({
             json: () => Promise.resolve().then(() => stream),
           }),
-        }))
+        })),
       )
       CourseActivitySummaryStore._fetchForCourse(1)
       await wait(1)
@@ -124,7 +124,7 @@ describe('CourseActivitySummaryStore', () => {
       expect(CourseActivitySummaryStore.getState()).toEqual(
         expect.objectContaining({
           streams: {1: {stream}},
-        })
+        }),
       )
     })
 
@@ -139,7 +139,7 @@ describe('CourseActivitySummaryStore', () => {
           json: () => {
             throw new Error('should never make it here')
           },
-        }))
+        })),
       )
       const errorFn = jest.fn()
       CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
@@ -158,7 +158,7 @@ describe('CourseActivitySummaryStore', () => {
           json: () => {
             throw new Error('should never make it here')
           },
-        }))
+        })),
       )
       const errorFn = jest.fn()
       CourseActivitySummaryStore._fetchForCourse(1).catch(errorFn)
@@ -227,7 +227,7 @@ describe('CourseActivitySummaryStore', () => {
               stream: [],
             },
           },
-        })
+        }),
       )
     })
   })

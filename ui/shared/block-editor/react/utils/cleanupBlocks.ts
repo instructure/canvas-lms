@@ -53,7 +53,7 @@ export const cleanupBlocks = (json: string) => {
         const parentBlock = blocks[parent]
         if (parentBlock) {
           const linkedBlockKey = Object.keys(parentBlock.linkedNodes).find(
-            key => parentBlock.linkedNodes[key] === blockid
+            key => parentBlock.linkedNodes[key] === blockid,
           )
           if (linkedBlockKey) {
             delete parentBlock.linkedNodes[linkedBlockKey]

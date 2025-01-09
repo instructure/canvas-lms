@@ -40,10 +40,10 @@ const I18n = createI18nScope('block-editor')
 const ChooseEditorModal = (props: ChooseEditorModalProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(true)
   const [rememberMyChoice, setRememberMyChoice] = useState<boolean>(
-    ENV.text_editor_preference !== null
+    ENV.text_editor_preference !== null,
   )
   const [editorChoice, setEditorChoice] = useState<'rce' | 'block_editor' | ''>(
-    ENV.text_editor_preference || ''
+    ENV.text_editor_preference || '',
   )
   const [erroredForm, setErroredForm] = useState<boolean>(false)
   const close = () => {
@@ -92,7 +92,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
         <Text lineHeight="condensed">
           <div>
             {I18n.t(
-              "We've introduced a new editor to give you more flexibility and power in content creation. Choose the editor that best suits your workflow."
+              "We've introduced a new editor to give you more flexibility and power in content creation. Choose the editor that best suits your workflow.",
             )}
           </div>
         </Text>
@@ -108,7 +108,7 @@ const ChooseEditorModal = (props: ChooseEditorModalProps) => {
               <Text size="x-small" lineHeight="condensed">
                 <div>
                   {I18n.t(
-                    'Read about key features and discover what you can create using the Block Editor.'
+                    'Read about key features and discover what you can create using the Block Editor.',
                   )}
                 </div>
               </Text>

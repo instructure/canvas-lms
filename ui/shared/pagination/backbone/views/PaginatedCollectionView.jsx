@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {extend} from '@canvas/backbone/utils'
@@ -118,7 +116,7 @@ PaginatedCollectionView.prototype.attachCollection = function () {
         return function () {
           return setTimeout(_this.checkScroll)
         }
-      })(this)
+      })(this),
     )
   } else {
     return this.listenTo(this.collection, 'fetch', this.hideLoadingIndicator)
@@ -213,12 +211,11 @@ PaginatedCollectionView.prototype.showLoadingIndicator = function () {
   const ref = this.$loadingIndicator
   const node = ref?.get(0)
   if (node instanceof HTMLElement) {
-     
     ReactDOM.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,
-      node
+      node,
     )
   }
   return ref != null ? ref.show() : void 0

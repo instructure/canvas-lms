@@ -73,10 +73,10 @@ describe('DirectShareSendToDialog', () => {
   describe('dialog controls', () => {
     it('handles error when fetching users api fails', () => {
       const {getByText, getByLabelText} = render(
-        <DirectShareUserModal open={true} courseId="123" />
+        <DirectShareUserModal open={true} courseId="123" />,
       )
       useContentShareUserSearchApi.mockImplementationOnce(({error}) =>
-        error([{status: 400, body: 'error'}])
+        error([{status: 400, body: 'error'}]),
       )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
@@ -105,7 +105,7 @@ describe('DirectShareSendToDialog', () => {
 
     it('displays user search results', () => {
       const {getByText, getByLabelText} = render(
-        <DirectShareUserModal open={true} courseId="123" />
+        <DirectShareUserModal open={true} courseId="123" />,
       )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
@@ -118,7 +118,7 @@ describe('DirectShareSendToDialog', () => {
 
     it('adds recipients to final list', () => {
       const {getByText, getByTitle, getByLabelText, queryByTitle} = render(
-        <DirectShareUserModal open={true} />
+        <DirectShareUserModal open={true} />,
       )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
@@ -132,7 +132,7 @@ describe('DirectShareSendToDialog', () => {
 
     it('allows removal of recipient from final list', () => {
       const {getByText, getByTitle, getByLabelText, queryByTitle} = render(
-        <DirectShareUserModal open={true} />
+        <DirectShareUserModal open={true} />,
       )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)

@@ -61,7 +61,7 @@ export const generateModalTitle = (
   enrollmentType: EnrollmentType,
   isEditMode: boolean,
   page: number,
-  enrollments: User[]
+  enrollments: User[],
 ): string => {
   const userName = user.name
   const enrollmentName = enrollments[0]?.name
@@ -78,7 +78,7 @@ export const generateModalTitle = (
           one: `Assign temporary enrollments to %{recipient}`,
           other: `Assign temporary enrollments to %{count} users`,
         },
-        {count: enrollments.length, recipient}
+        {count: enrollments.length, recipient},
       )
     } else {
       return I18n.t('Assign temporary enrollments')
@@ -117,7 +117,7 @@ export function TempEnrollModal(props: Props) {
       props.enrollmentType,
       props.isEditMode,
       page,
-      enrollments
+      enrollments,
     )
     setTitle(newTitle)
   }, [props.user, props.enrollmentType, props.isEditMode, page, enrollments])
@@ -140,7 +140,7 @@ export function TempEnrollModal(props: Props) {
 
   const handleGoToAssignPageWithEnrollments = (
     enrollmentUser: User,
-    tempEnrollments: Enrollment[]
+    tempEnrollments: Enrollment[],
   ) => {
     setEnrollments([enrollmentUser])
     setTempEnrollmentsPairing(tempEnrollments)
@@ -152,7 +152,7 @@ export function TempEnrollModal(props: Props) {
   const handleEnrollmentSubmission = (
     isSuccess: boolean,
     isUpdate: boolean,
-    isMultiple: boolean
+    isMultiple: boolean,
   ) => {
     if (isSuccess) {
       setOpen(false)

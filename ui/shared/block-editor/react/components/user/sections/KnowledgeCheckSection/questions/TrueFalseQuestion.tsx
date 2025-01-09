@@ -38,7 +38,7 @@ const TrueFalseQuestion = ({question, onAnswerChange}: TrueFalseQuestionProps) =
       setAnswer(value)
       onAnswerChange(value === correctAnswer)
     },
-    [correctAnswer, onAnswerChange]
+    [correctAnswer, onAnswerChange],
   )
 
   return (

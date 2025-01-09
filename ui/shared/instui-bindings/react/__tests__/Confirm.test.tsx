@@ -30,7 +30,7 @@ describe('confirm', () => {
 
   const runAndWaitUntilClosed = async (
     overrides: Partial<ConfirmProps>,
-    cb: () => Promise<void>
+    cb: () => Promise<void>,
   ) => {
     const props = {...defaultProps, ...overrides}
     const promise = confirm(props)
@@ -77,7 +77,7 @@ describe('confirm', () => {
 
         await waitNoTextElem('Confirm')
         fireEvent.click(await waitTextElem('Custom Confirm'))
-      }
+      },
     )
     expect(success).toBe(true)
   })
@@ -90,7 +90,7 @@ describe('confirm', () => {
       async () => {
         await waitNoTextElem('Cancel')
         fireEvent.click(await waitTextElem('Custom Cancel'))
-      }
+      },
     )
     expect(success).toBe(false)
   })

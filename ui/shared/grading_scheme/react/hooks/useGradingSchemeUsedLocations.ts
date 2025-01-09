@@ -28,12 +28,12 @@ export const useGradingSchemeUsedLocations = (): {
     contextType: 'Account' | 'Course',
     contextId: string,
     gradingSchemeId: string,
-    nextPagePath?: string
+    nextPagePath?: string,
   ) => Promise<{usedLocations: UsedLocation[]; isLastPage: boolean; nextPage: string}>
   gradingSchemeUsedLocationsStatus: string
 } => {
   const [gradingSchemeUsedLocationsStatus, setGradingSchemeUsedLocationsStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const getGradingSchemeUsedLocations = useCallback(
@@ -41,7 +41,7 @@ export const useGradingSchemeUsedLocations = (): {
       contextType: 'Account' | 'Course',
       contextId: string,
       gradingSchemeId: string,
-      nextPagePath?: string
+      nextPagePath?: string,
     ): Promise<{usedLocations: UsedLocation[]; isLastPage: boolean; nextPage: string}> => {
       setGradingSchemeUsedLocationsStatus(ApiCallStatus.PENDING)
       try {
@@ -71,7 +71,7 @@ export const useGradingSchemeUsedLocations = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

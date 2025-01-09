@@ -54,7 +54,7 @@ describe('Blueprint Course apiClient', () => {
         headers: {
           link: '<http://canvas.docker/api/v1/accounts/1/courses?page=2>; rel="next"',
         },
-      })
+      }),
     )
 
     await apiClient.getCourses(accountParams, getCourseParams)
@@ -80,7 +80,7 @@ describe('Blueprint Course apiClient', () => {
         headers: {
           link: '<http://canvas.docker/api/v1/accounts/sub/courses?page=2>; rel="next"',
         },
-      })
+      }),
     )
 
     await apiClient.getCourses(accountParams, {...getCourseParams, subAccount: expectedSubAccount})
@@ -97,10 +97,10 @@ describe('Blueprint Course apiClient', () => {
         data: [],
         headers: {
           link: `<http://canvas.docker/api/v1/accounts/1/courses?search_term=${encodeURIComponent(
-            expectedSearch
+            expectedSearch,
           )}&page=2>; rel="next"`,
         },
-      })
+      }),
     )
 
     await apiClient.getCourses(accountParams, {...getCourseParams, search: expectedSearch})
@@ -117,10 +117,10 @@ describe('Blueprint Course apiClient', () => {
         data: [],
         headers: {
           link: `<http://canvas.docker/api/v1/accounts/1/courses?search_term=${encodeURIComponent(
-            expectedSearch
+            expectedSearch,
           )}&page=2>; rel="next"`,
         },
-      })
+      }),
     )
 
     await apiClient.getCourses(accountParams, {...getCourseParams, search: expectedSearch})

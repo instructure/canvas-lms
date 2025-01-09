@@ -17,12 +17,7 @@
           "displayName": "Course Tour"
         },
         "hidden": false,
-        "nodes": [
-          "gBLermHJ_I",
-          "-OTw61rxIV",
-          "F5y1MWLQWh",
-          "7VTGuZHEST"
-        ],
+        "nodes": ["gBLermHJ_I", "-OTw61rxIV", "F5y1MWLQWh", "7VTGuZHEST"],
         "linkedNodes": {}
       },
       "gBLermHJ_I": {
@@ -57,10 +52,7 @@
         },
         "parent": "gBLermHJ_I",
         "hidden": false,
-        "nodes": [
-          "UyJ_J_jDwx",
-          "i74DnoJSl-"
-        ],
+        "nodes": ["UyJ_J_jDwx", "i74DnoJSl-"],
         "linkedNodes": {}
       },
       "UyJ_J_jDwx": {
@@ -106,9 +98,7 @@
         },
         "parent": "UyJ_J_jDwx",
         "hidden": false,
-        "nodes": [
-          "HfNwRNcsXP"
-        ],
+        "nodes": ["HfNwRNcsXP"],
         "linkedNodes": {}
       },
       "HfNwRNcsXP": {
@@ -153,10 +143,7 @@
         },
         "parent": "HfNwRNcsXP",
         "hidden": false,
-        "nodes": [
-          "WYbHJX9FFX",
-          "w7qoMPKUHI"
-        ],
+        "nodes": ["WYbHJX9FFX", "w7qoMPKUHI"],
         "linkedNodes": {}
       },
       "WYbHJX9FFX": {
@@ -239,9 +226,7 @@
         },
         "parent": "i74DnoJSl-",
         "hidden": false,
-        "nodes": [
-          "zH6ozsYbA7"
-        ],
+        "nodes": ["zH6ozsYbA7"],
         "linkedNodes": {}
       },
       "zH6ozsYbA7": {
@@ -299,9 +284,7 @@
         },
         "parent": "-OTw61rxIV",
         "hidden": false,
-        "nodes": [
-          "EbpgAIz3DD"
-        ],
+        "nodes": ["EbpgAIz3DD"],
         "linkedNodes": {}
       },
       "EbpgAIz3DD": {
@@ -383,9 +366,7 @@
         },
         "parent": "F5y1MWLQWh",
         "hidden": false,
-        "nodes": [
-          "vFE45qX1YU"
-        ],
+        "nodes": ["vFE45qX1YU"],
         "linkedNodes": {}
       },
       "vFE45qX1YU": {
@@ -431,10 +412,7 @@
         },
         "parent": "vFE45qX1YU",
         "hidden": false,
-        "nodes": [
-          "IL7G0IP9db",
-          "MfZJRSVgoc"
-        ],
+        "nodes": ["IL7G0IP9db", "MfZJRSVgoc"],
         "linkedNodes": {}
       },
       "IL7G0IP9db": {
@@ -479,9 +457,7 @@
         },
         "parent": "IL7G0IP9db",
         "hidden": false,
-        "nodes": [
-          "C7TtraT18Y"
-        ],
+        "nodes": ["C7TtraT18Y"],
         "linkedNodes": {}
       },
       "C7TtraT18Y": {
@@ -546,11 +522,7 @@
         },
         "parent": "MfZJRSVgoc",
         "hidden": false,
-        "nodes": [
-          "uW8PPU_Ndg",
-          "utquyV1iPC",
-          "_6sT3jAedH"
-        ],
+        "nodes": ["uW8PPU_Ndg", "utquyV1iPC", "_6sT3jAedH"],
         "linkedNodes": {}
       },
       "uW8PPU_Ndg": {
@@ -596,11 +568,7 @@
         },
         "parent": "uW8PPU_Ndg",
         "hidden": false,
-        "nodes": [
-          "BM0FJY7OQs",
-          "s9qS1WjFms",
-          "ZuTKe36cxw"
-        ],
+        "nodes": ["BM0FJY7OQs", "s9qS1WjFms", "ZuTKe36cxw"],
         "linkedNodes": {}
       },
       "BM0FJY7OQs": {
@@ -705,11 +673,7 @@
         },
         "parent": "utquyV1iPC",
         "hidden": false,
-        "nodes": [
-          "AwBDad1Su6",
-          "xTbVb0rEJa",
-          "i2x1ctYNgj"
-        ],
+        "nodes": ["AwBDad1Su6", "xTbVb0rEJa", "i2x1ctYNgj"],
         "linkedNodes": {}
       },
       "AwBDad1Su6": {
@@ -814,11 +778,7 @@
         },
         "parent": "_6sT3jAedH",
         "hidden": false,
-        "nodes": [
-          "LHFXm2vkIh",
-          "ohwksfUk7u",
-          "rrY88jOL9D"
-        ],
+        "nodes": ["LHFXm2vkIh", "ohwksfUk7u", "rrY88jOL9D"],
         "linkedNodes": {}
       },
       "LHFXm2vkIh": {
@@ -911,9 +871,7 @@
         },
         "parent": "7VTGuZHEST",
         "hidden": false,
-        "nodes": [
-          "9HM_rjAJAY"
-        ],
+        "nodes": ["9HM_rjAJAY"],
         "linkedNodes": {}
       },
       "9HM_rjAJAY": {
@@ -960,9 +918,7 @@
         },
         "parent": "9HM_rjAJAY",
         "hidden": false,
-        "nodes": [
-          "WHqtC9IIs_"
-        ],
+        "nodes": ["WHqtC9IIs_"],
         "linkedNodes": {}
       },
       "WHqtC9IIs_": {
@@ -1007,9 +963,7 @@
         },
         "parent": "WHqtC9IIs_",
         "hidden": false,
-        "nodes": [
-          "hDOpSj__EE"
-        ],
+        "nodes": ["hDOpSj__EE"],
         "linkedNodes": {}
       },
       "hDOpSj__EE": {

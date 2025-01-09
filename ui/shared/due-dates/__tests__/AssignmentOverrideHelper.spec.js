@@ -66,7 +66,7 @@ describe('AssignmentOverrideHelper#effectiveDueDatesForAssignment - assignment o
     dueDates = AssignmentOverrideHelper.effectiveDueDatesForAssignment(
       assignment,
       overrides,
-      defaultStudents
+      defaultStudents,
     )
   })
 
@@ -99,7 +99,7 @@ describe('AssignmentOverrideHelper#effectiveDueDatesForAssignment - assignment v
     dueDates = AssignmentOverrideHelper.effectiveDueDatesForAssignment(
       assignment,
       overrides,
-      defaultStudents
+      defaultStudents,
     )
   })
 

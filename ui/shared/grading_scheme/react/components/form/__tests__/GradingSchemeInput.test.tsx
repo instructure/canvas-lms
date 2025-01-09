@@ -48,14 +48,14 @@ describe('GradingSchemeInput', () => {
         }}
         schemeInputType="percentage"
         onSave={onSave}
-      />
+      />,
     )
 
     const titleInput = screen.getByLabelText('Grading Scheme Name *')
     expect(titleInput).toBeInTheDocument()
 
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
-    expect(letterGradeInputs.length).toBe(5)
+    expect(letterGradeInputs).toHaveLength(5)
     expect(letterGradeInputs[0].value).toBe('A')
     expect(letterGradeInputs[1].value).toBe('B')
     expect(letterGradeInputs[2].value).toBe('C')
@@ -73,7 +73,7 @@ describe('GradingSchemeInput', () => {
 
     const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
 
-    expect(maxRangeCells.length).toBe(5)
+    expect(maxRangeCells).toHaveLength(5)
     expect(maxRangeCells[0].textContent).toBe('100%')
     expect(maxRangeCells[1].textContent).toBe('< 90%')
     expect(maxRangeCells[2].textContent).toBe('< 80%')
@@ -90,21 +90,21 @@ describe('GradingSchemeInput', () => {
         }}
         schemeInputType="points"
         onSave={onSave}
-      />
+      />,
     )
 
     const titleInput = screen.getByLabelText('Grading Scheme Name *')
     expect(titleInput).toBeInTheDocument()
 
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
-    expect(letterGradeInputs.length).toBe(4)
+    expect(letterGradeInputs).toHaveLength(4)
     expect(letterGradeInputs[0].value).toBe('A')
     expect(letterGradeInputs[1].value).toBe('B')
     expect(letterGradeInputs[2].value).toBe('C')
     expect(letterGradeInputs[3].value).toBe('D')
 
     const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
-    expect(maxRangeCells.length).toBe(4)
+    expect(maxRangeCells).toHaveLength(4)
     expect((maxRangeCells[0] as HTMLInputElement).value).toBe('4')
     expect(maxRangeCells[1].textContent).toBe('< 3')
     expect(maxRangeCells[2].textContent).toBe('< 2')
@@ -129,7 +129,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalled()
@@ -146,7 +146,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalled()
@@ -163,7 +163,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const deleteRowButton = screen.getAllByText('Remove letter grade row')
     act(() => deleteRowButton[0].click())
@@ -182,13 +182,13 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
-    expect(deleteRowButtons.length).toBe(2)
+    expect(deleteRowButtons).toHaveLength(2)
     act(() => deleteRowButtons[1].click()) // delete the last row
     const newDeleteRowButtons = screen.getAllByText('Remove letter grade row')
-    expect(newDeleteRowButtons.length).toBe(1)
+    expect(newDeleteRowButtons).toHaveLength(1)
     act(() => gradingSchemeInputRef.current?.savePressed())
     expect(onSave).toHaveBeenCalledWith({
       title: 'A Grading Scheme',
@@ -209,13 +209,13 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
-    expect(deleteRowButtons.length).toBe(2)
+    expect(deleteRowButtons).toHaveLength(2)
     act(() => deleteRowButtons[0].click()) // delete the first row
     const newDeleteRowButtons = screen.getAllByText('Remove letter grade row')
-    expect(newDeleteRowButtons.length).toBe(1)
+    expect(newDeleteRowButtons).toHaveLength(1)
     act(() => gradingSchemeInputRef.current?.savePressed())
     // expect(onSave).toHaveBeenCalled()
     expect(onSave).toHaveBeenCalledWith({
@@ -237,10 +237,10 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const deleteRowButtons = screen.getAllByText('Remove letter grade row')
-    expect(deleteRowButtons.length).toBe(5)
+    expect(deleteRowButtons).toHaveLength(5)
     act(() => deleteRowButtons[4].click()) // delete the last row
     act(() => gradingSchemeInputRef.current?.savePressed())
     // expect(onSave).toHaveBeenCalled()
@@ -268,16 +268,16 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const addRowButtons = screen.getAllByText(
-      'Add new row for a letter grade to grading scheme after this row'
+      'Add new row for a letter grade to grading scheme after this row',
     )
 
-    expect(addRowButtons.length).toBe(2)
+    expect(addRowButtons).toHaveLength(2)
     act(() => addRowButtons[0].click()) // add a row after the first row
     const letterGradeInputs = screen.getAllByLabelText('Letter Grade')
-    expect(letterGradeInputs.length).toBe(3) // we've added a row between the initial two
+    expect(letterGradeInputs).toHaveLength(3) // we've added a row between the initial two
     await userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
 
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -304,15 +304,15 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const addRowButtons = screen.getAllByText(
-      'Add new row for a letter grade to grading scheme after this row'
+      'Add new row for a letter grade to grading scheme after this row',
     )
-    expect(addRowButtons.length).toBe(2)
+    expect(addRowButtons).toHaveLength(2)
     act(() => addRowButtons[0].click()) // add a row after the first row
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
-    expect(letterGradeInputs.length).toBe(3) // we've added a row between the initial two
+    expect(letterGradeInputs).toHaveLength(3) // we've added a row between the initial two
     await userEvent.type(letterGradeInputs[1], 'X') // give the new row a letter grade
 
     act(() => gradingSchemeInputRef.current?.savePressed())
@@ -339,7 +339,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
 
@@ -350,7 +350,7 @@ describe('GradingSchemeInput', () => {
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -367,7 +367,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText('Upper limit of range')
 
@@ -377,7 +377,7 @@ describe('GradingSchemeInput', () => {
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -394,7 +394,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
 
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
@@ -402,7 +402,7 @@ describe('GradingSchemeInput', () => {
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -419,14 +419,14 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
     await userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -443,14 +443,14 @@ describe('GradingSchemeInput', () => {
         schemeInputType="points"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
     await userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than the upper points range. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -467,7 +467,7 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
 
@@ -477,7 +477,7 @@ describe('GradingSchemeInput', () => {
 
     // ensure that this value shows in the next row's max range as a string
     const maxRangeCells = screen.getAllByLabelText('Upper limit of range')
-    expect(maxRangeCells.length).toBe(5)
+    expect(maxRangeCells).toHaveLength(5)
     expect(maxRangeCells[0].textContent).toBe('100%')
     expect(maxRangeCells[1].textContent).toBe('< foo%')
     expect(maxRangeCells[2].textContent).toBe('< 80%')
@@ -486,7 +486,7 @@ describe('GradingSchemeInput', () => {
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -503,14 +503,14 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
     await userEvent.type(rangeInputs[0], '-1') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -527,14 +527,14 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     const rangeInputs = screen.getAllByLabelText<HTMLInputElement>('Lower limit of range')
     await userEvent.type(rangeInputs[0], '101') // give the 1st row an invalid value
 
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again."
+      "Range must be a valid number. Cannot have negative numbers or numbers that are greater than 100. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -551,11 +551,11 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Grading Scheme Name is required. Add a name and try clicking 'Save' again."
+      "Grading Scheme Name is required. Add a name and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -572,11 +572,11 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again."
+      "Cannot have overlapping or empty ranges. Fix the ranges and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -593,11 +593,11 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -614,11 +614,11 @@ describe('GradingSchemeInput', () => {
         schemeInputType="percentage"
         onSave={onSave}
         ref={gradingSchemeInputRef}
-      />
+      />,
     )
     act(() => gradingSchemeInputRef.current?.savePressed())
     const validationError = screen.getByText(
-      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again."
+      "Cannot have duplicate or empty row names. Fix the names and try clicking 'Save' again.",
     )
     expect(validationError).toBeInTheDocument()
     expect(onSave).toHaveBeenCalledTimes(0)
@@ -633,7 +633,7 @@ describe('GradingSchemeInput', () => {
         }}
         schemeInputType="percentage"
         onSave={onSave}
-      />
+      />,
     )
 
     const titleInput = screen.getByLabelText('Grading Scheme Name *')
@@ -651,7 +651,7 @@ describe('GradingSchemeInput', () => {
 
     // verify scheme chagned from pct to points defaults
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
-    expect(letterGradeInputs.length).toBe(4)
+    expect(letterGradeInputs).toHaveLength(4)
     expect(letterGradeInputs[0].value).toBe('A')
     expect(letterGradeInputs[1].value).toBe('B')
     expect(letterGradeInputs[2].value).toBe('C')
@@ -681,7 +681,7 @@ describe('GradingSchemeInput', () => {
         }}
         onSave={onSave}
         schemeInputType="percentage"
-      />
+      />,
     )
 
     const titleInput = screen.getByLabelText('Grading Scheme Name *')
@@ -703,7 +703,7 @@ describe('GradingSchemeInput', () => {
     expect(titleInputPoints.value).toEqual('A Grading Scheme') // title does not change when points / pct radio changes
 
     const letterGradeInputs = screen.getAllByLabelText<HTMLInputElement>('Letter Grade')
-    expect(letterGradeInputs.length).toBe(4)
+    expect(letterGradeInputs).toHaveLength(4)
     expect(letterGradeInputs[0].value).toBe('A')
     expect(letterGradeInputs[1].value).toBe('B')
     expect(letterGradeInputs[2].value).toBe('C')

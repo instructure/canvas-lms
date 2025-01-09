@@ -79,7 +79,7 @@ const ResizePopup = ({
         setHeightValue(h)
       }
     },
-    [aspectRatio, maintainAspectRatio]
+    [aspectRatio, maintainAspectRatio],
   )
 
   const handleChangeHeight = useCallback(
@@ -91,14 +91,14 @@ const ResizePopup = ({
         setWidthValue(w)
       }
     },
-    [aspectRatio, maintainAspectRatio]
+    [aspectRatio, maintainAspectRatio],
   )
 
   const handleSizeVariantChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>, value: string) => {
       setSizeVariantValue(value as ImageSizeVariant)
     },
-    []
+    [],
   )
 
   const setImageSize = useCallback(() => {

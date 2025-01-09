@@ -28,15 +28,15 @@ export const mapStateToProps = ({loading, opportunities, timeZone, weeklyDashboa
   const today = days.find(([date]) => date === todaysDate)
   if (today?.[1]?.length) {
     props.assignmentsDueToday = countByCourseId(
-      today[1].filter(({status}) => status && !status.submitted)
+      today[1].filter(({status}) => status && !status.submitted),
     )
     props.assignmentsCompletedForToday = countByCourseId(
-      today[1].filter(({status}) => status && status.submitted)
+      today[1].filter(({status}) => status && status.submitted),
     )
   }
   if (opportunities?.items?.length) {
     props.assignmentsMissing = countByCourseId(
-      opportunities.items.filter(({planner_override}) => !planner_override?.dismissed)
+      opportunities.items.filter(({planner_override}) => !planner_override?.dismissed),
     )
   }
   props.loadingOpportunities = !loading?.allOpportunitiesLoaded

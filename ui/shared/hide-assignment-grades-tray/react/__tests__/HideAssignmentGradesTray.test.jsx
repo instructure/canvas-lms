@@ -70,7 +70,7 @@ describe('HideAssignmentGradesTray', () => {
         ref={ref => {
           trayRef = ref
         }}
-      />
+      />,
     )
   }
 
@@ -162,7 +162,7 @@ describe('HideAssignmentGradesTray', () => {
 
     it('disables hide button while processing', async () => {
       const hideAssignmentGradesMock = jest.fn(
-        () => new Promise(resolve => setTimeout(resolve, 100))
+        () => new Promise(resolve => setTimeout(resolve, 100)),
       )
       Api.hideAssignmentGrades.mockImplementation(hideAssignmentGradesMock)
       await showTray()

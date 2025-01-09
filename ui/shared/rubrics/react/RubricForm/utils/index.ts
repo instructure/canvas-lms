@@ -41,7 +41,7 @@ export const translateRubricQueryResponse = (fields: RubricQueryResponse): Rubri
 
 export const translateRubricData = (
   rubric: Rubric,
-  rubricAssociation: RubricAssociation
+  rubricAssociation: RubricAssociation,
 ): RubricFormProps => {
   return {
     id: rubric.id,

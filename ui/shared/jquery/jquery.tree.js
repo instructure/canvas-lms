@@ -263,7 +263,7 @@ $.fn.instTree = function (options) {
         $(activeElement).replaceWith(
           '<span class="text">&nbsp;</span><input type="text" value="' +
             htmlEscape($(activeElement).text()) +
-            '" />'
+            '" />',
         )
 
         li.find('input:text')

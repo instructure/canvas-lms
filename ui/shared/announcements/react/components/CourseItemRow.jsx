@@ -252,7 +252,7 @@ export default class CourseItemRow extends Component {
                 )}
                 {this.props.title}
               </Heading>,
-              '_titleElement'
+              '_titleElement',
             )}
             {this.props.sectionToolTip}
             {this.props.body ? this.renderDiv(this.props.body) : null}
@@ -299,8 +299,8 @@ export default class CourseItemRow extends Component {
             <div className="ic-item-row__meta-content">{this.props.metaContent}</div>
           </div>
         </div>,
-        {dropEffect: 'copy'}
-      )
+        {dropEffect: 'copy'},
+      ),
     )
   }
 }

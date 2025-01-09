@@ -61,7 +61,7 @@ describe('Notification Preferences', () => {
     const notification_times = getByTestId('notification_times')
     expect(notification_times).not.toBeNull()
     expect(notification_times.textContent).toEqual(
-      'Daily notifications will be delivered around 6pm. Weekly notifications will be delivered Saturday between 7pm and 9pm.Close'
+      'Daily notifications will be delivered around 6pm. Weekly notifications will be delivered Saturday between 7pm and 9pm.Close',
     )
   })
 
@@ -107,8 +107,8 @@ describe('Notification Preferences', () => {
 
     expect(
       getByText(
-        'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.'
-      )
+        'Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -121,8 +121,8 @@ describe('Notification Preferences', () => {
 
     expect(
       getByText(
-        'Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.'
-      )
+        'Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.',
+      ),
     ).toBeInTheDocument()
   })
 

@@ -51,11 +51,11 @@ const AnnouncementModal = ({
       data: {
         value?: string | number
         id?: string
-      }
+      },
     ) => {
       setAnnouncementId(data.value as string)
     },
-    []
+    [],
   )
 
   const handleChooseAnnouncement = useCallback(() => {

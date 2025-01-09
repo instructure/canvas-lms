@@ -117,12 +117,7 @@ for (const [timeZoneDesc, timeZoneName] of [
         courses: [{id: '1', shortName: 'Course 1', color: '#00FF00', originalName: 'Course 1'}],
       }
       const {getByTestId} = renderWithRedux(
-        <Day
-          {...defaultProps}
-          timeZone={timeZoneName}
-          day={today}
-          showMissingAssignments={true}
-        />,
+        <Day {...defaultProps} timeZone={timeZoneName} day={today} showMissingAssignments={true} />,
         {reduxState: mockState},
       )
 

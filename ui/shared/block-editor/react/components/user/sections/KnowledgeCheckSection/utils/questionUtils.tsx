@@ -30,7 +30,7 @@ const defaultHandleCheckAnswer = (_result: boolean) => true
 
 export const renderQuestion = (
   question: QuestionProps,
-  handleCheckAnswer: (result: boolean) => void = defaultHandleCheckAnswer
+  handleCheckAnswer: (result: boolean) => void = defaultHandleCheckAnswer,
 ) => {
   // @ts-expect-error
   switch (question.interaction_type_slug) {

@@ -25,7 +25,7 @@ const getToolbarPos = (
   domNode: HTMLElement | null,
   mountPoint: HTMLElement,
   currentToolbarOrTagRef: HTMLElement | null,
-  includeOffset: boolean = true
+  includeOffset: boolean = true,
 ) => {
   if (!domNode) return {top: 0, left: 0}
 
@@ -54,7 +54,7 @@ const getToolbarPos = (
 function findUpNode(
   node: Node,
   query: any,
-  templateEditor: TemplateEditor = TemplateEditor.NONE
+  templateEditor: TemplateEditor = TemplateEditor.NONE,
 ): Node | undefined {
   let upnode = node.data.parent ? query.node(node.data.parent).get() : undefined
   while (upnode && upnode.data.parent && upnode.data.custom?.noToolbar) {

@@ -59,7 +59,7 @@ export type submitMigrationFormData = {
 
 export type onSubmitMigrationFormCallback = (
   formData: submitMigrationFormData,
-  preAttachmentFile?: File
+  preAttachmentFile?: File,
 ) => void
 
 export type DateShiftsRequestBody = DateShiftsCommon & {

@@ -27,7 +27,7 @@ const renderComponent = (props = {}) => {
       selectedTags={Object.keys(AvailableTags)}
       interaction="enabled"
       {...props}
-    />
+    />,
   )
 }
 

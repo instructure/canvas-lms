@@ -233,7 +233,7 @@ describe('MessageStudentsWhoHelper', () => {
       const cutoff = 5
       const selected = 'Scored more than'
       const filteredStudents = MessageStudentsWhoHelper.callbackFn(selected, cutoff, students)
-      expect(filteredStudents.length).toBe(1)
+      expect(filteredStudents).toHaveLength(1)
       expect(filteredStudents[0]).toBe('1')
     })
   })
@@ -332,7 +332,7 @@ describe('MessageStudentsWhoHelper', () => {
         recipientsIds,
         subject,
         body,
-        contextCode
+        contextCode,
       )
       const request = getRequest()
       expect(request.method).toBe('POST')
@@ -344,7 +344,7 @@ describe('MessageStudentsWhoHelper', () => {
         recipientsIds,
         subject,
         body,
-        contextCode
+        contextCode,
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.mode).toBe('async')
@@ -355,7 +355,7 @@ describe('MessageStudentsWhoHelper', () => {
         recipientsIds,
         subject,
         body,
-        contextCode
+        contextCode,
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.group_conversation).toBe(true)
@@ -366,7 +366,7 @@ describe('MessageStudentsWhoHelper', () => {
         recipientsIds,
         subject,
         body,
-        contextCode
+        contextCode,
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.bulk_message).toBe(true)
@@ -381,7 +381,7 @@ describe('MessageStudentsWhoHelper', () => {
         {
           id: '123',
           type: 'video',
-        }
+        },
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.media_comment_id).toBe('123')
@@ -395,7 +395,7 @@ describe('MessageStudentsWhoHelper', () => {
         body,
         contextCode,
         null,
-        ['4', '8']
+        ['4', '8'],
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData.attachment_ids).toEqual(['4', '8'])
@@ -406,7 +406,7 @@ describe('MessageStudentsWhoHelper', () => {
         recipientsIds,
         subject,
         body,
-        contextCode
+        contextCode,
       )
       const bodyData = JSON.parse(getRequest().requestBody)
       expect(bodyData).not.toHaveProperty('media_comment_id')

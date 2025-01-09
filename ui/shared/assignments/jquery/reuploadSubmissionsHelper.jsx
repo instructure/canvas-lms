@@ -95,7 +95,7 @@ export function setupSubmitHandler(userAssetString) {
         const isZip = fileName.match(/\.zip$/)
         fileRoot = createRoot(uploadedFileTagContainer)
         fileRoot.render(
-          <Flex direction='column' margin="0 0 small 0">
+          <Flex direction="column" margin="0 0 small 0">
             <Flex.Item>
               <Tag
                 text={<AccessibleContent alt={fileName}>{fileName}</AccessibleContent>}
@@ -108,10 +108,12 @@ export function setupSubmitHandler(userAssetString) {
                 <Flex.Item as="div" margin="0 xx-small xxx-small 0">
                   <IconWarningSolid color="error" />
                 </Flex.Item>
-                <Text size="small" color="danger">{I18n.t('File type must be .zip')}</Text>
+                <Text size="small" color="danger">
+                  {I18n.t('File type must be .zip')}
+                </Text>
               </Flex>
             )}
-          </Flex>
+          </Flex>,
         )
       }
     }

@@ -46,7 +46,7 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
             hide={unmount(root)}
             importId={importId}
             invokedImport={invokedImport}
-          />
+          />,
         )
       }
     })
@@ -89,14 +89,13 @@ export default class OutcomesImporter extends Component {
 
   pollImportStatus(importId) {
     this.pollStatus = setInterval(() => {
-       
       apiClient.queryImportStatus(this.props.contextUrlRoot, importId).then(response => {
         const workflowState = response.data.workflow_state
         if (workflowState === 'succeeded' || workflowState === 'failed') {
           this.completeUpload(
             importId,
             response.data.processing_errors.length,
-            workflowState === 'succeeded'
+            workflowState === 'succeeded',
           )
           clearInterval(this.pollStatus)
         }
@@ -141,7 +140,7 @@ export default class OutcomesImporter extends Component {
       showFlashAlert({
         type: 'error',
         message: I18n.t(
-          'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.'
+          'There was an error with your import, please examine your file and attempt the upload again. Check your email for more details.',
         ),
       })
     } else {
@@ -176,7 +175,7 @@ export default class OutcomesImporter extends Component {
     showFlashAlert({
       type: 'warning',
       message: I18n.t(
-        'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
+        'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.',
       ),
     })
   }

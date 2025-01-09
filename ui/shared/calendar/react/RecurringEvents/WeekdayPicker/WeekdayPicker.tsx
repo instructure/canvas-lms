@@ -111,12 +111,12 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
         }
       }
       const sortedDays = newDays.sort(
-        (a, b) => weekDays.dayRRULEValues.indexOf(a) - weekDays.dayRRULEValues.indexOf(b)
+        (a, b) => weekDays.dayRRULEValues.indexOf(a) - weekDays.dayRRULEValues.indexOf(b),
       )
       setShowError(sortedDays.length === 0)
       onChange(sortedDays)
     },
-    [onChange, selectedDays, weekDays.dayRRULEValues]
+    [onChange, selectedDays, weekDays.dayRRULEValues],
   )
 
   // until canvas is on instui 8 where <Flex> has the gap prop
@@ -143,7 +143,7 @@ export default function WeekdayPicker({locale, selectedDays = [], onChange}: Wee
           <span aria-hidden="true">*</span>
         </>
       ),
-    [showError]
+    [showError],
   )
 
   return (

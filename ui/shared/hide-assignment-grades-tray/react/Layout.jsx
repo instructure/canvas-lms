@@ -54,7 +54,7 @@ export default function Layout({
       {!gradesPublished && (
         <Alert margin="x-small" variant="warning">
           {I18n.t(
-            'Hiding grades is not allowed because grades have not been released for this assignment.'
+            'Hiding grades is not allowed because grades have not been released for this assignment.',
           )}
         </Alert>
       )}
@@ -68,7 +68,7 @@ export default function Layout({
       {gradesPublished && hasSections && anonymousGrading && (
         <Alert margin="x-small" variant="info">
           {I18n.t(
-            'When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.'
+            'When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied.',
           )}
         </Alert>
       )}

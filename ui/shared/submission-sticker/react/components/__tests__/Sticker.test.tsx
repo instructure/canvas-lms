@@ -140,7 +140,7 @@ describe('Sticker', () => {
             element?.getAttribute('alt') ===
               'A placeholder sticker with a smiley face and a plus sign.'
           )
-        })
+        }),
       ).toBeInTheDocument()
     })
 

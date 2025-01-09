@@ -62,7 +62,7 @@ async function createMutationMocks(mutationOverrides) {
       channelId: '1',
       category: 'Grading',
       frequency: 'never',
-    }
+    },
   )
 
   return [
@@ -123,14 +123,14 @@ describe('Course Notification Settings', () => {
         <AlertManager>
           <CourseNotificationSettingsQuery courseId="1" courseName="Super Cool Class" userId="1" />
         </AlertManager>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(await findByTestId('enable-notifications-toggle')).toBeInTheDocument()
     expect(
       await findByText(
-        'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.'
-      )
+        'You are currently receiving notifications for this course. To disable course notifications, use the toggle above.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -142,13 +142,13 @@ describe('Course Notification Settings', () => {
         <AlertManager>
           <CourseNotificationSettingsQuery courseId="1" courseName="Super Cool Class" userId="1" />
         </AlertManager>
-      </MockedProvider>
+      </MockedProvider>,
     )
 
     expect(
       await findByText(
-        'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.'
-      )
+        'You will not receive any course notifications at this time. To enable course notifications, use the toggle above.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -180,7 +180,7 @@ describe('Course Notification Settings', () => {
             notificationPreferences={mockedPrefs}
           />
         </MockedProvider>
-      </AlertManagerContext.Provider>
+      </AlertManagerContext.Provider>,
     )
 
     const button = getAllByRole('button').pop()

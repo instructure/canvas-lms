@@ -63,7 +63,7 @@ export function hasSubmission(assignment) {
 
   return some(
     submissionTypes,
-    submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
+    submissionType => submissionType !== 'none' && submissionType !== 'on_paper',
   )
 }
 
@@ -108,7 +108,7 @@ const MessageStudentsWhoHelper = {
     body: string,
     contextCode: string,
     mediaFile?: {id: string; type: string},
-    attachmentIds: null | string[] = null
+    attachmentIds: null | string[] = null,
   ) {
     const params: MessageStudentParams = {
       recipients: recipientsIds,
@@ -210,7 +210,7 @@ const MessageStudentsWhoHelper = {
     // @ts-expect-error
     const criteriaFn = this.findOptionByText(selected).criteriaFn
     const studentsMatchingCriteria = filter(students, student =>
-      criteriaFn(student.user_data, cutoff)
+      criteriaFn(student.user_data, cutoff),
     )
     return map(studentsMatchingCriteria, student => student.user_data.id)
   },

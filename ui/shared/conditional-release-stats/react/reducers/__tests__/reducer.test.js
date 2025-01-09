@@ -94,7 +94,7 @@ describe('Conditional Release Stats reducer', () => {
             },
           ],
         },
-      })
+      }),
     )
     expect(newState.studentCache).toEqual({
       1: {

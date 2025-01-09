@@ -42,7 +42,7 @@ export default {
     const excusedMountPoints = document.querySelectorAll('.submission-excused-pill')
     const extendedMountPoints = document.querySelectorAll('.submission-extended-pill')
     const customGradeStatusMountPoints = document.querySelectorAll(
-      '[class^="submission-custom-grade-status-pill-"]'
+      '[class^="submission-custom-grade-status-pill-"]',
     )
 
     forEachNode(missMountPoints, mountPoint => {

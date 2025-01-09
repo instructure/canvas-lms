@@ -250,7 +250,7 @@ const RubricsForContext = ({
   }
 
   const filteredContextRubrics = rubricsForContext?.filter(({rubric}) =>
-    rubric.title.toLowerCase().includes(search.toLowerCase())
+    rubric.title.toLowerCase().includes(search.toLowerCase()),
   )
 
   return (

@@ -43,7 +43,7 @@ describe('WikiPageRevision', () => {
           pageUrl: 'page-url',
           latest: true,
           summary: true,
-        }
+        },
       )
       expect(revision.contextAssetString).toBe('course_73')
       expect(revision.page).toBe(page)
@@ -58,7 +58,7 @@ describe('WikiPageRevision', () => {
         {
           contextAssetString: 'course_73',
           pageUrl: 'page-url',
-        }
+        },
       )
       expect(revision.urlRoot()).toBe('/api/v1/courses/73/pages/page-url/revisions')
     })
@@ -69,7 +69,7 @@ describe('WikiPageRevision', () => {
         {
           contextAssetString: 'course_73',
           pageUrl: 'page-url',
-        }
+        },
       )
       expect(revision.url()).toBe('/api/v1/courses/73/pages/page-url/revisions')
     })
@@ -80,7 +80,7 @@ describe('WikiPageRevision', () => {
         {
           contextAssetString: 'course_73',
           pageUrl: 'page-url',
-        }
+        },
       )
       expect(revision.url()).toBe('/api/v1/courses/73/pages/page-url/revisions/42')
     })
@@ -92,7 +92,7 @@ describe('WikiPageRevision', () => {
           contextAssetString: 'course_73',
           pageUrl: 'page-url',
           latest: true,
-        }
+        },
       )
       expect(revision.url()).toBe('/api/v1/courses/73/pages/page-url/revisions/latest')
     })
@@ -124,12 +124,12 @@ describe('WikiPageRevision', () => {
         {
           contextAssetString: 'course_73',
           pageUrl: 'page-url',
-        }
+        },
       )
       await revision.restore()
       expect($.ajaxJSON).toHaveBeenCalledWith(
         '/api/v1/courses/73/pages/page-url/revisions/42',
-        'POST'
+        'POST',
       )
     })
   })
@@ -143,7 +143,7 @@ describe('WikiPageRevision', () => {
           contextAssetString: 'course_73',
           pageUrl: 'page-url',
           summary: true,
-        }
+        },
       )
       revision.fetch()
       expect($.ajax.mock.calls[0][0].data.summary).toBe(true)

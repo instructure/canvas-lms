@@ -30,7 +30,7 @@ describe('@canvas/brandable-css#loadStylesheet', () => {
     BrandableCSS.loadStylesheet(bundleId, {combinedChecksum: fingerprint})
 
     expect(document.head.querySelector('link[rel="stylesheet"]:last-of-type').href).toEqual(
-      `http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`
+      `http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`,
     )
   })
 })
@@ -77,7 +77,7 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
       expect.any(String),
       expect.objectContaining({
         combinedChecksum: 'xxx',
-      })
+      }),
     )
   })
 
@@ -93,13 +93,13 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
       expect.any(String),
       expect.objectContaining({
         includesNoVariables: true,
-      })
+      }),
     )
   })
 
   it('throws if bundle has no mapping', () => {
     expect(() => subject({id: 'asdfasdf', bundle: 'asdfasdf'})).toThrow(
-      /requested to load stylesheet for template.*but no mapping is available/
+      /requested to load stylesheet for template.*but no mapping is available/,
     )
   })
 })
@@ -112,7 +112,7 @@ describe('@canvas/brandable-css#urlFor', () => {
 
   test('should have right default', () => {
     expect(subject(bundleId, {combinedChecksum: fingerprint})).toEqual(
-      `/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`
+      `/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`,
     )
   })
 
@@ -121,7 +121,7 @@ describe('@canvas/brandable-css#urlFor', () => {
       subject(bundleId, {
         combinedChecksum: fingerprint,
         includesNoVariables: true,
-      })
+      }),
     ).toEqual(`/dist/brandable_css/no_variables/${bundleId}-${fingerprint}.css`)
   })
 
@@ -130,7 +130,7 @@ describe('@canvas/brandable-css#urlFor', () => {
     env.use_high_contrast = false
 
     expect(subject(bundleId, {combinedChecksum: fingerprint})).toEqual(
-      `http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`
+      `http://cdn.example.com/dist/brandable_css/new_styles_normal_contrast/${bundleId}-${fingerprint}.css`,
     )
   })
 
@@ -139,7 +139,7 @@ describe('@canvas/brandable-css#urlFor', () => {
     env.use_high_contrast = true
 
     expect(subject(bundleId, {combinedChecksum: fingerprint})).toEqual(
-      `http://cdn.example.com/dist/brandable_css/new_styles_high_contrast/${bundleId}-${fingerprint}.css`
+      `http://cdn.example.com/dist/brandable_css/new_styles_high_contrast/${bundleId}-${fingerprint}.css`,
     )
   })
 })

@@ -60,8 +60,8 @@ export const PageBlock = ({children}: PageBlockProps) => {
         scrollingContainer.scrollTo({top: 0, behavior: 'instant'})
       })
     }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handlePagekey: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
     e => {
@@ -81,7 +81,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
         kbnav.key(e, actions, query, selectedNodeId)
       }
     },
-    [actions, kbnav, query, selectedNodeId]
+    [actions, kbnav, query, selectedNodeId],
   )
 
   // Per the w3c:
@@ -99,7 +99,7 @@ export const PageBlock = ({children}: PageBlockProps) => {
         }
       }
     },
-    [actions, enabled]
+    [actions, enabled],
   )
 
   const handlePaste = useCallback((_e: React.ClipboardEvent<HTMLDivElement>) => {

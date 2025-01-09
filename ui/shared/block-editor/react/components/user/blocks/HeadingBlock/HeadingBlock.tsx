@@ -55,7 +55,7 @@ export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) =>
         props.text = e.target.value.replace(/<\/?[^>]+(>|$)/g, '')
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const handleKey = useCallback(
@@ -73,7 +73,7 @@ export const HeadingBlock = ({text = '', level, fontSize}: HeadingBlockProps) =>
         setEditable(true)
       }
     },
-    [editable]
+    [editable],
   )
 
   // @ts-expect-error

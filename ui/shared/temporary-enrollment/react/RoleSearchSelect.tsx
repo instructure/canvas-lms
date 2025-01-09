@@ -39,14 +39,14 @@ const reEscapeMatcher = /(\^|\$|\|\.|\*|\+|\?|\(|\)|\[|\]|\{|\}|\||\\)/g
 const reEscape = (str: string) => str.replace(reEscapeMatcher, '\\$1')
 
 const SearchableSelectOption = () => <div />
- 
+
 SearchableSelectOption.propTypes = {
   id: string,
   value: string,
   children: string,
   label: string,
 }
- 
+
 SearchableSelectOption.displayName = 'Option'
 
 interface Props {

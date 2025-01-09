@@ -30,7 +30,7 @@ export default function Description() {
       <View as="p" margin="0 0 small">
         <Text>
           {I18n.t(
-            'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:'
+            'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:',
           )}
         </Text>
       </View>

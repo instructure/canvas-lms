@@ -140,7 +140,6 @@ export class UpdateItemTray_ extends Component {
   onInvalidDateTimeMessage = this.invalidDateTimeMessage.bind(this)
 
   handleDeleteClick = () => {
-     
     if (confirm(I18n.t('Are you sure you want to delete this planner item?'))) {
       this.props.onDeletePlannerItem(this.props.noteItem)
     }

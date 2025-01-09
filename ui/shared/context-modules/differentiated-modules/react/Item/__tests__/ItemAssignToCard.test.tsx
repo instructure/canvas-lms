@@ -47,7 +47,7 @@ const renderComponent = (overrides: Partial<ItemAssignToCardProps> = {}) =>
   render(
     <MockedQueryProvider>
       <ItemAssignToCard {...props} {...overrides} />
-    </MockedQueryProvider>
+    </MockedQueryProvider>,
   )
 
 const withWithGradingPeriodsMock = () => {
@@ -104,7 +104,7 @@ describe('ItemAssignToCard', () => {
     expect(getByTestId('item-assign-to-card')).toBeInTheDocument()
     expect(queryByRole('button', {name: 'Delete'})).not.toBeInTheDocument()
     expect(getByLabelText('Due Date')).toBeInTheDocument()
-    expect(getAllByLabelText('Time').length).toBe(3)
+    expect(getAllByLabelText('Time')).toHaveLength(3)
     expect(getByLabelText('Available from')).toBeInTheDocument()
     expect(getByLabelText('Until')).toBeInTheDocument()
   })
@@ -120,7 +120,7 @@ describe('ItemAssignToCard', () => {
     expect(getByLabelText('Available from')).toBeInTheDocument()
     expect(getByLabelText('Until')).toBeInTheDocument()
     // rather than query for not due date, notice length remains 4
-    expect(getAllByLabelText('Time').length).toBe(4)
+    expect(getAllByLabelText('Time')).toHaveLength(4)
   })
 
   describe('describes the render order', () => {
@@ -260,7 +260,7 @@ describe('ItemAssignToCard', () => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
         'due_at',
-        '2020-11-09T23:59:00.000Z'
+        '2020-11-09T23:59:00.000Z',
       )
       expect((await findAllByLabelText('Time'))[0]).toHaveValue('11:59 PM')
     })
@@ -314,7 +314,7 @@ describe('ItemAssignToCard', () => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
         'unlock_at',
-        '2020-11-09T00:00:00.000Z'
+        '2020-11-09T00:00:00.000Z',
       )
       expect((await findAllByLabelText('Time'))[1]).toHaveValue('12:00 AM')
     })
@@ -349,7 +349,7 @@ describe('ItemAssignToCard', () => {
       expect(onCardDatesChangeMock).toHaveBeenCalledWith(
         expect.any(String),
         'lock_at',
-        '2020-11-09T23:59:00.000Z'
+        '2020-11-09T23:59:00.000Z',
       )
       expect((await findAllByLabelText('Time'))[2]).toHaveValue('11:59 PM')
     })

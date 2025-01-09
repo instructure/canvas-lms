@@ -59,7 +59,7 @@ export const enum actions {
 
 export function reducer(
   state: SettingsPanelState,
-  action: {type: actions; payload: any}
+  action: {type: actions; payload: any},
 ): SettingsPanelState {
   switch (action.type) {
     case actions.SET_MODULE_NAME:

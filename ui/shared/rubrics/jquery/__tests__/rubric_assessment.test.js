@@ -112,7 +112,7 @@ describe('RubricAssessment', () => {
 
       rubric_assessment.checkScoreAdjustment($criterion, rating, rawData)
       expect(flashWarning).toHaveBeenCalledWith(
-        'Extra credit not permitted on outcomes, score adjusted to maximum possible for Some Criterion'
+        'Extra credit not permitted on outcomes, score adjusted to maximum possible for Some Criterion',
       )
     })
 

@@ -61,7 +61,7 @@ export default function PostTypes({anonymousGrading, defaultValue, disabled, pos
             <br />
             <Text size="small">
               {I18n.t(
-                'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.'
+                'Students who have received a grade or a submission comment will be able to see their grade and/or submission comments.',
               )}
             </Text>
           </>

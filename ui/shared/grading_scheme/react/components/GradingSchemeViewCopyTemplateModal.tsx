@@ -69,7 +69,7 @@ export const GradingSchemeViewCopyTemplateModal = ({
       })
       .catch(error => {
         showFlashError(
-          I18n.t('There was an error while loading the default canvas grading scheme')
+          I18n.t('There was an error while loading the default canvas grading scheme'),
         )(error)
       })
     return () => {

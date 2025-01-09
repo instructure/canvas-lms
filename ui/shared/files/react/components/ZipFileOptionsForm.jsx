@@ -47,7 +47,7 @@ class ZipFileOptionsForm extends React.Component {
       message = I18n.t(
         'message',
         'Would you like to expand the contents of "%{fileName}" into the current folder, or upload the zip file as is?',
-        {fileName: name}
+        {fileName: name},
       )
     }
     return message

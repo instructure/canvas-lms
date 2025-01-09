@@ -24,7 +24,7 @@ describe('Droppable Widget', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="fixtures"></div>'
     $('#fixtures').append(
-      '<div id="droppable-element" style="width: 100px; height: 100px; background: blue;">Droppable Element</div>'
+      '<div id="droppable-element" style="width: 100px; height: 100px; background: blue;">Droppable Element</div>',
     )
     $('#droppable-element').droppable()
   })
@@ -51,7 +51,7 @@ describe('Droppable Widget', () => {
   it('accepts draggable elements', () => {
     const $droppableElement = $('#droppable-element')
     const $draggableElement = $(
-      '<div class="draggable" style="width: 50px; height: 50px; background: red;"></div>'
+      '<div class="draggable" style="width: 50px; height: 50px; background: red;"></div>',
     )
       .appendTo('#fixtures')
       .draggable()

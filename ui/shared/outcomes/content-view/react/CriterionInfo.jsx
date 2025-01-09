@@ -101,6 +101,5 @@ export default class CriterionInfo extends React.Component {
 }
 
 export const addCriterionInfoButton = element => {
-   
   ReactDOM.render(<CriterionInfo />, element)
 }

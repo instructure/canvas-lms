@@ -47,7 +47,7 @@ export function showFilePreview(file_id, verifier = '', access_token = '', instf
   asJson(fetch(url, defaultFetchOptions()))
     .then(file => {
       const backboneFile = new File(file)
-       
+
       ReactDOM.render(<StandaloneFilePreview preview_file={backboneFile} />, container)
     })
     .catch(err => {

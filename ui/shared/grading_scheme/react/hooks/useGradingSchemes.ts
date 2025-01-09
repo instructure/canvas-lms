@@ -27,19 +27,19 @@ export const useGradingSchemes = (): {
   loadGradingSchemes: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    includeArchived?: boolean
+    includeArchived?: boolean,
   ) => Promise<GradingScheme[]>
   loadGradingSchemesStatus: string
 } => {
   const [loadGradingSchemesStatus, setLoadGradingSchemesStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const loadGradingSchemes = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      includeArchived = false
+      includeArchived = false,
     ): Promise<GradingScheme[]> => {
       setLoadGradingSchemesStatus(ApiCallStatus.NOT_STARTED)
       const contextPath = buildContextPath(contextType, contextId)
@@ -61,7 +61,7 @@ export const useGradingSchemes = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

@@ -23,7 +23,7 @@ import keycode from 'keycode'
 import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 import {array, bool, string, func, number, oneOfType} from 'prop-types'
- 
+
 import Opportunity from '../Opportunity'
 import {specialFallbackFocusId} from '../../dynamic-ui/util'
 import {animatable} from '../../dynamic-ui'

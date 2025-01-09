@@ -46,7 +46,7 @@ const UpdateCalendarEventDialog = ({event, isOpen, onUpdate, onCancel}: Props) =
       }
       onCancel?.()
     },
-    [onCancel]
+    [onCancel],
   )
 
   const handleSubmit = useCallback(() => {
@@ -103,7 +103,6 @@ const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
   }
 
   const whichPromise = new Promise(resolve => {
-     
     ReactDOM.render(
       <UpdateCalendarEventDialog
         event={selectedEvent}
@@ -117,7 +116,7 @@ const renderUpdateCalendarEventDialog = (selectedEvent: CalendarEvent) => {
           resolve(which)
         }}
       />,
-      modalContainer as HTMLElement
+      modalContainer as HTMLElement,
     )
   })
   return whichPromise

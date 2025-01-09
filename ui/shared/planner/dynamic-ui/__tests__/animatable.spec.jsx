@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import {animatable} from '../animatable'
 import {DynamicUiProvider} from '../provider'
 
-// eslint-disable-next-line react/prefer-stateless-function
+ 
 class MockComponent extends React.Component {
   render() {
     return <div data-testid="mock-component" />
@@ -45,7 +45,7 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
   const wrapper = render(
     <DynamicUiProvider manager={mockManager}>
       <Wrapped innerRef={ref} />
-    </DynamicUiProvider>
+    </DynamicUiProvider>,
   )
   expect(wrapper.getByTestId('mock-component')).toMatchSnapshot()
 

@@ -19,7 +19,7 @@
 import * as tz from '@instructure/moment-utils'
 
 export const parseDateToISOString = (
-  dateString: Date | string | null | undefined
+  dateString: Date | string | null | undefined,
 ): string | null => {
   if (!dateString) {
     return null

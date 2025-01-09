@@ -87,9 +87,9 @@ export default function FilterBar<T extends string>({
         onSearch(query)
       },
       searchDebounceDelay,
-      {leading: false, trailing: true}
+      {leading: false, trailing: true},
     ),
-    [searchDebounceDelay]
+    [searchDebounceDelay],
   )
 
   const acceptSearchInput = (_e: SyntheticEvent, val: string) => {
@@ -103,7 +103,7 @@ export default function FilterBar<T extends string>({
 
   const updateFilter = (
     _e: SyntheticEvent,
-    data: {value?: string | number | undefined; id?: string | undefined}
+    data: {value?: string | number | undefined; id?: string | undefined},
   ) => {
     if (typeof data.value === 'string') {
       setFilter(data.value)

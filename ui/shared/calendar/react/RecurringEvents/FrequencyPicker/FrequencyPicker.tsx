@@ -118,22 +118,22 @@ export default function FrequencyPicker({
     return frequency === 'saved-custom' && rrule ? rrule : null
   })
   const [options, setOptions] = useState<FrequencyOption[]>(
-    generateFrequencyOptions(parsedMoment, locale, timezone, customRRule)
+    generateFrequencyOptions(parsedMoment, locale, timezone, customRRule),
   )
   const [selectTextWidth, setSelectTextWidth] = useState<string>(() =>
-    getFrequencySelectWidth(width, options)
+    getFrequencySelectWidth(width, options),
   )
   const freqPickerRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (date === undefined && interaction === 'enabled') {
       throw new FrequencyPickerError(
-        'FrequencyPicker: date is required when interaction is enabled'
+        'FrequencyPicker: date is required when interaction is enabled',
       )
     }
     if (date === undefined && initialFrequency !== 'not-repeat') {
       throw new FrequencyPickerError(
-        'FrequencyPicker: date is required when initialFrequency is not not-repeat'
+        'FrequencyPicker: date is required when initialFrequency is not not-repeat',
       )
     }
   }, [date, initialFrequency, interaction])
@@ -179,7 +179,7 @@ export default function FrequencyPicker({
         setCurrRRule(newRRule)
       }
     },
-    [customRRule, parsedMoment]
+    [customRRule, parsedMoment],
   )
 
   const handleCloseModal = useCallback(() => {
@@ -211,7 +211,7 @@ export default function FrequencyPicker({
       setOptions(newOpts)
       setSelectTextWidth(getFrequencySelectWidth(width, newOpts))
     },
-    [locale, parsedMoment, timezone, width]
+    [locale, parsedMoment, timezone, width],
   )
 
   return (

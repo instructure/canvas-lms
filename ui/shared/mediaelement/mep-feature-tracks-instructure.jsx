@@ -37,7 +37,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {languageCodes} from './mediaLanguageCodes'
 
 const I18n = createI18nScope('mepfeaturetracksinstructure')
-
 ;(function ($) {
   // add extra default options
   $.extend(mejs.MepDefaults, {
@@ -99,7 +98,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
       player.captions = $(
         '<div class="mejs-captions-layer mejs-layer"><div class="mejs-captions-position mejs-captions-position-hover" ' +
           attr +
-          '><span class="mejs-captions-text"></span></div></div>'
+          '><span class="mejs-captions-text"></span></div></div>',
       )
         .prependTo(layers)
         .hide()
@@ -134,7 +133,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
           '</li>' +
           '</ul>' +
           '</div>' +
-          '</div>'
+          '</div>',
       ).appendTo(controls)
 
       let subtitleCount = 0
@@ -167,7 +166,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
               hoverTimeout = setTimeout(() => {
                 player.hideCaptionsSelector()
               }, t.options.menuTimeoutMouseLeave)
-            }
+            },
           )
 
           // handle clicks to the language radio buttons
@@ -222,7 +221,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
                   player.hideCaptionsSelector()
                 }
               }, 0)
-            }, 100)
+            }, 100),
           )
 
           // handle clicks to the language radio buttons
@@ -279,7 +278,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
             player.tracks[i].srclang,
             player.tracks[i].label,
             player.tracks[i].src,
-            player.container.find('track[label=' + player.tracks[i].label + ']')[0]
+            player.container.find('track[label=' + player.tracks[i].label + ']')[0],
           )
         }
       }
@@ -296,7 +295,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
         () => {
           player.displayCaptions()
         },
-        false
+        false,
       )
 
       if (player.options.slidesSelector !== '') {
@@ -307,7 +306,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
           () => {
             player.displaySlides()
           },
-          false
+          false,
         )
       }
 
@@ -316,7 +315,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
         () => {
           player.displayChapters()
         },
-        false
+        false,
       )
 
       player.container.hover(
@@ -334,7 +333,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
               $(this).css('display', 'block')
             })
           }
-        }
+        },
       )
 
       t.container.on('controlsresize', () => {
@@ -467,7 +466,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
                     t.displayChapters(track)
                   }
                 },
-                false
+                false,
               )
             }
 
@@ -548,7 +547,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
             .attr('name', `${t.id}_captions`)
             .attr('id', id)
             .attr('aria-label', label)
-            .val(lang)
+            .val(lang),
         )
         .append($('<span aria-hidden="true">').attr('for', id).text('✓'))
         .append($('<label aria-hidden="true">').attr('for', id).text(label))
@@ -562,7 +561,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
             .attr('data-confirm', I18n.t('Are you sure you want to delete this track?'))
             .attr('data-url', src)
             .attr('aria-label', I18n.t('Delete track'))
-            .append($('<span aria-hidden="true">').text('x'))
+            .append($('<span aria-hidden="true">').text('x')),
         )
       }
 
@@ -573,7 +572,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
         const tooltip_container = $li
           .append('<span class="track-tip-container"></span>')
           .find('.track-tip-container')
-         
+
         ReactDOM.render(<InheritedCaptionTooltip />, tooltip_container[0])
       }
 
@@ -588,7 +587,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
         .find('.mejs-captions-selector')
         .height(
           t.captionsButton.find('.mejs-captions-selector ul').outerHeight(true) +
-            t.captionsButton.find('.mejs-captions-translations').outerHeight(true)
+            t.captionsButton.find('.mejs-captions-translations').outerHeight(true),
         )
     },
 
@@ -782,8 +781,8 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
               mejs.Utility.secondsToTimeCode(chapters.entries.times[i].stop, t.options) +
               '</span>' +
               '</div>' +
-              '</div>'
-          )
+              '</div>',
+          ),
         )
         usedPercent += percent
       }
@@ -845,7 +844,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
             }
             text = $.trim(text).replace(
               /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi,
-              "<a href='$1' target='_blank'>$1</a>"
+              "<a href='$1' target='_blank'>$1</a>",
             )
             // Text is in a different array so I can use .join
             entries.text.push(text)
@@ -912,7 +911,7 @@ const I18n = createI18nScope('mepfeaturetracksinstructure')
           entries.times.push(_temp_times)
           text = $.trim(lines.eq(i).html()).replace(
             /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi,
-            "<a href='$1' target='_blank'>$1</a>"
+            "<a href='$1' target='_blank'>$1</a>",
           )
           entries.text.push(text)
         }

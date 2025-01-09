@@ -113,13 +113,13 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
     (includeOffset: boolean = true) => {
       return getToolbarPosUtil(node.dom, mountPoint, currentToolbarOrTagRef, includeOffset)
     },
-    [currentToolbarOrTagRef, node.dom, mountPoint]
+    [currentToolbarOrTagRef, node.dom, mountPoint],
   )
 
   const renderBlockToolbar = () => {
     return ReactDOM.createPortal(
       <BlockToolbar templateEditor={RenderNode.globals.templateEditor} />,
-      mountPoint
+      mountPoint,
     )
   }
 
@@ -152,7 +152,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
           <Text size="small">{hoverName}</Text>
         </View>
       </div>,
-      mountPoint
+      mountPoint,
     )
   }
 
@@ -161,7 +161,7 @@ export const RenderNode: RenderNodeComponent = ({render}: RenderNodeProps) => {
 
     return ReactDOM.createPortal(
       <BlockResizer mountPoint={mountPoint} sizeVariant={node.data.props.sizeVariant || 'pixel'} />,
-      mountPoint
+      mountPoint,
     )
   }
 

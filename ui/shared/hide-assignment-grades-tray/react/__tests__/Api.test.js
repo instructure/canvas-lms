@@ -112,7 +112,7 @@ describe('HideAssignmentGradesTray Api', () => {
 
     it('consumers are required to handle when mutating rejects', async () => {
       await expect(
-        Api.hideAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
+        Api.hideAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS),
       ).rejects.toThrow('a graphql error')
     })
   })
@@ -160,7 +160,7 @@ describe('HideAssignmentGradesTray Api', () => {
       ])
 
       await expect(
-        Api.resolveHideAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'})
+        Api.resolveHideAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'}),
       ).rejects.toEqual('job failed')
     })
   })

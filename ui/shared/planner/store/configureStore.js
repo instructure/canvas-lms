@@ -31,7 +31,7 @@ export default function configureStore(uiManager, defaultState) {
   const store = createStore(
     rootReducer,
     defaultState,
-    composeWithDevTools(applyMiddleware(...middlewares))
+    composeWithDevTools(applyMiddleware(...middlewares)),
   )
   sagaMiddleware.run(allSagas)
   return store

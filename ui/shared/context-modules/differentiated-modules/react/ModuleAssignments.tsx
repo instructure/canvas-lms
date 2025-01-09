@@ -50,7 +50,7 @@ export default function ModuleAssignments({
       setSelectedOptions(assignees)
       onSelect(assignees)
     },
-    [onSelect]
+    [onSelect],
   )
 
   useEffect(() => {

@@ -34,7 +34,7 @@ const convertDaySubstitutions = (dateShiftOptions: DateShifts): Record<string, s
 }
 
 const convertDateOperation = (
-  adjustDates?: AdjustDates
+  adjustDates?: AdjustDates,
 ): {} | {shift_dates: boolean} | {remove_dates: boolean} => {
   if (!adjustDates || !adjustDates.enabled) {
     return {}
@@ -50,7 +50,7 @@ const convertDateOperation = (
 }
 
 const convertDateShiftOptions = (
-  formDateShiftOptions: submitMigrationFormData
+  formDateShiftOptions: submitMigrationFormData,
 ): DateShiftsRequestBody => {
   const dateShiftOptions = formDateShiftOptions.date_shift_options
   let convertedDateShiftOptions = {}
@@ -74,7 +74,7 @@ const convertDateShiftOptions = (
 export const convertFormDataToMigrationCreateRequest = (
   formData: submitMigrationFormData,
   courseId: string,
-  chosenMigrator: string
+  chosenMigrator: string,
 ): MigrationCreateRequestBody => {
   return {
     course_id: courseId,

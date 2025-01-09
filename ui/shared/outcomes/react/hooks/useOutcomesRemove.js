@@ -50,7 +50,7 @@ const useOutcomesRemove = () => {
           },
           {
             count: outcomeCount,
-          }
+          },
         ),
         type: 'success',
       })
@@ -63,7 +63,7 @@ const useOutcomesRemove = () => {
           },
           {
             count: outcomeCount,
-          }
+          },
         ),
         type: 'error',
       })
@@ -74,7 +74,7 @@ const useOutcomesRemove = () => {
     async outcomes => {
       const removableLinkIds = Object.keys(outcomes).filter(linkId => outcomes[linkId].canUnlink)
       const nonRemovableLinkIds = Object.keys(outcomes).filter(
-        linkId => !outcomes[linkId].canUnlink
+        linkId => !outcomes[linkId].canUnlink,
       )
       const removableCount = removableLinkIds.length
       const nonRemovableCount = nonRemovableLinkIds.length
@@ -110,7 +110,7 @@ const useOutcomesRemove = () => {
         showFlashMessage(totalCount)
       }
     },
-    [deleteOutcomeLinks]
+    [deleteOutcomeLinks],
   )
 
   return {

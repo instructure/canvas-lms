@@ -74,8 +74,8 @@ const useCourseAlignments = shouldWait => {
             ? I18n.t('More Search Results Have Been Loaded')
             : I18n.t('Showing Search Results Below')
           : isSameSearch
-          ? I18n.t('More Outcomes Have Been Loaded')
-          : ''
+            ? I18n.t('More Outcomes Have Been Loaded')
+            : ''
       }
       showFlashAlert({
         message: screenreaderText,

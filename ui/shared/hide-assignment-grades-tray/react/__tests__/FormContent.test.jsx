@@ -76,8 +76,8 @@ describe('FormContent', () => {
     it('shows the description', () => {
       expect(
         screen.getByText(
-          'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:'
-        )
+          'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -137,8 +137,8 @@ describe('FormContent', () => {
     it('shows the description', () => {
       expect(
         screen.getByText(
-          'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:'
-        )
+          'While the grades for this assignment are hidden, students will not receive new notifications about or be able to see:',
+        ),
       ).toBeInTheDocument()
     })
   })

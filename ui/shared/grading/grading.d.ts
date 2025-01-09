@@ -210,7 +210,7 @@ export type SubmissionOriginalityData = z.infer<typeof ZSubmissionOriginalityDat
 export const ZVericiteOriginalityData = ZSubmissionOriginalityData.extend(
   z.object({
     provider: z.literal('vericite'),
-  }).shape
+  }).shape,
 )
 
 export type VericiteOriginalityData = z.infer<typeof ZVericiteOriginalityData>

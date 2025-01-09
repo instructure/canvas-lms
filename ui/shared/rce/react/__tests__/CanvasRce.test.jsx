@@ -121,13 +121,13 @@ describe('CanvasRce', () => {
             plugins: ['foo', 'bar'],
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
 
       expect(rceRef.current.mceInstance().props.init.plugins).toEqual(
-        expect.arrayContaining(['foo', 'bar'])
+        expect.arrayContaining(['foo', 'bar']),
       )
     })
 
@@ -147,7 +147,7 @@ describe('CanvasRce', () => {
             },
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -158,7 +158,7 @@ describe('CanvasRce', () => {
             title: 'Format',
             items: expect.stringMatching(/\| item1 item2$/),
           }),
-        })
+        }),
       )
     })
 
@@ -178,7 +178,7 @@ describe('CanvasRce', () => {
             },
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -191,7 +191,7 @@ describe('CanvasRce', () => {
             title: 'A new menu',
             items: 'item1 item2',
           }),
-        })
+        }),
       )
     })
 
@@ -211,7 +211,7 @@ describe('CanvasRce', () => {
             ],
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -222,7 +222,7 @@ describe('CanvasRce', () => {
             name: 'Styles',
             items: expect.arrayContaining(['button1', 'button2']),
           },
-        ])
+        ]),
       )
     })
 
@@ -242,7 +242,7 @@ describe('CanvasRce', () => {
             ],
           }}
         />,
-        target
+        target,
       )
 
       await waitFor(() => expect(rceRef.current).not.toBeNull())
@@ -254,7 +254,7 @@ describe('CanvasRce', () => {
             name: 'New Toolbar',
             items: expect.arrayContaining(['button1', 'button2']),
           },
-        ])
+        ]),
       )
     })
   })

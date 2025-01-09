@@ -129,7 +129,7 @@ const TokenActions = {
   removeForType(selector, tokenToRemove, overridesFromRow) {
     const overrideToRemove = find(
       overridesFromRow,
-      override => override.get(selector) == tokenToRemove[selector]
+      override => override.get(selector) == tokenToRemove[selector],
     )
 
     return difference(overridesFromRow, [overrideToRemove])
@@ -138,7 +138,7 @@ const TokenActions = {
   removeDefaultSection(overridesFromRow) {
     return this.handleTokenRemove(
       {course_section_id: Section.defaultDueDateSectionID},
-      overridesFromRow
+      overridesFromRow,
     )
   },
 

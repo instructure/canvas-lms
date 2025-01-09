@@ -28,7 +28,7 @@ export const useGradingScheme = (): {
     contextType: 'Account' | 'Course',
     contextId: string,
     gradingSchemeId: string,
-    assignmentId?: string | null
+    assignmentId?: string | null,
   ) => Promise<GradingScheme>
   loadGradingSchemeStatus: string
 } => {
@@ -42,7 +42,7 @@ export const useGradingScheme = (): {
       contextId,
       // @ts-expect-error
       gradingSchemeId,
-      assignmentId = null
+      assignmentId = null,
     ): Promise<GradingScheme> => {
       setLoadGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
 
@@ -67,7 +67,7 @@ export const useGradingScheme = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

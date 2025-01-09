@@ -28,7 +28,7 @@ describe('Sortable Widget', () => {
         '<li style="height: 30px;">Item 1</li>' +
         '<li style="height: 30px;">Item 2</li>' +
         '<li style="height: 30px;">Item 3</li>' +
-        '</ul>'
+        '</ul>',
     )
     $('#sortable-list').sortable() // Initialize sortable widget
   })

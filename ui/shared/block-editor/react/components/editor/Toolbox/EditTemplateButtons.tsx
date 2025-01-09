@@ -41,7 +41,7 @@ const EditTemplateButtons = ({
       event.stopPropagation()
       onDeleteTemplate(id)
     },
-    [onDeleteTemplate]
+    [onDeleteTemplate],
   )
 
   const handleEditTemplate = useCallback(
@@ -49,7 +49,7 @@ const EditTemplateButtons = ({
       event.stopPropagation()
       onEditTemplate(id)
     },
-    [onEditTemplate]
+    [onEditTemplate],
   )
 
   return (

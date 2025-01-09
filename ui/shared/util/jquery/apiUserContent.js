@@ -46,7 +46,7 @@ const apiUserContent = {
         data-media_comment_type='${htmlEscape($(node).data('media_comment_type'))}'
         class='instructure_inline_media_comment ${htmlEscape(node.nodeName.toLowerCase())}_comment'
         data-alt='${htmlEscape($(node).attr('data-alt'))}'
-      />`
+      />`,
     )
     $link.html($(node).html())
     return $link
@@ -97,19 +97,19 @@ const apiUserContent = {
             class='user_content_post_form'
             target='${htmlEscape(uuid)}'
             id='form-${htmlEscape(uuid)}'
-          />`
+          />`,
           )
           $form.append(
             $("<input type='hidden'/>").attr({
               name: 'object_data',
               value: $this.data('uc_snippet'),
-            })
+            }),
           )
           $form.append(
             $("<input type='hidden'/>").attr({
               name: 's',
               value: $this.data('uc_sig'),
-            })
+            }),
           )
           $('body').append($form)
           setTimeout(() => $form.submit(), 0)
@@ -118,11 +118,11 @@ const apiUserContent = {
             class='user_content_iframe'
             name='${htmlEscape(uuid)}'
             style='width: ${htmlEscape($this.data('uc_width'))}; height: ${htmlEscape(
-              $this.data('uc_height')
+              $this.data('uc_height'),
             )};'
             frameborder='0'
             title='${htmlEscape(I18n.t('User Content'))}'
-          />`
+          />`,
           )
         })
 

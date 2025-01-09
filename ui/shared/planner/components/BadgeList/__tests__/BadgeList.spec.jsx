@@ -26,7 +26,7 @@ it('renders Pill components as list items', () => {
       <Pill>Pill 1</Pill>
       <Pill>Pill 2</Pill>
       <Pill>Pill 3</Pill>
-    </BadgeList>
+    </BadgeList>,
   )
   expect(wrapper).toMatchSnapshot()
 })

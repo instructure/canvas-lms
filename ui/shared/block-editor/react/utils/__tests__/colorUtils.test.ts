@@ -61,7 +61,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
           node2: {
             type: {resolvedName: 'Node2'},
@@ -72,7 +72,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
           node3: {
             type: {resolvedName: 'Node3'},
@@ -83,7 +83,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
           node4: {
             type: {resolvedName: 'Node4'},
@@ -94,7 +94,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
           node5: {
             type: {resolvedName: 'Node5'},
@@ -105,7 +105,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
           node6: {
             type: {resolvedName: 'Node6'},
@@ -116,7 +116,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
           node7: {
             type: {resolvedName: 'Node7'},
@@ -127,7 +127,7 @@ describe('colorUtils', () => {
             nodes: [],
             custom: {},
             isCanvas: false,
-            linkedNodes: {} as Record<string, string>
+            linkedNodes: {} as Record<string, string>,
           },
         }),
       }

@@ -39,7 +39,7 @@ export default class {
       '@type'?: string
       url?: string
     },
-    expectedType = 'LtiLinkItem'
+    expectedType = 'LtiLinkItem',
   ) {
     if (item['@type'] !== expectedType) {
       return I18n.t('Error: The tool returned an invalid content type "%{contentType}"', {

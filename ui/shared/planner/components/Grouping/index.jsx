@@ -22,7 +22,7 @@ import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import PlannerItem from '../PlannerItem'
- 
+
 import CompletedItemsFacade from '../CompletedItemsFacade'
 import {MissingIndicator, NewActivityIndicator, NotificationBadge} from '../NotificationBadge'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -86,7 +86,7 @@ export class Grouping extends Component {
       'group',
       this,
       newProps.animatableIndex,
-      this.itemUniqueIds(newProps)
+      this.itemUniqueIds(newProps),
     )
   }
 
@@ -129,7 +129,7 @@ export class Grouping extends Component {
       }),
       () => {
         if (this.groupingLink) this.groupingLink.focus()
-      }
+      },
     )
   }
 
@@ -150,7 +150,10 @@ export class Grouping extends Component {
 
     const componentsToRender = this.renderItems(itemsToRender)
     componentsToRender.push(
-      this.renderFacade(completedItems, this.props.animatableIndex * 100 + itemsToRender.length + 1)
+      this.renderFacade(
+        completedItems,
+        this.props.animatableIndex * 100 + itemsToRender.length + 1,
+      ),
     )
     return componentsToRender
   }
@@ -323,7 +326,7 @@ export class Grouping extends Component {
         className={classnames(
           this.style.classNames.root,
           this.style.classNames[this.getLayout()],
-          'planner-grouping'
+          'planner-grouping',
         )}
       >
         {this.renderNotificationBadge()}

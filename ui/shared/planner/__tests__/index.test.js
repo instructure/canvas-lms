@@ -96,7 +96,7 @@ describe('with mock api', () => {
             const options = defaultPlannerOptions()
             options[flash] = null
             return initializePlanner(options)
-          })
+          }),
         )
       ).forEach(({status}) => expect(status).toBe('rejected'))
     })
@@ -166,7 +166,7 @@ describe('with mock api', () => {
     })
 
     it('renders the WeeklyPlannerHeader', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-shadow
+       
       const {findByTestId} = render(renderWeeklyPlannerHeader({visible: false}))
 
       const wph = await findByTestId('WeeklyPlannerHeader')

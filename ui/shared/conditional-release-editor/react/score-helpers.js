@@ -184,6 +184,6 @@ const externalPercentToPercent = score => {
 
 export const getScoringRangeSplitWarning = () => {
   return I18n.t(
-    'Splitting disabled: there can only be a maximum of three assignment groups in a scoring range.'
+    'Splitting disabled: there can only be a maximum of three assignment groups in a scoring range.',
   )
 }

@@ -42,10 +42,10 @@ export const setContainScrollBehavior = (element: HTMLElement | null) => {
 }
 
 export const generateAssignmentOverridesPayload = (
-  selectedAssignees: AssigneeOption[]
+  selectedAssignees: AssigneeOption[],
 ): AssignmentOverridesPayload => {
   const studentsOverrideId = selectedAssignees.find(
-    assignee => assignee.id.includes('student') && assignee.overrideId
+    assignee => assignee.id.includes('student') && assignee.overrideId,
   )?.overrideId
   const sectionOverrides = selectedAssignees
     .filter(assignee => assignee.id.includes('section'))
@@ -70,7 +70,7 @@ export const generateAssignmentOverridesPayload = (
 export const generateDateDetailsPayload = (
   cards: ItemAssignToCardSpec[],
   hasModuleOverrides: boolean,
-  deletedModuleAssignees: string[]
+  deletedModuleAssignees: string[],
 ) => {
   const payload: DateDetailsPayload = {} as DateDetailsPayload
   const everyoneCard = cards.find(card => card.selectedAssigneeIds.includes('everyone'))
@@ -250,7 +250,7 @@ export function getOverriddenAssignees(overrides?: DateDetailsOverride[]) {
         tmp =>
           tmp.course_section_id !== undefined &&
           tmp.course_section_id === current.course_section_id &&
-          !tmp.context_module_id
+          !tmp.context_module_id,
       )
       if (sectionOverride && current.course_section_id) {
         acc.sections.push(current.course_section_id)
@@ -267,7 +267,7 @@ export function getOverriddenAssignees(overrides?: DateDetailsOverride[]) {
       acc.students.push(...studentsOverride)
       return acc
     },
-    {sections: [], students: []}
+    {sections: [], students: []},
   )
   return overriddenTargets
 }

@@ -58,7 +58,7 @@ export default {
 
   updatePublishClassElements() {
     return this.props.togglePublishClassOn.classList[this.state.published ? 'add' : 'remove'](
-      'ig-published'
+      'ig-published',
     )
   },
 

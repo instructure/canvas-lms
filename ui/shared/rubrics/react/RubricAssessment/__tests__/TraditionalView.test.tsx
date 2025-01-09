@@ -112,7 +112,7 @@ describe('TraditionalView', () => {
         {...defaultProps}
         onUpdateAssessmentData={onUpdateAssessmentData}
         isFreeFormCriterionComments={true}
-      />
+      />,
     )
 
     const commentInput = screen.getByTestId('free-form-comment-area-criterion_1')
@@ -123,7 +123,7 @@ describe('TraditionalView', () => {
       expect.objectContaining({
         criterionId: 'criterion_1',
         comments: 'Test comment',
-      })
+      }),
     )
   })
 })

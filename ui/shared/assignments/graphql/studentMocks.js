@@ -35,7 +35,7 @@ async function loadDefaultMocks() {
     filesToImport.map(async file => {
       const fileImport = await import(file)
       return fileImport.DefaultMocks || {}
-    })
+    }),
   )
   _dynamicDefaultMockImports = defaultMocks.filter(m => m !== undefined)
   return _dynamicDefaultMockImports

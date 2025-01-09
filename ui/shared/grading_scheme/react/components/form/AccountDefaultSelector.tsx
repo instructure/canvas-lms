@@ -46,7 +46,7 @@ const AccountDefaultGradingSchemeLabel = () => {
             {I18n.t(
               `This grading scheme will be the default for all courses in the account.
               Individual courses can override it with their own default. Sub accounts will
-              inherit the default grading scheme from their parent account unless overridden.`
+              inherit the default grading scheme from their parent account unless overridden.`,
             )}
           </View>
         }
@@ -152,7 +152,7 @@ export const AccountDefaultSelector = ({
         </Modal.Header>
         <Modal.Body>
           {I18n.t(
-            'This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.'
+            'This change will affect all active courses and assignments that are currently inheriting the account default. This change will take awhile to finish as all course and assignment grades are recalculated with respect to the new account default grading scheme.',
           )}
         </Modal.Body>
         <Modal.Footer>

@@ -84,7 +84,7 @@ class IndividualStudentMastery extends React.Component {
         expandedGroups: groups,
         expandedOutcomes: outcomes,
       },
-      () => this.notifyExpansionChange()
+      () => this.notifyExpansionChange(),
     )
   }
 
@@ -94,7 +94,7 @@ class IndividualStudentMastery extends React.Component {
         expandedGroups: Set(),
         expandedOutcomes: Set(),
       },
-      () => this.notifyExpansionChange()
+      () => this.notifyExpansionChange(),
     )
   }
 
@@ -107,7 +107,7 @@ class IndividualStudentMastery extends React.Component {
           expandedOutcomes: Set(outcomes.map(o => o.expansionId)),
         }
       },
-      () => this.notifyExpansionChange()
+      () => this.notifyExpansionChange(),
     )
   }
 

@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
- 
+
 /*
  * Copyright (C) 2014 - present Instructure, Inc.
  *
@@ -82,7 +82,6 @@ const StudentView = createReactClass({
       $dialog.dialog('close')
     }
 
-     
     ReactDOM.render(
       <ManageGroupDialog
         userCollection={this.state.userCollection}
@@ -94,7 +93,7 @@ const StudentView = createReactClass({
         closeDialog={closeDialog}
         loadMore={() => this._loadMore(this.state.userCollection)}
       />,
-      $dialog[0]
+      $dialog[0],
     )
   },
 
@@ -125,7 +124,7 @@ const StudentView = createReactClass({
 
   _categoryGroups(group) {
     return this.state.groupCollection.filter(
-      g => g.get('group_category_id') === group.get('group_category_id')
+      g => g.get('group_category_id') === group.get('group_category_id'),
     )
   },
 
@@ -136,7 +135,7 @@ const StudentView = createReactClass({
 
   updateGroup(groupId, name, members) {
     $.ajaxJSON(`/api/v1/groups/${groupId}`, 'PUT', {name, members}, group =>
-      this._onUpdateGroup(group)
+      this._onUpdateGroup(group),
     )
   },
 
@@ -156,7 +155,7 @@ const StudentView = createReactClass({
   _removeUser(groupModel, userId) {
     groupModel.set(
       'users',
-      groupModel.get('users').filter(u => u.id !== userId)
+      groupModel.get('users').filter(u => u.id !== userId),
     )
     // If user was a leader, unset the leader attribute.
     const leader = groupModel.get('leader')
@@ -179,7 +178,7 @@ const StudentView = createReactClass({
 
   leave(group) {
     const dfd = $.ajaxJSON(`/api/v1/groups/${group.id}/memberships/self`, 'DELETE', {}, () =>
-      this._onLeave(group)
+      this._onLeave(group),
     )
     // eslint-disable-next-line react/no-find-dom-node
     $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)
@@ -209,7 +208,7 @@ const StudentView = createReactClass({
       () =>
         this._extendAttribute(this.state.groupCollection.get(group.id), 'permissions', {
           join: false,
-        })
+        }),
     )
     // eslint-disable-next-line react/no-find-dom-node
     $(ReactDOM.findDOMNode(this.panelRef)).disableWhileLoading(dfd)

@@ -88,7 +88,7 @@ export function isElementOfStyle(property: string, value: string, elem: Element 
 export function scrollIntoViewWithCallback(
   element: HTMLElement | null,
   scrollIntoViewOpts: any,
-  callback: () => void
+  callback: () => void,
 ) {
   if (!element) return
 
@@ -103,7 +103,7 @@ export function scrollIntoViewWithCallback(
         observer.disconnect()
       }
     },
-    {threshold: 1.0}
+    {threshold: 1.0},
   )
 
   // Observe the target element

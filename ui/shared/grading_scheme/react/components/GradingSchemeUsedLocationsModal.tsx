@@ -72,7 +72,7 @@ const GradingSchemeUsedLocationsModal = ({
           gradingScheme.context_type,
           gradingScheme.context_id,
           gradingScheme.id,
-          path.current
+          path.current,
         )
 
         path.current = usedLocations.nextPage
@@ -92,7 +92,7 @@ const GradingSchemeUsedLocationsModal = ({
           gradingScheme.context_id,
           gradingScheme.id,
           courseId,
-          currentPath
+          currentPath,
         )
       }}
       fetchAccountUsedLocations={async () => {
@@ -105,7 +105,7 @@ const GradingSchemeUsedLocationsModal = ({
         return getGradingSchemeAccountUsedLocations(
           gradingScheme.context_type,
           gradingScheme.context_id,
-          gradingScheme.id
+          gradingScheme.id,
         )
       }}
       onClose={onClose}

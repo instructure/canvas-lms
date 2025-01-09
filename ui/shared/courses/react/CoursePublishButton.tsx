@@ -113,7 +113,7 @@ const CoursePublishButton = ({
                       })
                     }
                   }}
-                />
+                />,
               )
             } else {
               apiClient.publishCourse({courseId, onSuccess: () => handleUpdatePublishSuccess(true)})

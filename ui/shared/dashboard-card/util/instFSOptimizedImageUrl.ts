@@ -49,7 +49,7 @@ export default function instFSOptimizedImageUrl(
   }: {
     x: number
     y: number
-  }
+  },
 ) {
   if (url && url.startsWith('https://inst-fs-')) {
     url += (url.includes('?') ? '&' : '?') + `geometry=${x * dpiMultiplier}x${y * dpiMultiplier}`

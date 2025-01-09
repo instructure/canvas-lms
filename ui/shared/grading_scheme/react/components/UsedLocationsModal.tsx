@@ -63,7 +63,7 @@ type UsedLocationsModalProps = {
   fetchUsedLocations: () => Promise<FetchUsedLocationResponse>
   fetchAssignmentUsedLocations: (
     courseId: string,
-    nextPagePath?: string
+    nextPagePath?: string,
   ) => Promise<FetchAssignmentUsedLocationResponse>
   fetchAccountUsedLocations: () => Promise<FetchAccountUsedLocationResponse>
   onClose: () => void
@@ -79,7 +79,7 @@ export const UsedLocationsModal = ({
 }: UsedLocationsModalProps) => {
   const [usedLocations, setUsedLocations] = useState<UsedLocation[]>([])
   const [accountUsedLocations, setAccountUsedLocations] = useState<AccountUsedLocation[] | null>(
-    null
+    null,
   )
 
   const [filter, setFilter] = useState<string>('')
@@ -120,7 +120,7 @@ export const UsedLocationsModal = ({
       try {
         const newLocations = await fetchAssignmentUsedLocations(
           currentCourse.id,
-          currentCourse.assignments_next_page
+          currentCourse.assignments_next_page,
         )
 
         if (newLocations.assignmentUsedLocations.length) {
@@ -146,7 +146,7 @@ export const UsedLocationsModal = ({
         setLoadingAssignments(prev => ({...prev, [currentCourse.id]: false}))
       }
     },
-    [fetchAssignmentUsedLocations, itemId]
+    [fetchAssignmentUsedLocations, itemId],
   )
 
   const loadAccountLocations = useCallback(async () => {
@@ -196,7 +196,7 @@ export const UsedLocationsModal = ({
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       observer.observe(sentinelRef.current)
@@ -301,7 +301,7 @@ export const UsedLocationsModal = ({
                 filteredAssignments = course.assignments
               } else {
                 filteredAssignments = course.assignments.filter(assignment =>
-                  assignment.title.toLowerCase().includes(filter.toLowerCase())
+                  assignment.title.toLowerCase().includes(filter.toLowerCase()),
                 )
                 // if no assignments match the filter nor the course name,
                 // don't render the course in the list

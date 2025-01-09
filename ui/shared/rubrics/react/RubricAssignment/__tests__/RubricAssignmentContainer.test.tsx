@@ -45,13 +45,13 @@ describe('RubricAssignmentContainer Tests', () => {
       Promise.resolve({
         rubric: RUBRIC,
         rubricAssociation: RUBRIC_ASSOCIATION,
-      })
+      }),
     )
 
     queryClient.setQueryData(['fetchGradingRubricContexts', '1'], RUBRIC_CONTEXTS)
     queryClient.setQueryData(
       ['fetchGradingRubricsForContext', '1', 'course_2'],
-      RUBRICS_FOR_CONTEXT
+      RUBRICS_FOR_CONTEXT,
     )
   })
 
@@ -71,7 +71,7 @@ describe('RubricAssignmentContainer Tests', () => {
         rubricSelfAssessmentEnabled={false}
         rubricSelfAssessmentFFEnabled={true}
         {...props}
-      />
+      />,
     )
   }
 
@@ -113,7 +113,7 @@ describe('RubricAssignmentContainer Tests', () => {
 
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(document.querySelector('#flash_screenreader_holder')?.textContent).toEqual(
-        'Rubric saved successfully'
+        'Rubric saved successfully',
       )
       expect(getByTestId('preview-assignment-rubric-button')).toBeInTheDocument()
       expect(getByTestId('edit-assignment-rubric-button')).toBeInTheDocument()
@@ -175,7 +175,7 @@ describe('RubricAssignmentContainer Tests', () => {
       })
       fireEvent.click(getByTestId('preview-assignment-rubric-button'))
       const rubricTray = document.querySelector(
-        '[role="dialog"][aria-label="Rubric Assessment Tray"]'
+        '[role="dialog"][aria-label="Rubric Assessment Tray"]',
       )
       expect(rubricTray).toBeInTheDocument()
       expect(getByTestId('traditional-criterion-1-ratings-0')).toBeInTheDocument()

@@ -97,7 +97,7 @@ const QuizSelect: React.FC<QuizSelectProps> = ({onSelect}) => {
   }
 
   const filteredQuizzes = quizzes.filter(quiz =>
-    quiz.title.toLowerCase().includes(value.toLowerCase())
+    quiz.title.toLowerCase().includes(value.toLowerCase()),
   )
 
   const handleQuizSelect = (quiz: any) => {

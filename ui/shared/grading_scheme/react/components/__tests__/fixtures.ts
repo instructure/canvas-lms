@@ -256,7 +256,7 @@ export const AccountGradingSchemeCards: GradingSchemeCardData[] = AccountGrading
   scheme => ({
     gradingScheme: scheme,
     editing: false,
-  })
+  }),
 )
 
 export const ExtraGradingSchemeCards: GradingSchemeCardData[] = ExtraGradingSchemes.map(scheme => ({
@@ -410,10 +410,10 @@ export class IntersectionObserver {
 
   thresholds = []
 
-  // eslint-disable-next-line no-undef
+   
   callback: IntersectionObserverCallback
 
-  // eslint-disable-next-line no-undef
+   
   constructor(callback: IntersectionObserverCallback) {
     this.callback = callback
     return this

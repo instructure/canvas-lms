@@ -29,7 +29,7 @@ type RequiredRepliesDueDateTimeInputProps = CustomDateTimeInputProps & {
   setRequiredRepliesDueDate: (requiredRepliesDueDate: string | null) => void
   handleRequiredRepliesDueDateChange: (
     _event: React.SyntheticEvent,
-    value: string | undefined
+    value: string | undefined,
   ) => void
   disabledWithGradingPeriod?: boolean
   clearButtonAltLabel: string
@@ -52,19 +52,19 @@ export function RequiredRepliesDueDateTimeInput({
   const key = 'required_replies_due_at'
   const handleClear = useCallback(
     () => setRequiredRepliesDueDate(null),
-    [setRequiredRepliesDueDate]
+    [setRequiredRepliesDueDate],
   )
   const dateInputRef = useCallback(
     // @ts-expect-error
     el => (dateInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const timeInputRef = useCallback(
     // @ts-expect-error
     el => (timeInputRefs[key] = el),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   )
   const onBlur = useMemo(() => handleBlur(key), [handleBlur])
   const messages = useMemo(
@@ -72,9 +72,9 @@ export function RequiredRepliesDueDateTimeInput({
       generateMessages(
         requiredRepliesDueDate,
         validationErrors[key] ?? null,
-        unparsedFieldKeys.has(key)
+        unparsedFieldKeys.has(key),
       ),
-    [requiredRepliesDueDate, validationErrors, unparsedFieldKeys]
+    [requiredRepliesDueDate, validationErrors, unparsedFieldKeys],
   )
 
   const requiredRepliesDueDateProps = {

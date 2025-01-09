@@ -23,7 +23,7 @@ describe('Resizable Widget', () => {
   beforeEach(() => {
     document.body.innerHTML = '<div id="fixtures"></div>'
     $('#fixtures').append(
-      '<div id="resizable-element" style="width: 100px; height: 100px;">Resizable Element</div>'
+      '<div id="resizable-element" style="width: 100px; height: 100px;">Resizable Element</div>',
     )
     $('#resizable-element').resizable()
   })

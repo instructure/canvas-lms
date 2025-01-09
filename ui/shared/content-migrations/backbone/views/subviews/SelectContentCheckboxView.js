@@ -68,7 +68,7 @@ SelectContentCheckbox.prototype.courseSelected = function (course) {
 SelectContentCheckbox.prototype.validations = function () {
   const errors = {}
   const selective_import = this.model.get('selective_import')
-   
+
   if (selective_import === null || selective_import === void 0) {
     errors.selective_import = [
       {

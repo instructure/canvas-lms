@@ -26,7 +26,7 @@ export const mergeFutureItems = (newFutureItems, response) => (dispatch, getStat
   const completeDays = extractCompleteDays(
     state.loading.partialFutureDays,
     state.loading.allFutureItemsLoaded,
-    'asc'
+    'asc',
   )
   return mergeCompleteDays(completeDays, dispatch, state.loading.allFutureItemsLoaded, response)
 }
@@ -37,7 +37,7 @@ export const mergePastItems = (newPastItems, response) => (dispatch, getState) =
   const completeDays = extractCompleteDays(
     state.loading.partialPastDays,
     state.loading.allPastItemsLoaded,
-    'desc'
+    'desc',
   )
   return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response)
 }
@@ -48,7 +48,7 @@ function mergePastItemsFor(foundPredicate, newPastItems, response, dispatch, get
   const completeDays = extractCompleteDays(
     state.loading.partialPastDays,
     state.loading.allPastItemsLoaded,
-    'desc'
+    'desc',
   )
   if (foundPredicate(completeDays) || state.loading.allPastItemsLoaded) {
     return mergeCompleteDays(completeDays, dispatch, state.loading.allPastItemsLoaded, response)
@@ -74,7 +74,7 @@ export const mergeWeekItems =
     const completeDays = extractCompleteDays(
       state.loading.partialWeekDays,
       state.loading.allWeekItemsLoaded,
-      'asc'
+      'asc',
     )
     const initialWeeklyLoad = state.loading.isLoading // only true on initial page load
     if (
@@ -85,7 +85,7 @@ export const mergeWeekItems =
         completeDays,
         dispatch,
         state.loading.allWeekItemsLoaded,
-        response
+        response,
       )
       if (r) {
         dispatch(LA.weekLoaded({weekDays: completeDays, weekStart, initialWeeklyLoad, isPreload}))

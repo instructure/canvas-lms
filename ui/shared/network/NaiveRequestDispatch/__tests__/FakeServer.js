@@ -40,7 +40,7 @@ function matchParams(request, params) {
   const queryParams = qs.parse(queryString)
   return Object.keys(params).every(
     // ensure the params match, no matter the data type
-    key => qs.stringify({[key]: queryParams[key]}) === qs.stringify({[key]: params[key]})
+    key => qs.stringify({[key]: queryParams[key]}) === qs.stringify({[key]: params[key]}),
   )
 }
 
@@ -196,7 +196,7 @@ export default class FakeServer {
   unsetResponses(...urlsToUnset) {
     urlsToUnset.forEach(url => {
       this.pendingResponses = this.pendingResponses.filter(
-        response => response.response.url !== url
+        response => response.response.url !== url,
       )
     })
   }

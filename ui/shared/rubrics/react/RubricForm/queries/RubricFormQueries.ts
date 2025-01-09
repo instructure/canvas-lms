@@ -114,12 +114,12 @@ export const fetchRubric = async ({
 }
 
 export type SaveRubricResponse = {
-  rubric: Rubric & { canUpdate?: boolean }
+  rubric: Rubric & {canUpdate?: boolean}
   rubricAssociation: RubricAssociation
 }
 export const saveRubric = async (
   rubric: RubricFormProps,
-  assignmentId?: string
+  assignmentId?: string,
 ): Promise<SaveRubricResponse> => {
   const {
     id,
@@ -211,7 +211,10 @@ export const saveRubric = async (
   }
 
   return {
-    rubric: {...mapRubricUnderscoredKeysToCamelCase(savedRubric), canUpdate: savedRubric.permissions?.update},
+    rubric: {
+      ...mapRubricUnderscoredKeysToCamelCase(savedRubric),
+      canUpdate: savedRubric.permissions?.update,
+    },
     rubricAssociation: mapRubricAssociationUnderscoredKeysToCamelCase(rubric_association),
   }
 }

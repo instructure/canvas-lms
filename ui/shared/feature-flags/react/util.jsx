@@ -162,7 +162,7 @@ export function transitionMessage(flag, name) {
         <p>
           {I18n.t(
             `You are currently in the %{environment} environment. This will affect every customer. Are you sure?`,
-            {environment: ENV.RAILS_ENVIRONMENT}
+            {environment: ENV.RAILS_ENVIRONMENT},
           )}
         </p>
         <p>{message}</p>

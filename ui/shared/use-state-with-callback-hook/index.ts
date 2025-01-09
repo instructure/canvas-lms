@@ -52,7 +52,7 @@ import {isEqual} from 'lodash'
 
 export default function useStateWithCallback<T>(
   initialValue: T,
-  makeMultipleCallbacks: boolean = false
+  makeMultipleCallbacks: boolean = false,
 ) {
   type Callback = (arg: T) => void
   type BoundCallback = () => void // argument is bound when the callback is created

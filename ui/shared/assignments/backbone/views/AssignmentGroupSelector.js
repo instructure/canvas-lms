@@ -70,7 +70,7 @@ AssignmentGroupSelector.prototype.showAssignmentGroupCreateDialog = function () 
           _this.$assignmentGroupId.prepend($newGroup)
           return _this.$assignmentGroupId.val(group.id)
         }
-      })(this)
+      })(this),
     )
     return this.dialog.on(
       'assignmentGroup:canceled',
@@ -78,7 +78,7 @@ AssignmentGroupSelector.prototype.showAssignmentGroupCreateDialog = function () 
         return function () {
           return _this.$assignmentGroupId.val(_this.assignmentGroups[0].id)
         }
-      })(this)
+      })(this),
     )
   }
 }
@@ -109,7 +109,7 @@ AssignmentGroupSelector.prototype._validateAssignmentGroupId = function (data, e
       {
         message: I18n.t(
           'assignment_group_must_have_group',
-          'Please select an assignment group for this assignment'
+          'Please select an assignment group for this assignment',
         ),
       },
     ]

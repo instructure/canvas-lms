@@ -42,11 +42,13 @@ describe('GradeFormatHelper#formatGrade', () => {
   })
 
   it('formats points grade type using formatPointsOutOf', () => {
-    expect(GradeFormatHelper.formatGrade('4', {
-      gradingType: 'points',
-      pointsPossible: '7',
-      formatType: 'points_out_of_fraction',
-    })).toBe('4/7')
+    expect(
+      GradeFormatHelper.formatGrade('4', {
+        gradingType: 'points',
+        pointsPossible: '7',
+        formatType: 'points_out_of_fraction',
+      }),
+    ).toBe('4/7')
   })
 
   it('formats numerical decimal grades using I18n#n', () => {
@@ -98,7 +100,9 @@ describe('GradeFormatHelper#formatGrade', () => {
   })
 
   it('does not transform en-dash characters that are not trailing', () => {
-    expect(GradeFormatHelper.formatGrade('smarty-pants', {gradingType: 'letter_grade'})).toBe('smarty-pants')
+    expect(GradeFormatHelper.formatGrade('smarty-pants', {gradingType: 'letter_grade'})).toBe(
+      'smarty-pants',
+    )
   })
 
   it('returns the given grade when it is a mix of letters and numbers', () => {

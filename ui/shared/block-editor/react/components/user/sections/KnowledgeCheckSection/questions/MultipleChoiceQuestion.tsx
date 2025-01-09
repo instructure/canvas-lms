@@ -39,7 +39,7 @@ const MultipleChoiceQuestion = ({question, onAnswerChange}: MultipleChoiceQuesti
       setAnswer(value)
       onAnswerChange(value === correctAnswer)
     },
-    [correctAnswer, onAnswerChange]
+    [correctAnswer, onAnswerChange],
   )
 
   return (

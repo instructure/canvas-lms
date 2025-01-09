@@ -46,7 +46,7 @@ describe('ExpandableErrorAlert', () => {
 
   it('does not display an error details button if there is no error', () => {
     const {getByText, queryByText, rerender} = render(
-      <ExpandableErrorAlert>Error</ExpandableErrorAlert>
+      <ExpandableErrorAlert>Error</ExpandableErrorAlert>,
     )
     expect(getByText('Error')).toBeInTheDocument()
     expect(queryByText('Error details')).not.toBeInTheDocument()
@@ -61,7 +61,7 @@ describe('ExpandableErrorAlert', () => {
       <>
         <div id="flash_screenreader_holder" role="alert" />
         <ExpandableErrorAlert liveRegionText="My error summary">My error</ExpandableErrorAlert>
-      </>
+      </>,
     )
 
     expect(getByText('My error')).toBeInTheDocument()
@@ -75,7 +75,7 @@ describe('ExpandableErrorAlert', () => {
         <ExpandableErrorAlert liveRegionText="My error summary" closeable={true}>
           My error
         </ExpandableErrorAlert>
-      </>
+      </>,
     )
 
     const [error, summary] = [getByText('My error'), getByText('My error summary')]
@@ -91,7 +91,7 @@ describe('ExpandableErrorAlert', () => {
 
   it('displays a functioning close button when closeable is true', async () => {
     const {getByText, getByRole, queryByText, queryByRole, rerender} = render(
-      <ExpandableErrorAlert>My error</ExpandableErrorAlert>
+      <ExpandableErrorAlert>My error</ExpandableErrorAlert>,
     )
 
     expect(getByText('My error')).toBeInTheDocument()

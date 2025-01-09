@@ -25,5 +25,5 @@ export default handleActions(
     [actionTypes.ENROLL_USERS_SUCCESS]: (state, action) => action.payload,
     [actionTypes.RESET]: (/* state, action */) => false,
   },
-  false
+  false,
 )

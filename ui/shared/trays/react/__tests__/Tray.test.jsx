@@ -26,7 +26,7 @@ describe('CanvasTray', () => {
     const {getByText} = render(
       <CanvasTray open={true} label="Do the thing" onDismiss={handleDismiss}>
         Tray Content
-      </CanvasTray>
+      </CanvasTray>,
     )
     expect(getByText('Do the thing').tagName).toBe('SPAN')
     expect(getByText('Tray Content')).toBeInTheDocument()
@@ -43,7 +43,7 @@ describe('CanvasTray', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()  
     })
 
     it('has an error boundary in case the children throw', () => {
@@ -54,7 +54,7 @@ describe('CanvasTray', () => {
       const {getByText} = render(
         <CanvasTray open={true} label="Do the thing">
           <ThrowError />
-        </CanvasTray>
+        </CanvasTray>,
       )
       expect(getByText(/something broke/i)).toBeInTheDocument()
       // Header and close button should still be there

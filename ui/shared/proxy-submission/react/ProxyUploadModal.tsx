@@ -270,7 +270,7 @@ const ProxyUploadModal = ({
           null,
           axios,
           onProgress,
-          true
+          true,
         )
       } else {
         promise = uploadFile(
@@ -283,7 +283,7 @@ const ProxyUploadModal = ({
           file,
           axios,
           onProgress,
-          true
+          true,
         )
       }
       uploadPromises.push(promise)

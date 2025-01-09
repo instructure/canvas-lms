@@ -30,7 +30,7 @@ const generateMessageObject = (
   label: string,
   dateString: string,
   timezone?: string,
-  margin?: Spacing
+  margin?: Spacing,
 ): FormMessage => ({
   type: 'hint',
   text: (
@@ -43,7 +43,7 @@ const generateMessageObject = (
 export const timeZonedFormMessages = (
   courseTimeZone: string,
   userTimeZone: string,
-  dateString?: string
+  dateString?: string,
 ): FormMessage[] => {
   if (!dateString || courseTimeZone === userTimeZone) {
     return []

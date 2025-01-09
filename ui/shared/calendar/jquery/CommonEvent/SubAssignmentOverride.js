@@ -26,7 +26,7 @@ const I18n = createI18nScope('calendar')
 
 const deleteConfirmation = I18n.t(
   'prompts.delete_sub_assignment_override',
-  'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.'
+  'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment and other checkpoints associated with the assignment.',
 )
 
 extend(SubAssignmentOverride, CommonEvent)

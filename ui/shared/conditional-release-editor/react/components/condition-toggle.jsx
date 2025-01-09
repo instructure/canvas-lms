@@ -50,8 +50,8 @@ export default class ConditionToggle extends React.Component {
     return this.props.isDisabled
       ? I18n.t('Splitting disabled: reached maximum of three assignment groups in a scoring range')
       : this.props.isAnd
-      ? I18n.t('Click to split set here')
-      : I18n.t('Click to merge sets here')
+        ? I18n.t('Click to split set here')
+        : I18n.t('Click to merge sets here')
   }
 
   handleToggle() {

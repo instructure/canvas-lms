@@ -35,7 +35,7 @@ function partition(collection, partitionFn) {
       result[index].push(current)
       return result
     },
-    [[], []]
+    [[], []],
   )
 }
 
@@ -46,7 +46,7 @@ function parseScore(score: string | number | null) {
 
 function sortPairsDescending(
   [scoreA, submissionA]: [number, {submission: SubmissionGradeCriteria}],
-  [scoreB, submissionB]: [number, {submission: SubmissionGradeCriteria}]
+  [scoreB, submissionB]: [number, {submission: SubmissionGradeCriteria}],
 ) {
   const scoreDiff = scoreB - scoreA
   if (scoreDiff !== 0) {
@@ -59,7 +59,7 @@ function sortPairsDescending(
 
 function sortPairsAscending(
   [scoreA, submissionA]: [number, {submission: SubmissionGradeCriteria}],
-  [scoreB, submissionB]: [number, {submission: SubmissionGradeCriteria}]
+  [scoreB, submissionB]: [number, {submission: SubmissionGradeCriteria}],
 ) {
   const scoreDiff = scoreA - scoreB
   if (scoreDiff !== 0) {
@@ -87,7 +87,7 @@ function getSubmissionGrade({score, total}: {score: number; total: number}) {
 function estimateQHigh(
   pointed: {total: number; score: number}[],
   unpointed: {score: number}[],
-  grades: number[]
+  grades: number[],
 ) {
   if (unpointed.length > 0) {
     const pointsPossible = sumBy(pointed, 'total')
@@ -116,7 +116,7 @@ function buildBigF(keepCount: number, cannotDrop: DroppableSubmission[], sortAsc
     const qCannotDrop = sumBy(
       cannotDrop,
       // @ts-expect-error
-      (submission: SubmissionGradeCriteria) => submission.score - q * submission.total
+      (submission: SubmissionGradeCriteria) => submission.score - q * submission.total,
     )
     return [qKept + qCannotDrop, keptSubmissions]
   }
@@ -144,7 +144,7 @@ function keepHelper(submissions, initialKeepCount, sortAsc, cannotDrop, maxTotal
   const [unpointed, pointed] = partition(
     allSubmissionData,
     // @ts-expect-error
-    submissionDatum => submissionDatum.total === 0
+    submissionDatum => submissionDatum.total === 0,
   )
 
   let [qHigh, qLow, qMid] = setUpGrades(pointed, unpointed)
@@ -164,7 +164,6 @@ function keepHelper(submissions, initialKeepCount, sortAsc, cannotDrop, maxTotal
     if (qMid === qHigh || qMid === qLow) {
       break
     }
-
     ;[x, submissionsToKeep] = bigF(qMid, submissions)
   }
 
@@ -175,7 +174,7 @@ function dropPointed(
   droppableSubmissionData: DroppableSubmission[],
   cannotDrop: DroppableSubmission[],
   keepHighest: number,
-  keepLowest: number
+  keepLowest: number,
 ) {
   const totals = droppableSubmissionData.map(submission => submission.total)
   const maxTotal = Math.max(...totals)
@@ -185,14 +184,14 @@ function dropPointed(
     keepHighest,
     false, // sort descending
     cannotDrop,
-    maxTotal
+    maxTotal,
   )
   return keepHelper(
     submissionsWithLowestDropped,
     keepLowest,
     true, // sort ascending
     cannotDrop,
-    maxTotal
+    maxTotal,
   )
 }
 
@@ -214,7 +213,7 @@ function dropUnpointed(submissions, keepHighest, keepLowest) {
 // (http://cseweb.ucsd.edu/~dakane/droplowest.pdf)
 function dropAssignments(
   allSubmissionData: DroppableSubmission[],
-  rules: AssignmentGroup['rules'] = {}
+  rules: AssignmentGroup['rules'] = {},
 ): DroppableSubmission[] {
   let dropLowest = rules.drop_lowest || 0
   let dropHighest = rules.drop_highest || 0
@@ -229,7 +228,7 @@ function dropAssignments(
   if (neverDropIds.length > 0) {
     // @ts-expect-error
     ;[cannotDrop, droppableSubmissionData] = partition(allSubmissionData, submission =>
-      neverDropIds.includes(submission.submission.assignment_id)
+      neverDropIds.includes(submission.submission.assignment_id),
     )
   }
 
@@ -268,7 +267,7 @@ function calculateGroupGrade(
   opts: {
     ignoreUnpostedAnonymous: boolean
     includeUngraded: boolean
-  }
+  },
 ): AggregateGrade {
   // Remove assignments without visibility from gradeableAssignments.
   const hiddenAssignmentsById = allSubmissions
@@ -298,7 +297,7 @@ function calculateGroupGrade(
   // @ts-expect-error
   let submissions: SubmissionGradeCriteria = allSubmissions.filter(
     // @ts-expect-error
-    (submission: SubmissionGradeCriteria) => assignments[submission.assignment_id]
+    (submission: SubmissionGradeCriteria) => assignments[submission.assignment_id],
   )
 
   // Remove excused submissions.
@@ -320,7 +319,7 @@ function calculateGroupGrade(
   if (!opts.includeUngraded) {
     relevantSubmissionData = submissionData.filter(
       // @ts-expect-error
-      submission => submission.submitted && !submission.pending_review
+      submission => submission.submitted && !submission.pending_review,
     )
   }
 
@@ -398,7 +397,7 @@ function calculateGroupGrade(
 function calculate(
   allSubmissions: SubmissionGradeCriteria[],
   assignmentGroup: AssignmentGroup,
-  ignoreUnpostedAnonymous: boolean
+  ignoreUnpostedAnonymous: boolean,
 ): AssignmentGroupGrade {
   const uniqAssignmentIds = new Set()
   const submissions = allSubmissions.filter(sub => {

@@ -70,10 +70,10 @@ const fetchOutcomes = (courseId, studentId) => {
   return Promise.all([
     fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_groups?per_page=100`),
     fetchWithDispatch(
-      `/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full&per_page=100`
+      `/api/v1/courses/${courseId}/outcome_group_links?outcome_style=full&per_page=100`,
     ),
     fetchWithDispatch(
-      `/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`
+      `/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`,
     ),
     fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`),
   ])
@@ -89,7 +89,7 @@ const fetchOutcomes = (courseId, studentId) => {
       return makePromisePool(chunks, chunk => {
         const chunkArgs = chunk.map(id => `outcome_ids[]=${id}`).join('&')
         return fetchWithDispatch(
-          `/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&${chunkArgs}&include[]=assignments&per_page=100`
+          `/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&${chunkArgs}&include[]=assignments&per_page=100`,
         )
       })
     })

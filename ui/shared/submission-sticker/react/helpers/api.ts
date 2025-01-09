@@ -21,7 +21,7 @@ import type {Submission} from '../types/stickers.d'
 function updateSticker(
   submission: Submission,
   sticker: string | null,
-  onFailure: (err: Error) => void
+  onFailure: (err: Error) => void,
 ) {
   const method = 'PUT'
   const basePath = `/api/v1/courses/${submission.courseId}/assignments/${submission.assignmentId}`

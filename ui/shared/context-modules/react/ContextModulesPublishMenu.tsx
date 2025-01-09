@@ -113,17 +113,16 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
       .catch((error: Error) =>
         showFlashAlert({
           message: I18n.t(
-            'There was an error updating module and items publish status. Try refreshing the page.'
+            'There was an error updating module and items publish status. Try refreshing the page.',
           ),
           type: 'error',
           err: error,
-        })
+        }),
       )
       .finally(() => reset())
   }
 
   const onPublishComplete = () => {
-     
     refreshPublishStates(true).then(() => reset())
   }
 
@@ -181,7 +180,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
   function onProgressFail(error: Error) {
     showFlashAlert({
       message: I18n.t(
-        "Something went wrong monitoring the work's progress. Try refreshing the page."
+        "Something went wrong monitoring the work's progress. Try refreshing the page.",
       ),
       err: error,
       type: 'error',
@@ -217,7 +216,7 @@ const ContextModulesPublishMenu = ({courseId, runningProgressId, disabled}: Prop
 
   const focusPublishAllButton = () => {
     const btn: HTMLButtonElement | null = document.querySelector(
-      '#context-modules-publish-menu button'
+      '#context-modules-publish-menu button',
     )
     if (document.activeElement !== btn) {
       btn?.focus()

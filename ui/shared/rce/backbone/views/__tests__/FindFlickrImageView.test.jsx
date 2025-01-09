@@ -152,7 +152,7 @@ describe('FindFlickrImageView', () => {
 
       const results = container.querySelectorAll('ul.flickrResults li a.thumbnail')
       const nsfwImage = Array.from(results).find(result =>
-        result.getAttribute('data-fullsize').includes('nsfwid')
+        result.getAttribute('data-fullsize').includes('nsfwid'),
       )
       expect(nsfwImage).toBeUndefined()
     })

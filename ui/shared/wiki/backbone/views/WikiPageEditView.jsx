@@ -204,7 +204,7 @@ export default class WikiPageEditView extends ValidatedFormView {
           labelText="Student Planner Date"
           labelClasses="screenreader-only"
         />,
-        elt
+        elt,
       )
     }
   }
@@ -258,7 +258,7 @@ export default class WikiPageEditView extends ValidatedFormView {
             content={blockEditorData}
             onCancel={this.cancel.bind(this)}
           />
-        </Suspense>
+        </Suspense>,
       )
     } else {
       RichContentEditor.loadNewEditor(this.$wikiPageBody, {
@@ -296,7 +296,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       reloadMessage: I18n.t(
         'reload_editing_page',
         'This page has changed since you started editing it. *Reloading* will lose all of your changes.',
-        {wrapper: '<a class="reload" href="#">$1</a>'}
+        {wrapper: '<a class="reload" href="#">$1</a>'},
       ),
       warning: true,
     })
@@ -315,7 +315,6 @@ export default class WikiPageEditView extends ValidatedFormView {
         RichContentEditor.destroyRCE(this.$wikiPageBody)
       }
     } catch (e) {
-       
       console.warn(e)
     } finally {
       this.$el.remove()
@@ -367,7 +366,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
 
     const sectionViewRef = document.getElementById(
-      'manage-assign-to-container'
+      'manage-assign-to-container',
     )?.reactComponentInstance
     const invalidInput = sectionViewRef?.focusErrors()
     if (invalidInput) {
@@ -391,7 +390,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   unsavedWarning() {
     return I18n.t(
       'warnings.unsaved_changes',
-      'You have unsaved changes. Do you want to continue without saving these changes?'
+      'You have unsaved changes. Do you want to continue without saving these changes?',
     )
   }
 
@@ -399,12 +398,11 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.checkUnsavedOnLeave = false
     if (this.reloadPending) {
       if (
-         
         !window.confirm(
           I18n.t(
             'warnings.overwrite_changes',
-            'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?'
-          )
+            'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?',
+          ),
         )
       ) {
         if (event != null) {
@@ -467,7 +465,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (event != null) {
       event.preventDefault()
     }
-     
+
     if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
       if (this.model.get('editor') !== 'block_editor') {

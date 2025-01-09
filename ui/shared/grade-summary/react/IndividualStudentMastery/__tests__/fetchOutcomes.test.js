@@ -175,7 +175,7 @@ describe('fetchOutcomes', () => {
     fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
     fetchMock.mock(
       '/api/v1/courses/1/outcome_group_links?outcome_style=full&per_page=100',
-      linksResponse
+      linksResponse,
     )
     fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2&per_page=100', rollupsResponse)
     fetchMock.mock('/api/v1/courses/1/outcome_alignments?student_id=2', alignmentsResponse)
@@ -329,7 +329,7 @@ describe('fetchOutcomes', () => {
     it('handles deeply nested objects', () => {
       mockRequests(
         {a: {b: {c: {d: ['e', 'f'], g: ['h', 'i'], j: 'k'}}}},
-        {a: {b: {c: {d: ['e2', 'f2'], g: ['h2', 'i2'], j: 'k2'}}}}
+        {a: {b: {c: {d: ['e2', 'f2'], g: ['h2', 'i2'], j: 'k2'}}}},
       )
       return fetchUrl('/first', dispatch).then(resp => {
         expect(resp).toEqual({

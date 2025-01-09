@@ -313,7 +313,7 @@ describe('updateRRuleForNewDate', () => {
     const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=260'
     const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
     expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
-      'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=260'
+      'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO,TU,WE,TH,FR;COUNT=260',
     )
   })
 
@@ -321,7 +321,7 @@ describe('updateRRuleForNewDate', () => {
     const rrule = 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO;COUNT=52'
     const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
     expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
-      'FREQ=WEEKLY;INTERVAL=1;BYDAY=TU;COUNT=52'
+      'FREQ=WEEKLY;INTERVAL=1;BYDAY=TU;COUNT=52',
     )
   })
 
@@ -329,7 +329,7 @@ describe('updateRRuleForNewDate', () => {
     const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYDAY=MO;BYSETPOS=3;COUNT=12'
     const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
     expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
-      'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=3;COUNT=12'
+      'FREQ=MONTHLY;INTERVAL=1;BYDAY=TU;BYSETPOS=3;COUNT=12',
     )
   })
 
@@ -337,7 +337,7 @@ describe('updateRRuleForNewDate', () => {
     const rrule = 'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=17;COUNT=12'
     const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
     expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
-      'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=18;COUNT=12'
+      'FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=18;COUNT=12',
     )
   })
 
@@ -345,7 +345,7 @@ describe('updateRRuleForNewDate', () => {
     const rrule = 'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=17;COUNT=5'
     const newDate = moment.tz('2023-07-18T00:00:00', defaultTZ)
     expect(updateRRuleForNewDate(newDate, rrule)).toEqual(
-      'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=18;COUNT=5'
+      'FREQ=YEARLY;INTERVAL=1;BYMONTH=7;BYMONTHDAY=18;COUNT=5',
     )
   })
 })

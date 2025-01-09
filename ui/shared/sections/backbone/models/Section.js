@@ -29,7 +29,7 @@ let Section
 
 const I18n = createI18nScope('modelsSection')
 
-export default Section = (function () {
+export default (Section = (function () {
   Section = class Section extends Model {
     constructor(...args) {
       super(...args)
@@ -53,4 +53,4 @@ export default Section = (function () {
   }
   Section.initClass()
   return Section
-})()
+})())

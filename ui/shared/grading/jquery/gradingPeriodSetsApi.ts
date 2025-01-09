@@ -88,14 +88,13 @@ export default {
   list() {
     return new Promise((resolve, reject) => {
       const dispatch = new NaiveRequestDispatch()
-       
+
       dispatch
         .getDepaginated(listUrl())
         // @ts-expect-error
         .then(response => resolve(deserializeSets(response)))
         // @ts-expect-error
         .fail(error => reject(error))
-       
     })
   },
 

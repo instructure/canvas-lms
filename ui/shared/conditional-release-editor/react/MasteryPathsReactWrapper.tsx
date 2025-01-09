@@ -54,7 +54,7 @@ export const MasteryPathsReactWrapper = (props: Props) => {
       ConditionalRelease.attach(
         document.querySelector('#conditional-release-target'),
         props.type,
-        props.env
+        props.env,
       )
     }
   }, [props.env, props.type])

@@ -82,7 +82,7 @@ const DownloadSubmissionsModal = ({
     if (downloadProgress < 90 && !fileSize) {
       const incrementProgressValue = () =>
         setDownloadProgress((prevValue: number) =>
-          prevValue < 100 && !error ? prevValue + 1 : prevValue
+          prevValue < 100 && !error ? prevValue + 1 : prevValue,
         )
       setTimeout(() => {
         incrementProgressValue()
@@ -140,7 +140,7 @@ const DownloadSubmissionsModal = ({
       <Modal.Body>
         <Text>
           {I18n.t(
-            'Your student submissions are being gathered and compressed into a zip file. This may take some time depending on the size and number of submission files.'
+            'Your student submissions are being gathered and compressed into a zip file. This may take some time depending on the size and number of submission files.',
           )}
         </Text>
         <View as="div" margin="medium 0" borderWidth={error ? 'small' : '0'} borderColor="danger">

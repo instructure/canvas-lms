@@ -51,11 +51,11 @@ const ButtonBlockToolbar = () => {
       _e: React.MouseEvent,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       setProp((prps: ButtonBlockProps) => (prps.size = value as ButtonSize))
     },
-    [setProp]
+    [setProp],
   )
 
   const handleVariantChange = useCallback(
@@ -63,7 +63,7 @@ const ButtonBlockToolbar = () => {
       _e: React.MouseEvent,
       value: MenuItemProps['value'] | MenuItemProps['value'][],
       _selected: MenuItemProps['selected'],
-      _args: MenuItem
+      _args: MenuItem,
     ) => {
       if (value === 'text') {
         setProp((prps: ButtonBlockProps) => {
@@ -77,7 +77,7 @@ const ButtonBlockToolbar = () => {
       }
       setProp((prps: ButtonBlockProps) => (prps.variant = value as ButtonVariant))
     },
-    [setProp]
+    [setProp],
   )
 
   const handleColorChange = useCallback(
@@ -88,7 +88,7 @@ const ButtonBlockToolbar = () => {
         prps.borderColor = newcolors.bordercolor
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const handleLinkButtonClick = useCallback(() => {
@@ -106,7 +106,7 @@ const ButtonBlockToolbar = () => {
         prps.href = url
       })
     },
-    [setProp]
+    [setProp],
   )
 
   const getButtonStyleName = useCallback(() => {

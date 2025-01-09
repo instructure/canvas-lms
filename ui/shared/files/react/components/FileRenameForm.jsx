@@ -37,7 +37,7 @@ FileRenameForm.buildContent = function () {
           {onRenameFileMessage?.(nameToUse) ||
             I18n.t(
               'An item named "%{name}" already exists in this location. Do you want to replace the existing file?',
-              {name: nameToUse}
+              {name: nameToUse},
             )}
         </p>
       </div>
@@ -49,7 +49,7 @@ FileRenameForm.buildContent = function () {
         onLockFileMessage?.(nameToUse) ||
         I18n.t(
           'A locked item named "%{name}" already exists in this location. Please enter a new name.',
-          {name: nameToUse}
+          {name: nameToUse},
         )
     } else {
       renameMessage = I18n.t('Change "%{name}" to', {name: nameToUse})
@@ -123,7 +123,7 @@ FileRenameForm.buildButtons = function () {
           onClick={this.handleSkipClick}
         >
           {I18n.t('Skip')}
-        </button>
+        </button>,
       )
     }
   } else {

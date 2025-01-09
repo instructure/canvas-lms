@@ -95,7 +95,7 @@ describe('PlannerApp', () => {
         changeDashboardView={() => {}}
         firstNewActivityDate={moment().add(-1, 'days')}
         loadingPast={true}
-      />
+      />,
     )
     expect(wrapper).toMatchSnapshot()
   })
@@ -104,7 +104,7 @@ describe('PlannerApp', () => {
     const mockUpdate = jest.fn()
     const wrapper = shallow(
       <PlannerApp {...getDefaultValues({isLoading: true})} triggerDynamicUiUpdates={mockUpdate} />,
-      {disableLifecycleMethods: false}
+      {disableLifecycleMethods: false},
     ) // so componentDidUpdate gets called on setProps
     wrapper.setProps({isLoading: false})
     expect(mockUpdate).toHaveBeenCalledTimes(1)
@@ -147,7 +147,7 @@ describe('PlannerApp', () => {
           focusFallback={focusFallback}
           ref={ref}
         />,
-        {attachTo: containerElement}
+        {attachTo: containerElement},
       )
       const button = wrapper.getByText('Load prior dates')
       button.focus()
@@ -159,7 +159,7 @@ describe('PlannerApp', () => {
           focusFallback={focusFallback}
           ref={ref}
         />,
-        {attachTo: containerElement}
+        {attachTo: containerElement},
       )
       expect(focusFallback).toHaveBeenCalled()
     })

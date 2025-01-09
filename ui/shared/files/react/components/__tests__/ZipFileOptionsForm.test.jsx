@@ -41,8 +41,8 @@ describe('ZipFileOptionsForm', () => {
     render(<ZipFileOptionsForm {...props} />)
     expect(
       screen.getByText(
-        /Would you like to expand the contents of "neat_file" into the current folder, or upload the zip file as is?/
-      )
+        /Would you like to expand the contents of "neat_file" into the current folder, or upload the zip file as is?/,
+      ),
     ).toBeInTheDocument()
   })
 

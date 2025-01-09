@@ -41,7 +41,7 @@ function ImageCarousel(props: ImageCarouselProps) {
     screenshots,
     isDesktop,
     isTablet,
-    isMobile
+    isMobile,
   )
 
   const [currentSlideNumber, setCurrentSlideNumber] = useState(0)

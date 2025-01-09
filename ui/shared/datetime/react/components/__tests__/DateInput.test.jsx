@@ -328,7 +328,6 @@ describe('disabled dates', () => {
     fireEvent.click(getInput())
     const button12 = getByText('12').closest('button')
     const button22 = getByText('22').closest('button')
-
     ;[button12, button22].forEach(b => expect(b).toBeDisabled())
   })
 

@@ -85,7 +85,7 @@ describe('api actions', () => {
       })
       return moxiosWait(request => {
         expect(request.config.url).toBe(
-          `/api/v1/planner/items?start_date=${encodeURIComponent(fromMoment.toISOString())}`
+          `/api/v1/planner/items?start_date=${encodeURIComponent(fromMoment.toISOString())}`,
         )
       })
     })
@@ -111,8 +111,8 @@ describe('api actions', () => {
       return moxiosWait(request => {
         expect(request.config.url).toBe(
           `/api/v1/planner/items?end_date=${encodeURIComponent(
-            fromMoment.toISOString()
-          )}&order=desc`
+            fromMoment.toISOString(),
+          )}&order=desc`,
         )
       })
     })
@@ -160,7 +160,7 @@ describe('api actions', () => {
         expect(mockDispatch).toHaveBeenCalledWith(
           expect.objectContaining({
             type: 'FOUND_FIRST_NEW_ACTIVITY_DATE',
-          })
+          }),
         )
       })
     })
@@ -176,8 +176,8 @@ describe('api actions', () => {
       const request = moxios.requests.mostRecent()
       expect(request.url).toBe(
         `/api/v1/planner/items?start_date=${encodeURIComponent(
-          mockMoment.subtract(6, 'months').toISOString()
-        )}&filter=new_activity&order=asc`
+          mockMoment.subtract(6, 'months').toISOString(),
+        )}&filter=new_activity&order=asc`,
       )
     })
 
@@ -200,7 +200,7 @@ describe('api actions', () => {
       const mockDispatch = jest.fn()
       Actions.loadFutureItems()(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith(
-        Actions.gettingFutureItems({loadMoreButtonClicked: false})
+        Actions.gettingFutureItems({loadMoreButtonClicked: false}),
       )
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingFutureSaga())
     })
@@ -249,7 +249,7 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith(
         Actions.gettingPastItems({
           seekingNewActivity: true,
-        })
+        }),
       )
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingPastUntilNewActivitySaga())
     })
@@ -300,11 +300,11 @@ describe('api actions', () => {
             weekStart: weeklyState.weekStart,
             weekEnd: weeklyState.weekEnd,
             isPreload: false,
-          })
+          }),
         )
         const getWayFutureItemThunk = mockDispatch.mock.calls[4][0] // the function returned by getWayFutureItem()
         expect(typeof getWayFutureItemThunk).toBe('function')
-        /* eslint-disable jest/valid-expect-in-promise */
+         
         const futurePromise = getWayFutureItemThunk(mockDispatch, getBasicState).then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
             type: 'GOT_WAY_FUTURE_ITEM_DATE',
@@ -319,7 +319,7 @@ describe('api actions', () => {
             payload: '2017-01-01T:00:00:00Z',
           })
         })
-        /* eslint-enable jest/valid-expect-in-promise */
+         
         return Promise.all([futurePromise, pastPromise])
       })
     })
@@ -332,7 +332,7 @@ describe('api actions', () => {
             weekStart: weeklyState.weekStart.clone().add(-7, 'days'),
             weekEnd: weeklyState.weekEnd.clone().add(-7, 'days'),
             isPreload: true,
-          })
+          }),
         )
       })
 
@@ -343,7 +343,7 @@ describe('api actions', () => {
             weekStart: weeklyState.weekStart.clone().add(7, 'days'),
             weekEnd: weeklyState.weekEnd.clone().add(7, 'days'),
             isPreload: true,
-          })
+          }),
         )
       })
     })
@@ -371,11 +371,11 @@ describe('api actions', () => {
         Actions.loadPastWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(lastWeek))
         expect(mockDispatch).toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({...lastWeek, isPreload: false})
+          Actions.startLoadingWeekSaga({...lastWeek, isPreload: false}),
         )
         // Pre-loading an additional week previous
         expect(mockDispatch).toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({...twoWeeksAgo, isPreload: true})
+          Actions.startLoadingWeekSaga({...twoWeeksAgo, isPreload: true}),
         )
       })
 
@@ -403,7 +403,7 @@ describe('api actions', () => {
         expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek({weekDays: lastWeekItems}))
         // Doesn't pre-load an additional week if we already had the previous week in state
         expect(mockDispatch).not.toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({...twoWeeksAgo, isPreload: true})
+          Actions.startLoadingWeekSaga({...twoWeeksAgo, isPreload: true}),
         )
       })
     })
@@ -431,11 +431,11 @@ describe('api actions', () => {
         Actions.loadNextWeekItems()(mockDispatch, getStateMock)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.gettingWeekItems(nextWeek))
         expect(mockDispatch).toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({...nextWeek, isPreload: false})
+          Actions.startLoadingWeekSaga({...nextWeek, isPreload: false}),
         )
         // Pre-loading an additional week hence
         expect(mockDispatch).toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({...twoWeeksHence, isPreload: true})
+          Actions.startLoadingWeekSaga({...twoWeeksHence, isPreload: true}),
         )
       })
 
@@ -463,7 +463,7 @@ describe('api actions', () => {
         expect(mockDispatch).toHaveBeenCalledWith(Actions.jumpToWeek({weekDays: nextWeekItems}))
         // Doesn't pre-load an additional week if we already had the next week in state
         expect(mockDispatch).not.toHaveBeenCalledWith(
-          Actions.startLoadingWeekSaga({...twoWeeksHence, isPreload: true})
+          Actions.startLoadingWeekSaga({...twoWeeksHence, isPreload: true}),
         )
       })
     })
@@ -638,13 +638,13 @@ describe('getCourseList with GraphQL integration', () => {
   })
 
   const assertCorrectCourseData = data => {
-    expect(data.length).toBe(3)
+    expect(data).toHaveLength(3)
     expect(data).toEqual(
       expect.arrayContaining([
         expect.objectContaining({id: '1', shortName: 'Economics 101'}),
         expect.objectContaining({id: '2', shortName: 'Home Room'}),
         expect.objectContaining({id: '3', shortName: 'The Maths'}),
-      ])
+      ]),
     )
   }
 

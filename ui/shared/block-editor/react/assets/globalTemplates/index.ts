@@ -67,7 +67,7 @@ export const getGlobalTemplates = (): Promise<BlockTemplate[]> => {
     navigationsection as unknown as BlockTemplate,
   ]).then(
     // @ts-expect-error
-    (t: BlockTemplate) => t.map(transformTemplate)
+    (t: BlockTemplate) => t.map(transformTemplate),
   )
 }
 
@@ -98,6 +98,6 @@ export const getGlobalPageTemplates = (): Promise<BlockTemplate[]> => {
     moduleWrapUp2,
   ]).then(
     // @ts-expect-error
-    (t: BlockTemplate) => t.map(transformTemplate)
+    (t: BlockTemplate) => t.map(transformTemplate),
   )
 }

@@ -34,7 +34,7 @@ const getPageContent: LtiMessageHandler = ({responseMessages}) => {
       })
       return accumulator + (clonedElement.outerHTML || '').replace(/\n\s*\n/gm, '\n')
     },
-    ''
+    '',
   )
   responseMessages.sendResponse({content})
   return true

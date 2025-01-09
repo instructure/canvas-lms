@@ -30,7 +30,7 @@ describe('TempEnrollNavigation', () => {
 
   it('renders both enabled buttons', () => {
     const {getByTestId} = render(
-      <TempEnrollNavigation prev={prevPage} next={nextPage} {...defaultProps} />
+      <TempEnrollNavigation prev={prevPage} next={nextPage} {...defaultProps} />,
     )
     expect(getByTestId('previous-bookmark')).not.toBeDisabled()
     expect(getByTestId('next-bookmark')).not.toBeDisabled()
@@ -38,7 +38,7 @@ describe('TempEnrollNavigation', () => {
 
   it('renders no buttons', () => {
     const {queryByText} = render(
-      <TempEnrollNavigation prev={undefined} next={undefined} {...defaultProps} />
+      <TempEnrollNavigation prev={undefined} next={undefined} {...defaultProps} />,
     )
     expect(queryByText('Previous Page')).not.toBeInTheDocument()
     expect(queryByText('Next Page')).not.toBeInTheDocument()
@@ -46,7 +46,7 @@ describe('TempEnrollNavigation', () => {
 
   it('previous page is disabled', () => {
     const {getByTestId} = render(
-      <TempEnrollNavigation prev={undefined} next={nextPage} {...defaultProps} />
+      <TempEnrollNavigation prev={undefined} next={nextPage} {...defaultProps} />,
     )
     expect(getByTestId('previous-bookmark')).toBeDisabled()
     expect(getByTestId('next-bookmark')).not.toBeDisabled()
@@ -54,7 +54,7 @@ describe('TempEnrollNavigation', () => {
 
   it('next page is disabled', () => {
     const {getByTestId} = render(
-      <TempEnrollNavigation prev={prevPage} next={undefined} {...defaultProps} />
+      <TempEnrollNavigation prev={prevPage} next={undefined} {...defaultProps} />,
     )
     expect(getByTestId('previous-bookmark')).not.toBeDisabled()
     expect(getByTestId('next-bookmark')).toBeDisabled()

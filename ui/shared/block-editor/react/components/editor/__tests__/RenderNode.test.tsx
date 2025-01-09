@@ -43,7 +43,7 @@ function renderEditor(props = {}) {
       }}
       {...props}
     />,
-    {container}
+    {container},
   )
 }
 
@@ -146,7 +146,7 @@ describe('BlockEditor', () => {
     })
 
     const deleteButton = domGetByText(getBlockToolbar(), 'Delete').closest(
-      'button'
+      'button',
     ) as HTMLButtonElement
     await user.click(deleteButton)
     await waitFor(() => {
@@ -167,7 +167,7 @@ describe('BlockEditor', () => {
       expect(domGetByText(getBlockToolbar(), 'Heading')).toBeInTheDocument()
     })
     const levelButton = domGetByText(getBlockToolbar(), 'Level').closest(
-      'button'
+      'button',
     ) as HTMLButtonElement
     await user.click(levelButton)
     await waitFor(() => {

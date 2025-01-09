@@ -36,7 +36,6 @@ function getSectionToggleInput() {
 }
 
 function mountComponent() {
-   
   ReactDOM.render(<SpecificSections {...context} />, $container)
 }
 

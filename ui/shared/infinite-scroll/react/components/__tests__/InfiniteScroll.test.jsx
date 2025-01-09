@@ -92,7 +92,7 @@ describe('InfiniteScroll', () => {
       mockContainer(scrollContainer2, 'scrollTop', 0)
 
       const {rerender} = render(
-        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />
+        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />,
       )
       rerender(<InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer2} />)
 
@@ -115,7 +115,7 @@ describe('InfiniteScroll', () => {
       const windowSpy = jest.spyOn(window, 'addEventListener')
 
       const {rerender} = render(
-        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />
+        <InfiniteScroll {...defaultProps()} scrollContainer={scrollContainer} />,
       )
       expect(windowSpy.mock.calls.map(c => c[0])).not.toContain('scroll')
 

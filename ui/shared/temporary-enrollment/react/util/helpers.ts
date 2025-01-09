@@ -39,7 +39,7 @@ const I18n = createI18nScope('temporary_enrollment')
 export function removeStringAffix(
   inputString: string,
   affix: string,
-  type: 'prefix' | 'suffix' = 'suffix'
+  type: 'prefix' | 'suffix' = 'suffix',
 ): string {
   if (!affix) {
     return inputString
@@ -80,9 +80,9 @@ export function getDayBoundaries(date: Date = new Date()): [Date, Date] {
  * @param {boolean} isInvalid True if the value cannot be parsed
  * @return {FormMessage[]} Array of messages to display in a DateTimeInput
  */
-export function generateDateTimeMessage(dateTime:{
-  value: string | null,
-  isInvalid: boolean,
+export function generateDateTimeMessage(dateTime: {
+  value: string | null
+  isInvalid: boolean
   wrongOrder: boolean
 }): FormMessage[] {
   if (dateTime.isInvalid) {
@@ -104,14 +104,19 @@ export function generateDateTimeMessage(dateTime:{
       {
         type: 'success',
         text: I18n.t('Account: %{datetime}', {
-          datetime: moment.tz(dateTime.value, ENV.CONTEXT_TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+          datetime: moment
+            .tz(dateTime.value, ENV.CONTEXT_TIMEZONE)
+            .format('ddd, MMM D, YYYY, h:mm A'),
         }),
       },
     ]
   } else {
     // default to returning local datetime if local and account are the same timezone
     return [
-      {type: 'success', text: moment.tz(dateTime.value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A')},
+      {
+        type: 'success',
+        text: moment.tz(dateTime.value, ENV.TIMEZONE).format('ddd, MMM D, YYYY, h:mm A'),
+      },
     ]
   }
 }
@@ -119,7 +124,7 @@ export function generateDateTimeMessage(dateTime:{
 export const handleCollectSelectedEnrollments = (
   tree: NodeStructure[],
   enrollmentsByCourse: Course[],
-  roleChoice: RoleChoice
+  roleChoice: RoleChoice,
 ): SelectedEnrollment[] => {
   const selectedEnrolls: SelectedEnrollment[] = []
   for (const role in tree) {
@@ -137,7 +142,7 @@ export const handleCollectSelectedEnrollments = (
                     // covers base role types
                     matchedEnrollment.role_id === roleChoice.id ||
                     // covers custom role types if existing enrollment with same role type is present
-                    matchedEnrollment.type === roleChoice.name.toLowerCase()
+                    matchedEnrollment.type === roleChoice.name.toLowerCase(),
                 )
                 if (enrollment === undefined) {
                   // covers custom role types if no matching enrollment role type is present
@@ -220,7 +225,7 @@ export function setToLocalStorage<T>(storageKey: string, value: T): void {
 export function updateLocalStorageObject<T extends object>(
   storageKey: string,
   // using partial to allow partial updates of object
-  newValues: Partial<T>
+  newValues: Partial<T>,
 ): void {
   const existingData = getFromLocalStorage<T>(storageKey) || {}
 
@@ -258,7 +263,7 @@ export function safeDateConversion(date: Date | string | undefined): Date | unde
  */
 export function splitArrayByProperty(
   arr: any[],
-  property: string
+  property: string,
 ): {[propertyValue: string]: any[]} {
   return arr.reduce((result: {[x: string]: any[]}, obj: {[x: string]: any}) => {
     const index = obj[property]

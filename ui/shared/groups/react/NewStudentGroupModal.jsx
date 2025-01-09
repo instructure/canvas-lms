@@ -69,7 +69,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
         </Flex>
       )
       setNameValidationMessages([{text: nameErrorText, type: 'error'}])
-      if(shouldFocus){
+      if (shouldFocus) {
         const input = document.getElementById(`group-name`)
         input?.focus()
         shouldFocus = false
@@ -87,7 +87,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
         </Flex>
       )
       setNameValidationMessages([{text: nameErrorText, type: 'error'}])
-      if(shouldFocus){
+      if (shouldFocus) {
         const input = document.getElementById(`group-name`)
         input?.focus()
         shouldFocus = false
@@ -117,7 +117,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
           console.error(err)
           captureException(err)
           setStatus('error')
-      })
+        })
     }
   }
 
@@ -164,7 +164,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
     sessions and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of
     space to store files.  Groups can collaborate on documents, or even schedule web conferences.
     It's really like a mini-course where you can work with a smaller number of students on a
-    more focused project.`
+    more focused project.`,
   )
 
   const setOptionIds = optionIds => {
@@ -212,7 +212,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
               onChange={(_event, value) => {
                 setName(value)
               }}
-              onBlur={(e) => {
+              onBlur={e => {
                 validateName(e.target.value)
               }}
               isRequired={true}

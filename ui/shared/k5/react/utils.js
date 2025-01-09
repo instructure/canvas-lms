@@ -96,22 +96,22 @@ export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
   asJson(
     window.fetch(
       `/api/v1/users/${userId}/enrollments?state[]=active&&type[]=StudentEnrollment&grading_period_id=${gradingPeriodId}`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   ).then(enrollments =>
     enrollments.map(({course_id, grades}) => ({
       courseId: course_id,
       score: grades && grades.current_score,
       grade: grades && grades.current_grade,
-    }))
+    })),
   )
 
 export const fetchLatestAnnouncement = courseId =>
   asJson(
     window.fetch(
       `/api/v1/announcements?context_codes=course_${courseId}&active_only=true&per_page=1`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   ).then(data => {
     if (data?.length > 0) {
       return data[0]
@@ -125,8 +125,8 @@ export const fetchCourseInstructors = courseId =>
   asJson(
     window.fetch(
       `/api/v1/courses/${courseId}/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 export const fetchCourseApps = courseIds =>
@@ -135,8 +135,8 @@ export const fetchCourseApps = courseIds =>
       `/api/v1/external_tools/visible_course_nav_tools?${courseIds
         .map(id => `context_codes[]=course_${id}`)
         .join('&')}`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 export const fetchCourseTabs = courseId =>
@@ -177,14 +177,14 @@ export const getAssignmentGroupTotals = (
   restrictQuantitativeData = false,
   gradingScheme = [],
   pointsBasedGradingScheme = false,
-  scalingFactor = null
+  scalingFactor = null,
 ) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
       group.assignments?.some(a => {
         const submission = getSubmission(a, observedUserId)
         return submission?.grading_period_id === gradingPeriodId
-      })
+      }),
     )
   }
   return data.map(group => {
@@ -202,7 +202,7 @@ export const getAssignmentGroupTotals = (
         }
       }),
       {...group, assignments},
-      false
+      false,
     )
 
     let score
@@ -277,7 +277,7 @@ export const getAssignmentGrades = (data, observedUserId) => {
           hasComments: !!submission?.submission_comments?.length,
         })
         return assignments
-      }, [])
+      }, []),
     )
     .flat(1)
     .sort((a, b) => {
@@ -296,12 +296,12 @@ export const getTotalGradeStringFromEnrollments = (
   restrictQuantitativeData = false,
   gradingScheme = [],
   pointsBasedGradingScheme,
-  scalingFactor
+  scalingFactor,
 ) => {
   let grades
   if (observedUserId) {
     const enrollment = enrollments.find(
-      ({associated_user_id}) => associated_user_id === observedUserId
+      ({associated_user_id}) => associated_user_id === observedUserId,
     )
     grades = enrollment?.observed_user?.enrollments[0]?.grades
   } else {
@@ -315,7 +315,7 @@ export const getTotalGradeStringFromEnrollments = (
       grades.current_score,
       gradingScheme,
       pointsBasedGradingScheme,
-      scalingFactor
+      scalingFactor,
     )
   }
   const score = I18n.n(grades.current_score, {percentage: true, precision: 2})
@@ -338,8 +338,8 @@ export const fetchImportantInfos = courses =>
         courseName: c.shortName,
         canEdit: c.canManage,
         content: data.json.syllabus_body,
-      }))
-    )
+      })),
+    ),
   ).then(infos => infos.filter(info => info.content))
 
 /* Turns raw announcement data from API into usable object */
@@ -394,7 +394,7 @@ export const groupAnnouncementsByHomeroom = (announcements = [], courses = []) =
       if (parsedAnnouncement) acc[course.isHomeroom] = [...group, parsedAnnouncement]
       return acc
     },
-    {true: [], false: []}
+    {true: [], false: []},
   )
 
 export const saveElementaryDashboardPreference = disabled =>

@@ -49,7 +49,7 @@ describe('GradingSchemeTable', () => {
         archiveOrUnarchiveScheme={archiveOrUnarchiveScheme}
         defaultAccountGradingSchemeEnabled={false}
         {...props}
-      />
+      />,
     )
     return {
       ...funcs,
@@ -167,7 +167,7 @@ describe('GradingSchemeTable', () => {
     const archiveButton = getByTestId('grading-scheme-1-archive-button')
     archiveButton.click()
     expect(archiveOrUnarchiveScheme).toHaveBeenCalledWith(
-      AccountGradingSchemeCards[0].gradingScheme
+      AccountGradingSchemeCards[0].gradingScheme,
     )
   })
 
@@ -192,8 +192,8 @@ describe('GradingSchemeTable', () => {
       await userEvent.hover(archiveButton)
       expect(
         getByText(
-          "You can't archive this grading scheme because it is set as a default for a course or account."
-        )
+          "You can't archive this grading scheme because it is set as a default for a course or account.",
+        ),
       ).toBeInTheDocument()
     })
 
@@ -204,7 +204,7 @@ describe('GradingSchemeTable', () => {
       const deleteButton = getByTestId('grading-scheme-3-delete-button')
       await userEvent.hover(deleteButton)
       expect(
-        getByText("You can't delete this grading scheme because it is in use.")
+        getByText("You can't delete this grading scheme because it is in use."),
       ).toBeInTheDocument()
     })
 

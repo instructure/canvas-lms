@@ -30,7 +30,7 @@ const buildClassNames = (
   empty: boolean,
   selected: boolean,
   hovered: boolean,
-  others: string[]
+  others: string[],
 ) => {
   const newClassNames = classNames({
     ...others.reduce((prev: Record<string, boolean>, curr: string) => {
@@ -51,7 +51,7 @@ const useClassNames = (enabled: boolean, nodeState: NodeState, others?: string |
   const rest: string[] = others ? (Array.isArray(others) ? others : [others]) : []
 
   const [classNameState, setClassNameState] = useState<string>(
-    buildClassNames(enabled, empty, selected, hovered, rest)
+    buildClassNames(enabled, empty, selected, hovered, rest),
   )
 
   useEffect(() => {

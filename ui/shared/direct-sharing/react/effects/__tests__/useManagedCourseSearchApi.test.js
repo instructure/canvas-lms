@@ -67,11 +67,11 @@ describe('useManagedCourseSearchApi', () => {
     renderHook(() =>
       useManagedCourseSearchApi({
         params: {term: 'game', enforce_manage_grant_filter: true},
-      })
+      }),
     )
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe(
-      '/users/self/manageable_courses?term=game&enforce_manage_grant_filter=true'
+      '/users/self/manageable_courses?term=game&enforce_manage_grant_filter=true',
     )
   })
 
@@ -88,7 +88,7 @@ describe('useManagedCourseSearchApi', () => {
     renderHook(() => useManagedCourseSearchApi({params}))
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe(
-      '/users/self/manageable_courses?term=Course&include=concluded'
+      '/users/self/manageable_courses?term=Course&include=concluded',
     )
   })
 
@@ -97,7 +97,7 @@ describe('useManagedCourseSearchApi', () => {
       setupManagedCoursesResponse()
       renderHook(useManagedCourseSearchApi)
       await fetchMock.flush(true)
-      expect(fetchMock.calls().length).toBe(1)
+      expect(fetchMock.calls()).toHaveLength(1)
     })
   })
 
@@ -111,14 +111,14 @@ describe('useManagedCourseSearchApi', () => {
       setupManagedCoursesResponse()
       renderHook(useManagedCourseSearchApi)
       await fetchMock.flush(true)
-      expect(fetchMock.calls().length).toBe(0)
+      expect(fetchMock.calls()).toHaveLength(0)
     })
 
     it('does not make network request if search term is only one character', async () => {
       setupManagedCoursesResponse()
       renderHook(() => useManagedCourseSearchApi({params: {term: 'a'}}))
       await fetchMock.flush(true)
-      expect(fetchMock.calls().length).toBe(0)
+      expect(fetchMock.calls()).toHaveLength(0)
     })
   })
 })

@@ -79,14 +79,12 @@ function handleClick({title, content}, readerSDK) {
           launchAsync(token, subdomain, requestContent, options)
         })
         .catch(e => {
-           
           console.error('Getting authentication details failed', e)
           captureException(e)
           showFlashError(I18n.t('Immersive Reader Failed to Load'))()
         })
     })
     .catch(e => {
-       
       console.error('Loading the Immersive Reader SDK failed', e)
       captureException(e)
       showFlashError(I18n.t('Immersive Reader Failed to Load'))()
@@ -111,6 +109,5 @@ export function ImmersiveReaderButton({content, readerSDK, breakpoints}) {
 const ImmersiveReaderButtonWithBreakpoints = WithBreakpoints(ImmersiveReaderButton)
 
 export function initializeReaderButton(mountPoint, content) {
-   
   ReactDOM.render(<ImmersiveReaderButtonWithBreakpoints content={content} />, mountPoint)
 }

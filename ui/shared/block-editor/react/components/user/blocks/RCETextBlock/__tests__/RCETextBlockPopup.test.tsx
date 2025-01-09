@@ -30,7 +30,12 @@ describe('RCETextBlockPopup', () => {
 
   it('renders', async () => {
     render(
-      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={() => {}} />
+      <RCETextBlockPopup
+        nodeId="1"
+        content="<p>content</p>"
+        onClose={() => {}}
+        onSave={() => {}}
+      />,
     )
     expect(screen.getByText('Edit Text')).toBeInTheDocument()
     expect(screen.getByText('Cancel')).toBeInTheDocument()
@@ -45,7 +50,7 @@ describe('RCETextBlockPopup', () => {
   it('calls onSave with the content', async () => {
     const onSave = jest.fn()
     render(
-      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={onSave} />
+      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={onSave} />,
     )
     await waitFor(() => {
       expect(document.querySelector('.rce-wrapper')).toBeInTheDocument()
@@ -60,7 +65,7 @@ describe('RCETextBlockPopup', () => {
   it('calls onClose when cancel is clicked', async () => {
     const onClose = jest.fn()
     render(
-      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={onClose} onSave={() => {}} />
+      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={onClose} onSave={() => {}} />,
     )
     const cancelButton = screen.getByText('Cancel')
     cancelButton.click()
@@ -70,7 +75,12 @@ describe('RCETextBlockPopup', () => {
   it('fires the close event when the modal is closed', async () => {
     const handleClose = jest.fn()
     render(
-      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={() => {}} />
+      <RCETextBlockPopup
+        nodeId="1"
+        content="<p>content</p>"
+        onClose={() => {}}
+        onSave={() => {}}
+      />,
     )
     document.addEventListener('rce-text-block-popup-close', handleClose)
     const cancelButton = screen.getByText('Cancel')
@@ -81,7 +91,12 @@ describe('RCETextBlockPopup', () => {
   it('toggles the fullscreen button', async () => {
     // we can't test fullscreen since tinymce is never actually rendered
     render(
-      <RCETextBlockPopup nodeId="1" content="<p>content</p>" onClose={() => {}} onSave={() => {}} />
+      <RCETextBlockPopup
+        nodeId="1"
+        content="<p>content</p>"
+        onClose={() => {}}
+        onSave={() => {}}
+      />,
     )
     await waitFor(() => {
       expect(document.querySelector('.rce-wrapper')).toBeInTheDocument()

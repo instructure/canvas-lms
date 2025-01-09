@@ -36,7 +36,7 @@ describe('canvas_quizzes/components/screen_reader_content', () => {
       <ScreenReaderContent
         forceSentenceDelimiter={true}
         dangerouslySetInnerHTML={{__html: '<span>yea!</span>'}}
-      />
+      />,
     )
 
     expect(document.body.textContent).not.toMatch('yea!')

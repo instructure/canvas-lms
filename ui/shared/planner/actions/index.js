@@ -92,7 +92,7 @@ export const {
   'CLEAR_OPPORTUNITIES',
   'CLEAR_DAYS',
   'CLEAR_COURSES',
-  'CLEAR_SIDEBAR'
+  'CLEAR_SIDEBAR',
 )
 
 export * from './loading-actions'
@@ -128,7 +128,7 @@ export const getNextOpportunities = () => {
               addOpportunities({
                 items: response.data,
                 nextUrl: parseLinkHeader(getResponseHeader(response, 'link')).next.url,
-              })
+              }),
             )
           } else {
             dispatch(addOpportunities({items: response.data, nextUrl: null}))
@@ -147,7 +147,6 @@ export const getInitialOpportunities = () => {
   return (dispatch, getState) => {
     dispatch(startLoadingOpportunities())
 
-     
     const {courses, selectedObservee} = getState()
     const url =
       getState().opportunities.nextUrl ||
@@ -205,7 +204,7 @@ export const savePlannerItem = plannerItem => {
         apiItem = transformPlannerNoteApiToInternalItem(
           response.data,
           getState().courses,
-          getState().timeZone
+          getState().timeZone,
         )
         return {
           item: updateOverrideDataOnItem(apiItem, overrideData),
@@ -230,8 +229,8 @@ export const deletePlannerItem = plannerItem => {
         transformPlannerNoteApiToInternalItem(
           response.data,
           getState().courses,
-          getState().timeZone
-        )
+          getState().timeZone,
+        ),
       )
       .catch(() => alert(I18n.t('Failed to delete to do'), true))
     dispatch(clearUpdateTodo())

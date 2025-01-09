@@ -67,11 +67,11 @@ describe('instructure misc plugins', () => {
     equal(el.is(':disabled'), true)
     equal(
       el.disableIf(() => true),
-      el
+      el,
     )
     equal(
       el.disableIf(() => false),
-      el
+      el,
     )
     equal(el.disableIf(true), el)
     equal(el.disableIf(false), el)

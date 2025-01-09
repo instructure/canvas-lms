@@ -27,7 +27,7 @@ const renderBlock = (props: Partial<NoSectionsProps> = {}) => {
       <Frame>
         <NoSections {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 

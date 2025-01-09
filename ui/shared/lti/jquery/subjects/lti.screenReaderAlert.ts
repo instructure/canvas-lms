@@ -23,7 +23,7 @@ const screenReaderAlert: LtiMessageHandler<{
   body: string | unknown
 }> = ({message}) => {
   $.screenReaderFlashMessageExclusive(
-    typeof message.body === 'string' ? message.body : JSON.stringify(message.body)
+    typeof message.body === 'string' ? message.body : JSON.stringify(message.body),
   )
   return false
 }

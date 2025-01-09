@@ -101,18 +101,18 @@ INST.lookupPrerequisites = function () {
       const sentence = I18n.beforeLabel(
         I18n.t(
           'labels.requirements_must_be_completed',
-          'The following requirements need to be completed before this page will be unlocked'
-        )
+          'The following requirements need to be completed before this page will be unlocked',
+        ),
       )
       $link.after(
-        "<br/><h2 style='margin-top: 15px;'>" + htmlEscape(header) + '</h2>' + htmlEscape(sentence)
+        "<br/><h2 style='margin-top: 15px;'>" + htmlEscape(header) + '</h2>' + htmlEscape(sentence),
       )
       $link.prev('a').hide()
     },
     _data => {
       spinner.stop()
       $('.module_prerequisites_fallback').show()
-    }
+    },
   )
 }
 $(document).ready(INST.lookupPrerequisites)

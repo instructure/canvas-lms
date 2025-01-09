@@ -29,7 +29,7 @@ describe('PreviewModal', () => {
     const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />)
-      </Editor>
+      </Editor>,
     )
     expect(getByText('Preview')).toBeInTheDocument()
     expect(getByText('Desktop')).toBeInTheDocument()
@@ -42,7 +42,7 @@ describe('PreviewModal', () => {
     const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />
-      </Editor>
+      </Editor>,
     )
 
     expect(getByText('Desktop').closest('button')).toHaveAttribute('aria-current', 'true')
@@ -55,7 +55,7 @@ describe('PreviewModal', () => {
     const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />)
-      </Editor>
+      </Editor>,
     )
 
     const tabletButton = getByText('Tablet').closest('button') as HTMLButtonElement
@@ -72,7 +72,7 @@ describe('PreviewModal', () => {
     const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={() => {}} />)
-      </Editor>
+      </Editor>,
     )
 
     const mobileButton = getByText('Mobile').closest('button') as HTMLButtonElement
@@ -90,7 +90,7 @@ describe('PreviewModal', () => {
     render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={onDismiss} />)
-      </Editor>
+      </Editor>,
     )
 
     fireEvent.keyDown(document.activeElement as HTMLElement, {key: 'Escape'})
@@ -103,7 +103,7 @@ describe('PreviewModal', () => {
     const {getByText} = render(
       <Editor enabled={false}>
         <PreviewModal open={true} onDismiss={onDismiss} />)
-      </Editor>
+      </Editor>,
     )
 
     const closeButton = getByText('Close').closest('button ') as HTMLButtonElement

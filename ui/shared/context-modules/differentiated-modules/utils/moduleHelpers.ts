@@ -116,7 +116,7 @@ function parsePrerequisites(element: HTMLDivElement) {
 
 export function parseModuleList() {
   const potentialModules = Array.from(
-    document.querySelectorAll('.item-group-condensed.context_module.editable_context_module')
+    document.querySelectorAll('.item-group-condensed.context_module.editable_context_module'),
   )
   const parsedModules = potentialModules.reduce((moduleList: Module[], moduleNode: Element) => {
     const id = moduleNode.getAttribute('data-module-id') ?? ''
@@ -131,10 +131,10 @@ export function parseModuleList() {
 
 function parseRequirements(element: HTMLDivElement) {
   const requirementElements = Array.from(
-    element.querySelectorAll('.ig-row.with-completion-requirements')
+    element.querySelectorAll('.ig-row.with-completion-requirements'),
   )
   return requirementElements.map((requirementNode: Element) =>
-    parseModuleItemData(requirementNode, true)
+    parseModuleItemData(requirementNode, true),
   ) as Requirement[]
 }
 
@@ -163,7 +163,7 @@ function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanel
       if (messageElement.textContent?.includes(oldModuleName)) {
         messageElement.textContent = messageElement.textContent.replace(
           oldModuleName,
-          moduleSettings.moduleName
+          moduleSettings.moduleName,
         )
       }
     })
@@ -192,7 +192,7 @@ function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanel
     button.setAttribute('title', moduleSettings.moduleName)
     button.setAttribute(
       'aria-label',
-      I18n.t('%{name} toggle module visibility', {name: moduleSettings.moduleName})
+      I18n.t('%{name} toggle module visibility', {name: moduleSettings.moduleName}),
     )
   })
 
@@ -211,7 +211,7 @@ function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanel
   if (kebabMenuButton) {
     kebabMenuButton.setAttribute(
       'aria-label',
-      I18n.t('Manage %{name}', {name: moduleSettings.moduleName})
+      I18n.t('Manage %{name}', {name: moduleSettings.moduleName}),
     )
   }
 
@@ -219,7 +219,7 @@ function updateName(moduleElement: HTMLDivElement, moduleSettings: SettingsPanel
   if (duplicateButton) {
     duplicateButton.setAttribute(
       'aria-label',
-      I18n.t('Duplicate %{name}', {name: moduleSettings.moduleName})
+      I18n.t('Duplicate %{name}', {name: moduleSettings.moduleName}),
     )
   }
 
@@ -294,7 +294,7 @@ function updateRequirements(moduleElement: HTMLDivElement, moduleSettings: Setti
   if (requirementsMessageElement) {
     requirementsMessageElement.setAttribute(
       'data-requirement-type',
-      moduleSettings.requirementCount
+      moduleSettings.requirementCount,
     )
 
     if (moduleSettings.requirements.length === 0) {
@@ -369,7 +369,7 @@ function parseModuleItemData(element: Element, isRequirement: boolean) {
   if (isRequirement) {
     // One of these (the active one) has "display: block;" and the others are hidden
     activeRequirementNode = Array.from(element.querySelectorAll('.requirement_type')).filter(
-      node => window.getComputedStyle(node).display !== 'none'
+      node => window.getComputedStyle(node).display !== 'none',
     )[0]
     // @ts-expect-error
     data.type = requirementTypeMap[activeRequirementNode.classList[1] as Requirement['type']]
@@ -395,7 +395,7 @@ function parseModuleItemData(element: Element, isRequirement: boolean) {
 
 function updatePublishFinalGrade(
   moduleElement: HTMLDivElement,
-  moduleSettings: SettingsPanelState
+  moduleSettings: SettingsPanelState,
 ) {
   const publishFinalGradeElement = moduleElement.querySelector('.publish_final_grade')
   if (publishFinalGradeElement) {

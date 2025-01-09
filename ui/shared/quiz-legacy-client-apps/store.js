@@ -39,13 +39,13 @@ const Store = function (key, proto, Dispatcher) {
               resolve(rc)
               emitChange()
             },
-            reject
+            reject,
           )
         } catch (e) {
           reject(e)
         }
       })
-    }.bind(this)
+    }.bind(this),
   )
 
   return this

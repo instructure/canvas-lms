@@ -36,7 +36,7 @@ export default class WikiPageReloadView extends Backbone.View {
 
   template() {
     return `<div class='alert alert-${raw(
-      this.options.warning ? 'warning' : 'info'
+      this.options.warning ? 'warning' : 'info',
     )} reload-changed-page'>${raw(this.reloadMessage)}</div>`
   }
 
@@ -54,11 +54,13 @@ export default class WikiPageReloadView extends Backbone.View {
     if (latestRevision && !model.isNew()) {
       latestRevision.on('change:revision_id', () =>
         // when the revision changes, query the full record
-        latestRevision.fetch({data: {summary: false}}).done(() => {
-          view.render()
-          view.trigger('changed')
-          return view.stopPolling()
-        })
+        latestRevision
+          .fetch({data: {summary: false}})
+          .done(() => {
+            view.render()
+            view.trigger('changed')
+            return view.stopPolling()
+          }),
       )
 
       return latestRevision.pollForChanges(this.interval)

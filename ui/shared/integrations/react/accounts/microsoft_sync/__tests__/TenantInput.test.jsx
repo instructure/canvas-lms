@@ -40,7 +40,7 @@ describe('TenantInput', () => {
       container.getByRole('textbox', {
         name: /tenant name input area/i,
       }),
-      {target: {value: 'testtenant.com'}}
+      {target: {value: 'testtenant.com'}},
     )
 
     expect(inputHandlerMock).toHaveBeenCalled()
@@ -72,7 +72,7 @@ describe('TenantInput', () => {
     expect(
       container.getByRole('textbox', {
         name: /tenant name input area/i,
-      }).value
+      }).value,
     ).toBe(tenant)
   })
 })

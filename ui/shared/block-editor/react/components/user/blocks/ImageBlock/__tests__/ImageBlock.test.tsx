@@ -27,7 +27,7 @@ const renderBlock = (props: Partial<ImageBlockProps> = {}) => {
       <Frame>
         <ImageBlock {...props} />
       </Frame>
-    </Editor>
+    </Editor>,
   )
 }
 describe('ImageBlock', () => {

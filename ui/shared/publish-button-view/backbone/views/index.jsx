@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -88,7 +86,7 @@ export default (function (superClass) {
                 return _this.disable()
               }
             }
-          })(this)
+          })(this),
         )
       : void 0
   }
@@ -165,7 +163,7 @@ export default (function (superClass) {
           _this.setFocusToElement()
           if (
             !['discussion_topic', 'quiz', 'assignment'].includes(
-              _this.model.attributes.module_type
+              _this.model.attributes.module_type,
             ) ||
             (_this.model.attributes.module_type === 'discussion_topic' &&
               !((ref = _this.$el[0]) != null
@@ -180,11 +178,11 @@ export default (function (superClass) {
             '#speed-grader-container-' +
               _this.model.attributes.module_type +
               '-' +
-              _this.model.attributes.content_id
+              _this.model.attributes.content_id,
           )
           return $sgLink.removeClass('hidden')
         }
-      })(this)
+      })(this),
     )
   }
 
@@ -203,11 +201,11 @@ export default (function (superClass) {
               '#speed-grader-container-' +
                 _this.model.attributes.module_type +
                 '-' +
-                _this.model.attributes.content_id
+                _this.model.attributes.content_id,
             )
             return $sgLink.addClass('hidden')
           }
-        })(this)
+        })(this),
       )
       .fail(
         (function (_this) {
@@ -219,7 +217,7 @@ export default (function (superClass) {
             _this.renderPublished()
             return _this.setFocusToElement()
           }
-        })(this)
+        })(this),
       )
   }
 
@@ -269,7 +267,7 @@ export default (function (superClass) {
         this.publishedClass +
         ' ' +
         this.unpublishClass +
-        ' published-status restricted'
+        ' published-status restricted',
     )
     this.$icon.removeClass('icon-publish icon-unpublish icon-unpublished')
     return this.$el.removeAttr('title aria-label')
@@ -395,7 +393,7 @@ export default (function (superClass) {
     // Grade permission.
     if (this.model.get('disabledForModeration')) {
       return this.disableWithMessage(
-        'You do not have permissions to edit this moderated assignment'
+        'You do not have permissions to edit this moderated assignment',
       )
       // unpublishable (i.e., able to be unpublished)
     } else if (this.model.get('unpublishable') == null || this.model.get('unpublishable')) {

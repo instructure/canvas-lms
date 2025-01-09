@@ -31,7 +31,7 @@ const renderBlock = (enabled: boolean, props: Partial<TextBlockProps> = {}) => {
           <TextBlock {...props} />
         </Frame>
       </Editor>
-    </>
+    </>,
   )
 }
 

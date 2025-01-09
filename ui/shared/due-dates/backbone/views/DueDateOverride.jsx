@@ -80,7 +80,7 @@ DueDateOverrideView.prototype.render = function () {
       React.createElement(CoursePacingNotice, {
         courseId: this.options.courseId,
       }),
-      div
+      div,
     )
   }
 
@@ -169,7 +169,7 @@ DueDateOverrideView.prototype.render = function () {
     // re-renders to apply all card validations
     const forceFocus = () => {
       const sectionViewRef = document.getElementById(
-        'manage-assign-to-container'
+        'manage-assign-to-container',
       )?.reactComponentInstance
       if (!sectionViewRef?.focusErrors()) {
         setTimeout(forceFocus, 500)
@@ -184,7 +184,7 @@ DueDateOverrideView.prototype.render = function () {
 }
 
 DueDateOverrideView.prototype.gradingPeriods = GradingPeriodsAPI.deserializePeriods(
-  ENV.active_grading_periods
+  ENV.active_grading_periods,
 )
 
 DueDateOverrideView.prototype.hasGradingPeriods = !!ENV.HAS_GRADING_PERIODS
@@ -205,7 +205,7 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
   const requiredDueDates = ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
 
   const sectionViewRef = document.getElementById(
-    'manage-assign-to-container'
+    'manage-assign-to-container',
   )?.reactComponentInstance
   const postToSisEnabled = data.postToSIS && requiredDueDates
   // Runs custom validation for all cards with the current post to sis selection without re-renders
@@ -213,7 +213,7 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
 
   if (!formIsValid) {
     const aDueDateMissing = data.assignment_overrides.some(
-      o => o.due_at === null || o.due_at === ''
+      o => o.due_at === null || o.due_at === '',
     )
     const hasAfterRenderIssue = postToSisEnabled && aDueDateMissing
     // If there are errors visible already don't force the focus
@@ -284,7 +284,7 @@ DueDateOverrideView.prototype.validateDatetimes = function (data, errors) {
       continue
     }
     rowErrors = dateValidator.validateDatetimes(override)
-     
+
     Object.keys(rowErrors).forEach(function (key) {
       return (rowErrors[key] = {
         message: rowErrors[key],
@@ -359,7 +359,7 @@ DueDateOverrideView.prototype.validateGroupOverrides = function (data, errors) {
     return e.rowKey
   })
   const invalidGroupOverrideMessage = I18n.t(
-    "You cannot assign to a group outside of the assignment's group set"
+    "You cannot assign to a group outside of the assignment's group set",
   )
   const ref = $('.Container__DueDateRow-item')
   for (i = 0, len = ref.length; i < len; i++) {

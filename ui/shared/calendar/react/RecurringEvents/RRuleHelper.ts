@@ -178,7 +178,7 @@ export default class RRuleHelper {
       case 'MONTHLY':
         if (this.spec.monthdate === undefined && this.spec.pos === undefined) {
           throw new RruleValidationError(
-            'RRULE with MONTHLY frequency must have BYMONTHDAY or BYSETPOS'
+            'RRULE with MONTHLY frequency must have BYMONTHDAY or BYSETPOS',
           )
         }
         return true
@@ -243,7 +243,7 @@ export default class RRuleHelper {
       return `FREQ=MONTHLY;INTERVAL=${interval};BYMONTHDAY=${monthdate}${endoptions}`
     } else if (monthdate === undefined && Array.isArray(weekdays)) {
       return `FREQ=MONTHLY;INTERVAL=${interval};BYDAY=${weekdays.join(
-        ','
+        ',',
       )};BYSETPOS=${pos}${endoptions}`
     } else {
       throw new RruleValidationError('Invalid monthly recurrence')

@@ -122,12 +122,12 @@ export default class ToDoItem extends React.Component {
       toDisplay.push(
         <InlineList.Item key="points">
           {I18n.t('%{numPoints} points', {numPoints: points})}
-        </InlineList.Item>
+        </InlineList.Item>,
       )
     }
 
     toDisplay.push(
-      <InlineList.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</InlineList.Item>
+      <InlineList.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</InlineList.Item>,
     )
     return toDisplay
   }
@@ -173,7 +173,7 @@ export default class ToDoItem extends React.Component {
             {this.getInformationRow(
               this.props.item.date,
               this.props.item.points,
-              this.props.item?.restrict_quantitative_data
+              this.props.item?.restrict_quantitative_data,
             )}
           </InlineList>
         </div>

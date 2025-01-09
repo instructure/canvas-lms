@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {includes} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -77,7 +75,7 @@ GradingTypeSelector.optionProperty('canEditGrades')
 GradingTypeSelector.prototype.handleGradingTypeChange = function (_ev) {
   const gradingType = this.$gradingType.val()
   this.$viewGradingLevels.toggleAccessibly(
-    gradingType === 'letter_grade' || gradingType === 'gpa_scale'
+    gradingType === 'letter_grade' || gradingType === 'gpa_scale',
   )
   if (ENV.GRADING_SCHEME_UPDATES_ENABLED) {
     if (gradingType === 'letter_grade' || gradingType === 'gpa_scale') {
@@ -193,7 +191,7 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
     contextType: 'Course',
     archivedGradingSchemesEnabled: ENV.ARCHIVED_GRADING_SCHEMES_ENABLED,
     assignmentId:
-      ENV.ASSIGNMENT?.id ?? ENV.ASSIGNMENT_ID ?? this.parentModel.id
+      (ENV.ASSIGNMENT?.id ?? ENV.ASSIGNMENT_ID ?? this.parentModel.id)
         ? String(this.parentModel.id)
         : undefined,
   }

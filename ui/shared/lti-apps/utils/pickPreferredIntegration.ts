@@ -43,7 +43,7 @@ type IntegrationType<T extends PreferredLtiIntegration['integration_type']> = Ex
 >
 
 export const isLti13DynamicRegistrationConfig = (
-  lti: Lti13Config
+  lti: Lti13Config,
 ): lti is IntegrationType<'lti_13_dynamic_registration'> => {
   return (
     lti.integration_type === 'lti_13_dynamic_registration' &&
@@ -53,7 +53,7 @@ export const isLti13DynamicRegistrationConfig = (
 }
 
 export const isLti13GlobalInheritedKeyConfig = (
-  lti: Lti13Config
+  lti: Lti13Config,
 ): lti is IntegrationType<'lti_13_global_inherited_key'> => {
   return (
     lti.integration_type === 'lti_13_global_inherited_key' &&
@@ -63,7 +63,7 @@ export const isLti13GlobalInheritedKeyConfig = (
 }
 
 export const isLti13JsonConfig = (
-  lti: Lti13Config
+  lti: Lti13Config,
 ): lti is IntegrationType<'lti_13_configuration'> => {
   if (
     lti.integration_type === 'lti_13_configuration' &&
@@ -88,7 +88,7 @@ export const isLti13UrlConfig = (lti: Lti13Config): lti is IntegrationType<'lti_
 }
 
 export const pickPreferredIntegration = (
-  configs: Lti13Config[]
+  configs: Lti13Config[],
 ): PreferredLtiIntegration | undefined => {
   return (
     configs.find(isLti13DynamicRegistrationConfig) ||

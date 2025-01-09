@@ -139,7 +139,7 @@ describe('UsageRightsDialog', () => {
     }
     renderDialog(props)
     expect(
-      screen.queryByText('Items selected have different usage rights.')
+      screen.queryByText('Items selected have different usage rights.'),
     ).not.toBeInTheDocument()
   })
 

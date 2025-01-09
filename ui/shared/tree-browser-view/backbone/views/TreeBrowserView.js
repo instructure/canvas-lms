@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import $ from 'jquery'
 import {uniqueId} from 'lodash'
 import {extend} from '@canvas/backbone/utils'
@@ -284,7 +282,7 @@ TreeBrowserView.prototype.activateCurrent = function ($current) {
   return $.screenReaderFlashMessage(
     I18n.t('Selected %{subtree}', {
       subtree: $current.attr('aria-label'),
-    })
+    }),
   )
 }
 

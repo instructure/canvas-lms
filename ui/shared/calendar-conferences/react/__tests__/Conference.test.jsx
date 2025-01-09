@@ -58,7 +58,7 @@ describe('Conference', () => {
   describe('Link conferences', () => {
     it('shows plugin conferences as links', () => {
       const {getByRole} = render(
-        <Conference conference={pluginConference} conferenceType={bbbConferenceType} />
+        <Conference conference={pluginConference} conferenceType={bbbConferenceType} />,
       )
       const link = getByRole('button')
       expect(link.textContent).toEqual('BigBlueButton Conference')
@@ -67,7 +67,7 @@ describe('Conference', () => {
 
     it('shows lti link conferences as links', () => {
       const {getByRole} = render(
-        <Conference conference={ltiConference} conferenceType={msTeamsConferenceType} />
+        <Conference conference={ltiConference} conferenceType={msTeamsConferenceType} />,
       )
       const link = getByRole('button')
       expect(link.textContent).toEqual('LTI Conference')
@@ -78,7 +78,7 @@ describe('Conference', () => {
       const conference = {...ltiConference}
       conference.lti_settings.icon = {url: 'invalid://icon'}
       const {getByRole} = render(
-        <Conference conference={conference} conferenceType={msTeamsConferenceType} />
+        <Conference conference={conference} conferenceType={msTeamsConferenceType} />,
       )
       const link = getByRole('button')
       const icon = link.querySelector('img')
@@ -92,7 +92,7 @@ describe('Conference', () => {
           conference={pluginConference}
           conferenceType={bbbConferenceType}
           removeConference={removeConference}
-        />
+        />,
       )
       const closeButton = getByText('Remove conference: BigBlueButton Conference')
       expect(closeButton).not.toBeNull()
@@ -105,7 +105,7 @@ describe('Conference', () => {
           conference={pluginConference}
           conferenceType={bbbConferenceType}
           removeConference={removeConference}
-        />
+        />,
       )
       const closeButton = getByText('Remove conference: BigBlueButton Conference')
       act(() => {
@@ -116,7 +116,7 @@ describe('Conference', () => {
 
     it('does not show remove button if handler not provided', () => {
       const {queryByText} = render(
-        <Conference conference={pluginConference} conferenceType={bbbConferenceType} />
+        <Conference conference={pluginConference} conferenceType={bbbConferenceType} />,
       )
       const closeButton = queryByText('Remove conference: BigBlueButton Conference')
       expect(closeButton).toBeNull()
@@ -131,7 +131,7 @@ describe('Conference', () => {
           conferenceType={bbbConferenceType}
           removeConference={removeConference}
           removeButtonRef={ref}
-        />
+        />,
       )
       expect(ref).toHaveBeenCalled()
     })
@@ -151,7 +151,7 @@ describe('Conference', () => {
 
     it('shows lti html conferences as html', () => {
       const {getByText} = render(
-        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />
+        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />,
       )
       const link = getByText('This is some text')
       expect(link.href).toMatch(/foo$/)
@@ -181,7 +181,7 @@ describe('Conference', () => {
           conference={htmlConference}
           conferenceType={msTeamsConferenceType}
           removeConference={removeConference}
-        />
+        />,
       )
       const closeButton = getByText('Remove conference: HTML Conference')
       expect(closeButton).not.toBeNull()
@@ -194,7 +194,7 @@ describe('Conference', () => {
           conference={htmlConference}
           conferenceType={msTeamsConferenceType}
           removeConference={removeConference}
-        />
+        />,
       )
       const closeButton = getByText('Remove conference: HTML Conference')
       act(() => {
@@ -205,7 +205,7 @@ describe('Conference', () => {
 
     it('does not show remove button if handler not provided', () => {
       const {queryByText} = render(
-        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />
+        <Conference conference={htmlConference} conferenceType={msTeamsConferenceType} />,
       )
       const closeButton = queryByText('Remove conference: HTML Conference')
       expect(closeButton).toBeNull()
@@ -220,7 +220,7 @@ describe('Conference', () => {
           conferenceType={msTeamsConferenceType}
           removeConference={removeConference}
           removeButtonRef={ref}
-        />
+        />,
       )
       expect(ref).toHaveBeenCalled()
     })

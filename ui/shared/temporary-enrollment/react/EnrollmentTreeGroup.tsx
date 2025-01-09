@@ -61,7 +61,7 @@ export function translateState(workflow: string) {
 export function constructLabel(
   label: string,
   termName?: string,
-  children?: NodeStructure[]
+  children?: NodeStructure[],
 ): string {
   const labelParts = [label]
   // append section label if it exists and is different
@@ -117,7 +117,7 @@ export function EnrollmentTreeGroup(props: Props) {
                 >
                   {course.children}
                 </EnrollmentTreeGroup>
-              </Flex.Item>
+              </Flex.Item>,
             )
           } else {
             // top-level course
@@ -136,7 +136,7 @@ export function EnrollmentTreeGroup(props: Props) {
                 >
                   {[]}
                 </EnrollmentTreeItem>
-              </Flex.Item>
+              </Flex.Item>,
             )
           }
         }
@@ -157,7 +157,7 @@ export function EnrollmentTreeGroup(props: Props) {
               >
                 {[]}
               </EnrollmentTreeItem>
-            </Flex.Item>
+            </Flex.Item>,
           )
         }
       }

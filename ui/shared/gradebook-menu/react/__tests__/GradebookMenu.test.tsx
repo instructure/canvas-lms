@@ -73,7 +73,7 @@ describe('GradebookMenu', () => {
 
     it('omits "Learning Mastery" when learningMasteryEnabled is false (1)', () => {
       const {getByRole, queryByTestId} = render(
-        <GradebookMenu {...defaultProps()} learningMasteryEnabled={false} />
+        <GradebookMenu {...defaultProps()} learningMasteryEnabled={false} />,
       )
       const menu = getByRole('button')
       fireEvent.click(menu)
@@ -87,7 +87,7 @@ describe('GradebookMenu', () => {
     it('renders the gradebook title when ICE feature flag is OFF', () => {
       window.ENV.FEATURES.instui_nav = false
       const {getByRole} = render(
-        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />
+        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />,
       )
       const menu = getByRole('button')
       expect(menu).toHaveTextContent('Learning Mastery')
@@ -96,14 +96,14 @@ describe('GradebookMenu', () => {
     // EVAL-3711 Remove ICE Evaluate feature flag
     it('renders the gradebook title when ICE feature flag is ON', () => {
       const {getByTestId} = render(
-        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />
+        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />,
       )
       expect(getByTestId('gradebook-title')).toHaveTextContent('Learning Mastery')
     })
 
     it('renders the expected options', () => {
       const {getAllByRole, getByRole} = render(
-        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />
+        <GradebookMenu {...defaultProps()} variant="DefaultGradebookLearningMastery" />,
       )
 
       const menu = getByRole('button')
@@ -121,12 +121,12 @@ describe('GradebookMenu', () => {
 
       expect(menuItems[0]).toHaveAttribute(
         'href',
-        '/courseUrl/gradebook/change_gradebook_version?version=gradebook'
+        '/courseUrl/gradebook/change_gradebook_version?version=gradebook',
       )
       expect(menuItems[1]).toHaveAttribute('href', '/courseUrl/gradebook?view=learning_mastery')
       expect(menuItems[2]).toHaveAttribute(
         'href',
-        '/courseUrl/gradebook/change_gradebook_version?version=individual'
+        '/courseUrl/gradebook/change_gradebook_version?version=individual',
       )
       expect(menuItems[3]).toHaveAttribute('href', '/courseUrl/gradebook/history')
     })
@@ -149,7 +149,7 @@ describe('GradebookMenu', () => {
 
     it('renders the expected options', () => {
       const {getAllByRole, getByRole} = render(
-        <GradebookMenu {...defaultProps()} variant="GradebookHistory" />
+        <GradebookMenu {...defaultProps()} variant="GradebookHistory" />,
       )
 
       const menu = getByRole('button')
@@ -168,12 +168,12 @@ describe('GradebookMenu', () => {
 
       expect(menuItems[0]).toHaveAttribute(
         'href',
-        '/courseUrl/gradebook/change_gradebook_version?version=gradebook'
+        '/courseUrl/gradebook/change_gradebook_version?version=gradebook',
       )
       expect(menuItems[1]).toHaveAttribute('href', '/courseUrl/gradebook?view=learning_mastery')
       expect(menuItems[2]).toHaveAttribute(
         'href',
-        '/courseUrl/gradebook/change_gradebook_version?version=individual'
+        '/courseUrl/gradebook/change_gradebook_version?version=individual',
       )
       expect(menuItems[3]).toHaveAttribute('href', '/courseUrl/gradebook/history')
     })
@@ -184,7 +184,7 @@ describe('GradebookMenu', () => {
           {...defaultProps()}
           variant="GradebookHistory"
           learningMasteryEnabled={false}
-        />
+        />,
       )
       const menu = getByRole('button')
       fireEvent.click(menu)
@@ -200,11 +200,11 @@ describe('GradebookMenu', () => {
 
       expect(menuItems[0]).toHaveAttribute(
         'href',
-        '/courseUrl/gradebook/change_gradebook_version?version=gradebook'
+        '/courseUrl/gradebook/change_gradebook_version?version=gradebook',
       )
       expect(menuItems[1]).toHaveAttribute(
         'href',
-        '/courseUrl/gradebook/change_gradebook_version?version=individual'
+        '/courseUrl/gradebook/change_gradebook_version?version=individual',
       )
       expect(menuItems[2]).toHaveAttribute('href', '/courseUrl/gradebook/history')
     })

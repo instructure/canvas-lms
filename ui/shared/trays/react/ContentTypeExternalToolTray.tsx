@@ -87,7 +87,7 @@ export default function ContentTypeExternalToolTray({
   useEffect(
     // returns cleanup function:
     () => handleExternalContentMessages({ready: onExternalContentReady}),
-    [onExternalContentReady]
+    [onExternalContentReady],
   )
 
   return (

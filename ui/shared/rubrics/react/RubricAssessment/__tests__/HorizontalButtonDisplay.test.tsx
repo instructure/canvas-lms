@@ -95,7 +95,7 @@ describe('HorizontalButtonDisplay', () => {
 
   it('shows point range when criterionUseRange is true', () => {
     render(
-      <HorizontalButtonDisplay {...defaultProps} criterionUseRange={true} selectedRatingId="2" />
+      <HorizontalButtonDisplay {...defaultProps} criterionUseRange={true} selectedRatingId="2" />,
     )
 
     const ratingDetails = screen.getByTestId('rating-details-2')
@@ -104,7 +104,7 @@ describe('HorizontalButtonDisplay', () => {
 
   it('shows exact points when criterionUseRange is false', () => {
     render(
-      <HorizontalButtonDisplay {...defaultProps} criterionUseRange={false} selectedRatingId="2" />
+      <HorizontalButtonDisplay {...defaultProps} criterionUseRange={false} selectedRatingId="2" />,
     )
 
     const ratingDetails = screen.getByTestId('rating-details-2')

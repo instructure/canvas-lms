@@ -35,12 +35,12 @@ const HelpText = () => (
   <div style={{maxWidth: '300px'}}>
     <p>
       {I18n.t(
-        'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work.'
+        'You can create sets of groups where students can sign up on their own. Students are still limited to being in only one group in the set, but this way students can organize themselves into groups instead of needing the teacher to do the work.',
       )}
     </p>
     <p>
       {I18n.t(
-        'With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.'
+        'With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.',
       )}
     </p>
   </div>

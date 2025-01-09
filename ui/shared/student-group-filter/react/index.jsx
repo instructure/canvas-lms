@@ -69,10 +69,10 @@ StudentGroupFilter.propTypes = {
         shape({
           id: string.isRequired,
           name: string.isRequired,
-        })
+        }),
       ),
       name: string.isRequired,
-    })
+    }),
   ),
   label: string.isRequired,
   onChange: func.isRequired,

@@ -71,8 +71,8 @@ describe('DeleteCalendarEventDialog', () => {
     expect(getByText('Confirm Deletion')).toBeInTheDocument()
     expect(
       getByText(
-        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.'
-      )
+        'Are you sure you want to delete this event? Deleting this event will also delete the associated assignment.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -143,7 +143,7 @@ describe('DeleteCalendarEventDialog', () => {
       const {getByRole, getAllByText} = renderDialog()
       const deleteButton = getByRole('button', {name: 'Delete'})
       act(() => deleteButton.click())
-      expect(getAllByText('Wait for delete to complete').length).toEqual(2)
+      expect(getAllByText('Wait for delete to complete')).toHaveLength(2)
     })
 
     it('renders a spinner inside the delete button', () => {

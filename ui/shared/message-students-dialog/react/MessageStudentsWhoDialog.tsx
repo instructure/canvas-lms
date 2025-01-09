@@ -161,13 +161,13 @@ const isReassignable = (assignment: CamelizedAssignment) =>
   (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
   assignment.dueAt !== null &&
   new Set(assignment.submissionTypes).isDisjointFrom(
-    new Set(['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz'])
+    new Set(['on_paper', 'external_tool', 'none', 'discussion_topic', 'online_quiz']),
   )
 
 const isSubmittableAssignment = (assignment: CamelizedAssignment) =>
   !!assignment &&
   new Set(assignment.submissionTypes).isDisjointFrom(
-    new Set(['on_paper', 'none', 'not_graded', ''])
+    new Set(['on_paper', 'none', 'not_graded', '']),
   )
 
 const filterCriteria: FilterCriterion[] = [
@@ -247,7 +247,7 @@ const filterCriteria: FilterCriterion[] = [
 
 function observerCount(
   students: Student[],
-  observers: Record<string, ObserverEnrollmentConnectionUser[]>
+  observers: Record<string, ObserverEnrollmentConnectionUser[]>,
 ) {
   return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
 }
@@ -329,7 +329,7 @@ function cumulativeScoreDefaultSubject(
   criterion: 'total_grade_higher_than' | 'total_grade_lower_than',
   launchContext: MSWLaunchContext,
   cutoff: number,
-  assignmentGroupName = ''
+  assignmentGroupName = '',
 ) {
   const context =
     launchContext === MSWLaunchContext.ASSIGNMENT_GROUP_CONTEXT ? assignmentGroupName : 'course'
@@ -353,7 +353,7 @@ function defaultSubject(
 
   pointsBasedGradingScheme: boolean,
 
-  assignmentGroupName?: string
+  assignmentGroupName?: string,
 ) {
   if (assignment) {
     switch (criterion) {
@@ -387,7 +387,7 @@ function defaultSubject(
       criterion as 'total_grade_higher_than' | 'total_grade_lower_than',
       launchContext,
       cutoff,
-      assignmentGroupName
+      assignmentGroupName,
     )
 
     // Add % at end of subject line if this is NOT a points based scheme
@@ -417,10 +417,13 @@ const MessageStudentsWhoDialog = ({
   const [message, setMessage] = useState('')
 
   const initializeSelectedObservers = (studentCollection: Student[]) =>
-    studentCollection.reduce((map, student) => {
-      map[student.id] = []
-      return map
-    }, {} as Record<string, string[]>)
+    studentCollection.reduce(
+      (map, student) => {
+        map[student.id] = []
+        return map
+      },
+      {} as Record<string, string[]>,
+    )
 
   const [selectedObservers, setSelectedObservers] = useState(initializeSelectedObservers(students))
   const [selectedStudents, setSelectedStudents] = useState(Object.keys(selectedObservers))
@@ -445,17 +448,20 @@ const MessageStudentsWhoDialog = ({
 
   const observerEnrollments = data?.course?.enrollmentsConnection?.nodes || []
 
-  const observersByStudentID = observerEnrollments.reduce((results, enrollment) => {
-    const observeeId = enrollment.associatedUser._id
-    results[observeeId] = results[observeeId] || []
-    const existingObservers = results[observeeId]
+  const observersByStudentID = observerEnrollments.reduce(
+    (results, enrollment) => {
+      const observeeId = enrollment.associatedUser._id
+      results[observeeId] = results[observeeId] || []
+      const existingObservers = results[observeeId]
 
-    if (!existingObservers.some(user => user._id === enrollment.user._id)) {
-      results[observeeId].push(enrollment.user)
-    }
+      if (!existingObservers.some(user => user._id === enrollment.user._id)) {
+        results[observeeId].push(enrollment.user)
+      }
 
-    return results
-  }, {} as Record<string, ObserverEnrollmentConnectionUser[]>)
+      return results
+    },
+    {} as Record<string, ObserverEnrollmentConnectionUser[]>,
+  )
 
   const isLengthBetweenBoundaries = (subsetLength: number, totalLength: number) =>
     subsetLength > 0 && subsetLength < totalLength
@@ -465,7 +471,7 @@ const MessageStudentsWhoDialog = ({
   const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
   const [filteredStudents, setFilteredStudents] = useState(
-    filterStudents(availableCriteria[0], sortedStudents, cutoff)
+    filterStudents(availableCriteria[0], sortedStudents, cutoff),
   )
   const [subject, setSubject] = useState(
     defaultSubject(
@@ -474,8 +480,8 @@ const MessageStudentsWhoDialog = ({
       launchContext,
       cutoff,
       pointsBasedGradingScheme,
-      assignmentGroupName
-    )
+      assignmentGroupName,
+    ),
   )
 
   const [observerRecipientCount, setObserverRecipientCount] = useState(0)
@@ -483,12 +489,12 @@ const MessageStudentsWhoDialog = ({
   useEffect(() => {
     const partialStudentSelection = isLengthBetweenBoundaries(
       selectedStudents.length,
-      filteredStudents.length
+      filteredStudents.length,
     )
     setIsIndeterminateStudentsCheckbox(partialStudentSelection)
     setIsDisabledStudentsCheckbox(filteredStudents.length === 0)
     setIsCheckedStudentsCheckbox(
-      filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length
+      filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length,
     )
   }, [selectedStudents, filteredStudents])
 
@@ -496,16 +502,16 @@ const MessageStudentsWhoDialog = ({
     const observerCountValue = observerCount(filteredStudents, observersByStudentID)
     const selectedObserverCount = Object.values(selectedObservers).reduce(
       (acc: number, array: any) => acc + array.length,
-      0
+      0,
     )
     const partialObserverSelection = isLengthBetweenBoundaries(
       selectedObserverCount,
-      observerCountValue
+      observerCountValue,
     )
     setIsIndeterminateObserversCheckbox(partialObserverSelection)
     setIsDisabledObserversCheckbox(observerCountValue === 0)
     setIsCheckedObserversCheckbox(
-      observerCountValue > 0 && selectedObserverCount === observerCountValue
+      observerCountValue > 0 && selectedObserverCount === observerCountValue,
     )
   }, [filteredStudents, observersByStudentID, selectedObservers])
 
@@ -552,7 +558,7 @@ const MessageStudentsWhoDialog = ({
 
   const handleCriterionSelected = (
     _e: React.SyntheticEvent,
-    {value}: {value?: string | number}
+    {value}: {value?: string | number},
   ) => {
     const newCriterion = filterCriteria.find(criterion => criterion.value === value)
     if (newCriterion != null) {
@@ -566,8 +572,8 @@ const MessageStudentsWhoDialog = ({
           launchContext,
           cutoff,
           pointsBasedGradingScheme,
-          assignmentGroupName
-        )
+          assignmentGroupName,
+        ),
       )
     }
   }
@@ -618,8 +624,8 @@ const MessageStudentsWhoDialog = ({
           launchContext,
           cutoff,
           true,
-          assignmentGroupName
-        )
+          assignmentGroupName,
+        ),
       )
     }
   }
@@ -638,7 +644,7 @@ const MessageStudentsWhoDialog = ({
     setPendingUploads,
     messageAttachmentUploadFolderId,
     setOnFailure,
-    setOnSuccess
+    setOnSuccess,
   )
   const onDeleteAttachment = removeAttachmentFn(setAttachments)
 
@@ -661,7 +667,7 @@ const MessageStudentsWhoDialog = ({
   const onMediaUploadComplete = (
     err: unknown | null,
     mediaData: {mediaObject?: any; uploadedFile: File},
-    captionData?: null
+    captionData?: null,
   ) => {
     if (err) {
       setOnFailure(I18n.t('There was an error uploading the media.'))
@@ -707,11 +713,14 @@ const MessageStudentsWhoDialog = ({
   const onObserversCheckboxChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       setSelectedObservers(
-        filteredStudents.reduce((map, student) => {
-          map[student.id] = [...observersByStudentID[student.id].map(observer => observer._id)]
+        filteredStudents.reduce(
+          (map, student) => {
+            map[student.id] = [...observersByStudentID[student.id].map(observer => observer._id)]
 
-          return map
-        }, {} as Record<string, string[]>)
+            return map
+          },
+          {} as Record<string, string[]>,
+        ),
       )
     } else {
       setSelectedObservers(initializeSelectedObservers(students))
@@ -770,7 +779,7 @@ const MessageStudentsWhoDialog = ({
                     setCutoff(actualValue)
                     if (actualValue !== 0) {
                       setFilteredStudents(
-                        filterStudents(selectedCriterion, sortedStudents, actualValue)
+                        filterStudents(selectedCriterion, sortedStudents, actualValue),
                       )
                       setSubject(
                         defaultSubject(
@@ -779,8 +788,8 @@ const MessageStudentsWhoDialog = ({
                           launchContext,
                           actualValue,
                           pointsBasedGradingScheme,
-                          assignmentGroupName
-                        )
+                          assignmentGroupName,
+                        ),
                       )
                     }
                   }}
@@ -790,7 +799,7 @@ const MessageStudentsWhoDialog = ({
                 />
                 <Text size="small" data-testid="cutoff-footnote">
                   {I18n.t(
-                    'This is based on values seen in this grade book. It may not be the same values students see.'
+                    'This is based on values seen in this grade book. It may not be the same values students see.',
                   )}
                 </Text>
               </>
@@ -900,7 +909,7 @@ const MessageStudentsWhoDialog = ({
                       <Flex direction="row" margin="0 0 0 small" wrap="wrap">
                         {_.sortBy(
                           observersByStudentID[student.id] || [],
-                          observer => observer.sortableName
+                          observer => observer.sortableName,
                         ).map(observer => (
                           <Flex.Item key={observer._id}>
                             <Pill

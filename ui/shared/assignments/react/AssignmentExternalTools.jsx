@@ -211,7 +211,7 @@ const attach = function (element, placement, courseId, assignmentId) {
       assignmentId={assignmentId}
     />
   )
-   
+
   ReactDOM.render(configTools, element)
 }
 

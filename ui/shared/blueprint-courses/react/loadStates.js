@@ -24,7 +24,7 @@ const loadStates = {
       Object.assign(map, {
         [state]: state,
       }),
-    {}
+    {},
   ),
 }
 

@@ -26,19 +26,19 @@ export const useGradingSchemeUnarchive = (): {
   unarchiveGradingScheme: (
     contextType: 'Account' | 'Course',
     contextId: string,
-    gradingSchemeId: string
+    gradingSchemeId: string,
   ) => Promise<void>
   unarchiveGradingSchemeStatus: string
 } => {
   const [unarchiveGradingSchemeStatus, setUnarchiveGradingSchemeStatus] = useState(
-    ApiCallStatus.NOT_STARTED
+    ApiCallStatus.NOT_STARTED,
   )
 
   const unarchiveGradingScheme = useCallback(
     async (
       contextType: 'Account' | 'Course',
       contextId: string,
-      gradingSchemeId: string
+      gradingSchemeId: string,
     ): Promise<void> => {
       setUnarchiveGradingSchemeStatus(ApiCallStatus.NOT_STARTED)
       try {
@@ -59,7 +59,7 @@ export const useGradingSchemeUnarchive = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

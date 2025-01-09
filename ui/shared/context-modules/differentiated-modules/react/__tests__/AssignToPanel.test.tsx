@@ -81,7 +81,7 @@ describe('AssignToPanel', () => {
     render(
       <MockedQueryProvider>
         <AssignToPanel {...props} {...overrides} />
-      </MockedQueryProvider>
+      </MockedQueryProvider>,
     )
 
   it('renders', async () => {
@@ -135,7 +135,7 @@ describe('AssignToPanel', () => {
         selectedAssignees: [],
         selectedOption: 'custom',
       },
-      true
+      true,
     )
   })
 
@@ -148,7 +148,7 @@ describe('AssignToPanel', () => {
         selectedAssignees: [],
         selectedOption: 'everyone',
       },
-      false
+      false,
     )
   })
 
@@ -164,7 +164,7 @@ describe('AssignToPanel', () => {
       act(() => assigneeSelector.click())
       const option2 = await findByText(SECTIONS_DATA[2].name)
       act(() => option2.click())
-      expect(getAllByTestId('assignee_selector_selected_option').length).toBe(2)
+      expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(2)
     })
 
     it('clears selection', async () => {
@@ -175,9 +175,9 @@ describe('AssignToPanel', () => {
       act(() => assigneeSelector.click())
       const option = await findByText(STUDENTS_DATA[0].value)
       act(() => option.click())
-      expect(queryAllByTestId('assignee_selector_selected_option').length).toBe(1)
+      expect(queryAllByTestId('assignee_selector_selected_option')).toHaveLength(1)
       act(() => getByTestId('clear_selection_button').click())
-      expect(queryAllByTestId('assignee_selector_selected_option').length).toBe(0)
+      expect(queryAllByTestId('assignee_selector_selected_option')).toHaveLength(0)
     })
 
     it('shows existing assignmentOverrides as the default selection', async () => {
@@ -185,12 +185,12 @@ describe('AssignToPanel', () => {
         overwriteRoutes: true,
       })
       const assignedSections = ASSIGNMENT_OVERRIDES_DATA.filter(
-        override => override.course_section !== undefined
+        override => override.course_section !== undefined,
       )
       const {getAllByTestId, findByText} = renderComponent()
       expect(await findByText(ASSIGNMENT_OVERRIDES_DATA[0].students![0].name)).toBeInTheDocument()
-      expect(getAllByTestId('assignee_selector_selected_option').length).toBe(
-        ASSIGNMENT_OVERRIDES_DATA[0].students!.length + assignedSections.length
+      expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(
+        ASSIGNMENT_OVERRIDES_DATA[0].students!.length + assignedSections.length,
       )
     })
 
@@ -208,8 +208,8 @@ describe('AssignToPanel', () => {
         defaultAssignees,
       })
       expect(await findByText(defaultAssignees[0].value)).toBeInTheDocument()
-      expect(getAllByTestId('assignee_selector_selected_option').length).toBe(
-        defaultAssignees.length
+      expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(
+        defaultAssignees.length,
       )
     })
   })

@@ -58,12 +58,12 @@ const AssignToOption = (props: Props) => {
     hasModuleOverrides: boolean,
     deletedModuleAssignees: string[],
     newDisabledOptionIds: string[],
-    moduleOverrides: ItemAssignToCardSpec[]
+    moduleOverrides: ItemAssignToCardSpec[],
   ) => {
     const filteredCards = assignToCards.filter(
       card =>
         [null, undefined, ''].includes(card.contextModuleId) ||
-        (card.contextModuleId !== null && card.isEdited)
+        (card.contextModuleId !== null && card.isEdited),
     )
     if (hasModuleOverrides) {
       assignToCards.forEach(card => {
@@ -96,7 +96,7 @@ const AssignToOption = (props: Props) => {
     const overrides = generateDateDetailsPayload(
       filteredCards,
       hasModuleOverrides,
-      deletedModuleAssignees
+      deletedModuleAssignees,
     )
     props.onSync(overrides)
     setDisabledOptionIds(newDisabledOptionIds)

@@ -247,7 +247,7 @@ export function TempEnrollSearchConfirmation(props: Props) {
             one: 'One user is ready to be assigned temporary enrollments.',
             other: '%{count} users are ready to be assigned temporary enrollments',
           },
-          {count: userCount}
+          {count: userCount},
         )}
       </Alert>
     )

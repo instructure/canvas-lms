@@ -92,7 +92,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
     }
 
     const [formState, setFormState] = useState<GradingSchemeInputState>(
-      schemeInputType === 'points' ? formStateByType.points : formStateByType.percentage
+      schemeInputType === 'points' ? formStateByType.points : formStateByType.percentage,
     )
 
     function decimalRangeToDisplayString(percentageValue: number, displayScalingFactor: number) {
@@ -117,7 +117,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
             minRangeDisplay: decimalRangeToDisplayString(dataRow.value, scalingFactorDisplay),
             maxRangeDisplay: decimalRangeToDisplayString(
               idx === 0 ? 1 : arr[idx - 1].value,
-              scalingFactorDisplay
+              scalingFactorDisplay,
             ),
             pointsBased: formInput.pointsBased,
           }
@@ -156,11 +156,11 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
     const handlePointsBasedChanged = (newValue: string) => {
       if (formState.pointsBased && newValue === 'percentage') {
         setFormState(
-          initializeFormState({...initialFormDataByInputType.percentage, title: formState.title})
+          initializeFormState({...initialFormDataByInputType.percentage, title: formState.title}),
         )
       } else if (!formState.pointsBased && newValue === 'points') {
         setFormState(
-          initializeFormState({...initialFormDataByInputType.points, title: formState.title})
+          initializeFormState({...initialFormDataByInputType.points, title: formState.title}),
         )
       }
     }
@@ -273,7 +273,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
 
       const rowBeforeLowRangeAsPercentage = rangeDisplayStringToDecimal(
         rowBefore.minRangeDisplay,
-        formState.scalingFactor
+        formState.scalingFactor,
       )
       const rowAfterLowRangeAsPercentage = rowAfter
         ? rangeDisplayStringToDecimal(rowAfter.minRangeDisplay, formState.scalingFactor)
@@ -284,7 +284,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         rowAfterLowRangeAsPercentage
       const lowRangeForNewRowScaledForDisplay = rangeScaledForDisplay(
         lowRangeForNewRowAsPercentage,
-        formState.scalingFactor
+        formState.scalingFactor,
       )
 
       const updatedScheme = {
@@ -374,7 +374,7 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
             <caption>
               <ScreenReaderContent>
                 {I18n.t(
-                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
+                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.',
                 )}
               </ScreenReaderContent>
             </caption>
@@ -418,5 +418,5 @@ export const GradingSchemeInput = React.forwardRef<GradingSchemeInputHandle, Com
         </View>
       </View>
     )
-  }
+  },
 )

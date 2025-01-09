@@ -200,7 +200,7 @@ describe('TeacherCheckpointsInfo', () => {
     })
     it('shows the availability for the row', () => {
       const {queryByText, queryByTestId} = render(
-        <TeacherCheckpointsInfo assignment={assignmentWithDueDates} />
+        <TeacherCheckpointsInfo assignment={assignmentWithDueDates} />,
       )
 
       expect(queryByTestId('2_cp_availability')).toBeInTheDocument()
@@ -209,7 +209,7 @@ describe('TeacherCheckpointsInfo', () => {
     })
     it('shows multiple availability dates for the row', () => {
       const {queryByText, queryByTestId} = render(
-        <TeacherCheckpointsInfo assignment={assignmentWithOverrides} />
+        <TeacherCheckpointsInfo assignment={assignmentWithOverrides} />,
       )
 
       expect(queryByTestId('3_cp_availability')).toBeInTheDocument()
@@ -244,7 +244,9 @@ describe('TeacherCheckpointsInfo', () => {
 
   describe('points possible', () => {
     it('display points possible for checkpoint', () => {
-      const {queryByText, queryByTestId} = render(<TeacherCheckpointsInfo assignment={assignmentNoDueDates} />)
+      const {queryByText, queryByTestId} = render(
+        <TeacherCheckpointsInfo assignment={assignmentNoDueDates} />,
+      )
 
       expect(queryByText('20 pts')).toBeInTheDocument()
       expect(queryByTestId('1_points_possible')).toBeInTheDocument()

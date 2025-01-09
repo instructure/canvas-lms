@@ -44,7 +44,7 @@ LockButton.optionProperty('lockedText')
 
 LockButton.optionProperty(
   'unlockedText',
-  LockButton.optionProperty('course_id', LockButton.optionProperty('content_id'))
+  LockButton.optionProperty('course_id', LockButton.optionProperty('content_id')),
 )
 
 LockButton.optionProperty('content_type')
@@ -176,7 +176,7 @@ LockButton.prototype.setLockState = function (locked) {
       return function (_error) {
         return _this.setFocusToElement()
       }
-    })(this)
+    })(this),
   )
 }
 

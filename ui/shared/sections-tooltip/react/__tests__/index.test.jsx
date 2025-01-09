@@ -88,7 +88,7 @@ describe('SectionTooltip', () => {
     await userEvent.hover(tree.container.querySelector('span[data-cid="Position Popover Tooltip"]'))
 
     expect(document.querySelector('span[role="tooltip"]').textContent).toEqual(
-      'sections name (4 Users)'
+      'sections name (4 Users)',
     )
   })
 
@@ -105,7 +105,7 @@ describe('SectionTooltip', () => {
     await userEvent.hover(tree.container.querySelector('span[data-cid="Position Popover Tooltip"]'))
 
     expect(document.querySelector('span[role="tooltip"]').textContent).toEqual(
-      'sections name (4 Users)section other name (8 Users)'
+      'sections name (4 Users)section other name (8 Users)',
     )
   })
 

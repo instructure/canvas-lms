@@ -23,7 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentFilter from './ContentFilter'
 
 const I18n = createI18nScope(
-  'gradebook_default_gradebook_components_content_filters_section_filter'
+  'gradebook_default_gradebook_components_content_filters_section_filter',
 )
 
 export default function SectionFilter(props) {
@@ -47,7 +47,7 @@ SectionFilter.propTypes = {
     shape({
       id: string.isRequired,
       name: string.isRequired,
-    })
+    }),
   ).isRequired,
 
   selectedSectionId: string,

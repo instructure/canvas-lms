@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable promise/catch-or-return */
+ 
 /* eslint-disable promise/no-callback-in-promise */
 
 import moxios from 'moxios'
@@ -90,7 +90,7 @@ describe('load items', () => {
     expect(fakeDispatch).toHaveBeenCalledWith(expect.objectContaining(expected))
     const action = fakeDispatch.mock.calls[0][0]
     expect(action.payload.firstMoment.toISOString()).toBe(
-      today.clone().add(-2, 'weeks').toISOString()
+      today.clone().add(-2, 'weeks').toISOString(),
     )
   })
 
@@ -188,7 +188,7 @@ describe('load items', () => {
           {completed: false},
           {completed: false},
         ],
-      })
+      }),
     )
     moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
       expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
@@ -222,7 +222,7 @@ describe('load items', () => {
             {completed: true},
             {completed: true},
           ],
-        })
+        }),
       )
       return moxiosRespond([], secondFetchPromise).then(__response => {
         // make sure we got here because another load happened.
@@ -255,7 +255,7 @@ describe('load items', () => {
           {completed: false},
           {completed: false},
         ],
-      })
+      }),
     )
     return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
       expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
@@ -277,13 +277,13 @@ describe('load items', () => {
           {completed: true},
           {completed: true},
         ],
-      })
+      }),
     )
     return moxiosRespond([], fetchPromise).then(_response => {
       expect(fakeDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'SIDEBAR_ENOUGH_ITEMS_LOADED',
-        })
+        }),
       )
     })
   })
@@ -302,7 +302,7 @@ describe('load items', () => {
         })
         .then(() => {
           expect(fakeDispatch).toHaveBeenCalledWith(
-            expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true})
+            expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}),
           )
           done()
         })

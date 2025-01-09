@@ -68,7 +68,7 @@ export type OnRepeatPickerChangeType = {
 export const getByMonthdateString = (
   datetime: moment.Moment,
   locale: string,
-  timezone: string
+  timezone: string,
 ): string => {
   const cardinal = cardinalDayInMonth(datetime)
   const dayname = getWeekdayName(datetime, locale, timezone)
@@ -101,7 +101,7 @@ export default function RepeatPicker({
   const [currInterval, setCurrInterval] = useState<number>(interval)
   const [currFreq, setCurrFreq] = useState<FrequencyValue>(freq)
   const [currWeekDays, setCurrWeekdays] = useState<SelectedDaysArray>(
-    weekdays ?? weekdaysFromMoment(eventStart)
+    weekdays ?? weekdaysFromMoment(eventStart),
   )
   const [currPos, setCurrPos] = useState<number | undefined>(pos)
   const [currMonthlyMode, setCurrMonthlyMode] = useState<MonthlyModeValue>(() => {
@@ -184,7 +184,7 @@ export default function RepeatPicker({
         })
       }
     },
-    [onChange]
+    [onChange],
   )
 
   const handleChangeMonthlyMode = useCallback(
@@ -208,7 +208,7 @@ export default function RepeatPicker({
     },
     // it wants eventStart, which we replace with dtstart and timezone
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [dtstart, timezone, fireOnChange, currInterval, currFreq, currPos]
+    [dtstart, timezone, fireOnChange, currInterval, currFreq, currPos],
   )
 
   const handleIntervalChange = useCallback(
@@ -217,7 +217,7 @@ export default function RepeatPicker({
         | React.ChangeEvent<HTMLInputElement>
         | React.KeyboardEvent<HTMLInputElement>
         | React.MouseEvent<HTMLButtonElement, MouseEvent>,
-      value: string | number
+      value: string | number,
     ) => {
       const num = typeof value === 'string' ? parseInt(value, 10) : value
       if (Number.isNaN(num)) return
@@ -231,7 +231,7 @@ export default function RepeatPicker({
 
       fireOnChange(num, currFreq, currWeekDays, monthdate, month, currPos)
     },
-    [currFreq, fireOnChange, currWeekDays, currPos, eventStart]
+    [currFreq, fireOnChange, currWeekDays, currPos, eventStart],
   )
 
   const handleFreqChange = useCallback(
@@ -250,7 +250,14 @@ export default function RepeatPicker({
         fireOnChange(currInterval, value, currWeekDays, undefined, undefined, undefined)
       }
     },
-    [eventStart, fireOnChange, currInterval, handleChangeMonthlyMode, currMonthlyMode, currWeekDays]
+    [
+      eventStart,
+      fireOnChange,
+      currInterval,
+      handleChangeMonthlyMode,
+      currMonthlyMode,
+      currWeekDays,
+    ],
   )
 
   const handleWeekdayChange = useCallback(
@@ -259,7 +266,7 @@ export default function RepeatPicker({
       if (currFreq !== 'WEEKLY') return
       fireOnChange(currInterval, currFreq, newSelectedDays, undefined, undefined, undefined)
     },
-    [fireOnChange, currInterval, currFreq]
+    [fireOnChange, currInterval, currFreq],
   )
 
   const yearlyFreqToText = useCallback(() => {
@@ -328,21 +335,21 @@ export default function RepeatPicker({
                 {I18n.t(
                   'single_and_plural_weeks',
                   {one: 'Week', other: 'Weeks'},
-                  {count: interval}
+                  {count: interval},
                 )}
               </SimpleSelectOption>
               <SimpleSelectOption id="MONTHLY" value="MONTHLY">
                 {I18n.t(
                   'single_and_plural_months',
                   {one: 'Month', other: 'Months'},
-                  {count: interval}
+                  {count: interval},
                 )}
               </SimpleSelectOption>
               <SimpleSelectOption id="YEARLY" value="YEARLY">
                 {I18n.t(
                   'single_and_plural_years',
                   {one: 'Year', other: 'Years'},
-                  {count: interval}
+                  {count: interval},
                 )}
               </SimpleSelectOption>
             </SimpleSelect>

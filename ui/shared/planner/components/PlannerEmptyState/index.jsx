@@ -73,7 +73,7 @@ export default class PlannerEmptyState extends Component {
         className={classnames(
           this.style.classNames.root,
           'planner-empty-state',
-          this.style.classNames[this.props.responsiveSize]
+          this.style.classNames[this.props.responsiveSize],
         )}
       >
         <DesertSvg
@@ -116,7 +116,7 @@ export default class PlannerEmptyState extends Component {
         className={classnames(
           this.style.classNames.root,
           'planner-empty-state',
-          this.style.classNames[this.props.responsiveSize]
+          this.style.classNames[this.props.responsiveSize],
         )}
       >
         <BalloonsSvg

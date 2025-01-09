@@ -32,5 +32,5 @@ export default handleActions(
   {
     naiAboveScreen: false,
     gradesTrayOpen: false,
-  }
+  },
 )

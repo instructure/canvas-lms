@@ -54,8 +54,8 @@ class HomePagePromptContainer extends React.Component {
   flashScreenReaderAlert() {
     $.screenReaderFlashMessage(
       I18n.t(
-        'Before publishing your course, you must either publish a module or choose a different home page.'
-      )
+        'Before publishing your course, you must either publish a module or choose a different home page.',
+      ),
     )
   }
 

@@ -53,7 +53,7 @@ const MicrosoftSync = ({group, loading, children}) => {
       <br />
       <Text>
         {I18n.t(
-          'Note: Syncing is triggered by changes to course enrollments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below.'
+          'Note: Syncing is triggered by changes to course enrollments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below.',
         )}
       </Text>
       <br />
@@ -63,7 +63,7 @@ const MicrosoftSync = ({group, loading, children}) => {
           {
             max_enrollments: ENV.MSFT_SYNC_MAX_ENROLLMENT_MEMBERS,
             max_owners: ENV.MSFT_SYNC_MAX_ENROLLMENT_OWNERS,
-          }
+          },
         )}
       </Text>
       <Flex margin="small 0 0 0">

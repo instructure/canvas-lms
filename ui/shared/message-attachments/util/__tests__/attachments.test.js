@@ -52,7 +52,7 @@ const getAddAttachments = ({
     mockSetPendingUploads,
     attachmentFolderId,
     mockSetOnFailure,
-    mockSetOnSuccess
+    mockSetOnSuccess,
   )
 }
 
@@ -80,7 +80,7 @@ describe('addAttachmentsFn', () => {
           {name: 'FakeFile1.txt', url: 'https://example.com/FakeFile1.txt'},
           {name: 'FakeFile2.txt', url: 'https://example.com/FakeFile2.txt'},
         ],
-        '/api/v1/folders/1983/files'
+        '/api/v1/folders/1983/files',
       )
     })
 

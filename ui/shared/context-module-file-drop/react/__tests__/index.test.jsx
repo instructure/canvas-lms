@@ -115,6 +115,6 @@ it('renders accessibility text with the module name', async () => {
   expect(ref.current.state.interaction).toBeTruthy()
   expect(ref.current.state.folder).toBeTruthy()
   expect(
-    component.queryByText('Drop files here to add to Introduction module or choose files')
+    component.queryByText('Drop files here to add to Introduction module or choose files'),
   ).toBeInTheDocument()
 })

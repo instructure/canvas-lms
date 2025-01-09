@@ -73,7 +73,7 @@ export class ToDoSidebar extends Component {
   componentDidMount() {
     this.props.sidebarLoadInitialItems(
       moment.tz(this.props.timeZone).startOf('day'),
-      this.props.forCourse
+      this.props.forCourse,
     )
   }
 

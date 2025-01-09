@@ -136,7 +136,7 @@ class __Folder extends FilesystemObject {
     let needle
     if (((needle = this.get('context_type')), ['Course', 'Group'].includes(needle))) {
       return `/${`${this.get('context_type').toLowerCase()}s`}/${this.get(
-        'context_id'
+        'context_id',
       )}/files/{{id}}/preview`
     }
   }
@@ -163,7 +163,7 @@ class __Folder extends FilesystemObject {
     // so it would be something like /files/folder/users_1/some/sub/folder
     if (filesEnv.showingAllContexts) {
       const assetString = `${__guard__(this.get('context_type'), x => x.toLowerCase())}s_${this.get(
-        'context_id'
+        'context_id',
       )}`
       relativePath = `${assetString}/${relativePath}`
     }
@@ -221,7 +221,7 @@ __Folder.resolvePath = function (contextType, contextId, folderPath) {
 
   const url = `/api/v1/${contextType}/${contextId}/folders/by_path${folderPath}`
   return $.getJSON(url).pipe(folders =>
-    folders.map(folderAttrs => new Folder(folderAttrs, {parse: true}))
+    folders.map(folderAttrs => new Folder(folderAttrs, {parse: true})),
   )
 }
 

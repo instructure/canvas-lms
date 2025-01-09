@@ -31,7 +31,7 @@ const getDroppableDashboardCardBox = (withDragDropContext = DefaultDragDropConte
     withDragDropContext,
     DropTarget(ItemTypes.CARD, cardTarget, connect => ({
       connectDropTarget: connect.dropTarget(),
-    }))
+    })),
   )(DashboardCardBox)
 
 export default getDroppableDashboardCardBox

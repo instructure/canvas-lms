@@ -29,7 +29,7 @@ export const useGradingSchemeAssignmentUsedLocations = (): {
     contextId: string,
     gradingSchemeId: string,
     courseId: string,
-    nextPagePath?: string
+    nextPagePath?: string,
   ) => Promise<{
     assignmentUsedLocations: AssignmentUsedLocation[]
     isLastPage: boolean
@@ -48,7 +48,7 @@ export const useGradingSchemeAssignmentUsedLocations = (): {
       contextId: string,
       gradingSchemeId: string,
       courseId: string,
-      nextPagePath?: string
+      nextPagePath?: string,
     ): Promise<{
       assignmentUsedLocations: AssignmentUsedLocation[]
       isLastPage: boolean
@@ -82,7 +82,7 @@ export const useGradingSchemeAssignmentUsedLocations = (): {
         throw err
       }
     },
-    []
+    [],
   )
 
   return {

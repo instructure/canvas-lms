@@ -46,7 +46,7 @@ describe('mediaComment', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(resp),
-      })
+      }),
     )
 
     return resp
@@ -57,13 +57,13 @@ describe('mediaComment', () => {
       media_sources: [
         {
           content_type: 'flv',
-          // eslint-disable-next-line no-script-url
+           
           url: 'javascript:alert(document.cookie);//',
           bitrate: '200',
         },
         {
           content_type: 'mp4',
-          // eslint-disable-next-line no-script-url
+           
           url: 'javascript:alert(document.cookie);//',
           bitrate: '100',
         },
@@ -74,7 +74,7 @@ describe('mediaComment', () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve(resp),
-      })
+      }),
     )
 
     return resp

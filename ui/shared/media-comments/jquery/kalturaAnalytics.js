@@ -207,7 +207,7 @@ class KalturaAnalytics {
         }, 50)
         return (this.mediaElement.listeningToPlaying = true)
       },
-      false
+      false,
     )
   }
 }

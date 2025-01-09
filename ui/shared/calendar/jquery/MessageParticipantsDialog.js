@@ -50,7 +50,7 @@ export default class MessageParticipantsDialog {
 
     if (this.recipients) {
       this.$participantList.html(
-        recipientListTemplate({recipientType: participantType, recipients: this.recipients})
+        recipientListTemplate({recipientType: participantType, recipients: this.recipients}),
       )
     }
   }
@@ -108,7 +108,7 @@ export default class MessageParticipantsDialog {
           recipientListTemplate({
             recipientType: this.group.participant_type,
             recipients: data,
-          })
+          }),
         )
       } else {
         const text =
@@ -192,7 +192,7 @@ export default class MessageParticipantsDialog {
       'POST',
       data,
       this.messageSent,
-      this.messageFailed
+      this.messageFailed,
     )
     return this.$form.disableWhileLoading(deferred, {
       buttons: ['[data-text-while-loading] .ui-button-text'],
@@ -210,8 +210,8 @@ export default class MessageParticipantsDialog {
       .text(
         I18n.t(
           'errors.send_message_failed',
-          'There was an error sending your message, please try again'
-        )
+          'There was an error sending your message, please try again',
+        ),
       )
   }
 }

@@ -288,7 +288,7 @@ describe('useFetchApi', () => {
     await fetchMock.flush(true)
     expect(success).toHaveBeenCalledWith({fetch: 'result'})
     expect(meta).toHaveBeenCalledWith(
-      expect.objectContaining({link: undefined, response: expect.anything()})
+      expect.objectContaining({link: undefined, response: expect.anything()}),
     )
   })
 
@@ -450,14 +450,14 @@ describe('useFetchApi', () => {
       fetchMock.mock(
         path,
         {headers: {link: `<${path}?page=bar>;rel="next"`}, body: {foo: 'bar'}},
-        {overwriteRoutes: false}
+        {overwriteRoutes: false},
       )
       const success = jest.fn()
       const error = jest.fn()
       const [loading, loadingDone] = makeEventedFn({arg: false})
       const {rerender} = renderHook(
         ({fetchAllPages}) => useFetchApi({path, loading, success, error, fetchAllPages}),
-        {initialProps: {fetchAllPages: true}}
+        {initialProps: {fetchAllPages: true}},
       )
       rerender({fetchAllPages: false})
       await loadingDone
@@ -478,7 +478,7 @@ describe('useFetchApi', () => {
       const error = jest.fn()
       const convert = page => page.map(n => n + 10)
       renderHook(() =>
-        useFetchApi({path, loading, success, meta, error, convert, fetchAllPages: true})
+        useFetchApi({path, loading, success, meta, error, convert, fetchAllPages: true}),
       )
       await loadingDone
       expect(success).toHaveBeenCalledWith([11, 12, 13, 14, 15])
@@ -568,7 +568,7 @@ describe('useFetchApi', () => {
           error,
           fetchAllPages: true,
           fetchNumPages: 1,
-        })
+        }),
       )
       await loadingDone
 
