@@ -7808,6 +7808,8 @@ uk:
   folder_705fd2d7: Тека
   folder_browsing_tree_1f00a3ae: "Дерево перегляду тек"
   folder_icon_29017021: "Іконка теки"
+  folder_name_b28488c2: "Ім'я папки"
+  folder_was_successfully_created_8de6a282: "Тека була успішно створена."
   folders: 
     event_updated: "Подію було успішно оновлено."
     folder_created: "Тека була успішно створена."
