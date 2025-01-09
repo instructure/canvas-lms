@@ -657,6 +657,7 @@ pipeline {
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                       string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL || setupStage.hasGemOverrides()}"),
+                      string(name: 'RSPECQ_UPDATE_TIMINGS', value: "${env.RSPECQ_UPDATE_TIMINGS || 0}"),
                       string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
                       string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
                     ])

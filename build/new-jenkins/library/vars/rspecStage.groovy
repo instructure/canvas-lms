@@ -38,7 +38,6 @@ def createDistribution(nestedStages) {
     "RERUNS_RETRY=${commitMessageFlag('rspecq-max-requeues') as Integer}",
     "RSPEC_PROCESSES=${commitMessageFlag('rspecq-processes') as Integer}",
     "RSPECQ_MAX_REQUEUES=${commitMessageFlag('rspecq-max-requeues') as Integer}",
-    "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
 
   if(env.CRYSTALBALL_MAP == '1') {
