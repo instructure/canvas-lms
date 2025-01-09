@@ -236,6 +236,73 @@ describe "assignments" do
       end
     end
 
+    context "re-upload submissions" do
+      def create_text_file(file_path, content)
+        File.write(file_path, content)
+      end
+
+      def create_zip_file(zip_path, files)
+        Zip::File.open(zip_path, Zip::File::CREATE) do |zipfile|
+          files.each do |file|
+            zipfile.add(File.basename(file), file)
+          end
+        end
+      end
+
+      before do
+        # Create assignment with at least one submission
+        student_in_course(course: @course, active_all: true)
+        @assignment = @course.assignments.create!(
+          name: "Assignment 1",
+          submission_types: "online_text_entry"
+        )
+        submission = @assignment.submit_homework(@student)
+        submission.submission_type = "online_text_entry"
+        submission.save!
+
+        # Go to assignment show page
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        # Download submissions
+        f(".download_submissions_link").click
+        wait_for_ajaximations
+        fj(".ui-dialog-titlebar-close:visible").click
+        wait_for_ajaximations
+        # Click Re-Upload Submissions link
+        f(".upload_submissions_link").click
+        wait_for_ajaximations
+      end
+
+      it "displays correct buttons" do
+        expect(f("#choose_file_button")).to be_displayed
+        Dir.mktmpdir do |tmpdir|
+          # Create text files in the temp directory
+          txt_file_1 = File.join(tmpdir, "file1.txt")
+          txt_file_2 = File.join(tmpdir, "file2.txt")
+
+          create_text_file(txt_file_1, "This is the content of file1.")
+          create_text_file(txt_file_2, "This is the content of file2.")
+
+          # Create the zip file in the temp directory
+          zip_file_path = File.join(tmpdir, "my_files.zip")
+          create_zip_file(zip_file_path, [txt_file_1, txt_file_2])
+
+          f('input[name="submissions_zip"]').send_keys(zip_file_path)
+          expect(f("#reuploaded_submissions_button")).to be_displayed
+        end
+      end
+
+      it "displays error text if incorrect file type" do
+        Dir.mktmpdir do |tmpdir|
+          # Create text files in the temp directory
+          txt_file_1 = File.join(tmpdir, "file1.txt")
+          create_text_file(txt_file_1, "This is the content of file1.")
+
+          f('input[name="submissions_zip"]').send_keys(txt_file_1)
+          expect(f("#file_type_error_text")).to be_displayed
+        end
+      end
+    end
+
     it "edits an assignment", priority: "1" do
       assignment_name = "first test assignment"
       due_date = Time.now.utc + 2.days

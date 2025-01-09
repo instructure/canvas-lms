@@ -19,16 +19,20 @@
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms' // brings in $.fn.formSubmit
+import React from 'react'
+import {createRoot} from 'react-dom/client'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {Flex} from '@instructure/ui-flex'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Tag} from '@instructure/ui-tag'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignment!reupload_submissions_helper')
 
 const formId = 're_upload_submissions_form'
 
 function beforeSubmit({submissions_zip: submissionsZip}) {
-  if (!submissionsZip) {
-    return false
-  } else if (!submissionsZip.match(/\.zip$/)) {
-    $(this).formErrors({submissions_zip: I18n.t('Please upload files as a .zip')})
+  if (!submissionsZip || !submissionsZip.match(/\.zip$/)) {
     return false
   }
 
@@ -65,6 +69,54 @@ function errorFormatter(_error) {
 }
 
 export function setupSubmitHandler(userAssetString) {
+  const chooseFileButton = document.getElementById('choose_file_button')
+  const fileInput = document.querySelector('input[name="submissions_zip"]')
+  const uploadFilesButton = document.getElementById('reuploaded_submissions_button')
+  const uploadedFileTagContainer = document.getElementById('uploaded_file_tag')
+  let fileRoot
+
+  chooseFileButton?.addEventListener('click', _event => {
+    fileInput.click()
+  })
+
+  fileInput?.addEventListener('change', event => {
+    const files = event.target.files
+    if (files.length > 0) {
+      chooseFileButton.style.display = 'none'
+      uploadFilesButton.style.display = ''
+      const removeFile = () => {
+        fileRoot.unmount()
+        fileInput.value = ''
+        chooseFileButton.style.display = ''
+        uploadFilesButton.style.display = 'none'
+      }
+      if (uploadedFileTagContainer) {
+        const fileName = files[0].name
+        const isZip = fileName.match(/\.zip$/)
+        fileRoot = createRoot(uploadedFileTagContainer)
+        fileRoot.render(
+          <Flex direction='column' margin="0 0 small 0">
+            <Flex.Item>
+              <Tag
+                text={<AccessibleContent alt={fileName}>{fileName}</AccessibleContent>}
+                dismissible={true}
+                onClick={removeFile}
+              />
+            </Flex.Item>
+            {!isZip && (
+              <Flex as="div" alignItems="center" margin="xx-small 0 0 0" id="file_type_error_text">
+                <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+                  <IconWarningSolid color="error" />
+                </Flex.Item>
+                <Text size="small" color="danger">{I18n.t('File type must be .zip')}</Text>
+              </Flex>
+            )}
+          </Flex>
+        )
+      }
+    }
+  })
+
   const options = {
     fileUpload: true,
     fileUploadOptions: {

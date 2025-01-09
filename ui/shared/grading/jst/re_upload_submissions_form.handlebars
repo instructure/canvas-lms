@@ -11,6 +11,10 @@
   <p>
     <i>{{#t "upload_warning"}}Make sure you don't change the names of the submission files so we can recognize them.{{/t}}</i>
   </p>
-  <input type="file" name="submissions_zip"/>
-  <button type="submit" class="btn">{{#t "buttons.upload"}}Upload Files{{/t}}</button>
+  <button id="choose_file_button" class="btn">{{#t "buttons.choose_file"}}Choose File{{/t}}</button>
+  <div id="uploaded_file_tag"></div>
+  <div class="button-container">
+    <button id="reuploaded_submissions_button" type="submit" class="btn btn-primary" style="display: none;">{{#t "buttons.upload"}}Upload Files{{/t}}</button>
+  </div>
+  <input type="file" name="submissions_zip" style="height:0;width:0;overflow:hidden;"/>
 </form>
