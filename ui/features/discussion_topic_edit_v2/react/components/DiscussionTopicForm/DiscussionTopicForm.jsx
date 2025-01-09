@@ -1021,7 +1021,7 @@ function DiscussionTopicForm({
               </Flex.Item>
             </Flex>
           )}
-          <Text size="large">{I18n.t('Options')}</Text>
+          <Text size="large" as="h2">{I18n.t('Options')}</Text>
           {shouldShowAnonymousOptions && (
             <AnonymousSelector
               discussionAnonymousState={discussionAnonymousState}
