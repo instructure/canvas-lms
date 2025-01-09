@@ -8884,6 +8884,8 @@ tr:
   folder_705fd2d7: Klasör
   folder_browsing_tree_1f00a3ae: "Dizin Görüntüleme Ağacı"
   folder_icon_29017021: "Klasör ikonu"
+  folder_name_b28488c2: "Dizin İsmi"
+  folder_was_successfully_created_8de6a282: "Klasör başarıyla oluşturuldu."
   folders: 
     event_updated: "Olay başarıyla güncellendi."
     file_zip_in_process: "Dosya sıkıştırma süreci devam ediyor..."
