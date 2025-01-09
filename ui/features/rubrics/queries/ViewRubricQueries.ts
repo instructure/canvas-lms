@@ -32,10 +32,11 @@ import type {Rubric, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import type {UsedLocation} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
+const rubricsPerPage = 100
 const COURSE_RUBRICS_QUERY = gql`
-  query CourseRubricsQuery($courseId: ID!) {
+  query CourseRubricsQuery($courseId: ID!, $after: String) {
     course(id: $courseId) {
-      rubricsConnection {
+      rubricsConnection(first: ${rubricsPerPage}, after: $after) {
         nodes {
           id: _id
           buttonDisplay
@@ -62,15 +63,19 @@ const COURSE_RUBRICS_QUERY = gql`
           title
           workflowState
         }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
       }
     }
   }
 `
 
 const ACCOUNT_RUBRICS_QUERY = gql`
-  query AccountRubricsQuery($accountId: ID!) {
+  query AccountRubricsQuery($accountId: ID!, $after: String) {
     account(id: $accountId) {
-      rubricsConnection {
+      rubricsConnection(first: ${rubricsPerPage}, after: $after) {
         nodes {
           id: _id
           buttonDisplay
@@ -95,6 +100,10 @@ const ACCOUNT_RUBRICS_QUERY = gql`
           ratingOrder
           title
           workflowState
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }
@@ -204,19 +213,27 @@ type RubricArchiveResponse = {
 
 export type FetchRubricVariables = AccountRubricsQueryVariables | CourseRubricsQueryVariables
 
-export const fetchCourseRubrics = async (queryVariables: FetchRubricVariables) => {
-  const {course} = await executeQuery<CourseRubricQueryResponse>(
-    COURSE_RUBRICS_QUERY,
-    queryVariables,
-  )
+export const fetchCourseRubrics = async (
+  pageParam: string | null,
+  queryVariables: FetchRubricVariables,
+) => {
+  const {course} = await executeQuery<CourseRubricQueryResponse>(COURSE_RUBRICS_QUERY, {
+    ...queryVariables,
+    after: pageParam,
+  })
+
   return course
 }
 
-export const fetchAccountRubrics = async (queryVariables: FetchRubricVariables) => {
-  const {account} = await executeQuery<AccountRubricQueryResponse>(
-    ACCOUNT_RUBRICS_QUERY,
-    queryVariables,
-  )
+export const fetchAccountRubrics = async (
+  pageParam: string | null,
+  queryVariables: FetchRubricVariables,
+) => {
+  const {account} = await executeQuery<AccountRubricQueryResponse>(ACCOUNT_RUBRICS_QUERY, {
+    ...queryVariables,
+    after: pageParam,
+  })
+
   return account
 }
 
