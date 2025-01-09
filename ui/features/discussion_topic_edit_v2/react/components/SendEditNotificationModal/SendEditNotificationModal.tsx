@@ -54,7 +54,7 @@ export const SendEditNotificationModal = ({
       <Modal.Body>
         <Text lineHeight="double">
           {I18n.t(
-            'Would you like to send a notification to users that the Announcement has been edited?'
+            'Would you like to send a notification to users that the Announcement has been edited?',
           )}
         </Text>
       </Modal.Body>

@@ -74,7 +74,7 @@ const ImportantDates = ({
       // Make sure that we only include K-5 subject courses from `contexts` in the
       // `selectedContextCodes` we pass to the FilterCalendarsModal
       const savedSelected = initialSelectedContextCodes?.filter(code =>
-        contexts.some(c => c.assetString === code)
+        contexts.some(c => c.assetString === code),
       )
       const contextCodes = savedSelected?.length ? savedSelected : defaultSelected
       setSelectedContextCodes(contextCodes)
@@ -118,7 +118,7 @@ const ImportantDates = ({
     success: setAssignments,
     error: useCallback(
       showFlashError(I18n.t('Failed to load assignments in important dates.')),
-      []
+      [],
     ),
     loading: setLoadingAssignments,
     params: {
@@ -163,7 +163,7 @@ const ImportantDates = ({
 
   const dates = useMemo(
     () => groupImportantDates(assignments, events, timeZone),
-    [assignments, events, timeZone]
+    [assignments, events, timeZone],
   )
 
   return (

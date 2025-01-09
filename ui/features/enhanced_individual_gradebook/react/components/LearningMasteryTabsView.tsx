@@ -84,7 +84,7 @@ export default function LearningMasteryTabsView() {
   const [searchParams, setSearchParams] = useSearchParams()
   const studentIdQueryParam = searchParams.get(STUDENT_SEARCH_PARAM)
   const [selectedStudentId, setSelectedStudentId] = useState<string | null | undefined>(
-    studentIdQueryParam
+    studentIdQueryParam,
   )
   const {currentStudent, studentSubmissions} = useCurrentStudentInfo(courseId, selectedStudentId)
 
@@ -92,13 +92,13 @@ export default function LearningMasteryTabsView() {
 
   const outcomeIdQueryParam = searchParams.get(OUTCOME_SEARCH_PARAM)
   const [selectedOutcomeId, setSelectedOutcomeId] = useState<string | null | undefined>(
-    outcomeIdQueryParam
+    outcomeIdQueryParam,
   )
 
   const selectedOutcome = outcomes?.find(outcome => outcome.id === selectedOutcomeId)
 
   const [gradebookOptions, setGradebookOptions] = useState<GradebookOptions>(
-    gradebookOptionsSetup(ENV)
+    gradebookOptionsSetup(ENV),
   )
 
   const {courseData, isLoading: isLoadingCourseData} = useGradebookQuery(courseId)
@@ -113,7 +113,7 @@ export default function LearningMasteryTabsView() {
 
   const {customColumns} = useCustomColumns(customColumnsUrl)
   const studentNotesColumnId = customColumns?.find(
-    (column: CustomColumn) => column.teacher_notes
+    (column: CustomColumn) => column.teacher_notes,
   )?.id
 
   const [currentStudentHiddenName, setCurrentStudentHiddenName] = useState<string>('')
@@ -144,7 +144,7 @@ export default function LearningMasteryTabsView() {
     }
 
     const outcomeRollupScores = parsedOutcomeRollups.filter(
-      outcomeRollup => outcomeRollup.outcome_id === selectedOutcomeId
+      outcomeRollup => outcomeRollup.outcome_id === selectedOutcomeId,
     )
 
     const scores = outcomeRollupScores
@@ -164,7 +164,7 @@ export default function LearningMasteryTabsView() {
     }
 
     const selectedParsedOutcomeRollup = parsedOutcomeRollups.find(
-      outcomeRollup => outcomeRollup.user_id === selectedStudentId
+      outcomeRollup => outcomeRollup.user_id === selectedStudentId,
     )
 
     if (selectedParsedOutcomeRollup) {
@@ -196,7 +196,7 @@ export default function LearningMasteryTabsView() {
 
       const {mappedAssignmentGroupMap} = mapAssignmentGroupQueryResults(
         assignmentGroupsConnection.nodes,
-        assignmentGradingPeriodMap
+        assignmentGradingPeriodMap,
       )
 
       setAssignmentGroupMap(mappedAssignmentGroupMap)
@@ -208,24 +208,27 @@ export default function LearningMasteryTabsView() {
         return a.sortableName.localeCompare(b.sortableName)
       })
       sortedStudents.forEach(
-        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1}))
+        (student, index) => (student.hiddenName = I18n.t('Student %{id}', {id: index + 1})),
       )
       setStudents(sortedStudents)
     }
   }, [courseData, isLoadingCourseData])
 
-  const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce((invalidKeys, groupId) => {
-    const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
-    const {selectedGradingPeriodId} = gradebookOptions
-    if (
-      invalid ||
-      (selectedGradingPeriodId && !gradingPeriodsIds?.includes(selectedGradingPeriodId))
-    ) {
-      invalidKeys[groupId] = name
-    }
+  const invalidAssignmentGroups = Object.keys(assignmentGroupMap).reduce(
+    (invalidKeys, groupId) => {
+      const {invalid, name, gradingPeriodsIds} = assignmentGroupMap[groupId]
+      const {selectedGradingPeriodId} = gradebookOptions
+      if (
+        invalid ||
+        (selectedGradingPeriodId && !gradingPeriodsIds?.includes(selectedGradingPeriodId))
+      ) {
+        invalidKeys[groupId] = name
+      }
 
-    return invalidKeys
-  }, {} as Record<string, string>)
+      return invalidKeys
+    },
+    {} as Record<string, string>,
+  )
 
   const handleStudentChange = (studentId?: string) => {
     setSelectedStudentId(studentId)

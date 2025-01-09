@@ -70,7 +70,7 @@ describe('RetrievingContent', () => {
     })
 
     it('shows a message about no content items', () => {
-      expect(component.getAllByText('The external app returned with no content.').length).toBe(1)
+      expect(component.getAllByText('The external app returned with no content.')).toHaveLength(1)
     })
   })
 
@@ -88,13 +88,13 @@ describe('RetrievingContent', () => {
     })
 
     it('shows succeeded content items just for info', () => {
-      expect(component.getAllByText('Processed').length).toBe(1)
+      expect(component.getAllByText('Processed')).toHaveLength(1)
       expect(component.getByText(content_items[0].title)).toBeInTheDocument()
     })
 
     it('shows one row per errored field', () => {
-      expect(component.getAllByText('Discarded').length).toBe(2)
-      expect(component.getAllByText(content_items[1].title).length).toBe(2)
+      expect(component.getAllByText('Discarded')).toHaveLength(2)
+      expect(component.getAllByText(content_items[1].title)).toHaveLength(2)
       expect(component.getByText(content_items[1].errors.fieldOne)).toBeInTheDocument()
       expect(component.getByText(content_items[1].errors.fieldTwo)).toBeInTheDocument()
     })
@@ -121,13 +121,12 @@ describe('RetrievingContent', () => {
     })
 
     const messageData = () => windowMock.postMessage.mock.calls[0][0]
-
     ;['content_items', 'msg', 'log', 'errormsg', 'errorlog', 'ltiEndpoint', 'reloadpage'].forEach(
       attr => {
         it(`sends the correct ${attr}`, () => {
           expect(messageData()[attr]).toEqual(env().deep_link_response[attr])
         })
-      }
+      },
     )
 
     it('sends the correct content items', () => {

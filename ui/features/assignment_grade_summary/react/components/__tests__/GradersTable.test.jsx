@@ -94,7 +94,7 @@ describe('GradeSummary GradersTable', () => {
     wrapper = render(
       <Provider store={store}>
         <GradersTable />
-      </Provider>
+      </Provider>,
     )
   }
 
@@ -115,20 +115,20 @@ describe('GradeSummary GradersTable', () => {
 
   function getAcceptGradesColumnHeader() {
     return [...wrapper.container.querySelectorAll('div')].find(el =>
-      el.textContent.includes('Accept Grades')
+      el.textContent.includes('Accept Grades'),
     )
   }
 
   test('includes a row for each grader', () => {
     mountComponent()
-    expect(wrapper.container.querySelectorAll('.grader-label').length).toBe(4)
+    expect(wrapper.container.querySelectorAll('.grader-label')).toHaveLength(4)
   })
 
   test('displays grader names in the row headers', () => {
     mountComponent()
     const rowHeaders = wrapper.container.querySelectorAll('.grader-label')
     expect([...rowHeaders].map(header => header.textContent)).toEqual(
-      storeEnv.graders.map(grader => grader.graderName)
+      storeEnv.graders.map(grader => grader.graderName),
     )
   })
 
@@ -189,12 +189,12 @@ describe('GradeSummary GradersTable', () => {
       mountAndFinishLoading()
       act(() => {
         store.dispatch(
-          GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED)
+          GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED),
         )
       })
       const row = getGraderRow('1101')
       expect(
-        within(row.querySelector('[aria-hidden="true"]')).getByText('Accepting')
+        within(row.querySelector('[aria-hidden="true"]')).getByText('Accepting'),
       ).toBeInTheDocument()
     })
 
@@ -202,13 +202,13 @@ describe('GradeSummary GradersTable', () => {
       sinon
         .stub(GradeActions, 'acceptGraderGrades')
         .callsFake(graderId =>
-          GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED)
+          GradeActions.setBulkSelectProvisionalGradesStatus(graderId, GradeActions.STARTED),
         )
       mountAndFinishLoading()
       const button = getGraderAcceptGradesButton('1101')
       button.click()
       expect(store.getState().grades.bulkSelectProvisionalGradeStatuses[1101]).toBe(
-        GradeActions.STARTED
+        GradeActions.STARTED,
       )
     })
 

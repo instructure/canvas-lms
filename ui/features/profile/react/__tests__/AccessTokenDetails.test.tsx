@@ -76,7 +76,7 @@ describe('AccessTokenDetails', () => {
     render(<AccessTokenDetails {...props} loadedToken={undefined} />)
 
     const error = await screen.findByText(
-      'Failed to load access token details. Please try again later.'
+      'Failed to load access token details. Please try again later.',
     )
     expect(error).toBeInTheDocument()
   })
@@ -99,11 +99,11 @@ describe('AccessTokenDetails', () => {
       <AccessTokenDetails
         {...props}
         loadedToken={{...loadedToken, visible_token: fully_visible_token}}
-      />
+      />,
     )
 
     const warning = screen.getByText(
-      /once you leave this page you won't be able to retrieve the full token anymore, you'll have to regenerate it to get a new value./i
+      /once you leave this page you won't be able to retrieve the full token anymore, you'll have to regenerate it to get a new value./i,
     )
     expect(warning).toBeInTheDocument()
   })
@@ -123,7 +123,12 @@ describe('AccessTokenDetails', () => {
   })
 
   it('should disable the regenerate button if the token is not eligible', async () => {
-    render(<AccessTokenDetails {...props} loadedToken={{...loadedToken, can_manually_regenerate: false}} />)
+    render(
+      <AccessTokenDetails
+        {...props}
+        loadedToken={{...loadedToken, can_manually_regenerate: false}}
+      />,
+    )
 
     const regenerateButton = (await screen.findByText('Regenerate Token')).closest('button')
     expect(regenerateButton).toBeDisabled()
@@ -133,7 +138,7 @@ describe('AccessTokenDetails', () => {
     fetchMock.put(
       props.url,
       {...loadedToken, visible_token: fully_visible_token},
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
     jest.spyOn(window, 'confirm').mockImplementationOnce(() => true)
     render(<AccessTokenDetails {...props} />)

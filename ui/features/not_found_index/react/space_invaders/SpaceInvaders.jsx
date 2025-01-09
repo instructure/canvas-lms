@@ -81,7 +81,7 @@ class SpaceInvaders extends React.Component {
       2,
       'bold 32px sans-serif',
       CANVAS_WIDTH / 2,
-      CANVAS_HEIGHT / 2 - 40
+      CANVAS_HEIGHT / 2 - 40,
     )
 
     this.drawText(
@@ -90,7 +90,7 @@ class SpaceInvaders extends React.Component {
       1,
       '18px sans-serif',
       CANVAS_WIDTH / 2,
-      CANVAS_HEIGHT / 2
+      CANVAS_HEIGHT / 2,
     )
 
     this.drawText(
@@ -99,7 +99,7 @@ class SpaceInvaders extends React.Component {
       1,
       '18px sans-serif',
       CANVAS_WIDTH / 2,
-      CANVAS_HEIGHT / 2 + 40
+      CANVAS_HEIGHT / 2 + 40,
     )
 
     document.addEventListener('keydown', this.handleStartGameEvent)
@@ -132,7 +132,7 @@ class SpaceInvaders extends React.Component {
             this.particleFactory.createParticles(
               spawnedObject.position.x,
               spawnedObject.position.y,
-              10
+              10,
             )
           }
         }
@@ -214,18 +214,18 @@ class SpaceInvaders extends React.Component {
     this.handleCollisions(
       this.player,
       this.enemySpawner?.getSpawnedGameObjects(),
-      this.playerEnemyCollisionCallback
+      this.playerEnemyCollisionCallback,
     )
     this.handleCollisions(
       this.player,
       this.powerUpSpawner?.getSpawnedGameObjects(),
-      this.playerPowerupCollisionCallback
+      this.playerPowerupCollisionCallback,
     )
     this.handleCollisions(
       this.player?.getSpawnedProjectiles(),
       this.enemySpawner?.getSpawnedGameObjects(),
       this.projectileEnemyCollisionCallback,
-      true
+      true,
     )
     this.particleFactory.updateParticles(ctx)
   }

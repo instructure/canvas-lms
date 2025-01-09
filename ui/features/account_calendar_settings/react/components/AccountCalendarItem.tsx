@@ -56,7 +56,7 @@ export const AccountCalendarItem = ({
 }: ComponentProps) => {
   const [isVisible, setIsVisible] = useState(item.visible)
   const [isAutoSubscription, setIsAutoSubscription] = useState<boolean>(
-    item.auto_subscribe ?? false
+    item.auto_subscribe ?? false,
   )
 
   useEffect(() => {

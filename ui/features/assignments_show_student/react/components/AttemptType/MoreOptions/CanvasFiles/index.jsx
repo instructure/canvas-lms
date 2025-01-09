@@ -85,7 +85,7 @@ class CanvasFiles extends React.Component {
         const newFocus =
           document.getElementById('parent-folder') ||
           document.getElementById(
-            `folder-${this.state.loadedFolders[this.state.selectedFolderID].subFolderIDs[0]}`
+            `folder-${this.state.loadedFolders[this.state.selectedFolderID].subFolderIDs[0]}`,
           )
         newFocus.focus()
       })
@@ -100,7 +100,7 @@ class CanvasFiles extends React.Component {
         this.ROOT_FOLDER_ID,
         this.FOLDER_TYPE,
         '/api/v1/users/self/folders/root',
-        opts
+        opts,
       )
 
       // load group folders
@@ -109,7 +109,7 @@ class CanvasFiles extends React.Component {
           this.ROOT_FOLDER_ID,
           this.FOLDER_TYPE,
           `/api/v1/groups/${group._id}/folders/root`,
-          {...opts, group_name: group.name}
+          {...opts, group_name: group.name},
         )
       })
     }
@@ -289,7 +289,7 @@ CanvasFiles.propTypes = {
     shape({
       _id: string,
       name: string,
-    })
+    }),
   ),
 }
 

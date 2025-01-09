@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'Allows user to view the Outcomes Calculations tab and set outcome proficiency calculations at the account and course levels.'
+        'Allows user to view the Outcomes Calculations tab and set outcome proficiency calculations at the account and course levels.',
       ),
     },
   ],
@@ -34,7 +34,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Feature Option'),
       description: I18n.t(
-        'This permission requires the Account and Course Level Outcome Mastery Scales feature option, which must be enabled by a Customer Success Manager.'
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature option, which must be enabled by a Customer Success Manager.',
       ),
     },
     {
@@ -43,18 +43,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'If the feature option is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+        'If the feature option is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.',
       ),
     },
     {
       description: I18n.t(
-        'To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.'
+        'To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.',
       ),
     },
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.'
+        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.',
       ),
     },
   ],
@@ -62,7 +62,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'Allows user to view the Outcomes Calculation tab and set outcome proficiency calculations at the course level.'
+        'Allows user to view the Outcomes Calculation tab and set outcome proficiency calculations at the course level.',
       ),
     },
   ],
@@ -70,7 +70,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Feature Option'),
       description: I18n.t(
-        'This permission requires the Account and Course Level Outcome Mastery Scales feature option, which can only be enabled at the account level.'
+        'This permission requires the Account and Course Level Outcome Mastery Scales feature option, which can only be enabled at the account level.',
       ),
     },
     {
@@ -79,19 +79,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Outcomes'),
       description: I18n.t(
-        'If the feature option is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.'
+        'If the feature option is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation.',
       ),
     },
     {
       description: I18n.t(
-        'To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.'
+        'To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled.',
       ),
     },
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
-        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.'
+        'If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page.',
       ),
     },
-  ]
+  ],
 )

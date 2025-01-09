@@ -25,7 +25,7 @@ describe('GradeDisplay', () => {
   describe('when gradingStatus is set to Excused', () => {
     it('renders the text "Excused"', () => {
       const {getByTestId} = render(
-        <GradeDisplay gradingType="points" pointsPossible={10} gradingStatus="excused" />
+        <GradeDisplay gradingType="points" pointsPossible={10} gradingStatus="excused" />,
       )
       expect(getByTestId('grade-display')).toHaveTextContent('Excused')
     })
@@ -70,7 +70,7 @@ describe('GradeDisplay', () => {
 
       it('does not indicate possible points if possiblePoints is null', () => {
         const {getByTestId, queryByText} = render(
-          <GradeDisplay pointsPossible={null} gradingType="points" />
+          <GradeDisplay pointsPossible={null} gradingType="points" />,
         )
         expect(getByTestId('grade-display')).toBeEmptyDOMElement()
         expect(queryByText(/Possible Point/)).not.toBeInTheDocument()
@@ -80,21 +80,21 @@ describe('GradeDisplay', () => {
     describe('when a grade has been awarded', () => {
       it('renders the awarded score and the possible points', () => {
         const {getByTestId} = render(
-          <GradeDisplay receivedGrade={2} pointsPossible={5} gradingType="points" />
+          <GradeDisplay receivedGrade={2} pointsPossible={5} gradingType="points" />,
         )
         expect(getByTestId('grade-display')).toHaveTextContent('2/5 Points')
       })
 
       it('renders the awarded score and the possible points in decimal', () => {
         const {getByTestId} = render(
-          <GradeDisplay receivedGrade={2} pointsPossible={5.7} gradingType="points" />
+          <GradeDisplay receivedGrade={2} pointsPossible={5.7} gradingType="points" />,
         )
         expect(getByTestId('grade-display')).toHaveTextContent('2/5.7 Points')
       })
 
       it('renders the awarded score and the possible points when possiblePoints is 1', () => {
         const {getByTestId} = render(
-          <GradeDisplay receivedGrade={1} pointsPossible={1} gradingType="points" />
+          <GradeDisplay receivedGrade={1} pointsPossible={1} gradingType="points" />,
         )
         expect(getByTestId('grade-display')).toHaveTextContent('1/1 Point')
       })
@@ -104,14 +104,14 @@ describe('GradeDisplay', () => {
   describe('for a pass-fail assignment', () => {
     it('renders "Complete" when a "complete" grade has been awarded', () => {
       const {getByTestId} = render(
-        <GradeDisplay receivedGrade="complete" pointsPossible={5} gradingType="pass_fail" />
+        <GradeDisplay receivedGrade="complete" pointsPossible={5} gradingType="pass_fail" />,
       )
       expect(getByTestId('grade-display')).toHaveTextContent('complete')
     })
 
     it('renders "Incomplete" when an "incomplete" grade has been awarded', () => {
       const {getByTestId} = render(
-        <GradeDisplay receivedGrade="incomplete" pointsPossible={5} gradingType="pass_fail" />
+        <GradeDisplay receivedGrade="incomplete" pointsPossible={5} gradingType="pass_fail" />,
       )
       expect(getByTestId('grade-display')).toHaveTextContent('incomplete')
     })
@@ -130,7 +130,7 @@ describe('GradeDisplay', () => {
   describe('for a percent-based assignment', () => {
     it('renders the grade as a percent when one has been awarded', () => {
       const {getByTestId} = render(
-        <GradeDisplay receivedGrade="15%" pointsPossible={5} gradingType="percent" />
+        <GradeDisplay receivedGrade="15%" pointsPossible={5} gradingType="percent" />,
       )
       expect(getByTestId('grade-display')).toHaveTextContent('15%')
     })
@@ -149,7 +149,7 @@ describe('GradeDisplay', () => {
   describe('for an assignment graded using a GPA scale', () => {
     it('renders the grade when one has been awarded', () => {
       const {getByTestId} = render(
-        <GradeDisplay receivedGrade="just great" pointsPossible={5} gradingType="gpa_scale" />
+        <GradeDisplay receivedGrade="just great" pointsPossible={5} gradingType="gpa_scale" />,
       )
       expect(getByTestId('grade-display')).toHaveTextContent('just great')
     })
@@ -168,7 +168,7 @@ describe('GradeDisplay', () => {
   describe('for an assignment graded using a letter grade', () => {
     it('renders the grade when one has been awarded', () => {
       const {getByTestId} = render(
-        <GradeDisplay receivedGrade="A-" pointsPossible={5} gradingType="letter_grade" />
+        <GradeDisplay receivedGrade="A-" pointsPossible={5} gradingType="letter_grade" />,
       )
       expect(getByTestId('grade-display')).toHaveTextContent('A−')
     })

@@ -119,13 +119,13 @@ const Ratings = ({
         currentIndex === 0 && ratingsCopy.length > 1
           ? (ratingsCopy[currentIndex].focusField = 'trash')
           : ratingsCopy.length === 1
-          ? (ratingsCopy[0].focusField = 'points')
-          : (ratingsCopy[currentIndex - 1].focusField = 'trash')
+            ? (ratingsCopy[0].focusField = 'points')
+            : (ratingsCopy[currentIndex - 1].focusField = 'trash')
 
         return ratingsCopy
       })
     },
-    [onChangeRatings]
+    [onChangeRatings],
   )
 
   const handleMasteryPointsChange = e => onChangeMasteryPoints(e.target.value)
@@ -329,7 +329,7 @@ const Ratings = ({
                 canManage={canManage}
                 individualOutcome={true}
               />
-            )
+            ),
           )}
           {renderEditMasteryPoints()}
         </>

@@ -55,10 +55,10 @@ describe('pace modal stats', () => {
     expect(getByText('Determined by course end date')).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
-      `Assignments${defaultProps.assignments}`
+      `Assignments${defaultProps.assignments}`,
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`,
     )
   })
 
@@ -76,10 +76,10 @@ describe('pace modal stats', () => {
     expect(getByText('Determined by course end date')).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
-      `Assignments${defaultProps.assignments}`
+      `Assignments${defaultProps.assignments}`,
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`,
     )
   })
 
@@ -89,7 +89,7 @@ describe('pace modal stats', () => {
         {...defaultProps}
         coursePace={STUDENT_PACE}
         appliedPace={PACE_CONTEXTS_STUDENTS_RESPONSE.pace_contexts[0]?.applied_pace!}
-      />
+      />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -98,10 +98,10 @@ describe('pace modal stats', () => {
     expect(getByText('Student enrollment date')).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
-      `Assignments${defaultProps.assignments}`
+      `Assignments${defaultProps.assignments}`,
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`,
     )
   })
 
@@ -115,10 +115,10 @@ describe('pace modal stats', () => {
     const end = getByTestId('coursepace-end-date')
     expect(within(end).getByText(/Not Specified/)).toBeInTheDocument()
     expect(getByTestId('colored-assignments-section').textContent).toBe(
-      `Assignments${defaultProps.assignments}`
+      `Assignments${defaultProps.assignments}`,
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`,
     )
   })
 
@@ -134,10 +134,10 @@ describe('pace modal stats', () => {
     expect(within(end).getByText('Determined by course pace')).toBeInTheDocument()
 
     expect(getByTestId('colored-assignments-section').textContent).toBe(
-      `Assignments${defaultProps.assignments}`
+      `Assignments${defaultProps.assignments}`,
     )
     expect(getByTestId('colored-duration-section').textContent).toBe(
-      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`
+      `Time to complete${defaultProps.paceDuration.weeks} weeks, ${defaultProps.paceDuration.days} days`,
     )
   })
 
@@ -155,7 +155,7 @@ describe('pace modal stats', () => {
     it("shows course end date for student if start date is all that's given", () => {
       const cpace = {...STUDENT_PACE, end_date: null}
       const {getByTestId, getByText} = render(
-        <PaceModalStats {...defaultProps} coursePace={cpace} />
+        <PaceModalStats {...defaultProps} coursePace={cpace} />,
       )
 
       expect(getByText('Start Date')).toBeInTheDocument()

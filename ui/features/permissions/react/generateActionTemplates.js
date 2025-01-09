@@ -30,7 +30,7 @@ export const generateActionTemplates = (
   accountDetails,
   accountConsiderations,
   courseDetails,
-  courseConsiderations
+  courseConsiderations,
 ) => ({
   [ACCOUNT]: {
     [PERMISSION_DETAIL_SECTIONS[0].key]: accountDetails,

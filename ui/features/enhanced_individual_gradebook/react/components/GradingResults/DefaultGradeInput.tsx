@@ -54,7 +54,7 @@ type Props = {
   handleSubmitGrade?: () => void
   handleChangePassFailStatus: (
     e: React.SyntheticEvent<Element, Event>,
-    data: {value?: string | number}
+    data: {value?: string | number},
   ) => void
   header?: string
   shouldShowOutOfText?: boolean

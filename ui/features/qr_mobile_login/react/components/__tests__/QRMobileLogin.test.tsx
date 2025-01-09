@@ -94,7 +94,7 @@ describe('QRMobileLogin', () => {
       const refreshInterval = 15 * MINUTES
       const pollInterval = 3 * MINUTES
       const {findByText} = render(
-        <QRMobileLogin refreshInterval={refreshInterval} pollInterval={pollInterval} />
+        <QRMobileLogin refreshInterval={refreshInterval} pollInterval={pollInterval} />,
       )
       await findByText(/expires in 10 minutes/)
       advance(11 * MINUTES) // code is only good for 10
@@ -152,7 +152,7 @@ describe('QRMobileLogin', () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
       const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning={true} />)
       const cancelButton = getByTestId('qr-header-close-button').querySelector(
-        'button'
+        'button',
       ) as HTMLButtonElement
       fireEvent.click(cancelButton)
       await findByText(/qr code display was canceled/i)

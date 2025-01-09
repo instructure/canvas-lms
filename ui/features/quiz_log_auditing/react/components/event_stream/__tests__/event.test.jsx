@@ -32,7 +32,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           startedAt="2014-11-16T13:37:19Z"
           type={K.EVT_SESSION_STARTED}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -46,7 +46,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
           data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -60,7 +60,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
           data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -74,7 +74,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[]}
           data={[]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -88,7 +88,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[]}
           data={[]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -102,7 +102,7 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
           data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -118,14 +118,14 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
 
     it('renders a green "complete" icon when the user focus the quiz', () => {
       const wrapper = shallow(
-        <Event {...defaultProps({type: K.EVT_QUESTION_VIEWED, flag: K.EVT_FLAG_OK})} />
+        <Event {...defaultProps({type: K.EVT_QUESTION_VIEWED, flag: K.EVT_FLAG_OK})} />,
       )
       expect(wrapper.find('IconCompleteLine').props().color).toBe('success')
     })
 
     it('renders a red "trouble" icon when the user leaves the quiz', () => {
       const wrapper = shallow(
-        <Event {...defaultProps({type: K.EVT_PAGE_BLURRED, flag: K.EVT_FLAG_WARNING})} />
+        <Event {...defaultProps({type: K.EVT_PAGE_BLURRED, flag: K.EVT_FLAG_WARNING})} />,
       )
       expect(wrapper.find('IconTroubleLine').props().color).toBe('warning')
     })

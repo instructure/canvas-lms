@@ -43,7 +43,7 @@ export default class UsersPane extends React.Component {
       shape({
         id: string.isRequired,
         label: string.isRequired,
-      })
+      }),
     ).isRequired,
     onUpdateQueryParams: func.isRequired,
     queryParams: shape({
@@ -64,7 +64,7 @@ export default class UsersPane extends React.Component {
     }
     this.debouncedDispatchApplySearchFilter = debounce(
       this.handleApplyingSearchFilter,
-      SEARCH_DEBOUNCE_TIME
+      SEARCH_DEBOUNCE_TIME,
     )
   }
 
@@ -82,7 +82,7 @@ export default class UsersPane extends React.Component {
         search_term,
         role_filter_id,
         include_deleted_users: bool_include_deleted_users,
-      })
+      }),
     )
 
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))

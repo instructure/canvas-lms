@@ -30,7 +30,7 @@ describe('LatePolicyStatusDisplay', () => {
         originalGrade="8"
         pointsDeducted={3}
         pointsPossible={32}
-      />
+      />,
     )
 
     const latePolicyContainer = getByTestId('late-policy-container')
@@ -48,7 +48,7 @@ describe('LatePolicyStatusDisplay', () => {
         originalGrade="8"
         pointsDeducted={3}
         pointsPossible={32}
-      />
+      />,
     )
 
     const tooltipContent = getByTestId('late-policy-tip-content')
@@ -69,12 +69,12 @@ describe('LatePolicyStatusDisplay', () => {
         gradingType="points"
         pointsDeducted={3}
         pointsPossible={32}
-      />
+      />,
     )
 
     const tooltipContent = getByTestId('late-policy-accessible-tip-content')
     expect(tooltipContent).toContainElement(
-      getByText('Attempt 2: 8/32Late Penalty: minus 3 PointsGrade: 5/32')
+      getByText('Attempt 2: 8/32Late Penalty: minus 3 PointsGrade: 5/32'),
     )
   })
 
@@ -86,12 +86,12 @@ describe('LatePolicyStatusDisplay', () => {
         originalGrade="8"
         gradingType="points"
         pointsPossible={32}
-      />
+      />,
     )
 
     const tooltipContent = getByTestId('late-policy-accessible-tip-content')
     expect(tooltipContent).toContainElement(
-      getByText('Attempt 2: 8/32Late Penalty: NoneGrade: 8/32')
+      getByText('Attempt 2: 8/32Late Penalty: NoneGrade: 8/32'),
     )
   })
 })

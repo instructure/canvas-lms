@@ -128,7 +128,7 @@ export default class OverrideDates extends React.Component {
               this.onChangeDue,
               this.onChangeDueMode,
               this.onValidateDue,
-              this.invalidMessageDue
+              this.invalidMessageDue,
             )}
           </Flex.Item>
           <Flex.Item margin="0 x-small 0 0" as="div" shouldGrow={true} width="30%">
@@ -140,7 +140,7 @@ export default class OverrideDates extends React.Component {
               this.onChangeUnlock,
               this.onChangeUnlockMode,
               this.onValidateUnlock,
-              this.invalidMessageUnlock
+              this.invalidMessageUnlock,
             )}
           </Flex.Item>
           <Flex.Item margin="0 0 0 0" as="div" shouldGrow={true} width="30%">
@@ -152,7 +152,7 @@ export default class OverrideDates extends React.Component {
               this.onChangeLock,
               this.onChangeLockMode,
               this.onValidateLock,
-              this.invalidMessageLock
+              this.invalidMessageLock,
             )}
           </Flex.Item>
         </Flex>

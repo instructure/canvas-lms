@@ -197,7 +197,9 @@ describe('SpeedGrader Comment Rendering', () => {
   it('renders a comment with an attachment', () => {
     const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[1]
     const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
-    expect(renderedComment.find('.comment_attachment a').text().trim()).toBe('SampleVideo_1280x720_1mb (1).mp4')
+    expect(renderedComment.find('.comment_attachment a').text().trim()).toBe(
+      'SampleVideo_1280x720_1mb (1).mp4',
+    )
   })
 
   it('renders generic grader name when graders cannot view other grader names', () => {
@@ -222,7 +224,7 @@ describe('SpeedGrader Comment Rendering', () => {
             created_at: '2018-07-30T15:42:14Z',
             id: '44',
             author_id: 'mry2b',
-            anonymous: true
+            anonymous: true,
           },
         ],
       },
@@ -237,7 +239,9 @@ describe('SpeedGrader Comment Rendering', () => {
   it('should add comment text to delete link for screenreaders', () => {
     const commentToRender = SpeedGrader.EG.currentStudent.submission.submission_comments[0]
     const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
-    expect(renderedComment.find('.delete_comment_link .screenreader-only').text()).toBe('Delete comment: test')
+    expect(renderedComment.find('.delete_comment_link .screenreader-only').text()).toBe(
+      'Delete comment: test',
+    )
   })
 
   it('refreshes provisional grader display names when names are stale', () => {
@@ -262,7 +266,7 @@ describe('SpeedGrader Comment Rendering', () => {
             created_at: '2018-07-30T15:42:14Z',
             id: '44',
             author_id: 'mry2b',
-            anonymous: true
+            anonymous: true,
           },
         ],
       },
@@ -288,7 +292,7 @@ describe('SpeedGrader Comment Rendering', () => {
             created_at: '2018-07-30T15:43:14Z',
             id: '45',
             author_id: 'asdfg',
-            anonymous: true
+            anonymous: true,
           },
         ],
       },
@@ -297,7 +301,7 @@ describe('SpeedGrader Comment Rendering', () => {
     SpeedGrader.EG.currentStudent = firstStudent
     SpeedGrader.EG.renderComment(
       SpeedGrader.EG.currentStudent.submission.submission_comments[0],
-      commentRenderingOptions
+      commentRenderingOptions,
     )
 
     SpeedGrader.EG.currentStudent = secondStudent

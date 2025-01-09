@@ -36,10 +36,10 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'The Quiz Log Auditing feature option must be enabled in Course Settings.'
+        'The Quiz Log Auditing feature option must be enabled in Course Settings.',
       ),
     },
   ],
   [],
-  []
+  [],
 )

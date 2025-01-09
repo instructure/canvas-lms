@@ -245,7 +245,7 @@ describe('InheritanceStateControl', () => {
         ctx={context}
         store={{dispatch: () => {}}}
         actions={{setBindingWorkflowState: () => {}}}
-      />
+      />,
     )
     return container
   }
@@ -258,7 +258,7 @@ describe('InheritanceStateControl', () => {
 
   it('disabled the checkbox if the account does not own the binding and it is not set and the account is a child account', () => {
     const checkbox = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
-      'input[type="checkbox"]'
+      'input[type="checkbox"]',
     )
 
     expect(checkbox.disabled).toBe(true)
@@ -266,7 +266,7 @@ describe('InheritanceStateControl', () => {
 
   it('enables the radio group if the account does not own the binding and it is not set and the account is not a child account', () => {
     const radioGroup = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
-      'input[type="radio"]'
+      'input[type="radio"]',
     )
 
     expect(radioGroup.disabled).toBeFalsy()
@@ -280,7 +280,7 @@ describe('InheritanceStateControl', () => {
 
   it('the correct state for the developer key for siteadmin', () => {
     const offRadioInput = componentNode(mockDevKey(), siteAdminCTX).querySelector(
-      'input[value="off"]'
+      'input[value="off"]',
     )
 
     expect(offRadioInput.checked).toBe(true)
@@ -302,7 +302,7 @@ describe('InheritanceStateControl', () => {
     const modifiedKey = mockDevKey()
     modifiedKey.developer_key_account_binding = undefined
     const allowRadioInput = componentNode(modifiedKey, siteAdminCTX).querySelector(
-      'input[value="allow"]'
+      'input[value="allow"]',
     )
 
     expect(allowRadioInput.checked).toBe(true)
@@ -314,7 +314,7 @@ describe('InheritanceStateControl', () => {
 
   it('renders an "off" option for siteadmin keys', () => {
     expect(
-      componentNode({id: '123'}, siteAdminCTX).querySelector('input[value="off"]')
+      componentNode({id: '123'}, siteAdminCTX).querySelector('input[value="off"]'),
     ).toBeTruthy()
   })
 
@@ -324,19 +324,19 @@ describe('InheritanceStateControl', () => {
 
   it('renders an "allow" option only for site_admin', () => {
     expect(
-      componentNode(mockDevKey(), siteAdminCTX).querySelector('input[value="allow"]')
+      componentNode(mockDevKey(), siteAdminCTX).querySelector('input[value="allow"]'),
     ).toBeTruthy()
   })
 
   it('do not render an "allow" option only for root-account', () => {
     expect(
-      componentNode(mockDevKey(), rootAccountCTX).querySelector('input[value="allow"]')
+      componentNode(mockDevKey(), rootAccountCTX).querySelector('input[value="allow"]'),
     ).toBeFalsy()
   })
 
   it('renders "allow" if "allow" is set as the workflow state for site admin', () => {
     const allowRadioInput = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
-      'input[value="allow"]'
+      'input[value="allow"]',
     )
 
     expect(allowRadioInput.checked).toBe(true)

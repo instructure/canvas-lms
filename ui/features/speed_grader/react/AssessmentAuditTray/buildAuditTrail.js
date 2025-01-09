@@ -135,12 +135,12 @@ function extractEvents(eventDatum, featureTracking) {
 
       addCreateEvent(
         'grader_to_final_grader_anonymity_updated',
-        'grader_names_visible_to_final_grader'
+        'grader_names_visible_to_final_grader',
       )
 
       addCreateEvent(
         'grader_to_grader_comment_visibility_updated',
-        'grader_comments_visible_to_graders'
+        'grader_comments_visible_to_graders',
       )
 
       if (payload.moderated_grading) {
@@ -163,7 +163,7 @@ function extractEvents(eventDatum, featureTracking) {
       // [1] is the value after the change
       if (payload[payloadKey][1] !== payload[payloadKey][0]) {
         eventData.push(
-          extractEvent(eventDatum, newEventType, {[payloadKey]: payload[payloadKey][1]})
+          extractEvent(eventDatum, newEventType, {[payloadKey]: payload[payloadKey][1]}),
         )
       }
     }
@@ -179,14 +179,14 @@ function extractEvents(eventDatum, featureTracking) {
     if ('grader_names_visible_to_final_grader' in payload) {
       maybeAddUpdateEvent(
         'grader_to_final_grader_anonymity_updated',
-        'grader_names_visible_to_final_grader'
+        'grader_names_visible_to_final_grader',
       )
     }
 
     if ('grader_comments_visible_to_graders' in payload) {
       maybeAddUpdateEvent(
         'grader_to_grader_comment_visibility_updated',
-        'grader_comments_visible_to_graders'
+        'grader_comments_visible_to_graders',
       )
     }
 

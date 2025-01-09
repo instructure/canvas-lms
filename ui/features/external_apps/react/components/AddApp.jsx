@@ -31,7 +31,6 @@ import {Button} from '@instructure/ui-buttons'
 
 const I18n = createI18nScope('external_tools')
 
- 
 export default createReactClass({
   displayName: 'AddApp',
 
@@ -110,7 +109,7 @@ export default createReactClass({
         if (v.required && isEmpty(v.value)) {
           return k
         }
-      })
+      }),
     )
     this.setState({invalidFields})
   },

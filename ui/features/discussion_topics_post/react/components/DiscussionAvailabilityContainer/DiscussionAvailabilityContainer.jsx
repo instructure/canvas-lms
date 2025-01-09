@@ -39,9 +39,9 @@ export function DiscussionAvailabilityContainer({...props}) {
       props.anonymousState === 'full_anonymity'
         ? I18n.t('Anonymous Discussion')
         : props.anonymousState === 'partial_anonymity'
-        ? I18n.t('Partially Anonymous Discussion')
-        : null,
-    [props.anonymousState]
+          ? I18n.t('Partially Anonymous Discussion')
+          : null,
+    [props.anonymousState],
   )
 
   const availabilities = useMemo(() => {
@@ -71,7 +71,8 @@ export function DiscussionAvailabilityContainer({...props}) {
         const foundOverride =
           haveGroupsOverrideType &&
           overrides.find(
-            override => override.set.__typename === 'Group' && override.set._id === availability._id
+            override =>
+              override.set.__typename === 'Group' && override.set._id === availability._id,
           )
         // If we don't find a matching override we'll use the 'Everyone' dates, if there is
         // no everyone dates it will be null

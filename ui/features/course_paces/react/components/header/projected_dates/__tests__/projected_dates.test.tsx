@@ -70,7 +70,7 @@ describe('ProjectedDates', () => {
 
   it('shows student enrollment dates when given', () => {
     const {getByText} = renderConnected(
-      <ProjectedDates {...defaultProps} coursePace={STUDENT_PACE} />
+      <ProjectedDates {...defaultProps} coursePace={STUDENT_PACE} />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -102,7 +102,7 @@ describe('ProjectedDates', () => {
     const cpace = {...defaultProps.coursePace, end_date: null}
 
     const {getByTestId, getByText} = renderConnected(
-      <ProjectedDates {...defaultProps} coursePace={cpace} />
+      <ProjectedDates {...defaultProps} coursePace={cpace} />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -118,7 +118,7 @@ describe('ProjectedDates', () => {
     const cpace: CoursePace = {...defaultProps.coursePace, end_date: null, end_date_context: 'term'}
 
     const {getByTestId, getByText} = renderConnected(
-      <ProjectedDates {...defaultProps} coursePace={cpace} />
+      <ProjectedDates {...defaultProps} coursePace={cpace} />,
     )
 
     expect(getByText('Start Date')).toBeInTheDocument()
@@ -133,7 +133,7 @@ describe('ProjectedDates', () => {
 
   it('compresses dates if projectedEndDate is after pace end_date', () => {
     renderConnected(
-      <ProjectedDates {...defaultProps} plannedEndDate={'2021-12-17'} compression={1000} />
+      <ProjectedDates {...defaultProps} plannedEndDate={'2021-12-17'} compression={1000} />,
     )
     expect(defaultProps.compressDates).toHaveBeenCalled()
     expect(defaultProps.uncompressDates).not.toHaveBeenCalled()

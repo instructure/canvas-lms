@@ -30,7 +30,7 @@ $(document).ready(() =>
     const $item = $link.parents('.item')
     const item_name = $.trim($item.find('.name').text())
     const result = window.confirm(
-      I18n.t('are_you_sure', 'Are you sure you want to restore %{item_name}?', {item_name})
+      I18n.t('are_you_sure', 'Are you sure you want to restore %{item_name}?', {item_name}),
     )
     if (result) {
       $link.text(I18n.t('restoring', 'restoring...'))
@@ -40,8 +40,8 @@ $(document).ready(() =>
         'POST',
         {},
         () => $item.slideUp(() => $item.remove()),
-        () => $link.text(I18n.t('restore_failed', 'restore failed'))
+        () => $link.text(I18n.t('restore_failed', 'restore failed')),
       )
     }
-  })
+  }),
 )

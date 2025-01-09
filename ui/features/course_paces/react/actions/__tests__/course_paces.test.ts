@@ -53,7 +53,7 @@ const mockGetState =
     pace: CoursePacesState,
     originalPace: CoursePace,
     blackoutDates = DEFAULT_BLACKOUT_DATE_STATE,
-    originalBlackoutDates = BLACKOUT_DATES
+    originalBlackoutDates = BLACKOUT_DATES,
   ) =>
   (): StoreState => ({
     ...DEFAULT_STORE_STATE,
@@ -94,7 +94,7 @@ describe('Course paces actions', () => {
       expect(dispatch.mock.calls[3]).toEqual([coursePaceActions.setProgress(PROGRESS_RUNNING)])
       // Compare dispatched functions by name since they won't be directly equal
       expect(JSON.stringify(dispatch.mock.calls[4])).toEqual(
-        JSON.stringify([coursePaceActions.pollForPublishStatus()])
+        JSON.stringify([coursePaceActions.pollForPublishStatus()]),
       )
       expect(dispatch.mock.calls[5]).toEqual([
         paceContextsActions.addPublishingPace({
@@ -197,7 +197,7 @@ describe('Course paces actions', () => {
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
         expect(
-          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0]
+          screen.getAllByText(`${contextsPublishing[0].pace_context?.name} Pace updated`)[0],
         ).toBeInTheDocument()
       })
     })
@@ -262,10 +262,10 @@ describe('Course paces actions', () => {
                   id: item.id,
                   duration: item.duration,
                   module_item_id: item.module_item_id,
-                }))
+                })),
               )
             },
-            []
+            [],
           ),
           selected_days_to_skip: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.selected_days_to_skip,
           exclude_weekends: PRIMARY_PACE.exclude_weekends,
@@ -293,10 +293,10 @@ describe('Course paces actions', () => {
                     id: item.id,
                     duration: item.duration,
                     module_item_id: item.module_item_id,
-                  }))
+                  })),
                 )
               },
-              []
+              [],
             ),
           selected_days_to_skip: PRIMARY_PACE_SKIP_SELECTED_DAYS_ENABLED.selected_days_to_skip,
           exclude_weekends: true,

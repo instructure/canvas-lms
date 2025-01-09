@@ -101,7 +101,7 @@ describe('ComposeModalContainer', () => {
             />
           </ConversationContext.Provider>
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </ApolloProvider>,
     )
 
   const uploadFiles = (element, files) => {
@@ -159,7 +159,7 @@ describe('ComposeModalContainer', () => {
   describe('Inbox Settings Loader', () => {
     it('shows loader when Inbox Signature Block Setting is enabled', async () => {
       const {findAllByText} = setup({inboxSignatureBlock: true})
-      expect((await findAllByText('Loading Inbox Settings')).length).toBe(2)
+      expect(await findAllByText('Loading Inbox Settings')).toHaveLength(2)
     })
   })
 
@@ -175,7 +175,7 @@ describe('ComposeModalContainer', () => {
       await waitFor(() =>
         expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith([file], '/files/pending', {
           conversations: true,
-        })
+        }),
       )
     })
 
@@ -195,8 +195,8 @@ describe('ComposeModalContainer', () => {
         expect(uploadFileModule.uploadFiles).toHaveBeenCalledWith(
           [file1, file2],
           '/files/pending',
-          {conversations: true}
-        )
+          {conversations: true},
+        ),
       )
     })
   })
@@ -247,7 +247,7 @@ describe('ComposeModalContainer', () => {
       fireEvent.click(select) // This will fail without the fix because of an unhandled error. We can't have items with duplicate keys because of our jest-setup.
 
       const selectOptions = await component.findAllByText('Flying The Blackbird')
-      expect(selectOptions.length).toBe(1)
+      expect(selectOptions).toHaveLength(1)
     })
 
     it('does not render All Courses option', async () => {
@@ -359,9 +359,9 @@ describe('ComposeModalContainer', () => {
       await waitFor(() =>
         expect(
           component.queryByText(
-            'The following recipients have no active enrollment in the course, ["Student 2"], unable to send messages'
-          )
-        ).toBeInTheDocument()
+            'The following recipients have no active enrollment in the course, ["Student 2"], unable to send messages',
+          ),
+        ).toBeInTheDocument(),
       )
     })
 
@@ -505,7 +505,7 @@ describe('ComposeModalContainer', () => {
     fireEvent.click(button)
     expect(mockedSetOnFailure).toHaveBeenCalledWith(
       'Please insert a message body., Please select a recipient.',
-      true
+      true,
     )
 
     expect(component.findByText('Please select a recipient.')).toBeTruthy()

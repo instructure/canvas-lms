@@ -19,7 +19,6 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer'
 
-
 const defaultProps = () => ({
   discussionTopicTitle: 'Test title',
 })

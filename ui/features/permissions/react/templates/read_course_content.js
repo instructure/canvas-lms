@@ -32,7 +32,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Undelete Courses)'),
       description: I18n.t(
-        'If Courses - manage and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
+        'If Courses - manage and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.',
       ),
     },
     {
@@ -41,12 +41,12 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'User cannot manage individual course content without the appropriate permission for that content item.'
+        'User cannot manage individual course content without the appropriate permission for that content item.',
       ),
     },
     {
       description: I18n.t(
-        'If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course.'
+        'If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course.',
       ),
     },
     {
@@ -55,5 +55,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

@@ -151,7 +151,6 @@ export const SpeedGraderCheckpoint = (props: Props) => {
   }
 
   const updateTimeLate = (value: string) => {
-     
     const timeLate = parseInt(value, 10)
     const secondsLate =
       props.lateSubmissionInterval === 'hour' ? timeLate * 3600 : timeLate * 24 * 3600

@@ -55,7 +55,7 @@ export default class CoursesListRow extends React.Component {
         href: UserLink.propTypes.href,
         display_name: UserLink.propTypes.name,
         avatar_url: UserLink.propTypes.avatar_url,
-      })
+      }),
     ),
     teacher_count: number,
     sis_course_id: string,
@@ -90,7 +90,7 @@ export default class CoursesListRow extends React.Component {
   getSections = () =>
     this.promiseToGetSections ||
     (this.promiseToGetSections = axios.get(
-      `/api/v1/courses/${this.props.id}/sections?per_page=100`
+      `/api/v1/courses/${this.props.id}/sections?per_page=100`,
     )).then(resp => resp.data)
 
   uniqueTeachers = () => uniqBy(this.props.teachers, 'id')
@@ -108,7 +108,7 @@ export default class CoursesListRow extends React.Component {
             user_name: newEnrollments[0].enrollment.name,
             course_name: this.props.name,
             wrappers: [`<a href="/courses/${this.props.id}">$1</a>`],
-          }
+          },
         ),
       })
       const newStudents = newEnrollments.filter(e => e.enrollment.type === 'StudentEnrollment')
@@ -126,14 +126,13 @@ export default class CoursesListRow extends React.Component {
     if (this.props.blueprint) {
       roles = roles.filter(
         role =>
-          role.base_role_name != 'StudentEnrollment' && role.base_role_name != 'ObserverEnrollment'
+          role.base_role_name != 'StudentEnrollment' && role.base_role_name != 'ObserverEnrollment',
       )
     }
     return roles
   }
 
   openAddUsersToCourseDialog = () => {
-     
     this.getSections().then(sections => {
       this.addPeopleApp =
         this.addPeopleApp ||

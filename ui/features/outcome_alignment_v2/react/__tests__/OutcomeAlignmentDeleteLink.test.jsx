@@ -32,7 +32,7 @@ describe('OutcomeAlignmentDeleteLink', () => {
 
     expect(container.querySelector('a')).not.toBeInTheDocument()
     expect(
-      screen.getByText(/Can't delete alignments based on rubric associations./)
+      screen.getByText(/Can't delete alignments based on rubric associations./),
     ).toBeInTheDocument()
   })
 

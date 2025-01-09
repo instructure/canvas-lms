@@ -40,7 +40,7 @@ const i18nLtiPiiField = (field: LtiPiiField): string =>
     picture: I18n.t('Avatar'),
     lis_claim: I18n.t('SIS ID'),
     email: I18n.t('Email Address'),
-  }[field])
+  })[field]
 
 const allLtiPiiFields: LtiPiiField[] = [
   'id',
@@ -75,7 +75,6 @@ export const RegistrationPrivacyField = (props: RegistrationPrivacyFieldProps) =
           if (isLtiPrivacyLevel(value)) {
             props.onChange(value)
           } else {
-             
             console.warn(`${value} was not a valid Lti privacy setting`)
           }
         }}

@@ -48,7 +48,7 @@ export const ImportFailuresModal = ({
 
       return prev
     },
-    {fileNames: [] as string[], messages: [] as string[]}
+    {fileNames: [] as string[], messages: [] as string[]},
   )
 
   return (
@@ -69,7 +69,6 @@ export const ImportFailuresModal = ({
         </View>
         {/* @ts-expect-error */}
         {fileNames.map((fileName, i) => (
-           
           <View as="div" margin="x-small 0 0" key={`${fileName}-${i}`}>
             <Text weight="bold">{fileName}</Text>
           </View>

@@ -59,7 +59,7 @@ ConverterViewControl.setModel(
   new ContentMigrationModel({
     course_id: ENV.COURSE_ID,
     daySubCollection,
-  })
+  }),
 )
 
 const daySubCollectionView = new CollectionView({
@@ -97,7 +97,7 @@ progressingCollectionView.getStatusView = function (migProgress) {
   if (
     (getView = __guard__(
       __guard__(ConverterViewControl.getView(migProgress.get('migration_type')), x1 => x1.view),
-      x => x.getStatusView
+      x => x.getStatusView,
     ))
   ) {
     return getView(migProgress)

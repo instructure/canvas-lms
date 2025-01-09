@@ -26,8 +26,8 @@ $(document).ready(() => {
     const result = window.confirm(
       I18n.t(
         'confirm_reject_invitation',
-        'Are you sure you want to reject the invitation to participate in this course?'
-      )
+        'Are you sure you want to reject the invitation to participate in this course?',
+      ),
     )
     if (!result) {
       event.preventDefault()

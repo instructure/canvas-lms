@@ -73,7 +73,6 @@ export default function SpeedGraderStatusMenu({
       data = {excuse: true}
     } else if (newSelection === 'late') {
       data = {latePolicyStatus: newSelection, secondsLateOverride: secondsLate}
-       
     } else if (!isNaN(parseInt(newSelection, 10))) {
       data = {customGradeStatusId: newSelection}
     }

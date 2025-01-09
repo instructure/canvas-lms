@@ -30,16 +30,16 @@ function success(target) {
   const favorited_tooltip = I18n.t(
     'favorited_tooltip',
     'Click to remove %{course_name} from the courses menu.',
-    {course_name: courseName}
+    {course_name: courseName},
   )
   const nonfavorite_tooltip = I18n.t(
     'nonfavorited_tooltip',
     'Click to add %{course_name} to the courses menu.',
-    {course_name: courseName}
+    {course_name: courseName},
   )
   const notfavoritable_tooltip = I18n.t(
     '%{course_name} cannot be added to the courses menu unless the course is active.',
-    {course_name: courseName}
+    {course_name: courseName},
   )
 
   if (target.hasClass('course-list-favorite-course')) {
@@ -85,7 +85,6 @@ ready(() => {
     const container = document.getElementById('create_subject_modal_container')
     if (container) {
       startButton.addEventListener('click', () => {
-         
         ReactDOM.render(
           <CreateCourseModal
             isModalOpen={true}
@@ -96,7 +95,7 @@ ready(() => {
             restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
             isK5User={ENV.K5_USER}
           />,
-          container
+          container,
         )
       })
     }

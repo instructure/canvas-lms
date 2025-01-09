@@ -60,7 +60,7 @@ SortableCollectionView.prototype._initSort = function (opts) {
   this.$list.sortable(
     lodashExtend({}, this.sortOptions, opts, {
       scope: this.cid,
-    })
+    }),
   )
   this.$list.on('sortupdate', this._updateSort)
   return this.$list.disableSelection()

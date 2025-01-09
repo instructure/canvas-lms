@@ -29,7 +29,7 @@ const I18n = createI18nScope('course_wizard')
 const courseNotSetUpItem = {
   get text() {
     return I18n.t(
-      "Great, so you've got a course. Now what? Well, before you go publishing it to the world, you may want to check and make sure you've got the basics laid out.  Work through the list on the left to ensure that your course is ready to use."
+      "Great, so you've got a course. Now what? Well, before you go publishing it to the world, you may want to check and make sure you've got the basics laid out.  Work through the list on the left to ensure that your course is ready to use.",
     )
   },
   get warning() {
@@ -41,7 +41,7 @@ const courseNotSetUpItem = {
 const checklistComplete = {
   get text() {
     return I18n.t(
-      "Now that your course is set up and available, you probably won't need this checklist anymore. But we'll keep it around in case you realize later you want to try something new, or you just want a little extra help as you make changes to your course content."
+      "Now that your course is set up and available, you probably won't need this checklist anymore. But we'll keep it around in case you realize later you want to try something new, or you just want a little extra help as you make changes to your course content.",
     )
   },
   iconClass: 'icon-instructure',
@@ -102,7 +102,7 @@ class InfoFrame extends React.Component {
         } else {
           this.messageBox.focus()
         }
-      }
+      },
     )
   }
 

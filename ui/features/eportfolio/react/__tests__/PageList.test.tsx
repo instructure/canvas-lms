@@ -46,7 +46,7 @@ describe('PageList', () => {
           isOwner={true}
           onUpdate={jest.fn()}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     expect(await findByText('First Page')).toBeInTheDocument()
     expect(await findByText('Second Page')).toBeInTheDocument()
@@ -61,7 +61,7 @@ describe('PageList', () => {
           isOwner={false}
           onUpdate={jest.fn()}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     expect(await findByText('First Page')).toBeInTheDocument()
     expect(queryByTestId('1-menu')).not.toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('PageList', () => {
           isOwner={true}
           onUpdate={jest.fn()}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const addPage = await findByTestId('add-page-button')
     addPage.click()
@@ -92,7 +92,7 @@ describe('PageList', () => {
           isOwner={true}
           onUpdate={jest.fn()}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
     menuButton.click()
@@ -110,7 +110,7 @@ describe('PageList', () => {
           isOwner={true}
           onUpdate={jest.fn()}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('2-menu')
     menuButton.click()
@@ -128,7 +128,7 @@ describe('PageList', () => {
           isOwner={true}
           onUpdate={jest.fn()}
         />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
     menuButton.click()

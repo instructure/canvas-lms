@@ -174,7 +174,7 @@ describe('ContentMigrationForm', () => {
           no_redirect: false,
         },
       },
-      {overwriteRoutes: true}
+      {overwriteRoutes: true},
     )
 
     renderComponent()
@@ -200,7 +200,7 @@ describe('ContentMigrationForm', () => {
         {
           ignoreResult: true,
           onProgress: expect.any(Function),
-        }
+        },
       )
       const secondSetterFunction = setMigrationsMock.mock.calls[1][0]
       const result = secondSetterFunction([])
@@ -290,14 +290,14 @@ describe('ContentMigrationForm', () => {
           {...postResponseMock, workflow_state},
           {
             overwriteRoutes: true,
-          }
+          },
         )
         renderComponent()
         await submitAMigration()
 
         const setterFunction = setMigrationsMock.mock.calls[0][0]
         const setterFunctionResult = setterFunction([])
-        expect(setterFunctionResult.length).toBe(1)
+        expect(setterFunctionResult).toHaveLength(1)
         expect(setterFunctionResult[0].workflow_state).toBe('queued')
       })
     })
@@ -311,14 +311,14 @@ describe('ContentMigrationForm', () => {
           {...postResponseMock, workflow_state},
           {
             overwriteRoutes: true,
-          }
+          },
         )
         renderComponent()
         await submitAMigration()
 
         const setterFunction = setMigrationsMock.mock.calls[0][0]
         const setterFunctionResult = setterFunction([])
-        expect(setterFunctionResult.length).toBe(1)
+        expect(setterFunctionResult).toHaveLength(1)
         expect(setterFunctionResult[0].workflow_state).toBe('waiting_for_select')
       })
     })

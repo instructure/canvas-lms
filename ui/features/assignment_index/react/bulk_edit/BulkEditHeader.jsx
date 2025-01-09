@@ -63,13 +63,13 @@ export default function BulkEditHeader({
         originalDateField('due_at'),
         originalDateField('unlock_at'),
         originalDateField('lock_at'),
-      ].some(originalField => override.hasOwnProperty(originalField))
+      ].some(originalField => override.hasOwnProperty(originalField)),
     )
   })()
 
   const validationErrorsExist = (() => {
     return assignments.some(assignment =>
-      assignment.all_dates.some(override => Object.keys(override.errors || {}).length > 0)
+      assignment.all_dates.some(override => Object.keys(override.errors || {}).length > 0),
     )
   })()
 
@@ -88,7 +88,7 @@ export default function BulkEditHeader({
             <Text>
               {I18n.t(
                 {one: '%{count} assignment selected', other: '%{count} assignments selected'},
-                {count: selectedAssignmentsCount}
+                {count: selectedAssignmentsCount},
               )}
             </Text>
           </Flex.Item>
@@ -161,7 +161,7 @@ export default function BulkEditHeader({
           <Text>
             {I18n.t(
               {one: '%{count} assignment selected', other: '%{count} assignments selected'},
-              {count: selectedAssignmentsCount}
+              {count: selectedAssignmentsCount},
             )}
           </Text>
         </Flex.Item>

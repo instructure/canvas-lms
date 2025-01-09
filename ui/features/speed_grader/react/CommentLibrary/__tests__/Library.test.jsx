@@ -100,7 +100,7 @@ describe('Library', () => {
 
     it('hides results and calls setComment when a result is clicked', () => {
       const {getByText, queryByText} = render(
-        <Library {...defaultProps({searchResults: comments})} />
+        <Library {...defaultProps({searchResults: comments})} />,
       )
       fireEvent.click(getByText('great comment'))
       expect(queryByText('great comment')).not.toBeInTheDocument()
@@ -109,7 +109,7 @@ describe('Library', () => {
 
     it('shows results again after being closed if there are new results', () => {
       const {getByText, queryByText, rerender} = render(
-        <Library {...defaultProps({searchResults: comments})} />
+        <Library {...defaultProps({searchResults: comments})} />,
       )
       fireEvent.click(getByText('Close suggestions'))
       expect(queryByText('great comment')).not.toBeInTheDocument()
@@ -131,7 +131,7 @@ describe('Library', () => {
 
     it('hides the menu if there are no results', () => {
       const {queryByText, rerender} = render(
-        <Library {...defaultProps({searchResults: comments})} />
+        <Library {...defaultProps({searchResults: comments})} />,
       )
       rerender(<Library {...defaultProps({searchResults: []})} />)
       expect(queryByText('Insert Comment from Library')).not.toBeInTheDocument()
@@ -139,7 +139,7 @@ describe('Library', () => {
 
     it('does not render results if showSuggestions is false', () => {
       const {queryByText} = render(
-        <Library {...defaultProps({searchResults: comments, showSuggestions: false})} />
+        <Library {...defaultProps({searchResults: comments, showSuggestions: false})} />,
       )
       expect(queryByText('Insert Comment from Library')).not.toBeInTheDocument()
       expect(queryByText('great comment')).not.toBeInTheDocument()
@@ -147,7 +147,7 @@ describe('Library', () => {
 
     it('does not render suggestions if suggestionsRef is not provided', () => {
       const {queryByText} = render(
-        <Library {...defaultProps({searchResults: comments, suggestionsRef: null})} />
+        <Library {...defaultProps({searchResults: comments, suggestionsRef: null})} />,
       )
       expect(queryByText('Insert Comment from Library')).not.toBeInTheDocument()
     })
@@ -167,7 +167,7 @@ describe('Library', () => {
             searchResults: comments,
             suggestionsRef: document.getElementById('library-suggestions'),
           })}
-        />
+        />,
       )
       expect(spy).toHaveBeenCalled()
     })
@@ -181,7 +181,7 @@ describe('Library', () => {
             searchResults: comments,
             suggestionsRef: document.getElementById('library-suggestions'),
           })}
-        />
+        />,
       )
       unmount()
       expect(spy).toHaveBeenCalled()
@@ -189,7 +189,7 @@ describe('Library', () => {
 
     it('hides results if the suggestionsRef.parentNode lose focus', () => {
       const {getByText, queryByText} = render(
-        <Library {...defaultProps({searchResults: comments})} />
+        <Library {...defaultProps({searchResults: comments})} />,
       )
       expect(getByText('Insert Comment from Library')).toBeInTheDocument()
       getByText('Close suggestions').closest('button').focus()

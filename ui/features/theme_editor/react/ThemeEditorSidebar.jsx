@@ -68,7 +68,7 @@ export default function ThemeEditorSidebar(props) {
               <div>
                 <p className="Theme__editor-upload-warning_text-emphasis">
                   {I18n.t(
-                    'Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!'
+                    'Custom CSS and Javascript may cause accessibility issues or conflicts with future Canvas updates!',
                   )}
                 </p>
                 <p
@@ -77,7 +77,7 @@ export default function ThemeEditorSidebar(props) {
                       'Before implementing custom CSS or Javascript, please refer to *our documentation*.',
                       {
                         wrappers: ['<a href="' + customCssLink + '" target="_blank">$1</a>'],
-                      }
+                      },
                     ),
                   }}
                 />
@@ -115,7 +115,7 @@ export default function ThemeEditorSidebar(props) {
           <div className="Theme__editor-upload-overrides">
             <div className="Theme__editor-upload-overrides_header">
               {I18n.t(
-                'File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API.'
+                'File(s) will be included when user content is displayed within the Canvas iOS or Android apps, and in third-party apps built on our API.',
               )}
             </div>
 

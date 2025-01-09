@@ -175,7 +175,7 @@ export default function ThemeCard(props) {
                 className="Button Button--icon-action-rev"
                 data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
                 title={I18n.t(
-                  'Multiple are marked "Current theme" because the same values have been saved under multiple names—i.e., they\'re each the same as what\'s currently applied'
+                  'Multiple are marked "Current theme" because the same values have been saved under multiple names—i.e., they\'re each the same as what\'s currently applied',
                 )}
               >
                 <i className="icon-question" aria-hidden="true" />

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import ProgressModel from '@canvas/content-migrations/backbone/models/ContentMigrationProgress'
@@ -91,7 +89,7 @@ ProgressingContentMigration.prototype.syncProgressUrl = function () {
       return function () {
         return _this.progressModel.set('url', _this.get('progress_url'))
       }
-    })(this)
+    })(this),
   )
 }
 

@@ -96,7 +96,7 @@ class FlashMessageHolder extends Component {
           selected: bool,
         }).isRequired,
         status: oneOf(enumeratedStatuses(StudentActions)),
-      })
+      }),
     ).isRequired,
   }
 
@@ -109,7 +109,7 @@ class FlashMessageHolder extends Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     const changes = Object.keys(nextProps).reduce(
       (changeMap, prop) => ({...changeMap, [prop]: nextProps[prop] !== this.props[prop]}),
-      {}
+      {},
     )
 
     if (changes.loadStudentsStatus) {
@@ -167,7 +167,7 @@ class FlashMessageHolder extends Component {
 
     if (changes.updateGradeStatuses) {
       const newStatuses = nextProps.updateGradeStatuses.filter(
-        statusInfo => this.props.updateGradeStatuses.indexOf(statusInfo) === -1
+        statusInfo => this.props.updateGradeStatuses.indexOf(statusInfo) === -1,
       )
       newStatuses.forEach(statusInfo => {
         if (statusInfo.status === GradeActions.SUCCESS && statusInfo.gradeInfo.selected) {

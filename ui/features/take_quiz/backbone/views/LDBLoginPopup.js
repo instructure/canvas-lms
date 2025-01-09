@@ -98,7 +98,7 @@ export default class LDBLoginPopup extends Backbone.View {
     extend(this.options, options)
 
     const windowOptions = map(this.options.window, (v, k) =>
-      [k, isBoolean(v) ? (v ? 'yes' : 'no') : v].join('=')
+      [k, isBoolean(v) ? (v ? 'yes' : 'no') : v].join('='),
     ).join(',')
 
     // @method on
@@ -178,7 +178,6 @@ export default class LDBLoginPopup extends Backbone.View {
 
       const authenticate = this.authenticate(credentials)
 
-       
       authenticate.then(rc => {
         $delegate.triggerHandler('login_success')
         whnd.close()

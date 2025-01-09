@@ -111,7 +111,7 @@ describe('submissions', () => {
         'submission[assignment_id]': 27,
         'submission[user_id]': 1,
       }),
-      expect.any(Function)
+      expect.any(Function),
     )
   })
 
@@ -128,7 +128,7 @@ describe('submissions', () => {
         'submission[assignment_id]': 27,
         'submission[user_id]': 1,
       }),
-      expect.any(Function)
+      expect.any(Function),
     )
 
     const [, , formData] = $.ajaxJSON.mock.calls[0]

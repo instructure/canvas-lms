@@ -62,7 +62,7 @@ CollaboratorPickerView.prototype.cacheElements = function () {
   this.$template = $(
     this.template({
       id: this.options.id || 'new',
-    })
+    }),
   )
   this.$userList = this.$template.find('.available-users')
   this.$groupList = this.$template.find('.available-groups')

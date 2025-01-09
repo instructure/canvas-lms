@@ -57,7 +57,7 @@ if (loadExtension) {
     .catch(error => {
       throw new Error(
         `Failed to load extension for ui/features/account_settings/backbone/account_quota_settings.js`,
-        error
+        error,
       )
     })
 }

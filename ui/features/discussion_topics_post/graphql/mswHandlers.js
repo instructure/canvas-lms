@@ -28,8 +28,8 @@ const mswAssign = (target, ...objects) => {
     ...objects.map(object => {
       return Object.entries(object)
         .filter(([_k, v]) => v !== undefined)
-        .reduce((obj, [k, v]) => ((obj[k] = v), obj), {}) // eslint-disable-line no-sequences
-    })
+        .reduce((obj, [k, v]) => ((obj[k] = v), obj), {})
+    }),
   )
 }
 
@@ -148,7 +148,7 @@ export const handlers = [
               rating: variables.rating === 'liked',
               ratingSum: variables.rating === 'liked' ? 1 : 0,
               forcedReadState: variables.forcedReadState,
-            }
+            },
           ),
           __typename: 'UpdateDiscussionEntryParticipantPayload',
         },
@@ -164,7 +164,7 @@ export const handlers = [
             {
               deleted: true,
               message: null,
-            }
+            },
           ),
           errors: null,
           __typename: 'DeleteDiscussionEntryPayload',
@@ -182,7 +182,7 @@ export const handlers = [
               id: 'RGlzY3Vzc2lvbi0x',
               published: variables.published,
               __typename: 'Discussion',
-            }
+            },
           ),
           __typename: 'UpdateDiscussionTopicPayload',
         },
@@ -199,7 +199,7 @@ export const handlers = [
               id: 'RGlzY3Vzc2lvbi0x',
               subscribed: variables.subscribed,
               __typename: 'Discussion',
-            }
+            },
           ),
           __typename: 'SubscribeToDiscussionTopicPayload',
         },
@@ -226,7 +226,7 @@ export const handlers = [
             {
               id: variables.discussionTopicId,
               message: variables.message,
-            }
+            },
           ),
           errors: null,
           __typename: 'CreateDiscussionEntryPayload',
@@ -243,7 +243,7 @@ export const handlers = [
             {
               id: variables.discussionEntryId,
               message: variables.message,
-            }
+            },
           ),
           errors: null,
           __typename: 'UpdateDiscussionEntryPayload',

@@ -44,7 +44,7 @@ export const getGradingPeriodID = () => {
 export const filteredAssignments = (
   data,
   calculateOnlyGradedAssignments = false,
-  activeWhatIfScores = []
+  activeWhatIfScores = [],
 ) => {
   let assignments =
     data?.assignmentsConnection?.nodes.filter(assignment => {
@@ -97,7 +97,7 @@ export const sortAssignments = (sortBy, assignments) => {
     assignments = [...assignmentsWithDueDates, ...assignmentsWithoutDueDates]
   } else if (sortBy === ASSIGNMENT_SORT_OPTIONS.ASSIGNMENT_GROUP) {
     assignments = [...assignments]?.sort((a, b) =>
-      a?.assignmentGroup?.name?.localeCompare(b?.assignmentGroup?.name)
+      a?.assignmentGroup?.name?.localeCompare(b?.assignmentGroup?.name),
     )
   } else if (sortBy === ASSIGNMENT_SORT_OPTIONS.MODULE) {
     const assignmentsWithModules = assignments
@@ -199,7 +199,7 @@ export const getDisplayScore = (assignment, gradingStandard) => {
     return getZeroPointAssignmentDisplayScore(
       getAssignmentEarnedPoints(assignment),
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus,
-      gradingStandard
+      gradingStandard,
     )
 
   const earned = getAssignmentEarnedPoints(assignment)
@@ -228,7 +228,7 @@ export const getDisplayScore = (assignment, gradingStandard) => {
   ) {
     const letterGrade = getAssignmentLetterGrade(
       assignment,
-      assignment?.gradingStandard ? assignment?.gradingStandard : gradingStandard
+      assignment?.gradingStandard ? assignment?.gradingStandard : gradingStandard,
     )
     return GradeFormatHelper.replaceDashWithMinus(letterGrade)
   } else if (assignment?.gradingType === 'percentage') {
@@ -269,14 +269,14 @@ export const scorePercentageToLetterGrade = (score, gradingStandard) => {
 export const filterDroppedAssignments = (
   assignments = [],
   assignmentGroup,
-  returnDropped = false
+  returnDropped = false,
 ) => {
   if (!assignments || !assignments.length) return []
 
   const relevantSubmissions = assignments.map(assignment => {
     return convertSubmissionToDroppableSubmission(
       assignment,
-      assignment?.submissionsConnection?.nodes[0]
+      assignment?.submissionsConnection?.nodes[0],
     )
   })
 
@@ -297,7 +297,7 @@ export const filterDroppedAssignments = (
 export const listDroppedAssignments = (
   queryData,
   byGradingPeriod,
-  calculateOnlyGradedAssignments
+  calculateOnlyGradedAssignments,
 ) => {
   const processAssignmentGroup = (data, checkAssignment) => {
     return data?.assignmentGroupsConnection?.nodes
@@ -307,7 +307,7 @@ export const listDroppedAssignments = (
             return checkAssignment(assignment, assignmentGroup)
           }),
           assignmentGroup,
-          true
+          true,
         )
         return assignments
       })
@@ -326,14 +326,14 @@ export const listDroppedAssignments = (
                 )
               })
             })
-            .flat()
+            .flat(),
         ),
       ]
     : [
         ...new Set(
           processAssignmentGroup(queryData, (assignment, assignmentGroup) => {
             return assignment?.assignmentGroup?._id === assignmentGroup?._id
-          })
+          }),
         ),
       ]
 }
@@ -374,7 +374,7 @@ const removeNonGroupAssignments = (assignments, assignmentGroup) => {
 export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
   return filterDroppedAssignments(
     removeNonGroupAssignments(assignments, assignmentGroup),
-    assignmentGroup
+    assignmentGroup,
   )?.reduce((total, assignment) => {
     if (
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'excused' &&
@@ -389,7 +389,7 @@ export const getAssignmentGroupTotalPoints = (assignmentGroup, assignments) => {
 export const getAssignmentGroupEarnedPoints = (assignmentGroup, assignments) => {
   return filterDroppedAssignments(
     removeNonGroupAssignments(assignments, assignmentGroup),
-    assignmentGroup
+    assignmentGroup,
   ).reduce((total, assignment) => {
     if (
       assignment?.submissionsConnection?.nodes[0]?.gradingStatus !== 'excused' &&
@@ -421,14 +421,14 @@ export const getAssignmentGroupPercentage = (assignmentGroup, assignments, apply
 
 export const getAssignmentGroupPercentageWithPartialWeight = (
   assignmentGroups = [],
-  assignments = []
+  assignments = [],
 ) => {
   if (assignmentGroups?.length === 0 || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
   return (
     calculateTotalPercentageWithPartialWeight(
       assignmentGroups,
       group => getAssignmentGroupPercentage(group, assignments, false),
-      group => group?.groupWeight || 0
+      group => group?.groupWeight || 0,
     ) || '0'
   )
 }
@@ -457,7 +457,7 @@ export const getGradingPeriodTotalPoints = (gradingPeriod, assignments, assignme
       total +=
         getAssignmentGroupTotalPoints(
           assignmentGroup,
-          removeNonGradingPeriodAssignments(assignments, gradingPeriod)
+          removeNonGradingPeriodAssignments(assignments, gradingPeriod),
         ) || 0
       return total
     }, 0) || 0
@@ -470,7 +470,7 @@ export const getGradingPeriodEarnedPoints = (gradingPeriod, assignments, assignm
       total +=
         getAssignmentGroupEarnedPoints(
           assignmentGroup,
-          removeNonGradingPeriodAssignments(assignments, gradingPeriod)
+          removeNonGradingPeriodAssignments(assignments, gradingPeriod),
         ) || 0
       return total
     }, 0) || 0
@@ -481,7 +481,7 @@ export const getGradingPeriodPercentage = (
   gradingPeriod,
   assignments,
   assignmentGroups,
-  applyGroupWeights
+  applyGroupWeights,
 ) => {
   if (!assignments || assignments?.length === 0) return ASSIGNMENT_NOT_APPLICABLE
 
@@ -492,12 +492,12 @@ export const getGradingPeriodPercentage = (
   const gradingPeriodEarnedPoints = getGradingPeriodEarnedPoints(
     gradingPeriod,
     assignments,
-    assignmentGroups
+    assignmentGroups,
   )
   const gradingPeriodTotalPoints = getGradingPeriodTotalPoints(
     gradingPeriod,
     assignments,
-    assignmentGroups
+    assignmentGroups,
   )
 
   if (gradingPeriodTotalPoints === 0 && gradingPeriodEarnedPoints === 0)
@@ -548,7 +548,7 @@ export const getCoursePercentage = (assignments = []) => {
 export const calculateTotalPercentageWithPartialWeight = (
   items,
   getItemPercentage,
-  getItemWeight
+  getItemWeight,
 ) => {
   const filteredItems = items?.filter(item => {
     return getItemWeight(item) && getItemPercentage(item) !== 'N/A'
@@ -594,9 +594,9 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
             return assignment?.gradingPeriodId === period?._id
           }),
           assignmentGroups,
-          validGradingPeriodsCount.length === gradingPeriods.length ? applyWeights : false
+          validGradingPeriodsCount.length === gradingPeriods.length ? applyWeights : false,
         ),
-      period => period?.weight || 0
+      period => period?.weight || 0,
     )
   } else if (applyWeights) {
     returnTotal = getAssignmentGroupPercentageWithPartialWeight(assignmentGroups, assignments)
@@ -616,7 +616,7 @@ export const getTotal = (assignments, assignmentGroups, gradingPeriods, applyWei
 
         return coursePoints
       },
-      {possiblePoints: 0, earnedPoints: 0}
+      {possiblePoints: 0, earnedPoints: 0},
     )
 
     returnTotal = `${(earnedPoints / possiblePoints) * 100}`

@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -100,7 +99,7 @@ $(document).ready(function () {
       .confirmDelete({
         message: I18n.t(
           'confirms.delete_enrollment',
-          'Are you sure you want to delete this enrollment permanently?'
+          'Are you sure you want to delete this enrollment permanently?',
         ),
         url: $(this).attr('href'),
         success() {
@@ -167,14 +166,14 @@ $(document).ready(function () {
                         {
                           course_sisid: item.sis_id,
                           course_term: item.term,
-                        }
+                        },
                       )
                     : I18n.t('course.term', 'Term: %{course_term}', {
                         course_term: item.term,
-                      })
-                )
-              )
-          )
+                      }),
+                ),
+              ),
+          ),
       )
       .appendTo(ul)
   }
@@ -240,7 +239,7 @@ $(document).ready(function () {
           const errorText = I18n.t(
             'errors.course_not_authorized_for_crosslist',
             '%{course_name} not authorized for cross-listing',
-            {course_name: course.name}
+            {course_name: course.name},
           )
           $('#course_autocomplete_name').text(errorText)
           $.screenReaderFlashError(errorText)
@@ -249,9 +248,9 @@ $(document).ready(function () {
       },
       _data => {
         $('#course_autocomplete_name').text(
-          I18n.t('errors.confirmation_failed', 'Confirmation Failed')
+          I18n.t('errors.confirmation_failed', 'Confirmation Failed'),
         )
-      }
+      },
     )
   })
 })

@@ -25,7 +25,7 @@ export const usePlacements = (registration: LtiImsRegistration): LtiPlacement[] 
   return React.useMemo(() => {
     return (
       canvasPlatformSettings(registration.default_configuration)?.settings.placements.map(
-        p => p.placement
+        p => p.placement,
       ) ?? []
     )
   }, [registration.default_configuration])

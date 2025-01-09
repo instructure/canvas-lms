@@ -44,7 +44,7 @@ describe('PointsPossible', () => {
         {...defaultProps}
         pointsPossible={0}
         setPointsPossible={mockSetPointsPossible}
-      />
+      />,
     )
 
     const input = getByTestId('points-possible-input')
@@ -60,7 +60,7 @@ describe('PointsPossible', () => {
         {...defaultProps}
         pointsPossible={0}
         setPointsPossible={mockSetPointsPossible}
-      />
+      />,
     )
 
     const input = getByTestId('points-possible-input')
@@ -83,7 +83,7 @@ describe('PointsPossible', () => {
         {...defaultProps}
         pointsPossible={0}
         setPointsPossible={mockSetPointsPossible}
-      />
+      />,
     )
 
     const input = getByTestId('points-possible-input')

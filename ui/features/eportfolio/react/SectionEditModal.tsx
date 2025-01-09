@@ -53,7 +53,7 @@ const validationSchema = z.object({
       NAME_MAX_LENGTH,
       I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
         nameMaxLength: NAME_MAX_LENGTH,
-      })
+      }),
     ),
 })
 
@@ -135,7 +135,7 @@ function SectionEditModal(props: Props) {
           props.portfolio.id,
           sectionOrder.map(s => {
             return s.id
-          })
+          }),
         )
           .then(props.onConfirm)
           .catch(() => {
@@ -158,7 +158,7 @@ function SectionEditModal(props: Props) {
             value={sectionOption.name}
           >
             {sectionOption.name}
-          </SimpleSelect.Option>
+          </SimpleSelect.Option>,
         )
       }
       return acc
@@ -166,7 +166,7 @@ function SectionEditModal(props: Props) {
     options.push(
       <SimpleSelect.Option key="bottom" id="bottom" value={I18n.t('At the bottom')}>
         {I18n.t('At the bottom')}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
     return options
   }

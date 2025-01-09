@@ -77,7 +77,7 @@ export interface Lti1p3RegistrationOverlayActions {
   setDefaultTargetLinkURI: (targetLinkURI: string) => void
   setOIDCInitiationURI: (oidcInitiationURI: string) => void
   setJwkMethod: (
-    jwkMethod: Required<Lti1p3RegistrationOverlayState['launchSettings']['JwkMethod']>
+    jwkMethod: Required<Lti1p3RegistrationOverlayState['launchSettings']['JwkMethod']>,
   ) => void
   setJwkURL: (jwkURL: string) => void
   setJwk: (jwk: string) => void
@@ -104,7 +104,7 @@ const stateFor = (state: Lti1p3RegistrationOverlayState) => ({state})
 
 const updateLaunchSetting = <K extends keyof Lti1p3RegistrationOverlayState['launchSettings']>(
   key: K,
-  value: Lti1p3RegistrationOverlayState['launchSettings'][K]
+  value: Lti1p3RegistrationOverlayState['launchSettings'][K],
 ) =>
   updateState(state => ({
     ...state,
@@ -152,7 +152,7 @@ const updateMessageType = (placement: LtiPlacement, messageType: LtiMessageType)
 
 export const computeCourseNavDefaultValue = (
   state: Lti1p3RegistrationOverlayState,
-  internalConfig?: InternalLtiConfiguration
+  internalConfig?: InternalLtiConfiguration,
 ): 'enabled' | 'disabled' | undefined => {
   const courseNavConfig = internalConfig?.placements.find(p => p.placement === 'course_navigation')
   if (typeof state.placements.courseNavigationDefaultDisabled !== 'undefined') {
@@ -166,7 +166,7 @@ export const computeCourseNavDefaultValue = (
 export const createLti1p3RegistrationOverlayStore = (
   internalConfig: InternalLtiConfiguration,
   adminNickname?: string,
-  existingOverlay?: LtiConfigurationOverlay
+  existingOverlay?: LtiConfigurationOverlay,
 ) =>
   create<{state: Lti1p3RegistrationOverlayState} & Lti1p3RegistrationOverlayActions>(set => ({
     state: initialOverlayStateFromInternalConfig(internalConfig, adminNickname, existingOverlay),
@@ -191,7 +191,7 @@ export const createLti1p3RegistrationOverlayStore = (
         updateState(state => ({
           ...state,
           naming: {...state.naming, description: filterEmptyString(description)},
-        }))
+        })),
       ),
     setPlacementLabel: (placement, name) =>
       set(
@@ -204,7 +204,7 @@ export const createLti1p3RegistrationOverlayStore = (
               [placement]: filterEmptyString(name),
             },
           },
-        }))
+        })),
       ),
     toggleScope: scope => {
       set(
@@ -223,7 +223,7 @@ export const createLti1p3RegistrationOverlayStore = (
               scopes: updatedScopes,
             },
           }
-        })
+        }),
       )
     },
     setPrivacyLevel: privacyLevel =>
@@ -234,7 +234,7 @@ export const createLti1p3RegistrationOverlayStore = (
             ...state.data_sharing,
             privacy_level: privacyLevel,
           },
-        }))
+        })),
       ),
     toggleCourseNavigationDefaultDisabled: () => {
       set(
@@ -246,7 +246,7 @@ export const createLti1p3RegistrationOverlayStore = (
               courseNavigationDefaultDisabled: !state.placements.courseNavigationDefaultDisabled,
             },
           }
-        })
+        }),
       )
     },
     togglePlacement: placement => {
@@ -267,7 +267,7 @@ export const createLti1p3RegistrationOverlayStore = (
               placements: updatedPlacements,
             },
           }
-        })
+        }),
       )
     },
     setPlacementIconUrl: (placement, iconUrl) => {
@@ -283,7 +283,7 @@ export const createLti1p3RegistrationOverlayStore = (
               },
             },
           }
-        })
+        }),
       )
     },
   }))
@@ -295,7 +295,7 @@ export const keys = <T>(object?: T): Array<keyof T> => {
 export type Lti1p3RegistrationOverlayStore = ReturnType<typeof createLti1p3RegistrationOverlayStore>
 
 export const formatCustomFields = (
-  customFields: Record<string, string> | null | undefined
+  customFields: Record<string, string> | null | undefined,
 ): string | undefined => {
   return customFields
     ? Object.entries(customFields).reduce((acc, [key, value]) => {

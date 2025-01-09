@@ -50,14 +50,14 @@ describe('OutcomeDescription', () => {
 
   const render = (
     children,
-    {friendlyDescriptionFF = false, accountLevelMasteryScalesFF = true, isStudent = false} = {}
+    {friendlyDescriptionFF = false, accountLevelMasteryScalesFF = true, isStudent = false} = {},
   ) => {
     return rtlRender(
       <OutcomesContext.Provider
         value={{env: {friendlyDescriptionFF, accountLevelMasteryScalesFF, isStudent}}}
       >
         {children}
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -83,7 +83,7 @@ describe('OutcomeDescription', () => {
 
   it('renders non-expandable description when description is provided in text format and truncate prop true', () => {
     const {queryByTestId} = render(
-      <OutcomeDescription {...defaultProps({description: 'Text description'})} />
+      <OutcomeDescription {...defaultProps({description: 'Text description'})} />,
     )
     expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
   })
@@ -100,7 +100,7 @@ describe('OutcomeDescription', () => {
           />,
           {
             friendlyDescriptionFF: true,
-          }
+          },
         )
         expect(queryByTestId(friendlyExpandedTestId)).toBeInTheDocument()
       })
@@ -116,7 +116,7 @@ describe('OutcomeDescription', () => {
           {
             friendlyDescriptionFF: true,
             isStudent: true,
-          }
+          },
         )
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
         expect(getByText('Friendly Description')).toBeInTheDocument()
@@ -133,7 +133,7 @@ describe('OutcomeDescription', () => {
           />,
           {
             friendlyDescriptionFF: true,
-          }
+          },
         )
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
         expect(queryByTestId('Description')).not.toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('OutcomeDescription', () => {
               truncated: false,
               friendlyDescription: 'Friendly Description',
             })}
-          />
+          />,
         )
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
       })
@@ -164,7 +164,7 @@ describe('OutcomeDescription', () => {
           />,
           {
             isStudent: true,
-          }
+          },
         )
         expect(getByTestId(expandedTestId)).toBeInTheDocument()
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
@@ -180,7 +180,7 @@ describe('OutcomeDescription', () => {
           <OutcomeDescription {...defaultProps({description: null, truncated: false})} />,
           {
             accountLevelMasteryScalesFF: false,
-          }
+          },
         )
         expect(queryByTestId(ratingsTestId)).toBeInTheDocument()
       })

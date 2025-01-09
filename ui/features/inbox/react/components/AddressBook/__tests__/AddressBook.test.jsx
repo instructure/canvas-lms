@@ -88,7 +88,7 @@ const setup = props => {
       <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
         <AddressBook {...props} />
       </AlertManagerContext.Provider>
-    </ApolloProvider>
+    </ApolloProvider>,
   )
 }
 
@@ -258,7 +258,7 @@ describe('Address Book Component', () => {
       fireEvent.focus(input)
       fireEvent.keyDown(input, {key: 'ArrowDown', keyCode: 40})
       fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
-      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls).toHaveLength(1)
       expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuUsers')
     })
 
@@ -270,7 +270,7 @@ describe('Address Book Component', () => {
       fireEvent.keyDown(input, {key: 'ArrowUp', keyCode: 38})
       fireEvent.keyDown(input, {key: 'ArrowUp', keyCode: 38})
       fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
-      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls).toHaveLength(1)
       expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuCourse')
     })
 
@@ -294,7 +294,7 @@ describe('Address Book Component', () => {
         isLoadingMoreMenuData: false,
       })
 
-      expect(queryAllByTestId('address-book-item').length).toBe(0)
+      expect(queryAllByTestId('address-book-item')).toHaveLength(0)
       expect(queryByTestId('address-book-popover')).not.toBeInTheDocument()
       expect(queryByTestId('menu-loading-spinner')).toBeInTheDocument()
     })
@@ -341,7 +341,7 @@ describe('Address Book Component', () => {
 
       const tag = await screen.findByTestId('address-book-tag')
       expect(tag.getAttribute('id')).toBe(
-        `address-book-label-${current_filter.context.contextID}-selectContext`
+        `address-book-label-${current_filter.context.contextID}-selectContext`,
       )
 
       expect(tag).toBeTruthy()
@@ -368,7 +368,7 @@ describe('Address Book Component', () => {
       fireEvent.mouseDown(items2[5])
 
       const tags = await screen.findAllByTestId('address-book-tag')
-      expect(tags.length).toBe(2)
+      expect(tags).toHaveLength(2)
     })
 
     it('Should pass back selected IDs as an array', async () => {
@@ -405,7 +405,7 @@ describe('Address Book Component', () => {
       const {findByTestId} = setup({...defaultProps, onTextChange: onChangeSpy})
       const input = await findByTestId('-address-book-input')
       fireEvent.change(input, {target: {value: 'Test'}})
-      expect(onChangeSpy.mock.calls.length).toBe(1)
+      expect(onChangeSpy.mock.calls).toHaveLength(1)
     })
 
     it('Should select item when clicked', async () => {
@@ -414,7 +414,7 @@ describe('Address Book Component', () => {
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
-      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls).toHaveLength(1)
     })
 
     it('Should call onUserFilterSelect when item is selected', async () => {
@@ -430,7 +430,7 @@ describe('Address Book Component', () => {
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[4])
-      expect(onUserFilterSelectSpy.mock.calls.length).toBe(1)
+      expect(onUserFilterSelectSpy.mock.calls).toHaveLength(1)
     })
 
     it('Should call back for group clicks', async () => {
@@ -439,7 +439,7 @@ describe('Address Book Component', () => {
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[1])
-      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls).toHaveLength(1)
       expect(onSelectSpy.mock.calls[0][0].itemType).toBe(CONTEXT_TYPE)
     })
 
@@ -449,7 +449,7 @@ describe('Address Book Component', () => {
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[3])
-      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls).toHaveLength(1)
       expect(onSelectSpy.mock.calls[0][0].itemType).toBe(CONTEXT_TYPE)
       expect(onSelectSpy.mock.calls[0][0].isLast).toBe(true)
     })
@@ -460,7 +460,7 @@ describe('Address Book Component', () => {
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[0])
-      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls).toHaveLength(1)
       expect(onSelectSpy.mock.calls[0][0].itemType).toBe(BACK_BUTTON_TYPE)
     })
   })

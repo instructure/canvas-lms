@@ -72,16 +72,18 @@ export const ContentSelectionModal = ({
     const rootItems: Item[] = []
 
     for (const {type, title, property, sub_items, count, sub_items_url, migration_id} of response) {
-      const rootItem = responseToItem({
-        type,
-        title,
-        property,
-        sub_items,
-        migration_id,
-      }, I18n)
+      const rootItem = responseToItem(
+        {
+          type,
+          title,
+          property,
+          sub_items,
+          migration_id,
+        },
+        I18n,
+      )
 
       if (sub_items_url && count) {
-         
         const {json} = await doFetchApi<GenericItemResponse[]>({
           path: sub_items_url,
           method: 'GET',
@@ -156,7 +158,7 @@ export const ContentSelectionModal = ({
       <View display="block" padding="0 0 xx-large">
         <Text>
           {I18n.t(
-            'This file appears to be empty. Do you still want to proceed with content selection?'
+            'This file appears to be empty. Do you still want to proceed with content selection?',
           )}
         </Text>
       </View>

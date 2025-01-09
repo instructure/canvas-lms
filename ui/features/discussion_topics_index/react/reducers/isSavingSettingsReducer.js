@@ -24,7 +24,7 @@ const isSavingSettingsReducer = handleActions(
     [actionTypes.SAVING_SETTINGS_SUCCESS]: () => false,
     [actionTypes.SAVING_SETTINGS_FAIL]: () => false,
   },
-  false
+  false,
 )
 
 export default isSavingSettingsReducer

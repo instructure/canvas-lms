@@ -160,7 +160,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
       {
         endDate: date ? date.toISOString() : '',
       },
-      () => this.validateDates()
+      () => this.validateDates(),
     )
   }
 

@@ -48,7 +48,7 @@ describe('OverrideSummary', () => {
 
     const dates = `${tz.format(unlockAt, I18n.t('#date.formats.short'))} to ${tz.format(
       lockAt,
-      I18n.t('#date.formats.short')
+      I18n.t('#date.formats.short'),
     )}`
     expect(getAllByText(dates)[0]).toBeInTheDocument()
 

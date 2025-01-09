@@ -35,10 +35,9 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
-   
   ReactDOM.render(
     <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
-    parent
+    parent,
   )
 }
 
@@ -106,7 +105,7 @@ export default class ConfirmDeleteModal extends Component {
               one: 'You are about to delete 1 announcement. Are you sure?',
               other: 'You are about to delete %{count} announcements. Are you sure?',
             },
-            {count: this.props.selectedCount}
+            {count: this.props.selectedCount},
           )}
         </Modal.Body>
         <Modal.Footer>

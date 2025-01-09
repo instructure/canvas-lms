@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        'Allows user to search by course ID or assignment ID in grade change logs in Admin Tools (not available at the subaccount level.)'
+        'Allows user to search by course ID or assignment ID in grade change logs in Admin Tools (not available at the subaccount level.)',
       ),
     },
     {
@@ -40,7 +40,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'Allows user to like discussion posts when the Only Graders Can Like checkbox is selected.'
+        'Allows user to like discussion posts when the Only Graders Can Like checkbox is selected.',
       ),
     },
     {
@@ -49,7 +49,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to access Gradebook History. Allows user to access the Learning Mastery Gradebook (if enabled).'
+        'Allows user to access Gradebook History. Allows user to access the Learning Mastery Gradebook (if enabled).',
       ),
     },
     {
@@ -69,13 +69,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        'To search grade change logs, Grades - view change logs must also be enabled.'
+        'To search grade change logs, Grades - view change logs must also be enabled.',
       ),
     },
     {
       title: I18n.t('Analytics'),
       description: I18n.t(
-        'To view student analytics in course analytics, Analytics - view must also be enabled.'
+        'To view student analytics in course analytics, Analytics - view must also be enabled.',
       ),
     },
     {
@@ -85,35 +85,35 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Gradebook, SpeedGrader'),
       description: I18n.t(
-        'Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades are disabled.'
+        'Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades are disabled.',
       ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'To view student analytics, Users - view list and Analytics - view must also be enabled.'
+        'To view student analytics, Users - view list and Analytics - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.'
+        'To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.'
+        'To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To view the submission log, Quizzes - view submission log must also be enabled.'
+        'To view the submission log, Quizzes - view submission log must also be enabled.',
       ),
     },
     {
       title: I18n.t('Reports'),
       description: I18n.t(
-        'To access the Student Interactions report, Reports - manage must also be enabled.'
+        'To access the Student Interactions report, Reports - manage must also be enabled.',
       ),
     },
   ],
@@ -129,7 +129,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'Allows user to like discussion posts when the Only Graders Can Like checkbox is selected.'
+        'Allows user to like discussion posts when the Only Graders Can Like checkbox is selected.',
       ),
     },
     {
@@ -155,35 +155,35 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Analytics'),
       description: I18n.t(
-        'To view student analytics in course analytics, Analytics - view must also be enabled.'
+        'To view student analytics in course analytics, Analytics - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Gradebook, SpeedGrader'),
       description: I18n.t(
-        'Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades are disabled.'
+        'Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades are disabled.',
       ),
     },
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To view student analytics, Users - view list and Analytics - view must also be enabled.'
+        'To view student analytics, Users - view list and Analytics - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        'To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.'
+        'To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.'
+        'To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.',
       ),
     },
     {
       title: I18n.t('Settings'),
       description: I18n.t('Course Grading Schemes can be enabled/disabled in Course Settings.'),
     },
-  ]
+  ],
 )

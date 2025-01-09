@@ -33,7 +33,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to search grade change logs by grader or student in Admin Tools.'
+        'Allows user to search grade change logs by grader or student in Admin Tools.',
       ),
     },
     {
@@ -47,7 +47,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'Allows user to send a message in Conversations without selecting a course.'
+        'Allows user to send a message in Conversations without selecting a course.',
       ),
     },
     {
@@ -68,7 +68,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view the Prior Enrollments button in the course People page.'
+        'Allows user to view the Prior Enrollments button in the course People page.',
       ),
     },
     {
@@ -84,18 +84,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
-        'To generate login/logout activity in Admin Tools, Users - manage login details or Statistics - view must also be enabled.'
+        'To generate login/logout activity in Admin Tools, Users - manage login details or Statistics - view must also be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To generate grade change logs in Admin Tools, Grades - view change logs must also be enabled.'
+        'To generate grade change logs in Admin Tools, Grades - view change logs must also be enabled.',
       ),
     },
     {
       title: I18n.t('Courses'),
       description: I18n.t(
-        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
+        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).',
       ),
     },
     {
@@ -111,7 +111,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
-        'To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.'
+        'To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.',
       ),
     },
     {
@@ -123,7 +123,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'To edit a user’s section, the appropriate Users permission (e.g. Users - Teachers), Users - allow administrative actions in courses, and Conversations - send to individual course members must also be enabled.'
+        'To edit a user’s section, the appropriate Users permission (e.g. Users - Teachers), Users - allow administrative actions in courses, and Conversations - send to individual course members must also be enabled.',
       ),
     },
   ],
@@ -150,7 +150,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to view the Prior Enrollments button in the course People page.'
+        'Allows user to view the Prior Enrollments button in the course People page.',
       ),
     },
     {
@@ -162,7 +162,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Conversations'),
       description: I18n.t(
-        'To send a message to an individual user, Conversations - send messages to individual course members must also be enabled.'
+        'To send a message to an individual user, Conversations - send messages to individual course members must also be enabled.',
       ),
     },
     {
@@ -178,13 +178,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
+        'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).',
       ),
     },
     {
       description: I18n.t(
-        'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.'
+        'To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled.',
       ),
     },
-  ]
+  ],
 )

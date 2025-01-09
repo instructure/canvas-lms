@@ -60,7 +60,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={basicNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText(basicNote.langs.en.title)).toBeInTheDocument()
     expect(getByText(basicNote.langs.en.description)).toBeInTheDocument()
@@ -73,7 +73,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={basicNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('English')).toBeInTheDocument()
   })
@@ -84,7 +84,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={fancyNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('English, Spanish')).toBeInTheDocument()
   })
@@ -95,7 +95,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={basicNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('Everyone')).toBeInTheDocument()
   })
@@ -106,7 +106,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={fancyNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('Students, Observers')).toBeInTheDocument()
   })
@@ -117,7 +117,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={basicNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('Unpublished')).toBeInTheDocument()
   })
@@ -128,7 +128,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={fancyNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('Published')).toBeInTheDocument()
   })
@@ -139,7 +139,7 @@ describe('release notes row', () => {
         <tbody>
           <NotesTableRow note={basicNote} />
         </tbody>
-      </table>
+      </table>,
     )
     expect(getByText('Menu')).toBeInTheDocument()
   })

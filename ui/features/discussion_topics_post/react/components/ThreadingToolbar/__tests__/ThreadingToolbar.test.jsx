@@ -49,7 +49,7 @@ describe('ThreadingToolbar', () => {
       <ThreadingToolbar searchTerm="" filter="unread">
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(getByText('Go to Reply')).toBeTruthy()
@@ -60,7 +60,7 @@ describe('ThreadingToolbar', () => {
       <ThreadingToolbar searchTerm="" filter="unread" isSplitView={true}>
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(queryByText('Go to Reply')).toBeNull()
@@ -71,7 +71,7 @@ describe('ThreadingToolbar', () => {
       <ThreadingToolbar searchTerm="asdf">
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(getByText('Go to Reply')).toBeTruthy()
@@ -90,7 +90,7 @@ describe('ThreadingToolbar', () => {
           })}
           searchTerm="neato"
           onOpenSplitView={onOpenSplitView}
-        />
+        />,
       )
 
       fireEvent.click(container.getByText('Go to Reply'))
@@ -110,7 +110,7 @@ describe('ThreadingToolbar', () => {
           })}
           searchTerm="neato"
           onOpenSplitView={onOpenSplitView}
-        />
+        />,
       )
 
       fireEvent.click(container.getByText('Go to Reply'))
@@ -129,7 +129,7 @@ describe('ThreadingToolbar', () => {
         })}
         searchTerm="neato"
         onOpenSplitView={onOpenSplitView}
-      />
+      />,
     )
 
     fireEvent.click(container.getByText('Go to Reply'))
@@ -141,7 +141,7 @@ describe('ThreadingToolbar', () => {
       <ThreadingToolbar filter="all" searchTerm="" isSplitView={false}>
         <>First</>
         <>Second</>
-      </ThreadingToolbar>
+      </ThreadingToolbar>,
     )
 
     expect(getByText('First')).toBeTruthy()
@@ -160,7 +160,7 @@ describe('ThreadingToolbar', () => {
         <ThreadingToolbar>
           <>First</>
           <>Second</>
-        </ThreadingToolbar>
+        </ThreadingToolbar>,
       )
 
       expect(queryAllByTestId('mobile-thread-tool')).toBeTruthy()

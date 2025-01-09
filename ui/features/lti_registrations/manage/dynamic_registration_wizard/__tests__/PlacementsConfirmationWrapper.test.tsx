@@ -44,7 +44,7 @@ describe('PlacementsConfirmation', () => {
     render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     expect(
-      screen.getByText(/This tool has not requested access to any placements/i)
+      screen.getByText(/This tool has not requested access to any placements/i),
     ).toBeInTheDocument()
   })
 
@@ -64,7 +64,7 @@ describe('PlacementsConfirmation', () => {
     })
 
     expect(
-      screen.getByTestId(`placement-img-${LtiPlacements.CourseNavigation}`)
+      screen.getByTestId(`placement-img-${LtiPlacements.CourseNavigation}`),
     ).toBeInTheDocument()
   })
 
@@ -114,7 +114,7 @@ describe('PlacementsConfirmation', () => {
     render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const boxes = screen.getAllByText('Default to Hidden')
-    expect(boxes.length).toBe(1)
+    expect(boxes).toHaveLength(1)
   })
 
   it("renders the default disabled checkbox as on when the registration has default='disabled'", () => {
@@ -173,7 +173,7 @@ describe('PlacementsConfirmation', () => {
     render(<PlacementsConfirmationWrapper registration={reg} overlayStore={overlayStore} />)
 
     const boxes = screen.queryAllByText('Default to Hidden')
-    expect(boxes.length).toBe(0)
+    expect(boxes).toHaveLength(0)
   })
 
   it('renders a checkbox for each placement in the configuration', () => {

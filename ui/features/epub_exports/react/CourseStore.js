@@ -49,7 +49,7 @@ CourseEpubExportStore.create = function (id) {
       _courses[data.id] = data
       CourseEpubExportStore.setState(_courses)
     },
-    'json'
+    'json',
   )
 }
 

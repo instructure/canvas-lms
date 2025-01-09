@@ -25,7 +25,7 @@ import {useMemo} from 'react'
 import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 
 export const getTermsNextPage = (
-  lastPage: DoFetchApiResults<EnrollmentTerms>
+  lastPage: DoFetchApiResults<EnrollmentTerms>,
 ): NextPageTerms | undefined => {
   const isResultEmpty = !lastPage.json?.enrollment_terms.length
   if (isResultEmpty) {
@@ -60,7 +60,7 @@ export const useTermsQuery = (accountId: string) => {
 
   const terms: Term[] = useMemo(
     () => data?.pages.flatMap(page => page.json?.enrollment_terms || []) ?? [],
-    [data]
+    [data],
   ).map(term => ({id: term.id, name: term.name, startAt: term.start_at, endAt: term.end_at}))
 
   return {

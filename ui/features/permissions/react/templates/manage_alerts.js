@@ -30,5 +30,5 @@ export const template = generateActionTemplates(
   ],
   [],
   [],
-  []
+  [],
 )

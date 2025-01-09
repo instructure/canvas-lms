@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -86,7 +84,7 @@ ContentCheckboxView.prototype.toJSON = function () {
       },
       {
         count: json.submodule_count,
-      }
+      },
     )
   }
   json.screenreaderType = {
@@ -187,7 +185,7 @@ ContentCheckboxView.prototype.fetchSublevelCheckboxes = function (silent) {
       return function () {
         return _this.$el.trigger('doneFetchingCheckboxes', _this.$el.find('#checkbox-' + _this.cid))
       }
-    })(this)
+    })(this),
   )
   if (!silent) {
     this.$el.disableWhileLoading(dfd)

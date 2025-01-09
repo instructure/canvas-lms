@@ -85,7 +85,7 @@ export const NonGradedDateOptions = ({
             newAvailableFrom,
             availableUntil,
             isGraded,
-            setAvailabilityValidationMessages
+            setAvailabilityValidationMessages,
           )
           // @ts-expect-error
           setAvailableFrom(newAvailableFrom)
@@ -130,7 +130,7 @@ export const NonGradedDateOptions = ({
             availableFrom,
             newAvailableUntil,
             isGraded,
-            setAvailabilityValidationMessages
+            setAvailabilityValidationMessages,
           )
           // @ts-expect-error
           setAvailableUntil(newAvailableUntil)

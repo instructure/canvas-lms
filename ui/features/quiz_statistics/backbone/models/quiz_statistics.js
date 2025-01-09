@@ -34,7 +34,7 @@ const QuizStatistics = Backbone.Model.extend({
 
     attrs.submissionStatistics = pickAndNormalize(
       payload.submission_statistics,
-      K.SUBMISSION_STATISTICS_ATTRS
+      K.SUBMISSION_STATISTICS_ATTRS,
     )
 
     attrs.questionStatistics = wrap(payload.question_statistics).map(parseQuestion)

@@ -119,7 +119,7 @@ describe('ExternalApps.ExternalAppsStore', () => {
         },
         () => {
           reject(new Error('Unable to update app center access token'))
-        }
+        },
       )
     })
   })
@@ -169,7 +169,7 @@ describe('ExternalApps.ExternalAppsStore', () => {
             expect(statusText).toBe('success')
             resolve()
           },
-          () => reject(new Error('Failed to save external tool'))
+          () => reject(new Error('Failed to save external tool')),
         )
       })
     })

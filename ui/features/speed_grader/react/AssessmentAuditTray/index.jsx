@@ -71,7 +71,6 @@ export default class AssessmentAuditTray extends Component {
 
     const {assignment, courseId, submission} = context
 
-     
     this.props.api
       .loadAssessmentAuditTrail(courseId, assignment.id, submission.id)
       .then(auditData => {
@@ -82,7 +81,6 @@ export default class AssessmentAuditTray extends Component {
           })
         }
       })
-     
   }
 
   render() {

@@ -57,7 +57,7 @@ const componentOverrides = {
 const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcomeHandler}) => {
   const [title, titleChangeHandler, titleChanged] = useInput(outcome.title)
   const [displayName, displayNameChangeHandler, displayNameChanged] = useInput(
-    outcome.displayName || ''
+    outcome.displayName || '',
   )
   const [description, setDescription, descriptionChanged] = useInput(outcome.description || '')
   const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
@@ -170,7 +170,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
               variables: {
                 input,
               },
-            })
+            }),
           )
         }
 
@@ -185,7 +185,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   outcomeId: outcome._id,
                 },
               },
-            })
+            }),
           )
         }
 

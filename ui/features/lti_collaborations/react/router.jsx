@@ -47,7 +47,7 @@ const attachListeners = () => {
           service_id: event.data?.service_id,
           contentItems: [item],
           tool_id: event.data?.tool_id,
-        })
+        }),
       )
     } catch {
       store.dispatch(actions.externalContentRetrievalFailed)
@@ -72,8 +72,8 @@ function renderShowCollaborations(ctx) {
   store.dispatch(
     actions.getCollaborations(
       `/api/v1/${ctx.params.context}/${ctx.params.contextId}/collaborations`,
-      true
-    )
+      true,
+    ),
   )
 
   const view = () => {
@@ -93,7 +93,7 @@ function renderLaunchTool(ctx) {
       root = createRoot(document.getElementById('content'))
     }
     root.render(
-      <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />
+      <CollaborationsToolLaunch launchUrl={ctx.path.replace('/lti_collaborations', '')} />,
     )
   }
   view()

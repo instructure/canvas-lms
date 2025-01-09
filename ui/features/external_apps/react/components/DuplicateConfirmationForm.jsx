@@ -37,7 +37,7 @@ export default function DuplicateConfirmationForm(props) {
       <div className="ReactModal__Body">
         <p data-testid="confirmation-message">
           {I18n.t(
-            'This tool has already been installed in this context. Would you like to install it anyway?'
+            'This tool has already been installed in this context. Would you like to install it anyway?',
           )}
         </p>
       </div>
@@ -52,8 +52,8 @@ export default function DuplicateConfirmationForm(props) {
           >
             {I18n.t('No, Cancel Installation')}
           </Button>
-          <Button 
-            id="continue-install" 
+          <Button
+            id="continue-install"
             data-testid="continue-install-button"
             onClick={forceSaveTool}
           >

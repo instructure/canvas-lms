@@ -46,7 +46,7 @@ const defaultProps = (props = {}) => {
       userCanEditFilesForContext: true,
       userCanRestrictFilesForContext: true,
     },
-    props
+    props,
   )
 }
 

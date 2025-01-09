@@ -37,7 +37,7 @@ export function Primary(args) {
     _ => {
       setColor(args.submitColor)
     },
-    [args.submitColor]
+    [args.submitColor],
   )
 
   return (

@@ -42,7 +42,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
   })
 
   const [setCalculationMethodQuery, {error: setCalculationMethodError}] = useMutation(
-    SET_OUTCOME_CALCULATION_METHOD
+    SET_OUTCOME_CALCULATION_METHOD,
   )
 
   const setCalculationMethod = useCallback(
@@ -53,10 +53,10 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
         showFlashAlert({
           message: I18n.t('Mastery calculation saved'),
           type: 'success',
-        })
+        }),
       )
     },
-    [contextType, contextId, setCalculationMethodQuery]
+    [contextType, contextId, setCalculationMethodQuery],
   )
 
   if (loading) {
@@ -90,7 +90,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
       {accountRoles.length > 0 && (
         <RoleList
           description={I18n.t(
-            'Permission to change this mastery calculation at the account level is enabled for:'
+            'Permission to change this mastery calculation at the account level is enabled for:',
           )}
           roles={accountRoles}
         />
@@ -99,7 +99,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
       {roles.length > 0 && (
         <RoleList
           description={I18n.t(
-            'Permission to change this mastery calculation at the course level is enabled for:'
+            'Permission to change this mastery calculation at the course level is enabled for:',
           )}
           roles={roles}
         />

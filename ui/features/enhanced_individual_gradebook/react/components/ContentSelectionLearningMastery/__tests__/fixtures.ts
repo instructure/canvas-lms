@@ -248,7 +248,7 @@ export const defaultOutcomes = [
 ]
 
 export function makeContentSelectionProps(
-  props: Partial<ContentSelectionComponentProps> = {}
+  props: Partial<ContentSelectionComponentProps> = {},
 ): ContentSelectionComponentProps {
   return {...defaultContentSelectionProps, ...props}
 }

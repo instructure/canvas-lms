@@ -37,7 +37,6 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
-    // eslint-disable-next-line no-await-in-loop
     await act(async () => {
       jest.runAllTimers()
     })
@@ -82,7 +81,7 @@ describe('LibraryManager', () => {
     func(
       <MockedProvider mocks={mocks} cache={createCache()}>
         <LibraryManager {...props} />
-      </MockedProvider>
+      </MockedProvider>,
     )
 
   describe('query', () => {
@@ -314,7 +313,7 @@ describe('LibraryManager', () => {
 
     it("fires a request to save the checkbox state when it's clicked", async () => {
       doFetchApi.mockImplementationOnce(() =>
-        Promise.resolve({json: {comment_library_suggestions_enabled: false}})
+        Promise.resolve({json: {comment_library_suggestions_enabled: false}}),
       )
       const {getByText, getByLabelText} = render()
       await act(async () => jest.advanceTimersByTime(1000))

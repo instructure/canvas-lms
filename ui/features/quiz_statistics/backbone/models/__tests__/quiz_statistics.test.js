@@ -27,7 +27,7 @@ it('parses', function () {
 
   expect(typeof subject.get('submissionStatistics')).toBe('object')
   expect(subject.get('submissionStatistics').uniqueCount).toBe(156)
-  expect(subject.get('questionStatistics').length).toBe(13)
+  expect(subject.get('questionStatistics')).toHaveLength(13)
 })
 
 it('parses the discrimination index', function () {
@@ -51,7 +51,7 @@ describe('calculating participant count', function () {
           },
         ],
       },
-      {parse: true}
+      {parse: true},
     )
 
     expect(subject.get('questionStatistics')[0].participantCount).toEqual(5)
@@ -82,7 +82,7 @@ describe('calculating participant count', function () {
           },
         ],
       },
-      {parse: true}
+      {parse: true},
     )
 
     expect(subject.get('questionStatistics')[0].participantCount).toEqual(5)
@@ -105,7 +105,7 @@ describe('calculating participant count', function () {
           },
         ],
       },
-      {parse: true}
+      {parse: true},
     )
 
     expect(subject.get('questionStatistics')[0].participantCount).toEqual(2)

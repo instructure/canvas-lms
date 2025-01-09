@@ -243,7 +243,7 @@ export const AddressBook = ({
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (menuItemCurrent) {
@@ -555,7 +555,7 @@ export const AddressBook = ({
       onUserFilterSelect(undefined)
     }
     newSelectedMenuItems = newSelectedMenuItems.filter(
-      menuItem => menuItem.id !== removeMenuItem.id
+      menuItem => menuItem.id !== removeMenuItem.id,
     )
     setSelectedMenuItems([...newSelectedMenuItems])
     onSelectedIdsChange([...newSelectedMenuItems])

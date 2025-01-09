@@ -55,7 +55,7 @@ export default function RubricsQuery(props) {
 
           return {...prev, parsedAssessments: [...prev.parsedAssessments, parsedAssessment]}
         },
-        {parsedAssessments: [], selfAssessment: null}
+        {parsedAssessments: [], selfAssessment: null},
       )
 
       const parsedRubric = transformRubricData(data.assignment.rubric)
@@ -90,7 +90,7 @@ export default function RubricsQuery(props) {
   return (
     <RubricTab
       assessments={data.submission?.rubricAssessmentsConnection?.nodes?.map(assessment =>
-        transformRubricAssessmentData(assessment)
+        transformRubricAssessmentData(assessment),
       )}
       key={props.submission.attempt}
       proficiencyRatings={

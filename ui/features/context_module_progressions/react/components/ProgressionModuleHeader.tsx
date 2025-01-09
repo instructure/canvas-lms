@@ -27,7 +27,7 @@ type Props = {
   bridge: {
     on: (
       event: string,
-      callback: (model: {attributes: {user: {id: string; name: string}}}) => void
+      callback: (model: {attributes: {user: {id: string; name: string}}}) => void,
     ) => void
   }
 }

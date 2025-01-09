@@ -140,7 +140,7 @@ describe('AssignmentGroupListItemView', () => {
       view = createView(model)
 
       const sisIcon = document.querySelector(
-        `#assignment_group_${model.id} .ig-header-title .icon-sis-imported`
+        `#assignment_group_${model.id} .ig-header-title .icon-sis-imported`,
       )
       expect(sisIcon).toBeInTheDocument()
     })
@@ -151,7 +151,7 @@ describe('AssignmentGroupListItemView', () => {
       view = createView(model)
 
       const sisIcon = document.querySelector(
-        `#assignment_group_${model.id} .ig-header-title .icon-sis-imported`
+        `#assignment_group_${model.id} .ig-header-title .icon-sis-imported`,
       )
       expect(sisIcon).toHaveAttribute('title', 'Imported from PowerSchool')
     })
@@ -160,7 +160,7 @@ describe('AssignmentGroupListItemView', () => {
       view = createView(model)
 
       const sisIcon = document.querySelector(
-        `#assignment_group_${model.id} .ig-header-title .icon-sis-imported`
+        `#assignment_group_${model.id} .ig-header-title .icon-sis-imported`,
       )
       expect(sisIcon).not.toBeInTheDocument()
     })
@@ -170,7 +170,7 @@ describe('AssignmentGroupListItemView', () => {
       view = createView(model)
 
       const linkIcon = document.querySelector(
-        `#assignment_group_${model.id} .ig-header-title .icon-link`
+        `#assignment_group_${model.id} .ig-header-title .icon-link`,
       )
       expect(linkIcon).toBeInTheDocument()
       expect(linkIcon).toHaveAttribute('title', 'Grading category aligned with SIS')
@@ -181,7 +181,7 @@ describe('AssignmentGroupListItemView', () => {
       view = createView(model)
 
       const linkIcon = document.querySelector(
-        `#assignment_group_${model.id} .ig-header-title .icon-link`
+        `#assignment_group_${model.id} .ig-header-title .icon-link`,
       )
       expect(linkIcon).not.toBeInTheDocument()
     })
@@ -198,7 +198,7 @@ describe('AssignmentGroupListItemView', () => {
       view = createView(model, {userIsAdmin: true})
 
       const deleteButton = document.querySelector(
-        `#assignment_group_${model.id} a.delete_group:not(.disabled)`
+        `#assignment_group_${model.id} a.delete_group:not(.disabled)`,
       )
       expect(deleteButton).toBeInTheDocument()
     })

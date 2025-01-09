@@ -67,7 +67,7 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shards: ['101']}})
+      expect.objectContaining({params: {job_shards: ['101']}}),
     )
 
     expect(queryByText('jobs held')).not.toBeInTheDocument()
@@ -93,10 +93,10 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(
-      getByText('Are you sure you want to unblock all stuck jobs in this job cluster?')
+      getByText('Are you sure you want to unblock all stuck jobs in this job cluster?'),
     ).toBeInTheDocument()
     expect(
-      getByText('NOTE: Jobs blocked by shard migrations will not be unblocked.')
+      getByText('NOTE: Jobs blocked by shard migrations will not be unblocked.'),
     ).toBeInTheDocument()
 
     fireEvent.click(getByText('Confirm'))
@@ -108,7 +108,7 @@ describe('JobStats', () => {
         method: 'PUT',
         params: {job_shards: ['101']},
         path: '/api/v1/jobs2/unstuck',
-      })
+      }),
     )
 
     await act(async () => jest.advanceTimersByTime(2000))
@@ -126,14 +126,14 @@ describe('JobStats', () => {
     await act(async () => jest.runAllTimers())
 
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/strands'})
+      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/strands'}),
     )
     expect(doFetchApi).toHaveBeenCalledWith(
-      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/singletons'})
+      expect.objectContaining({params: {job_shard: '101'}, path: '/api/v1/jobs2/stuck/singletons'}),
     )
 
     const ss_links = getAllByText('baz', {selector: 'td a'})
-    expect(ss_links.length).toEqual(2)
+    expect(ss_links).toHaveLength(2)
     expect(ss_links.map(link => link.getAttribute('href'))).toEqual([
       '//jobs101.example.com/jobs_v2?group_type=strand&group_text=baz&bucket=queued',
       '//jobs101.example.com/jobs_v2?group_type=singleton&group_text=baz&bucket=queued',

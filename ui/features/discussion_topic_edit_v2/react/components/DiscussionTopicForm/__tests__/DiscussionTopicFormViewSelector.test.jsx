@@ -36,7 +36,7 @@ describe('DiscussionTopicFormViewSelector', () => {
         breakpoints={breakpoints}
         shouldMasteryPathsBeVisible={shouldMasteryPathsBeVisible}
         shouldMasteryPathsBeEnabled={shouldMasteryPathsBeEnabled}
-      />
+      />,
     )
   }
 

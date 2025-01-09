@@ -30,10 +30,10 @@ export const LtiPrivacyLevelTranslations: Record<LtiPrivacyLevel, string> = {
 
 const LtiPrivacyLevelDescriptions: Record<LtiPrivacyLevel, string> = {
   [LtiPrivacyLevels.Public]: I18n.t(
-    'Includes: Canvas ID, Name, First Name, Last Name, SIS ID, Avatar, and Email Address'
+    'Includes: Canvas ID, Name, First Name, Last Name, SIS ID, Avatar, and Email Address',
   ),
   [LtiPrivacyLevels.NameOnly]: I18n.t(
-    'Includes: Canvas ID, Name, First Name, Last Name, SIS ID, and Avatar'
+    'Includes: Canvas ID, Name, First Name, Last Name, SIS ID, and Avatar',
   ),
   [LtiPrivacyLevels.EmailOnly]: I18n.t('Includes: Canvas ID and Email Address'),
   [LtiPrivacyLevels.Anonymous]: I18n.t('Includes: Canvas ID'),

@@ -82,7 +82,7 @@ export default function JobsIndex() {
       // interpret in the selected timezone
       return moment.tz(plainDate, state.time_zone).toISOString()
     },
-    [state.time_zone]
+    [state.time_zone],
   )
 
   useFetchApi(
@@ -105,7 +105,7 @@ export default function JobsIndex() {
         dispatch({type: 'FETCHED_GROUPS', payload: response})
       }, []),
     },
-    [state.groups_refresh_nonce]
+    [state.groups_refresh_nonce],
   )
 
   useFetchApi(
@@ -129,7 +129,7 @@ export default function JobsIndex() {
         dispatch({type: 'FETCHED_JOBS', payload: response})
       }, []),
     },
-    [state.jobs_refresh_nonce]
+    [state.jobs_refresh_nonce],
   )
 
   useEffect(() => {

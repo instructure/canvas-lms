@@ -45,7 +45,7 @@ export const ZDeleteSubmissionCommentParams = z.object({
 })
 
 export const deleteSubmissionComment = async (
-  params: z.infer<typeof ZDeleteSubmissionCommentParams>
+  params: z.infer<typeof ZDeleteSubmissionCommentParams>,
 ) => {
   return executeQuery(DELETE_SUBMISSION_COMMENT, params)
 }

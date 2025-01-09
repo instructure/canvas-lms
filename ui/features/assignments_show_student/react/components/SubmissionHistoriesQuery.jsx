@@ -46,7 +46,6 @@ function shouldDisplayUnavailablePeerReview({assignment, reviewerSubmission}) {
   )
 }
 
- 
 class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
     initialQueryData: shape({

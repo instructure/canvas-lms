@@ -28,7 +28,7 @@ describe('canvas_quizzes/events/views/answer_matrix', () => {
     render(
       <MemoryRouter>
         <AnswerMatrix />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 
@@ -50,7 +50,7 @@ describe('canvas_quizzes/events/views/answer_matrix', () => {
             startedAt: '2014-11-16T13:37:19Z',
           }}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
 
     // we must expand it first
@@ -82,7 +82,7 @@ describe('canvas_quizzes/events/views/answer_matrix', () => {
             startedAt: '2014-11-16T13:37:19Z',
           }}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
 
     assertChange({
@@ -117,7 +117,7 @@ describe('canvas_quizzes/events/views/answer_matrix', () => {
             startedAt: '2014-11-16T13:37:19Z',
           }}
         />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
 
     assertChange({

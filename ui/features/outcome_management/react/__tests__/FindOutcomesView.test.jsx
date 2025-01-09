@@ -99,14 +99,14 @@ describe('FindOutcomesView', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = findOutcomesMocks()} = {}
+    {contextType = 'Account', contextId = '1', mocks = findOutcomesMocks()} = {},
   ) => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 
@@ -125,7 +125,7 @@ describe('FindOutcomesView', () => {
             name: null,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Outcome Group')).toBeInTheDocument()
     expect(getByPlaceholderText('Search within Outcome Group')).toBeInTheDocument()
@@ -145,14 +145,14 @@ describe('FindOutcomesView', () => {
             outcomesCount: 0,
           },
         })}
-      />
+      />,
     )
     expect(getByText('0 Outcomes')).toBeInTheDocument()
   })
 
   it('calls onChangeHandler when users types in searchbar', () => {
     const {getByDisplayValue} = render(
-      <FindOutcomesView {...defaultProps({searchString: '123'})} />
+      <FindOutcomesView {...defaultProps({searchString: '123'})} />,
     )
     const input = getByDisplayValue('123')
     fireEvent.change(input, {target: {value: 'test'}})
@@ -171,7 +171,7 @@ describe('FindOutcomesView', () => {
             },
           },
         })}
-      />
+      />,
     )
     expect(queryByText('The search returned no results.')).toBeInTheDocument()
   })
@@ -187,7 +187,7 @@ describe('FindOutcomesView', () => {
             },
           },
         })}
-      />
+      />,
     )
     expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
@@ -212,7 +212,7 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           importGroupStatus: IMPORT_FAILED,
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
   })
@@ -223,7 +223,7 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           importGroupStatus: IMPORT_NOT_STARTED,
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
   })
@@ -234,7 +234,7 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           importGroupStatus: IMPORT_PENDING,
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
@@ -249,7 +249,7 @@ describe('FindOutcomesView', () => {
             notImportedOutcomesCount: 2,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
   })
@@ -264,7 +264,7 @@ describe('FindOutcomesView', () => {
             notImportedOutcomesCount: 1,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
@@ -279,7 +279,7 @@ describe('FindOutcomesView', () => {
             notImportedOutcomesCount: 1,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
@@ -294,7 +294,7 @@ describe('FindOutcomesView', () => {
             notImportedOutcomesCount: 1,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
   })
@@ -309,7 +309,7 @@ describe('FindOutcomesView', () => {
             notImportedOutcomesCount: 1,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
   })
@@ -329,7 +329,7 @@ describe('FindOutcomesView', () => {
             outcomesCount: 0,
           },
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
@@ -345,7 +345,7 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           outcomesGroup: {...defaultProps().outcomesGroup, notImportedOutcomesCount: 0},
         })}
-      />
+      />,
     )
     expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
   })
@@ -359,7 +359,7 @@ describe('FindOutcomesView', () => {
             isRootGroup: true,
           },
         })}
-      />
+      />,
     )
     expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
@@ -376,7 +376,7 @@ describe('FindOutcomesView', () => {
           loading: true,
           outcomesGroup: {...defaultProps().outcomesGroup, outcomes: null},
         })}
-      />
+      />,
     )
     expect(getByTestId('loading')).toBeInTheDocument()
   })
@@ -397,7 +397,7 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           importGroupStatus: IMPORT_PENDING,
         })}
-      />
+      />,
     )
     expect(getByPlaceholderText('Search within State Standards').closest('input')).toBeDisabled()
   })
@@ -408,7 +408,7 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           importGroupStatus: IMPORT_COMPLETED,
         })}
-      />
+      />,
     )
     expect(getByPlaceholderText('Search within State Standards').closest('input')).toBeEnabled()
   })
@@ -418,7 +418,7 @@ describe('FindOutcomesView', () => {
       render(
         <OutcomesContext.Provider value={{env: {isMobileView: true}}}>
           {children}
-        </OutcomesContext.Provider>
+        </OutcomesContext.Provider>,
       )
 
     it('does not render the group name', () => {

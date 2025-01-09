@@ -99,7 +99,11 @@ const PaceModalHeading = ({
         <Text data-testid="section-name" as="div" size="x-large" weight="bold">
           {getPaceName()}
         </Text>
-        {isDraftPace ? <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">Draft</Pill> : null}
+        {isDraftPace ? (
+          <Pill data-testid="draft-pace-status-pill" margin="small 0" statusLabel="Status">
+            Draft
+          </Pill>
+        ) : null}
         <Flex as="div" margin="medium none">
           <IconUserSolid size="medium" />
           <View data-testid="pace-info" as="div" margin="none small">

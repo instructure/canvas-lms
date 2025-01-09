@@ -60,7 +60,7 @@ Object.assign(GradeChangeLoggingContentView.prototype, {
         onSubmit={data => {
           this.updateCollection(data)
         }}
-      />
+      />,
     )
   },
 

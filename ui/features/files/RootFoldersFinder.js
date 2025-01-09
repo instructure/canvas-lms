@@ -52,7 +52,7 @@ RootFoldersFinder.prototype.find = function () {
             'custom_name',
             contextTypeAndId[0] === 'courses'
               ? I18n.t('course_files', 'Course files')
-              : I18n.t('group_files', 'Group files')
+              : I18n.t('group_files', 'Group files'),
           )
           contextFiles.url =
             '/api/v1/' + contextTypeAndId[0] + '/' + contextTypeAndId[1] + '/folders/root'

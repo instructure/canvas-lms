@@ -114,7 +114,7 @@ describe('ViewManager', () => {
         const {getByDisplayValue, getByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         const newAttemptButton = getByText('New Attempt')
         fireEvent.click(newAttemptButton)
@@ -126,7 +126,7 @@ describe('ViewManager', () => {
         const {queryByText, getByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         const newAttemptButton = getByText('New Attempt')
         fireEvent.click(newAttemptButton)
@@ -140,7 +140,7 @@ describe('ViewManager', () => {
         const {queryByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByText('New Attempt')).toBeNull()
       })
@@ -152,7 +152,7 @@ describe('ViewManager', () => {
         const {queryByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByText('New Attempt')).toBeNull()
       })
@@ -162,7 +162,7 @@ describe('ViewManager', () => {
         const {queryByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByText('New Attempt')).not.toBeNull()
       })
@@ -172,7 +172,7 @@ describe('ViewManager', () => {
         const {getByText, getByTestId} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
 
         const mockFocus = jest.fn()
@@ -192,7 +192,7 @@ describe('ViewManager', () => {
         const {queryByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByText('New Attempt')).not.toBeNull()
       })
@@ -204,7 +204,7 @@ describe('ViewManager', () => {
         const {queryByText} = render(
           <MockedProvider>
             <ViewManager {...props} />
-          </MockedProvider>
+          </MockedProvider>,
         )
         expect(queryByText('New Attempt')).toBeNull()
       })
@@ -217,7 +217,7 @@ describe('ViewManager', () => {
       const {getByDisplayValue} = render(
         <MockedProvider>
           <ViewManager {...props} />
-        </MockedProvider>
+        </MockedProvider>,
       )
       expect(getByDisplayValue('Attempt 2')).not.toBeNull()
     })

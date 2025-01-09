@@ -136,7 +136,7 @@ describe('CourseRestore', () => {
     server.respond(
       'PUT',
       `${courseRestore.baseUrl()}/?course_ids[]=${courseRestore.get('id')}&event=undelete`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(progressQueuedJSON)]
+      [200, {'Content-Type': 'application/json'}, JSON.stringify(progressQueuedJSON)],
     )
     clock.tick(1000)
     server.respond('GET', progressQueuedJSON.url, [

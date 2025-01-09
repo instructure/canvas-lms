@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import {extend} from '@canvas/backbone/utils'
 import {compact} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -74,7 +72,7 @@ NeverDropCollection.prototype.toAssignments = function (include_id) {
         }
         return undefined
       }
-    })(this)
+    })(this),
   )
   // compact results because we're mapping assignments :(
   return compact(models)
@@ -114,7 +112,7 @@ NeverDropCollection.prototype.findNextAvailable = function () {
           return a.id === av.id
         })
       }
-    })(this)
+    })(this),
   )
   return this.availableValues.get(next.id)
 }

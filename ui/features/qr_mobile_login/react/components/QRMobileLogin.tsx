@@ -58,7 +58,7 @@ export function QRMobileLogin({
   const [imagePng, setImagePng] = useState(null)
   const [validFor, setValidFor] = useState(null)
   const [display, setDisplay] = useState(
-    withWarning ? DISPLAY_STATE.warning : DISPLAY_STATE.displayed
+    withWarning ? DISPLAY_STATE.warning : DISPLAY_STATE.displayed,
   )
 
   function renderQRCode() {
@@ -105,7 +105,7 @@ export function QRMobileLogin({
         {display !== DISPLAY_STATE.canceled && (
           <View display="block">
             {I18n.t(
-              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.'
+              'To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.',
             )}
           </View>
         )}
@@ -225,12 +225,12 @@ export function QRMobileLogin({
               <p>
                 {I18n.t(
                   'Sharing a QR code can give others immediate access to your account through the %{canvas} mobile applications.',
-                  {canvas: 'Canvas'}
+                  {canvas: 'Canvas'},
                 )}
               </p>
               <p>
                 {I18n.t(
-                  'Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service.'
+                  'Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service.',
                 )}
               </p>
               <p>{I18n.t('Click "Proceed" to continue.')}</p>

@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -137,7 +135,7 @@ EntryCollectionView.prototype.addNewView = function (view) {
           return view.$el.fadeIn()
         }
       })(this),
-      500
+      500,
     )
   }
 }
@@ -171,7 +169,7 @@ EntryCollectionView.prototype.renderNextLink = function () {
       },
       {
         count: stats.total + this.collection.options.perPage,
-      }
+      },
     )
   }
   this.nextLink.html(
@@ -179,7 +177,7 @@ EntryCollectionView.prototype.renderNextLink = function () {
       stats,
       moreText,
       showMore: true,
-    })
+    }),
   )
   this.nextLink.addClass('showMore loadNext')
   if (this.options.threaded) {

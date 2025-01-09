@@ -433,7 +433,7 @@ describe('EditView#renderModeratedGradingFormFieldGroup', () => {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       AVAILABLE_MODERATORS: [],
       HAS_GRADED_SUBMISSIONS: false,
-      LOCALE: 'en'
+      LOCALE: 'en',
     })
 
     view = createEditView({
@@ -441,7 +441,7 @@ describe('EditView#renderModeratedGradingFormFieldGroup', () => {
       grader_count: 2,
       final_grader_id: '1',
       grader_comments_visible_to_graders: true,
-      grader_names_visible_to_final_grader: true
+      grader_names_visible_to_final_grader: true,
     })
 
     jest.spyOn(React, 'createElement')
@@ -456,7 +456,7 @@ describe('EditView#renderModeratedGradingFormFieldGroup', () => {
     view.renderModeratedGradingFormFieldGroup()
     const calls = React.createElement.mock.calls
     const moderatedGradingFormFieldGroupCall = calls.find(
-      call => call[1] && call[1].moderatedGradingEnabled !== undefined
+      call => call[1] && call[1].moderatedGradingEnabled !== undefined,
     )
     expect(moderatedGradingFormFieldGroupCall[1]).toMatchObject({
       moderatedGradingEnabled: true,
@@ -471,20 +471,20 @@ describe('EditView#renderModeratedGradingFormFieldGroup', () => {
       isGroupAssignment: false,
       isPeerReviewAssignment: false,
       onGraderCommentsVisibleToGradersChange: expect.any(Function),
-      onModeratedGradingChange: expect.any(Function)
+      onModeratedGradingChange: expect.any(Function),
     })
   })
 
   it('does not render the moderated grading form field group when Moderated Grading is disabled', () => {
     setupFakeEnv({
       MODERATED_GRADING_ENABLED: false,
-      MODERATED_GRADING_MAX_GRADER_COUNT: 2
+      MODERATED_GRADING_MAX_GRADER_COUNT: 2,
     })
     view = createEditView({moderated_grading: false})
     view.renderModeratedGradingFormFieldGroup()
     const calls = React.createElement.mock.calls
     const moderatedGradingFormFieldGroupCall = calls.find(
-      call => call[1] && call[1].moderatedGradingEnabled !== undefined
+      call => call[1] && call[1].moderatedGradingEnabled !== undefined,
     )
     expect(moderatedGradingFormFieldGroupCall).toBeUndefined()
   })
@@ -494,7 +494,7 @@ describe('EditView#renderModeratedGradingFormFieldGroup', () => {
       view.renderModeratedGradingFormFieldGroup()
       const calls = React.createElement.mock.calls
       const moderatedGradingFormFieldGroupCall = calls.find(
-        call => call[1] && call[1].moderatedGradingEnabled !== undefined
+        call => call[1] && call[1].moderatedGradingEnabled !== undefined,
       )
       props = moderatedGradingFormFieldGroupCall[1]
     })

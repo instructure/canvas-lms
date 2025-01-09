@@ -60,7 +60,7 @@ export default function (url, onClose) {
             $('#download_submissions_dialog .progress').progressbar('value', 100)
             const message = I18n.t(
               '#submissions.finished_redirecting',
-              'Finished!  Redirecting to File...'
+              'Finished!  Redirecting to File...',
             )
             const linkText = I18n.t('Click here to download %{size_of_file}', {
               size_of_file: attachment.readable_size,
@@ -77,7 +77,7 @@ export default function (url, onClose) {
             // to the zip in the first place...
             $('#download_submissions_dialog .progress').progressbar('value', 100)
             $('#download_submissions_dialog .status').text(
-              I18n.t('No submissions to zip. Please try again after student submissions.')
+              I18n.t('No submissions to zip. Please try again after student submissions.'),
             )
             cancelled = true
           } else {
@@ -94,7 +94,7 @@ export default function (url, onClose) {
               message = I18n.t(
                 '#submissions.gathering_files_progress',
                 'Gathering Files (%{progress})...',
-                {progress: I18n.toPercentage(progress)}
+                {progress: I18n.toPercentage(progress)},
               )
             }
             $('#download_submissions_dialog .status').text(message)
@@ -104,7 +104,7 @@ export default function (url, onClose) {
                 'GET',
                 {},
                 () => {},
-                () => {}
+                () => {},
               )
             }
             lastProgress = progress
@@ -118,14 +118,14 @@ export default function (url, onClose) {
         if (retryCount > MAX_RETRIES) {
           $('#download_submissions_dialog .progress').progressbar('value', 100)
           $('#download_submissions_dialog .status').text(
-            I18n.t('Something went wrong downloading submissions. Please try again later.')
+            I18n.t('Something went wrong downloading submissions. Please try again later.'),
           )
           cancelled = true
         }
 
         $('#download_submissions_dialog .status_loader').css('visibility', 'hidden')
         setTimeout(checkForChange, 1000)
-      }
+      },
     )
   }
   checkForChange()

@@ -39,8 +39,8 @@ const I18n = createI18nScope('course_settings')
 
 const BlueprintLockOptions = React.lazy(() => import('./react/components/BlueprintLockOptions'))
 const CourseTemplateDetails = React.lazy(() => import('./react/components/CourseTemplateDetails'))
-const CourseAvailabilityOptions = React.lazy(() =>
-  import('./react/components/CourseAvailabilityOptions')
+const CourseAvailabilityOptions = React.lazy(
+  () => import('./react/components/CourseAvailabilityOptions'),
 )
 const Integrations = React.lazy(() => import('@canvas/integrations/react/courses/Integrations'))
 const CourseApps = React.lazy(() => import('./react/components/CourseApps'))
@@ -55,7 +55,6 @@ const Error = () => (
 ready(() => {
   const blueprint = document.getElementById('blueprint_menu')
   if (blueprint) {
-     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
@@ -68,49 +67,46 @@ ready(() => {
           />
         </ErrorBoundary>
       </Suspense>,
-      blueprint
+      blueprint,
     )
   }
 
   const courseTemplate = document.getElementById('course_template_details')
   if (courseTemplate) {
     const isEditable = courseTemplate.getAttribute('data-is-editable') === 'true'
-     
+
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <CourseTemplateDetails isEditable={isEditable} />
         </ErrorBoundary>
       </Suspense>,
-      courseTemplate
+      courseTemplate,
     )
   }
 
   const navView = new NavigationView({el: $('#tab-navigation')})
 
   if (document.getElementById('tab-features')) {
-     
     ReactDOM.render(
       <FeatureFlags disableDefaults={true} />,
-      document.getElementById('tab-features')
+      document.getElementById('tab-features'),
     )
   }
 
   $(() => navView.render())
 
-   
   ReactDOM.render(
     <CourseImageSelector
       store={configureStore(initialState)}
       courseId={ENV.COURSE_ID}
       setting="image"
     />,
-    $('.CourseImageSelector__Container')[0]
+    $('.CourseImageSelector__Container')[0],
   )
 
   const bannerImageContainer = document.getElementById('course_banner_image_selector_container')
   if (bannerImageContainer) {
-     
     ReactDOM.render(
       <CourseImageSelector
         store={configureStore(initialState)}
@@ -118,13 +114,12 @@ ready(() => {
         setting="banner_image"
         wide={true}
       />,
-      bannerImageContainer
+      bannerImageContainer,
     )
   }
 
   const availabilityOptionsContainer = document.getElementById('availability_options_container')
   if (availabilityOptionsContainer) {
-     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
@@ -135,68 +130,63 @@ ready(() => {
           />
         </ErrorBoundary>
       </Suspense>,
-      availabilityOptionsContainer
+      availabilityOptionsContainer,
     )
   }
 
   const restrictQuantitativeDataContainer = document.getElementById(
-    'restrict_quantitative_data_options_container'
+    'restrict_quantitative_data_options_container',
   )
   if (restrictQuantitativeDataContainer) {
-     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <QuantitativeDataOptions canManage={ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA} />
       </Suspense>,
-      restrictQuantitativeDataContainer
+      restrictQuantitativeDataContainer,
     )
   }
 
   const defaultDueTimeContainer = document.getElementById('default_due_time_container')
   if (defaultDueTimeContainer) {
-     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <CourseDefaultDueTime />
       </Suspense>,
-      defaultDueTimeContainer
+      defaultDueTimeContainer,
     )
   }
 
   if (ENV.COURSE_COLORS_ENABLED) {
     const courseColorPickerContainer = document.getElementById('course_color_picker_container')
     if (courseColorPickerContainer) {
-       
       ReactDOM.render(
         <CourseColorSelector courseColor={ENV.COURSE_COLOR} />,
-        courseColorPickerContainer
+        courseColorPickerContainer,
       )
     }
   }
 
   const integrationsContainer = document.getElementById('tab-integrations')
   if (integrationsContainer) {
-     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <Integrations />
         </ErrorBoundary>
       </Suspense>,
-      integrationsContainer
+      integrationsContainer,
     )
   }
 
   const appsMountpoint = document.getElementById('tab-apps')
   if (appsMountpoint) {
-     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
           <CourseApps />
         </ErrorBoundary>
       </Suspense>,
-      appsMountpoint
+      appsMountpoint,
     )
   }
 })

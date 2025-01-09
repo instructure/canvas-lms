@@ -32,7 +32,7 @@ describe('getFirstPageUrl', () => {
       current_user_id: '1',
     }
     expect(getFirstPageUrl()).toEqual(
-      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname'
+      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname',
     )
   })
 
@@ -44,7 +44,7 @@ describe('getFirstPageUrl', () => {
     }
     document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=17`
     expect(getFirstPageUrl()).toEqual(
-      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17'
+      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17',
     )
   })
 
@@ -56,12 +56,12 @@ describe('getFirstPageUrl', () => {
     }
     document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=17`
     expect(getFirstPageUrl()).toEqual(
-      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17'
+      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=17',
     )
 
     document.cookie = `${OBSERVER_COOKIE_PREFIX}${ENV.current_user_id}=27`
     expect(getFirstPageUrl()).toEqual(
-      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=27'
+      '/api/v1/users/self/favorites/courses?include[]=term&include[]=sections&sort=nickname&observed_user_id=27',
     )
   })
 })

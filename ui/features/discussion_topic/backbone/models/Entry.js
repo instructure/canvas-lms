@@ -162,7 +162,7 @@ Entry.prototype.toJSON = function () {
     'deleted',
     'attachment',
     'replies',
-    'author'
+    'author',
   )
 }
 
@@ -202,7 +202,7 @@ Entry.prototype.ratingString = function () {
     },
     {
       count: sum,
-    }
+    },
   )
 }
 
@@ -341,7 +341,7 @@ Entry.prototype._hasActiveReplies = function (replies) {
         return function (reply) {
           return _this._hasActiveReplies(reply.replies)
         }
-      })(this)
+      })(this),
     )
   ) {
     return true

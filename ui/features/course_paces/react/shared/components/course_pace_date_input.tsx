@@ -95,12 +95,12 @@ const CoursePaceDateInput = ({
   const formatDateReadonly = useDateTimeFormat(
     'date.formats.medium_with_weekday',
     coursePaceTimezone,
-    ENV.LOCALE
+    ENV.LOCALE,
   )
   const formatDateForEdit = useDateTimeFormat(
     'date.formats.compact',
     coursePaceTimezone,
-    ENV.LOCALE
+    ENV.LOCALE,
   )
 
   const calculateErrors = (date?: Moment): string[] => {

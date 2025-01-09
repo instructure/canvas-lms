@@ -82,7 +82,7 @@ export type AttachmentProgressResponse = ContentMigrationItem & {
 export type UpdateMigrationItemType = (
   contentMigrationItemId: string,
   data?: object,
-  noXHR?: boolean
+  noXHR?: boolean,
 ) => Promise<ContentMigrationItem | undefined>
 
 export type QuestionBankSettings = {

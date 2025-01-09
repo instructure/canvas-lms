@@ -45,7 +45,7 @@ const useStore = create(
     rubricHidePoints: false,
     studentAssessment: undefined,
     rubricSavedComments: {},
-  }))
+  })),
 )
 
 export const updateState = (newState: Partial<SpeedGraderStore>) => {

@@ -74,7 +74,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       ...payloadValues,
     }
     auditEvents.push(
-      buildAssignmentCreatedEvent({id: '4901', createdAt: '2018-09-01T12:00:00Z'}, payload)
+      buildAssignmentCreatedEvent({id: '4901', createdAt: '2018-09-01T12:00:00Z'}, payload),
     )
   }
 
@@ -91,7 +91,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     const {dateEventGroups} = getCreatorEventGroup('user-1101')
     return dateEventGroups.reduce(
       (allEvents, dateEventGroup) => allEvents.concat(dateEventGroup.auditEvents),
-      []
+      [],
     )
   }
 
@@ -123,7 +123,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents = [
           buildAssignmentCreatedEvent(
             {id: '4901', createdAt: '2018-09-01T12:00:00Z'},
-            {moderated_grading: true}
+            {moderated_grading: true},
           ),
           buildEvent({
             createdAt: '2018-09-17T12:00:00Z',
@@ -150,7 +150,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             createdAt: '2018-09-17T12:08:00Z',
             eventType: 'provisional_grade_selected',
             id: '4913',
-          })
+          }),
         )
         auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:08:00Z'))
@@ -162,7 +162,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents = [
           buildAssignmentCreatedEvent(
             {id: '4901', createdAt: '2018-09-01T12:00:00Z'},
-            {moderated_grading: false}
+            {moderated_grading: false},
           ),
         ]
       })
@@ -171,8 +171,8 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents.push(
           buildEvent(
             {createdAt, eventType: 'submission_updated', id},
-            {grade: [gradeBefore, gradeAfter]}
-          )
+            {grade: [gradeBefore, gradeAfter]},
+          ),
         )
       }
 
@@ -221,7 +221,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
     function getCreatorKeys() {
       return buildAuditTrail({auditEvents, users, externalTools, quizzes}).creatorEventGroups.map(
-        group => group.creator.key
+        group => group.creator.key,
       )
     }
 
@@ -523,7 +523,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       it('separates events which occurred on different dates into different groups', () => {
         const eventIds = getDateEventGroups().map(dateEventGroup =>
-          getDateGroupEventIds(dateEventGroup).sort()
+          getDateGroupEventIds(dateEventGroup).sort(),
         )
         expect(eventIds).toEqual([
           ['4901', '4902'],
@@ -533,7 +533,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       it('orders events within date event groups by ascending date', () => {
         const eventIds = getDateEventGroups().map(dateEventGroup =>
-          getDateGroupEventIds(dateEventGroup)
+          getDateGroupEventIds(dateEventGroup),
         )
         expect(eventIds).toEqual([
           ['4901', '4902'],
@@ -549,7 +549,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildUnknownEvent('4902', '2018-09-02T03:59:59Z'),
         ]
         const eventIds = getDateEventGroups().map(dateEventGroup =>
-          getDateGroupEventIds(dateEventGroup)
+          getDateGroupEventIds(dateEventGroup),
         )
         expect(eventIds).toEqual([
           ['4901', '4902'],
@@ -593,7 +593,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment creation date', () => {
           const auditEventData = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -601,7 +601,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {anonymous_grading: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({anonymous_grading: true})
         })
@@ -609,7 +609,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_created" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4901.student_anonymity_updated')
         })
@@ -618,7 +618,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -642,7 +642,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment creation date', () => {
           const auditEventData = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -650,7 +650,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {anonymous_grading: false}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({anonymous_grading: false})
         })
@@ -658,7 +658,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_created" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4901.student_anonymity_updated')
         })
@@ -667,7 +667,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -679,7 +679,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment update date', () => {
           const auditEventData = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -687,7 +687,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {anonymous_grading: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({anonymous_grading: true})
         })
@@ -695,7 +695,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.student_anonymity_updated')
         })
@@ -704,7 +704,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -716,7 +716,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, true]})
         const auditEventData = filterAuditEvents(
           'student_anonymity_updated',
-          '2018-09-03T12:00:00Z'
+          '2018-09-03T12:00:00Z',
         )
         expect(auditEventData).toHaveLength(0)
       })
@@ -732,7 +732,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment update date', () => {
           const auditEventData = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -740,7 +740,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {anonymous_grading: false}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({anonymous_grading: false})
         })
@@ -748,7 +748,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.student_anonymity_updated')
         })
@@ -757,7 +757,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'student_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -801,7 +801,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, graders_anonymous_to_graders: true})
           const auditEventData = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -810,7 +810,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, graders_anonymous_to_graders: false})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({graders_anonymous_to_graders: false})
         })
@@ -819,7 +819,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, graders_anonymous_to_graders: true})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({graders_anonymous_to_graders: true})
         })
@@ -828,7 +828,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4901.grader_to_grader_anonymity_updated')
         })
@@ -838,7 +838,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -848,7 +848,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -861,7 +861,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_names_visible_to_final_grader: true})
           const auditEventData = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -870,7 +870,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_names_visible_to_final_grader: false})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_names_visible_to_final_grader: false,
@@ -881,7 +881,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_names_visible_to_final_grader: false})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_names_visible_to_final_grader: false,
@@ -892,10 +892,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4901.grader_to_final_grader_anonymity_updated'
+            '4901.grader_to_final_grader_anonymity_updated',
           )
         })
 
@@ -904,7 +904,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -914,7 +914,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -927,7 +927,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_comments_visible_to_graders: true})
           const auditEventData = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -936,7 +936,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_comments_visible_to_graders: false})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_comments_visible_to_graders: false,
@@ -947,7 +947,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_comments_visible_to_graders: false})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_comments_visible_to_graders: false,
@@ -958,10 +958,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true})
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4901.grader_to_grader_comment_visibility_updated'
+            '4901.grader_to_grader_comment_visibility_updated',
           )
         })
 
@@ -970,7 +970,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -980,7 +980,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -999,7 +999,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true, grader_count: 2})
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({grader_count: 2})
         })
@@ -1008,7 +1008,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildCreateEvent({moderated_grading: true})
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4901.grader_count_updated')
         })
@@ -1018,7 +1018,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -1028,7 +1028,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -1063,7 +1063,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment creation date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1071,7 +1071,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {graders_anonymous_to_graders: false}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({graders_anonymous_to_graders: false})
         })
@@ -1079,7 +1079,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_created" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4901.grader_to_grader_anonymity_updated')
         })
@@ -1088,7 +1088,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -1097,7 +1097,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -1113,7 +1113,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment updated date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1121,7 +1121,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {graders_anonymous_to_graders: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({graders_anonymous_to_graders: true})
         })
@@ -1129,7 +1129,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.grader_to_grader_anonymity_updated')
         })
@@ -1138,7 +1138,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
@@ -1147,7 +1147,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -1163,7 +1163,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment creation date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1171,7 +1171,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {grader_names_visible_to_final_grader: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_names_visible_to_final_grader: true,
@@ -1181,10 +1181,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_created" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4901.grader_to_final_grader_anonymity_updated'
+            '4901.grader_to_final_grader_anonymity_updated',
           )
         })
 
@@ -1192,7 +1192,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -1201,7 +1201,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -1217,7 +1217,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment updated date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1225,7 +1225,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {grader_names_visible_to_final_grader: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_names_visible_to_final_grader: true,
@@ -1235,10 +1235,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4902.grader_to_final_grader_anonymity_updated'
+            '4902.grader_to_final_grader_anonymity_updated',
           )
         })
 
@@ -1246,7 +1246,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
@@ -1255,7 +1255,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -1271,7 +1271,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment creation date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1279,7 +1279,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {grader_comments_visible_to_graders: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_comments_visible_to_graders: true,
@@ -1289,10 +1289,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_created" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4901.grader_to_grader_comment_visibility_updated'
+            '4901.grader_to_grader_comment_visibility_updated',
           )
         })
 
@@ -1300,7 +1300,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
@@ -1309,7 +1309,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-01T12:00:00Z'
+            '2018-09-01T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(createEventDatum.auditEvent[key])
@@ -1325,7 +1325,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment updated date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1333,7 +1333,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {grader_comments_visible_to_graders: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_comments_visible_to_graders: true,
@@ -1343,10 +1343,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4902.grader_to_grader_comment_visibility_updated'
+            '4902.grader_to_grader_comment_visibility_updated',
           )
         })
 
@@ -1354,7 +1354,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
@@ -1363,7 +1363,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_comment_visibility_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -1393,7 +1393,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload with the updated grader count', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({grader_count: 2})
         })
@@ -1401,7 +1401,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.grader_count_updated')
         })
@@ -1410,7 +1410,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
@@ -1419,7 +1419,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_count_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -1431,7 +1431,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         enabledModeratedGradingWith({graders_anonymous_to_graders: [false, false]})
         const auditEventData = filterAuditEvents(
           'grader_to_grader_anonymity_updated',
-          '2018-09-02T12:00:00Z'
+          '2018-09-02T12:00:00Z',
         )
         expect(auditEventData).toHaveLength(0)
       })
@@ -1440,7 +1440,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         enabledModeratedGradingWith({grader_names_visible_to_final_grader: [false, false]})
         const auditEventData = filterAuditEvents(
           'grader_to_final_grader_anonymity_updated',
-          '2018-09-02T12:00:00Z'
+          '2018-09-02T12:00:00Z',
         )
         expect(auditEventData).toHaveLength(0)
       })
@@ -1449,7 +1449,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         enabledModeratedGradingWith({grader_comments_visible_to_graders: [false, false]})
         const auditEventData = filterAuditEvents(
           'grader_to_grader_comment_visibility_updated',
-          '2018-09-02T12:00:00Z'
+          '2018-09-02T12:00:00Z',
         )
         expect(auditEventData).toHaveLength(0)
       })
@@ -1482,7 +1482,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment update date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1490,7 +1490,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {graders_anonymous_to_graders: false}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({graders_anonymous_to_graders: false})
         })
@@ -1498,7 +1498,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.grader_to_grader_anonymity_updated')
         })
@@ -1507,7 +1507,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
@@ -1516,7 +1516,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -1532,7 +1532,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('is added using the assignment update date', () => {
           const auditEventData = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventData).toHaveLength(1)
         })
@@ -1540,7 +1540,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('sets the payload to {grader_names_visible_to_final_grader: true}', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.payload).toEqual({
             grader_names_visible_to_final_grader: true,
@@ -1550,10 +1550,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.auditEvent.id).toEqual(
-            '4902.grader_to_final_grader_anonymity_updated'
+            '4902.grader_to_final_grader_anonymity_updated',
           )
         })
 
@@ -1561,7 +1561,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
@@ -1570,7 +1570,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
             'grader_to_final_grader_anonymity_updated',
-            '2018-09-02T12:00:00Z'
+            '2018-09-02T12:00:00Z',
           )
           ;['assignmentId', 'createdAt', 'submissionId', 'userId'].forEach(key => {
             expect(auditEventDatum.auditEvent[key]).toEqual(updateEventDatum.auditEvent[key])
@@ -1899,7 +1899,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
     function gradeStudent(id, createdAt, userId, payload) {
       auditEvents.push(
-        buildEvent({createdAt, eventType: 'provisional_grade_created', id, userId}, payload)
+        buildEvent({createdAt, eventType: 'provisional_grade_created', id, userId}, payload),
       )
     }
 
@@ -1940,7 +1940,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
     function gradeStudent(id, createdAt, userId, payload) {
       auditEvents.push(
-        buildEvent({createdAt, eventType: 'provisional_grade_created', id, userId}, payload)
+        buildEvent({createdAt, eventType: 'provisional_grade_created', id, userId}, payload),
       )
     }
 

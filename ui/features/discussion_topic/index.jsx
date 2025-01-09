@@ -56,7 +56,7 @@ if (ENV.MASTER_COURSE_DATA) {
         const lockManager = new LockManager()
         lockManager.init({itemType: 'discussion_topic', page: 'show'})
       })
-    }
+    },
   )
 }
 
@@ -84,7 +84,6 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, ENV.COURSE_ID)
       })
       .catch(ex => {
-         
         console.error('Falied loading CoursePacingNotice', ex)
         captureException(new Error('Failed loading CoursePacingNotice: ' + ex.message))
       })
@@ -95,10 +94,9 @@ ready(() => {
   new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
   if (!window.ENV.disable_keyboard_shortcuts) {
-     
     ReactDOM.render(
       <DiscussionTopicKeyboardShortcutModal />,
-      document.getElementById('keyboard-shortcut-modal')
+      document.getElementById('keyboard-shortcut-modal'),
     )
   }
 
@@ -113,13 +111,12 @@ ready(() => {
     !ENV.DISCUSSION.IS_ASSIGNMENT &&
     !ENV.DISCUSSION.IS_GROUP
   ) {
-     
     ReactDOM.render(
       <SectionsTooltip
         totalUserCount={ENV.TOTAL_USER_COUNT}
         sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}
       />,
-      container
+      container,
     )
   }
 
@@ -194,20 +191,20 @@ ready(() => {
   // catch when an EntryView changes the read_state
   // of a discussion entry and update the materialized view.
   EntryView.on('readStateChanged', (entry, _view) =>
-    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
+    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state')),
   )
 
   // catch when auto-mark-as-read watcher changes an entry
   // and update the materialized view to match.
   MarkAsReadWatcher.on('markAsRead', entry =>
-    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
+    updateMaterializedViewReadState(entry.get('id'), entry.get('read_state')),
   )
 
   // detect when read_state changes on filtered model.
   // sync the change to full view collections.
   filterView.on('readStateChanged', (id, read_state) =>
     // update on materialized view
-    updateMaterializedViewReadState(id, read_state)
+    updateMaterializedViewReadState(id, read_state),
   )
 
   filterView.on('clickEntry', entry => router.navigate(`entry-${entry.get('id')}`, true))

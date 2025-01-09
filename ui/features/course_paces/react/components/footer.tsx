@@ -121,7 +121,7 @@ export const Footer = ({
     (saveAsDraft: boolean) => {
       syncUnpublishedChanges(saveAsDraft)
     },
-    [syncUnpublishedChanges]
+    [syncUnpublishedChanges],
   )
 
   const handlePublishClicked = () => {

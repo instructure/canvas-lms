@@ -72,7 +72,7 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
               },
               {
                 count: outcomeCount,
-              }
+              },
             )}
           </Link>
         }

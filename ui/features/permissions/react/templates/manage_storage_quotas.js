@@ -26,11 +26,11 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Quotas (Account Settings)'),
       description: I18n.t(
-        'Allows user to view and manage Quotas tab in Account Settings. User can set default course, user, and group storage quotes.'
+        'Allows user to view and manage Quotas tab in Account Settings. User can set default course, user, and group storage quotes.',
       ),
     },
   ],
   [],
   [],
-  []
+  [],
 )

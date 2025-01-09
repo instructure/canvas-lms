@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-pascal-case */
 /*
  * Copyright (C) 2024 - present Instructure, Inc.
  *
@@ -120,7 +119,7 @@ describe('AssignmentConfigurationsTools', () => {
 
   test('it renders', () => {
     const {container} = render(
-      <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />
+      <AssignmentConfigurationTools.configTools courseId={1} secureParams={secureParams} />,
     )
     expect(container).toBeInTheDocument()
   })
@@ -134,7 +133,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={courseId}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     expect(ref.current.getDefinitionsUrl()).toBe(correctUrl)
   })
@@ -146,7 +145,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
 
@@ -160,7 +159,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
     const toolType = wrapper.container.querySelector('#configuration-tool-type')
@@ -174,11 +173,11 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
-    expect(wrapper.container.querySelectorAll('#similarity_detection_tool option').length).toBe(
-      toolDefinitions.length + 1
+    expect(wrapper.container.querySelectorAll('#similarity_detection_tool option')).toHaveLength(
+      toolDefinitions.length + 1,
     )
   })
 
@@ -189,7 +188,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
@@ -207,7 +206,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     const tool = toolDefinitions[3]
     const correctUrl = `/courses/1/lti/basic_lti_launch_request/5?display=borderless&secure_params=${secureParams}`
@@ -222,7 +221,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     const toolSelect = wrapper.container.querySelector('#similarity_detection_tool')
@@ -240,7 +239,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     const toolSelect = wrapper.container.querySelector('#similarity_detection_tool')
@@ -259,7 +258,7 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     ref.current.setState({tools: toolDefinitions})
     const selectBox = wrapper.container.querySelector('#similarity_detection_tool')
@@ -273,7 +272,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
     wrapper.container.querySelector('.before_external_content_info_alert').focus()
@@ -288,7 +287,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
     wrapper.container.querySelector('.after_external_content_info_alert').focus()
@@ -303,7 +302,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
     wrapper.container.querySelector('.before_external_content_info_alert').focus()
@@ -319,7 +318,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
     wrapper.container.querySelector('.after_external_content_info_alert').focus()
@@ -335,7 +334,7 @@ describe('AssignmentConfigurationsTools', () => {
         courseId={1}
         secureParams={secureParams}
         ref={ref}
-      />
+      />,
     )
     ref.current.setState({toolLaunchUrl: 'http://localhost:3000/messages/blti'})
     expect(ref.current.state.beforeExternalContentAlertClass).toBe('screenreader-only')
@@ -351,7 +350,7 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
     expect(wrapper.container.querySelector('#report_visibility_picker')).toBeInTheDocument()
@@ -366,7 +365,7 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     ref.current.state.tools = toolDefinitions
     expect(wrapper.container.querySelector('#report_visibility_picker')).toBeVisible()
@@ -380,10 +379,10 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('allow')).toBe(
-      ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '),
     )
   })
 
@@ -394,10 +393,10 @@ describe('AssignmentConfigurationsTools', () => {
         secureParams={secureParams}
         selectedTool={5}
         selectedToolType="ContextExternalTool"
-      />
+      />,
     )
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('data-lti-launch')).toBe(
-      'true'
+      'true',
     )
   })
 })

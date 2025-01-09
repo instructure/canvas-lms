@@ -54,7 +54,7 @@ export default function processMigrationContentItem(event) {
   } catch (error) {
     $.flashError(I18n.t('Error retrieving content'))
     postMessageExternalContentCancel(window)
-     
+
     console.error(error)
     captureException(error)
   }

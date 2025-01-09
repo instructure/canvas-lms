@@ -60,8 +60,8 @@ const ConfirmEmailAddress = ({email, children, onClose}: ConfirmEmailAddressProp
               __html: raw(
                 I18n.t(
                   'We emailed a confirmation link to *%{email}*. Click the link in that email to finish registering. Make sure to check your spam box in case it got filtered.',
-                  {wrapper: '<b>$1</b>', email}
-                )
+                  {wrapper: '<b>$1</b>', email},
+                ),
               ),
             }}
           />

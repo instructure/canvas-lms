@@ -79,7 +79,7 @@ export default class CreateDSRModal extends React.Component {
             request_output: 'xlsx',
           },
         },
-      })
+      }),
     )
   }
 
@@ -121,7 +121,7 @@ export default class CreateDSRModal extends React.Component {
       },
       () => {
         // do nothing
-      }
+      },
     )
   }
 
@@ -141,7 +141,7 @@ export default class CreateDSRModal extends React.Component {
     if (!isEmpty(this.state.errors)) return
     const url = `/api/v1/accounts/${this.props.accountId}/users/${this.props.user.id}/dsr_request`
     const method = 'POST'
-     
+
     axios({url, method, data: this.state.data}).then(
       response => {
         const dsr_request = response.data
@@ -149,8 +149,8 @@ export default class CreateDSRModal extends React.Component {
         $.flashMessage(
           I18n.t(
             'DSR Request *%{request_name}* was created successfully! You will receive an email upon completion.',
-            {request_name}
-          )
+            {request_name},
+          ),
         )
 
         this.setState({...initialState})
@@ -163,7 +163,7 @@ export default class CreateDSRModal extends React.Component {
             request_name: ['Invalid request name'],
           },
         })
-      }
+      },
     )
   }
 
@@ -255,7 +255,7 @@ export default class CreateDSRModal extends React.Component {
             if (child.props.onClick) child.props.onClick(...args)
             this.setState({open: true})
           },
-        })
+        }),
       )}
     </span>
   )

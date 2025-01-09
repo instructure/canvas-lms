@@ -39,7 +39,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.'
+        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.',
       ),
     },
     {
@@ -63,11 +63,11 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.'
+        'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.',
       ),
     },
     {
       description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.'),
     },
-  ]
+  ],
 )

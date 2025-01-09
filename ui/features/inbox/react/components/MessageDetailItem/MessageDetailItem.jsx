@@ -45,7 +45,9 @@ export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
   const pronouns = props.conversationMessage?.author?.pronouns
   const {isSubmissionCommentsType} = useContext(ConversationContext)
-  const {conversationMessage: {mediaComment} = {}} = props
+  const {
+    conversationMessage: {mediaComment} = {},
+  } = props
   const [translatedMessage, setTranslatedMessage] = useState('')
   const [translationError, setTranslationError] = useState('')
   const [isTranslating, setIsTranslating] = useState(false)

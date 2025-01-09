@@ -67,7 +67,7 @@ AssignmentGroupListView.prototype.createItemView = function (model) {
     noItemTemplate: NoAssignmentsListItem,
     userIsAdmin: this.userIsAdmin,
   }
-  // eslint-disable-next-line new-cap
+
   return new this.itemView(
     $.extend(
       {},
@@ -75,8 +75,8 @@ AssignmentGroupListView.prototype.createItemView = function (model) {
       {
         model,
       },
-      options
-    )
+      options,
+    ),
   )
 }
 
@@ -150,7 +150,7 @@ AssignmentGroupListView.prototype.expand = function (e, ui) {
         return $toggler.off('click', _this.handleExtraClick)
       }
     })(this),
-    50
+    50,
   )
   const id = item.children(':first').attr('data-id')
   const ag = this.collection.findWhere({

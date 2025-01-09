@@ -44,7 +44,7 @@ it('generates the toolConfiguration', () => {
   const p = props({overrides: {ref}})
   render(<RequiredValues {...p} />)
   const toolConfig = ref.current.generateToolConfigurationPart()
-  expect(Object.keys(toolConfig).length).toEqual(5)
+  expect(Object.keys(toolConfig)).toHaveLength(5)
 })
 
 const checkToolConfigPart = (toolConfig, path, value) => {
@@ -71,7 +71,7 @@ it('changes the output when icon_url changes', () => {
   checkChange(
     ['oidc_initiation_url'],
     'handleOidcInitiationUrlChange',
-    'http://example.com/new/login'
+    'http://example.com/new/login',
   )
 })
 
@@ -95,7 +95,7 @@ it('is invalid when invalid inputs', () => {
   render(
     <RequiredValues
       {...props({overrides: {flashError, ref}, configOverrides: {target_link_uri: ''}})}
-    />
+    />,
   )
   expect(ref.current.valid()).toEqual(false)
   expect(flashError).toHaveBeenCalled()

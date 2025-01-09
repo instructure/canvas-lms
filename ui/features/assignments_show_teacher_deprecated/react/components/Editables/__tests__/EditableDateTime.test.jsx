@@ -41,7 +41,7 @@ function renderEditableDateTime(props = {}) {
       displayFormat="lll"
       invalidMessage={() => undefined}
       {...props}
-    />
+    />,
   )
 }
 

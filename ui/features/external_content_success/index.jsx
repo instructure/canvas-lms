@@ -39,7 +39,7 @@ ExternalContentSuccess.dataReady = function (contentItems, service_id) {
 
   setTimeout(() => {
     $('#dialog_message').text(
-      I18n.t('popup_success', 'Success! This popup should close on its own...')
+      I18n.t('popup_success', 'Success! This popup should close on its own...'),
     )
   }, 1000)
 }
@@ -57,7 +57,7 @@ ExternalContentSuccess.a2DataReady = function (data) {
       errorlog: ENV.error_log,
       ltiEndpoint: ENV.lti_endpoint,
     },
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
+    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
   )
 }
 
@@ -71,7 +71,6 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
     target.parentNode.insertBefore(wrapper, target)
 
     await new Promise(resolve => {
-       
       ReactDOM.render(
         <>
           {[
@@ -82,7 +81,6 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
             .map(([msg, isError], index) => {
               return (
                 <Alert
-                   
                   key={index}
                   variant={isError ? 'error' : 'info'}
                   renderCloseButtonLabel="Close"
@@ -94,7 +92,7 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
               )
             })}
         </>,
-        wrapper
+        wrapper,
       )
     })
     ReactDOM.unmountComponentAtNode(wrapper)
@@ -109,10 +107,10 @@ ExternalContentSuccess.start = async function () {
       replaceTags(
         $('#oembed_retrieve_url').attr('href'),
         'endpoint',
-        encodeURIComponent(ENV.oembed.endpoint)
+        encodeURIComponent(ENV.oembed.endpoint),
       ),
       'url',
-      encodeURIComponent(ENV.oembed.url)
+      encodeURIComponent(ENV.oembed.url),
     )
     $.ajaxJSON(
       url,
@@ -123,9 +121,9 @@ ExternalContentSuccess.start = async function () {
         $('#dialog_message').text(
           I18n.t(
             'oembed_failure',
-            'Content retrieval failed, please try again or notify your system administrator of the error.'
-          )
-        )
+            'Content retrieval failed, please try again or notify your system administrator of the error.',
+          ),
+        ),
     )
   } else {
     ExternalContentSuccess.dataReady(data, service_id)

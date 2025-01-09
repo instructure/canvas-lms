@@ -63,7 +63,7 @@ const EnrollmentTermInput = ({enrollmentTerms, setSelectedEnrollmentTermIDs, sel
     if (!inputValue) return unselectedTerms
 
     return unselectedTerms.filter(term =>
-      term.displayName.toLowerCase().includes(inputValue.toLowerCase())
+      term.displayName.toLowerCase().includes(inputValue.toLowerCase()),
     )
   }
 
@@ -195,7 +195,7 @@ const EnrollmentTermInput = ({enrollmentTerms, setSelectedEnrollmentTermIDs, sel
         data-testid="enrollment-term-select"
         renderLabel={I18n.t('Attach terms')}
         assistiveText={I18n.t(
-          'Type or use arrow keys to navigate options. Multiple selections allowed.'
+          'Type or use arrow keys to navigate options. Multiple selections allowed.',
         )}
         inputValue={inputValue}
         isShowingOptions={isShowingOptions}

@@ -45,7 +45,7 @@ describe('ProficiencyRating', () => {
 
   it('shows a enabled_filter SVG only when the rating is enabled', () => {
     const {getByTestId, queryByTestId, getByText} = render(
-      <ProficiencyRating {...defaultProps()} />
+      <ProficiencyRating {...defaultProps()} />,
     )
     expect(getByTestId('enabled-filter')).toBeInTheDocument()
     fireEvent.click(getByText('great'))

@@ -36,7 +36,7 @@ describe('TeacherView', () => {
       const {getByText, getAllByText} = await renderTeacherView(assignment)
       expect(await waitFor(() => getAllByText(assignment.name)[0])).toBeInTheDocument()
       expect(
-        await waitFor(() => getAllByText(`${assignment.pointsPossible}`)[0])
+        await waitFor(() => getAllByText(`${assignment.pointsPossible}`)[0]),
       ).toBeInTheDocument()
       expect(await waitFor(() => getByText('Everyone'))).toBeInTheDocument()
       expect(await waitFor(() => getAllByText('Due:', {exact: false})[0])).toBeInTheDocument()
@@ -80,7 +80,7 @@ describe('TeacherView', () => {
             lockAt: assignment.lockAt && new Date(assignment.lockAt).toISOString(),
             assignmentOverrides: [],
           },
-          {state: 'published'}
+          {state: 'published'},
         ),
       ])
       const publish = getByText('publish', {exact: false})
@@ -111,7 +111,7 @@ describe('TeacherView', () => {
             assignmentOverrides: [],
           },
           {},
-          'this failed!'
+          'this failed!',
         ),
       ])
       const publish = getByText('publish', {exact: false})
@@ -152,7 +152,7 @@ describe('TeacherView', () => {
         [],
         {
           readOnly: false,
-        }
+        },
       )
 
       // put name into edit
@@ -181,7 +181,7 @@ describe('TeacherView', () => {
         [],
         {
           readOnly: false,
-        }
+        },
       )
 
       // put name into edit
@@ -209,7 +209,7 @@ describe('TeacherView', () => {
         [],
         {
           readOnly: false,
-        }
+        },
       )
 
       // put name into edit

@@ -82,7 +82,7 @@ export default class CourseFilter extends React.Component {
         },
         () => {
           this.props.onActivate()
-        }
+        },
       )
     }
   }

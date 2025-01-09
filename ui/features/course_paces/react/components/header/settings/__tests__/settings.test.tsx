@@ -198,7 +198,7 @@ describe('Settings', () => {
       act(() => settingsButton.click())
 
       expect(
-        screen.queryByRole('menuitem', {name: 'Manage Blackout Dates'})
+        screen.queryByRole('menuitem', {name: 'Manage Blackout Dates'}),
       ).not.toBeInTheDocument()
       expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
     })

@@ -51,7 +51,7 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     expect(screen.getByText(/Icon URLs/i)).toBeInTheDocument()
@@ -78,10 +78,10 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
-    expect(screen.getAllByPlaceholderText(/https:\/\/example.com\/icon/i).length).toBe(2)
+    expect(screen.getAllByPlaceholderText(/https:\/\/example.com\/icon/i)).toHaveLength(2)
   })
 
   it('allows users to change the icon URL for a placement', async () => {
@@ -101,7 +101,7 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     const state = overlayStore.getState().state
@@ -118,7 +118,7 @@ describe('IconConfirmationWrapper', () => {
     jest.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[placement as LtiPlacementWithIcon]).toBe(
-      'https://new-icon-url.com'
+      'https://new-icon-url.com',
     )
   })
 
@@ -137,11 +137,11 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     const input = screen.getByLabelText(
-      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation))
+      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
     )
     await userEvent.click(input)
     await userEvent.clear(input)
@@ -165,11 +165,11 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     const input = screen.getByLabelText(
-      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation))
+      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
     )
     await userEvent.click(input)
     await userEvent.clear(input)
@@ -194,11 +194,11 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     const input = screen.getByLabelText(
-      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation))
+      new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)),
     )
     await userEvent.click(input)
     await userEvent.clear(input)
@@ -226,13 +226,13 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     expect(
       screen.getByText(
-        'If left blank, a default icon resembling the one displayed will be provided. Color may vary.'
-      )
+        'If left blank, a default icon resembling the one displayed will be provided. Color may vary.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -259,17 +259,17 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     await userEvent.clear(
       screen.getByLabelText(new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation)), {
         selector: 'input',
-      })
+      }),
     )
 
     expect(
-      screen.getByText("If left blank, the tool's default icon will display.")
+      screen.getByText("If left blank, the tool's default icon will display."),
     ).toBeInTheDocument()
   })
 
@@ -290,7 +290,7 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     const input = screen.getByLabelText(new RegExp('Global Navigation'), {
@@ -302,13 +302,13 @@ describe('IconConfirmationWrapper', () => {
 
     expect(input).toHaveValue('https://new-icon-url.com')
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
-      'https://example.com/icon/first'
+      'https://example.com/icon/first',
     )
 
     jest.runAllTimers()
 
     expect(overlayStore.getState().state.icons.placements[LtiPlacements.GlobalNavigation]).toBe(
-      'https://new-icon-url.com'
+      'https://new-icon-url.com',
     )
   })
 
@@ -332,7 +332,7 @@ describe('IconConfirmationWrapper', () => {
         reviewing={false}
         onNextButtonClicked={onNextButtonClicked}
         onPreviousButtonClicked={onPreviousButtonClicked}
-      />
+      />,
     )
 
     overlayStore.getState().togglePlacement(LtiPlacements.EditorButton)
@@ -342,7 +342,7 @@ describe('IconConfirmationWrapper', () => {
       new RegExp(i18nLtiPlacement(LtiPlacements.GlobalNavigation), 'i'),
       {
         selector: 'input',
-      }
+      },
     )
 
     expect(input).toHaveAttribute('placeholder', 'https://example.com/icon')
@@ -350,7 +350,7 @@ describe('IconConfirmationWrapper', () => {
       new RegExp(i18nLtiPlacement(LtiPlacements.EditorButton), 'i'),
       {
         selector: 'input',
-      }
+      },
     )
 
     expect(newPlacementInput.placeholder).toBe('https://example.com/default_icon')

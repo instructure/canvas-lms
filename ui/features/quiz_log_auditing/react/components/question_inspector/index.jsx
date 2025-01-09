@@ -106,7 +106,7 @@ class QuestionInspector extends React.Component {
               one: 'This question was answered once.',
               other: 'This question was answered %{count} times.',
             },
-            {count: answers.length}
+            {count: answers.length},
           )}
         </p>
 

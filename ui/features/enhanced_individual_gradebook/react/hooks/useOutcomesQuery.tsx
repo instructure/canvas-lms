@@ -34,7 +34,7 @@ export const useOutcomesQuery = (courseId: string) => {
 
   const outcomes = useMemo(
     () => data?.pages.flatMap(page => page.course.rootOutcomeGroup.outcomes.nodes) ?? [],
-    [data]
+    [data],
   )
 
   return {

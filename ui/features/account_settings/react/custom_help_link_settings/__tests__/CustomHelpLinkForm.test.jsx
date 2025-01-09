@@ -64,7 +64,7 @@ describe('<CustomHelpLinkForm/>', () => {
 
     it('renders featured checkbox checked if featured is selected', () => {
       const {getByLabelText} = render(
-        <CustomHelpLinkForm {...makeProps({link: {is_featured: true, feature_headline: 'foo'}})} />
+        <CustomHelpLinkForm {...makeProps({link: {is_featured: true, feature_headline: 'foo'}})} />,
       )
       expect(getByLabelText('Featured').checked).toBe(true)
       expect(getByLabelText('Feature headline').disabled).toBe(false)
@@ -78,7 +78,7 @@ describe('<CustomHelpLinkForm/>', () => {
 
     it('sets featured to false if new is selected', () => {
       const {getByLabelText} = render(
-        <CustomHelpLinkForm {...makeProps({link: {is_featured: true}})} />
+        <CustomHelpLinkForm {...makeProps({link: {is_featured: true}})} />,
       )
       fireEvent.click(getByLabelText('New'))
       expect(getByLabelText('Featured').checked).toBe(false)
@@ -95,7 +95,7 @@ describe('<CustomHelpLinkForm/>', () => {
       const {getByLabelText, getByDisplayValue, queryByDisplayValue} = render(
         <CustomHelpLinkForm
           {...makeProps({link: {is_featured: true, feature_headline: headline}})}
-        />
+        />,
       )
       fireEvent.click(getByLabelText('Featured')) // disable
       expect(queryByDisplayValue(headline)).toBeNull()
@@ -108,7 +108,7 @@ describe('<CustomHelpLinkForm/>', () => {
       const {getByLabelText, getByDisplayValue} = render(
         <CustomHelpLinkForm
           {...makeProps({link: {is_featured: true, feature_headline: headline}})}
-        />
+        />,
       )
       fireEvent.click(getByLabelText('New')) // enables new (disables featured)
       fireEvent.click(getByLabelText('New')) // disables new

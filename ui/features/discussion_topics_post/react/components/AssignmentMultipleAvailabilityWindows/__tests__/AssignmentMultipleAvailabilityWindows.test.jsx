@@ -76,7 +76,7 @@ const setup = props => {
       assignmentOverrides={mockOverrides}
       onSetDueDateTrayOpen={jest.fn()}
       {...props}
-    />
+    />,
   )
 }
 

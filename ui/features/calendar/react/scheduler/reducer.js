@@ -35,7 +35,7 @@ const reducer = handleActions(
       }
     },
   },
-  initialState
+  initialState,
 )
 
 export default reducer

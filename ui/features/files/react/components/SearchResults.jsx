@@ -50,7 +50,7 @@ SearchResults.displayErrors = function (errors) {
             one: 'Your search encountered the following error:',
             other: 'Your search encountered the following errors:',
           },
-          {count: errors.length}
+          {count: errors.length},
         )}
       </p>
       <ul>{error_message}</ul>
@@ -101,7 +101,7 @@ SearchResults.render = function () {
               tabIndex="0"
             >
               {I18n.t(
-                'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
+                'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.',
               )}
             </div>
           )}
@@ -119,8 +119,8 @@ SearchResults.render = function () {
               Folder.prototype.childrenSorter.bind(
                 this.state.collection,
                 this.props.query.sort,
-                this.props.query.order
-              )
+                this.props.query.order,
+              ),
             )
             .map(child => (
               <FolderChild

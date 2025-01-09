@@ -227,13 +227,13 @@ export default class IndexHeader extends Component {
             <IconLockLine />,
             I18n.t('Lock'),
             I18n.t('Lock Selected Announcements'),
-            responsiveStyles
+            responsiveStyles,
           )
         : this.renderLockToggleButton(
             <IconUnlockLine />,
             I18n.t('Unlock'),
             I18n.t('Unlock Selected Announcements'),
-            responsiveStyles
+            responsiveStyles,
           ))
     )
   }
@@ -408,5 +408,5 @@ const selectedActions = [
 
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = WithBreakpoints(
-  connect(connectState, connectActions)(IndexHeader)
+  connect(connectState, connectActions)(IndexHeader),
 )

@@ -69,7 +69,7 @@ export default function JobDetails({job, timeZone, onRequeue}) {
         )
       }
     },
-    [job]
+    [job],
   )
 
   const renderModalRow = useCallback(
@@ -104,7 +104,7 @@ export default function JobDetails({job, timeZone, onRequeue}) {
         )
       }
     },
-    [job, openModal, setOpenModal]
+    [job, openModal, setOpenModal],
   )
 
   if (!job) return <Text>{I18n.t('No job selected')}</Text>

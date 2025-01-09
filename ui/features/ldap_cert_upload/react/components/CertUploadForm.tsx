@@ -49,7 +49,7 @@ export type CertUploadFormProps = {
 
 export const CertUploadForm = ({inputField}: CertUploadFormProps) => {
   const [cert, setCert] = useState(() =>
-    inputField.value ? new X509Certificate(inputField.value) : null
+    inputField.value ? new X509Certificate(inputField.value) : null,
   )
   const [errors, setErrors] = useState<string[]>([])
 

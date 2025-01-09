@@ -88,11 +88,11 @@ describe('AddExternalToolButton', () => {
           modalIsOpen={true}
           ref={ref}
           configurationType="lti2"
-        />
+        />,
       )
       await userEvent.selectOptions(
         screen.getByRole('combobox', {name: /Configuration Type/i}),
-        'By LTI 2 Registration URL'
+        'By LTI 2 Registration URL',
       )
       const registrationUrl = 'http://www.instructure.com/register'
       const iframeDouble = {submit: jest.fn()}
@@ -224,7 +224,7 @@ describe('AddExternalToolButton', () => {
           duplicateTool={true}
           configurationType="xml"
           ref={ref}
-        />
+        />,
       )
       const xhr = {
         responseText: JSON.stringify({

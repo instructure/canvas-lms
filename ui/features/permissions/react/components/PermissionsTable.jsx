@@ -87,7 +87,7 @@ export default class PermissionsTable extends Component {
     // operation that JUST happened.
     if (!this.tableRef.current) return
     const newGranulars = this.tableRef.current.querySelectorAll(
-      `tr.${GRANULAR_PERMISSION_TAG}-${this.justExpanded}`
+      `tr.${GRANULAR_PERMISSION_TAG}-${this.justExpanded}`,
     )
     if (newGranulars.length === 0) return
 
@@ -171,7 +171,7 @@ export default class PermissionsTable extends Component {
     const toggleExpanded = () => {
       this.setState(prevState => {
         // Need to make a copy to avoid mutating existing state
-         
+
         const expanded = Object.assign({}, prevState.expanded)
         expanded[name] = !expanded[name]
 
@@ -316,5 +316,5 @@ const mapDispatchToProps = {
 
 export const ConnectedPermissionsTable = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(PermissionsTable)

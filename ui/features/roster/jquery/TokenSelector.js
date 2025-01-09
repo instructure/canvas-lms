@@ -451,12 +451,12 @@ export default class TokenSelector {
         ? this.selection.next().length
           ? this.selection.next()
           : this.selection.parent('ul').next().length
-          ? this.selection.parent('ul').next().find('li').first()
-          : null
+            ? this.selection.parent('ul').next().find('li').first()
+            : null
         : this.list != null
-        ? this.list.first()
-        : undefined,
-      preserveMode
+          ? this.list.first()
+          : undefined,
+      preserveMode,
     )
     if (this.selection != null ? this.selection.hasClass('message') : undefined) {
       return this.selectNext(preserveMode)
@@ -469,11 +469,11 @@ export default class TokenSelector {
         ? (this.selection != null ? this.selection.prev().length : undefined)
           ? this.selection.prev()
           : this.selection.parent('ul').prev().length
-          ? this.selection.parent('ul').prev().find('li').last()
-          : null
+            ? this.selection.parent('ul').prev().find('li').last()
+            : null
         : this.list != null
-        ? this.list.last()
-        : undefined
+          ? this.list.last()
+          : undefined,
     )
     if (this.selection != null ? this.selection.hasClass('message') : undefined) {
       return this.selectPrev()
@@ -519,7 +519,7 @@ export default class TokenSelector {
       {},
       this.options.baseData != null ? this.options.baseData : {},
       data != null ? data : {},
-      {search: this.input.val().replace(/^\s+|\s+$/g, '')}
+      {search: this.input.val().replace(/^\s+|\s+$/g, '')},
     )
     if (postData.exclude == null) {
       postData.exclude = []
@@ -567,7 +567,7 @@ export default class TokenSelector {
             this.updateSearch()
           }
           return delete this.nextRequest
-        })
+        }),
       )
     }
 

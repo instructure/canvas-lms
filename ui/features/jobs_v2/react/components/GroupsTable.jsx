@@ -53,7 +53,7 @@ export default function GroupsTable({
         </Table.ColHeader>
       )
     },
-    [bucket, sortColumn, onClickHeader]
+    [bucket, sortColumn, onClickHeader],
   )
 
   return (

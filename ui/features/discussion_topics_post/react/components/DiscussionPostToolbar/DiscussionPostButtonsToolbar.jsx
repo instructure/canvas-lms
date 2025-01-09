@@ -54,7 +54,7 @@ const DiscussionPostButtonsToolbar = props => {
   const [showAssignToTray, setShowAssignToTray] = useState(false)
   const [moreOpened, setMoreOpened] = useState(false)
   const {translationLanguages, showTranslationControl, setShowTranslationControl} = useContext(
-    DiscussionManagerUtilityContext
+    DiscussionManagerUtilityContext,
   )
 
   const handleClose = () => setShowAssignToTray(false)
@@ -199,7 +199,7 @@ const DiscussionPostButtonsToolbar = props => {
             <IconGroupLine />
             {I18n.t('Group')}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     if (props.breakpoints.mobileOnly) {
@@ -219,7 +219,7 @@ const DiscussionPostButtonsToolbar = props => {
             )}
             {I18n.t('Sort')}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     if (ENV.user_can_summarize && !props.isSummaryEnabled) {
@@ -235,7 +235,7 @@ const DiscussionPostButtonsToolbar = props => {
             <AiIcon />
             {I18n.t('Summarize')}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     if (translationLanguages.current.length > 0) {
@@ -251,7 +251,7 @@ const DiscussionPostButtonsToolbar = props => {
             <AiIcon />
             {translationOptionText}
           </Flex>
-        </Drilldown.Option>
+        </Drilldown.Option>,
       )
     }
     return options

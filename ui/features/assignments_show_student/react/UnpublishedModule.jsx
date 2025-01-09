@@ -45,7 +45,7 @@ export default function UnpublishedModule() {
                 margin="xx-small"
               >
                 {I18n.t(
-                  'This assignment is part of an unpublished module and is not available yet.'
+                  'This assignment is part of an unpublished module and is not available yet.',
                 )}
               </Heading>
             </View>

@@ -86,7 +86,7 @@ export const ColorPicker = ({
           "'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.",
           {
             chosenColor: currentColor,
-          }
+          },
         ),
         type: 'warning',
         srOnly: true,
@@ -110,7 +110,7 @@ export const ColorPicker = ({
           colorLabels={colorLabels}
           currentColor={currentColor}
           handleOnClick={setCurrentColor}
-        />
+        />,
       )
     }
 

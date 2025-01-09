@@ -64,7 +64,7 @@ describe('ToolConfigurationForm', () => {
       mountForm()
 
       expect(
-        screen.getByText(new RegExp(defaultProps().toolConfiguration.url, 'i'))
+        screen.getByText(new RegExp(defaultProps().toolConfiguration.url, 'i')),
       ).toBeInTheDocument()
     })
 

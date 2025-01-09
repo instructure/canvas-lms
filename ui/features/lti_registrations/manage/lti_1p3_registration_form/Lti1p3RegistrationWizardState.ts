@@ -44,13 +44,13 @@ export interface Lti1p3RegistrationWizardActions {
   install: (
     onSuccessfulInstallation: () => void,
     accountId: AccountId,
-    unifiedToolId?: string
+    unifiedToolId?: string,
   ) => Promise<void>
   update: (
     onSuccessfulUpdate: () => void,
     accountId: AccountId,
     registrationId: LtiRegistrationId,
-    unifiedToolId?: string
+    unifiedToolId?: string,
   ) => Promise<void>
 }
 
@@ -91,7 +91,7 @@ export const createLti1p3RegistrationWizardState = ({
       overlayStore: createLti1p3RegistrationOverlayStore(
         internalConfig,
         adminNickname,
-        existingOverlay
+        existingOverlay,
       ),
       _step: 'LaunchSettings',
       service,
@@ -106,7 +106,7 @@ export const createLti1p3RegistrationWizardState = ({
 
       const {overlay, config} = convertToLtiConfigurationOverlay(
         get().state.overlayStore.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       const result = await service.createLtiRegistration(
@@ -114,7 +114,7 @@ export const createLti1p3RegistrationWizardState = ({
         config,
         overlay,
         unifiedToolId,
-        get().state.overlayStore.getState().state.naming.nickname
+        get().state.overlayStore.getState().state.naming.nickname,
       )
 
       if (isSuccessful(result)) {
@@ -134,7 +134,7 @@ export const createLti1p3RegistrationWizardState = ({
 
       const {overlay, config} = convertToLtiConfigurationOverlay(
         get().state.overlayStore.getState().state,
-        internalConfig
+        internalConfig,
       )
 
       const result = await service.updateLtiRegistration(
@@ -142,7 +142,7 @@ export const createLti1p3RegistrationWizardState = ({
         registrationId,
         config,
         overlay,
-        get().state.overlayStore.getState().state.naming.nickname
+        get().state.overlayStore.getState().state.naming.nickname,
       )
 
       if (isSuccessful(result)) {

@@ -35,7 +35,7 @@ function renderAssignmentDate(props) {
       invalidMessage={() => 'oh no!'}
       value="2108-03-13T15:15:00-07:00"
       {...props}
-    />
+    />,
   )
 }
 

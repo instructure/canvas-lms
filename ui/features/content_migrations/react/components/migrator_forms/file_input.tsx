@@ -56,7 +56,7 @@ const MigrationFileInput = ({
   isRequired,
 }: MigrationFileInputProps) => {
   const [formMessage, setFormMessage] = useState<FormMessage>(
-    externalFormMessage || {text: I18n.t('No file chosen'), type: 'hint'}
+    externalFormMessage || {text: I18n.t('No file chosen'), type: 'hint'},
   )
 
   useEffect(() => {
@@ -79,8 +79,8 @@ const MigrationFileInput = ({
           getErrorMessage(
             I18n.t('Your migration can not exceed %{upload_limit}', {
               upload_limit: humanReadableSize(ENV.UPLOAD_LIMIT),
-            })
-          )
+            }),
+          ),
         )
       }
       if (selectedFile.name) {
@@ -88,7 +88,7 @@ const MigrationFileInput = ({
       }
       onChange(selectedFile)
     },
-    [onChange, setFormMessage]
+    [onChange, setFormMessage],
   )
 
   const handleDropRejected = useCallback(() => {

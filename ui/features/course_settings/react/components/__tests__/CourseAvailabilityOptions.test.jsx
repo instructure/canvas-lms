@@ -62,17 +62,17 @@ function renderComponent(wrapper, overrides = {}) {
   createFormField(
     wrapper,
     'course_restrict_student_past_view',
-    options.course_restrict_student_past_view
+    options.course_restrict_student_past_view,
   )
   createFormField(
     wrapper,
     'course_restrict_student_future_view',
-    options.course_restrict_student_future_view
+    options.course_restrict_student_future_view,
   )
   createFormField(
     wrapper,
     'course_restrict_enrollments_to_course_dates',
-    options.course_restrict_enrollments_to_course_dates
+    options.course_restrict_enrollments_to_course_dates,
   )
 
   return render(<CourseAvailabilityOptions {...options} />, wrapper)
@@ -93,14 +93,14 @@ describe('CourseAvailabilityOptions', () => {
   it('renders all applicable inputs with default options', () => {
     const {getByLabelText, getByText} = renderComponent(wrapper)
     expect(
-      getByLabelText('Limit course participation to term or custom course dates?')
+      getByLabelText('Limit course participation to term or custom course dates?'),
     ).toBeInTheDocument()
     expect(getByText('Course participation is limited to', {exact: false})).toBeInTheDocument()
     expect(
-      getByLabelText('Restrict students from viewing course before term start date')
+      getByLabelText('Restrict students from viewing course before term start date'),
     ).toBeInTheDocument()
     expect(
-      getByLabelText('Restrict students from viewing course after term end date')
+      getByLabelText('Restrict students from viewing course after term end date'),
     ).toBeInTheDocument()
   })
 
@@ -118,7 +118,7 @@ describe('CourseAvailabilityOptions', () => {
     expect(
       getByText('Any section dates created in the course may override course dates.', {
         exact: false,
-      })
+      }),
     ).toBeInTheDocument()
   })
 
@@ -151,10 +151,10 @@ describe('CourseAvailabilityOptions', () => {
       viewFutureLocked: true,
     })
     expect(
-      getByLabelText('Restrict students from viewing course before term start date')
+      getByLabelText('Restrict students from viewing course before term start date'),
     ).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course after term end date')
+      getByLabelText('Restrict students from viewing course after term end date'),
     ).toBeEnabled()
   })
 
@@ -163,10 +163,10 @@ describe('CourseAvailabilityOptions', () => {
       viewPastLocked: true,
     })
     expect(
-      getByLabelText('Restrict students from viewing course after term end date')
+      getByLabelText('Restrict students from viewing course after term end date'),
     ).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course before term start date')
+      getByLabelText('Restrict students from viewing course before term start date'),
     ).toBeEnabled()
   })
 
@@ -176,15 +176,15 @@ describe('CourseAvailabilityOptions', () => {
       course_restrict_enrollments_to_course_dates: 'true',
     })
     expect(
-      getByLabelText('Limit course participation to term or custom course dates?')
+      getByLabelText('Limit course participation to term or custom course dates?'),
     ).toBeDisabled()
     expect(getByLabelText('Start')).toBeDisabled()
     expect(getByLabelText('End')).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course before course start date')
+      getByLabelText('Restrict students from viewing course before course start date'),
     ).toBeDisabled()
     expect(
-      getByLabelText('Restrict students from viewing course after course end date')
+      getByLabelText('Restrict students from viewing course after course end date'),
     ).toBeDisabled()
   })
 
@@ -218,10 +218,10 @@ describe('CourseAvailabilityOptions', () => {
       course_restrict_student_past_view: 'true',
     })
     expect(
-      getByLabelText('Restrict students from viewing course before term start date').checked
+      getByLabelText('Restrict students from viewing course before term start date').checked,
     ).toBeFalsy()
     expect(
-      getByLabelText('Restrict students from viewing course after term end date').checked
+      getByLabelText('Restrict students from viewing course after term end date').checked,
     ).toBeTruthy()
   })
 
@@ -271,7 +271,7 @@ describe('CourseAvailabilityOptions', () => {
     fireEvent.click(endDate)
     fireEvent.blur(endDate)
     expect(document.getElementById('course_conclude_at').value).toBe(
-      `${futureYear}-01-01T00:00:00.000Z`
+      `${futureYear}-01-01T00:00:00.000Z`,
     )
   })
 
@@ -370,7 +370,7 @@ describe('CourseAvailabilityOptions', () => {
       fireEvent.change(endDate, {target: {value: `Apr 5, ${year} 10:00am`}})
       pressKey(endDate, {key: 'Enter'})
       expect(document.getElementById('course_conclude_at').value).toBe(
-        `${year}-04-05T10:00:00.000Z`
+        `${year}-04-05T10:00:00.000Z`,
       )
       expect(getByText(`Local: Apr 5, ${year} 10:00am`)).toBeInTheDocument()
       expect(getByText(`Course: Apr 5, ${year} 7:00am`)).toBeInTheDocument()

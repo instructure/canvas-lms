@@ -42,7 +42,7 @@ describe('LaunchSettings', () => {
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
         reviewing={false}
-      />
+      />,
     )
 
     const redirectUris = screen.getByLabelText(/Redirect URIs/i)
@@ -67,7 +67,7 @@ describe('LaunchSettings', () => {
       'placeholder',
       Object.entries(config.custom_fields!).reduce((acc, [key, value]) => {
         return acc + `${key}=${value}\n`
-      }, '')
+      }, ''),
     )
   })
 
@@ -85,7 +85,7 @@ describe('LaunchSettings', () => {
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
         reviewing={false}
-      />
+      />,
     )
     const redirectURIs = screen.getByLabelText('Redirect URIs')
     const expectedRedirectUris = [
@@ -140,7 +140,7 @@ describe('LaunchSettings', () => {
         unregister={jest.fn()}
         onNextClicked={jest.fn()}
         reviewing={false}
-      />
+      />,
     )
 
     const nextButton = screen.getByRole('button', {name: /Next/i})

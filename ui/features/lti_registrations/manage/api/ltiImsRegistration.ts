@@ -38,15 +38,15 @@ import type {UnifiedToolId} from '../model/UnifiedToolId'
 export const fetchRegistrationToken = (
   accountId: AccountId,
   registrationUrl: string,
-  unifiedToolId?: UnifiedToolId
+  unifiedToolId?: UnifiedToolId,
 ) =>
   parseFetchResult(ZDynamicRegistrationToken)(
     fetch(
       `/api/lti/accounts/${accountId}/registration_token?unified_tool_id=${
         unifiedToolId || ''
       }&registration_url=${registrationUrl}`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 /**
@@ -62,13 +62,13 @@ export const fetchRegistrationToken = (
  */
 export const getRegistrationByUUID = (
   accountId: AccountId,
-  registrationUuid: DynamicRegistrationTokenUUID
+  registrationUuid: DynamicRegistrationTokenUUID,
 ) =>
   parseFetchResult(ZLtiImsRegistration)(
     fetch(
       `/api/lti/accounts/${accountId}/registrations/uuid/${registrationUuid}`,
-      defaultFetchOptions()
-    )
+      defaultFetchOptions(),
+    ),
   )
 
 /**
@@ -81,10 +81,10 @@ export const getRegistrationByUUID = (
  */
 export const getLtiImsRegistrationById = (
   accountId: AccountId,
-  registrationId: LtiImsRegistrationId
+  registrationId: LtiImsRegistrationId,
 ) =>
   parseFetchResult(ZLtiImsRegistration)(
-    fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}`, defaultFetchOptions())
+    fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}`, defaultFetchOptions()),
   )
 
 /**
@@ -97,7 +97,7 @@ export const getLtiImsRegistrationById = (
 export const updateRegistrationOverlay = (
   accountId: AccountId,
   registrationId: LtiImsRegistrationId,
-  overlay: RegistrationOverlay
+  overlay: RegistrationOverlay,
 ) =>
   parseFetchResult(ZLtiImsRegistration)(
     fetch(`/api/lti/accounts/${accountId}/registrations/${registrationId}/overlay`, {
@@ -108,5 +108,5 @@ export const updateRegistrationOverlay = (
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(overlay),
-    })
+    }),
   )

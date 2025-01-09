@@ -18,23 +18,23 @@
  */
 
 import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
-import { VideoConferenceModal } from '../VideoConferenceModal'
+import {fireEvent, render} from '@testing-library/react'
+import {VideoConferenceModal} from '../VideoConferenceModal'
 import userEvent from '@testing-library/user-event'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 
 injectGlobalAlertContainers()
 
 const userList = [
-  { displayName: 'Allison Pitler', id: '7', assetCode: '7' },
-  { displayName: 'Caleb Guanzon', id: '3', assetCode: '3' },
-  { displayName: 'Chawn Neal', id: '2', assetCode: '2' },
-  { displayName: 'Drake Harper', id: '1', assetCode: '1' },
-  { displayName: 'Jason Gillet', id: '5', assetCode: '5' },
-  { displayName: 'Jeffrey Johnson', id: '0', assetCode: '0' },
-  { displayName: 'Jewel Pearson', id: '8', assetCode: '8' },
-  { displayName: 'Nic Nolan', id: '6', assetCode: '6' },
-  { displayName: 'Omar Soto Fortuno', id: '4', assetCode: '4' },
+  {displayName: 'Allison Pitler', id: '7', assetCode: '7'},
+  {displayName: 'Caleb Guanzon', id: '3', assetCode: '3'},
+  {displayName: 'Chawn Neal', id: '2', assetCode: '2'},
+  {displayName: 'Drake Harper', id: '1', assetCode: '1'},
+  {displayName: 'Jason Gillet', id: '5', assetCode: '5'},
+  {displayName: 'Jeffrey Johnson', id: '0', assetCode: '0'},
+  {displayName: 'Jewel Pearson', id: '8', assetCode: '8'},
+  {displayName: 'Nic Nolan', id: '6', assetCode: '6'},
+  {displayName: 'Omar Soto Fortuno', id: '4', assetCode: '4'},
 ]
 
 const startCalendarDate = new Date().toISOString()
@@ -55,7 +55,7 @@ describe('VideoConferenceModal', () => {
         startCalendarDate={startCalendarDate}
         endCalendarDate={endCalendarDate}
         {...props}
-      />
+      />,
     )
   }
 
@@ -109,7 +109,7 @@ describe('VideoConferenceModal', () => {
     await userEvent.type(container.getByLabelText('Name *'), 'A great video conference name')
     await userEvent.type(
       container.getByLabelText('Description'),
-      'A great video conference description'
+      'A great video conference description',
     )
     await userEvent.click(container.getByTestId('submit-button'))
 

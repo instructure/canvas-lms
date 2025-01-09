@@ -128,7 +128,7 @@ const Actions = {
       this.ajaxPutFormData(`/api/v1/courses/${courseId}`, data, ajaxLib)
         .then(() => {
           dispatch(
-            imageId ? this.setCourseImageId(imageUrl, imageId) : this.setCourseImageUrl(imageUrl)
+            imageId ? this.setCourseImageId(imageUrl, imageId) : this.setCourseImageUrl(imageUrl),
           )
         })
         .catch(() => {
@@ -189,7 +189,7 @@ const Actions = {
         rawUploadFile(url, data, file, ajaxLib)
           .then(attachment => {
             dispatch(
-              this.prepareSetImage(attachment.url, attachment.id, settingName, courseId, ajaxLib)
+              this.prepareSetImage(attachment.url, attachment.id, settingName, courseId, ajaxLib),
             )
           })
           .catch(_response => {
@@ -198,7 +198,7 @@ const Actions = {
       } else {
         dispatch(this.rejectedUpload(type))
         $.flashWarning(
-          I18n.t("'%{type}' is not a valid image type (try jpg, png, webp, or gif)", {type})
+          I18n.t("'%{type}' is not a valid image type (try jpg, png, webp, or gif)", {type}),
         )
       }
     }

@@ -45,13 +45,13 @@ function persistCheckbox(state) {
   })
     .then(
       ({json}) =>
-        (ENV.comment_library_suggestions_enabled = json.comment_library_suggestions_enabled)
+        (ENV.comment_library_suggestions_enabled = json.comment_library_suggestions_enabled),
     )
     .catch(() =>
       showFlashAlert({
         message: I18n.t('Error saving suggestion preference'),
         type: 'error',
-      })
+      }),
     )
 }
 
@@ -119,7 +119,7 @@ const LibraryManager = ({
       setComment(comment)
       setFocusToTextArea()
     },
-    [setComment, setFocusToTextArea]
+    [setComment, setFocusToTextArea],
   )
 
   const [deleteComment, {loading: isDeletingComment}] = useMutation(DELETE_COMMENT_MUTATION, {

@@ -32,7 +32,7 @@ export default {
           TabActions.selectTab({
             selected: i,
             queryParams: parse(context.querystring),
-          })
+          }),
         )
       })
     })

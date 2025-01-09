@@ -47,7 +47,6 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
 
   React.useEffect(() => {
     if (state._type === 'RequestingRegistration') {
-       
       fetchRegistrationByClientId(props.accountId, state.developerKeyId).then(result => {
         loaded(result)
       })
@@ -89,7 +88,7 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
             // then install the app???
             if (state._type === 'RegistrationLoaded' && state.result._type === 'Success') {
               install()
-               
+
               props.service
                 .bindGlobalLtiRegistration(props.accountId, state.result.data.id)
                 .then(result => {
@@ -102,7 +101,6 @@ export const InheritedKeyRegistrationWizard = (props: InheritedKeyRegistrationWi
                       state.onSuccessfulInstallation?.()
                     })
                   } else {
-                     
                     console.error('Failed to install app', formatApiResultError(result))
                     close()
                     flashError(I18n.t('Failed to install app'))

@@ -73,7 +73,7 @@ describe('Discussions redux actions', () => {
       expect(apiClient.updateDiscussion).toHaveBeenCalledWith(
         expect.anything(),
         discussion,
-        updateFields
+        updateFields,
       )
     })
 

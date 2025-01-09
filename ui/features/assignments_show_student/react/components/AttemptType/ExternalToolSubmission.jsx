@@ -132,7 +132,12 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
   )
 }
 
-const ExternalToolSubmission = ({createSubmissionDraft, onFileUploadRequested, submission, tool}) =>
+const ExternalToolSubmission = ({
+  createSubmissionDraft,
+  onFileUploadRequested,
+  submission,
+  tool,
+}) =>
   isSubmitted(submission) ? (
     <SelectedContentView
       url={submission.url}

@@ -98,7 +98,7 @@ export default class Filters extends React.Component {
       options.push(
         <Select.Option id={i} key={i} value={i.toString()}>
           {I18n.t('Attempt %{count}', {count: i})}
-        </Select.Option>
+        </Select.Option>,
       )
     }
     return options

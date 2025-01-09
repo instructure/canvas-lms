@@ -43,7 +43,7 @@ describe('OverrideDates', () => {
         onChange={() => {}}
         onValidate={() => true}
         invalidMessage={() => undefined}
-      />
+      />,
     )
 
     expect(getAllByTestId('EditableDateTime')).toHaveLength(3)
@@ -63,7 +63,7 @@ describe('OverrideDates', () => {
         onChange={() => {}}
         onValidate={() => true}
         invalidMessage={() => undefined}
-      />
+      />,
     )
 
     expect(getAllByTestId('EditableDateTime')).toHaveLength(3)
@@ -116,7 +116,7 @@ function failADate(whichDate) {
         <span id="focus-me" tabIndex="-1">
           focus me
         </span>
-      </div>
+      </div>,
     )
 
     // click the edit button

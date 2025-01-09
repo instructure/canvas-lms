@@ -26,7 +26,7 @@ describe('FindOutcomesBillboard', () => {
     return realRender(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         {children}
-      </OutcomesContext.Provider>
+      </OutcomesContext.Provider>,
     )
   }
 

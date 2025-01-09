@@ -32,7 +32,7 @@ export const MessageDetailParticipants = ({...props}) => {
   const [participantsExpanded, setParticipantsExpanded] = useState(false)
 
   const uniqueMessageRecipients = props.conversationMessage?.recipients?.filter(
-    p => p.shortName !== props.conversationMessage?.author?.shortName
+    p => p.shortName !== props.conversationMessage?.author?.shortName,
   )
 
   const participantsToShow = participantsExpanded

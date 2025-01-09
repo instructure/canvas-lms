@@ -29,12 +29,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('gradingGradeSummary')
 
-const $fixtures = document.getElementById('fixtures') || (() => {
-  const fixturesDiv = document.createElement('div')
-  fixturesDiv.id = 'fixtures'
-  document.body.appendChild(fixturesDiv)
-  return fixturesDiv
-})()
+const $fixtures =
+  document.getElementById('fixtures') ||
+  (() => {
+    const fixturesDiv = document.createElement('div')
+    fixturesDiv.id = 'fixtures'
+    document.body.appendChild(fixturesDiv)
+    return fixturesDiv
+  })()
 
 function createAssignmentGroups() {
   return [
@@ -119,7 +121,9 @@ describe('GradeSummary.onScoreChange', () => {
 
   beforeEach(() => {
     // Mock jQuery plugins
-    $.fn.showIf = function() { return this }
+    $.fn.showIf = function () {
+      return this
+    }
     $.screenReaderFlashMessageExclusive = jest.fn()
     $.ajaxJSON = jest.fn()
     $.ajaxJSON.unhandledXHRs = []
@@ -137,10 +141,10 @@ describe('GradeSummary.onScoreChange', () => {
       GRADE_CALC_IGNORE_UNPOSTED_ANONYMOUS: false,
       GRADEBOOK_OPTIONS: {has_grading_periods: false},
     })
-    
+
     setPageHtmlFixture()
     GradeSummary.setup()
-    
+
     $assignment = $('.student_assignment.editable').first()
     const $gradeEntry = $('#grade_entry')
     $gradeEntry.appendTo($assignment.find('.grade'))

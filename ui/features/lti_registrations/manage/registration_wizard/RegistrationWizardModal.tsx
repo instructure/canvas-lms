@@ -155,7 +155,7 @@ const ModalBodyWrapper = ({
             showFlashSuccess(
               state.ltiImsRegistrationId
                 ? I18n.t('App updated successfully!')
-                : I18n.t('App installed successfully!')
+                : I18n.t('App installed successfully!'),
             )()
             state.onSuccessfulInstallation?.()
           }}
@@ -367,7 +367,7 @@ const InitializationModalBody = (props: InitializationModalBodyProps) => {
         {props.state.lti_version === '1p1' && (
           <View display="block" margin="medium 0" padding="small" background="secondary">
             {I18n.t(
-              'Thank you for your interest in 1.1. We are exploring implementing this feature in future releases'
+              'Thank you for your interest in 1.1. We are exploring implementing this feature in future releases',
             )}
           </View>
         )}
@@ -430,11 +430,11 @@ const validForm = (state: RegistrationWizardModalState) => {
 }
 
 const dynamicRegistrationUrlInputMessages = (
-  state: RegistrationWizardModalState
+  state: RegistrationWizardModalState,
 ): Array<FormMessage> => {
   const defaultMessage: FormMessage = {
     text: I18n.t(
-      'You can locate this URL on the integration page of the tool if it supports this method'
+      'You can locate this URL on the integration page of the tool if it supports this method',
     ),
     type: 'hint',
   }
@@ -459,7 +459,7 @@ const jsonUrlInputMessages = (state: RegistrationWizardModalState): Array<FormMe
       ? [
           {
             text: I18n.t(
-              'You can locate this URL on the integration page of the tool if it supports this method'
+              'You can locate this URL on the integration page of the tool if it supports this method',
             ),
             type: 'hint',
           } as const,
@@ -511,7 +511,7 @@ const jsonFetchMessages = (state: RegistrationWizardModalState): Array<FormMessa
       {
         text: configurationError
           ? I18n.t(
-              'The configuration is invalid. Please reach out to the app provider for assistance.'
+              'The configuration is invalid. Please reach out to the app provider for assistance.',
             )
           : I18n.t('An error occurred. Please try again.'),
         type: 'error',

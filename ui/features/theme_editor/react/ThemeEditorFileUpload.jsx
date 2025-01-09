@@ -135,7 +135,7 @@ export default class ThemeEditorFileUpload extends Component {
             name={!this.props.userInput.val ? this.props.name : undefined}
             value={this.props.userInput.val === '' ? '' : this.props.currentValue}
           />
-          { }
+          {}
           <label className="ThemeEditorFileUpload__file-chooser">
             <span className="screenreader-only">{this.props.label}</span>
             <input

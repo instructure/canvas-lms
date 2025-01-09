@@ -40,7 +40,7 @@ describe('Files Client-side Router', () => {
     router.getFolderSplat(fakeCtx, fakeNext)
 
     expect(fakeCtx.splat).toBe(
-      'this%23could%2Bbe%20bad%3F%20maybe/another%3Fbad%20folder/something%20else'
+      'this%23could%2Bbe%20bad%3F%20maybe/another%3Fbad%20folder/something%20else',
     )
   })
 })

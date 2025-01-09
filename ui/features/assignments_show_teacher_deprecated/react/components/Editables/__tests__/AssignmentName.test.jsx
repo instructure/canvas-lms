@@ -39,7 +39,7 @@ function renderAssignmentName(props) {
       invalidMessage={errorMessage}
       name="the name"
       {...props}
-    />
+    />,
   )
 }
 
@@ -101,7 +101,7 @@ describe('AssignmentName', () => {
         <span id="focus-me" tabIndex="-1">
           just here to get focus
         </span>
-      </div>
+      </div>,
     )
 
     const input = getByDisplayValue('the name')

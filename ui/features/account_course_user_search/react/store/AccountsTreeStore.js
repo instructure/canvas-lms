@@ -32,7 +32,7 @@ const AccountsTreeStore = createStore({
       this.getKey(),
       `/api/v1/accounts/${this.context.accountId}`,
       {},
-      {wrap: true}
+      {wrap: true},
     ).then(() => this.loadAll(null, true))
   },
 

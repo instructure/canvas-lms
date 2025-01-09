@@ -104,7 +104,7 @@ describe('AppointmentGroup EditPage', () => {
       render(<EditPage {...defaultProps} />)
       await waitFor(() => {
         expect(axios.get).toHaveBeenCalledWith(
-          '/api/v1/appointment_groups/1?include[]=appointments&include[]=child_events'
+          '/api/v1/appointment_groups/1?include[]=appointments&include[]=child_events',
         )
       })
     })
@@ -156,7 +156,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.click(deleteButton)
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
-          'An error occurred while deleting the appointment group'
+          'An error occurred while deleting the appointment group',
         )
       })
     })
@@ -193,7 +193,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.click(saveButton)
       await waitFor(() => {
         expect($.fn.errorBox).toHaveBeenCalledWith(
-          'You must provide a value or unselect the option.'
+          'You must provide a value or unselect the option.',
         )
       })
     })
@@ -218,7 +218,7 @@ describe('AppointmentGroup EditPage', () => {
 
       await waitFor(() => {
         expect($.fn.errorBox).toHaveBeenCalledWith(
-          'You must allow at least one appointment per time slot.'
+          'You must allow at least one appointment per time slot.',
         )
       })
     })
@@ -253,7 +253,7 @@ describe('AppointmentGroup EditPage', () => {
               participant_visibility: 'protected',
               participants_per_appointment: '1',
             }),
-          })
+          }),
         )
       })
     })
@@ -265,7 +265,7 @@ describe('AppointmentGroup EditPage', () => {
       fireEvent.click(saveButton)
       await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
-          'An error occurred while saving the appointment group'
+          'An error occurred while saving the appointment group',
         )
       })
     })

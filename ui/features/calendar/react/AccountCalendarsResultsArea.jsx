@@ -40,7 +40,7 @@ const accountCalendarsType = arrayOf(
     name: string.isRequired,
     asset_string: string.isRequired,
     type: string.isRequired,
-  })
+  }),
 )
 
 const AccountCalendarResultsArea = ({

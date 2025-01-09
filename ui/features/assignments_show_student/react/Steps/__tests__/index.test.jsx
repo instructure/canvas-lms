@@ -36,49 +36,44 @@ afterEach(() => {
 })
 
 it('should render', () => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<Steps />, document.getElementById('fixtures'))
   const element = $('[data-testid="assignment-2-step-index"]')
   expect(element).toHaveLength(1)
 })
 
 it('should not render collapsed class when not collapsed', () => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<Steps isCollapsed={false} />, document.getElementById('fixtures'))
   const element = $('[data-testid="steps-container-collapsed"]')
   expect(element).toHaveLength(0)
 })
 
 it('should render collapsed class when collapsed', () => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<Steps isCollapsed={true} />, document.getElementById('fixtures'))
   const element = $('[data-testid="steps-container-collapsed"]')
   expect(element).toHaveLength(1)
 })
 
 it('should render with StepItems', () => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <Steps label="Settings">
       <StepItem label="Phase one" status="complete" />
       <StepItem label="Phase two" status="in-progress" />
       <StepItem label="Phase three" />
     </Steps>,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
   const element = $('li')
   expect(element).toHaveLength(3)
 })
 
 it('should render aria-current for the item that is in progress', () => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(
     <Steps label="Settings">
       <StepItem label="Phase one" status="complete" />
       <StepItem label="Phase two" status="in-progress" />
       <StepItem label="Phase three" />
     </Steps>,
-    document.getElementById('fixtures')
+    document.getElementById('fixtures'),
   )
 
   const items = $('li')

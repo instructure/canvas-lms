@@ -36,10 +36,9 @@ describe('SVGWithTextPlaceholder', () => {
   })
 
   it('renders correctly with required props', () => {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SVGWithTextPlaceholder url="www.test.com" text="coolest test ever" />,
-      document.getElementById('fixtures')
+      document.getElementById('fixtures'),
     )
     const textContainer = $('#fixtures:contains("coolest test ever")')
     const imgContainer = $("img[src$='www.test.com']")
@@ -48,30 +47,27 @@ describe('SVGWithTextPlaceholder', () => {
   })
 
   it('renders if empty is provided to the text prop', () => {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SVGWithTextPlaceholder url="www.test.com" text="" />,
-      document.getElementById('fixtures')
+      document.getElementById('fixtures'),
     )
     const imgContainer = $("img[src$='www.test.com']")
     expect(imgContainer).toHaveLength(1)
   })
 
   it('renders with null in img prop', () => {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SVGWithTextPlaceholder text="coolest test ever" url="" />,
-      document.getElementById('fixtures')
+      document.getElementById('fixtures'),
     )
     const textContainer = $('#fixtures:contains("coolest test ever")')
     expect(textContainer).toHaveLength(1)
   })
 
   it('renders when no props provided', () => {
-    // eslint-disable-next-line no-restricted-properties
     ReactDOM.render(
       <SVGWithTextPlaceholder text="coolest test ever" url="" />,
-      document.getElementById('fixtures')
+      document.getElementById('fixtures'),
     )
     const imgContainer = $('img')
     expect(imgContainer).toHaveLength(1)

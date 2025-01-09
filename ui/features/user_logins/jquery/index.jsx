@@ -80,8 +80,8 @@ $(function () {
         return $.flashError(
           I18n.t(
             'error.unauthorized',
-            'You do not have sufficient privileges to make the change requested'
-          )
+            'You do not have sufficient privileges to make the change requested',
+          ),
         )
       const accountId = $(this).find('.account_id select').val()
       const policy =
@@ -113,7 +113,7 @@ $(function () {
         {
           unique_id: data.unique_id,
         },
-        {object_name: 'pseudonym'}
+        {object_name: 'pseudonym'},
       )
       window.canvas_pseudonyms.jqInterface.onEdit({
         canEditSisUserId: data.can_edit_sis_user_id === 'true',
@@ -159,9 +159,8 @@ $(function () {
     .on('click', '.delete_pseudonym_link', function (event) {
       event.preventDefault()
       if ($('#login_information .login:visible').length < 2) {
-         
         alert(
-          I18n.t('notices.cant_delete_last_login', "You can't delete the last login for a user")
+          I18n.t('notices.cant_delete_last_login', "You can't delete the last login for a user"),
         )
         return
       }
@@ -172,7 +171,7 @@ $(function () {
           message: I18n.t(
             'confirms.delete_login',
             'Are you sure you want to delete the login, "%{login}"?',
-            {login}
+            {login},
           ),
           url: $(this).attr('rel'),
           success() {
@@ -231,7 +230,7 @@ $(function () {
     if (typeof savedSSOIcons[id] === 'undefined') savedSSOIcons[id] = icon.cloneNode(true)
     const innerDiv = document.createElement('div')
     icon.replaceChildren(innerDiv)
-     
+
     ReactDOM.render(<SuspendedIcon login={login} />, innerDiv)
   }
 

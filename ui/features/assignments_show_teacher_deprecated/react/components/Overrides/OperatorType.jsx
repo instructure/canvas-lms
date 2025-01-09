@@ -26,7 +26,6 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments_2')
 
- 
 export default class OperatorType extends React.Component {
   static propTypes = {
     value: string.isRequired,

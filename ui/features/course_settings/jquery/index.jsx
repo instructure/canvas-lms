@@ -49,7 +49,7 @@ const GradePublishing = {
       if (!data.hasOwnProperty('sis_publish_overall_status')) return
       GradePublishing.status = data.sis_publish_overall_status
       GradePublishing.update(
-        data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {}
+        data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {},
       )
     })
   },
@@ -100,10 +100,9 @@ const GradePublishing = {
       GradePublishing.status === 'published'
         ? I18n.t('Are you sure you want to resync these grades to the student information system?')
         : I18n.t(
-            'Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.'
+            'Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.',
           )
 
-     
     if (!window.confirm(confirmMessage)) {
       return
     }
@@ -116,8 +115,8 @@ const GradePublishing = {
       GradePublishing.status = 'unknown'
       $.flashError(
         I18n.t(
-          'Something went wrong when trying to sync grades to the student information system. Please try again later.'
-        )
+          'Something went wrong when trying to sync grades to the student information system. Please try again later.',
+        ),
       )
       GradePublishing.update({})
     }
@@ -135,10 +134,10 @@ const GradePublishing = {
         }
         GradePublishing.status = data.sis_publish_overall_status
         GradePublishing.update(
-          data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {}
+          data.hasOwnProperty('sis_publish_statuses') ? data.sis_publish_statuses : {},
         )
       },
-      error
+      error,
     )
   },
 }
@@ -158,7 +157,7 @@ function checkHomeroomSyncProgress(progress) {
       },
       _data => {
         checkHomeroomSyncProgress(progress)
-      }
+      },
     )
   }, 1000)
 }
@@ -173,7 +172,7 @@ $(document).ready(function () {
   const settingsTabs = $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]')
   // find the index of the tab whose href matches the URL's hash
   const initialTab = Array.from(settingsTabs || []).findIndex(
-    t => `#${t.id}` === `${window.location.hash}-link`
+    t => `#${t.id}` === `${window.location.hash}-link`,
   )
   // Sync the location hash with window.history, this fixes some issues with the browser back
   // button when going back to or from the details tab
@@ -241,7 +240,6 @@ $(document).ready(function () {
     },
   })
   $('.cant_delete_section_link').click(function (_event) {
-     
     window.alert($(this).attr('title'))
     return false
   })
@@ -388,7 +386,7 @@ $(document).ready(function () {
         // special value indicating the default grading scheme
         selectedGradingSchemeId = undefined
       }
-       
+
       ReactDOM.render(
         <GradingSchemesSelector
           canManage={ENV.PERMISSIONS.manage_grading_schemes}
@@ -399,7 +397,7 @@ $(document).ready(function () {
           archivedGradingSchemesEnabled={ENV.ARCHIVED_GRADING_SCHEMES_ENABLED}
           shrinkSearchBar={true}
         />,
-        grading_scheme_selector
+        grading_scheme_selector,
       )
     }
   }
@@ -420,7 +418,7 @@ $(document).ready(function () {
           renderGradingSchemeSelector($('#grading_standard_id').val())
         } else {
           $('#grading_standard_id').val('')
-           
+
           ReactDOM.render(<></>, grading_scheme_selector)
           $course_form.find('.grading_scheme_selector').hide()
         }
@@ -458,8 +456,8 @@ $(document).ready(function () {
       if (rqdEnabled && !hasCourseDefaultGradingScheme) {
         errorMessages.push(
           I18n.t(
-            'If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.'
-          )
+            'If "Restrict view of quantitative data" is enabled, then the course must have a default grading scheme enabled.',
+          ),
         )
       }
 
@@ -469,7 +467,7 @@ $(document).ready(function () {
         data['course[conclude_at]'] < data['course[start_at]']
       ) {
         errorMessages.push(
-          I18n.t('The course end date can not occur before the course start date.')
+          I18n.t('The course end date can not occur before the course start date.'),
         )
       }
 
@@ -506,7 +504,6 @@ $(document).ready(function () {
       enrollment_data.associated_user_id,
       enrollment => {
         if (enrollment) {
-           
           const $user = $('.observer_enrollments .user_' + enrollment.user_id)
           const $enrollment_link = $user.find('.enrollment_link.enrollment_' + enrollment.id)
           $enrollment_link.find('.associated_user.associated').showIf(enrollment.associated_user_id)
@@ -515,7 +512,7 @@ $(document).ready(function () {
             .find('.associated_user.unassociated')
             .showIf(!enrollment.associated_user_id)
         }
-      }
+      },
     )
   })
   $('.course_info')
@@ -556,7 +553,7 @@ $(document).ready(function () {
       },
       _data => {
         $link.text(I18n.t('errors.invitation', 'Invitation Failed.  Please try again.'))
-      }
+      },
     )
   })
 
@@ -567,12 +564,12 @@ $(document).ready(function () {
   const $default_edit_roles_select = $('#course_default_wiki_editing_roles')
   $default_edit_roles_select.data(
     'current_default_wiki_editing_roles',
-    $default_edit_roles_select.val()
+    $default_edit_roles_select.val(),
   )
   $default_edit_roles_select.change(function () {
     const $this = $(this)
     $('.changed_default_wiki_editing_roles').showIf(
-      $this.val() !== $default_edit_roles_select.data('current_default_wiki_editing_roles')
+      $this.val() !== $default_edit_roles_select.data('current_default_wiki_editing_roles'),
     )
     $('.default_wiki_editing_roles_change').text($this.find(':selected').text())
   })
@@ -607,7 +604,7 @@ $(document).ready(function () {
         $button
           .text(I18n.t('errors.re_send_all', 'Send Failed, Please Try Again'))
           .prop('disabled', false)
-      }
+      },
     )
   })
 
@@ -665,12 +662,11 @@ $(document).ready(function () {
 
       const allow_tighter = ['tighter', 'any'].includes($(sel).data('flexibility'))
       const allow_looser = ['looser', 'any', null, undefined, ''].includes(
-        $(sel).data('flexibility')
+        $(sel).data('flexibility'),
       )
 
       let found_current = false
       visibility_options.each((_index, item) => {
-         
         const isCourseSel = item == course_visibility[0]
         if (isCourseSel) found_current = true
         if (isCourseSel || (allow_tighter && !found_current) || (allow_looser && found_current)) {

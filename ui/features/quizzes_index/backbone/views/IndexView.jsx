@@ -91,7 +91,7 @@ export default class IndexView extends Backbone.View {
       (runningCount, view) => {
         return runningCount + view.matchingCount(searchTerm)
       },
-      0
+      0,
     )
     return this.announceMatchingQuizzes(matchingQuizCount)
   }
@@ -103,7 +103,7 @@ export default class IndexView extends Backbone.View {
         other: '%{count} quizzes found.',
         zero: 'No matching quizzes found.',
       },
-      {count: numQuizzes}
+      {count: numQuizzes},
     )
     return $.screenReaderFlashMessageExclusive(msg)
   }
@@ -128,7 +128,7 @@ export default class IndexView extends Backbone.View {
         {authenticity_token: authenticity_token()},
         data => {
           window.location.href = data.url
-        }
+        },
       )
     } else {
       this.chooseQuizEngine()
@@ -153,7 +153,7 @@ export default class IndexView extends Backbone.View {
       },
       () => {
         this.renderQuizEngineSelectionFailureNotice()
-      }
+      },
     )
   }
 
@@ -163,10 +163,9 @@ export default class IndexView extends Backbone.View {
       returnFocusTo && returnFocusTo.focus()
     }
 
-     
     ReactDOM.render(
       <QuizEngineModal onDismiss={handleDismiss} setOpen={setOpen} />,
-      $('#quiz-modal-mount-point')[0]
+      $('#quiz-modal-mount-point')[0],
     )
   }
 
@@ -176,12 +175,11 @@ export default class IndexView extends Backbone.View {
       .css('padding-left', '35rem')
       .css('display', 'block')
 
-     
     ReactDOM.render(
       <Alert variant="success" timeout={4000} transition="fade">
         <Text>{I18n.t(`Your quiz engine choice has been reset!`)}</Text>
       </Alert>,
-      $('#flash_message_holder')[0]
+      $('#flash_message_holder')[0],
     )
   }
 
@@ -190,12 +188,12 @@ export default class IndexView extends Backbone.View {
       .css('width', '30rem')
       .css('padding-left', '35rem')
       .css('display', 'block')
-     
+
     ReactDOM.render(
       <Alert variant="error" timeout={4000} transition="fade">
         <Text>{I18n.t(`There was a problem resetting your quiz engine choice`)}</Text>
       </Alert>,
-      $('#flash_message_holder')[0]
+      $('#flash_message_holder')[0],
     )
   }
 
@@ -220,7 +218,6 @@ export default class IndexView extends Backbone.View {
       }
     }
 
-     
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}
@@ -232,7 +229,7 @@ export default class IndexView extends Backbone.View {
         onDismiss={handleDismiss}
         open={tool !== null}
       />,
-      $('#external-tool-mount-point')[0]
+      $('#external-tool-mount-point')[0],
     )
   }
 }

@@ -28,7 +28,7 @@ ready(() => {
     const moduleDnd = zone.querySelector('.module_dnd')
     if (moduleDnd) {
       const moduleName = zone.querySelector('.ig-header-title .name')?.textContent || null
-      // eslint-disable-next-line no-restricted-properties
+
       ReactDOM.render(
         <ModuleFileDrop
           courseId={ENV.course_id}
@@ -36,7 +36,7 @@ ready(() => {
           contextModules={contextModules}
           moduleName={moduleName}
         />,
-        moduleDnd
+        moduleDnd,
       )
     }
   })

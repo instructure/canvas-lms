@@ -88,7 +88,7 @@ const DiscussionTopicManager = props => {
     perPage: ENV.per_page,
   }
   const [userSplitScreenPreference, setUserSplitScreenPreference] = useState(
-    (!isSpeedGraderInTopUrl && ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) || false
+    (!isSpeedGraderInTopUrl && ENV.DISCUSSION?.preferences?.discussions_splitscreen_view) || false,
   )
   const goToTopic = () => {
     setSearchTerm('')
@@ -98,7 +98,7 @@ const DiscussionTopicManager = props => {
 
   // Split_screen parent id
   const [threadParentEntryId, setThreadParentEntryId] = useState(
-    ENV.discussions_deep_link?.parent_id
+    ENV.discussions_deep_link?.parent_id,
   )
   const [replyFromId, setReplyFromId] = useState(null)
 
@@ -108,7 +108,7 @@ const DiscussionTopicManager = props => {
       ENV.DISCUSSION?.preferences?.discussions_splitscreen_view &&
       !!(ENV.discussions_deep_link?.parent_id
         ? ENV.discussions_deep_link?.parent_id
-        : ENV.discussions_deep_link?.entry_id)
+        : ENV.discussions_deep_link?.entry_id),
   )
   const [isSplitScreenViewOverlayed, setSplitScreenViewOverlayed] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
@@ -347,7 +347,7 @@ const DiscussionTopicManager = props => {
   // Used when replying to the Topic directly
   const {createDiscussionEntry, isSubmitting} = useCreateDiscussionEntry(
     onEntryCreationCompletion,
-    updateCache
+    updateCache,
   )
 
   // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
@@ -365,7 +365,7 @@ const DiscussionTopicManager = props => {
 
   if (discussionTopicQuery.error || !discussionTopicQuery?.data?.legacyNode) {
     captureException(
-      new Error(`Error received from discussionTopicQuery: ${discussionTopicQuery.error}`)
+      new Error(`Error received from discussionTopicQuery: ${discussionTopicQuery.error}`),
     )
 
     return (
@@ -469,7 +469,7 @@ const DiscussionTopicManager = props => {
                             discussionEntryId,
                             withRCE,
                             relativeId,
-                            highlightId
+                            highlightId,
                           ) => {
                             setHighlightEntryId(highlightId)
                             openSplitScreenView(discussionEntryId, withRCE, relativeId)

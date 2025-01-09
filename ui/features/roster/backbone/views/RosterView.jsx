@@ -68,7 +68,6 @@ export default class RosterView extends Backbone.View {
   }
 
   afterRender() {
-     
     ReactDOM.render(
       <TextInput
         onChange={e => {
@@ -83,13 +82,13 @@ export default class RosterView extends Backbone.View {
         renderLabel={
           <ScreenReaderContent>
             {I18n.t(
-              'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.'
+              'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.',
             )}
           </ScreenReaderContent>
         }
         renderBeforeInput={() => <IconSearchLine />}
       />,
-      this.$el.find('#search_input_container')[0]
+      this.$el.find('#search_input_container')[0],
     )
 
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))

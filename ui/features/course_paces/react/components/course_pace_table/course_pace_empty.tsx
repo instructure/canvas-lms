@@ -72,7 +72,7 @@ export const CoursePaceEmpty = ({
               </Text>
               <Text>
                 {I18n.t(
-                  'Get started by creating a course pace that will serve as the default pace for all sections and students in the course.'
+                  'Get started by creating a course pace that will serve as the default pace for all sections and students in the course.',
                 )}
               </Text>
             </Flex.Item>
@@ -104,7 +104,7 @@ export const CoursePaceEmpty = ({
               </Text>
               <Text>
                 {I18n.t(
-                  'Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional).'
+                  'Next, adjust the paces for individual sections and/or students to further customize based on your needs (this step is optional).',
                 )}
               </Text>
             </Flex.Item>
@@ -137,7 +137,7 @@ export const CoursePaceEmpty = ({
                 wrappers: [
                   `<a target="_blank" href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">$1</a>`,
                 ],
-              }
+              },
             ),
         }}
       />
@@ -147,5 +147,5 @@ export const CoursePaceEmpty = ({
 
 export default connect(null, {setSelectedPaceContext: actions.setSelectedPaceContext})(
   // @ts-expect-error
-  CoursePaceEmpty
+  CoursePaceEmpty,
 )

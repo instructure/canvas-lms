@@ -43,19 +43,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Files'),
       description: I18n.t(
-        'If one or all permissions are disabled, user can still view and download files into a zip file.'
+        'If one or all permissions are disabled, user can still view and download files into a zip file.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.'
+        'To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.',
       ),
     },
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage must also be enabled.'
+        'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage must also be enabled.',
       ),
     },
   ],
@@ -80,13 +80,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Files'),
       description: I18n.t(
-        'If one or all permissions are disabled, user can still view and download files into a zip file.'
+        'If one or all permissions are disabled, user can still view and download files into a zip file.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.'
+        'To import files using the Course Import Tool, Course files - add and Course Content - add / edit / delete must be enabled.',
       ),
     },
     {
@@ -95,8 +95,8 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
+        'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.',
       ),
     },
-  ]
+  ],
 )

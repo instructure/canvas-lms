@@ -32,7 +32,7 @@ describe('canvas_quizzes/events/views/QuestionInspector', () => {
           },
         ]}
         question={{id: 'q1'}}
-      />
+      />,
     )
     expect(document.body.textContent).toMatch('This question was answered once.')
   })
@@ -462,7 +462,7 @@ describe('canvas_quizzes/events/views/QuestionInspector', () => {
         question={{
           id: '111',
         }}
-      />
+      />,
     )
 
     expect(document.body.textContent).toMatch('This question was answered 8 times.')

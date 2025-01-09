@@ -65,7 +65,7 @@ type Column = {
   sortable?: boolean
   render: (
     registration: LtiRegistration,
-    callbacks: {deleteApp: CallbackWithRegistration}
+    callbacks: {deleteApp: CallbackWithRegistration},
   ) => React.ReactNode
 }
 
@@ -294,7 +294,7 @@ const renderHeaderRow = (props: {
   sort: AppsSortProperty
   dir: AppsSortDirection
   updateSearchParams: (
-    params: Partial<Record<keyof ManageSearchParams, string | undefined>>
+    params: Partial<Record<keyof ManageSearchParams, string | undefined>>,
   ) => void
 }) => (
   <Table.Row>
@@ -375,7 +375,7 @@ const AppsTableResponsiveWrapper = React.memo(
         )}
       </Responsive>
     )
-  }
+  },
 )
 
 type AppsTableInnerProps = {
@@ -436,7 +436,6 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
           >
             {Array.from(Array(Math.ceil(apps.total / MANAGE_APPS_PAGE_LIMIT))).map((_, i) => (
               <Pagination.Page
-                 
                 key={i}
                 current={i === page - 1}
                 onClick={() => {

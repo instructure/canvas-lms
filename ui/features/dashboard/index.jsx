@@ -26,7 +26,7 @@ import ready from '@instructure/ready'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import DashboardWrapper from './react/DashboardWrapper'
-// eslint-disable-next-line import/no-named-as-default
+
 import DashboardHeader from './react/DashboardHeader'
 
 ready(() => {
@@ -49,15 +49,13 @@ ready(() => {
     }
 
     if (dashcard_query_enabled) {
-      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(
         <QueryProvider>
           <DashboardWrapper {...dashboardProps} />
         </QueryProvider>,
-        dashboardHeaderContainer
+        dashboardHeaderContainer,
       )
     } else {
-      // eslint-disable-next-line no-restricted-properties
       ReactDOM.render(<DashboardHeader {...dashboardProps} />, dashboardHeaderContainer)
     }
   } else {

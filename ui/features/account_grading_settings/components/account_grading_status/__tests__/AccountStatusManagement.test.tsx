@@ -47,7 +47,7 @@ describe('Account Grading Status Management', () => {
             }
           />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>,
     )
   }
 

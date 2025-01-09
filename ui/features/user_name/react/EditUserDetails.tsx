@@ -130,7 +130,7 @@ const EditUserDetails = ({
         <Flex direction="column" gap="small">
           <Text>
             {I18n.t(
-              "You can update some of this user's information, but they can change it back if they choose."
+              "You can update some of this user's information, but they can change it back if they choose.",
             )}
           </Text>
           <Controller

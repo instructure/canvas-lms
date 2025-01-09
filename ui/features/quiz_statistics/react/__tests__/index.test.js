@@ -748,7 +748,7 @@ describe('canvas_quizzes/statistics', () => {
       .then(() => findByTestId(node, 'summary-statistics'))
       .then(el => {
         expect(el.textContent).toContain(
-          '11 students scored above or at the average, and 1 below. 1 student in percentile 50. 1 student in percentile 67.'
+          '11 students scored above or at the average, and 1 below. 1 student in percentile 50. 1 student in percentile 67.',
         )
       })
   })

@@ -69,7 +69,7 @@ class SearchResultsComponent extends Component {
         pointsPossibleBefore: string.isRequired,
         pointsPossibleCurrent: string.isRequired,
         student: string.isRequired,
-      })
+      }),
     ).isRequired,
     nextPage: string.isRequired,
     requestingResults: bool.isRequired,

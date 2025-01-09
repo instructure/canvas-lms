@@ -24,7 +24,7 @@ const I18n = createI18nScope('context_modules')
 
 let ProgressionModuleView
 
-export default ProgressionModuleView = (function () {
+export default (ProgressionModuleView = (function () {
   ProgressionModuleView = class ProgressionModuleView extends Backbone.View {
     static initClass() {
       this.prototype.tagName = 'li'
@@ -72,4 +72,4 @@ export default ProgressionModuleView = (function () {
   }
   ProgressionModuleView.initClass()
   return ProgressionModuleView
-})()
+})())

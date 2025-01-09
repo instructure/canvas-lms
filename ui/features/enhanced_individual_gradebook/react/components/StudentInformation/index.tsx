@@ -97,7 +97,7 @@ export default function StudentInformation({
       studentNotesColumnId,
       customColumnsUrl,
       customColumnDataUrl,
-      customColumnDatumUrl
+      customColumnDatumUrl,
     )
 
   useEffect(() => {
@@ -141,7 +141,7 @@ export default function StudentInformation({
       gradeCalcIgnoreUnpostedAnonymousEnabled,
       gradingPeriodSet,
       student,
-    ]
+    ],
   )
 
   if (!student || !submissions || !studentGradeResults) {
@@ -223,8 +223,8 @@ export default function StudentInformation({
             score,
             gradingStandard,
             gradingStandardPointsBased,
-            gradingStandardScalingFactor
-          )
+            gradingStandardScalingFactor,
+          ),
         )}`
       : ''
 
@@ -247,7 +247,7 @@ export default function StudentInformation({
       {
         count: invalidAssignmentGroupsLength,
         list_of_group_names: invalidAssignmentGroupsNames.join(' or '),
-      }
+      },
     )
   }
 

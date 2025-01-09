@@ -85,7 +85,7 @@ describe('SpeedGrader Submission Details', () => {
           anonymizableId: 'student_1',
           anonymous_id: 'student_1',
           submission_state: 'not_graded',
-          enrollments: [{ workflow_state: 'active' }],
+          enrollments: [{workflow_state: 'active'}],
           submission: {
             workflow_state: 'submitted',
             submission_type: 'online_text_entry',

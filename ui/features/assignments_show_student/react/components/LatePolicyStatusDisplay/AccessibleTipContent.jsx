@@ -42,7 +42,7 @@ export default function AccessibleTipContent(props) {
           other: 'Late Penalty: minus %{count} Points',
           zero: 'Late Penalty: None',
         },
-        {count: pointsDeducted || 0}
+        {count: pointsDeducted || 0},
       )}
       {I18n.t('Grade: %{grade}', {
         grade: GradeFormatHelper.formatGrade(grade, {

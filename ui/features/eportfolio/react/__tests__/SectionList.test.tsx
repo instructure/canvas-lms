@@ -36,7 +36,7 @@ describe('SectionList', () => {
     const {findByText} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={true} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     expect(await findByText('First Section')).toBeInTheDocument()
     expect(await findByText('Second Section')).toBeInTheDocument()
@@ -46,7 +46,7 @@ describe('SectionList', () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={true} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const profileButton = await findByTestId('user-profile')
     expect(profileButton).toBeInTheDocument()
@@ -57,7 +57,7 @@ describe('SectionList', () => {
     const {queryByTestId, findByText} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={false} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     expect(await findByText('First Section')).toBeInTheDocument()
     expect(queryByTestId('1-menu')).not.toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('SectionList', () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={true} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const addSection = await findByTestId('add-section-button')
     addSection.click()
@@ -78,7 +78,7 @@ describe('SectionList', () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={true} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
     menuButton.click()
@@ -91,7 +91,7 @@ describe('SectionList', () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={true} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('2-menu')
     menuButton.click()
@@ -104,7 +104,7 @@ describe('SectionList', () => {
     const {findByTestId} = render(
       <MockedQueryClientProvider client={queryClient}>
         <SectionList portfolio={portfolio} isOwner={true} />
-      </MockedQueryClientProvider>
+      </MockedQueryClientProvider>,
     )
     const menuButton = await findByTestId('1-menu')
     menuButton.click()

@@ -51,7 +51,7 @@ export default class ActAsModal extends React.Component {
           login_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
           sis_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
           integration_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-        })
+        }),
       ),
     }).isRequired,
   }
@@ -204,7 +204,7 @@ export default class ActAsModal extends React.Component {
                             "as if you were this user, and from other users' points " +
                             'of views, it will be as if this user performed them. However, ' +
                             'audit logs record that you were the one who performed the ' +
-                            'actions on behalf of this user.'
+                            'actions on behalf of this user.',
                         )}
                       </Text>
                     </View>
@@ -228,7 +228,7 @@ export default class ActAsModal extends React.Component {
                         key={pseudonym.login_id}
                       >
                         {this.renderInfoTable(I18n.t('Login info'), () =>
-                          this.renderLoginInfoRows(pseudonym)
+                          this.renderLoginInfoRows(pseudonym),
                         )}
                       </View>
                     ))}

@@ -101,7 +101,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
     terms => {
       setState({enrollmentTerms: presentEnrollmentTerms(terms)})
     },
-    [setState]
+    [setState],
   )
 
   const onSetsLoaded = useCallback(
@@ -109,7 +109,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       const sortedSets = sortBy(sets, 'createdAt').reverse()
       setState({sets: sortedSets})
     },
-    [setState]
+    [setState],
   )
 
   const getSets = useCallback(() => {
@@ -143,7 +143,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
           return term
         }
       }),
-    [state.enrollmentTerms]
+    [state.enrollmentTerms],
   )
 
   const addGradingPeriodSet = useCallback(
@@ -157,16 +157,16 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         },
         () => {
           addSetFormButtonRef.current?.focus()
-        }
+        },
       )
     },
-    [state.sets, state.expandedSetIDs, setState, associateTermsWithSet]
+    [state.sets, state.expandedSetIDs, setState, associateTermsWithSet],
   )
 
   const onSetUpdated = useCallback(
     updatedSet => {
       const sets = map(state.sets, set =>
-        set.id === updatedSet.id ? {...set, ...updatedSet} : set
+        set.id === updatedSet.id ? {...set, ...updatedSet} : set,
       )
 
       const terms = map(state.enrollmentTerms, term => {
@@ -182,7 +182,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       setState({sets, enrollmentTerms: terms})
       $.flashMessage(I18n.t('The grading period set was updated successfully.'))
     },
-    [state.sets, state.enrollmentTerms, setState]
+    [state.sets, state.enrollmentTerms, setState],
   )
 
   const setAndGradingPeriodTitles = useCallback(set => {
@@ -194,7 +194,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
   const searchTextMatchesTitles = useCallback(
     titles =>
       some(titles, title => SearchHelpers.substringMatchRegex(state.searchText).test(title)),
-    [state.searchText]
+    [state.searchText],
   )
 
   const filterSetsBySearchText = useCallback(
@@ -206,7 +206,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         return searchTextMatchesTitles(titles)
       })
     },
-    [setAndGradingPeriodTitles, searchTextMatchesTitles]
+    [setAndGradingPeriodTitles, searchTextMatchesTitles],
   )
 
   const changeSearchText = useCallback(
@@ -215,7 +215,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         setState({searchText})
       }
     },
-    [state.searchText, setState]
+    [state.searchText, setState],
   )
 
   const filterSetsBySelectedTerm = useCallback((sets, terms, selectedTermID) => {
@@ -230,7 +230,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
     event => {
       setState({selectedTermID: event.target.value})
     },
-    [setState]
+    [setState],
   )
 
   const alertForMatchingSets = useCallback(
@@ -245,13 +245,13 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
             other: '%{count} sets of grading periods found.',
             zero: 'No matching sets of grading periods found.',
           },
-          {count: numSets}
+          {count: numSets},
         )
       }
       const polite = true
       $.screenReaderFlashMessageExclusive(msg, polite)
     },
-    [state.selectedTermID, state.searchText]
+    [state.selectedTermID, state.searchText],
   )
 
   const getVisibleSets = useCallback(() => {
@@ -278,14 +278,14 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         setState({expandedSetIDs: state.expandedSetIDs.concat([setId])})
       }
     },
-    [state.expandedSetIDs, setState]
+    [state.expandedSetIDs, setState],
   )
 
   const editGradingPeriodSet = useCallback(
     set => {
       setState({editSet: {id: set.id, saving: false}})
     },
-    [setState]
+    [setState],
   )
 
   const nodeToFocusOnAfterSetDeletion = useCallback(
@@ -298,7 +298,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         return setRefs.current[`show-grading-period-set-${prevSet.id}`]?._refs.editButton
       }
     },
-    [state.sets]
+    [state.sets],
   )
 
   const removeGradingPeriodSet = useCallback(
@@ -307,7 +307,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       const nodeToFocus = nodeToFocusOnAfterSetDeletion(setID)
       setState({sets: newSets}, () => nodeToFocus?.focus())
     },
-    [state.sets, nodeToFocusOnAfterSetDeletion, setState]
+    [state.sets, nodeToFocusOnAfterSetDeletion, setState],
   )
 
   const updateSetPeriods = useCallback(
@@ -320,7 +320,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       })
       setState({sets: newSets})
     },
-    [state.sets, setState]
+    [state.sets, setState],
   )
 
   const openNewSetForm = useCallback(() => {
@@ -343,7 +343,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
 
   const termsNotBelongingToActiveSets = useCallback(
     () => difference(state.enrollmentTerms, termsBelongingToActiveSets()),
-    [state.enrollmentTerms, termsBelongingToActiveSets]
+    [state.enrollmentTerms, termsBelongingToActiveSets],
   )
 
   const selectableTermsForEditSetForm = useCallback(
@@ -353,14 +353,14 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
       })
       return union(termsNotBelongingToActiveSets(), termsBelongingToThisSet)
     },
-    [termsBelongingToActiveSets, termsNotBelongingToActiveSets]
+    [termsBelongingToActiveSets, termsNotBelongingToActiveSets],
   )
 
   const closeEditSetForm = useCallback(
     _id => {
       setState({editSet: {id: null, saving: false}})
     },
-    [setState]
+    [setState],
   )
 
   const getShowGradingPeriodSetRef = useCallback(set => `show-grading-period-set-${set.id}`, [])
@@ -397,7 +397,7 @@ const GradingPeriodSetCollection = ({readOnly, urls}) => {
         />
       )
     },
-    [state.editSet, setState, onSetUpdated, closeEditSetForm, selectableTermsForEditSetForm]
+    [state.editSet, setState, onSetUpdated, closeEditSetForm, selectableTermsForEditSetForm],
   )
 
   const renderNewGradingPeriodSetForm = useCallback(() => {

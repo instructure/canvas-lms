@@ -228,7 +228,7 @@ export default class ExternalToolPlacementList extends React.Component {
     }
 
     return placements.map(key =>
-      this.placementToggle(key, ALL_PLACEMENTS[key], this.isPlacementEnabled(tool, key))
+      this.placementToggle(key, ALL_PLACEMENTS[key], this.isPlacementEnabled(tool, key)),
     )
   }
 
@@ -246,7 +246,7 @@ export default class ExternalToolPlacementList extends React.Component {
 
     if (this.shouldShowToggleButtons()) {
       return placements.map(key =>
-        this.placementToggle(key, ALL_PLACEMENTS[key], this.isPlacementEnabled(tool, key))
+        this.placementToggle(key, ALL_PLACEMENTS[key], this.isPlacementEnabled(tool, key)),
       )
     } else {
       return placements
@@ -332,14 +332,14 @@ export default class ExternalToolPlacementList extends React.Component {
         <p style={{margin: 0}}>
           {I18n.t(
             'It may take some time for placement availability to reflect any changes made here. ' +
-              'You can also clear your cache and hard refresh on pages where you expect placements to change.'
+              'You can also clear your cache and hard refresh on pages where you expect placements to change.',
           )}
         </p>
         {this.state.tool.version === '1.3' && (
           <p style={{margin: '8px 0 0 0'}}>
             {I18n.t(
               'Changes made to placements here for 1.3 tools will be reset by any changes made to the ' +
-                'LTI developer key, including changes made by Instructure to inherited LTI keys.'
+                'LTI developer key, including changes made by Instructure to inherited LTI keys.',
             )}
           </p>
         )}

@@ -41,7 +41,7 @@ describe('SectionEditModal', () => {
 
   it('sets focus on blank text input', () => {
     const {getByTestId, getByText} = render(
-      <SectionEditModal {...props} modalType="add" section={null} sectionList={sectionList} />
+      <SectionEditModal {...props} modalType="add" section={null} sectionList={sectionList} />,
     )
     const textInput = getByTestId('add-field')
     const saveButton = getByText('Save')
@@ -57,7 +57,7 @@ describe('SectionEditModal', () => {
           modalType="delete"
           section={section}
           sectionList={sectionList}
-        />
+        />,
       )
       const path = encodeURI('/eportfolios/0/categories/2')
       fetchMock.delete(path, {status: 200})
@@ -74,7 +74,7 @@ describe('SectionEditModal', () => {
           modalType="delete"
           section={section}
           sectionList={sectionList}
-        />
+        />,
       )
       const path = encodeURI('/eportfolios/0/categories/2')
       fetchMock.delete(path, {status: 200})
@@ -88,7 +88,7 @@ describe('SectionEditModal', () => {
   describe('add', () => {
     it('does not add section on cancel', async () => {
       const {getByText, getByTestId} = render(
-        <SectionEditModal {...props} modalType="add" section={null} sectionList={sectionList} />
+        <SectionEditModal {...props} modalType="add" section={null} sectionList={sectionList} />,
       )
       const path = encodeURI('/eportfolios/0/categories?eportfolio_category[name]=Third Section')
       fetchMock.post(path, {status: 200})
@@ -102,7 +102,7 @@ describe('SectionEditModal', () => {
 
     it('adds section when clicking save button', async () => {
       const {getByText, getByTestId} = render(
-        <SectionEditModal {...props} modalType="add" section={null} sectionList={sectionList} />
+        <SectionEditModal {...props} modalType="add" section={null} sectionList={sectionList} />,
       )
       const path = encodeURI('/eportfolios/0/categories?eportfolio_category[name]=Third Section')
       fetchMock.post(path, {status: 200})
@@ -123,7 +123,7 @@ describe('SectionEditModal', () => {
           modalType="rename"
           section={section}
           sectionList={sectionList}
-        />
+        />,
       )
       const path = encodeURI('/eportfolios/0/categories/2?eportfolio_category[name]=Second Section')
       fetchMock.put(path, {status: 200})
@@ -140,7 +140,7 @@ describe('SectionEditModal', () => {
           modalType="rename"
           section={section}
           sectionList={sectionList}
-        />
+        />,
       )
       const path = encodeURI('/eportfolios/0/categories/2?eportfolio_category[name]=Second Section')
       fetchMock.put(path, {status: 200})
@@ -153,7 +153,12 @@ describe('SectionEditModal', () => {
   describe('move to', () => {
     it('does not move section on cancel', async () => {
       const {getByText, getByTestId} = render(
-        <SectionEditModal {...props} modalType="move" section={section} sectionList={sectionList} />
+        <SectionEditModal
+          {...props}
+          modalType="move"
+          section={section}
+          sectionList={sectionList}
+        />,
       )
       // encodeURIComponent encodes the slashes
       // encodeURI enocdes the commas
@@ -170,7 +175,12 @@ describe('SectionEditModal', () => {
     })
     it('move section when clicking save button', async () => {
       const {getByText, getByTestId} = render(
-        <SectionEditModal {...props} modalType="move" section={section} sectionList={sectionList} />
+        <SectionEditModal
+          {...props}
+          modalType="move"
+          section={section}
+          sectionList={sectionList}
+        />,
       )
       const path = '/eportfolios/0/reorder_categories?order=2%2C1'
       fetchMock.post(path, {status: 200})

@@ -34,7 +34,7 @@ describe('OutcomeHeader', () => {
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
     ratings: defaultRatings.map(rating =>
-      pick(rating, ['description', 'points', 'color', 'mastery'])
+      pick(rating, ['description', 'points', 'color', 'mastery']),
     ),
   }
 

@@ -26,7 +26,7 @@ describe('canvas_quizzes/events/routes/answer_matrix', () => {
     render(
       <MemoryRouter>
         <AnswerMatrix params={{}} query={{}} />
-      </MemoryRouter>
+      </MemoryRouter>,
     )
   })
 })

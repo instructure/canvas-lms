@@ -90,7 +90,7 @@ export default class EditCalendarEventView extends Backbone.View {
         'course_pacing_enabled',
         'course_sections',
         'rrule',
-        'calendar_event_context_code'
+        'calendar_event_context_code',
       )
       if (picked_params.start_date) {
         // this comes from the calendar via url params when editing an event
@@ -130,7 +130,7 @@ export default class EditCalendarEventView extends Backbone.View {
       this.frequency = attrs.rrule
         ? RRULEToFrequencyOptionValue(
             moment.tz(attrs.start_date, 'MMM D, YYYY', ENV.TIMEZONE),
-            attrs.rrule
+            attrs.rrule,
           )
         : 'not-repeat'
       this.render()
@@ -171,7 +171,7 @@ export default class EditCalendarEventView extends Backbone.View {
           const eventDateKeys = ['start_date', 'start_time', 'end_time']
           eventDateKeys.forEach(dateKey => {
             const $element = this.$el.find(
-              `input[name='child_event_data[${active_section_id}][${dateKey}]']`
+              `input[name='child_event_data[${active_section_id}][${dateKey}]']`,
             )
             $element.val(picked_params[dateKey])
           })
@@ -183,7 +183,7 @@ export default class EditCalendarEventView extends Backbone.View {
               const timeKeys = ['start_time', 'end_time']
               timeKeys.forEach(timeKey => {
                 const $element = this.$el.find(
-                  `input[name='child_event_data[${section.id}][${timeKey}]']`
+                  `input[name='child_event_data[${section.id}][${timeKey}]']`,
                 )
                 const newValue = section.event.all_day ? '' : $element.val().toUpperCase()
                 $element.val(newValue)
@@ -222,7 +222,7 @@ export default class EditCalendarEventView extends Backbone.View {
       conferenceNode.closest('fieldset').className = 'hide'
     } else {
       conferenceNode.closest('fieldset').className = ''
-       
+
       ReactDOM.render(
         <CalendarConferenceWidget
           key={this.conferencesKey}
@@ -232,7 +232,7 @@ export default class EditCalendarEventView extends Backbone.View {
           conferenceTypes={activeConferenceTypes}
           disabled={this.conferencesDisabled}
         />,
-        conferenceNode
+        conferenceNode,
       )
     }
   }
@@ -269,10 +269,9 @@ export default class EditCalendarEventView extends Backbone.View {
         ? I18n.t('Create New Calendar Event')
         : I18n.t('Edit %{title}', {title: this.model.get('title')})
 
-     
     ReactDOM.render(
       <EditCalendarEventHeader title={title} />,
-      document.getElementById('header_component_root')
+      document.getElementById('header_component_root'),
     )
   }
 
@@ -293,7 +292,6 @@ export default class EditCalendarEventView extends Backbone.View {
           : this.course.get('term')?.end_at
       }
 
-       
       ReactDOM.render(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPickerErrorBoundary>
@@ -311,7 +309,7 @@ export default class EditCalendarEventView extends Backbone.View {
             />
           </FrequencyPickerErrorBoundary>
         </div>,
-        pickerNode
+        pickerNode,
       )
     }
   }
@@ -344,7 +342,7 @@ export default class EditCalendarEventView extends Backbone.View {
             message: 'Failed to fetch course data.',
             err,
             type: 'error',
-          })
+          }),
         )
     }
   }
@@ -436,13 +434,13 @@ export default class EditCalendarEventView extends Backbone.View {
         this.redirectWithMessage(
           I18n.t('event_deleted', '%{event_title} deleted successfully', {
             event_title: this.model.get('title'),
-          })
+          }),
         )
       },
       delUrl: this.model.url(),
       isRepeating: !!this.model.get('series_uuid'),
       isSeriesHead: !!this.model.get('series_head'),
-       
+
       eventType: event.eventType,
     })
   }
@@ -451,7 +449,7 @@ export default class EditCalendarEventView extends Backbone.View {
   toggleUsingSectionClass() {
     this.$('#editCalendarEventFull').toggleClass(
       'use_section_dates',
-      this.model.get('use_section_dates')
+      this.model.get('use_section_dates'),
     )
   }
 
@@ -517,7 +515,7 @@ export default class EditCalendarEventView extends Backbone.View {
             this.model.save(eventData, {
               success: () =>
                 this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
-            })
+            }),
           )
           return $dialog.remove()
         },
@@ -611,7 +609,7 @@ export default class EditCalendarEventView extends Backbone.View {
         message: I18n.t(
           'errors.less_or_equal',
           'Please enter a value less than or equal to %{recurringEventLimit}',
-          {recurringEventLimit: EditCalendarEventView.recurringEventLimit}
+          {recurringEventLimit: EditCalendarEventView.recurringEventLimit},
         ),
       })
       errors.push('#duplicate_count')
@@ -634,7 +632,7 @@ export default class EditCalendarEventView extends Backbone.View {
           CommonEventShowError(JSON.parse(response.responseText))
         },
         skipDefaultError: true,
-      })
+      }),
     )
   }
 
@@ -654,7 +652,7 @@ export default class EditCalendarEventView extends Backbone.View {
     result.disableSectionDates =
       result.use_section_dates &&
       result.course_sections.filter(
-        section => !section.permissions.manage_calendar && section.event
+        section => !section.permissions.manage_calendar && section.event,
       ).length > 0
         ? 'disabled'
         : ''

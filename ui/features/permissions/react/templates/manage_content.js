@@ -37,7 +37,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Calendar'),
       description: I18n.t(
-        'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
@@ -50,7 +50,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit title, description, or remove collaborators on all collaborations.'
+        'Allows user to edit title, description, or remove collaborators on all collaborations.',
       ),
     },
     {
@@ -59,7 +59,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to share assignments to Commons or edit previously shared content.'
+        'Allows user to share assignments to Commons or edit previously shared content.',
       ),
     },
     {
@@ -69,7 +69,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Home Page'),
       description: I18n.t(
-        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.'
+        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.',
       ),
     },
     {
@@ -79,19 +79,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'Allows user to manage modules (create, add items, edit module settings, publish, unpublish, etc.).'
+        'Allows user to manage modules (create, add items, edit module settings, publish, unpublish, etc.).',
       ),
     },
     {
       title: I18n.t('Pages'),
       description: I18n.t(
-        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
@@ -111,19 +111,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a Discussion to Commons, Discussions - view must also be enabled.'
+        'To share a Discussion to Commons, Discussions - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.'
+        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.',
       ),
     },
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'To publish and unpublish module content, Courses - manage and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.'
+        'To publish and unpublish module content, Courses - manage and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.',
       ),
     },
   ],
@@ -142,7 +142,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Calendar'),
       description: I18n.t(
-        'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. '
+        'Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. ',
       ),
     },
     {
@@ -155,7 +155,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to edit title, description, or remove collaborators on all collaborations.'
+        'Allows user to edit title, description, or remove collaborators on all collaborations.',
       ),
     },
     {
@@ -164,7 +164,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to share assignments to Commons or edit previously shared content.'
+        'Allows user to share assignments to Commons or edit previously shared content.',
       ),
     },
     {
@@ -174,7 +174,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Course Home Page'),
       description: I18n.t(
-        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.'
+        'Allows user to view Course Status, Choose Home Page, and Course Setup Checklist buttons in the Home page.',
       ),
     },
     {
@@ -184,19 +184,19 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Discussions'),
       description: I18n.t(
-        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'Allows user to manage modules (create, add items, edit module settings, publish, unpublish, etc.).'
+        'Allows user to manage modules (create, add items, edit module settings, publish, unpublish, etc.).',
       ),
     },
     {
       title: I18n.t('Pages'),
       description: I18n.t(
-        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.'
+        'Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox.',
       ),
     },
     {
@@ -216,24 +216,24 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a Discussion to Commons, Discussions - view must also be enabled.'
+        'To share a Discussion to Commons, Discussions - view must also be enabled.',
       ),
     },
     {
       title: I18n.t('Course Home Page'),
       description: I18n.t(
-        'Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.'
+        'Teachers, designers, and TAs can select a course home page without the Course content - add / edit / delete permission.',
       ),
     },
     {
       title: I18n.t('Course Settings'),
       description: I18n.t(
-        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.'
+        'The Course Status buttons (unpublished and published) are only displayed until a student submission is received. Courses cannot be unpublished with student submissions.',
       ),
     },
     {
       title: I18n.t('Modules'),
       description: I18n.t('Module items cannot be unpublished if there are student submissions.'),
     },
-  ]
+  ],
 )

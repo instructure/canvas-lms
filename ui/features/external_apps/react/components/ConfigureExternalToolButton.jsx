@@ -45,7 +45,7 @@ export default class ConfigureExternalToolButton extends React.Component {
   getLaunchUrl = toolConfiguration => {
     const toolConfigUrl = toolConfiguration.url || toolConfiguration.target_link_uri
     return `${ENV.CONTEXT_BASE_URL}/external_tools/retrieve?url=${encodeURIComponent(
-      toolConfigUrl
+      toolConfigUrl,
     )}&display=borderless&placement=tool_configuration`
   }
 

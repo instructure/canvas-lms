@@ -135,7 +135,7 @@ export default class ShowEventDetailsDialog {
         errorHandled = true
         error.past_appointments = every(
           error.reservations,
-          res => fcUtil.wrap(res.end_at) < fcUtil.now()
+          res => fcUtil.wrap(res.end_at) < fcUtil.now(),
         )
         error.reschedulable = error.reservations.length === 1 && !error.past_appointments
         const $dialog = $(reservationOverLimitDialog(error)).dialog({
@@ -157,8 +157,8 @@ export default class ShowEventDetailsDialog {
                   click: () => {
                     $dialog.disableWhileLoading(
                       this.reserveEvent({cancel_existing: true}).always(() =>
-                        $dialog.dialog('close')
-                      )
+                        $dialog.dialog('close'),
+                      ),
                     )
                   },
                 },
@@ -181,7 +181,7 @@ export default class ShowEventDetailsDialog {
         $.fn.defaultAjaxError.object,
         data,
         request,
-        ...otherArgs
+        ...otherArgs,
       )
     }
   }
@@ -227,7 +227,7 @@ export default class ShowEventDetailsDialog {
       'POST',
       params,
       this.reserveSuccessCB.bind(this, params.cancel_existing),
-      this.reserveErrorCB
+      this.reserveErrorCB,
     )
   }
 
@@ -263,7 +263,7 @@ export default class ShowEventDetailsDialog {
           message: I18n.t('Are you sure you want to cancel your appointment with %{name}?', {
             name: (event.user && event.user.short_name) || event.group.name,
           }),
-        })
+        }),
       ),
       dialog: {
         title: I18n.t('Confirm Removal'),
@@ -273,7 +273,7 @@ export default class ShowEventDetailsDialog {
       prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
       success: () => {
         this.event.object.child_events = _(this.event.object.child_events).reject(
-          e => e.url === $appt.data('url')
+          e => e.url === $appt.data('url'),
         )
         $appt.remove()
 
@@ -327,12 +327,12 @@ export default class ShowEventDetailsDialog {
         ;(params.reservations ? params.reservations : (params.reservations = [])).push(reservation)
         if (e.user) {
           ;(params.reserved_users ? params.reserved_users : (params.reserved_users = [])).push(
-            reservation
+            reservation,
           )
         }
         if (e.group) {
           ;(params.reserved_groups ? params.reserved_groups : (params.reserved_groups = [])).push(
-            reservation
+            reservation,
           )
         }
       })
@@ -346,7 +346,7 @@ export default class ShowEventDetailsDialog {
       const MAX_PAGE_SIZE = 25
       axios
         .get(
-          `api/v1/calendar_events/${this.event.object.parent_event_id}/participants?per_page=${MAX_PAGE_SIZE}`
+          `api/v1/calendar_events/${this.event.object.parent_event_id}/participants?per_page=${MAX_PAGE_SIZE}`,
         )
         .then(response => {
           if (response.data && response.data.length) {
@@ -448,24 +448,24 @@ export default class ShowEventDetailsDialog {
       preventDefault(e => {
         const $appt = $(e.target).closest('li')
         this.cancelAppointment($appt)
-      })
+      }),
     )
 
     this.popover.el.find('.message_students').click(
       preventDefault(() => {
         new MessageParticipantsDialog({timeslot: this.event.calendarEvent}).show()
-      })
+      }),
     )
 
     if (params.webConference) {
       const conferenceNode = this.popover.el.find('.conferencing')[0]
-       
+
       ReactDOM.render(
         <Conference
           conference={params.webConference}
           conferenceType={getConferenceType(ENV.conferences.conference_types, params.webConference)}
         />,
-        conferenceNode
+        conferenceNode,
       )
     }
 

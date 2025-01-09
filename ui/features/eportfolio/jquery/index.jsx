@@ -172,7 +172,7 @@ function saveObject($obj, type) {
       }
     },
     // options
-    {skipDefaultError: true}
+    {skipDefaultError: true},
   )
   return true
 }
@@ -184,7 +184,7 @@ function renderSectionList(portfolio, isOwner) {
     root.render(
       <QueryProvider>
         <SectionList portfolio={portfolio} isOwner={isOwner} />
-      </QueryProvider>
+      </QueryProvider>,
     )
   }
 }
@@ -201,7 +201,7 @@ function renderPageList(portfolio, isOwner, sectionId) {
           sectionId={sectionId}
           onUpdate={json => $(document).triggerHandler('page_updated', json)}
         />
-      </QueryProvider>
+      </QueryProvider>,
     )
   }
 }
@@ -406,25 +406,25 @@ $(document).ready(function () {
     let section_type = 'rich_text'
     let section_type_name = I18n.t(
       '#eportfolios._page_section.section_types.rich_text',
-      'Rich Text Content'
+      'Rich Text Content',
     )
     if ($(this).hasClass('add_html_link')) {
       section_type = 'html'
       section_type_name = I18n.t(
         '#eportfolios._page_section.section_types.html',
-        'HTML/Embedded Content'
+        'HTML/Embedded Content',
       )
     } else if ($(this).hasClass('add_submission_link')) {
       section_type = 'submission'
       section_type_name = I18n.t(
         '#eportfolios._page_section.section_types.submission',
-        'Course Submission'
+        'Course Submission',
       )
     } else if ($(this).hasClass('add_file_link')) {
       section_type = 'attachment'
       section_type_name = I18n.t(
         '#eportfolios._page_section.section_types.attachment',
-        'Image/File Upload'
+        'Image/File Upload',
       )
     }
     const edit_type = 'edit_' + section_type + '_content'
@@ -634,7 +634,7 @@ $(document).ready(function () {
         I18n.t('default_description', 'This is my %{assignment} submission for %{course}.', {
           assignment,
           course: context,
-        })
+        }),
       )
       $('#add_submission_form')
         .dialog({
@@ -669,7 +669,7 @@ $(document).ready(function () {
       try {
         const submission_id = entry.content[1].submission_id
         $('#submission_' + submission_id + ',#recent_submission_' + submission_id).addClass(
-          'already_used'
+          'already_used',
         )
       } catch (e) {}
       /* eslint-enable no-empty */
@@ -868,8 +868,8 @@ $(document).ready(function () {
       .text(
         I18n.t(
           '#eportfolios.show.headers.export_progress',
-          'Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio.'
-        )
+          'Collecting ePortfolio resources. this may take a while if you have a lot of files in your ePortfolio.',
+        ),
       )
     const url = $(this).attr('href')
     let errorCount = 0
@@ -898,14 +898,14 @@ $(document).ready(function () {
               'value',
               Math.max(
                 Math.min($('#export_progress').progressbar('option', 'value') + 0.1, 90),
-                progress
-              )
+                progress,
+              ),
             )
           } else {
             $('#export_progress').progressbar(
               'option',
               'value',
-              Math.min($('#export_progress').progressbar('option', 'value') + 0.1, 90)
+              Math.min($('#export_progress').progressbar('option', 'value') + 0.1, 90),
             )
           }
           setTimeout(check, 2000)
@@ -918,13 +918,13 @@ $(document).ready(function () {
               .text(
                 I18n.t(
                   'errors.compiling',
-                  'There was an error compiling your eportfolio.  Please try again in a little while.'
-                )
+                  'There was an error compiling your eportfolio.  Please try again in a little while.',
+                ),
               )
           } else {
             setTimeout(check, 5000)
           }
-        }
+        },
       )
     }
     check(true)

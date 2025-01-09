@@ -54,7 +54,7 @@ const users = new RosterUserCollection(null, {
   params: fetchOptions,
 })
 const rolesCollection = new RolesCollection(
-  Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes))
+  Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes)),
 )
 const course = new Model(ENV.course)
 const inputFilterView = new InputFilterView({collection: users, minLength: 2})
@@ -117,7 +117,7 @@ users.once('reset', () =>
       })
     }
     return $('#aria_alerts').empty().text(msg)
-  })
+  }),
 )
 
 app.render()

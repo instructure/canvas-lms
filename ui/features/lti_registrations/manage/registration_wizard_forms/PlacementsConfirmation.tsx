@@ -98,14 +98,14 @@ export const PlacementsConfirmation = ({
                 '<strong>$1</strong>',
                 "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
               ],
-            }
+            },
           ),
         }}
       />
       {availablePlacements.length === 0 ? (
         <Text>
           {I18n.t(
-            "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page."
+            "This tool has not requested access to any placements. If installed, it will have access to the LTI APIs but won't be visible for users to launch. The app can be managed via the Manage Apps page.",
           )}
         </Text>
       ) : (
@@ -157,7 +157,7 @@ const PlacementCheckbox = React.memo(
           />
         </Flex.Item>
         {!UNDOCUMENTED_PLACEMENTS.includes(
-          placement as (typeof UNDOCUMENTED_PLACEMENTS)[number]
+          placement as (typeof UNDOCUMENTED_PLACEMENTS)[number],
         ) && (
           <Flex.Item>
             <Tooltip
@@ -236,5 +236,5 @@ const PlacementCheckbox = React.memo(
       )
     }
     return checkbox
-  }
+  },
 )

@@ -28,8 +28,8 @@ const expectSuccess = <Params extends SearchParameterSchemaMap>(
   url: string,
   params: Params,
   cb: (
-    r: Extract<ParamsParseResult<ParsedSearchParamsValue<Params>>, {success: true}>['value']
-  ) => void
+    r: Extract<ParamsParseResult<ParsedSearchParamsValue<Params>>, {success: true}>['value'],
+  ) => void,
 ) => {
   const searchParams = new URLSearchParams(url)
 
@@ -59,7 +59,7 @@ describe('parseSearchParams', () => {
           c: 'param',
           d: undefined,
         })
-      }
+      },
     )
   })
 
@@ -73,7 +73,7 @@ describe('parseSearchParams', () => {
         expect(value).toEqual({
           a: 'foo',
         })
-      }
+      },
     )
   })
 
@@ -87,7 +87,7 @@ describe('parseSearchParams', () => {
         expect(value).toEqual({
           a: [],
         })
-      }
+      },
     )
   })
 
@@ -97,7 +97,7 @@ describe('parseSearchParams', () => {
       {
         a: z.string(),
       },
-      searchParams
+      searchParams,
     )
     expect(result.success).toBe(false)
   })

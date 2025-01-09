@@ -111,7 +111,7 @@ export const TA_1 = {
 
 export const DATETIME_PATTERN = new RegExp(
   /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
-  'i'
+  'i',
 )
 
 export const STOPWATCH_PATTERN = new RegExp(/^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00

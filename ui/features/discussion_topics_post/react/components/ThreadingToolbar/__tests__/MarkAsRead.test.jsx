@@ -43,7 +43,7 @@ beforeEach(() => {
 
 const setup = props => {
   return render(
-    <MarkAsRead onClick={Function.prototype} isRead={false} isSplitScreenView={false} {...props} />
+    <MarkAsRead onClick={Function.prototype} isRead={false} isSplitScreenView={false} {...props} />,
   )
 }
 
@@ -66,9 +66,9 @@ describe('MarkAsRead', () => {
   it('calls provided callback when clicked', () => {
     const onClickMock = jest.fn()
     const {getAllByText} = setup({onClick: onClickMock})
-    expect(onClickMock.mock.calls.length).toBe(0)
+    expect(onClickMock.mock.calls).toHaveLength(0)
     fireEvent.click(getAllByText('Mark as Read')[0])
-    expect(onClickMock.mock.calls.length).toBe(1)
+    expect(onClickMock.mock.calls).toHaveLength(1)
   })
 
   describe('Mobile', () => {

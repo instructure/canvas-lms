@@ -20,7 +20,7 @@ import type {InternalLtiConfiguration} from '../../model/internal_lti_configurat
 import {LtiScopes} from '@canvas/lti/model/LtiScope'
 
 export const mockInternalConfiguration = (
-  overrides?: Partial<InternalLtiConfiguration>
+  overrides?: Partial<InternalLtiConfiguration>,
 ): InternalLtiConfiguration => {
   return {
     title: 'title',

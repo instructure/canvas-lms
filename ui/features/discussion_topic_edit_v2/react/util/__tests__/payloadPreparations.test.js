@@ -36,7 +36,7 @@ describe('prepareUngradedDiscussionOverridesPayload', () => {
       assignedInfoList,
       defaultEveryoneOption,
       defaultEveryoneElseOption,
-      masteryPathsOption
+      masteryPathsOption,
     )
     expect(payload).toEqual({
       delayedPostAt: '2024-04-10T00:00:00.000Z',
@@ -60,7 +60,7 @@ describe('prepareUngradedDiscussionOverridesPayload', () => {
       assignedInfoList,
       defaultEveryoneOption,
       defaultEveryoneElseOption,
-      masteryPathsOption
+      masteryPathsOption,
     )
     expect(payload).toEqual({
       delayedPostAt: null,
@@ -103,7 +103,7 @@ describe('prepareUngradedDiscussionOverridesPayload', () => {
       assignedInfoList,
       defaultEveryoneOption,
       defaultEveryoneElseOption,
-      masteryPathsOption
+      masteryPathsOption,
     )
     expect(payload).toEqual({
       delayedPostAt: '2024-04-10T00:00:00.000Z',

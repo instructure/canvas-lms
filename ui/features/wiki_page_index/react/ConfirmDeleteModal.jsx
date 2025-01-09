@@ -36,10 +36,9 @@ export function showConfirmDelete(props) {
     if (modal) modal.show()
   }
 
-   
   ReactDOM.render(
     <ConfirmDeleteModal {...props} parent={parent} ref={showConfirmDeleteRef} />,
-    parent
+    parent,
   )
 }
 
@@ -110,13 +109,12 @@ export default class ConfirmDeleteModal extends Component {
       },
       {
         count: this.props.pageTitles.length,
-      }
+      },
     )
     return (
       <>
         <div className="delete-wiki-pages-header">{message}</div>
         {this.props.pageTitles.map((title, index) => (
-           
           <div className="wiki-page-title" key={index}>
             {title}
           </div>

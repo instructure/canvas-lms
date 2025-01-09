@@ -35,7 +35,11 @@ describe('PortfolioSettingsModal', () => {
 
   it('renders default values', () => {
     const {getByDisplayValue, getByTestId} = render(
-      <PortfolioSettingsModal portfolio={portfolio} onConfirm={mockConfirm} onCancel={mockCancel} />
+      <PortfolioSettingsModal
+        portfolio={portfolio}
+        onConfirm={mockConfirm}
+        onCancel={mockCancel}
+      />,
     )
     const textInput = getByDisplayValue('Test Portfolio')
     expect(textInput).toBeInTheDocument()
@@ -49,7 +53,7 @@ describe('PortfolioSettingsModal', () => {
         portfolio={{...portfolio, name: ''}}
         onConfirm={mockConfirm}
         onCancel={mockCancel}
-      />
+      />,
     )
     const textInput = getByTestId('portfolio-name-field')
     const saveButton = getByText('Save')
@@ -59,7 +63,11 @@ describe('PortfolioSettingsModal', () => {
 
   it('updates portfolio after saving', async () => {
     const {getByText} = render(
-      <PortfolioSettingsModal portfolio={portfolio} onConfirm={mockConfirm} onCancel={mockCancel} />
+      <PortfolioSettingsModal
+        portfolio={portfolio}
+        onConfirm={mockConfirm}
+        onCancel={mockCancel}
+      />,
     )
     const path = encodeURI('/eportfolios/0?eportfolio[name]=Test Portfolio&eportfolio[public]=true')
     fetchMock.put(path, {status: 200})
@@ -71,7 +79,11 @@ describe('PortfolioSettingsModal', () => {
 
   it('does not update portfolio after cancel', async () => {
     const {getByText} = render(
-      <PortfolioSettingsModal portfolio={portfolio} onConfirm={mockConfirm} onCancel={mockCancel} />
+      <PortfolioSettingsModal
+        portfolio={portfolio}
+        onConfirm={mockConfirm}
+        onCancel={mockCancel}
+      />,
     )
     const path = encodeURI('/eportfolios/0?eportfolio[name]=Test Portfolio&eportfolio[public]=true')
     fetchMock.put(path, {status: 200})

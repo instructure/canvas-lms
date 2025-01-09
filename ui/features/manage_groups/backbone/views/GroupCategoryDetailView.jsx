@@ -93,7 +93,7 @@ export default class GroupCategoryDetailView extends View {
 
   deleteCategory(e) {
     e.preventDefault()
-     
+
     if (!confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group set?'))) {
       this.$groupCategoryActions.focus()
       return
@@ -104,7 +104,7 @@ export default class GroupCategoryDetailView extends View {
       },
       failure() {
         return $.flashError(
-          I18n.t('flash.removeError', 'Unable to remove the group set. Please try again later.')
+          I18n.t('flash.removeError', 'Unable to remove the group set. Please try again later.'),
         )
       },
     })
@@ -112,7 +112,7 @@ export default class GroupCategoryDetailView extends View {
 
   addGroup(e, open = true) {
     if (e) e.preventDefault()
-     
+
     ReactDOM.render(
       <GroupModal
         groupCategory={{id: this.model.get('id')}}
@@ -129,7 +129,7 @@ export default class GroupCategoryDetailView extends View {
           this.$addGroupButton.focus()
         }}
       />,
-      document.getElementById('group-mount-point')
+      document.getElementById('group-mount-point'),
     )
   }
 
@@ -140,14 +140,14 @@ export default class GroupCategoryDetailView extends View {
   importGroups(e) {
     if (e) e.preventDefault()
     const parent = document.getElementById('group-import-modal-mount-point')
-     
+
     ReactDOM.render(
       <GroupImportModal
         setProgress={this.setProgress.bind(this)}
         groupCategoryId={this.model.id}
         parent={parent}
       />,
-      parent
+      parent,
     )
   }
 
@@ -163,7 +163,7 @@ export default class GroupCategoryDetailView extends View {
 
   cloneCategory(e, open = true) {
     if (e) e.preventDefault()
-     
+
     ReactDOM.render(
       <GroupCategoryCloneModal
         // implicitly rendered with openedFromCaution: false
@@ -178,7 +178,7 @@ export default class GroupCategoryDetailView extends View {
           $(`#group-category-${this.model.id}-actions`).focus()
         }}
       />,
-      document.getElementById('group-category-clone-mount-point')
+      document.getElementById('group-category-clone-mount-point'),
     )
   }
 
@@ -192,7 +192,6 @@ export default class GroupCategoryDetailView extends View {
         .unassignedUsers()
         .map(user => ({id: user.get('id'), short_name: user.get('short_name')}))
       const dialog = () => {
-         
         ReactDOM.render(
           <GroupCategoryMessageAllUnassignedModal
             groupCategory={{name: this.model.get('name')}}
@@ -203,7 +202,7 @@ export default class GroupCategoryDetailView extends View {
               this.$messageAllUnassignedLink.focus()
             }}
           />,
-          document.getElementById('group-category-message-all-unassigned-mount-point')
+          document.getElementById('group-category-message-all-unassigned-mount-point'),
         )
       }
       return dialog()

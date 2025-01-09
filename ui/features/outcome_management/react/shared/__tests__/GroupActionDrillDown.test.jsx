@@ -92,10 +92,10 @@ describe('GroupActionDrillDown', () => {
       renderer = rtlRender,
       globalRootId = '',
       rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId],
-    } = {}
+    } = {},
   ) => {
     return renderer(
-      <OutcomesContext.Provider value={{env: {rootIds}}}>{children}</OutcomesContext.Provider>
+      <OutcomesContext.Provider value={{env: {rootIds}}}>{children}</OutcomesContext.Provider>,
     )
   }
 
@@ -183,7 +183,7 @@ describe('GroupActionDrillDown', () => {
     describe('showActionLinkForRoot', () => {
       it('renders an action link for the root if true', () => {
         const {getByText} = render(
-          <GroupActionDrillDown {...defaultProps({showActionLinkForRoot: true, rootId: '2'})} />
+          <GroupActionDrillDown {...defaultProps({showActionLinkForRoot: true, rootId: '2'})} />,
         )
         fireEvent.click(getByText('Groups'))
         expect(getByText('View 2 Outcomes')).toBeInTheDocument()
@@ -191,7 +191,7 @@ describe('GroupActionDrillDown', () => {
 
       it('does not render an action link for the root if false', () => {
         const {getByText, queryByText} = render(
-          <GroupActionDrillDown {...defaultProps({rootId: '2'})} />
+          <GroupActionDrillDown {...defaultProps({rootId: '2'})} />,
         )
         fireEvent.click(getByText('Groups'))
         expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
@@ -215,7 +215,7 @@ describe('GroupActionDrillDown', () => {
 
     it('hides the options and sets the display value to the group that was clicked', () => {
       const {queryByText, getByText, getByDisplayValue} = render(
-        <GroupActionDrillDown {...defaultProps()} />
+        <GroupActionDrillDown {...defaultProps()} />,
       )
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('Account folder'))
@@ -227,7 +227,7 @@ describe('GroupActionDrillDown', () => {
 
     it('clears the display value when the dropdown is clicked', () => {
       const {getByPlaceholderText, getByText, getByDisplayValue} = render(
-        <GroupActionDrillDown {...defaultProps()} />
+        <GroupActionDrillDown {...defaultProps()} />,
       )
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('State folder'))
@@ -239,7 +239,7 @@ describe('GroupActionDrillDown', () => {
 
     it('does not render an action link if isLoadingGroupDetail is true', () => {
       const {getByText, rerender, queryByText} = render(
-        <GroupActionDrillDown {...defaultProps()} />
+        <GroupActionDrillDown {...defaultProps()} />,
       )
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('State folder'))

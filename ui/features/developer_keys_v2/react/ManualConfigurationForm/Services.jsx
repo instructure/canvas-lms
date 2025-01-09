@@ -54,7 +54,7 @@ export default class Services extends React.Component {
         <View as="div" margin="small">
           <Alert variant="warning" margin="small">
             {I18n.t(
-              'Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.'
+              'Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.',
             )}
           </Alert>
           <CheckboxGroup

@@ -30,7 +30,7 @@ function transformRubricCriterionData(criterion) {
 
   if (criterionCopy.ratings) {
     criterionCopy.ratings = criterionCopy.ratings.map(rating =>
-      transformRubricCriterionRatingData(rating)
+      transformRubricCriterionRatingData(rating),
     )
   }
 
@@ -60,7 +60,7 @@ export function transformRubricData(rubric) {
   const {_id, ...rubricCopy} = {...rubric, id: rubric._id}
   if (rubricCopy.criteria) {
     rubricCopy.criteria = rubricCopy.criteria.map(criterion =>
-      transformRubricCriterionData(criterion)
+      transformRubricCriterionData(criterion),
     )
   }
 

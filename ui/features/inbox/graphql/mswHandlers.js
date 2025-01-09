@@ -35,8 +35,8 @@ const mswAssign = (target, ...objects) => {
     ...objects.map(object => {
       return Object.entries(object)
         .filter(([_k, v]) => v !== undefined)
-        .reduce((obj, [k, v]) => ((obj[k] = v), obj), {}) // eslint-disable-line no-sequences
-    })
+        .reduce((obj, [k, v]) => ((obj[k] = v), obj), {})
+    }),
   )
 }
 
@@ -137,7 +137,7 @@ export const handlers = [
         {
           ...ConversationParticipant.mock(
             {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-            {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+            {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
           ),
           conversation: Conversation.mock({
             _id: '197',
@@ -152,7 +152,7 @@ export const handlers = [
           {
             ...ConversationParticipant.mock(
               {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
             ),
             conversation: Conversation.mock({
               _id: '197',
@@ -163,7 +163,7 @@ export const handlers = [
           {
             ...ConversationParticipant.mock(
               {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
             ),
             conversation: Conversation.mock({
               _id: '905',
@@ -174,7 +174,7 @@ export const handlers = [
           {
             ...ConversationParticipant.mock(
               {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
-              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'},
             ),
             conversation: Conversation.mock({
               _id: '906',
@@ -796,7 +796,7 @@ export const handlers = [
               {
                 id: variables.conversationId,
                 read: variables.read,
-              }
+              },
             ),
           ],
           errors: null,

@@ -40,7 +40,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
   const truncatedDescription = stripHtmlTags(description || '')
   const alignmentsCount = (alignments || []).reduce(
     (acc, alignment) => acc + alignment.alignmentsCount,
-    0
+    0,
   )
   const {isMobileView} = useCanvasContext()
 
@@ -173,7 +173,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                       assignmentWorkflowState={assignmentWorkflowState}
                       quizItems={quizItems}
                     />
-                  )
+                  ),
                 )}
               </View>
             )}

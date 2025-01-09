@@ -119,8 +119,8 @@ const ConfirmCommunicationChannel = ({
               __html: raw(
                 I18n.t(
                   'To activate this communication channel, enter the four-character confirmation code sent to *%{phoneNumberOrEmail}*. The code is case sensitive.',
-                  {wrapper: '<b>$1</b>', phoneNumberOrEmail}
-                )
+                  {wrapper: '<b>$1</b>', phoneNumberOrEmail},
+                ),
               ),
             }}
           />

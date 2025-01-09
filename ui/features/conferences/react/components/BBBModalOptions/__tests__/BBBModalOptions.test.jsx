@@ -75,7 +75,7 @@ describe('BBBModalOptions', () => {
         setAddToCalendar={props.setAddToCalendar}
         addToCalendar={props.addToCalendar}
         tab={props.tab}
-      />
+      />,
     )
   }
 

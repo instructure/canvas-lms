@@ -34,7 +34,7 @@ describe('student tray data', () => {
 
     user.submission = submission
     const {getByText} = render(
-      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />,
     )
     expect(getByText(user.shortName)).toBeInTheDocument()
     const userProfileLink = closest(getByText(user.shortName), 'a')
@@ -47,7 +47,7 @@ describe('student tray data', () => {
     const viewSubmissionLink = closest(getByText('SpeedGrader'), 'a')
     expect(viewSubmissionLink).toBeTruthy()
     expect(viewSubmissionLink.getAttribute('href')).toMatch(
-      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid#%7B%22student_id%22:%22user_1%22%7D/
+      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid#%7B%22student_id%22:%22user_1%22%7D/,
     )
     expect(viewSubmissionLink.getAttribute('target')).toMatch('_blank')
   })
@@ -63,7 +63,7 @@ describe('student tray data', () => {
     user.submission = submission
 
     const {getByText} = render(
-      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />,
     )
     expect(getByText(`Score –/${assignment.pointsPossible}`)).toBeInTheDocument()
   })
@@ -84,7 +84,7 @@ describe('student tray actions options', () => {
     user.submission = submission
 
     const {getByText} = render(
-      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />,
     )
     const messageStudentButton = closest(getByText('Message Student'), 'button')
     expect(messageStudentButton).toBeTruthy()
@@ -101,7 +101,7 @@ describe('student tray actions options', () => {
     user.submission = submission
 
     const {getByText} = render(
-      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />,
     )
     const submitForButton = closest(getByText('Submit for Student'), 'button')
     expect(submitForButton).toBeTruthy()

@@ -41,18 +41,18 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
-        'To access the account Courses page, Courses - view list must be enabled.'
+        'To access the account Courses page, Courses - view list must be enabled.',
       ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
-        'To add or remove a student to or from a course, the Users - Student permission must be enabled.'
+        'To add or remove a student to or from a course, the Users - Student permission must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To view the list of users in the course, Users - view list must be enabled.'
+        'To view the list of users in the course, Users - view list must be enabled.',
       ),
     },
     {
@@ -60,7 +60,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit a student’s section, Conversations - send to individual course members must also be enabled.'
+        'To edit a student’s section, Conversations - send to individual course members must also be enabled.',
       ),
     },
   ],
@@ -83,12 +83,12 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('People'),
       description: I18n.t(
-        'To add or remove a student to or from a course, the Users - Students permissions must be enabled.'
+        'To add or remove a student to or from a course, the Users - Students permissions must be enabled.',
       ),
     },
     {
       description: I18n.t(
-        'To view the list of users in the course, Users - view list must be enabled.'
+        'To view the list of users in the course, Users - view list must be enabled.',
       ),
     },
     {
@@ -96,8 +96,8 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit a student’s section, Conversations - send to individual course members must also be enabled.'
+        'To edit a student’s section, Conversations - send to individual course members must also be enabled.',
       ),
     },
-  ]
+  ],
 )

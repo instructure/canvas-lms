@@ -38,7 +38,7 @@ type ContentMigrationsTableViewProps = {
   updateMigrationItem: (
     migrationId: string,
     data: any,
-    noXHR: boolean | undefined
+    noXHR: boolean | undefined,
   ) => Promise<ContentMigrationItem | undefined>
 }
 
@@ -103,8 +103,8 @@ export const ContentMigrationsTable = ({
       if (noXHR) {
         setMigrations(prevMigrations =>
           prevMigrations.map((m: ContentMigrationItem) =>
-            m.id === migrationId ? {...m, ...data} : m
-          )
+            m.id === migrationId ? {...m, ...data} : m,
+          ),
         )
       } else {
         try {
@@ -114,8 +114,8 @@ export const ContentMigrationsTable = ({
           const json = response.json
           setMigrations(prevMigrations =>
             prevMigrations.map((m: ContentMigrationItem) =>
-              m.id === migrationId ? {...json, ...data} : m
-            )
+              m.id === migrationId ? {...json, ...data} : m,
+            ),
           )
           return json
         } catch {
@@ -123,7 +123,7 @@ export const ContentMigrationsTable = ({
         }
       }
     },
-    [setMigrations]
+    [setMigrations],
   )
 
   return (

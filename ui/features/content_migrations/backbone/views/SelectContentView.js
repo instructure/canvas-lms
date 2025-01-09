@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- 
-
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {isEmpty, pick} from 'lodash'
@@ -92,7 +90,7 @@ SelectContentView.prototype.submit = function (event) {
             return function () {
               return _this.model.trigger('continue')
             }
-          })(this)
+          })(this),
         )
       : void 0
   }
@@ -128,7 +126,7 @@ SelectContentView.prototype.firstOpen = function () {
         _this.maintainTheTree(_this.$el.find('ul[role=tree]'))
         return _this.selectContentDialogEvents()
       }
-    })(this)
+    })(this),
   )
   return this.checkboxCollectionView.render()
 }
@@ -155,7 +153,7 @@ SelectContentView.prototype.selectContentDialogEvents = function () {
       return function () {
         return _this.close()
       }
-    })(this)
+    })(this),
   )
   return this.$el.on('change', 'input[type=checkbox]', this.setSubmitButtonState)
 }

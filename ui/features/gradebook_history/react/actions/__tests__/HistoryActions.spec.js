@@ -115,7 +115,7 @@ describe('HistoryActions', () => {
       },
     ]
     expect(fetchHistorySuccess(response.data, response.headers).payload.items).toEqual(
-      expectedItems
+      expectedItems,
     )
   })
 
@@ -183,7 +183,7 @@ describe('HistoryActions', () => {
     const response = defaultResponse()
     const expectedUrl = 'http://example.com/3?&page=bookmark:asdf'
     expect(fetchHistoryNextPageSuccess(response.data, response.headers).payload.link).toBe(
-      expectedUrl
+      expectedUrl,
     )
   })
 
@@ -224,7 +224,7 @@ describe('HistoryActions', () => {
   test('fetchHistoryNextPageSuccess creates an action with type FETCH_HISTORY_NEXT_PAGE_SUCCESS', () => {
     const response = defaultResponse()
     expect(fetchHistoryNextPageSuccess(response.data, response.headers).type).toBe(
-      FETCH_HISTORY_NEXT_PAGE_SUCCESS
+      FETCH_HISTORY_NEXT_PAGE_SUCCESS,
     )
   })
 
@@ -254,7 +254,7 @@ describe('HistoryActions', () => {
       },
     ]
     expect(fetchHistoryNextPageSuccess(response.data, response.headers).payload.items).toEqual(
-      expectedItems
+      expectedItems,
     )
   })
 
@@ -262,7 +262,7 @@ describe('HistoryActions', () => {
     const response = defaultResponse()
     const expectedUrl = 'http://example.com/3?&page=bookmark:asdf'
     expect(fetchHistoryNextPageSuccess(response.data, response.headers).payload.link).toBe(
-      expectedUrl
+      expectedUrl,
     )
   })
 

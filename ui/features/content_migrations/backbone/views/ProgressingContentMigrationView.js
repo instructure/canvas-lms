@@ -85,7 +85,7 @@ ProgressingContentMigrationView.prototype.initialize = function () {
         }
         return _this.render()
       }
-    })(this)
+    })(this),
   )
   // Render the progress bar if workflow_state changes to running
   this.progress.on(
@@ -96,7 +96,7 @@ ProgressingContentMigrationView.prototype.initialize = function () {
           return _this.renderProgressBar()
         }
       }
-    })(this)
+    })(this),
   )
   // When progress is complete, update
   return this.progress.on(
@@ -105,7 +105,7 @@ ProgressingContentMigrationView.prototype.initialize = function () {
       return function (_event) {
         return _this.updateMigrationModel()
       }
-    })(this)
+    })(this),
   )
 }
 
@@ -225,7 +225,7 @@ ProgressingContentMigrationView.prototype.toggleIssues = function (event) {
     this.$migrationIssues.toggle()
     this.$migrationIssues.attr(
       'aria-expanded',
-      this.$migrationIssues.attr('aria-expanded') !== 'true'
+      this.$migrationIssues.attr('aria-expanded') !== 'true',
     )
     return this.setIssuesButtonText()
   } else {
@@ -236,7 +236,7 @@ ProgressingContentMigrationView.prototype.toggleIssues = function (event) {
           _this.issuesLoaded = true
           return _this.toggleIssues(event)
         }
-      })(this)
+      })(this),
     )
   }
 }

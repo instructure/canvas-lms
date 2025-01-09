@@ -40,13 +40,13 @@ const keys = {
     get ObserverEnrollment() {
       return I18n.t(
         'enrolled_as_limited_observer',
-        'enrolled as: Observer with section-only access'
+        'enrolled as: Observer with section-only access',
       )
     },
     get DesignerEnrollment() {
       return I18n.t(
         'enrolled_as_limited_designer',
-        'enrolled as: Designer with section-only access'
+        'enrolled as: Designer with section-only access',
       )
     },
     get StudentEnrollment() {

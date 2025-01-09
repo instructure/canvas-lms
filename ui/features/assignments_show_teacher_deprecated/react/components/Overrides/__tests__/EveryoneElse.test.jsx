@@ -49,7 +49,7 @@ it("pulls everyone else's dates from the assignment", () => {
       onChangeAssignment={() => {}}
       onValidate={() => true}
       invalidMessage={() => undefined}
-    />
+    />,
   )
   expect(getByText('Everyone else')).toBeInTheDocument()
 
@@ -58,7 +58,7 @@ it("pulls everyone else's dates from the assignment", () => {
 
   const dates = `${tz.format(aUnlockAt, I18n.t('#date.formats.short'))} to ${tz.format(
     aLockAt,
-    I18n.t('#date.formats.short')
+    I18n.t('#date.formats.short'),
   )}`
   expect(getAllByText(dates)[0]).toBeInTheDocument()
 })

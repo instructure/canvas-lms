@@ -39,7 +39,7 @@ const reducer = handleActions(
     [actionTypes.SET_COPY_TO_OPEN]: setCopyToOpen,
     [actionTypes.SET_COPY_TO]: setCopyTo,
   },
-  {open: false, selection: {}}
+  {open: false, selection: {}},
 )
 
 export default reducer

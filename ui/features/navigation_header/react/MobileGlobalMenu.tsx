@@ -63,7 +63,7 @@ type Props = {
 export default function MobileGlobalMenu(props: Props) {
   const showGroups = useMemo(() => Boolean(document.getElementById('global_nav_groups_link')), [])
   const countsEnabled = Boolean(
-    window.ENV.current_user_id && !window.ENV.current_user?.fake_student
+    window.ENV.current_user_id && !window.ENV.current_user?.fake_student,
   )
   const k5User = window.ENV.K5_USER
   const showAdmin =
@@ -82,7 +82,7 @@ export default function MobileGlobalMenu(props: Props) {
   })
   const processedTools = useMemo(
     () => filterAndProcessTools(externalToolsData || []),
-    [externalToolsData]
+    [externalToolsData],
   )
 
   const {data: unreadConversationsCount, isSuccess: unreadConversationsCountHasLoaded} = useQuery({

@@ -55,7 +55,7 @@ const validationSchema = z.object({
       NAME_MAX_LENGTH,
       I18n.t('Exceeded the maximum length (%{nameMaxLength} characters).', {
         nameMaxLength: NAME_MAX_LENGTH,
-      })
+      }),
     ),
 })
 
@@ -103,7 +103,7 @@ function PageEditModal(props: Props) {
           props.portfolio.id,
           name,
           props.page.id,
-          props.sectionId
+          props.sectionId,
         )
         props.onConfirm(json as ePortfolioPage)
       } catch {
@@ -138,7 +138,7 @@ function PageEditModal(props: Props) {
         pageOrder.map(p => {
           return p.id
         }),
-        props.sectionId
+        props.sectionId,
       )
         .then(() => props.onConfirm())
         .catch(() => {
@@ -158,7 +158,7 @@ function PageEditModal(props: Props) {
             value={pageOption.name}
           >
             {pageOption.name}
-          </SimpleSelect.Option>
+          </SimpleSelect.Option>,
         )
       }
       return acc
@@ -166,7 +166,7 @@ function PageEditModal(props: Props) {
     options.push(
       <SimpleSelect.Option key="bottom" id="bottom" value={I18n.t('At the bottom')}>
         {I18n.t('At the bottom')}
-      </SimpleSelect.Option>
+      </SimpleSelect.Option>,
     )
     return options
   }
@@ -178,7 +178,7 @@ function PageEditModal(props: Props) {
         onClose={props.onCancel}
         open={true}
         label={I18n.t("Rename '%{pageName}'", {pageName: props.page.name})}
-        as='form'
+        as="form"
         noValidate={true}
         onSubmit={handleSubmit(handleUpdateSubmit)}
       >
@@ -214,7 +214,7 @@ function PageEditModal(props: Props) {
           <Button margin="0 small" onClick={props.onCancel} disabled={loading}>
             {I18n.t('Cancel')}
           </Button>
-          <Button color="primary" type='submit' disabled={loading}>
+          <Button color="primary" type="submit" disabled={loading}>
             {I18n.t('Save')}
           </Button>
         </Modal.Footer>
@@ -305,7 +305,7 @@ function PageEditModal(props: Props) {
         onClose={props.onCancel}
         open={true}
         label={I18n.t('Add Page')}
-        as='form'
+        as="form"
         noValidate={true}
         onSubmit={handleSubmit(handleAddSubmit)}
       >
@@ -341,7 +341,7 @@ function PageEditModal(props: Props) {
           <Button margin="0 small" onClick={props.onCancel} disabled={loading}>
             {I18n.t('Cancel')}
           </Button>
-          <Button color="primary" type='submit' disabled={loading}>
+          <Button color="primary" type="submit" disabled={loading}>
             {I18n.t('Save')}
           </Button>
         </Modal.Footer>

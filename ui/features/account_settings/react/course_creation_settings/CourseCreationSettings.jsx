@@ -46,13 +46,13 @@ const formatInputName = name => `account[settings][${name}]`
 
 const CourseCreationSettings = ({currentValues}) => {
   const [isTeachersChecked, setTeachersChecked] = useState(
-    currentValues.teachers_can_create_courses
+    currentValues.teachers_can_create_courses,
   )
   const [isStudentsChecked, setStudentsChecked] = useState(
-    currentValues.students_can_create_courses
+    currentValues.students_can_create_courses,
   )
   const [isNoEnrollmentsChecked, setNoEnrollmentsChecked] = useState(
-    currentValues.no_enrollments_can_create_courses
+    currentValues.no_enrollments_can_create_courses,
   )
 
   return (

@@ -22,7 +22,7 @@ import invariant from 'invariant'
 const createChartComponent = fns => {
   invariant(
     typeof fns.createChart === 'function',
-    'createChartComponent: you must define a createChart() method that returns a d3 element'
+    'createChartComponent: you must define a createChart() method that returns a d3 element',
   )
 
   const fnsWithDefaults = {updateChart, removeChart, ...fns}

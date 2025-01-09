@@ -61,30 +61,30 @@ describe('Course paces header', () => {
       const {getByText} = renderConnected(<Header {...defaultProps} newPace={true} />)
       expect(
         getByText(
-          'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
-        )
+          'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.',
+        ),
       ).toBeInTheDocument()
     })
 
     it('renders an alert for new section paces', () => {
       const {getByText} = renderConnected(
-        <Header {...defaultProps} context_type="Section" newPace={true} />
+        <Header {...defaultProps} context_type="Section" newPace={true} />,
       )
       expect(
         getByText(
-          'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.'
-        )
+          'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.',
+        ),
       ).toBeInTheDocument()
     })
 
     it('renders an alert for new student paces', () => {
       const {getByText} = renderConnected(
-        <Header {...defaultProps} context_type="Enrollment" newPace={true} />
+        <Header {...defaultProps} context_type="Enrollment" newPace={true} />,
       )
       expect(
         getByText(
-          'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.'
-        )
+          'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -169,7 +169,7 @@ describe('Course paces header', () => {
       expect(
         getAllByRole('tooltip', {
           name: 'This duration does not take into account weekends and blackout days.',
-        })[0]
+        })[0],
       ).toBeInTheDocument()
     })
   })

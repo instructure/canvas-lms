@@ -46,7 +46,7 @@ describe('MessageBody', () => {
     const {getByTestId} = render(
       <ModalBodyContext.Provider value={mockContext}>
         <MessageBody {...props} />
-      </ModalBodyContext.Provider>
+      </ModalBodyContext.Provider>,
     )
     const messageBody = getByTestId('message-body')
     fireEvent.change(messageBody, {target: {value: 'howdy'}})
@@ -82,7 +82,7 @@ describe('MessageBody', () => {
       render(
         <ModalBodyContext.Provider value={mockContext}>
           <MessageBody {...props} />
-        </ModalBodyContext.Provider>
+        </ModalBodyContext.Provider>,
       )
 
       expect(mockContext.setBody).toHaveBeenCalled()

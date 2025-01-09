@@ -40,7 +40,7 @@ export default class ConfigurationTypeSelector extends React.Component {
     return (
       <div className="ConfigurationsTypeSelector">
         <div className="form-group">
-          { }
+          {}
           <label>
             {I18n.t('Configuration Type')}
             <select

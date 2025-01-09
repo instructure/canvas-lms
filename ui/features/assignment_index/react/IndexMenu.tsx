@@ -199,7 +199,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         type: 'assignment_group',
       },
     ]
-     
+
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}
@@ -212,7 +212,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         onExternalContentReady={() => window.location.reload()}
         open={tool !== null}
       />,
-      document.getElementById('external-tool-mount-point')
+      document.getElementById('external-tool-mount-point'),
     )
   }
 

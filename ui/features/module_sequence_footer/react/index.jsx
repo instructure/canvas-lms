@@ -76,7 +76,6 @@ function renderModuleSequenceFooter() {
   if (ENV.speed_grader_url) {
     const $container = document.getElementById('speed_grader_link_container')
 
-     
     ReactDOM.render(
       <ModuleSequenceFooter
         courseId={ENV.COURSE_ID}
@@ -85,7 +84,7 @@ function renderModuleSequenceFooter() {
         selectedStudentGroupId={ENV.selected_student_group_id}
         speedGraderUrl={ENV.speed_grader_url}
       />,
-      $container
+      $container,
     )
   }
 }

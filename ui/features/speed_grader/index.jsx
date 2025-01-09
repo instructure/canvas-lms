@@ -53,12 +53,11 @@ ready(() => {
 
   if (classicContainer instanceof HTMLElement) {
     // touch punch simulates mouse events for touch devices
-     
+
     require('./touch_punch.js')
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
-     
     ReactDOM.render(
       <div
         style={{
@@ -74,7 +73,7 @@ ready(() => {
       >
         <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
       </div>,
-      mountPoint
+      mountPoint,
     )
     speedGrader.setup()
     return
@@ -84,7 +83,6 @@ ready(() => {
 
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
-     
     ReactDOM.render(
       <GenericErrorPage
         imageUrl={errorShipUrl}
@@ -98,7 +96,7 @@ ready(() => {
         errorSubject={I18n.t('SpeedGrader loading error')}
         errorCategory={I18n.t('SpeedGrader Error Page')}
       />,
-      mountPoint
+      mountPoint,
     )
     return
   }
@@ -167,10 +165,9 @@ ready(() => {
       })
     })
     .catch(error => {
-       
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
-       
+
       ReactDOM.render(
         <GenericErrorPage
           imageUrl={errorShipUrl}
@@ -178,7 +175,7 @@ ready(() => {
           errorSubject={I18n.t('SpeedGrader loading error')}
           errorCategory={I18n.t('SpeedGrader Error Page')}
         />,
-        mountPoint
+        mountPoint,
       )
     })
 })

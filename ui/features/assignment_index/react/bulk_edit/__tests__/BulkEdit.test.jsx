@@ -337,7 +337,7 @@ describe('Assignment Bulk Edit Dates', () => {
   it('disables non-editable dates', async () => {
     const {getByTitle, getAllByLabelText} = await renderBulkEditAndWait(
       {},
-      restrictedAssignmentResponse()
+      restrictedAssignmentResponse(),
     )
     const dueDateInputs = getAllByLabelText('Due At')
     expect(dueDateInputs.map(i => i.disabled)).toEqual([false, true, true, true])
@@ -353,7 +353,7 @@ describe('Assignment Bulk Edit Dates', () => {
   it('deals with too many dates', async () => {
     const {getByText, getAllByLabelText} = await renderBulkEditAndWait({}, tooManyDatesResponse())
     const dueDateInputs = getAllByLabelText('Due At')
-    expect(dueDateInputs.length).toEqual(2)
+    expect(dueDateInputs).toHaveLength(2)
 
     expect(getByText('This assignment has too many dates to display.')).toBeInTheDocument()
   })
@@ -370,7 +370,7 @@ describe('Assignment Bulk Edit Dates', () => {
         '/api/v1/courses/42/assignments/bulk_update',
         expect.objectContaining({
           method: 'PUT',
-        })
+        }),
       )
       const body = JSON.parse(fetch.mock.calls[1][1].body)
       expect(body).toMatchObject([
@@ -759,7 +759,7 @@ describe('Assignment Bulk Edit Dates', () => {
         [
           JSON.stringify({url: 'progress url', workflow_state: 'queued', completion: 0}),
           responseOpts,
-        ]
+        ],
       )
       fireEvent.click(fns.getByText('Save'))
       await flushPromises()
@@ -779,7 +779,7 @@ describe('Assignment Bulk Edit Dates', () => {
         [
           JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
           responseOpts,
-        ]
+        ],
       )
 
       act(jest.runOnlyPendingTimers)
@@ -819,7 +819,7 @@ describe('Assignment Bulk Edit Dates', () => {
             {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
           ],
         }),
-        responseOpts
+        responseOpts,
       )
       act(jest.runAllTimers)
       await flushPromises()
@@ -835,7 +835,7 @@ describe('Assignment Bulk Edit Dates', () => {
       const {getByText, queryByText, getAllByLabelText} = await renderBulkEditAndSave()
       fetch.mockResponseOnce(
         JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
-        responseOpts
+        responseOpts,
       )
       act(jest.runAllTimers)
       await flushPromises()
@@ -850,7 +850,7 @@ describe('Assignment Bulk Edit Dates', () => {
         [
           JSON.stringify({url: 'progress url', workflow_state: 'complete', completion: 100}),
           responseOpts,
-        ]
+        ],
       )
       fireEvent.click(getByText('Save'))
       await flushPromises()
@@ -891,7 +891,7 @@ describe('Assignment Bulk Edit Dates', () => {
       })
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignments
+        assignments,
       )
       const allCheckbox = getByLabelText('Select all assignments')
       fireEvent.click(allCheckbox)
@@ -1001,7 +1001,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('selects some assignments between two dates', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       const checkboxes = getAllByLabelText(/Select assignment:/)
       changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-20')
@@ -1013,7 +1013,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('deselects assignments outside of the dates', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       const checkboxes = getAllByLabelText(/Select assignment:/)
       checkboxes.forEach(cb => fireEvent.click(cb))
@@ -1027,7 +1027,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('selects some assignments from start date to end of time', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-24') // catches the unlock dates
       fireEvent.click(getByText(/^Apply$/))
@@ -1038,7 +1038,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('selects some assignments from beginning of time to end date', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       changeAndBlurInput(getByLabelText('Selection end date'), '2020-03-22')
       fireEvent.click(getByText(/^Apply$/))
@@ -1049,7 +1049,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('checks unlock date for selection', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       changeAndBlurInput(getByLabelText('Selection start date'), '2020-03-29')
       changeAndBlurInput(getByLabelText('Selection end date'), '2020-03-29')
@@ -1061,7 +1061,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('checks lock date for selection', async () => {
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       changeAndBlurInput(getByLabelText('Selection start date'), '2020-04-21')
       changeAndBlurInput(getByLabelText('Selection end date'), '2020-04-21')
@@ -1073,12 +1073,12 @@ describe('Assignment Bulk Edit Dates', () => {
     it('shows an error and disables apply if end date is before start date', async () => {
       const {getByText, getByLabelText, getAllByText} = await renderBulkEditAndWait(
         {},
-        assignmentListWithDates()
+        assignmentListWithDates(),
       )
       changeAndBlurInput(getByLabelText('Selection start date'), '2020-05-15')
       changeAndBlurInput(getByLabelText('Selection end date'), '2020-05-14')
       expect(
-        getAllByText('The end date must be after the start date').length
+        getAllByText('The end date must be after the start date').length,
       ).toBeGreaterThanOrEqual(1)
       expect(getByText(/^Apply$/).closest('button')).toBeDisabled()
     })
@@ -1118,7 +1118,7 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
-      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -1163,7 +1163,7 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
-      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -1195,7 +1195,7 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
-      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -1226,7 +1226,7 @@ describe('Assignment Bulk Edit Dates', () => {
       fireEvent.click(getByText('Save'))
       await flushPromises()
       const body = JSON.parse(fetch.mock.calls[1][1].body)
-      expect(body.length).toBe(1) // second assignment was not selected
+      expect(body).toHaveLength(1) // second assignment was not selected
       expect(body).toMatchObject([
         {
           id: 'assignment_1',
@@ -1299,7 +1299,7 @@ describe('in a timezone that does DST', () => {
     ]
     const {assignments, getAllByText, getByText, getAllByLabelText} = await renderBulkEditAndWait(
       {},
-      af
+      af,
     )
     const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'America/Anchorage')
     expect(originalDueAtMoment.format('YYYY-MM-DD h:mm:ss.S')).toEqual('2021-11-02 5:37:14.5')

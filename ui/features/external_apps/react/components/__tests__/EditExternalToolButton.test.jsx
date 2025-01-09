@@ -45,7 +45,7 @@ describe('EditExternalToolButton', () => {
   it('allows editing of tools when canEdit is true', () => {
     render(<EditExternalToolButton {...defaultProps} />)
     expect(
-      screen.queryByText('This action has been disabled by your admin.')
+      screen.queryByText('This action has been disabled by your admin.'),
     ).not.toBeInTheDocument()
   })
 
@@ -92,7 +92,7 @@ describe('EditExternalToolButton', () => {
   it('allows editing of tools with granular permissions', () => {
     render(<EditExternalToolButton {...defaultProps} canEdit={true} />)
     expect(
-      screen.queryByText('This action has been disabled by your admin.')
+      screen.queryByText('This action has been disabled by your admin.'),
     ).not.toBeInTheDocument()
   })
 

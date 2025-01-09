@@ -141,12 +141,11 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const node = document.querySelector('.paginatedLoadingIndicator')
     if (node instanceof HTMLElement) {
-       
       ReactDOM.render(
         <View padding="x-small" textAlign="center" as="div" display="block">
           <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
         </View>,
-        node
+        node,
       )
     }
   }
@@ -209,14 +208,14 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       if (sortOrder === 'up') {
         $sortHeader.attr(
           'aria-label',
-          I18n.t('headers.sort_ascending', '%{title}, Sort ascending', {title: $sortHeader.text()})
+          I18n.t('headers.sort_ascending', '%{title}, Sort ascending', {title: $sortHeader.text()}),
         )
       } else {
         $sortHeader.attr(
           'aria-label',
           I18n.t('headers.sort_descending', '%{title}, Sort descending', {
             title: $sortHeader.text(),
-          })
+          }),
         )
       }
 
@@ -280,7 +279,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
               }
             : null,
       },
-      {contextAssetString: this.contextAssetString}
+      {contextAssetString: this.contextAssetString},
     )
     this.editView = new WikiPageEditView({
       model: this.editModel,
@@ -327,7 +326,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
 
     const {ContentTypeExternalToolTray: ExternalToolTray} = this
-     
+
     ReactDOM.render(
       <ExternalToolTray
         tool={tool}
@@ -339,7 +338,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         onDismiss={handleDismiss}
         open={tool !== null}
       />,
-      this.$externalToolMountPoint[0]
+      this.$externalToolMountPoint[0],
     )
   }
 
@@ -351,7 +350,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const pageId = newCopyToItem?.id
     const {DirectShareCourseTray: CourseTray} = this
-     
+
     ReactDOM.render(
       <CourseTray
         open={newCopyToItem !== null}
@@ -360,7 +359,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         shouldReturnFocus={false}
         onDismiss={handleDismiss}
       />,
-      this.$copyToMountPoint[0]
+      this.$copyToMountPoint[0],
     )
   }
 
@@ -373,7 +372,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     const pageId = newSendToItem?.id
     const {DirectShareUserModal: UserModal} = this
-     
+
     ReactDOM.render(
       <UserModal
         open={newSendToItem !== null}
@@ -382,7 +381,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         shouldReturnFocus={false}
         onDismiss={handleDismiss}
       />,
-      this.$sendToMountPoint[0]
+      this.$sendToMountPoint[0],
     )
   }
 
@@ -397,7 +396,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     }
     const handleTrayExited = () => ReactDOM.unmountComponentAtNode(this.$assignToMountPoint[0])
 
-     
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -413,7 +411,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         itemContentId={newAssignToItem.get('page_id')}
         removeDueDateInput={true}
       />,
-      this.$assignToMountPoint[0]
+      this.$assignToMountPoint[0],
     )
   }
 

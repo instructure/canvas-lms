@@ -17,36 +17,36 @@
  */
 
 .contentLayout--tablet {
-    padding: 5rem 0 8rem; /* 80px 0 128px */
+  padding: 5rem 0 8rem; /* 80px 0 128px */
 }
 .contentLayout--desktop {
-    padding: 0;
+  padding: 0;
 }
 
 .contentLayout__content {
-    height: 100%;
-    padding: 2.25rem 1.5rem; /* 36px 24px */
+  height: 100%;
+  padding: 2.25rem 1.5rem; /* 36px 24px */
 }
 .contentLayout__content--tablet {
-    height: unset;
-    margin: 0 auto;
-    padding: 3.75rem 6.25rem; /* 60px 100px */
-    width: 35.75rem; /* 572px */
+  height: unset;
+  margin: 0 auto;
+  padding: 3.75rem 6.25rem; /* 60px 100px */
+  width: 35.75rem; /* 572px */
 }
 .contentLayout__content--desktop {
-    height: 100%;
-    margin: unset;
-    padding: 5rem; /* 80px */
-    width: 45rem; /* 720px */
+  height: 100%;
+  margin: unset;
+  padding: 5rem; /* 80px */
+  width: 45rem; /* 720px */
 }
 
 .contentLayout__background {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 .contentLayout__background--desktop {
-    left: 45rem; /* 720px (width of content) */
+  left: 45rem; /* 720px (width of content) */
 }

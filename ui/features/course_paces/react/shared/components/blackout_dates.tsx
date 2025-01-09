@@ -34,18 +34,18 @@ const BlackoutDates = ({blackoutDates, onChange}: PassedProps) => {
       blackoutDate.temp_id = uid('temp_', 3)
       onChange(blackoutDates.concat([blackoutDate]))
     },
-    [blackoutDates, onChange]
+    [blackoutDates, onChange],
   )
 
   const deleteBlackoutDate = useCallback(
     (blackoutDate: BlackoutDate) => {
       const newBlackoutDates: BlackoutDate[] = blackoutDates.filter(
         (bod: BlackoutDate) =>
-          (bod.id && bod.id !== blackoutDate.id) || bod.temp_id !== blackoutDate.temp_id
+          (bod.id && bod.id !== blackoutDate.id) || bod.temp_id !== blackoutDate.temp_id,
       )
       onChange(newBlackoutDates)
     },
-    [blackoutDates, onChange]
+    [blackoutDates, onChange],
   )
 
   return (

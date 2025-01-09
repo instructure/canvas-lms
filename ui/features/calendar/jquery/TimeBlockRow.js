@@ -121,7 +121,7 @@ export default class TimeBlockRow {
     if (start && end && end <= start) {
       this.showInlineError(
         this.$start_time,
-        I18n.t('end_before_start_error', 'Start time must be before end time')
+        I18n.t('end_before_start_error', 'Start time must be before end time'),
       )
       startValid = false
     } else {
@@ -132,7 +132,7 @@ export default class TimeBlockRow {
     if (end && end < fcUtil.now()) {
       this.showInlineError(
         this.$end_time,
-        I18n.t('ends_in_past_error', 'You cannot create an appointment slot that ends in the past')
+        I18n.t('ends_in_past_error', 'You cannot create an appointment slot that ends in the past'),
       )
       endValid = false
     } else {

@@ -43,7 +43,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(queryByLabelText(/Message students/i)).toBeVisible()
     expect(queryAllByText(/Recipients/i)).toBeTruthy()
@@ -58,7 +58,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(getByText(/Send Message/i)).toBeVisible()
     expect(getByText(/Cancel/i)).toBeVisible()
@@ -71,7 +71,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
       target: {value: 'foo'},
@@ -84,7 +84,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={false}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(getByLabelText('Required input. Message all unassigned students.')).toHaveValue('')
   })
@@ -96,7 +96,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     expect(getByText('Send Message').closest('button').hasAttribute('disabled')).toBeTruthy()
   })
@@ -108,7 +108,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
       target: {value: 't'},
@@ -124,7 +124,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         recipients={recipients}
         open={open}
         onDismiss={onDismiss}
-      />
+      />,
     )
     fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
       target: {value: 'hi'},
@@ -149,7 +149,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
     })
 
     afterEach(() => {
-      console.error.mockRestore() // eslint-disable-line no-console
+      console.error.mockRestore()
     })
 
     it('reports an error if the fetch fails', async () => {
@@ -160,7 +160,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
           recipients={recipients}
           open={open}
           onDismiss={onDismiss}
-        />
+        />,
       )
       fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
         target: {value: 'hi'},

@@ -79,7 +79,7 @@ class ViewManager extends React.Component {
       ...Assignment.shape.propTypes,
       ...AssignmentSubmissionsConnection.shape.propTypes,
     }),
-     
+
     submissionHistoriesQueryData: shape({
       submissionHistoriesConnection: shape({
         nodes: arrayOf(Submission.shape),
@@ -217,7 +217,7 @@ class ViewManager extends React.Component {
         document
           .querySelector('button[data-testid=assignments-2-assignment-toggle-details]')
           .focus()
-      }
+      },
     )
   }
 

@@ -44,7 +44,6 @@ export function PostMessage({...props}) {
 
   useEffect(() => {
     if (ENV.SEQUENCE !== undefined && props.isTopic) {
-       
       import('@canvas/modules/jquery/prerequisites_lookup').then(() => {
         INST.lookupPrerequisites()
       })

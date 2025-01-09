@@ -36,7 +36,7 @@ const render = () => {
   return testingLibraryRender(
     <MockedQueryProvider>
       <HelpTray {...props} />
-    </MockedQueryProvider>
+    </MockedQueryProvider>,
   )
 }
 

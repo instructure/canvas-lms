@@ -197,7 +197,7 @@ export default class EditableRichText extends React.Component {
       },
       () => {
         this.props.onChange(this.state.value)
-      }
+      },
     )
   }
 

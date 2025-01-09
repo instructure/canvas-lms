@@ -21,7 +21,7 @@ export const createEntry = async (
   type: string,
   portfolioId: number,
   name: string,
-  sectionId?: number
+  sectionId?: number,
 ) => {
   let params
   if (type === 'categories') {
@@ -56,7 +56,7 @@ export const moveEntry = async (
   type: string,
   portfolioId: number,
   order: number[],
-  sectionId?: number
+  sectionId?: number,
 ) => {
   const params = {
     order: order.toString(),
@@ -77,7 +77,7 @@ export const updateEntry = async (
   portfolioId: number,
   name: string,
   id: number,
-  sectionId?: number
+  sectionId?: number,
 ) => {
   let params
   if (type === 'categories') {

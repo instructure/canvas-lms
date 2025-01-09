@@ -30,7 +30,7 @@ const createEditHeaderView = (
   defaultAssignmentOpts = {
     name: 'Test Assignment',
     assignment_overrides: [],
-  }
+  },
 ) => {
   Object.assign(assignmentOptions, defaultAssignmentOpts)
   const assignment = new Assignment(assignmentOptions)
@@ -92,7 +92,7 @@ describe('EditHeaderView', () => {
       },
       runOnly: ['wcag2a', 'wcag2aa'],
     })
-    expect(results.violations.length).toBe(0)
+    expect(results.violations).toHaveLength(0)
   })
 
   it('renders header bar', () => {

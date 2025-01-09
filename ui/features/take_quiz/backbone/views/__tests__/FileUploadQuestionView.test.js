@@ -33,13 +33,13 @@ describe('FileUploadQuestionView', () => {
         display_name: 'foobar.jpg',
         id: 1,
       },
-      {preflightUrl: 'url.com'}
+      {preflightUrl: 'url.com'},
     )
     view = new FileUploadQuestion({model})
 
     document.body.innerHTML = '<div id="fixtures"></div>'
     $('<input value="C:\\fakepath\\file.upload.zip" class="file-upload hidden" />').appendTo(
-      view.$el
+      view.$el,
     )
     $('<input type="hidden" id="fileupload_in_progress" value="false"/>').appendTo(view.$el)
     view.$el.appendTo('#fixtures')

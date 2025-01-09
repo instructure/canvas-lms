@@ -160,13 +160,12 @@ describe('Sublevel Content Checkbox and Carrot Behaviors', () => {
   })
 
   test('renders sublevel checkboxes', () => {
-    expect(CheckboxHelper.$sublevelCheckboxes().length).toBe(3)
+    expect(CheckboxHelper.$sublevelCheckboxes()).toHaveLength(3)
   })
 
   test('checkboxes with sublevel checkboxes and no url only display labels', () => {
     expect(
-      CheckboxHelper.checkboxView.$el.find('label[title=Assignments]').siblings('[type=checkbox]')
-        .length
-    ).toBe(0)
+      CheckboxHelper.checkboxView.$el.find('label[title=Assignments]').siblings('[type=checkbox]'),
+    ).toHaveLength(0)
   })
 })

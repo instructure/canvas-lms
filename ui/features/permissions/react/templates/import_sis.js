@@ -26,7 +26,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Account Navigation'),
       description: I18n.t(
-        'Determines visibility and management of SIS Import link in Account Navigation.'
+        'Determines visibility and management of SIS Import link in Account Navigation.',
       ),
     },
     {
@@ -45,5 +45,5 @@ export const template = generateActionTemplates(
     },
   ],
   [],
-  []
+  [],
 )

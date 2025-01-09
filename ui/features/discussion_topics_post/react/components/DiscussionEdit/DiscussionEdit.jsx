@@ -42,7 +42,7 @@ export const DiscussionEdit = props => {
   const [includeQuotedReply, setIncludeQuotedReply] = useState(!!props.quotedEntry?.message)
   const textAreaId = useRef(`message-body-${props.rceIdentifier}`)
   const [anonymousAuthorState, setAnonymousAuthorState] = useState(
-    !!props.discussionAnonymousState && props.canReplyAnonymously
+    !!props.discussionAnonymousState && props.canReplyAnonymously,
   )
 
   const [attachment, setAttachment] = useState(null)
@@ -189,13 +189,13 @@ export const DiscussionEdit = props => {
                           return
                         }
                         localStorage.removeItem(
-                          `rceautosave:${ENV.current_user_id}${window.location?.href}:${textAreaId.current}`
+                          `rceautosave:${ENV.current_user_id}${window.location?.href}:${textAreaId.current}`,
                         )
                         props.onSubmit(
                           rceContent,
                           includeQuotedReply ? props.quotedEntry._id : null,
                           attachment,
-                          anonymousAuthorState
+                          anonymousAuthorState,
                         )
                       }
                     }}

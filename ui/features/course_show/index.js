@@ -38,7 +38,7 @@ $(document).ready(() => {
         modal: true,
         zIndex: 1000,
       })
-      .fixDialogButtons()
+      .fixDialogButtons(),
   )
 
   $selfUnenrollmentDialog.on('click', '.action', function () {
@@ -55,7 +55,7 @@ $(document).ready(() => {
       'POST',
       {},
       _data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
-      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.'))
+      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.')),
     )
   })
 

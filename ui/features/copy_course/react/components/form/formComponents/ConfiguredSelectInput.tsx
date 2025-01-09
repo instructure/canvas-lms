@@ -41,7 +41,7 @@ export const ConfiguredSelectInput = ({
 
   const handleSelectOption = (
     _: SyntheticEvent,
-    {id, value}: {id?: string; value?: string | number}
+    {id, value}: {id?: string; value?: string | number},
   ) => {
     const convertedId = id === undefined ? null : id
     setInputValue(value as string)

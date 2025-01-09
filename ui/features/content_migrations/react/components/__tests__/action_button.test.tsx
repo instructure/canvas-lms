@@ -49,7 +49,7 @@ const renderComponent = (overrideProps?: any) =>
       migration_issues_count={1}
       migration_issues_url="https://mock.issues.url"
       {...{...overrideProps}}
-    />
+    />,
   )
 
 describe('ActionButton', () => {
@@ -80,7 +80,7 @@ describe('ActionButton', () => {
       renderComponent()
       await userEvent.click(screen.getByRole('button', {name: 'View Issues'}))
       expect(
-        screen.getByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+        screen.getByRole('heading', {name: 'Canvas Cartridge Importer Issues'}),
       ).toBeInTheDocument()
     })
 
@@ -160,7 +160,7 @@ describe('ActionButton', () => {
         await userEvent.click(await screen.findByRole('button', {name: 'Show More'}))
 
         expect(
-          await screen.findByText('Failed to fetch migration issues data.')
+          await screen.findByText('Failed to fetch migration issues data.'),
         ).toBeInTheDocument()
       })
 
@@ -203,7 +203,7 @@ describe('ActionButton', () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'}),
         ).not.toBeInTheDocument()
       })
     })
@@ -217,7 +217,7 @@ describe('ActionButton', () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'})
+          screen.queryByRole('heading', {name: 'Canvas Cartridge Importer Issues'}),
         ).not.toBeInTheDocument()
       })
     })

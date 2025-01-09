@@ -25,7 +25,7 @@ import $ from 'jquery'
 
 function openMoveDialog(
   thingsToMove,
-  {contextType, contextId, returnFocusTo, clearSelectedItems, onMove}
+  {contextType, contextId, returnFocusTo, clearSelectedItems, onMove},
 ) {
   const rootFolderToShow = find(filesEnv.rootFolders, folder => {
     return (
@@ -53,7 +53,7 @@ function openMoveDialog(
       rootFoldersToShow={filesEnv.showingAllContexts ? filesEnv.rootFolders : [rootFolderToShow]}
       onClose={handleClose}
       onMove={handleMove}
-    />
+    />,
   )
 }
 

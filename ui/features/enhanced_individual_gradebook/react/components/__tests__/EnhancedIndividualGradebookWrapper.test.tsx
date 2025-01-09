@@ -72,7 +72,7 @@ describe('Enhanced Individual Wrapper Gradebook', () => {
             }
           />
         </Routes>
-      </BrowserRouter>
+      </BrowserRouter>,
     )
   }
 

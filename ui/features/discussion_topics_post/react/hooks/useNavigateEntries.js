@@ -81,7 +81,7 @@ export default function useNavigateEntries({
         setExpandedThreads([...expandedThreads, newEntry.rootEntryId])
       }
     },
-    [expandedThreads, highlightEntryId, setExpandedThreads, setHighlightEntryId, setPageNumber]
+    [expandedThreads, highlightEntryId, setExpandedThreads, setHighlightEntryId, setPageNumber],
   )
 
   const getStudentPreviousEntry = useCallback(() => {
@@ -134,7 +134,7 @@ export default function useNavigateEntries({
         }
       }
     },
-    [highlightEntryId, getStudentPreviousEntry, getStudentNextEntry, setFocusSelector]
+    [highlightEntryId, getStudentPreviousEntry, getStudentNextEntry, setFocusSelector],
   )
 
   useEffect(() => {

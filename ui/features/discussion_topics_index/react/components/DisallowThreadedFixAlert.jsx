@@ -49,8 +49,8 @@ function UpdateButton({onUpdateComplete}) {
     } catch (error) {
       setOnFailure(
         I18n.t(
-          'We’ve run into a problem while updating all discussions. Please try again or contact us to resolve this issue.'
-        )
+          'We’ve run into a problem while updating all discussions. Please try again or contact us to resolve this issue.',
+        ),
       )
     } finally {
       setIsLoading(false)
@@ -85,12 +85,12 @@ function UpdateButton({onUpdateComplete}) {
             <Flex direction="column" gap="large">
               <Text>
                 {I18n.t(
-                  "By selecting 'Make All Discussions Threaded,' you will update all non-threaded discussions in the course to threaded. This action will uncheck the 'Disallow Threaded Replies' option, enabling threaded replies for all discussions."
+                  "By selecting 'Make All Discussions Threaded,' you will update all non-threaded discussions in the course to threaded. This action will uncheck the 'Disallow Threaded Replies' option, enabling threaded replies for all discussions.",
                 )}
               </Text>
               <Text>
                 {I18n.t(
-                  'This change is irreversible and will affect all discussions in your course.'
+                  'This change is irreversible and will affect all discussions in your course.',
                 )}
               </Text>
             </Flex>
@@ -118,10 +118,10 @@ function DisallowThreadedFixAlertBase({breakpoints}) {
   // We have 2 different states to preserve the fade out transition, shouldShow triggers the animation
   // and shouldMount removes the component from the DOM once the animation is done
   const [shouldMount, setShouldMount] = useState(
-    () => localStorage.getItem(localStorageKey) !== 'true'
+    () => localStorage.getItem(localStorageKey) !== 'true',
   )
   const [shouldShow, setShouldShow] = useState(
-    () => localStorage.getItem(localStorageKey) !== 'true'
+    () => localStorage.getItem(localStorageKey) !== 'true',
   )
 
   const onDismiss = () => {
@@ -150,7 +150,7 @@ function DisallowThreadedFixAlertBase({breakpoints}) {
     'Following the *recent issues* around disallowing threaded replies, we provide a quick and easy way to update all of your discussions to be threaded.',
     {
       wrappers: [`<a target="_blank" href="${linkHref}">$1</a>`],
-    }
+    },
   )
 
   return (

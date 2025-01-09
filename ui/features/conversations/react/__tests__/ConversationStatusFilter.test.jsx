@@ -39,7 +39,7 @@ const makeProps = (props = {}) =>
         baz: 'baz',
       },
     },
-    props
+    props,
   )
 
 describe('ConversationStatusFilter component', () => {

@@ -73,7 +73,7 @@ const header = () => (
     <View display="block">
       {I18n.t(
         'One or more content items sent by this external app failed to process correctly. ' +
-          'These have not been saved by Canvas, and the reasons for failure are listed below.'
+          'These have not been saved by Canvas, and the reasons for failure are listed below.',
       )}
     </View>
     <View display="block" margin="small 0 0 0">
@@ -109,7 +109,7 @@ const buildContentItems = (items: ContentItem[]) =>
           ({
             title: item.title,
             error: {field, message},
-          } as ContentItemDisplay)
+          }) as ContentItemDisplay,
       )
       return [...acc, ...errorItems]
     }
@@ -140,7 +140,7 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
         subject,
         ...deepLinkResponse,
       },
-      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
+      environment.DEEP_LINKING_POST_MESSAGE_ORIGIN,
     )
   }, [deepLinkResponse, environment.DEEP_LINKING_POST_MESSAGE_ORIGIN, parentWindow])
 
@@ -149,7 +149,7 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
       setNoContent(true)
     }
     const anyItemHasError = deepLinkResponse.content_items.some(
-      item => Object.keys(item.errors || {}).length > 0
+      item => Object.keys(item.errors || {}).length > 0,
     )
     setHasErrors(anyItemHasError)
 

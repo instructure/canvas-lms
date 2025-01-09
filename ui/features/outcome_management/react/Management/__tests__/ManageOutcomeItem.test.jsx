@@ -33,7 +33,7 @@ const render = (
     friendlyDescriptionFF = true,
     accountLevelMasteryScalesFF = true,
     renderer = rtlRender,
-  } = {}
+  } = {},
 ) => {
   return renderer(
     <OutcomesContext.Provider
@@ -49,7 +49,7 @@ const render = (
       }}
     >
       <MockedProvider mocks={[]}>{children}</MockedProvider>
-    </OutcomesContext.Provider>
+    </OutcomesContext.Provider>,
   )
 }
 
@@ -114,7 +114,7 @@ describe('ManageOutcomeItem', () => {
 
   it('displays disabled caret button with "not-allowed" cursor if description is a single line html with no extra formatting', () => {
     const {queryByTestId} = render(
-      <ManageOutcomeItem {...defaultProps({description: '<p>The quick brown fox.</p>'})} />
+      <ManageOutcomeItem {...defaultProps({description: '<p>The quick brown fox.</p>'})} />,
     )
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveAttribute('disabled')
     expect(queryByTestId('icon-arrow-right').closest('button')).toHaveStyle('cursor: not-allowed')
@@ -126,7 +126,7 @@ describe('ManageOutcomeItem', () => {
         {...defaultProps({
           description: '<p>aaaaaaadfhausdfhkjsadhfkjsadhfkjhsadfkjhasdfkjh</p>'.repeat(10),
         })}
-      />
+      />,
     )
     fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
     expect(queryByTestId('icon-arrow-down').closest('button')).not.toHaveAttribute('disabled')
@@ -134,7 +134,7 @@ describe('ManageOutcomeItem', () => {
 
   it('expands description when user clicks on button with right pointing caret', () => {
     const {queryByTestId} = render(
-      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />
+      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />,
     )
     fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
     expect(queryByTestId('description-expanded')).toBeInTheDocument()
@@ -142,7 +142,7 @@ describe('ManageOutcomeItem', () => {
 
   it('collapses description when user clicks on button with down pointing caret', () => {
     const {queryByTestId} = render(
-      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bbbb</p>'})} />
+      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bbbb</p>'})} />,
     )
     fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
     fireEvent.click(queryByTestId('manage-outcome-item-expand-toggle'))
@@ -164,7 +164,7 @@ describe('ManageOutcomeItem', () => {
 
   it('displays spinner when a remove action is pending', () => {
     const {getByTestId} = render(
-      <ManageOutcomeItem {...defaultProps({removeOutcomeStatus: 'REMOVE_PENDING'})} />
+      <ManageOutcomeItem {...defaultProps({removeOutcomeStatus: 'REMOVE_PENDING'})} />,
     )
     expect(getByTestId('outcome-spinner')).toBeInTheDocument()
   })
@@ -180,7 +180,7 @@ describe('ManageOutcomeItem', () => {
 
   it('toggles aria-expanded attribute', () => {
     const {queryByTestId} = render(
-      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />
+      <ManageOutcomeItem {...defaultProps({description: '<p>aa</p><p>bb</p>'})} />,
     )
     const button = queryByTestId('manage-outcome-item-expand-toggle')
     const ariaExpandedValueBeforeClick = button.getAttribute('aria-expanded')
@@ -260,7 +260,7 @@ describe('ManageOutcomeItem', () => {
           <ManageOutcomeItem {...defaultProps({description: null})} />,
           {
             accountLevelMasteryScalesFF: false,
-          }
+          },
         )
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
       })
@@ -271,7 +271,7 @@ describe('ManageOutcomeItem', () => {
         const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeDisabled()
         expect(queryByTestId('icon-arrow-right').closest('button')).toHaveStyle(
-          'cursor: not-allowed'
+          'cursor: not-allowed',
         )
       })
     })

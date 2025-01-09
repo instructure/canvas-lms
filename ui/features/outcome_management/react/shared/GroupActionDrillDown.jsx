@@ -150,7 +150,7 @@ const GroupActionDrillDown = ({
               },
               {
                 count: outcomesCount,
-              }
+              },
             )}
           </div>
         </Select.Option>
@@ -188,8 +188,8 @@ const GroupActionDrillDown = ({
         isShowingOptions
           ? ''
           : selectedGroupId !== rootId
-          ? collections[selectedGroupId].name
-          : I18n.t('Select an outcome group')
+            ? collections[selectedGroupId].name
+            : I18n.t('Select an outcome group')
       }
       renderLabel={I18n.t('Groups')}
       onRequestShowOptions={() => setIsShowingOptions(true)}

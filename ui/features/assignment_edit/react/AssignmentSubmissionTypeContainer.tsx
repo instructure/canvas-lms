@@ -45,7 +45,7 @@ declare const ENV: GlobalEnv & {
 }
 
 export function AssignmentSubmissionTypeContainer(
-  props: AssignmentSubmissionTypeContainerProps
+  props: AssignmentSubmissionTypeContainerProps,
 ): React.ReactElement | null {
   if (!props.tool) {
     return null

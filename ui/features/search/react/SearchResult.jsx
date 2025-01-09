@@ -73,7 +73,7 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
 
     // Filter out single character search terms and common words
     const validSearchTerms = searchTerms.filter(
-      term => term.length > 1 && !stopwords.includes(term.toLowerCase())
+      term => term.length > 1 && !stopwords.includes(term.toLowerCase()),
     )
 
     // Escape each searchTerm and join them with '|'
@@ -124,7 +124,7 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
 
     return truncatedText.replace(
       searchExpression,
-      '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>'
+      '<span data-testid="highlighted-search-item" style="background-color: rgba(0,142,226,0.2); border-radius: .25rem; padding-bottom: 3px; padding-top: 1px;">$1</span>',
     )
   }
 
@@ -188,7 +188,7 @@ export default function SearchResult({onExplain, onLike, onDislike, result, sear
                 <IconButton
                   onClick={_ =>
                     onDislike({id: content_id, type: content_type}).then(_ =>
-                      setFeedback('disliked')
+                      setFeedback('disliked'),
                     )
                   }
                   screenReaderLabel={I18n.t('I do not like this result')}

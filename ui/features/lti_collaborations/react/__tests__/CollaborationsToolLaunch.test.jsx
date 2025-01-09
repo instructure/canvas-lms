@@ -92,14 +92,14 @@ describe('CollaborationsToolLaunch screenreader functionality', () => {
     expect(ref.current.state.beforeExternalContentAlertClass).toEqual('screenreader-only')
     expect(ref.current.state.afterExternalContentAlertClass).toEqual('screenreader-only')
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('allow')).toEqual(
-      ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; ')
+      ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '),
     )
   })
 
   test("sets the 'data-lti-launch' attribute on the iframe", () => {
     const wrapper = render(<CollaborationsToolLaunch />)
     expect(wrapper.container.querySelector('.tool_launch').getAttribute('data-lti-launch')).toEqual(
-      'true'
+      'true',
     )
   })
 })

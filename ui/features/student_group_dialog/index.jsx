@@ -32,7 +32,6 @@ function reloadStudentGroup() {
 }
 
 function editGroup(group, open = true) {
-   
   ReactDOM.render(
     <GroupModal
       group={{
@@ -52,7 +51,7 @@ function editGroup(group, open = true) {
         document.getElementById('edit_group').focus()
       }}
     />,
-    document.getElementById('student-group-dialog-mount-point')
+    document.getElementById('student-group-dialog-mount-point'),
   )
 }
 

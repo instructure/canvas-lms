@@ -35,7 +35,7 @@ const server = setupServer(
         can_upload: true,
         locked_for_user: false,
         parent_folder_id: null,
-      })
+      }),
     )
   }),
   http.get('/api/v1/folders/1/files', (_req, res, ctx) => {
@@ -50,9 +50,9 @@ const server = setupServer(
           thumbnail_url: 'thumbnail.jpg',
           'content-type': 'text/html',
         },
-      ])
+      ]),
     )
-  })
+  }),
 )
 
 describe('AnnotatedDocumentSelector', () => {

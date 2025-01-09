@@ -34,7 +34,7 @@ describe('Assignment Information Tests', () => {
     const props = {...assignmentInfoDefaultProps, assignment: undefined}
     const {getByText} = renderAssignmentInformation(props)
     expect(
-      getByText('Select an assignment to view additional information here.')
+      getByText('Select an assignment to view additional information here.'),
     ).toBeInTheDocument()
   })
 
@@ -44,7 +44,7 @@ describe('Assignment Information Tests', () => {
     const assignmentNameNode = getByTestId('assignment-information-name')
     expect(assignmentNameNode).toHaveAttribute(
       'href',
-      assignmentInfoDefaultProps.assignment?.htmlUrl
+      assignmentInfoDefaultProps.assignment?.htmlUrl,
     )
     expect(assignmentNameNode).toHaveTextContent(name)
   })

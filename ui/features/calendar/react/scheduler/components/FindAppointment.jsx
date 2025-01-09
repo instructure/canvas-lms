@@ -40,7 +40,7 @@ export default class FindAppointment extends React.Component {
   handleSubmit() {
     this.props.store.dispatch(Actions.actions.setCourse(this.state.selectedCourse))
     this.props.store.dispatch(
-      Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode)
+      Actions.actions.setFindAppointmentMode(!this.props.store.getState().inFindAppointmentMode),
     )
     this.setState({
       isModalOpen: false,

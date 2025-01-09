@@ -88,7 +88,7 @@ const router = createBrowserRouter(
 
   {
     basename: getBasename('apps'),
-  }
+  },
 )
 
 const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
@@ -128,5 +128,5 @@ root.render(
     />
     <InheritedKeyRegistrationWizard accountId={accountId} service={inheritedKeyService} />
     <RouterProvider router={router} />
-  </QueryClientProvider>
+  </QueryClientProvider>,
 )

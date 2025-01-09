@@ -159,7 +159,7 @@ ShowFolder.render = function () {
             tabIndex={0}
           >
             {I18n.t(
-              'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
+              'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.',
             )}
           </div>
         )}

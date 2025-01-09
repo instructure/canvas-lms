@@ -86,7 +86,7 @@ const moveQuestions = {
       window.location.href + '/questions?page=' + this.page,
       'GET',
       {},
-      $.proxy(this.onData, this)
+      $.proxy(this.onData, this),
     )
   },
   onData(data) {

@@ -113,7 +113,7 @@ const OutcomeManagementPanel = ({
       for (let i = createdOutcomeGroupIds.length - 1; i >= 0; i--) {
         if (collections[createdOutcomeGroupIds[i]]) {
           setParentsToUnload(
-            getOutcomeGroupAncestorsWithSelf(collections, createdOutcomeGroupIds[i])
+            getOutcomeGroupAncestorsWithSelf(collections, createdOutcomeGroupIds[i]),
           )
           break
         }
@@ -130,11 +130,11 @@ const OutcomeManagementPanel = ({
             targetGroupId === ROOT_GROUP
               ? [...acc, rootId]
               : [...acc, ...getOutcomeGroupAncestorsWithSelf(collections, targetGroupId)],
-          []
-        )
+          [],
+        ),
       )
       const lhsTargetGroupIdsToRefetch = targetGroupIdsToRefetch.map(gid =>
-        gid === ROOT_GROUP ? rootId : gid
+        gid === ROOT_GROUP ? rootId : gid,
       )
       setLhsGroupIdsToRefetch(lhsTargetGroupIdsToRefetch)
       setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...groupIdsToRefetch])])
@@ -253,7 +253,7 @@ const OutcomeManagementPanel = ({
       openGroupMoveModal,
       openGroupRemoveModal,
       openImportOutcomesModal,
-    ]
+    ],
   )
 
   const outcomeMenuHandler = useCallback(
@@ -279,7 +279,7 @@ const OutcomeManagementPanel = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [group]
+    [group],
   )
 
   // set the initial target group as the lhs group

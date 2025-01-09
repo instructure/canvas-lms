@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
-
 import $ from 'jquery'
 import {some, isNull, isUndefined, first, last, chain} from 'lodash'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
@@ -32,7 +30,7 @@ export default {
     if (!quiz) {
       console.warn(
         'Unable to set assignment overrides;\nquiz with id %s could not be found',
-        '' + quizId
+        '' + quizId,
       )
       return false
     }
@@ -46,7 +44,7 @@ export default {
       },
       {
         silent: true,
-      }
+      },
     )
     quiz.initAllDates()
     return quiz.set('loadingOverrides', false)
@@ -129,7 +127,7 @@ export default {
       if (service == null) {
         service = $.Deferred()
       }
-      // eslint-disable-next-line promise/catch-or-return
+
       overrideCollection
         .fetch({
           page,

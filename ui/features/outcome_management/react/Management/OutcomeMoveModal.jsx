@@ -79,7 +79,7 @@ const OutcomeMoveModal = ({
               newGroupTitle: targetGroup.name,
               outcomeTitle,
               count,
-            }
+            },
           ),
           type: 'success',
         })
@@ -92,7 +92,7 @@ const OutcomeMoveModal = ({
             },
             {
               count,
-            }
+            },
           ),
           type: 'error',
         })
@@ -111,7 +111,7 @@ const OutcomeMoveModal = ({
         {
           outcomeTitle,
           count,
-        }
+        },
       )}
       size="medium"
       overflow="scroll"
@@ -130,11 +130,10 @@ const OutcomeMoveModal = ({
               },
               {
                 count,
-              }
+              },
             )}
           </Text>
           <TargetGroupSelector
-             
             setTargetGroup={({targetGroup, targetAncestorsIds}) => {
               setTargetGroup(targetGroup)
               setTargetAncestorsIds(targetAncestorsIds)

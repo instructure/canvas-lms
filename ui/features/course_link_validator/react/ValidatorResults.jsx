@@ -74,7 +74,7 @@ export default class ValidatorResults extends React.Component {
           const new_result = clone(result)
           new_result.invalid_links = filter(
             result.invalid_links,
-            link => link.reason !== 'unpublished_item'
+            link => link.reason !== 'unpublished_item',
           )
           return new_result
         })

@@ -105,7 +105,7 @@ export default class BlueprintAssociations extends React.Component {
             <Text weight="bold">{I18n.t('Warning:')}</Text>&nbsp;
             <Text>
               {I18n.t(
-                'You have unsynced changes that will sync to all associated courses when a new association is saved.'
+                'You have unsynced changes that will sync to all associated courses when a new association is saved.',
               )}
             </Text>
           </p>
@@ -190,10 +190,10 @@ const connectState = state =>
     ]),
     {
       hasUnsyncedChanges: !state.hasLoadedUnsyncedChanges || state.unsyncedChanges.length > 0,
-    }
+    },
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedBlueprintAssociations = connect(
   connectState,
-  connectActions
+  connectActions,
 )(BlueprintAssociations)

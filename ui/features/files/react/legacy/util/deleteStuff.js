@@ -23,7 +23,7 @@ const I18n = createI18nScope('react_files')
 
 export default function deleteStuff(filesAndFolders, args) {
   const isDeletingAnUnemptyFolder = filesAndFolders.some(
-    item => item.get('folders_count') || item.get('files_count')
+    item => item.get('folders_count') || item.get('files_count'),
   )
   const message = isDeletingAnUnemptyFolder
     ? I18n.t(
@@ -35,7 +35,7 @@ export default function deleteStuff(filesAndFolders, args) {
         {
           count: filesAndFolders.length,
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
-        }
+        },
       )
     : I18n.t(
         {
@@ -45,7 +45,7 @@ export default function deleteStuff(filesAndFolders, args) {
         {
           count: filesAndFolders.length,
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
-        }
+        },
       )
   if (!window.confirm(message)) return
 
@@ -71,10 +71,10 @@ export default function deleteStuff(filesAndFolders, args) {
           I18n.t('Error deleting %{name}: %{reason}', {
             name: item.displayName(),
             reason,
-          })
+          }),
         )
       },
-    })
+    }),
   )
 
   return $.when(...Array.from(promises || [])).then(() => {
@@ -87,8 +87,8 @@ export default function deleteStuff(filesAndFolders, args) {
         {
           count: filesAndFolders.length,
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
-        }
-      )
+        },
+      ),
     )
     if (args && args.returnFocusTo) {
       args.returnFocusTo.focus()

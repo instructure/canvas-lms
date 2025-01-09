@@ -216,7 +216,7 @@ const getMenuConfigs = props => {
 
 const renderMenuItem = (
   {selectionCallback, icon, label, key, separator = false, disabled = false, color},
-  id
+  id,
 ) => {
   return separator ? (
     <Menu.Separator key={key} />

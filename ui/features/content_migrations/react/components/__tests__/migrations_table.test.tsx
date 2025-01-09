@@ -43,7 +43,7 @@ let setMigrationsMock: () => void
 
 const renderComponent = () => {
   return render(
-    <ContentMigrationsTable migrations={migrations} setMigrations={setMigrationsMock} />
+    <ContentMigrationsTable migrations={migrations} setMigrations={setMigrationsMock} />,
   )
 }
 
@@ -125,7 +125,7 @@ describe('ContentMigrationTable', () => {
         screen.getByRole('row', {
           name: 'Content Type Source Link Date Imported Status Progress Action',
           hidden: false,
-        })
+        }),
       ).toBeInTheDocument()
     })
 

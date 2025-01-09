@@ -157,7 +157,7 @@ export default class ConfigurationFormManual extends React.Component<
   }
 
   handleFieldChange: (
-    field: Exclude<keyof ConfigurationFormManualState, 'description' | 'customFields'>
+    field: Exclude<keyof ConfigurationFormManualState, 'description' | 'customFields'>,
   ) => TextInputChangeHandler = field => {
     return (_, value) => {
       this.setState(prevState => ({...prevState, [field]: value}))
@@ -166,7 +166,7 @@ export default class ConfigurationFormManual extends React.Component<
 
   handlePrivacyChange: (
     event: React.SyntheticEvent,
-    data: {value?: string | number; id?: string}
+    data: {value?: string | number; id?: string},
   ) => void = (_, data) => {
     this.setState({privacyLevel: data.value as keyof typeof PRIVACY_OPTIONS})
   }

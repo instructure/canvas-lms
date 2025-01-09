@@ -179,7 +179,7 @@ export const ViewRubrics = ({
               : prev.archivedRubricsInitialState.push(rubric)
             return prev
           },
-          {activeRubricsInitialState: [] as Rubric[], archivedRubricsInitialState: [] as Rubric[]}
+          {activeRubricsInitialState: [] as Rubric[], archivedRubricsInitialState: [] as Rubric[]},
         )
       setActiveRubrics(activeRubricsInitialState)
       setArchivedRubrics(archivedRubricsInitialState)
@@ -215,14 +215,14 @@ export const ViewRubrics = ({
   const filteredActiveRubrics =
     searchQuery.trim() !== ''
       ? activeRubrics.filter(rubric =>
-          rubric.title.toLowerCase().includes(searchQuery.toLowerCase())
+          rubric.title.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : activeRubrics
 
   const filteredArchivedRubrics =
     searchQuery.trim() !== ''
       ? archivedRubrics.filter(rubric =>
-          rubric.title.toLowerCase().includes(searchQuery.toLowerCase())
+          rubric.title.toLowerCase().includes(searchQuery.toLowerCase()),
         )
       : archivedRubrics
 

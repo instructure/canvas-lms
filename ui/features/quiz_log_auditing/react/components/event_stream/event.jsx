@@ -89,7 +89,7 @@ class Event extends React.Component {
                 one: 'Answered question:',
                 other: 'Answered the following questions:',
               },
-              {count: valid_answers.length}
+              {count: valid_answers.length},
             )}
 
             <div className="ic-QuestionAnchors">
@@ -108,7 +108,7 @@ class Event extends React.Component {
                 one: 'Viewed (and possibly read) question',
                 other: 'Viewed (and possibly read) the following questions:',
               },
-              {count: event.data.length}
+              {count: event.data.length},
             )}
 
             <div className="ic-QuestionAnchors">

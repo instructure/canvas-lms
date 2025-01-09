@@ -92,7 +92,7 @@ export default class ProgressionStudentView extends Backbone.View {
       return this.$students
         .find('.collectionViewItems')
         .height(
-          (this.$students.height() || 0) - (this.$students.find('.header').height() || 16) - 16
+          (this.$students.height() || 0) - (this.$students.find('.header').height() || 16) - 16,
         )
     }, 0)
   }

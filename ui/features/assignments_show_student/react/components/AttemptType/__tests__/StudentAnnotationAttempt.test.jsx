@@ -68,7 +68,7 @@ describe('StudentAnnotationAttempt', () => {
       const {getByTestId} = render(<StudentAnnotationAttempt {...props} />)
       await waitFor(() => {
         expect(getByTestId('canvadocs-iframe').src).toEqual(
-          'http://localhost/CANVADOCS_SESSION_URL'
+          'http://localhost/CANVADOCS_SESSION_URL',
         )
       })
     })

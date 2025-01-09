@@ -83,7 +83,7 @@ export default function DefaultGradeModal({
             },
             {
               count,
-            }
+            },
           )
         : I18n.t(
             {
@@ -92,10 +92,10 @@ export default function DefaultGradeModal({
             },
             {
               count,
-            }
+            },
           )
     },
-    [savedGrade]
+    [savedGrade],
   )
 
   useEffect(() => {
@@ -128,7 +128,7 @@ export default function DefaultGradeModal({
         showFlashError(
           I18n.t('Default grade cannot be set to %{ex}', {
             ex: 'EX',
-          })
+          }),
         )(new Error())
         return
       }
@@ -155,7 +155,7 @@ export default function DefaultGradeModal({
         showFlashError(
           I18n.t('Default grade for Reply to Topic cannot be set to %{ex}', {
             ex: 'EX',
-          })
+          }),
         )(new Error())
         return
       }
@@ -164,7 +164,7 @@ export default function DefaultGradeModal({
         showFlashError(
           I18n.t('Default grade for Required Replies cannot be set to %{ex}', {
             ex: 'EX',
-          })
+          }),
         )(new Error())
         return
       }

@@ -105,7 +105,7 @@ GradersTable.propTypes = {
     shape({
       graderName: string,
       graderId: string.isRequired,
-    })
+    }),
   ).isRequired,
   gradesLoading: bool.isRequired,
 }

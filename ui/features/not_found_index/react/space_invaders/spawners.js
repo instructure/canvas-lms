@@ -47,8 +47,8 @@ class MovingGameObjectSpawner {
         Math.random() * (this.gameWidth - this.gameImage.width),
         0 - this.gameImage.height,
         this.gameObjectSpeed / 2 + Math.random() * this.gameObjectSpeed,
-        this.gameObjectPoints
-      )
+        this.gameObjectPoints,
+      ),
     )
   }
 

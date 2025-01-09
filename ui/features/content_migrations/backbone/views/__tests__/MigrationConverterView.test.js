@@ -76,7 +76,7 @@ describe('MigrationConverterView', () => {
     const subView = new SomeBackboneView()
     migrationConverterView.on('converterRendered', () => {
       expect(migrationConverterView.$el.find('#overwrite-warning').text()).toBe(
-        'Importing the same course content more than once will overwrite any existing content in the course.'
+        'Importing the same course content more than once will overwrite any existing content in the course.',
       )
     })
     migrationConverterView.renderConverter(subView)

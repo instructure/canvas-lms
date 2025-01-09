@@ -94,7 +94,7 @@ export const ConversationListHolder = ({
           root: null,
           rootMargin: '0px',
           threshold: 0.4,
-        }
+        },
       )
 
       if (lastConversationItem) {

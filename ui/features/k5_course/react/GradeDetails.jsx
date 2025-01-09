@@ -78,7 +78,7 @@ const GradeDetails = ({
     restrictQuantitativeData,
     gradingScheme,
     pointsBasedGradingScheme,
-    scalingFactor
+    scalingFactor,
   )
   const grades = getAssignmentGrades(assignmentGroups, observedUserId)
   const totalGrade = getTotalGradeStringFromEnrollments(
@@ -88,7 +88,7 @@ const GradeDetails = ({
     restrictQuantitativeData,
     gradingScheme,
     pointsBasedGradingScheme,
-    scalingFactor
+    scalingFactor,
   )
   const include = ['assignments', 'submission', 'read_state', 'submission_comments']
   if (selectedGradingPeriodId) {
@@ -256,7 +256,7 @@ const GradeDetails = ({
             isStacked,
             currentUserId: observedUserId || currentUser.id,
             ...assignment,
-          })
+          }),
         )}
       </LoadingWrapper>
     </>

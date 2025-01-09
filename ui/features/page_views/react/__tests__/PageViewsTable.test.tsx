@@ -79,7 +79,7 @@ describe('PageViewsTable', () => {
     const id = '124'
     fetchMock.get(`begin:/api/v1/users/${id}`, sample1)
     render(
-      <Subject userId={id} startDate={new Date('2024-01-01')} endDate={new Date('2024-01-02')} />
+      <Subject userId={id} startDate={new Date('2024-01-01')} endDate={new Date('2024-01-02')} />,
     )
     await waitFor(() => expect(fetchMock.called()).toBe(true))
     expect(fetchMock.lastUrl()).toMatch(/start_time=2024-01-01/)

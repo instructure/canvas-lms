@@ -50,54 +50,61 @@ import {isOriginalityReportVisible} from '@canvas/grading/originalityReportHelpe
 
 const I18n = createI18nScope('assignments_2_attempt_tab')
 
-const ExternalToolSubmission = lazy(() =>
-  import(
-    /* webpackChunkName: "ExternalToolSubmission" */
-    /* webpackPrefetch: true */
-    './AttemptType/ExternalToolSubmission'
-  )
+const ExternalToolSubmission = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "ExternalToolSubmission" */
+      /* webpackPrefetch: true */
+      './AttemptType/ExternalToolSubmission'
+    ),
 )
-const FilePreview = lazy(() =>
-  import(
-    /* webpackChunkName: "FilePreview" */
-    /* webpackPrefetch: true */
-    './AttemptType/FilePreview'
-  )
+const FilePreview = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "FilePreview" */
+      /* webpackPrefetch: true */
+      './AttemptType/FilePreview'
+    ),
 )
-const FileUpload = lazy(() =>
-  import(
-    /* webpackChunkName: "FileUpload" */
-    /* webpackPrefetch: true */
-    './AttemptType/FileUpload'
-  )
+const FileUpload = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "FileUpload" */
+      /* webpackPrefetch: true */
+      './AttemptType/FileUpload'
+    ),
 )
-const MediaAttempt = lazy(() =>
-  import(
-    /* webpackChunkName: "MediaAttempt" */
-    /* webpackPrefetch: true */
-    './AttemptType/MediaAttempt'
-  )
+const MediaAttempt = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "MediaAttempt" */
+      /* webpackPrefetch: true */
+      './AttemptType/MediaAttempt'
+    ),
 )
-const TextEntry = lazy(() =>
-  import(
-    /* webpackChunkName: "TextEntry" */
-    /* webpackPrefetch: true */
-    './AttemptType/TextEntry'
-  )
+const TextEntry = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "TextEntry" */
+      /* webpackPrefetch: true */
+      './AttemptType/TextEntry'
+    ),
 )
-const UrlEntry = lazy(() =>
-  import(
-    /* webpackChunkName: "UrlEntry" */
-    /* webpackPrefetch: true */
-    './AttemptType/UrlEntry'
-  )
+const UrlEntry = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "UrlEntry" */
+      /* webpackPrefetch: true */
+      './AttemptType/UrlEntry'
+    ),
 )
-const StudentAnnotationAttempt = lazy(() =>
-  import(
-    /* webpackChunkName: "StudentAnnotationAttempt" */
-    /* webpackPrefetch: true */
-    './AttemptType/StudentAnnotationAttempt'
-  )
+const StudentAnnotationAttempt = lazy(
+  () =>
+    import(
+      /* webpackChunkName: "StudentAnnotationAttempt" */
+      /* webpackPrefetch: true */
+      './AttemptType/StudentAnnotationAttempt'
+    ),
 )
 
 const iconsByType = {
@@ -243,7 +250,7 @@ export default class AttemptTab extends Component {
           return {_id, index: i, isLoading: true, name, loaded: 0, total: 1}
         }),
       },
-      onSuccess
+      onSuccess,
     )
     this.updateUploadingFiles(async () => {
       try {
@@ -307,7 +314,7 @@ export default class AttemptTab extends Component {
           },
           null,
           axios,
-          onProgress
+          onProgress,
         )
       } else {
         promise = uploadFile(
@@ -319,7 +326,7 @@ export default class AttemptTab extends Component {
           },
           file,
           axios,
-          onProgress
+          onProgress,
         )
       }
       uploadPromises.push(promise)
@@ -345,7 +352,7 @@ export default class AttemptTab extends Component {
             isOriginalityReportVisible(
               this.props.assignment.originalityReportVisibility,
               this.props.assignment.dueAt,
-              this.props.submission.gradingStatus
+              this.props.submission.gradingStatus,
             ) && this.props.originalityReportsForA2
           }
         />
