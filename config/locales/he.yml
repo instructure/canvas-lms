@@ -8617,6 +8617,8 @@ he:
   folder_705fd2d7: תיקיה
   folder_browsing_tree_1f00a3ae: "עץ דפדוף בתיקיות"
   folder_icon_29017021: "צלמית תיקיה"
+  folder_name_b28488c2: "שם תיקיה"
+  folder_was_successfully_created_8de6a282: "תיקיה נוצרה בהצלחה"
   folders: 
     event_updated: "אירוע עודכן בהצלחה"
     file_zip_in_process: "תהליך כווץ הקובץ עדיין בתהליך..."
