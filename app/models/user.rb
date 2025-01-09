@@ -19,7 +19,7 @@
 #
 
 class User < ActiveRecord::Base
-  self.ignored_columns += ["last_user_note"]
+  self.ignored_columns += ["last_user_note", "page_views_count"]
 
   GRAVATAR_PATTERN = %r{^https?://[a-zA-Z0-9.-]+\.gravatar\.com/}
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
