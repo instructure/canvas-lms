@@ -58,7 +58,7 @@ const CreateFolderModal = ({isOpen, onRequestClose}: AddFolderModalProps) => {
     onSuccess: async () => {
       showFlashSuccess(I18n.t('Folder was successfully created.'))()
       onRequestClose()
-      await queryClient.refetchQueries({queryKey: ['files', parentFolderId], type: 'active'})
+      await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     },
     onError: () => {
       showFlashError(I18n.t('There was an error creating the folder. Please try again.'))(

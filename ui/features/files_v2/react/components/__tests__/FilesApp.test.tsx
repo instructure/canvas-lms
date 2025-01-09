@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
+import {render, waitFor, screen} from '@testing-library/react'
 import FilesApp from '../FilesApp'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
@@ -31,7 +31,9 @@ describe('FilesApp', () => {
   beforeEach(() => {
     setupFilesEnv()
     fetchMock.get(/.*\/by_path/, [FAKE_FOLDERS[0]], {overwriteRoutes: true})
-    fetchMock.get(/.*\/all/, [], {overwriteRoutes: true})
+    fetchMock.get(/.*\/all.*/, [FAKE_FOLDERS[1]], {
+      overwriteRoutes: true,
+    })
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000}, {overwriteRoutes: true})
     filesEnv.userHasPermission = jest.fn().mockReturnValue(true)
   })
@@ -68,5 +70,33 @@ describe('FilesApp', () => {
       expect(fetchMock.calls()).toHaveLength(1)
       expect(fetchMock.calls()[0][0]).not.toContain('/files/quota')
     })
+  })
+
+  it('renders next page button when header', async () => {
+    fetchMock.get(
+      /.*\/all.*/,
+      {
+        body: [],
+        headers: {
+          Link: '</next-page>; rel="next"',
+        },
+      },
+      {
+        overwriteRoutes: true,
+      },
+    )
+    renderComponent('course_12345')
+    const nextPageButton = await screen.findByRole('button', {name: '2'})
+    expect(nextPageButton).toBeInTheDocument()
+  })
+
+  it('does not render page buttons when no header', async () => {
+    renderComponent('course_12345')
+    // necessary to make sure table has finished loading
+    // otherwise test is false positive because button would never be rendered
+    const folderName = await screen.findByText(FAKE_FOLDERS[1].name)
+    expect(folderName).toBeInTheDocument()
+    const nextPageButton = screen.queryByRole('button', {name: '1'})
+    expect(nextPageButton).not.toBeInTheDocument()
   })
 })

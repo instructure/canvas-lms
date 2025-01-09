@@ -52,4 +52,13 @@ module FilesPage
   def create_folder_input
     f("[name='folderName']")
   end
+
+  def pagination_container
+    f("[data-testid='files-pagination']")
+  end
+
+  # which button is next/current/previous depends on how many are being rendered
+  def pagination_button_by_index(index)
+    pagination_container.find_elements(:css, "button")[index]
+  end
 end
