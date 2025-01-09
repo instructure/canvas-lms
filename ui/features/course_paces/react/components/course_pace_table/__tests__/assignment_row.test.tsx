@@ -54,6 +54,9 @@ const defaultProps: ComponentProps = {
   context_type: 'Course',
 }
 
+const NO_SUBMISSION_TEXT = 'No Submission'
+const LATE_SUBMISSION_TEXT = 'Late Submission'
+
 beforeAll(() => {
   ENV.CONTEXT_TIMEZONE = 'America/New_York' // to match defaultProps.dueDate
 })
@@ -176,6 +179,7 @@ describe('AssignmentRow', () => {
     beforeAll(() => {
       window.ENV.FEATURES ||= {}
       window.ENV.FEATURES.course_paces_for_students = true
+      window.ENV.FEATURES.course_pace_pacing_status_labels = true
     })
 
     it('renders an input for student paces that updates the duration for that module item', async () => {
@@ -216,6 +220,79 @@ describe('AssignmentRow', () => {
       renderRow(<AssignmentRow {...defaultProps} coursePaceItemChanges={coursePaceItemChanges} />),
     )
     expect(getByText(unsavedChangeText)).toBeInTheDocument()
+  })
+
+
+  it('renders rows where the items are off pace', () => {
+
+    const rowProps = {
+      ...defaultProps,
+      dueDate: "2025-01-01",
+      coursePace: STUDENT_PACE,
+      context_type: "Enrollment",
+    }
+      
+    // Simulate a due item with no submission
+    const {getByText, rerender} = renderConnected(
+      renderRow(
+        <AssignmentRow
+          {...rowProps}
+          coursePaceItem={PACE_ITEM_3}
+        />
+      )
+    )
+    
+    expect(getByText(NO_SUBMISSION_TEXT)).toBeInTheDocument()
+
+    // Simulate an item that was submitted after it's due date
+    rerender(
+      renderRow(
+        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_3, submitted_at: '2025-01-10T00:00:00Z'}} />
+      )
+    )
+    expect(getByText(LATE_SUBMISSION_TEXT)).toBeInTheDocument()
+  })
+
+  it('renders rows where the items are on pace', () => {
+
+    const rowProps = {
+      ...defaultProps,
+      dueDate: "2025-01-01",
+      coursePace: STUDENT_PACE,
+      context_type: "Enrollment",
+    }
+
+    // Simulate an item that was submitted on time
+    const {queryByText, rerender} = renderConnected(
+      renderRow(
+        <AssignmentRow
+          {...rowProps}
+          coursePaceItem={PACE_ITEM_1}
+        />
+      )
+    )
+    expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
+    expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+
+  
+    // Simulate an item that is not submittable
+    rerender(
+      renderRow(
+        <AssignmentRow {...rowProps} coursePaceItem={{...PACE_ITEM_1, submittable: false, submitted_at: null}} />
+      )
+    )
+    expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
+    expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
+
+    // Simulate an item that is not due yet
+    rowProps.dueDate = "2999-01-01"
+    rerender(
+      renderRow(
+        <AssignmentRow {...rowProps} coursePaceItem={PACE_ITEM_1} />
+      )
+    )
+    expect(queryByText(NO_SUBMISSION_TEXT)).toBeNull()
+    expect(queryByText(LATE_SUBMISSION_TEXT)).toBeNull()
   })
 
   describe('localized', () => {
