@@ -327,6 +327,7 @@ describe('Enhanced Individual Gradebook', () => {
       fireEvent.change(getByTestId('content-selection-assignment-select'), {target: {value: '1'}})
       fireEvent.click(getByTestId('default-grade-button'))
       fireEvent.change(getByTestId('default-grade-input'), {target: {value: '10'}})
+      fireEvent.blur(getByTestId('default-grade-input'))
       fireEvent.click(getByTestId('default-grade-submit-button'))
       await new Promise(resolve => setTimeout(resolve, 0))
       fireEvent.change(getByTestId('content-selection-student-select'), {target: {value: '5'}})

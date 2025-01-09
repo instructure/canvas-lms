@@ -241,7 +241,7 @@ export default function DefaultGradeModal({
           </View>
         )}
         {isCheckpointed && (
-          <Flex>
+          <Flex height="8rem" alignItems="start">
             <Flex.Item shouldShrink={true}>
               <View as="div" margin="small medium">
                 <DefaultGradeInput
@@ -276,7 +276,7 @@ export default function DefaultGradeModal({
             </Flex.Item>
           </Flex>
         )}
-        <View as="div" margin="small medium">
+        <View as="div" margin="large medium medium medium">
           <Checkbox
             label={I18n.t('Overwrite already-entered grades')}
             checked={gradeOverwrite}

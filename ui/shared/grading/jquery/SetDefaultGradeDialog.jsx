@@ -231,7 +231,7 @@ SetDefaultGradeDialog.prototype.show = function (onClose) {
 
   if (mountPoint) {
     const root = createRoot(mountPoint)
-    root.render(<CheckpointsGradeInputs assignment={this.assignment} />)
+    root.render(<CheckpointsGradeInputs assignment={this.assignment} canEdit={true} />)
   }
 
   const overwriteExitingGrades = document.getElementsByName('overwrite_existing_grades')[0]

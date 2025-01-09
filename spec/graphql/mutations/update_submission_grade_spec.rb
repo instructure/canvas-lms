@@ -36,6 +36,12 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
               name
             }
           }
+          parentAssignmentSubmission {
+            _id
+            id
+            grade
+            score
+          }
           errors {
             attribute
             message
@@ -88,5 +94,49 @@ RSpec.describe Mutations::UpdateSubmissionGrade do
     @submission.reload
     expect(@submission.score).to be_nil
     expect(errors[0][:message]).to eq "Not authorized to score Submission"
+  end
+
+  it "results should not include parent assignment submission if checkpoints are disabled" do
+    result = run_mutation({ submission_id: @submission.id, score: 9 })
+    expect(result.dig("data", "updateSubmissionGrade", "errors")).to be_nil
+    expect(result.dig("data", "updateSubmissionGrade", "parentAssignmentSubmission")).to be_nil
+  end
+
+  context "when submission is for a child assignment" do
+    before(:once) do
+      @parent_assignment = @course.assignments.create!(title: "Parent Assignment", has_sub_assignments: true)
+      @parent_assignment.root_account.enable_feature!(:discussion_checkpoints)
+
+      @reply_to_topic = SubAssignment.new(
+        name: "Reply to Topic",
+        sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+        points_possible: 10,
+        due_at: 3.days.from_now,
+        only_visible_to_overrides: false,
+        context: @course,
+        parent_assignment: @parent_assignment
+      )
+
+      @reply_to_topic.save!
+
+      # Need to add a submission to the "Reply To Topic" sub assignment
+      @sub_assignment_submission = @reply_to_topic.submit_homework(
+        @student,
+        submission_type: "discussion_topic",
+        body: "body"
+      )
+    end
+
+    it "results should include parent assignment submission" do
+      result = run_mutation({ submission_id: @sub_assignment_submission.id, score: 9 })
+      parent_submission = Submission.find_by(assignment_id: @parent_assignment.id, user_id: @student.id)
+
+      expect(result.dig("data", "updateSubmissionGrade", "errors")).to be_nil
+      expect(result.dig("data", "updateSubmissionGrade", "parentAssignmentSubmission")).to include({
+                                                                                                     _id: parent_submission.id.to_s,
+                                                                                                     score: 9.0,
+                                                                                                     grade: "9"
+                                                                                                   })
+    end
   end
 end
