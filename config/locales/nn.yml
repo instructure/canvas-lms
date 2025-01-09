@@ -11876,7 +11876,9 @@ nn:
   folder_browsing_tree_1f00a3ae: "Bla gjennom mappetre"
   folder_icon_29017021: Mappeikon
   folder_locked_b91cd0c4: "Mappe låst"
+  folder_name_b28488c2: Mappenamn
   folder_tree_fbab0726: Mappestruktur
+  folder_was_successfully_created_8de6a282: "Mappe er oppretta."
   folders: 
     event_updated: "Hendinga er oppdatert."
     file_zip_in_process: "Komprimering av filer held fram..."
