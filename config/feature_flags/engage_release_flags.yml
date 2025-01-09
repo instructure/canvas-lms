@@ -25,3 +25,8 @@ self_signup_deadline:
   applies_to: Account
   display_name: Self Sign-up Group Deadline
   description: Allows teachers to set a deadline for students to sign up for a group within a group set.
+people_page_modernization:
+  state: hidden
+  applies_to: Account
+  display_name: People Page Modernization
+  description: People page modernization
