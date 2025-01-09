@@ -131,7 +131,7 @@ class UserListV2
       if results.count == 1
         @resolved_results << results.first
       elsif results.uniq { |r| Shard.global_id_for(r[:user_id]) }.count == 1
-        (@resolved_results << results.detect { |r| r[:account_id] == @root_account.id }) || results.first # prioritize local result first
+        @resolved_results << (results.detect { |r| r[:account_id] == @root_account.id } || results.first) # prioritize local result first
       else
         @duplicate_results << results
       end

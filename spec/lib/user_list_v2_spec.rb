@@ -251,6 +251,25 @@ describe UserListV2 do
       expect(r[:account_id]).to eq Account.default.id
     end
 
+    it "finds a user who has pseudonyms in multiple trusted accounts but not the one being searched" do
+      user_with_pseudonym(name: "JT", username: "jt@instructure.com", active_all: true)
+
+      @shard1.activate do
+        @account1 = Account.create!(name: "account1", consortium_parent_account: Account.default)
+        ps = @account1.pseudonyms.build(user: @user, unique_id: "jt@instructure.com")
+        ps.save_without_session_maintenance
+      end
+
+      @shard2.activate do
+        @account2 = Account.create!(name: "account2", consortium_parent_account: Account.default)
+        @account2.trust_links.create!(managing_account: @account1)
+        @account2.trust_links.create!(managing_account: Account.default)
+      end
+
+      ul = UserListV2.new("jt@instructure.com", search_type: "unique_id", root_account: @account2)
+      expect(ul.resolved_results.pluck(:user_id)).to eq [@user.id]
+    end
+
     it "finds a user whose home shard is not the target shard" do
       @shard1.activate do
         @account = Account.create!(name: "non-local")
