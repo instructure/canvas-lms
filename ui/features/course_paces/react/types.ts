@@ -59,6 +59,8 @@ export interface CoursePaceItem {
   readonly module_item_id: string
   readonly module_item_type: string
   readonly published: boolean
+  readonly submittable: boolean
+  readonly submitted_at?: string | null
   compressed_due_date?: string
 }
 
@@ -202,6 +204,7 @@ export interface PaceContext {
   associated_section_count: number
   associated_student_count: number
   applied_pace: Pace | null
+  on_pace: boolean | null
 }
 
 export interface PaceContextProgress {

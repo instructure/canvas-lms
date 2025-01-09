@@ -118,6 +118,8 @@ export const PACE_ITEM_1: CoursePaceItem = {
   module_item_id: '60',
   module_item_type: 'Assignment',
   published: true,
+  submittable: true,
+  submitted_at: '2025-01-01T00:00:00Z',
 }
 
 export const PACE_ITEM_2: CoursePaceItem = {
@@ -130,6 +132,8 @@ export const PACE_ITEM_2: CoursePaceItem = {
   module_item_id: '61',
   module_item_type: 'Discussion',
   published: false,
+  submittable: true,
+  submitted_at: null,
 }
 
 export const PACE_ITEM_3: CoursePaceItem = {
@@ -142,6 +146,8 @@ export const PACE_ITEM_3: CoursePaceItem = {
   module_item_id: '62',
   module_item_type: 'Quiz',
   published: true,
+  submittable: true,
+  submitted_at: null,
 }
 
 export const PACE_MODULE_1: Module = {
@@ -229,6 +235,7 @@ export const COURSE_PACE_CONTEXT: PaceContext = {
     duration: 6,
     last_modified: '2022-10-17T23:12:24Z',
   },
+  on_pace: true,
 }
 
 export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
@@ -245,6 +252,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'D-F',
@@ -258,6 +266,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'G-K',
@@ -271,6 +280,7 @@ export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
   ],
   total_entries: 3,
@@ -290,6 +300,7 @@ export const PACE_CONTEXTS_SECTIONS_SEARCH_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
   ],
   total_entries: 1,
@@ -309,6 +320,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'Peter',
@@ -322,6 +334,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'Mike',
@@ -335,6 +348,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
     {
       name: 'Alex',
@@ -348,6 +362,7 @@ export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextsApiResponse = {
         duration: 6,
         last_modified: '2022-10-17T23:12:24Z',
       },
+      on_pace: true,
     },
   ],
   total_entries: 4,
