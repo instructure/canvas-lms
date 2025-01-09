@@ -71,6 +71,7 @@ const columnRenderers: {
     row: File | Folder,
     isStacked: boolean,
     userCanEditFilesForContext: boolean,
+    usageRightsRequiredForContext: boolean,
     size: 'small' | 'medium' | 'large',
     isSelected: boolean,
     toggleSelect: () => void,
@@ -87,7 +88,9 @@ const columnRenderers: {
     ) : null,
   size: row =>
     'size' in row ? <Text>{friendlyBytes(row.size)}</Text> : <Text>{I18n.t('--')}</Text>,
-  rights: _row => <RightsIconButton />,
+  rights: (row, _isStacked, userCanEditFilesForContext, usageRightsRequiredForContext) =>
+    row.folder_id && usageRightsRequiredForContext ?
+      <RightsIconButton usageRights={row.usage_rights} userCanEditFilesForContext={userCanEditFilesForContext} /> : null,
   published: (row, _isStacked, userCanEditFilesForContext) => (
     <PublishIconButton item={row} userCanEditFilesForContext={userCanEditFilesForContext} />
   ),
@@ -97,9 +100,14 @@ const columnRenderers: {
 interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   userCanEditFilesForContext: boolean
+  usageRightsRequiredForContext: boolean
 }
 
-const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProps) => {
+const FileFolderTable = ({
+  size,
+  userCanEditFilesForContext,
+  usageRightsRequiredForContext,
+}: FileFolderTableProps) => {
   const {folderId} = useContext(FileManagementContext)
   const isStacked = size !== 'large'
 
@@ -138,6 +146,13 @@ const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProp
   }
   const allRowsSelected = rows.length != 0 && selectedRows.size === rows.length
   const someRowsSelected = selectedRows.size > 0 && !allRowsSelected
+  const filteredColumns = columnHeaders.filter(column => {
+    if (column.id === 'rights') {
+      return usageRightsRequiredForContext
+    }
+    return true
+  })
+
   return (
     <>
       <Table
@@ -164,7 +179,7 @@ const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProp
                   data-testid="select-all-checkbox"
                 />
               </Table.ColHeader>
-              {columnHeaders.map(columnHeader => (
+              {filteredColumns.map(columnHeader => (
                 <Table.ColHeader
                   key={columnHeader.id}
                   id={columnHeader.id}
@@ -197,7 +212,7 @@ const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProp
                       data-testid="row-select-checkbox"
                     />
                   </Table.RowHeader>
-                  {columnHeaders.map(column => (
+                  {filteredColumns.map(column => (
                     <Table.Cell
                       key={column.id}
                       textAlign={isStacked ? undefined : column.textAlign}
@@ -206,6 +221,7 @@ const FileFolderTable = ({size, userCanEditFilesForContext}: FileFolderTableProp
                         row,
                         isStacked,
                         userCanEditFilesForContext,
+                        usageRightsRequiredForContext,
                         size,
                         isSelected,
                         () => toggleRowSelection(row.id),
