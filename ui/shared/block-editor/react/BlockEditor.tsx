@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {type NodeId, DefaultEventHandlers, Editor, Frame} from '@craftjs/core'
 import uuid from 'uuid'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
 import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Toolbox} from './components/editor/Toolbox/Toolbox'
@@ -153,10 +153,15 @@ export default function BlockEditor({
     return transform(content)
   })
   const noBlocks = content?.blocks == undefined
-  const [toolboxOpen, setToolboxOpen] = useState(false)
+  const [toolboxOpen, setToolboxOpen] = useState(true) // current state of the toolbox
+  const [toolboxOpened, setToolboxOpened] = useState<boolean>(false) // toggles true once the toolbox has opened
   const [templateEditor, setTemplateEditor] = useState<TemplateEditor>(TemplateEditor.UNKNOWN)
   const [blockTemplates, setBlockTemplates] = useState<BlockTemplate[]>([])
   const [blockEditorEditorEl, setBlockEditorEditorEl] = useState<HTMLDivElement | null>(null)
+  const [returnFromToolboxFocusElement, setReturnFromToolboxFocusElement] =
+    useState<HTMLElement | null>(null)
+  const [toolboxFocusElement, setToolboxFocusElement] = useState<HTMLElement | null>(null)
+  const toolboxDefaultFocusRef = useRef<HTMLElement | null>(null)
 
   RenderNode.globals.enableResizer = !!enableResizer
 
@@ -323,6 +328,50 @@ export default function BlockEditor({
     setToolboxOpen(open)
   }, [])
 
+  const handleShortcutKey: React.KeyboardEventHandler<ViewOwnProps & Element> = useCallback(
+    e => {
+      if (e.key === 'b' && e.ctrlKey) {
+        setReturnFromToolboxFocusElement(document.activeElement as HTMLElement)
+        if (toolboxOpen && toolboxDefaultFocusRef.current) {
+          if (toolboxFocusElement) {
+            toolboxFocusElement.focus()
+          } else {
+            toolboxDefaultFocusRef.current.focus()
+          }
+        } else {
+          setToolboxOpen(true)
+        }
+      }
+    },
+    [toolboxFocusElement, toolboxOpen],
+  )
+
+  const toolboxHandleShortcutKey = useCallback(
+    (e: React.KeyboardEvent | KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        setToolboxOpen(false)
+        returnFromToolboxFocusElement?.focus()
+      }
+      if (e.key === 'b' && e.ctrlKey) {
+        e.stopPropagation()
+        setToolboxFocusElement(e.target as HTMLElement)
+        returnFromToolboxFocusElement?.focus()
+      }
+    },
+    [returnFromToolboxFocusElement],
+  )
+
+  // if we're editing an existing page, once the Toolbox opens
+  // it will focus its close button. We want focus on the first
+  // element on the page for a11y.
+  const handleToolboxOpened = useCallback(() => {
+    if (toolboxOpened) return
+    setToolboxOpened(true)
+    const elem = firstFocusableElement(document.querySelector('.edit-content') as HTMLElement)
+    elem?.focus()
+  }, [toolboxOpened])
+
   return (
     <View
       elementRef={(el: Element | null) => setBlockEditorEditorEl(el as HTMLDivElement)}
@@ -335,6 +384,7 @@ export default function BlockEditor({
       padding="small"
       shadow="above"
       borderRadius="large large none none"
+      onKeyDown={handleShortcutKey}
     >
       <ErrorBoundary>
         <Editor
@@ -376,10 +426,15 @@ export default function BlockEditor({
           </Flex>
 
           <Toolbox
+            toolboxShortcutManager={{
+              defaultFocusRef: toolboxDefaultFocusRef,
+              keyDownHandler: toolboxHandleShortcutKey,
+            }}
             open={toolboxOpen}
             templateEditor={templateEditor}
             container={container}
-            onClose={handleCloseToolbox}
+            onDismiss={handleCloseToolbox}
+            onOpened={handleToolboxOpened}
             templates={blockTemplates}
           />
           <CreateFromTemplate course_id={course_id} noBlocks={noBlocks} />

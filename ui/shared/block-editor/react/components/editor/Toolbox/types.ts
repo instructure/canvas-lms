@@ -25,10 +25,17 @@ export interface TemplatePanelProps {
   templates: BlockTemplate[]
 }
 
+export type ToolboxShortcutManager = {
+  defaultFocusRef: React.Ref<HTMLElement | null>
+  keyDownHandler: (e: React.KeyboardEvent | KeyboardEvent) => void
+}
+
 export interface ToolboxProps extends TemplatePanelProps {
+  toolboxShortcutManager: ToolboxShortcutManager
   open: boolean
   container: HTMLElement
-  onClose: () => void
+  onDismiss: () => void
+  onOpened: () => void
 }
 
 export type KeyboardOrMouseEvent = React.KeyboardEvent<ViewProps> | React.MouseEvent<ViewProps>
