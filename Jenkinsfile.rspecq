@@ -171,7 +171,7 @@ pipeline {
     RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
-    RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
+    RSPECQ_UPDATE_TIMINGS = "${env.RSPECQ_UPDATE_TIMINGS}"
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
     RSPECQ_REDIS_URL = redisUrl()

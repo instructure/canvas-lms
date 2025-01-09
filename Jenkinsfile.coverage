@@ -112,7 +112,6 @@ pipeline {
     SELENIUM_TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/selenium'
     TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
     EXCLUDE_TESTS = '.*/(selenium|contracts)'
-    RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
     RSPECQ_REDIS_URL = redisUrl()
