@@ -1137,6 +1137,84 @@ describe GroupsController do
       user_session(@teacher)
     end
 
+    describe "GET index" do
+      it "does not return non collaborative groups" do
+        @non_collaborative_group.add_user(@student)
+        @collaborative_group.add_user(@student)
+        user_session(@student)
+
+        get "index", format: "json"
+        parsed_json = json_parse(response.body)
+        expect(parsed_json.length).to eq 1
+        expect(parsed_json[0]["name"]).to eq "Collaborative group"
+        expect(parsed_json[0]["id"]).to eq @collaborative_group.id
+      end
+    end
+
+    describe "GET context_index" do
+      it "filters out non collaborative groups when the user doesn't have permissions" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission: permission,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+
+        get "index", params: { course_id: @course.id, collaboration_state: "all" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be(1)
+        expect(assigns[:groups].first).to eq(@collaborative_group)
+      end
+
+      it "filters out non-collaborative groups by default" do
+        get "index", params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be(1)
+        expect(assigns[:groups].first).to eq(@collaborative_group)
+      end
+
+      it "filters out collaborative groups" do
+        get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be(1)
+        expect(assigns[:groups].first).to eq(@non_collaborative_group)
+      end
+
+      it "errors when a user without the correct permissions tries to get only non_collaborative groups" do
+        RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+          @course.account.role_overrides.create!(
+            permission: permission,
+            role: teacher_role,
+            enabled: false
+          )
+        end
+        get "index", params: { course_id: @course.id, collaboration_state: "non_collaborative" }
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it "returns both collaborative and non-collaborative groups when requested" do
+        get "index", params: { course_id: @course.id, collaboration_state: "all" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        group_ids = assigns[:groups].map(&:id)
+        expect(group_ids).to include(@collaborative_group.id, @non_collaborative_group.id)
+      end
+
+      it "filters out non-collaborative groups when requested explicitly" do
+        get "index", params: { course_id: @course.id, collaboration_state: "collaborative" }
+        expect(response).to be_successful
+        expect(assigns[:groups]).not_to be_empty
+        expect(assigns[:groups].length).to be >= 1
+        assigns[:groups].each do |group|
+          expect(group.non_collaborative).to be false
+        end
+      end
+    end
+
     describe "GET show" do
       it "denies access for users when group is non-collaborative" do
         get "show", params: { id: @non_collaborative_group.id }
