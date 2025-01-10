@@ -379,7 +379,6 @@ export const DiscussionPostToolbar = props => {
                   )}
                   {!isSpeedGraderInTopUrl &&
                     props.manageAssignTo &&
-                    ENV.FEATURES?.selective_release_ui_api &&
                     props.showAssignTo && (
                       <Flex.Item shouldGrow={true} textAlign="end">
                         <Button

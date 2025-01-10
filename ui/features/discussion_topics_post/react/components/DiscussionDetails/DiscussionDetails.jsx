@@ -33,7 +33,6 @@ const I18n = createI18nScope('discussion_posts')
 
 export function DiscussionDetails({...props}) {
   const showAssignTo =
-    ENV.FEATURES?.selective_release_ui_api &&
     !props.discussionTopic.isAnnouncement &&
     props.discussionTopic.permissions.manageAssignTo &&
     props.discussionTopic.contextType === 'Course' &&

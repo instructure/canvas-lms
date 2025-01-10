@@ -140,7 +140,7 @@ class OverrideListPresenter
 
     # Only supports classic quizzes and normal assignments
     type_is_allowed = assignment.is_a?(Assignment) ? assignment.submission_types != "discussion_topic" : assignment.is_a?(Quizzes::Quiz)
-    if Account.site_admin.feature_enabled?(:selective_release_ui_api) && type_is_allowed
+    if type_is_allowed
       overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
       overrides = assignment.merge_overrides_by_date(overrides)
       other_due_dates_exist = overrides.length > 1

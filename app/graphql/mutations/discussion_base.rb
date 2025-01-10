@@ -202,7 +202,7 @@ class Mutations::DiscussionBase < Mutations::BaseMutation
 
   # Adapted from LearningObjectDatesController#update_ungraded_object
   def update_ungraded_discussion(discussion_topic, overrides)
-    return if discussion_topic.assignment.present? || discussion_topic.context_type == "Group" || discussion_topic.is_announcement || !Account.site_admin.feature_enabled?(:selective_release_ui_api)
+    return if discussion_topic.assignment.present? || discussion_topic.context_type == "Group" || discussion_topic.is_announcement
 
     batch = prepare_assignment_overrides_for_batch_update(discussion_topic, overrides, @current_user) if overrides
     discussion_topic.transaction do

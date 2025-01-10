@@ -66,7 +66,6 @@ import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 import {isPassedDelayedPostAt} from '@canvas/datetime/react/date-utils'
 import select from '@canvas/obj-select'
-import SectionsTooltip from '@canvas/sections-tooltip'
 import UnreadBadge from '@canvas/unread-badge'
 import {assignLocation} from '@canvas/util/globalUtils'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
@@ -749,35 +748,6 @@ class DiscussionRow extends Component {
     }
   }
 
-  renderSectionsTooltip = () => {
-    if (
-      this.props.contextType === 'group' ||
-      this.props.discussion.assignment ||
-      this.props.discussion.group_category_id ||
-      this.props.isMasterCourse
-    ) {
-      return null
-    }
-
-    let anonText = null
-    if (this.props.discussion.anonymous_state === 'full_anonymity') {
-      anonText = I18n.t('Anonymous Discussion | ')
-    } else if (this.props.discussion.anonymous_state === 'partial_anonymity') {
-      anonText = I18n.t('Partially Anonymous Discussion | ')
-    }
-
-    const textColor = this.isInaccessibleDueToAnonymity() ? 'secondary' : null
-
-    return (
-      <SectionsTooltip
-        totalUserCount={this.props.discussion.user_count}
-        sections={this.props.discussion.sections}
-        prefix={anonText}
-        textColor={textColor}
-      />
-    )
-  }
-
   renderTitle = () => {
     const refFn = c => {
       this._titleElement = c
@@ -1014,7 +984,6 @@ class DiscussionRow extends Component {
                 <Grid.Row vAlign="middle">
                   <Grid.Col vAlign="middle" textAlign="start">
                     {this.renderTitle()}
-                    {!ENV?.FEATURES?.selective_release_ui_api && this.renderSectionsTooltip()}
                   </Grid.Col>
                   <Grid.Col vAlign="top" textAlign="end">
                     {this.renderUpperRightBadges()}
@@ -1137,7 +1106,6 @@ const mapState = (state, ownProps) => {
       (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
     displayDifferentiatedModulesTray:
-      ENV?.FEATURES?.selective_release_ui_api &&
       discussion.permissions.manage_assign_to &&
       state.contextType === 'course',
     masterCourseData: state.masterCourseData,

@@ -141,7 +141,6 @@ const createView = (model, options = {}) => {
     newquizzes_on_quiz_page: options.newquizzes_on_quiz_page,
   }
   ENV.SHOW_SPEED_GRADER_LINK = options.show_additional_speed_grader_link
-  ENV.FEATURES.selective_release_ui_api = options.selective_release
 
   const view = new AssignmentListItemView({
     model,
@@ -603,7 +602,6 @@ describe('AssignmentListItemViewSpec', () => {
     })
     const view = createView(model, {
       individualAssignmentPermissions: {manage_assign_to: true},
-      selective_release: true,
     })
     expect(view.$('.assign-to-link')).toHaveLength(1)
   })
@@ -617,21 +615,6 @@ describe('AssignmentListItemViewSpec', () => {
     })
     const view = createView(model, {
       individualAssignmentPermissions: {manage_assign_to: false},
-      selective_release: true,
-    })
-    expect(view.$('.assign-to-link')).toHaveLength(0)
-  })
-
-  test('cannot assign assignment if flag is off', () => {
-    const model = buildAssignment({
-      id: 1,
-      title: 'Foo',
-      can_update: true,
-      submission_types: ['online_text_entry'],
-    })
-    const view = createView(model, {
-      individualAssignmentPermissions: {manage_assign_to: true},
-      selective_release: false,
     })
     expect(view.$('.assign-to-link')).toHaveLength(0)
   })

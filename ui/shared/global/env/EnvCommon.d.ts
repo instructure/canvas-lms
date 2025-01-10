@@ -243,7 +243,6 @@ export type SiteAdminFeatureId =
   | 'account_level_blackout_dates'
   | 'course_paces_for_students'
   | 'course_paces_redesign'
-  | 'selective_release_ui_api'
   | 'assign_to_improved_search'
   | 'enhanced_course_creation_account_fetching'
   | 'explicit_latex_typesetting'

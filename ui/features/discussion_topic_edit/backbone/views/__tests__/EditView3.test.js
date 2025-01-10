@@ -27,11 +27,21 @@ const originalConsoleError = console.error
 const originalConsoleWarn = console.warn
 beforeAll(() => {
   console.error = (...args) => {
-    if (args[0]?.includes('Warning:')) return
+    if (
+      typeof args[0] === 'string' &&
+      (args[0].includes('Warning: React does not recognize') ||
+        args[0].includes('Warning: componentWillMount has been renamed') ||
+        args[0].includes('Target container is not a DOM element'))
+    )
+      return
     originalConsoleError.call(console, ...args)
   }
   console.warn = (...args) => {
-    if (args[0]?.includes('Warning:')) return
+    if (
+      typeof args[0] === 'string' &&
+      args[0].includes('Warning: componentWillMount has been renamed')
+    )
+      return
     originalConsoleWarn.call(console, ...args)
   }
 })

@@ -24,7 +24,6 @@ import {AssignmentGroupSelect} from './AssignmentGroupSelect'
 import {DisplayGradeAs} from './DisplayGradeAs'
 import {PointsPossible} from './PointsPossible'
 import {PeerReviewOptions} from './PeerReviewOptions'
-import {AssignmentDueDatesManager} from './AssignmentDueDatesManager'
 import {SyncToSisCheckbox} from './SyncToSisCheckbox'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 import {CheckpointsSettings} from './CheckpointsSettings'
@@ -81,7 +80,6 @@ export const GradedDiscussionOptions = ({
   isCheckpoints,
   canManageAssignTo,
 }: Props) => {
-  const differentiatedModulesEnabled = ENV.FEATURES?.selective_release_ui_api
   const isPacedDiscussion = ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.in_paced_course
 
   const renderDiffModulesAssignTo = () => {
@@ -153,11 +151,7 @@ export const GradedDiscussionOptions = ({
       </View>
       {isCheckpoints && <CheckpointsSettings />}
       <View as="div" margin="medium 0">
-        {!differentiatedModulesEnabled ? (
-          <AssignmentDueDatesManager />
-        ) : (
-          renderDiffModulesAssignTo()
-        )}
+          {renderDiffModulesAssignTo()}
       </View>
     </View>
   )

@@ -60,9 +60,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.prototype.template = template
     this.prototype.className = 'form-horizontal edit-form validated-form-view'
     this.prototype.dontRenableAfterSaveSuccess = true
-    if (window.ENV.FEATURES?.selective_release_ui_api) {
-      this.prototype.disablingDfd = new $.Deferred()
-    }
+    this.prototype.disablingDfd = new $.Deferred()
     this.optionProperty('wiki_pages_path')
     this.optionProperty('WIKI_RIGHTS')
     this.optionProperty('PAGE_RIGHTS')
@@ -74,7 +72,6 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
     this.queryParams = new URLSearchParams(window.location.search)
     this.enableAssignTo =
-      window.ENV.FEATURES?.selective_release_ui_api &&
       ENV.COURSE_ID != null &&
       ENV.WIKI_RIGHTS.manage_assign_to
     const redirect = () => {

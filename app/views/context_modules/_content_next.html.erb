@@ -225,20 +225,6 @@ context_modules_header_props = {
 <%= render :partial => 'context_modules/module_item_next', :object => nil, :as => :module_item %>
 
 <% if @can_add || @can_edit %>
-  <%= render :partial => "context_modules/add_context_module_form" %>
-
-  <div id="add_module_prerequisite_dialog" style="display: none;">
-    <span class="context_module_id" style="display: none;">&nbsp;</span>
-    <div>
-      <%= t 'add_prerequisite', "Add prerequisite to *%{module}*", :wrapper => '<span class="module_name">\1</span>', :module => 'module' %>
-    </div>
-    <div style="text-align: center;" class="prerequisite_module_select">
-    </div>
-    <div class="button-container">
-      <button type="button" class="btn submit_button"><%= t('buttons.add_prerequisite', %{Add Prerequisite}) %></button>
-      <button type="button" class="btn button-secondary cancel_button"><%= t('#buttons.cancel', %{Cancel}) %></button>
-    </div>
-  </div>
 
   <%= render :partial => "shared/select_content_dialog", :locals => {:for_modules => true, lti_app_placements: [Lti::ResourcePlacement::LINK_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION] }  %>
   <div id="edit_item_dialog" style="display: none;">

@@ -158,7 +158,6 @@ describe('DiscussionTopicForm', () => {
         window.ENV.CONTEXT_TYPE = 'Group'
         window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
         window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.in_paced_course = true
-        window.ENV.FEATURES.selective_release_ui_api = true
 
         const onSubmit = jest.fn()
         const {getByText, getByPlaceholderText} = setup({

@@ -312,21 +312,6 @@ EditView.prototype.initialize = function (options) {
   this.assignment = this.model
   this.setDefaultsIfNew()
   this.dueDateOverrideView = options.views['js-assignment-overrides']
-  if (ENV.FEATURES?.selective_release_ui_api) {
-    this.listenTo(this.dueDateOverrideView, 'tray:open', () =>
-      // Disables all Save, Save & Publish and Build buttons
-      this.$el
-        .find('.assignment__action-buttons button:not(".cancel_button")')
-        .prop('disabled', true),
-    )
-
-    this.listenTo(this.dueDateOverrideView, 'tray:close', () =>
-      // Enables all Save, Save & Publish and Build buttons
-      this.$el
-        .find('.assignment__action-buttons button:not(".cancel_button")')
-        .prop('disabled', false),
-    )
-  }
 
   this.on(
     'success',
@@ -518,10 +503,8 @@ EditView.prototype.handleAnonymousGradingChange = function () {
 }
 
 EditView.prototype.handlePostToSisBoxChange = function () {
-  if (ENV.FEATURES?.selective_release_ui_api) {
-    const postToSISChecked = this.$postToSisBox.prop('checked')
-    this.model.set('post_to_sis', postToSISChecked)
-  }
+  const postToSISChecked = this.$postToSisBox.prop('checked')
+  this.model.set('post_to_sis', postToSISChecked)
 }
 
 EditView.prototype.handleHideZeroPointQuizChange = function () {
@@ -1285,7 +1268,6 @@ EditView.prototype.toJSON = function () {
       (typeof ENV !== 'undefined' && ENV !== null
         ? ENV.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED
         : void 0) || false,
-    differentiatedModulesEnabled: ENV.FEATURES?.selective_release_ui_api,
   })
 }
 

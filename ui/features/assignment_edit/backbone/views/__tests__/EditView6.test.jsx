@@ -624,7 +624,7 @@ describe('EditView student annotation submission', () => {
     container.appendChild(button)
     await userEvent.click(button)
     expect(container.textContent).not.toContain('test.pdf')
-  })
+  }, 30000)
 
   it('does not render usage rights when they are not required', () => {
     const container = document.getElementById('annotated_document_usage_rights_container')

@@ -120,7 +120,6 @@ const DiscussionPostButtonsToolbar = props => {
   const renderAssignToButton = () =>
     !isSpeedGraderInTopUrl &&
     props.manageAssignTo &&
-    ENV.FEATURES?.selective_release_ui_api &&
     props.showAssignTo && (
       <Button
         width="100%"

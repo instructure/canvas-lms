@@ -1612,7 +1612,7 @@ Assignment.prototype.pollUntilFinished = function (interval, isFinished) {
 
 Assignment.prototype.isOnlyVisibleToOverrides = function (override_flag) {
   if (!(arguments.length > 0)) {
-    if (ENV.FEATURES?.selective_release_ui_api && this.get('visible_to_everyone') != null) {
+    if (this.get('visible_to_everyone') != null) {
       return !this.get('visible_to_everyone')
     }
     return this.get('only_visible_to_overrides') || false

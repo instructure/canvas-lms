@@ -378,7 +378,7 @@ function DiscussionTopicForm({
 
   useEffect(() => {
     // Expects to force the focus the errors on re-render once
-    if (shouldForceFocusAfterRenderRef.current && ENV.FEATURES.selective_release_ui_api) {
+    if (shouldForceFocusAfterRenderRef.current) {
       const sectionViewRef = document.getElementById(
         'manage-assign-to-container',
       )?.reactComponentInstance
@@ -547,7 +547,6 @@ function DiscussionTopicForm({
 
     if (
       !isGraded &&
-      ENV.FEATURES?.selective_release_ui_api &&
       !isAnnouncement &&
       ENV.context_type !== 'Group' &&
       !isGroupDiscussion
@@ -564,7 +563,6 @@ function DiscussionTopicForm({
       )
     } else if (
       isGraded &&
-      ENV.FEATURES?.selective_release_ui_api &&
       !isGroupDiscussion &&
       ENV.context_type !== 'Group'
     ) {
@@ -655,8 +653,7 @@ function DiscussionTopicForm({
 
     if (
       // Not validate override dates for announcements or ungraded group discussions
-      !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type === 'Group') &&
-      ENV.FEATURES.selective_release_ui_api
+      !(isAnnouncement || (isGroupDiscussion && !isGraded) || ENV?.context_type === 'Group')
     ) {
       const aDueDateMissing = assignedInfoList.some(assignee => !assignee.dueDate)
       const postToSisEnabled = isGraded && postToSis && ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT
@@ -682,15 +679,13 @@ function DiscussionTopicForm({
     }
 
     setTimeout(() => {
-      if (ENV.FEATURES.selective_release_ui_api) {
-        if (!formIsValid) {
-          // If there are errors visible already don't force the focus
-          if (hasAfterRenderIssue) {
-            shouldForceFocusAfterRenderRef.current = true
-          } else {
-            // Focus errors that are already visible
-            sectionViewRef?.focusErrors()
-          }
+      if (!formIsValid) {
+        // If there are errors visible already don't force the focus
+        if (hasAfterRenderIssue) {
+          shouldForceFocusAfterRenderRef.current = true
+        } else {
+          // Focus errors that are already visible
+          sectionViewRef?.focusErrors()
         }
       }
       setIsSubmitting(false)
@@ -785,7 +780,7 @@ function DiscussionTopicForm({
   const renderAvailabilityOptions = useCallback(() => {
     if (isGraded && !isAnnouncement) {
       return (
-        <View as="div" data-testid="assignment-settings-section">
+        <View as="div" data-testid="assignment-assign-to-section">
           <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
             <GradedDiscussionOptions
               assignmentGroups={assignmentGroups}
@@ -813,9 +808,9 @@ function DiscussionTopicForm({
           </DiscussionDueDatesContext.Provider>
         </View>
       )
-    } else if (!isGroupDiscussion && !isAnnouncement && ENV.FEATURES?.selective_release_ui_api) {
+    } else if (!isGroupDiscussion && !isAnnouncement) {
       return (
-        <View as="div" data-testid="assignment-settings-section">
+        <View as="div" data-testid="discussion-assign-to-section">
           <Text weight="bold">{I18n.t('Assign Access')}</Text>
           <DiscussionDueDatesContext.Provider value={assignmentDueDateContext}>
             <ItemAssignToTrayWrapper />

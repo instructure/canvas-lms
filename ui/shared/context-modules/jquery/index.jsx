@@ -115,31 +115,26 @@ window.modules = (function () {
         $(this).sortable('refresh')
         $(this).sortable('option', 'connectWith', '.context_module_items')
       })
-
-      if (ENV.FEATURES?.selective_release_ui_api) {
-        const options = {initialTab: 'settings'}
-        const settings = {
-          moduleList: parseModuleList(),
-          addModuleUI: (data, $moduleElement) => {
-            if (typeof callback === 'function') {
-              callback(data, $moduleElement)
-            } else {
-              addModuleElement(
-                data,
-                $moduleElement,
-                updatePublishMenuDisabledState,
-                new RelockModulesDialog(),
-                {},
-              )
-            }
-            $moduleElement.css('display', 'block')
-          },
-        }
-
-        renderDifferentiatedModulesTray(event.target, $module, settings, options)
-      } else {
-        modules.editModule($module)
+      const options = {initialTab: 'settings'}
+      const settings = {
+        moduleList: parseModuleList(),
+        addModuleUI: (data, $moduleElement) => {
+          if (typeof callback === 'function') {
+            callback(data, $moduleElement)
+          } else {
+            addModuleElement(
+              data,
+              $moduleElement,
+              updatePublishMenuDisabledState,
+              new RelockModulesDialog(),
+              {},
+            )
+          }
+          $moduleElement.css('display', 'block')
+        },
       }
+
+      renderDifferentiatedModulesTray(event.target, $module, settings, options)
     },
 
     updateModulePositions() {
@@ -402,159 +397,6 @@ window.modules = (function () {
         $this.text(content_tag.title)
         $this.attr('title', content_tag.title)
       })
-    },
-    editModule($module) {
-      const $form = $('#add_context_module_form')
-      $form.data('current_module', $module)
-      const data = $module.getTemplateData({
-        textValues: [
-          'name',
-          'unlock_at',
-          'require_sequential_progress',
-          'publish_final_grade',
-          'requirement_count',
-        ],
-      })
-      $form.fillFormData(data, {object_name: 'context_module'})
-      let isNew = false
-      if ($module.attr('id') === 'context_module_new') {
-        isNew = true
-        $form.attr('action', $form.find('.add_context_module_url').attr('href'))
-        $form.find('.completion_entry').hide()
-        $form.attr('method', 'POST')
-        $form.find('.submit_button').text(I18n.t('buttons.add', 'Add Module'))
-      } else {
-        $form.attr('action', $module.find('.edit_module_link').attr('href'))
-        $form.find('.completion_entry').show()
-        $form.attr('method', 'PUT')
-        $form.find('.submit_button').text(I18n.t('buttons.update', 'Update Module'))
-      }
-      $form.find('#unlock_module_at').prop('checked', data.unlock_at).change()
-      $form
-        .find('#require_sequential_progress')
-        .prop(
-          'checked',
-          data.require_sequential_progress === 'true' || data.require_sequential_progress === '1',
-        )
-      $form
-        .find('#publish_final_grade')
-        .prop('checked', data.publish_final_grade === 'true' || data.publish_final_grade === '1')
-
-      const has_predecessors =
-        $('#context_modules .context_module').length > 1 &&
-        $('#context_modules .context_module:first').attr('id') !== $module.attr('id')
-      $form.find('.prerequisites_entry').showIf(has_predecessors)
-      const prerequisites = []
-      $module.find('.prerequisites .prerequisite_criterion').each(function () {
-        prerequisites.push($(this).getTemplateData({textValues: ['id', 'name', 'type']}))
-      })
-
-      $form.find('.prerequisites_list .criteria_list').empty()
-      for (const idx in prerequisites) {
-        const pre = prerequisites[idx]
-        $form.find('.add_prerequisite_link:first').click()
-        if (pre.type === 'context_module') {
-          $form
-            .find('.prerequisites_list .criteria_list .criterion:last select')
-            .val(pre.id)
-            .trigger('change')
-        }
-      }
-      $form.find('.completion_entry .criteria_list').empty()
-      $module.find('.content .context_module_item .criterion.defined').each(function () {
-        const data = $(this)
-          .parents('.context_module_item')
-          .getTemplateData({textValues: ['id', 'criterion_type', 'min_score']})
-        $form.find('.add_completion_criterion_link').click()
-        $form
-          .find('.criteria_list .criterion:last')
-          .find('.id')
-          .val(data.id || '')
-          .change()
-          .end()
-          .find('.type')
-          .val(data.criterion_type || '')
-          .change()
-          .end()
-          .find('.min_score')
-          .val(data.min_score || '')
-      })
-      const no_items = $module.find('.content .context_module_item').length === 0
-      $form
-        .find('.prerequisites_list .criteria_list')
-        .showIf(prerequisites.length !== 0)
-        .end()
-        .find('.add_prerequisite_link')
-        .showIf(has_predecessors)
-        .end()
-        .find('.completion_entry .criteria_list')
-        .showIf(!no_items)
-        .end()
-
-        .find('.completion_entry .no_items_message')
-        .hide()
-        .end()
-        .find('.add_completion_criterion_link')
-        .showIf(!no_items)
-
-      // Set no items or criteria message plus disable elements if there are no items or no requirements
-      if (no_items) {
-        $form.find('.completion_entry .no_items_message').show()
-      }
-      if ($module.find('.content .context_module_item .criterion.defined').length !== 0) {
-        $('.requirement-count-radio').show()
-      } else {
-        $('.requirement-count-radio').hide()
-      }
-
-      const $requirementCount = $module.find('.pill li').data('requirement-count')
-      if ($requirementCount == 1) {
-        $('#context_module_requirement_count_1').prop('checked', true).change()
-      } else {
-        $('#context_module_requirement_count_').prop('checked', true).change()
-      }
-
-      $module.fadeIn('fast', () => {})
-      $module.addClass('dont_remove')
-      $form.find('.module_name').toggleClass('lonely_entry', isNew)
-      $form.find('.module_name label span').hide() // hide the asterisk in the form label
-      const $toFocus = $('.ig-header-admin .al-trigger', $module)
-      const fullSizeModal = window.matchMedia('(min-width: 600px)').matches
-      const responsiveWidth = fullSizeModal ? 600 : 320
-      $form
-        .dialog({
-          autoOpen: false,
-          modal: true,
-          title: isNew
-            ? I18n.t('titles.add', 'Add Module')
-            : I18n.t('titles.edit', 'Edit Module Settings'),
-          width: responsiveWidth,
-          height: isNew ? 400 : 600,
-          close() {
-            modules.hideEditModule(true)
-            $toFocus.focus()
-            const $contextModules = $('#context_modules .context_module')
-            if ($contextModules.length) {
-              $('#context_modules_sortable_container').removeClass('item-group-container--is-empty')
-            }
-          },
-          zIndex: 1000,
-        })
-        .dialog('open')
-      $module.removeClass('dont_remove')
-    },
-
-    hideEditModule(remove) {
-      const $module = $('#add_context_module_form').data('current_module') // .parents(".context_module");
-      if (
-        remove &&
-        $module &&
-        $module.attr('id') === 'context_module_new' &&
-        !$module.hasClass('dont_remove')
-      ) {
-        $module.remove()
-      }
-      $('#add_context_module_form:visible').dialog('close')
     },
 
     addContentTagToEnv(content_tag) {
@@ -1086,156 +928,6 @@ modules.initModuleManagement = async function (duplicate) {
 
     modules.refreshModuleList()
   })
-
-  $('#add_context_module_form').formSubmit({
-    object_name: 'context_module',
-    required: ['name'],
-    processData(data) {
-      const prereqs = []
-      $(this)
-        .find('.prerequisites_list .criteria_list .criterion')
-        .each(function () {
-          const id = $(this).find('.option select').val()
-          if (id) {
-            prereqs.push('module_' + id)
-          }
-        })
-
-      data['context_module[prerequisites]'] = prereqs.join(',')
-      data['context_module[completion_requirements][none]'] = 'none'
-
-      const $requirementsList = $(this).find('.completion_entry .criteria_list .criterion')
-      $requirementsList.each(function () {
-        const id = $(this).find('.id').val()
-        data['context_module[completion_requirements][' + id + '][type]'] = $(this)
-          .find('.type')
-          .val()
-        data['context_module[completion_requirements][' + id + '][min_score]'] = $(this)
-          .find('.min_score')
-          .val()
-      })
-
-      const requirementCount = $('input[name="context_module[requirement_count]"]:checked').val()
-      data['context_module[requirement_count]'] = requirementCount
-
-      return data
-    },
-    beforeSubmit(data) {
-      const $module = $(this).data('current_module')
-      $module.loadingImage()
-      $module.find('.header').fillTemplateData({
-        data,
-      })
-      $module.addClass('dont_remove')
-      modules.hideEditModule()
-      $module.removeClass('dont_remove')
-      return $module
-    },
-    success: (data, $module) =>
-      addModuleElement(
-        data,
-        $module,
-        updatePublishMenuDisabledState,
-        relock_modules_dialog,
-        moduleItems,
-      ),
-    error(data, $module) {
-      $module.loadingImage('remove')
-    },
-  })
-
-  $('#add_context_module_form .add_prerequisite_link').click(function (event) {
-    event.preventDefault()
-    const $form = $(this).parents('#add_context_module_form')
-    const $module = $form.data('current_module')
-    const $select = $('#module_list').clone(true).removeAttr('id')
-    const $pre = $form.find('#criterion_blank_prereq').clone(true).removeAttr('id')
-    $select.find('.' + $module.attr('id')).remove()
-    const afters = []
-
-    $('#context_modules .context_module').each(function () {
-      if ($(this)[0] === $module[0] || afters.length > 0) {
-        afters.push($(this).attr('id'))
-      }
-    })
-    for (const idx in afters) {
-      $select.find('.' + afters[idx]).hide()
-    }
-
-    $select.attr('id', 'module_list_prereq')
-    $pre.find('.option').empty().append($select.show())
-    $('<label for="module_list_prereq" class="screenreader-only" />')
-      .text(I18n.t('Select prerequisite module'))
-      .insertBefore($select)
-    $form.find('.prerequisites_list .criteria_list').append($pre).show()
-    $pre.show()
-    $select.change(event => {
-      const $target = $(event.target)
-      const title = $target.val() ? $target.find('option:selected').text() : ''
-      const $prereq = $target.closest('.criterion')
-      const $deleteBtn = $prereq.find('.delete_criterion_link')
-      $deleteBtn.attr('aria-label', I18n.t('Delete prerequisite %{title}', {title}))
-    })
-    $select.focus()
-  })
-
-  $('#add_context_module_form .add_completion_criterion_link').click(function (event) {
-    event.preventDefault()
-    const $form = $(this).parents('#add_context_module_form')
-    const $module = $form.data('current_module')
-    const $option = $('#completion_criterion_option').clone(true).removeAttr('id')
-    const $select = $option.find('select.id')
-    const $pre = $form.find('#criterion_blank_req').clone(true).removeAttr('id')
-    $pre.find('.prereq_desc').remove()
-    modules.prerequisites()
-    const $optgroups = {}
-    $module
-      .find('.content .context_module_item')
-      .not('.context_module_sub_header')
-      .each(function () {
-        let displayType
-        const data = $(this).getTemplateData({textValues: ['id', 'type']})
-        data.title = $(this).find('.title').attr('title')
-        if (data.type === 'quiz' || data.type === 'lti-quiz' || $(this).hasClass('lti-quiz')) {
-          displayType = I18n.t('optgroup.quizzes', 'Quizzes')
-        } else if (data.type === 'assignment') {
-          displayType = I18n.t('optgroup.assignments', 'Assignments')
-        } else if (data.type === 'attachment') {
-          displayType = I18n.t('optgroup.files', 'Files')
-        } else if (data.type === 'external_url') {
-          displayType = I18n.t('optgroup.external_urls', 'External URLs')
-        } else if (data.type === 'context_external_tool') {
-          displayType = I18n.t('optgroup.external_tools', 'External Tools')
-        } else if (data.type === 'discussion_topic') {
-          displayType = I18n.t('optgroup.discussion_topics', 'Discussions')
-        } else if (data.type === 'wiki_page') {
-          displayType = I18n.t('Pages')
-        }
-        let $group = $optgroups[displayType]
-        if (!$group) {
-          $group = $optgroups[displayType] = $(document.createElement('optgroup'))
-          $group.attr('label', displayType)
-          $select.append($group)
-        }
-        const titleDesc = data.title
-        const $option = $(document.createElement('option'))
-        $option.val(data.id).text(titleDesc)
-        $group.append($option)
-      })
-    $pre.find('.option').empty().append($option)
-    $option.find('.id').change()
-    $form.find('.completion_entry .criteria_list').append($pre).show()
-    $pre.slideDown()
-    $('.requirement-count-radio').show()
-    $('#context_module_requirement_count_').change()
-    $option.slideDown(function () {
-      if (event.originalEvent) {
-        // don't do this when populating the dialog :P
-        $('select:first', $(this)).trigger('focus')
-      }
-    })
-  })
-
   $('#completion_criterion_option .id').change(function () {
     const $option = $(this).parents('.completion_criterion_option')
     const data = $('#context_module_item_' + $(this).val()).getTemplateData({
@@ -1294,34 +986,6 @@ modules.initModuleManagement = async function (duplicate) {
       )
   })
 
-  $('#add_context_module_form .requirement-count-radio .ic-Radio input').change(() => {
-    if ($('#context_module_requirement_count_').prop('checked')) {
-      $('.require-sequential').show()
-    } else {
-      $('.require-sequential').hide()
-      $('#require_sequential_progress').prop('checked', false)
-    }
-  })
-
-  $('#add_context_module_form .delete_criterion_link').click(function (event) {
-    event.preventDefault()
-    const $elem = $(this).closest('.criteria_list')
-    const $requirement = $(this).parents('.completion_entry')
-    const $criterion = $(this).closest('.criterion')
-    const $prevCriterion = $criterion.prev()
-    const $toFocus = $prevCriterion.length
-      ? $('.delete_criterion_link', $prevCriterion)
-      : $('.add_prerequisite_or_requirement_link', $(this).closest('.form-section'))
-    $criterion.slideUp(function () {
-      $(this).remove()
-      // Hides radio button and checkbox if there are no requirements
-      if ($elem.html().length === 0 && $requirement.length !== 0) {
-        $('.requirement-count-radio').fadeOut('fast')
-      }
-      $toFocus.focus()
-    })
-  })
-
   $(document).on('click', '.duplicate_module_link', function (event) {
     event.preventDefault()
     const duplicateRequestUrl = $(this).attr('href')
@@ -1375,8 +1039,6 @@ modules.initModuleManagement = async function (duplicate) {
             $(document).off('click', '.add_module_link')
           }
           $('#context_modules').off('addFileToModule')
-          $('#add_context_module_form .add_prerequisite_link').off()
-          $('#add_context_module_form .add_completion_criterion_link').off()
           $('.context_module')
             .find('.expand_module_link,.collapse_module_link')
             .bind('click keyclick', toggleModuleCollapse)
@@ -1950,43 +1612,7 @@ modules.initModuleManagement = async function (duplicate) {
       },
     )
   })
-  $(document).on('click', '.context_module .add_prerequisite_link', function (event) {
-    event.preventDefault()
-    const module = $(this)
-      .parents('.context_module')
-      .find('.header')
-      .getTemplateData({textValues: ['name', 'id']})
-    $('#add_module_prerequisite_dialog').fillTemplateData({
-      data: {module_name: module.name, context_module_id: module.id},
-    })
-    const $module = $(this).parents('.context_module')
-    const $select = $('#module_list').clone(true).removeAttr('id')
-    $select.find('.' + $module.attr('id')).remove()
-    const afters = []
-    $('#context_modules .context_module').each(function () {
-      if ($(this)[0] === $module[0] || afters.length > 0) {
-        afters.push($(this).getTemplateData({textValues: ['id']}).id)
-      }
-    })
-    for (const idx in afters) {
-      $select.find('.context_module_' + afters[idx]).hide()
-    }
-    $('#add_module_prerequisite_dialog')
-      .find('.prerequisite_module_select')
-      .empty()
-      .append($select.show())
-    $('#add_module_prerequisite_dialog').dialog({
-      title: I18n.t('titles.add_prerequisite', 'Add Prerequisite to %{module}', {
-        module: module.name,
-      }),
-      width: 400,
-      modal: true,
-      zIndex: 1000,
-    })
-  })
-  $('#add_context_module_form .cancel_button').click(_event => {
-    modules.hideEditModule(true)
-  })
+
   requestAnimationFrame(function () {
     const items = Array.from(document.querySelectorAll('#context_modules .context_module_items'))
     const next = function () {
@@ -2552,16 +2178,12 @@ $(document).ready(function () {
 
   $(document).on('click', '.edit_module_link', function (event) {
     event.preventDefault()
-    if (ENV.FEATURES?.selective_release_ui_api) {
-      const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
-      const moduleElement = $(event.target).parents('.context_module')[0]
-      const settingsProps = parseModule(moduleElement)
-      renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
-        initialTab: 'settings',
-      })
-    } else {
-      modules.editModule($(this).parents('.context_module'))
-    }
+    const returnFocusTo = $(event.target).closest('ul').prev('.al-trigger')
+    const moduleElement = $(event.target).parents('.context_module')[0]
+    const settingsProps = parseModule(moduleElement)
+    renderDifferentiatedModulesTray(returnFocusTo, moduleElement, settingsProps, {
+      initialTab: 'settings',
+    })
   })
 
   if (ENV.MODULE_FEATURES?.TEACHER_MODULE_SELECTION) {
