@@ -101,7 +101,7 @@ module.exports = {
           '(^|/)[.][^/]+[.](?:js|cjs|mjs|ts|cts|mts|json)$', // dot files
           '[.]d[.]ts$', // TypeScript declaration files
           '(^|/)tsconfig[.]json$', // TypeScript config
-          '(^|/)(?:babel|webpack)[.]config[.](?:js|cjs|mjs|ts|cts|mts|json)$', // other configs
+          '(^|/)(?:babel|webpack|jest|vitest|eslint)[.]config[.](?:js|cjs|mjs|ts|cts|mts|json)$',
         ],
       },
       to: {},
@@ -217,7 +217,7 @@ module.exports = {
       from: {
         path: '^(packages)',
         pathNot:
-          '[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx|ls|coffee|litcoffee|coffee[.]md)$',
+          '[.](?:|config|spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx|ls|coffee|litcoffee|coffee[.]md)$',
       },
       to: {
         dependencyTypes: ['npm-dev'],
