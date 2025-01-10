@@ -77,21 +77,6 @@ import_numeric_lti_custom_params_as_string:
       state: allowed_on
     ci:
       state: allowed_on
-lti_ags_remove_top_submitted_at:
-  state: hidden
-  applies_to: RootAccount
-  shadow: true
-  display_name: Remove top-level submittedAt from LTI AGS Score API
-  description: |-
-    When enabled, removes support for passing submittedAt as a top-level parameter in an
-    LTI AGS Score request, to better conform to LTI AGS spec.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_apps_page_instructors:
   state: hidden
   shadow: true
