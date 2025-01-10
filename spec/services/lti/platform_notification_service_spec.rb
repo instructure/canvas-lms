@@ -224,4 +224,50 @@ describe Lti::PlatformNotificationService do
       Lti::PlatformNotificationService.notify_tools(tool.account, *builders)
     end
   end
+
+  describe "notify_tools_in_course" do
+    subject { Lti::PlatformNotificationService.notify_tools_in_course(course, builder) }
+
+    let(:course) { course_model }
+    let(:root_account) { course.root_account }
+    let(:notice_handler) do
+      Lti::NoticeHandler.last
+    end
+    let(:builder) { Lti::Pns::LtiContextCopyNoticeBuilder.new(course:, copied_at: Time.zone.now) }
+
+    before do
+      allow(Lti::PlatformNotificationService).to receive(:send_notices).and_return(true)
+      Lti::PlatformNotificationService.subscribe_tool_for_notice(tool:, notice_type: Lti::Pns::NoticeTypes::CONTEXT_COPY, handler_url: "https://example.com/notice", max_batch_size: 10)
+    end
+
+    context "with tool installed in root account" do
+      let(:tool) { external_tool_1_3_model(context: root_account) }
+
+      it "sends notice to tool" do
+        subject
+        expect(Lti::PlatformNotificationService).to have_received(:send_notices).with(notice_handler:, builders: anything)
+      end
+    end
+
+    context "with tool installed in subaccount" do
+      let(:course) { course_model(account: subaccount) }
+      let(:subaccount) { account_model(parent_account: root_account) }
+      let(:root_account) { account_model }
+      let(:tool) { external_tool_1_3_model(context: subaccount) }
+
+      it "sends notice to tool" do
+        subject
+        expect(Lti::PlatformNotificationService).to have_received(:send_notices).with(notice_handler:, builders: anything)
+      end
+    end
+
+    context "with tool installed in course" do
+      let(:tool) { external_tool_1_3_model(context: course) }
+
+      it "sends notice to tool" do
+        subject
+        expect(Lti::PlatformNotificationService).to have_received(:send_notices).with(notice_handler:, builders: anything)
+      end
+    end
+  end
 end
