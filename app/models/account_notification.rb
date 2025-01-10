@@ -82,10 +82,10 @@ class AccountNotification < ActiveRecord::Base
   end
   alias_method :past, :past?
 
-  def self.for_user_and_account(user, root_account, include_past: false)
+  def self.for_user_and_account(user, root_account, include_near_past: false)
     GuardRail.activate(:secondary) do
       if root_account.site_admin?
-        current = for_account(root_account, include_past:)
+        current = for_account(root_account, include_near_past:)
       else
         course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
@@ -95,7 +95,7 @@ class AccountNotification < ActiveRecord::Base
                                .joins(:account).where(accounts: { workflow_state: "active" })
                                .distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
-        current = for_account(root_account, all_account_ids, include_past:)
+        current = for_account(root_account, all_account_ids, include_near_past:)
       end
 
       user_role_ids = {}
@@ -145,7 +145,7 @@ class AccountNotification < ActiveRecord::Base
       end
 
       user.shard.activate do
-        unless include_past
+        unless include_near_past
           closed_ids = user.get_preference(:closed_notifications) || []
           # If there are ids marked as 'closed' that are no longer
           # applicable, they probably need to be cleared out.
@@ -205,7 +205,7 @@ class AccountNotification < ActiveRecord::Base
     ["root_account_notifications2", Shard.global_id_for(root_account_id), date.strftime("%Y-%m-%d")].cache_key
   end
 
-  def self.for_account(root_account, all_visible_account_ids = nil, include_past: false)
+  def self.for_account(root_account, all_visible_account_ids = nil, include_near_past: false, include_all: false)
     account_ids = root_account_ids = root_account.account_chain(include_site_admin: true).map(&:id)
     if all_visible_account_ids
       account_ids += all_visible_account_ids
@@ -215,9 +215,9 @@ class AccountNotification < ActiveRecord::Base
 
     block = proc do
       now = Time.now.utc
-      start_at = include_past ? now : now.end_of_day
+      start_at = include_near_past ? now : now.end_of_day
 
-      end_at = now - 4.months if include_past
+      end_at = now - 4.months if include_near_past
       end_at ||= start_at
       end_at = end_at.beginning_of_day
 
@@ -228,9 +228,16 @@ class AccountNotification < ActiveRecord::Base
       base_shard = Shard.current
       result = Shard.partition_by_shard(account_ids) do |sharded_account_ids|
         load_by_account = lambda do |slice_account_ids|
-          scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at)
+          scope = AccountNotification.where(account_id: slice_account_ids)
                                      .order("start_at DESC")
                                      .preload({ account: :root_account }, account_notification_roles: :role)
+          scope = if include_all
+                    scope.preload(:user)
+                  else
+                    scope.where(start_at: ..start_at)
+                         .where(end_at: end_at..)
+                  end
+
           if Shard.current == root_account.shard
             if slice_account_ids != [root_account.id]
               scope = scope.joins(:account).where("domain_specific=? OR #{Account.resolved_root_account_id_sql}=?", false, root_account.id)
@@ -247,7 +254,7 @@ class AccountNotification < ActiveRecord::Base
                                       else
                                         root_account_ids.map { |id| Shard.relative_id_for(id, base_shard, Shard.current) }
                                       end
-        if (sharded_account_ids - this_shard_root_account_ids).empty? && !include_past
+        if (sharded_account_ids - this_shard_root_account_ids).empty? && !include_near_past
           sharded_account_ids.map do |single_root_account_id|
             MultiCache.fetch(cache_key_for_root_account(single_root_account_id, end_at)) do
               load_by_account.call([single_root_account_id])
@@ -262,16 +269,16 @@ class AccountNotification < ActiveRecord::Base
       result.select! { |n| n.required_account_service.nil? || enabled_flags.include?(n.required_account_service) }
 
       # need to post-process since the cache covers the entire day
-      unless include_past
+      unless include_near_past || include_all
         result.select! { |n| n.start_at <= now && n.end_at >= now }
       end
       result
     end
 
-    if all_visible_account_ids || include_past
+    if all_visible_account_ids || include_near_past
       # Refreshes every 10 minutes at the longest
       all_account_ids_hash = Digest::SHA256.hexdigest all_visible_account_ids.try(:sort).to_s
-      Rails.cache.fetch(["account_notifications5", root_account, all_account_ids_hash, include_past].cache_key, expires_in: 10.minutes, &block)
+      Rails.cache.fetch(["account_notifications5", root_account, all_account_ids_hash, include_near_past].cache_key, expires_in: 10.minutes, &block)
     else
       # no point in doing an additional layer of caching for _only_ root accounts when root accounts are explicitly cached
       block.call

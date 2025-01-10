@@ -39,9 +39,11 @@ describe "Account Notification API", type: :request do
     end
 
     let(:second_announcement) { account_notification(message: "second") }
+    let(:third_announcement) { account_notification(message: "future", start_at: 1.day.from_now, end_at: 3.days.from_now) }
 
     it "lists notifications" do
       second_announcement
+      third_announcement
       json = api_call(:get, @path, @api_params)
       expect(json.length).to eq 2
       expect(json.pluck("message")).to match_array(%w[default second])
@@ -81,14 +83,15 @@ describe "Account Notification API", type: :request do
 
     describe "include_all param" do
       it "includes all announcements for an admin" do
+        third_announcement
         student_role = @account.get_role_by_name("StudentEnrollment")
         @user.close_announcement(second_announcement)
         account_notification(message: "student_only", role_ids: [student_role.id])
         json = api_call(:get, @path, @api_params.merge(include_all: true))
 
-        expect(json.length).to eq 3
+        expect(json.length).to eq 4
         messages = json.pluck("message")
-        expect(messages).to match_array(%w[default second student_only])
+        expect(messages).to match_array(%w[default second student_only future])
       end
 
       it "returns bad request if non admin user tries to call with include_all" do
