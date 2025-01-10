@@ -19,6 +19,11 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
+import theme from '@instructure/canvas-theme'
+import {IconInfoLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 
@@ -52,7 +57,30 @@ export const AnonymousSelector = ({
       {/* Title should not be read by screen readers as "dimmed", single inputs are disabled instead */}
       <RadioInputGroup
         name="anonymous"
-        description={I18n.t('Anonymous Discussion')}
+        description={
+          <>
+            <View display="inline-block">
+              <Text>{I18n.t('Anonymous Discussion')}</Text>
+            </View>
+            <Tooltip
+              renderTip={I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
+              placement="top"
+              on={['hover', 'focus']}
+              color="primary"
+            >
+              <div
+                style={{display: 'inline-block', marginLeft: theme.spacing.xxSmall}}
+                // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+                tabIndex={0}
+              >
+                <IconInfoLine data-testid="groups_grading_not_allowed" />
+                <ScreenReaderContent>
+                  {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
+                </ScreenReaderContent>
+              </div>
+            </Tooltip>
+          </>
+        }
         value={discussionAnonymousState}
         onChange={(_event, value) => {
           if (value !== 'off') {

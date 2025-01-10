@@ -102,13 +102,13 @@ describe('DiscussionTopicForm', () => {
       expect(document.queryByText('Replying as')).toBeFalsy()
     })
 
-    it('hides group and graded discussion options when Fully/Partially Anonymous', () => {
+    it('disables group and graded discussion options when Fully/Partially Anonymous', () => {
       const document = setup({
         currentDiscussionTopic: DiscussionTopic.mock({anonymousState: 'full_anonymity'}),
       })
 
-      expect(document.queryByTestId('graded-checkbox')).toBeFalsy()
-      expect(document.queryByTestId('group-discussion-checkbox')).toBeFalsy()
+      expect(document.queryByTestId('graded-checkbox')).toBeDisabled()
+      expect(document.queryByTestId('group-discussion-checkbox')).toBeDisabled()
     })
 
     it('hides student ToDo, and ungraded options when Graded', () => {
@@ -288,8 +288,8 @@ describe('DiscussionTopicForm', () => {
         currentDiscussionTopic: DiscussionTopic.mock({
           assignment: Assignment.mock({
             hasSubmittedSubmissions: true,
-          })
-        })
+          }),
+        }),
       })
 
       expect(queryByTestId('checkpoints-checkbox')).toBeDisabled()

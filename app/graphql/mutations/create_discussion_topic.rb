@@ -63,11 +63,9 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
       return validation_error(I18n.t("You are not able to create an anonymous discussion"))
     end
 
-    if anonymous_state && discussion_topic_context.is_a?(Group)
-      return validation_error(I18n.t("You are not able to create an anonymous discussion in a group"))
+    if anonymous_state && (discussion_topic_context.is_a?(Group) || input[:group_category_id].present?)
+      return validation_error(I18n.t("You are not able to create a group anonymous discussion"))
     end
-
-    # TODO: return an error when user tries to create a graded anonymous discussion
 
     if input[:todo_date] && !discussion_topic_context.grants_right?(current_user, session, :manage_course_content_add)
       return validation_error(I18n.t("You do not have permission to add this topic to the student to-do list."))
@@ -75,6 +73,9 @@ class Mutations::CreateDiscussionTopic < Mutations::DiscussionBase
 
     # validate course id for discussion topic and assignment match
     if input.key?(:assignment) && input[:assignment].present?
+      if anonymous_state
+        return validation_error(I18n.t("You are not able to create a graded anonymous discussion")) if input[:assignment].present?
+      end
       assignment_context_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:assignment].to_h[:course_id], "Course")
       if assignment_context_id != discussion_topic_context.id.to_s
         return validation_error(I18n.t("Assignment context_id must match discussion topic context_id"))

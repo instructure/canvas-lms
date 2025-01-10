@@ -602,12 +602,12 @@ describe "discussions" do
           expect(f("input[value='add-to-student-to-do']").selected?).to be_truthy
         end
 
-        it "does not display the grading and groups not supported in anonymous discussions message in the edit page" do
+        it "displays the grading and groups not supported in anonymous discussions message in the edit page" do
           get "/courses/#{course.id}/discussion_topics/#{@topic_all_options.id}/edit"
 
           expect(f("input[value='full_anonymity']").selected?).to be_truthy
           expect(f("input[value='full_anonymity']").attribute("disabled")).to be_nil
-          expect(f("body")).not_to contain_jqcss("[data-testid=groups_grading_not_allowed]")
+          expect(f("body")).to contain_jqcss("[data-testid=groups_grading_not_allowed]")
         end
 
         it "displays all unselected options correctly" do

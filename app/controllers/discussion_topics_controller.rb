@@ -567,7 +567,7 @@ class DiscussionTopicsController < ApplicationController
     return render_unauthorized_action unless @topic.visible_for?(@current_user)
 
     @context.try(:require_assignment_group) unless @topic.is_announcement
-    can_set_group_category = ANONYMOUS_STATES.exclude?(@topic.anonymous_state) && @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage_groups_add) # i.e. not anonymous and not a student
+    can_set_group = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage_groups_add) # i.e. not a student
     hash = {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
       PERMISSIONS: {
@@ -575,7 +575,7 @@ class DiscussionTopicsController < ApplicationController
         CAN_UPDATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :update),
         CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
         CAN_MODERATE: user_can_moderate,
-        CAN_SET_GROUP: can_set_group_category,
+        CAN_SET_GROUP: can_set_group,
         CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades),
         # if not a course content manager, or if topic is graded, do not show add to todo list checkbox
         CAN_MANAGE_CONTENT: @context.grants_right?(@current_user, session, :manage_course_content_add),
@@ -618,7 +618,7 @@ class DiscussionTopicsController < ApplicationController
     handle_assignment_edit_params(hash[:ATTRIBUTES])
 
     categories = []
-    if can_set_group_category
+    if can_set_group && ANONYMOUS_STATES.exclude?(@topic.anonymous_state)
       categories = @context.group_categories.to_a
       # if discussion has entries and is attached to a deleted group category,
       # add that category to the ENV list so it will be shown on the edit page.
@@ -1544,13 +1544,12 @@ class DiscussionTopicsController < ApplicationController
       params[:anonymous_state] = nil
     end
 
-    if is_new && params[:anonymous_state]
+    if params[:anonymous_state]
       # group discussions in a course or discussions simply in a group context cannot be anonymous
       if params[:group_category_id] || @context.is_a?(Group)
-        @errors[:anonymous_state] = t(:error_anonymous_state_groups_create,
-                                      "Group discussions cannot be anonymous.")
+        @errors[:anonymous_state] = t(:error_anonymous_state_groups_create, "Group discussions cannot be anonymous.") unless params.key?("group_category_id") && params[:group_category_id].nil?
       end
-      if params[:assignment]
+      if params[:assignment] && (["false", false, "0"].include?(params.dig(:assignment, :set_assignment)) == false)
         @errors[:anonymous_state] = t(:error_graded_anonymous,
                                       "Anonymous discussions cannot be graded")
       end
