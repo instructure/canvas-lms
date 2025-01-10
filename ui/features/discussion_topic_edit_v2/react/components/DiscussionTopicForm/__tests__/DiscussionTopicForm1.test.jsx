@@ -98,7 +98,7 @@ describe('DiscussionTopicForm', () => {
     // Default teacher options in order top to bottom
     expect(document.getByText('Topic Title')).toBeInTheDocument()
     expect(document.queryByText('Attach')).toBeTruthy()
-    expect(document.queryByTestId('section-select')).toBeTruthy()
+    expect(document.queryByTestId('discussion-assign-to-section')).toBeTruthy()
     expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
     expect(document.queryByLabelText('Disallow threaded replies')).toBeInTheDocument()
     expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
@@ -112,16 +112,6 @@ describe('DiscussionTopicForm', () => {
 
     // Hides announcement options
     expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
-  })
-
-  it('renders reset buttons for availability dates when creating/editing a discussion topic', () => {
-    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
-    window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
-
-    const document = setup()
-
-    expect(document.queryAllByTestId('reset-available-from-button').length).toBe(1)
-    expect(document.queryAllByTestId('reset-available-until-button').length).toBe(1)
   })
 
   it('renders expected default teacher announcement options', () => {
@@ -175,8 +165,8 @@ describe('DiscussionTopicForm', () => {
 
     const document = setup()
 
-    expect(document.queryAllByTestId('reset-available-from-button').length).toBe(1)
-    expect(document.queryAllByTestId('reset-available-until-button').length).toBe(1)
+    expect(document.queryAllByTestId('reset-available-from-button')).toHaveLength(1)
+    expect(document.queryAllByTestId('reset-available-until-button')).toHaveLength(1)
   })
 
   describe('assignment edit placement', () => {

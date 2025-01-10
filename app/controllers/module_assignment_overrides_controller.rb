@@ -74,7 +74,6 @@
 class ModuleAssignmentOverridesController < ApplicationController
   include Api::V1::ModuleAssignmentOverride
 
-  before_action :require_feature_flag # remove when selective_release_ui_api flag is removed
   before_action :require_user
   before_action :require_context
   before_action :check_authorized_action
@@ -165,10 +164,6 @@ class ModuleAssignmentOverridesController < ApplicationController
   end
 
   private
-
-  def require_feature_flag
-    not_found unless Account.site_admin.feature_enabled? :selective_release_ui_api
-  end
 
   def check_authorized_action
     render_unauthorized_action unless @context.grants_any_right?(@current_user, :manage_content, :manage_course_content_edit)

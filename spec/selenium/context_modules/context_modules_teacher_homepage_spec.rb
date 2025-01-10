@@ -150,50 +150,6 @@ describe "context modules" do
       end
     end
 
-    context "when adding new module without differentiated modules" do
-      before :once do
-        Account.site_admin.disable_feature! :selective_release_ui_api
-      end
-
-      before do
-        user_session(@teacher)
-      end
-
-      it "adds a new module", priority: "1" do
-        go_to_modules
-        add_module("New Module")
-        mod = @course.context_modules.first
-        expect(mod.name).to eq "New Module"
-      end
-
-      it "publishes an unpublished module", priority: "1" do
-        go_to_modules
-        add_module("New Module")
-        expect(f(".context_module")).to have_class("unpublished_module")
-        expect(@course.context_modules.count).to eq 1
-        mod = @course.context_modules.first
-        expect(mod.name).to eq "New Module"
-        publish_module_and_items(mod.id)
-        mod.reload
-        expect(mod).to be_published
-        expect(published_module_icon(mod.id)).to be_displayed
-      end
-
-      it "edits a module", priority: "1" do
-        @new_module = @course.context_modules.create! name: "New Module"
-        go_to_modules
-        edit_text = "Module Edited"
-        f(".ig-header-admin .al-trigger").click
-        f(".edit_module_link").click
-        expect(f("#add_context_module_form")).to be_displayed
-        edit_form = f("#add_context_module_form")
-        edit_form.find_element(:id, "context_module_name").send_keys(edit_text)
-        submit_form(edit_form)
-        expect(edit_form).not_to be_displayed
-        expect(f(".context_module > .header")).to include_text(edit_text)
-      end
-    end
-
     context "when adding new module with differentiated modules" do
       before :once do
         @new_module = @course.context_modules.create! name: "New Module"

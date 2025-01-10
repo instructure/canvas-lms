@@ -20,7 +20,6 @@
 
 describe ModuleAssignmentOverridesController do
   before :once do
-    Account.site_admin.enable_feature!(:selective_release_ui_api)
     course_with_teacher(active_all: true, course_name: "Awesome Course")
     @student1 = student_in_course(active_all: true, name: "Student 1").user
     @student2 = student_in_course(active_all: true, name: "Student 2").user
@@ -108,12 +107,6 @@ describe ModuleAssignmentOverridesController do
       course2 = course_with_teacher(active_all: true, user: @teacher).course
       course2.context_modules.create!
       get :index, params: { course_id: course2, context_module_id: @module1.id }
-      expect(response).to be_not_found
-    end
-
-    it "returns 404 if the selective_release_ui_api flag is disabled" do
-      Account.site_admin.disable_feature!(:selective_release_ui_api)
-      get :index, params: { course_id: @course.id, context_module_id: @module1.id }
       expect(response).to be_not_found
     end
 
@@ -332,12 +325,6 @@ describe ModuleAssignmentOverridesController do
 
     it "returns 404 if the course doesn't exist" do
       put :bulk_update, params: { course_id: 0, context_module_id: @module1.id, overrides: [] }
-      expect(response).to be_not_found
-    end
-
-    it "returns 404 if the selective_release_ui_api flag is disabled" do
-      Account.site_admin.disable_feature!(:selective_release_ui_api)
-      put :bulk_update, params: { course_id: @course.id, context_module_id: @module1.id, overrides: [] }
       expect(response).to be_not_found
     end
 

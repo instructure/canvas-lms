@@ -119,22 +119,6 @@ instui_for_import_page:
     If enabled, the course import page will use InstUI components
   applies_to: SiteAdmin
 
-selective_release_ui_api:
-  state: hidden
-  display_name: Selective Release - UI/API Changes
-  description: |-
-    Selective Release is a feature that allows modules and module items to
-    be assigned to specific individuals and groups. The selective_release_backend
-    flag MUST be enabled before this flag can be enabled. When this flag is enabled,
-    the UI and API that allow users to create module-type AssignmentOverrides will be
-    enabled, and thus the feature will be fully functional.
-  applies_to: SiteAdmin
-  environments:
-    ci:
-      state: allowed_on # enable for automated testings builds and local testing
-    development:
-      state: allowed_on # enable for local development
-
 differentiated_files:
   state: hidden
   display_name: Selective Release - Files

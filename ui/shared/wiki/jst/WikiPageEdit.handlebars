@@ -63,19 +63,6 @@
             </div>
           {{/if}}
         {{/if}}
-        {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
-          {{#unless ENV.FEATURES.selective_release_ui_api}}
-            <div class="controls-section">
-              <label class="checkbox" for="conditional_content">
-                {{checkbox "assignment.set_assignment"
-                  id="conditional_content"
-                  class="element_toggler"
-                  checked=set_assignment}}
-                {{#t}}Allow in mastery paths{{/t}}
-              </label>
-            </div>
-          {{/unless}}
-        {{/if}}
       </div>
     </div>
     {{#if show_assign_to}}

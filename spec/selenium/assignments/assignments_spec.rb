@@ -353,7 +353,7 @@ describe "assignments" do
       # freeze for a certain time, so we don't get unexpected ui complications
       time = Time.zone.parse("#{Time.zone.now.year}-01-07 02:13")
       Timecop.freeze(time) do
-        due_at = format_time_for_view(time)
+        format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
         # create assignment
@@ -364,9 +364,6 @@ describe "assignments" do
         ["#assignment_text_entry", "#assignment_online_url", "#assignment_online_upload"].each do |element|
           f(element).click
         end
-        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          replace_content(f(".DueDateInput"), due_at)
-        end
 
         submit_assignment_form
         wait_for_ajaximations
@@ -375,9 +372,6 @@ describe "assignments" do
         expect(f("#assignment_show .points_possible")).to include_text("10")
 
         expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
-        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          expect(f(".assignment_dates")).to include_text(due_at)
-        end
       end
     end
 
@@ -387,7 +381,7 @@ describe "assignments" do
       # freeze for a certain time, so we don't get unexpected ui complications
       time = Time.zone.parse("#{Time.zone.now.year}-01-07 02:13")
       Timecop.freeze(time) do
-        due_at = format_time_for_view(time)
+        format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
         # create assignment
@@ -398,9 +392,6 @@ describe "assignments" do
         ["#assignment_text_entry", "#assignment_online_url", "#assignment_online_upload"].each do |element|
           f(element).click
         end
-        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          replace_content(f(".DueDateInput"), due_at)
-        end
 
         submit_assignment_form
         wait_for_ajaximations
@@ -408,10 +399,6 @@ describe "assignments" do
         expect(f("h1.title")).to include_text(assignment_name)
         expect(f("#assignment_show .points_possible")).to include_text("10")
         expect(f("#assignment_show fieldset")).to include_text("a text entry box, a website url, or a file upload")
-
-        unless Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          expect(f(".assignment_dates")).to include_text(due_at)
-        end
       end
     end
 
@@ -495,12 +482,7 @@ describe "assignments" do
           expect(f("#assignment_name").attribute(:value)).to include(expected_text)
           expect(f("#assignment_points_possible").attribute(:value)).to include(points)
 
-          if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-            expect(element_value_for_attr(assign_to_due_date, "value") + ", " + element_value_for_attr(assign_to_due_time, "value")).to eq due_at
-          else
-            due_at_field = fj(".date_field[data-date-type='due_at']:first")
-            expect(due_at_field).to have_value due_at
-          end
+          expect(element_value_for_attr(assign_to_due_date, "value") + ", " + element_value_for_attr(assign_to_due_time, "value")).to eq due_at
 
           click_option("#assignment_submission_type", "No Submission")
           submit_assignment_form
@@ -535,15 +517,8 @@ describe "assignments" do
         expect(f("#assignment_name").text).to match ""
         expect(f("#assignment_points_possible").text).to match ""
 
-        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          expect(element_value_for_attr(assign_to_due_date(0), "value")).to match expected_date
-          expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
-        else
-          first_input_val = driver.execute_script("return $('.DueDateInput__Container:first input').val();")
-          expect(first_input_val).to match expected_date
-          second_input_val = driver.execute_script("return $('.DueDateInput__Container:last input').val();")
-          expect(second_input_val).to match ""
-        end
+        expect(element_value_for_attr(assign_to_due_date(0), "value")).to match expected_date
+        expect(element_value_for_attr(assign_to_due_date(1), "value")).to eq("")
       end
     end
 

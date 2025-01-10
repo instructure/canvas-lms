@@ -127,54 +127,6 @@ describe('DiscussionDetails', () => {
         expect(getByTestId('non-graded-discussion-info')).toBeTruthy()
       })
     })
-    describe('graded assignments', () => {
-      it('displays points possible info', () => {
-        const {queryByText} = setup()
-        expect(queryByText('7 points possible')).toBeTruthy()
-      })
-
-      it('displays correct pluralization', () => {
-        const {queryByText} = setup({}, [], 1)
-        expect(queryByText('1 point possible')).toBeTruthy()
-      })
-
-      it('displays points possible with 2 decimal places', () => {
-        const {queryByText} = setup({}, [], 4.333)
-        expect(queryByText('4.33 points possible')).toBeTruthy()
-      })
-
-      it('displays due date when there are no overrides', () => {
-        const {queryByText} = setup()
-        expect(queryByText('Everyone')).toBeTruthy()
-        expect(queryByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
-        expect(queryByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
-      })
-
-      it('displays "View due dates" button when there are overrides', () => {
-        const {getByText} = setup({}, mockOverrides)
-        expect(getByText('View Due Dates')).toBeTruthy()
-      })
-
-      it('displays tray and correctly formatted dates', async () => {
-        const {queryByText, findByText, findAllByTestId} = setup({}, mockOverrides)
-        expect(queryByText('View Due Dates')).toBeTruthy()
-        fireEvent.click(queryByText('View Due Dates'))
-        expect(await findAllByTestId('assignment-override-row')).toBeTruthy()
-        expect(await findByText('Sep 4, 2021 5:59am')).toBeTruthy()
-      })
-
-      it('correct text is shown when a date is not set', async () => {
-        mockOverrides[2].dueAt = null
-        mockOverrides[2].unlockAt = null
-        mockOverrides[2].lockAt = null
-        const {queryByText, findByText} = setup({}, mockOverrides)
-        expect(queryByText('View Due Dates')).toBeTruthy()
-        fireEvent.click(queryByText('View Due Dates'))
-        expect(await findByText('No Due Date')).toBeTruthy()
-        expect(await findByText('No Start Date')).toBeTruthy()
-        expect(await findByText('No End Date')).toBeTruthy()
-      })
-    })
   })
 
   describe('mobile', () => {
@@ -205,25 +157,6 @@ describe('DiscussionDetails', () => {
     })
 
     describe('graded assignments', () => {
-      it('displays points possible info', () => {
-        const {queryByText} = setup()
-        expect(queryByText('7 points')).toBeTruthy()
-      })
-
-      it('displays correct pluralization', () => {
-        const {queryByText} = setup({}, [], 1)
-        expect(queryByText('1 point')).toBeTruthy()
-      })
-
-      it('displays points possible with 2 decimal places', () => {
-        const {queryByText} = setup({}, [], 4.333333)
-        expect(queryByText('4.33 points')).toBeTruthy()
-      })
-
-      it('displays "Show due dates" button when there are overrides', () => {
-        const {queryByText} = setup({}, mockOverrides)
-        expect(queryByText('Due Dates')).toBeTruthy()
-      })
       describe('Restrict Quantitative Data is true', () => {
         const mockTopic = Discussion.mock({
           courseSections: mockSections,

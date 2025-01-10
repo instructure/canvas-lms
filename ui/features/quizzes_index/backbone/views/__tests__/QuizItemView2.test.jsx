@@ -64,7 +64,6 @@ const createView = (quiz, options = {}) => {
 
   ENV.context_asset_string = 'course_1'
   ENV.SHOW_SPEED_GRADER_LINK = true
-  ENV.FEATURES.selective_release_ui_api = options.selective_release
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
   const $fixtures = $('<div id="fixtures" />').appendTo(document.body)

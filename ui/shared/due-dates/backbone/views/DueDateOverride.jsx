@@ -25,12 +25,10 @@ import DueDateOverride from '@canvas/assignments/jst/DueDateOverride.handlebars'
 import DateValidator from '@canvas/grading/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import DueDates from '../../react/DueDates'
 import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import AssignToContent from '../../react/AssignToContent'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
-import * as tz from '@instructure/moment-utils'
 import '@canvas/jquery/jquery.instructure_forms'
 import sanitizeData from '../../../forms/sanitizeData'
 import {showPostToSisFlashAlert, combinedDates} from '../../util/differentiatedModulesUtil'
@@ -84,8 +82,7 @@ DueDateOverrideView.prototype.render = function () {
     )
   }
 
-  const assignToSection = ENV.FEATURES?.selective_release_ui_api
-    ? React.createElement(AssignToContent, {
+  const assignToSection = React.createElement(AssignToContent, {
         onSync: this.setNewOverridesCollection,
         defaultSectionId: this.model.defaultDueDateSectionId,
         overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
@@ -146,21 +143,6 @@ DueDateOverrideView.prototype.render = function () {
         },
         onTrayClose: () => this.trigger('tray:close'),
       })
-    : React.createElement(DueDates, {
-        overrides: this.model.overrides.models,
-        syncWithBackbone: this.setNewOverridesCollection,
-        sections: this.model.sections.models,
-        defaultSectionId: this.model.defaultDueDateSectionId,
-        selectedGroupSetId: this.model.assignment.get('group_category_id'),
-        gradingPeriods: this.gradingPeriods,
-        hasGradingPeriods: this.hasGradingPeriods,
-        isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
-        dueAt: tz.parse(this.model.assignment.get('due_at')),
-        dueDatesReadonly: this.options.dueDatesReadonly,
-        availabilityDatesReadonly: this.options.availabilityDatesReadonly,
-        importantDates: this.model.assignment.get('important_dates'),
-        defaultDueTime: ENV.DEFAULT_DUE_TIME,
-      })
 
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(assignToSection, div, () => {
@@ -193,11 +175,9 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
   if (!data || (this.options && this.options.inPacedCourse && this.options.isModuleItem)) {
     return errors
   }
-  if (ENV.FEATURES?.selective_release_ui_api) {
-    data = {
-      ...data,
-      assignment_overrides: data.assignment_overrides.map(o => ({...o, rowKey: combinedDates(o)})),
-    }
+  data = {
+    ...data,
+    assignment_overrides: data.assignment_overrides.map(o => ({...o, rowKey: combinedDates(o)})),
   }
   errors = this.validateDatetimes(data, errors)
   errors = this.validateTokenInput(data, errors)
@@ -419,9 +399,7 @@ DueDateOverrideView.prototype.overridesContainDefault = function () {
 }
 
 DueDateOverrideView.prototype.setOnlyVisibleToOverrides = function () {
-  if (ENV.FEATURES?.selective_release_ui_api) {
-    return !(this.model.overridesContainDefault() || this.model.onlyContainsModuleOverrides())
-  } else return !this.model.overridesContainDefault()
+  return !(this.model.overridesContainDefault() || this.model.onlyContainsModuleOverrides())
 }
 
 DueDateOverrideView.prototype.sectionsWithoutOverrides = function () {

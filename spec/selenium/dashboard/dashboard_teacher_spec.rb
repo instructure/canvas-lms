@@ -148,12 +148,8 @@ describe "dashboard" do
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click
 
-        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          formatted_date = format_date_for_view(1.day.from_now(Time.zone.now), "%m/%d/%Y")
-          update_due_date(0, formatted_date)
-        else
-          f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
-        end
+        formatted_date = format_date_for_view(1.day.from_now(Time.zone.now), "%m/%d/%Y")
+        update_due_date(0, formatted_date)
 
         expect_new_page_load { f(".btn-primary[type=submit]").click }
         wait_for_ajaximations
@@ -176,12 +172,8 @@ describe "dashboard" do
         f("#assignment_name").send_keys("unpublished assignment")
         f("input[type=checkbox][id=assignment_text_entry]").click
 
-        if Account.site_admin.feature_enabled?(:selective_release_ui_api)
-          formatted_date = format_date_for_view(1.day.from_now(Time.zone.now), "%m/%d/%Y")
-          update_due_date(0, formatted_date)
-        else
-          f(".datePickerDateField[data-date-type='due_at']").send_keys(1.day.from_now)
-        end
+        formatted_date = format_date_for_view(1.day.from_now(Time.zone.now), "%m/%d/%Y")
+        update_due_date(0, formatted_date)
 
         expect_new_page_load { f(".btn-primary[type=submit]").click }
         wait_for_ajaximations

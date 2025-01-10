@@ -719,7 +719,7 @@ describe "context modules" do
       expect(f(".user_content")).to include_text(page.body)
     end
 
-    context "with selective_release_ui_api flag enabled" do
+    context "with selective release" do
       before :once do
         @module1 = @course.context_modules.create!(name: "module 1")
         @module2 = @course.context_modules.create!(name: "module 2")
