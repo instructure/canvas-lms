@@ -82,6 +82,12 @@ describe Login::CanvasController do
         get "new"
         expect(response).to render_template("login/canvas/new_login")
       end
+
+      it "sets @exclude_account_css and @exclude_account_js to true" do
+        get :new
+        expect(assigns(:exclude_account_css)).to be(true)
+        expect(assigns(:exclude_account_js)).to be(true)
+      end
     end
 
     context "when the feature flag is disabled" do
@@ -90,6 +96,12 @@ describe Login::CanvasController do
       it "renders the old login page" do
         get "new"
         expect(response).to render_template(:new)
+      end
+
+      it "does not set @exclude_account_css or @exclude_account_js" do
+        get :new
+        expect(assigns(:exclude_account_css)).to be_nil
+        expect(assigns(:exclude_account_js)).to be_nil
       end
     end
   end
