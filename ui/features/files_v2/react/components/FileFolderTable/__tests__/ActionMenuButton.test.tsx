@@ -45,7 +45,8 @@ describe('ActionMenuButton', () => {
     defaultContext = {
       contextType: 'course',
       contextId: '1',
-      folderId: '1'
+      folderId: '1',
+      showingAllContexts: false,
     }
   })
 
@@ -162,10 +163,12 @@ describe('ActionMenuButton', () => {
   })
 
   it('does not renders items when when locked by blueprint', async () => {
-    renderComponent({row: {
-      ...FAKE_FILES[0],
-      ...{restricted_by_master_course: true, is_master_course_child_content: true}
-    }})
+    renderComponent({
+      row: {
+        ...FAKE_FILES[0],
+        ...{restricted_by_master_course: true, is_master_course_child_content: true},
+      },
+    })
 
     const button = screen.getByTestId('action-menu-button-large')
     expect(button).toBeInTheDocument()

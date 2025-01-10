@@ -68,7 +68,7 @@ export interface Folder {
   full_name: string
   context_id: string
   context_type: string
-  parent_folder_id: string
+  parent_folder_id: string | null
   created_at: string
   updated_at: string
   lock_at: string | null
