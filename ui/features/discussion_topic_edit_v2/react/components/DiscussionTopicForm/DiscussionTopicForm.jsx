@@ -145,7 +145,10 @@ function DiscussionTopicForm({
     isAnnouncement && !ENV.DISCUSSION_TOPIC?.ATTRIBUTES.course_published
   const published = currentDiscussionTopic?.published ?? false
   const shouldMasteryPathsBeVisible = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && !isAnnouncement
-  const masteryPathsWithCoursePaces = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED && ENV.IN_PACED_COURSE && ENV.FEATURES.course_pace_pacing_with_mastery_paths
+  const masteryPathsWithCoursePaces =
+    ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
+    ENV.IN_PACED_COURSE &&
+    ENV.FEATURES.course_pace_pacing_with_mastery_paths
 
   const announcementAlertProps = () => {
     if (isUnpublishedAnnouncement) {
@@ -1058,7 +1061,9 @@ function DiscussionTopicForm({
               discussionAnonymousState={discussionAnonymousState}
               setDiscussionAnonymousState={setDiscussionAnonymousState}
               isSelectDisabled={
-                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount > 0) || isGraded
+                (isEditing && currentDiscussionTopic?.entryCounts?.repliesCount > 0) ||
+                isGraded ||
+                isGroupDiscussion
               }
               setIsGraded={setIsGraded}
               setIsGroupDiscussion={setIsGroupDiscussion}
@@ -1136,6 +1141,7 @@ function DiscussionTopicForm({
                 inline={true}
                 checked={isGraded}
                 onChange={handleGradedCheckboxChange}
+                disabled={discussionAnonymousState !== 'off'}
                 // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
               />
             )}
@@ -1260,7 +1266,7 @@ function DiscussionTopicForm({
                   setGroupCategoryId(!isGroupDiscussion ? '' : groupCategoryId)
                   setIsGroupDiscussion(!isGroupDiscussion)
                 }}
-                disabled={!canGroupDiscussion}
+                disabled={!canGroupDiscussion || discussionAnonymousState !== 'off'}
               />
             )}
             {shouldShowGroupOptions && isGroupDiscussion && (
@@ -1358,13 +1364,6 @@ function DiscussionTopicForm({
                 </View>
               )}
           </FormFieldGroup>
-          {discussionAnonymousState.includes('anonymity') && !isEditing && (
-            <View width="580px" display="block" data-testid="groups_grading_not_allowed">
-              <Alert variant="info" margin="small">
-                {I18n.t('Grading and Groups are not supported in Anonymous Discussions.')}
-              </Alert>
-            </View>
-          )}
           {shouldShowViewSettings && (
             <ViewSettings
               expanded={expanded}

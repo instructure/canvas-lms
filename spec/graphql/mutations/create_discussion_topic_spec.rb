@@ -630,6 +630,28 @@ describe Mutations::CreateDiscussionTopic do
     end
 
     context "anonymous_state" do
+      it "returns error for anonymous discussions when a group_category_id is passed" do
+        context_type = "Course"
+        title = "Test Title"
+        message = "A message"
+        published = true
+        anonymous_state = "full_anonymity"
+        group_category_id = 1
+
+        query = <<~GQL
+          contextId: "#{@course.id}"
+          contextType: #{context_type}
+          title: "#{title}"
+          message: "#{message}"
+          published: #{published}
+          anonymousState: #{anonymous_state}
+          groupCategoryId: "#{group_category_id}"
+        GQL
+
+        result = execute_with_input(query)
+        expect_error(result, "You are not able to create a group anonymous discussion")
+      end
+
       it "returns error for anonymous discussions when context is a Group" do
         gc = @course.group_categories.create! name: "foo"
         group = gc.groups.create! context: @course, name: "baz"
@@ -649,7 +671,7 @@ describe Mutations::CreateDiscussionTopic do
         GQL
 
         result = execute_with_input(query)
-        expect_error(result, "You are not able to create an anonymous discussion in a group")
+        expect_error(result, "You are not able to create a group anonymous discussion")
       end
 
       it "returns an error for non-teachers without anonymous discussion creation permissions" do

@@ -734,10 +734,10 @@ describe DiscussionTopicsController do
     end
 
     context "js_env DISCUSSION_TOPIC PERMISSIONS CAN_SET_GROUP" do
-      it "CAN_SET_GROUP is true when existing discussion_topic is not anonymous" do
+      it "CAN_SET_GROUP is true when user is a teacher" do
         user_session(@teacher)
-        not_anon = @course.discussion_topics.create!(user: @teacher, title: "Greetings", message: "Hello, and good morning!")
-        get "edit", params: { course_id: @course.id, id: not_anon.id }
+        regular_topic = @course.discussion_topics.create!(user: @teacher, title: "Greetings", message: "Hello, and good morning!")
+        get "edit", params: { course_id: @course.id, id: regular_topic.id }
         expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be true
       end
 
@@ -754,20 +754,6 @@ describe DiscussionTopicsController do
         user_session(@admin)
         get("edit", params: { course_id: @course.id, id: regular_topic.id })
         expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be true
-      end
-
-      it "CAN_SET_GROUP is false when existing discussion_topic is fully anonymous" do
-        anon_topic = @course.discussion_topics.create!(title: "some topic", anonymous_state: "full_anonymity")
-        user_session(@teacher)
-        get("edit", params: { course_id: @course.id, id: anon_topic.id })
-        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
-      end
-
-      it "CAN_SET_GROUP is false when existing discussion_topic is partially anonymous" do
-        anon_topic = @course.discussion_topics.create!(title: "some topic", anonymous_state: "partial_anonymity")
-        user_session(@teacher)
-        get("edit", params: { course_id: @course.id, id: anon_topic.id })
-        expect(assigns[:js_env][:DISCUSSION_TOPIC][:PERMISSIONS][:CAN_SET_GROUP]).to be false
       end
     end
 
@@ -3164,6 +3150,25 @@ describe DiscussionTopicsController do
         put "update", params: { course_id: @course.id, topic_id: regular_discussion.id, group_category_id: group_category.id }, format: "json"
         expect(response).to be_successful
         expect(regular_discussion.reload.group_category).to eq group_category
+      end
+
+      it "allows the update to fully anonymous, when discussion is edited to be ungraded at the same time" do
+        @course.enable_feature! :react_discussions_post
+        obj_params = topic_params(@course).merge(assignment_params(@course))
+        user_session(@teacher)
+        post "create", params: obj_params, format: :json
+        expect(response).to be_successful
+
+        topic = DiscussionTopic.last
+        put "update",
+            params: {
+              course_id: @course.id,
+              topic_id: topic.id,
+              anonymous_state: "full_anonymity",
+              assignment: { set_assignment: false }
+            },
+            format: "json"
+        expect(response).to be_successful
       end
     end
   end

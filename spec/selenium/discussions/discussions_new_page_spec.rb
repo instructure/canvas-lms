@@ -744,10 +744,11 @@ describe "discussions" do
 
       it "displays the grading and groups not supported in anonymous discussions message when either of the anonymous options are selected" do
         get "/courses/#{course.id}/discussion_topics/new"
+        expect(f("body")).to contain_jqcss("[data-testid=groups_grading_not_allowed]")
         force_click_native("input[value='full_anonymity']")
-        expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
+        expect(f("body")).to contain_jqcss("[data-testid=groups_grading_not_allowed]")
         force_click_native("input[value='partial_anonymity']")
-        expect(f("[data-testid=groups_grading_not_allowed]")).to be_displayed
+        expect(f("body")).to contain_jqcss("[data-testid=groups_grading_not_allowed]")
       end
 
       it "creates an allow_rating discussion topic successfully" do

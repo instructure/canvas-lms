@@ -49,6 +49,12 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     unless input[:anonymous_state].nil?
+      unless input[:anonymous_state] == "off"
+        locked = input[:group_category_id].present?
+        locked ||= input[:assignment].present? && input[:assignment][:set_assignment]
+        return validation_error(I18n.t("Anonymity settings are locked for group and/or graded discussions")) if locked
+      end
+
       discussion_topic.anonymous_state = (input[:anonymous_state] == "off") ? nil : input[:anonymous_state]
     end
 
