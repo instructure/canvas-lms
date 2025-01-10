@@ -20,6 +20,6 @@
   "homepage": "https://github.com/instructure/canvas-lms#readme",
   "dependencies": {},
   "devDependencies": {
-    "vitest": "^1.2.1"
+    "vitest": "*"
   }
 }
