@@ -1,6 +1,3 @@
-/* eslint-disable eslint-comments/no-unlimited-disable */
-/* eslint-disable */
-
 /*
  * Copyright (C) 2019 - present Instructure, Inc.
  *

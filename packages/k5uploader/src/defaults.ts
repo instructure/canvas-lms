@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function (params) {
-  let queryUrl = '?'
-  for (const prop in params) {
-    queryUrl += prop + '=' + encodeURIComponent(params[prop]) + '&'
+function isPresent(passed: {[key: string]: unknown}, name: string): boolean {
+  return passed && passed[name] !== undefined
+}
+
+interface Options {
+  [key: string]: unknown
+}
+
+export default function (name: string, options: Options, passed: {[key: string]: unknown}): void {
+  if (isPresent(passed, name)) {
+    options[name] = passed[name]
   }
-  queryUrl = queryUrl.substring(0, queryUrl.length - 1)
-  return queryUrl
 }
