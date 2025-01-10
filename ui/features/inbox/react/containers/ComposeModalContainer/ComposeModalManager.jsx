@@ -38,7 +38,6 @@ import PropTypes from 'prop-types'
 import React, {useContext, useState, useEffect} from 'react'
 import {useMutation, useQuery} from '@apollo/client'
 import {ConversationContext} from '../../../util/constants'
-import {captureException} from '@sentry/react'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -107,12 +106,6 @@ const ComposeModalManager = props => {
         conversation.conversationMessagesConnection.nodes.unshift(
           result.data.addConversationMessage.conversationMessage,
         )
-      } else {
-        captureException(
-          new Error(
-            'There is no value for addConversationMessage.conversationMessage in updateConversationsCache',
-          ),
-        )
       }
 
       conversation.conversationMessagesCount++
@@ -153,12 +146,6 @@ const ComposeModalManager = props => {
         replyQueryResult.legacyNode.conversationMessagesConnection.nodes.unshift(
           result.data.addConversationMessage.conversationMessage,
         )
-      } else {
-        captureException(
-          new Error(
-            'There is no value for addConversationMessage.conversationMessage in updateReplyConversationsCache',
-          ),
-        )
       }
 
       cache.writeQuery({
@@ -188,12 +175,6 @@ const ComposeModalManager = props => {
           result.data.addConversationMessage.conversationMessage,
           ...data.legacyNode.conversationMessagesConnection.nodes,
         ]
-      } else {
-        captureException(
-          new Error(
-            'There is no value for addConversationMessage.conversationMessage in updateConversationMessagesCache',
-          ),
-        )
       }
 
       cache.writeQuery({...queryToUpdate, data})
@@ -244,9 +225,7 @@ const ComposeModalManager = props => {
   const updateCache = (cache, result) => {
     if (result?.data?.addConversationMessage?.conversationMessage?._id === '0') {
       // if the user sends another delayed message right now, we will have 2 0 id message in our stack, which will cause duplication
-      // result.data.addConversationMessage.conversationMessage.id = Date.now().toString()
-      window.location.reload()
-      return
+      result.data.addConversationMessage.conversationMessage.id = Date.now().toString()
     }
     const submissionFail = result?.data?.createSubmissionComment?.errors
     const addConversationFail = result?.data?.addConversationMessage?.errors
@@ -265,11 +244,11 @@ const ComposeModalManager = props => {
     }
   }
 
-  const onConversationCreateComplete = (data, fullData) => {
+  const onConversationCreateComplete = data => {
     setSendingMessage(false)
     // success is true if there is no error message or if data === true
     const errorMessage = data?.errors
-    const success = errorMessage && errorMessage.length > 0 ? false : !!data
+    const success = errorMessage ? false : !!data
     if (success) {
       props.onDismiss()
       setOnSuccess(I18n.t('Message sent!'), false)
@@ -281,8 +260,6 @@ const ComposeModalManager = props => {
       } else if (props.isReply || props.isReplyAll || props.isForward) {
         setModalError(I18n.t('Error occurred while adding message to conversation'))
       } else {
-        console.error(fullData)
-        captureException(new Error('Error occurred while creating conversation message'))
         setModalError(I18n.t('Error occurred while creating conversation message'))
       }
 
@@ -294,14 +271,14 @@ const ComposeModalManager = props => {
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data?.createConversation ?? {}, data),
-    onError: data => onConversationCreateComplete(false, data),
+    onCompleted: data => onConversationCreateComplete(data?.createConversation),
+    onError: () => onConversationCreateComplete(false),
   })
 
   const [addConversationMessage] = useMutation(ADD_CONVERSATION_MESSAGE, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data?.addConversationMessage ?? {}, data),
-    onError: data => onConversationCreateComplete(false, data),
+    onCompleted: data => onConversationCreateComplete(data?.addConversationMessage),
+    onError: () => onConversationCreateComplete(false),
   })
 
   const [createSubmissionComment] = useMutation(CREATE_SUBMISSION_COMMENT, {
