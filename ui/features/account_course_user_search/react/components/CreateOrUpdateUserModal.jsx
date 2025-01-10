@@ -159,11 +159,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
     return [
       {
         name: 'user[name]',
-        renderLabel: (
-          <>
-            {I18n.t('Full Name')} <Text color="danger"> *</Text>
-          </>
-        ),
+        renderLabel: I18n.t('Full Name'),
         hint: I18n.t('This name will be used by teachers for grading.'),
         required: I18n.t('Full name is required'),
       },
@@ -183,12 +179,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
           ? [
               {
                 name: 'pseudonym[unique_id]',
-                renderLabel: (
-                  <>
-                    {this.props.customized_login_handle_name || I18n.t('Email')}
-                    <Text color="danger"> *</Text>
-                  </>
-                ),
+                renderLabel: this.props.customized_login_handle_name || I18n.t('Email'),
                 required: this.props.customized_login_handle_name
                   ? I18n.t('%{login_handle} is required', {
                       login_handle: this.props.customized_login_handle_name,
@@ -197,12 +188,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
               },
               showCustomizedLoginId && {
                 name: 'pseudonym[path]',
-                renderLabel: (
-                  <>
-                    {I18n.t('Email')}
-                    <Text color="danger"> *</Text>
-                  </>
-                ),
+                renderLabel: I18n.t('Email'),
                 required: I18n.t('Email is required'),
               },
               this.props.showSIS && {
