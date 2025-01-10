@@ -165,20 +165,6 @@ lti_log_launches_site_admin:
       state: allowed_on
     ci:
       state: allowed_on
-lti_login_required_error_page:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Friendly Error Page for LTI Login Required
-  description: |-
-    When enabled, a friendly error page will be shown to users when they attempt to launch an LTI tool but encounter the
-    dreaded Heisenbug caused by missing cookies. See INTEROP-8200 for more background info.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 lti_migration_info:
   state: hidden
   display_name: LTI 1.1 to 1.3 Migration Info
