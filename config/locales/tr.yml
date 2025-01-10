@@ -14793,6 +14793,7 @@ tr:
   points_possible_1c0b3445: "Olası Puan"
   points_possible_e57d5613: "Olası puan"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Seçili notlandırma türü için olası puanlar 0 veya daha fazla olmalı"
+  points_possible_pts_aedb481e: "%{points_possible} puan"
   points_pts_e5596bf7: "%{points} puan"
   points_to_endofrangepoints_pts_aad207f0: "%{points} to >%{endOfRangePoints} puan"
   points_total_pts_5b4cbd77: "%{points} / %{total} puan"
