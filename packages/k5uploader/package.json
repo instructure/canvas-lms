@@ -2,24 +2,33 @@
   "name": "@instructure/k5uploader",
   "version": "1.1.1",
   "description": "html 5 kaltura uploader",
-  "main": "src/k5uploader.js",
-  "module": "src/k5uploader.js",
   "scripts": {
-    "test": "vitest run --color",
-    "testem": "echo \"if we want tests, we should go to https://github.com/knomedia/k5uploader/blob/master/package.json#L7 and copy/paste back in the testem stuff\""
+    "build": "rslib build",
+    "check": "biome check --write",
+    "dev": "rslib build --watch",
+    "format": "biome format --write",
+    "test": "vitest run"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/instructure/canvas-lms.git"
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "author": "Instructure",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/instructure/canvas-lms/issues"
-  },
-  "homepage": "https://github.com/instructure/canvas-lms#readme",
-  "dependencies": {},
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
+    "@biomejs/biome": "*",
+    "@rslib/core": "^0.3.1",
+    "@types/node": "^22.8.1",
+    "typescript": "*",
     "vitest": "*"
-  }
+  },
+  "private": true
 }

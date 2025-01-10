@@ -16,30 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function FileFilter(params) {
-  this.extensions = this.parseExtensions(params.extensions)
-  this.id = params.id
-  this.description = params.description
-  this.entryType = params.entryType
-  this.mediaType = params.mediaType
-  this.type = params.type
-}
+type Obj = {[key: string]: unknown}
 
-FileFilter.prototype.parseExtensions = function (extString) {
-  return extString.split(';').map(ext => ext.substring(2))
-}
-
-FileFilter.prototype.includesExtension = function (extension) {
-  return this.extensions.indexOf(extension.toLowerCase()) !== -1
-}
-
-FileFilter.prototype.toParams = function () {
-  const params = {
-    entry1_type: this.entryType,
-    entry1_mediaType: this.mediaType,
+export default function combineObjects(objs: Obj[] | undefined): Obj | undefined {
+  if (!objs) {
+    return objs
   }
 
-  return params
-}
+  const combined: Obj = {}
+  objs = objs.reverse()
+  objs.forEach(obj => {
+    for (const prop in obj) {
+      combined[prop] = obj[prop]
+    }
+  })
 
-export default FileFilter
+  return combined
+}
