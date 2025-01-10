@@ -3812,6 +3812,7 @@ hu:
     getting_file: "Fájl lekérése..."
     grade_assignment: 
       buttons: 
+        choose_file: "Válasszon fájlt"
         upload_files: "Fájlok feltöltése"
       graded_count: "%{graded_count} értékelve *összesen ennyi* %{total} beadandóból"
       links: 
@@ -18797,6 +18798,7 @@ hu:
   points_possible_e57d5613: "Elérhető pontok"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Az elérhető pontok száma ennél az értékelési típusnál csak 0 vagy annál nagyobb lehet"
   points_possible_points_fda3b111: "%{points_possible} pont"
+  points_possible_pts_aedb481e: "%{points_possible} pont"
   points_possible_reply_to_topic_6b19cfe3: "Elérhető pontok: Válasz egy témára"
   points_pts_e5596bf7: "%{points} pont"
   points_should_be_strictly_decreasing_l_r_18f26f87: "A pontoknak szigorúan csökkenőnek kell lenni: %{l} <= %{r}"
@@ -20712,6 +20714,7 @@ hu:
   re_upload_submissions_125e415d: "Beküldések újra feltöltése"
   re_upload_submissions_form: 
     buttons: 
+      choose_file: "Válasszon fájlt"
       upload: "Fájlok feltöltése"
     reupload_submission_files: "Beadott állományok újbóli feltöltése"
     upload_info: "Ha megváltoztatta a hallgatók által beadott fájlokat, amiket letöltött, tömörítse be újra, majd töltse fel a lenti űrlap segítségével. A hallgatók látni fogják a módosított fájlokat a beadandóhoz tartozó kommentekben."
