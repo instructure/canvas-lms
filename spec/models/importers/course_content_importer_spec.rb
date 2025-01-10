@@ -780,24 +780,43 @@ describe Course do
   end
 
   describe "audit logging" do
-    it "logs content migration in audit logs" do
-      course_factory
+    subject { Importers::CourseContentImporter.import_content(course, data, params, migration) }
 
+    let(:course) { course_factory }
+    let(:data) do
       json = File.read(File.join(IMPORT_JSON_DIR, "assessments.json"))
-      data = JSON.parse(json).with_indifferent_access
-
-      params = { "copy" => { "quizzes" => { "i7ed12d5eade40d9ee8ecb5300b8e02b2" => true } } }
-
-      migration = ContentMigration.create!(context: @course)
+      JSON.parse(json).with_indifferent_access
+    end
+    let(:params) { { "copy" => { "quizzes" => { "i7ed12d5eade40d9ee8ecb5300b8e02b2" => true } } } }
+    let(:migration) do
+      migration = ContentMigration.create!(context: course)
       migration.migration_settings[:migration_ids_to_import] = params
-      migration.source_course = @course
+      migration.source_course = course
       migration.initiated_source = :manual
       migration.user = @user
+      migration.started_at = Time.zone.now
       migration.save!
+      migration
+    end
 
-      expect(Auditors::Course).to receive(:record_copied).once.with(migration.source_course, @course, migration.user, source: migration.initiated_source)
+    it "logs content migration in audit logs" do
+      expect(Auditors::Course).to receive(:record_copied).once.with(migration.source_course, course, migration.user, source: migration.initiated_source)
+      expect(Lti::PlatformNotificationService).to receive(:notify_tools_in_course).once.with(course, anything)
+      expect(Lti::Pns::LtiContextCopyNoticeBuilder).to receive(:new).once.with(course:, copied_at: migration.started_at.iso8601, source_course: migration.source_course)
 
-      Importers::CourseContentImporter.import_content(@course, data, params, migration)
+      subject
+    end
+
+    context "with lti_context_copy_notice flag disabled" do
+      before do
+        course.root_account.disable_feature!(:lti_context_copy_notice)
+      end
+
+      it "does not send LTI Platform Notice" do
+        expect(Lti::PlatformNotificationService).not_to receive(:notify_tools_in_course)
+
+        subject
+      end
     end
   end
 
