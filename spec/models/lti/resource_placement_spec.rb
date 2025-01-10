@@ -56,13 +56,6 @@ module Lti
       it "contains common placements" do
         expect(described_class.public_placements(Account.default)).to include(:assignment_selection, :course_navigation, :link_selection)
       end
-
-      context "when the feature remove_submission_type_selection_from_dev_keys_edit_page flag is disabled" do
-        it "includes submission_type_selection" do
-          Account.default.disable_feature! :remove_submission_type_selection_from_dev_keys_edit_page
-          expect(described_class.public_placements(Account.default)).to include(:submission_type_selection)
-        end
-      end
     end
 
     describe ".supported_message_type?" do
