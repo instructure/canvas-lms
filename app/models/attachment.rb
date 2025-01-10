@@ -1784,7 +1784,7 @@ class Attachment < ActiveRecord::Base
       att.destroy_content
       att.thumbnail&.destroy
 
-      if att.instfs_hosted? && InstFS.enabled?
+      if InstFS.enabled?
         # duplicate the base file_removed file to a unique uuid
         att.instfs_uuid = InstFS.duplicate_file(Attachment.file_removed_base_instfs_uuid)
       else
