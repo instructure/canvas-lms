@@ -422,27 +422,9 @@ RSpec.describe ApplicationController do
             Account.site_admin.enable_feature!(:top_navigation_placement)
           end
 
-          context "lti_placement_restrictions FF on" do
-            before do
-              Account.site_admin.enable_feature!(:lti_placement_restrictions)
-            end
-
-            it "sets top_navigation_tools" do
-              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
-              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
-            end
-          end
-
-          context "lti_placement_restrictions FF off" do
-            before do
-              Account.site_admin.disable_feature!(:lti_placement_restrictions)
-            end
-
-            it "sets top_navigation_tools" do
-              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
-              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
-              expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(unauth_tool))
-            end
+          it "sets top_navigation_tools" do
+            expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(devkey_tool))
+            expect(@controller.js_env[:top_navigation_tools]).to include(tool_hash_for(domain_tool))
           end
         end
       end
@@ -1804,39 +1786,22 @@ RSpec.describe ApplicationController do
         let(:tool1) { external_tool_1_3_model(developer_key:, opts: { domain:, settings: { submission_type_selection: {} } }) }
         let(:tool2) { external_tool_1_3_model(developer_key:, opts: { domain:, settings: { submission_type_selection: {} } }) }
 
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
+        end
+
         def setup_tools
           allow(Lti::ContextToolFinder).to receive(:all_tools_for).and_return([tool1, tool2])
           allow(controller).to receive(:polymorphic_url).and_return(domain)
         end
 
-        context "lti_placement_restrictions FF on" do
-          before do
-            allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
-            expect(Account.site_admin).to receive(:feature_enabled?).with(:lti_placement_restrictions).and_return(true)
-          end
-
-          it "is filtering out not allowed placements" do
-            setup_tools
-            expect(tool1).to receive(:placement_allowed?).and_return(true)
-            expect(tool2).to receive(:placement_allowed?).and_return(false)
-            external_tools = controller.send(:external_tools_display_hashes, :submission_type_selection)
-            expect(external_tools).to include({ id: tool1.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
-            expect(external_tools).to_not include({ id: tool2.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
-          end
-        end
-
-        context "lti_placement_restrictions FF off" do
-          before do
-            allow(Account.site_admin).to receive(:feature_enabled?).with(:instructure_identity_global_flag)
-            expect(Account.site_admin).to receive(:feature_enabled?).with(:lti_placement_restrictions).and_return(false)
-          end
-
-          it "is not filtering out not allowed placements" do
-            setup_tools
-            external_tools = controller.send(:external_tools_display_hashes, :submission_type_selection)
-            expect(external_tools).to include({ id: tool1.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
-            expect(external_tools).to include({ id: tool2.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
-          end
+        it "is filtering out not allowed placements" do
+          setup_tools
+          expect(tool1).to receive(:placement_allowed?).and_return(true)
+          expect(tool2).to receive(:placement_allowed?).and_return(false)
+          external_tools = controller.send(:external_tools_display_hashes, :submission_type_selection)
+          expect(external_tools).to include({ id: tool1.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
+          expect(external_tools).to_not include({ id: tool2.id, title: "a", base_url: domain, icon_url: nil, canvas_icon_class: nil })
         end
       end
     end

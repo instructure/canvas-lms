@@ -848,58 +848,44 @@ module Lti
         tool_configuration.save!
       end
 
-      context "when the lti_placement_restrictions feature flag is disabled" do
-        before do
-          Account.site_admin.disable_feature!(:lti_placement_restrictions)
+      %w[submission_type_selection top_navigation].each do |placement|
+        it "returns nil when there are no #{placement} placements" do
+          expect(subject).to be_nil
         end
 
-        it { is_expected.to be_nil }
-      end
-
-      %w[submission_type_selection top_navigation].each do |placement|
-        context "when the lti_placement_restrictions feature flag is enabled" do
-          before do
-            Account.site_admin.enable_feature!(:lti_placement_restrictions)
+        context "when the configuration has a #{placement} placement" do
+          let(:tool_configuration) do
+            super().tap do |tc|
+              tc.placements << make_placement(placement, "LtiResourceLinkRequest")
+            end
           end
 
-          it "returns nil when there are no #{placement} placements" do
-            expect(subject).to be_nil
+          it { is_expected.to include("Warning").and include(placement) }
+
+          context "when the tool is allowed to use the #{placement} placement through it's dev key" do
+            before do
+              Setting.set("#{placement}_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
+            end
+
+            it { is_expected.to be_nil }
           end
 
-          context "when the configuration has a #{placement} placement" do
-            let(:tool_configuration) do
-              super().tap do |tc|
-                tc.placements << make_placement(placement, "LtiResourceLinkRequest")
-              end
+          context "when the tool is allowed to use the #{placement} placement through it's domain" do
+            before do
+              Setting.set("#{placement}_allowed_launch_domains", tool_configuration.domain)
+            end
+
+            it { is_expected.to be_nil }
+          end
+
+          context "when the tool has no domain and domain list is containing an empty space" do
+            before do
+              allow(tool_configuration).to receive_messages(domain: "", developer_key_id: nil)
+              Setting.set("#{placement}_allowed_launch_domains", ", ,,")
+              Setting.set("#{placement}_allowed_dev_keys", ", ,,")
             end
 
             it { is_expected.to include("Warning").and include(placement) }
-
-            context "when the tool is allowed to use the #{placement} placement through it's dev key" do
-              before do
-                Setting.set("#{placement}_allowed_dev_keys", tool_configuration.developer_key.global_id.to_s)
-              end
-
-              it { is_expected.to be_nil }
-            end
-
-            context "when the tool is allowed to use the #{placement} placement through it's domain" do
-              before do
-                Setting.set("#{placement}_allowed_launch_domains", tool_configuration.domain)
-              end
-
-              it { is_expected.to be_nil }
-            end
-
-            context "when the tool has no domain and domain list is containing an empty space" do
-              before do
-                allow(tool_configuration).to receive_messages(domain: "", developer_key_id: nil)
-                Setting.set("#{placement}_allowed_launch_domains", ", ,,")
-                Setting.set("#{placement}_allowed_dev_keys", ", ,,")
-              end
-
-              it { is_expected.to include("Warning").and include(placement) }
-            end
           end
         end
       end
