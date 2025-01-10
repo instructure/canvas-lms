@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
@@ -27,7 +27,6 @@ import friendlyBytes from '@canvas/files/util/friendlyBytes'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useQuery} from '@canvas/query'
-
 import {type File, type Folder} from '../../../interfaces/File'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {parseLinkHeader} from '../../../utils/apiUtils'
@@ -40,6 +39,7 @@ import RightsIconButton from './RightsIconButton'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import BulkActionButtons from './BulkActionButtons'
+import Breadcrumbs from './Breadcrumbs'
 
 const I18n = createI18nScope('files_v2')
 
@@ -115,15 +115,16 @@ const columnRenderers: {
     size,
     userCanEditFilesForContext,
     userCanDeleteFilesForContext,
-    usageRightsRequiredForContext
-  }) => 
-    <ActionMenuButton 
+    usageRightsRequiredForContext,
+  }) => (
+    <ActionMenuButton
       size={size}
       userCanEditFilesForContext={userCanEditFilesForContext}
       userCanDeleteFilesForContext={userCanDeleteFilesForContext}
       usageRightsRequiredForContext={usageRightsRequiredForContext}
       row={row}
-      />,
+    />
+  ),
 }
 
 interface FileFolderTableProps {
@@ -134,6 +135,7 @@ interface FileFolderTableProps {
   currentUrl: string
   onPaginationLinkChange: (links: Record<string, string>) => void
   onLoadingStatusChange: (isLoading: boolean) => void
+  folderBreadcrumbs: Folder[]
 }
 
 const FileFolderTable = ({
@@ -144,6 +146,7 @@ const FileFolderTable = ({
   currentUrl,
   onPaginationLinkChange,
   onLoadingStatusChange,
+  folderBreadcrumbs,
 }: FileFolderTableProps) => {
   const isStacked = size !== 'large'
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
@@ -198,23 +201,33 @@ const FileFolderTable = ({
     return true
   })
 
-  const renderTableActionsHead = () => {
+  const renderTableActionsHead = useCallback(() => {
+    const direction = size === 'small' ? 'column' : 'row'
     return (
-      <Flex gap="small" margin="0 0 medium" height={38}>
-        <Flex.Item shouldGrow={true}>
-          {/* // TODO: this is a placeholder for the breadcrumbs */}
-          <Text>English 101 Files</Text>
+      <Flex gap="small" margin="0 0 medium" direction={direction}>
+        <Flex.Item padding="xx-small" shouldShrink={true} shouldGrow={true}>
+          <Breadcrumbs folders={folderBreadcrumbs} size={size} />
         </Flex.Item>
 
-        <Flex.Item>
-          <BulkActionButtons selectedRows={selectedRows}
-                             totalRows={rows.length}
-                             userCanEditFilesForContext={userCanEditFilesForContext}
-                             userCanDeleteFilesForContext={userCanDeleteFilesForContext} />
+        <Flex.Item padding="xx-small">
+          <BulkActionButtons
+            size={size}
+            selectedRows={selectedRows}
+            totalRows={rows.length}
+            userCanEditFilesForContext={userCanEditFilesForContext}
+            userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+          />
         </Flex.Item>
       </Flex>
     )
-  }
+  }, [
+    folderBreadcrumbs,
+    rows.length,
+    selectedRows,
+    size,
+    userCanDeleteFilesForContext,
+    userCanEditFilesForContext,
+  ])
 
   return (
     <>

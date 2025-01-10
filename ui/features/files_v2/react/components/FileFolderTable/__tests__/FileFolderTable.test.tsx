@@ -37,6 +37,7 @@ const defaultProps = {
   currentUrl:
     '/api/v1/folders/1/all?include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status',
   onPaginationLinkChange: jest.fn(),
+  folderBreadcrumbs: [],
 }
 
 const renderComponent = (props = {}) => {
@@ -46,7 +47,7 @@ const renderComponent = (props = {}) => {
     <BrowserRouter>
       <MockedQueryClientProvider client={queryClient}>
         <FileManagementContext.Provider
-          value={{contextType: 'course', contextId: '1', folderId: '1'}}
+          value={{contextType: 'course', contextId: '1', folderId: '1', showingAllContexts: false}}
         >
           <FileFolderTable {...defaultProps} {...props} />
         </FileManagementContext.Provider>

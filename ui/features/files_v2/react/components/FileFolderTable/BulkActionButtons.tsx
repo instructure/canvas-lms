@@ -34,24 +34,28 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('files_v2')
 
 interface BulkActionButtonsProps {
-  selectedRows: Set<string>,
-  totalRows: number,
-  userCanEditFilesForContext: boolean,
-  userCanDeleteFilesForContext: boolean,
+  size: 'small' | 'medium' | 'large'
+  selectedRows: Set<string>
+  totalRows: number
+  userCanEditFilesForContext: boolean
+  userCanDeleteFilesForContext: boolean
 }
 
 const BulkActionButtons = ({
+  size,
   selectedRows,
   totalRows,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
 }: BulkActionButtonsProps) => {
   const isEnabled = selectedRows.size >= 1
-  const selectedText = !isEnabled ? I18n.t("0 selected") :
-    I18n.t("%{selected} of %{total} selected", {selected: selectedRows.size, total: totalRows})
+  const selectedText = !isEnabled
+    ? I18n.t('0 selected')
+    : I18n.t('%{selected} of %{total} selected', {selected: selectedRows.size, total: totalRows})
+  const justifyItems = size === 'small' ? 'space-between' : 'end'
 
   return (
-    <Flex gap="small" justifyItems="end">
+    <Flex gap="small" justifyItems={justifyItems}>
       <Flex.Item>
         <Text>{selectedText}</Text>
       </Flex.Item>
@@ -64,7 +68,7 @@ const BulkActionButtons = ({
               screenReaderLabel={I18n.t('Download')}
             />
           </Flex.Item>
-          {userCanDeleteFilesForContext &&
+          {userCanDeleteFilesForContext && (
             <Flex.Item data-testid="bulk-actions-delete-button">
               <IconButton
                 disabled={!isEnabled}
@@ -72,46 +76,59 @@ const BulkActionButtons = ({
                 screenReaderLabel={I18n.t('Delete')}
               />
             </Flex.Item>
-          }
+          )}
           <Flex.Item>
             <Menu
               placement="bottom"
               trigger={
-                <IconButton renderIcon={<IconMoreLine />}
-                            disabled={!isEnabled}
-                            screenReaderLabel={I18n.t('Actions')}
-                            data-testid="bulk-actions-more-button"
-                            />
+                <IconButton
+                  renderIcon={<IconMoreLine />}
+                  disabled={!isEnabled}
+                  screenReaderLabel={I18n.t('Actions')}
+                  data-testid="bulk-actions-more-button"
+                />
               }
             >
               <Menu.Item>
                 <Flex alignItems="center" gap="x-small">
-                  <Flex.Item><IconEyeLine inline={false}/></Flex.Item>
-                  <Flex.Item><Text>{I18n.t("View")}</Text></Flex.Item>
+                  <Flex.Item>
+                    <IconEyeLine inline={false} />
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Text>{I18n.t('View')}</Text>
+                  </Flex.Item>
                 </Flex>
               </Menu.Item>
 
-              {userCanEditFilesForContext &&
+              {userCanEditFilesForContext && (
                 <Menu.Item data-testid="bulk-actions-manage-access-button">
                   <Flex alignItems="center" gap="x-small">
-                    <Flex.Item><IconCloudLockLine inline={false}/></Flex.Item>
-                    <Flex.Item><Text>{I18n.t("Manage Access")}</Text></Flex.Item>
+                    <Flex.Item>
+                      <IconCloudLockLine inline={false} />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text>{I18n.t('Manage Access')}</Text>
+                    </Flex.Item>
                   </Flex>
                 </Menu.Item>
-              }
-              {userCanEditFilesForContext &&
+              )}
+              {userCanEditFilesForContext && (
                 <Menu.Item data-testid="bulk-actions-move-button">
                   <Flex alignItems="center" gap="x-small">
-                    <Flex.Item><IconExpandItemsLine inline={false}/></Flex.Item>
-                    <Flex.Item><Text>{I18n.t("Move To...")}</Text></Flex.Item>
+                    <Flex.Item>
+                      <IconExpandItemsLine inline={false} />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text>{I18n.t('Move To...')}</Text>
+                    </Flex.Item>
                   </Flex>
                 </Menu.Item>
-              }
+              )}
             </Menu>
           </Flex.Item>
         </Flex>
       </Flex.Item>
-  </Flex>
+    </Flex>
   )
 }
 

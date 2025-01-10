@@ -24,7 +24,6 @@ import {Flex} from '@instructure/ui-flex'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {Responsive} from '@instructure/ui-responsive'
 import {Pagination} from '@instructure/ui-pagination'
-
 import FilesHeader from './FilesHeader'
 import FileFolderTable from './FileFolderTable'
 import FilesUsageBar from './FilesUsageBar'
@@ -41,6 +40,7 @@ interface FilesAppProps {
 }
 
 const FilesApp = ({isUserContext, size}: FilesAppProps) => {
+  const showingAllContexts = filesEnv.showingAllContexts
   const [isTableLoading, setIsTableLoading] = useState(true)
   const [currentPageNumber, setCurrentPageNumber] = useState(1)
   const [currentUrl, setCurrentUrl] = useState<string | null>(null)
@@ -78,7 +78,7 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   const userCanManageFilesForContext =
     userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
   const usageRightsRequiredForContext =
-    filesEnv.contextFor({contextType, contextId}).usage_rights_required || false
+    filesEnv.contextFor({contextType, contextId})?.usage_rights_required || false
 
   const handleTableLoadingStatusChange = (isLoading: boolean) => {
     setIsTableLoading(isLoading)
@@ -96,12 +96,13 @@ const FilesApp = ({isUserContext, size}: FilesAppProps) => {
   }
 
   return (
-    <FileManagementContext.Provider value={{folderId, contextType, contextId}}>
+    <FileManagementContext.Provider value={{folderId, contextType, contextId, showingAllContexts}}>
       <View as="div">
         <FilesHeader size={size} isUserContext={isUserContext} />
         {currentUrl && (
           <FileFolderTable
             size={size}
+            folderBreadcrumbs={folders}
             userCanEditFilesForContext={userCanEditFilesForContext}
             userCanDeleteFilesForContext={userCanDeleteFilesForContext}
             usageRightsRequiredForContext={usageRightsRequiredForContext}
