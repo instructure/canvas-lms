@@ -4220,6 +4220,7 @@ nn:
     getting_file: "Hentar fil..."
     grade_assignment: 
       buttons: 
+        choose_file: "Vel fil"
         upload_files: "Last opp filer"
       graded_count: "%{graded_count} *av* %{total} vurderte innleveringar"
       links: 
@@ -20149,6 +20150,7 @@ nn:
   points_possible_e57d5613: "Moglege poeng"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Moglege poeng må vere 0 eller meir for valde typar karaktersetjing"
   points_possible_points_fda3b111: "%{points_possible} poeng"
+  points_possible_pts_aedb481e: "%{points_possible} poeng"
   points_pts_e5596bf7: "%{points} poeng"
   points_should_be_strictly_decreasing_l_r_18f26f87: "Poengskalaen må vere synkande: %{l} <= %{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} til >%{endOfRangePoints} poeng"
@@ -22139,6 +22141,7 @@ nn:
   re_upload_submissions_125e415d: "Last tilbake kommenterte filer"
   re_upload_submissions_form: 
     buttons: 
+      choose_file: "Vel fil"
       upload: "Last opp filer"
     reupload_submission_files: "Last tilbake filinnleveringar"
     upload_info: "Dersom du gjorde endringar i filinnleveringane du lasta ned, kan du pakke dei tilbake i ZIP og laste opp ZIP-fila med skjemaet nedanfor. Studentane ser dei endra filene i kommentarane til innleveringa."
