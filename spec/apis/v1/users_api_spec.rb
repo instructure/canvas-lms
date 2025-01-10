@@ -966,6 +966,39 @@ describe "Users API", type: :request do
                  { expected_status: 404 })
       end
 
+      context "with include of confirmation_url" do
+        before do
+          c = CommunicationChannel.create!(user: @other_user, path_type: "email", path: "example@example.com")
+          c.save!
+          p = @other_user.pseudonyms.first
+          p.communication_channel = c
+          p.save!
+        end
+
+        it "returns confirmation_url when included" do
+          json = api_call(:get,
+                          "/api/v1/users/#{@other_user.id}",
+                          { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json", include: "confirmation_url" },
+                          {},
+                          {},
+                          {})
+
+          expect(json).to have_key("confirmation_url")
+        end
+
+        it "requires :manager_user_login to include confirmation_url" do
+          account_admin_user_with_role_changes(role_changes: { manage_user_logins: false })
+          json = api_call(:get,
+                          "/api/v1/users/#{@other_user.id}",
+                          { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json", include: "confirmation_url" },
+                          {},
+                          {},
+                          {})
+
+          expect(json).not_to have_key("confirmation_url")
+        end
+      end
+
       it "404s on a deleted user" do
         @other_user.destroy
         account_admin_user
