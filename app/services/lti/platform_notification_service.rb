@@ -79,6 +79,14 @@ module Lti
       end
     end
 
+    def notify_tools_in_course(course, *builders)
+      notice_type = get_notice_type(builders:)
+      tool_ids = Lti::ContextToolFinder.all_tools_for(course).ids
+      Lti::NoticeHandler.active.where(notice_type:, context_external_tool_id: tool_ids).find_each do |notice_handler|
+        send_notices(notice_handler:, builders:)
+      end
+    end
+
     def validate_notice_type!(notice_type)
       # This is also validated in the model, but we want to validate for
       # unsubscribing and have a consistent error also for subscribing
