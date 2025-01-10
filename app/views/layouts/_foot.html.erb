@@ -12,7 +12,5 @@
 <% end %>
 <%= include_css_bundles %>
 <%= include_js_bundles %>
-<% unless @exclude_account_js %>
-  <%= include_account_js %>
-<% end %>
+<%= include_account_js unless @exclude_account_js %>
 <%= render partial: 'shared/additional_footer_scripts' %>
