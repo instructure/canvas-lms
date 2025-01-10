@@ -3656,6 +3656,7 @@ fa:
     getting_file: "درحال بازیابی فایل..."
     grade_assignment: 
       buttons: 
+        choose_file: "انتخاب فایل"
         upload_files: "بارگذاری فایل ها"
       graded_count: "%{graded_count} *از*  %{total} مورد ارسالی نمره گذاری شده"
       links: 
@@ -18099,6 +18100,7 @@ fa:
   points_possible_e57d5613: "امتیازهای ممکن"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "امتیازهای ممکن باید برای نوع نمره گذاری انتخابی 0 یا بیشتر باشد"
   points_possible_points_fda3b111: "%{points_possible} امتیاز"
+  points_possible_pts_aedb481e: "%{points_possible} امتیاز"
   points_pts_e5596bf7: "%{points} امتیاز"
   points_should_be_strictly_decreasing_l_r_18f26f87: "امتیازها باید اکیدا کاهش یابد:  %{l} <=%{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} به >%{endOfRangePoints} امتیازها"
@@ -20206,6 +20208,7 @@ fa:
   re_upload_submissions_125e415d: "بارگذاری دوباره موردهای ارسالی"
   re_upload_submissions_form: 
     buttons: 
+      choose_file: "انتخاب فایل"
       upload: "بارگذاری فایل ها"
     reupload_submission_files: "بارگذاری دوباره فایل های ارسالی"
     upload_info: "اگر در فایل های ارسالی دانشجو که قبلا بارگیری کرده اید، تغییراتی ایجاد کردید، آنها را دوباره فشرده کنید و فایل فشرده را با استفاده از فرم زیر بارگذاری نمایید. دانشجویان فایل های تغییر یافته را در نظرهای مربوط به مورد ارسالی خود مشاهده خواهند کرد."
