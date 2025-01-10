@@ -6601,6 +6601,7 @@ el:
   folder_705fd2d7: Φάκελος
   folder_browsing_tree_1f00a3ae: "Δέντρο Προσπέλασης Φακέλου"
   folder_icon_29017021: "Εικόνα Φακέλου"
+  folder_name_b28488c2: "Όνομα Φακέλου"
   folder_was_successfully_created_8de6a282: "Ο φάκελος δημουργήθηκε επιτυχώς."
   folders: 
     event_updated: "Το συμβάν ενημερώθηκε επιτυχώς"
@@ -11182,6 +11183,7 @@ el:
   points_points_b6b422e2: "<mrk mid=\"5747\" mtype=\"seg\">Μόρια:</mrk> <mrk mid=\"5748\" mtype=\"seg\">%{points}</mrk>"
   points_possible_e57d5613: "Πιθανά μόρια"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Τα πιθανά μόρια πρέπει να είναι 0 ή μεγαλύτερα από το 0 για τον επιλεγμένο τύπο βαθμολόγησης"
+  points_possible_pts_aedb481e: "%{points_possible} μόρια"
   points_pts_e5596bf7: "%{points} μόρια"
   pointspossible_pts_624a6733: "%{pointsPossible} μόρια"
   polling: 
