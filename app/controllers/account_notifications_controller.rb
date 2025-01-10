@@ -71,6 +71,12 @@
 #           "example": [1],
 #           "type": "array",
 #           "items": {"type": "integer"}
+#         },
+#         "author": {
+#           "description": "The author of the notification. Available only to admins using include_all.",
+#           "example": {"id": 1, "name": "John Doe"},
+#           "type": "object",
+#           "items": {"type": "integer"}
 #         }
 #       }
 #     }
@@ -90,7 +96,7 @@ class AccountNotificationsController < ApplicationController
   #   Include past and dismissed global announcements.
   #
   # @argument include_all  [Boolean]
-  #   Include all global announcements, regardless of user's role. Only available to account admins.
+  #   Include all global announcements, regardless of user's role or availability date. Only available to account admins.
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
@@ -98,17 +104,20 @@ class AccountNotificationsController < ApplicationController
   #
   # @returns [AccountNotification]
   def user_index
-    include_past = value_to_boolean(params[:include_past])
+    # include_past is used for obtaining notification from the last 4 months
+    include_near_past = value_to_boolean(params[:include_past])
     include_all = value_to_boolean(params[:include_all])
+    admin = false
 
     notifications = if include_all
                       require_account_admin
+                      admin = true
 
-                      AccountNotification.for_account(@account, include_past: true)
+                      AccountNotification.for_account(@account, include_all: true)
                     else
-                      AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past:)
+                      AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_near_past:)
                     end
-    render json: account_notifications_json(notifications, @current_user, session)
+    render json: account_notifications_json(notifications, @current_user, session, display_author: admin)
   end
 
   def user_index_deprecated
@@ -132,7 +141,7 @@ class AccountNotificationsController < ApplicationController
     # to allow for paination on the front end.
     html_strings = { current: [], past: [] }
     @for_display = true
-    coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: true)
+    coll = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_near_past: true)
     [:current, :past].each do |time|
       coll.select(&time).in_groups_of(5, false) { |a| html_strings[time] << html_string_from_announcements(a) }
     end
