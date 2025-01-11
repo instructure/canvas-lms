@@ -20,7 +20,7 @@
 
 module Schemas
   class BaseSpecsTest < Base
-    def schema
+    def self.schema
       {
         type: "object",
         properties: {
@@ -35,7 +35,7 @@ module Schemas
   end
 
   class NestedValidationTest < Base
-    def schema
+    def self.schema
       {
         type: "object",
         properties: {

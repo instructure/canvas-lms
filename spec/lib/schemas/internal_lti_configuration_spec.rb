@@ -26,7 +26,7 @@ describe Schemas::InternalLtiConfiguration do
   include_context "lti_1_3_tool_configuration_spec_helper"
 
   describe "#validate" do
-    subject { Schemas::InternalLtiConfiguration.new.validate(json).to_a }
+    subject { Schemas::InternalLtiConfiguration.validate(json).to_a }
 
     let(:json) { internal_lti_configuration }
     let(:error_details) { subject.first["details"] }
@@ -422,7 +422,7 @@ describe Schemas::InternalLtiConfiguration do
     end
 
     it "returns a valid InternalLtiConfiguration" do
-      expect(Schemas::InternalLtiConfiguration.new.validate(internal_lti_config).to_a).to be_empty
+      expect(Schemas::InternalLtiConfiguration.validate(internal_lti_config).to_a).to be_empty
     end
 
     it "returns an InternalLtiConfiguration with the same values as the LtiConfiguration" do
