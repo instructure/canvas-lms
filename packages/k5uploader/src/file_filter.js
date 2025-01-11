@@ -16,16 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function isPresent(passed: {[key: string]: unknown}, name: string): boolean {
-  return passed && passed[name] !== undefined
+function FileFilter(params) {
+  this.extensions = this.parseExtensions(params.extensions)
+  this.id = params.id
+  this.description = params.description
+  this.entryType = params.entryType
+  this.mediaType = params.mediaType
+  this.type = params.type
 }
 
-interface Options {
-  [key: string]: unknown
+FileFilter.prototype.parseExtensions = function (extString) {
+  return extString.split(';').map(ext => ext.substring(2))
 }
 
-export default function (name: string, options: Options, passed: {[key: string]: unknown}): void {
-  if (isPresent(passed, name)) {
-    options[name] = passed[name]
+FileFilter.prototype.includesExtension = function (extension) {
+  return this.extensions.indexOf(extension.toLowerCase()) !== -1
+}
+
+FileFilter.prototype.toParams = function () {
+  const params = {
+    entry1_type: this.entryType,
+    entry1_mediaType: this.mediaType,
   }
+
+  return params
 }
+
+export default FileFilter

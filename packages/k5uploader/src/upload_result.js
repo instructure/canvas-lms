@@ -27,11 +27,7 @@ function UploadResult() {
 UploadResult.prototype.parseXML = function (xml) {
   const parser = new DOMParser()
   this.xml = parser.parseFromString(xml, 'application/xml')
-  this.isError = !!(
-    this.xml.querySelector('error') &&
-    this.xml.querySelector('error').children &&
-    this.xml.querySelector('error').children.length
-  )
+  this.isError = !!(this.xml.querySelector('error') && this.xml.querySelector('error').children && this.xml.querySelector('error').children.length)
   if (!this.isError) {
     this.pullData()
   }
@@ -41,10 +37,8 @@ UploadResult.prototype.pullData = function () {
   const resultOk = this.xml.querySelector('result_ok')
   if (resultOk) {
     this.token = resultOk.querySelector('token') && resultOk.querySelector('token').textContent
-    this.fileId =
-      resultOk.querySelector('filename') && resultOk.querySelector('filename').textContent
-    this.filename =
-      resultOk.querySelector('origFilename') && resultOk.querySelector('origFilename').textContent
+    this.fileId = resultOk.querySelector('filename') && resultOk.querySelector('filename').textContent
+    this.filename = resultOk.querySelector('origFilename') && resultOk.querySelector('origFilename').textContent
   }
 }
 

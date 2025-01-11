@@ -16,16 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-interface Params {
-  [key: string]: string | number | boolean | undefined
-}
-
-export default function buildQueryString(params: Params): string {
+export default function (params) {
   let queryUrl = '?'
   for (const prop in params) {
-    if (params.hasOwnProperty(prop)) {
-      queryUrl += `${prop}=${encodeURIComponent(String(params[prop]))}&`
-    }
+    queryUrl += prop + '=' + encodeURIComponent(params[prop]) + '&'
   }
   queryUrl = queryUrl.substring(0, queryUrl.length - 1)
   return queryUrl
