@@ -16,20 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-type Obj = {[key: string]: unknown}
-
-export default function combineObjects(objs: Obj[] | undefined): Obj | undefined {
+export default function (objs) {
   if (!objs) {
     return objs
   }
-
-  const combined: Obj = {}
+  const combined = {}
   objs = objs.reverse()
   objs.forEach(obj => {
     for (const prop in obj) {
       combined[prop] = obj[prop]
     }
   })
-
   return combined
 }
