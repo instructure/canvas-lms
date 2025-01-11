@@ -47,9 +47,7 @@ module Schemas::Lti
       }.freeze
     }.freeze
 
-    private
-
-    def schema
+    def self.schema
       SCHEMA
     end
   end

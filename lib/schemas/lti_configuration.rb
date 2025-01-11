@@ -22,41 +22,39 @@ module Schemas
   # Represents the "external" JSON schema used to configure an LTI 1.3 tool,
   # as described in doc/api/lti_dev_key_config.md
   class LtiConfiguration < Base
-    def schema
-      {
-        type: "object",
-        required: %w[
-          title
-          description
-          target_link_uri
-          oidc_initiation_url
-        ],
-        properties: {
-          **InternalLtiConfiguration.base_properties,
-          extensions: {
-            type: :array,
-            items: {
-              type: "object",
-              required: %w[platform settings],
-              properties: {
-                platform: { type: "string", description: "Must be canvas.instructure.com" },
-                domain: { type: "string" },
-                tool_id: { type: "string" },
-                privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
-                settings: {
-                  type: "object",
-                  required: %w[placements],
-                  properties: {
-                    **InternalLtiConfiguration.base_settings_properties,
-                    placements: InternalLtiConfiguration.placements_schema,
-                  }
-                },
-              }
+    @schema = {
+      type: "object",
+      required: %w[
+        title
+        description
+        target_link_uri
+        oidc_initiation_url
+      ],
+      properties: {
+        **InternalLtiConfiguration.base_properties,
+        extensions: {
+          type: :array,
+          items: {
+            type: "object",
+            required: %w[platform settings],
+            properties: {
+              platform: { type: "string", description: "Must be canvas.instructure.com" },
+              domain: { type: "string" },
+              tool_id: { type: "string" },
+              privacy_level: { type: "string", enum: ::Lti::PrivacyLevelExpander::SUPPORTED_LEVELS },
+              settings: {
+                type: "object",
+                required: %w[placements],
+                properties: {
+                  **InternalLtiConfiguration.base_settings_properties,
+                  placements: InternalLtiConfiguration.placements_schema,
+                }
+              },
             }
           }
         }
-      }.freeze
-    end
+      }
+    }
 
     # Transforms a hash conforming to the InternalLtiConfiguration schema into
     # a hash conforming to the LtiConfiguration schema.

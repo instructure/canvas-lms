@@ -20,26 +20,41 @@
 
 module Schemas
   class Base
-    delegate :validate, :valid?, to: :schema_checker
+    def self.create_schema
+      raise "Implement self.create_schema or define @schema directly"
+    end
+
+    def self.schema
+      unless @schema
+        @schema = superclass.schema.deep_dup.with_indifferent_access
+        raise "One of your base classes must define a schema" unless @schema
+
+        create_schema
+      end
+
+      @schema
+    end
 
     class << self
+      delegate :validate, :valid?, to: :schema_checker
+
       # TODO: deprecated, use simple_validation_errors instead
       # Remove this method if the lti_report_multiple_schema_validation_errors feature flag is turned on in production
       def simple_validation_first_error(json_hash, error_format: :string)
-        err = new.validate(json_hash).to_a.first
+        err = validate(json_hash).to_a.first
         err && simple_validation_error(err, error_format:)
       end
 
       # Returns nil if no errors
       def simple_validation_errors(json_hash, error_format: :string)
-        new.validate(json_hash).to_a.presence&.map { simple_validation_error _1, error_format: }
+        validate(json_hash).to_a.presence&.map { simple_validation_error _1, error_format: }
       end
 
       def validation_errors(json_hash, allow_nil: false)
         if allow_nil
           json_hash = Utils::HashUtils.nested_compact(json_hash)
         end
-        new.validate(json_hash).pluck("error")
+        validate(json_hash).pluck("error")
       end
 
       private
@@ -76,16 +91,10 @@ module Schemas
           hash.slice!(*(schema[:properties] || schema["properties"]).keys.map(&:to_s))
         end
       end
-    end
 
-    private
-
-    def schema_checker
-      @schema_checker ||= JSONSchemer.schema(schema)
-    end
-
-    def schema
-      raise "Abstract method"
+      def schema_checker
+        @schema_checker ||= JSONSchemer.schema(schema)
+      end
     end
   end
 end
