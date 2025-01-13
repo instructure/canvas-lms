@@ -15,9 +15,8 @@ jobs:
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
-        token: ${{ secrets.CI_TOKEN }}
         submodules: true
 
     # Update references
