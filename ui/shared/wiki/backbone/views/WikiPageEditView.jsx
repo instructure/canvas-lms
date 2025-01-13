@@ -18,7 +18,6 @@
 import $ from 'jquery'
 import React, {lazy, Suspense} from 'react'
 import {createRoot} from 'react-dom/client'
-import ReactDOM from 'react-dom'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import template from '../../jst/WikiPageEdit.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
@@ -193,8 +192,8 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-      // eslint-disable-next-line react/no-render-return-value
-      return ReactDOM.render(
+       
+      return createRoot(elt).render(
         <DueDateCalendarPicker
           dateType="todo_date"
           name="student_todo_at"
@@ -208,7 +207,6 @@ export default class WikiPageEditView extends ValidatedFormView {
           labelText="Student Planner Date"
           labelClasses="screenreader-only"
         />,
-        elt,
       )
     }
   }
