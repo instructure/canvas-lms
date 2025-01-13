@@ -24,7 +24,10 @@ import EntryService from './entry_service'
 import UiconfService from './uiconf_service'
 import k5Options from './k5_options'
 
-function K5Uploader(options) {
+/**
+ * @type Class
+ */
+export function K5Uploader(options) {
   // set up instance as an event dispatcher
   Messenger.decorate(this)
 
@@ -125,5 +128,3 @@ K5Uploader.prototype.onEntryFail = function (data) {
 K5Uploader.prototype.onUiConfError = function (result) {
   this.dispatchEvent('K5.uiconfError', result, this)
 }
-
-export default K5Uploader

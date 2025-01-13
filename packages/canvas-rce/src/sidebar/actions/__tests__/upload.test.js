@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable jest/valid-expect-in-promise */
-/* eslint-disable promise/catch-or-return */
-
 import {jest} from '@jest/globals'
 import moxios from 'moxios'
 import * as actions from '../upload'
@@ -27,7 +24,7 @@ import * as imagesActions from '../images'
 import {buildSvg} from '../../../rce/plugins/instructure_icon_maker/svg'
 import {spiedStore} from './utils'
 import Bridge from '../../../bridge'
-import K5Uploader from '@instructure/k5uploader'
+import {K5Uploader} from '@instructure/k5uploader'
 import {
   DEFAULT_SETTINGS,
   SVG_TYPE,
@@ -237,7 +234,7 @@ describe('Upload data actions', () => {
       return store.dispatch(actions.uploadToIconMakerFolder(svg)).then(() => {
         expect(successSource.uploadFRD).toHaveBeenCalledWith(
           new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'}),
-          results
+          results,
         )
       })
     })
@@ -268,7 +265,7 @@ describe('Upload data actions', () => {
             contextType: 'course',
             host: 'http://host:port',
             onDuplicate: 'overwrite',
-          }
+          },
         )
       })
     })
@@ -367,7 +364,7 @@ describe('Upload data actions', () => {
               partnerData: 'data from our partners',
             },
           },
-        }
+        },
       )
 
       return store.dispatch(actions.uploadToMediaFolder('media', fakeFileMetaData)).then(() => {
@@ -459,7 +456,7 @@ describe('Upload data actions', () => {
               expect.objectContaining({}),
               expect.objectContaining({
                 category: ICON_MAKER_ICONS,
-              })
+              }),
             )
           })
         })
@@ -476,7 +473,7 @@ describe('Upload data actions', () => {
               expect.objectContaining({}),
               expect.objectContaining({
                 category: undefined,
-              })
+              }),
             )
           })
         })
@@ -503,7 +500,7 @@ describe('Upload data actions', () => {
         subject().then(() => {
           expect(successSource.preflightUpload).toHaveBeenCalledWith(
             expect.objectContaining({}),
-            expect.objectContaining({category: undefined})
+            expect.objectContaining({category: undefined}),
           )
         })
       })
@@ -524,7 +521,7 @@ describe('Upload data actions', () => {
           },
         })
         expect(store.spy).toHaveBeenCalledWith(
-          expect.objectContaining({type: filesActions.INSERT_FILE})
+          expect.objectContaining({type: filesActions.INSERT_FILE}),
         )
       })
     })
@@ -551,7 +548,7 @@ describe('Upload data actions', () => {
             name: 'foo',
             url: 'http://someurl',
             fileType: 'image/png',
-          })
+          }),
         )
       })
     })
@@ -565,7 +562,7 @@ describe('Upload data actions', () => {
             type: filesActions.INSERT_FILE,
             id: 74,
             fileId: 47,
-          })
+          }),
         )
       })
     })
@@ -578,7 +575,7 @@ describe('Upload data actions', () => {
       })
       return store.dispatch(actions.uploadPreflight('images', props)).then(() => {
         expect(store.spy).toHaveBeenCalledWith(
-          expect.objectContaining({type: imagesActions.ADD_IMAGE})
+          expect.objectContaining({type: imagesActions.ADD_IMAGE}),
         )
       })
     })
@@ -587,7 +584,7 @@ describe('Upload data actions', () => {
       props.contentType = 'text/plain'
       return store.dispatch(actions.uploadPreflight('images', props)).then(() => {
         expect(store.spy).not.toHaveBeenCalledWith(
-          expect.objectContaining({type: imagesActions.INSERT_IMAGE})
+          expect.objectContaining({type: imagesActions.INSERT_IMAGE}),
         )
       })
     })
@@ -627,7 +624,7 @@ describe('Upload data actions', () => {
       }
       const results = {}
       const actionSet = actions.allUploadCompleteActions(results, fileMetaProps)
-      expect(actionSet.length).toBe(3)
+      expect(actionSet).toHaveLength(3)
     })
   })
 
@@ -658,7 +655,7 @@ describe('Upload data actions', () => {
               title: uploadResult.display_name,
               href: uploadResult.url,
             }),
-            false
+            false,
           )
         })
 
@@ -670,7 +667,7 @@ describe('Upload data actions', () => {
                 disableInlinePreview: true,
               }),
             }),
-            false
+            false,
           )
         })
       })
@@ -682,7 +679,7 @@ describe('Upload data actions', () => {
           expect.objectContaining({
             title: expected,
           }),
-          false
+          false,
         )
       })
 
@@ -693,7 +690,7 @@ describe('Upload data actions', () => {
           expect.objectContaining({
             href: expected,
           }),
-          false
+          false,
         )
       })
 
@@ -705,7 +702,7 @@ describe('Upload data actions', () => {
               type: 'scribd',
             }),
           }),
-          false
+          false,
         )
       })
 
@@ -718,7 +715,7 @@ describe('Upload data actions', () => {
               type: 'image',
             }),
           }),
-          false
+          false,
         )
       })
 
@@ -732,7 +729,7 @@ describe('Upload data actions', () => {
               type: 'image',
             }),
           }),
-          false
+          false,
         )
         Bridge.existingContentToLink.mockRestore()
         Bridge.existingContentToLinkIsImg.mockRestore()
@@ -766,7 +763,7 @@ describe('Upload data actions', () => {
           expect.objectContaining({
             type: 'QUOTA_EXCEEDED_UPLOAD',
             error,
-          })
+          }),
         )
       })
     })
@@ -780,7 +777,7 @@ describe('Upload data actions', () => {
           expect.objectContaining({
             type: 'FAIL_FILE_UPLOAD',
             error,
-          })
+          }),
         )
       })
     })
@@ -793,7 +790,7 @@ describe('Upload data actions', () => {
           expect.objectContaining({
             type: 'FAIL_FILE_UPLOAD',
             error,
-          })
+          }),
         )
       })
     })
@@ -860,7 +857,7 @@ describe('Upload data actions', () => {
         expect.objectContaining({
           type: actions.FAIL_MEDIA_UPLOAD,
           error,
-        })
+        }),
       )
     })
 

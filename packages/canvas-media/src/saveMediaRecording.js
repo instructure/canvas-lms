@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import K5Uploader from '@instructure/k5uploader'
+import {K5Uploader} from '@instructure/k5uploader'
 import FileSizeError from './shared/FileSizeError'
 
 export const VIDEO_SIZE_OPTIONS = {height: '432px', width: '768px'}
@@ -132,7 +132,7 @@ export default async function saveMediaRecording(file, rcsConfig, done, onProgre
     }
     const session = generateUploadOptions(
       ['video', 'audio', 'webm', 'video/webm', 'audio/webm'],
-      mediaServerSession.data
+      mediaServerSession.data,
     )
     const k5UploaderSession = new K5Uploader(session)
     addUploaderReadyEventListeners(k5UploaderSession, file)
@@ -168,7 +168,7 @@ export async function saveClosedCaptionsForAttachment(
   attachmentId,
   subtitles,
   rcsConfig,
-  maxBytes
+  maxBytes,
 ) {
   // read all the subtitle files' contents
   const url = `${mediaAttachmentsUrl(rcsConfig)}/${attachmentId}/media_tracks`

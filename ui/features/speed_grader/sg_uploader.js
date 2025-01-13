@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import K5Uploader from '@instructure/k5uploader'
+import {K5Uploader} from '@instructure/k5uploader'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import KalturaSessionLoader from '@canvas/media-comments/jquery/kaltura_session_loader'
 import $ from 'jquery'
