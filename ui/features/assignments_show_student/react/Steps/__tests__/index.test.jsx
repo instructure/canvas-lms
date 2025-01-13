@@ -17,67 +17,51 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render} from '@testing-library/react'
 import Steps from '../index'
 import StepItem from '../StepItem/index'
-import $ from 'jquery'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-})
+describe('Steps', () => {
+  it('should render', () => {
+    const container = render(<Steps />)
+    expect(container.getByTestId('assignment-2-step-index')).toBeInTheDocument()
+  })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
+  it('should not render collapsed class when not collapsed', () => {
+    const container = render(<Steps isCollapsed={false} />)
+    expect(container.queryByTestId('steps-container-collapsed')).not.toBeInTheDocument()
+  })
 
-it('should render', () => {
-  ReactDOM.render(<Steps />, document.getElementById('fixtures'))
-  const element = $('[data-testid="assignment-2-step-index"]')
-  expect(element).toHaveLength(1)
-})
+  it('should render collapsed class when collapsed', () => {
+    const container = render(<Steps isCollapsed={true} />)
+    expect(container.getByTestId('steps-container-collapsed')).toBeInTheDocument()
+  })
 
-it('should not render collapsed class when not collapsed', () => {
-  ReactDOM.render(<Steps isCollapsed={false} />, document.getElementById('fixtures'))
-  const element = $('[data-testid="steps-container-collapsed"]')
-  expect(element).toHaveLength(0)
-})
+  it('should render with StepItems', () => {
+    const container = render(
+      <Steps label="Settings">
+        <StepItem label="Phase one" status="complete" />
+        <StepItem label="Phase two" status="in-progress" />
+        <StepItem label="Phase three" />
+      </Steps>
+    )
+    expect(container.getByText('Phase one')).toBeInTheDocument()
+    expect(container.getByText('Phase two')).toBeInTheDocument()
+    expect(container.getByText('Phase three')).toBeInTheDocument()
+  })
 
-it('should render collapsed class when collapsed', () => {
-  ReactDOM.render(<Steps isCollapsed={true} />, document.getElementById('fixtures'))
-  const element = $('[data-testid="steps-container-collapsed"]')
-  expect(element).toHaveLength(1)
-})
+  it('should render aria-current for the item that is in progress', async () => {
+    const container = render(
+      <Steps label="Settings">
+        <StepItem label="Phase one" status="complete" />
+        <StepItem label="Phase two" status="in-progress" />
+        <StepItem label="Phase three" />
+      </Steps>
+    )
 
-it('should render with StepItems', () => {
-  ReactDOM.render(
-    <Steps label="Settings">
-      <StepItem label="Phase one" status="complete" />
-      <StepItem label="Phase two" status="in-progress" />
-      <StepItem label="Phase three" />
-    </Steps>,
-    document.getElementById('fixtures'),
-  )
-  const element = $('li')
-  expect(element).toHaveLength(3)
-})
-
-it('should render aria-current for the item that is in progress', () => {
-  ReactDOM.render(
-    <Steps label="Settings">
-      <StepItem label="Phase one" status="complete" />
-      <StepItem label="Phase two" status="in-progress" />
-      <StepItem label="Phase three" />
-    </Steps>,
-    document.getElementById('fixtures'),
-  )
-
-  const items = $('li')
-  expect(items[0].getAttribute('aria-current')).toEqual('false')
-  expect(items[1].getAttribute('aria-current')).toEqual('true')
-  expect(items[2].getAttribute('aria-current')).toEqual('false')
+    const items = container.getAllByRole('listitem')
+    expect(items[0].getAttribute('aria-current')).toEqual('false')
+    expect(items[1].getAttribute('aria-current')).toEqual('true')
+    expect(items[2].getAttribute('aria-current')).toEqual('false')
+  })
 })
