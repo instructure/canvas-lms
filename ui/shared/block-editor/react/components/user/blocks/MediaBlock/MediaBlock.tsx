@@ -104,6 +104,8 @@ const MediaBlock = ({src, title, height = '50', width = '50', attachmentId}: Med
               objectFit: 'cover',
             }}
             title={title || ''}
+            data-media-type="video"
+            allow="fullscreen"
             src={src || MediaBlock.craft.defaultProps.src}
           />
         )}
