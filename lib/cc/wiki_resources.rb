@@ -42,8 +42,7 @@ module CC
           name_max -= 5 if name_max
           path_max -= 5 + wiki_folder.length + 1 if path_max
           max = [name_max, path_max].compact.min
-          file_name = "#{page.url[0...max]}.html"
-
+          file_name = page.block_editor ? "#{page.url[0...max]}.json" : "#{page.url[0...max]}.html"
           relative_path = File.join(CCHelper::WIKI_FOLDER, file_name)
           path = File.join(wiki_folder, file_name)
           meta_fields = { identifier: migration_id }
@@ -62,7 +61,11 @@ module CC
           meta_fields[:lock_at] = page.lock_at
 
           File.open(path, "w") do |file|
-            file << @html_exporter.html_page(page.body, page.title, meta_fields)
+            file << if page.block_editor
+                      @html_exporter.json_page(page.block_editor, page.title, meta_fields)
+                    else
+                      @html_exporter.html_page(page.body, page.title, meta_fields)
+                    end
           end
 
           @resources.resource(

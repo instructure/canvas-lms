@@ -127,7 +127,12 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
   end
 
   def replace_item_placeholders!(item_key, field_links, skip_associations = false)
-    case item_key[:type]
+    item_type = item_key[:type]
+    item_type = field_links.keys.first if [:block_editor, :block_editor_text].include? field_links.keys.first
+
+    case item_type
+    when :block_editor, :block_editor_text
+      process_block_editor_record(item_key, field_links)
     when :syllabus
       syllabus = context.syllabus_body
       if LinkReplacer.sub_placeholders!(syllabus, field_links.values.flatten)
@@ -138,23 +143,59 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     when :quiz_question
       process_quiz_question!(item_key[:item], field_links.values.flatten)
     else
-      item = item_key[:item]
-      item_updates = {}
-      field_links.each do |field, links|
-        html = item[field]
-        if LinkReplacer.sub_placeholders!(html, links)
-          item_updates[field] = html
-        end
-      end
-      if item_updates.present?
-        item.class.where(id: item.id).update_all(item_updates)
-        # we don't want the placeholders sticking around in any
-        # version we've created.
-        rewrite_item_version!(item)
-      end
+      process_html_record(item_key, field_links, skip_associations)
+    end
+  end
 
-      unless skip_associations
-        process_assignment_types!(item, field_links.values.flatten)
+  def process_html_record(item_key, field_links, skip_associations)
+    item = item_key[:item]
+    return unless item
+
+    item_updates = {}
+
+    field_links.each do |field, links|
+      html = item[field]
+      if LinkReplacer.sub_placeholders!(html, links)
+        item_updates[field] = html
+      end
+    end
+    if item_updates.present?
+      item.class.where(id: item.id).update_all(item_updates)
+      rewrite_item_version!(item) # we don't want the placeholders sticking around in any version we've created.
+    end
+    unless skip_associations
+      process_assignment_types!(item, field_links.values.flatten)
+    end
+  end
+
+  def process_block_editor_record(item_key, field_links)
+    item = item_key[:item]
+    updated_blocks = replaced_block_editor_record(field_links, item.block_editor.blocks)
+
+    updated_blocks.each_value do |block|
+      media_block = block["type"]["resolvedName"] == "MediaBlock" && block["props"]["src"]
+      block["props"]["attachmentId"] = block["props"]["src"].split("/media_attachments_iframe/")[1].to_i.to_s if media_block
+    end
+
+    item.block_editor.update! blocks: updated_blocks
+  end
+
+  def replaced_block_editor_record(field_links, blocks)
+    field_links.each_value do |links|
+      links.each do |replacement|
+        update_blocks(blocks, replacement)
+      end
+    end
+    blocks
+  end
+
+  def update_blocks(blocks, replacement)
+    blocks.each do |block|
+      block = block[1]
+      if block["props"]["src"]&.include?(replacement[:placeholder])
+        block["props"]["src"] = block["props"]["src"].gsub(replacement[:placeholder], replacement[:new_value])
+      elsif block["props"]["text"]&.include?(replacement[:placeholder])
+        block["props"]["text"] = block["props"]["text"].gsub(replacement[:placeholder], replacement[:new_value])
       end
     end
   end

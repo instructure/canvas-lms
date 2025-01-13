@@ -227,6 +227,19 @@ module UserContent
       doc.to_html
     end
 
+    def translate_blocks(block_editor)
+      return block_editor.blocks if block_editor.blocks.blank?
+
+      source_blocks = %w[ImageBlock MediaBlock]
+      block_editor.blocks.each do |block|
+        if source_blocks.include? block[1]["type"]["resolvedName"]
+          block[1]["props"]["src"] = replacement(block[1]["props"]["src"]) unless block[1]["props"]["src"].blank?
+        elsif block[1]["type"]["resolvedName"] == "RCETextBlock"
+          block[1]["props"]["text"] = block[1]["props"]["text"].gsub(@toplevel_regex) { |url| replacement(url) }
+        end
+      end
+    end
+
     def precise_translate_content(html)
       doc = Nokogiri::HTML5::DocumentFragment.parse(html, nil, { max_tree_depth: 10_000 })
       attributes = %w[value href longdesc src srcset title]

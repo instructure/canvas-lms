@@ -72,6 +72,8 @@ module Importers
       item ||= context.wiki_pages.temp_record(wiki: context.wiki)
       item.mark_as_importing!(migration)
 
+      block_editor = hash["block_editor"]
+
       # force the url to be the same as the url_name given, since there are
       # likely other resources in the import that link to that url
       if hash[:url_name].present?
@@ -230,7 +232,7 @@ module Importers
         description += "</ul>"
         item.body = description
         return nil if topic_count == 0
-      elsif hash[:title] && hash[:text]
+      elsif hash[:title] && (hash[:text] || block_editor)
         # it's an actual wiki page
         item.title = hash[:title].presence || item.url.presence || "unnamed page"
         if item.title.length > WikiPage::TITLE_LENGTH
@@ -240,8 +242,7 @@ module Importers
           item.title.splice!(0...WikiPage::TITLE_LENGTH) # truncate too-long titles
         end
 
-        item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body)
-
+        item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body) unless block_editor
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
         item.notify_of_update = hash[:notify_of_update] unless hash[:notify_of_update].nil?
       else # rubocop:disable Lint/DuplicateBranch
@@ -264,6 +265,15 @@ module Importers
           item.save!
         else
           item.save_without_broadcasting!
+        end
+
+        if block_editor
+          created_block_editor = BlockEditor.create!(
+            context: item,
+            editor_version: block_editor["editor_version"],
+            blocks: migration.convert_block_editor_blocks(block_editor["blocks"], hash[:migration_id], :wiki_page)
+          )
+          item.update! body: "<iframe class=\"block_editor_view\" src=\"/block_editors/#{created_block_editor.id}\"></iframe>"
         end
 
         migration.add_imported_item(item)
