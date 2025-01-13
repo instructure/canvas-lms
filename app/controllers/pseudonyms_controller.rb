@@ -177,8 +177,19 @@ class PseudonymsController < ApplicationController
         redirect_to canvas_login_url
       end
       @password_pseudonyms = @cc.user.pseudonyms_visible_to(@cc.user).select { |p| p.active? && p.account.canvas_authentication? }
+      password_policies = @password_pseudonyms.to_h do |p|
+        [p.id, { pseudonym: { unique_id: p.unique_id, account_display_name: p.account.display_name }, policy: p.account.password_policy }]
+      end
       js_env PASSWORD_POLICY: @domain_root_account.password_policy,
-             PASSWORD_POLICIES: @password_pseudonyms.to_h { |p| [p.id, p.account.password_policy] }
+             PASSWORD_POLICIES: password_policies,
+             CC: {
+               confirmation_code: @cc.confirmation_code,
+               path: @cc.path,
+             },
+             PSEUDONYM: {
+               id: @pseudonym.id,
+               user_name: @pseudonym.user.name,
+             }
     end
   end
 
