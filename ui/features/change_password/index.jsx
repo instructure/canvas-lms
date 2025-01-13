@@ -16,26 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import registrationErrors from '@canvas/normalize-registration-errors'
-import '@canvas/jquery/jquery.instructure_forms'
+import {createRoot} from 'react-dom/client'
+import ready from '@instructure/ready'
+import ConfirmChangePassword from './react/ConfirmChangePassword'
 
-const $form = $('#change_password_form')
-$form.formSubmit({
-  disableWhileLoading: 'spin_on_success',
-  errorFormatter(errors) {
-    const pseudonymId = $form.find('#pseudonym_id_select').val()
-    return registrationErrors(
-      errors,
-      ENV.PASSWORD_POLICIES[pseudonymId] != null
-        ? ENV.PASSWORD_POLICIES[pseudonymId]
-        : ENV.PASSWORD_POLICY,
-    )
-  },
-  success() {
-    window.location.href = '/login/canvas?password_changed=1'
-  },
-  error(errors) {
-    if (errors.nonce) window.location.href = '/login/canvas'
-  },
+ready(() => {
+  const mountPoint = document.getElementById('confirm_change_password_mount_point')
+  const root = createRoot(mountPoint)
+
+  root.render(
+    <ConfirmChangePassword
+      cc={ENV.CC}
+      pseudonym={ENV.PSEUDONYM}
+      defaultPolicy={ENV.PASSWORD_POLICY}
+      passwordPoliciesAndPseudonyms={ENV.PASSWORD_POLICIES}
+    />,
+  )
 })
