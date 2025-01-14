@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Course from '@canvas/courses/backbone/models/Course'
 import AssignmentGroupListView from './backbone/views/AssignmentGroupListView'
@@ -116,11 +116,11 @@ ready(() => {
 
   const node = document.querySelector('.loadingIndicator')
   if (node instanceof HTMLElement) {
-    ReactDOM.render(
+    const root = createRoot(node)
+    root.render(
       <View padding="x-small" textAlign="center" as="div" display="block">
         <Spinner delay={300} size="x-small" renderTitle={() => I18n.t('Loading')} />
       </View>,
-      node,
     )
   }
 
