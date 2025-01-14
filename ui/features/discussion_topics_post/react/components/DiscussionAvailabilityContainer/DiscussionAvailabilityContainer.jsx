@@ -49,7 +49,7 @@ export function DiscussionAvailabilityContainer({...props}) {
     let haveGroupsOverrideType = false
     if (!props.groupSet) {
       selectedAvailabilities = props.courseSections.length
-        ? props.courseSections
+        ? JSON.parse(JSON.stringify([props.courseSections]))
         : [{userCount: props.totalUserCount, name: I18n.t('All Sections'), id: '1'}]
     } else if (props.groupSet.currentGroup) {
       selectedAvailabilities = JSON.parse(JSON.stringify([props.groupSet.currentGroup]))
