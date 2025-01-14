@@ -46,10 +46,18 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
     contribute: 'must_contribute',
   }
 
-  return {
-    context_module: {
-      name: moduleSettings.moduleName,
-      unlock_at: moduleSettings.lockUntilChecked ? moduleSettings.unlockAt : null,
+  type ContextModule = {
+    name?: string
+    unlock_at: string | null
+    prerequisites: string
+    completion_requirements: Record<string, Record<string, string>>
+    requirement_count: string
+    require_sequential_progress: boolean
+    publish_final_grade: boolean
+  }
+
+  const context_module: ContextModule = {
+    unlock_at: moduleSettings.lockUntilChecked ? moduleSettings.unlockAt : null,
       prerequisites: moduleSettings.prerequisites
         .map(prerequisite => `module_${prerequisite.id}`)
         .join(','),
@@ -67,8 +75,12 @@ export function convertModuleSettingsForApi(moduleSettings: SettingsPanelState) 
       require_sequential_progress:
         moduleSettings.requirementCount === 'all' && moduleSettings.requireSequentialProgress,
       publish_final_grade: moduleSettings.publishFinalGrade,
-    },
   }
+
+  // do not include module name if it was not modified on the panel
+  if (moduleSettings.moduleNameDirty) context_module.name = moduleSettings.moduleName
+
+  return {context_module}
 }
 
 export function requirementTypesForResource(requirement: Requirement): Requirement['type'][] {

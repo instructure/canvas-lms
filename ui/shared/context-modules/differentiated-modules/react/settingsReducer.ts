@@ -20,6 +20,7 @@ import type {Module, Requirement} from './types'
 
 export type SettingsPanelState = {
   moduleName: string
+  moduleNameDirty: boolean
   unlockAt: string
   lockUntilChecked: boolean
   nameInputMessages: Array<{type: 'error'; text: string}>
@@ -33,6 +34,7 @@ export type SettingsPanelState = {
 
 export const defaultState: SettingsPanelState = {
   moduleName: '',
+  moduleNameDirty: false,
   unlockAt: '',
   lockUntilChecked: false,
   nameInputMessages: [],
@@ -63,7 +65,8 @@ export function reducer(
 ): SettingsPanelState {
   switch (action.type) {
     case actions.SET_MODULE_NAME:
-      return {...state, moduleName: action.payload}
+      console.info(`Setting module name to ${action.payload}`)
+      return {...state, moduleName: action.payload, moduleNameDirty: true}
     case actions.SET_UNLOCK_AT:
       return {...state, unlockAt: action.payload}
     case actions.SET_LOCK_UNTIL_CHECKED:
