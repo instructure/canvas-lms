@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import {some} from 'lodash'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
 import PublishCloud from '@canvas/files/react/components/PublishCloud'
@@ -146,10 +146,8 @@ export function initPublishButton($el, data) {
       render: () => {
         const model = $el.data('view').model
 
-        ReactDOM.render(
-          <PublishCloud {...props} model={model} disabled={model.get('disabled')} />,
-          $el[0],
-        )
+        const root = createRoot($el[0])
+        root.render(<PublishCloud {...props} model={model} disabled={model.get('disabled')} />)
         // to look disable, we need to add the class here
         $el[0].classList[model.get('disabled') ? 'add' : 'remove']('disabled')
       },
@@ -555,7 +553,8 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
     }
   }
 
-  ReactDOM.render(
+  const root = createRoot($('#external-tool-mount-point')[0])
+  root.render(
     <ContentTypeExternalToolTray
       tool={tool}
       placement={placement}
@@ -566,7 +565,6 @@ function setExternalToolTray(tool, moduleData, placement = 'module_index_menu', 
       onDismiss={handleDismiss}
       open={tool !== null}
     />,
-    $('#external-tool-mount-point')[0],
   )
 }
 
@@ -588,7 +586,8 @@ function setExternalToolModal({
     returnFocusTo.focus()
   }
 
-  ReactDOM.render(
+  const root = createRoot($('#external-tool-mount-point')[0])
+  root.render(
     <ExternalToolModalLauncher
       tool={tool}
       launchType={launchType}
@@ -599,7 +598,6 @@ function setExternalToolModal({
       onRequestClose={handleDismiss}
       contextModuleId={contextModuleId}
     />,
-    $('#external-tool-mount-point')[0],
   )
 }
 
