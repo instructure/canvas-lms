@@ -17,16 +17,21 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import JobsIndex from './react'
 import ready from '@instructure/ready'
 import {ApolloProvider, createClient} from '@canvas/apollo-v3'
 
 ready(() => {
-  ReactDOM.render(
+  const container = document.getElementById('content')
+  if (!container) {
+    throw new Error('Failed to find root container element')
+  }
+
+  const root = createRoot(container)
+  root.render(
     <ApolloProvider client={createClient()}>
       <JobsIndex />
     </ApolloProvider>,
-    document.getElementById('content'),
   )
 })
