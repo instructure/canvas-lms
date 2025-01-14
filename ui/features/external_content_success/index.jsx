@@ -22,7 +22,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/rails-flash-notifications'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Alert} from '@instructure/ui-alerts'
 import replaceTags from '@canvas/util/replaceTags'
 import {postMessageExternalContentReady} from '@canvas/external-tools/messages'
@@ -70,8 +70,9 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
     wrapper.setAttribute('id', 'lti_messages_wrapper')
     target.parentNode.insertBefore(wrapper, target)
 
+    const root = createRoot(wrapper)
     await new Promise(resolve => {
-      ReactDOM.render(
+      root.render(
         <>
           {[
             [errorMessage, true],
@@ -92,10 +93,9 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
               )
             })}
         </>,
-        wrapper,
       )
     })
-    ReactDOM.unmountComponentAtNode(wrapper)
+    root.unmount()
   }
 }
 
