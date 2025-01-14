@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import {extend, omit} from 'lodash'
@@ -176,6 +176,7 @@ class Popup extends React.Component {
 
     this.contentRef = React.createRef()
     this.screenReaderContentRef = React.createRef()
+    this.root = null
   }
 
   componentDidMount() {
@@ -191,11 +192,8 @@ class Popup extends React.Component {
     this.__disableInherentAccessibilityLayer(this.qTip)
 
     const Content = this.props.content
-
-    ReactDOM.render(
-      <Content ref={this.contentRef} {...this.getContentProps(this.props)} />,
-      $container[0],
-    )
+    this.root = createRoot($container[0])
+    this.root.render(<Content ref={this.contentRef} {...this.getContentProps(this.props)} />)
 
     this.setState({
       container: $container[0],
@@ -203,7 +201,10 @@ class Popup extends React.Component {
   }
 
   componentWillUnmount() {
-    ReactDOM.unmountComponentAtNode(this.state.container)
+    if (this.root) {
+      this.root.unmount()
+      this.root = null
+    }
 
     if (this.qTip) {
       this.qTip.destroy(false)
@@ -220,11 +221,8 @@ class Popup extends React.Component {
     if (this.contentRef.current && this.state.container) {
       const Content = this.props.content
 
-      ReactDOM.render(
-        <Content ref={this.contentRef} {...this.getContentProps(this.props)} />,
-        this.state.container,
-        this.contentDidUpdate.bind(this),
-      )
+      this.root.render(<Content ref={this.contentRef} {...this.getContentProps(this.props)} />)
+      this.contentDidUpdate()
     }
   }
 
