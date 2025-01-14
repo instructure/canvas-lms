@@ -23308,6 +23308,7 @@ nn:
   section_name_edb51b2: "namn på seksjon"
   section_name_fa2b80d7: "Seksjonsnamn:"
   section_name_inactive_36edffe6: "%{section_name} - inaktiv"
+  section_name_is_too_long_9cec2a30: "Seksjonsnamnet er for langt"
   section_pace_989d2856: Seksjonsframdrift
   section_removed_2ac72a79: "%{section} fjerna"
   section_section_names_98f172e6: "Seksjon: %{section_names}"
