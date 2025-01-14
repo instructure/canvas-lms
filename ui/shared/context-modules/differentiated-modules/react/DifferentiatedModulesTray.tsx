@@ -199,7 +199,7 @@ function Body({
               mountNodeRef={trayRef}
               updateParentData={(newSettingsData, changed) => {
                 settingsData.current = newSettingsData
-                changed && changes.current.add(SETTINGS_ID)
+                if (changed) changes.current.add(SETTINGS_ID)
               }}
               onDidSubmit={handleSubmitMissingTabs}
               {...settingsProps}
@@ -228,7 +228,7 @@ function Body({
                 onDismiss={onDismiss}
                 updateParentData={(newAssignToData, changed) => {
                   assignToData.current = newAssignToData
-                  changed && changes.current.add(ASSIGN_TO_ID)
+                  if (changed) changes.current.add(ASSIGN_TO_ID)
                 }}
                 defaultOption={assignToData.current?.selectedOption}
                 defaultAssignees={assignToData.current?.selectedAssignees}

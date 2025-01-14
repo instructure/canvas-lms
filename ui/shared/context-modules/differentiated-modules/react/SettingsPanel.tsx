@@ -102,11 +102,12 @@ export const updateModule = ({moduleId, moduleElement, data}: any) => {
     `/courses/${ENV.COURSE_ID}/modules/${moduleId}`,
     'PUT',
     data,
-    responseData => {
+    responseJSON => {
+      const {context_module: responseData} = responseJSON
       updateModuleUI(moduleElement, data)
       const dialog = new RelockModulesDialog()
       dialog.renderIfNeeded({
-        relock_warning: responseData?.context_module?.relock_warning ?? false,
+        relock_warning: responseData?.relock_warning ?? false,
         id: moduleId,
       })
     },
@@ -293,7 +294,7 @@ export default function SettingsPanel({
               prevMonthLabel={I18n.t('Previous month')}
               nextMonthLabel={I18n.t('Next month')}
               allowNonStepInput={true}
-              onChange={(e, dateTimeString) => {
+              onChange={(_e, dateTimeString) => {
                 dispatch({type: actions.SET_UNLOCK_AT, payload: dateTimeString})
                 if (dateTimeString) {
                   setValidDate(true)
