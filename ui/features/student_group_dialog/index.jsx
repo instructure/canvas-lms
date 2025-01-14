@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import $ from 'jquery'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
@@ -27,12 +27,19 @@ import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
 const I18n = createI18nScope('StudentGroupDialog')
 
+let root
+const mountPoint = document.getElementById('student-group-dialog-mount-point')
+
 function reloadStudentGroup() {
   return window.location.reload()
 }
 
 function editGroup(group, open = true) {
-  ReactDOM.render(
+  if (!root) {
+    root = createRoot(mountPoint)
+  }
+
+  root.render(
     <GroupModal
       group={{
         name: group.get('name'),
@@ -51,7 +58,6 @@ function editGroup(group, open = true) {
         document.getElementById('edit_group').focus()
       }}
     />,
-    document.getElementById('student-group-dialog-mount-point'),
   )
 }
 
