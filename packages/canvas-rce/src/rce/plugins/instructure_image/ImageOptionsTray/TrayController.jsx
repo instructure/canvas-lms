@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 
 import bridge from '../../../../bridge'
 import {asImageEmbed} from '../../shared/ContentSelection'
@@ -33,6 +33,7 @@ export default class TrayController {
     this._shouldOpen = false
     this._renderId = 0
     this._isIconMaker = false
+    this._root = null
   }
 
   get $container() {
@@ -117,6 +118,10 @@ export default class TrayController {
   }
 
   _dismissTray() {
+    if (this._root) {
+      this._root.unmount()
+      this._root = null
+    }
     this._shouldOpen = false
     this._renderTray()
     this.$img = null
@@ -154,6 +159,10 @@ export default class TrayController {
         isIconMaker={this._isIconMaker}
       />
     )
-    ReactDOM.render(element, this.$container)
+    
+    if (!this._root) {
+      this._root = createRoot(this.$container)
+    }
+    this._root.render(element)
   }
 }
