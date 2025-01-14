@@ -26,7 +26,7 @@ import htmlEscape from '@instructure/html-escape'
 import sanitizeUrl from '@canvas/util/sanitizeUrl'
 import {contentMapping} from '@instructure/canvas-rce/src/common/mimeClass'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {StudioPlayer} from '@instructure/studio-player'
 
 const I18n = createI18nScope('jquery_media_comments')
@@ -335,9 +335,14 @@ const mediaCommentActions = {
             openingElement.focus()
           }
           if (studioMediaEnabled) {
+            const root = $dialog.data('reactRoot')
+            if (root) {
+              root.unmount()
+            }
             $dialog.empty()
             $this.data({
               media_comment_dialog: null,
+              reactRoot: null,
             })
           }
         },
@@ -377,7 +382,9 @@ const mediaCommentActions = {
             })
 
             if (studioMediaEnabled) {
-              ReactDOM.render(mediaPlayer, $dialog[0])
+              const root = createRoot($dialog[0])
+              root.render(mediaPlayer)
+              $dialog.data('reactRoot', root)
             } else {
               $mediaTag.appendTo($dialog.html(''))
             }
