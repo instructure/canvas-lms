@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import RCE from '../src/rce/RCE'
 import DemoOptions from './DemoOptions'
 import {Button} from '@instructure/ui-buttons'
@@ -27,6 +27,8 @@ import '@instructure/canvas-theme'
 import * as fakeSource from '../src/rcs/fake'
 
 import './test-plugin/plugin'
+
+let root = null
 
 function getSetting(settingKey, defaultValue) {
   let val = localStorage.getItem(settingKey) || defaultValue
@@ -54,7 +56,7 @@ function saveSettings(state) {
     'include_test_plugin',
     'test_plugin_toolbar',
     'test_plugin_menu',
-    'readonly'
+    'readonly',
   ].forEach(settingKey => {
     saveSetting(settingKey, state[settingKey])
   })
@@ -63,7 +65,7 @@ function saveSettings(state) {
 function Demo() {
   const [canvas_exists, set_canvas_exists] = useState(() => getSetting('canvas_exists', false))
   const [canvas_origin, set_canvas_origin] = useState(() =>
-    getSetting('canvas_origin', 'http://localhost:3000')
+    getSetting('canvas_origin', 'http://localhost:3000'),
   )
   const [dir, set_dir] = useState(() => getSetting('dir', 'ltr'))
   const [host, set_host] = useState(() => getSetting('host', 'http:/who.cares')) // 'https://rich-content-iad.inscloudgate.net'
@@ -74,13 +76,13 @@ function Demo() {
   const [sourceType, set_sourceType] = useState(() => getSetting('sourceType', 'fake'))
   const [lang, set_lang] = useState(() => getSetting('lang', 'en'))
   const [include_test_plugin, set_include_test_plugin] = useState(
-    getSetting('include_test_plugin', false)
+    getSetting('include_test_plugin', false),
   )
   const [test_plugin_toolbar, set_test_plugin_toolbar] = useState(
-    getSetting('test_plugin_toolbar', '__none__')
+    getSetting('test_plugin_toolbar', '__none__'),
   )
   const [test_plugin_menu, set_test_plugin_menu] = useState(
-    getSetting('test_plugin_menu', '__none__')
+    getSetting('test_plugin_menu', '__none__'),
   )
   const [rcsProps, set_rcsProps] = useState(() => getRcsPropsFromOpts())
   const [toolbar, set_toolbar] = useState(() => updateToolbar())
@@ -141,7 +143,7 @@ function Demo() {
           containingContext: {
             contextType,
             contextId,
-            userId
+            userId,
           },
           filesTabDisabled: false,
           host,
@@ -153,7 +155,7 @@ function Demo() {
                   Promise.resolve({jwt})
                 },
           source: jwt && sourceType === 'real' ? undefined : fakeSource,
-          themeUrl: ''
+          themeUrl: '',
         }
       : undefined
   }
@@ -163,15 +165,15 @@ function Demo() {
       ? [
           {
             name: test_plugin_toolbar,
-            items: ['rce_demo_test']
-          }
+            items: ['rce_demo_test'],
+          },
         ]
       : undefined
   }
   function updateMenu() {
     return include_test_plugin && test_plugin_menu !== '__none__'
       ? {
-          [test_plugin_menu]: {title: 'Test Plugin', items: 'rce_demo_test'}
+          [test_plugin_menu]: {title: 'Test Plugin', items: 'rce_demo_test'},
         }
       : undefined
   }
@@ -193,7 +195,7 @@ function Demo() {
             height: 350,
             toolbar,
             menu,
-            plugins
+            plugins,
           }}
           highContrastCSS={[]}
           rcsProps={rcsProps}
@@ -262,7 +264,7 @@ function refreshCanvasToken(canvas_origin, initialToken) {
       promise = fetch(`${canvas_origin}/api/v1/jwts/refresh`, {
         method: 'POST',
         mode: 'cors',
-        body: JSON.stringify({jwt: token})
+        body: JSON.stringify({jwt: token}),
       }).then(resp => {
         promise = null
         token = resp.data.token
@@ -278,4 +280,10 @@ function refreshCanvasToken(canvas_origin, initialToken) {
   }
 }
 
-ReactDOM.render(<Demo />, document.getElementById('demo'))
+const container = document.getElementById('demo')
+if (container) {
+  if (!root) {
+    root = createRoot(container)
+  }
+  root.render(<Demo />)
+}
