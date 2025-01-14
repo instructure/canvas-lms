@@ -21138,6 +21138,7 @@ fa:
   section_name_16ea8a4a: "نام بخش"
   section_name_b6d82574: "نام بخش"
   section_name_edb51b2: "نام بخش"
+  section_name_is_too_long_9cec2a30: "نام بخش، طولانی است "
   section_removed_2ac72a79: "%{section} حذف شد."
   section_section_names_98f172e6: "بخش: %{section_names}"
   section_sis_2a80d2fa: "سامانه اطلاعات دانشجوی بخش"
