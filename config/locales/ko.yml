@@ -12369,6 +12369,7 @@ ko:
   section_name_16ea8a4a: "이름 선택"
   section_name_b6d82574: "섹션 이름"
   section_name_edb51b2: 섹션명
+  section_name_is_too_long_9cec2a30: "섹션 이름이 너무 김"
   sections: 
     section_created: "섹션을 성공적으로 만들었습니다!"
     section_creation_failed: "섹션 만들기에 실패"
