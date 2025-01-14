@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import Bridge from '../../../bridge'
 import {parseLatex} from './EquationEditorModal/parseLatex'
 import * as advancedPreference from './EquationEditorModal/advancedPreference'
@@ -33,8 +33,13 @@ export default function (ed, document, _trayProps) {
       document.body.appendChild(container)
     }
 
+    let root = null
+
     const handleDismiss = () => {
-      ReactDOM.unmountComponentAtNode(container)
+      if (root) {
+        root.unmount()
+        root = null
+      }
       ed.focus(false)
     }
 
@@ -42,7 +47,8 @@ export default function (ed, document, _trayProps) {
       rce.insertMathEquation(latex)
     }
 
-    ReactDOM.render(
+    root = createRoot(container)
+    root.render(
       <EquationEditorModal
         editor={ed}
         onModalDismiss={handleDismiss}
