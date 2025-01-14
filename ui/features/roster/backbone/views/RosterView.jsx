@@ -22,7 +22,7 @@ import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import AddPeopleApp from '@canvas/add-people'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -67,29 +67,37 @@ export default class RosterView extends Backbone.View {
     })
   }
 
+  constructor(options) {
+    super(options)
+    this.root = null
+  }
+
   afterRender() {
-    ReactDOM.render(
-      <TextInput
-        onChange={e => {
-          // Sends events to hidden input to utilize backbone
-          const hiddenInput = $('[data-view=inputFilter]')
-          hiddenInput[0].value = e.target?.value
-          hiddenInput.keyup()
-        }}
-        display="inline-block"
-        type="text"
-        placeholder={I18n.t('Search people')}
-        renderLabel={
-          <ScreenReaderContent>
-            {I18n.t(
-              'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.',
-            )}
-          </ScreenReaderContent>
-        }
-        renderBeforeInput={() => <IconSearchLine />}
-      />,
-      this.$el.find('#search_input_container')[0],
-    )
+    const container = this.$el.find('#search_input_container')[0]
+    if (container) {
+      this.root = createRoot(container)
+      this.root.render(
+        <TextInput
+          onChange={e => {
+            // Sends events to hidden input to utilize backbone
+            const hiddenInput = $('[data-view=inputFilter]')
+            hiddenInput[0].value = e.target?.value
+            hiddenInput.keyup()
+          }}
+          display="inline-block"
+          type="text"
+          placeholder={I18n.t('Search people')}
+          renderLabel={
+            <ScreenReaderContent>
+              {I18n.t(
+                'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.',
+              )}
+            </ScreenReaderContent>
+          }
+          renderBeforeInput={() => <IconSearchLine />}
+        />,
+      )
+    }
 
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
 
@@ -147,6 +155,14 @@ export default class RosterView extends Backbone.View {
 
   showCreateUsersModal() {
     return this.addPeopleApp.open()
+  }
+
+  remove() {
+    if (this.root) {
+      this.root.unmount()
+      this.root = null
+    }
+    super.remove()
   }
 }
 RosterView.initClass()
