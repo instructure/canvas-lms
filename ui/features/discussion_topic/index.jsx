@@ -25,7 +25,7 @@ import MarkAsReadWatcher from './backbone/MarkAsReadWatcher'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import MaterializedDiscussionTopic from './backbone/models/Topic'
 import SideCommentDiscussionTopic from './backbone/models/SideCommentDiscussionTopic'
 import EntryCollection from './backbone/collections/EntryCollection'
@@ -93,11 +93,15 @@ function renderCoursePacingNotice() {
 ready(() => {
   new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
+  let keyboardShortcutRoot = null
+  let sectionTooltipRoot = null
+
   if (!window.ENV.disable_keyboard_shortcuts) {
-    ReactDOM.render(
-      <DiscussionTopicKeyboardShortcutModal />,
-      document.getElementById('keyboard-shortcut-modal'),
-    )
+    const keyboardShortcutModal = document.getElementById('keyboard-shortcut-modal')
+    if (keyboardShortcutModal) {
+      keyboardShortcutRoot = createRoot(keyboardShortcutModal)
+      keyboardShortcutRoot.render(<DiscussionTopicKeyboardShortcutModal />)
+    }
   }
 
   renderCoursePacingNotice()
@@ -111,12 +115,12 @@ ready(() => {
     !ENV.DISCUSSION.IS_ASSIGNMENT &&
     !ENV.DISCUSSION.IS_GROUP
   ) {
-    ReactDOM.render(
+    sectionTooltipRoot = createRoot(container)
+    sectionTooltipRoot.render(
       <SectionsTooltip
         totalUserCount={ENV.TOTAL_USER_COUNT}
         sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}
       />,
-      container,
     )
   }
 
