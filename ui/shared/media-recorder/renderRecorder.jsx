@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import CanvasMediaRecorder from './react/components/MediaRecorder'
 
 export default function renderCanvasMediaRecorder(element, onSaveFile) {
@@ -51,13 +51,12 @@ export default function renderCanvasMediaRecorder(element, onSaveFile) {
     }
   }
 
-   
-  ReactDOM.render(
+  const root = createRoot(element)
+  root.render(
     <CanvasMediaRecorder
       onSaveFile={onSaveFile}
       onModalShowToggle={onModalShowToggle}
       indicatorBarMountPointId={indicatorBarMountPointId}
     />,
-    element,
   )
 }
