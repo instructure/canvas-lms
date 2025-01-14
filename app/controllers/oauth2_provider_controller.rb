@@ -186,7 +186,7 @@ class OAuth2ProviderController < ApplicationController
         # The AAC could have been deleted since the user logged in
         @aac = AuthenticationProvider.where(id: session[:login_aac]).first
         redirect = @aac.try(:user_logout_redirect, self, @current_user)
-        increment_statsd(:attempts, action: :slo) if @aac&.slo?
+        increment_statsd(:attempts, action: :slo) if @aac.try(:slo?)
       end
       logout_current_user
     end
