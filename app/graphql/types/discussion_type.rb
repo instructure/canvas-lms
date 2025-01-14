@@ -407,7 +407,8 @@ module Types
       argument :sort, Types::DiscussionSortOrderType, required: false
     end
 
-    def sort_order
+    # TODO, sort parameter is there to avoid alerts on deploy, it should be removed in the next deploy cycke
+    def sort_order(sort: nil)
       object.sort_order.to_sym || DiscussionTopic::SortOrder::DESC.to_sym
     end
 
