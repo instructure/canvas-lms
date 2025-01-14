@@ -17,17 +17,17 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import OfficialNotFoundGame from './frogger/OfficialNotFoundGame'
 import SpaceInvaders from './space_invaders/SpaceInvaders'
 import SlidePuzzle from './slide_puzzle/SlidePuzzle'
 
 export const renderGameApp = domElement => {
   const AppRootElement = document.getElementById(domElement)
+  const root = createRoot(AppRootElement)
   const gamePool = [<OfficialNotFoundGame />, <SpaceInvaders />, <SlidePuzzle />]
   const index = Math.floor(Math.random() * 3)
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(gamePool[index], AppRootElement)
+  root.render(gamePool[index])
 }
 
 export const renderGameIntoDom = domElement => {
