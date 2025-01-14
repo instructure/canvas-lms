@@ -18,10 +18,11 @@
 
 import $ from 'jquery'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import PastGlobalAnnouncements from './react/PastGlobalAnnouncements'
 
 $(() => {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(<PastGlobalAnnouncements />, $('<div/>').appendTo('#content')[0])
+  const container = $('<div/>').appendTo('#content')[0]
+  const root = createRoot(container)
+  root.render(<PastGlobalAnnouncements />)
 })
