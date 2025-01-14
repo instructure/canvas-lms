@@ -2839,7 +2839,7 @@ de:
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Studenten sehen lassen, wer sich für die Zeitfenster eingeschrieben hat"
   allow_students_to_see_who_has_signed_up_for_time_s_7eb1d0ef: "Zulassen, dass Studierende sehen, wer sich für Zeitfenster, die noch verfügbar sind, eingetragen hat."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Studenten dürfen sehen, wer sich für die Zeitfenster eingeschrieben hat."
-  allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Damit Studierende zu sehen, wer für Zeitfenster, die noch verfügbar sind, eingetragen wurde."
+  allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Zulassen, dass Studierende sehen, wer sich für Zeitfenster, die noch verfügbar sind, eingetragen hat."
   allow_students_to_submit_photo_using_their_webcam_5c18bf01: "Erlauben, dass Studenten ein Foto mit Ihrer Webcam senden."
   allow_students_to_sync_their_course_content_in_the_b6fd9169: "Ermöglicht es Studierenden, ihre Kursinhalte in den mobilen Apps zu synchronisieren und sie offline zu betrachten."
   allow_sub_account_selection_when_users_manually_cr_d0a6e2e6: "Erlaubt die Auswahl eines Unterkontos, wenn Benutzer\\*innen manuell Kurse erstellen"
@@ -15787,7 +15787,7 @@ de:
   have_not_been_graded_df2a5fd2: "Wurden nicht bewertet"
   have_not_yet_submitted_57e6a58b: "Wurden noch nicht abgegeben"
   have_not_yet_submitted_and_excused_8987e3ab: "Noch nicht abgegeben und entschuldigt"
-  have_students_sign_up_in_groups_d6cfd4d2: "Studierende sich in Gruppen anmelden lassen"
+  have_students_sign_up_in_groups_d6cfd4d2: "Studierende in Gruppen anmelden lassen"
   have_submitted_9194a0c: Abgegeben
   have_submitted_and_been_graded_e318d256: "Abgegeben und benotet"
   have_submitted_and_not_been_graded_f20b6383: "Abgegeben und nicht benotet"
@@ -17836,7 +17836,7 @@ de:
   limit_certain_lti_placements_to_authorized_tools_f4384cb6: "Bestimmte LTI-Platzierungen auf autorisierte Tools beschränken"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Die Kursteilnahme auf Semester oder benutzerdefinierte Kurstermine beschränken?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Jedes Zeitfenster auf %{input_value} Benutzer\\*innen beschränken."
-  limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Jedes Zeitfenster auf %{num_participants} *Gruppen begrenzen.* **Benutzer\\*innen.**"
+  limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Jedes Zeitfenster auf %{num_participants} *Gruppen begrenzen.* **Benutzer\\*innen beschränken.**"
   limit_file_size_limit_per_file_b336c0d8: "%{file_size_limit} Begrenzung pro Datei"
   limit_group_members_to_leave_blank_for_no_limit_c341e248: "Gruppenmitglieder begrenzen auf (für „keine Begrenzung“ leer lassen)"
   limit_groups_to_group_limit_members_40651ea7: "Gruppen auf %{group_limit} Mitglieder beschränken"
@@ -17847,10 +17847,10 @@ de:
   limit_search_to_activity_before_13d8bf3a: "Suche auf Aktivitäten davor beschränken."
   limit_search_to_activity_before_e05aad05: "Suche einschränken auf Aktivität davor"
   limit_section_privileges_e6425dfd: limit_section_privileges
-  limit_students_to_attend_input_value_slot_s_9a5bf576: "Teilnahme von Studierenden an %{input_value} Zeitfenstern begrenzen. "
+  limit_students_to_attend_input_value_slot_s_9a5bf576: "Teilnehmende können sich für maximal %{input_value} Termine eintragen."
   limit_the_ability_to_manage_access_tokens_to_admin_f7a8ad5d: "Beschränken Sie die Möglichkeit, Zugangs-Token zu verwalten, auf Admins."
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "Diesen Zeitblock auf %{input_type_number_name_max_parti} Gruppen limitieren."
-  limit_this_slot_to_input_type_number_name_max_part_8344547a: "Diesen Zeitblock für %{input_type_number_name_max_parti} Benutzer\\*innen limitieren"
+  limit_this_slot_to_input_type_number_name_max_part_8344547a: "Dieses Zeitfenster auf %{input_type_number_name_max_parti} Benutzer\\*innen beschränken."
   limit_to_a_specific_date_e3341b10: "Auf ein bestimmtes Datum beschränken"
   limited_322546c5: Begrenzt
   line_items_828f62cc: Positionen
