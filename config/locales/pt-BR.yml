@@ -21897,9 +21897,9 @@ pt-BR:
   note_this_login_s_account_uses_delegated_authentic_89227914: "Nota: Essa conta de login usa a autenticação externa, mas permite a autenticação de senha Canvas fallback. Os campos de senha neste formulário atualizam a senha de Canvas fallback, *não* a autenticação externa."
   note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "NOTA: Isso tentará desfazer a mesclagem o mais completamente possível; no entanto, os usuários mesclados podem não ser restaurados perfeitamente ao estado anterior."
   notebook_b0eea5b4: caderno
-  notes_5ef20d1: notas
+  notes_5ef20d1: observações
   notes_6cfc3988: "Observações:"
-  notes_c42e0fd5: Notas
+  notes_c42e0fd5: Observações
   notes_d5339f17: "%{notes}"
   notes_for_name_2eefac11: "Anotações para %{name}"
   nothing_due_this_week_d45c9ef9: "Nada com prazo nesta semana"
@@ -23284,7 +23284,7 @@ pt-BR:
   play_media_comment_by_name_from_createdat_515b3b: "Reproduzir comentário em mídia por %{name} de %{createdAt}."
   play_media_comment_fad7a166: "Reproduzir comentário em mídia"
   playback: 
-    notes: Notas
+    notes: Observações
     podcast: Podcast
     presentation: Apresentação
     statistics: Estatísticas
