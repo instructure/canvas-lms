@@ -25,7 +25,7 @@ import template from '../../jst/GradingTypeSelector.handlebars'
 import '../../jquery/toggleAccessibly'
 import '@canvas/util/jquery/fixDialogButtons'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {GradingSchemesSelector} from '@canvas/grading-scheme'
 
 const I18n = createI18nScope('assignment_grading_type')
@@ -41,6 +41,7 @@ function GradingTypeSelector() {
   this.showGradingSchemeDialog = this.showGradingSchemeDialog.bind(this)
   this.showGpaDialog = this.showGpaDialog.bind(this)
   this.handleGradingTypeChange = this.handleGradingTypeChange.bind(this)
+  this.root = null
   return GradingTypeSelector.__super__.constructor.apply(this, arguments)
 }
 
@@ -196,8 +197,10 @@ GradingTypeSelector.prototype.renderGradingSchemeSelector = function () {
         : undefined,
   }
   const mountPoint = document.querySelector('#grading_scheme_selector-target')
-  // eslint-disable-next-line react/no-render-return-value
-  return ReactDOM.render(React.createElement(GradingSchemesSelector, props), mountPoint)
+  if (!this.root) {
+    this.root = createRoot(mountPoint)
+  }
+  this.root.render(React.createElement(GradingSchemesSelector, props))
 }
 
 export default GradingTypeSelector
