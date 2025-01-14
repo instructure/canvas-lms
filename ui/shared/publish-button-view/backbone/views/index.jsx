@@ -24,7 +24,7 @@ import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.instructure_forms'
 import * as tz from '@instructure/moment-utils'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import DelayedPublishDialog from '../../react/components/DelayedPublishDialog'
 
 const I18n = createI18nScope('publish_btn_module')
@@ -73,6 +73,8 @@ export default (function (superClass) {
     '.publish-text': '$text',
     '.dpd-mount': '$dpd_mount',
   }
+
+  PublishButton.prototype.dpdRoot = null
 
   PublishButton.prototype.initialize = function () {
     let ref
@@ -437,12 +439,18 @@ export default (function (superClass) {
       })(this),
       onClose: (function (_this) {
         return function () {
-          return ReactDOM.unmountComponentAtNode(_this.$dpd_mount[0])
+          if (_this.dpdRoot) {
+            _this.dpdRoot.unmount()
+            _this.dpdRoot = null
+          }
         }
       })(this),
     }
-    // eslint-disable-next-line react/no-render-return-value
-    return ReactDOM.render(React.createElement(DelayedPublishDialog, props), this.$dpd_mount[0])
+    if (this.dpdRoot) {
+      this.dpdRoot.unmount()
+    }
+    this.dpdRoot = createRoot(this.$dpd_mount[0])
+    return this.dpdRoot.render(React.createElement(DelayedPublishDialog, props))
   }
 
   return PublishButton
