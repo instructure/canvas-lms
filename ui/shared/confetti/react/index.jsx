@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import Confetti from './Confetti'
 
 export {Confetti}
 
 export default function renderConfettiApp(env, elt) {
-  // eslint-disable-next-line no-restricted-properties
-  ReactDOM.render(<Confetti />, elt)
+  const root = createRoot(elt)
+  root.render(<Confetti />)
 }
