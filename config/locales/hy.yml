@@ -14968,6 +14968,7 @@ hy:
   section_name_16ea8a4a: "Բաժնի անվանում"
   section_name_b6d82574: "Բաժնի անվանում"
   section_name_edb51b2: "բաժնի անվանում"
+  section_name_is_too_long_9cec2a30: "Բաժնի անվանումը չափազանց երկար է"
   section_sis_id_6f989834: "sis բաժնի id"
   section_starts_at_65eaed1: "Բաժինը սկսվում է "
   sections: 
