@@ -718,15 +718,25 @@ function getCourseId() {
   return ENV.context_asset_string.match(/.*_(\d+)$/)[1]
 }
 
+let selectMenuRoot = null
+let gradeSummaryRoot = null
+let submissionCommentsTrayRoot = null
+let clearBadgeCountsRoot = null
+
 function renderSelectMenuGroup() {
-  ReactDOM.render(
-    <SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />,
-    document.getElementById('GradeSummarySelectMenuGroup'),
-  )
+  const container = document.getElementById('GradeSummarySelectMenuGroup')
+  if (!selectMenuRoot) {
+    selectMenuRoot = ReactDOM.createRoot(container)
+  }
+  selectMenuRoot.render(<SelectMenuGroup {...GradeSummary.getSelectMenuGroupProps()} />)
 }
 
 function renderGradeSummaryTable() {
-  ReactDOM.render(<GradeSummaryManager />, document.getElementById('grade-summary-react'))
+  const container = document.getElementById('grade-summary-react')
+  if (!gradeSummaryRoot) {
+    gradeSummaryRoot = ReactDOM.createRoot(container)
+  }
+  gradeSummaryRoot.render(<GradeSummaryManager />)
 }
 
 function handleSubmissionsCommentTray(assignmentId) {
@@ -772,9 +782,11 @@ function getSubmissionCommentsTrayProps(assignmentId) {
 }
 
 function renderSubmissionCommentsTray() {
-  ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
-
-  ReactDOM.render(
+  const container = document.getElementById('GradeSummarySubmissionCommentsTray')
+  if (!submissionCommentsTrayRoot) {
+    submissionCommentsTrayRoot = ReactDOM.createRoot(container)
+  }
+  submissionCommentsTrayRoot.render(
     <SubmissionCommentsTray
       onDismiss={() => {
         const {submissionTrayAssignmentId} = useStore.getState()
@@ -782,19 +794,17 @@ function renderSubmissionCommentsTray() {
         $(`#submission_${submissionTrayAssignmentId}`).removeClass('selected-assignment')
       }}
     />,
-    document.getElementById('GradeSummarySubmissionCommentsTray'),
   )
 }
 
 function renderClearBadgeCountsButton() {
-  ReactDOM.unmountComponentAtNode(document.getElementById('ClearBadgeCountsButton'))
+  const container = document.getElementById('ClearBadgeCountsButton')
+  if (!clearBadgeCountsRoot) {
+    clearBadgeCountsRoot = ReactDOM.createRoot(container)
+  }
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
-
-  ReactDOM.render(
-    <ClearBadgeCountsButton userId={userId} courseId={courseId} />,
-    document.getElementById('ClearBadgeCountsButton'),
-  )
+  clearBadgeCountsRoot.render(<ClearBadgeCountsButton userId={userId} courseId={courseId} />)
 }
 
 function setup() {
