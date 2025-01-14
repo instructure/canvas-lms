@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
@@ -41,7 +41,9 @@ const CoursePacingNotice = props => {
 }
 
 export function renderCoursePacingNotice(mountPoint, courseId) {
-  ReactDOM.render(<CoursePacingNotice courseId={courseId} />, mountPoint)
+  const root = createRoot(mountPoint)
+  root.render(<CoursePacingNotice courseId={courseId} />)
+  return () => root.unmount()
 }
 
 export default CoursePacingNotice
