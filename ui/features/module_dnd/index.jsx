@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
 import ready from '@instructure/ready'
 
@@ -29,14 +29,14 @@ ready(() => {
     if (moduleDnd) {
       const moduleName = zone.querySelector('.ig-header-title .name')?.textContent || null
 
-      ReactDOM.render(
+      const root = createRoot(moduleDnd)
+      root.render(
         <ModuleFileDrop
           courseId={ENV.course_id}
           moduleId={moduleDnd.getAttribute('data-context-module-id')}
           contextModules={contextModules}
           moduleName={moduleName}
         />,
-        moduleDnd,
       )
     }
   })
