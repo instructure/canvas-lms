@@ -78,6 +78,10 @@ module Lti
       def user
         params[:user]
       end
+
+      def opts
+        { extra_claims: %i[roles target_link_uri] }
+      end
     end
   end
 end
