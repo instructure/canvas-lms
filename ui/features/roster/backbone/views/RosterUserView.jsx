@@ -25,7 +25,7 @@ import EditRolesView from './EditRolesView'
 import InvitationsView from './InvitationsView'
 import LinkToStudentsView from './LinkToStudentsView'
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {Avatar} from '@instructure/ui-avatar'
 import {nanoid} from 'nanoid'
 import 'jquery-kyle-menu'
@@ -307,18 +307,29 @@ export default class RosterUserView extends Backbone.View {
   }
 
   afterRender() {
-    ReactDOM.render(
-      <a href={`users/${this.model.id}`}>
-        <Avatar
-          name={this.model.attributes.name}
-          src={this.model.attributes.avatar_url}
-          size="small"
-          alt={this.model.attributes.name}
-        />
-        <span className="screenreader-only">{this.model.attributes.name}</span>
-      </a>,
-      this.$el.find(`#${this.model.attributes.avatarId}`)[0],
-    )
+    const container = this.$el.find(`#${this.model.attributes.avatarId}`)[0]
+    if (container) {
+      const root = createRoot(container)
+      root.render(
+        <a href={`users/${this.model.id}`}>
+          <Avatar
+            name={this.model.attributes.name}
+            src={this.model.attributes.avatar_url}
+            size="small"
+            alt={this.model.attributes.name}
+          />
+          <span className="screenreader-only">{this.model.attributes.name}</span>
+        </a>,
+      )
+      this._reactRoot = root
+    }
+  }
+
+  remove() {
+    if (this._reactRoot) {
+      this._reactRoot.unmount()
+    }
+    return super.remove(...arguments)
   }
 }
 RosterUserView.initClass()
