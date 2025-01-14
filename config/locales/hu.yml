@@ -21838,6 +21838,7 @@ hu:
   section_name_edb51b2: szekciónév
   section_name_fa2b80d7: "Szekció neve:"
   section_name_inactive_36edffe6: "%{section_name} - Inaktív"
+  section_name_is_too_long_9cec2a30: "A szekció neve túl hosszú"
   section_pace_989d2856: "Szekció ütemezés"
   section_removed_2ac72a79: "%{section}eltávolítva"
   section_section_names_98f172e6: "Szekció: %{section_names}"
