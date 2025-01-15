@@ -88,6 +88,8 @@
           disabled=submissionTypesFrozen}}
           {{#t "labels.allows_annotated_document"}}Student Annotation{{/t}}
         </label>
+        {{!-- Student Annotation File Upload Error Container --}}
+        <div id="online_submission_types[student_annotation]_errors"></div>
         <div id="assignment_annotated_document_info" style="{{hiddenUnless acceptsAnnotatedDocument}}">
           {{#t}}Consider selecting multiple submission types to accommodate students who may not be able to create
           annotations.{{/t}}

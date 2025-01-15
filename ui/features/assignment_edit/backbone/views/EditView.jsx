@@ -58,6 +58,10 @@ import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import {queryClient} from '@canvas/query'
+import {createRoot} from 'react-dom/client'
+import {IconWarningSolid} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('assignment_editview')
 
@@ -204,6 +208,8 @@ function EditView() {
   this.handleCancel = this.handleCancel.bind(this)
   this.handleMessageEvent = this.handleMessageEvent.bind(this)
   window.addEventListener('message', this.handleMessageEvent.bind(this))
+  this.hideErrors = this.hideErrors.bind(this)
+  this.errorRoots = {}
 
   return EditView.__super__.constructor.apply(this, arguments)
 }
@@ -791,6 +797,7 @@ EditView.prototype.getAnnotatedDocument = function () {
 }
 
 EditView.prototype.renderAnnotatedDocumentSelector = function () {
+  this.hideErrors("online_submission_types[student_annotation]_errors")
   const props = {
     attachment: this.getAnnotatedDocument(),
     defaultUploadFolderId: ENV.ROOT_FOLDER_ID,
@@ -897,11 +904,12 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
   if (annotatedDocument) {
     contextType = annotatedDocument.contextType
     contextId = annotatedDocument.contextId
-
+    const hideErrors = this.hideErrors
     ReactDOM.render(
       React.createElement(UsageRightsSelectBox, {
         contextType,
         contextId,
+        hideErrors
       }),
       document.querySelector(USAGE_RIGHTS_CONTAINER),
     )
@@ -1509,6 +1517,28 @@ EditView.prototype.fieldSelectors = Object.assign(
 )
 
 EditView.prototype.showErrors = function (errors) {
+  Object.entries(errors).forEach(([key, value]) => {
+    // For this to function properly
+    // the error containers must have an ID formatted as ${key}_errors.
+    const errorsContainer = document.getElementById(`${key}_errors`)
+    if(errorsContainer){
+      const root = this.errorRoots[key] ?? createRoot(errorsContainer)
+      root.render(
+        <Flex as="div" alignItems="center" margin="0 0 0 medium">
+          <Flex.Item as="div" margin="0 xx-small xxx-small 0">
+            <IconWarningSolid color="error" />
+          </Flex.Item>
+          <Text size="small" color="danger">
+            {value[0].message}
+          </Text>
+        </Flex>
+      )
+      this.errorRoots[`${key}_errors`] = root
+      delete errors[key]
+    }
+  })
+
+
   // override view handles displaying override errors, remove them
   // before calling super
   delete errors.assignmentOverrides
@@ -1519,6 +1549,12 @@ EditView.prototype.showErrors = function (errors) {
       return this.conditionalReleaseEditor.focusOnError()
     }
   }
+}
+
+EditView.prototype.hideErrors = function (containerId) {
+  const container = document.getElementById(containerId)
+  this.errorRoots[containerId]?.unmount()
+  delete this.errorRoots[containerId]
 }
 
 EditView.prototype.validateBeforeSave = function (data, errors) {
@@ -1667,7 +1703,7 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
   ) {
     errors['online_submission_types[student_annotation]'] = [
       {
-        message: I18n.t('You must attach a file'),
+        message: I18n.t('This submission type requires a file upload'),
       },
     ]
   } else if (
@@ -1679,7 +1715,7 @@ EditView.prototype._validateSubmissionTypes = function (data, errors) {
     if (annotatedDocumentUsageRights.use_justification === 'choose') {
       errors.usage_rights_use_justification = [
         {
-          message: I18n.t('You must set document usage rights'),
+          message: I18n.t('Identifying the usage rights is required'),
         },
       ]
     }
