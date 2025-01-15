@@ -52,8 +52,8 @@ if settings.present?
     config.traces_sampler = lambda do |sampling_context|
       rack_env = sampling_context[:env]
       return 1 if rack_env && rack_env.try(:[], 'QUERY_STRING')&.include?('sentry')
-      transaction_context = sampling_context[:transaction_context]
-      return 0.001 if transaction_context[:name].match?(/grade_passback$/)
+      return 0.01 if rack_env && rack_env.try(:[], 'PATH_INFO') =~ /grade_passback$/
+
       0.0001
     end
   end
