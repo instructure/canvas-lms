@@ -37,7 +37,6 @@ const SearchableSelectOption = () => <div />
 SearchableSelectOption.propTypes = {
   id: string.isRequired,
   value: string.isRequired,
-  children: node.isRequired,
 }
 SearchableSelectOption.displayName = 'Option'
 
@@ -86,7 +85,7 @@ function SearchableSelect(props) {
 
   function setSearchResultMessage(matches) {
     if (!matches) {
-      setMessages([{type: 'newError', text: noSearchMatchLabel}])
+      setMessages([{type: 'error', text: noSearchMatchLabel}])
       return
     }
     if (noResults) {

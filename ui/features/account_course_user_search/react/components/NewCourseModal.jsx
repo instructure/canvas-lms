@@ -23,36 +23,21 @@ import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
-import {Text} from '@instructure/ui-text'
 import {propType as termsPropType} from '../store/TermsStore'
 import SearchableSelect from './SearchableSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
+import preventDefault from '@canvas/util/preventDefault'
 import {flatten} from 'lodash'
 import {clearDashboardCache} from '../../../../shared/dashboard-card/dashboardCardQueries'
-import * as z from 'zod'
-import {zodResolver} from '@hookform/resolvers/zod'
-import {useForm, Controller} from 'react-hook-form'
-import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
-import {Term, Course} from '../../../../api'
-
-type Account = {
-  id: string
-  name: string
-  subAccounts: Account[]
-}
-
-type TermList = {
-  data: Term[]
-  loading: boolean
-}
 
 const I18n = createI18nScope('account_course_user_search')
 
 const nonBreakingSpace = '\u00a0'
-const renderAccountOptions = (accounts: Account[] = [], depth = 0): {id: string; name: string}[] =>
+const renderAccountOptions = (accounts = [], depth = 0) =>
   flatten(
     accounts.map(account =>
       [{id: account.id, name: Array(2 * depth + 1).join(nonBreakingSpace) + account.name}].concat(
@@ -66,45 +51,40 @@ NewCourseModal.propTypes = {
   children: node.isRequired,
 }
 
-const validationSchema = z.object({
-  name: z.string().min(1, I18n.t('Course name is required.')),
-  reference_code: z.string().min(1, I18n.t('Reference code is required.')),
-})
+const emptyData = {name: '', course_code: ''}
 
-export default function NewCourseModal({
-  terms,
-  children,
-}: {terms: TermList; children: React.ReactNode}) {
+export default function NewCourseModal({terms, children}) {
   const [isOpen, setIsOpen] = useState(false)
-  const [account, setAccount] = useState('')
-  const [enrollmentTerm, setEnrollmentTerm] = useState('')
-  const defaultValues = {name: '', reference_code: ''}
-  const {
-    formState: {errors},
-    control,
-    handleSubmit,
-    setFocus,
-  } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
+  const [data, setData] = useState(emptyData)
+  const [errors, setErrors] = useState({})
 
   const accountTree = AccountsTreeStore.getTree()
 
   function closeModal() {
     setIsOpen(false)
-    setAccount('')
-    setEnrollmentTerm('')
+    setData(emptyData)
+    setErrors({})
   }
 
-  function onSubmit({name, reference_code}: typeof defaultValues) {
-    const successHandler = (createdCourse: Course) => {
+  function onSubmit() {
+    const errs = {}
+    if (!data.name) errs.name = I18n.t('Course name is required')
+    if (!data.course_code) errs.course_code = I18n.t('Reference code is required')
+    if (Object.keys(errs).length > 0) {
+      setErrors(errs)
+      return
+    }
+
+    const successHandler = createdCourse => {
       closeModal()
       showFlashAlert({
         type: 'success',
         message: (
-          <Text>
+          <>
             {I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})}
             &emsp;
             <Link href={`/courses/${createdCourse.id}`}>{I18n.t('Go to the new course')}</Link>
-          </Text>
+          </>
         ),
       })
       if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
@@ -112,26 +92,25 @@ export default function NewCourseModal({
       }
     }
 
-    const errorHandler = () => {
-      showFlashError(I18n.t('Something went wrong creating the course. Please try again.'))
-      setFocus('name')
-    }
+    const errorHandler = showFlashError(
+      I18n.t('Something went wrong creating the course. Please try again.')
+    )
 
-    const data = {
-      name: name,
-      course_code: reference_code,
-      account_id: account,
-      enrollment_term_id: enrollmentTerm,
-    }
     CoursesStore.create({course: data}, successHandler, errorHandler)
+  }
+
+  function onChange(field) {
+    return function (e, value) {
+      setData(oldState => ({...oldState, [field]: value.id || value}))
+      setErrors({})
+    }
   }
 
   return (
     <span>
       <Modal
         as="form"
-        noValidate={true}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={preventDefault(onSubmit)}
         open={isOpen}
         onDismiss={closeModal}
         onOpen={() => AccountsTreeStore.loadTree()}
@@ -141,35 +120,27 @@ export default function NewCourseModal({
       >
         <Modal.Body>
           <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-            <Controller
-              name="name"
-              control={control}
-              render={({field}) => (
-                <TextInput
-                  {...field}
-                  renderLabel={I18n.t('Course Name')}
-                  isRequired={true}
-                  messages={getFormErrorMessage(errors, 'name')}
-                />
-              )}
+            <TextInput
+              renderLabel={I18n.t('Course Name')}
+              value={data.name}
+              onChange={onChange('name')}
+              isRequired={true}
+              messages={errors.name && [{type: 'error', text: errors.name}]}
             />
-            <Controller
-              name="reference_code"
-              control={control}
-              render={({field}) => (
-                <TextInput
-                  {...field}
-                  renderLabel={I18n.t('Reference Code')}
-                  isRequired={true}
-                  messages={getFormErrorMessage(errors, 'reference_code')}
-                />
-              )}
+
+            <TextInput
+              renderLabel={I18n.t('Reference Code')}
+              value={data.course_code}
+              onChange={onChange('course_code')}
+              isRequired={true}
+              messages={errors.course_code && [{type: 'error', text: errors.course_code}]}
             />
+
             <SearchableSelect
               id="accountSelector"
               label={I18n.t('Subaccount')}
               isLoading={accountTree.loading}
-              onChange={(_e, option) => setAccount(option.id)}
+              onChange={onChange('account_id')}
             >
               {renderAccountOptions(accountTree.accounts).map(account => (
                 <SearchableSelect.Option key={account.id} id={account.id} value={account.id}>
@@ -182,7 +153,7 @@ export default function NewCourseModal({
               id="termSelector"
               label={I18n.t('Enrollment Term')}
               isLoading={terms.loading}
-              onChange={(_e, option) => setEnrollmentTerm(option.id)}
+              onChange={onChange('enrollment_term_id')}
             >
               {(terms.data || []).map(term => (
                 <SearchableSelect.Option key={term.id} id={term.id} value={term.id}>
@@ -199,16 +170,14 @@ export default function NewCourseModal({
           </Button>
         </Modal.Footer>
       </Modal>
-      {React.Children.map(
-        children,
-        child =>
-          React.isValidElement(child) &&
-          // when you click whatever is the child element to this, open the modal
-          React.cloneElement(child as React.ReactElement<any>, {
-            onClick: () => {
-              setIsOpen(true)
-            },
-          }),
+      {React.Children.map(children, child =>
+        // when you click whatever is the child element to this, open the modal
+        React.cloneElement(child, {
+          onClick: (...args) => {
+            if (child.props.onClick) child.props.onClick(...args)
+            setIsOpen(true)
+          },
+        })
       )}
     </span>
   )
