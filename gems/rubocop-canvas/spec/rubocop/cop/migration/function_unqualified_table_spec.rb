@@ -22,7 +22,7 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
 
   context "create function" do
     it "complains if a function is created with a schema qualified table name" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -41,16 +41,16 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq <<~'TEXT'.tr("\n", " ")
         Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "does not complain on functions without a schema qualified table name" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -69,11 +69,11 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "finds function creation with white space" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -93,16 +93,16 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq <<~'TEXT'.tr("\n", " ")
         Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "finds function creation without replace" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -121,16 +121,16 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq <<~'TEXT'.tr("\n", " ")
         Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "finds function replacement without create" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -149,16 +149,16 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq <<~'TEXT'.tr("\n", " ")
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq <<~'TEXT'.tr("\n", " ")
         Migration/FunctionUnqualifiedTable: Use unqualified table names in function creation to be compatible with beta/test refresh.
         (ie: `folders` and not `#{Folder.quoted_table_name}`))
       TEXT
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "does not complain on non-function creation" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -178,11 +178,11 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "does not complain on function creation separate from some other execution" do
-      inspect_source(<<~'RUBY')
+      offenses = inspect_source(<<~'RUBY')
         class MyMigration < ActiveRecord::Migration
           def up
             execute("
@@ -207,7 +207,7 @@ describe RuboCop::Cop::Migration::FunctionUnqualifiedTable do
         end
       RUBY
 
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
   end
 end

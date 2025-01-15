@@ -19,7 +19,7 @@
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
 import {each, isEmpty, extend as lodashExtend} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import MarkAsReadWatcher from '../MarkAsReadWatcher'
 import walk from '../../array-walk'
 import Backbone from '@canvas/backbone'
@@ -37,7 +37,7 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 import '@canvas/avatar/jst/_avatar.handlebars'
 import '../../jst/_reply_form.handlebars'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 extend(EntryView, Backbone.View)
 
@@ -294,7 +294,7 @@ EntryView.prototype.renderTree = function (opts) {
     perPage: children,
   })
   const page = collection.getPageAsCollection(0)
-  // eslint-disable-next-line new-cap
+   
   this.treeView = new this.options.treeView({
     el: this.$replies[0],
     descendants,
@@ -356,7 +356,7 @@ EntryView.prototype.remove = function () {
     return
   }
   if (
-    // eslint-disable-next-line no-alert
+     
     window.confirm(I18n.t('are_your_sure_delete', 'Are you sure you want to delete this entry?'))
   ) {
     this.model.set('deleted', true)

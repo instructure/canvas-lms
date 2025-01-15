@@ -75,6 +75,7 @@ const router = createBrowserRouter(
           renderConfigureButton={(buttonWidth, ltiConfiguration) => {
             return (
               <ProductConfigureButton
+                accountId={accountId}
                 buttonWidth={buttonWidth}
                 ltiConfiguration={ltiConfiguration}
               />

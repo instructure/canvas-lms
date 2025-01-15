@@ -17,13 +17,14 @@
  */
 
 import React, {useContext, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {IconCollapseLine, IconExpandLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {AllThreadsState, SearchContext} from '../../utils/constants'
 import PropTypes from 'prop-types'
-const I18n = useI18nScope('discussions_posts')
+
+const I18n = createI18nScope('discussions_posts')
 
 export const ExpandCollapseThreadsButton = props => {
   const {setAllThreadsStatus, expandedThreads, setExpandedThreads} = useContext(SearchContext)
@@ -55,16 +56,24 @@ export const ExpandCollapseThreadsButton = props => {
     }, 0)
   }
 
-  return (
+  const button = (
+    <Button
+      display="block"
+      onClick={() => onExpandCollapseClick()}
+      renderIcon={displayExpanded ? <IconExpandLine /> : <IconCollapseLine />}
+      data-testid="ExpandCollapseThreads-button"
+      disabled={props.disabled || false}
+    >
+      {props.showText ? buttonText : null}
+    </Button>
+  )
+
+  return props.tooltipEnabled ? (
     <Tooltip renderTip={buttonText} width="78px" data-testid="sortButtonTooltip">
-      <Button
-        onClick={() => onExpandCollapseClick()}
-        renderIcon={displayExpanded ? <IconExpandLine /> : <IconCollapseLine />}
-        data-testid="ExpandCollapseThreads-button"
-      >
-        {props.showText ? buttonText : null}
-      </Button>
+      {button}
     </Tooltip>
+  ) : (
+    button
   )
 }
 
@@ -72,4 +81,6 @@ ExpandCollapseThreadsButton.propTypes = {
   showText: PropTypes.bool,
   isExpanded: PropTypes.bool,
   onCollapseRepliesToggle: PropTypes.func,
+  tooltipEnabled: PropTypes.bool,
+  disabled: PropTypes.bool,
 }

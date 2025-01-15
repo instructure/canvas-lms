@@ -48,7 +48,7 @@ describe AuthenticationProvider::OpenIDConnect::JwksRefresher do
 
   describe ".refresh_providers" do
     before do
-      response = instance_double("Net::HTTPSuccess", :body => google_jwks, :value => nil, :[] => nil)
+      response = instance_double(Net::HTTPSuccess, :body => google_jwks, :value => nil, :[] => nil)
       allow(CanvasHttp).to receive(:get).with("https://www.googleapis.com/oauth2/v3/certs").and_yield(response).and_return(response)
       allow(CanvasHttp).to receive(:get).with("https://www.googleapis.com/oauth2/v3/certs", {}).and_yield(response).and_return(response)
     end

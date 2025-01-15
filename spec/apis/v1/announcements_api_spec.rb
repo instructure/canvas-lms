@@ -33,7 +33,7 @@ describe "Announcements API", type: :request do
     @anns = []
 
     1.upto(5) do |i|
-      ann = @course1.announcements.build title: "Accountment 1.#{i}", message: i
+      ann = @course1.announcements.build title: "Announcement 1.#{i}", message: i
       ann.posted_at = (7 - i).days.ago # To make them more recent each time
       ann.save!
 
@@ -45,11 +45,19 @@ describe "Announcements API", type: :request do
     @course2 = @course
     @ann2 = @course2.announcements.build title: "Announcement 2", message: "2"
     @ann2.workflow_state = "post_delayed"
-    @ann2.posted_at = Time.now
+    @ann2.posted_at = Time.zone.now
     @ann2.delayed_post_at = 21.days.from_now
     @ann2.save!
 
     @params = { controller: "announcements_api", action: "index", format: "json" }
+  end
+
+  def test_with_expiring_announcements
+    # Setting up for expiration check on home page
+    0.upto(4) do |i|
+      @anns[i].update_attribute(:lock_at, (5 + (-2 * i)).days.ago)
+    end
+    yield
   end
 
   context "as teacher" do
@@ -266,6 +274,22 @@ describe "Announcements API", type: :request do
         expect(json.length).to be 2
         expect(json.pluck("id")).to include(@anns.last[:id], @ann3[:id])
       end
+
+      it "won't exclude expired announcements on home page" do
+        test_with_expiring_announcements do
+          json = api_call_as_user(@teacher,
+                                  :get,
+                                  "/api/v1/announcements",
+                                  @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
+                                                start_date: 10.days.ago.iso8601,
+                                                end_date: Time.now.utc.iso8601,
+                                                available_after: Time.now.utc.iso8601,
+                                                active_only: true,
+                                                page: 1,
+                                                per_page: 6))
+          expect(json.length).to eq 6
+        end
+      end
     end
   end
 
@@ -328,6 +352,25 @@ describe "Announcements API", type: :request do
                                             end_date:))
       expect(json.length).to eq 6
       expect(json.pluck("id")).to eq @anns.map(&:id).reverse << @ann1.id
+    end
+
+    it "excludes expired announcements on home page" do
+      test_with_expiring_announcements do
+        json = api_call_as_user(@student,
+                                :get,
+                                "/api/v1/announcements",
+                                @params.merge(context_codes: ["course_#{@course1.id}", "course_#{@course2.id}"],
+                                              start_date: 10.days.ago.iso8601,
+                                              end_date: Time.now.utc.iso8601,
+                                              available_after: Time.now.utc.iso8601,
+                                              active_only: true,
+                                              page: 1,
+                                              per_page: 6))
+        0.upto(2) do |i|
+          expect(json[i]["lock_at"] > Time.now.utc.iso8601).to be_truthy unless json[i]["lock_at"].nil?
+        end
+        expect(json.length).to eq 3
+      end
     end
 
     it "excludes courses not in the context_ids list" do

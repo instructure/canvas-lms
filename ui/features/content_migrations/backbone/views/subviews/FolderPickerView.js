@@ -19,9 +19,9 @@
 import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import template from '../../../jst/subviews/FolderPicker.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('content_migrations')
+const I18n = createI18nScope('content_migrations')
 
 extend(FolderPickerView, Backbone.View)
 
@@ -48,7 +48,7 @@ FolderPickerView.prototype.setAttributes = function (_event) {
       ? {
           folder_id: this.$migrationUploadTo.val(),
         }
-      : // eslint-disable-next-line no-void
+      :  
         void 0
   )
 }
@@ -71,7 +71,7 @@ FolderPickerView.prototype.toJSON = function (json) {
 FolderPickerView.prototype.validations = function () {
   const errors = {}
   const settings = this.model.get('settings')
-  // eslint-disable-next-line no-void
+   
   if (!(settings != null ? settings.folder_id : void 0)) {
     errors.migrationUploadTo = [
       {

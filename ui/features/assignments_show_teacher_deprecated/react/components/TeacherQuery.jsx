@@ -18,16 +18,16 @@
 
 import React from 'react'
 import {string} from 'prop-types'
-import {Query} from '@apollo/react-components'
+import {Query} from '@apollo/client/react/components'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {TEACHER_QUERY} from '../assignmentData'
 import TeacherView from './TeacherView'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 TeacherQuery.propTypes = {
   assignmentLid: string,

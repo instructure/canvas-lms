@@ -286,7 +286,7 @@ module BroadcastPolicies
 
     describe "#should_dispatch_submission_grade_changed?" do
       before do
-        allow(submission).to receive_messages(graded_at: Time.now,
+        allow(submission).to receive_messages(graded_at: Time.zone.now,
                                               assignment_graded_in_the_last_hour?: false,
                                               assignment_just_published: true)
         allow(submission).to receive(:changed_in_state).with(:graded, fields: [:score, :grade]).and_return true

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import React, {useEffect, useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -33,7 +33,7 @@ import {prefetchQuery} from '@canvas/query'
 import profileQuery from './queries/profileQuery'
 import getAccounts from '@canvas/api/accounts/getAccounts'
 
-const I18n = useI18nScope('Navigation')
+const I18n = createI18nScope('Navigation')
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))

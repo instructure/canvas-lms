@@ -221,11 +221,11 @@ class StreamItem < ActiveRecord::Base
     end
     if context_type
       res["context_short_name"] = Rails.cache.fetch(["short_name_lookup", "#{context_type.underscore}_#{context_id}"].cache_key) do
-        self.context.short_name rescue ""
+        self.context.try(:short_name) || ""
       end
     end
     res["type"] = object.class.to_s
-    res["user_short_name"] = object.user.short_name rescue nil
+    res["user_short_name"] = object.try(:user)&.short_name
 
     if self.class.new_message?(object)
       self.asset_type = "Message"

@@ -17,7 +17,6 @@
  */
 
 import FileUploader from '../FileUploader'
-import {ICON_MAKER_ICONS} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants'
 
 let fileOptions: object, folder: object
 
@@ -34,12 +33,12 @@ describe('createPreFlightParams()', () => {
   const subject = () => uploader().createPreFlightParams()
 
   beforeEach(() => {
-    fileOptions = {...fileOptions, category: ICON_MAKER_ICONS}
+    fileOptions = {...fileOptions, category: 'icon_maker_icons'}
   })
 
   describe('when a "category" option is given', () => {
     it('sets the category', () => {
-      expect(subject().category).toEqual(ICON_MAKER_ICONS)
+      expect(subject().category).toEqual('icon_maker_icons')
     })
   })
 })

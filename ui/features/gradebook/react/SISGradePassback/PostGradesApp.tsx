@@ -20,12 +20,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PostGradesDialog from './PostGradesDialog'
 import classnames from 'classnames'
 import PostGradesStore from './PostGradesStore'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
 type Props = {
   labelText: string
@@ -73,7 +73,7 @@ class PostGradesApp extends React.Component<Props> {
     }
 
     store.reset()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<PostGradesDialog store={store} closeDialog={closeDialog} />, $dialog[0])
   }
 

@@ -43,7 +43,7 @@ module SendToStream
 
   module SendToStreamInstanceMethods
     def queue_create_stream_items
-      block = self.class.send_to_stream_block rescue nil
+      block = self.class.send_to_stream_block
       stream_recipients = Array(instance_eval(&block)) if block
       if stream_recipients.present?
         delay_if_production(priority: Delayed::LOW_PRIORITY).create_stream_items

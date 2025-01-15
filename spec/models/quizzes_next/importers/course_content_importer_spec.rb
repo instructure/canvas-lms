@@ -164,7 +164,7 @@ describe QuizzesNext::Importers::CourseContentImporter do
 
   context "migration context is not a Course" do
     let(:context) { double }
-    let(:migration) { instance_double("ContextMigration") }
+    let(:migration) { instance_double(ContentMigration) }
     let(:data) { double }
 
     before do

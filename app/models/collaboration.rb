@@ -217,7 +217,7 @@ class Collaboration < ActiveRecord::Base
   # Returns true.
   def destroy
     self.workflow_state = "deleted"
-    self.deleted_at     = Time.now
+    self.deleted_at     = Time.zone.now
 
     save!
   end

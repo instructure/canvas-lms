@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -26,7 +26,7 @@ import {RubricForm} from '@canvas/rubrics/react/RubricForm'
 import type {Rubric, RubricAssociation} from '../../types/rubric'
 import type {SaveRubricResponse} from '../../../../../features/rubrics/queries/RubricFormQueries'
 
-const I18n = useI18nScope('rubrics-form')
+const I18n = createI18nScope('rubrics-form')
 
 type RubricCreateModalProps = {
   isOpen: boolean

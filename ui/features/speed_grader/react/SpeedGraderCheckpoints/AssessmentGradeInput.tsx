@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {TextInput, type TextInputProps} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
   Assignment,
   SubAssignmentSubmission,
@@ -59,7 +59,7 @@ const isScientific = (inputString: string) => {
   return inputString.match(scientificPattern)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
+ 
 const getLocaleSeparators = (numberFormatter: Intl.NumberFormat) => {
   // Generate a localized number to find out the thousand and decimal separators
   const parts = numberFormatter.formatToParts(1234567.89)
@@ -69,7 +69,7 @@ const getLocaleSeparators = (numberFormatter: Intl.NumberFormat) => {
   return {thousands: thousands || ',', decimal: decimal || '.'}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-shadow
+ 
 const parseFormattedNumber = (input: number | string, numberFormatter: Intl.NumberFormat) => {
   if (input === null) {
     return Number.NaN
@@ -95,7 +95,7 @@ const parseFormattedNumber = (input: number | string, numberFormatter: Intl.Numb
   return num
 }
 
-const I18n = useI18nScope('SpeedGraderCheckpoints')
+const I18n = createI18nScope('SpeedGraderCheckpoints')
 
 export type AssessmentGradeInputProps = {
   assignment: Assignment

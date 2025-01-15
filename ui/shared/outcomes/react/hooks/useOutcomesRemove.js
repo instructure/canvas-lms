@@ -17,12 +17,12 @@
  */
 
 import {useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {DELETE_OUTCOME_LINKS} from '../../graphql/Management'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 export const REMOVE_NOT_STARTED = 'REMOVE_NOT_STARTED'
 export const REMOVE_PENDING = 'REMOVE_PENDING'

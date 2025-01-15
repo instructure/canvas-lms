@@ -181,7 +181,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
           GuardRail.activate(:primary) do
             where(user:, root_account: acct)
-              .update_all(updated_at: Time.now, needs_updating: true)
+              .update_all(updated_at: Time.zone.now, needs_updating: true)
           end
         end
       end

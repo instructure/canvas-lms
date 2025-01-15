@@ -23,13 +23,22 @@ class Login::OpenidConnectController < Login::OAuth2Controller
 
   def destroy
     return unless (logout_token = validate_logout_token)
-    return unless (ap = validate_authentication_provider(logout_token))
 
-    if (signature_error = ap.validate_signature(logout_token))
+    @aac = validate_authentication_provider(logout_token)
+
+    increment_statsd(:attempts)
+    return unless @aac
+
+    if (signature_error = @aac.validate_signature(logout_token))
+      increment_statsd(:failure, reason: :invalid_signature)
       return render plain: "Invalid signature: #{signature_error}", status: :bad_request
     end
-    return render plain: "No session found", status: :not_found unless Pseudonym.expire_oidc_session(logout_token)
+    unless Pseudonym.expire_oidc_session(logout_token)
+      increment_statsd(:failure, reason: :no_session)
+      return render plain: "No session found", status: :not_found
+    end
 
+    increment_statsd(:success)
     render plain: "OK", status: :ok
   end
 
@@ -44,6 +53,7 @@ class Login::OpenidConnectController < Login::OAuth2Controller
     rescue ::Canvas::Security::InvalidToken
       Rails.logger.warn("Failed to decode OpenID Connect back-channel logout token: #{jwt_string.inspect}")
       render plain: "Invalid logout token", status: :bad_request
+      increment_statsd(:failure, reason: :invalid_token)
       nil
     end
     return unless logout_token
@@ -51,24 +61,29 @@ class Login::OpenidConnectController < Login::OAuth2Controller
     unless (missing_claims = %w[aud iss iat exp events jti] - logout_token.keys).empty?
       render plain: "Missing claim#{"s" if missing_claims.length > 1} #{missing_claims.join(", ")}",
              status: :bad_request
+      increment_statsd(:failure, reason: :missing_claims)
       return
     end
     unless logout_token["events"].is_a?(Hash) && logout_token["events"][OIDC_BACKCHANNEL_LOGOUT_EVENT_URN].is_a?(Hash)
       render plain: "Invalid events", status: :bad_request
+      increment_statsd(:failure, reason: :invalid_events)
       return
     end
     unless logout_token["sid"] || logout_token["sub"]
       render plain: "Missing session information", status: :bad_request
+      increment_statsd(:failure, reason: :missing_session)
       return
     end
     if logout_token["nonce"]
       render plain: "Nonce must not be provided", status: :bad_request
+      increment_statsd(:failure, reason: :missing_nonce)
       return
     end
 
     duplicate_request_key = "oidc_slo_jti_#{Digest::MD5.new.update(logout_token["jti"].to_s).hexdigest}"
     unless Canvas.redis.set(duplicate_request_key, true, nx: true, exat: logout_token["exp"])
       render plain: "Received duplicate logout token", status: :bad_request
+      increment_statsd(:failure, reason: :duplicate)
       return
     end
 
@@ -94,5 +109,9 @@ class Login::OpenidConnectController < Login::OAuth2Controller
 
   def additional_authorize_params
     params.permit(:login_hint)
+  end
+
+  def auth_type
+    AuthenticationProvider::OpenIDConnect.sti_name
   end
 end

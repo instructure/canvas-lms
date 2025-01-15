@@ -105,15 +105,4 @@ describe "new_announcement" do
       expect(@message.body.strip).to eq asset.message
     end
   end
-
-  describe ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      generate_message(notification_name, path_type, asset)
-      expect(@message.subject).to eq "Canvas Alert"
-      expect(@message.url).to match(%r{/courses/\d+/announcements/\d+})
-      expect(@message.body).to include("Canvas Alert - Announcement: #{asset.title}")
-    end
-  end
 end

@@ -26,9 +26,9 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_paces_flaggable_number_input')
+const I18n = createI18nScope('course_paces_flaggable_number_input')
 
 const baseTheme = ENV.use_high_contrast ? canvasHighContrast : canvas
 const borderRadiusMedium = baseTheme.borders.radiusMedium
@@ -82,6 +82,7 @@ export const FlaggableNumberInput = ({
         >
           {/* @ts-expect-error */}
           <NumberInput
+            allowStringValue={true}
             renderLabel={label}
             interaction={interaction}
             width="5.5rem"

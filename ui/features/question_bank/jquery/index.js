@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-shadow, no-alert, eqeqeq */
+ 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
@@ -33,7 +33,7 @@ import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('question_bank')
+const I18n = createI18nScope('question_bank')
 
 export function updateAlignments(alignments) {
   $('.add_outcome_text')

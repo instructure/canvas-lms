@@ -71,7 +71,7 @@ module Canvas
                  else
                    I18n.t("messages.content_unpublished_module", "This content is part of an unpublished module and is not available yet.")
                  end
-               elsif hash[:context_module]["unlock_at"] && hash[:context_module]["unlock_at"] > Time.now
+               elsif hash[:context_module]["unlock_at"] && hash[:context_module]["unlock_at"] > Time.zone.now
                  unlock_time = datetime_string(hash[:context_module]["unlock_at"])
                  case type
                  when "quiz"

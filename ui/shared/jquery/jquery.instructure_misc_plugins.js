@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape, {raw} from '@instructure/html-escape'
 import authenticity_token from '@canvas/authenticity-token'
@@ -25,7 +25,7 @@ import 'jqueryui/dialog'
 import 'jquery-scroll-to-visible'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
-const I18n = useI18nScope('instructure_misc_plugins')
+const I18n = createI18nScope('instructure_misc_plugins')
 
 $.fn.setOptions = function (prompt, options) {
   let result = prompt ? "<option value=''>" + htmlEscape(prompt) + '</option>' : ''
@@ -190,7 +190,7 @@ $.fn.confirmDelete = function (options) {
       )
       return
     } else {
-      // eslint-disable-next-line no-alert
+       
       result = window.confirm(options.message)
     }
   }
@@ -393,7 +393,7 @@ $.fn.hasScrollbar = function () {
 }
 
 $.fn.log = function (msg) {
-  // eslint-disable-next-line no-console
+   
   console.log('%s: %o', msg, this)
   return this
 }

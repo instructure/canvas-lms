@@ -18,7 +18,7 @@
 
 import CanvasMultiSelect, {type Size} from '@canvas/multi-select/react'
 import React, {type ReactElement, useEffect, useRef, useState, useCallback, useMemo} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -35,7 +35,7 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 interface Props {
   courseId: string

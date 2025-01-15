@@ -202,7 +202,8 @@
     "hidden": false,
     "nodes": [
       "8Yzfaup-QH",
-      "EfM_7H1OPA"
+      "EfM_7H1OPA",
+      "JG7e1DAlUy"
     ],
     "linkedNodes": {}
   },
@@ -297,6 +298,25 @@
       "noToolbar": true
     },
     "parent": "Mqx0wAUvHD",
+    "hidden": false,
+    "nodes": [],
+    "linkedNodes": {}
+  },
+  "JG7e1DAlUy": {
+    "type": {
+      "resolvedName": "RCETextBlock"
+    },
+    "isCanvas": false,
+    "props": {
+      "text": "",
+      "sizeVariant": "auto"
+    },
+    "displayName": "Text",
+    "custom": {
+      "isBlock": true,
+      "isResizable": true
+    },
+    "parent": "zYinVC3Soa",
     "hidden": false,
     "nodes": [],
     "linkedNodes": {}

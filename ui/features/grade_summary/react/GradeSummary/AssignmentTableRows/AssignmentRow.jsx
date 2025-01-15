@@ -18,7 +18,7 @@
 
 import React from 'react'
 import DateHelper from '@canvas/datetime/dateHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import useStore from '../../stores'
 
@@ -40,7 +40,7 @@ import {View} from '@instructure/ui-view'
 import WhatIfGrade from '../WhatIfGrade'
 import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../utils'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const getSubmissionCommentsTrayProps = assignmentId => {
   const matchingSubmission = ENV.submissions.find(x => x.assignment_id === assignmentId)

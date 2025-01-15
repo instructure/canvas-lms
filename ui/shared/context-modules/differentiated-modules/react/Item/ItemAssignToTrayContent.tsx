@@ -32,7 +32,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {ApplyLocale} from '@instructure/ui-i18n'
 import {uid} from '@instructure/uid'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconAddLine} from '@instructure/ui-icons'
@@ -54,7 +54,7 @@ import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelp
 import {getEveryoneOption, type ItemAssignToTrayProps} from './ItemAssignToTray'
 import {getDueAtForCheckpointTag} from './utils'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export interface ItemAssignToTrayContentProps
   extends Omit<ItemAssignToTrayProps, 'iconType' | 'itemName'> {
@@ -199,7 +199,7 @@ const ItemAssignToTrayContent = ({
         }
         while (url && pageCount < MAX_PAGES) {
           // @ts-expect-error
-          // eslint-disable-next-line no-await-in-loop
+           
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
           // @ts-expect-error
@@ -320,7 +320,7 @@ const ItemAssignToTrayContent = ({
         }
         while (url && pageCount < MAX_PAGES) {
           // @ts-expect-error
-          // eslint-disable-next-line no-await-in-loop
+           
           const response: FetchDueDatesResponse = await doFetchApi(args)
           allResponses.push(response.json)
           // @ts-expect-error

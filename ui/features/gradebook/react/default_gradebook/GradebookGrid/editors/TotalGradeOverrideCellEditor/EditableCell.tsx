@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconExpandStartLine} from '@instructure/ui-icons'
@@ -30,7 +30,7 @@ import CellEditorComponent from '../CellEditorComponent'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
 import useStore from '../../../stores'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const themeOverrides = {
   componentOverrides: {

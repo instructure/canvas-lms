@@ -259,7 +259,8 @@ describe "people" do
       end
       open_student_group_dialog
       replace_and_proceed f("#new-group-set-name"), "new group"
-      fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
+      f("body").send_keys(:tab)
+      f("span[data-testid='allow-self-signup-wrapper'] div div").click
       force_click('[data-testid="initial-group-count"]')
       f('[data-testid="initial-group-count"]').send_keys("4")
       f(%(button[data-testid="group-set-save"])).click
@@ -276,7 +277,8 @@ describe "people" do
       end
       open_student_group_dialog
       replace_and_proceed f("#new-group-set-name"), "new group"
-      fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
+      f("body").send_keys(:tab)
+      f("span[data-testid='allow-self-signup-wrapper'] div div").click
       force_click('[data-testid="initial-group-count"]')
       f('[data-testid="group-member-limit"]').send_keys("1")
       f(%(button[data-testid="group-set-save"])).click

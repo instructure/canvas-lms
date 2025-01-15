@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import createStore, {type StoreApi} from 'zustand/vanilla'
+import {createStore, type StoreApi} from 'zustand/vanilla'
 import {subscribeWithSelector} from 'zustand/middleware'
 import type {RegistrationOverlay} from '../../model/RegistrationOverlay'
 import type {LtiScope} from '@canvas/lti/model/LtiScope'
@@ -143,7 +143,7 @@ export const createRegistrationOverlayStore = (
     state: RegistrationOverlayState
   } & RegistrationOverlayActions
 > =>
-  createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>(
+  createStore<{state: RegistrationOverlayState} & RegistrationOverlayActions>()(
     subscribeWithSelector(set => ({
       state: initialOverlayStateFromLtiRegistration(
         ltiRegistration.tool_configuration,

@@ -20,7 +20,7 @@ import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {getGroupDiscussionUrl} from '../../utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {IconGroupLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
@@ -30,7 +30,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export const GroupsMenu = ({...props}) => {
   const menuItems = props.childTopics?.map(childTopic => (
@@ -72,8 +72,15 @@ export const GroupsMenu = ({...props}) => {
       placement="bottom"
       trigger={
         <span className="discussions-group-discussion-btn">
-          <Button renderIcon={IconGroupLine} data-testid="groups-menu-btn" type="button">
+          <Button
+            renderIcon={IconGroupLine}
+            data-testid="groups-menu-btn"
+            type="button"
+            display="block"
+            style={{width: '100%'}}
+          >
             <ScreenReaderContent>{I18n.t('Group discussions')}</ScreenReaderContent>
+            {I18n.t('Group')}
           </Button>
         </span>
       }

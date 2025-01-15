@@ -18,9 +18,10 @@
 
 import React from 'react'
 import type {TeacherAssignmentType} from '@canvas/assignments/graphql/teacher/AssignmentTeacherTypes'
-import AssignmentHeader, {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentHeader'
+import AssignmentHeader from '@canvas/assignments/react/AssignmentHeader'
 import {QueryProvider} from '@canvas/query'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints'
+import {ASSIGNMENT_VIEW_TYPES} from '@canvas/assignments/react/AssignmentTypes'
 
 interface TeacherViewProps {
   assignment: TeacherAssignmentType

@@ -1274,6 +1274,81 @@ describe LearningObjectDatesController do
       end
     end
 
+    context "checkpointed discussions with dates in future" do
+      before do
+        @course.root_account.enable_feature! :discussion_checkpoints
+
+        @student2 = student_in_course(name: "Student 2").user
+
+        @reply_to_topic_points = 5
+        @reply_to_entry_points = 15
+
+        discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        @reply_to_topic = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student2.id] }],
+          points_possible: @reply_to_topic_points
+        )
+
+        @reply_to_entry = Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "override", set_type: "ADHOC", student_ids: [@student2.id] }],
+          points_possible: @reply_to_entry_points,
+          replies_required: 3
+        )
+        @discussion = discussion.reload
+
+        @default_params = {
+          course_id: @course.id,
+          discussion_topic_id: @discussion.id
+        }
+      end
+
+      it "creates a override for a prior date and verify that missing is set correctly" do
+        missing_submission_deduction = 10.0
+        @course.create_late_policy(
+          missing_submission_deduction_enabled: true,
+          missing_submission_deduction:
+        )
+
+        parent_assignment_override = @discussion.assignment.assignment_overrides.active.first
+        request_params = {
+          **@default_params,
+          only_visible_to_overrides: true
+        }
+
+        put :update, params: {
+          **request_params,
+          assignment_overrides: [
+            { id: parent_assignment_override.id, due_at: nil, lock_at: nil, reply_to_topic_due_at: 7.days.ago, required_replies_due_at: 14.days.ago, student_ids: [@student2.id], unassign_item: false, unlock_at: nil }
+          ]
+        }
+
+        @reply_to_topic.reload
+        @reply_to_entry.reload
+
+        parent_assignment = @discussion.assignment
+        student2_parent_submission = parent_assignment.submission_for_student(@student2)
+        student2_reply_to_topic_submission = @reply_to_topic.submission_for_student(@student2)
+        student2_reply_to_entry_submission = @reply_to_entry.submission_for_student(@student2)
+
+        expect(student2_reply_to_topic_submission.missing?).to be true
+        expect(student2_reply_to_entry_submission.missing?).to be true
+        expect(student2_parent_submission.missing?).to be true
+
+        expected_reply_to_topic_score = @reply_to_topic_points.to_f * ((100 - missing_submission_deduction.to_f) / 100)
+        expected_reply_to_entry_score = @reply_to_entry_points.to_f * ((100 - missing_submission_deduction.to_f) / 100)
+        expected_parent_score = expected_reply_to_topic_score + expected_reply_to_entry_score
+
+        expect(student2_reply_to_topic_submission.score).to eq expected_reply_to_topic_score
+        expect(student2_reply_to_entry_submission.score).to eq expected_reply_to_entry_score
+
+        expect(student2_parent_submission.score).to eq expected_parent_score
+      end
+    end
+
     context "basic checkpointed discussions w/all dates" do
       before do
         @course.root_account.enable_feature! :discussion_checkpoints

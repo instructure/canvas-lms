@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {ScreenCapture, canUseScreenCapture} from '@instructure/media-capture-new'
 import {func, string} from 'prop-types'
@@ -31,7 +31,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('media_recorder')
+const I18n = createI18nScope('media_recorder')
 const DEFAULT_EXTENSION = 'webm'
 const fileExtensionRegex = /\.\S/
 
@@ -103,7 +103,7 @@ export default class CanvasMediaRecorder extends React.Component {
     if (!indicatorBarMountPointId) return
     const mountPoint = document.getElementById(indicatorBarMountPointId)
     if (mountPoint) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <ScreenCaptureIndicatorBar
           onFinishClick={this.handleFinishClick}

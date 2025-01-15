@@ -140,7 +140,8 @@ class RubricAssessmentImport < ApplicationRecord
         user: student_to_assess,
         artifact: student_submissions[student_id.to_i],
         assessment:,
-        graded_anonymously: false
+        graded_anonymously: false,
+        get_score_from_rating: !rubric_association.hide_points
       )
       update!(progress: ((student_index + 1) * 100 / total_assessments))
     rescue DataFormatError => e

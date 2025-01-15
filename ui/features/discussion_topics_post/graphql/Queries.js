@@ -20,7 +20,7 @@ import {AnonymousUser} from './AnonymousUser'
 import {Discussion} from './Discussion'
 import {Course} from './Course'
 import {DiscussionEntry} from './DiscussionEntry'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {PageInfo} from './PageInfo'
 import {GroupSet} from './GroupSet'
 import {Group} from './Group'
@@ -43,7 +43,6 @@ export const DISCUSSION_QUERY = gql`
         anonymousAuthor {
           ...AnonymousUser
         }
-        sortOrder(sort: $sort)
         discussionEntriesConnection(
           after: $page
           first: $perPage
@@ -101,7 +100,6 @@ export const STUDENT_DISCUSSION_QUERY = gql`
         anonymousAuthor {
           ...AnonymousUser
         }
-        sortOrder(sort: $sort)
         discussionEntriesConnection(sortOrder: $sort, userSearchId: $userSearchId) {
           nodes {
             _id

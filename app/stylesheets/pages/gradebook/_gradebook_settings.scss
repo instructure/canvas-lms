@@ -17,12 +17,11 @@
  */
 
 #gradebook-settings-modal-footer {
-  margin: 1rem;
+  padding: 1rem;
 }
 
-//EVAL-2079: prevent masquerade bar from overlapping buttons
 body.is-masquerading-or-student-view {
   #gradebook-settings-modal-footer {
-    margin-bottom: 4rem;
+    padding-bottom: 4rem;
   }
 }

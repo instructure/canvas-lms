@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import HelpDialog from '@canvas/help-dialog'
 import ReleaseNotesList from '../lists/ReleaseNotesList'
 
-const I18n = useI18nScope('HelpTray')
+const I18n = createI18nScope('HelpTray')
 
 type Props = {
   closeTray: () => void

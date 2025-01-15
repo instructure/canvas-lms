@@ -28,8 +28,8 @@ describe "Account Reports API", type: :request do
     @report.account = @admin.account
     @report.user = @admin
     @report.progress = rand(100)
-    @report.start_at = DateTime.now
-    @report.end_at = (Time.now + rand(60 * 60 * 4)).to_datetime
+    @report.start_at = Time.zone.now
+    @report.end_at = Time.zone.now + rand(60 * 60 * 4)
     @report.report_type = "student_assignment_outcome_map_csv"
     @report.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
 

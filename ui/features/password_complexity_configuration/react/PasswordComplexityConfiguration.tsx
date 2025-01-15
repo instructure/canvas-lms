@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -35,7 +35,7 @@ import CustomForbiddenWordsSection from './CustomForbiddenWordsSection'
 import type {PasswordPolicy, PasswordSettings, PasswordSettingsResponse} from './types'
 import {deleteForbiddenWordsFile} from './apiClient'
 
-const I18n = useI18nScope('password_complexity_configuration')
+const I18n = createI18nScope('password_complexity_configuration')
 
 declare const ENV: GlobalEnv
 
@@ -177,7 +177,7 @@ const PasswordComplexityConfiguration = () => {
       try {
         await deleteForbiddenWordsFile(newlyUploadedAttachmentId)
       } catch (error) {
-        // eslint-disable-next-line no-console
+         
         console.error('Error deleting forbidden words file on cancel:', error)
       }
       setNewlyUploadedAttachmentId(null)

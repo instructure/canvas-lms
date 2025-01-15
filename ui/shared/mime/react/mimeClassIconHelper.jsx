@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   IconAttachMediaLine,
   IconCodeLine,
@@ -32,7 +32,7 @@ import {
   IconZippedLine,
 } from '@instructure/ui-icons'
 
-const I18n = useI18nScope('mime_class_icons')
+const I18n = createI18nScope('mime_class_icons')
 
 export const DEFAULT_ICON = <IconPaperclipLine title={I18n.t('File')} />
 

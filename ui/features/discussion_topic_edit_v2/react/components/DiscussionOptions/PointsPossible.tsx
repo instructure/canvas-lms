@@ -35,6 +35,7 @@ export const PointsPossible = ({
 }: Props) => {
   return (
     <NumberInput
+      allowStringValue={true}
       inputMode="decimal"
       showArrows={false}
       data-testid={pointsPossibleDataTestId}

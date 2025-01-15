@@ -53,7 +53,7 @@ describe "Module Items API", type: :request do
     }
     @module1.save!
 
-    @christmas = Time.zone.local(Time.now.year + 1, 12, 25, 7, 0)
+    @christmas = Time.zone.local(Time.zone.now.year + 1, 12, 25, 7, 0)
     @module2 = @course.context_modules.create!(name: "do not open until christmas",
                                                unlock_at: @christmas,
                                                require_sequential_progress: true)

@@ -63,7 +63,7 @@ describe Quizzes::QuizSubmission do
 
     describe "#finished_at" do
       it "rectifies small amounts of drift (could be caused by JS stalling)" do
-        anchor = Time.now
+        anchor = Time.zone.now
 
         subject.started_at = anchor
         subject.end_at = anchor + 5.minutes
@@ -73,7 +73,7 @@ describe Quizzes::QuizSubmission do
       end
 
       it "does not rectify drift for a submission finished before the end at date" do
-        anchor = Time.now
+        anchor = Time.zone.now
 
         subject.started_at = anchor
         subject.end_at = anchor + 5.minutes
@@ -123,7 +123,7 @@ describe Quizzes::QuizSubmission do
     it "does not lose time" do
       @quiz.update_attribute(:time_limit, 10)
       q = @quiz.quiz_submissions.create!
-      q.update_attribute(:started_at, Time.now)
+      q.update_attribute(:started_at, Time.zone.now)
       original_end_at = q.end_at
 
       @quiz.update_attribute(:time_limit, 5)
@@ -1725,7 +1725,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "returns the correct time spent in seconds" do
-      anchor = Time.now
+      anchor = Time.zone.now
 
       subject.started_at = anchor
       subject.finished_at = anchor + 1.hour
@@ -1733,7 +1733,7 @@ describe Quizzes::QuizSubmission do
     end
 
     it "accounts for extra time" do
-      anchor = Time.now
+      anchor = Time.zone.now
 
       subject.started_at = anchor
       subject.finished_at = anchor + 1.hour

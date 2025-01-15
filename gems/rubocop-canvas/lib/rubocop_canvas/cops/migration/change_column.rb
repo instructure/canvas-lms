@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class ChangeColumn < Cop
+      class ChangeColumn < Base
         MSG = "Changing column names or types usually requires a multi-deploy process; see https://instructure.atlassian.net/l/c/mArfa4cn"
 
         def_node_matcher :change_column?, <<~PATTERN

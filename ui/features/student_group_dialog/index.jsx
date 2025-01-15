@@ -19,20 +19,20 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import GroupModal from '@canvas/group-modal'
 import Group from '@canvas/groups/backbone/models/Group'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
-const I18n = useI18nScope('StudentGroupDialog')
+const I18n = createI18nScope('StudentGroupDialog')
 
 function reloadStudentGroup() {
   return window.location.reload()
 }
 
 function editGroup(group, open = true) {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <GroupModal
       group={{

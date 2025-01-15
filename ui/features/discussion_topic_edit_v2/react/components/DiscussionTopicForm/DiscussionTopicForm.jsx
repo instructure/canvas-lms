@@ -19,7 +19,7 @@
 import React, {useState, useRef, useEffect, useContext, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import {CreateOrEditSetModal} from '@canvas/groups/react/CreateOrEditSetModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -83,7 +83,7 @@ import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewS
 import {MasteryPathsReactWrapper} from '@canvas/conditional-release-editor/react/MasteryPathsReactWrapper'
 import {showPostToSisFlashAlert} from '@canvas/due-dates/util/differentiatedModulesUtil'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
@@ -405,6 +405,13 @@ function DiscussionTopicForm({
   useEffect(() => {
     if (!isGroupDiscussion) setGroupCategoryId(null)
   }, [isGroupDiscussion])
+
+  useEffect(() => {
+    if (isGraded) {
+      setAddToTodo(false)
+      setTodoDate(null)
+    }
+  }, [isGraded])
 
   const setAbGuidPostMessageListener = event => {
     const validatedAbGuid = isGuidDataValid(event)
@@ -905,6 +912,20 @@ function DiscussionTopicForm({
     }
   }, [isAnnouncement, locked, shouldShowAllowParticipantsToCommentOption])
 
+  const handleGradedCheckboxChange = () => {
+    setIsGraded(!isGraded)
+    if (!isGraded) {
+      // When switching to ungraded, clear assignment-related fields
+      setPointsPossible(0)
+      setDisplayGradeAs('points')
+      setAssignmentGroup(null)
+      setAddToTodo(false)
+      setTodoDate(null)
+    } else {
+      setIsCheckpoints(false)
+    }
+  }
+
   return (
     <>
       {((shouldMasteryPathsBeVisible && instUINavEnabled()) || !instUINavEnabled()) &&
@@ -1093,12 +1114,7 @@ function DiscussionTopicForm({
                 value="graded"
                 inline={true}
                 checked={isGraded}
-                onChange={() => {
-                  if (isGraded) {
-                    setIsCheckpoints(false)
-                  }
-                  setIsGraded(!isGraded)
-                }}
+                onChange={handleGradedCheckboxChange}
                 // disabled={sectionIdsToPostTo === [allSectionsOption._id]}
               />
             )}
@@ -1295,7 +1311,9 @@ function DiscussionTopicForm({
                       setShowGroupCategoryModal(false)
                       if (!newGroupCategory) return
                       addNewGroupCategoryToCache(apolloClient.cache, newGroupCategory)
-                      setGroupCategoryId(newGroupCategory.id)
+                      setTimeout(() => {
+                        setGroupCategoryId(newGroupCategory.id)
+                      })
                     }}
                     studentSectionCount={sections.length}
                     context={ENV.context_type.toLocaleLowerCase()}

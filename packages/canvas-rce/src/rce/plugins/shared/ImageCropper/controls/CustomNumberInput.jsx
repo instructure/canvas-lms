@@ -46,6 +46,7 @@ export const CustomNumberInput = ({
 
   return (
     <NumberInput
+      allowStringValue={true}
       value={inputValue}
       onChange={handleChange}
       onBlur={handleBlur}

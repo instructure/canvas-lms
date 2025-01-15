@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
@@ -39,7 +39,7 @@ import type {
   UpdateAccountDataResponse,
 } from '../types'
 
-const I18n = useI18nScope('account_calendar_settings')
+const I18n = createI18nScope('account_calendar_settings')
 
 type ComponentProps = {
   readonly accountId: number

@@ -7,10 +7,6 @@
   "exports": {
     ".": "./index.ts"
   },
-  "scripts": {
-    "lint": "eslint . --ext .ts,.js",
-    "build:canvas": "yarn run lint"
-  },
   "dependencies": {
     "@instructure/updown": "^1.3",
     "@formatjs/intl-getcanonicallocales": "^2",
@@ -19,19 +15,5 @@
     "@formatjs/intl-datetimeformat": "^6",
     "@formatjs/intl-numberformat": "^8",
     "@formatjs/intl-relativetimeformat": "^11"
-  },
-  "eslintConfig": {
-    "env": {
-      "es6": true,
-      "browser": true
-    },
-    "parserOptions": {
-      "ecmaVersion": 2020,
-      "sourceType": "module"
-    },
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint"
-    ]
   }
 }

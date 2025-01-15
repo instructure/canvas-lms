@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import React from 'react'
@@ -50,7 +50,7 @@ import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
 
 if (!('INST' in window)) window.INST = {}
 
-const I18n = useI18nScope('assignment')
+const I18n = createI18nScope('assignment')
 
 ready(() => {
   const comments = document.getElementsByClassName('comment_content')
@@ -105,7 +105,7 @@ function renderSpeedGraderLink() {
   const $mountPoint = document.getElementById('speed_grader_link_mount_point')
 
   if ($mountPoint) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <SpeedGraderLink
         disabled={disabled}
@@ -121,7 +121,7 @@ function renderStudentGroupFilter() {
   const $mountPoint = document.getElementById('student_group_filter_mount_point')
 
   if ($mountPoint) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <StudentGroupFilter
         categories={ENV.group_categories}
@@ -144,7 +144,7 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, ENV.COURSE_ID)
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Falied loading CoursePacingNotice', ex)
         captureException(ex)
       })
@@ -175,7 +175,7 @@ ready(() => {
         }
       })
       .catch(e => {
-        console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+        console.log('Error loading immersive readers.', e)  
       })
   }
 })
@@ -220,7 +220,7 @@ $(() => {
 })
 
 function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ItemAssignToManager
       open={open}
@@ -266,7 +266,7 @@ $(() =>
 
 function openSendTo(event, open = true) {
   if (event) event.preventDefault()
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <DirectShareUserModal
       open={open}
@@ -283,7 +283,7 @@ function openSendTo(event, open = true) {
 
 function openCopyTo(event, open = true) {
   if (event) event.preventDefault()
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <DirectShareCourseTray
       open={open}
@@ -329,7 +329,7 @@ $(() => {
     const assignmentRubricAssociation = envRubricAssociation
       ? mapRubricAssociationUnderscoredKeysToCamelCase(ENV.rubric_association)
       : undefined
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <RubricAssignmentContainer
         accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}

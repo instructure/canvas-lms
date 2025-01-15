@@ -112,7 +112,7 @@ describe "users" do
       wait_for_ajaximations
       expect(ff("#page_view_results tr").first.text).to include "older"
       match = f("#page_views_csv_link")["href"].match(/start_time=([^&]+)/)
-      expect(DateTime.parse(match[1]).to_i).to eq old_date.to_i
+      expect(Time.zone.parse(match[1]).to_i).to eq old_date.to_i
     end
   end
 

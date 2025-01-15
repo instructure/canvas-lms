@@ -367,29 +367,6 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "3eaff243d053ea3fc947043dbc45d2fa3e8f0f7b3be372c9c304892afc5766b9",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/conversation_participant.rb",
-      "line": 72,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "where((\"conversation_participants.root_account_ids <> '' AND \" + like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)), ((\"[\" + Shard.birth.activate do\n accts = (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end\n((masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:id) + (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:global_id))\n\n end.join(\"][\")) + \"]\"))",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "ConversationParticipant",
-        "method": "for_masquerading_user"
-      },
-      "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
       "fingerprint": "43aed4f93ac312cbfc36318b3752856c01b9db4c4b3a6677509a5681d755842f",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -450,29 +427,6 @@
         "method": "correlated_assignment_submissions"
       },
       "user_input": "outer_user_id_column",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "57bf50dbd2610462dcf2668cee33bc98fa95715b7017fa3ce22202b03a026ef4",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/discussion_entry_participant.rb",
-      "line": 164,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "connection.exec_insert(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"discussion_entry_id,user_id,root_account_id,workflow_state,read_at,forced_read_state,rating,report_type\"})\\n       VALUES #{[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")}\\n  ON CONFLICT (discussion_entry_id,user_id)\\nDO UPDATE SET #{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].zip([connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL), connection.quote(new_state), connection.quote((Time.now or nil))]).map do\n a.join(\"=\")\n end.join(\",\")}\\n        WHERE #{\"(#{quoted_table_name}.#{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].join(\",#{quoted_table_name}.\")})\\n                     IS DISTINCT FROM (#{\"#{connection.quote(forced)},#{connection.quote(rating)},#{connection.quote(:BRAKEMAN_SAFE_LITERAL)},#{connection.quote(new_state)},#{connection.quote((Time.now or nil))}\"})\"}\\n\".squish)",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "DiscussionEntryParticipant",
-        "method": "DiscussionEntryParticipant.upsert_for_entries"
-      },
-      "user_input": "[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")",
       "confidence": "Medium",
       "cwe_id": [
         89
@@ -683,6 +637,29 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "750eb4c930157426d6110fe086f4f5567c5baacf015a038468b99519ac0ede2f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/conversation_participant.rb",
+      "line": 72,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where((\"conversation_participants.root_account_ids <> '' AND \" + like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", :downcase => false)), ((\"[\" + Shard.birth.activate do\n accts = (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end\n((masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:id) + (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:global_id))\n\n end.join(\"][\")) + \"]\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ConversationParticipant",
+        "method": "for_masquerading_user"
+      },
+      "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", :downcase => false)",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "781bcd475f1cc9f734536572daca9d75fb12c7a0a6140708522d93126b6e9712",
@@ -886,6 +863,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "95cb09e9318723a29052bcdcf833ac2cf91cab22b8cd593987cc9d9e55223f11",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/discussion_entry_participant.rb",
+      "line": 164,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.exec_insert(\"  INSERT INTO #{quoted_table_name}\\n              (#{\"discussion_entry_id,user_id,root_account_id,workflow_state,read_at,forced_read_state,rating,report_type\"})\\n       VALUES #{[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")}\\n  ON CONFLICT (discussion_entry_id,user_id)\\nDO UPDATE SET #{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].zip([connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL), connection.quote(new_state), connection.quote((Time.zone.now or nil))]).map do\n a.join(\"=\")\n end.join(\",\")}\\n        WHERE #{\"(#{quoted_table_name}.#{[\"forced_read_state\", \"rating\", \"report_type\", \"workflow_state\", \"read_at\"].join(\",#{quoted_table_name}.\")})\\n                     IS DISTINCT FROM (#{\"#{connection.quote(forced)},#{connection.quote(rating)},#{connection.quote(:BRAKEMAN_SAFE_LITERAL)},#{connection.quote(new_state)},#{connection.quote((Time.zone.now or nil))}\"})\"}\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DiscussionEntryParticipant",
+        "method": "DiscussionEntryParticipant.upsert_for_entries"
+      },
+      "user_input": "[entry_or_topic].map do\n row_values(batch_entry, user.id, entry_or_topic.root_account_id, (new_state or \"unread\"), [connection.quote(forced), connection.quote(rating), connection.quote(:BRAKEMAN_SAFE_LITERAL)])\n end.map do\n \"(#{row.join(\",\")})\"\n end.join(\",\")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "96ad8f781198eb407e8e108f14a4aa2c4d98bf212125ff66f6cde643bc5bf029",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1065,6 +1065,25 @@
       "note": ""
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a4576047db11df4a8fe67fc4ff1fee6a227218c60fbf1649e1edf9e2bb0bd4f7",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1540,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"#{lock_type} OF #{connection.quote_local_table_name(klass.table_name)}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "lock_type",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "Remote Code Execution",
       "warning_code": 119,
       "fingerprint": "ac7f2592c16706e89d16ac41a7507f8abeaec4c0a0df52da89ede40d10d42cab",
@@ -1196,25 +1215,6 @@
         "method": "record_due_date_changes_for_auditable_assignments!"
       },
       "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": ""
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "b6f831712d0a04b2fcc4efc4a94c6b022740cd92bef1cd6dbadf32e7f7ad8f77",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "config/initializers/active_record.rb",
-      "line": 1556,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "lock(\"#{lock_type_clause(lock_type)} OF #{connection.quote_local_table_name(klass.table_name)}\")",
-      "render_path": null,
-      "location": null,
-      "user_input": "lock_type_clause(lock_type)",
       "confidence": "Medium",
       "cwe_id": [
         89

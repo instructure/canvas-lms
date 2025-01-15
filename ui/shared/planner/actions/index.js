@@ -21,7 +21,7 @@ import {asAxios, getPrefetchedXHR} from '@canvas/util/xhr'
 import parseLinkHeader from '@canvas/parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {maybeUpdateTodoSidebar} from './sidebar-actions'
 import {
   getPlannerItems,
@@ -37,7 +37,7 @@ import {
   buildURL,
 } from '../utilities/apiUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 configureAxios(axios)
 
@@ -147,7 +147,7 @@ export const getInitialOpportunities = () => {
   return (dispatch, getState) => {
     dispatch(startLoadingOpportunities())
 
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+     
     const {courses, selectedObservee} = getState()
     const url =
       getState().opportunities.nextUrl ||

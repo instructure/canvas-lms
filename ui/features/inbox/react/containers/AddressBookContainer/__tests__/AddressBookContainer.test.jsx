@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {ApolloProvider} from '@apollo/react-common'
+import {ApolloProvider} from '@apollo/client'
 import {act, render, fireEvent, screen} from '@testing-library/react'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'

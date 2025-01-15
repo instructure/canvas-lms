@@ -174,7 +174,7 @@ module ItemsAssignToTray
     ff(assign_to_date_and_time_selector + " input")
       .map { |input| input.attribute("value") }
       .each_slice(2)
-      .map { |date, time| DateTime.parse("#{date} #{time}") }
+      .map { |date, time| Time.zone.parse("#{date} #{time}") }
   end
 
   def assign_to_reply_to_topic_date(card_number = 0)

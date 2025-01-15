@@ -22,7 +22,7 @@ import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {BlockTemplate, TemplateNodeTree} from './types'
 import {IconArrowStartLine, IconSearchLine, IconXLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
@@ -40,7 +40,7 @@ import DisplayLayoutButtons, {
 } from './components/create_from_templates/DisplayLayoutButtons'
 import {TagSelect, AvailableTags} from './components/create_from_templates/TagSelect'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 declare const ENV: GlobalEnv & {WIKI_PAGE: object}
 

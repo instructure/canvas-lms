@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from './MasteryScale/index'
@@ -34,7 +34,7 @@ import {
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const unmount = mount => ReactDOM.unmountComponentAtNode(mount)
 
@@ -87,13 +87,13 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
 
   const handleTabChange = (_, {index}) => {
     if (hasUnsavedChangesRef.current) {
-      /* eslint-disable no-restricted-globals */
-      /* eslint-disable no-alert */
+       
+       
       if (
         confirm(I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'))
       ) {
-        /* eslint-enable no-restricted-globals */
-        /* eslint-enable no-alert */
+         
+         
         setHasUnsavedChanges(false)
         setSelectedIndex(index)
       }

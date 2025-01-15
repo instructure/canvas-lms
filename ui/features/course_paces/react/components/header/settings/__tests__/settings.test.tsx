@@ -20,14 +20,22 @@
 import React from 'react'
 import {act, screen} from '@testing-library/react'
 
-import {BLACKOUT_DATES, COURSE, PRIMARY_PACE, SECTION_PACE} from '../../../../__tests__/fixtures'
+import {
+  BLACKOUT_DATES,
+  COURSE,
+  DEFAULT_STORE_STATE,
+  PRIMARY_PACE,
+  SECTION_PACE,
+} from '../../../../__tests__/fixtures'
 import {renderConnected} from '../../../../__tests__/utils'
 
 import {Settings} from '../settings'
+import type {CoursePace} from 'features/course_paces/react/types'
 
 const loadLatestPaceByContext = jest.fn()
 const showLoadingOverlay = jest.fn()
 const toggleExcludeWeekends = jest.fn()
+const toggleSelectedDaysToSkip = jest.fn()
 const updateBlackoutDates = jest.fn()
 
 const defaultProps = {
@@ -40,6 +48,7 @@ const defaultProps = {
   loadLatestPaceByContext,
   showLoadingOverlay,
   toggleExcludeWeekends,
+  toggleSelectedDaysToSkip,
   updateBlackoutDates,
 }
 
@@ -63,17 +72,6 @@ describe('Settings', () => {
 
     expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
     expect(screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
-  })
-
-  it('toggles the associated setting when the checkboxes are clicked', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} />)
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
-    act(() => settingsButton.click())
-
-    const skipWeekendsToggle = screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).not.toBeDisabled()
-    act(() => skipWeekendsToggle.click())
-    expect(toggleExcludeWeekends).toHaveBeenCalled()
   })
 
   it('disables all settings while syncing', () => {
@@ -118,6 +116,66 @@ describe('Settings', () => {
     expect(updateBlackoutDates).toHaveBeenCalledWith(defaultProps.blackoutDates)
   })
 
+  describe('course_paces_skip_selected_days is enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = true
+    })
+
+    it('toggles the associated setting when the checkboxes are clicked', () => {
+      renderConnected(<Settings {...defaultProps} />)
+      const settingsButton = screen.queryByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const skipSelectedDaysOption = screen.queryByRole('menuitem', {name: 'Skip Selected Days'})
+      act(() => skipSelectedDaysOption.click())
+
+      const mondaysOption = screen.queryByRole('menuitemcheckbox', {name: 'Mondays'})
+      const fridaysOption = screen.queryByRole('menuitemcheckbox', {name: 'Fridays'})
+
+      expect(mondaysOption).not.toBeDisabled()
+      expect(fridaysOption).not.toBeDisabled()
+
+      act(() => mondaysOption.click())
+      act(() => fridaysOption.click())
+
+      expect(toggleSelectedDaysToSkip).toHaveBeenCalledTimes(2)
+    })
+
+    it('Skip selected counter pill shows correct information', () => {
+      const coursePace = {
+        ...DEFAULT_STORE_STATE.coursePace,
+        selected_days_to_skip: ['mon', 'tue', 'wed', 'thu', 'fri'],
+      } as CoursePace
+
+      const state = {...DEFAULT_STORE_STATE, coursePace}
+
+      renderConnected(<Settings {...defaultProps} />, state)
+      const settingsButton = screen.queryByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const selectedDaysCounterPill = screen.getByTestId('selected_days_counter')
+      expect(selectedDaysCounterPill).toHaveTextContent('5')
+    })
+  })
+
+  describe('course_paces_skip_selected_days is disabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_skip_selected_days = false
+    })
+    it('toggles the associated setting when the checkboxes are clicked', () => {
+      renderConnected(<Settings {...defaultProps} />)
+      const settingsButton = screen.queryByRole('button', {name: 'Modify Settings'})
+      act(() => settingsButton.click())
+
+      const skipWeekendsToggle = screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})
+      expect(skipWeekendsToggle).not.toBeDisabled()
+      act(() => skipWeekendsToggle.click())
+      expect(toggleExcludeWeekends).toHaveBeenCalled()
+    })
+  })
+
   describe('with course paces redesign', () => {
     beforeAll(() => {
       window.ENV.FEATURES ||= {}
@@ -129,6 +187,7 @@ describe('Settings', () => {
       const settingsButton = getByRole('button', {name: 'Settings'})
       expect(settingsButton).toBeInTheDocument()
     })
+
     it('renders manage blackout dates for course paces', () => {
       const {getByRole} = renderConnected(<Settings {...defaultProps} />)
       const settingsButton = getByRole('button', {name: 'Settings'})

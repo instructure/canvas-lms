@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {uniqueId} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
@@ -45,7 +45,7 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import {captureException} from '@sentry/browser'
 
-const I18n = useI18nScope('instructure_js')
+const I18n = createI18nScope('instructure_js')
 
 export function formatTimeAgoTitle(date) {
   const fudgedDate = fudgeDateForProfileTimezone(date)
@@ -100,7 +100,7 @@ function enhanceUserJQueryWidgetContent() {
         'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements) // eslint-disable-line no-console
+      console.error(msg, $elements)  
       captureException(new Error(msg))
     })
     .end()
@@ -426,7 +426,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         let submission = null
         for (const idx in data) {
           const s = data[idx].submission
-          // eslint-disable-next-line eqeqeq
+           
           if (s.user_id == user_id) {
             submission = s
           }
@@ -537,7 +537,7 @@ function doThingsToModuleSequenceFooter() {
         })
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error(ex)
         captureException(ex)
       })
@@ -609,7 +609,7 @@ function showFilePreviewInOverlayHandler({file_id, verifier, access_token, instf
         message: I18n.t('Something went wrong loading the file previewer.'),
         type: 'error',
       })
-      // eslint-disable-next-line no-console
+       
       console.log(err)
     })
 }

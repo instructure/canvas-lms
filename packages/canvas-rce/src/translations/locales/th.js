@@ -100,6 +100,7 @@ const locale = {
     "message": "มีเนื้อหาบันทึกอัตโนมัติ ต้องการโหลดเนื้อหาบันทึกอัตโนมัติแทนหรือไม่"
   },
   "available_folders_694d0436": { "message": "โฟลเดอร์ที่ใช้ได้" },
+  "background_1bc88842": { "message": "พื้นหลัง" },
   "backslash_b2d5442d": { "message": "แบ็คสแลช" },
   "bar_ec63ed6": { "message": "แท่ง" },
   "basic_554cdc0a": { "message": "พื้นฐาน" },
@@ -110,6 +111,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "สัมประสิทธิ์ทวินาม" },
   "black_4cb01371": { "message": "ดำ" },
   "blue_daf8fea9": { "message": "น้ำเงิน" },
+  "border_5b08b06d": { "message": "ขอบ" },
   "bottom_15a2a9be": { "message": "ล่างสุด" },
   "bottom_third_5f5fec1d": { "message": "อันดับที่สามจากด้านล่าง" },
   "bowtie_5f9629e4": { "message": "โบว์" },
@@ -177,10 +179,14 @@ const locale = {
   "clubs_suit_c1ffedff": { "message": "คลับ (ชุด)" },
   "collaborations_5c56c15f": { "message": "การประสานความร่วมมือ" },
   "collapse_to_hide_types_1ab46d2e": { "message": "ย่อเพื่อซ่อน { types }" },
+  "color_a363e1b0": { "message": "สี" },
+  "color_contrast_4c418add": { "message": "ความต่างสี" },
+  "color_contrast_ratio_687782f0": { "message": "สัดส่วนความต่างสี" },
   "color_picker_6b359edf": { "message": "ระบบเลือกสี " },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "ระบบเลือกสี ({ colorName } ที่เลือก)"
   },
+  "color_popup_af39810f": { "message": "ป๊อปอัพสี" },
   "column_e1ae5c64": { "message": "คอลัมน์" },
   "column_group_1c062368": { "message": "กลุ่มคอลัมน์" },
   "complex_numbers_a543d004": { "message": "จำนวนเชิงซ้อน" },
@@ -352,6 +358,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "เล็กพิเศษ" },
   "extracurricular_icon_67c8ca42": { "message": "ไอคอนกิจกรรมนอกหลักสูตร" },
   "f_function_fe422d65": { "message": "F (ฟังก์ชั่น)" },
+  "fail_544e5dde": { "message": "ล้มเหลว" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "ไม่สามารถสืบค้นเนื้อหาของไฟล์"
   },
@@ -407,6 +414,7 @@ const locale = {
     "message": "ไปที่แถบเครื่องมือของโปรแกรมแก้ไข"
   },
   "grades_a61eba0a": { "message": "เกรด" },
+  "graphics_text_bc9568bc": { "message": "ข้อความกราฟิก" },
   "greater_than_e98af662": { "message": "มากกว่า" },
   "greater_than_or_equal_b911949a": { "message": "มากกว่าหรือเท่ากับ" },
   "greek_65c5b3f7": { "message": "กรีก" },
@@ -506,6 +514,16 @@ const locale = {
   "indigo_2035fc55": { "message": "คราม" },
   "inference_fed5c960": { "message": "การอนุมาน" },
   "infinity_7a10f206": { "message": "อนันต์" },
+  "input_field_for_alpha_678265fd": {
+    "message": "ฟิลด์ป้อนข้อมูลสำหรับอัลฟ่า"
+  },
+  "input_field_for_blue_561e020a": {
+    "message": "ฟิลด์ป้อนข้อมูลสำหรับสีน้ำเงิน"
+  },
+  "input_field_for_green_67f8b2b6": {
+    "message": "ฟิลด์ป้อนข้อมูลสำหรับสีเขียว"
+  },
+  "input_field_for_red_86a84615": { "message": "ฟิลด์ป้อนข้อมูลสำหรับสีแดง" },
   "insert_593145ef": { "message": "ใบกัด" },
   "insert_link_6dc23cae": { "message": "แทรกลิงค์" },
   "insert_math_equation_57c6e767": { "message": "แทรกสมการทางคณิตศาสตร์" },
@@ -527,6 +545,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "ไอคอนศิลปศาสตร์ด้านภาษา" },
   "languages_icon_9d20539": { "message": "ไอคอนภาษา" },
   "large_9c5e80e7": { "message": "ใหญ่" },
+  "large_text_e7ba08cd": { "message": "ข้อความขนาดใหญ่" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "เรียนรู้เพิ่มเติมเกี่ยวกับลิงค์ที่ติดกัน"
   },
@@ -701,6 +720,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "ไม่มีวิดีโอ" },
   "none_3b5e34d2": { "message": "ไม่มี" },
   "none_selected_b93d56d2": { "message": "ไม่ได้เลือกรายการใด" },
+  "normal_text_7b03da48": { "message": "ข้อความปกติ" },
   "not_equal_6e2980e6": { "message": "ไม่เท่ากับ" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "ไม่อยู่ใน (ไม่ใช่องค์ประกอบของ)"
@@ -738,9 +758,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "สีเค้าโครง" },
   "outline_size_a6059a21": { "message": "ขนาดเค้าโครง" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } ไม่ใช่โปรโตคอลที่ถูกต้อง โดยจะต้องเป็น ftp, http, https, mailto, skype, tel หรือสามารถเว้นว่าง"
-  },
   "page_50c4823d": { "message": "หน้า" },
   "pages_e5414c2c": { "message": "เพจ" },
   "paragraph_5e5ad8eb": { "message": "ย่อหน้า" },
@@ -749,6 +766,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "คู่ขนาน" },
   "partial_derivative_4a9159df": { "message": "บางส่วน (อนุพันธ์)" },
+  "pass_1c19a2b3": { "message": "ผ่าน" },
   "paste_5963d1c1": { "message": "วาง" },
   "pause_12af3bb4": { "message": "หยุดชั่วคราว" },
   "pentagon_17d82ea3": { "message": "ห้าเหลี่ยม" },
@@ -757,6 +775,9 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "เปอร์เซ็นต์จะต้องเป็นตัวเลข"
   },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "เปอร์เซ็นต์อย่างน้อยจะต้องเท่ากับ { percentage }%"
+  },
   "performing_arts_icon_f3497486": { "message": "ไอคอนนาฏศิลป์" },
   "perpendicular_7c48ede4": { "message": "แนวดิ่ง" },
   "phi_4ac33b6d": { "message": "ฟาย" },
@@ -764,8 +785,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "ไอคอนพลศึกษา" },
   "pi_dc4f0bd8": { "message": "พาย" },
   "pi_variant_10f5f520": { "message": "พาย (ตัวแปร)" },
+  "pick_a_color_557abfb0": { "message": "เลือกสี" },
   "pink_68ad45cb": { "message": "ชมพู" },
   "pixels_52ece7d1": { "message": "พิกเซล" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "พิกเซลจะต้องอย่างน้อยเท่ากับ { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "เปิดเล่น" },
   "play_media_comment_35257210": { "message": "เปิดเล่นความเห็นแบบสื่อ" },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -794,6 +819,7 @@ const locale = {
   "preview_inline_9787330": { "message": "แสดงตัวอย่างในแถว" },
   "previous_bd2ac015": { "message": "ก่อนหน้า" },
   "previous_findtext_8dfbfd30": { "message": "{ findText } ก่อนหน้า" },
+  "previously_chosen_colors_f1338315": { "message": "สีที่เลือกไว้ก่อนหน้า" },
   "prime_917ea60e": { "message": "เฉพาะ" },
   "prime_numbers_13464f61": { "message": "จำนวนเฉพาะ" },
   "product_39cf144f": { "message": "ผล" },
@@ -1240,6 +1266,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "ผู้ช่วยเขียนงาน" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "ใช่" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "คุณอยู่ที่จานสี เลื่อนจานสีขึ้น ไปทางซ้าย ลงหรือไปทางขวาโดยใช้ปุ่ม ''W'' ''A'' ''S'' และ ''D'' ตามลำดับ"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "คุณอยู่ที่แถบเลื่อนสี เลื่อนแถบเลื่อนไปทางซ้ายหรือขวาโดยใช้ปุ่ม ''A'' และ ''D'' ตามลำดับ"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "คุณอยู่ในแถบเลื่อนอัลฟ่า เลื่อนแถบเลื่อนไปทางซ้ายหรือขวาโดยใช้ปุ่ม ''A'' และ ''D'' ตามลำดับ"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "คุณมีการเปลี่ยนแปลงที่ไม่ได้บันทึกไว้ในถาด Icon Maker ต้องการดำเนินการต่อโดยไม่บันทึกการเปลี่ยนแปลงเหล่านี้หรือไม่"
   },

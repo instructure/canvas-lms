@@ -17,7 +17,7 @@
  */
 
 import React, {useContext} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
@@ -25,7 +25,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {func, string} from 'prop-types'
 import {GroupContext, formatMessages} from './context'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 export const GroupSetName = ({onChange, errormsg, elementRef, direction}) => {
   const {name} = useContext(GroupContext)

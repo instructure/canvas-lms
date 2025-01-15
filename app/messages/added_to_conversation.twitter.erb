@@ -1,7 +1,0 @@
-<% define_content :link do -%>
-  <%= conversation_url(asset.conversation_id) %>
-<% end -%>
-<% define_content :user_name do -%>
-<%= asset.author_short_name_with_shared_contexts(user) rescue t(:unknown_user, "Unknown User") %>
-<% end -%>
-<%= t :tweet, "Canvas Alert - Added to conversation by %{user_name}.", :user_name => content(:user_name) %>

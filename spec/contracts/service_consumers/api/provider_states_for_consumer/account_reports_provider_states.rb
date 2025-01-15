@@ -30,7 +30,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.user = @account_admin
         @report.progress = rand(100)
         @report.start_at = Time.zone.now
-        @report.end_at = (Time.zone.now + rand(60 * 60 * 4)).to_datetime
+        @report.end_at = Time.zone.now + rand(60 * 60 * 4)
         @report.report_type = "student_assignment_outcome_map_csv"
         @report.parameters = ActiveSupport::HashWithIndifferentAccess["param" => "test", "error" => "failed"]
         folder = Folder.assert_path("test", @account_admin.account)
@@ -50,7 +50,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         @report.user = @account_admin
         @report.progress = rand(100)
         @report.start_at = Time.zone.now
-        @report.end_at = (Time.zone.now + rand(60 * 60 * 4)).to_datetime
+        @report.end_at = Time.zone.now + rand(60 * 60 * 4)
         @report.report_type = "student_assignment_outcome_map_csv"
         @report.parameters = ActiveSupport::HashWithIndifferentAccess["purple" => "test", "lovely" => "ears"]
         folder = Folder.assert_path("test", @account_admin.account)

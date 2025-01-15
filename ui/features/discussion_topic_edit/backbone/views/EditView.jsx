@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector'
 import GradingTypeSelector from '@canvas/assignments/backbone/views/GradingTypeSelector'
@@ -49,7 +49,7 @@ import 'jqueryui/tabs'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('discussion_topics')
+const I18n = createI18nScope('discussion_topics')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -459,7 +459,7 @@ EditView.prototype.renderUsageRights = function () {
       isOpen: false,
       openModal: (function (_this) {
         return function (contents, _afterClose) {
-          // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+          // eslint-disable-next-line react/no-render-return-value
           return ReactDOM.render(contents, _this.$('#usage_rights_modal')[0])
         }
       })(this),
@@ -471,7 +471,7 @@ EditView.prototype.renderUsageRights = function () {
     },
   }
   const component = React.createElement(UsageRightsIndicator, props, null)
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(component, this.$('#usage_rights_control')[0])
 }
 
@@ -548,7 +548,7 @@ EditView.prototype.loadConditionalRelease = function () {
 
 EditView.prototype.renderStudentTodoAtDate = function () {
   this.toggleTodoDateInput()
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(
     React.createElement(DueDateCalendarPicker, {
       dateType: 'todo_date',

@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
-const I18n = useI18nScope('collaborations')
+const I18n = createI18nScope('collaborations')
 
 let main
 

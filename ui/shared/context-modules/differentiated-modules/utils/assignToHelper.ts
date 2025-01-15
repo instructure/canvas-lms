@@ -17,7 +17,7 @@
  */
 
 import type {AssignmentOverridePayload, AssignmentOverridesPayload, ItemType} from '../react/types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
   DateDetailsPayload,
   ItemAssignToCardSpec,
@@ -25,7 +25,7 @@ import type {
   AssigneeOption,
 } from '../react/Item/types'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export const setContainScrollBehavior = (element: HTMLElement | null) => {
   if (element !== null) {

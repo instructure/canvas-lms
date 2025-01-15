@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -28,7 +28,7 @@ import ApiClient from '../../apiClient'
 import LockBanner from './LockBanner'
 import LockToggle from './LockToggle'
 
-const I18n = useI18nScope('blueprint_coursesLockManageer')
+const I18n = createI18nScope('blueprint_coursesLockManageer')
 
 export default class LockManager {
   constructor() {
@@ -136,7 +136,7 @@ export default class LockManager {
   renderLockToggle() {
     if (!this.props.toggleWrapperSelector) return
     this.setupToggle(() => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <LockToggle
           isLocked={this.state.isLocked}
@@ -150,7 +150,7 @@ export default class LockManager {
 
   renderBanner() {
     if (!this.bannerNode) this.bannerNode = LockBanner.setupRootNode(this.props?.bannerSelector)
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <LockBanner isLocked={this.state.isLocked} itemLocks={this.state.itemLocks} />,
       this.bannerNode

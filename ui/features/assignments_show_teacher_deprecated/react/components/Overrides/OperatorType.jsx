@@ -18,15 +18,15 @@
 
 import React from 'react'
 import {string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
-// eslint-disable-next-line react/prefer-stateless-function
+ 
 export default class OperatorType extends React.Component {
   static propTypes = {
     value: string.isRequired,

@@ -343,9 +343,22 @@ class ContextController < ApplicationController
       end.reject { |item| item.is_a?(DiscussionTopic) && !item.restorable? }
 
       @deleted_items += @context.attachments.where(file_state: "deleted").limit(25).to_a
-      if @context.grants_right?(@current_user, :manage_groups_delete)
-        @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a
+
+      can_delete_group_categories = @context.grants_right?(@current_user, :manage_groups_delete)
+      can_delete_differentiation_tag_categories = @context.grants_right?(@current_user, :manage_tags_delete)
+      undelete_scope = if can_delete_group_categories && can_delete_differentiation_tag_categories
+                         @context.combined_group_and_differentiation_tag_categories
+                       elsif can_delete_group_categories
+                         @context.all_group_categories
+                       elsif can_delete_differentiation_tag_categories
+                         @context.all_differentiation_tag_categories
+                       else
+                         nil
+                       end
+      if undelete_scope.present?
+        @deleted_items += undelete_scope.where.not(deleted_at: nil).limit(25).to_a
       end
+
       @deleted_items.sort_by { |item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end

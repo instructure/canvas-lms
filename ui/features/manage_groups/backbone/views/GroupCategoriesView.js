@@ -26,9 +26,9 @@ import awaitElement from '@canvas/await-element'
 import {renderCreateDialog} from '@canvas/groups/react/CreateOrEditSetModal'
 import 'jqueryui/tabs'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('GroupCategoriesView')
+const I18n = createI18nScope('GroupCategoriesView')
 export default class GroupCategoriesView extends CollectionView {
   static initClass() {
     this.prototype.template = groupCategoriesTemplate

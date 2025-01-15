@@ -39,26 +39,26 @@ import {saveRubricAssessment} from './mutations/saveRubricAssessmentMutation'
 import {updateSubmissionSecondsLate} from './mutations/updateSubmissionSecondsLateMutation'
 import {reassignAssignment} from './mutations/reassignAssignmentMutation'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {executeQuery} from '@canvas/query/graphql'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 ready(() => {
   const classicContainer = document.querySelector('#classic_speedgrader_container')
 
   if (classicContainer instanceof HTMLElement) {
     // touch punch simulates mouse events for touch devices
-    // eslint-disable-next-line import/extensions
+     
     require('./touch_punch.js')
 
     const mountPoint = document.getElementById('speed_grader_loading')
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <div
         style={{
@@ -84,7 +84,7 @@ ready(() => {
 
   // The feature must be enabled AND we must be handed the speedgrader platform URL
   if (!window.ENV.PLATFORM_SERVICE_SPEEDGRADER_ENABLED || !window.REMOTES?.speedgrader) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <GenericErrorPage
         imageUrl={errorShipUrl}
@@ -167,10 +167,10 @@ ready(() => {
       })
     })
     .catch(error => {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to load SpeedGrader', error)
       captureException(error)
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <GenericErrorPage
           imageUrl={errorShipUrl}

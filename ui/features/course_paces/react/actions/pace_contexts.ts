@@ -29,11 +29,11 @@ import type {
 } from '../types'
 import type {ThunkAction} from 'redux-thunk'
 import type {Action} from 'redux'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {CONTEXT_TYPE_MAP} from '../utils/utils'
 import {coursePaceActions} from './course_paces'
 
-const I18n = useI18nScope('pace_contexts_actions')
+const I18n = createI18nScope('pace_contexts_actions')
 
 export interface FetchContextsActionParams {
   contextType: APIPaceContextTypes

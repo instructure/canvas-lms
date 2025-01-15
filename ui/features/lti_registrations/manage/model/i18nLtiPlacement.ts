@@ -18,9 +18,9 @@
 
 import {type LtiPlacement} from './LtiPlacement'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export const LtiPlacementTranslations: Record<LtiPlacement, string> = {
   account_navigation: I18n.t('Account Navigation'),

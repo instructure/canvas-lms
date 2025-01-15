@@ -18,20 +18,55 @@
 
 import type {QueryFunctionContext} from '@tanstack/react-query'
 import type {EnrollmentTerms} from '../../../../api'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import type {Term} from '../types'
+import type {NextPageTerms, Term} from '../types'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {useAllPages} from '@canvas/query'
+import {useMemo} from 'react'
+import {courseCopyRootKey, enrollmentTermsFetchKey} from '../types'
 
-export const termsQuery = async ({signal, queryKey}: QueryFunctionContext): Promise<Term[]> => {
-  const [, , accountId] = queryKey
-  const data: Array<Term> = []
-  const fetchOpts = {signal}
-  let path: any = `/api/v1/accounts/${accountId}/terms`
-
-  while (path) {
-    // eslint-disable-next-line no-await-in-loop
-    const {json, link} = await doFetchApi<EnrollmentTerms>({path, fetchOpts})
-    if (json) data.push(...json.enrollment_terms)
-    path = link?.next?.url || null
+export const getTermsNextPage = (
+  lastPage: DoFetchApiResults<EnrollmentTerms>
+): NextPageTerms | undefined => {
+  const isResultEmpty = !lastPage.json?.enrollment_terms.length
+  if (isResultEmpty) {
+    return
   }
-  return data
+  return lastPage.link?.next
+}
+
+export const termsQuery = async ({
+  signal,
+  queryKey,
+  pageParam,
+}: QueryFunctionContext<[string, string, string], NextPageTerms>): Promise<
+  DoFetchApiResults<EnrollmentTerms>
+> => {
+  const [, , accountId] = queryKey
+  const fetchOpts = {signal}
+  const page = pageParam?.page || '1'
+  const perPage = pageParam?.per_page || '10'
+  const path = `/api/v1/accounts/${accountId}/terms?page=${page}&per_page=${perPage}`
+
+  return doFetchApi<EnrollmentTerms>({path, fetchOpts})
+}
+
+export const useTermsQuery = (accountId: string) => {
+  const {isLoading, isError, data, hasNextPage} = useAllPages({
+    queryKey: [courseCopyRootKey, enrollmentTermsFetchKey, accountId],
+    queryFn: termsQuery,
+    getNextPageParam: getTermsNextPage,
+    meta: {fetchAtLeastOnce: true},
+  })
+
+  const terms: Term[] = useMemo(
+    () => data?.pages.flatMap(page => page.json?.enrollment_terms || []) ?? [],
+    [data]
+  ).map(term => ({id: term.id, name: term.name, startAt: term.start_at, endAt: term.end_at}))
+
+  return {
+    data: terms,
+    isLoading,
+    isError,
+    hasNextPage,
+  }
 }

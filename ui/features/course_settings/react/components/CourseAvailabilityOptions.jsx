@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import {isMidnight} from '@instructure/moment-utils'
 import moment from 'moment'
@@ -33,7 +33,7 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 import {changeTimezone} from '@instructure/moment-utils/changeTimezone'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('CourseAvailabilityOptions')
+const I18n = createI18nScope('CourseAvailabilityOptions')
 
 export default function CourseAvailabilityOptions({canManage, viewPastLocked, viewFutureLocked}) {
   const FORM_IDS = {

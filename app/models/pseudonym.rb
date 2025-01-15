@@ -361,7 +361,7 @@ class Pseudonym < ActiveRecord::Base
 
     # Assert a time zone for the user if none provided
     if user && !user.time_zone
-      user.time_zone = self.account.default_time_zone rescue Account.default.default_time_zone
+      user.time_zone = account.default_time_zone
       user.time_zone ||= Time.zone
     end
     user.save if user.workflow_state_changed? || user.time_zone_changed?
@@ -521,7 +521,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def user_code
-    user.uuid rescue nil
+    user.uuid
   end
 
   def email

@@ -614,7 +614,7 @@ describe ContentTag do
     Setting.set("touch_personal_space", "10")
     course_factory
     mod = @course.context_modules.create!
-    recent = Time.now
+    recent = Time.zone.now
     ContextModule.where(id: mod).update_all(updated_at: recent)
     Timecop.travel(recent + 1.second) do
       ContextModule.transaction do

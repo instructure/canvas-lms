@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import RubricAddCriterionPopover from '../react/components/RubricAddCriterionPopover'
 import RubricManagement from '../react/components/RubricManagement'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import changePointsPossibleToMatchRubricDialog from '../jst/changePointsPossibleToMatchRubricDialog.handlebars'
 import $ from 'jquery'
 import {debounce} from 'lodash'
@@ -41,7 +41,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('edit_rubric')
+const I18n = createI18nScope('edit_rubric')
 
 const rubricEditing = {
   htmlBody: null,
@@ -70,7 +70,7 @@ const rubricEditing = {
     $('#add_criterion_container').remove()
     $rubric.find('#add_criterion_holder').append($('<span/>').attr('id', 'add_criterion_container'))
     setTimeout(() => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <RubricAddCriterionPopover
           rubric={$rubric}
@@ -939,7 +939,7 @@ rubricEditing.init = function () {
         useMasteryScale = shouldUseMasteryScale($rubric)
 
       if (rubricEditing.isEditing) return false
-      // eslint-disable-next-line no-restricted-globals, no-alert
+       
       if (!$link.hasClass('copy_edit') || confirm(getEditRubricPrompt(useMasteryScale))) {
         rubricEditing.editRubric($rubric, $link.attr('href'), useMasteryScale)
       }
@@ -1631,7 +1631,7 @@ if (
 ) {
   $('h1').hide()
   const contextId = ENV.context_asset_string.split('_')[1]
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <RubricManagement accountId={contextId} />,
     document.getElementById('rubric_management')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import {truncateText} from '@canvas/util/TextHelper'
@@ -25,7 +25,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('findLinkForService')
+const I18n = createI18nScope('findLinkForService')
 
 function titleize(inputString) {
   const processedString = (inputString || '')
@@ -115,7 +115,7 @@ export function findLinkForService(service_type, callback) {
           }
           for (const idx in data) {
             data[idx].short_title = data[idx].title
-            // eslint-disable-next-line eqeqeq
+             
             if (data[idx].title == data[idx].description) {
               data[idx].short_title = truncateText(data[idx].description, {max: 30})
             }

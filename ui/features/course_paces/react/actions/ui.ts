@@ -42,6 +42,7 @@ export enum Constants {
   SHOW_PACE_MODAL = 'UI/SHOW_PACE_MODAL',
   HIDE_PACE_MODAL = 'UI/HIDE_PACE_MODAL',
   START_SYNCING = 'UI/START_SYNCING',
+  SAVING_DRAFT = 'UI/START_SAVE_DRAFT',
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
   SET_SELECTED_PACE_CONTEXT_TYPE = 'UI/SET_SELECTED_PACE_CONTEXT_TYPE',
   SET_BLUEPRINT_LOCK = 'COURSE_PACE/SET_BLUEPRINT_LOCK',
@@ -69,6 +70,7 @@ export const regularActions = {
   setOuterResponsiveSize: (outerResponsiveSize: ResponsiveSizes) =>
     createAction(Constants.SET_OUTER_RESPONSIVE_SIZE, outerResponsiveSize),
   startSyncing: () => createAction(Constants.START_SYNCING),
+  toggleSavingDraft: () => createAction(Constants.SAVING_DRAFT),
   syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED),
   setSelectedContextType: (selectedContextType: PaceContextTypes) =>
     createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, selectedContextType),

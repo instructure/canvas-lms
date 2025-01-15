@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {IconModuleSolid} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('modules_home_page')
+const I18n = createI18nScope('modules_home_page')
 
 function ModulesHomePage({onCreateButtonClick}) {
   return (

@@ -17,7 +17,7 @@
  */
 
 import getCookie from '@instructure/get-cookie'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import qs from 'qs'
 import type {GradingRubricContext} from '../types/rubricAssignment'
 import type {Rubric, RubricAssociation} from '../../types/rubric'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {Alert} from '@instructure/ui-alerts'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function TagThrottle({tag, jobs, onUpdate}) {
   const [modalOpen, setModalOpen] = useState(false)
@@ -166,6 +166,7 @@ export default function TagThrottle({tag, jobs, onUpdate}) {
           </Flex.Item>
           <Flex.Item padding="xx-small">
             <NumberInput
+              allowStringValue={true}
               renderLabel={I18n.t('New Concurrency')}
               value={maxConcurrent}
               onChange={onChangeConcurrency}

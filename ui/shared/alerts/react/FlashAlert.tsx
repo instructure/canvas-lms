@@ -43,14 +43,14 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
 
-const I18n = useI18nScope('ajaxflashalert')
+const I18n = createI18nScope('ajaxflashalert')
 
 const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jquery's elements
 const screenreaderMessageHolderId = 'flash_screenreader_holder'
@@ -83,7 +83,7 @@ function findDetailMessage(err: CanvasApiResponseError) {
           a = err.response.data.message
           b = err.message
         }
-      } catch (ignore) {
+      } catch (_ignore) {
         a = err.message
       }
     }
@@ -247,7 +247,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
   }
 
   function renderAlert(parent: Element) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <FlashAlert
         message={message}

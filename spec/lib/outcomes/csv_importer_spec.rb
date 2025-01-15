@@ -30,7 +30,7 @@ describe Outcomes::CSVImporter do
 
     updates ||= no_errors
     Tempfile.open do |tf|
-      CSV.open(tf.path, "wb", col_sep: separator) do |csv|
+      CSV.open(tf.path, "wb", col_sep: separator, encoding: nil) do |csv|
         rows.each { |r| csv << r }
       end
       tf.binmode

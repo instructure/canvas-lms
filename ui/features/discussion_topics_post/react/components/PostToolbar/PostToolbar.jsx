@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
@@ -46,7 +46,7 @@ import {Text} from '@instructure/ui-text'
 import ReadIcon from '@canvas/read-icon'
 import UnreadIcon from '@canvas/unread-icon'
 
-const I18n = useI18nScope('discussion_posts')
+const I18n = createI18nScope('discussion_posts')
 
 export function PostToolbar({repliesCount, unreadCount, ...props}) {
   const showSubscribe = useMemo(() => {
@@ -60,7 +60,7 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
         : true
     }
     return !props.discussionTopic?.groupSet
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [props.discussionTopic?.groupSet]) // disabling to use safe nav in dependencies
 
   const subscriptionDisabled = props.discussionTopic?.subscriptionDisabledForUser

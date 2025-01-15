@@ -22,11 +22,11 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {BlackoutDate} from '../types'
 import {coursePaceDateFormatter} from '../api/backend_serializer'
 
-const I18n = useI18nScope('course_paces_blackout_dates_table')
+const I18n = createI18nScope('course_paces_blackout_dates_table')
 
 /* React Components */
 

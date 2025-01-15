@@ -23,7 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useState, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   type CheckpointState,
   EXCUSED,
@@ -46,7 +46,7 @@ import {
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import type {GradeStatus} from '@canvas/grading/accountGradingStatus'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type Props = {
   hasCheckpoints: boolean

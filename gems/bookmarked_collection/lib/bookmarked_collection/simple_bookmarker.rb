@@ -118,8 +118,8 @@ module BookmarkedCollection
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
       datetime: lambda do |val|
-        val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!DateTime.parse(val))
-      rescue Date::Error
+        val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!Time.parse(val))
+      rescue ArgumentError
         false
       end,
       float: ->(val) { val.is_a?(Float) }

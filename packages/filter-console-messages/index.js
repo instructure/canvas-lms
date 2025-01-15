@@ -39,6 +39,9 @@ const consoleMessagesToIgnore = {
 
     // until INSTUI fixes this in v8
     'Warning: Failed prop type: Invalid prop `color` of value `secondary` supplied to `CondensedButton`, expected one of ["primary","primary-inverse"].',
+
+    /uses the legacy childContextTypes API which is no longer supported/,
+    /findDOMNode is deprecated/,
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up

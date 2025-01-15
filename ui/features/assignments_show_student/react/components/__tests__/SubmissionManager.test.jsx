@@ -31,7 +31,7 @@ import {
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import {MockedProviderWithIntrospectionMatching as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithIntrospectionMatching'
+import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
 import React from 'react'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
@@ -259,7 +259,6 @@ describe('SubmissionManager', () => {
   })
 
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
-    // eslint-disable-next-line jest/valid-describe
     describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {
       beforeEach(() => {
         window.ENV = {
@@ -2149,8 +2148,9 @@ describe('SubmissionManager', () => {
 
       expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
       expect(getByTestId('rubric-assessment-horizontal-display')).toBeInTheDocument()
-      expect(getByTestId('rubric-rating-button-1')).not.toBeDisabled()
-      expect(getByTestId('rubric-rating-button-0')).not.toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-rating-button-1')).not.toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-rating-button-0')).not.toBeDisabled()
     })
 
     it('renders the rubric assessment tray in preview mode when the user has already self assessed', async () => {
@@ -2171,10 +2171,10 @@ describe('SubmissionManager', () => {
 
       expect(getByTestId('enhanced-rubric-assessment-tray')).toBeInTheDocument()
       expect(getByTestId('rubric-assessment-horizontal-display')).toBeInTheDocument()
-
-      expect(getByTestId('rubric-rating-button-1')).toBeDisabled()
-      expect(getByTestId('rubric-rating-button-selected')).toBeInTheDocument()
-      expect(getByTestId('rubric-rating-button-0')).toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-rating-button-1')).toBeDisabled()
+      expect(getByTestId('rubric-self-assessment-rating-button-selected')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-rating-button-0')).toBeDisabled()
     })
   })
 })

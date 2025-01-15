@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {Modal} from '@instructure/ui-modal'
@@ -36,7 +36,7 @@ import {
 } from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 export const UsageRights = ({
   onSaveUsageRights,

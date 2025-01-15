@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import type {GradeStatus, GradeStatusType} from '@canvas/grading/accountGradingStatus'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Alert} from '@instructure/ui-alerts'
@@ -32,7 +32,7 @@ import {StandardStatusItem} from './StandardStatusItem'
 import {CustomStatusNewItem} from './CustomStatusNewItem'
 import {useAccountGradingStatuses} from '../../hooks/useAccountGradingStatuses'
 
-const I18n = useI18nScope('account_grading_status')
+const I18n = createI18nScope('account_grading_status')
 
 const {Row: GridRow, Col: GridCol} = Grid as any
 
@@ -177,7 +177,7 @@ export const AccountStatusManagement = ({
                 const editStatusId = getEditStatusId(index.toString(), 'new')
                 return (
                   <CustomStatusNewItem
-                    // eslint-disable-next-line react/no-array-index-key
+                     
                     key={`custom-status-new-${index}-${allowedCustomStatusAdditions}`}
                     handleSave={handleSaveCustomStatus}
                     index={index}

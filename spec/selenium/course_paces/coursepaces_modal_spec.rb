@@ -62,6 +62,38 @@ describe "course pace page" do
 
       expect(course_pace_settings_button).to be_displayed
     end
+
+    it "does not show save as draft button" do
+      visit_course_paces_page
+
+      click_create_default_pace_button
+
+      expect(element_exists?(save_draft_button_selector)).to be_falsey
+    end
+  end
+
+  context "when course_pace_draft_state feature flag is enabled" do
+    before :once do
+      @course.root_account.enable_feature!(:course_pace_draft_state)
+      @course.root_account.reload
+      create_draft_course_pace
+    end
+
+    it "pace in a draft state renders save as draft button" do
+      visit_course_paces_page
+
+      click_create_default_pace_button
+
+      expect(element_exists?(save_draft_button_selector)).to be_truthy
+    end
+
+    it "pace in a draft state renders draft status pill" do
+      visit_course_paces_page
+
+      click_create_default_pace_button
+
+      expect(element_exists?(draft_pace_status_pill_selector)).to be_truthy
+    end
   end
 
   context "remove course pace button" do
@@ -261,7 +293,7 @@ describe "course pace page" do
       click_remove_pace_modal_cancel
 
       expect(element_exists?(remove_pace_modal_selector(:section))).to be_falsey
-      expect(publish_status.text).to eq("No pending changes to apply")
+      expect(publish_status.text).to eq("No pending changes")
     end
 
     it "cancels out of remove pace modal with X button without removing pace" do
@@ -276,7 +308,7 @@ describe "course pace page" do
       click_remove_pace_modal_x
 
       expect(element_exists?(remove_pace_modal_selector(:student))).to be_falsey
-      expect(publish_status.text).to eq("No pending changes to apply")
+      expect(publish_status.text).to eq("No pending changes")
     end
 
     it "removes section pace with Remove button and returns to default" do

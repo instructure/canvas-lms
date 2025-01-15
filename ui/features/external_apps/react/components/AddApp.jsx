@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {map, each, isEmpty, compact} from 'lodash'
 import $ from 'jquery'
 import React from 'react'
@@ -29,9 +29,9 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/rails-flash-notifications'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
-// eslint-disable-next-line react/prefer-es6-class
+ 
 export default createReactClass({
   displayName: 'AddApp',
 

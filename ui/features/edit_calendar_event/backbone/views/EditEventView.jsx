@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import {omit, defer, pick} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as tz from '@instructure/moment-utils'
 import moment from 'moment-timezone'
 import Backbone from '@canvas/backbone'
@@ -49,7 +49,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import EditCalendarEventHeader from '../../react/components/EditCalendarEventHeader'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('calendar.edit')
+const I18n = createI18nScope('calendar.edit')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -222,7 +222,7 @@ export default class EditCalendarEventView extends Backbone.View {
       conferenceNode.closest('fieldset').className = 'hide'
     } else {
       conferenceNode.closest('fieldset').className = ''
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <CalendarConferenceWidget
           key={this.conferencesKey}
@@ -269,7 +269,7 @@ export default class EditCalendarEventView extends Backbone.View {
         ? I18n.t('Create New Calendar Event')
         : I18n.t('Edit %{title}', {title: this.model.get('title')})
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <EditCalendarEventHeader title={title} />,
       document.getElementById('header_component_root')
@@ -293,7 +293,7 @@ export default class EditCalendarEventView extends Backbone.View {
           : this.course.get('term')?.end_at
       }
 
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <div id="recurring_event_frequency_picker" style={{margin: '.5rem 0 1rem'}}>
           <FrequencyPickerErrorBoundary>
@@ -442,7 +442,7 @@ export default class EditCalendarEventView extends Backbone.View {
       delUrl: this.model.url(),
       isRepeating: !!this.model.get('series_uuid'),
       isSeriesHead: !!this.model.get('series_head'),
-      // eslint-disable-next-line no-restricted-globals
+       
       eventType: event.eventType,
     })
   }

@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {nanoid} from 'nanoid'
 import PropTypes from 'prop-types'
 
@@ -40,7 +40,7 @@ import {assignmentRow} from './AssignmentTableRows/AssignmentRow'
 import {scoreDistributionRow} from './AssignmentTableRows/ScoreDistributionRow'
 import {rubricRow} from './AssignmentTableRows/RubricRow'
 
-const I18n = useI18nScope('grade_summary')
+const I18n = createI18nScope('grade_summary')
 
 const headers = [
   {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},

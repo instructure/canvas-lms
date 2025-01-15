@@ -23,9 +23,9 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Responsive} from '@instructure/ui-responsive'
 import {UploadButton} from './UploadButton'
 import {uploadFile} from '@canvas/upload-file'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 const returnFocus = () => {
   // clear conversation selection then use timeout to give time

@@ -20,9 +20,9 @@ import React, {useRef, useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 type ContextModuleLinkProps = {
   courseId?: string | null

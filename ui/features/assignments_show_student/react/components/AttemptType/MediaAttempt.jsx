@@ -22,7 +22,7 @@ import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func, string} from 'prop-types'
 import elideString from '../../helpers/elideString'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconTrashLine, IconUploadLine, IconAttachMediaSolid} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -46,7 +46,7 @@ import {MediaPlayer} from '@instructure/ui-media-player'
 import theme from '@instructure/canvas-theme'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('assignments_2_media_attempt')
+const I18n = createI18nScope('assignments_2_media_attempt')
 
 export const VIDEO_SIZE_OPTIONS = {height: '400px', width: '768px'}
 

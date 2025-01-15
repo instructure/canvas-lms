@@ -1,4 +1,4 @@
-/* eslint-disable eqeqeq */
+ 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
@@ -36,7 +36,7 @@ import '@canvas/context-cards/react/StudentContextCardTrigger'
 import replaceTags from '@canvas/util/replaceTags'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('section')
+const I18n = createI18nScope('section')
 
 $(document).ready(function () {
   const section_id = window.location.pathname.split('/')[4],

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme, GradingSchemeTemplate} from '../../gradingSchemeApiModel'
 import {Heading} from '@instructure/ui-heading'
@@ -28,7 +28,7 @@ import {
   type GradingSchemeInputHandle,
 } from './form/GradingSchemeInput'
 
-const I18n = useI18nScope('GradingSchemeViewModal')
+const I18n = createI18nScope('GradingSchemeViewModal')
 
 export type GradingSchemeCreateModalProps = {
   open: boolean

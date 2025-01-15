@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent, act, within} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {
   OutcomePanel,
   OutcomeManagementWithoutGraphql as OutcomeManagement,

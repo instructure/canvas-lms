@@ -19,11 +19,11 @@
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 type AppsSearchBarProps = {
   value: string

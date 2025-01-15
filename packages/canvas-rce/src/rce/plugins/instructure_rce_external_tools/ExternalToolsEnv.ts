@@ -17,22 +17,9 @@
  */
 
 import {Editor} from 'tinymce'
+import {RCEWrapperInterface, RCEWrapperProps} from '../../types'
 import RCEWrapper from '../../RCEWrapper'
-import {RCEWrapperProps} from '../../RCEWrapperProps'
-
-/**
- * Fallback iframe allowances used when they aren't provided to the editor.
- */
-export const fallbackIframeAllowances = [
-  'geolocation *',
-  'microphone *',
-  'camera *',
-  'midi *',
-  'encrypted-media *',
-  'autoplay *',
-  'clipboard-write *',
-  'display-capture *',
-]
+import {fallbackIframeAllowances} from './constants'
 
 /**
  * Type of the "editor buttons" that come from Canvas.
@@ -60,7 +47,7 @@ export interface ExternalToolsEditor {
 
 export interface ExternalToolsEnv {
   editor: ExternalToolsEditor | null
-  rceWrapper: RCEWrapper | null
+  rceWrapper: RCEWrapperInterface | null
 
   availableRceLtiTools: RceLtiToolInfo[]
   contextAssetInfo: {
@@ -188,17 +175,15 @@ export function externalToolsEnvFor(
     },
 
     insertCode(code: string) {
-      this.rceWrapper?.insertCode(code)
+      if (this.rceWrapper?.insertCode) {
+        this.rceWrapper.insertCode(code)
+      }
     },
 
     replaceCode(code: string) {
-      this.rceWrapper?.replaceCode(code)
+      if (this.rceWrapper?.replaceCode) {
+        this.rceWrapper.replaceCode(code)
+      }
     },
   }
 }
-
-/**
- * Name of the parameter used to indicate to Canvas that it is being loaded in an iframe inside of an
- * LTI tool. It should be set to the global id of the containing tool.
- */
-export const PARENT_FRAME_CONTEXT_PARAM = 'parent_frame_context'

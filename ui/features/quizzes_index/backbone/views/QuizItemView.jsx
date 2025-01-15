@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import {each, extend} from 'lodash'
@@ -35,7 +35,7 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 
-const I18n = useI18nScope('quizzes.index')
+const I18n = createI18nScope('quizzes.index')
 
 export default class ItemView extends Backbone.View {
   static initClass() {
@@ -175,7 +175,7 @@ export default class ItemView extends Backbone.View {
 
   renderItemAssignToTray(open, returnFocusTo, itemProps) {
     const quizItemType = this.model.get('quiz_type') !== 'quizzes.next' ? 'quiz' : 'assignment'
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ItemAssignToManager
         open={open}
@@ -220,7 +220,7 @@ export default class ItemView extends Backbone.View {
   onDelete(e) {
     e.preventDefault()
     if (this.canDelete()) {
-      // eslint-disable-next-line no-alert
+       
       if (window.confirm(this.messages.confirm)) return this.delete()
     }
   }
@@ -246,7 +246,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentSelection = isOldQuiz ? {quizzes: [quizId]} : {assignments: [quizId]}
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -270,7 +270,7 @@ export default class ItemView extends Backbone.View {
     const quizId = this.model.get('id')
     const isOldQuiz = this.model.get('quiz_type') !== 'quizzes.next'
     const contentType = isOldQuiz ? 'quiz' : 'assignment'
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareUserModal
         open={open}

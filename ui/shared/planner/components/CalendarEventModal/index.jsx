@@ -28,12 +28,12 @@ import {Text} from '@instructure/ui-text'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {dateString, dateTimeString, dateRangeString} from '../../utilities/dateUtils'
 import {convertApiUserContent} from '../../utilities/contentUtils'
 import {userShape} from '../plannerPropTypes'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default class CalendarEventModal extends React.Component {
   static propTypes = {

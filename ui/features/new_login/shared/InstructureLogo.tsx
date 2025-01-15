@@ -19,38 +19,39 @@
 import React from 'react'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
-import {View, type ViewOwnProps} from '@instructure/ui-view'
+import {type ViewOwnProps} from '@instructure/ui-view'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const InstructureLogo = () => {
   const {isPreviewMode, isUiActionPending} = useNewLogin()
 
+  const isDisabled = isPreviewMode || isUiActionPending
+
   const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
-    if (isPreviewMode || isUiActionPending) {
+    if (isDisabled) {
       event.preventDefault()
     }
   }
 
   return (
-    <View as="div" textAlign="center">
-      <Link
-        href="https://instructure.com"
-        target="_blank"
-        aria-label={I18n.t('By Instructure')}
-        onClick={handleClick}
-      >
-        <Img
-          width="7.9375rem"
-          height="1.125rem"
-          constrain="contain"
-          src={require('../assets/images/instructure-logo.svg')}
-          alt=""
-        />
-      </Link>
-    </View>
+    <Link
+      aria-label={I18n.t('By Instructure')}
+      href="https://instructure.com"
+      onClick={handleClick}
+      target="_blank"
+    >
+      <Img
+        constrain="contain"
+        height="1.125rem"
+        src={require('../assets/images/instructure.svg')}
+        width="7.9375rem"
+        // InstUI v10 bug: <Img /> does not focus when display="block"
+        // Semantically, this standalone image is block-level
+      />
+    </Link>
   )
 }
 

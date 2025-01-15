@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import type {Product} from '../../models/Product'
+import type {OrganizationProduct, Product} from '../../models/Product'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -29,7 +29,7 @@ import TruncateWithTooltip from '../common/TruncateWithTooltip'
 import {instructorAppsHash, instructorAppsRoute} from '../../utils/route'
 
 type ProductCardProps = {
-  product: Product
+  product: Product | OrganizationProduct
 }
 
 const ProductCard = (props: ProductCardProps) => {
@@ -37,24 +37,6 @@ const ProductCard = (props: ProductCardProps) => {
   const productUrl = `${window.location.origin}${window.location.pathname}/product_detail/${
     product.global_product_id
   }${window.location.pathname.endsWith(instructorAppsRoute) ? instructorAppsHash : ''}`
-
-  // const tagTheme = {
-  //   installed: {
-  //     defaultBackground: 'white',
-  //     defaultColor: 'green',
-  //     defaultBorderColor: 'green',
-  //   },
-  //   review: {
-  //     defaultBackground: 'white',
-  //     defaultColor: 'gray',
-  //     defaultBorderColor: 'gray',
-  //   },
-  //   denied: {
-  //     defaultBackground: 'white',
-  //     defaultColor: 'red',
-  //     defaultBorderColor: 'red',
-  //   },
-  // }
 
   return (
     <Flex.Item>
@@ -113,16 +95,21 @@ const ProductCard = (props: ProductCardProps) => {
               <Tag key={tag.name} text={tag.name} size="small" margin="0 xx-small 0 0" />
             ))}
           </View>
-          {/* TODO: connect to api when its ready */}
-          {/* <View as="div" margin="auto 0 0 0">
-            <Tag
-              key="1"
-              text="Installed"
-              size="medium"
-              margin="0 xx-small 0 0"
-              themeOverride={tagTheme.installed}
-            />
-          </View> */}
+          {'organization_tool' in product && product.organization_tool.product_status && (
+            <View as="div" margin="auto 0 0 0">
+              <Tag
+                key="1"
+                text={product.organization_tool.product_status?.name}
+                size="medium"
+                margin="0 xx-small 0 0"
+                themeOverride={{
+                  defaultBackground: 'white',
+                  defaultColor: product.organization_tool.product_status?.color,
+                  defaultBorderColor: product.organization_tool.product_status?.color,
+                }}
+              />
+            </View>
+          )}
         </Flex>
       </View>
     </Flex.Item>

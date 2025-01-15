@@ -80,15 +80,4 @@ describe "announcement_reply" do
       expect(msg.body.strip).to eq "hai"
     end
   end
-
-  describe ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.subject).to eq "Canvas Alert"
-      expect(msg.url).to include "/courses/#{@announcement.context.id}/discussion_topics/#{@announcement.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
-      expect(msg.body).to include("Canvas Alert - Announcement Comment: value for title, value for name")
-    end
-  end
 end

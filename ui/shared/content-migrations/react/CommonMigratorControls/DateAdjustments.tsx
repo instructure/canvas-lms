@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -30,38 +30,13 @@ import {IconAddLine, IconEndLine} from '@instructure/ui-icons'
 import {IconButton, Button} from '@instructure/ui-buttons'
 import {Responsive} from '@instructure/ui-responsive'
 import type {DateAdjustmentConfig, DaySub} from './types'
-import type {FormMessage} from '@instructure/ui-form-field'
-import type {Spacing} from '@instructure/emotion'
+import {timeZonedFormMessages} from './timeZonedFormMessages'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 let subs_id = 1
 
 const formatDate = (date: Date) => {
-  return datetimeString(date, {timezone: ENV.CONTEXT_TIMEZONE})
-}
-
-const generateMessageObject = (
-  label: string,
-  dateString: string,
-  timezone?: string,
-  margin?: Spacing
-): FormMessage => ({
-  type: 'hint',
-  text: (
-    <View as="div" margin={margin}>
-      <Text size="small">{`${label}: ${datetimeString(dateString, {timezone})}`}</Text>
-    </View>
-  ),
-})
-
-export const localisedDateMessages = (dateString?: string): FormMessage[] => {
-  if (!dateString || ENV.CONTEXT_TIMEZONE === ENV.TIMEZONE) {
-    return []
-  }
-  return [
-    generateMessageObject(I18n.t('Local'), dateString, ENV.TIMEZONE, 'x-small none none'),
-    generateMessageObject(I18n.t('Course'), dateString, ENV.CONTEXT_TIMEZONE),
-  ]
+  return datetimeString(date, {timezone: ENV.TIMEZONE})
 }
 
 export const DateAdjustments = ({
@@ -131,6 +106,9 @@ export const DateAdjustments = ({
     return null
   }
 
+  const courseTimeZone = ENV.CONTEXT_TIMEZONE || ''
+  const userTimeZone = ENV.TIMEZONE
+
   return (
     <Responsive
       match="media"
@@ -191,7 +169,12 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
-                      messages={localisedDateMessages(start_from_date)}
+                      messages={timeZonedFormMessages(
+                        courseTimeZone,
+                        userTimeZone,
+                        start_from_date
+                      )}
+                      dataTestid="old_start_date"
                     />
                     <View
                       as="div"
@@ -216,7 +199,8 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
-                      messages={localisedDateMessages(start_to_date)}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, start_to_date)}
+                      dataTestid="new_start_date"
                     />
                   </Flex>
                 </View>
@@ -242,7 +226,8 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
-                      messages={localisedDateMessages(end_from_date)}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_from_date)}
+                      dataTestid="old_end_date"
                     />
                     <View
                       as="div"
@@ -265,7 +250,8 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={matches?.includes('small') ? '100%' : '18.75rem'}
-                      messages={localisedDateMessages(end_to_date)}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_to_date)}
+                      dataTestid="new_end_date"
                     />
                   </Flex>
                 </View>

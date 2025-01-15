@@ -17,12 +17,12 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import ClearableDateTimeInput from '@canvas/context-modules/differentiated-modules/react/Item/ClearableDateTimeInput'
 import WithBreakpoints, {type Breakpoints} from '@canvas/with-breakpoints/'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 type SelfSignupEndDateProps = {
   initialEndDate?: string

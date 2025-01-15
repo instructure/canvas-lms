@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act, render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   ACCOUNT_OUTCOME_CALCULATION_QUERY,
@@ -100,7 +100,10 @@ describe('MasteryCalculation', () => {
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(<MasteryCalculation />, {mocks: []})
+    const mocks = [...masteryCalculationGraphqlMocks]
+    mocks[0] = { ...mocks[0], result: { errors: new Error('aw shucks') } }
+
+    const {getByText} = render(<MasteryCalculation />, {mocks: mocks})
     await act(async () => jest.runAllTimers())
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })

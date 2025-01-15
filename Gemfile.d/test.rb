@@ -42,6 +42,7 @@ group :test do
   gem "headless", "2.3.1", require: false
   gem "escape_code", "0.2", require: false
   gem "luminosity_contrast", "0.2.1"
+  # if pact is removed, please remove gems/autoextend/lib/rack/
   gem "pact", "~> 1.57", require: false
   gem "pact-messages", "0.2.0"
   # pinned to 1.72 due to contract tests breaking with the following versions

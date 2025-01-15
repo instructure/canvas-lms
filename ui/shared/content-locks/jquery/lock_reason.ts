@@ -19,9 +19,9 @@
 import {datetimeString} from '@canvas/datetime/date-functions'
 import $ from 'jquery'
 import htmlEscape, {SafeString, raw} from '@instructure/html-escape'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('content_locks')
+const I18n = createI18nScope('content_locks')
 
 export default function lockExplanation(
   data: {

@@ -54,6 +54,65 @@ class SubAssignment < AbstractAssignment
     false
   end
 
+  # AbstractAssignment method with support for sub_assignments
+  # link points to the parent assignment as sub_assignments cannot be accessed directly
+  def direct_link
+    "http://#{HostUrl.context_host(context)}/#{context_url_prefix}/assignments/#{parent_assignment_id}"
+  end
+
+  # AbstractAssignment method with support for sub_assignments and sub_assignment overrides
+  def to_atom(opts = {})
+    extend ApplicationHelper
+    author_name = context.present? ? context.name : t("atom_no_author", "No Author")
+    content = "#{before_label(:due, "Due")} #{datetime_string(due_at, :due_date)}"
+    unless opts[:exclude_description]
+      content += "<br/>#{description}<br/><br/>
+        <div>
+          #{description}
+        </div>
+      "
+    end
+
+    sub_title = title_with_required_replies
+
+    if applied_overrides.present?
+      applied_overrides.try(:each) do |override|
+        next unless override.due_at_overridden
+
+        sub_title = "#{sub_title} (#{override.title})" if override.title.present?
+      end
+    end
+
+    sub_title = if opts[:include_context]
+                  t(:feed_entry_title_with_course, "Assignment, %{course}: %{sub_title}", sub_title:, course: context.name)
+                else
+                  t(:feed_entry_title, "Assignment: %{sub_title}", sub_title:)
+                end
+
+    due_at_str = due_at.strftime("%Y-%m-%d-%H-%M") rescue "none" # rubocop:disable Style/RescueModifier
+
+    {
+      title: sub_title,
+      updated: updated_at.utc,
+      published: created_at.utc,
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/sub_assignments/#{feed_code}_#{due_at_str}",
+      content:,
+      link: direct_link,
+      author: author_name
+    }
+  end
+
+  def title_with_required_replies
+    required_replies = discussion_topic&.reply_to_entry_required_count || 1
+    if sub_assignment_tag == CheckpointLabels::REPLY_TO_TOPIC
+      I18n.t("%{title} Reply to Topic", title:)
+    elsif sub_assignment_tag == CheckpointLabels::REPLY_TO_ENTRY
+      I18n.t("%{title} Required Replies (%{required_replies})", title:, required_replies:)
+    else
+      title
+    end
+  end
+
   private
 
   def sync_with_parent

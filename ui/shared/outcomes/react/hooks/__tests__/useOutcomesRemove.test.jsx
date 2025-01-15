@@ -28,7 +28,7 @@ import {createCache} from '@canvas/apollo-v3'
 import OutcomesContext from '../../contexts/OutcomesContext'
 import {deleteOutcomeMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 
 jest.useFakeTimers()
 

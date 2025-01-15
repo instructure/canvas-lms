@@ -79,14 +79,4 @@ describe "discussion_mention" do
       expect(msg.subject).to include "You have been mentioned in #{@entry.title}: #{@course.name}"
     end
   end
-
-  context "twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders twitter" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.url).to include "/courses/#{@topic.context.id}/discussion_topics/#{@topic.id}?entry_id=#{@entry.id}#entry-#{@entry.id}"
-      expect(msg.body).to include "Canvas Alert - Mention: #{@entry.title}, #{@course.name}."
-    end
-  end
 end

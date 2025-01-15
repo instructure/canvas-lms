@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection'
 import GroupUser from '../models/GroupUser'
 import h from '@instructure/html-escape'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 
-const I18n = useI18nScope('GroupUserCollection')
+const I18n = createI18nScope('GroupUserCollection')
 
 extend(GroupUserCollection, PaginatedCollection)
 

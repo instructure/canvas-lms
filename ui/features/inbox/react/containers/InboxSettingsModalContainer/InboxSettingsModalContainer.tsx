@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect, useCallback} from 'react'
 import moment from 'moment'
 import {Responsive} from '@instructure/ui-responsive'
@@ -35,13 +35,13 @@ import ModalSpinner from '../ComposeModalContainer/ModalSpinner'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
 import {UPDATE_INBOX_SETTINGS} from '../../../graphql/Mutations'
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation} from '@apollo/client'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import useInboxSettingsValidate from '../../hooks/useInboxSettingsValidate'
 import type {InboxSettings, InboxSettingsData} from '../../../inboxModel'
 import type {FormMessage} from '@instructure/ui-form-field'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export interface Props {
   inboxSignatureBlock: boolean
@@ -172,7 +172,7 @@ const InboxSettingsModalContainer = ({
     }
   }
 
-  const filterState = (state: Object = defaultInboxSettings): InboxSettings => {
+  const filterState = (state: object = defaultInboxSettings): InboxSettings => {
     const allowedKeys = new Set([
       'useSignature',
       'signature',

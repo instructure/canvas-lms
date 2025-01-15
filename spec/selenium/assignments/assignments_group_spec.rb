@@ -190,6 +190,44 @@ describe "assignment groups" do
     expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text("10.11% of Total")
   end
 
+  it "shows error text if group weight is not a number" do
+    @course.update_attribute(:group_weighting_scheme, "percent")
+    ag1 = @course.assignment_groups.create!(name: "Test")
+
+    get "/courses/#{@course.id}/assignments"
+
+    f("#course_assignment_settings_link").click
+    f("#assignmentSettingsCog").click
+    wait_for_ajaximations
+
+    fj('input[name="Test_group_weight"]:visible').send_keys("abc")
+
+    fj('button[id="update-assignment-settings"]:visible').click
+
+    expect(f("#group_#{ag1.id}_weight_errors")).to include_text("Must be a valid number")
+  end
+
+  it "hide errors when changing the input value" do
+    @course.update_attribute(:group_weighting_scheme, "percent")
+    ag1 = @course.assignment_groups.create!(name: "Test")
+
+    get "/courses/#{@course.id}/assignments"
+
+    f("#course_assignment_settings_link").click
+    f("#assignmentSettingsCog").click
+    wait_for_ajaximations
+
+    fj('input[name="Test_group_weight"]:visible').send_keys("abc")
+
+    fj('button[id="update-assignment-settings"]:visible').click
+
+    expect(f("#group_#{ag1.id}_weight_errors")).to include_text("Must be a valid number")
+
+    fj('input[name="Test_group_weight"]:visible').send_keys("100")
+
+    expect(f("#group_#{ag1.id}_weight_errors")).to include_text("")
+  end
+
   # This feels like it would be better suited here than in QUnit
   it "does not remove new assignments when editing a group", priority: "1" do
     get "/courses/#{@course.id}/assignments"

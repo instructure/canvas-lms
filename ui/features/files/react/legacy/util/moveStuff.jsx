@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import FileRenameForm from '@canvas/files/react/components/FileRenameForm'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 function moveItem(item, destinationFolder, options = {}) {
   const dfd = $.Deferred()
@@ -33,7 +33,7 @@ function moveItem(item, destinationFolder, options = {}) {
     (jqXHR, _textStatus, _errorThrown) => {
       if (jqXHR.status === 409) {
         // file already exists: prompt and retry
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           React.createFactory(FileRenameForm)({
             onClose() {},

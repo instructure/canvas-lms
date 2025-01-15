@@ -27,7 +27,7 @@ import createStore from '@canvas/backbone/createStore'
 import {View} from '@instructure/ui-view'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -37,7 +37,7 @@ import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('courses_show')
+const I18n = createI18nScope('courses_show')
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
@@ -115,7 +115,7 @@ const addToDoSidebar = parent => {
 $(() => {
   const container = document.getElementById('choose_home_page')
   if (container) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<ChooseHomePageButton store={defaultViewStore} />, container)
   }
 
@@ -126,7 +126,7 @@ $(() => {
 
   const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
   if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <View as="div" maxWidth="12em">
         <ObserverOptions

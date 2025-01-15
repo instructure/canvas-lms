@@ -83,7 +83,7 @@ class LearningOutcome < ActiveRecord::Base
     if data && data[:rubric_criterion]
       data[:rubric_criterion][:description] = short_description
     end
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
 
     # if we are changing the calculation_method but not the calculation_int, set the int to the default value
     if calculation_method_changed? && !calculation_int_changed?
@@ -287,7 +287,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
-      context.short_name rescue ""
+      context&.short_name.to_s
     end
   end
 
@@ -345,7 +345,7 @@ class LearningOutcome < ActiveRecord::Base
       end
       criterion[:ratings] = criterion[:ratings].sort_by { |r| r[:points] }.reverse
       criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
-      criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
+      criterion[:points_possible] = criterion.dig(:ratings, 0, :points)
     else
       criterion = self.class.default_rubric_criterion
     end

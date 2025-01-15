@@ -27,7 +27,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
 
     context "top level context" do
       it "does not warn for *_spec.rb extension" do
-        inspect_source(%{
+        offenses = inspect_source(%{
           context AuthenticationProvider::BlueDragoon do
             describe '#fire' do
               it 'rains fire' do
@@ -36,13 +36,13 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
             end
           end
         })
-        expect(cop.offenses.size).to eq(0)
+        expect(offenses.size).to eq(0)
       end
     end
 
     context "top level describe" do
       it "does not warn for *_spec.rb extension" do
-        inspect_source(%{
+        offenses = inspect_source(%{
           describe AuthenticationProvider::GreenDragoon do
             describe '#green' do
               it 'smells bad' do
@@ -51,7 +51,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
             end
           end
         })
-        expect(cop.offenses.size).to eq(0)
+        expect(offenses.size).to eq(0)
       end
     end
   end
@@ -63,7 +63,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
 
     context "top level context" do
       it "warns for *_spec.rb extension" do
-        inspect_source(%{
+        offenses = inspect_source(%{
           context AuthenticationProvider::BlueDragoon do
             describe '#fire' do
               it 'rains fire' do
@@ -72,15 +72,15 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
             end
           end
         })
-        expect(cop.offenses.size).to eq(1)
-        expect(cop.messages.first).to match(/Spec files need to end with "_spec.rb"/)
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq(1)
+        expect(offenses.first.message).to match(/Spec files need to end with "_spec.rb"/)
+        expect(offenses.first.severity.name).to eq(:warning)
       end
     end
 
     context "top level describe" do
       it "warns for *_spec.rb extension" do
-        inspect_source(%{
+        offenses = inspect_source(%{
           describe AuthenticationProvider::GreenDragoon do
             describe '#green' do
               it 'smells bad' do
@@ -89,9 +89,9 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
             end
           end
         })
-        expect(cop.offenses.size).to eq(1)
-        expect(cop.messages.first).to match(/Spec files need to end with "_spec.rb"/)
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq(1)
+        expect(offenses.first.message).to match(/Spec files need to end with "_spec.rb"/)
+        expect(offenses.first.severity.name).to eq(:warning)
       end
     end
   end

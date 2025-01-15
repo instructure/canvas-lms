@@ -47,13 +47,13 @@ import {
   scrollToNewActivity,
   setGradesTrayState,
 } from '../../actions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {notifier} from '../../dynamic-ui'
 import {getFirstLoadedMoment} from '../../utilities/dateUtils'
 import {observedUserId} from '../../utilities/apiUtils'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class PlannerHeader extends Component {
   static propTypes = {

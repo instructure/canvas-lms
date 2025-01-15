@@ -22,13 +22,13 @@ import OutcomesContext from '../contexts/OutcomesContext'
 import {useManageOutcomes} from '../treeBrowser'
 import {smallOutcomeTree} from '../../mocks/Management'
 import {renderHook, act} from '@testing-library/react-hooks'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.useFakeTimers()
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashAlert: jest.fn(() => jest.fn(() => {})),
+  showFlashAlert: jest.fn(),
 }))
 
 describe('useManageOutcomes', () => {
@@ -69,6 +69,7 @@ describe('useManageOutcomes', () => {
 
     expect(result.current.collections['100']).toBeDefined()
     act(() => result.current.removeGroup('100'))
+    await act(async () => jest.runAllTimers())
     expect(result.current.collections['100']).toBeUndefined()
 
     const {result: result2} = renderHook(() => useManageOutcomes(), {wrapper})

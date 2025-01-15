@@ -22,11 +22,11 @@ import {coursePaceActions} from '../actions/course_paces'
 import {connect} from 'react-redux'
 import React, {createRef, type ReactNode, type RefObject} from 'react'
 import {ExpandableErrorAlert} from '@canvas/alerts/react/ExpandableErrorAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('course_paces_errors')
+const I18n = createI18nScope('course_paces_errors')
 
 type StoreProps = {
   errors: CategoryErrors

@@ -17,7 +17,7 @@
  */
 
 import {shape, string} from 'prop-types'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const ContextModule = {
   fragment: gql`

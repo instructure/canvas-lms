@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Ffolderi sydd ar gael"
     },
+    "background_1bc88842": {
+        "message": "Cefndir"
+    },
     "backslash_b2d5442d": {
         "message": "Ôl-slaes"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Glas"
+    },
+    "border_5b08b06d": {
+        "message": "Bordor"
     },
     "bottom_15a2a9be": {
         "message": "Gwaelod"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Crebachu i guddio { types }"
     },
+    "color_a363e1b0": {
+        "message": "Lliw"
+    },
+    "color_contrast_4c418add": {
+        "message": "Cyferbyniad Lliw"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Cymhareb Cyferbyniad Lliw"
+    },
     "color_picker_6b359edf": {
         "message": "Dewisydd Lliw"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Dewisydd Lliw ({ colorName } wedi’i ddewis)"
+    },
+    "color_popup_af39810f": {
+        "message": "Naidlen lliwiau"
     },
     "column_e1ae5c64": {
         "message": "Colofn"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (nodwedd)"
     },
+    "fail_544e5dde": {
+        "message": "WEDI METHU"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Wedi methu cael cynnwys ffeil"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Graddau"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Testun graffeg"
     },
     "greater_than_e98af662": {
         "message": "Yn fwy na"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Anfeidredd"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Maes mewnbwn ar gyfer alffa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Maes mewnbwn ar gyfer glas"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Maes mewnbwn ar gyfer gwyrdd"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Maes mewnbwn ar gyfer coch"
+    },
     "insert_593145ef": {
         "message": "Mewnosod"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Mawr"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Testun mawr"
     },
     "latvian_2bbb6aab": {
         "message": "Latfieg"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Dim un wedi’i ddewis"
     },
+    "normal_text_7b03da48": {
+        "message": "Testun cyffredin"
+    },
     "norwegian_53f391ec": {
         "message": "Norwyeg"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "Maint Amlinell"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
-    },
     "page_50c4823d": {
         "message": "Tudalen"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Rhannol (Deilliadol)"
     },
+    "pass_1c19a2b3": {
+        "message": "PASIO"
+    },
     "paste_5963d1c1": {
         "message": "Gludo"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Mae canran yn gorfod bod yn rhif"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Rhaid i''r ganran fod o leiaf { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Eicon Celfyddydau Perfformio"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Amrywiad)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Dewiswch liw"
+    },
     "pink_68ad45cb": {
         "message": "Pinc"
     },
     "pixels_52ece7d1": {
         "message": "Picseli"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Rhaid i’r picseli fod o leiaf { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Chwarae"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Blaenorol { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Lliwiau a ddewiswyd yn y gorffennol"
     },
     "prime_917ea60e": {
         "message": "Cysefin"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Iddew-Almaeneg"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Rydych chi ar balet lliw. I grwydro’r palet i fyny, i’r chwith, i lawr neu i’r dde, defnyddiwch y botymau ''W'', ''A'', ''S'' a ''D'' yn eu tro"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Rydych chi ar lithrydd lliw. I grwydro’r llithrydd i’r chwith neu i’r dde, defnyddiwch y botymau ''A’ a ''D'' yn eu tro"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Rydych chi ar lithrydd alffa. I grwydro’r llithrydd i’r chwith neu i’r dde, defnyddiwch y botymau ''A’ a ''D'' yn eu tro"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Gallwch chi ddisodli drwy lwytho ffeil capsiwn newydd i fyny."

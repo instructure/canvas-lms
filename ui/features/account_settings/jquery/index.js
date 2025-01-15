@@ -17,7 +17,7 @@
  */
 
 import 'jqueryui/dialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -34,7 +34,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('account_settings')
+const I18n = createI18nScope('account_settings')
 
 let reportsTabHasLoaded = false
 
@@ -151,7 +151,7 @@ $(document).ready(function () {
 
   $('#account_settings_suppress_notifications').click(event => {
     if (event.target.checked) {
-      // eslint-disable-next-line no-alert
+       
       const result = window.confirm(
         I18n.t(
           'suppress_notifications_warning',
@@ -611,7 +611,7 @@ $(document).ready(function () {
     const $textarea = $rce_container.find('textarea')
     RichContentEditor.preloadRemoteModule()
     const $terms_type = $('#account_terms_of_service_terms_type').change(onTermsTypeChange)
-    // eslint-disable-next-line no-inner-declarations
+     
     async function onTermsTypeChange() {
       if ($terms_type.val() === 'custom') {
         $('#terms_of_service_modal').show()
@@ -629,13 +629,13 @@ $(document).ready(function () {
               defaultContent: json?.content || '',
             })
           } else {
-            // eslint-disable-next-line no-console
+             
             console.error(
               `Failed to load Acceptable Use Policy content: Received ${response.status} ${response.statusText}`
             )
           }
         } catch (error) {
-          // eslint-disable-next-line no-console
+           
           console.error('Failed to load Acceptable Use Policy content:', error)
         }
       } else {

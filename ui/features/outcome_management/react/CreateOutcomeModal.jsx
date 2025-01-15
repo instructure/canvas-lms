@@ -20,7 +20,7 @@
 import React, {useRef, useState, useEffect} from 'react'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Button} from '@instructure/ui-buttons'
@@ -40,7 +40,7 @@ import {
 } from '@canvas/outcomes/graphql/Management'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import OutcomesRceField from './shared/OutcomesRceField'
 import ProficiencyCalculation, {
   defaultProficiencyCalculation,
@@ -53,7 +53,7 @@ import useOutcomeFormValidate from '@canvas/outcomes/react/hooks/useOutcomeFormV
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Management/Ratings'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const componentOverrides = {
   Mask: {

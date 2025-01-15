@@ -302,17 +302,17 @@ describe ProfileController do
 
     it "lets you set visibility on user_services" do
       @user.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: true
-      @user.user_services.create! service: "twitter", service_user_name: "user", service_user_id: "user", visible: false
+      @user.user_services.create! service: "diigo", service_user_name: "user", service_user_id: "user", visible: false
 
       put "update_profile",
           params: { user_profile: { bio: "..." },
-                    user_services: { twitter: "1", skype: "false" } },
+                    user_services: { diigo: "1", skype: "false" } },
           format: "json"
       expect(response).to be_successful
 
       @user.reload
       expect(@user.user_services.where(service: "skype").first.visible?).to be_falsey
-      expect(@user.user_services.where(service: "twitter").first.visible?).to be_truthy
+      expect(@user.user_services.where(service: "diigo").first.visible?).to be_truthy
     end
 
     it "lets you set your profile links" do

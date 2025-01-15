@@ -161,7 +161,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz = @course.quizzes.create!
       @quiz.quiz_questions.create!(question_data: { name: "test 1" })
       @quiz.generate_quiz_data
-      @quiz.published_at = Time.now
+      @quiz.published_at = Time.zone.now
       @quiz.save!
     end
 
@@ -384,7 +384,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     student2 = User.create!(name: "Stevie Jeebie")
     @course.enroll_user(student2, "StudentEnrollment", enrollment_state: :active)
     q = @course.quizzes.create!(title: "new quiz")
-    q.update_attribute :published_at, Time.now
+    q.update_attribute :published_at, Time.zone.now
     question = q.quiz_questions.create! question_data: {
       name: "q1",
       points_possible: 1,
@@ -417,7 +417,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   it "strips tags from html multiple-choice/multiple-answers" do
     student_in_course(active_all: true)
     q = @course.quizzes.create!(title: "new quiz")
-    q.update_attribute(:published_at, Time.now)
+    q.update_attribute(:published_at, Time.zone.now)
     q.quiz_questions.create!(question_data: { :name => "q1", :points_possible => 1, "question_type" => "multiple_choice_question", "answers" => [{ "answer_text" => "", "answer_html" => "<em>zero</em>", "answer_weight" => "100" }, { "answer_text" => "", "answer_html" => "<p>one</p>", "answer_weight" => "0" }] })
     q.quiz_questions.create!(question_data: { :name => "q2", :points_possible => 1, "question_type" => "multiple_answers_question", "answers" => [{ "answer_text" => "", "answer_html" => "<a href='http://example.com/caturday.gif'>lolcats</a>", "answer_weight" => "100" }, { "answer_text" => "lolrus", "answer_weight" => "100" }] })
     q.generate_quiz_data
@@ -474,7 +474,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   it "strips tags from all student-provided answers" do
     student_in_course(active_all: true)
     q = @course.quizzes.create!
-    q.update_attribute(:published_at, Time.now)
+    q.update_attribute(:published_at, Time.zone.now)
     q.quiz_questions.create!(question_data: short_answer_question_data)
     q.quiz_questions.create!(question_data: fill_in_multiple_blanks_question_one_blank_data)
     q.quiz_questions.create!(question_data: essay_question_data)
@@ -507,7 +507,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   it "does not count teacher preview submissions" do
     teacher_in_course(active_all: true)
     q = @course.quizzes.create!
-    q.update_attribute(:published_at, Time.now)
+    q.update_attribute(:published_at, Time.zone.now)
     q.quiz_questions.create!(question_data: { :name => "q1", :points_possible => 1, "question_type" => "multiple_choice_question", "answers" => [{ "answer_text" => "", "answer_html" => "<em>zero</em>", "answer_weight" => "100" }, { "answer_text" => "", "answer_html" => "<p>one</p>", "answer_weight" => "0" }] })
     q.quiz_questions.create!(question_data: { :name => "q2", :points_possible => 1, "question_type" => "multiple_answers_question", "answers" => [{ "answer_text" => "", "answer_html" => "<a href='http://example.com/caturday.gif'>lolcats</a>", "answer_weight" => "100" }, { "answer_text" => "lolrus", "answer_weight" => "100" }] })
     q.generate_quiz_data
@@ -546,7 +546,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     @course = course_factory(active_all: true)
     fake_student = @course.student_view_student
     q = @course.quizzes.create!
-    q.update_attribute(:published_at, Time.now)
+    q.update_attribute(:published_at, Time.zone.now)
     q.quiz_questions.create!(question_data: { :name => "q1", :points_possible => 1, "question_type" => "multiple_choice_question", "answers" => [{ "answer_text" => "", "answer_html" => "<em>zero</em>", "answer_weight" => "100" }, { "answer_text" => "", "answer_html" => "<p>one</p>", "answer_weight" => "0" }] })
     q.quiz_questions.create!(question_data: { :name => "q2", :points_possible => 1, "question_type" => "multiple_answers_question", "answers" => [{ "answer_text" => "", "answer_html" => "<a href='http://example.com/caturday.gif'>lolcats</a>", "answer_weight" => "100" }, { "answer_text" => "lolrus", "answer_weight" => "100" }] })
     q.generate_quiz_data

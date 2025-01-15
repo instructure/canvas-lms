@@ -27,7 +27,7 @@ end
 
 class SimpleModel
   def to_atom(entry_title:)
-    { title: entry_title, link: "link", updated: Time.now }
+    { title: entry_title, link: "link", updated: Time.zone.now }
   end
 end
 
@@ -55,7 +55,7 @@ describe AtomFeedHelper do
   let(:link) { "https://www.example.com/feed/atom.xml" }
   let(:ns) { { "atom" => "http://www.w3.org/2005/Atom" } }
   let(:entries) { [] }
-  let(:updated) { Time.now }
+  let(:updated) { Time.zone.now }
 
   let(:custom_entry_author) { "custom_entry_author" }
   let(:custom_entry_title) { "custom_entry_title" }

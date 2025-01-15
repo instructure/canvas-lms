@@ -91,7 +91,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
           sql: "bad query",
           connection_id: "1"
         }
-        payload[Sentry::Rails::Tracing::START_TIMESTAMP_NAME] = Time.now
+        payload[Sentry::Rails::Tracing::START_TIMESTAMP_NAME] = Time.zone.now
 
         ActiveSupport::Notifications.instrument("sql.active_record", payload)
       end
@@ -112,7 +112,7 @@ describe SentryExtensions::Tracing::ActiveRecordSubscriber do
             sql: query,
             connection_id: "1"
           }
-          payload[Sentry::Rails::Tracing::START_TIMESTAMP_NAME] = Time.now
+          payload[Sentry::Rails::Tracing::START_TIMESTAMP_NAME] = Time.zone.now
 
           ActiveSupport::Notifications.instrument("sql.active_record", payload)
         end

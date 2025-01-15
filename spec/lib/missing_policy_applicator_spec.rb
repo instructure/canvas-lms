@@ -20,7 +20,7 @@
 describe MissingPolicyApplicator do
   describe ".apply_missing_deductions" do
     it "invokes #apply_missing_deductions" do
-      dbl = instance_double("MissingPolicyApplicator")
+      dbl = instance_double(MissingPolicyApplicator)
       allow(described_class).to receive(:new).and_return(dbl)
       expect(dbl).to receive(:apply_missing_deductions)
 

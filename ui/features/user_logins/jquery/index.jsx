@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SuspendedIcon from '../react/SuspendedIcon'
@@ -29,7 +29,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf
 import '@canvas/util/templateData'
 import '../react/externalIdFields'
 
-const I18n = useI18nScope('user_logins')
+const I18n = createI18nScope('user_logins')
 
 const savedSSOIcons = {}
 
@@ -159,7 +159,7 @@ $(function () {
     .on('click', '.delete_pseudonym_link', function (event) {
       event.preventDefault()
       if ($('#login_information .login:visible').length < 2) {
-        // eslint-disable-next-line no-alert
+         
         alert(
           I18n.t('notices.cant_delete_last_login', "You can't delete the last login for a user")
         )
@@ -231,7 +231,7 @@ $(function () {
     if (typeof savedSSOIcons[id] === 'undefined') savedSSOIcons[id] = icon.cloneNode(true)
     const innerDiv = document.createElement('div')
     icon.replaceChildren(innerDiv)
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<SuspendedIcon login={login} />, innerDiv)
   }
 

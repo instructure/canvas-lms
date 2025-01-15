@@ -18,7 +18,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
@@ -41,14 +41,14 @@ import {
   passFailStatusOptions,
   assignmentHasCheckpoints,
   getCorrectSubmission,
-} from '../../../utils/gradebookUtils'
+} from '../../../utils/gradeInputUtils'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import DefaultGradeInput from './DefaultGradeInput'
 import {CheckpointGradeInputs} from './CheckpointGradeInputs'
 import {Flex} from '@instructure/ui-flex'
 import SubmissionSticker, {stickersAvailable} from '@canvas/submission-sticker'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type GradingResultsComponentProps = {
   currentStudent?: GradebookStudentDetails

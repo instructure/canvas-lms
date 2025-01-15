@@ -37,7 +37,6 @@ module.exports = {
   },
 
   presets: [
-    '@babel/preset-typescript',
     [
       '@babel/preset-env',
       {
@@ -63,6 +62,9 @@ module.exports = {
         extractDefaultTranslations: false,
       },
     ],
+    ['@babel/preset-typescript', {
+      allowDeclareFields: true
+    }],
   ],
 
   plugins: [

@@ -27,7 +27,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
 
       @dynamo = Canvas::DynamoDB::DatabaseBuilder.from_config(:auditors)
       @sequence = 0
-      @timestamp = Time.now
+      @timestamp = Time.zone.now
       @ttl = 90.days.from_now.to_i
     end
 

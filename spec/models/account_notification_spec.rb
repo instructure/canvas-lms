@@ -145,15 +145,15 @@ describe AccountNotification do
   it "caches queries for root accounts" do
     enable_cache do
       Timecop.freeze do
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to be_nil
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to be_nil
         # once for @account, once for site admin
         allow(AccountNotification).to receive(:where).twice.and_call_original
 
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to_not be_nil
-        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
 
         # no more calls to `where`; this _must_ be returned from cache
         expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
@@ -765,15 +765,15 @@ describe AccountNotification do
           account_notification(account: @account)
           user_factory
 
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to be_nil
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to be_nil
           # once for @account, once for site admin
           allow(AccountNotification).to receive(:where).twice.and_call_original
 
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
 
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to_not be_nil
-          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.zone.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.zone.now))).to_not be_nil
 
           # no more calls to `where`; this _must_ be returned from cache
           expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]

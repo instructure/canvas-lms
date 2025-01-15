@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import {IconArrowOpenDownLine, IconAttachMediaLine, IconUploadLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -30,7 +30,7 @@ import {
 import {type MediaBlockProps} from './types'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export const AddMediaButton = ({setProp}: {setProp: (args: any) => void}) => {
   const [showAllMediaUploadModal, setShowAllMediaUploadModal] = useState(false)

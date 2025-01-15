@@ -17,7 +17,7 @@
  */
 
 import React, {type ReactNode} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 import {raw} from '@instructure/html-escape'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 interface ConfirmEmailAddressProps {
   email: string

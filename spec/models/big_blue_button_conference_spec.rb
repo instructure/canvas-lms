@@ -164,7 +164,7 @@ describe BigBlueButtonConference do
 
     it "initiates with the correct default values when bbb_modal_update is OFF" do
       Account.site_admin.disable_feature! :bbb_modal_update
-      allow(@bbb).to receive(:send_request).and_return({ createTime: Time.now })
+      allow(@bbb).to receive(:send_request).and_return({ createTime: Time.zone.now })
       allow(InstStatsd::Statsd).to receive(:increment)
 
       # these are the defaults defined in the BigBlueButtonConference model
@@ -212,7 +212,7 @@ describe BigBlueButtonConference do
       end
 
       it "send the correct bbb_modal_update default params" do
-        allow(@bbb).to receive(:send_request).and_return({ createTime: Time.now })
+        allow(@bbb).to receive(:send_request).and_return({ createTime: Time.zone.now })
         allow(InstStatsd::Statsd).to receive(:increment)
 
         # these are the defaults defined in the BigBlueButtonConference model
@@ -251,7 +251,7 @@ describe BigBlueButtonConference do
       end
 
       it "send the correct bbb_modal_update supplied params" do
-        allow(@bbb).to receive(:send_request).and_return({ createTime: Time.now })
+        allow(@bbb).to receive(:send_request).and_return({ createTime: Time.zone.now })
         allow(InstStatsd::Statsd).to receive(:increment)
 
         # these are the opposites of the defaults

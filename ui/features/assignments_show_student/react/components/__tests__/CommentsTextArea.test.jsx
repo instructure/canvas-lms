@@ -20,7 +20,7 @@ import * as uploadFileModule from '@canvas/upload-file'
 import $ from 'jquery'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 
 import CommentsTray from '../CommentsTray/index'

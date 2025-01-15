@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {createRoot} from 'react-dom/client'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -30,7 +30,7 @@ import EditUserDetails from '../react/EditUserDetails'
 
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 
-const I18n = useI18nScope('user_name')
+const I18n = createI18nScope('user_name')
 
 ready(function () {
   $('#name_and_email').on('click', '.edit_user_link', event => {

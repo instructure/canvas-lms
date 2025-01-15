@@ -19,7 +19,7 @@
 import {Table} from '@instructure/ui-table'
 import React, {useMemo, useState} from 'react'
 import type {InternalSetting} from '../types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {EditableCodeValue} from './EditableCodeValue'
 import {InternalSettingActionButtons} from './InternalSettingActionButtons'
@@ -27,7 +27,7 @@ import {Menu} from '@instructure/ui-menu'
 import exportFromJSON from 'export-from-json'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('internal-settings')
+const I18n = createI18nScope('internal-settings')
 
 // id, name, width, sortable
 const tableHeaders: [string, string, string, boolean][] = [

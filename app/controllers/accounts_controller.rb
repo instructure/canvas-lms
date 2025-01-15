@@ -1441,19 +1441,15 @@ class AccountsController < ApplicationController
       end
 
       js_permissions = {
-        manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags)
+        manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags),
+        add_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_add),
+        edit_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_edit),
+        delete_tool_manually: @account.grants_right?(@current_user, session, :manage_lti_delete)
       }
-      if @account.root_account.feature_enabled?(:granular_permissions_manage_lti)
-        js_permissions[:add_tool_manually] = @account.grants_right?(@current_user, session, :manage_lti_add)
-        js_permissions[:edit_tool_manually] = @account.grants_right?(@current_user, session, :manage_lti_edit)
-        js_permissions[:delete_tool_manually] = @account.grants_right?(@current_user, session, :manage_lti_delete)
-      else
-        js_permissions[:create_tool_manually] = @account.grants_right?(@current_user, session, :create_tool_manually)
-      end
 
       can_set_token = true
       if @account.root_account.feature_enabled?(:require_permission_for_app_center_token)
-        can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually create_tool_manually].any? { |perm| js_permissions[perm] }
+        can_set_token = %i[add_tool_manually edit_tool_manually delete_tool_manually].any? { |perm| js_permissions[perm] }
       end
 
       js_env({
@@ -1600,8 +1596,10 @@ class AccountsController < ApplicationController
     end
 
     # this is a no-op if the user was deleted from the account profile page
-    user.update!(workflow_state: "registered") if user.deleted?
-    pseudonym.update!(workflow_state: "active")
+    User.transaction do
+      user.update!(workflow_state: "registered") if user.deleted?
+      pseudonym.update!(workflow_state: "active")
+    end
     pseudonym.clear_permissions_cache(user)
     user.update_account_associations
     user.clear_caches
@@ -1926,8 +1924,7 @@ class AccountsController < ApplicationController
     token = params.dig(:account, :settings)&.delete(:app_center_access_token)
     return if token.nil?
 
-    manage_lti_permissions = [:lti_add_edit, *RoleOverride::GRANULAR_MANAGE_LTI_PERMISSIONS]
-    return :unauthorized unless @account.grants_any_right?(@current_user, *manage_lti_permissions)
+    return :unauthorized unless @account.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_LTI_PERMISSIONS)
 
     @account.settings[:app_center_access_token] = token
     :ok
@@ -2004,6 +2001,7 @@ class AccountsController < ApplicationController
                                    :admins_can_view_notifications,
                                    :allow_name_pronunciation_edit_for_admins,
                                    :allow_additional_email_at_registration,
+                                   :allow_assign_to_differentiation_tags,
                                    :allow_invitation_previews,
                                    :allow_sending_scores_in_emails,
                                    :author_email_in_notifications,

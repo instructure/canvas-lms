@@ -20,7 +20,7 @@ import React from 'react'
 import {render as rtlRender, fireEvent} from '@testing-library/react'
 import ManageOutcomeItem from '../ManageOutcomeItem'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {defaultRatingsAndCalculationMethod} from './helpers'
 
 const render = (

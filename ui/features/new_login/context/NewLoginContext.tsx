@@ -17,10 +17,11 @@
  */
 
 import React, {createContext, type ReactNode, useContext, useState} from 'react'
-import type {AuthProvider} from '../types'
+import {type AuthProvider, type PasswordPolicy, SelfRegistrationType} from '../types'
 import {useNewLoginData} from '../hooks/useNewLoginData'
 
 interface NewLoginContextType {
+  isDataLoading: boolean
   rememberMe: boolean
   setRememberMe: (value: boolean) => void
   isUiActionPending: boolean
@@ -40,6 +41,14 @@ interface NewLoginContextType {
   bodyBgColor?: string
   bodyBgImage?: string
   isPreviewMode?: boolean
+  selfRegistrationType?: SelfRegistrationType
+  recaptchaKey?: string
+  termsRequired?: boolean
+  termsOfUseUrl?: string
+  privacyPolicyUrl?: string
+  requireEmail?: boolean
+  passwordPolicy?: PasswordPolicy
+  forgotPasswordUrl?: string
 }
 
 const NewLoginContext = createContext<NewLoginContextType | undefined>(undefined)
@@ -56,6 +65,8 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
   const [otpCommunicationChannelId, setOtpCommunicationChannelId] = useState<string | null>(null)
 
   // get data attribute values from hook
+  const {data, isDataLoading} = useNewLoginData()
+
   const {
     enableCourseCatalog,
     authProviders,
@@ -65,11 +76,20 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
     bodyBgColor,
     bodyBgImage,
     isPreviewMode,
-  } = useNewLoginData()
+    selfRegistrationType,
+    recaptchaKey,
+    termsRequired,
+    termsOfUseUrl,
+    privacyPolicyUrl,
+    requireEmail,
+    passwordPolicy,
+    forgotPasswordUrl,
+  } = data
 
   return (
     <NewLoginContext.Provider
       value={{
+        isDataLoading,
         rememberMe,
         setRememberMe,
         isUiActionPending,
@@ -89,6 +109,14 @@ export const NewLoginProvider = ({children}: NewLoginProviderProps) => {
         bodyBgColor,
         bodyBgImage,
         isPreviewMode,
+        selfRegistrationType,
+        recaptchaKey,
+        termsRequired,
+        termsOfUseUrl,
+        privacyPolicyUrl,
+        requireEmail,
+        passwordPolicy,
+        forgotPasswordUrl,
       }}
     >
       {children}

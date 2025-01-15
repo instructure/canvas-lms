@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const GET_SETTING_QUERY = gql`
   query GetSetting($name: String!) {

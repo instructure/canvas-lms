@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {Link} from '@instructure/ui-link'
 import {bool} from 'prop-types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('terms_of_service_modal')
+const I18n = createI18nScope('terms_of_service_modal')
 
 const termsOfServiceText = I18n.t('Acceptable Use Policy')
 
@@ -43,13 +43,13 @@ class TermsOfServiceCustomContents extends React.Component {
       if (response.ok) {
         this.setState({TERMS_OF_SERVICE_CUSTOM_CONTENT: json?.content || ''})
       } else {
-        // eslint-disable-next-line no-console
+         
         console.error(
           `Failed to load Terms of Service content: ${response.status} ${response.statusText}`
         )
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error('An error occurred while fetching the Terms of Service content:', error)
     }
   }

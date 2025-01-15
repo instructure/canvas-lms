@@ -23,7 +23,7 @@ import TeacherView from '../../TeacherView'
 
 import {mockAssignment, initialTeacherViewGQLMocks} from '../../../test-utils'
 
-import CanvasValidatedMockedProvider from '@canvas/validated-apollo-mocked-provider'
+import {MockedProvider} from '@apollo/client/testing'
 import {TEACHER_QUERY} from '../../../assignmentData'
 
 export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
@@ -43,9 +43,9 @@ export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
     ...additionalApolloMocks,
   ]
   const fns = render(
-    <CanvasValidatedMockedProvider mocks={mocks} addTypename={false}>
+    <MockedProvider mocks={mocks} addTypename={false}>
       <TeacherQuery assignmentLid={assignment.lid} />
-    </CanvasValidatedMockedProvider>
+    </MockedProvider>
   )
   return fns
 }
@@ -64,9 +64,9 @@ export function renderTeacherView(
 ) {
   const mocks = [...initialTeacherViewGQLMocks(assignment.course.lid), ...additionalApolloMocks]
   const fns = render(
-    <CanvasValidatedMockedProvider mocks={mocks} addTypename={false}>
+    <MockedProvider mocks={mocks} addTypename={false}>
       <TeacherView assignment={assignment} {...teacherViewProps} />
-    </CanvasValidatedMockedProvider>
+    </MockedProvider>
   )
   if (activeTabName) {
     fireEvent.click(fns.getAllByText(new RegExp(activeTabName, 'i'))[0])

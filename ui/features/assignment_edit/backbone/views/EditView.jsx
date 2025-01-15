@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import _, {each, find, keys, includes, forEach, filter} from 'lodash'
 import $, {param} from 'jquery'
@@ -60,7 +60,7 @@ import {AnnotatedDocumentSelector} from '../../react/EditAssignment'
 import {selectContentDialog} from '@canvas/select-content-dialog'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 
-const I18n = useI18nScope('assignment_editview')
+const I18n = createI18nScope('assignment_editview')
 
 const slice = [].slice
 
@@ -594,7 +594,7 @@ EditView.prototype.setDefaultsIfNew = function () {
 }
 
 EditView.prototype.cacheAssignmentSettings = function () {
-  // eslint-disable-next-line prefer-spread
+   
   const new_assignment_settings = _.pick.apply(
     _,
     [this.getFormData()].concat(slice.call(this.settingsToCache()))
@@ -837,7 +837,7 @@ EditView.prototype.renderAnnotatedDocumentSelector = function () {
     })(this),
   }
   const element = React.createElement(AnnotatedDocumentSelector, props)
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(element, this.getAnnotatedDocumentContainer())
 }
 
@@ -904,7 +904,7 @@ EditView.prototype.renderAnnotatedDocumentUsageRightsSelectBox = function () {
   if (annotatedDocument) {
     contextType = annotatedDocument.contextType
     contextId = annotatedDocument.contextId
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       React.createElement(UsageRightsSelectBox, {
         contextType,
@@ -964,7 +964,7 @@ EditView.prototype.renderDefaultExternalTool = function () {
     toolInfoMessage: ENV.DEFAULT_ASSIGNMENT_TOOL_INFO_MESSAGE,
     previouslySelected: this.assignment.defaultToolSelected(),
   }
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(
     React.createElement(DefaultToolForm, props),
     document.querySelector('[data-component="DefaultToolForm"]')
@@ -1091,7 +1091,7 @@ EditView.prototype.renderAssignmentSubmissionTypeContainer = function () {
     onLaunchButtonClick: this.handleSubmissionTypeSelectionLaunch,
   }
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     React.createElement(AssignmentSubmissionTypeContainer, props),
     document.querySelector('[data-component="AssignmentSubmissionTypeContainer"]')
@@ -1139,7 +1139,7 @@ EditView.prototype.renderSubmissionTypeSelectionDialog = function (open) {
   }
   const mountPoint = document.querySelector('#assignment_submission_type_selection_tool_dialog')
   const dialog = React.createElement(ExternalToolModalLauncher, props)
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(dialog, mountPoint)
 }
 
@@ -1717,7 +1717,7 @@ EditView.prototype._validatePointsPossible = function (data, errors) {
   if (this.lockedItems.points) {
     return errors
   }
-  // eslint-disable-next-line no-restricted-globals
+   
   if (typeof data.points_possible !== 'number' || isNaN(data.points_possible)) {
     errors.points_possible = [
       {
@@ -1737,7 +1737,7 @@ EditView.prototype._validatePointsRequired = function (data, errors) {
   if (
     typeof data.points_possible !== 'number' ||
     data.points_possible < 0 ||
-    // eslint-disable-next-line no-restricted-globals
+     
     isNaN(data.points_possible)
   ) {
     errors.points_possible = [
@@ -1948,7 +1948,7 @@ EditView.prototype.renderModeratedGradingFormFieldGroup = function () {
   }
   const formFieldGroup = React.createElement(ModeratedGradingFormFieldGroup, props)
   const mountPoint = document.querySelector("[data-component='ModeratedGradingFormFieldGroup']")
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(formFieldGroup, mountPoint)
 }
 
@@ -1962,7 +1962,7 @@ EditView.prototype.renderAllowedAttempts = function () {
     locked: !!this.lockedItems.settings,
   }
   const mountPoint = document.querySelector('#allowed-attempts-target')
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(React.createElement(AllowedAttemptsWithState, props), mountPoint)
 }
 

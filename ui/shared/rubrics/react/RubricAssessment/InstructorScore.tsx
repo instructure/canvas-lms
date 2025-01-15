@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {possibleString} from '../Points'
 
-const I18n = useI18nScope('rubrics-assessment')
+const I18n = createI18nScope('rubrics-assessment')
 const {ash, shamrock} = colors
 
 type InstructorScoreProps = {

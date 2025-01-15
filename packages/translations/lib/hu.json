@@ -488,6 +488,9 @@
     "deep_purple_bb3e2907": {
         "message": "Sötétlila"
     },
+    "default_9db103d": {
+        "message": "Alapértelmezett"
+    },
     "default_bulleted_unordered_list_47079da8": {
         "message": "alapértelmezett nem rendezett lista"
     },
@@ -1582,9 +1585,6 @@
     },
     "outline_size_a6059a21": {
         "message": "Vázlat mérete"
-    },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } nem egy érvényes protokoll; lehet ftp, http, https, mailto, skype, tel, vagy esetleg elhagyható"
     },
     "page_50c4823d": {
         "message": "Oldal"

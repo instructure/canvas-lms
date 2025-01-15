@@ -25,7 +25,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {View, type ViewOwnProps} from '@instructure/ui-view'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import iconApple from '../assets/images/apple.svg'
 import iconClasslink from '../assets/images/classlink.svg'
@@ -35,9 +35,8 @@ import iconGithub from '../assets/images/github.svg'
 import iconGoogle from '../assets/images/google.svg'
 import iconLinkedin from '../assets/images/linkedin.svg'
 import iconMicrosoft from '../assets/images/microsoft.svg'
-import iconX from '../assets/images/x.svg'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const providerIcons: Record<string, string> = {
   apple: iconApple,
@@ -48,11 +47,12 @@ const providerIcons: Record<string, string> = {
   google: iconGoogle,
   linkedin: iconLinkedin,
   microsoft: iconMicrosoft,
-  twitter: iconX,
 }
 
 const SSOButtons = () => {
   const {isUiActionPending, isPreviewMode, authProviders} = useNewLogin()
+
+  const isDisabled = isPreviewMode || isUiActionPending
 
   if (!authProviders || authProviders.length === 0) {
     return null
@@ -61,7 +61,7 @@ const SSOButtons = () => {
   const handleClick = (
     event: React.KeyboardEvent<ViewOwnProps> | React.MouseEvent<ViewOwnProps>
   ) => {
-    if (isPreviewMode || isUiActionPending) {
+    if (isDisabled) {
       event.preventDefault()
     }
   }
@@ -99,13 +99,7 @@ const SSOButtons = () => {
                 transform: 'translateY(-50%)',
               }}
             >
-              <Img
-                src={iconSrc}
-                alt={displayName}
-                width="1.125rem"
-                height="1.125rem"
-                display="block"
-              />
+              <Img display="block" height="1.125rem" src={iconSrc} width="1.125rem" />
             </View>
           )}
           {I18n.t('Log in with %{displayName}', {displayName})}

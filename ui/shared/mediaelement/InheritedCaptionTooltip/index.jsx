@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('mepfeaturetracksinstructure_tooltip')
+const I18n = createI18nScope('mepfeaturetracksinstructure_tooltip')
 
 export default function InheritedCaptionTooltip() {
   return (

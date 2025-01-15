@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render as realRender, fireEvent, act} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {within} from '@testing-library/dom'
 import {pick} from 'lodash'
 import OutcomeEditModal from '../OutcomeEditModal'

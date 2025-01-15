@@ -97,7 +97,7 @@ describe('BBBModalOptions', () => {
 
   it('should render with default props', () => {
     const {getByLabelText, getAllByLabelText} = setup(defaultProps)
-    expect(getByLabelText('Name')).toHaveValue(defaultProps.name)
+    expect(getByLabelText('Name *')).toHaveValue(defaultProps.name)
     expect(getAllByLabelText('Duration in Minutes')[0]).toHaveValue('')
     expect(getByLabelText('Enable recording for this conference').checked).toBeTruthy()
     expect(getByLabelText('Enable recording for this conference').disabled).toBeFalsy()

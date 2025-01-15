@@ -66,4 +66,8 @@ class Login::OAuthController < Login::OAuthBaseController
   def callback_uri
     oauth_login_callback_url(id: @aac.global_id)
   end
+
+  def auth_type
+    "oauth"
+  end
 end

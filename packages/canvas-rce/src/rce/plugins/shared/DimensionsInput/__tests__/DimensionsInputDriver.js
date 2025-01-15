@@ -64,7 +64,7 @@ export default class DimensionsInputDriver {
 
   get messageTexts() {
     const messageContainer = this.$dimensionsInput.querySelector(
-      'fieldset legend span:last-child span:first-child'
+      'fieldset legend span:last-child span:first-child span'
     )
     return [...messageContainer.querySelectorAll('span')].map($message =>
       $message.textContent.trim()

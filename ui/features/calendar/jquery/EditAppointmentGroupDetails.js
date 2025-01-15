@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import _, {some} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
@@ -34,7 +34,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import {CommonEventShowError} from '@canvas/calendar/jquery/CommonEvent/CommonEvent'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 
-const I18n = useI18nScope('EditAppointmentGroupDetails')
+const I18n = createI18nScope('EditAppointmentGroupDetails')
 
 export default class EditAppointmentGroupDetails {
   constructor(selector, apptGroup, contexts, closeCB, event, useScheduler) {

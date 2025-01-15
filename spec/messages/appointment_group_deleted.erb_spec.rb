@@ -73,13 +73,4 @@ describe "appointment_group_deleted" do
       expect(msg.body).to include("some title")
     end
   end
-
-  describe ".twitter" do
-    let(:path_type) { :twitter }
-
-    it "renders" do
-      msg = generate_message(notification_name, path_type, asset)
-      expect(msg.body).to include("some title")
-    end
-  end
 end

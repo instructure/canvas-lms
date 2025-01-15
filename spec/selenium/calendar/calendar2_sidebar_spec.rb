@@ -73,7 +73,7 @@ describe "calendar2" do
       it "shows the event in the mini calendar", priority: "1" do
         # lock to a particular day (the 13th because why not)
         # otherwise it turns out this spec will break on almost every 31st
-        date = Date.new(Time.now.year, Time.now.month, 13) - 1.month
+        date = Date.new(Time.zone.now.year, Time.zone.now.month, 13) - 1.month
         assignment_model(course: @course,
                          title: "ricochet",
                          due_at: date.to_time)
@@ -93,7 +93,7 @@ describe "calendar2" do
 
       describe "contexts list" do
         it "toggles event display when context is clicked" do
-          make_event context: @course, start: Time.now
+          make_event context: @course, start: Time.zone.now
           get "/calendar2"
 
           f(".context_list_context .context-list-toggle-box").click
@@ -136,7 +136,7 @@ describe "calendar2" do
 
         it "removes calendar item if calendar is unselected", priority: "1" do
           title = "blarg"
-          make_event(context: @course, start: Time.now, title:)
+          make_event(context: @course, start: Time.zone.now, title:)
           load_month_view
 
           # expect event to be on the calendar

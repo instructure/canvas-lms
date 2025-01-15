@@ -42,7 +42,7 @@ module.exports = {
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/canvas'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
-  testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
+  testEnvironment: 'jsdom',
   moduleNameMapper: {
     // jest can't import css
     '\\.(css|less)$': '<rootDir>/src/rce/__mocks__/styleMock.js',

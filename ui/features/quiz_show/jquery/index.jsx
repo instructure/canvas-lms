@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -39,7 +39,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 
-const I18n = useI18nScope('quizzes.show')
+const I18n = createI18nScope('quizzes.show')
 
 $(document).ready(function () {
   if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {
@@ -179,7 +179,7 @@ $(document).ready(function () {
 
   function openSendTo(event, open = true) {
     if (event) event.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -198,7 +198,7 @@ $(document).ready(function () {
 
   function openCopyTo(event, open = true) {
     if (event) event.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -272,7 +272,7 @@ $(document).ready(function () {
   })
 
   function renderItemAssignToTray(open, returnFocusTo, itemProps) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ItemAssignToManager
         open={open}

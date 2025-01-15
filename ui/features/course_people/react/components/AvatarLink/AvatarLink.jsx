@@ -20,9 +20,9 @@ import React from 'react'
 import {string} from 'prop-types'
 import {Avatar} from '@instructure/ui-avatar'
 import {Link} from '@instructure/ui-link'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 
 const AvatarLink = ({avatarUrl, name, href}) => {
   return (

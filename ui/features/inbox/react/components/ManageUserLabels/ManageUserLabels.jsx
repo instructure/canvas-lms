@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
@@ -30,7 +30,7 @@ import {Table} from '@instructure/ui-table'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const MAX_LABEL_LENGTH = 25
 

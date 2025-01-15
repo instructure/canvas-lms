@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class RemoveColumn < Cop
+      class RemoveColumn < Base
         include RuboCop::Canvas::MigrationTags
         include RuboCop::Canvas::CurrentDef
 

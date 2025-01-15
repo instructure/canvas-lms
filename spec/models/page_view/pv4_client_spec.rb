@@ -94,6 +94,42 @@ describe PageView::Pv4Client do
         client.fetch(user, start_time:, end_time:)
       end
     end
+
+    it "parses the JSON response when the body is valid JSON with page_views" do
+      response = double(body: { "page_views" => [pv4_object] }.to_json)
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      result = client.fetch(user)
+      expect(result.length).to eq 1
+      expect(result.first).to be_a PageView
+    end
+
+    it "raises Pv4EmptyResponse when response body is empty" do
+      response = double(body: "")
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      expect { client.fetch(user) }.to raise_error(
+        PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
+      )
+    end
+
+    it "raises Pv4EmptyResponse when response body is invalid JSON" do
+      response = double(body: "invalid json")
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      expect { client.fetch(user) }.to raise_error(
+        PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
+      )
+    end
+
+    it "raises Pv4EmptyResponse when response body does not contain page_views" do
+      response = double(body: { "other_key" => [pv4_object] }.to_json)
+      allow(CanvasHttp).to receive(:get).and_return(response)
+
+      expect { client.fetch(user) }.to raise_error(
+        PageView::Pv4Client::Pv4EmptyResponse, "the response is empty or does not contain expected keys"
+      )
+    end
   end
 
   describe "#for_user" do

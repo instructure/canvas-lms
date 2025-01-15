@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -33,7 +33,7 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 GroupCategoryMessageAllUnassignedModal.propTypes = {
   groupCategory: shape({name: string.isRequired}),
@@ -86,9 +86,9 @@ export default function GroupCategoryMessageAllUnassignedModal({
     Promise.all(promiseArray)
       .then(notifyDidSave)
       .catch(err => {
-        console.error(err) // eslint-disable-line no-console
+        console.error(err)  
         captureException(err)
-        if (err.response) console.error(err.response) // eslint-disable-line no-console
+        if (err.response) console.error(err.response)  
         setStatus('error')
       })
   }

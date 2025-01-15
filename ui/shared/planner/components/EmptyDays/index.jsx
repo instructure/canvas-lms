@@ -25,10 +25,10 @@ import {string} from 'prop-types'
 import {sizeShape} from '../plannerPropTypes'
 import {getShortDate} from '../../utilities/dateUtils'
 import buildStyle from './style'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GroupedDates from './GroupedDates'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default class EmptyDays extends Component {
   constructor(props) {

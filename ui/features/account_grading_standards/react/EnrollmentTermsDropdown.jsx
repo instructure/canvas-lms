@@ -19,9 +19,9 @@
 import React, {useRef} from 'react'
 import PropTypes from 'prop-types'
 import {map, filter, sortBy} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('EnrollmentTermsDropdown')
+const I18n = createI18nScope('EnrollmentTermsDropdown')
 
 const EnrollmentTermsDropdown = ({terms, changeSelectedEnrollmentTerm}) => {
   const termsDropdownRef = useRef(null)

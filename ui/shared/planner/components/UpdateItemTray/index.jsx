@@ -27,12 +27,12 @@ import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import moment from 'moment-timezone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {courseShape} from '../plannerPropTypes'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class UpdateItemTray_ extends Component {
   static propTypes = {
@@ -140,7 +140,7 @@ export class UpdateItemTray_ extends Component {
   onInvalidDateTimeMessage = this.invalidDateTimeMessage.bind(this)
 
   handleDeleteClick = () => {
-    // eslint-disable-next-line no-restricted-globals, no-alert
+     
     if (confirm(I18n.t('Are you sure you want to delete this planner item?'))) {
       this.props.onDeletePlannerItem(this.props.noteItem)
     }

@@ -101,7 +101,7 @@ describe "Discussion Topic Search" do
       f("input[placeholder='Search entries or author...']").send_keys("foo")
       wait_for(method: nil, timeout: 5) { fj("span:contains('foo bar)").displayed? }
       expect(fj("span:contains('foo bar')")).to be_present
-      f("span.discussions-filter-by-menu").click
+      f("[data-testid='toggle-filter-menu']").click
       wait_for_ajaximations
       fj("li li:contains('Unread')").click
       wait_for_ajaximations
@@ -177,7 +177,7 @@ describe "Discussion Topic Search" do
       expect(fj("span:contains('foo 9')")).to be_present
       expect(fj("button[aria-current='page']:contains('2')")).to be_present
 
-      f("span.discussions-filter-by-menu").click
+      f("[data-testid='toggle-filter-menu']").click
       wait_for_ajaximations
       fj("li li:contains('Unread')").click
       wait_for_ajaximations

@@ -23,11 +23,11 @@ import {Text} from '@instructure/ui-text'
 import {IconUploadSolid, IconCertifiedLine, IconTrashLine} from '@instructure/ui-icons'
 import {isCa, parseCertificate, withinValidityPeriod} from '../../utils/certUtils'
 import {X509Certificate} from '@peculiar/x509'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('ldapInternalCaUpload')
+const I18n = createI18nScope('ldapInternalCaUpload')
 
 const dateFormatter = new Intl.DateTimeFormat(ENV?.LOCALE || navigator.language, {
   dateStyle: 'full',

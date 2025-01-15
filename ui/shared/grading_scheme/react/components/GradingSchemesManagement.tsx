@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -64,7 +64,7 @@ import {useAccountDefaultGradingScheme} from '../hooks/useAccountDefaultGradingS
 import {useAccountDefaultGradingSchemeUpdate} from '../hooks/useAccountDefaultGradingSchemeUpdate'
 import {AccountDefaultSelector} from './form/AccountDefaultSelector'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 interface GradingSchemeTemplateCardData {
   creating: boolean
@@ -180,7 +180,7 @@ export const GradingSchemesManagement = ({
     setDeletingGradingScheme(true)
     if (
       !archivedGradingSchemesEnabled &&
-      // eslint-disable-next-line no-alert
+       
       !window.confirm(
         I18n.t('confirm.delete', 'Are you sure you want to delete this grading scheme?')
       )

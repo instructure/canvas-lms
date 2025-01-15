@@ -221,6 +221,19 @@ module CanvasSecurity
             expect(decrypted_token_body[:context_id]).to eq "47"
           end
 
+          it "includes only requested audience if given" do
+            audience = ["foo", "bar"]
+            jwt = ServicesJwt.for_user(host, user, audience:)
+            decrypted_token_body = translate_token.call(jwt)
+            expect(decrypted_token_body[:aud]).to match_array audience
+          end
+
+          it "includes default audience if not given" do
+            jwt = ServicesJwt.for_user(host, user)
+            decrypted_token_body = translate_token.call(jwt)
+            expect(decrypted_token_body[:aud]).to match_array [ServicesJwt::DEFAULT_AUDIENCE]
+          end
+
           it "errors without a host" do
             expect { ServicesJwt.for_user(nil, user) }
               .to raise_error(ArgumentError)

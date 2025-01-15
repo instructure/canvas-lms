@@ -1,5 +1,5 @@
-/* eslint-disable no-alert */
-/* eslint-disable eqeqeq */
+ 
+ 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -31,7 +31,7 @@ import '@canvas/util/templateData'
 import replaceTags from '@canvas/util/replaceTags'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
-const I18n = useI18nScope('sub_accounts')
+const I18n = createI18nScope('sub_accounts')
 
 ready(() => {
   initializeTopNavPortal()

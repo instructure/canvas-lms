@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {useNavigate} from 'react-router-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
@@ -29,7 +29,7 @@ import {DeleteRubricModal} from './DeleteRubricModal'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
-const I18n = useI18nScope('rubrics-list-table')
+const I18n = createI18nScope('rubrics-list-table')
 
 export type RubricPopoverProps = {
   id?: string

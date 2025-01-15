@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import preventDefault from '@canvas/util/preventDefault'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import teacherDialog from '../jst/teacherDialog.handlebars'
@@ -32,7 +32,7 @@ import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/util/jquery/fixDialogButtons'
 import extensions from '@canvas/bundles/extensions'
 
-const I18n = useI18nScope('registration')
+const I18n = createI18nScope('registration')
 
 const $nodes = {}
 
@@ -134,9 +134,9 @@ const signupDialog = function (id, title, path) {
   $node.dialog({
     resizable: false,
     title,
-    // eslint-disable-next-line no-restricted-globals
+     
     width: Math.min(screen.width, 550),
-    // eslint-disable-next-line no-restricted-globals
+     
     height: screen.height > 750 ? 'auto' : screen.height,
     open() {
       let $captchaId
@@ -173,7 +173,7 @@ const signupDialog = function (id, title, path) {
         $form.attr('data-captcha-id', $captchaId)
         $node.find('button[type=submit]').prop('disabled', true)
       }
-      // eslint-disable-next-line no-void
+       
       return typeof signupDialog.afterRender === 'function' ? signupDialog.afterRender() : void 0
     },
     close() {

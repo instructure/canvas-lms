@@ -449,6 +449,13 @@
               <xs:element name="end_date" type="xs:date" minOccurs="0"/>
               <xs:element name="published_at" type="xs:dateTime" minOccurs="0"/>
               <xs:element name="exclude_weekends" type="xs:boolean" minOccurs="0"/>
+              <xs:element name="selected_days_to_skip">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="day_of_week" type="xs:string" maxOccurs="7"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="hard_end_dates" type="xs:boolean" minOccurs="0"/>
               <xs:element name="module_items" minOccurs="0">
                 <xs:complexType>

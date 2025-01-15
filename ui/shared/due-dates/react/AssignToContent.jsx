@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useEffect, useMemo, useCallback} from 'react'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {getEveryoneOption} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import _ from 'underscore'
@@ -41,7 +41,7 @@ import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('DueDateOverrideView')
+const I18n = createI18nScope('DueDateOverrideView')
 
 const AssignToContent = ({
   onSync,
@@ -491,7 +491,7 @@ const AssignToContent = ({
     handleImportantDatesChange,
     supportDueDates,
     stagedImportantDates,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
     stagedCardsRef?.current,
   ])
 

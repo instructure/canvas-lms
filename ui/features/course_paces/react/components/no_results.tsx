@@ -22,10 +22,10 @@ import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
 
-const I18n = useI18nScope('course_paces_no_results')
+const I18n = createI18nScope('course_paces_no_results')
 
 const NoResults = () => (
   <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">

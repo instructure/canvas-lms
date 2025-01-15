@@ -26,12 +26,12 @@ import {Menu} from '@instructure/ui-menu'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ConversationContext} from '../../../util/constants'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 export const MessageDetailHeader = ({...props}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)

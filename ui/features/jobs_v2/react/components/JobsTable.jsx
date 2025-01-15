@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
@@ -29,7 +29,7 @@ import {InfoColumn, InfoColumnHeader} from './InfoColumn'
 import SortColumnHeader from './SortColumnHeader'
 import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 function CopyToClipboardTruncatedValue({value, onClick}) {
   if (!value) {

@@ -262,7 +262,8 @@ module Importers
       elsif /url/i.match?(hash[:linked_resource_type])
         # external url
         if (url = hash[:url])
-          if (CanvasHttp.validate_url(hash[:url]) rescue nil)
+          begin
+            CanvasHttp.validate_url(hash[:url])
             url = migration.process_domain_substitutions(url)
 
             item = context_module.add_item({
@@ -273,7 +274,7 @@ module Importers
                                            },
                                            existing_item,
                                            position: context_module.migration_position)
-          else
+          rescue URI::InvalidURIError, ArgumentError, CanvasHttp::RelativeUriError, CanvasHttp::InsecureUriError
             migration.add_import_warning(t(:migration_module_item_type, "Module Item"), hash[:title], "#{hash[:url]} is not a valid URL")
           end
         end

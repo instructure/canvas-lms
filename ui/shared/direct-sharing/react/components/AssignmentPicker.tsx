@@ -19,9 +19,9 @@
 import React, {useState, useEffect} from 'react'
 import {Select} from '@instructure/ui-select'
 import {getAssignmentsByCourseId, type AssignmentItem} from './queries/assignmentsByCourseIdQuery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_and_module_picker')
+const I18n = createI18nScope('course_and_module_picker')
 
 interface AssignmentPickerProps {
   courseId: string

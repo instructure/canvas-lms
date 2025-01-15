@@ -179,6 +179,7 @@ tr:
   _section_not_synced_yet_cd07d0dd: "-- Bölüm henüz senkronize edilmedi"
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} ve {b} birlikte kullanılamaz"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Bu hesaplama yöntemiyle bir hesaplama değeri kullanılmıyor "
+  a_canvas_security_token_was_just_deleted_for_your__94c7ab7c: "Hesabınız için bir Canvas güvenlik anahtarı siz veya bir hesap yöneticisi tarafından silindi. Kalan anahtarları buradan görüntüleyebilir ve bunlarla etkileşim kurabilirsiniz:"
   a_canvas_security_token_was_just_generated_for_you_b03be18b: "Canvas güvenlik anahtarı, başka biri tarafından hesabınız için yeni oluşturuldu. Kullanılmadan önce, anahtarın burada sizin tarafınızdan etkinleştirilmesi gerekir:"
   a_canvas_security_token_was_just_generated_for_you_ef4021aa: "Hesabınız için başka biri tarafından bir Canvas güvenlik anahtarı oluşturuldu. Bir kullanıcı anahtarı talep ettiyseniz, başka bir işlem yapmanız gerekmez. Kullanılabilmesi için anahtarın sizin tarafınızdan burada etkinleştirilmesi gerekir:"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Hesabınız için az önce bir Canvas güvenlik anahtarı oluşturuldu. Bir kullanıcı anahtarı istediyseniz, başka bir işlem yapmanız gerekmez. Anahtar talep etmediyseniz veya Canvas erişim anahtarlarınızı yönetmek istiyorsanız, bunu buradan yapabilirsiniz:"
@@ -2089,6 +2090,7 @@ tr:
   add_old_quiz_f4c546a: "Eski Kısa Sınav Ekle"
   add_outcomes_36272787: "Öğrenme Çıktısı Ekle"
   add_outcomes_to_account_4647776f: "Öğrenme Çıktılarını Hesaba Ekle"
+  add_page_7ea7ee39: "Sayfa Ekle"
   add_people_7948b7da: "Kullanıcı Ekle"
   add_people_7ee4b2ec: "Katılımcı Ekle"
   add_people_to_coursename_5ea234e1: "%{courseName}'e kişileri ekleyin"
@@ -4016,6 +4018,7 @@ tr:
     edit: 
       confirm_delete_calendar_event: "Bu takvim etkinliğini silmek istediğinize emin misiniz?"
       errors: 
+        greater_or_equal: "En az bir kullanıcının katılmasına izin vermelisiniz"
         start_date_required: "Bir tarih girmelisiniz"
         title_required: "Bir başlık girmelisiniz"
       event_deleted: "%{event_title} başarıyla silindi"
@@ -4990,6 +4993,7 @@ tr:
     unexpected_error: "Beklenmeyen bir hata oluştur, lütfen destek birimi ile iletişime geçin."
     unknown: Bilinmiyor
     upload_timeout_error: "Dosya yükleme işlemi zaman aşımına uğradı."
+  content_migration_1f14de27: "İçerik Geçişi"
   content_migration_queued_46c27790: "İçerik aktarımı sıraya konuldu"
   content_migration_running_percent_complete_4b00c024: "İçerik aktarımı başlatıldı, %{percent}% tamamlandı"
   content_migrations: 
@@ -6814,6 +6818,7 @@ tr:
   crumbs: 
     access_report: "Erişim Raporu"
     announcements: Duyurular
+    apps: Uygulamalar
     assignments: Ödevler
     calendar_events: "Takvim Olayları"
     collaborations: İşbirlikleri
@@ -8626,6 +8631,7 @@ tr:
   external_tools_6e77821: "Harici Araçlar"
   external_url_e9b87215: "Harici URL"
   external_urls_62082a38: "Harici Web adresleri"
+  extra_large_b6cdf1ff: "Ekstra Büyük"
   extreme_critical_emergency_80b3dbda: "ÇOK KRİTİK DURUM!"
   faculty_journal_5634938e: "Öğretim Üyesi Kaydı"
   faculty_journal_manage_entries_efc09599: "Öğretim Üyesi Günlüğü - girdileri yönet"
@@ -8840,6 +8846,7 @@ tr:
     titles: 
       bookmark_search: "Yer İmi Arama: %{service_name}"
   find_8d605019: Ara
+  find_a_course_94301b4d: "Ders Ara"
   find_an_existing_grading_scheme_d836ea: "Varolan Notlandırma Şeması Bul"
   find_an_outcome_919328e6: "Bir Öğrenme Çıktısı Ara"
   find_appointment_85d6922e: "Randevu Ara"
@@ -8877,6 +8884,8 @@ tr:
   folder_705fd2d7: Klasör
   folder_browsing_tree_1f00a3ae: "Dizin Görüntüleme Ağacı"
   folder_icon_29017021: "Klasör ikonu"
+  folder_name_b28488c2: "Dizin İsmi"
+  folder_was_successfully_created_8de6a282: "Klasör başarıyla oluşturuldu."
   folders: 
     event_updated: "Olay başarıyla güncellendi."
     file_zip_in_process: "Dosya sıkıştırma süreci devam ediyor..."
@@ -11048,6 +11057,9 @@ tr:
       new_tab: "Bu aracın yeni bir tarayıcı penceresinde yüklenmesi gerekiyor"
       new_tab_expired: "Bu araç için oturum süresi doldu. Araca tekrar erişmek için lütfen sayfayı yeniden yükleyin"
       new_tab_loaded: "Bu araç başarılı bir şekilde yeni tarayıcı penceresinde yüklendi. Araca tekrar erişmek için sayfayı yeniden yükleyin."
+    registrations: 
+      index: 
+        title: Uygulamalar
   lti2: 
     register_tool: "Kayıt Aracı"
   lti_2_reregistration_afabde25: "LTI 2 Yeniden Kayıt"
@@ -11058,6 +11070,7 @@ tr:
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle İçe Aktarma"
   main_navigation_3f080c80: "Ana Gezinme Menüsü"
+  make_it_public_71bf2a86: "Herkese Açık Olsun"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Öğrencilerin puanlarının etkilenmeyeceği en uygun seçeneği seçtiğinizden emin olun : "
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Bu dersi herkese görünür yap (öğrenci verileri gizli kalacak)"
   malaysia_60_7d357b28: "Malezya (+60)"
@@ -13320,6 +13333,7 @@ tr:
     submission_comments: "Gönderim yorumları"
     sure_you_want_to_mute: "Bu ödevi askıya almak istediğinize emin misiniz? Bu ödev askıdayken öğenciler yeni bildirim almayacak ve şunları göremeyecekler:"
   muted_283cfa0f: "(askıya alınmış)"
+  muted_3ff94739: Bekletiliyor
   my_dashboard_8983c283: "Kontrol Panelim"
   my_dashboard_b724020: "Kontrol Panelim"
   my_files_2f621040: Dosyalarım
@@ -14200,6 +14214,7 @@ tr:
   parent_of_a_canvas_user_afba1624: "Bir Canvas Kullanıcısının Velisi misiniz?"
   parent_signup_b7c6bf0a: "Ebeveyn Hesap Oluşturma"
   parents_sign_up_here_f0aa8f4f: "Veliler buradan kayıt olabilir"
+  participated_6279fba: Katılınan
   participation_af2598: Katılım
   participations_1823832d: Katılımlar
   pass_2a8c4f07: geçti
@@ -14778,6 +14793,7 @@ tr:
   points_possible_1c0b3445: "Olası Puan"
   points_possible_e57d5613: "Olası puan"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Seçili notlandırma türü için olası puanlar 0 veya daha fazla olmalı"
+  points_possible_pts_aedb481e: "%{points_possible} puan"
   points_pts_e5596bf7: "%{points} puan"
   points_to_endofrangepoints_pts_aad207f0: "%{points} to >%{endOfRangePoints} puan"
   points_total_pts_5b4cbd77: "%{points} / %{total} puan"
@@ -17390,8 +17406,10 @@ tr:
   section_84b5391: bölüm
   section_id_6f73f3d5: "bölüm id"
   section_id_8ec4f46f: "Bölüm Numarası"
+  section_name_16ea8a4a: "Bölüm adı"
   section_name_b6d82574: "Bölüm Adı"
   section_name_edb51b2: "bölüm ismi"
+  section_name_is_too_long_9cec2a30: "Bölüm ismi çok uzun"
   section_sis_94511bcd: "bölüm öbs"
   section_sis_id_6f989834: "bölüm öbs id"
   section_specific_topics_must_have_sections_11868960: "Bölüme özel konularda bölüm olmak zorunda"
@@ -19582,6 +19600,7 @@ tr:
   unpublished_courses_count_d35672f0: "Yayınlanmayan Dersler (%{count})"
   unpublished_courses_title: "Yayınlanmamış Dersler"
   unread_e9c1b19c: Okunmamış
+  unrecognized_browser_1fd80dfb: "Bilinmeyen Tarayıcı"
   unregister_service_985238e9: "Kayıtlı Olmayan Servisler"
   unsplash_ee049fbf: Unsplash
   unstar_b84daaef: "Yıldız Al"

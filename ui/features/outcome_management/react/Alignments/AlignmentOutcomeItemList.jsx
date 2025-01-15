@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -28,7 +28,7 @@ import InfiniteScroll from '@canvas/infinite-scroll'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {groupDataShape} from './propTypeShapes'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer}) => {
   const outcomes = rootGroup?.outcomes

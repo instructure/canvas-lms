@@ -25,7 +25,7 @@ import {
   type SubmissionGradeParams,
   type SubmissionStatusParams,
 } from './SpeedGraderCheckpointsContainer'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
@@ -36,7 +36,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import AssessmentGradeInput from './AssessmentGradeInput'
 import {UseSameGrade} from '../Shared/UseSameGrade'
 
-const I18n = useI18nScope('SpeedGraderCheckpoints')
+const I18n = createI18nScope('SpeedGraderCheckpoints')
 
 export const NONE = 'none'
 export const LATE = 'late'
@@ -61,6 +61,10 @@ export const SpeedGraderCheckpoint = (props: Props) => {
   const getStatus = useCallback(() => {
     if (props.subAssignmentSubmission.excused) {
       return EXCUSED
+    } else if (props.subAssignmentSubmission.missing) {
+      return MISSING
+    } else if (props.subAssignmentSubmission.late) {
+      return LATE
     } else if (props.subAssignmentSubmission.custom_grade_status_id) {
       return props.subAssignmentSubmission.custom_grade_status_id
     } else if (
@@ -73,11 +77,16 @@ export const SpeedGraderCheckpoint = (props: Props) => {
   }, [
     props.subAssignmentSubmission.custom_grade_status_id,
     props.subAssignmentSubmission.excused,
+    props.subAssignmentSubmission.missing,
+    props.subAssignmentSubmission.late,
     props.subAssignmentSubmission.late_policy_status,
   ])
 
   const getTimeLate = useCallback(() => {
-    if (props.subAssignmentSubmission.late_policy_status === LATE) {
+    if (
+      props.subAssignmentSubmission.late ||
+      props.subAssignmentSubmission.late_policy_status === LATE
+    ) {
       const secondsLate = props.subAssignmentSubmission.seconds_late
       const timeLate =
         props.lateSubmissionInterval === 'hour'
@@ -90,6 +99,7 @@ export const SpeedGraderCheckpoint = (props: Props) => {
     return '0'
   }, [
     props.lateSubmissionInterval,
+    props.subAssignmentSubmission.late,
     props.subAssignmentSubmission.late_policy_status,
     props.subAssignmentSubmission.seconds_late,
   ])
@@ -141,7 +151,7 @@ export const SpeedGraderCheckpoint = (props: Props) => {
   }
 
   const updateTimeLate = (value: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-shadow
+     
     const timeLate = parseInt(value, 10)
     const secondsLate =
       props.lateSubmissionInterval === 'hour' ? timeLate * 3600 : timeLate * 24 * 3600
@@ -189,6 +199,9 @@ export const SpeedGraderCheckpoint = (props: Props) => {
           setTimeLate={setTimeLate}
           updateTimeLate={updateTimeLate}
           subAssignmentTag={props.subAssignmentSubmission.sub_assignment_tag}
+          data-testid={
+            props.subAssignmentSubmission.sub_assignment_tag + '-checkpoint-time-late-input'
+          }
         />
       )}
       {!props.subAssignmentSubmission.grade_matches_current_submission && (

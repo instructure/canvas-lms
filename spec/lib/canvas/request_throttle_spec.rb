@@ -451,17 +451,17 @@ describe RequestThrottle do
 
         it "leaks when incrementing" do
           @bucket.redis.hmset(@bucket.cache_key, "count", @bucket.count, "last_touched", @bucket.last_touched)
-          @bucket.increment(0, 0, Time.at(@current_time))
+          @bucket.increment(0, 0, Time.zone.at(@current_time))
           expect(@bucket.count).to be_within(0.1).of(@expected)
           expect(@bucket.last_touched).to be_within(0.1).of(@current_time)
-          @bucket.increment(0, 0, Time.at(75))
+          @bucket.increment(0, 0, Time.zone.at(75))
           expect(@bucket.count).to eq 0.0
           expect(@bucket.last_touched).to be_within(0.1).of(75)
         end
 
         it "doesn't leak the current request" do
           @bucket.redis.hmset(@bucket.cache_key, "count", 1, "last_touched", @current_time - 50)
-          @bucket.increment(5.0, 0, Time.at(@current_time))
+          @bucket.increment(5.0, 0, Time.zone.at(@current_time))
           expect(@bucket.count).to be_within(0.1).of(5.0)
         end
       end

@@ -22,7 +22,7 @@ import {AppsSearchBar} from './AppsSearchBar'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import {Flex} from '@instructure/ui-flex'
@@ -43,7 +43,7 @@ import {useAppendBreadcrumbsToDefaults} from '@canvas/breadcrumbs/useAppendBread
 
 const SEARCH_DEBOUNCE_MS = 250
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const ManagePage = () => {
   const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])

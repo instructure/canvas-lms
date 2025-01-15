@@ -19,7 +19,7 @@ import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '@canvas/assignments/graphql/student/Mutations'
-import {createCache} from '@canvas/apollo'
+import {createCache} from '@canvas/apollo-v3'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
@@ -28,7 +28,7 @@ import {
   SUBMISSION_HISTORIES_QUERY,
   USER_GROUPS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'

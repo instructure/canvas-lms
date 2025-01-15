@@ -21,9 +21,9 @@ import {GroupUserMenu} from '../../react/GroupUserMenu'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('GroupUsersView')
+const I18n = createI18nScope('GroupUsersView')
 
 export default class GroupUserView extends View {
   static initClass() {
@@ -72,7 +72,7 @@ export default class GroupUserView extends View {
         `group_${groupId}_user_${userId}_menu_selector`
       )
       if (this.canEditGroupAssignment && groupUserMenuSelector) {
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <GroupUserMenu
             userId={userId}

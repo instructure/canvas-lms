@@ -32,65 +32,199 @@
 # You should have received a copy of the GNU Affero General Public License along
 
 describe CoursePacesDateHelpers do
+  before do
+    course_with_student active_all: true
+    @course.update start_at: "2022-09-01", restrict_enrollments_to_course_dates: true
+    @course_pace = @course.course_paces.create!(
+      workflow_state: "active"
+    )
+  end
+
   describe "add_days" do
-    it "adds days" do
-      start_date = Date.new(2022, 5, 9) # monday
-      expect(CoursePacesDateHelpers.add_days(start_date, 3, false, [])).to eq Date.new(2022, 5, 12)
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+      end
+
+      it "adds days" do
+        start_date = Date.new(2022, 5, 9) # monday
+        expect(
+          CoursePacesDateHelpers.add_days(start_date, 3, @course_pace, [])
+        ).to eq Date.new(2022, 5, 12)
+      end
+
+      it "skips weekends" do
+        start_date = Date.new(2022, 5, 9) # monday
+        expect(
+          CoursePacesDateHelpers.add_days(start_date, 5, @course_pace, [])
+        ).to eq Date.new(2022, 5, 16)
+      end
+
+      it "skips blackout dates" do
+        start_date = Date.new(2022, 5, 9) # monday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 10),
+            end_date: Date.new(2022, 5, 11)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.add_days(start_date, 2, @course_pace, blackout_dates)
+        ).to eq Date.new(2022, 5, 13)
+      end
     end
 
-    it "skips weekends" do
-      start_date = Date.new(2022, 5, 9) # monday
-      expect(CoursePacesDateHelpers.add_days(start_date, 5, true, [])).to eq Date.new(2022, 5, 16)
-    end
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+      end
 
-    it "skips blackout dates" do
-      start_date = Date.new(2022, 5, 9) # monday
-      blackout_dates = [
-        BlackoutDate.new(
-          event_title: "blackout dates 1",
-          start_date: Date.new(2022, 5, 10),
-          end_date: Date.new(2022, 5, 11)
-        )
-      ]
-      expect(CoursePacesDateHelpers.add_days(start_date, 2, true, blackout_dates)).to eq Date.new(2022, 5, 13)
+      it "adds days" do
+        start_date = Date.new(2022, 5, 9) # monday
+        expect(
+          CoursePacesDateHelpers.add_days(start_date, 3, @course_pace, [])
+        ).to eq Date.new(2022, 5, 12)
+      end
+
+      it "skips weekends" do
+        start_date = Date.new(2022, 5, 9) # monday
+        expect(
+          CoursePacesDateHelpers.add_days(start_date, 5, @course_pace, [])
+        ).to eq Date.new(2022, 5, 16)
+      end
+
+      it "skips blackout dates" do
+        start_date = Date.new(2022, 5, 9) # monday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 10),
+            end_date: Date.new(2022, 5, 11)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.add_days(start_date, 2, @course_pace, blackout_dates)
+        ).to eq Date.new(2022, 5, 13)
+      end
     end
   end
 
   describe "previous_enabled_day" do
-    it "avoids weekends" do
-      end_date = Date.new(2022, 5, 8) # sunday
-      expect(CoursePacesDateHelpers.previous_enabled_day(end_date, true, [])).to eq Date.new(2022, 5, 6)
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+      end
+
+      it "avoids weekends" do
+        end_date = Date.new(2022, 5, 8) # sunday
+        expect(
+          CoursePacesDateHelpers.previous_enabled_day(end_date, @course_pace, [])
+        ).to eq Date.new(2022, 5, 6)
+      end
+
+      it "avoids blackout dates" do
+        end_date = Date.new(2022, 5, 6) # friday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 5),
+            end_date: Date.new(2022, 5, 6)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.previous_enabled_day(end_date, @course_pace, blackout_dates)
+        ).to eq Date.new(2022, 5, 4)
+      end
     end
 
-    it "avoids blackout dates" do
-      end_date = Date.new(2022, 5, 6) # friday
-      blackout_dates = [
-        BlackoutDate.new(
-          event_title: "blackout dates 1",
-          start_date: Date.new(2022, 5, 5),
-          end_date: Date.new(2022, 5, 6)
-        )
-      ]
-      expect(CoursePacesDateHelpers.previous_enabled_day(end_date, true, blackout_dates)).to eq Date.new(2022, 5, 4)
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+      end
+
+      it "avoids weekends" do
+        end_date = Date.new(2022, 5, 8) # sunday
+        expect(
+          CoursePacesDateHelpers.previous_enabled_day(end_date, @course_pace, [])
+        ).to eq Date.new(2022, 5, 6)
+      end
+
+      it "avoids blackout dates" do
+        end_date = Date.new(2022, 5, 6) # friday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 5),
+            end_date: Date.new(2022, 5, 6)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.previous_enabled_day(end_date, @course_pace, blackout_dates)
+        ).to eq Date.new(2022, 5, 4)
+      end
     end
   end
 
   describe "first_enabled_day" do
-    it "avoids weekends" do
-      start_date = Date.new(2022, 5, 7) # saturday
-      expect(CoursePacesDateHelpers.first_enabled_day(start_date, true, [])).to eq Date.new(2022, 5, 9)
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+      end
+
+      it "avoids weekends" do
+        start_date = Date.new(2022, 5, 7) # saturday
+        expect(
+          CoursePacesDateHelpers.first_enabled_day(start_date, @course_pace, [])
+        ).to eq Date.new(2022, 5, 9)
+      end
+
+      it "avoids blackout dates" do
+        end_date = Date.new(2022, 5, 9) # monday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 9),
+            end_date: Date.new(2022, 5, 10)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.first_enabled_day(end_date, @course_pace, blackout_dates)
+        ).to eq Date.new(2022, 5, 11)
+      end
     end
 
-    it "avoids blackout dates" do
-      end_date = Date.new(2022, 5, 9) # monday
-      blackout_dates = [
-        BlackoutDate.new(
-          event_title: "blackout dates 1",
-          start_date: Date.new(2022, 5, 9),
-          end_date: Date.new(2022, 5, 10)
-        )
-      ]
-      expect(CoursePacesDateHelpers.first_enabled_day(end_date, true, blackout_dates)).to eq Date.new(2022, 5, 11)
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+      end
+
+      it "avoids weekends" do
+        start_date = Date.new(2022, 5, 7) # saturday
+        expect(
+          CoursePacesDateHelpers.first_enabled_day(start_date, @course_pace, [])
+        ).to eq Date.new(2022, 5, 9)
+      end
+
+      it "avoids blackout dates" do
+        end_date = Date.new(2022, 5, 9) # monday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 9),
+            end_date: Date.new(2022, 5, 10)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.first_enabled_day(end_date, @course_pace, blackout_dates)
+        ).to eq Date.new(2022, 5, 11)
+      end
     end
   end
 
@@ -105,46 +239,146 @@ describe CoursePacesDateHelpers do
       ]
     end
 
-    it "enables weekdays" do
-      date = Date.new(2022, 5, 9) # monday
-      expect(CoursePacesDateHelpers.day_is_enabled?(date, true, @blackout_dates)).to be_truthy
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+      end
+
+      it "enables weekdays" do
+        date = Date.new(2022, 5, 9) # monday
+        expect(
+          CoursePacesDateHelpers.day_is_enabled?(date, @course_pace, @blackout_dates)
+        ).to be_truthy
+      end
+
+      it "disables weekends" do
+        date = Date.new(2022, 5, 8) # sunday
+        expect(
+          CoursePacesDateHelpers.day_is_enabled?(date, @course_pace, @blackout_dates)
+        ).to be_falsey
+      end
+
+      it "disables blackout dates" do
+        date = Date.new(2022, 5, 10)
+        expect(
+          CoursePacesDateHelpers.day_is_enabled?(date, @course_pace, @blackout_dates)
+        ).to be_falsey
+      end
     end
 
-    it "disables weekends" do
-      date = Date.new(2022, 5, 8) # sunday
-      expect(CoursePacesDateHelpers.day_is_enabled?(date, true, @blackout_dates)).to be_falsey
-    end
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+      end
 
-    it "disables blackout dates" do
-      date = Date.new(2022, 5, 10)
-      expect(CoursePacesDateHelpers.day_is_enabled?(date, true, @blackout_dates)).to be_falsey
+      it "enables weekdays" do
+        date = Date.new(2022, 5, 9) # monday
+        expect(
+          CoursePacesDateHelpers.day_is_enabled?(date, @course_pace, @blackout_dates)
+        ).to be_truthy
+      end
+
+      it "disables weekends" do
+        date = Date.new(2022, 5, 8) # sunday
+        expect(
+          CoursePacesDateHelpers.day_is_enabled?(date, @course_pace, @blackout_dates)
+        ).to be_falsey
+      end
+
+      it "disables blackout dates" do
+        date = Date.new(2022, 5, 10)
+        expect(
+          CoursePacesDateHelpers.day_is_enabled?(date, @course_pace, @blackout_dates)
+        ).to be_falsey
+      end
     end
   end
 
   describe "days_between" do
-    it "counts work days" do
-      start_date = Date.new(2022, 5, 9) # monday
-      end_date = Date.new(2022, 5, 16) # monday
-      expect(CoursePacesDateHelpers.days_between(start_date, end_date, false)).to eq 8
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update selected_days_to_skip: %w[sat sun]
+      end
+
+      it "counts work days weekends included" do
+        start_date = Date.new(2022, 5, 9) # monday
+        end_date = Date.new(2022, 5, 16) # monday
+        @course_pace.update selected_days_to_skip: []
+        @course_pace.reload
+        expect(CoursePacesDateHelpers.days_between(start_date, end_date, @course_pace)).to eq 8
+      end
+
+      it "skips weekends" do
+        start_date = Date.new(2022, 5, 9) # monday
+        end_date = Date.new(2022, 5, 16) # monday
+        expect(CoursePacesDateHelpers.days_between(start_date, end_date, @course_pace)).to eq 6
+      end
+
+      it "skips blackout dates" do
+        start_date = Date.new(2022, 5, 9) # monday
+        end_date = Date.new(2022, 5, 16) # monday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 10),
+            end_date: Date.new(2022, 5, 11)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.days_between(
+            start_date,
+            end_date,
+            @course_pace,
+            inclusive_end: true,
+            blackout_dates:
+          )
+        ).to eq 4
+      end
     end
 
-    it "skips weekends" do
-      start_date = Date.new(2022, 5, 9) # monday
-      end_date = Date.new(2022, 5, 16) # monday
-      expect(CoursePacesDateHelpers.days_between(start_date, end_date, true)).to eq 6
-    end
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        @course_pace.update exclude_weekends: true
+      end
 
-    it "skips blackout dates" do
-      start_date = Date.new(2022, 5, 9) # monday
-      end_date = Date.new(2022, 5, 16) # monday
-      blackout_dates = [
-        BlackoutDate.new(
-          event_title: "blackout dates 1",
-          start_date: Date.new(2022, 5, 10),
-          end_date: Date.new(2022, 5, 11)
-        )
-      ]
-      expect(CoursePacesDateHelpers.days_between(start_date, end_date, true, inclusive_end: true, blackout_dates:)).to eq 4
+      it "counts work days exclude weekends false" do
+        start_date = Date.new(2022, 5, 9) # monday
+        end_date = Date.new(2022, 5, 16) # monday
+        @course_pace.update exclude_weekends: false
+        @course_pace.reload
+        expect(CoursePacesDateHelpers.days_between(start_date, end_date, @course_pace)).to eq 8
+      end
+
+      it "skips weekends" do
+        start_date = Date.new(2022, 5, 9) # monday
+        end_date = Date.new(2022, 5, 16) # monday
+        expect(CoursePacesDateHelpers.days_between(start_date, end_date, @course_pace)).to eq 6
+      end
+
+      it "skips blackout dates" do
+        start_date = Date.new(2022, 5, 9) # monday
+        end_date = Date.new(2022, 5, 16) # monday
+        blackout_dates = [
+          BlackoutDate.new(
+            event_title: "blackout dates 1",
+            start_date: Date.new(2022, 5, 10),
+            end_date: Date.new(2022, 5, 11)
+          )
+        ]
+        expect(
+          CoursePacesDateHelpers.days_between(
+            start_date,
+            end_date,
+            @course_pace,
+            inclusive_end: true,
+            blackout_dates:
+          )
+        ).to eq 4
+      end
     end
   end
 end

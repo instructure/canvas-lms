@@ -197,4 +197,8 @@ class Login::OtpController < ApplicationController
     session.delete(:pending_otp_secret_key)
     session.delete(:pending_otp_communication_channel_id)
   end
+
+  def increment_statsd(...)
+    # ignore
+  end
 end

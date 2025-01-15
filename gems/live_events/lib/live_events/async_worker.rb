@@ -115,15 +115,11 @@ module LiveEvents
 
     private
 
-    def time_block
-      res = nil
+    def time_block(&)
       if LiveEvents.statsd.nil?
-        res = yield
+        yield
       else
-        LiveEvents.statsd.time("live_events.put_records") do
-          res = yield
-        end
-
+        LiveEvents.statsd.time("live_events.put_records", &)
       end
     end
 

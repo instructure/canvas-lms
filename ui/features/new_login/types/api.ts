@@ -20,3 +20,29 @@ export interface ApiResponse<T> {
   status: number
   data: T
 }
+
+export interface RegistrationResponse {
+  success: boolean
+  destination?: string
+  course?: {
+    course: {
+      id: number
+    }
+  }
+}
+
+export interface LoginResponse {
+  location?: string
+  otp_required?: boolean
+  pseudonym?: object
+}
+
+export interface OtpInitiationResponse {
+  otp_sent?: boolean
+  otp_configuring?: boolean
+  otp_communication_channel_id?: string
+}
+
+export interface OtpVerifyResponse {
+  location?: string
+}

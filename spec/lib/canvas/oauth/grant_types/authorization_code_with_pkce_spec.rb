@@ -22,8 +22,8 @@ RSpec.describe Canvas::OAuth::GrantTypes::AuthorizationCodeWithPKCE do # rubocop
   let(:client_id) { key.global_id }
   let(:secret) { key.api_key }
   let(:opts) { { code: "test_code", code_verifier: "test_code_verifier" } }
-  let(:provider) { instance_double("Canvas::OAuth::Provider") }
-  let(:token) { instance_double("Canvas::OAuth::Token") }
+  let(:provider) { instance_double(Canvas::OAuth::Provider) }
+  let(:token) { instance_double(Canvas::OAuth::Token) }
   let(:authorization_code_with_pkce) { described_class.new(client_id, secret, opts) }
 
   before do

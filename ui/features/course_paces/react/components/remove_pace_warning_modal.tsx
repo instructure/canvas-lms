@@ -23,11 +23,11 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import type {PaceContextTypes} from '../types'
 
-const I18n = useI18nScope('remove_pace_warning_modal')
+const I18n = createI18nScope('remove_pace_warning_modal')
 
 const {Body: ModalBody, Footer: ModalFooter} = Modal as any
 

@@ -20,7 +20,7 @@
 describe ConcludedGradingStandardSetter do
   describe ".preserve_grading_standard_inheritance" do
     it "invokes #preserve_grading_standard_inheritance" do
-      dbl = instance_double("ConcludedGradingStandardSetter")
+      dbl = instance_double(ConcludedGradingStandardSetter)
       allow(described_class).to receive(:new).and_return(dbl)
       expect(dbl).to receive(:preserve_grading_standard_inheritance)
 

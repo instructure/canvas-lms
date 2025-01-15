@@ -18,9 +18,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type ErrorBoundaryState = {
   hasError: boolean
@@ -50,7 +50,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    // eslint-disable-next-line no-console
+     
     console.error(error, '\n', info.componentStack)
   }
 

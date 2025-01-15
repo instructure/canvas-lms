@@ -18,7 +18,7 @@
 
 import React, {type ReactNode, useEffect, useState} from 'react'
 import moment from 'moment-timezone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -37,7 +37,7 @@ import {
 import type {CoursePace, OptionalDate, Pace, PaceDuration, ResponsiveSizes} from '../../types'
 import {coursePaceActions} from '../../actions/course_paces'
 
-const I18n = useI18nScope('course_paces_projected_dates')
+const I18n = createI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
 

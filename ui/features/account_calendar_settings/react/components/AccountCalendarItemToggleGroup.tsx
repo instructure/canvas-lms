@@ -34,9 +34,9 @@ import type {
   ExpandedAccounts,
 } from '../types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_calendar_settings_account_group')
+const I18n = createI18nScope('account_calendar_settings_account_group')
 
 type ComponentProps = {
   readonly parentId: null | number

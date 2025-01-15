@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, each, isEmpty, last} from 'lodash'
 import htmlEscape from '@instructure/html-escape'
@@ -32,7 +32,7 @@ import 'jqueryui/draggable'
 import 'jqueryui/droppable'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('OutcomesDirectoryView')
+const I18n = createI18nScope('OutcomesDirectoryView')
 
 // The outcome group "directory" browser.
 export default class OutcomesDirectoryView extends PaginatedView {

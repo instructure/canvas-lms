@@ -21,9 +21,9 @@ import {extend} from '@canvas/backbone/utils'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/ProgressBar.handlebars'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('progressbar_view')
+const I18n = createI18nScope('progressbar_view')
 
 extend(ProgressBarView, Backbone.View)
 
@@ -46,7 +46,7 @@ ProgressBarView.prototype.initialize = function () {
     (function (_this) {
       return function () {
         let ref
-        // eslint-disable-next-line no-void
+         
         const integer = Math.floor((ref = _this.model.changed) != null ? ref.completion : void 0)
         const message = I18n.t('Content migration running, %{percent}% complete', {
           percent: integer,

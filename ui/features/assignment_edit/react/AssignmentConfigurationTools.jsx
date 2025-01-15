@@ -20,13 +20,13 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OriginalityReportVisibilityPicker from './OriginalityReportVisibilityPicker'
 import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
-const I18n = useI18nScope('moderated_grading')
+const I18n = createI18nScope('moderated_grading')
 
 class AssignmentConfigurationTools extends React.Component {
   static displayName = 'AssignmentConfigurationTools'
@@ -281,7 +281,7 @@ const attach = function (
       visibilitySetting={visibilitySetting}
     />
   )
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(configTools, element)
 }
 

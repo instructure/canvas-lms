@@ -284,7 +284,7 @@ describe Login::SamlController do
     account.save!
     controller.instance_variable_set(:@aac, nil)
     post :create, params: { SAMLResponse: "foo" }
-    expect(response).to redirect_to(unknown_user_url)
+    expect(response).to redirect_to(/^#{unknown_user_url}\?message=Canvas/)
     expect(session[:saml_unique_id]).to be_nil
   end
 
@@ -421,6 +421,30 @@ describe Login::SamlController do
       assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
       assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create("eduPersonNickname", "Cody Cutrer")])
       saml_response
+    end
+
+    it "works for the local account" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "http://test.host/courses/2"]
+      )
+
+      expect(Account).to receive(:find_by_domain).and_return(@pseudonym.account)
+
+      post :create, params: { SAMLResponse: "foo", RelayState: "http://test.host/courses/2" }
+      expect(response).to be_redirect
+      expect(response.location).to eql "http://test.host/courses/2"
+    end
+
+    it "appends a session token if we're redirecting to a different domain for the same account" do
+      allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+        [saml_response, "https://sameaccount/courses/2"]
+      )
+
+      expect(Account).to receive(:find_by_domain).and_return(@pseudonym.account)
+
+      post :create, params: { SAMLResponse: "foo", RelayState: "https://sameaccount/courses/2" }
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{^https://sameaccount/courses/2\?session_token=})
     end
 
     it "appends a session token if we're redirecting to a trusted account" do

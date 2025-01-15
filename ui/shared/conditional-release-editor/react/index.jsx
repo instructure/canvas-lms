@@ -20,10 +20,10 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('conditional_release')
+const I18n = createI18nScope('conditional_release')
 
 const SAVE_TIMEOUT = 15000
 
@@ -151,7 +151,7 @@ class Editor extends React.Component {
 
 const attach = function (element, type, env) {
   const editor = <Editor env={env} type={type} />
-  // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+  // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(editor, element)
 }
 

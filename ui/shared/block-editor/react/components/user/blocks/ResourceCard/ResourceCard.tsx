@@ -28,9 +28,9 @@ import {IconBlock} from '../IconBlock'
 import {type ResourceCardProps} from './types'
 import {isLastChild} from '../../../../utils'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const ResourceCard = ({id, title, description, iconName, linkText, linkUrl}: ResourceCardProps) => {
   const [myId] = useState(id)

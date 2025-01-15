@@ -33,7 +33,7 @@ const mockedEditor = {
 
 jest.mock('../getPosition')
 
-jest.mock('@apollo/react-hooks', () => {
+jest.mock('@apollo/client', () => {
   const data = {
     legacyNode: {
       id: 'Vxb',
@@ -106,8 +106,11 @@ jest.mock('@apollo/react-hooks', () => {
     },
   }
 
+  const originalGql = jest.requireActual('@apollo/client').gql
+
   return {
     __esModule: true,
+    gql: originalGql,
     useQuery: () => ({data}),
   }
 })

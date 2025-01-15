@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconRefreshLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function RefreshWidget({loading, autoRefresh, onRefresh, title}) {
   if (loading) {

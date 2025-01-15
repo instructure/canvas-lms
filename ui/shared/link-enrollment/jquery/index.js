@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_forms' /* formSubmit */
@@ -24,7 +24,7 @@ import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('link_enrollment')
+const I18n = createI18nScope('link_enrollment')
 /* fillTemplateData */
 
 /* global link_enrollment */

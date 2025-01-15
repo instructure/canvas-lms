@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 class DataFixup::RegradePointsBasedSchemeAssignments
   def self.run
-    current_time = Time.now
+    current_time = Time.zone.now
     GuardRail.activate(:secondary) do
       process_points_based_grading_standards(current_time)
     end

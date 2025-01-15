@@ -107,6 +107,28 @@ describe "course pace landing page" do
       expect(number_of_sections.text).to include("2")
       expect(default_duration.text).to include("3 days")
     end
+
+    it "does not show direct publish draft pace button for published paces" do
+      visit_course_paces_page
+
+      expect(element_exists?(direct_publish_draft_button_selector)).to be_falsey
+    end
+  end
+
+  context "draft course pace landing page" do
+    before :once do
+      @course.root_account.enable_feature!(:course_pace_draft_state)
+      @course.root_account.reload
+      create_draft_course_pace
+    end
+
+    it "shows publish pace button and draft status pill" do
+      visit_course_paces_page
+
+      expect(element_exists?(draft_pace_status_pill_selector)).to be_truthy
+      expect(element_exists?(direct_publish_draft_button_selector)).to be_truthy
+      expect(element_exists?(draft_pace_confused_panda_div_selector)).to be_truthy
+    end
   end
 
   context "course pace table for sections" do
@@ -150,6 +172,35 @@ describe "course pace landing page" do
       click_context_table_page(2)
 
       expect(course_pace_table_rows.count).to eq(9)
+    end
+
+    context "when course_pace_download_document flag is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_pace_download_document)
+        @course_pace.course.root_account.reload
+      end
+
+      it "shows download button" do
+        visit_course_paces_page
+        expect(download_selected_paces_button).to be_displayed
+      end
+
+      it "shows select all paces checkbox" do
+        visit_course_paces_page
+        expect(select_all_paces_checkbox).to be_displayed
+      end
+
+      it "shows row select pace checkbox" do
+        visit_course_paces_page
+        checkbox = course_pace_table_rows.first.find_element(:css, 'input[type="checkbox"]')
+        expect(checkbox.displayed?).to be true
+      end
+
+      it "shows more menu for pace row" do
+        visit_course_paces_page
+        more_options_button.click
+        expect(download_pace).to be_displayed
+      end
     end
   end
 

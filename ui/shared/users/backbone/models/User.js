@@ -17,7 +17,7 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {filter, isEmpty, find} from 'lodash'
 import Backbone from '@canvas/backbone'
 
@@ -29,7 +29,7 @@ function where(collection, properties, first) {
   }
 }
 
-const I18n = useI18nScope('user')
+const I18n = createI18nScope('user')
 
 export default (function (superClass) {
   function User() {

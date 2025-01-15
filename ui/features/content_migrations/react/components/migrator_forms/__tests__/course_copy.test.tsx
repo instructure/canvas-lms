@@ -177,8 +177,8 @@ describe('CourseCopyImporter', () => {
   sharedDateParsingTests(CourseCopyImporter)
 
   describe('source course adjust date field prefills', () => {
-    const expectDateField = (label: string, value: string) => {
-      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    const expectDateField = (dataCid: string, value: string) => {
+      expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)
     }
 
     it('parse the date from found course start date', async () => {
@@ -188,7 +188,7 @@ describe('CourseCopyImporter', () => {
       await userEvent.click(await screen.findByText('Mathmatics'))
       await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
 
-      expectDateField('Select original beginning date', 'Oct 14 at 8pm')
+      expectDateField('old_start_date', 'Oct 14 at 8pm')
     })
 
     it('parse the date from found course end date', async () => {
@@ -198,7 +198,7 @@ describe('CourseCopyImporter', () => {
       await userEvent.click(await screen.findByText('Mathmatics'))
       await userEvent.click(getByRole('checkbox', {name: 'Adjust events and due dates'}))
 
-      expectDateField('Select original end date', 'Oct 16 at 8pm')
+      expectDateField('old_end_date', 'Oct 16 at 8pm')
     })
   })
 })

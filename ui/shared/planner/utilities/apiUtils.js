@@ -18,9 +18,9 @@
 import moment from 'moment-timezone'
 import _ from 'lodash'
 import parseLinkHeader from '@canvas/parse-link-header'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const REPLY_TO_TOPIC = 'reply_to_topic'
 export const REPLY_TO_ENTRY = 'reply_to_entry'

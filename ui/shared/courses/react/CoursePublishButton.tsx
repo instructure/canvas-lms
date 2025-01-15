@@ -32,12 +32,12 @@ import {
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import type {BaseButtonTheme} from '@instructure/shared-types'
 import {clearDashboardCache} from '@canvas/dashboard-card/dashboardCardQueries'
 
-const I18n = useI18nScope('course_publish_button')
+const I18n = createI18nScope('course_publish_button')
 
 const CoursePublishButton = ({
   isPublished,

@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import type {PaceContextTypes} from '../../types'
 
-const I18n = useI18nScope('unpublished_warning_modal')
+const I18n = createI18nScope('unpublished_warning_modal')
 
 export type UnpublishedWarningModalProps = {
   open: boolean

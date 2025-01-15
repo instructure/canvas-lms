@@ -178,7 +178,7 @@ class DiscussionEntriesController < ApplicationController
           channel.title = t :podcast_feed_title, "%{title} Posts Podcast Feed", title: @topic.title
           channel.description = t :podcast_description, "Any media files linked from or embedded within entries in the topic \"%{title}\" will appear in this feed.", title: @topic.title
           channel.link = polymorphic_url([@context, @topic])
-          channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
+          channel.pubDate = Time.zone.now.strftime("%a, %d %b %Y %H:%M:%S %z")
           elements = Announcement.podcast_elements(@entries, @context)
           elements.each do |item|
             channel.items << item

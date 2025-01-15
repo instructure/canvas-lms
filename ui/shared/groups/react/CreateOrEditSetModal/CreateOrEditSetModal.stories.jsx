@@ -190,6 +190,7 @@ const Wrapper = () => {
           />
           <div>
             <NumberInput
+              allowStringValue={true}
               renderLabel=""
               display="inline-block"
               size="small"
@@ -204,6 +205,7 @@ const Wrapper = () => {
           </div>
           <div>
             <NumberInput
+              allowStringValue={true}
               renderLabel=""
               display="inline-block"
               size="small"

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {GradingScheme} from '@canvas/grading_scheme/gradingSchemeApiModel'
 import {useGradingSchemeUsedLocations} from '../hooks/useGradingSchemeUsedLocations'
 import {useGradingSchemeAccountUsedLocations} from '../hooks/useGradingSchemeAccountUsedLocations'
@@ -24,7 +24,7 @@ import {useGradingSchemeAssignmentUsedLocations} from '../hooks/useGradingScheme
 import {ApiCallStatus} from '../hooks/ApiCallStatus'
 import {UsedLocationsModal} from './UsedLocationsModal'
 
-const I18n = useI18nScope('GradingSchemeViewModal')
+const I18n = createI18nScope('GradingSchemeViewModal')
 
 export type GradingSchemeUsedLocationsModalProps = {
   open: boolean

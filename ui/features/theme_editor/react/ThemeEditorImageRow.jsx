@@ -19,9 +19,9 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('theme_editor')
+const I18n = createI18nScope('theme_editor')
 
 // consider anything other than null or undefined (including '') as "set"
 function isSet(val) {
@@ -103,7 +103,7 @@ export default class ThemeEditorImageRow extends Component {
                 value={this.props.userInput.val === '' ? '' : this.props.currentValue}
               />
 
-              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+              { }
               <label className="Theme__editor-image_upload-label">
                 <span className="screenreader-only">{this.props.varDef.human_name}</span>
                 <input

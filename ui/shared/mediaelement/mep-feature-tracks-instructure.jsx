@@ -27,16 +27,16 @@
 //   ui/shared/mediaelement/mep-feature-tracks-instructure.js
 //
 
-/* eslint-disable no-undef, eqeqeq, prefer-const, promise/catch-or-return */
-/* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
+/* eslint-disable no-undef, prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React from 'react'
 import ReactDOM from 'react-dom'
 import InheritedCaptionTooltip from './InheritedCaptionTooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {closedCaptionLanguages} from '@instructure/canvas-media'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {languageCodes} from './mediaLanguageCodes'
 
-const I18n = useI18nScope('mepfeaturetracksinstructure')
+const I18n = createI18nScope('mepfeaturetracksinstructure')
 
 ;(function ($) {
   // add extra default options
@@ -573,7 +573,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
         const tooltip_container = $li
           .append('<span class="track-tip-container"></span>')
           .find('.track-tip-container')
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(<InheritedCaptionTooltip />, tooltip_container[0])
       }
 
@@ -800,7 +800,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure')
   })
 
   mejs.language = {
-    codes: closedCaptionLanguages.reduce((result, {id, label}) => ({...result, [id]: label}), {}),
+    codes: languageCodes,
   }
 
   /*

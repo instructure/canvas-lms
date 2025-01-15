@@ -17,7 +17,7 @@
  */
 import * as React from 'react'
 import GenericErrorPage from '@canvas/generic-error-page/react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {htmlEscape} from '@instructure/html-escape'
 import {Alert} from '@instructure/ui-alerts'
@@ -42,9 +42,11 @@ export type InheritedKeyRegistrationReviewProps = {
   result: ApiResult<LtiRegistrationWithConfiguration>
 }
 
-const I18n = useI18nScope('lti_registration.wizard')
+const I18n = createI18nScope('lti_registration.wizard')
 
 export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationReviewProps) => {
+  const [expandCustomFields, setExpandCustomFields] = React.useState(false)
+
   if (props.result._type === 'Success' && props.result.data.configuration) {
     const toolConfiguration = props.result.data.configuration
     const placements = toolConfiguration.placements ?? []
@@ -62,9 +64,6 @@ export const InheritedKeyRegistrationReview = (props: InheritedKeyRegistrationRe
         }
         return acc
       }, {} as Partial<Record<LtiPlacement, string>>) ?? {}
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks -- eslint rule is confused
-    const [expandCustomFields, setExpandCustomFields] = React.useState(false)
 
     const customFields = toolConfiguration.custom_fields ?? {}
 

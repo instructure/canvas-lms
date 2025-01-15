@@ -240,6 +240,49 @@ describe('fileTypeUtils', () => {
       expect(url).toBe('/media_objects_iframe?mediahref=/path/to/file&verifier=xyzzy&type=video')
     })
 
+    it('throws error if content_type is invalid', () => {
+      const file = {
+        type: undefined,
+      }
+      expect(() => mediaPlayerURLFromFile(file)).toThrow('Invalid content type')
+    })
+
+    it('throws error if href is not string when checking verifier', () => {
+      const file = {
+        'content-type': 'video/mov',
+        href: 123,
+      }
+      // @ts-expect-error
+      expect(() => mediaPlayerURLFromFile(file)).toThrow('Invalid URL')
+    })
+
+    it('handles file with no id and no media_entry_id but valid audio content_type', () => {
+      const file = {
+        'content-type': 'audio/mp3',
+        url: 'http://origin/audio.mp3',
+      }
+      const url = mediaPlayerURLFromFile(file)
+      expect(url).toBe('/media_objects_iframe?mediahref=/audio.mp3&type=audio')
+    })
+
+    it('handles file with no embedded_iframe_url but is video without verifier', () => {
+      const file = {
+        'content-type': 'video/mp4',
+        url: 'http://origin/video.mp4',
+      }
+      const url = mediaPlayerURLFromFile(file)
+      expect(url).toBe('/media_objects_iframe?mediahref=/video.mp4&type=video')
+    })
+
+    it('throws error if file url is not a string', () => {
+      const file = {
+        'content-type': 'video/mp4',
+        url: 42,
+      }
+      // @ts-expect-error
+      expect(() => mediaPlayerURLFromFile(file)).toThrow('Invalid URL')
+    })
+
     describe('when media_attachments feature flag on', () => {
       RCEGlobals.getFeatures = jest.fn().mockReturnValue({media_links_use_attachment_id: true})
 

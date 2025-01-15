@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class NoExecuteScript < Cop
+      class NoExecuteScript < Base
         MSG = "Avoid using execute_script. Instead, perform actual " \
               "user interactions such as click/keypress. If these " \
               "seem insufficient, consider converting your " \

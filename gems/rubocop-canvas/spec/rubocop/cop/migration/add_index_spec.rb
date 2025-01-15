@@ -22,7 +22,7 @@ describe RuboCop::Cop::Migration::AddIndex do
 
   context "add_index" do
     it "expects a non-transactional migration" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             add_index :users, :karma, algorithm: :concurrently
@@ -30,13 +30,13 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1 # only nags about this once
-      expect(cop.messages.first).to include "`disable_ddl_transaction!`"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1 # only nags about this once
+      expect(offenses.first.message).to include "`disable_ddl_transaction!`"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "expects `algorithm: :concurrently`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -45,13 +45,13 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 2
-      expect(cop.messages.first).to include "`algorithm: :concurrently`"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 2
+      expect(offenses.first.message).to include "`algorithm: :concurrently`"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "emits no warnings when conditions are satisfied" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -59,11 +59,11 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "still finds `algorithm: :concurrently` if other index options are given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -71,11 +71,11 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "emits no warnings when adding an index to a table created in the same migration" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             create_table :wickets do |t|
@@ -85,22 +85,22 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "doesn't flag when adding an index in `down`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def down
             add_index :users, :karma
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "handles non-constant table names" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             with_each_partition do |partition|
@@ -112,26 +112,26 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
+      expect(offenses.size).to eq 1
     end
   end
 
   context "add_reference" do
     it "expects a non-transactional migration" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             add_reference :users, :organizations, index: { algorithm: :concurrently }
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to include "`disable_ddl_transaction!`"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to include "`disable_ddl_transaction!`"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "expects `algorithm: :concurrently` if `index: true` is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -139,13 +139,13 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to include "Use `index: { algorithm: :concurrently }`"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to include "Use `index: { algorithm: :concurrently }`"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "expects `algorithm: :concurrently` if no `index` option is given (since it defaults to `true`)" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -153,24 +153,24 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to include "Use `index: { algorithm: :concurrently }`"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to include "Use `index: { algorithm: :concurrently }`"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if not indexed" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             add_reference :users, :organizations, index: false
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "emits no warnings when conditions are satisfied" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -178,11 +178,11 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "still finds `algorithm: :concurrently` when other index options are given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           disable_ddl_transaction!
           def up
@@ -190,11 +190,11 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "emits no warnings when adding a reference on a table created in the same migration" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             create_table "wickets" do |t|
@@ -203,24 +203,24 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "doesn't flag when adding a reference in `down`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def down
             add_reference :wickets, :color, index: true
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
   end
 
   context "create_table" do
     it "does not complain about indexes or references in a new table" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             create_table :widgets do |t|
@@ -231,14 +231,14 @@ describe RuboCop::Cop::Migration::AddIndex do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
   end
 
   context "change_table" do
     context "t.index" do
       it "expects a non-transactional migration" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             def change
               change_table :widgets do |t|
@@ -248,13 +248,13 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 1
-        expect(cop.messages.first).to include "`disable_ddl_transaction!`"
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq 1
+        expect(offenses.first.message).to include "`disable_ddl_transaction!`"
+        expect(offenses.first.severity.name).to eq(:warning)
       end
 
       it "expects `algorithm: :concurrently`" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             disable_ddl_transaction!
             def change
@@ -265,13 +265,13 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 1
-        expect(cop.messages.first).to include "`algorithm: :concurrently`"
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq 1
+        expect(offenses.first.message).to include "`algorithm: :concurrently`"
+        expect(offenses.first.severity.name).to eq(:warning)
       end
 
       it "emits no warnings when conditions are satisfied" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             disable_ddl_transaction!
             def change
@@ -282,11 +282,11 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 0
+        expect(offenses.size).to eq 0
       end
 
       it "doesn't flag when adding an index in `down`" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             def down
               change_table :widgets do |d|
@@ -295,13 +295,13 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 0
+        expect(offenses.size).to eq 0
       end
     end
 
     context "t.references" do
       it "expects a non-transactional migration" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             def change
               change_table :widgets do |t|
@@ -310,13 +310,13 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 1
-        expect(cop.messages.first).to include "`disable_ddl_transaction!`"
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq 1
+        expect(offenses.first.message).to include "`disable_ddl_transaction!`"
+        expect(offenses.first.severity.name).to eq(:warning)
       end
 
       it "expects `algorithm: :concurrently` if `index: true` is given" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             disable_ddl_transaction!
             def change
@@ -326,13 +326,13 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 1
-        expect(cop.messages.first).to include "Use `index: { algorithm: :concurrently }`"
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq 1
+        expect(offenses.first.message).to include "Use `index: { algorithm: :concurrently }`"
+        expect(offenses.first.severity.name).to eq(:warning)
       end
 
       it "expects `algorithm: :concurrently` if no `index` option is given (since it defaults to `true`)" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             disable_ddl_transaction!
             def change
@@ -342,13 +342,13 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 1
-        expect(cop.messages.first).to include "Use `index: { algorithm: :concurrently }`"
-        expect(cop.offenses.first.severity.name).to eq(:warning)
+        expect(offenses.size).to eq 1
+        expect(offenses.first.message).to include "Use `index: { algorithm: :concurrently }`"
+        expect(offenses.first.severity.name).to eq(:warning)
       end
 
       it "doesn't complain if not indexed" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             disable_ddl_transaction!
             def change
@@ -358,11 +358,11 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 0
+        expect(offenses.size).to eq 0
       end
 
       it "emits no warnings when conditions are satisfied" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             disable_ddl_transaction!
             def change
@@ -372,11 +372,11 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 0
+        expect(offenses.size).to eq 0
       end
 
       it "doesn't flag when adding a reference in `down`" do
-        inspect_source(<<~RUBY)
+        offenses = inspect_source(<<~RUBY)
           class TestMigration < ActiveRecord::Migration
             def down
               change_table :widgets do |t|
@@ -385,7 +385,7 @@ describe RuboCop::Cop::Migration::AddIndex do
             end
           end
         RUBY
-        expect(cop.offenses.size).to eq 0
+        expect(offenses.size).to eq 0
       end
     end
   end

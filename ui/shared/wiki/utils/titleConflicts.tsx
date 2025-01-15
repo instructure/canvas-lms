@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {debounce} from '@instructure/debounce'
 import type {Message} from '../react/renderWikiPageTitle'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('wiki_pages')
+const I18n = createI18nScope('wiki_pages')
 
 type AvailabilityResponse = {
   conflict?: boolean
@@ -74,7 +74,7 @@ export async function checkForTitleConflict(
     const conflict = await fetchTitleAvailability(title)
     conflict ? callback([conflictMessage()]) : callback([])
   } catch (error) {
-    console.log(error) // eslint-disable-line no-console
+    console.log(error)  
     callback([])
   }
 }

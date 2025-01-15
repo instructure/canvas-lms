@@ -65,7 +65,7 @@ describe JwtsController do
     context "asymmetric tokens" do
       before { user_session(token_user) }
 
-      it "gererates an unencrypt token for non-canvas audiences" do
+      it "generates an unencrypted token for non-canvas audiences" do
         post "create", params: { canvas_audience: false }, format: "json"
 
         jwt = translate_unencrypted_token.call(response)
@@ -84,6 +84,51 @@ describe JwtsController do
 
         jwt = translate_token.call(response)
         expect(jwt[:sub]).to eq(token_user.global_id)
+      end
+
+      describe "with custom audiences requested" do
+        let(:allowed_audience) { "custom_audience" }
+
+        before do
+          pseudonym(admin_user)
+          access_token = admin_user.access_tokens.create!.full_token
+          admin_user.access_tokens.first.developer_key.update!(allowed_audiences: [allowed_audience])
+          request.headers["Authorization"] = "Bearer #{access_token}"
+        end
+
+        context "when audience is allowed through the developer key" do
+          it "returns unencrypted token" do
+            post "create", params: { audience: allowed_audience }, format: "json"
+
+            jwt = translate_unencrypted_token.call(response)
+            expect(jwt[:sub]).to eq(admin_user.global_id)
+          end
+
+          it "generates a token that includes the requested audience" do
+            post "create", params: { audience: allowed_audience }, format: "json"
+
+            jwt = translate_unencrypted_token.call(response)
+            expect(jwt[:aud]).to eq(["custom_audience"])
+          end
+        end
+
+        context "when at least one audience is not allowed through the developer key" do
+          it "throws an error with status code bad request" do
+            post "create", params: { audience: "#{allowed_audience} not_allowed_audience" }, format: "json"
+
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include(/invalid_target/)
+          end
+        end
+
+        context "when no audience is allowed through the developer key" do
+          it "returns an error with bad request status code" do
+            post "create", params: { audience: "not_allowed_audience" }, format: "json"
+
+            expect(response).to have_http_status(:bad_request)
+            expect(response.body).to include(/invalid_target/)
+          end
+        end
       end
     end
 

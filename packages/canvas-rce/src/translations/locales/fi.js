@@ -104,6 +104,7 @@ const locale = {
     "message": "Automaattisesti tallennettua sisältöä on olemassa. Haluaisitko ladata automaattisesti tallennetun sisällön tämän sijasta?"
   },
   "available_folders_694d0436": { "message": "Saatavissa olevat kansiot" },
+  "background_1bc88842": { "message": "Tausta" },
   "backslash_b2d5442d": { "message": "Takakenoviiva" },
   "bar_ec63ed6": { "message": "tanko" },
   "basic_554cdc0a": { "message": "Perus" },
@@ -114,6 +115,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Binomiaalinen kerroin" },
   "black_4cb01371": { "message": "Musta" },
   "blue_daf8fea9": { "message": "Sininen" },
+  "border_5b08b06d": { "message": "Reunus" },
   "bottom_15a2a9be": { "message": "Ala" },
   "bottom_third_5f5fec1d": { "message": "Alakolmannes" },
   "bowtie_5f9629e4": { "message": "Rusetti" },
@@ -189,10 +191,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Piilota kutistamalla { types }"
   },
+  "color_a363e1b0": { "message": "Väri" },
+  "color_contrast_4c418add": { "message": "Värin kontrasti" },
+  "color_contrast_ratio_687782f0": { "message": "Värikontrastin suhde" },
   "color_picker_6b359edf": { "message": "Värivalitsin" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Värivalitsin ({ colorName } valittu)"
   },
+  "color_popup_af39810f": { "message": "Värin ponnahdusvalikko" },
   "column_e1ae5c64": { "message": "Sarake" },
   "column_group_1c062368": { "message": "Sarakeryhmä" },
   "complex_numbers_a543d004": { "message": "Monimutkaiset numerot" },
@@ -380,6 +386,7 @@ const locale = {
     "message": "Kouluajan ulkopuolisen kohteen kuvake"
   },
   "f_function_fe422d65": { "message": "F (funktio)" },
+  "fail_544e5dde": { "message": "VIKA" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Tiedoston sisällön haku epäonnistui"
   },
@@ -437,6 +444,7 @@ const locale = {
     "message": "Siirry editorin työkalupalkkiin"
   },
   "grades_a61eba0a": { "message": "Arvosanat" },
+  "graphics_text_bc9568bc": { "message": "Graafinen teksti" },
   "greater_than_e98af662": { "message": "Suurempi kuin" },
   "greater_than_or_equal_b911949a": {
     "message": "Suurempi tai yhtä suuri kuin"
@@ -540,6 +548,10 @@ const locale = {
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Päättely" },
   "infinity_7a10f206": { "message": "ÄÄRETÖN" },
+  "input_field_for_alpha_678265fd": { "message": "Datan syöttökenttä" },
+  "input_field_for_blue_561e020a": { "message": "Alphan syöttökenttä" },
+  "input_field_for_green_67f8b2b6": { "message": "Vihreän syöttökenttä" },
+  "input_field_for_red_86a84615": { "message": "Punaisen syöttökenttä" },
   "insert_593145ef": { "message": "Aseta" },
   "insert_link_6dc23cae": { "message": "Lisää linkki" },
   "insert_math_equation_57c6e767": { "message": "Lisää matemaattinen kaava" },
@@ -561,6 +573,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Kielen taiteiden kuvake" },
   "languages_icon_9d20539": { "message": "Kielien kuvake" },
   "large_9c5e80e7": { "message": "Suuri" },
+  "large_text_e7ba08cd": { "message": "Suuri teksti" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Lue lisää vierekkäisistä linkeistä"
   },
@@ -747,6 +760,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "Ei videota" },
   "none_3b5e34d2": { "message": "Ei mitään" },
   "none_selected_b93d56d2": { "message": "Ei valintoja" },
+  "normal_text_7b03da48": { "message": "Normaali teksti" },
   "not_equal_6e2980e6": { "message": "Ei yhtä suuri" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Ei (vain tämän elementti)"
@@ -782,9 +796,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Ääriviivan väri" },
   "outline_size_a6059a21": { "message": "Ääriviivan koko" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } ei ole voimassa oleva protokolla. Sen täytyy olla ftp, http, https, mailto, skype, tel tai se saatetaan poistaa"
-  },
   "page_50c4823d": { "message": "Sivu" },
   "pages_e5414c2c": { "message": "Sivut" },
   "paragraph_5e5ad8eb": { "message": "Kappale" },
@@ -793,6 +804,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Rungon suuntainen" },
   "partial_derivative_4a9159df": { "message": "Osittainen (johdannainen)" },
+  "pass_1c19a2b3": { "message": "LÄPÄISTY" },
   "paste_5963d1c1": { "message": "Liitä" },
   "pause_12af3bb4": { "message": "Keskeytä" },
   "pentagon_17d82ea3": { "message": "Viisikulmio" },
@@ -800,6 +812,9 @@ const locale = {
   "percentage_34ab7c2c": { "message": "Prosenttimäärä" },
   "percentage_must_be_a_number_8033c341": {
     "message": "Prosenttiosuuden täytyy olla numero"
+  },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Prosenttiosuuden täytyy olla vähintään { percentage }%"
   },
   "performing_arts_icon_f3497486": { "message": "Esittävien taiteiden kuvake" },
   "perpendicular_7c48ede4": { "message": "Kohtisuora" },
@@ -810,8 +825,12 @@ const locale = {
   },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Muuttuja)" },
+  "pick_a_color_557abfb0": { "message": "Valitse väri" },
   "pink_68ad45cb": { "message": "Vaaleanpunainen" },
   "pixels_52ece7d1": { "message": "Pikselit" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Pikseleiden täytyy olla vähintään { width } x { height }px."
+  },
   "play_1a47eaa7": { "message": "Toista" },
   "play_media_comment_35257210": { "message": "Toista mediakommentti." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -840,6 +859,9 @@ const locale = {
   "preview_inline_9787330": { "message": "Esikatselu inline-tilassa" },
   "previous_bd2ac015": { "message": "Edellinen" },
   "previous_findtext_8dfbfd30": { "message": "Edellinen { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Aikaisemmin valitut värit"
+  },
   "prime_917ea60e": { "message": "Alku" },
   "prime_numbers_13464f61": { "message": "Alkuluvut" },
   "product_39cf144f": { "message": "Tuote" },
@@ -1308,6 +1330,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Kirjoitusavustaja" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Kyllä" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Olet väripaletissa. Jos haluat navigoida palettia ylös, vasermmalle, alas tai oikealle, käytä painikkeita ”W”, ”A”, ”S” ja ”D” vastaavassa järjestyksessä."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Olet väriliu´ittimessa. Jos haluat siirtyä vasemmalle tai oikealle, käytä painikkeita ”A” ja ”D” vastaavassa järjestyksessä."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Olet alphaliu´ittimessa. Jos haluat siirtyä vasemmalle tai oikealle, käytä painikkeita ”A” ja ”D” vastaavassa järjestyksessä."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Kuvakkeen tekijän ilmoitusalueella on tallentamattomia muutoksia. Haluatko jatkaa tallentamatta näitä muutoksia?"
   },

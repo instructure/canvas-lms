@@ -55,7 +55,7 @@ describe "Pace Contexts API" do
         expect(applied_pace_json["name"]).to eq course.name
         expect(applied_pace_json["type"]).to eq "Course"
         expect(applied_pace_json["duration"]).to eq 1
-        expect(Time.parse(applied_pace_json["last_modified"])).to be_within(1.second).of(default_pace.published_at)
+        expect(Time.zone.parse(applied_pace_json["last_modified"])).to be_within(1.second).of(default_pace.published_at)
       end
 
       context "when the course does not have a default pace" do

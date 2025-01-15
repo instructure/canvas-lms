@@ -23,7 +23,7 @@ describe DataFixup::RecalculateSectionOverrideDates do
     course_with_student(active_all: true)
     @section2 = @course.course_sections.create!(name: "Second Section")
     @course.enroll_student(@student, allow_multiple_enrollments: true, enrollment_state: "active", section: @section2)
-    @everyone_due_date = 10.days.from_now.iso8601.to_datetime
+    @everyone_due_date = 10.days.from_now.change(usec: 0)
     @assignment = @course.assignments.create!(due_at: @everyone_due_date)
     @section2_due_date = 10.days.from_now(@everyone_due_date)
     create_section_override_for_assignment(@assignment, course_section: @section2, due_at: @section2_due_date)

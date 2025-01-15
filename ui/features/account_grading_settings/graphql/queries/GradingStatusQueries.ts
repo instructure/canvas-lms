@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const ACCOUNT_GRADING_STATUS_QUERY = gql`
   query AccountGradingStatusQuery($accountId: ID!) {

@@ -39,7 +39,7 @@ describe AssetUserAccessLog do
 
     describe "via postgres" do
       it "inserts to correct tables" do
-        dt = DateTime.civil(2020, 9, 4, 12, 0, 0) # a friday, index 5
+        dt = Time.iso8601("2020-09-04T12:00:00Z") # a friday, index 5
         AssetUserAccessLog::AuaLog5.delete_all
         AssetUserAccessLog.put_view(@asset, timestamp: dt)
         expect(AssetUserAccessLog::AuaLog5.count).to eq(1)

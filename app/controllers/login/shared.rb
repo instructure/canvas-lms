@@ -29,15 +29,23 @@ module Login::Shared
                               :oauth2_nonce)
   end
 
+  def redirect_to_unknown_user_url(message)
+    unknown_user_url = @domain_root_account.unknown_user_url.presence
+    if unknown_user_url
+      unknown_user_url += (URI.parse(unknown_user_url).query ? "&" : "?")
+      unknown_user_url << "message=#{URI::DEFAULT_PARSER.escape(message)}"
+    else
+      flash[:delegated_message] = message
+    end
+    redirect_to unknown_user_url || login_url
+  end
+
   def successful_login(user, pseudonym, otp_passed = false)
     reset_authenticity_token!
     Auditors::Authentication.record(pseudonym, "login")
 
     auth_provider = pseudonym&.authentication_provider
-    auth_type = auth_provider&.auth_type
-    tags = { auth_type:, domain: request.host }
-
-    InstStatsd::Statsd.increment("login.count", tags:) if auth_type
+    increment_statsd(:success, authentication_provider: pseudonym&.authentication_provider)
 
     # Since the user just logged in, we'll reset the context to include their info.
     setup_live_events_context
@@ -165,11 +173,14 @@ module Login::Shared
 
   protected
 
-  def statsd_timeout_error
-    "auth.timeout_error"
-  end
-
-  def statsd_timeout_cutoff
-    "auth.timeout_cutoff"
+  def increment_statsd(counter, tags: {}, action: nil, reason: nil, authentication_provider: nil)
+    action ||= params[:action]
+    authentication_provider ||= @aac
+    auth_type = authentication_provider&.auth_type || self.auth_type
+    tags ||= {}
+    tags = tags.reverse_merge({ auth_type:, domain: request.host })
+    tags[:auth_provider_id] = authentication_provider.global_id if authentication_provider
+    tags[:reason] = reason if reason
+    InstStatsd::Statsd.distributed_increment("auth.#{action}.#{counter}", tags:)
   end
 end

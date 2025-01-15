@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useCallback, useState} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
@@ -28,7 +28,7 @@ import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
 import RequeueButton from './RequeueButton'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function JobDetails({job, timeZone, onRequeue}) {
   const [openModal, setOpenModal] = useState('')

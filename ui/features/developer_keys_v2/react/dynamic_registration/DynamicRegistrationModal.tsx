@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
@@ -35,7 +35,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 type DynamicRegistrationModalProps = {
   contextId: string
   store: ReturnType<typeof storeCreator>
@@ -262,7 +262,7 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             margin="0 x-small"
             disabled={buttonsDisabled}
             onClick={() => {
-              // eslint-disable-next-line promise/catch-or-return
+               
               deleteKey(state.registration).then(onFinish)
             }}
           >
@@ -273,7 +273,7 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             margin="0 x-small"
             disabled={buttonsDisabled}
             onClick={() => {
-              // eslint-disable-next-line promise/catch-or-return
+               
               closeAndSaveOverlay(
                 props.contextId,
                 state.registration,
@@ -289,7 +289,7 @@ const DynamicRegistrationModalFooter = (props: DynamicRegistrationModalFooterPro
             disabled={buttonsDisabled}
             data-testid="dynamic-reg-modal-enable-and-close-button"
             onClick={() => {
-              // eslint-disable-next-line promise/catch-or-return
+               
               enableAndClose(
                 props.contextId,
                 state.registration,

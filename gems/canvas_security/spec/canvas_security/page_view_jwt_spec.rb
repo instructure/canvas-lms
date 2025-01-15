@@ -23,7 +23,7 @@ require "spec_helper"
 describe CanvasSecurity::PageViewJwt do
   describe ".generate" do
     it "generates and decodes a valid jwt token" do
-      created_at = DateTime.now
+      created_at = Time.zone.now
       uid = 1_065_040_302_011
       attributes = {
         request_id: "abcdefg-1234566",

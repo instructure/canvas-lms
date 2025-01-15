@@ -18,7 +18,7 @@
 
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import StudentViewContext from './Context'
@@ -32,7 +32,7 @@ import {Pill} from '@instructure/ui-pill'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
 
-const I18n = useI18nScope('assignments_2_student_header_date_title')
+const I18n = createI18nScope('assignments_2_student_header_date_title')
 
 export function renderPipe(item) {
   return item && <View margin="0 xx-small 0 xx-small">|</View>

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Sticker, StickerDescriptions} from '../types/stickers.d'
 
-const I18n = useI18nScope('submission_sticker')
+const I18n = createI18nScope('submission_sticker')
 
 export function stickerDescriptions(): StickerDescriptions {
   const descriptions: StickerDescriptions = {

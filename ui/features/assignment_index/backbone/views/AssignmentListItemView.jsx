@@ -23,7 +23,7 @@ import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ListViewCheckpoints} from '@canvas/list-view-checkpoints/react/ListViewCheckpoints'
 import {TeacherCheckpointsInfo} from '@canvas/list-view-checkpoints/react/TeacherCheckpointsInfo'
 import LockIconView from '@canvas/lock-icon'
@@ -49,7 +49,7 @@ import {captureException} from '@sentry/browser'
 import CreateAssignmentViewAdapter from './CreateAssignmentViewAdapter'
 import {createRoot} from 'react-dom/client'
 
-const I18n = useI18nScope('AssignmentListItemView')
+const I18n = createI18nScope('AssignmentListItemView')
 
 let AssignmentListItemView
 
@@ -328,7 +328,7 @@ export default AssignmentListItemView = (function () {
             this.$el.find(`#assignment_student_checkpoints_${this.model.id}`) ?? []
           const mountPoint = checkpointsElem[0]
 
-          // eslint-disable-next-line no-restricted-properties
+           
           ReactDOM.render(
             React.createElement(ListViewCheckpoints, {
               assignment: attributes,
@@ -337,7 +337,7 @@ export default AssignmentListItemView = (function () {
           )
         } catch (error) {
           const errorMessage = I18n.t('Checkpoints mount point element not found')
-          // eslint-disable-next-line no-console
+           
           console.error(errorMessage, error)
           captureException(new Error(errorMessage), error)
         }
@@ -348,7 +348,7 @@ export default AssignmentListItemView = (function () {
         const mountPoint = checkpointsElem[0]
         if (mountPoint) {
           try {
-            // eslint-disable-next-line no-restricted-properties
+             
             ReactDOM.render(
               React.createElement(TeacherCheckpointsInfo, {
                 assignment: this.model.attributes,
@@ -368,7 +368,7 @@ export default AssignmentListItemView = (function () {
           this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []
         const mountPoint = peerReviewElem[0]
         if (mountPoint) {
-          // eslint-disable-next-line no-restricted-properties
+           
           ReactDOM.render(
             React.createElement(StudentViewPeerReviews, {
               assignment: attributes,
@@ -618,7 +618,7 @@ export default AssignmentListItemView = (function () {
         ReactDOM.unmountComponentAtNode(mountPoint)
         mountPoint.innerHTML = ''
       }
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <ItemAssignToManager
           open={open}
@@ -664,7 +664,7 @@ export default AssignmentListItemView = (function () {
       if (!this.canDelete()) {
         return
       }
-      // eslint-disable-next-line no-alert
+       
       if (!window.confirm(this.messages.confirm)) {
         return this.$el.find('a[id*=manage_link]').focus()
       }
@@ -685,7 +685,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           React.createElement(DirectShareUserModal, {
             open,
@@ -714,7 +714,7 @@ export default AssignmentListItemView = (function () {
         if (!mountPoint) {
           return
         }
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           React.createElement(DirectShareCourseTray, {
             open,

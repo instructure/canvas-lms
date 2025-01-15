@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Lint
-      class NoFileUtilsRmRf < Cop
+      class NoFileUtilsRmRf < Base
         MSG = "In order to enable spec parallelization, avoid FileUtils.rm_rf " \
               "and making persistent files/directories. Instead use " \
               "Dir.mktmpdir. See https://gerrit.instructure.com/#/c/73834 " \

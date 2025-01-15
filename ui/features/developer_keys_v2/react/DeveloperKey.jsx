@@ -17,7 +17,7 @@
  */
 
 import 'jqueryui/dialog'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 
@@ -36,7 +36,7 @@ import {datetimeString} from '@canvas/datetime/date-functions'
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 class DeveloperKey extends React.Component {
   static displayName = 'Row'
@@ -141,19 +141,21 @@ class DeveloperKey extends React.Component {
         <Table.Cell>
           <Flex>
             {this.makeImage(developerKey)}
-            <Flex.Item shouldShrink={true}>{this.getToolName(developerKey)}</Flex.Item>
+            <Flex.Item shouldShrink={true} data-testid="developer-name">
+              {this.getToolName(developerKey)}
+            </Flex.Item>
           </Flex>
         </Table.Cell>
 
         {!inherited && (
-          <Table.Cell style={{wordBreak: 'break-all'}}>
+          <Table.Cell style={{wordBreak: 'break-all'}} data-testid="user-email">
             {this.makeUserLink(developerKey)}
           </Table.Cell>
         )}
 
         <Table.Cell>
           <View maxWidth="200px" as="div">
-            <div>{developerKey.id}</div>
+            <div data-testid="developer-key-id">{developerKey.id}</div>
             {!inherited && (
               <div>
                 <Popover
@@ -186,7 +188,9 @@ class DeveloperKey extends React.Component {
               </div>
             )}
             {!inherited && (
-              <div style={{wordBreak: 'break-all'}}>{this.redirectURI(developerKey)}</div>
+              <div style={{wordBreak: 'break-all'}} data-testid="redirect-uri">
+                {this.redirectURI(developerKey)}
+              </div>
             )}
           </View>
         </Table.Cell>
@@ -194,16 +198,18 @@ class DeveloperKey extends React.Component {
         {!inherited && (
           <Table.Cell>
             <div>
-              {I18n.t('Access Token Count: %{access_token_count}', {
-                access_token_count: developerKey.access_token_count,
-              })}
+              <div data-testid="access-token-count">
+                {I18n.t('Access Token Count: %{access_token_count}', {
+                  access_token_count: developerKey.access_token_count,
+                })}
+              </div>
+              <div data-testid="created-at">
+                {I18n.t('Created: %{created_at}', {
+                  created_at: datetimeString(developerKey.created_at),
+                })}
+              </div>
+              <div data-testid="last-used">{this.lastUsed(developerKey)}</div>
             </div>
-            <div>
-              {I18n.t('Created: %{created_at}', {
-                created_at: datetimeString(developerKey.created_at),
-              })}
-            </div>
-            <div>{this.lastUsed(developerKey)}</div>
           </Table.Cell>
         )}
         <Table.Cell>

@@ -261,7 +261,7 @@ class AuthenticationProvidersController < ApplicationController
   # described below. A provider specification must include an 'auth_type'
   # parameter with a value of 'apple', 'canvas', 'cas', 'clever', 'facebook',
   # 'github', 'google', 'ldap', 'linkedin', 'microsoft', 'openid_connect',
-  # 'saml', or 'twitter'. The other recognized parameters depend on this
+  # or 'saml'. The other recognized parameters depend on this
   # auth_type; unrecognized parameters are discarded. Provider specifications
   # not specifying a valid auth_type are ignored.
   #
@@ -613,32 +613,7 @@ class AuthenticationProvidersController < ApplicationController
   # - federated_attributes [Optional]
   #
   #   See FederatedAttributesConfig. Any value is allowed for the provider attribute names.
-  #
-  # For X.com, the additional recognized parameters are:
-  #
-  # - consumer_key [Required]
-  #
-  #   The X.com Consumer Key. Not available if configured globally for Canvas.
-  #
-  # - consumer_secret [Required]
-  #
-  #   The X.com Consumer Secret. Not available if configured globally for Canvas.
-  #
-  # - login_attribute [Optional]
-  #
-  #   The attribute to use to look up the user's login in Canvas. Either
-  #   'user_id' (the default), or 'screen_name'
-  #
-  # - parent_registration [Optional] - DEPRECATED 2017-11-03
-  #
-  #   Accepts a boolean value, true designates the authentication service
-  #   for use on parent registrations.  Only one service can be selected
-  #   at a time so if set to true all others will be set to false
-  #
-  # - federated_attributes [Optional]
-  #
-  #   See FederatedAttributesConfig. Valid provider attributes are 'name',
-  #   'screen_name', 'time_zone', and 'user_id'.
+
   #
   # @example_request
   #   # Create LDAP config
@@ -686,8 +661,15 @@ class AuthenticationProvidersController < ApplicationController
     # mfa_required might be set, and ruby maintains insertion order in hashes
     data = { account: @account }.merge(filter_data(aac_data))
     deselect_parent_registration(data)
-    account_config = @account.authentication_providers.build(data)
-    if account_config.class.singleton? && @account.authentication_providers.active.where(auth_type: account_config.auth_type).exists?
+
+    account_config = AuthenticationProvider.find_restorable_provider(
+      root_account: @account,
+      auth_type: data["auth_type"]
+    )
+    account_config ||= @account.authentication_providers.build(data)
+    account_config.workflow_state = "active"
+
+    if account_config.duplicated_in_account?
       respond_to do |format|
         format.html do
           flash[:error] = t(
@@ -702,6 +684,7 @@ class AuthenticationProvidersController < ApplicationController
       end
       return
     end
+
     update_deprecated_account_settings_data(aac_data, account_config)
 
     unless account_config.save

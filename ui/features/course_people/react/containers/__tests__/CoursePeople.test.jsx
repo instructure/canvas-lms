@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {render, within} from '@testing-library/react'
 import React from 'react'

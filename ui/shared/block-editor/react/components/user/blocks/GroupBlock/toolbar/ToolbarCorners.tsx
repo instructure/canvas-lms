@@ -20,7 +20,7 @@ import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 const roundedCorners = `<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg">
   <rect width="16" height="16" rx="4" ry="4" fill="none" stroke="currentColor" />
@@ -30,7 +30,7 @@ const squareCorners = `<svg width="16" height="16" xmlns="http://www.w3.org/2000
   <rect width="16" height="16" fill="none" stroke="currentColor" />
 </svg>`
 
-const I18n = useScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type ToolbarCornersProps = {
   rounded: boolean

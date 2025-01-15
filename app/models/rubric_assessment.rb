@@ -244,7 +244,7 @@ class RubricAssessment < ActiveRecord::Base
 
     given do |user, session|
       rubric_association&.grants_right?(user, session, :manage) &&
-        (rubric_association.association_object.context.grants_right?(assessor, :manage_rubrics) rescue false)
+        rubric_association.association_object.try(:context)&.grants_right?(assessor, :manage_rubrics)
     end
     can :update
 
@@ -276,11 +276,11 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def assessor_name
-    assessor.short_name rescue t("unknown_user", "Unknown User")
+    assessor&.short_name || t("unknown_user", "Unknown User")
   end
 
   def assessment_url
-    artifact.url rescue nil
+    artifact.try(:url)
   end
 
   def can_read_assessor_name?(user, session)

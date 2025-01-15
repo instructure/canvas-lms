@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {connect} from 'react-redux'
 import PropTypes from 'prop-types'
@@ -43,7 +43,7 @@ import permissionPropTypes from '@canvas/permissions/react/propTypes'
 
 import {getPermissionsWithLabels, roleIsBaseRole} from '@canvas/permissions/util'
 
-const I18n = useI18nScope('permissions_role_tray')
+const I18n = createI18nScope('permissions_role_tray')
 
 export default class RoleTray extends Component {
   static propTypes = {
@@ -104,7 +104,7 @@ export default class RoleTray extends Component {
       const message = I18n.t('Cannot change role name to %{label}: already in use', {
         label: trimmedValue,
       })
-      errorMessages = [{text: message, type: 'error'}]
+      errorMessages = [{text: message, type: 'newError'}]
     }
     this.setState({
       editRoleLabelInput: event.target.value,

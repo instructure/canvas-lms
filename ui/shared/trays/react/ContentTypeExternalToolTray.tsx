@@ -37,6 +37,7 @@ type KnownResourceType =
   | 'image'
   | 'module'
   | 'quiz'
+  | 'quizzesnext'
   | 'page'
   | 'video'
 

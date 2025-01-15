@@ -129,7 +129,7 @@ describe Quizzes::Quiz do
       quiz = nil
       Timecop.freeze(5.minutes.ago) do
         quiz = @course.quizzes.create! title: "hello"
-        quiz.published_at = Time.now
+        quiz.published_at = Time.zone.now
         quiz.publish!
         expect(quiz.unpublished_changes?).to be_falsey
       end
@@ -144,7 +144,7 @@ describe Quizzes::Quiz do
       quiz = nil
       Timecop.freeze(5.minutes.ago) do
         quiz = @course.quizzes.create! title: "hello"
-        quiz.published_at = Time.now
+        quiz.published_at = Time.zone.now
         quiz.publish!
         expect(quiz.unpublished_changes?).to be_falsey
       end
@@ -441,7 +441,7 @@ describe Quizzes::Quiz do
     a = @course.assignments.create!(title: "some assignment", points_possible: 5)
     expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
-    a.update_attribute(:created_at, Time.now - (40 * 60))
+    a.update_attribute(:created_at, Time.zone.now - (40 * 60))
     q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
     q.workflow_state = "available"
     expect(q.assignment).to receive(:save_without_broadcasting!).at_least(:once)
@@ -457,7 +457,7 @@ describe Quizzes::Quiz do
     a.unmute!
     expect(a.points_possible).to be(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
-    a.update_attribute(:created_at, Time.now - (40 * 60))
+    a.update_attribute(:created_at, Time.zone.now - (40 * 60))
     q = @course.quizzes.build(assignment_id: a.id, title: "some quiz", points_possible: 10)
     q.workflow_state = "available"
     q.notify_of_update = 1
@@ -2488,11 +2488,11 @@ describe Quizzes::Quiz do
     end
 
     it "returns quizzes due between the given dates" do
-      expect(@course.quizzes.due_between_with_overrides(2.days.ago, Time.now)).to include(@quiz)
+      expect(@course.quizzes.due_between_with_overrides(2.days.ago, Time.zone.now)).to include(@quiz)
     end
 
     it "returns quizzes with overrides between the given dates" do
-      expect(@course.quizzes.due_between_with_overrides(Time.now, 2.days.from_now)).to include(@quiz)
+      expect(@course.quizzes.due_between_with_overrides(Time.zone.now, 2.days.from_now)).to include(@quiz)
     end
 
     it "excludes quizzes that don't meet either criterion" do

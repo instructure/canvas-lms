@@ -29,7 +29,7 @@ import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDial
 import WikiPageReloadView from '@canvas/wiki/backbone/views/WikiPageReloadView'
 import renderChooseEditorModal from '@canvas/block-editor/react/renderChooseEditorModal'
 import PublishButtonView from '@canvas/publish-button-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/modules/jquery/prerequisites_lookup'
@@ -40,7 +40,7 @@ import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('pages')
+const I18n = createI18nScope('pages')
 
 export default class WikiPageView extends Backbone.View {
   static initClass() {
@@ -144,7 +144,7 @@ export default class WikiPageView extends Backbone.View {
           }
         })
         .catch(e => {
-          console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+          console.log('Error loading immersive readers.', e)  
         })
     }
 
@@ -238,7 +238,7 @@ export default class WikiPageView extends Backbone.View {
           renderBlockEditorView(content, container)
         })
         .catch(() => {
-          // eslint-disable-next-line no-alert
+           
           window.alert('Error loading block editor content')
         })
     }
@@ -305,7 +305,7 @@ export default class WikiPageView extends Backbone.View {
 
   openSendTo(ev, open = true) {
     if (ev) ev.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareUserModal
         open={open}
@@ -322,7 +322,7 @@ export default class WikiPageView extends Backbone.View {
 
   openCopyTo(ev, open = true) {
     if (ev) ev.preventDefault()
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DirectShareCourseTray
         open={open}
@@ -355,7 +355,7 @@ export default class WikiPageView extends Backbone.View {
     }
     const onTrayExited = () => ReactDOM.unmountComponentAtNode(mountPoint)
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ItemAssignToManager
         open={open}

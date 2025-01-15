@@ -21,6 +21,10 @@ module CC::Importer::Canvas
   module CoursePacesConverter
     include CC::Importer
 
+    def process_selected_days_to_skip(course_pace_node)
+      course_pace_node.css("day_of_week").map(&:text)
+    end
+
     def convert_course_paces(doc)
       course_paces = []
       return course_paces unless doc
@@ -32,6 +36,7 @@ module CC::Importer::Canvas
         course_pace[:end_date] = get_time_val(course_pace_node, "end_date")
         course_pace[:published_at] = get_time_val(course_pace_node, "published_at")
         course_pace[:exclude_weekends] = get_bool_val(course_pace_node, "exclude_weekends")
+        course_pace[:selected_days_to_skip] = process_selected_days_to_skip(course_pace_node)
         course_pace[:hard_end_dates] = get_bool_val(course_pace_node, "hard_end_dates")
 
         course_pace[:module_items] = []

@@ -128,7 +128,7 @@ describe "terms of use SOC2 compliance test" do
 
   it "prevents a user from accessing canvas if they are newly registered/imported after the SOC2 start date and have not yet accepted the terms" do
     # Create a user after SOC2 implemented
-    after_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime + 10.days
+    after_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_time + 10.days
 
     Timecop.freeze(after_soc2_start_date) do
       user_with_pseudonym
@@ -156,7 +156,7 @@ describe "terms of use SOC2 compliance test" do
 
   it "grandfathers in previously registered users without prompting them to reaccept the terms", priority: "1" do
     # Create a user before SOC2 implemented
-    before_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime - 10.days
+    before_soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_time - 10.days
 
     Timecop.freeze(before_soc2_start_date) do
       user_with_pseudonym

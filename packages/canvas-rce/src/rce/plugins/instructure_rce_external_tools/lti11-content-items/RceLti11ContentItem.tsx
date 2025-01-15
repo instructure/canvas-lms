@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import {DeepPartialNullable} from '../../../../util/DeepPartialNullable'
 import {ExternalToolsEnv, externalToolsEnvFor} from '../ExternalToolsEnv'
 import {emptyAsNull} from '../../../../util/string-util'
@@ -27,9 +26,23 @@ import {
   isStudioContentItemCustomJson,
   studioAttributesFrom,
   displayStyleFrom,
+  StudioMediaOptionsAttributes,
 } from '../../shared/StudioLtiSupportUtils'
 
+function maybeAddPx(value: string | number | undefined): string | undefined {
+  if (value == null) return undefined
+  const strVal = String(value).trim()
+  if (/^\d+$/.test(strVal)) {
+    return strVal + 'px'
+  }
+  return strVal
+}
+
 export class RceLti11ContentItem {
+  readonly contentItem: RceLti11ContentItemJson
+
+  readonly env: ExternalToolsEnv
+
   static fromJSON(
     contentItem: RceLti11ContentItemJson,
     env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor)
@@ -38,9 +51,12 @@ export class RceLti11ContentItem {
   }
 
   constructor(
-    public readonly contentItem: RceLti11ContentItemJson,
-    public readonly env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor)
-  ) {}
+    contentItem: RceLti11ContentItemJson,
+    env: ExternalToolsEnv = externalToolsEnvFor(tinymce.activeEditor)
+  ) {
+    this.contentItem = contentItem
+    this.env = env
+  }
 
   get text() {
     return this.contentItem.text
@@ -77,7 +93,6 @@ export class RceLti11ContentItem {
     if (this.isOverriddenForThumbnail) {
       return JSON.stringify(this.contentItem.placementAdvice)
     }
-
     return this.contentItem?.placementAdvice?.presentationDocumentTarget?.toLowerCase() === 'window'
       ? '_blank'
       : null
@@ -92,7 +107,6 @@ export class RceLti11ContentItem {
     } else if (this.isOverriddenForThumbnail) {
       return 'link'
     }
-
     return this.contentItem?.placementAdvice?.presentationDocumentTarget?.toLowerCase()
   }
 
@@ -100,64 +114,13 @@ export class RceLti11ContentItem {
     switch (this.docTarget) {
       case 'iframe':
         return this.generateCodePayloadIframe()
-
       case 'embed':
         return this.generateCodePayloadEmbed()
-
       case 'text':
         return this.generateCodePayloadText()
-
       default:
         return this.generateCodePayloadLink()
     }
-  }
-
-  private generateCodePayloadIframe(): string {
-    const studioAttributes = isStudioContentItemCustomJson(this.contentItem.custom)
-      ? studioAttributesFrom(this.contentItem.custom)
-      : null
-
-    return $('<div/>')
-      .append(
-        $('<iframe/>', {
-          src: addParentFrameContextToUrl(this.url, this.containingCanvasLtiToolId),
-          title: this.contentItem.title,
-          allowfullscreen: 'true',
-          webkitallowfullscreen: 'true',
-          mozallowfullscreen: 'true',
-          allow: this.env?.ltiIframeAllowPolicy,
-          ...studioAttributes,
-        })
-          .addClass(this.contentItem.class ?? '')
-          .css({
-            width: this.contentItem.placementAdvice?.displayWidth ?? '',
-            height: this.contentItem.placementAdvice?.displayHeight ?? '',
-            display: displayStyleFrom(studioAttributes),
-          })
-          .attr({
-            width: this.contentItem.placementAdvice?.displayWidth ?? '',
-            height: this.contentItem.placementAdvice?.displayHeight ?? '',
-          })
-      )
-      .html()
-  }
-
-  private generateCodePayloadEmbed(): string {
-    return $('<div/>')
-      .append(
-        $('<img/>', {
-          src: this.url,
-          alt: this.text,
-        }).css({
-          width: this.contentItem.placementAdvice?.displayWidth ?? '',
-          height: this.contentItem.placementAdvice?.displayHeight ?? '',
-        })
-      )
-      .html()
-  }
-
-  private generateCodePayloadText(): string {
-    return this.text ?? ''
   }
 
   private get containingCanvasLtiToolId(): string | null {
@@ -168,36 +131,97 @@ export class RceLti11ContentItem {
     return this.env.editorSelection
   }
 
-  private generateCodePayloadLink(): string {
-    const $linkContainer = $('<div/>'),
-      $link = $('<a/>', {
-        href: this.url,
-        title: this.contentItem.title,
-        target: this.linkTarget,
-      })
-
-    if (this.linkClassName) {
-      $link.addClass(this.linkClassName)
+  private generateCodePayloadIframe(): string {
+    const iframe = document.createElement('iframe')
+    iframe.src = addParentFrameContextToUrl(this.url, this.containingCanvasLtiToolId) ?? ''
+    iframe.title = this.contentItem.title ?? ''
+    iframe.setAttribute('allowfullscreen', 'true')
+    iframe.setAttribute('webkitallowfullscreen', 'true')
+    iframe.setAttribute('mozallowfullscreen', 'true')
+    if (this.env?.ltiIframeAllowPolicy !== undefined) {
+      iframe.setAttribute('allow', this.env.ltiIframeAllowPolicy)
+    } else if (this.isLTI) {
+      iframe.setAttribute('allow', 'microphone; camera; midi')
+    }
+    if (this.contentItem.class) {
+      iframe.className = this.contentItem.class
+    }
+    const w = maybeAddPx(this.contentItem.placementAdvice?.displayWidth ?? undefined)
+    const h = maybeAddPx(this.contentItem.placementAdvice?.displayHeight ?? undefined)
+    if (w) {
+      iframe.style.width = w
+      iframe.setAttribute('width', w.replace('px', ''))
+    }
+    if (h) {
+      iframe.style.height = h
+      iframe.setAttribute('height', h.replace('px', ''))
     }
 
-    $linkContainer.append($link)
-    if (this.contentItem.thumbnail) {
-      $link.append(
-        $('<img />', {
-          src: this.contentItem.thumbnail['@id'],
-          height: this.contentItem.thumbnail.height ?? 48,
-          width: this.contentItem.thumbnail.width ?? 48,
-          alt: this.text,
-        })
+    if (isStudioContentItemCustomJson(this.contentItem.custom)) {
+      const studioAttributes: StudioMediaOptionsAttributes = studioAttributesFrom(
+        this.contentItem.custom
       )
-    } else if (emptyAsNull(this.currentTinyMceSelection) != null && $link[0] != null) {
-      $link[0].innerHTML = this.currentTinyMceSelection ?? ''
+      const ds = displayStyleFrom(studioAttributes)
+      if (ds) iframe.style.display = ds
+      for (const key in studioAttributes) {
+        const val = studioAttributes[key as keyof typeof studioAttributes]
+        if (val !== undefined && val !== null) {
+          iframe.setAttribute(key, String(val))
+        }
+      }
+    }
+
+    const div = document.createElement('div')
+    div.appendChild(iframe)
+    return div.innerHTML
+  }
+
+  private generateCodePayloadEmbed(): string {
+    const img = document.createElement('img')
+    if (this.url) img.src = this.url
+    if (this.text) img.alt = this.text
+    const w = maybeAddPx(this.contentItem.placementAdvice?.displayWidth ?? undefined)
+    const h = maybeAddPx(this.contentItem.placementAdvice?.displayHeight ?? undefined)
+    if (w) img.style.width = w
+    if (h) img.style.height = h
+
+    const div = document.createElement('div')
+    div.appendChild(img)
+    return div.innerHTML
+  }
+
+  private generateCodePayloadText(): string {
+    return this.text ?? ''
+  }
+
+  private generateCodePayloadLink(): string {
+    const div = document.createElement('div')
+    const a = document.createElement('a')
+
+    if (this.url) a.href = this.url
+    if (this.contentItem.title) a.title = this.contentItem.title
+    if (this.linkTarget) a.target = this.linkTarget
+    if (this.linkClassName) a.className = this.linkClassName
+
+    div.appendChild(a)
+    if (this.contentItem.thumbnail && this.contentItem.thumbnail['@id']) {
+      const img = document.createElement('img')
+      img.src = this.contentItem.thumbnail['@id']
+      const h = maybeAddPx(this.contentItem.thumbnail.height ?? 48)
+      const w = maybeAddPx(this.contentItem.thumbnail.width ?? 48)
+      if (h) img.style.height = h
+      if (w) img.style.width = w
+      if (this.text) img.alt = this.text
+      a.appendChild(img)
+    } else if (emptyAsNull(this.currentTinyMceSelection) != null && a != null) {
+      a.innerHTML = this.currentTinyMceSelection ?? ''
     } else {
       // don't inject tool provided content into the page HTML
-      $link.text(this.generateLinkHtml() ?? '')
+      const linkHtml = this.generateLinkHtml()
+      if (linkHtml) a.textContent = linkHtml
     }
 
-    return $linkContainer.html()
+    return div.innerHTML
   }
 
   private generateLinkHtml() {

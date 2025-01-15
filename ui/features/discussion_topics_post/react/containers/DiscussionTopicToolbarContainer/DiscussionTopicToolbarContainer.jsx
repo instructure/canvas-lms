@@ -28,10 +28,18 @@ import {
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TranslationControls} from '../../components/TranslationControls/TranslationControls'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {UPDATE_DISCUSSION_SORT_ORDER, UPDATE_DISCUSSION_EXPANDED} from '../../../graphql/Mutations'
+import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer/DiscussionTopicTitleContainer'
+import DiscussionPostButtonsToolbar from '../../components/DiscussionPostToolbar/DiscussionPostButtonsToolbar'
+import {Flex} from '@instructure/ui-flex'
+import {hideStudentNames} from '../../utils'
+import DiscussionPostSearchTool from '../../components/DiscussionPostToolbar/DiscussionPostSearchTool'
+import {breakpointsShape} from '@canvas/with-breakpoints'
 
-export const DiscussionTopicToolbarContainer = props => {
+const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
+
+const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
   const {showTranslationControl} = useContext(DiscussionManagerUtilityContext)
   const [currentSearchValue, setCurrentSearchValue] = useState(searchTerm || '')
@@ -56,7 +64,7 @@ export const DiscussionTopicToolbarContainer = props => {
   const onSortClick = () => {
     let newOrder = null
     if (sort === null) {
-      newOrder = props.discussionTopic.sortOrder === 'asc' ? 'desc' : 'asc'
+      newOrder = props.discussionTopic.participant.sortOrder === 'asc' ? 'desc' : 'asc'
     } else {
       newOrder = sort === 'asc' ? 'desc' : 'asc'
     }
@@ -99,37 +107,104 @@ export const DiscussionTopicToolbarContainer = props => {
       <ScreenReaderContent>
         <h1>{props.discussionTopic.title}</h1>
       </ScreenReaderContent>
-      <DiscussionPostToolbar
-        isAdmin={props.discussionTopic.permissions.readAsAdmin}
-        canEdit={props.discussionTopic.permissions.update}
-        childTopics={getGroupsMenuTopics()}
-        selectedView={filter}
-        sortDirection={props.discussionTopic.sortOrder}
-        isExpanded={props.discussionTopic.expanded}
-        onSearchChange={value => setCurrentSearchValue(value)}
-        onViewFilter={onViewFilter}
-        onSortClick={onSortClick}
-        onCollapseRepliesToggle={onExpandCollapseClick}
-        onTopClick={() => {}}
-        searchTerm={currentSearchValue}
-        discussionAnonymousState={props.discussionTopic.anonymousState}
-        canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
-        setUserSplitScreenPreference={props.setUserSplitScreenPreference}
-        userSplitScreenPreference={props.userSplitScreenPreference}
-        onSummarizeClick={onSummarizeClick}
-        isSummaryEnabled={props.isSummaryEnabled}
-        closeView={props.closeView}
-        discussionId={props.discussionTopic._id}
-        typeName={props.discussionTopic.__typename?.toLowerCase()}
-        discussionTitle={props.discussionTopic.title}
-        pointsPossible={props.discussionTopic.assignment?.pointsPossible}
-        isAnnouncement={props.discussionTopic.isAnnouncement}
-        isGraded={props.discussionTopic.assignment !== null}
-        contextType={props.discussionTopic.contextType}
-        manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
-        isGroupDiscussion={props.discussionTopic.groupSet !== null}
-        isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
-      />
+      {instUINavEnabled() ? (
+        <>
+          <Flex
+            wrap="wrap"
+            direction={props.breakpoints.ICEDesktop ? 'row' : 'column'}
+            justifyItems="space-between"
+            margin="0 0 small 0"
+          >
+            <Flex.Item>
+              <DiscussionTopicTitleContainer
+                discussionTopicTitle={props.discussionTopic.title}
+                mobileHeader={!props.breakpoints.ICEDesktop}
+                onViewFilter={onViewFilter}
+                selectedView={filter}
+                instUINavEnabled={instUINavEnabled()}
+              />
+            </Flex.Item>
+            <Flex.Item id="Main">
+              <DiscussionPostButtonsToolbar
+                isAdmin={props.discussionTopic.permissions.readAsAdmin}
+                canEdit={props.discussionTopic.permissions.update}
+                childTopics={getGroupsMenuTopics()}
+                selectedView={filter}
+                sortDirection={props.discussionTopic.participant.sortOrder}
+                isExpanded={props.discussionTopic.participant.expanded}
+                onSearchChange={value => setCurrentSearchValue(value)}
+                onViewFilter={onViewFilter}
+                onSortClick={onSortClick}
+                onCollapseRepliesToggle={onExpandCollapseClick}
+                onTopClick={() => {}}
+                searchTerm={currentSearchValue}
+                discussionAnonymousState={props.discussionTopic.anonymousState}
+                canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
+                setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+                userSplitScreenPreference={props.userSplitScreenPreference}
+                onSummarizeClick={onSummarizeClick}
+                isSummaryEnabled={props.isSummaryEnabled}
+                closeView={props.closeView}
+                discussionId={props.discussionTopic._id}
+                typeName={props.discussionTopic.__typename?.toLowerCase()}
+                discussionTitle={props.discussionTopic.title}
+                pointsPossible={props.discussionTopic.assignment?.pointsPossible}
+                isGraded={props.discussionTopic.assignment !== null}
+                manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
+                isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
+                breakpoints={props.breakpoints}
+                showAssignTo={
+                  !props.discussionTopic.isAnnouncement &&
+                  props.discussionTopic.contextType === 'Course' &&
+                  (props.discussionTopic.assignment !== null ||
+                    !props.discussionTopic.groupSet !== null)
+                }
+              />
+            </Flex.Item>
+          </Flex>
+          {!hideStudentNames && (
+            <DiscussionPostSearchTool
+              discussionAnonymousState={props.discussionTopic.anonymousState}
+              onSearchChange={value => setCurrentSearchValue(value)}
+              searchTerm={currentSearchValue}
+              breakpoints={props.breakpoints}
+            />
+          )}
+        </>
+      ) : (
+        <DiscussionPostToolbar
+          isAdmin={props.discussionTopic.permissions.readAsAdmin}
+          canEdit={props.discussionTopic.permissions.update}
+          childTopics={getGroupsMenuTopics()}
+          selectedView={filter}
+          sortDirection={props.discussionTopic.participant.sortOrder}
+          searchTerm={currentSearchValue}
+          discussionAnonymousState={props.discussionTopic.anonymousState}
+          canReplyAnonymously={props.discussionTopic.canReplyAnonymously}
+          isExpanded={props.discussionTopic.participant.expanded}
+          onSearchChange={value => setCurrentSearchValue(value)}
+          onViewFilter={onViewFilter}
+          onSortClick={onSortClick}
+          onCollapseRepliesToggle={onExpandCollapseClick}
+          setUserSplitScreenPreference={props.setUserSplitScreenPreference}
+          userSplitScreenPreference={props.userSplitScreenPreference}
+          onSummarizeClick={onSummarizeClick}
+          isSummaryEnabled={props.isSummaryEnabled}
+          closeView={props.closeView}
+          discussionId={props.discussionTopic._id}
+          typeName={props.discussionTopic.__typename?.toLowerCase()}
+          discussionTitle={props.discussionTopic.title}
+          pointsPossible={props.discussionTopic.assignment?.pointsPossible}
+          isGraded={props.discussionTopic.assignment !== null}
+          manageAssignTo={props.discussionTopic.permissions.manageAssignTo}
+          isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
+          showAssignTo={
+            !props.discussionTopic.isAnnouncement &&
+            props.discussionTopic.contextType === 'Course' &&
+            (props.discussionTopic.assignment !== null || !props.discussionTopic.groupSet !== null)
+          }
+        />
+      )}
       {showTranslationControl && <TranslationControls />}
     </View>
   )
@@ -142,6 +217,7 @@ DiscussionTopicToolbarContainer.propTypes = {
   isSummaryEnabled: PropTypes.bool,
   setIsSummaryEnabled: PropTypes.func,
   closeView: PropTypes.func,
+  breakpoints: breakpointsShape,
 }
 
 export default DiscussionTopicToolbarContainer

@@ -17,13 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {result} from 'lodash'
 import Backbone from '@canvas/backbone'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('dialog')
+const I18n = createI18nScope('dialog')
 
 extend(DialogBaseView, Backbone.View)
 
@@ -111,7 +111,7 @@ DialogBaseView.prototype.close = function () {
 }
 
 DialogBaseView.prototype.update = function (_e) {
-  // eslint-disable-next-line no-throw-literal
+   
   throw 'Not yet implemented'
 }
 

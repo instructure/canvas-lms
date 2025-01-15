@@ -422,6 +422,48 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(category)
     end
 
+    context ":differentiation_tags" do
+      before :once do
+        Account.site_admin.enable_feature!(:differentiation_tags)
+        @gc = @course.group_categories.create!(name: "group category")
+        @gc.destroy
+
+        @ncgc = @course.group_categories.create!(name: "non-collaborative group category", non_collaborative: true)
+        @ncgc.destroy
+      end
+
+      it "shows both kinds of group categories when both kinds of group deletion permissions are true" do
+        # by default, teachers have both permissions
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).to match_array([@gc, @ncgc])
+      end
+
+      it "shows only collaborative group categories when only that permission is true" do
+        @course.account.role_overrides.create!(permission: :manage_tags_delete, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).to eq([@gc])
+      end
+
+      it "shows only non-collaborative group categories when only that permission is true" do
+        @course.account.role_overrides.create!(permission: :manage_groups_delete, role: teacher_role, enabled: false)
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).to eq([@ncgc])
+      end
+
+      it "shows no group categories when neither permission is true" do
+        false_permissions = [:manage_groups_delete, :manage_tags_delete]
+        false_permissions.each do |perm|
+          @course.account.role_overrides.create!(permission: perm, role: teacher_role, enabled: false)
+        end
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).to be_empty
+      end
+    end
+
     it "shows groups" do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)

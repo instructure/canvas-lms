@@ -1106,8 +1106,8 @@ describe UserLearningObjectScopes do
         end
 
         it "includes topics from concluded enrollments if requested" do
-          expect(@u.discussion_topics_needing_viewing(**opts.merge(include_concluded: true)).count).to eq 2
-          expect(@u.discussion_topics_needing_viewing(**opts.merge(include_concluded: true)).map(&:id).sort).to eq [@dt1.id, @dt2.id].sort
+          expect(@u.discussion_topics_needing_viewing(**opts, include_concluded: true).count).to eq 2
+          expect(@u.discussion_topics_needing_viewing(**opts, include_concluded: true).map(&:id).sort).to eq [@dt1.id, @dt2.id].sort
         end
       end
 
@@ -1127,7 +1127,7 @@ describe UserLearningObjectScopes do
         end
 
         it "only includes assignments from given course/group ids" do
-          expect(@student.discussion_topics_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
+          expect(@student.discussion_topics_needing_viewing(**@opts, course_ids: [], group_ids: []).order(:id)).to eq []
           opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
           expect(@student.discussion_topics_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
         end
@@ -1318,8 +1318,8 @@ describe UserLearningObjectScopes do
       end
 
       it "includes pages from concluded enrollments if requested" do
-        expect(@u.wiki_pages_needing_viewing(**opts.merge(include_concluded: true)).count).to eq 2
-        expect(@u.wiki_pages_needing_viewing(**opts.merge(include_concluded: true)).map(&:id).sort).to eq [@wp1.id, @wp2.id].sort
+        expect(@u.wiki_pages_needing_viewing(**opts, include_concluded: true).count).to eq 2
+        expect(@u.wiki_pages_needing_viewing(**opts, include_concluded: true).map(&:id).sort).to eq [@wp1.id, @wp2.id].sort
       end
     end
 
@@ -1339,7 +1339,7 @@ describe UserLearningObjectScopes do
       end
 
       it "only includes assignments from given course/group ids" do
-        expect(@student.wiki_pages_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
+        expect(@student.wiki_pages_needing_viewing(**@opts, course_ids: [], group_ids: []).order(:id)).to eq []
         opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
         expect(@student.wiki_pages_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
       end

@@ -17,7 +17,7 @@
  */
 
 import type {LtiMessageHandler} from '../lti_message_handler'
-import {SUBJECT_ALLOW_LIST} from '../messages'
+import {SUBJECT_ALLOW_LIST} from '../constants'
 
 const handler: LtiMessageHandler<unknown> = ({responseMessages}) => {
   const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {

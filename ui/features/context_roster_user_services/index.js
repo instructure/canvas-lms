@@ -19,9 +19,9 @@ import $ from 'jquery'
 
 import '@canvas/jquery/jquery.ajaxJSON'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('RegisteredServices')
+const I18n = createI18nScope('RegisteredServices')
 $(document).ready(() => {
   const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
     const crumbs = getCrumbs()

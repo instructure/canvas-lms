@@ -19,9 +19,9 @@
 import React from 'react'
 import {func, object, string, oneOfType, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default function DuplicateConfirmationForm(props) {
   const forceSaveTool =

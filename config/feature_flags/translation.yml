@@ -9,3 +9,9 @@ translate_inbox_messages:
   applies_to: RootAccount
   display_name: Inbox AI Translation
   description: Enable translation software when composing messages. Translate inbound messages automatically into user's preferred language.
+
+ai_translation_improvements:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: AI Translation Improvements
+  description: Improve the ui and ux around AI translation features.

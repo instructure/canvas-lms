@@ -21,7 +21,7 @@ import _ from 'lodash'
 import $ from 'jquery'
 import 'jquery-migrate'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
@@ -29,7 +29,7 @@ import GradeSummary from '../index'
 import {createCourseGradesWithGradingPeriods} from '@canvas/grading/GradeCalculatorSpecHelper'
 import useStore from '../../react/stores'
 
-const I18n = useI18nScope('gradingGradeSummary')
+const I18n = createI18nScope('gradingGradeSummary')
 
 const $fixtures = $('#fixtures')
 

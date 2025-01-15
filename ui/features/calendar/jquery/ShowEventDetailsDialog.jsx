@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import Popover from 'jquery-popover'
 import _, {find, every} from 'lodash'
@@ -43,7 +43,7 @@ import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
 import replaceTags from '@canvas/util/replaceTags'
 import {subAssignmentOrOverride} from '@canvas/calendar/jquery/CommonEvent/SubAssignment'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 const destroyArguments = fn =>
   function () {
@@ -459,7 +459,7 @@ export default class ShowEventDetailsDialog {
 
     if (params.webConference) {
       const conferenceNode = this.popover.el.find('.conferencing')[0]
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <Conference
           conference={params.webConference}

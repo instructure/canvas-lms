@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import Footer from './Footer'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ModuleAssignments, {type AssigneeOption} from './ModuleAssignments'
@@ -32,7 +32,7 @@ import type {AssignmentOverride} from './types'
 import LoadingOverlay from './LoadingOverlay'
 import type {FormMessage} from '@instructure/ui-form-field'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export type AssignToPanelProps = {
   bodyHeight: string
@@ -154,7 +154,7 @@ export default function AssignToPanel({
 
       try {
         while (url) {
-          // eslint-disable-next-line no-await-in-loop
+           
           const response: any = await doFetchApi({
             path: url,
             params: {per_page: 100},
@@ -217,7 +217,7 @@ export default function AssignToPanel({
       return
     }
     setIsLoading(true)
-    // eslint-disable-next-line promise/catch-or-return
+     
     updateModuleAssignees({courseId, moduleId, moduleElement, selectedAssignees})
       .finally(() => setIsLoading(false))
       .then(() => (onDidSubmit ? onDidSubmit() : onDismiss()))

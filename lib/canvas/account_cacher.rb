@@ -69,9 +69,21 @@ module Canvas
 
         m = Module.new
         polymorphic_condition = "#{r.foreign_type} == 'Account' && " if r.options[:polymorphic]
+        # def context
+        #   if !association("context").loaded? &&
+        #      context_type == 'Account' && has_attribute?(:root_account_id) &&
+        #      context_id == root_account_id
+        #     return root_account
+        #   end
+        # end
         m.module_eval <<~RUBY, __FILE__, __LINE__ + 1
           def #{name}
-            return root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{polymorphic_condition}root_account_id && #{r.foreign_key} == root_account_id
+            if !association(#{r.name.to_sym.inspect}).loaded? &&
+               #{polymorphic_condition}has_attribute?(:root_account_id) &&
+               root_account_id &&
+               #{r.foreign_key} == root_account_id
+              return root_account
+            end
             super
           end
         RUBY

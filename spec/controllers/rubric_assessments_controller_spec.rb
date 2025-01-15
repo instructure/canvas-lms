@@ -60,6 +60,20 @@ describe RubricAssessmentsController do
       expect(response.headers["Content-Disposition"]).to include("attachment")
       expect(response.headers["Content-Disposition"]).to include("export_rubric_assessments.csv")
     end
+
+    it "return error if assignment is anonymous grading" do
+      course_with_teacher_logged_in(active_all: true)
+      rubric_assessment_model(user: @user, context: @course, purpose: "grading")
+      @rubric_association.association_object.update(anonymous_grading: true)
+      get :export, params: {
+        course_id: @course.id,
+        assignment_id: @rubric_association.association_object.id,
+        format: :json
+      }
+
+      expect(response).to be_bad_request
+      expect(response.body).to match(/Rubric export is not supported for assignments with anonymous grading/)
+    end
   end
 
   describe "PUT 'update'" do

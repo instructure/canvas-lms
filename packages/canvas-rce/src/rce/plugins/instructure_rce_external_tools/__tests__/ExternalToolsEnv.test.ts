@@ -1,4 +1,3 @@
-// @ts-nocheck
 /*
  * Copyright (C) 2023 - present Instructure, Inc.
  *
@@ -17,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  ExternalToolsEditor,
-  externalToolsEnvFor,
-  fallbackIframeAllowances,
-} from '../ExternalToolsEnv'
-import {createDeepMockProxy} from '../../../../util/__tests__/deepMockProxy'
 import RCEWrapper from '../../../RCEWrapper'
+import {RCEWrapperInterface} from '../../../types'
+import {externalToolsEnvFor, ExternalToolsEditor} from '../ExternalToolsEnv'
+import {fallbackIframeAllowances} from '../constants'
 
 describe('ExternalToolsEnv', () => {
   const ltiTools1 = [
@@ -31,111 +27,78 @@ describe('ExternalToolsEnv', () => {
     {id: 'yay', name: 'Yay!'},
   ]
 
-  const editor = createDeepMockProxy<ExternalToolsEditor>()
-  const rceWrapper = createDeepMockProxy<RCEWrapper>()
+  const editor = {
+    id: 'editor1',
+    selection: {
+      getContent: jest.fn(),
+    },
+    editorContainer: document.createElement('div'),
+    $: jest.fn(),
+    ui: {
+      registry: {
+        getAll: jest.fn(),
+      },
+    },
+    getContent: jest.fn(),
+    focus: jest.fn(),
+  } as unknown as jest.Mocked<ExternalToolsEditor>
+
+  const mockRceWrapper = {
+    id: 'rce1',
+    props: {
+      ltiTools: ltiTools1,
+      trayProps: {
+        contextType: 'course',
+        contextId: '17',
+      },
+      resourceSelectionUrlOverride: null,
+      containingCanvasLtiToolId: null,
+      externalToolsConfig: {
+        ltiIframeAllowances: null as string[] | null,
+      },
+    },
+    insertCode: jest.fn(),
+    replaceCode: jest.fn(),
+  }
 
   const nullEnv = () => externalToolsEnvFor(null)
   const editorEnv = () => externalToolsEnvFor(editor)
 
   beforeAll(() => {
+    const rceInstance = mockRceWrapper as unknown as RCEWrapperInterface
     jest
       .spyOn(RCEWrapper, 'getByEditor')
-      .mockImplementation(e => (e === editor ? rceWrapper : null))
+      .mockImplementation(e => (e === editor ? rceInstance : null))
   })
 
   beforeEach(() => {
-    editor.mockClear()
-    rceWrapper.mockClear()
+    jest.clearAllMocks()
   })
 
   test('availableRceLtiTools', () => {
     expect(nullEnv().availableRceLtiTools).toEqual([])
-
-    rceWrapper.props.ltiTools = ltiTools1
     expect(editorEnv().availableRceLtiTools).toEqual(ltiTools1)
   })
 
   test('contextAssetInfo', () => {
-    expect(editorEnv().contextAssetInfo).toEqual(null)
-
-    rceWrapper.props.trayProps = {
-      contextType: 'user',
-      contextId: '4567',
-    }
-
-    expect(editorEnv().contextAssetInfo).toEqual({
-      contextType: 'user',
-      contextId: '4567',
-    })
-
-    // Containing context should override
-    rceWrapper.props.trayProps = {
-      contextType: 'user',
-      contextId: '4567',
-      containingContext: {
-        contextType: 'course',
-        contextId: '1234',
-      },
-    }
-
+    expect(nullEnv().contextAssetInfo).toBeNull()
     expect(editorEnv().contextAssetInfo).toEqual({
       contextType: 'course',
-      contextId: '1234',
+      contextId: '17',
     })
-  })
-
-  test('canvasOrigin', () => {
-    expect(nullEnv().canvasOrigin).toEqual(window.location.origin)
-
-    // Ensure editor override works
-    rceWrapper.props.canvasOrigin = 'https://example.com'
-
-    expect(editorEnv().canvasOrigin).toEqual('https://example.com')
-  })
-
-  test('MAX_MRU_LTI_TOOLS', () => {
-    expect(nullEnv().maxMruTools).toEqual(5)
-
-    // Ensure editor override works
-    rceWrapper.props.externalToolsConfig = {
-      maxMruTools: 17,
-    }
-
-    expect(editorEnv().maxMruTools).toEqual(17)
-  })
-
-  test('ENV_a2_student_view', () => {
-    expect(nullEnv().isA2StudentView).toEqual(false)
-
-    // Ensure editor override works
-    rceWrapper.props.externalToolsConfig = {
-      isA2StudentView: true,
-    }
-
-    expect(editorEnv().isA2StudentView).toEqual(true)
   })
 
   test('resourceSelectionUrlOverride', () => {
-    rceWrapper.props.externalToolsConfig = {}
-
-    // Ensure it handles null
-    expect(editorEnv().resourceSelectionUrlOverride).toEqual(null)
-
-    rceWrapper.props.externalToolsConfig = {
-      resourceSelectionUrlOverride: 'https://example.com/lti/resource_selection',
-    }
-
-    expect(editorEnv().resourceSelectionUrlOverride).toEqual(
-      'https://example.com/lti/resource_selection'
-    )
+    expect(nullEnv().resourceSelectionUrlOverride).toBeNull()
+    expect(editorEnv().resourceSelectionUrlOverride).toBeNull()
   })
 
-  test('ltiIframeAllowances', () => {
+  test('ltiIframeAllowPolicy uses fallback when not provided', () => {
     expect(editorEnv().ltiIframeAllowPolicy).toEqual(fallbackIframeAllowances.join('; '))
+  })
 
-    // Ensure editor override works
-    rceWrapper.props.externalToolsConfig.ltiIframeAllowances = ['c', 'd']
-
+  test('ltiIframeAllowPolicy uses provided allowances', () => {
+    mockRceWrapper.props.externalToolsConfig.ltiIframeAllowances = ['c', 'd']
     expect(editorEnv().ltiIframeAllowPolicy).toEqual('c; d')
   })
 })

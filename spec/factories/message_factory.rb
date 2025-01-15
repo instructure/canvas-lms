@@ -27,7 +27,7 @@ module Factories
     {
       subject: "value for subject",
       body: "value for body",
-      sent_at: Time.now
+      sent_at: Time.zone.now
     }
   end
 

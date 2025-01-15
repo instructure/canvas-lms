@@ -17,9 +17,9 @@
  */
 
 import moment from 'moment-timezone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 const COMMON_PROPS = {
   date: moment().hour(23).minute(59),

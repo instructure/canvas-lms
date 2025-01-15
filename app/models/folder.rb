@@ -318,7 +318,7 @@ class Folder < ActiveRecord::Base
         end
       end
     end
-    dup.updated_at = Time.now
+    dup.updated_at = Time.zone.now
     dup.clone_updated = true
     dup
   end

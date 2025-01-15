@@ -20,14 +20,14 @@ import React, {useCallback, useEffect, useState} from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import type {QuestionBankSettings} from '../types'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type QuestionBank = {
-  // eslint-disable-next-line react/no-unused-prop-types
+   
   assessment_question_bank: {
     id: number
     title: string

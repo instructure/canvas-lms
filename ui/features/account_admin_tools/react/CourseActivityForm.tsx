@@ -19,12 +19,11 @@
 import React, {useRef} from 'react'
 import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {
-  focusFiled,
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
@@ -32,7 +31,7 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AutoCompleteSelect from './AutoCompleteSelect'
 
-const I18n = useI18nScope('course_logging_content')
+const I18n = createI18nScope('course_logging_content')
 
 const defaultValues = {course_id: '', start_time: undefined, end_time: undefined}
 
@@ -74,6 +73,7 @@ const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
     control,
     formState: {errors},
     handleSubmit,
+    setFocus,
   } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
   const startDateInputRef = useRef<DateTimeInput>(null)
   const endDateInputRef = useRef<DateTimeInput>(null)
@@ -81,12 +81,12 @@ const CourseActivityForm = ({accountId, onSubmit}: CourseActivityFormProps) => {
 
   const handleFormSubmit: SubmitHandler<FormValues> = async data => {
     if (isDateTimeInputInvalid(startDateInputRef)) {
-      focusFiled(control, 'start_time')
+      setFocus('start_time')
       return
     }
 
     if (isDateTimeInputInvalid(endDateInputRef)) {
-      focusFiled(control, 'end_time')
+      setFocus('end_time')
       return
     }
 

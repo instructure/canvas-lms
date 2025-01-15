@@ -52,9 +52,9 @@ import {
   TemplateEditor,
 } from '../../types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const moveIcon = `<svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path fill-rule="evenodd" clip-rule="evenodd" d="M8.77359 0L5.00002 3.77358L5.77532 4.54998L8.22638 2.09893V15.901L5.77532 13.451L5.00002 14.2263L8.77359 17.9999L12.5472 14.2263L11.773 13.451L9.3219 15.901V2.09893L11.773 4.54998L12.5472 3.77358L8.77359 0Z" fill="#273540"/>

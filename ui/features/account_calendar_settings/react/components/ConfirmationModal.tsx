@@ -25,9 +25,9 @@ import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_calendar_settings_confirmation_modal')
+const I18n = createI18nScope('account_calendar_settings_confirmation_modal')
 
 export interface ComponentProps {
   readonly isOpen: boolean

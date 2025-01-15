@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {truncateText} from '@canvas/util/TextHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('find_outcome')
+const I18n = createI18nScope('find_outcome')
 /* fillTemplateData, getTemplateData */
 
 const find_outcome = (function () {

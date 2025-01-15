@@ -1106,14 +1106,15 @@ class AbstractAssignment < ActiveRecord::Base
   def default_values
     raise "Assignments can only be assigned to Course records" if context_type && context_type != "Course"
 
-    self.title ||= (assignment_group.default_assignment_name rescue nil) || "Assignment"
-
     infer_all_day
     self.position = position_was if will_save_change_to_position? && position.nil? # don't allow setting to nil
 
     if !assignment_group || (assignment_group.deleted? && !deleted?)
       ensure_assignment_group(false)
     end
+
+    self.title ||= assignment_group.default_assignment_name || "Assignment"
+
     self.submission_types ||= "none"
     if will_save_change_to_submission_types? && ["none", "on_paper"].include?(self.submission_types)
       self.allowed_attempts = nil
@@ -1751,7 +1752,7 @@ class AbstractAssignment < ActiveRecord::Base
   def infer_all_day(tz = nil)
     # make the comparison to "fancy midnight" and the date-part extraction in
     # the time zone that was active during editing
-    time_zone = tz || (ActiveSupport::TimeZone.new(time_zone_edited) rescue nil) || Time.zone
+    time_zone = tz || ((edited = time_zone_edited) && ActiveSupport::TimeZone.new(edited)) || Time.zone
     self.all_day, self.all_day_date = Assignment.all_day_interpretation(
       due_at: due_at&.in_time_zone(time_zone),
       due_at_was:,
@@ -1779,7 +1780,7 @@ class AbstractAssignment < ActiveRecord::Base
       title:,
       updated: updated_at.utc,
       published: created_at.utc,
-      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}",
+      id: "tag:#{HostUrl.default_host},#{created_at.strftime("%Y-%m-%d")}:/assignments/#{feed_code}_#{due_at&.strftime("%Y-%m-%d-%H-%M") || "none"}",
       content:,
       link: direct_link,
       author: author_name

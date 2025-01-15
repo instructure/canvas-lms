@@ -21,9 +21,9 @@ import PropTypes from 'prop-types'
 import React, {useEffect, useState, useRef} from 'react'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useScope('mentions')
+const I18n = createI18nScope('mentions')
 
 const addIgnoreAttributes = node => {
   node.setAttribute('data-ignore-a11y-check', '')

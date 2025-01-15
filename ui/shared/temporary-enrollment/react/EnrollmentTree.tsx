@@ -21,10 +21,10 @@ import {EnrollmentTreeGroup} from './EnrollmentTreeGroup'
 import {Spinner} from '@instructure/ui-spinner'
 import type {Course, Enrollment, NodeStructure, Role, RoleChoice, Section} from './types'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import cloneDeep from 'lodash/cloneDeep'
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 export interface Props {
   enrollmentsByCourse: Course[]
@@ -131,7 +131,7 @@ export function EnrollmentTree(props: Props) {
         let roleNode: NodeStructure = {
           id: roleId,
           label: roleData?.label,
-          // eslint-disable-next-line no-array-constructor
+           
           children: new Array<NodeStructure>(),
           isToggle: false,
           isMixed: false,

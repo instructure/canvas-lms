@@ -19,14 +19,14 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import template from '../../jst/userDateRangeSearchForm.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/rails-flash-notifications'
 import UserDateRangeSearch from '../../react/UserDateRangeSearch'
 
-const I18n = useI18nScope('user_date_range_search')
+const I18n = createI18nScope('user_date_range_search')
 
 export default class UserDateRangeSearchFormView extends Backbone.View {
   static initClass() {

@@ -563,13 +563,19 @@ class ExternalToolsController < ApplicationController
       selection_type = "editor_button" if params[:editor]
       selection_type = "homework_submission" if params[:homework]
 
-      @return_url = named_context_url(@context, :context_external_content_success_url, "external_tool_dialog", { include_host: true })
       @headers = false
 
       unless find_tool(params[:external_tool_id], selection_type)
         timing_meta.tags = { error: true }
         return
       end
+
+      @return_url =
+        if @tool&.use_1_3?
+          deep_linking_cancel_url(include_host: true, placement:)
+        else
+          named_context_url(@context, :context_external_content_success_url, "external_tool_dialog", include_host: true)
+        end
 
       @lti_launch = lti_launch(tool: @tool, selection_type:, launch_token: params[:launch_token])
       unless @lti_launch
@@ -1311,7 +1317,7 @@ class ExternalToolsController < ApplicationController
   #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/rce_favorites/<id>' \
   #        -H "Authorization: Bearer <token>"
   def add_rce_favorite
-    if authorized_action(@context, @current_user, [:lti_add_edit, :manage_lti_add])
+    if authorized_action(@context, @current_user, :manage_lti_add)
       @tool = ContextExternalTool.find_external_tool_by_id(params[:id], @context)
       raise ActiveRecord::RecordNotFound unless @tool
       unless @tool.can_be_rce_favorite?
@@ -1348,7 +1354,7 @@ class ExternalToolsController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/rce_favorites/<id>' \
   #        -H "Authorization: Bearer <token>"
   def remove_rce_favorite
-    if authorized_action(@context, @current_user, [:lti_add_edit, :manage_lti_delete])
+    if authorized_action(@context, @current_user, :manage_lti_delete)
       favorite_ids = @context.get_rce_favorite_tool_ids
       if favorite_ids.delete(Shard.global_id_for(params[:id]))
         @context.settings[:rce_favorite_tool_ids] = { value: favorite_ids }
@@ -1367,7 +1373,7 @@ class ExternalToolsController < ApplicationController
   #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/top_nav_favorites/<id>' \
   #        -H "Authorization: Bearer <token>"
   def add_top_nav_favorite
-    if authorized_action(@context, @current_user, [:lti_add_edit, :manage_lti_add])
+    if authorized_action(@context, @current_user, :manage_lti_add)
       @tool = ContextExternalTool.find_external_tool_by_id(params[:id], @context)
       raise ActiveRecord::RecordNotFound unless @tool
       unless @tool.can_be_top_nav_favorite?
@@ -1400,7 +1406,7 @@ class ExternalToolsController < ApplicationController
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/top_nav_favorites/<id>' \
   #        -H "Authorization: Bearer <token>"
   def remove_top_nav_favorite
-    if authorized_action(@context, @current_user, [:lti_add_edit, :manage_lti_delete])
+    if authorized_action(@context, @current_user, :manage_lti_delete)
       favorite_ids = @context.get_top_nav_favorite_tool_ids
       if favorite_ids.delete(Shard.global_id_for(params[:id]))
         @context.settings[:top_nav_favorite_tool_ids] = { value: favorite_ids }
@@ -1739,7 +1745,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def require_tool_create_rights
-    authorized_action(@context, @current_user, [:create_tool_manually, :manage_lti_add])
+    authorized_action(@context, @current_user, :manage_lti_add)
   end
 
   def require_tool_configuration

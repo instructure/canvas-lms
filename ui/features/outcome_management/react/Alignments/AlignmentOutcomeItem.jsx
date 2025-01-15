@@ -25,14 +25,14 @@ import {Heading} from '@instructure/ui-heading'
 import {IconButton} from '@instructure/ui-buttons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import AlignmentItem from './AlignmentItem'
 import {alignmentShape} from './propTypeShapes'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const AlignmentOutcomeItem = ({title, description, alignments}) => {
   const [truncated, setTruncated] = useState(true)

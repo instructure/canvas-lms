@@ -28,13 +28,13 @@ import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {observedUserId} from '../../utilities/apiUtils'
 
 import {sidebarLoadInitialItems, sidebarCompleteItem} from '../../actions'
 import ToDoItem from './ToDoItem'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class ToDoSidebar extends Component {
   static propTypes = {

@@ -3575,7 +3575,7 @@ describe CoursesController do
       delete "destroy", params: { id: @course.id, event: "conclude" }
       expect(response).to be_redirect
       expect(@course.reload).to be_completed
-      expect(@course.conclude_at).to be <= Time.now
+      expect(@course.conclude_at).to be <= Time.zone.now
       expect(Auditors::Course).to receive(:record_unconcluded)
         .with(anything, anything, source: :manual)
 

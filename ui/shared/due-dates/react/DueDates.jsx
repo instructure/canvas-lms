@@ -28,7 +28,7 @@ import StudentGroupStore from './StudentGroupStore'
 import TokenActions from './TokenActions'
 import Override from '@canvas/assignments/backbone/models/AssignmentOverride'
 import AssignmentOverrideHelper from '../AssignmentOverrideHelper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import {Checkbox} from '@instructure/ui-checkbox'
 import '@canvas/rails-flash-notifications'
@@ -39,7 +39,7 @@ import {
   datesFromOverride,
 } from '../util/overridesUtils'
 
-const I18n = useI18nScope('due_datesDueDates')
+const I18n = createI18nScope('due_datesDueDates')
 
 export default class DueDates extends React.Component {
   static propTypes = {

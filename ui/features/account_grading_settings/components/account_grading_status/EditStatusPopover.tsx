@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {colorPickerColors, defaultColorLabels} from '@canvas/grading-status-list-item'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEditSolid} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import {ColorPicker} from './ColorPicker'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('account_grading_status')
+const I18n = createI18nScope('account_grading_status')
 
 type EditStatusPopoverProps = {
   currentColor: string

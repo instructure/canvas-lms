@@ -26,8 +26,8 @@ interface Permissions {
 }
 interface FileContext {
   asset_string: string
-  contextType?: string
-  contextId?: string
+  contextType: string
+  contextId: string
   root_folder_id: string
   permissions: Permissions
 }
@@ -43,7 +43,7 @@ const buildContextsDictionary = (contexts: FileContext[]) => {
     const [contextType, contextId] = splitAssetString(context.asset_string) ?? ['', '']
     context.contextType = contextType
     context.contextId = contextId
-    dict[context.asset_string] = context
+    dict[[contextType, contextId].join('_')] = context
     return dict
   }, {})
 }
@@ -60,13 +60,16 @@ const filesEnv = {
 }
 
 function contextFor(folder: {contextType: string; contextId: string}) {
-  const assetString = `${folder && folder.contextType}s_${folder && folder.contextId}`.toLowerCase()
-  return filesEnv.contextsDictionary && filesEnv.contextsDictionary[assetString]
+  const pluralAssetString = `${folder.contextType}s_${folder.contextId}`.toLowerCase()
+  return filesEnv.contextsDictionary && filesEnv.contextsDictionary[pluralAssetString]
 }
 
 function userHasPermission(folder: {contextType: string; contextId: string}, action: string) {
   return (
-    contextFor(folder) && contextFor(folder).permissions && contextFor(folder).permissions[action]
+    (contextFor(folder) &&
+      contextFor(folder).permissions &&
+      contextFor(folder).permissions[action]) ??
+    false
   )
 }
 

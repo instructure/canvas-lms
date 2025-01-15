@@ -20,7 +20,7 @@ import React, {useEffect, useRef, useState} from 'react'
 import {Popover} from '@instructure/ui-popover'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine, IconTrashLine, IconUserLine, IconUpdownLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Menu, type MenuItem} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -46,7 +46,7 @@ type MenuItemProps = {
   setRef?: (ref: MenuItem | null) => void
 }
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 export const GroupUserMenu = ({...props}: Props): JSX.Element => {
   const [isOpen, setIsOpen] = useState<boolean>(false)

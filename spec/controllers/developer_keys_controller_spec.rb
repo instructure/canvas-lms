@@ -89,9 +89,21 @@ describe DeveloperKeysController do
           expect(json_parse.pluck("id")).to match_array [site_admin_key.global_id]
         end
 
-        it "includes valid LTI scopes in js env" do
-          get "index", params: { account_id: Account.site_admin.id }
-          expect(assigns[:js_env][:validLtiScopes]).to eq TokenScopes::LTI_SCOPES
+        it "includes public LTI scopes for that root account (possible feature-flag-gated) in js env" do
+          sample_scopes_for_root_account =
+            TokenScopes::LTI_SCOPES.except(TokenScopes::LTI_ASSET_REPORT_SCOPE)
+
+          acct_id_from_stub = nil
+          expect(TokenScopes).to receive(:public_lti_scopes_hash_for_account) do |acct|
+            acct_id_from_stub = acct.id
+            sample_scopes_for_root_account
+          end
+
+          get "index", params: { account_id: Account.default.id }
+          expect(acct_id_from_stub).to eq(Account.default.id)
+
+          expect(assigns[:js_env][:validLtiScopes]).to \
+            eq(sample_scopes_for_root_account)
         end
 
         context "when the platform_notification_service feature flag is disabled" do

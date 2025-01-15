@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
@@ -32,7 +32,7 @@ import {getResourcesTheme} from './k5-theme'
 
 const resourcesTheme = getResourcesTheme()
 
-const I18n = useI18nScope('resources_page')
+const I18n = createI18nScope('resources_page')
 
 const fetchStaff = cards =>
   Promise.all(cards.filter(c => c.isHomeroom).map(course => fetchCourseInstructors(course.id)))

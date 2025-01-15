@@ -29,8 +29,7 @@ class Mutations::UpdateDiscussionExpanded < Mutations::BaseMutation
     discussion_topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise GraphQL::ExecutionError, "insufficient permission" unless discussion_topic.grants_right?(current_user, session, :read)
 
-    discussion_topic.update_or_create_participant(current_user:, expanded: input[:expanded])
-
+    discussion_topic.update_or_create_participant(current_user:, expanded: input[:expanded]) unless Account.site_admin.feature_enabled?(:discussion_default_expand) && discussion_topic.expanded_locked?
     { discussion_topic: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"

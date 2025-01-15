@@ -20,12 +20,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {i18nGrade} from '@canvas/conditional-release-score'
 import StudentAssignmentItem from './student-assignment-item'
 import {assignmentShape, studentShape} from '../shapes/index'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_student_details_view')
+const I18n = createI18nScope('cyoe_assignment_sidebar_student_details_view')
 
 const {shape, string, number, arrayOf, func, bool} = PropTypes
 
@@ -64,7 +64,7 @@ export default class StudentDetailsView extends React.Component {
       return null
     }
     return (
-      <header className="crs-student-details__header">
+      <header className="crs-student-details__header" data-testid="student-details-header">
         {/* TODO: use InstUI button */}
         <button
           type="button"
@@ -73,6 +73,7 @@ export default class StudentDetailsView extends React.Component {
             this.backButton = e
           }}
           onClick={this.props.unselectStudent}
+          data-testid="back-button"
         >
           <i aria-hidden={true} className="icon-arrow-open-left" />
           {I18n.t('Back')}
@@ -89,12 +90,16 @@ export default class StudentDetailsView extends React.Component {
     const conversationUrl = `/conversations?context_id=course_${assignment.course_id}&user_id=${student.id}&user_name=${student.name}`
 
     return (
-      <section className="crs-student-details__profile-content">
+      <section
+        className="crs-student-details__profile-content"
+        data-testid="student-details-profile"
+      >
         <button
           className="Button Button--icon-action student-details__prev-student"
           aria-label={I18n.t('view previous student')}
           onClick={this.props.selectPrevStudent}
           type="button"
+          data-testid="prev-student-button"
         >
           <i aria-hidden={true} className="icon-arrow-open-left" />
         </button>
@@ -121,6 +126,7 @@ export default class StudentDetailsView extends React.Component {
           aria-label={I18n.t('view next student')}
           onClick={this.props.selectNextStudent}
           type="button"
+          data-testid="next-student-button"
         >
           <i aria-hidden={true} className="icon-arrow-open-right" />
         </button>
@@ -143,7 +149,7 @@ export default class StudentDetailsView extends React.Component {
     }
 
     return (
-      <section className="crs-student-details__score-content">
+      <section className="crs-student-details__score-content" data-testid="student-details-scores">
         <h3 className="crs-student-details__score-number">
           {i18nGrade(submission.grade, assignment)}
         </h3>
@@ -171,7 +177,7 @@ export default class StudentDetailsView extends React.Component {
       <section>
         {followOnAssignments.map((item, i) => (
           <StudentAssignmentItem
-            // eslint-disable-next-line react/no-array-index-key
+             
             key={i}
             assignment={item.assignment}
             score={item.score}
@@ -211,7 +217,7 @@ export default class StudentDetailsView extends React.Component {
     })
 
     return (
-      <div className={studentDetailsClasses}>
+      <div className={studentDetailsClasses} data-testid="student-details">
         {this.renderHeader()}
         {this.renderContent()}
       </div>

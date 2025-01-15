@@ -17,13 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import template from '../../jst/_sisButton.handlebars'
 import SisValidationHelper from '../../SisValidationHelper'
 
-const I18n = useI18nScope('SisButtonView')
+const I18n = createI18nScope('SisButtonView')
 
 extend(SisButtonView, Backbone.View)
 

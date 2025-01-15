@@ -371,7 +371,7 @@ class Submission < ActiveRecord::Base
     return false if assignment.nil?
     return false unless assignment.checkpoints_parent?
 
-    Submission.where(user_id:)
+    Submission.active.having_submission.where(user_id:)
               .where(assignment_id: SubAssignment.select(:id).where(parent_assignment_id: assignment_id))
               .find_each do |sub_assignment_submission|
       return true if sub_assignment_submission.needs_grading?
@@ -1427,7 +1427,7 @@ class Submission < ActiveRecord::Base
   def submitted_at
     if submission_type
       self.submitted_at = updated_at unless super
-      super.in_time_zone rescue nil
+      super&.in_time_zone
     else
       nil
     end
@@ -1554,11 +1554,11 @@ class Submission < ActiveRecord::Base
       end
     end
 
-    self.submitted_at ||= Time.now if has_submission?
+    self.submitted_at ||= Time.zone.now if has_submission?
     quiz_submission.reload if quiz_submission_id
     self.workflow_state = inferred_workflow_state
     if (workflow_state_changed? && graded?) || late_policy_status_changed?
-      self.graded_at = Time.now
+      self.graded_at = Time.zone.now
     end
     self.media_comment_id = nil if media_comment_id && media_comment_id.strip.empty?
     if media_comment_id && (media_comment_id_changed? || !media_object_id)
@@ -1577,7 +1577,7 @@ class Submission < ActiveRecord::Base
 
     if submission_type == "online_quiz"
       self.quiz_submission ||= Quizzes::QuizSubmission.where(submission_id: self).first
-      self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id:, quiz_id: assignment.quiz).first rescue nil
+      self.quiz_submission ||= Quizzes::QuizSubmission.where(user_id:, quiz_id: assignment.quiz).first if assignment
     end
     @just_submitted = (submitted? || pending_review?) && submission_type && (new_record? || workflow_state_changed? || attempt_changed?)
     if score_changed? || grade_changed?
@@ -2481,7 +2481,7 @@ class Submission < ActiveRecord::Base
   def assign_assessor(obj)
     @assessment_request_count ||= 0
     @assessment_request_count += 1
-    user = obj.user rescue nil
+    user = obj.try(:user)
     association = assignment.active_rubric_association? ? assignment.rubric_association : nil
     res = assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id))
                              .first_or_initialize
@@ -3157,6 +3157,17 @@ class Submission < ActiveRecord::Base
     false
   end
 
+  # For large body text, this can be SLOW. Call this method in a delayed job.
+  def calc_body_word_count
+    return 0 if body.nil?
+
+    tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
+    segments = body.split(%r{<br\s*/?>})
+    segments.sum do |segment|
+      ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
+    end
+  end
+
   private
 
   def checkpoint_changes?
@@ -3179,17 +3190,6 @@ class Submission < ActiveRecord::Base
 
   def get_word_count_from_body?
     !body.nil? && submission_type != "online_quiz"
-  end
-
-  # For large body text, this can be SLOW. Call this method in a delayed job.
-  def calc_body_word_count
-    return 0 if body.nil?
-
-    tinymce_wordcount_count_regex = /(?:[\w\u2019\x27\-\u00C0-\u1FFF]+|(?<=<br>)([^<]+)|([^<]+)(?=<br>))/
-    segments = body.split(%r{<br\s*/?>})
-    segments.sum do |segment|
-      ActionController::Base.helpers.strip_tags(segment).scan(tinymce_wordcount_count_regex).size
-    end
   end
 
   def update_body_word_count_later

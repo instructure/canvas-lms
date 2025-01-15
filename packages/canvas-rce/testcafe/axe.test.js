@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {axeCheck, createReport} from 'axe-testcafe'
-// eslint-disable-next-line babel/no-unused-expressions
 fixture`aXe a11y checking`.page`./testcafe.html`
 
 async function runAxeCheck(t, context, options) {
@@ -28,13 +27,13 @@ async function runAxeCheck(t, context, options) {
 
 test('automated a11y testing', async t => {
   const axeContext = {
-    include: 'body'
+    include: 'body',
   }
   const axeOptions = {
     runOnly: {
       type: 'tag',
-      values: ['wcag21a', 'wcag21aa', 'best-practice', 'section508']
-    }
+      values: ['wcag21a', 'wcag21aa', 'best-practice', 'section508'],
+    },
   }
   await runAxeCheck(t, axeContext, axeOptions)
 })

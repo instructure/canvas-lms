@@ -25,9 +25,9 @@ import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const AlignmentStatItem = ({type, count, percent, average}) => {
   const {isMobileView} = useCanvasContext()

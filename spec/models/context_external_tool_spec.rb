@@ -3239,7 +3239,7 @@ describe ContextExternalTool do
     end
 
     it "updates the visibility cache if enrollments are updated or user is touched" do
-      time = Time.now
+      time = Time.zone.now
       enable_cache(:redis_cache_store) do
         Timecop.freeze(time) do
           course_with_student(account: @account, active_all: true)
@@ -3271,7 +3271,7 @@ describe ContextExternalTool do
     end
 
     it "updates the global navigation menu cache key when the global navigation tools are updated (or removed)" do
-      time = Time.now
+      time = Time.zone.now
       enable_cache do
         Timecop.freeze(time) do
           @admin_tool = @account.context_external_tools.new(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
@@ -4410,7 +4410,7 @@ describe ContextExternalTool do
       let(:tool) { external_tool_model }
 
       it "can save last_udapted" do
-        now = Time.now
+        now = Time.zone.now
         tool.unified_tool_id_last_updated_at = now
         expect(tool.save).to be true
         expect(tool.reload.unified_tool_id_last_updated_at).to eq(now)

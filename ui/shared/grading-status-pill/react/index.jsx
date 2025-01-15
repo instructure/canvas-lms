@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradingStatusPill')
+const I18n = createI18nScope('gradingStatusPill')
 
 function forEachNode(nodeList, fn) {
   for (let i = 0; i < nodeList.length; i += 1) {
@@ -44,22 +44,22 @@ export default {
       '[class^="submission-custom-grade-status-pill-"]'
     )
     forEachNode(missMountPoints, mountPoint => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<Pill color="danger">{I18n.t('missing')}</Pill>, mountPoint)
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<Pill color="info">{I18n.t('late')}</Pill>, mountPoint)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<Pill color="danger">{I18n.t('excused')}</Pill>, mountPoint)
     })
 
     forEachNode(extendedMountPoints, mountPoint => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(<Pill color="alert">{I18n.t('extended')}</Pill>, mountPoint)
     })
 
@@ -67,7 +67,7 @@ export default {
       const status =
         statusMap[mountPoint.classList[0].substring('submission-custom-grade-status-pill-'.length)]
       if (status) {
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(<Pill>{status.name}</Pill>, mountPoint)
       }
     })

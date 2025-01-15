@@ -73,7 +73,7 @@ describe "calendar2" do
       end
 
       it "shows short events at full height", priority: "2" do
-        noon = Time.now.at_beginning_of_day + 12.hours
+        noon = Time.zone.now.at_beginning_of_day + 12.hours
         @course.calendar_events.create! title: "ohai", start_at: noon, end_at: noon + 5.minutes
 
         load_week_view

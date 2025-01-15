@@ -18,7 +18,7 @@
 
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 const HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS = gql`
   mutation ($assignmentId: ID!, $sectionIds: [ID!]!) {

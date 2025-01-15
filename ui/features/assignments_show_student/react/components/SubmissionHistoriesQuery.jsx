@@ -18,9 +18,9 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Header from './Header'
-import {Query} from '@apollo/react-components'
+import {Query} from '@apollo/client/react/components'
 import React, {Suspense, lazy} from 'react'
 import {shape} from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
@@ -30,7 +30,7 @@ import ViewManager from './ViewManager'
 import UnavailablePeerReview from '../UnavailablePeerReview'
 import NeedsSubmissionPeerReview from '../NeedsSubmissionPeerReview'
 
-const I18n = useI18nScope('assignments_2_submission_histories_query')
+const I18n = createI18nScope('assignments_2_submission_histories_query')
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 
@@ -46,7 +46,7 @@ function shouldDisplayUnavailablePeerReview({assignment, reviewerSubmission}) {
   )
 }
 
-// eslint-disable-next-line react/prefer-stateless-function
+ 
 class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
     initialQueryData: shape({

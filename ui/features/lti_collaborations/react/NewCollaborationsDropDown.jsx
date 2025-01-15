@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('react_collaborations')
+const I18n = createI18nScope('react_collaborations')
 
-// eslint-disable-next-line react/prefer-stateless-function
+ 
 class NewCollaborationsDropDown extends React.Component {
   render() {
     const [context, contextId] = splitAssetString(ENV.context_asset_string)

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
@@ -28,7 +28,7 @@ import {getK5ThemeVars} from '@canvas/k5/react/k5-theme'
 
 const k5ThemeVariables = getK5ThemeVars()
 
-const I18n = useI18nScope('grade_row')
+const I18n = createI18nScope('grade_row')
 
 // For the instui Table to render correctly with layout="stacked", (see GradeDetails)
 // its body's children must be Table.Rows. It doesn't work to trick it by setting

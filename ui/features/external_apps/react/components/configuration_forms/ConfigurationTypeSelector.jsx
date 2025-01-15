@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class ConfigurationTypeSelector extends React.Component {
   static propTypes = {
@@ -40,7 +40,7 @@ export default class ConfigurationTypeSelector extends React.Component {
     return (
       <div className="ConfigurationsTypeSelector">
         <div className="form-group">
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          { }
           <label>
             {I18n.t('Configuration Type')}
             <select

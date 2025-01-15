@@ -47,8 +47,8 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("onlyVisibleToOverrides")).to eq assignment.only_visible_to_overrides
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.id.to_s
     expect(assignment_type.resolve("allowedExtensions")).to eq assignment.allowed_extensions
-    expect(assignment_type.resolve("createdAt").to_datetime).to eq assignment.created_at.to_s.to_datetime
-    expect(assignment_type.resolve("updatedAt").to_datetime).to eq assignment.updated_at.to_s.to_datetime
+    expect(Time.iso8601(assignment_type.resolve("createdAt")).to_i).to eq assignment.created_at.to_i
+    expect(Time.iso8601(assignment_type.resolve("updatedAt")).to_i).to eq assignment.updated_at.to_i
     expect(assignment_type.resolve("gradeGroupStudentsIndividually")).to eq assignment.grade_group_students_individually
     expect(assignment_type.resolve("originalityReportVisibility")).to eq assignment.turnitin_settings[:originality_report_visibility]
     expect(assignment_type.resolve("anonymousGrading")).to eq assignment.anonymous_grading
@@ -200,7 +200,7 @@ describe Types::AssignmentType do
     assignment.save!
     expect(assignment_type.resolve("peerReviews { enabled }")).to eq assignment.peer_reviews
     expect(assignment_type.resolve("peerReviews { count }")).to eq assignment.peer_review_count
-    expect(assignment_type.resolve("peerReviews { dueAt }").to_datetime).to eq assignment.peer_reviews_due_at.to_s.to_datetime
+    expect(Time.iso8601(assignment_type.resolve("peerReviews { dueAt }")).to_i).to eq assignment.peer_reviews_due_at.to_i
     expect(assignment_type.resolve("peerReviews { intraReviews }")).to eq assignment.intra_group_peer_reviews
     expect(assignment_type.resolve("peerReviews { anonymousReviews }")).to eq assignment.anonymous_peer_reviews
     expect(assignment_type.resolve("peerReviews { automaticReviews }")).to eq assignment.automatic_peer_reviews

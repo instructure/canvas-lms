@@ -17,7 +17,7 @@
 //
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import Outcome from '../../../backbone/models/Outcome'
 import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
@@ -31,7 +31,7 @@ import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import {subscribe} from 'jquery-tinypubsub'
 import {raw} from '@instructure/html-escape'
 
-const I18n = useI18nScope('contentview')
+const I18n = createI18nScope('contentview')
 
 // This view is a wrapper for showing details for outcomes and groups.
 // It uses OutcomeView and OutcomeGroupView to render

@@ -236,6 +236,118 @@ describe "accounts/settings" do
     end
   end
 
+  context "differentiation tags" do
+    describe "account" do
+      let_once(:account) { Account.default }
+      let_once(:admin) { account_admin_user(account:) }
+
+      before do
+        view_context(account, admin)
+        assign(:account, account)
+        assign(:context, account)
+        assign(:root_account, account)
+        assign(:current_user, admin)
+        assign(:announcements, AccountNotification.none.paginate)
+      end
+
+      it "shows differentiation tags section when differentiation tags and assign to different tags FF are enabled" do
+        account.enable_feature!(:differentiation_tags)
+        account.enable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when differentiation tags and assign to different tags FF are disabled" do
+        account.disable_feature!(:differentiation_tags)
+        account.disable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when differentiation tags FF is disabled" do
+        account.disable_feature!(:differentiation_tags)
+        account.enable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when assign to differentiation tags FF is disabled" do
+        account.enable_feature!(:differentiation_tags)
+        account.disable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+    end
+
+    describe "sub-account" do
+      let_once(:account) { Account.default }
+      let_once(:sub_account) { account.sub_accounts.create!(name: "sub-account") }
+      let_once(:sub_account_admin) { account_admin_user(account: sub_account) }
+      before do
+        view_context(sub_account, sub_account_admin)
+        assign(:account, sub_account)
+        assign(:context, sub_account)
+        assign(:root_account, sub_account)
+        assign(:current_user, sub_account_admin)
+        assign(:announcements, AccountNotification.none.paginate)
+      end
+
+      it "shows differentiation tags section when differentiation tags and assign to different tags FF are enabled" do
+        sub_account.enable_feature!(:differentiation_tags)
+        sub_account.enable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when differentiation tags and assign to different tags FF are disabled" do
+        sub_account.disable_feature!(:differentiation_tags)
+        sub_account.disable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when differentiation tags FF is disabled" do
+        sub_account.disable_feature!(:differentiation_tags)
+        sub_account.enable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when assign to differentiation tags FF is disabled" do
+        sub_account.enable_feature!(:differentiation_tags)
+        sub_account.disable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+    end
+
+    describe "site-admin" do
+      let_once(:site_admin_account) { Account.site_admin }
+      let_once(:site_admin) { account_admin_user(account: site_admin_account) }
+
+      before do
+        view_context(site_admin_account, site_admin)
+        assign(:account, site_admin_account)
+        assign(:context, site_admin_account)
+        assign(:root_account, site_admin_account)
+        assign(:current_user, site_admin)
+        assign(:announcements, AccountNotification.none.paginate)
+      end
+
+      it "hides differentiation tags section by default" do
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+
+      it "hides differentiation tags section when differentiation tags and assign to different tags are enabled" do
+        site_admin_account.enable_feature!(:differentiation_tags)
+        site_admin_account.enable_feature!(:assign_to_differentiation_tags)
+        render
+        expect(response).not_to have_tag "#differentiation_tags"
+      end
+    end
+  end
+
   describe "SIS Integration Settings" do
     before do
       assign(:account_users, [])

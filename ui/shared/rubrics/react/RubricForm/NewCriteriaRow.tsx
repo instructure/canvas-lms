@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconDragHandleLine, IconEditLine, IconOutcomesLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('rubrics-criteria-new-row')
+const I18n = createI18nScope('rubrics-criteria-new-row')
 
 type NewCriteriaRowProps = {
   rowIndex: number

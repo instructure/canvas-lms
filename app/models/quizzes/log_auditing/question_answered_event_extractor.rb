@@ -74,7 +74,7 @@ module Quizzes::LogAuditing
       Quizzes::QuizSubmissionEvent.new.tap do |event|
         event.event_type = EVENT_TYPE
         event.event_data = extract_answers(submission_data, quiz_submission.quiz_data)
-        event.created_at = Time.now
+        event.created_at = Time.zone.now
         event.quiz_submission = quiz_submission
         event.attempt = submission_data["attempt"]
       end

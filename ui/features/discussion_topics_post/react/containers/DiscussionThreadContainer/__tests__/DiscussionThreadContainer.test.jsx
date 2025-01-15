@@ -25,7 +25,7 @@ import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer'
 import {fireEvent, render} from '@testing-library/react'
 import {getSpeedGraderUrl} from '../../../utils'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import React from 'react'
 import {
   updateDiscussionEntryParticipantMock,

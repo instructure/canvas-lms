@@ -20,7 +20,7 @@ import React from 'react'
 import {render, waitFor, fireEvent} from '@testing-library/react'
 import {DiscussionSummary} from '../DiscussionSummary'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 

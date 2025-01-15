@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
 import type {Product} from '../../models/Product'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 interface ExternalLinksProps {
   product: Product
@@ -38,14 +39,14 @@ const ExternalLinks = (props: ExternalLinksProps) => {
       <Flex direction="column" gap="medium">
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
-            <Text weight="bold" size="x-large">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Privacy')}
-            </Text>
+            </Heading>
           </Flex.Item>
           {product.privacy_policy_url ? (
             <Flex direction="column">
               <Flex.Item>
-                <Link href={product.privacy_policy_url} isWithinText={false}>
+                <Link href={product.privacy_policy_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
                     {I18n.t('Partner Privacy Policy')} <IconExternalLinkLine />
                   </Text>
@@ -60,14 +61,14 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         </Flex>
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
-            <Text weight="bold" size="x-large">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Terms of Service')}
-            </Text>
+            </Heading>
           </Flex.Item>
           {product.terms_of_service_url ? (
             <Flex direction="column">
               <Flex.Item>
-                <Link href={product.terms_of_service_url} isWithinText={false}>
+                <Link href={product.terms_of_service_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
                     {I18n.t('Terms of Service')} <IconExternalLinkLine />
                   </Text>
@@ -84,14 +85,14 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         </Flex>
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
-            <Text weight="bold" size="x-large">
+            <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
               {I18n.t('Accessibility')}
-            </Text>
+            </Heading>
           </Flex.Item>
           {product.accessibility_url ? (
             <Flex direction="column">
               <Flex.Item>
-                <Link href={product.accessibility_url} isWithinText={false}>
+                <Link href={product.accessibility_url} isWithinText={false} target="_blank">
                   <Text weight="bold">
                     {I18n.t('Accessibility Documentation')} <IconExternalLinkLine />
                   </Text>

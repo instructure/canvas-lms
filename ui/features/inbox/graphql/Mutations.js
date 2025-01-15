@@ -21,7 +21,7 @@ import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import {SubmissionComment} from './SubmissionComment'
 import {Error} from '../../../shared/graphql/Error'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
   mutation UpdateConversationParticipants(

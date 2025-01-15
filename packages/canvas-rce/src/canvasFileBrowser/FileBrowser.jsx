@@ -151,7 +151,6 @@ class FileBrowser extends React.Component {
       },
       error => {
         this.props.onLoading(false)
-        /* eslint-disable no-console */
         console.error('Error fetching data from API')
         console.error(error)
       }

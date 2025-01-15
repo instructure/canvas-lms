@@ -20,7 +20,7 @@
 //  * Make assignments (due date) events non-resizable. Having an end date on them doesn't
 //    make sense.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, defaults, filter, omit, each, has, last, includes} from 'lodash'
 import * as tz from '@instructure/moment-utils'
@@ -52,7 +52,7 @@ import 'jquery-tinypubsub'
 import 'jqueryui/button'
 import 'jqueryui/tooltip'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 // we use a <div> (with a <style> inside it) because you cant set .innerHTML directly on a
 // <style> node in ie8
@@ -716,7 +716,7 @@ export default class Calendar {
     }
     event.start = date
     event.addClass('event_pending')
-    const revertFunc = () => console.log('could not save date on undated event') // eslint-disable-line no-console
+    const revertFunc = () => console.log('could not save date on undated event')  
 
     if (!this._eventDrop(event, 0, false, revertFunc)) {
       return

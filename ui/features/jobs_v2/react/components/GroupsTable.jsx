@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import React, {useCallback} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
@@ -25,7 +25,7 @@ import {InfoColumn, GroupedInfoColumnHeader} from './InfoColumn'
 import SortColumnHeader from './SortColumnHeader'
 import OrphanedStrandIndicator from './OrphanedStrandIndicator'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function GroupsTable({
   groups,

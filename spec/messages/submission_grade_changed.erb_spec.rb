@@ -87,11 +87,6 @@ describe "submission_grade_changed" do
       asset.save!
     end
 
-    it "shows only the letter grade when RQD is enabled - twitter" do
-      message = generate_message(:submission_grade_changed, :twitter, asset, user: student)
-      expect(message.body).to include("grade: F")
-    end
-
     it "shows only the letter grade when RQD is enabled - sms" do
       message = generate_message(:submission_grade_changed, :sms, asset, user: student)
       expect(message.body).to include("grade: F")

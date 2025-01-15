@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import CanvasValidatedMockedProvider from '@canvas/validated-apollo-mocked-provider'
+import {MockedProvider} from '@apollo/client/testing'
 import {mockAssignment, mockSubmission} from '../../test-utils'
 import Toolbox from '../Toolbox'
 
 function renderToolbox(assignment) {
   return render(
-    <CanvasValidatedMockedProvider>
+    <MockedProvider>
       <Toolbox
         assignment={assignment}
         onChangeAssignment={() => {}}
@@ -32,7 +32,7 @@ function renderToolbox(assignment) {
         onValidate={() => true}
         invalidMessage={() => undefined}
       />
-    </CanvasValidatedMockedProvider>
+    </MockedProvider>
   )
 }
 

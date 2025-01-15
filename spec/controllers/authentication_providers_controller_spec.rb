@@ -232,6 +232,59 @@ describe AuthenticationProvidersController do
       expect(response).to have_http_status :unprocessable_entity
     end
 
+    context "when the auth provider type is restorable" do
+      subject(:create_provider) { post "create", format: :json, params: }
+
+      let(:params) do
+        {
+          auth_type: "apple",
+          account_id: account.id
+        }
+      end
+
+      before do
+        allow(AuthenticationProvider::Apple).to receive(:restorable?).and_return(true)
+      end
+
+      context "and a deleted authentication provider of the same type exists" do
+        let!(:existing_provider) { account.authentication_providers.create!(params.merge(workflow_state: "deleted")) }
+
+        it { is_expected.to be_successful }
+
+        it "restores the deleted provider" do
+          expect { create_provider }.to change { existing_provider.reload.workflow_state }.from("deleted").to("active")
+        end
+
+        it "does not create a new provider" do
+          expect { create_provider }.not_to change { account.authentication_providers.count }
+        end
+      end
+
+      context "and an active existing provider of the same type exists" do
+        before { account.authentication_providers.create!(params.merge(workflow_state: "active")) }
+
+        it { is_expected.to have_http_status :unprocessable_entity }
+
+        it "indicates an active auth provider of the type already exists" do
+          create_provider
+          expect(json_parse["errors"].first["message"]).to eq "duplicate provider apple"
+        end
+      end
+
+      context "and no existing provider of the same type exists" do
+        it { is_expected.to be_successful }
+
+        it "creates a new provider" do
+          expect { create_provider }.to change { account.authentication_providers.count }.by(1)
+        end
+
+        it "creates the requested authentication provider" do
+          create_provider
+          expect(AuthenticationProvider.find(json_parse["id"]).auth_type).to eq "apple"
+        end
+      end
+    end
+
     it "allows multiple non-singleton types" do
       cas = {
         auth_type: "cas",

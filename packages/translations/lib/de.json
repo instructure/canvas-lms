@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Verfügbare Ordner"
     },
+    "background_1bc88842": {
+        "message": "Hintergrund"
+    },
     "backslash_b2d5442d": {
         "message": "Umgekehrter Schrägstrich"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Blau"
+    },
+    "border_5b08b06d": {
+        "message": "Rand"
     },
     "bottom_15a2a9be": {
         "message": "Unten"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "{ types } ausblenden"
     },
+    "color_a363e1b0": {
+        "message": "Farbe"
+    },
+    "color_contrast_4c418add": {
+        "message": "Farbkontrast"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Farbkontrastverhältnis"
+    },
     "color_picker_6b359edf": {
         "message": "Farbwähler"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Farbwähler ({ colorName } ausgewählt)"
+    },
+    "color_popup_af39810f": {
+        "message": "Farb-Popup"
     },
     "column_e1ae5c64": {
         "message": "Spalte"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (Funktion)"
     },
+    "fail_544e5dde": {
+        "message": "NICHT BESTANDEN"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Abruf der Dateiinhalte fehlgeschlagen"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Noten"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Text für Grafik"
     },
     "greater_than_e98af662": {
         "message": "Größer als"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Unendlichkeit"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Eingabefeld für Alpha"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Eingabefeld für Blau"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Eingabefeld für Grün"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Eingabefeld für Rot"
+    },
     "insert_593145ef": {
         "message": "Einfügen"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Groß"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Großer Text"
     },
     "latvian_2bbb6aab": {
         "message": "Lettisch"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Keines ausgewählt"
     },
+    "normal_text_7b03da48": {
+        "message": "Normaler Text"
+    },
     "norwegian_53f391ec": {
         "message": "Norwegisch"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "Umrissgröße"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } Ist kein gültiges Protokoll. Es muss ftp, http, https, mailto, skype oder tel sein oder weggelassen werden."
-    },
     "page_50c4823d": {
         "message": "Seite"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Teilweise (abgeleitet)"
     },
+    "pass_1c19a2b3": {
+        "message": "BESTANDEN"
+    },
     "paste_5963d1c1": {
         "message": "Einfügen"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Prozentsatz muss eine Zahl sein"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Der Prozentsatz muss mindestens { percentage }% betragen"
     },
     "performing_arts_icon_f3497486": {
         "message": "Symbol für „Darstellende Kunst“"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Variante)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Farbe auswählen"
+    },
     "pink_68ad45cb": {
         "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Pixel"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pixel müssen mindestens { width } x { height } px betragen."
     },
     "play_1a47eaa7": {
         "message": "Abspielen"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "Vorheriger { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Zuvor ausgewählte Farben"
     },
     "prime_917ea60e": {
         "message": "Primzahl"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Sie befinden sich auf einer Farbpalette. Um auf der Palette nach oben, links, unten oder rechts zu navigieren, verwenden Sie die Tasten „W“, „A“, „S“ und „D“."
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Sie befinden sich auf einem Farbschieberegler. Um den Schieberegler nach links oder rechts zu bewegen, verwenden Sie die Tasten „A“ und „D“."
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Sie befinden sich auf einem Alpha-Schieberegler. Um den Schieberegler nach links oder rechts zu bewegen, verwenden Sie die Tasten „A“ und „D“."
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Sie können sie durch das Hochladen einer neuen Untertiteldatei ersetzen."

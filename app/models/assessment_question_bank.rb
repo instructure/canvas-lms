@@ -85,12 +85,14 @@ class AssessmentQuestionBank < ActiveRecord::Base
   end
 
   def self.unfiled_for_context(context)
-    context.assessment_question_banks.where(title: default_unfiled_title, workflow_state: "active").first_or_create rescue nil
+    return unless context
+
+    context.assessment_question_banks.where(title: default_unfiled_title, workflow_state: "active").first_or_create
   end
 
   def cached_context_short_name
     @cached_context_name ||= Rails.cache.fetch(["short_name_lookup", context_code].cache_key) do
-      context.short_name rescue ""
+      context.try(:short_name) || ""
     end
   end
 

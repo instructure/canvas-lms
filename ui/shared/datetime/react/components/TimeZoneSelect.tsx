@@ -19,10 +19,10 @@
 import React from 'react'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import type {CanvasSelectProps} from '@canvas/instui-bindings/react/Select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('edit_timezone')
+const I18n = createI18nScope('edit_timezone')
 
 type Timezone = {
   name: string
@@ -84,7 +84,7 @@ import(
     }
   })
   .catch(error => {
-    // eslint-disable-next-line no-console
+     
     console.error('Error loading localized timezone list', error)
     captureException(error)
   })

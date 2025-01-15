@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import CanvasAsyncSelect, {
   type CanvasAsyncSelectProps,
@@ -25,7 +25,7 @@ import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/use
 import useContentShareUserSearchApi from '../effects/useContentShareUserSearchApi'
 import UserSearchSelectorItem from './UserSearchSelectorItem'
 
-const I18n = useI18nScope('user_search_selector')
+const I18n = createI18nScope('user_search_selector')
 
 ContentShareUserSearchSelector.defaultProps = {
   selectedUsers: [],

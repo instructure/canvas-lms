@@ -21,6 +21,18 @@
 describe AuthenticationProvider do
   let(:account) { Account.default }
 
+  describe ".singleton?" do
+    subject { described_class.singleton? }
+
+    it { is_expected.to be false }
+  end
+
+  describe ".restorable?" do
+    subject { described_class.restorable? }
+
+    it { is_expected.to be false }
+  end
+
   context "password" do
     it "decrypts the password to the original value" do
       c = AuthenticationProvider.new
@@ -83,7 +95,90 @@ describe AuthenticationProvider do
     end
   end
 
+  describe "#duplicated_in_account?" do
+    subject { authentication_provider.duplicated_in_account? }
+
+    context "when the account lacks other auth provider with the same auth type" do
+      context "and the auth provider is singleton" do
+        let(:authentication_provider) { account.authentication_providers.create!(auth_type: "apple") }
+
+        it { is_expected.to be false }
+      end
+
+      context "and the auth provider is not singleton" do
+        let(:authentication_provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+        it { is_expected.to be false }
+      end
+    end
+
+    context "when the account has another auth provider with the same auth type" do
+      context "and the auth provider is singleton" do
+        let(:authentication_provider) { account.authentication_providers.create!(auth_type: "apple") }
+
+        before do
+          account.authentication_providers.create!(auth_type: "apple")
+        end
+
+        it { is_expected.to be true }
+      end
+
+      context "and the auth provider is not singleton" do
+        let(:authentication_provider) { account.authentication_providers.create!(auth_type: "cas") }
+
+        before do
+          account.authentication_providers.create!(auth_type: "cas")
+        end
+
+        it { is_expected.to be false }
+      end
+    end
+  end
+
+  describe ".find_restorable_provider" do
+    subject(:restorable_duplicate) do
+      described_class.find_restorable_provider(
+        root_account: account,
+        auth_type:
+      )
+    end
+
+    context "when the auth provider is not singleton" do
+      let(:auth_type) { "cas" }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when the auth provider is singleton, but not restorable" do
+      let(:auth_type) { "apple" }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when the auth provider is singleton and restorable" do
+      let(:auth_type) { "apple" }
+
+      before do
+        allow(AuthenticationProvider::Apple).to receive_messages(restorable?: true, singleton?: true)
+      end
+
+      context "and the account contains a duplicate auth provider" do
+        let!(:existing_auth_provider) { account.authentication_providers.create!(auth_type: "apple", workflow_state: "deleted") }
+
+        it "returns the duplicate auth provider" do
+          expect(restorable_duplicate).to eq(existing_auth_provider)
+        end
+      end
+
+      context "and the account does not contain a duplicate auth provider" do
+        it { is_expected.to be_nil }
+      end
+    end
+  end
+
   describe "#destroy" do
+    subject(:destroy_authentication_provider) { aac.destroy }
+
     let!(:aac) { account.authentication_providers.create!(auth_type: "cas") }
 
     it "retains the database row" do
@@ -111,6 +206,29 @@ describe AuthenticationProvider do
       pseudonym.save!
       aac.destroy
       expect(pseudonym.reload.workflow_state).to eq("deleted")
+    end
+
+    context "when the authentication provider is restorable" do
+      let!(:pseudonym) do
+        user = user_model
+
+        user.pseudonyms.create!(
+          unique_id: "user@test.com",
+          authentication_provider: aac
+        )
+      end
+
+      before do
+        allow(aac.class).to receive(:restorable?).and_return(true)
+      end
+
+      it "does not modify pseudonyms" do
+        expect { destroy_authentication_provider }.not_to change { pseudonym.reload.workflow_state }
+      end
+
+      it "soft deletes the authentication provider" do
+        expect { destroy_authentication_provider }.to change { aac.reload.workflow_state }.from("active").to("deleted")
+      end
     end
   end
 
@@ -141,7 +259,7 @@ describe AuthenticationProvider do
     end
 
     it "respects deletions for position management" do
-      aac3 = account.authentication_providers.create!(auth_type: "twitter")
+      aac3 = account.authentication_providers.create!(auth_type: "google")
       expect(aac2.reload.position).to eq(2)
       aac2.destroy
       expect(aac1.reload.position).to eq(1)

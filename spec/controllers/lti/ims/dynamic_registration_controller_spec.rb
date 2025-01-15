@@ -34,10 +34,6 @@ describe Lti::IMS::DynamicRegistrationController do
 
   verifier = OpenApiSpecHelper::SchemaVerifier.new(openapi_spec)
 
-  before do
-    Account.default.root_account.enable_feature! :lti_dynamic_registration
-  end
-
   after do
     verifier.verify(request, response) if response.sent?
   end
@@ -306,10 +302,6 @@ describe Lti::IMS::DynamicRegistrationController do
     let(:account) { Account.default }
     let(:registration) { lti_ims_registration_model(account:) }
 
-    before do
-      account.enable_feature!(:lti_dynamic_registration)
-    end
-
     context "with a user session" do
       let(:user) { account_admin_user(account:) }
 
@@ -353,14 +345,6 @@ describe Lti::IMS::DynamicRegistrationController do
 
     context "without a user session" do
       it { is_expected.to be_redirect }
-    end
-
-    context "without the feature flag enabled" do
-      before do
-        account.disable_feature!(:lti_dynamic_registration)
-      end
-
-      it { is_expected.to be_not_found }
     end
   end
 

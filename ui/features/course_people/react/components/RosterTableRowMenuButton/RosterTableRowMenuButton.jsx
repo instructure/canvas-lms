@@ -19,10 +19,10 @@
 import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {string} from 'prop-types'
 
-const I18n = useI18nScope('course_people')
+const I18n = createI18nScope('course_people')
 
 const RosterTableRowMenuButton = ({name}) => {
   return (

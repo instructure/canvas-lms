@@ -68,7 +68,7 @@ describe Latex::MathMl do
                   "X-Request-Context-Signature" => CanvasSecurity.base64_encode(request_id_signature)
                 })
           .and_return(
-            instance_double("Net::HTTPOK",
+            instance_double(Net::HTTPOK,
                             code: 200,
                             body: mml_doc)
           )
@@ -78,7 +78,7 @@ describe Latex::MathMl do
 
       context "when response status is not 200" do
         it "returns an empty string" do
-          expect(CanvasHttp).to receive_messages(get: instance_double("Net::HTTPServerError",
+          expect(CanvasHttp).to receive_messages(get: instance_double(Net::HTTPServerError,
                                                                       code: 500,
                                                                       body: mml_doc))
           expect(math_ml.parse).to be_empty
@@ -95,7 +95,7 @@ describe Latex::MathMl do
                     "X-Request-Context-Signature" => CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac_sha512("5"))
                   })
             .and_return(
-              instance_double("Net::HTTPOK",
+              instance_double(Net::HTTPOK,
                               code: 200,
                               body: mml_doc)
             )
@@ -105,7 +105,7 @@ describe Latex::MathMl do
 
         it "caches" do
           enable_cache do
-            expect(CanvasHttp).to receive(:get).and_return(instance_double("Net::HTTPOK", code: 200, body: mml_doc)).once
+            expect(CanvasHttp).to receive(:get).and_return(instance_double(Net::HTTPOK, code: 200, body: mml_doc)).once
 
             math_ml.parse
             math_ml.parse

@@ -19,7 +19,7 @@
 import React, {useEffect, useRef, useState} from 'react'
 import {useNavigate, useParams} from 'react-router-dom'
 import {queryClient, useQuery} from '@canvas/query'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -50,7 +50,7 @@ import {colors} from '@instructure/canvas-theme'
 
 const {Item: FlexItem} = Flex
 
-const I18n = useI18nScope('rubrics-list-view')
+const I18n = createI18nScope('rubrics-list-view')
 
 export const TABS = {
   saved: 'Saved',

@@ -18,7 +18,7 @@
 
 RSpec.describe CC::Importer::Canvas::Converter do
   let(:unzipped_file_path) { "path" }
-  let(:mock_package_root) { instance_double("PackageRoot") }
+  let(:mock_package_root) { instance_double(PackageRoot) }
 
   before do
     allow(PackageRoot).to receive(:new).with(unzipped_file_path).and_return(mock_package_root)

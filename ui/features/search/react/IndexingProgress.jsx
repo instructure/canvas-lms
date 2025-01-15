@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {ProgressBar} from '@instructure/ui-progress'
 
-const I18n = useI18nScope('SmartSearch')
+const I18n = createI18nScope('SmartSearch')
 
 export default function IndexingProgress({progress}) {
   return (

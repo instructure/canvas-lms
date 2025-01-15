@@ -19,14 +19,14 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from './constants'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('learning_mastery_gradebook')
+const I18n = createI18nScope('learning_mastery_gradebook')
 
 const StudentHeader = ({gradebookFilters, gradebookFilterHandler}) => {
   const toggleStudentsWithoutAssessments = () => gradebookFilterHandler('missing_user_rollups')

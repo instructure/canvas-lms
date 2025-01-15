@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconAttachMediaLine} from '@instructure/ui-icons'
-import {Mutation} from '@apollo/react-components'
+import {Mutation} from '@apollo/client/react/components'
 import React, {Component} from 'react'
 import {bool} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -38,7 +38,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {UploadMediaStrings, MediaCaptureStrings} from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 export default class CommentTextArea extends Component {
   static propTypes = {

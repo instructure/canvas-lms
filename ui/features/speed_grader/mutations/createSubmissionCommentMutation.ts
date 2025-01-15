@@ -18,7 +18,7 @@
 
 import {z} from 'zod'
 import {executeQuery} from '@canvas/query/graphql'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 
 export const CREATE_SUBMISSION_COMMENT = gql`

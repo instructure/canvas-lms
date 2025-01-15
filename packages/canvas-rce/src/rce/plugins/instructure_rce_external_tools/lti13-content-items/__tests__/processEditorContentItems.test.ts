@@ -29,6 +29,11 @@ import {
 import {createDeepMockProxy} from '../../../../../util/__tests__/deepMockProxy'
 import {ExternalToolsEditor, externalToolsEnvFor} from '../../ExternalToolsEnv'
 import RCEWrapper from '../../../../RCEWrapper'
+import {showFlashAlert} from '../../../../../common/FlashAlert'
+
+jest.mock('../../../../../common/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 
 describe('processEditorContentItems', () => {
   const linkContentItem: LinkContentItemJson = {
@@ -87,8 +92,6 @@ describe('processEditorContentItems', () => {
   const editor = createDeepMockProxy<ExternalToolsEditor>()
   const rceWrapper = createDeepMockProxy<RCEWrapper>()
 
-  let showFlashAlertSpy: ReturnType<typeof jest.spyOn>
-
   beforeAll(() => {
     jest.spyOn(RCEWrapper, 'getByEditor').mockImplementation(e => {
       if (e === editor) return rceWrapper
@@ -96,17 +99,15 @@ describe('processEditorContentItems', () => {
         throw new Error('Wrong editor requested')
       }
     })
-
-    showFlashAlertSpy = jest.spyOn(
-      jest.requireActual('../../../../../common/FlashAlert'),
-      'showFlashAlert'
-    )
   })
 
   beforeEach(() => {
     editor.mockClear()
     rceWrapper.mockClear()
-    showFlashAlertSpy.mockClear()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   describe('static', () => {
@@ -115,7 +116,7 @@ describe('processEditorContentItems', () => {
       const dialog = {close: jest.fn()}
       await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
       expect(dialog.close).toHaveBeenCalled()
-      expect(showFlashAlertSpy).not.toHaveBeenCalled()
+      expect(showFlashAlert).not.toHaveBeenCalled()
     })
 
     it('ignores messages without content_items', async () => {
@@ -136,8 +137,8 @@ describe('processEditorContentItems', () => {
       const dialog = {close: jest.fn()}
 
       await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'test message',
       })
     })
@@ -147,8 +148,8 @@ describe('processEditorContentItems', () => {
       const dialog = {close: jest.fn()}
 
       await processEditorContentItems(ev, externalToolsEnvFor(editor), dialog)
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'test error message',
         type: 'error',
       })
@@ -173,8 +174,8 @@ describe('processEditorContentItems', () => {
       )
       expect(dialog.close).toHaveBeenCalled()
 
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Could not insert content: "file" items are not currently supported in Canvas.',
         type: 'warning',
         err: null,
@@ -203,8 +204,8 @@ describe('processEditorContentItems', () => {
       )
       expect(dialog.close).toHaveBeenCalled()
 
-      expect(showFlashAlertSpy).toHaveBeenCalledTimes(1)
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledTimes(1)
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message:
           'Could not insert content: "unsupported" items are not currently supported in Canvas.',
         type: 'warning',

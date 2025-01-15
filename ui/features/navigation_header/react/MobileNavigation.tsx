@@ -22,7 +22,7 @@ import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 import {useQuery} from '@tanstack/react-query'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {getUnreadCount} from './queries/unreadCountQuery'
 
 declare global {
@@ -31,7 +31,7 @@ declare global {
   }
 }
 
-const I18n = useI18nScope('MobileNavigation')
+const I18n = createI18nScope('MobileNavigation')
 
 const mobileHeaderInboxUnreadBadge = document.getElementById('mobileHeaderInboxUnreadBadge')
 

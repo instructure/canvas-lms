@@ -808,21 +808,27 @@ QUnit.module('SpeedGrader', rootHooks => {
       const spinnerShown = () =>
         document.getElementById('grades-loading-spinner').children.length > 0
 
-      test('shows a spinner while polling', () => {
+      test('shows a spinner while polling', async () => {
         const retry = () => true
         SpeedGrader.EG.refreshGrades(null, retry)
+        // Have to wait for React to finish async rendering
+        await new Promise(resolve => setTimeout(resolve, 0))
         ok(spinnerShown())
       })
 
-      test('hides the spinner when polling completes', () => {
+      test('hides the spinner when polling completes', async () => {
         const retry = (_sub, _originalSub, numRequests) => numRequests <= 1
         SpeedGrader.EG.refreshGrades(null, retry)
+        // Have to wait for React to finish async rendering
+        await new Promise(resolve => setTimeout(resolve, 0))
         notOk(spinnerShown())
       })
 
-      test('does not show a spinner when no retries are made', () => {
+      test('does not show a spinner when no retries are made', async () => {
         const retry = () => false
         SpeedGrader.EG.refreshGrades(null, retry)
+        // Have to wait for React to finish async rendering
+        await new Promise(resolve => setTimeout(resolve, 0))
         notOk(spinnerShown())
       })
     })

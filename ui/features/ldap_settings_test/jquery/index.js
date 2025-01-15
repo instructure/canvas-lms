@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-shadow */
+ 
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *
@@ -17,14 +17,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import h from '@instructure/html-escape'
 import authenticity_token from '@canvas/authenticity-token'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('accounts')
+const I18n = createI18nScope('accounts')
 
 function testLDAP() {
   clearTestLDAP()

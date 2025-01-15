@@ -3285,10 +3285,10 @@ RSpec.describe ApplicationController, "#compute_http_cost" do
   it "has some cost for http actions (in seconds)" do
     stub_request(:get, "http://www.example.com/test")
       .to_return(status: 200, body: "", headers: {})
-    start_time = Time.now
+    start_time = Time.zone.now
     get :index, params: { do_http: 1, do_error: 0 }
     expect(response).to have_http_status :success
-    end_time = Time.now
+    end_time = Time.zone.now
     expect(CanvasHttp.cost > 0).to be_truthy
     expect(CanvasHttp.cost <= (end_time - start_time)).to be_truthy
     expect(controller.request.env["extra-request-cost"]).to eq(CanvasHttp.cost)

@@ -1,4 +1,4 @@
-/* eslint-disable eqeqeq */
+ 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -18,7 +18,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {createRoot} from 'react-dom/client'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym'
@@ -36,7 +36,7 @@ import AccessTokenDetails from '../react/AccessTokenDetails'
 import NewAccessToken from '../react/NewAccessToken'
 import RegisterService from '../react/RegisterService'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 const $edit_settings_link = $('.edit_settings_link')
 

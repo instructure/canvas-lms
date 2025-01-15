@@ -50,13 +50,13 @@ module DataFixup
     end
 
     def run_expired?
-      Time.now >= @run_until
+      Time.zone.now >= @run_until
     end
 
     def import_batch(shard_id, key)
       InstStatsd::Statsd.time("import_instfs_attachments.import_batch.time") do
         lines = read_source(key)
-        started = Time.now
+        started = Time.zone.now
         Shard.find(shard_id).activate do
           InstStatsd::Statsd.time("import_instfs_attachments.import_batch.transaction.time") do
             Attachment.transaction do
@@ -65,7 +65,7 @@ module DataFixup
           end
         end
         InstStatsd::Statsd.increment("import_instfs_attachments.import_batch.count")
-        Time.now - started
+        Time.zone.now - started
       end
     end
 

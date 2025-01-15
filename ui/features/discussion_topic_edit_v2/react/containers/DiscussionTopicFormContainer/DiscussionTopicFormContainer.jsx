@@ -18,12 +18,12 @@
 
 import React, {useCallback, useContext, useEffect, useState} from 'react'
 
-import {useQuery, useMutation} from '@apollo/react-hooks'
+import {useQuery, useMutation} from '@apollo/client'
 import {DISCUSSION_TOPIC_QUERY} from '../../../graphql/Queries'
 import {CREATE_DISCUSSION_TOPIC, UPDATE_DISCUSSION_TOPIC} from '../../../graphql/Mutations'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DiscussionTopicForm from '../../components/DiscussionTopicForm/DiscussionTopicForm'
 import {setUsageRights} from '../../util/setUsageRights'
 import {getContextQuery} from '../../util/utils'
@@ -37,7 +37,7 @@ import WithBreakpoints from '@canvas/with-breakpoints'
 import {flushSync} from 'react-dom'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 
 function DiscussionTopicFormContainer({apolloClient, breakpoints}) {

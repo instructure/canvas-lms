@@ -33,15 +33,15 @@ describe CanvasPartman::PartitionManager do
       context "precision = :months" do
         it "creates a partition suffixed by YYYY_MM" do
           expect do
-            subject.create_partition(Time.new(2014, 11))
+            subject.create_partition(Time.local(2014, 11))
           end.not_to raise_error
 
           expect(SchemaHelper.table_exists?("partman_animals_2014_11")).to be true
         end
 
         it "creates multiple partitions" do
-          subject.create_partition(Time.new(2014, 11, 5))
-          subject.create_partition(Time.new(2014, 12, 5))
+          subject.create_partition(Time.local(2014, 11, 5))
+          subject.create_partition(Time.local(2014, 12, 5))
 
           expect(SchemaHelper.table_exists?("partman_animals_2014_11")).to be true
           expect(SchemaHelper.table_exists?("partman_animals_2014_12")).to be true
@@ -49,7 +49,7 @@ describe CanvasPartman::PartitionManager do
       end
 
       it "brings along foreign keys" do
-        subject.create_partition(Time.new(2014, 11))
+        subject.create_partition(Time.local(2014, 11))
         parent_foreign_key = Animal.connection.foreign_keys("partman_animals")[0]
         foreign_key = Animal.connection.foreign_keys("partman_animals_2014_11")[0]
         expect(foreign_key.to_table).to eq("partman_zoos")
@@ -114,9 +114,9 @@ describe CanvasPartman::PartitionManager do
     describe "#create_partition" do
       it "creates partitions suffixed by year and week number" do
         expect do
-          subject.create_partition(Time.new(2018, 12, 24))
-          subject.create_partition(Time.new(2018, 12, 31)) # beginning of next year's first week
-          subject.create_partition(Time.new(2021, 1, 1)) # part of last year's 53rd week
+          subject.create_partition(Time.local(2018, 12, 24))
+          subject.create_partition(Time.local(2018, 12, 31)) # beginning of next year's first week
+          subject.create_partition(Time.local(2021, 1, 1)) # part of last year's 53rd week
         end.not_to raise_error
 
         expect(SchemaHelper.table_exists?("partman_week_events_2018_52")).to be true

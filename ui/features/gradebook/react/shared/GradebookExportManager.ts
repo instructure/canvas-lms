@@ -17,9 +17,9 @@
  */
 
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebookSharedGradebookexportManager')
+const I18n = createI18nScope('gradebookSharedGradebookexportManager')
 
 type Export = {
   progressId: string

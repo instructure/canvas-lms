@@ -29,13 +29,8 @@ import {
   defaultGradebookOptions,
   checkpointedAssignment,
 } from './fixtures'
-import {GRADEBOOK_SUBMISSION_COMMENTS} from '../../../../queries/Queries'
-import {MockedProvider} from '@apollo/react-testing'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
-import type {
-  AssignmentConnection,
-  GradebookUserSubmissionDetails,
-} from 'features/enhanced_individual_gradebook/types'
+import type {AssignmentConnection, GradebookUserSubmissionDetails} from '../../../../types'
 import type {GradingType} from '../../../../../../api'
 import {setupCanvasQueries} from '../../__tests__/fixtures'
 import {MockedQueryProvider} from '@canvas/test-utils/query'

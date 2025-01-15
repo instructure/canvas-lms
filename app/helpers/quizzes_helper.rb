@@ -144,7 +144,7 @@ module QuizzesHelper
 
     show_at = quiz.show_correct_answers_at
     hide_at = quiz.hide_correct_answers_at
-    now = Time.now
+    now = Time.zone.now
 
     # Some labels will be used in more than one case, so we'll pre-define them.
     labels = {}

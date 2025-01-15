@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {array, bool, func, number, shape} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -36,7 +36,7 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('student_groups')
+const I18n = createI18nScope('student_groups')
 
 export default function NewStudentGroupModal({userCollection, loadMore, onSave, ...modalProps}) {
   const [name, setName] = useState('')
@@ -63,7 +63,7 @@ export default function NewStudentGroupModal({userCollection, loadMore, onSave, 
     })
       .then(notifyDidSave)
       .catch(err => {
-        console.error(err) // eslint-disable-line no-console
+        console.error(err)  
         captureException(err)
         setStatus('error')
       })

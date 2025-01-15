@@ -21,9 +21,9 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Pill} from '@instructure/ui-pill'
 import {object, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('feature_flags')
+const I18n = createI18nScope('feature_flags')
 
 export default function StatusPill({feature, updatedState}) {
   const state = updatedState || feature.feature_flag.state

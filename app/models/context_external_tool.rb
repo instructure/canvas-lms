@@ -130,23 +130,13 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
     given do |user, session|
-      !context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        context.grants_right?(user, session, :lti_add_edit)
-    end
-    can :read and can :update and can :delete and can :update_manually
-    ##################### End legacy permission block ##########################
-
-    given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        context.grants_right?(user, session, :manage_lti_edit)
+      context.grants_right?(user, session, :manage_lti_edit)
     end
     can :read and can :update and can :update_manually
 
     given do |user, session|
-      context.root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        context.grants_right?(user, session, :manage_lti_delete)
+      context.grants_right?(user, session, :manage_lti_delete)
     end
     can :read and can :delete
   end
@@ -327,7 +317,11 @@ class ContextExternalTool < ActiveRecord::Base
     val = calculate_extension_setting(type, property)
     if property == :icon_url
       # make sure it's a valid url
-      return nil if val && (URI.parse(val) rescue nil).nil?
+      begin
+        URI.parse(val) if val
+      rescue URI::InvalidURIError
+        return nil
+      end
 
       # account for beta and test overrides
       return url_with_environment_overrides(val)
@@ -1623,7 +1617,11 @@ class ContextExternalTool < ActiveRecord::Base
     return false unless developer_key&.internal_service?
     return false unless launch_url
 
-    domain = URI.parse(launch_url).host rescue nil
+    begin
+      domain = URI.parse(launch_url).host
+    rescue URI::InvalidURIError
+      # ignore
+    end
     return false unless domain
 
     internal_tool_domain_allowlist.any? { |d| domain.end_with?(".#{d}") || domain == d }

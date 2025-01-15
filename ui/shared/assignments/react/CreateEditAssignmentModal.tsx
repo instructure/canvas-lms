@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {Flex} from '@instructure/ui-flex'
@@ -34,7 +34,7 @@ import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import useInputFocus from '@canvas/outcomes/react/hooks/useInputFocus'
 
-const I18n = useI18nScope('CreateEditAssignmentModal')
+const I18n = createI18nScope('CreateEditAssignmentModal')
 
 export type ModalAssignment = {
   type: string
@@ -496,6 +496,7 @@ const CreateEditAssignmentModal = ({
         </View>
         <View as="div">
           <NumberInput
+            allowStringValue={true}
             renderLabel={I18n.t('Points')}
             interaction={enablePointsInput ? 'enabled' : 'disabled'}
             showArrows={false}

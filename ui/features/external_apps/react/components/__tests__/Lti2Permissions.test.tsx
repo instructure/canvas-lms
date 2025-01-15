@@ -28,7 +28,7 @@ describe('Lti2Permissions', () => {
       description: null,
       enabled: false,
       installed_locally: true,
-      name: 'Twitter',
+      name: 'SomeTool',
     }
     render(
       <Lti2Permissions tool={tool} handleCancelLti2={jest.fn()} handleActivateLti2={jest.fn()} />

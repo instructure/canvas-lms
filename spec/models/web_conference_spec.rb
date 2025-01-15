@@ -326,7 +326,7 @@ describe WebConference do
     end
 
     it "has a start date" do
-      @conference.start_at = Time.now
+      @conference.start_at = Time.zone.now
       expect(@conference.scheduled?).to be_falsey
     end
 

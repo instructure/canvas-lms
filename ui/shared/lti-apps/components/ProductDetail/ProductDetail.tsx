@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {useLocation} from 'react-router-dom'
 import useBreakpoints from '@canvas/lti-apps/hooks/useBreakpoints'
 import useSimilarProducts from '../../queries/useSimilarProducts'
 import useProduct from '../../queries/useProduct'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -43,7 +44,7 @@ import Disclaimer from '../common/Disclaimer'
 import type {Lti, Product} from '../../models/Product'
 import {instructorAppsRoute} from '@canvas/lti-apps/utils/route'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 type ProductDetailProps = {
   renderConfigureButton?: (buttonWidth: 'block' | 'inline-block', lti: Lti) => JSX.Element
@@ -146,10 +147,8 @@ const ProductDetail = (props: ProductDetailProps) => {
               </div>
             </Flex.Item>
           )}
-          <Flex.Item shouldGrow={true} shouldShrink={true} padding="small 0 0 small">
-            <Text weight="bold" size="x-large">
-              {product.name}
-            </Text>
+          <Flex.Item shouldGrow={true} shouldShrink={true} margin="small 0 0 mediumSmall">
+            <Heading level="h1">{product.name}</Heading>
             <Flex.Item shouldGrow={true} shouldShrink={true}>
               <div style={{marginBottom: '.5rem'}}>
                 <TruncateWithTooltip
@@ -286,9 +285,9 @@ const ProductDetail = (props: ProductDetailProps) => {
               position="relative"
               withFocusOutline={!showTrucatedDescription}
             >
-              <Text weight="bold" size="x-large">
+              <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
                 {I18n.t('Overview')}
-              </Text>
+              </Heading>
             </View>{' '}
             <Flex gap="x-large">
               {product.company.company_url && (
@@ -297,6 +296,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                     href={product.company.company_url}
                     isWithinText={false}
                     renderIcon={<IconExpandStartLine />}
+                    target="_blank"
                   >
                     <Text weight="bold">{I18n.t('Website')}</Text>
                   </Link>
@@ -308,6 +308,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                     href={product.support_url}
                     isWithinText={false}
                     renderIcon={<IconMessageLine />}
+                    target="_blank"
                   >
                     <Text weight="bold">{I18n.t('Contact')}</Text>
                   </Link>
@@ -344,9 +345,9 @@ const ProductDetail = (props: ProductDetailProps) => {
             <LtiConfigurationDetail integrationData={integrationData} />
             <Flex margin="medium 0 0 0">
               <Flex.Item margin="0 0 small 0">
-                <Text weight="bold" size="x-large">
+                <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
                   {I18n.t('Implementation Resources')}
-                </Text>
+                </Heading>
               </Flex.Item>
             </Flex>
             <Flex direction="column" margin="0 0 large 0">

@@ -189,7 +189,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   def infer_defaults
     self.learning_outcome_id = alignment.learning_outcome_id
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
     self.original_score ||= score
     self.original_possible ||= possible
     self.original_mastery = mastery if original_mastery.nil?

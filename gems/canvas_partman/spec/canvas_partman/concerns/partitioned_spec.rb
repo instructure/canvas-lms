@@ -32,12 +32,12 @@ describe CanvasPartman::Concerns::Partitioned do
       end
 
       it "creates multiple records in the proper partition tables" do
-        subject.create_partition(Time.new(2014, 11))
-        subject.create_partition(Time.new(2014, 12))
+        subject.create_partition(Time.local(2014, 11))
+        subject.create_partition(Time.local(2014, 12))
 
-        Animal.create({ created_at: Time.new(2014, 11, 8) })
-        Animal.create({ created_at: Time.new(2014, 11, 15) })
-        Animal.create({ created_at: Time.new(2014, 12, 4) })
+        Animal.create({ created_at: Time.local(2014, 11, 8) })
+        Animal.create({ created_at: Time.local(2014, 11, 15) })
+        Animal.create({ created_at: Time.local(2014, 12, 4) })
 
         expect(Animal.count).to eq 3
 
@@ -57,13 +57,13 @@ describe CanvasPartman::Concerns::Partitioned do
         end
 
         it "locates the correct partition table" do
-          subject.create_partition(Time.new(2014, 12))
-          subject.create_partition(Time.new(2015, 1))
+          subject.create_partition(Time.local(2014, 12))
+          subject.create_partition(Time.local(2015, 1))
 
           expect do
             # this would be at new years of 2015 in UTC: 1/1/2015 00:00:00
             Animal.create({
-                            created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
+                            created_at: Time.local(2014, 12, 31, 17, 0, 0, 0)
                           })
           end.not_to raise_error
         end
@@ -71,19 +71,19 @@ describe CanvasPartman::Concerns::Partitioned do
 
       context "via an association scope" do
         it "works" do
-          subject.create_partition(Time.new(2014, 11))
-          subject.create_partition(Time.new(2014, 12))
+          subject.create_partition(Time.local(2014, 11))
+          subject.create_partition(Time.local(2014, 12))
 
           zoo = Zoo.create!
 
           monkey = zoo.animals.create!({
                                          race: "monkey",
-                                         created_at: Time.new(2014, 11, 5)
+                                         created_at: Time.local(2014, 11, 5)
                                        })
 
           parrot = zoo.animals.create({
                                         race: "parrot",
-                                        created_at: Time.new(2014, 12, 5)
+                                        created_at: Time.local(2014, 12, 5)
                                       })
 
           expect(count_records("partman_animals")).to eq 2
@@ -101,9 +101,9 @@ describe CanvasPartman::Concerns::Partitioned do
       it "puts records from the same partition into a partition group" do
         yield_count = 0
         attrs = [
-          { created_at: Time.new(2020, 7, 2) },
-          { created_at: Time.new(2020, 7, 3) },
-          { created_at: Time.new(2020, 7, 4) }
+          { created_at: Time.local(2020, 7, 2) },
+          { created_at: Time.local(2020, 7, 3) },
+          { created_at: Time.local(2020, 7, 4) }
         ].map(&:with_indifferent_access)
         Animal.attrs_in_partition_groups(attrs) do |partition_name, records|
           yield_count += 1
@@ -115,11 +115,11 @@ describe CanvasPartman::Concerns::Partitioned do
 
       it "can insert into multiple partitions simultaneously" do
         attrs = [
-          { created_at: Time.new(2020, 7, 2) },
-          { created_at: Time.new(2020, 7, 3) },
-          { created_at: Time.new(2020, 7, 4) },
-          { created_at: Time.new(2020, 6, 28) },
-          { created_at: Time.new(2020, 6, 29) }
+          { created_at: Time.local(2020, 7, 2) },
+          { created_at: Time.local(2020, 7, 3) },
+          { created_at: Time.local(2020, 7, 4) },
+          { created_at: Time.local(2020, 6, 28) },
+          { created_at: Time.local(2020, 6, 29) }
         ].map(&:with_indifferent_access)
         yield_count = 0
 
@@ -133,10 +133,10 @@ describe CanvasPartman::Concerns::Partitioned do
 
     describe "updating records" do
       before do
-        subject.create_partition(Time.new(2014, 11, 1))
+        subject.create_partition(Time.local(2014, 11, 1))
 
         @pt = Animal.create({
-                              created_at: Time.new(2014, 11, 8),
+                              created_at: Time.local(2014, 11, 8),
                               race: "monkey"
                             })
       end
@@ -159,13 +159,13 @@ describe CanvasPartman::Concerns::Partitioned do
 
     describe "removing records" do
       it "works using #destroy or scope#destroy_all" do
-        subject.create_partition(Time.new(2014, 11, 1))
-        subject.create_partition(Time.new(2014, 12, 1))
+        subject.create_partition(Time.local(2014, 11, 1))
+        subject.create_partition(Time.local(2014, 12, 1))
 
-        pt1 = Animal.create({ created_at: Time.new(2014, 11, 8) })
-        Animal.create({ created_at: Time.new(2014, 11, 15) })
-        Animal.create({ created_at: Time.new(2014, 12, 4) })
-        pt4 = Animal.create({ created_at: Time.new(2014, 12, 4) })
+        pt1 = Animal.create({ created_at: Time.local(2014, 11, 8) })
+        Animal.create({ created_at: Time.local(2014, 11, 15) })
+        Animal.create({ created_at: Time.local(2014, 12, 4) })
+        pt4 = Animal.create({ created_at: Time.local(2014, 12, 4) })
 
         expect(Animal.count).to eq 4
 

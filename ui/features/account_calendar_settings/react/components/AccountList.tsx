@@ -27,7 +27,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import SpacePandaUrl from '@canvas/images/SpacePanda.svg'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AccountCalendarItem} from './AccountCalendarItem'
 import {FilterType} from './FilterControls'
@@ -35,7 +35,7 @@ import type {Account, AccountData, VisibilityChange, SubscriptionChange} from '.
 import {castIdsToInt} from '../utils'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
-const I18n = useI18nScope('account_calendar_settings_account_list')
+const I18n = createI18nScope('account_calendar_settings_account_list')
 
 const MIN_SEARCH_TERM_LENGTH = 2
 const PAGE_LENGTH_SEARCH = 20
@@ -80,7 +80,6 @@ export const AccountList = ({
     }
   }, [isLoading, accounts, debouncedSearchTerm])
 
-  // @ts-expect-error - this hook isn't ts-ified
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/account_calendars`,
     params: {

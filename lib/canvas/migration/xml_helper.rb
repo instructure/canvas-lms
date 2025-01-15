@@ -25,7 +25,11 @@ module Canvas::Migration
     def convert_to_timestamp(string)
       return nil if string.nil? || string == ""
 
-      Time.use_zone("UTC") { Time.zone.parse(string).to_i * 1000 } rescue nil
+      timestamp = ActiveSupport::TimeZone["UTC"].parse(string)
+
+      timestamp.to_i * 1000
+    rescue ArgumentError
+      nil
     end
 
     def get_node_att(node, selector, attribute, default = nil)

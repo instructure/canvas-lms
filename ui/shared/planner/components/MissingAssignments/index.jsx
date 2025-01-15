@@ -29,11 +29,11 @@ import {View} from '@instructure/ui-view'
 
 import {courseShape, opportunityShape, sizeShape} from '../plannerPropTypes'
 import {toggleMissingItems} from '../../actions'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import PlannerItem from '../PlannerItem'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const convertSubmissionType = submissionTypes => {
   if (submissionTypes?.length > 0) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {clone} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -42,7 +42,7 @@ import {VideoConferenceModal} from './react/components/VideoConferenceModal/Vide
 import getCookie from '@instructure/get-cookie'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 
-const I18n = useI18nScope('conferences')
+const I18n = createI18nScope('conferences')
 
 if (ENV.can_create_conferences) {
   if (ENV.render_alternatives) {
@@ -158,7 +158,7 @@ const ConferencesRouter = Backbone.Router.extend({
           }) || []
 
         const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <VideoConferenceModal
             open={true}
@@ -166,7 +166,7 @@ const ConferencesRouter = Backbone.Router.extend({
             availableAttendeesList={menuData}
             onDismiss={() => {
               window.location.hash = ''
-              // eslint-disable-next-line no-restricted-properties
+               
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
             }}
             onSubmit={async (e, data) => {
@@ -343,7 +343,7 @@ const ConferencesRouter = Backbone.Router.extend({
         }
       })
 
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <VideoConferenceModal
           open={true}
@@ -364,7 +364,7 @@ const ConferencesRouter = Backbone.Router.extend({
           endCalendarDate={attributes.end_at}
           onDismiss={() => {
             window.location.hash = ''
-            // eslint-disable-next-line no-restricted-properties
+             
             ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
           }}
           onSubmit={async (e, data) => {

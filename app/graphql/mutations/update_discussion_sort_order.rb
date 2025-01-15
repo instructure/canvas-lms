@@ -29,10 +29,11 @@ class Mutations::UpdateDiscussionSortOrder < Mutations::BaseMutation
     discussion_topic = DiscussionTopic.find(input[:discussion_topic_id])
     raise GraphQL::ExecutionError, "insufficient permission" unless discussion_topic.grants_right?(current_user, session, :read)
 
-    sort_order = input[:sort_order].to_s
-    sort_order = DiscussionTopicParticipant::SortOrder::DESC unless DiscussionTopicParticipant::SortOrder::TYPES.include?(sort_order)
-    discussion_topic.update_or_create_participant(current_user:, sort_order:)
-
+    unless Account.site_admin.feature_enabled?(:discussion_default_sort) && discussion_topic.sort_order_locked?
+      sort_order = input[:sort_order].to_s
+      sort_order = DiscussionTopic::SortOrder::DESC unless DiscussionTopic::SortOrder::TYPES.include?(sort_order)
+      discussion_topic.update_or_create_participant(current_user:, sort_order:)
+    end
     { discussion_topic: }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"

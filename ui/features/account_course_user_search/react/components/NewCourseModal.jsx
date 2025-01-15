@@ -20,13 +20,13 @@ import React, {useState} from 'react'
 import {node} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
 import {propType as termsPropType} from '../store/TermsStore'
 import SearchableSelect from './SearchableSelect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Text} from '@instructure/ui-text'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -34,7 +34,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import {flatten} from 'lodash'
 import {clearDashboardCache} from '../../../../shared/dashboard-card/dashboardCardQueries'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 const nonBreakingSpace = '\u00a0'
 const renderAccountOptions = (accounts = [], depth = 0) =>
@@ -80,11 +80,11 @@ export default function NewCourseModal({terms, children}) {
       showFlashAlert({
         type: 'success',
         message: (
-          <Text>
+          <>
             {I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})}
             &emsp;
             <Link href={`/courses/${createdCourse.id}`}>{I18n.t('Go to the new course')}</Link>
-          </Text>
+          </>
         ),
       })
       if (window?.ENV?.FEATURES?.dashboard_graphql_integration) {
@@ -121,12 +121,7 @@ export default function NewCourseModal({terms, children}) {
         <Modal.Body>
           <FormFieldGroup layout="stacked" rowSpacing="small" description="">
             <TextInput
-              renderLabel={
-                <>
-                  {I18n.t('Course Name')}
-                  <Text color="danger"> *</Text>
-                </>
-              }
+              renderLabel={I18n.t('Course Name')}
               value={data.name}
               onChange={onChange('name')}
               isRequired={true}
@@ -134,12 +129,7 @@ export default function NewCourseModal({terms, children}) {
             />
 
             <TextInput
-              renderLabel={
-                <>
-                  {I18n.t('Reference Code')}
-                  <Text color="danger"> *</Text>
-                </>
-              }
+              renderLabel={I18n.t('Reference Code')}
               value={data.course_code}
               onChange={onChange('course_code')}
               isRequired={true}

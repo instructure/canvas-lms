@@ -18,11 +18,11 @@
 
 import * as React from 'react'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {isLtiPrivacyLevel, type LtiPrivacyLevel} from '../../model/LtiPrivacyLevel'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export type RegistrationPrivacyFieldProps = {
   onChange: (value: LtiPrivacyLevel) => void
@@ -75,7 +75,7 @@ export const RegistrationPrivacyField = (props: RegistrationPrivacyFieldProps) =
           if (isLtiPrivacyLevel(value)) {
             props.onChange(value)
           } else {
-            // eslint-disable-next-line no-console
+             
             console.warn(`${value} was not a valid Lti privacy setting`)
           }
         }}

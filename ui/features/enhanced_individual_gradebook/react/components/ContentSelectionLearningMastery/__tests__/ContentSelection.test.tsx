@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {render} from '@testing-library/react'
 import ContentSelection from '..'
 import {defaultOutcomes, defaultSortableStudents, makeContentSelectionProps} from './fixtures'

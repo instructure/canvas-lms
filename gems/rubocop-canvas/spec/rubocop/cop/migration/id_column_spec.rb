@@ -22,7 +22,7 @@ describe RuboCop::Cop::Migration::IdColumn do
 
   context "create_table/change_table block with t.integer" do
     it "complains if a small integer column is named `_id`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             create_table :widgets do |t|
@@ -31,13 +31,13 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "still complains if limit: 8 is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             create_table :widgets do |t|
@@ -46,13 +46,13 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if type :bigint is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             create_table :widgets do |t|
@@ -61,11 +61,11 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "doesn't complain about a non-id column" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def up
             create_table :widgets do |t|
@@ -74,13 +74,13 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
   end
 
   context "create_table/change_table block with t.column" do
     it "complains if a small integer column is named `_id`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             change_table :widgets do |t|
@@ -89,13 +89,13 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "still complains if limit: 8 is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             change_table :widgets do |t|
@@ -104,13 +104,13 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if type :bigint is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             change_table :widgets do |t|
@@ -119,11 +119,11 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "doesn't complain about a non-id column" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             change_table :widgets do |t|
@@ -132,68 +132,68 @@ describe RuboCop::Cop::Migration::IdColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
   end
 
   context "add_column" do
     it "complains if a small integer column is named `_id`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             add_column :widgets, :wicket_id, :integer
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to include "Use `:bigint` for id columns"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to include "Use `:bigint` for id columns"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "still complains if limit: 8 is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             add_column :widgets, :wicket_id, :integer, limit: 8
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
-      expect(cop.messages.first).to eq "Migration/IdColumn: Use `:bigint` for id columns"
-      expect(cop.offenses.first.severity.name).to eq(:warning)
+      expect(offenses.size).to eq 1
+      expect(offenses.first.message).to eq "Migration/IdColumn: Use `:bigint` for id columns"
+      expect(offenses.first.severity.name).to eq(:warning)
     end
 
     it "doesn't complain if type :bigint is given" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             add_column :widgets, :wicket_id, :bigint
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "doesn't complain about a non-id column" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             add_column :widgets, :fluoride, :integer
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 0
+      expect(offenses.size).to eq 0
     end
 
     it "recognizes the :int spelling" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class TestMigration < ActiveRecord::Migration
           def change
             add_column :widgets, :wicket_id, :int
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq 1
+      expect(offenses.size).to eq 1
     end
   end
 end

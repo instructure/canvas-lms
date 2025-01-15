@@ -422,7 +422,6 @@ module Api::V1::Submission
     params = {},
     avatars = false
   )
-
     json = submission_json(submission, assignment, current_user, session, context, includes, params, avatars)
 
     # we want to make a clear distinction between a submission and a sub assignment submission, we will do this by

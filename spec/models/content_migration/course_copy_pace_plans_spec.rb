@@ -20,6 +20,11 @@
 require_relative "course_copy_helper"
 
 describe ContentMigration do
+  before do
+    stub_const("EXCLUDE_WEEKENDS_WORK_WEEK_DAYS", [])
+    stub_const("NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS", %w[sun sat])
+  end
+
   context "course paces" do
     include_context "course copy"
 
@@ -28,7 +33,7 @@ describe ContentMigration do
       course_pace.workflow_state = "active"
       course_pace.end_date = 1.day.from_now.beginning_of_day
       course_pace.published_at = Time.now.utc
-      course_pace.exclude_weekends = false
+      course_pace.selected_days_to_skip = NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS
       course_pace.hard_end_dates = true
       course_pace.save!
 
@@ -41,7 +46,7 @@ describe ContentMigration do
       expect(course_pace_to.start_date).to eq course_pace.start_date
       expect(course_pace_to.end_date).to eq course_pace.end_date
       expect(course_pace_to.published_at.to_i).to eq course_pace.published_at.to_i
-      expect(course_pace_to.exclude_weekends).to be false
+      expect(course_pace_to.selected_days_to_skip).to eq NOT_EXCLUDE_WEEKENDS_WORK_WEEK_DAYS
       expect(course_pace_to.hard_end_dates).to be true
     end
 

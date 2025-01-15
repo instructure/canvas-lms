@@ -21,9 +21,9 @@ import type {Module, Requirement} from '../react/types'
 import {updateModulePublishedState} from '../../utils/publishAllModulesHelper'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {convertFriendlyDatetimeToUTC} from './miscHelpers'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 const resourceTypeMap: Record<string, Requirement['resource']> = {
   assignment: 'assignment',

@@ -17,10 +17,10 @@
  */
 
 import $ from '@canvas/rails-flash-notifications'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {LtiMessageHandler} from '../lti_message_handler'
 
-const I18n = useI18nScope('ltiMessages')
+const I18n = createI18nScope('ltiMessages')
 
 const showAlert: LtiMessageHandler<{
   body: unknown

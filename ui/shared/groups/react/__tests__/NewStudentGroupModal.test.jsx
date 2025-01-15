@@ -85,10 +85,10 @@ describe('NewStudentGroupModal', () => {
         onDismiss={onDismiss}
       />
     )
-    fireEvent.input(getByLabelText('Group Name'), {
+    fireEvent.input(getByLabelText('Group Name *'), {
       target: {value: 'Dat new new'},
     })
-    expect(getByLabelText('Group Name')).toHaveValue('Dat new new')
+    expect(getByLabelText('Group Name *')).toHaveValue('Dat new new')
     fireEvent.click(getByText('Cancel'))
     rerender(
       <NewStudentGroupModal
@@ -99,7 +99,7 @@ describe('NewStudentGroupModal', () => {
         onDismiss={onDismiss}
       />
     )
-    expect(getByLabelText('Group Name')).toHaveValue('')
+    expect(getByLabelText('Group Name *')).toHaveValue('')
   })
 
   it('disables the submit button if group name is not provided', () => {
@@ -125,7 +125,7 @@ describe('NewStudentGroupModal', () => {
         onDismiss={onDismiss}
       />
     )
-    fireEvent.input(getByLabelText('Group Name'), {
+    fireEvent.input(getByLabelText('Group Name *'), {
       target: {value: 'name'},
     })
     expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
@@ -142,7 +142,7 @@ describe('NewStudentGroupModal', () => {
         onDismiss={onDismiss}
       />
     )
-    fireEvent.input(getByLabelText('Group Name'), {
+    fireEvent.input(getByLabelText('Group Name *'), {
       target: {value: 'name'},
     })
     fireEvent.click(getByRole('combobox', {name: 'Invite Students'}))
@@ -183,7 +183,7 @@ describe('NewStudentGroupModal', () => {
           onDismiss={onDismiss}
         />
       )
-      fireEvent.input(getByLabelText('Group Name'), {
+      fireEvent.input(getByLabelText('Group Name *'), {
         target: {value: 'name'},
       })
       fireEvent.click(getByText('Submit'))

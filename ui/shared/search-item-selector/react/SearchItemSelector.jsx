@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect, useCallback} from 'react'
 import {func, string, object, number, node, shape, instanceOf} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from './hooks/useDebouncedSearchTerm'
 
-const I18n = useI18nScope('managed_course_selector')
+const I18n = createI18nScope('managed_course_selector')
 const MINIMUM_SEARCH_LENGTH = 2
 
 SearchItemSelector.propTypes = {

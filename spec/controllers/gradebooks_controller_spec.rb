@@ -1418,6 +1418,30 @@ describe GradebooksController do
           groupless_json = group_categories_json.find { |cat| cat["id"] == @groupless_category.id }
           expect(groupless_json["groups"]).to be_empty
         end
+
+        context ":differentiation_tags" do
+          before :once do
+            Account.site_admin.enable_feature!(:differentiation_tags)
+          end
+
+          before do
+            @ncgc = @course.group_categories.create!(name: "ncgc", non_collaborative: true)
+            @ncgc.create_groups(2)
+          end
+
+          it "includes differentiation tag categories when user has a manage tags permission" do
+            get :show, params: { course_id: @course.id }
+            expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id, @ncgc.id)
+          end
+
+          it "excludes differentiation tag categories when user does not have a manage tags permission" do
+            ta_in_course
+            user_session(@ta)
+
+            get :show, params: { course_id: @course.id }
+            expect(group_categories_json.pluck("id")).to contain_exactly(category.id, category2.id, @groupless_category.id)
+          end
+        end
       end
 
       context "publish_to_sis_enabled" do

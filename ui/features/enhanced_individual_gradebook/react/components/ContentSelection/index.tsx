@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 
 import type {GradebookOptions, SortableAssignment, SortableStudent} from '../../../types'
@@ -29,7 +29,7 @@ import {
 } from '../../hooks/useContentDropdownOptions'
 import {studentDisplayName} from '../../../utils/gradebookUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type ContentSelectionComponentProps = {
   courseId: string

@@ -17,7 +17,7 @@
  */
 
 import * as tz from '@instructure/moment-utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -55,7 +55,7 @@ export type AppsTableProps = {
   page: number
 }
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 type Column = {
   id: string
@@ -436,7 +436,7 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
           >
             {Array.from(Array(Math.ceil(apps.total / MANAGE_APPS_PAGE_LIMIT))).map((_, i) => (
               <Pagination.Page
-                // eslint-disable-next-line react/no-array-index-key
+                 
                 key={i}
                 current={i === page - 1}
                 onClick={() => {

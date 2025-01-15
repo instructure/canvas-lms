@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
 import {bool, func, string, object, oneOf, arrayOf} from 'prop-types'
@@ -46,7 +46,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('dashboard')
+const I18n = createI18nScope('dashboard')
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)
@@ -521,7 +521,7 @@ function loadStartNewCourseHandler() {
   const modalContainer = document.getElementById('create_course_modal_container')
   if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
     startButton.addEventListener('click', () => {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <CreateCourseModal
           isModalOpen={true}

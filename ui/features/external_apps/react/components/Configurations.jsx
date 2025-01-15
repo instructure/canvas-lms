@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Header from './Header'
@@ -26,15 +26,12 @@ import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import page from 'page'
 
-const I18n = useI18nScope('external_tools')
+const I18n = createI18nScope('external_tools')
 
 export default class Configurations extends React.Component {
   static propTypes = {
     env: PropTypes.object.isRequired,
   }
-
-  // legacy all-encompassing permission
-  canAddEdit = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.create_tool_manually
 
   canAdd = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.add_tool_manually
 
@@ -68,14 +65,13 @@ export default class Configurations extends React.Component {
     return (
       <div className="Configurations">
         <Header ref={this.setHeaderRef}>
-          {(this.canAddEdit() || this.canAdd()) && <AddExternalToolButton />}
+          {this.canAdd() && <AddExternalToolButton />}
           {appCenterLink()}
         </Header>
         <ExternalToolsTable
           canAdd={this.canAdd()}
           canEdit={this.canEdit()}
           canDelete={this.canDelete()}
-          canAddEdit={this.canAddEdit()}
           setFocusAbove={this.focusHeader}
         />
       </div>

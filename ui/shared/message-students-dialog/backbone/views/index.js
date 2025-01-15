@@ -18,7 +18,7 @@
 
 import {extend} from '@canvas/backbone/utils'
 import {find, map} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import template from '../../jst/messageStudentsDialog.handlebars'
@@ -27,7 +27,7 @@ import ConversationCreator from '../models/ConversationCreator'
 import recipientListTemplate from '../../jst/_messageStudentsWhoRecipientList.handlebars'
 import '@canvas/serialize-form'
 
-const I18n = useI18nScope('viewsMessageStudentsDialog')
+const I18n = createI18nScope('viewsMessageStudentsDialog')
 
 extend(MessageStudentsDialog, DialogFormView)
 

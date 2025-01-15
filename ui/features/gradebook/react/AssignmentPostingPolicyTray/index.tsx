@@ -23,14 +23,14 @@ import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Heading} from '@instructure/ui-heading'
 import {Tray} from '@instructure/ui-tray'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import Layout from './Layout'
 import {setAssignmentPostPolicy} from './Api'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 
-const I18n = useI18nScope('post_grades_tray')
+const I18n = createI18nScope('post_grades_tray')
 
 type Props = {}
 

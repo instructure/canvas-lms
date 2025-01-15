@@ -36,10 +36,10 @@ import {CompletionProgressBar} from './completion_progress_bar'
 import {SourceLink} from './source_link'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {timeout} from './utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ContentSelectionModal} from './content_selection_modal'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 const done_states = ['completed', 'failed', 'waiting_for_select']
 

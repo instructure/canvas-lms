@@ -261,11 +261,11 @@ describe SIS::CSV::SectionImporter do
     )
     course.course_sections.where(sis_source_id: "sec4").first.tap do |section|
       expect(section.restrict_enrollments_to_section_dates).to be_truthy
-      expect(section.start_at).to eq DateTime.parse("2011-04-14 00:00:00")
-      expect(section.end_at).to eq DateTime.parse("2011-05-14 00:00:00")
+      expect(section.start_at).to eq Time.zone.parse("2011-04-14 00:00:00")
+      expect(section.end_at).to eq Time.zone.parse("2011-05-14 00:00:00")
       section.restrict_enrollments_to_section_dates = false
-      section.start_at = DateTime.parse("2010-04-14 00:00:00")
-      section.end_at = DateTime.parse("2010-05-14 00:00:00")
+      section.start_at = Time.zone.parse("2010-04-14 00:00:00")
+      section.end_at = Time.zone.parse("2010-05-14 00:00:00")
       section.save!
     end
     process_csv_data_cleanly(
@@ -274,8 +274,8 @@ describe SIS::CSV::SectionImporter do
     )
     course.course_sections.where(sis_source_id: "sec4").first.tap do |section|
       expect(section.restrict_enrollments_to_section_dates).to be_falsey
-      expect(section.start_at).to eq DateTime.parse("2010-04-14 00:00:00")
-      expect(section.end_at).to eq DateTime.parse("2010-05-14 00:00:00")
+      expect(section.start_at).to eq Time.zone.parse("2010-04-14 00:00:00")
+      expect(section.end_at).to eq Time.zone.parse("2010-05-14 00:00:00")
     end
   end
 

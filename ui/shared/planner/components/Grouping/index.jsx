@@ -22,10 +22,10 @@ import {arrayOf, bool, string, number, shape, func} from 'prop-types'
 import moment from 'moment-timezone'
 import {userShape, itemShape, sizeShape} from '../plannerPropTypes'
 import PlannerItem from '../PlannerItem'
-// eslint-disable-next-line import/no-named-as-default
+ 
 import CompletedItemsFacade from '../CompletedItemsFacade'
 import {MissingIndicator, NewActivityIndicator, NotificationBadge} from '../NotificationBadge'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   getBadgesForItem,
   getBadgesForItems,
@@ -34,7 +34,7 @@ import {
 import {animatable} from '../../dynamic-ui'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class Grouping extends Component {
   static componentId = 'Grouping'

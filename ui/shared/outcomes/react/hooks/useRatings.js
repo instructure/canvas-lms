@@ -17,11 +17,11 @@
  */
 
 import {useMemo, useState, useCallback} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {v1 as uuid} from 'uuid'
 import useBoolean from './useBoolean'
 
-const I18n = useI18nScope('useRatings')
+const I18n = createI18nScope('useRatings')
 
 const floatRegex = /^[+-]?\d+(\.\d+)?$/
 

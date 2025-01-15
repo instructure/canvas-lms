@@ -20,9 +20,9 @@ import React from 'react'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {type IconProps} from './iconTypes'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 export default ({elementRef, size = 'small'}: IconProps) => {
   return (
     <SVGIcon

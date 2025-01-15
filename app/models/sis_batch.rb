@@ -225,7 +225,7 @@ class SisBatch < ActiveRecord::Base
 
   def self.abort_all_pending_for_account(account)
     transaction do
-      account.sis_batches.not_started.lock(:no_key_update).order(:id).find_in_batches do |batch|
+      account.sis_batches.not_started.lock("FOR NO KEY UPDATE").order(:id).find_in_batches do |batch|
         SisBatch.where(id: batch).update_all(workflow_state: "aborted", progress: 100)
       end
     end
@@ -328,7 +328,8 @@ class SisBatch < ActiveRecord::Base
 
     # require a remaster if too many consecutive batches exceeded the threshold
     return :too_many_over_threshold_batches if previous_batch && account.sis_batches
-                                                                        .where(diffing_data_set_identifier:)
+                                                                        .succeeded
+                                                                        .where(diffing_data_set_identifier:, diffing_threshold_exceeded: true)
                                                                         .where("id > ? AND id < ?", previous_batch.id, id)
                                                                         .count > Setting.get("sis_diffing_max_skip", "5").to_i
 
@@ -958,14 +959,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def add_restore_statistics
-    statistics unless self&.data&.key? :statistics
-    stats = self.data[:statistics]
+    statistics unless data&.key? :statistics
+    stats = data[:statistics]
     stats ||= {}
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
       stats[type.to_sym] ||= {}
       stats[type.to_sym][:restored] = roll_back_data.restored.where(context_type: type).count
     end
-    self.data[:statistics] = stats
+    data[:statistics] = stats
   end
 
   # returns values "(1,'deleted'),(2,'deleted'),(3,'other_state'),(4,'active')"

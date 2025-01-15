@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import update from 'immutability-helper'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Text} from '@instructure/ui-text'
@@ -27,7 +27,7 @@ import {statuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
 import type {StatusColors} from '../constants/colors'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 const {Body: ModalBody, Footer: ModalFooter} = Modal as any
 

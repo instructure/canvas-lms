@@ -40,14 +40,13 @@ unless defined?($canvas_rails)
     source = file_path
   else
     begin
-      consul_yml = File.expand_path("consul.yml", __dir__)
-      if File.exist?(consul_yml)
+      consul_environment = File.expand_path("consul_environment.txt", __dir__)
+      if File.exist?(consul_environment)
         # have to do the consul communication without any gems, because
         # we're in the context of loading the gemfile
         require "bundler/vendored_net_http"
-        require "yaml"
 
-        environment = YAML.safe_load_file(consul_yml).dig(ENV["RAILS_ENV"] || "development", "environment")
+        environment = File.read(consul_environment)
 
         keys.push(
           ["private/canvas", environment, "rails_version"].compact.join("/"),

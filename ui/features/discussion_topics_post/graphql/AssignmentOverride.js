@@ -18,7 +18,7 @@
 
 import {AdhocStudents} from './AdhocStudents'
 import {Group} from './Group'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {shape, string, oneOfType} from 'prop-types'
 
 export const AssignmentOverride = {

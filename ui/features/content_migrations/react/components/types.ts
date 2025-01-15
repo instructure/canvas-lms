@@ -22,6 +22,8 @@ import {
   type DateShifts,
   type DateShiftsCommon,
   type DateAdjustmentConfig,
+  type MigrationCreateRequestBody,
+  type onSubmitMigrationFormCallback,
 } from '@canvas/content-migrations'
 
 export type ContentMigrationItemSettings = {
@@ -69,44 +71,6 @@ export type ContentMigrationItem = {
   created_at: string
 }
 
-export type DateShiftsRequestBody = DateShiftsCommon & {
-  remove_dates?: boolean
-  shift_dates?: boolean
-  day_substitutions: Record<string, string>
-}
-
-export type submitMigrationFormData = {
-  errored?: boolean
-  adjust_dates: AdjustDates
-  selective_import: boolean
-  date_shift_options: DateShifts
-  settings: {[key: string]: any}
-  daySubCollection?: object
-  pre_attachment?: {
-    name: string
-    size: number
-    no_redirect: boolean
-  }
-}
-
-export type MigrationCreateRequestBody = {
-  course_id: string
-  migration_type: string
-  date_shift_options: DateShiftsRequestBody
-  selective_import: boolean
-  settings: {[key: string]: any}
-  pre_attachment?: {
-    name: string
-    no_redirect: boolean
-    size: number
-  }
-}
-
-export type onSubmitMigrationFormCallback = (
-  formData: submitMigrationFormData,
-  preAttachmentFile?: File
-) => void
-
 export type AttachmentProgressResponse = ContentMigrationItem & {
   type: string
   total: number
@@ -125,4 +89,12 @@ export type QuestionBankSettings = {
   question_bank_name?: string
 }
 
-export type {AdjustDates, DaySub, DateShifts, DateShiftsCommon, DateAdjustmentConfig}
+export type {
+  AdjustDates,
+  DaySub,
+  DateShifts,
+  DateShiftsCommon,
+  DateAdjustmentConfig,
+  MigrationCreateRequestBody,
+  onSubmitMigrationFormCallback,
+}

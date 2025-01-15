@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map, some, compact, difference, filter, includes} from 'lodash'
 import DialogBaseView from '@canvas/dialog-base-view'
@@ -24,7 +24,7 @@ import linkToStudentsViewTemplate from '../../jst/LinkToStudentsView.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '../../jquery/ContextSearch'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 export default class LinkToStudentsView extends DialogBaseView {
   static initClass() {
@@ -121,7 +121,7 @@ export default class LinkToStudentsView extends DialogBaseView {
 
     // create new links
     for (const id of newLinks) {
-      // eslint-disable-next-line no-loop-func
+       
       this.getUserData(id).done(user => {
         const udfds = []
         const sections = map(user.enrollments, en => en.course_section_id)
@@ -147,7 +147,7 @@ export default class LinkToStudentsView extends DialogBaseView {
                 newEnrollment.observed_user = user
                 return newEnrollments.push(newEnrollment)
               },
-              // eslint-disable-next-line no-loop-func
+               
               response => {
                 const messages = Object.keys(response.errors)
 

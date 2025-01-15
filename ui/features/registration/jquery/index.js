@@ -22,10 +22,10 @@ import {loadSignupDialog} from '@canvas/signup-dialog'
 import loginForm from '../jst/login.handlebars'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from '@instructure/html-escape'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import extensions from '@canvas/bundles/extensions'
 
-const I18n = useI18nScope('registration')
+const I18n = createI18nScope('registration')
 
 let $loginForm = null
 
@@ -65,7 +65,7 @@ $('#registration_video a').click(
 
 $('body').click(function (e) {
   if (!$(e.target).closest('#registration_login, #login_form').length) {
-    // eslint-disable-next-line no-void
+     
     return $loginForm != null ? $loginForm.hide() : void 0
   }
 })

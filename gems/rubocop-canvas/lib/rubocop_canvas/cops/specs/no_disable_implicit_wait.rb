@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class NoDisableImplicitWait < Cop
+      class NoDisableImplicitWait < Base
         MSG = "Avoid using disable_implicit_wait.\n" \
               "Look through custom_selenium_rspec_matchers.rb " \
               "and custom_wait_methods.rb."

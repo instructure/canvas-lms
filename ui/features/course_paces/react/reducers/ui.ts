@@ -27,6 +27,7 @@ import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 export const initialState: UIState = {
   autoSaving: false,
   syncing: 0,
+  savingDraft: false,
   errors: {},
   divideIntoWeeks: true,
   selectedContextType: 'Course',
@@ -44,6 +45,7 @@ export const initialState: UIState = {
 /* Selectors */
 
 export const getAutoSaving = (state: StoreState) => state.ui.autoSaving
+export const getSavingDraft = (state: StoreState) => state.ui.savingDraft
 // there is a window between when blackout dates finish updating and the pace
 // begins publishing. use getSyncing to keep the ui consistent in the transition
 export const getSyncing = (state: StoreState): boolean =>
@@ -126,6 +128,8 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, selectedContextType: action.payload}
     case UIConstants.SET_BLUEPRINT_LOCK:
       return {...state, blueprintLocked: action.payload}
+    case UIConstants.SAVING_DRAFT:
+      return {...state, savingDraft: !state.savingDraft}
     default:
       return state
   }

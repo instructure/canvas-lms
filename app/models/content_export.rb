@@ -217,7 +217,7 @@ class ContentExport < ActiveRecord::Base
       if @cc_exporter.export
         self.progress = 100
         job_progress.try :complete!
-        duration = Time.now - created_at
+        duration = Time.zone.now - created_at
         InstStatsd::Statsd.timing("content_migrations.export_duration", duration, tags: { export_type:, selective_export: selective_export? })
         self.workflow_state = if for_course_copy?
                                 "exported_for_course_copy"

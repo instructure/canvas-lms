@@ -64,6 +64,7 @@ const getBeforeText = (startingElement: Element, wordCount: number) => {
   return text
 }
 
+// eslint-disable-next-line no-undef
 export const getSelectionContext = (elements: HTMLCollectionOf<Element>) => {
   const firstSelected = elements[0]
   const lastSelected = elements[elements.length - 1]

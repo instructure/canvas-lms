@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import page from 'page'
@@ -37,7 +37,7 @@ import '@canvas/rails-flash-notifications'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 
-const I18n = useI18nScope('react_files')
+const I18n = createI18nScope('react_files')
 
 export default class Toolbar extends React.Component {
   static propTypes = {
@@ -104,7 +104,7 @@ export default class Toolbar extends React.Component {
       zIndex: 1000,
     })
 
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <RestrictedDialogForm
         models={this.props.selectedItems}
@@ -197,7 +197,7 @@ export default class Toolbar extends React.Component {
         window.location.reload()
       }
     }
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

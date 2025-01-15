@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {createRoot} from 'react-dom/client' // Updated import
 import SideNav from './react/SideNav'
@@ -28,7 +28,7 @@ import NewTabIndicator from './react/NewTabIndicator'
 import {QueryProvider} from '@canvas/query'
 import {getExternalTools} from './react/utils'
 
-const I18n = useI18nScope('common')
+const I18n = createI18nScope('common')
 
 // #
 // Handle user toggling of nav width

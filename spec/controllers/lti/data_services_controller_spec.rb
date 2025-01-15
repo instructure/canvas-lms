@@ -116,7 +116,7 @@ describe Lti::DataServicesController do
       end
 
       context "with not found user" do
-        let(:user) { instance_double("User", global_id: "notfound") }
+        let(:user) { instance_double(User, global_id: "notfound") }
 
         it "raises a 404" do
           send_request
@@ -201,7 +201,7 @@ describe Lti::DataServicesController do
       end
 
       context "with not found user" do
-        let(:user) { instance_double("User", global_id: "notfound") }
+        let(:user) { instance_double(User, global_id: "notfound") }
 
         it "raises a 404" do
           send_request

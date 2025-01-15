@@ -93,7 +93,6 @@ function renderRow(props) {
       canAdd={true}
       canEdit={true}
       canDelete={true}
-      canAddEdit={true}
       setFocusAbove={() => {}}
       rceFavoriteCount={0}
       topNavFavoriteCount={0}
@@ -119,7 +118,6 @@ describe('ExternalToolsTableRow', () => {
       const {queryByText} = renderRow({
         canEdit: false,
         canDelete: false,
-        canAddEdit: false,
       })
       expect(queryByText(`${tools[0].name} Settings`)).not.toBeInTheDocument()
     })

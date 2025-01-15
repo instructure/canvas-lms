@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func, instanceOf, shape} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import classnames from 'classnames'
 import ProgressBar from '@canvas/progress/react/components/ProgressBar'
 import mimeClass from '@canvas/mime/mimeClass'
@@ -26,7 +26,7 @@ import UploadQueue from '../modules/UploadQueue'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {isIWork, getIWorkType} from '@instructure/canvas-rce/es/rce/plugins/shared/fileTypeUtils'
 
-const I18n = useI18nScope('files_upload_progress')
+const I18n = createI18nScope('files_upload_progress')
 
 class UploadProgress extends React.Component {
   static propTypes = {

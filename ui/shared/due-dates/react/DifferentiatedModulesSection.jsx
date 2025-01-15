@@ -20,7 +20,7 @@ import React, {useState, useRef, useEffect, useMemo, useCallback} from 'react'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import {getEveryoneOption} from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToTray'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -45,7 +45,7 @@ import {Pill} from '@instructure/ui-pill'
 import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 
-const I18n = useI18nScope('DueDateOverrideView')
+const I18n = createI18nScope('DueDateOverrideView')
 
 const DifferentiatedModulesSection = ({
   onSync,
@@ -152,7 +152,7 @@ const DifferentiatedModulesSection = ({
       setHasModuleOverrides(overrides.some(card => card.context_module_id))
       const allModuleAssignees = overrides
         .filter(override => override.context_module_id)
-        // eslint-disable-next-line array-callback-return
+         
         ?.map(moduleOverride => {
           if (moduleOverride.course_section_id) {
             return `section-${moduleOverride.course_section_id}`

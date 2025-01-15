@@ -26,11 +26,11 @@ import {FileDrop} from '@instructure/ui-file-drop'
 import SVGWrapper from '@canvas/svg-wrapper'
 import useStore from '../stores'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricAssessmentImportResponse} from '../queries/Queries'
 import {RubricAssessmentImportTable} from './RubricAssessmentImportTable'
 
-const I18n = useI18nScope('rubrics-import')
+const I18n = createI18nScope('rubrics-import')
 
 type RubricAssessmentImportTrayProps = {
   currentImports: RubricAssessmentImportResponse[]

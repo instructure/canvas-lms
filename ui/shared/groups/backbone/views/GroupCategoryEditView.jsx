@@ -21,14 +21,14 @@ import ReactDOM from 'react-dom'
 import {createRoot} from 'react-dom/client'
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapperTemplate from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import template from '../../jst/groupCategoryEdit.handlebars'
 import h from '@instructure/html-escape'
 import SelfSignupEndDate from '../../react/CreateOrEditSetModal/SelfSignupEndDate'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 extend(GroupCategoryEditView, DialogFormView)
 

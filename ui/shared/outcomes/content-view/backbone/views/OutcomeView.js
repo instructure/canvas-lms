@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import {map, maxBy, isEqual, isNaN, extend as lodashExtend} from 'lodash'
@@ -32,7 +32,7 @@ import 'jqueryui/dialog'
 import CalculationMethodContent from '@canvas/grading/CalculationMethodContent'
 import {raw} from '@instructure/html-escape'
 
-const I18n = useI18nScope('OutcomeView')
+const I18n = createI18nScope('OutcomeView')
 
 // For outcomes in the main content view.
 

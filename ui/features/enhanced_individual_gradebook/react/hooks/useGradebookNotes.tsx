@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useEffect, useState} from 'react'
 import {ApiCallStatus, type CustomColumnDatum} from '../../types'
 import {executeApiRequest} from '@canvas/do-fetch-api-effect/apiRequest'
 
-const I18n = useI18nScope('enhanced_individual_gradebook_submit_score')
+const I18n = createI18nScope('enhanced_individual_gradebook_submit_score')
 
 type NotesMap = {
   [userId: string]: string
@@ -54,7 +54,7 @@ export const useGradebookNotes = (
       const notesMap: NotesMap = {}
       let path: string = getCustomColumnDataUrl.replace(':id', studentNotesColumnId)
       while (path) {
-        // eslint-disable-next-line no-await-in-loop
+         
         const {data, link} = await executeApiRequest<CustomColumnDatum[]>({
           method: 'GET',
           path,

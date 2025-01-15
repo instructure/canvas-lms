@@ -22,7 +22,7 @@ import {Assignment} from './Assignment'
 import {Attachment} from './Attachment'
 import {Section} from './Section'
 import {DiscussionPermissions} from './DiscussionPermissions'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {User} from './User'
 import {DiscussionEntry} from './DiscussionEntry'
 import {PageInfo} from './PageInfo'
@@ -61,7 +61,6 @@ export const Discussion = {
       contextType
       lockInformation
       subscriptionDisabledForUser
-      expanded
       editor {
         ...User
       }
@@ -92,6 +91,10 @@ export const Discussion = {
       }
       rootTopic {
         ...RootTopic
+      }
+      participant {
+        sortOrder
+        expanded
       }
     }
     ${User.fragment}
@@ -150,8 +153,10 @@ export const Discussion = {
     rootEntriesTotalPages: number,
     entriesTotalPages: number,
     subscriptionDisabledForUser: bool,
-    sortOrder: string,
-    expanded: bool,
+    participant: shape({
+      sortOrder: string,
+      expanded: bool,
+    }),
   }),
 
   mock: ({
@@ -199,12 +204,15 @@ export const Discussion = {
     groupSet = GroupSet.mock(),
     rootTopic = RootTopic.mock(),
     entriesTotalPages = 2,
-    sortOrder = 'desc',
-    expanded = false,
     discussionEntriesConnection = {
       nodes: [DiscussionEntry.mock()],
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionEntriesConnection',
+    },
+    participant = {
+      sortOrder: 'desc',
+      expanded: false,
+      __typename: 'DiscussionParticipant',
     },
     subscriptionDisabledForUser = false,
   } = {}) => ({
@@ -250,8 +258,7 @@ export const Discussion = {
     entriesTotalPages,
     discussionEntriesConnection,
     subscriptionDisabledForUser,
-    sortOrder,
-    expanded,
+    participant,
     __typename: 'Discussion',
   }),
 }

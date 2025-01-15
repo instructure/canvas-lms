@@ -43,7 +43,7 @@ class RubricAssessmentExport
       "Student Name"
     ]
 
-    rubric.rubric_criteria.each do |criteria|
+    rubric.criteria_object.each do |criteria|
       headers << "#{criteria.description} - Rating" if rating_visible?
       headers << "#{criteria.description} - Points" if points_visible?
       headers << "#{criteria.description} - Comments"

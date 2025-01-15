@@ -70,6 +70,10 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
     end
   end
 
+  def slo?
+    false
+  end
+
   def user_logout_redirect(controller, _current_user)
     controller.canvas_login_url unless controller.instance_variable_get(:@domain_root_account).auth_discovery_url
   end

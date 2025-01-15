@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import initLastAttended from './react/index'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -29,7 +29,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/link-enrollment'
 import {datetimeString} from '@canvas/datetime/date-functions'
 
-const I18n = useI18nScope('context.roster_user')
+const I18n = createI18nScope('context.roster_user')
 
 $(document).ready(() => {
   $('.show_user_services_checkbox').change(function () {
@@ -122,7 +122,7 @@ $(document).ready(() => {
 
   const container = document.querySelector('#pairing-code')
   if (container != null) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <GeneratePairingCode userId={ENV.USER_ID} name={ENV.CONTEXT_USER_DISPLAY_NAME} />,
       container

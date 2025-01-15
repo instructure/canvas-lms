@@ -18,11 +18,11 @@
 
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import React from 'react'
 
-const I18n = useI18nScope('eportfolio')
+const I18n = createI18nScope('eportfolio')
 
 type Props = {
   header: string
@@ -51,7 +51,7 @@ class MoveToDialog extends React.Component<Props, State> {
   handleMove = () => {
     if (this.props.onMove) {
       // @ts-expect-error
-      // eslint-disable-next-line react/no-string-refs
+       
       this.props.onMove(this.refs.select.value)
     }
     this.handleRequestClose()

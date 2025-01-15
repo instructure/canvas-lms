@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Specs
-      class PreferFOverFj < Cop
+      class PreferFOverFj < Base
         include RuboCop::Cop::Consts::JQuerySelectors
 
         SUSPECT_METHOD_NAMES = {

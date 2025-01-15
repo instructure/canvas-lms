@@ -88,7 +88,7 @@ module Api::V1::DiscussionTopics
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
     # ignore :include_sections_user_count for non-course contexts like groups
-    if opts[:include_sections_user_count] && context && context.is_a?(Course)
+    if opts[:include_sections_user_count] && context.is_a?(Course)
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.distinct.count(:user_id) }
     end
 

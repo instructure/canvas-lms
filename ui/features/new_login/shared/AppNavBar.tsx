@@ -22,12 +22,12 @@ import {Responsive} from '@instructure/ui-responsive'
 import {TopNavBar} from '@instructure/ui-top-nav-bar'
 import {canvas} from '@instructure/ui-theme-tokens'
 import {useNewLogin} from '../context/NewLoginContext'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-import CanvasLmsLogoIcon from '../assets/images/canvas-logo-small.svg'
-import CanvasLmsLogo from '../assets/images/canvas-logo.svg'
+import CanvasLmsLogoIcon from '../assets/images/canvas-small.svg'
+import CanvasLmsLogo from '../assets/images/canvas.svg'
 
-const I18n = useI18nScope('new_login')
+const I18n = createI18nScope('new_login')
 
 const AppNavBar = () => {
   const {enableCourseCatalog} = useNewLogin()
@@ -55,21 +55,21 @@ const AppNavBar = () => {
                       if (matches?.includes('tablet')) {
                         return (
                           <Img
-                            src={CanvasLmsLogo}
-                            alt={I18n.t('Canvas LMS Logo')}
-                            width="8rem"
-                            height="2.375rem"
                             constrain="contain"
+                            display="block"
+                            height="2.375rem"
+                            src={CanvasLmsLogo}
+                            width="8rem"
                           />
                         )
                       } else {
                         return (
                           <Img
-                            src={CanvasLmsLogoIcon}
-                            alt={I18n.t('Canvas LMS Logo')}
-                            width="2.375rem"
-                            height="2.375rem"
                             constrain="contain"
+                            display="block"
+                            height="2.375rem"
+                            src={CanvasLmsLogoIcon}
+                            width="2.375rem"
                           />
                         )
                       }

@@ -22,10 +22,10 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 const {Item: FlexItem} = Flex as any
-const I18n = useI18nScope('collapsable_list')
+const I18n = createI18nScope('collapsable_list')
 
 type SingleItemCheckboxProps = {
   id: string

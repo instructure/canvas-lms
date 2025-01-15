@@ -22,6 +22,9 @@ import {Text} from '@instructure/ui-text'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {datetimeString} from '@canvas/datetime/date-functions'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ErrorFormMessage} from '@canvas/content-migrations'
+import type {FormMessage} from '@instructure/ui-form-field'
+import {timeZonedFormMessages} from '@canvas/content-migrations/react/CommonMigratorControls/timeZonedFormMessages'
 
 export const ConfiguredDateInput = ({
   selectedDate,
@@ -29,19 +32,44 @@ export const ConfiguredDateInput = ({
   renderScreenReaderLabelText,
   renderLabelText,
   onSelectedDateChange,
-  timeZone,
   disabled = false,
+  errorMessage,
+  courseTimeZone,
+  userTimeZone,
 }: {
   selectedDate?: string | null
   placeholder?: string
   renderScreenReaderLabelText: string
   renderLabelText: string
   onSelectedDateChange: (d: Date | null) => void
-  timeZone?: string
   disabled?: boolean
+  errorMessage?: string
+  courseTimeZone?: string
+  userTimeZone?: string
 }) => {
   const formatDate = (date: Date) => {
-    return datetimeString(date, {timezone: timeZone})
+    return datetimeString(date, {timezone: userTimeZone})
+  }
+
+  const generateErrorMessage = (message: string): FormMessage[] => {
+    return [
+      {
+        text: <ErrorFormMessage>{message}</ErrorFormMessage>,
+        type: 'error',
+      },
+    ]
+  }
+
+  const generateMessages = (): FormMessage[] => {
+    const messageArray: FormMessage[] = []
+    if (errorMessage) {
+      messageArray.push(...generateErrorMessage(errorMessage))
+    }
+    if (courseTimeZone && userTimeZone && selectedDate && courseTimeZone !== userTimeZone) {
+      messageArray.push(...timeZonedFormMessages(courseTimeZone, userTimeZone, selectedDate))
+    }
+
+    return messageArray
   }
 
   return (
@@ -56,6 +84,7 @@ export const ConfiguredDateInput = ({
           renderLabel={<ScreenReaderContent>{renderScreenReaderLabelText}</ScreenReaderContent>}
           interaction={disabled ? 'disabled' : 'enabled'}
           width="100%"
+          messages={generateMessages()}
         />
       </Flex>
     </>

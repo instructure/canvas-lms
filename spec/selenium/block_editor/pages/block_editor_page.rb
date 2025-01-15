@@ -211,6 +211,10 @@ module BlockEditorPage
     f(group_block_inner_selector)
   end
 
+  def drop_new_block(block_name, where)
+    drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
+  end
+
   def text_block
     f(".text-block")
   end
@@ -271,12 +275,20 @@ module BlockEditorPage
     f(".page-block")
   end
 
+  def group_block_child
+    f(".group-block .group-block .group-block")
+  end
+
   def group_block
     f(".group-block")
   end
 
   def group_blocks
     ff(".group-block")
+  end
+
+  def container_block
+    ff(".container-block")
   end
 
   def icon_block
@@ -357,6 +369,10 @@ module BlockEditorPage
     driver.find_element(:css, selector).displayed?
   rescue Selenium::WebDriver::Error::NoSuchElementError
     false
+  end
+
+  def text_block_popup
+    f("#rce-text-block-popup")
   end
 
   # Toolbox

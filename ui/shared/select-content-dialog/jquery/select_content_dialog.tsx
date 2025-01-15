@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -87,7 +87,7 @@ type LtiLaunchDefinition = {
   placements: Record<SelectContentPlacementType, LtiLaunchPlacement>
 }
 
-const I18n = useI18nScope('select_content_dialog')
+const I18n = createI18nScope('select_content_dialog')
 
 const SelectContentDialog = {}
 
@@ -99,7 +99,7 @@ export const externalContentReadyHandler = (event: MessageEvent, tool: LtiLaunch
   if (item['@type'] === 'LtiLinkItem' && item.url) {
     handleContentItemResult(item, tool)
   } else {
-    // eslint-disable-next-line no-alert
+     
     window.alert(SelectContent.errorForUrlItem(item))
 
     resetExternalToolFields()
@@ -148,7 +148,7 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
       }
     } catch (e) {
       $.flashError(I18n.t('Error retrieving content'))
-      // eslint-disable-next-line no-console
+       
       console.error(e)
     } finally {
       const $dialog = $('#resource_selection_dialog')
@@ -178,7 +178,7 @@ export const deepLinkingResponseHandler = (event: MessageEvent<DeepLinkResponse>
       handleContentItemResult(result, tool)
     } catch (e) {
       $.flashError(I18n.t('Error retrieving content'))
-      // eslint-disable-next-line no-console
+       
       console.error(e)
     } finally {
       const $dialog = $('#resource_selection_dialog')
@@ -219,10 +219,10 @@ export function closeAll() {
 }
 
 export function dialogCancelHandler(
-  // eslint-disable-next-line no-undef
+   
   event: JQuery.TriggeredEvent<HTMLElement, any, any, any>
 ) {
-  // eslint-disable-next-line no-alert
+   
   const response = window.confirm(
     I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
   )
@@ -232,7 +232,7 @@ export function dialogCancelHandler(
 }
 
 export function beforeUnloadHandler(
-  // eslint-disable-next-line no-undef
+   
   e: JQuery.TriggeredEvent<Window & typeof globalThis, any, any, any>
 ) {
   return ((e as typeof e & {returnValue: string}).returnValue = I18n.t(
@@ -260,12 +260,7 @@ export function handleContentItemResult(
   }
   const populateUrl = (url: string) => {
     if (url && url !== '') {
-      if (
-        $('#external_tool_create_url').val() === '' ||
-        window.ENV.FEATURES.lti_overwrite_user_url_input_select_content_dialog
-      ) {
-        $('#external_tool_create_url').val(url)
-      }
+      $('#external_tool_create_url').val(url)
     }
   }
   if (typeof result.url !== 'undefined' && result.url !== '') {
@@ -312,9 +307,9 @@ export const Events = {
   },
 
   onContextExternalToolSelect(
-    // eslint-disable-next-line no-undef
+     
     e: JQuery.ClickEvent<HTMLElement, undefined, any, any>,
-    // eslint-disable-next-line no-undef
+     
     existingTool: JQuery<HTMLElement>
   ) {
     e.preventDefault()
@@ -835,9 +830,9 @@ $(document).ready(function () {
               if (
                 !Object.keys(ENV.MODULE_FILE_DETAILS).find(fdkey => {
                   file_matches =
-                    // eslint-disable-next-line eqeqeq
+                     
                     ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId &&
-                    ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id // eslint-disable-line eqeqeq
+                    ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id  
                   if (file_matches) ENV.MODULE_FILE_DETAILS[fdkey].content_id = attachment.id
                   return file_matches
                 })
@@ -912,7 +907,7 @@ $(document).ready(function () {
 
     $('#select_context_content_dialog .module_item_option').hide()
     if ($(this).val() === 'attachment') {
-      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+      // eslint-disable-next-line react/no-render-return-value
       fileSelectBox = ReactDOM.render(
         React.createFactory(FileSelectBox)({
           contextString: ENV.context_asset_string,
@@ -1107,7 +1102,7 @@ function renderFileUploadForm() {
     // toggle from current uploads to the choose files button
     $('#module_attachment_upload_form').show()
     $('#module_attachment_upload_progress').hide()
-    // eslint-disable-next-line no-restricted-properties
+     
     upload_form = ReactDOM.render(
       <UploadForm {...folderProps} />,
       $('#module_attachment_upload_form')[0]
@@ -1116,7 +1111,7 @@ function renderFileUploadForm() {
 }
 
 function renderCurrentUploads() {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <CurrentUploads onUploadChange={handleUploadOnChange} />,
     $('#module_attachment_upload_progress')[0]

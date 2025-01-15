@@ -19,11 +19,11 @@
 import moment from 'moment'
 import type React from 'react'
 import {useState, useCallback, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 const fancyMidnightDueTime = '23:59:00'
 
@@ -67,31 +67,31 @@ type UseDatesHookResult = [
   // setRequiredRepliesDueDate
   (requiredRepliesDueDate: string | null) => void,
   // handleRequiredRepliesDueDateChange
-  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
   // replyToTopicDueDate
   string | null,
   // setReplyToTopicDueDate
   (replyToTopicDueDate: string | null) => void,
   // handleReplyToTopicDueDateChange
-  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
   // dueDate
   string | null,
   // setDueDate
   (dueDate: string | null) => void,
   // handleDueDateChange
-  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
   // availableFromDate
   string | null,
   // setAvailableFromDate
   (availableFromDate: string | null) => void,
   // handleAvailableFromDateChange
-  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void,
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void,
   // availableToDate
   string | null,
   // setAvailableToDate
   (availableToDate: string | null) => void,
   // handleAvailableToDateChange
-  (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => void
+  (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => void
 ]
 
 function setTimeToStringDate(time: string, date: string | undefined): string | undefined {
@@ -203,7 +203,7 @@ export function useDates({
   }, [availableToDate])
 
   const handleRequiredRepliesDueDateChange = useCallback(
-    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultRequiredRepliesDueDate = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
       const newRequiredRepliesDueDate = requiredRepliesDueDate
         ? value
@@ -221,7 +221,7 @@ export function useDates({
   )
 
   const handleReplyToTopicDueDateChange = useCallback(
-    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultReplyToTopicDueDate = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
       const newReplyToTopicDueDate = replyToTopicDueDate
         ? value
@@ -239,7 +239,7 @@ export function useDates({
   )
 
   const handleDueDateChange = useCallback(
-    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
       const newDueDate = dueDate
         ? value
@@ -269,7 +269,7 @@ export function useDates({
   )
 
   const handleAvailableFromDateChange = useCallback(
-    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const newAvailableFromDate = availableFromDate
         ? value
         : timeValue === ''
@@ -286,7 +286,7 @@ export function useDates({
   )
 
   const handleAvailableToDateChange = useCallback(
-    (timeValue: String) => (_event: React.SyntheticEvent, value: string | undefined) => {
+    (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const newAvailableToDate = availableToDate
         ? value
         : timeValue === ''
@@ -468,7 +468,7 @@ export const generateCardActionLabels = (selected: string[]) => {
   }
 }
 
-export const getDueAtForCheckpointTag = (override: Override, checkpointTag: String) => {
+export const getDueAtForCheckpointTag = (override: Override, checkpointTag: string) => {
   return override.sub_assignment_due_dates
     ? override.sub_assignment_due_dates.find(item => item.sub_assignment_tag === checkpointTag)
         ?.due_at || null

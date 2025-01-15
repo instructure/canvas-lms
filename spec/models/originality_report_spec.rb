@@ -341,11 +341,11 @@ describe OriginalityReport do
         updated_at: originality_report.updated_at - 1.hour,
       }
       expect do
-        OriginalityReport.copy_to_group_submissions!(**params.merge(attachment_id: -1))
+        OriginalityReport.copy_to_group_submissions!(**params, attachment_id: -1)
       end.to raise_error(ActiveRecord::RecordNotFound)
       expect do
         OriginalityReport.copy_to_group_submissions!(
-          **params.merge(updated_at: originality_report.updated_at + 1.hour)
+          **params, updated_at: originality_report.updated_at + 1.hour
         )
       end.to raise_error(ActiveRecord::RecordNotFound)
     end

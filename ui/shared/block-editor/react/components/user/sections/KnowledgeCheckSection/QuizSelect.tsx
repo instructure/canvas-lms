@@ -25,10 +25,10 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 declare const ENV: GlobalEnv
 
 interface QuizSelectProps {

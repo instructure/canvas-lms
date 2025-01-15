@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -26,7 +26,7 @@ import {IconAddLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 
-const I18n = useI18nScope('calendar.header')
+const I18n = createI18nScope('calendar.header')
 
 const RenderAddEventButton = ({size}: {size: string}) => {
   if (size === 'large') {
@@ -63,10 +63,10 @@ const RenderViewsSelector = ({
   }
 
   useEffect(() => {
-    // eslint-disable-next-line no-undef
+     
     document.addEventListener('calendar:header:select_view', handleViewChange as EventListener)
     return () =>
-      // eslint-disable-next-line no-undef
+       
       document.removeEventListener('calendar:header:select_view', handleViewChange as EventListener)
   }, [view])
 

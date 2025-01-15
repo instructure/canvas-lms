@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -35,7 +35,7 @@ import type {LtiPlacementOverlay} from '../../model/PlacementOverlay'
 import {canvasPlatformSettings, type RegistrationOverlayStore} from './RegistrationOverlayState'
 import {RegistrationPrivacyField} from './RegistrationPrivacyField'
 
-const I18n = useI18nScope('react_developer_keys')
+const I18n = createI18nScope('react_developer_keys')
 
 export const RegistrationOverlayForm = (props: {
   ltiRegistration: LtiImsRegistration

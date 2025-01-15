@@ -1207,6 +1207,34 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(fb).to be_imported
     end
 
+    it "does not count restored batches towards the skip count" do
+      Setting.set("sis_diffing_max_skip", "1")
+
+      3.times do
+        process_csv_data(
+          [
+            %(course_id,short_name,long_name,account_id,term_id,status
+              test_1,TC 101,Test Course 101,,term1,active
+              test_4,TC 104,Test Course 104,,term1,active)
+          ],
+          diffing_data_set_identifier: "foobar"
+        )
+      end
+
+      @account.sis_batches.last(2).each(&:restore_states_later)
+      run_jobs
+
+      nb = process_csv_data(
+        [
+          %(course_id,short_name,long_name,account_id,term_id,status
+            test_1,TC 101,Test Course 101,,term1,active
+            test_4,TC 104,Test Course 104,,term1,active)
+        ],
+        diffing_data_set_identifier: "foobar"
+      )
+      expect(nb).to be_imported
+    end
+
     it "marks files separately when created for diffing" do
       f1 = %(course_id,short_name,long_name,account_id,term_id,status
         test_1,TC 101,Test Course 101,,term1,active)

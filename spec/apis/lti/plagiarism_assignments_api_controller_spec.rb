@@ -45,7 +45,7 @@ module Lti
         student
       end
       let(:assignment) do
-        a = course.assignments.new(title: "some assignment", points_possible: 10, description: "<p>Dude...</p>", due_at: DateTime.now)
+        a = course.assignments.new(title: "some assignment", points_possible: 10, description: "<p>Dude...</p>", due_at: Time.zone.now)
         a.workflow_state = "published"
         a.tool_settings_tool = message_handler
         a.save!

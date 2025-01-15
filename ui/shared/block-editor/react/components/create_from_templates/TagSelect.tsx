@@ -21,10 +21,10 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Menu, type MenuItemProps} from '@instructure/ui-menu'
 import {IconArrowOpenDownLine, IconFilterLine} from '@instructure/ui-icons'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {Record} from 'immutable'
 
-const I18n = useScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export const AvailableTags: Record<string, string> = {
   home: I18n.t('Home'),

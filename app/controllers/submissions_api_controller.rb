@@ -474,7 +474,6 @@ class SubmissionsApiController < ApplicationController
       return render json: { error: "invalid assignment ids requested" }, status: :forbidden
     end
 
-    assignment_visibilities = {}
     assignment_visibilities = if Account.site_admin.feature_enabled?(:selective_release_backend)
                                 unless student_ids.is_a?(Array)
                                   student_ids = student_ids.pluck(:user_id)

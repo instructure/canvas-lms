@@ -193,7 +193,7 @@ class Group < ActiveRecord::Base
   end
 
   def update_max_membership_from_group_category
-    if (!max_membership || max_membership == 0) && group_category && group_category.group_limit
+    if (!max_membership || max_membership == 0) && group_category&.group_limit
       self.max_membership = group_category.group_limit
     end
   end
@@ -262,8 +262,7 @@ class Group < ActiveRecord::Base
   end
 
   def should_add_creator?(creator)
-    group_category &&
-      (group_category.communities? || (group_category.student_organized? && context.user_is_student?(creator)))
+    group_category.communities? || (group_category&.student_organized? && context.user_is_student?(creator))
   end
 
   def submission?
@@ -289,7 +288,7 @@ class Group < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.filter_map { |c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }
+    ids = codes.filter_map { |c| c.match(/\Agroup_(\d+)\z/)&.[](1) }
     Group.find(ids)
   end
 
@@ -345,7 +344,7 @@ class Group < ActiveRecord::Base
 
   def full_name
     res = before_label(name) + " "
-    res += (context.course_code rescue context.name) if context
+    res += context.try(:course_code) || context.name if context
     res
   end
 
@@ -436,7 +435,7 @@ class Group < ActiveRecord::Base
   end
 
   def bulk_insert_group_memberships(users, options = {})
-    current_time = Time.now
+    current_time = Time.zone.now
     options = {
       group_id: id,
       workflow_state: "accepted",

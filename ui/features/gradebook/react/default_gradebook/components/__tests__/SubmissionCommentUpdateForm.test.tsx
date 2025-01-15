@@ -189,21 +189,21 @@ describe('SubmissionCommentUpdateForm', () => {
 
   test('TextArea has a placeholder message', () => {
     wrapper = mountComponent()
-    expect(wrapper.container.querySelector('TextArea').getAttribute('placeholder')).toEqual(
-      'Leave a comment'
-    )
+    const textarea = wrapper.getByTestId('comment-textarea')
+    expect(textarea).toHaveAttribute('placeholder', 'Leave a comment')
   })
 
   test('TextArea has a label', () => {
     wrapper = mountComponent()
-    const screenReaderSpan = wrapper.container.querySelector('label > span > span > span')
-    expect(screenReaderSpan.textContent).toEqual('Leave a comment')
+    const textarea = wrapper.getByRole('textbox', { name: 'Leave a comment' })
+    expect(textarea).toBeInTheDocument()
   })
 
-  test('focuses on the textarea when mounted', () => {
+  test('focuses on the textarea when mounted', async () => {
     wrapper = mountComponent()
-    ref.current.componentDidMount()
-    expect(wrapper.container.querySelector('TextArea').matches(':focus')).toBe(true)
+    await waitFor(() => {
+      expect(wrapper.getByTestId('comment-textarea')).toHaveFocus()
+    })
   })
 
   test('the default action is prevented when the button is clicked', async () => {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getK5ThemeVars, useK5Theme} from '../k5-theme'
+import {getK5ThemeVars, registerK5Theme} from '../k5-theme'
 
 describe('k5-theme', () => {
   let originalEnv
@@ -34,21 +34,21 @@ describe('k5-theme', () => {
   describe('K-5 theme', () => {
     it('is based off of the standard canvas theme', () => {
       const k5ThemeVariables = getK5ThemeVars()
-      useK5Theme()
+      registerK5Theme()
       expect(k5ThemeVariables.colors.brand).toBe('#0374B5')
     })
 
     it('is based off of the high contrast canvas theme when ENV.use_high_contrast is set', () => {
       window.ENV.use_high_contrast = true
       const k5ThemeVariables = getK5ThemeVars()
-      useK5Theme()
+      registerK5Theme()
 
       expect(k5ThemeVariables.colors.brand).toBe('#0770A3')
     })
 
     it('overrides base variables with K-5-specific values', () => {
       const k5ThemeVariables = getK5ThemeVars()
-      useK5Theme()
+      registerK5Theme()
 
       expect(k5ThemeVariables.typography.fontFamily).toMatch(/Balsamiq Sans/)
       expect(k5ThemeVariables.typography.fontSizeLarge).toBe('1.5rem')
@@ -57,13 +57,13 @@ describe('k5-theme', () => {
     it('does not override font when ENV.USE_CLASSIC_FONT is true', () => {
       window.ENV.USE_CLASSIC_FONT = true
       const k5ThemeVariables = getK5ThemeVars()
-      useK5Theme()
+      registerK5Theme()
       expect(k5ThemeVariables.typography.fontFamily).not.toMatch(/Balsamiq Sans/)
     })
 
     it('only overrides base variables with font overrides if specified', () => {
       const k5ThemeVariables = getK5ThemeVars()
-      useK5Theme({fontOnly: true})
+      registerK5Theme({fontOnly: true})
 
       expect(k5ThemeVariables.typography.fontFamily).toMatch(/Balsamiq Sans/)
       expect(k5ThemeVariables.typography.fontSizeLarge).toBe('1.5rem')

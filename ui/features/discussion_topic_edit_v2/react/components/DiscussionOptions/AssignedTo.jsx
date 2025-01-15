@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useMemo, useEffect, useCallback, useContext} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tag} from '@instructure/ui-tag'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
@@ -26,7 +26,7 @@ import {IconCheckSolid} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {DiscussionDueDatesContext} from '../../util/constants'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 const liveRegion = () => document.getElementById('flash_screenreader_holder')
 
 export const AssignedTo = ({

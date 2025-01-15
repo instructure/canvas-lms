@@ -24,11 +24,11 @@ import {IconMiniArrowEndLine, IconMiniArrowStartLine} from '@instructure/ui-icon
 import $ from 'jquery'
 import {find} from 'lodash'
 import template from '../jst/ModuleSequenceFooter.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-const I18n = useI18nScope('sequence_footer')
+const I18n = createI18nScope('sequence_footer')
 
 // Summary
 //   Creates a new ModuleSequenceFooter so clicking to see the next item in a module
@@ -96,7 +96,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
         const label = `Previous Module Item${
           this.msfInstance.previous.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
         }`
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <Tooltip
             aria-label={label}
@@ -120,7 +120,7 @@ $.fn.moduleSequenceFooter = function (options = {}) {
         const label = `Next Module Item${
           this.msfInstance.next.externalItem ? ` - ${I18n.t('opens in new window')}` : ''
         }`
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <Tooltip
             aria-label={label}

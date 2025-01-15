@@ -22,10 +22,10 @@ import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
 import type {Module} from './types'
 import PrerequisiteSelector from './PrerequisiteSelector'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export interface PrerequisiteFormProps {
   prerequisites: Module[]
@@ -89,7 +89,7 @@ export default function PrerequisiteForm({
       {prerequisites.map((module, index) => (
         <PrerequisiteSelector
           // This is needed to keep focus in the component after re-rendering when module changed
-          // eslint-disable-next-line react/no-array-index-key
+           
           key={`module-${index}`}
           selection={module.name}
           options={filterOptions(module)}

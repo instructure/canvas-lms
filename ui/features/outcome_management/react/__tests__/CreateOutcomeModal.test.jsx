@@ -19,7 +19,7 @@
 import React from 'react'
 import {act, render as rtlRender, fireEvent, waitFor} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {createCache} from '@canvas/apollo-v3'
 import {within} from '@testing-library/dom'
 import CreateOutcomeModal from '../CreateOutcomeModal'

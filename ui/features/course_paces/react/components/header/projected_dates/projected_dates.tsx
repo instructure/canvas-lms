@@ -19,7 +19,7 @@
 import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -36,7 +36,7 @@ import {
 } from '../../../reducers/course_paces'
 import {coursePaceTimezone, coursePaceDateFormatter} from '../../../shared/api/backend_serializer'
 
-const I18n = useI18nScope('course_paces_projected_dates')
+const I18n = createI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
 const NBSP = String.fromCharCode(0x00a0)

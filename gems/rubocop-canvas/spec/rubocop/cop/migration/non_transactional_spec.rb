@@ -21,7 +21,7 @@ describe RuboCop::Cop::Migration::NonTransactional do
   subject(:cop) { described_class.new }
 
   it "complains about concurrent indexes in ddl transaction" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
 
         def up
@@ -29,13 +29,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/disable_ddl/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/disable_ddl/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "ignores non-concurrent indexes" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
 
         def up
@@ -43,11 +43,11 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "is ok with concurrent indexes added non-transactionally" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -56,11 +56,11 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "complains about missing if_not_exists for add_index" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -69,13 +69,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists for add_column" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -84,13 +84,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists for add_reference" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -99,35 +99,35 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq 1
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq :error
+    expect(offenses.size).to eq 1
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq :error
   end
 
   it "is ok about missing if_not_exists for add_index when transactional" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           add_index :my_index
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "is ok about missing if_not_exists for add_column when transactional" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         def up
           add_column :table, :column, :type
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "is ok about if_not_exists for add_index" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -136,11 +136,11 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "is ok about if_not_exists for add_column" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -149,11 +149,11 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "complains about missing if_exists on remove_foreign_key" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -162,13 +162,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists on create_table" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -179,13 +179,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists on indexes in create_table" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -197,13 +197,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists on indexes in add_reference" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -215,13 +215,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "complains about missing if_not_exists on indexes with options in add_reference" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -233,13 +233,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_not_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_not_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "doesn't complain about present if_not_exists on indexes in add_reference" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -252,11 +252,11 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "doesn't complain about non-index in add_reference" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -267,11 +267,11 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 
   it "complains about drop_table without if_exists" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -280,13 +280,13 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(1)
-    expect(cop.messages.first).to match(/if_exists/)
-    expect(cop.offenses.first.severity.name).to eq(:error)
+    expect(offenses.size).to eq(1)
+    expect(offenses.first.message).to match(/if_exists/)
+    expect(offenses.first.severity.name).to eq(:error)
   end
 
   it "doesn't complain about drop_table with if_exists" do
-    inspect_source(<<~RUBY)
+    offenses = inspect_source(<<~RUBY)
       class TestMigration < ActiveRecord::Migration
         disable_ddl_transaction!
 
@@ -295,6 +295,6 @@ describe RuboCop::Cop::Migration::NonTransactional do
         end
       end
     RUBY
-    expect(cop.offenses.size).to eq(0)
+    expect(offenses.size).to eq(0)
   end
 end

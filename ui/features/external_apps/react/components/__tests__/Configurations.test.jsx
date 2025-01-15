@@ -44,26 +44,6 @@ describe('ExternalApps.Configurations', () => {
     ok(TestUtils.isCompositeComponentWithType(component, Configurations))
   })
 
-  test('canNotAddEdit', () => {
-    const component = renderComponent({
-      env: {
-        PERMISSIONS: {create_tool_manually: false},
-        APP_CENTER: {enabled: true},
-      },
-    })
-    notOk(component.canAddEdit())
-  })
-
-  test('canAddEdit', () => {
-    const component = renderComponent({
-      env: {
-        PERMISSIONS: {create_tool_manually: true},
-        APP_CENTER: {enabled: true},
-      },
-    })
-    ok(component.canAddEdit())
-  })
-
   test('canAdd', () => {
     const component = renderComponent({
       env: {

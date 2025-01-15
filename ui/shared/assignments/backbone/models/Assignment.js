@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import $ from 'jquery'
@@ -28,7 +28,7 @@ import VeriCiteSettings from '../../VeriCiteSettings'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection'
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import * as tz from '@instructure/moment-utils'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -36,7 +36,7 @@ import PandaPubPoller from '@canvas/panda-pub-poller'
 import {matchingToolUrls} from './LtiAssignmentHelpers'
 
 const default_interval = 3000
-const I18n = useI18nScope('models_Assignment')
+const I18n = createI18nScope('models_Assignment')
 
 const hasProp = {}.hasOwnProperty
 

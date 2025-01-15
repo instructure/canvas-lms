@@ -34,9 +34,9 @@ module Factories
       perishable_token: "value for perishable_token",
       login_count: 1,
       failed_login_count: 0,
-      last_request_at: Time.now,
-      last_login_at: Time.now,
-      current_login_at: Time.now,
+      last_request_at: Time.zone.now,
+      last_login_at: Time.zone.now,
+      current_login_at: Time.zone.now,
       last_login_ip: "value for last_login_ip",
       current_login_ip: "value for current_login_ip",
       user: @user

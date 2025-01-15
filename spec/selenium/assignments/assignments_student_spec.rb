@@ -178,7 +178,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{locked_assignment.id}"
       expect(f("#content")).to include_text(format_date_for_view(unlock_time))
-      locked_assignment.update(unlock_at: Time.now)
+      locked_assignment.update(unlock_at: Time.zone.now)
       refresh_page # to show the updated assignment
       expect(f("#content")).not_to include_text("This assignment is locked until")
     end

@@ -153,6 +153,7 @@ class GroupsController < ApplicationController
   include Api::V1::GroupCategory
   include Context
   include K5Mode
+  include GroupPermissionHelper
 
   SETTABLE_GROUP_ATTRIBUTES = %w[
     name
@@ -274,9 +275,9 @@ class GroupsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
 
     page_has_instui_topnav
-    @groups = all_groups = @context.groups.active
+    @groups = @context.groups.active
     unless params[:filter].nil?
-      @groups = all_groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
+      @groups = @groups.left_outer_joins(:users).where("groups.name ILIKE :query OR users.name ILIKE :query", query: "%#{ActiveRecord::Base.sanitize_sql_like(params[:filter])}%")
     end
     @groups = all_groups = @groups.order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                   .eager_load(:group_category).preload(:root_account)
@@ -513,28 +514,53 @@ class GroupsController < ApplicationController
     if api_request?
       if params[:group_category_id]
         group_category = api_find(GroupCategory.active, params[:group_category_id])
-        return render json: {}, status: bad_request unless group_category
+        return render json: {}, status: :bad_request unless group_category
 
         @context = group_category.context
         attrs[:group_category] = group_category
-        return unless authorized_action(group_category.context, @current_user, :manage_groups_add)
+
+        non_collaborative = group_category.non_collaborative?
+
+        unless check_group_authorization(
+          context: @context,
+          current_user: @current_user,
+          action_category: :add,
+          non_collaborative:
+        )
+          return render json: { message: "Not authorized to create groups in this category" }, status: :unauthorized
+        end
       else
         @context = @domain_root_account
         attrs[:group_category] = GroupCategory.communities_for(@context)
       end
     elsif params[:group]
-      group_category_id = params[:group].delete :group_category_id
-      if group_category_id && @context.grants_right?(@current_user, session, :manage_groups_add)
-        group_category = @context.group_categories.where(id: group_category_id).first
+      group_category_id = params[:group].delete(:group_category_id)
+      if group_category_id
+        group_category = @context.active_combined_group_and_differentiation_tag_categories.where(id: group_category_id).first
         return render json: {}, status: :bad_request unless group_category
 
         attrs[:group_category] = group_category
+
+        non_collaborative = group_category.non_collaborative?
+        unless check_group_context_rights(
+          context: @context,
+          current_user: @current_user,
+          action_category: :add,
+          non_collaborative:
+        )
+          if non_collaborative
+            return render json: { message: "Not authorized to create groups in this category" }, status: :unauthorized
+          else
+            # If collaborative and not authorized, fall back to not setting the category
+            attrs[:group_category] = nil
+          end
+        end
       else
         attrs[:group_category] = nil
       end
     end
 
-    attrs.delete :storage_quota_mb unless @context.grants_right? @current_user, session, :manage_storage_quotas
+    attrs.delete :storage_quota_mb unless @context.grants_right?(@current_user, session, :manage_storage_quotas)
     @group = @context.groups.temp_record(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
 
     if authorized_action(@group, @current_user, :create)
@@ -966,7 +992,7 @@ class GroupsController < ApplicationController
       @group = api_find(Group.active, params[:group_id])
     else
       @group = @context if @context.is_a?(Group)
-      @group ||= api_find(@context ? @context.groups : Group, params[:id])
+      @group ||= api_find(@context ? @context.combined_groups_and_differentiation_tags : Group, params[:id])
     end
   end
 end

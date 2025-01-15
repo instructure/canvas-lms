@@ -86,6 +86,7 @@ const locale = {
   "cyan_c1d5f68a": { "message": "آبی تیره" },
   "decrease_indent_d9cf469d": { "message": "کاهش تورفتگی" },
   "deep_purple_bb3e2907": { "message": "ارغوانی پر رنگ" },
+  "default_9db103d": { "message": "پیش فرض" },
   "delimiters_4db4840d": { "message": "جداکننده ها" },
   "description_436c48d7": { "message": "شرح" },
   "details_98a31b68": { "message": "اطلاعات" },

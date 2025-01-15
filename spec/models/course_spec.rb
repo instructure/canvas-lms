@@ -1031,31 +1031,9 @@ describe Course do
         expect(@course.grants_right?(@admin2, :reset_content)).to be_falsey
       end
 
-      it "grants create_tool_manually to the proper individuals" do
+      it "grants manage_lti_* to the proper individuals" do
         course_with_teacher(active_all: true)
-        @course.root_account.disable_feature!(:granular_permissions_manage_lti)
-        @teacher = user_factory(active_all: true)
-        @course.enroll_teacher(@teacher).accept!
 
-        @ta = user_factory(active_all: true)
-        @course.enroll_ta(@ta).accept!
-
-        @designer = user_factory(active_all: true)
-        @course.enroll_designer(@designer).accept!
-
-        @student = user_factory(active_all: true)
-        @course.enroll_student(@student).accept!
-
-        clear_permissions_cache
-        expect(@course.grants_right?(@teacher, :create_tool_manually)).to be_truthy
-        expect(@course.grants_right?(@ta, :create_tool_manually)).to be_truthy
-        expect(@course.grants_right?(@designer, :create_tool_manually)).to be_truthy
-        expect(@course.grants_right?(@student, :create_tool_manually)).to be_falsey
-      end
-
-      it "grants manage_lti_* to the proper individuals (granular permissions)" do
-        course_with_teacher(active_all: true)
-        @course.root_account.enable_feature!(:granular_permissions_manage_lti)
         @teacher = user_factory(active_all: true)
         @course.enroll_teacher(@teacher).accept!
 
@@ -2079,7 +2057,7 @@ describe Course do
     it "orders assignments and groups by position" do
       @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(name: "Some Assignment Group 1", group_weight: 100), @course.assignment_groups.create!(name: "Some Assignment Group 2", group_weight: 100)].sort_by(&:id)
 
-      now = Time.now
+      now = Time.zone.now
 
       g1a1 = @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 3, assignment_group: @assignment_group_1, points_possible: 10)
       @course.assignments.create!(title: "Assignment 02", due_at: now + 1.day, position: 1, assignment_group: @assignment_group_1, points_possible: 10)
@@ -2139,7 +2117,7 @@ describe Course do
 
       assignment_group = @course.assignment_groups.create!(name: "Some Assignment Group 1")
 
-      now = Time.now
+      now = Time.zone.now
 
       @course.assignments.create!(title: "Assignment 01", due_at: now + 1.day, position: 1, assignment_group:, points_possible: 10)
       @course.assignments.create!(title: "Assignment 02", due_at: nil, position: 1, assignment_group:, points_possible: 10)
@@ -5087,7 +5065,7 @@ describe Course do
     context "appointment cancellation" do
       before :once do
         course_with_student(active_all: true)
-        @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [["2010-01-01 13:00:00", "2010-01-01 14:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]])
+        @ag = AppointmentGroup.create!(title: "test", contexts: [@course], new_appointments: [["2010-01-01 13:00:00", "2010-01-01 14:00:00"], ["#{Time.zone.now.year + 1}-01-01 13:00:00", "#{Time.zone.now.year + 1}-01-01 14:00:00"]])
         @ag.appointments.each do |a|
           a.reserve_for(@user, @user)
         end
@@ -6834,6 +6812,40 @@ describe Course do
     end
   end
 
+  describe "archival" do
+    before :once do
+      course_with_student(active_all: true)
+    end
+
+    it "identifies archived courses via predicate and scope" do
+      expect(@course.archived?).to be false
+      expect(Course.archived).to be_empty
+
+      @course.archive!
+      expect(@course.archived?).to be true
+      expect(Course.archived).to eq [@course]
+    end
+
+    it "sets the archived_at timestamp on the course and enrollments when archived individually" do
+      student_in_course.destroy # test that this enrollment is not part of the archive
+      @course.archive!
+      expect(@course.archived_at).to be_present
+      expect(@course.all_enrollments.pluck(:type, :workflow_state, :archived_at)).to match_array(
+        [["TeacherEnrollment", "deleted", @course.archived_at],
+         ["StudentEnrollment", "deleted", @course.archived_at],
+         ["StudentEnrollment", "deleted", nil]]
+      )
+    end
+
+    it "sets the archived_at timestamp on courses and enrollments when archived in bulk" do
+      courses = [@course, course_with_student(active_all: true).course]
+      Course.destroy_batch(courses, archive: true)
+      dates = courses.flat_map { |c| [c.reload.archived_at] + c.all_enrollments.pluck(:archived_at) }
+      expect(dates.uniq.size).to eq 1
+      expect(dates.first).to be_present
+    end
+  end
+
   describe "#apply_nickname_for!" do
     before(:once) do
       @course = Course.create! name: "some terrible name"
@@ -7401,7 +7413,7 @@ describe Course do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now, settings: { enable_course_paces: true }).offer!
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now, settings: { enable_course_paces: true }).offer!
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
 
         Course.last.update! restrict_enrollments_to_course_dates: false
@@ -7412,7 +7424,7 @@ describe Course do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
 
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now).offer!
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
 
         Course.last.update! settings: { enable_course_paces: true }
@@ -7423,7 +7435,7 @@ describe Course do
       it "increments and decrements on pace status and end date existence concurrently" do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now).offer!
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
 
         Course.last.update! restrict_enrollments_to_course_dates: false, settings: { enable_course_paces: true }
@@ -7438,7 +7450,7 @@ describe Course do
       it "ignores unpublished date having changes" do
         allow(InstStatsd::Statsd).to receive(:increment)
         allow(InstStatsd::Statsd).to receive(:decrement)
-        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now)
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.zone.now)
         expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.has_end_date")
         Course.last.update! settings: { enable_course_paces: true }
         expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.has_end_date")

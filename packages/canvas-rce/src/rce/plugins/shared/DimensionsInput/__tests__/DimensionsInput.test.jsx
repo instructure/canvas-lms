@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {render, screen, within} from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 
-import DimensionsInput, {useDimensionsState} from '..'
+import DimensionsInput, { useDimensionsState } from '..'
 import DimensionsInputDriver from './DimensionsInputDriver'
 
 const W_AND_H_NAN_ERROR = 'Width and height must be numbers'
@@ -61,14 +61,14 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
   })
 
   function SpecComponent() {
-    const {minHeight, minWidth, minPercentage} = props
-    dimensionsState = useDimensionsState(initialState, {minHeight, minWidth, minPercentage})
+    const { minHeight, minWidth, minPercentage } = props
+    dimensionsState = useDimensionsState(initialState, { minHeight, minWidth, minPercentage })
 
     return <DimensionsInput dimensionsState={dimensionsState} {...props} />
   }
 
   function renderComponent() {
-    component = render(<SpecComponent />, {container: $container})
+    component = render(<SpecComponent />, { container: $container })
     dimensions = new DimensionsInputDriver($container)
   }
 
@@ -1419,7 +1419,8 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
     })
 
     it('The radio input group for Percentage and Pixels is displayed', () => {
-      const radioInputGroup = screen.getByRole('group', {name: /Dimension Type/i})
+      const radioInputGroup = screen.getByRole('radiogroup', { name: /Dimension Type/i })
+
       expect(radioInputGroup).toBeVisible()
     })
     it('The "Percentage" radio input is checked', () => {
@@ -1441,7 +1442,7 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
       renderComponent()
     })
     it('The radio input group for Percentage and Pixels is not displayed', () => {
-      const radioInputGroup = screen.queryByRole('group', {name: /Dimension Type/i})
+      const radioInputGroup = screen.queryByRole('group', { name: /Dimension Type/i })
       expect(radioInputGroup).toBeNull()
     })
     it('The custom text description is displayed', () => {

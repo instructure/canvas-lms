@@ -14,13 +14,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import 'jqueryui/dialog'
 import 'jquery-tinypubsub'
 
-const I18n = useI18nScope('assignmentRubricDialog')
+const I18n = createI18nScope('assignmentRubricDialog')
 
 const assignmentRubricDialog = {
   // the markup for the trigger should look like:

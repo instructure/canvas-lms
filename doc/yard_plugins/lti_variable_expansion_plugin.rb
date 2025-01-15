@@ -96,8 +96,10 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
   def availability
     all_availabilities = all_guards.filter_map do |guard|
       case guard
-      when "ALWAYS", "CONTROLLER_GUARD"
+      when "ALWAYS", "CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD"
         "always"
+      when "CONTROLLER_GUARD"
+        "when a tool is launched (excludes background messages like PNS notices)"
       when "USER_GUARD"
         "when launched by a logged in user"
       when "SIS_USER_GUARD"

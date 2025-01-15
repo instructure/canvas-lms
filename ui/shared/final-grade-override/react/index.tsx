@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
   DeprecatedGradingScheme,
   FinalGradeOverride,
@@ -32,7 +32,7 @@ import {scoreToGrade} from '@instructure/grading-utils'
 import {View} from '@instructure/ui-view'
 import {finalGradeOverrideUtils} from '../utils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 export type FinalGradeOverrideTextBoxProps = {
   finalGradeOverride?: FinalGradeOverride

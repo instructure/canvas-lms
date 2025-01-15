@@ -17,14 +17,16 @@
 
 import $ from 'jquery'
 import CourseRestore from './CourseRestore'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('user_restore')
+const I18n = createI18nScope('user_restore')
 
 export default class UserRestore extends CourseRestore {
   searchUrl() {
-    return `/accounts/${this.get('account_id')}/users/${this.get('id')}.json`
+    return `/accounts/${this.get('account_id')}/users/${this.get(
+      'id'
+    )}.json?include_deleted_users=true`
   }
 
   // @api public

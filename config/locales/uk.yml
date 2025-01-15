@@ -1826,6 +1826,7 @@ uk:
   add_new_group_7ac49f31: "Додати нову групу"
   add_new_set_of_due_dates_e8e240f: "Додати новий набір фіксованих дат"
   add_new_term_d2217c0d: "Додати новий період"
+  add_page_7ea7ee39: "Додати сторінку"
   add_people_7948b7da: "Додати людей"
   add_people_7ee4b2ec: "Додати людей"
   add_people_to_coursename_5ea234e1: "Додати людей до : %{courseName}"
@@ -3490,6 +3491,7 @@ uk:
     edit: 
       confirm_delete_calendar_event: "Ви впевнені, що хочете видалити цю календарну подію?"
       errors: 
+        greater_or_equal: "Ви повинні дозволити принаймні одному користувачу прийняти участь"
         start_date_required: "Ви повинні ввести дату"
         title_required: "Ви повинні ввести назву"
       event_deleted: "%{event_title} видалено успішно"
@@ -4370,6 +4372,7 @@ uk:
     unexpected_error: "Сталася неочікувана помилка, зверніться до служби підтримки."
     unknown: Невідомий
     upload_timeout_error: "Час процесу завантаження файлу минув."
+  content_migration_1f14de27: "Міграція вмісту"
   content_migration_queued_46c27790: "Поставлено до черги міграції вмісту"
   content_migration_running_percent_complete_4b00c024: "Процес міграції вмісту триває, %{percent}% до кінця"
   content_migrations: 
@@ -5925,6 +5928,7 @@ uk:
   crumbs: 
     access_report: "Звіт про доступ"
     announcements: Оголошення
+    apps: Застосунки
     assignments: Завдання
     calendar_events: "Календарні події"
     collaborations: "Сумісна робота"
@@ -7768,6 +7772,7 @@ uk:
     titles: 
       bookmark_search: "Знайти закладку: %{service_name}"
   find_8d605019: Знайти
+  find_a_course_94301b4d: "Пошук курсу"
   find_an_existing_grading_scheme_d836ea: "Знайти існуючу схему оцінювання"
   find_an_outcome_919328e6: "Знайти результат"
   find_appointment_85d6922e: "Знайти призначення"
@@ -7803,6 +7808,8 @@ uk:
   folder_705fd2d7: Тека
   folder_browsing_tree_1f00a3ae: "Дерево перегляду тек"
   folder_icon_29017021: "Іконка теки"
+  folder_name_b28488c2: "Ім'я папки"
+  folder_was_successfully_created_8de6a282: "Тека була успішно створена."
   folders: 
     event_updated: "Подію було успішно оновлено."
     folder_created: "Тека була успішно створена."
@@ -9645,6 +9652,9 @@ uk:
       new_tab: "Цей інструмент повинен бути завантажений в новому вікні браузера"
       new_tab_expired: "Сесія для цього інструменту закінчилася. Будь ласка, перезавантажте сторінку, щоб знову отримати доступ до інструмента "
       new_tab_loaded: "Цей інструмент був успішно завантажений у новому вікні браузера. Оновити сторінку, щоб отримати доступ до інструмента знову."
+    registrations: 
+      index: 
+        title: Застосунки
   lti2: 
     register_tool: "Зареєструвати інструмент"
   lti_2_reregistration_afabde25: "Повторна реєстрація LTI 2"
@@ -9654,6 +9664,7 @@ uk:
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Імпортер Moodle "
   main_text_color_7d65ab1b: "Колір основного тексту"
+  make_it_public_71bf2a86: "Зробити публічним"
   malaysia_60_7d357b28: "Малайзія (+60)"
   malformed_csv_aaa4b7f2: "Неправильно сформовані CSV"
   manage_access_bd923d8d: "Керувати доступом"
@@ -10253,7 +10264,7 @@ uk:
       twitter: 
         assignment_change: "Canvas Оповіщення - Зміна дати: %{assignment_name}, %{course_name}"
         due_at: "очікується:  %{assignment_due_date_time}"
-        no_due_date: "очікується: Відсутня очікувана дата"
+        no_due_date: "очікується: Відсутній термін виконання"
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Очікувана дата завдання змінена: %{assignment_name}, %{course_name} (%{override})"
@@ -10275,7 +10286,7 @@ uk:
       twitter: 
         assignment_change: "Canvas Оповіщення - Зміна дати: %{assignment_name}, %{course_name} (%{override})"
         due_at: "очікується:  %{assignment_due_date_time}"
-        no_due_date: "очікується: Відсутня очікувана дата"
+        no_due_date: "очікується: Відсутній термін виконання"
     assignment_graded: 
       email: 
         assignment_graded: "Завдання оцінено: %{assignment_name}, %{course_name}"
@@ -11740,7 +11751,7 @@ uk:
     sure_you_want_to_mute: "Ви впевнені, що хочете вимкнути сповіщення для цього завдання? При вимкнені сповіщень для завдання, студенти не отримуватимуть нових повідомлень стосовно нього або зможуть побачити:"
   mute_unmute_assignment_62608e44: "Відключити/включити завдання"
   muted_283cfa0f: "(без звуку)"
-  muted_3ff94739: "Без звуку"
+  muted_3ff94739: "Вимкнено звук"
   muting_assignment_a9aeb5c7: "Відключення завдання ..."
   my_dashboard_8983c283: "Моя панель інструментів"
   my_dashboard_b724020: "Моя панель інструментів"
@@ -12629,6 +12640,7 @@ uk:
   parent_of_a_canvas_user_afba1624: "Батько користувача Canvas?"
   parent_signup_b7c6bf0a: "Бітьківська реєстрація"
   parents_sign_up_here_f0aa8f4f: "Батьки реєструються тут"
+  participated_6279fba: Використано
   participation_af2598: Участь
   participations_1823832d: Участі
   pass_2a8c4f07: пропустити
@@ -13178,6 +13190,7 @@ uk:
   points_possible_e57d5613: "Можливі бали"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Можливі бали повинні були 0 або більше, щоб вибрати тип сортування"
   points_possible_points_fda3b111: "%{points_possible} балів"
+  points_possible_pts_aedb481e: "%{points_possible}бал"
   points_pts_e5596bf7: "%{points} балів"
   points_total_pts_5b4cbd77: "%{points} / %{total} балів"
   pointspossible_pts_624a6733: "%{pointsPossible} балів"
@@ -15645,8 +15658,10 @@ uk:
   section_id_6f73f3d5: "ідентифікатор розділу"
   section_id_8ec4f46f: "ID розділу"
   section_id_b5aad4a7: "Ідентифікатор розділу"
+  section_name_16ea8a4a: "Назва розділу"
   section_name_b6d82574: "Назва розділу"
   section_name_edb51b2: "назва розділу"
+  section_name_is_too_long_9cec2a30: "Назва розділу занадто довга"
   section_section_names_98f172e6: "Розділ: %{section_names}"
   section_sis_2a80d2fa: "Sis розділу"
   section_sis_94511bcd: "sis розділу"
@@ -18011,6 +18026,7 @@ uk:
   unpublished_courses_title: "Неопубліковані курси"
   unpublished_dfd8801: Неопублікований
   unread_e9c1b19c: Непрочитані
+  unrecognized_browser_1fd80dfb: "Нерозпізнаний браузер"
   unregister_service_985238e9: "Незареєстрований сервіс"
   unreserved_e86b7425: "Не зарезервовано"
   unsafe_file_link_8a18eceb: "небезпечне посилання на файл"

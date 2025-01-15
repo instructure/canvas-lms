@@ -1,14 +1,16 @@
 <th scope="row">{{name}}</th>
 
 <td class="right-align">
-  <div class="input-append">
+  <div id="assignment_group_{{id}}_weight" class="input-append">
     <input
       aria-label='{{#t}}Group weight for:{{/t}} {{name}}'
       type="text"
       class="span1 group_weight_value"
       value="{{n group_weight}}"
       name="{{name}}_group_weight"
+      groupId="{{id}}"
       {{#unless canChangeWeights}}readonly{{/unless}} />
     <span class="add-on">%</span>
   </div>
+  <div id="group_{{id}}_weight_errors"></div>
 </td>

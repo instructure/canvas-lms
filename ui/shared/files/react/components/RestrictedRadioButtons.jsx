@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
@@ -29,7 +29,7 @@ import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 import {mergeTimeAndDate} from '@instructure/moment-utils'
 import classnames from 'classnames'
 
-const I18n = useI18nScope('restrict_student_access')
+const I18n = createI18nScope('restrict_student_access')
 
 const allAreEqual = (models, fields) =>
   models.every(model =>
@@ -175,9 +175,9 @@ class RestrictedRadioButtons extends React.Component {
       </label>
       <div>
         {this.permissionOptions.map((option, index) => (
-          // eslint-disable-next-line react/no-array-index-key
+           
           <div className="radio" key={index}>
-            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+            { }
             <label>
               <input
                 ref={e => (this[option.ref] = e)}

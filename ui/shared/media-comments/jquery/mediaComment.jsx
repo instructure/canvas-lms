@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 // mediaComment.js
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as pubsub from 'jquery-tinypubsub'
 import mejs from '@canvas/mediaelement'
 import MediaElementKeyActionHandler from './MediaElementKeyActionHandler'
@@ -29,7 +29,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {MediaPlayer} from '@instructure/ui-media-player'
 
-const I18n = useI18nScope('jquery_media_comments')
+const I18n = createI18nScope('jquery_media_comments')
 
 // #
 // a module for some of the transformation functions pulled out of the middle
@@ -85,7 +85,7 @@ mejs.MepDefaults.success = function (mediaElement, _domObject) {
       kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
     })
     .catch(error => {
-      console.log('Error importing kalturaAnalytics:', error) // eslint-disable-line no-console
+      console.log('Error importing kalturaAnalytics:', error)  
     })
   return mediaElement.play()
 }
@@ -370,7 +370,7 @@ const mediaCommentActions = {
 
             const studioMediaEnabled = ENV.studio_media_capture_enabled
             if (studioMediaEnabled) {
-              // eslint-disable-next-line no-restricted-properties
+               
               ReactDOM.render(mediaPlayer, $dialog[0])
             } else {
               $mediaTag.appendTo($dialog.html(''))
@@ -396,7 +396,7 @@ const mediaCommentActions = {
 
 $.fn.mediaComment = function (command, ...restArgs) {
   if (!INST.kalturaSettings) {
-    return console.log('Kaltura has not been enabled for this account') // eslint-disable-line no-console
+    return console.log('Kaltura has not been enabled for this account')  
   } else {
     mediaCommentActions[command].apply(this, restArgs)
   }

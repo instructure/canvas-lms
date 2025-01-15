@@ -306,12 +306,14 @@ class RoleOverride < ActiveRecord::Base
   EMPTY_ARRAY = [].freeze
   private_constant :EMPTY_ARRAY
 
-  def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key, default_data, no_caching = false, preloaded_overrides: nil)
+  def self.uncached_permission_for(context, permission, role_or_role_id, role_context, account, permissionless_base_key,
+                                   default_data, no_caching = false, preloaded_overrides: nil)
     role = role_or_role_id.is_a?(Role) ? role_or_role_id : Role.get_role_by_id(role_or_role_id)
 
-    true_for_custom_site_admin_role = (!account.site_admin? || !default_data[:account_only] == :site_admin) &&
-                                      role.account == Account.site_admin && role.belongs_to_account? &&
-                                      Setting.get("allowed_custom_site_admin_roles", "").split.uniq.include?(role.name)
+    true_for_custom_site_admin_role =
+      (!account.site_admin? || !default_data[:account_only] == :site_admin) &&
+      role.account == Account.site_admin && role.belongs_to_account? &&
+      Setting.get("allowed_custom_site_admin_roles", "").split(",").uniq.include?(role.name)
 
     # be explicit that we're expecting calculation to stop at the role's account rather than, say, passing in a course
     # unnecessarily to make sure we go all the way down the chain (when nil would work just as well)

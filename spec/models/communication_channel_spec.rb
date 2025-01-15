@@ -230,7 +230,7 @@ describe CommunicationChannel do
     expect(HostUrl).to receive(:context_host).and_return("test.canvas.com")
     expect(CanvasSlug).to receive(:generate).and_return("abc123")
     communication_channel_model
-    mock_request = instance_double("ActionDispatch::Request", host_with_port: "test.canvas.com")
+    mock_request = instance_double(ActionDispatch::Request, host_with_port: "test.canvas.com")
     presenter = CommunicationChannelPresenter.new(@cc, mock_request)
     expect(presenter.confirmation_url).to eql("https://test.canvas.com/register/abc123")
   end
@@ -836,13 +836,13 @@ describe CommunicationChannel do
       it "doesn't flag old mappings if path type is not email" do
         cc.update!(path_type: described_class::TYPE_SMS, path: "8005551212")
         expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
-        cc.update!(path_type: described_class::TYPE_TWITTER)
+        cc.update!(path_type: described_class::TYPE_PUSH)
         cc.update!(path: "instructure")
       end
 
       it "doesn't flag old mappings if nothing relevant has changed" do
         expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
-        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.now)
+        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.zone.now)
       end
     end
   end

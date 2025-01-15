@@ -845,78 +845,95 @@ describe('DiscussionTopicForm', () => {
     })
   })
 
-  describe('Ungraded', () => {
-    describe('selective_release_ui_api flag is ON', () => {
-      beforeAll(() => {
-        window.ENV.FEATURES.selective_release_ui_api = true
+  describe('Todo Date', () => {
+    it('clears todo date in submission when switching to graded', async () => {
+      const mockOnSubmit = jest.fn()
+      const todoDate = '2024-12-31T23:59:00Z'
+      const {getByRole, getByLabelText} = setup({
+        onSubmit: mockOnSubmit,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          todoDate,
+          addToTodo: true,
+        }),
       })
 
-      it('renders expected default teacher discussion options', () => {
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT = true
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_UPDATE_ASSIGNMENT = true
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = true
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = true
+      // Switch to graded
+      getByLabelText('Graded').click()
 
-        const document = setup()
-        // Default teacher options in order top to bottom
-        expect(document.getByText('Topic Title')).toBeInTheDocument()
-        expect(document.queryByText('Attach')).toBeTruthy()
-        expect(document.queryByTestId('section-select')).toBeTruthy()
-        expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
-        expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
-        expect(document.queryByLabelText('Enable podcast feed')).toBeInTheDocument()
-        expect(document.queryByTestId('graded-checkbox')).toBeTruthy()
-        expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
-        expect(document.queryByLabelText('Add to student to-do')).toBeInTheDocument()
-        expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
-        expect(document.queryAllByText('Manage Due Dates and Assign To')).toBeTruthy()
+      // Submit form
+      getByRole('button', {name: 'Save'}).click()
 
-        // Hides announcement options
-        expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
-        expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
+      // Verify submission
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          todoDate: null,
+          assignment: expect.any(Object),
+        }),
+        false
+      )
+    })
+
+    it('preserves todo date in ungraded mode', async () => {
+      const mockOnSubmit = jest.fn()
+      const todoDate = '2024-12-31T23:59:00Z'
+      const {getByRole} = setup({
+        onSubmit: mockOnSubmit,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          todoDate,
+          addToTodo: true,
+        }),
       })
 
-      it('renders expected default student discussion options', () => {
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT = false
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_UPDATE_ASSIGNMENT = false
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MODERATE = false
-        window.ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_MANAGE_CONTENT = false
+      // Submit form
+      getByRole('button', {name: 'Save'}).click()
 
-        const document = setup()
-        // Default teacher options in order top to bottom
-        expect(document.getByText('Topic Title')).toBeInTheDocument()
-        expect(document.queryByText('Attach')).toBeTruthy()
-        expect(document.queryByTestId('section-select')).toBeTruthy()
-        expect(document.queryAllByText('Anonymous Discussion')).toBeTruthy()
-        expect(document.queryByTestId('require-initial-post-checkbox')).toBeTruthy()
-        expect(document.queryByLabelText('Allow liking')).toBeInTheDocument()
-        expect(document.queryByTestId('group-discussion-checkbox')).toBeTruthy()
-        expect(document.queryAllByText('Available from')).toBeTruthy()
-        expect(document.queryAllByText('Until')).toBeTruthy()
-
-        // Hides announcement options
-        expect(document.queryByLabelText('Delay Posting')).not.toBeInTheDocument()
-        expect(document.queryByLabelText('Allow Participants to Comment')).not.toBeInTheDocument()
-      })
+      // Verify submission
+      expect(mockOnSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          todoDate,
+          assignment: null,
+        }),
+        false
+      )
     })
   })
 
-  describe('Special characters in RCE', () => {
-    const message = '<p><span>’</span></p>'
+  it('applies fancy midnight to assign reviews when needed', () => {
+    const {getByTestId, getByLabelText, getByText} = setup()
 
-    it('should be the original version if there is no user interaction', () => {
-      const onSubmit = jest.fn()
-      const document = setup({
-        onSubmit,
-        currentDiscussionTopic: DiscussionTopic.mock({
-          title: 'Test discussion',
-          message,
-        }),
-      })
-      const saveButton = document.getByText('Save')
-      saveButton.click()
-      expect(onSubmit).toHaveBeenCalled()
-      expect(onSubmit.mock.calls[0][0].message).toBe(message)
-    })
+    getByLabelText('Graded').click()
+    getByLabelText('Automatically assign').click()
+
+    const dueDate = getByTestId('reviews-due-date')
+    const dueTime = getByTestId('reviews-due-time')
+
+    expect(dueDate).toBeInTheDocument()
+    expect(dueTime).toBeInTheDocument()
+
+    fireEvent.change(dueDate, {target: {value: 'Nov 9, 2020'}})
+    fireEvent.click(getByText('10 November 2020'))
+
+    expect(dueTime).toHaveValue('11:59 PM')
+  })
+
+  it('does not apply fancy midnight to assign reviews when the user have other time set', () => {
+    const {getByTestId, getByLabelText, getByText} = setup()
+
+    getByLabelText('Graded').click()
+    getByLabelText('Automatically assign').click()
+
+    const dueDate = getByTestId('reviews-due-date')
+    const dueTime = getByTestId('reviews-due-time')
+
+    expect(dueDate).toBeInTheDocument()
+    expect(dueTime).toBeInTheDocument()
+
+    fireEvent.change(dueTime, {target: {value: '10:00 AM'}})
+    fireEvent.click(getByText('10:00 AM'))
+
+    fireEvent.change(dueDate, {target: {value: 'Nov 9, 2020'}})
+    fireEvent.click(getByText('10 November 2020'))
+
+    expect(dueTime).toHaveValue('10:00 AM')
   })
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type Gradebook from '../../Gradebook'
 import {
   getSecondaryDisplayInfo,
@@ -25,7 +25,7 @@ import {
   renderCell,
 } from './StudentCellFormatter.utils'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export default class StudentLastNameCellFormatter {
   options: ReturnType<typeof getOptions>

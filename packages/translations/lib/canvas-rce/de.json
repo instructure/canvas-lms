@@ -79,6 +79,7 @@
     "message": "Automatisch gespeicherte Inhalte vorhanden. Möchten Sie lieber die automatisch gespeicherten Inhalte laden?"
   },
   "available_folders_694d0436": { "message": "Verfügbare Ordner" },
+  "background_1bc88842": { "message": "Hintergrund" },
   "backslash_b2d5442d": { "message": "Umgekehrter Schrägstrich" },
   "bar_ec63ed6": { "message": "Bar" },
   "basic_554cdc0a": { "message": "Grundlegend" },
@@ -89,6 +90,7 @@
   "binomial_coefficient_ea5b9bb7": { "message": "Binomischer Koeffizient" },
   "black_4cb01371": { "message": "Schwarz" },
   "blue_daf8fea9": { "message": "Blau" },
+  "border_5b08b06d": { "message": "Rand" },
   "bottom_15a2a9be": { "message": "Unten" },
   "bottom_third_5f5fec1d": { "message": "Unteres Drittel" },
   "bowtie_5f9629e4": { "message": "Fliege" },
@@ -158,10 +160,14 @@
   "clubs_suit_c1ffedff": { "message": "Kreuz (Spielkartenfarbe)" },
   "collaborations_5c56c15f": { "message": "Collaborations" },
   "collapse_to_hide_types_1ab46d2e": { "message": "{ types } ausblenden" },
+  "color_a363e1b0": { "message": "Farbe" },
+  "color_contrast_4c418add": { "message": "Farbkontrast" },
+  "color_contrast_ratio_687782f0": { "message": "Farbkontrastverhältnis" },
   "color_picker_6b359edf": { "message": "Farbwähler" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Farbwähler ({ colorName } ausgewählt)"
   },
+  "color_popup_af39810f": { "message": "Farb-Popup" },
   "column_e1ae5c64": { "message": "Spalte" },
   "column_group_1c062368": { "message": "Spaltengruppe" },
   "complex_numbers_a543d004": { "message": "Komplexe Zahlen" },
@@ -341,6 +347,7 @@
   "extra_small_9ae33252": { "message": "Extra klein" },
   "extracurricular_icon_67c8ca42": { "message": "Außerschulisches Symbol" },
   "f_function_fe422d65": { "message": "F (Funktion)" },
+  "fail_544e5dde": { "message": "NICHT BESTANDEN" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Abruf der Dateiinhalte fehlgeschlagen"
   },
@@ -400,6 +407,7 @@
     "message": "Gehen Sie zur Editor-Symbolleiste"
   },
   "grades_a61eba0a": { "message": "Noten" },
+  "graphics_text_bc9568bc": { "message": "Text für Grafik" },
   "greater_than_e98af662": { "message": "Größer als" },
   "greater_than_or_equal_b911949a": { "message": "Größer oder gleich" },
   "greek_65c5b3f7": { "message": "Griechisch" },
@@ -505,6 +513,10 @@
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Schlussfolgerung" },
   "infinity_7a10f206": { "message": "Unendlichkeit" },
+  "input_field_for_alpha_678265fd": { "message": "Eingabefeld für Alpha" },
+  "input_field_for_blue_561e020a": { "message": "Eingabefeld für Blau" },
+  "input_field_for_green_67f8b2b6": { "message": "Eingabefeld für Grün" },
+  "input_field_for_red_86a84615": { "message": "Eingabefeld für Rot" },
   "insert_593145ef": { "message": "Einfügen" },
   "insert_link_6dc23cae": { "message": "Link einfügen" },
   "insert_math_equation_57c6e767": { "message": "Math. Gleichung einfügen" },
@@ -526,6 +538,7 @@
   "language_arts_icon_a798b0f8": { "message": "Symbol für „Sprachkunst“" },
   "languages_icon_9d20539": { "message": "Sprachen-Symbol" },
   "large_9c5e80e7": { "message": "Groß" },
+  "large_text_e7ba08cd": { "message": "Großer Text" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Weitere Informationen über nebenstehende Links"
   },
@@ -716,6 +729,7 @@
   "no_video_1ed00b26": { "message": "Kein Video" },
   "none_3b5e34d2": { "message": "Keine" },
   "none_selected_b93d56d2": { "message": "Keines ausgewählt" },
+  "normal_text_7b03da48": { "message": "Normaler Text" },
   "not_equal_6e2980e6": { "message": "Ungleich" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Nicht in (kein Element von)"
@@ -753,9 +767,6 @@
   },
   "outline_color_3ef2cea7": { "message": "Umrissfarbe" },
   "outline_size_a6059a21": { "message": "Umrissgröße" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "{ p } Ist kein gültiges Protokoll. Es muss ftp, http, https, mailto, skype oder tel sein oder weggelassen werden."
-  },
   "page_50c4823d": { "message": "Seite" },
   "pages_e5414c2c": { "message": "Seiten" },
   "paragraph_5e5ad8eb": { "message": "Absatz" },
@@ -764,6 +775,7 @@
   },
   "parallel_d55d6e38": { "message": "Parallel" },
   "partial_derivative_4a9159df": { "message": "Teilweise (abgeleitet)" },
+  "pass_1c19a2b3": { "message": "BESTANDEN" },
   "paste_5963d1c1": { "message": "Einfügen" },
   "pause_12af3bb4": { "message": "Pause" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
@@ -771,6 +783,9 @@
   "percentage_34ab7c2c": { "message": "Prozentsatz" },
   "percentage_must_be_a_number_8033c341": {
     "message": "Prozentsatz muss eine Zahl sein"
+  },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Der Prozentsatz muss mindestens { percentage }% betragen"
   },
   "performing_arts_icon_f3497486": {
     "message": "Symbol für „Darstellende Kunst“"
@@ -783,8 +798,12 @@
   },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Variante)" },
+  "pick_a_color_557abfb0": { "message": "Farbe auswählen" },
   "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixel" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Pixel müssen mindestens { width } x { height } px betragen."
+  },
   "play_1a47eaa7": { "message": "Abspielen" },
   "play_media_comment_35257210": { "message": "Medienkommentar wiedergeben" },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -813,6 +832,9 @@
   "preview_inline_9787330": { "message": "Inline-Vorschau" },
   "previous_bd2ac015": { "message": "Vorherige" },
   "previous_findtext_8dfbfd30": { "message": "Vorheriger { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Zuvor ausgewählte Farben"
+  },
   "prime_917ea60e": { "message": "Primzahl" },
   "prime_numbers_13464f61": { "message": "Primzahlen" },
   "product_39cf144f": { "message": "Produkt" },
@@ -1291,6 +1313,15 @@
   "writing_assistant_a30ac16a": { "message": "Schreibassistent" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Ja" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Sie befinden sich auf einer Farbpalette. Um auf der Palette nach oben, links, unten oder rechts zu navigieren, verwenden Sie die Tasten „W“, „A“, „S“ und „D“."
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Sie befinden sich auf einem Farbschieberegler. Um den Schieberegler nach links oder rechts zu bewegen, verwenden Sie die Tasten „A“ und „D“."
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Sie befinden sich auf einem Alpha-Schieberegler. Um den Schieberegler nach links oder rechts zu bewegen, verwenden Sie die Tasten „A“ und „D“."
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Sie haben nicht gespeicherte Änderungen im Icon Maker-Fach. Möchten Sie fortfahren, ohne diese Änderungen zu speichern?"
   },

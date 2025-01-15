@@ -831,8 +831,8 @@ describe Types::CourseType do
         ).compact
 
         expect(student_last_activity).to have(1).items
-        expect(student_last_activity.first.to_datetime).to be_within(1.second)
-          .of(@student1.enrollments.first.last_activity_at.to_datetime)
+        expect(Time.iso8601(student_last_activity.first)).to be_within(1.second)
+          .of(@student1.enrollments.first.last_activity_at)
       end
 
       it "returns zero for each user's initial totalActivityTime" do

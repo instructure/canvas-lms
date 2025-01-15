@@ -17,7 +17,7 @@
  */
 
 import {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {
   GradebookSortOrder,
@@ -28,7 +28,7 @@ import {
 } from '../../types'
 import {filterAssignmentsByStudent, sortAssignments} from '../../utils/gradebookUtils'
 
-const I18n = useI18nScope('enhanced_individual_gradebook_content_selection')
+const I18n = createI18nScope('enhanced_individual_gradebook_content_selection')
 
 type DropDownOption<T> = {
   id: string

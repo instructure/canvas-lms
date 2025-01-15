@@ -22,9 +22,9 @@ import FileRenameForm from './LegacyFileRenameForm'
 import Modal from '@canvas/modal'
 import ModalContent from '@canvas/modal/react/content'
 import ModalButtons from '@canvas/modal/react/buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('file_rename_form')
+const I18n = createI18nScope('file_rename_form')
 
 FileRenameForm.buildContent = function () {
   const {onRenameFileMessage, onLockFileMessage} = this.props
@@ -59,9 +59,17 @@ FileRenameForm.buildContent = function () {
       <div ref="bodyContent">
         <p>{renameMessage}</p>
         <form onSubmit={this.handleFormSubmit}>
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
-          <label className="file-rename-form__form-label">{I18n.t('Name')}</label>
-          <input className="input-block-level" type="text" defaultValue={nameToUse} ref="newName" />
+          <label className="file-rename-form__form-label" htmlFor="renameFileInput">
+            {I18n.t('Name')}
+          </label>
+          <input
+            id="renameFileInput"
+            className="input-block-level"
+            type="text"
+            defaultValue={nameToUse}
+            ref="newName"
+            aria-label={I18n.t('File name')}
+          />
         </form>
       </div>
     )

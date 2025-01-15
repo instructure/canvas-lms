@@ -27,7 +27,7 @@ import {IconXSolid} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Tray} from '@instructure/ui-tray'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 
 import Body from '../body'
@@ -66,7 +66,7 @@ import {getEnrolledSection} from '../../reducers/enrollments'
 import PaceModalStats from './stats'
 import {generateModalLauncherId} from '../../utils/utils'
 
-const I18n = useI18nScope('course_paces_modal')
+const I18n = createI18nScope('course_paces_modal')
 
 interface StoreProps {
   readonly coursePace: CoursePace

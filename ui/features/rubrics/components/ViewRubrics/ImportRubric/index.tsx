@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {useMutation} from '@canvas/query'
 import {ImportRubricTray} from './ImportRubricTray'
 import {ImportFailuresModal} from './ImportFailuresModal'
@@ -31,7 +31,7 @@ import {
 } from '../../../queries/ViewRubricQueries'
 import type {Rubric} from '@canvas/rubrics/react/types/rubric'
 
-const I18n = useI18nScope('rubrics-import')
+const I18n = createI18nScope('rubrics-import')
 
 export type ImportRubricProps = {
   isTrayOpen: boolean

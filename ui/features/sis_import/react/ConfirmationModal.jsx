@@ -21,9 +21,9 @@ import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('SIS_Import')
+const I18n = createI18nScope('SIS_Import')
 
 export function BatchImportAlert({margin}) {
   return (
@@ -74,7 +74,7 @@ export function ConfirmationModal({isOpen, onSubmit, onRequestClose}) {
 }
 
 export function renderBatchImportAlert(margin) {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <BatchImportAlert margin={margin} />,
     document.getElementById('batch_import_instructions')
@@ -82,7 +82,7 @@ export function renderBatchImportAlert(margin) {
 }
 
 export function openModal(onSubmit, onRequestClose) {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ConfirmationModal isOpen={true} onSubmit={onSubmit} onRequestClose={onRequestClose} />,
     document.getElementById('confirmation_modal_root')

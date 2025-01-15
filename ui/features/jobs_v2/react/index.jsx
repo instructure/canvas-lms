@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useCallback, useReducer, useEffect, useMemo, useRef} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
@@ -38,7 +38,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as tz from '@instructure/moment-utils'
 import moment from 'moment-timezone'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 const AUTO_REFRESH_INTERVAL = 5000
 
 export default function JobsIndex() {

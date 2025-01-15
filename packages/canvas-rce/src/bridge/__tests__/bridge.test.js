@@ -343,3 +343,69 @@ describe('Editor/Sidebar bridge', () => {
     })
   })
 })
+
+describe('Bridge actions, embed image', () => {
+  let mockEditor, origEditor
+
+  beforeEach(() => {
+    mockEditor = {
+      existingContentToLink: jest.fn(),
+      existingContentToLinkIsImg: jest.fn(),
+      insertImage: jest.fn(),
+      insertLink: jest.fn(),
+      insertImagePlaceholder: jest.fn(),
+      removePlaceholders: jest.fn(),
+    }
+    origEditor = Bridge.getEditor()
+    Bridge.focusEditor(mockEditor)
+  })
+
+  afterEach(() => {
+    Bridge.focusEditor(origEditor)
+  })
+
+  it('inserts an image when no selection', () => {
+    mockEditor.existingContentToLink.mockReturnValue(false)
+    Bridge.embedImage({})
+    expect(mockEditor.insertImage).toHaveBeenCalled()
+  })
+
+  it('inserts an image when image is selected', () => {
+    mockEditor.existingContentToLink.mockReturnValue(true)
+    mockEditor.existingContentToLinkIsImg.mockReturnValue(true)
+    Bridge.embedImage({})
+    expect(mockEditor.insertImage).toHaveBeenCalled()
+  })
+
+  it('inserts a link through the bridge', () => {
+    mockEditor.props = {
+      textareaId: 'fake_editor',
+      tinymce: {
+        get: jest.fn().mockReturnValue({
+          selection: {
+            getRng: jest.fn().mockReturnValue('some-range'),
+            getNode: jest.fn().mockReturnValue('some-node'),
+          },
+        }),
+      },
+    }
+    mockEditor.existingContentToLink.mockReturnValue(true)
+    Bridge.embedImage({})
+    expect(mockEditor.insertLink).toHaveBeenCalledWith(
+      expect.objectContaining({
+        embed: {type: 'image'},
+      })
+    )
+  })
+
+  it('inserts a image placeholder through the bridge', () => {
+    mockEditor.existingContentToLink.mockReturnValue(false)
+    Bridge.insertImagePlaceholder({})
+    expect(mockEditor.insertImagePlaceholder).toHaveBeenCalled()
+  })
+
+  it('removes placeholders through the bridge', () => {
+    Bridge.removePlaceholders('abc')
+    expect(mockEditor.removePlaceholders).toHaveBeenCalled()
+  })
+})

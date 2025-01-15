@@ -25,7 +25,7 @@ describe IncomingMail::MessageHandler do
   let(:body) { "Hello" }
   let(:html_body) { "Hello" }
   let(:original_message_id) { Shard.short_id_for(@shard1.global_id_for(42)) }
-  let(:timestamp) { DateTime.parse("2018-10-16").to_i.to_s }
+  let(:timestamp) { Time.zone.parse("2018-10-16").to_i.to_s }
   let(:secure_id) { "123abc" }
   let(:tag) { "#{secure_id}-#{original_message_id}-#{timestamp}" }
   let(:shard) do

@@ -18,11 +18,11 @@
 
 import {find, forEach} from 'lodash'
 import * as tz from '@instructure/moment-utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
 import DateHelper from '@canvas/datetime/dateHelper'
 
-const I18n = useI18nScope('DateValidator')
+const I18n = createI18nScope('DateValidator')
 
 const DATE_RANGE_ERRORS = {
   due_at: {

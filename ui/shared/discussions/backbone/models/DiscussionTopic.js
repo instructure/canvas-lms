@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import {defaults, result} from 'lodash'
@@ -30,7 +30,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import axios from '@canvas/axios'
 
-const I18n = useI18nScope('discussion_topics')
+const I18n = createI18nScope('discussion_topics')
 
 const stripTags = function (str) {
   const div = document.createElement('div')

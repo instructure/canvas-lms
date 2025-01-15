@@ -31,13 +31,9 @@ module JSONToken
 
   def self.decode(token)
     json = Base64.decode64(token.tr("-_", "+/").ljust((token.length + 4 - 1) / 4 * 4, "="))
-    # JSON.parse requires the thing-to-parse to be an object or array. but we
-    # want to be able to parse literal values, too (e.g. strings or integers).
-    # so wrap it in an array
-    json = JSON.parse("[#{json}]")
-    raise JSON::ParserError unless json.size == 1
+    json = JSON.parse(json, quirks_mode: true)
 
-    walk_json(json.first, method(:decode_binary_string))
+    walk_json(json, method(:decode_binary_string))
   end
 
   def self.walk_json(value, method)

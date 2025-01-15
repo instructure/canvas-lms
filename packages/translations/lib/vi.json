@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Thư Mục Khả Dụng"
     },
+    "background_1bc88842": {
+        "message": "Nền"
+    },
     "backslash_b2d5442d": {
         "message": "Dấu Chéo Ngược"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Xanh Dương"
+    },
+    "border_5b08b06d": {
+        "message": "Viền"
     },
     "bottom_15a2a9be": {
         "message": "Đáy"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Thu gọn để ẩn { types }"
     },
+    "color_a363e1b0": {
+        "message": "Màu"
+    },
+    "color_contrast_4c418add": {
+        "message": "Tương Phản Màu"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Tỷ Lệ Tương Phản Màu"
+    },
     "color_picker_6b359edf": {
         "message": "Trình Chọn Màu"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Trình Chọn Màu (đã chọn { colorName })"
+    },
+    "color_popup_af39810f": {
+        "message": "Cửa sổ bật lên màu"
     },
     "column_e1ae5c64": {
         "message": "Cột"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (hàm số)"
     },
+    "fail_544e5dde": {
+        "message": "KHÔNG ĐẠT"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "Lấy nội dung tệp không thành công"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Điểm"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Văn bản đồ họa"
     },
     "greater_than_e98af662": {
         "message": "Lớn Hơn"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Vô Hạn"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Trường đầu vào cho alpha"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Trường đầu vào cho màu xanh dương"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Trường đầu vào cho màu xanh lá cây"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Trường đầu vào cho màu đỏ"
+    },
     "insert_593145ef": {
         "message": "Chèn"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Lớn"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Văn bản khổ lớn"
     },
     "latvian_2bbb6aab": {
         "message": "Tiếng Latvia"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "Chưa Chọn Gì"
     },
+    "normal_text_7b03da48": {
+        "message": "Văn bản khổ bình thường"
+    },
     "norwegian_53f391ec": {
         "message": "Tiếng Na Uy"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "Kích Thước Viền"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } không phải là giao thức hợp lệ, vốn phải là ftp, http, https, mailto, skype, tel hoặc có thể lược bỏ"
-    },
     "page_50c4823d": {
         "message": "Trang"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Riêng (Đạo Hàm)"
     },
+    "pass_1c19a2b3": {
+        "message": "ĐẠT"
+    },
     "paste_5963d1c1": {
         "message": "Dán"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Phần trăm phải là số"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "Phần trăm ít nhất phải bằng { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "Biểu Tượng Nghệ Thuật Biểu Diễn"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (Biến)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Chọn một màu"
+    },
     "pink_68ad45cb": {
         "message": "Hồng"
     },
     "pixels_52ece7d1": {
         "message": "Pixel"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Pixel ít nhất phải bằng { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "Phát"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "{ findText } Trước"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Các màu đã chọn trước đây"
     },
     "prime_917ea60e": {
         "message": "Nguyên Tố"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Tiếng Yiddish"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Bạn đang ở bảng màu. Để điều hướng bảng màu lên, sang trái, xuống hoặc sang phải, hãy sử dụng lần lượt các nút “W”, “A”, “S” và “D”"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Bạn đang ở thanh trượt màu. Để điều hướng thanh trượt sang trái hoặc phải, hãy sử dụng lần lượt các nút “A” và “D”"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Bạn đang ở thanh trượt alpha. Để điều hướng thanh trượt sang trái hoặc phải, hãy sử dụng lần lượt các nút “A” và “D”"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Bạn có thể thay thế bằng cách tải lên một tập tin phụ đề mới."

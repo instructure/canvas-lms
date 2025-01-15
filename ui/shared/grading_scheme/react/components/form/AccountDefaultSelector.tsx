@@ -23,12 +23,12 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import type {GradingScheme} from '../../../gradingSchemeApiModel'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 export type AccountDefaultSelectorProps = {
   defaultGradingSchemeId: string | undefined

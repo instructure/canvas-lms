@@ -124,7 +124,7 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
     end
 
     it "syncs unlock_at and lock_at fields to the latest created checkpoint" do
-      now = Time.now.change(usec: 0)
+      now = Time.zone.now.change(usec: 0)
       first_unlock_at = 1.day.from_now(now)
       first_lock_at = 3.days.from_now(now)
       second_unlock_at = 2.days.from_now(now)
@@ -248,7 +248,7 @@ describe Checkpoints::DiscussionCheckpointCreatorService do
       end
 
       it "can create a combination of overrides and 'everyone' dates" do
-        now = Time.now.change(usec: 0)
+        now = Time.zone.now.change(usec: 0)
         new_section = @topic.course.course_sections.create!
         student1 = student_in_course(course: @topic.course, active_all: true).user
         student2 = student_in_course(course: @topic.course, active_all: true, section: new_section).user

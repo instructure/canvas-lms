@@ -29,7 +29,7 @@ import update from 'immutability-helper'
 import {get, isEmpty} from 'lodash'
 import axios from '@canvas/axios'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   firstNameFirst,
   lastNameFirst,
@@ -41,7 +41,7 @@ import registrationErrors from '@canvas/normalize-registration-errors'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import TimeZoneSelect from '@canvas/datetime/react/components/TimeZoneSelect'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 const trim = (str = '') => str.trim()
 
@@ -92,7 +92,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
         const key = name.match(/user\[(.*)\]/)[1] // extracts 'short_name' from 'user[short_name]'
         return {...memo, [key]: this.props.user[key]}
       }, {})
-      // eslint-disable-next-line react/no-access-state-in-setstate
+       
       this.setState(update(this.state, {data: {user: {$set: userDataFromProps}}}))
     }
   }
@@ -126,7 +126,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
   onSubmit = () => {
     if (!isEmpty(this.state.errors)) return
     const method = {create: 'POST', update: 'PUT'}[this.props.createOrUpdate]
-    // eslint-disable-next-line promise/catch-or-return
+     
     axios({url: this.props.url, method, data: this.state.data}).then(
       response => {
         const getUserObj = o => (o.user ? getUserObj(o.user) : o)
@@ -159,11 +159,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
     return [
       {
         name: 'user[name]',
-        renderLabel: (
-          <>
-            {I18n.t('Full Name')} <Text color="danger"> *</Text>
-          </>
-        ),
+        renderLabel: I18n.t('Full Name'),
         hint: I18n.t('This name will be used by teachers for grading.'),
         required: I18n.t('Full name is required'),
       },
@@ -183,12 +179,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
           ? [
               {
                 name: 'pseudonym[unique_id]',
-                renderLabel: (
-                  <>
-                    {this.props.customized_login_handle_name || I18n.t('Email')}
-                    <Text color="danger"> *</Text>
-                  </>
-                ),
+                renderLabel: this.props.customized_login_handle_name || I18n.t('Email'),
                 required: this.props.customized_login_handle_name
                   ? I18n.t('%{login_handle} is required', {
                       login_handle: this.props.customized_login_handle_name,
@@ -197,12 +188,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
               },
               showCustomizedLoginId && {
                 name: 'pseudonym[path]',
-                renderLabel: (
-                  <>
-                    {I18n.t('Email')}
-                    <Text color="danger"> *</Text>
-                  </>
-                ),
+                renderLabel: I18n.t('Email'),
                 required: I18n.t('Email is required'),
               },
               this.props.showSIS && {

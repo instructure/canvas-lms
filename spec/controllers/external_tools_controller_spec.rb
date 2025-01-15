@@ -1495,7 +1495,6 @@ describe ExternalToolsController do
 
       before do
         user_session(@student)
-        Account.site_admin.enable_feature!(:lti_rce_postmessage_support)
       end
 
       it "renders the sibling forwarder frame once" do
@@ -1693,8 +1692,8 @@ describe ExternalToolsController do
                                                })
       end
 
-      let(:due_at) { "2021-07-29 08:26:56.000000000 +0000".to_datetime }
-      let(:due_at_diff) { "2021-07-30 08:26:56.000000000 +0000".to_datetime }
+      let(:due_at) { Time.zone.parse("2021-07-29 08:26:56.000000000 +0000") }
+      let(:due_at_diff) { Time.zone.parse("2021-07-30 08:26:56.000000000 +0000") }
 
       let(:retrieve_params) do
         {
@@ -1727,7 +1726,7 @@ describe ExternalToolsController do
         get :retrieve, params: retrieve_params
 
         expect(
-          assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
+          Time.zone.parse(assigns[:lti_launch].params["custom_canvas_assignment_due_at"])
         ).to eq due_at_diff
       end
 
@@ -1738,7 +1737,7 @@ describe ExternalToolsController do
         get :retrieve, params: retrieve_params
 
         expect(
-          assigns[:lti_launch].params["custom_canvas_assignment_due_at"].to_datetime
+          Time.zone.parse(assigns[:lti_launch].params["custom_canvas_assignment_due_at"])
         ).to eq due_at_diff
       end
 
@@ -2010,6 +2009,18 @@ describe ExternalToolsController do
         context "during a deep linking launch" do
           let(:message_type) { "LtiDeepLinkingRequest" }
 
+          before do
+            tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
+            tool.save!
+            user_session(@teacher)
+          end
+
+          it "includes the deep_linking_cancel_url as the return_url" do
+            post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, editor: true }
+            url = launch_params["post_payload"]["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"]["return_url"]
+            expect(url).to include(deep_linking_cancel_path)
+          end
+
           it_behaves_like "includes editor variables" do
             let(:selection_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "selection") }
             let(:contents_launch_param) { launch_params["post_payload"].dig("https://purl.imsglobal.org/spec/lti/claim/custom", "contents") }
@@ -2017,9 +2028,6 @@ describe ExternalToolsController do
 
           context "when the parent_frame_context param is sent" do
             before do
-              tool.resource_selection = { message_type: "LtiDeepLinkingRequest" }
-              tool.save!
-              user_session(@teacher)
               post "resource_selection", params: { course_id: @course.id, external_tool_id: tool.id, parent_frame_context: tool.id, editor: true }
             end
 
@@ -2056,7 +2064,7 @@ describe ExternalToolsController do
         </cartridge_basiclti_link>
       XML
     end
-    let(:xml_response) { instance_double("Net::HTTPResponse", body: xml) }
+    let(:xml_response) { instance_double(Net::HTTPResponse, body: xml) }
 
     context "with client id" do
       subject do
@@ -2230,13 +2238,13 @@ describe ExternalToolsController do
       assert_status(401)
     end
 
-    it "does not create tool if user lacks create_tool_manually" do
+    it "does not create tool if user lacks add_tool_manually" do
       user_session(@student)
       post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com", consumer_key: "key", shared_secret: "secret" } }, format: "json"
       assert_forbidden
     end
 
-    it "creates tool if user is granted create_tool_manually" do
+    it "creates tool if user is granted add_tool_manually" do
       user_session(@teacher)
       post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com", consumer_key: "key", shared_secret: "secret" } }, format: "json"
       assert_status(200)
@@ -2429,7 +2437,7 @@ describe ExternalToolsController do
             <cartridge_icon identifierref="BLTI001_Icon"/>
         </cartridge_basiclti_link>
       XML
-      obj = instance_double("Net::HTTPResponse", body: xml)
+      obj = instance_double(Net::HTTPResponse, body: xml)
       allow(CanvasHttp).to receive(:get).and_return(obj)
       post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com", consumer_key: "key", shared_secret: "secret", config_type: "by_url", config_url: "http://config.example.com" } }, format: "json"
 
@@ -2810,7 +2818,7 @@ describe ExternalToolsController do
         expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
         expect(tool_settings["resource_link_title"]).to eq "tool assignment"
 
-        expect(Time.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of due_at
+        expect(Time.zone.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of due_at
       end
 
       context "and the assignment has due date overrides" do
@@ -2830,7 +2838,7 @@ describe ExternalToolsController do
         it "sends the overridden due_at value in the launch parameters" do
           get :generate_sessionless_launch, params: { course_id: course.id, launch_type: "assessment", assignment_id: assignment.id }
 
-          expect(Time.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of(assignment_override.due_at)
+          expect(Time.zone.parse(tool_settings["custom_assignment_due_at"])).to be_within(5.seconds).of(assignment_override.due_at)
         end
       end
     end

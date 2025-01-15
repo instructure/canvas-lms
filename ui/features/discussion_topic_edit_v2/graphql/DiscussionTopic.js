@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, shape, string, number} from 'prop-types'
 import {Section} from './Section'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import {Attachment} from './Attachment'
 import {GroupSet} from './GroupSet'
 import {Assignment} from './Assignment'

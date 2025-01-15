@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {array, func, instanceOf} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import SVGWrapper from '@canvas/svg-wrapper'
 
-const I18n = useI18nScope('ImportOutcomesModal')
+const I18n = createI18nScope('ImportOutcomesModal')
 
 export function showImportOutcomesModal(props) {
   const parent = document.createElement('div')
@@ -40,7 +40,7 @@ export function showImportOutcomesModal(props) {
     if (modal) modal.show()
   }
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ImportOutcomesModal {...props} parent={parent} ref={showImportOutcomesRef} />,
     parent

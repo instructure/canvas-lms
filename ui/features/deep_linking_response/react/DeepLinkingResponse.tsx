@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useCallback, useState} from 'react'
 import ReactDOM from 'react-dom/client'
 import {Text} from '@instructure/ui-text'
@@ -32,7 +32,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 declare const ENV: GlobalEnv
 
-const I18n = useI18nScope('external_content.success')
+const I18n = createI18nScope('external_content.success')
 
 const {
   Head: TableHead,

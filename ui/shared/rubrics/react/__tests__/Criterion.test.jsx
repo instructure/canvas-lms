@@ -30,7 +30,6 @@ const subComponents = ['Threshold', 'OutcomeIcon', 'LongDescription', 'LongDescr
 _.toPairs(rubrics).forEach(([key, rubric]) => {
   const assessment = assessments[key]
 
-  // eslint-disable-next-line jest/valid-describe
   describe(rubric.title, () => {
     criteriaTypes.forEach((criteriaType, ix) => {
       const basicProps = {
@@ -55,7 +54,6 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
         })
       }
 
-      // eslint-disable-next-line jest/valid-describe
       describe(`with a ${criteriaType} criterion`, () => {
         describe('by default', () => {
           testRenderedSnapshots(basicProps)

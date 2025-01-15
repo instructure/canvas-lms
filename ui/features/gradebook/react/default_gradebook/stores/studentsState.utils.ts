@@ -17,12 +17,12 @@
  */
 
 import {chunk} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {RequestDispatch} from '@canvas/network'
 import type {Student, UserSubmissionGroup} from '../../../../../api.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 export function flashStudentLoadError(): void {
   showFlashAlert({
@@ -42,7 +42,7 @@ export function flashSubmissionLoadError(): void {
 
 // @ts-expect-error
 export function reportCatch(error) {
-  // eslint-disable-next-line no-console
+   
   console.warn(error)
 }
 

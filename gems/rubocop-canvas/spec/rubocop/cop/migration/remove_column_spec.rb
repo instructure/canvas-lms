@@ -22,7 +22,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
 
   context "predeploy" do
     it "disallows remove_column in `up`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -31,13 +31,13 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to match(/column removal/)
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).to match(/column removal/)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "disallows remove_column in `self.up`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -46,13 +46,13 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to match(/column removal/)
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).to match(/column removal/)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "disallows remove_column in `change`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -61,13 +61,13 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to match(/column removal/)
-      expect(cop.offenses.first.severity.name).to eq(:error)
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).to match(/column removal/)
+      expect(offenses.first.severity.name).to eq(:error)
     end
 
     it "disallows a bunch of other column removal methods" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -83,11 +83,11 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(6)
+      expect(offenses.size).to eq(6)
     end
 
     it "allows remove_column in `down`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :predeploy
 
@@ -96,13 +96,13 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(0)
+      expect(offenses.size).to eq(0)
     end
   end
 
   context "postdeploy" do
     it "gives ignored_columns note in `up`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :postdeploy
 
@@ -111,13 +111,13 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(1)
-      expect(cop.messages.first).to include "ignored_columns"
-      expect(cop.offenses.first.severity.name).to eq(:convention)
+      expect(offenses.size).to eq(1)
+      expect(offenses.first.message).to include "ignored_columns"
+      expect(offenses.first.severity.name).to eq(:convention)
     end
 
     it "says nothing about `down`" do
-      inspect_source(<<~RUBY)
+      offenses = inspect_source(<<~RUBY)
         class MyMigration < ActiveRecord::Migration
           tag :postdeploy
 
@@ -126,7 +126,7 @@ describe RuboCop::Cop::Migration::RemoveColumn do
           end
         end
       RUBY
-      expect(cop.offenses.size).to eq(0)
+      expect(offenses.size).to eq(0)
     end
   end
 end

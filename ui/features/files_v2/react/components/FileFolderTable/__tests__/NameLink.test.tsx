@@ -20,7 +20,7 @@ import React from 'react'
 import {render, screen} from '@testing-library/react'
 import NameLink from '../NameLink'
 import {BrowserRouter} from 'react-router-dom'
-import {FAKE_FILES, FAKE_FOLDERS} from '../../../../data/FakeData'
+import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
 
 const defaultProps = {
   isStacked: false,
@@ -68,5 +68,15 @@ describe('NameLink', () => {
 
     expect(screen.getByText(file.display_name)).toBeInTheDocument()
     expect(screen.getByRole('img', {name: /file/i})).toBeInTheDocument()
+  })
+
+  it('renders folder with url', () => {
+    const folder = FAKE_FOLDERS[1]
+    renderComponent({item: folder})
+
+    expect(screen.getByRole('link')).toHaveAttribute(
+      'href',
+      `/folder/${encodeURIComponent(folder.name)}`
+    )
   })
 })

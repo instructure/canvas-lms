@@ -348,9 +348,7 @@ class ApplicationController < ActionController::Base
   def group_information
     if @context.is_a?(Group) &&
        can_do(@context, @current_user, :manage) &&
-       @context.group_category &&
-       @context.group_category.groups &&
-       @context.group_category.groups.active
+       @context.group_category
 
       @context.group_category.groups.active.sort_by(&:name).pluck(:id, :name).map { |item| { id: item[0], label: item[1] } }
     end
@@ -385,15 +383,14 @@ class ApplicationController < ActionController::Base
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
     horizon_course_setting
+    new_quizzes_media_type
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
     create_course_subaccount_picker
     file_verifiers_for_quiz_links
     lti_deep_linking_module_index_menu_modal
-    lti_dynamic_registration
     lti_registrations_next
-    lti_overwrite_user_url_input_select_content_dialog
     buttons_and_icons_root_account
     extended_submission_state
     scheduled_page_publication
@@ -402,7 +399,6 @@ class ApplicationController < ActionController::Base
     mobile_offline_mode
     react_discussions_post
     instui_nav
-    enhanced_developer_keys_tables
     lti_registrations_discover_page
     account_level_mastery_scales
     non_scoring_rubrics
@@ -413,6 +409,9 @@ class ApplicationController < ActionController::Base
     lti_toggle_placements
     login_registration_ui_identity
     lti_apps_page_instructors
+    course_paces_skip_selected_days
+    course_pace_download_document
+    course_pace_draft_state
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes,
@@ -2489,8 +2488,6 @@ class ApplicationController < ActionController::Base
 
     @features_enabled[feature] ||= if [:question_banks].include?(feature)
                                      true
-                                   elsif feature == :twitter
-                                     !!Twitter::Connection.config
                                    elsif feature == :diigo
                                      !!Diigo::Connection.config
                                    elsif feature == :google_drive

@@ -364,5 +364,67 @@ describe('PaceContextsContent', () => {
         expect(fetchMock.called(INIT_PACE_PROGRESS_STATUS_POLL, 'GET')).toBe(true)
       })
     })
+
+    describe('when course_pace_download_document feature is enabled', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES ||= {}
+        window.ENV.FEATURES.course_paces_redesign = true
+        window.ENV.FEATURES.course_pace_download_document = true
+      })
+
+      it('renders download button disabled', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {findByTestId} = renderConnected(<PaceContent />, state)
+        const downloadButton = await findByTestId('download-selected-button')
+        expect(downloadButton).toBeInTheDocument()
+        expect(downloadButton).toBeDisabled()
+      })
+
+      it('renders download button enabled when selecting paces', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {findByTestId} = renderConnected(<PaceContent />, state)
+
+        const selectAllPacesCheckbox = await findByTestId(`select-all-paces-checkbox`)
+        act(() => selectAllPacesCheckbox.click())
+
+        const downloadButton = await findByTestId('download-selected-button')
+        expect(downloadButton).toBeInTheDocument()
+        expect(downloadButton).not.toBeDisabled()
+      })
+    })
+
+    describe('when course_pace_download_document feature is disabled', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES ||= {}
+        window.ENV.FEATURES.course_paces_redesign = true
+        window.ENV.FEATURES.course_pace_download_document = false
+      })
+
+      it('does not render download button', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {queryByTestId} = renderConnected(<PaceContent />, state)
+
+        expect(await queryByTestId(`download-selected-button`)).not.toBeInTheDocument()
+      })
+
+      it('does not render select all checkbox', async () => {
+        const paceContextsState: PaceContextsState = {
+          ...DEFAULT_STORE_STATE.paceContexts,
+        }
+        const state = {...DEFAULT_STORE_STATE, paceContexts: paceContextsState}
+        const {queryByTestId} = renderConnected(<PaceContent />, state)
+
+        expect(await queryByTestId(`select-all-paces-checkbox`)).not.toBeInTheDocument()
+      })
+    })
   })
 })

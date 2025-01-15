@@ -18,7 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {IconAddSolid} from '@instructure/ui-icons'
@@ -29,7 +29,7 @@ import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternal
 import type {SelectableItem} from '@canvas/trays/react/ContentTypeExternalToolTray'
 import {ltiState} from '@canvas/lti/jquery/messages'
 
-const I18n = useI18nScope('assignment_index_menu')
+const I18n = createI18nScope('assignment_index_menu')
 
 type Props = {
   store: any
@@ -199,7 +199,7 @@ export default class IndexMenu extends React.Component<Props, State> {
         type: 'assignment_group',
       },
     ]
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

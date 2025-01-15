@@ -18,7 +18,7 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -44,7 +44,7 @@ import useOutcomesImport, {
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {getOutcomeGroupAncestorsWithSelf} from '../helpers/getOutcomeGroupAncestorsWithSelf'
 
-const I18n = useI18nScope('FindOutcomesModal')
+const I18n = createI18nScope('FindOutcomesModal')
 
 const FindOutcomesModal = ({
   open,

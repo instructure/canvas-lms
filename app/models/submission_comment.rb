@@ -380,7 +380,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def infer_details
     self.anonymous = submission.assignment.anonymous_peer_reviews
-    self.author_name ||= author.short_name rescue t(:unknown_author, "Someone")
+    self.author_name ||= author&.short_name || t(:unknown_author, "Someone")
     self.cached_attachments = attachments.map(&:attributes)
     self.context = context unless context_id
 

@@ -27,9 +27,9 @@ import {
 } from '@instructure/ui-icons'
 import {type IconProps} from './iconTypes'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export const IconAnnouncement = ({elementRef, size = 'small'}: IconProps) => {
   return <IconAnnouncementLine elementRef={elementRef} size={size} title={I18n.t('announcement')} />

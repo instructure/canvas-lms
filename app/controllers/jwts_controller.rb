@@ -37,6 +37,8 @@
 
 class JwtsController < ApplicationController
   before_action :require_user, :require_non_jwt_auth
+  before_action :require_access_token, only: :create, if: :audience_requested?
+  before_action :validate_requested_audience, only: :create, if: :audience_requested?
 
   # @API Create JWT
   #
@@ -80,6 +82,8 @@ class JwtsController < ApplicationController
     # TODO: remove this once we teach all consumers to consume the asymmetric ones
     symmetric = workflows_require_symmetric_encryption?(workflows)
     domain = request.host_with_port
+    audience = requested_audience if audience_requested?
+
     services_jwt = CanvasSecurity::ServicesJwt.for_user(
       domain,
       @current_user,
@@ -87,7 +91,8 @@ class JwtsController < ApplicationController
       workflows:,
       context: @context,
       symmetric:,
-      encrypt: encrypt?
+      encrypt: encrypt?,
+      audience:
     )
     render json: { token: services_jwt }
   end
@@ -190,6 +195,13 @@ class JwtsController < ApplicationController
     @current_user.root_admin_for?(@domain_root_account) && @access_token.developer_key.internal_service?
   end
 
+  def render_unauthorized
+    render(
+      json: { errors: { jwt: "unauthorized" } },
+      status: :unauthorized
+    )
+  end
+
   def render_invalid_refresh
     render(
       json: { errors: { jwt: "invalid refresh" } },
@@ -197,7 +209,44 @@ class JwtsController < ApplicationController
     )
   end
 
+  def render_not_allowed_audience
+    render(
+      json: {
+        error: "invalid_target",
+        error_description: "The requested audience is not permitted for this client"
+      },
+      status: :bad_request
+    )
+  end
+
   def encrypt?
+    return false if audience_requested?
+
     params[:canvas_audience].nil? ? true : value_to_boolean(params[:canvas_audience])
+  end
+
+  def audience_requested?
+    !params[:audience].nil?
+  end
+
+  def require_access_token
+    render_unauthorized unless @access_token
+  end
+
+  def validate_requested_audience
+    render_not_allowed_audience unless valid_audience?
+  end
+
+  def requested_audience
+    @requested_audience ||= params[:audience].split
+  end
+
+  def valid_audience?
+    allowed_audiences = configured_audiences
+    requested_audience.all? { |aud| allowed_audiences.include?(aud) }
+  end
+
+  def configured_audiences
+    @access_token&.developer_key&.allowed_audiences || []
   end
 end

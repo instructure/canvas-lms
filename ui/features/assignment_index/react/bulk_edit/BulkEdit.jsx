@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useCallback, useEffect, useState, useMemo} from 'react'
 import {func, string} from 'prop-types'
 import moment from 'moment-timezone'
@@ -35,7 +35,7 @@ import DateValidator from '@canvas/grading/DateValidator'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import {originalDateField, canEditAll} from './utils'
 
-const I18n = useI18nScope('assignments_bulk_edit')
+const I18n = createI18nScope('assignments_bulk_edit')
 
 BulkEdit.propTypes = {
   courseId: string.isRequired,
@@ -125,10 +125,10 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
               let error
               if (draftOverride.base) {
                 error = errors.find(
-                  e => e.assignment_id == draftAssignment.id && !e.assignment_override_id // eslint-disable-line eqeqeq
+                  e => e.assignment_id == draftAssignment.id && !e.assignment_override_id  
                 )
               } else {
-                error = errors.find(e => e.assignment_override_id == draftOverride.id) // eslint-disable-line eqeqeq
+                error = errors.find(e => e.assignment_override_id == draftOverride.id)  
               }
               if (error && error.errors) {
                 draftOverride.errors = {}

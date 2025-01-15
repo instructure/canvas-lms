@@ -88,7 +88,11 @@ module AssignmentOverrideApplicator
 
   def self.version_for_cache(learning_object)
     # don't really care about the version number unless it is an old one
-    learning_object.current_version? ? "current" : learning_object.version_number
+    if learning_object.is_a?(SimplyVersioned::InstanceMethods) && !learning_object.current_version?
+      learning_object.version_number
+    else
+      "current"
+    end
   end
 
   # determine list of overrides (of appropriate version) that apply to the
@@ -109,7 +113,9 @@ module AssignmentOverrideApplicator
         context.shard.activate do
           if (context.user_has_been_admin?(user) || context.user_has_no_enrollments?(user)) && context.grants_right?(user, :read_as_admin)
             overrides = learning_object.all_assignment_overrides
-            if learning_object.current_version?
+            if learning_object.is_a?(SimplyVersioned::InstanceMethods) && !learning_object.current_version?
+              overrides = current_override_version(learning_object, overrides)
+            else
               visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
 
               overrides = if overrides.loaded?
@@ -125,8 +131,6 @@ module AssignmentOverrideApplicator
 
                             ovs + adhoc_ovs
                           end
-            else
-              overrides = current_override_version(learning_object, overrides)
             end
 
             unless ConditionalRelease::Service.enabled_in_context?(learning_object.context)
@@ -154,7 +158,7 @@ module AssignmentOverrideApplicator
             overrides += observed if observed
           end
 
-          unless learning_object.current_version?
+          if learning_object.is_a?(SimplyVersioned::InstanceMethods) && !learning_object.current_version?
             overrides = current_override_version(learning_object, overrides)
           end
 

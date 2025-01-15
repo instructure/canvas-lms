@@ -2988,7 +2988,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       before do
-        time = Time.now
+        time = Time.zone.now
         allow(Time).to receive(:now).and_return(time)
       end
 

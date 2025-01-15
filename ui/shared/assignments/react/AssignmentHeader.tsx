@@ -35,15 +35,10 @@ import ItemAssignToTray from '@canvas/context-modules/differentiated-modules/rea
 import OptionsMenu from './OptionsMenu'
 import {type Breakpoints} from '@canvas/with-breakpoints'
 import type {TeacherAssignmentType} from '../graphql/teacher/AssignmentTeacherTypes'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {ASSIGNMENT_VIEW_TYPES} from './AssignmentTypes'
 
-const I18n = useI18nScope('assignment_teacher_header')
-
-export const ASSIGNMENT_VIEW_TYPES = {
-  SAVED: 'saved',
-  EDIT: 'edit',
-  CREATE: 'create',
-}
+const I18n = createI18nScope('assignment_teacher_header')
 
 interface HeaderProps {
   type: string

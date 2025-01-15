@@ -17,13 +17,13 @@
  */
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import AssignmentGroupCreateDialog from './AssignmentGroupCreateDialog'
 import template from '../../jst/AssignmentGroupSelector.handlebars'
 
-const I18n = useI18nScope('assignment_group_selector')
+const I18n = createI18nScope('assignment_group_selector')
 
 const ASSIGNMENT_GROUP_ID = '#assignment_group_id'
 

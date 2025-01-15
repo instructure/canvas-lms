@@ -60,7 +60,7 @@ module Api::V1::GroupCategory
   def included_data(group_category, user, session, includes)
     hash = {}
     if includes
-      if includes.include?("progress_url") && group_category.current_progress && group_category.current_progress.pending?
+      if includes.include?("progress_url") && group_category.current_progress&.pending?
         hash["progress"] = progress_json(group_category.current_progress, user, session)
       end
       if includes.include?("groups_count")

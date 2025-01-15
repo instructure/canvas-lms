@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import create from 'zustand'
+import {create} from 'zustand'
 import {isSuccessful, type ApiResult} from '../../common/lib/apiResult/ApiResult'
 import type {LtiImsRegistrationId} from '../model/lti_ims_registration/LtiImsRegistrationId'
 import {ZUnifiedToolId, type UnifiedToolId} from '../model/UnifiedToolId'
@@ -131,10 +131,15 @@ export const useRegistrationModalWizardState = create<
     // todo: if we've already returned from the tool,
     // we need to delete the registration we created
     set(prev => {
-      return {
-        open: !prev.exitOnCancel,
-        ltiImsRegistrationId: undefined,
-        registering: false,
+      if (prev.exitOnCancel) {
+        return {
+          open: false,
+        }
+      } else {
+        return {
+          ltiImsRegistrationId: undefined,
+          registering: false,
+        }
       }
     })
   },
@@ -145,7 +150,7 @@ export const useRegistrationModalWizardState = create<
       set({jsonFetch: status})
     }
   },
-  close: () => set({open: false, ltiImsRegistrationId: undefined, registering: false}),
+  close: () => set({open: false}),
 }))
 
 export const openRegistrationWizard = (
@@ -163,6 +168,60 @@ export const openRegistrationWizard = (
       existingRegistrationId: undefined,
       ...initialState,
       open: true,
+    }
+  })
+}
+
+export const openJsonRegistrationWizard = (
+  jsonCode: string,
+  internalLtiConfig: InternalLtiConfiguration,
+  unifiedToolId?: UnifiedToolId,
+  onSuccessfulInstallation?: () => void
+) => {
+  useRegistrationModalWizardState.setState(prev => {
+    return {
+      ...prev,
+      jsonCode,
+      method: 'json',
+      open: true,
+      jsonFetch: {
+        _tag: 'loaded',
+        result: {
+          _type: 'Success',
+          data: internalLtiConfig,
+        },
+      },
+      unifiedToolId,
+      exitOnCancel: true,
+      registering: true,
+      onSuccessfulInstallation,
+    }
+  })
+}
+
+export const openJsonUrlRegistrationWizard = (
+  jsonUrl: string,
+  internalLtiConfig: InternalLtiConfiguration,
+  unifiedToolId?: UnifiedToolId,
+  onSuccessfulInstallation?: () => void
+) => {
+  useRegistrationModalWizardState.setState(prev => {
+    return {
+      ...prev,
+      jsonUrl,
+      method: 'json_url',
+      open: true,
+      jsonFetch: {
+        _tag: 'loaded',
+        result: {
+          _type: 'Success',
+          data: internalLtiConfig,
+        },
+      },
+      unifiedToolId,
+      registering: true,
+      exitOnCancel: true,
+      onSuccessfulInstallation,
     }
   })
 }

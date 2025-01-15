@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {extend, isEmpty} from 'lodash'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
@@ -24,7 +24,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('OutcomeContentBase')
+const I18n = createI18nScope('OutcomeContentBase')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -201,7 +201,7 @@ export default class OutcomeContentBase extends ValidatedFormView {
 
   delete(e) {
     e.preventDefault()
-    // eslint-disable-next-line no-alert
+     
     if (!window.confirm(I18n.t('confirm.delete', 'Are you sure you want to delete?'))) return
     this.state = 'delete'
     this.setModelUrl()

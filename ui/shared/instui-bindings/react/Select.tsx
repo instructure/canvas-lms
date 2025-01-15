@@ -44,7 +44,7 @@
 
 import React, {type ReactElement, type ChangeEvent, type SyntheticEvent} from 'react'
 import {compact, castArray, isEqual} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
@@ -53,7 +53,7 @@ import getLiveRegion from './liveRegion'
 
 import type {SelectProps} from '@instructure/ui-select'
 
-const I18n = useI18nScope('app_shared_components')
+const I18n = createI18nScope('app_shared_components')
 const {Option: SelectOption, Group: SelectGroup} = Select as any
 
 const noOptionsOptionId = '_noOptionsOption'
@@ -261,7 +261,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
     })
   }
 
-  /* eslint-disable react/no-access-state-in-setstate */
+   
   // Because handleShowOptions sets state.isShowingOptions:true
   // it's already in the value of state passed to the setState(updater)
   // by the time handleHighlightOption is called we miss the transition,
@@ -279,7 +279,7 @@ class CanvasSelect extends React.Component<CanvasSelectProps, State> {
       announcement: `${this.getOptionTextForScreenReaderById(id)} ${nowOpen}`,
     })
   }
-  /* eslint-enable react/no-access-state-in-setstate */
+   
 
   handleSelectOption: SelectProps['onRequestSelectOption'] = (event, {id}) => {
     if (id === noOptionsOptionId) {

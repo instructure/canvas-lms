@@ -19,9 +19,9 @@
 import {useState} from 'react'
 import {exportCSV} from '../apiClient'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('Learning Mastery Gradebook')
+const I18n = createI18nScope('Learning Mastery Gradebook')
 
 export const EXPORT_NOT_STARTED = 'EXPORT_NOT_STARTED'
 export const EXPORT_PENDING = 'EXPORT_PENDING'

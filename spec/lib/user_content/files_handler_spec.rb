@@ -200,7 +200,7 @@ describe UserContent::FilesHandler do
         it "when replaced the replacement attachment url will be returned" do
           current_user = user_factory
           replacement_attachment = attachment_with_context(course, { filename: "hello" })
-          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: DateTime.now)
+          attachment.update!(replacement_attachment_id: replacement_attachment.id, file_state: "deleted", deleted_at: Time.zone.now)
           preloaded_attachments = {}
           preloaded_attachments[attachment.id] = attachment
 

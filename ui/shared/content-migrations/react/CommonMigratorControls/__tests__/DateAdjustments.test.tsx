@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import DateAdjustments, {localisedDateMessages} from '../DateAdjustments'
+import DateAdjustments from '../DateAdjustments'
+import {timeZonedFormMessages} from '../timeZonedFormMessages'
 import type {DateAdjustmentConfig, DateShifts} from '../types'
 import userEvent from '@testing-library/user-event'
 import moment from 'moment-timezone'
@@ -105,28 +106,28 @@ describe('DateAdjustment', () => {
       )
     }
 
-    const expectDateField = (label: string, value: string) => {
-      expect(screen.getByLabelText(label).closest('input')?.value).toBe(value)
+    const expectDateField = (dataCid: string, value: string) => {
+      expect((screen.getByTestId(dataCid) as HTMLInputElement).value).toBe(value)
     }
 
     it('Fill in original beginning date with old_start_date', () => {
       render(getComponent({old_start_date: dateObject}))
-      expectDateField('Select original beginning date', expectedDate)
+      expectDateField('old_start_date', expectedDate)
     })
 
     it('Fill in original end date with old_end_date', () => {
       render(getComponent({old_end_date: dateObject}))
-      expectDateField('Select original end date', expectedDate)
+      expectDateField('old_end_date', expectedDate)
     })
 
     it('Fill in new beginning date with new_start_date', () => {
       render(getComponent({new_start_date: dateObject}))
-      expectDateField('Select new beginning date', expectedDate)
+      expectDateField('new_start_date', expectedDate)
     })
 
     it('Fill in new end date with new_end_date', () => {
       render(getComponent({new_end_date: dateObject}))
-      expectDateField('Select new end date', expectedDate)
+      expectDateField('new_end_date', expectedDate)
     })
   })
 
@@ -178,22 +179,7 @@ describe('DateAdjustment', () => {
     expect(setDateAdjustments).toHaveBeenCalledWith(dateAdjustments)
   })
 
-  describe('localisedDateMessages', () => {
-    describe('when date parameter is missing', () => {
-      it('returns an empty array', () => {
-        expect(localisedDateMessages()).toStrictEqual([])
-      })
-    })
-
-    describe('when the two timezones are the same', () => {
-      it('returns an empty array', () => {
-        ENV.CONTEXT_TIMEZONE = 'America/New_York'
-        ENV.TIMEZONE = 'America/New_York'
-
-        expect(localisedDateMessages('2024-08-08T08:00:00+00:00')).toStrictEqual([])
-      })
-    })
-
+  describe('timeZoneFormMessages', () => {
     it('returns the correct localised date messages', () => {
       moment.tz.setDefault('America/Denver')
 
@@ -205,8 +191,12 @@ describe('DateAdjustment', () => {
         },
         formats: getI18nFormats(),
       })
-      ENV.CONTEXT_TIMEZONE = 'America/Detroit'
-      ENV.TIMEZONE = 'America/Chicago'
+
+      const messages = timeZonedFormMessages(
+        'America/Detroit',
+        'America/Chicago',
+        '2024-11-08T08:00:00+00:00'
+      )
 
       render(
         <CanvasDateInput
@@ -214,7 +204,7 @@ describe('DateAdjustment', () => {
           onSelectedDateChange={() => {}}
           formatDate={jest.fn(date => date.toISOString())}
           interaction="enabled"
-          messages={localisedDateMessages('2024-11-08T08:00:00+00:00')}
+          messages={messages}
         />
       )
 

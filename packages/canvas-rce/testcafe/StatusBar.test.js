@@ -17,7 +17,6 @@
  */
 
 import {Selector} from 'testcafe'
-// eslint-disable-next-line babel/no-unused-expressions
 fixture`StatusBar`.page`./testcafe.html`
 
 const tinyIframe = Selector('#textarea_ifr')

@@ -25,7 +25,7 @@ import {
   updateDiscussionEntryParticipantMock,
 } from '../../../../graphql/Mocks'
 import {SplitScreenViewContainer} from '../SplitScreenViewContainer'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
@@ -569,6 +569,7 @@ describe('SplitScreenViewContainer', () => {
       const likeButtons = await findAllByTestId('like-button')
 
       expect(likeButtons.length).toBe(2)
+      await new Promise(resolve => setTimeout(resolve, 0))
       expect(queryByTestId('liked-icon')).toBeTruthy()
       fireEvent.click(queryByTestId('liked-icon'))
       await waitFor(() => {

@@ -21,9 +21,9 @@ import Backbone from '@canvas/backbone'
 import registrationErrors from '@canvas/normalize-registration-errors'
 import '@canvas/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.ajaxJSON'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('self_enrollment')
+const I18n = createI18nScope('self_enrollment')
 
 export default class SelfEnrollmentForm extends Backbone.View {
   static initClass() {

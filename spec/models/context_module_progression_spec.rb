@@ -119,7 +119,7 @@ describe ContextModuleProgression do
     end
 
     context "does not evaluate" do
-      before { module_progression.evaluated_at = Time.now }
+      before { module_progression.evaluated_at = Time.zone.now }
 
       it "when current" do
         module_progression.evaluate

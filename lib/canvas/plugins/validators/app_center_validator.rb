@@ -26,7 +26,11 @@ module Canvas::Plugins::Validators::AppCenterValidator
       plugin_setting.errors.add(:base, I18n.t("canvas.plugins.errors.all_fields_required", "All fields are required"))
       false
     else
-      uri = URI.parse(settings[:base_url].strip) rescue nil
+      begin
+        uri = URI.parse(settings[:base_url].strip) if settings[:base_url]
+      rescue URI::InvalidURIError
+        # ignore
+      end
       if uri
         settings.slice(:base_url, :token, :apps_index_endpoint, :app_reviews_endpoint).to_h.with_indifferent_access
       else

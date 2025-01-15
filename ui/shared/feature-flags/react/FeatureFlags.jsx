@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
 import {groupBy} from 'lodash'
 
@@ -28,7 +28,7 @@ import FilterBar from '@canvas/filter-bar'
 import FeatureFlagTable from './FeatureFlagTable'
 import * as flagUtils from './util'
 
-const I18n = useI18nScope('feature_flags')
+const I18n = createI18nScope('feature_flags')
 
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)

@@ -84,7 +84,7 @@ describe "RequestContext::Generator" do
         @attrs[:created_at]
       end
     end
-    pv = fake_pv_class.new({ seconds: 5.0, created_at: DateTime.now, participated: false })
+    pv = fake_pv_class.new({ seconds: 5.0, created_at: Time.now.utc, participated: false })
     _, headers, _ = RequestContext::Generator.new(lambda do |_env|
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_page_view_meta(pv)
@@ -147,7 +147,7 @@ describe "RequestContext::Generator" do
     before do
       Thread.current[:context] = nil
 
-      rails_app = instance_double("Rails::Application", credentials: {
+      rails_app = instance_double(Rails::Application, credentials: {
                                     canvas_security: {
                                       signing_secret: shared_secret
                                     }

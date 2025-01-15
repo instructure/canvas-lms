@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable object-shorthand */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import template from '../../jst/DeleteGroup.handlebars'
@@ -28,7 +28,7 @@ import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 
-const I18n = useI18nScope('DeleteGroupView')
+const I18n = createI18nScope('DeleteGroupView')
 
 extend(DeleteGroupView, DialogFormView)
 
@@ -140,7 +140,7 @@ DeleteGroupView.prototype.destroyModel = function (moveTo) {
     data: data,
     wait: true,
   })
-  // eslint-disable-next-line promise/catch-or-return
+   
   destroyDfd.then(
     (function (_this) {
       return function () {
@@ -167,7 +167,7 @@ DeleteGroupView.prototype.openAgain = function () {
     if (this.model.get('assignments').length > 0) {
       return DeleteGroupView.__super__.openAgain.apply(this, arguments)
     } else if (
-      // eslint-disable-next-line no-alert
+       
       window.confirm(
         I18n.t('confirm_delete_group', 'Are you sure you want to delete this Assignment Group?')
       )
@@ -175,7 +175,7 @@ DeleteGroupView.prototype.openAgain = function () {
       return this.destroyModel()
     }
   } else {
-    // eslint-disable-next-line no-alert
+     
     return window.alert(
       I18n.t('cannot_delete_group', 'You must have at least one Assignment Group')
     )

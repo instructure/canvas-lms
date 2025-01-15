@@ -51,7 +51,7 @@ describe('ExternalApps.Lti2Edit', () => {
         description: null,
         enabled: false,
         installed_locally: true,
-        name: 'Twitter',
+        name: 'SomeTool',
       },
       handleActivateLti2() {},
       handleDeactivateLti2() {},

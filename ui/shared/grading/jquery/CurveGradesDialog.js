@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import curveGradesDialogTemplate from '../jst/CurveGradesDialog.handlebars'
@@ -28,7 +28,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/util/jquery/fixDialogButtons'
 import 'jquery-tinypubsub'
 
-const I18n = useI18nScope('sharedCurveGradesDialog')
+const I18n = createI18nScope('sharedCurveGradesDialog')
 
 export default (function () {
   function CurveGradesDialog(arg) {
@@ -112,7 +112,7 @@ export default (function () {
               return results
             })()
             $.publish('submissions_updated', [submissions])
-            // eslint-disable-next-line no-alert
+             
             window.alert(
               I18n.t(
                 {
@@ -173,7 +173,7 @@ export default (function () {
     let middleScore = numberHelper.parse($('#middle_score').val())
     middleScore /= this.assignment.points_possible
     const should_assign_blanks = $('#assign_blanks').prop('checked')
-    // eslint-disable-next-line no-restricted-globals
+     
     if (isNaN(middleScore)) {
       return
     }
@@ -181,7 +181,7 @@ export default (function () {
     for (idx in ref) {
       student = ref[idx]
       sub = student['assignment_' + this.assignment.id]
-      // eslint-disable-next-line no-void
+       
       score = sub != null ? sub.score : void 0
       if (score > this.assignment.points_possible) {
         score = this.assignment.points_possible

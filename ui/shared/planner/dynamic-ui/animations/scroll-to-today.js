@@ -17,14 +17,14 @@
  */
 
 import moment from 'moment-timezone'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Animation from '../animation'
 import {loadPastUntilToday} from '../../actions/loading-actions'
 import {alert} from '../../utilities/alertUtils'
 import {isToday} from '../../utilities/dateUtils'
 import {handleNothingToday} from '../util'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class ScrollToToday extends Animation {
   uiDidUpdate() {

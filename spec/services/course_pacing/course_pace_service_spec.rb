@@ -68,17 +68,38 @@ describe CoursePacing::CoursePaceService do
   end
 
   describe ".update_pace" do
-    let(:update_params) { { exclude_weekends: false } }
-
     context "the update is successful" do
-      it "returns the updated pace" do
-        expect do
-          expect(
-            CoursePacing::CoursePaceService.update_pace(course_pace, update_params)
-          ).to eq course_pace
-        end.to change {
-          course_pace.exclude_weekends
-        }.to false
+      context "when add_selected_days_to_skip_param is enabled" do
+        before do
+          stub_const("SKIP_SELECTED_DAYS", %w[mon tue wed thu])
+          @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+        end
+
+        it "returns the updated pace" do
+          expect do
+            expect(
+              CoursePacing::CoursePaceService.update_pace(course_pace, { selected_days_to_skip: SKIP_SELECTED_DAYS })
+            ).to eq course_pace
+          end.to change {
+            course_pace.selected_days_to_skip
+          }.to SKIP_SELECTED_DAYS
+        end
+      end
+
+      context "when add_selected_days_to_skip_param is disabled" do
+        before do
+          @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+        end
+
+        it "returns the updated pace" do
+          expect do
+            expect(
+              CoursePacing::CoursePaceService.update_pace(course_pace, { exclude_weekends: false })
+            ).to eq course_pace
+          end.to change {
+            course_pace.exclude_weekends
+          }.to false
+        end
       end
     end
 
@@ -86,7 +107,7 @@ describe CoursePacing::CoursePaceService do
       it "returns false" do
         allow(course_pace).to receive(:update).and_return false
         expect(
-          CoursePacing::CoursePaceService.update_pace(course_pace, update_params)
+          CoursePacing::CoursePaceService.update_pace(course_pace, { exclude_weekends: false })
         ).to be false
       end
     end

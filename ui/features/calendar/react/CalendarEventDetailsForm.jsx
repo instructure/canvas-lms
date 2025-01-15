@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useLayoutEffect, useCallback, useRef} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -49,7 +49,7 @@ import {renderUpdateCalendarEventDialog} from '@canvas/calendar/react/RecurringE
 import FrequencyPicker from '@canvas/calendar/react/RecurringEvents/FrequencyPicker/FrequencyPicker'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 
-const I18n = useI18nScope('calendar.edit_calendar_event')
+const I18n = createI18nScope('calendar.edit_calendar_event')
 
 const screenReaderMessageCallback = msg => {
   showFlashAlert({message: msg, type: 'info', srOnly: true})

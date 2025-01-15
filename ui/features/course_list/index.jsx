@@ -20,10 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('course_list')
+const I18n = createI18nScope('course_list')
 
 function success(target) {
   const courseName = target[0].dataset.courseName
@@ -85,7 +85,7 @@ ready(() => {
     const container = document.getElementById('create_subject_modal_container')
     if (container) {
       startButton.addEventListener('click', () => {
-        // eslint-disable-next-line no-restricted-properties
+         
         ReactDOM.render(
           <CreateCourseModal
             isModalOpen={true}

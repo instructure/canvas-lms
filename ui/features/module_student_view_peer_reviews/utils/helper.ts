@@ -26,7 +26,7 @@ import type {
 } from '../types'
 import ASSIGNMENT_QUERY from '../graphql/Queries'
 import $ from 'jquery'
-import {createClient} from '@canvas/apollo'
+import {createClient} from '@canvas/apollo-v3'
 import type {ReactElement} from 'react'
 
 export function formatAssessmentRequest({

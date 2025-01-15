@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {PendingGradeInfo} from '../gradebook.d'
 import type {
   CamelizedAssignment,
@@ -34,7 +34,7 @@ import {isUnusuallyHigh} from '@canvas/grading/OutlierScoreHelper'
 import CompleteIncompleteGradeInput from './GradeInput/CompleteIncompleteGradeInput'
 import type {TextInputProps} from '@instructure/ui-text-input'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type Message = {
   text: string

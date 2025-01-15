@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {fireEvent, render, act} from '@testing-library/react'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import Library from '../Library'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
 jest.useFakeTimers()
 
 describe('Library', () => {
@@ -114,14 +117,12 @@ describe('Library', () => {
       expect(getByText('new result!')).toBeInTheDocument()
     })
 
-    // EVAL-3907 - remove or rewrite to remove spies on imports
-    it.skip('renders a flash alert when new results are available', () => {
-      const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    it('renders a flash alert when new results are available', () => {
       const {rerender} = render(<Library {...defaultProps()} />)
 
       rerender(<Library {...defaultProps({searchResults: comments})} />)
 
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         srOnly: true,
         message:
           'There are new comment suggestions available. Press Tab to access the suggestions menu.',

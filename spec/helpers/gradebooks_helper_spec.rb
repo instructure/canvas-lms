@@ -268,7 +268,7 @@ describe GradebooksHelper do
 
   describe "#history_submission_class" do
     it "returns a class based on given submission" do
-      submission = instance_double("Submission", assignment_id: "assignment_id", user_id: "user_id")
+      submission = instance_double(Submission, assignment_id: "assignment_id", user_id: "user_id")
       expect(
         helper.history_submission_class(submission)
       ).to eq "assignment_assignment_id_user_user_id_current_grade"

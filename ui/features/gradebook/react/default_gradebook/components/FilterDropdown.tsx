@@ -26,11 +26,11 @@ import {IconArrowOpenEndLine, IconArrowOpenStartLine, IconFilterLine} from '@ins
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {unescape} from '@instructure/html-escape'
 import type {FilterDrilldownData, FilterDrilldownMenuItem} from '../gradebook.d'
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 type Props = {
   rootId?: string

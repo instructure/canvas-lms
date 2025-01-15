@@ -19,10 +19,10 @@
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import SearchResult from './SearchResult'
 
-const I18n = useI18nScope('SmartSearch')
+const I18n = createI18nScope('SmartSearch')
 
 export default function SearchResults({onDislike, onExplain, onLike, searchResults, searchTerm}) {
   const searchItemKey = ({content_id, content_type}) => `${content_type}_${content_id}`

@@ -152,7 +152,7 @@ context_modules_header_props = {
 <div id="differentiated-modules-mount-point"></div>
 <div class="item-group-container" id="context_modules_sortable_container">
   <div class="module-selector-container">
-    <% unless @is_student %>
+    <% if @can_edit %>
       <% if @feature_teacher_module_selection %>
         <div class="module-selector" id="teacher_module_view_selection">
           <% selected_module = @context.show_teacher_only_module_id&.to_i %>

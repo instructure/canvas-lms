@@ -19,7 +19,7 @@
 import React, {Fragment, type ChangeEvent, useState, useImperativeHandle} from 'react'
 import shortid from '@canvas/shortid'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -33,7 +33,7 @@ import {gradingSchemeIsValid} from './validations/gradingSchemeValidations'
 import {roundToTwoDecimalPlaces, roundToFourDecimalPlaces} from '../../helpers/roundDecimalPlaces'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('GradingSchemeManagement')
+const I18n = createI18nScope('GradingSchemeManagement')
 
 export interface ComponentProps {
   initialFormDataByInputType: {

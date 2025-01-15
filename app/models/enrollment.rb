@@ -549,7 +549,7 @@ class Enrollment < ActiveRecord::Base
 
   def conclude
     self.workflow_state = "completed"
-    self.completed_at = Time.now
+    self.completed_at = Time.zone.now
     save
   end
 
@@ -619,7 +619,7 @@ class Enrollment < ActiveRecord::Base
 
   def assert_section
     self.course_section = course.default_section if !course_section_id && course
-    self.root_account_id ||= course.root_account_id rescue nil
+    self.root_account_id ||= course&.root_account_id
   end
 
   def course_name(display_user = nil)
@@ -629,7 +629,7 @@ class Enrollment < ActiveRecord::Base
   def short_name(length = nil, display_user = nil)
     return @short_name if @short_name
 
-    @short_name = course_section.display_name if course_section && root_account && root_account.show_section_name_as_course_name
+    @short_name = course_section.display_name if course_section && root_account&.show_section_name_as_course_name
     @short_name ||= course_name(display_user)
     @short_name = @short_name[0..length] if length
     @short_name
@@ -953,9 +953,7 @@ class Enrollment < ActiveRecord::Base
     invited? || creation_pending?
   end
 
-  def email
-    user.email rescue t("#enrollment.default_email", "No Email")
-  end
+  delegate :email, to: :user
 
   def user_name
     has_attribute?("user_name") ? self["user_name"] : user.name

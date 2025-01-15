@@ -156,7 +156,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       @submission.manually_unlocked = params[:manually_unlocked] == "1" if params[:manually_unlocked]
       if @submission.extendable? && (params[:extend_from_now] || params[:extend_from_end_at]).to_i > 0
         if params[:extend_from_now].to_i > 0
-          @submission.end_at = Time.now + params[:extend_from_now].to_i.minutes
+          @submission.end_at = Time.zone.now + params[:extend_from_now].to_i.minutes
         else
           @submission.end_at += params[:extend_from_end_at].to_i.minutes
         end

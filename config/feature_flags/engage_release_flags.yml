@@ -9,6 +9,12 @@ assignment_edit_enhancements_teacher_view:
   applies_to: RootAccount
   display_name: Assignment Enhancements Teacher View (Create/Edit)
   description: Updates to the Teacher create/edit view of assignments.
+assign_to_differentiation_tags:
+  state: hidden
+  applies_to: Account
+  shadow: true
+  display_name: Assign to Differentiation Tags
+  description: Allows instructors to assign course content to differentiation tags via Account/Sub-account setting.
 differentiation_tags:
   state: hidden
   applies_to: Course

@@ -16,12 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import TokenSelector from './TokenSelector'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('roster')
+const I18n = createI18nScope('roster')
 
 export default class TokenInput {
   constructor($node, options) {

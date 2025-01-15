@@ -125,7 +125,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # override has_one relationship provided by simply_versioned
   def current_version_unidirectional
-    versions.limit(1)
+    versions.order(:number).last
   end
 
   def infer_times
@@ -250,11 +250,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def valid_ip?(ip)
+    return false unless ip
+
     require "ipaddr"
     ip_filter.split(",").any? do |filter|
-      addr_range = ::IPAddr.new(filter) rescue nil
-      addr = ::IPAddr.new(ip) rescue nil
-      addr && addr_range && addr_range.include?(addr)
+      IPAddr.new(filter).include?(IPAddr.new(ip))
+    rescue IPAddr::InvalidAddressError
+      false
     end
   end
 
@@ -749,7 +751,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
       submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
       submission.retake
-      submission.attempt = (submission.attempt + 1) rescue 1
+      submission.attempt ||= 0
+      submission.attempt += 1
       submission.score = nil
       submission.fudge_points = nil
 
@@ -759,7 +762,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       end
 
       submission.quiz_version = version_number
-      submission.started_at = ::Time.now
+      submission.started_at = ::Time.zone.now
       submission.score_before_regrade = nil
       submission.end_at = build_submission_end_at(submission)
       submission.finished_at = nil
@@ -794,7 +797,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # be held in Quizzes::Quiz.quiz_data
   def generate_quiz_data(opts = {})
     entries = root_entries(true)
-    t = Time.now
+    t = Time.zone.now
     entries.each do |e|
       e[:published_at] = t
     end
@@ -881,17 +884,17 @@ class Quizzes::Quiz < ActiveRecord::Base
     new_val = Canvas::Plugin.value_to_boolean(new_val)
     if new_val
       # lock the quiz either until unlock_at, or indefinitely if unlock_at.nil?
-      self.lock_at = Time.now
+      self.lock_at = Time.zone.now
       self.unlock_at = [lock_at, unlock_at].min if unlock_at
     else
       # unlock the quiz
-      self.unlock_at = Time.now
+      self.unlock_at = Time.zone.now
     end
   end
 
   def locked?
-    (unlock_at && unlock_at > Time.now) ||
-      (lock_at && lock_at <= Time.now)
+    (unlock_at && unlock_at > Time.zone.now) ||
+      (lock_at && lock_at <= Time.zone.now)
   end
 
   def hide_results=(val)

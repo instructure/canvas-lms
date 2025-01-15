@@ -37,9 +37,9 @@ import React from 'react'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export type DisplayType = 'grid' | 'rows'
 

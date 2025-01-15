@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {string, func, bool, arrayOf, node, shape} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ConnectorIcon from './ConnectorIcon'
 import {Text} from '@instructure/ui-text'
 import {FormField} from '@instructure/ui-form-field'
@@ -32,7 +32,7 @@ export const itemShape = shape({
   groupId: string,
 })
 
-const I18n = useI18nScope('selectPosition')
+const I18n = createI18nScope('selectPosition')
 
 RenderSelect.propTypes = {
   label: string.isRequired,

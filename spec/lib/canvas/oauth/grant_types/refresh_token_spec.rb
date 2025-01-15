@@ -22,8 +22,8 @@ RSpec.describe Canvas::OAuth::GrantTypes::RefreshToken do # rubocop:disable RSpe
   let(:client_id) { key.global_id }
   let(:secret) { key.api_key }
   let(:opts) { { refresh_token: "test_refresh_token" } }
-  let(:provider) { instance_double("Canvas::OAuth::Provider") }
-  let(:token) { instance_double("Canvas::OAuth::Token") }
+  let(:provider) { instance_double(Canvas::OAuth::Provider) }
+  let(:token) { instance_double(Canvas::OAuth::Token) }
   let(:access_token) { key.access_tokens.create! }
   let(:refresh_token_instance) { described_class.new(client_id, secret, opts) }
 

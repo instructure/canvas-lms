@@ -30,7 +30,8 @@ describe Canvas::Security::PasswordPolicy do
            open: StringIO.new("password1\npassword2\npassword3"),
            root_account: account)
   end
-  let(:cache_key) { "common_passwords_set_#{policy[:common_passwords_attachment_id]}" }
+  let(:redis) { Canvas.redis }
+  let(:cache_key) { "common_passwords:{#{account.global_id}}/#{policy[:common_passwords_attachment_id]}" }
 
   before do
     account.enable_feature!(:password_complexity)
@@ -163,6 +164,13 @@ describe Canvas::Security::PasswordPolicy do
         expect(@pseudonym).not_to be_valid
       end
 
+      it "is invalid when the password dictionary member check returns nil" do
+        allow(described_class).to receive(:check_password_membership).and_return(nil)
+        pseudonym_with_policy(policy)
+        @pseudonym.password = @pseudonym.password_confirmation = "Password!"
+        expect(@pseudonym).not_to be_valid
+      end
+
       it "falls back to default common password dictionary when password complexity feature is disabled" do
         account.disable_feature!(:password_complexity)
         pseudonym_with_policy(disallow_common_passwords: true)
@@ -249,7 +257,6 @@ describe Canvas::Security::PasswordPolicy do
     it "adds passwords to the Redis set" do
       passwords = %w[password1 password2 password3]
       described_class.add_password_membership(cache_key, passwords)
-      redis = Canvas.redis
 
       passwords.each do |password|
         expect(redis.sismember(cache_key, password)).to be_truthy
@@ -275,12 +282,23 @@ describe Canvas::Security::PasswordPolicy do
       new_cache_key = "common_passwords_set_2"
       passwords = %w[password4 password5 password6]
       described_class.add_password_membership(new_cache_key, passwords)
-      redis = Canvas.redis
 
       passwords.each do |password|
         expect(redis.sismember(cache_key, password)).to be_falsey
         expect(redis.sismember(new_cache_key, password)).to be_truthy
       end
+    end
+
+    it "returns nil when an error occurs" do
+      allow(redis).to receive(:srandmember).with(cache_key).and_raise(Redis::BaseConnectionError)
+      expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_nil
+    end
+
+    it "returns nil when a Redis::Distributed::CannotDistribute error occurs" do
+      allow(redis).to receive(:sismember).with(cache_key, "password1").and_raise(
+        Redis::Distributed::CannotDistribute.new(:sismember)
+      )
+      expect(described_class.check_password_membership(cache_key, "password1", policy)).to be_nil
     end
   end
 end

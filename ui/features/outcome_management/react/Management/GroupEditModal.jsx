@@ -19,14 +19,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import GroupEditForm from './GroupEditForm'
 import {UPDATE_LEARNING_OUTCOME_GROUP} from '@canvas/outcomes/graphql/Management'
-import {useMutation} from '@apollo/react-hooks'
+import {useMutation} from '@apollo/client'
 import {outcomeGroupShape} from './shapes'
 
-const I18n = useI18nScope('FindOutcomesModal')
+const I18n = createI18nScope('FindOutcomesModal')
 
 const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
   const [editOutcomeGroup] = useMutation(UPDATE_LEARNING_OUTCOME_GROUP)

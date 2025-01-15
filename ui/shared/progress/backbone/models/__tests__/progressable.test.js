@@ -1,3 +1,4 @@
+/* eslint-disable no-global-assign */
 /*
  * Copyright (C) 2013 - present Instructure, Inc.
  *

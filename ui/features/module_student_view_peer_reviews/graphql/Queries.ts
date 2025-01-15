@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 const ASSIGNMENT_QUERY = gql`
   query GetCourseModules($courseId: ID!) {

@@ -48,6 +48,10 @@ class Announcement < DiscussionTopic
     between(start_date, end_date).order(Arel.sql("context_id, COALESCE(unlock_at, delayed_post_at, posted_at, created_at) DESC"))
   }
 
+  scope :available_after, lambda { |available_after|
+    where("lock_at IS NULL OR lock_at>?", available_after)
+  }
+
   def validate_draft_state_change
     _old_draft_state, new_draft_state = changes["workflow_state"]
     errors.add :workflow_state, I18n.t("#announcements.error_draft_state", "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == "unpublished"

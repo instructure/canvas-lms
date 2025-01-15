@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n, {useScope} from '..'
+import I18n, {useScope as createI18nScope} from '..'
 import I18nStubber from '@canvas/test-utils/I18nStubber'
 import {raw} from '@instructure/html-escape'
 
-const scope = useScope('foo')
+const scope = createI18nScope('foo')
 const t = (...args) => scope.t(...Array.from(args || []))
 const interpolate = (...args) => I18n.interpolate(...Array.from(args || []))
 

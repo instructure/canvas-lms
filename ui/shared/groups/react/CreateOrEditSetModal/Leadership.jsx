@@ -17,7 +17,7 @@
  */
 
 import React, {useContext} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -29,7 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {func, string} from 'prop-types'
 import {GroupContext, SPLIT} from './context'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 const tooltipText = I18n.t(
   'Group leaders can manage members and edit the group name but not the group size.'

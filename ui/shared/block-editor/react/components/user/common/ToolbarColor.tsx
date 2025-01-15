@@ -23,10 +23,9 @@ import {Popover} from '@instructure/ui-popover'
 import {IconBackgroundColor} from '../../../assets/internal-icons'
 import {ColorPicker, type ColorSpec, type TabsSpec} from '@instructure/canvas-rce'
 import {getColorsInUse, type ColorsInUse} from '../../../utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {useScope} from '@canvas/i18n'
-
-const I18n = useScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type ToolbarColorProps = {
   tabs: TabsSpec

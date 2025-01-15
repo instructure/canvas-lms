@@ -18,19 +18,19 @@
 
 import React from 'react'
 import {arrayOf, bool, func, oneOf, string} from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
-import {Query} from '@apollo/react-components'
-import {withApollo} from '@apollo/react-hoc'
+import {Query} from '@apollo/client/react/components'
+import {withApollo} from '@apollo/client/react/hoc'
 
 import {Text} from '@instructure/ui-text'
 
 import SelectableText from './SelectableText'
 import {ModuleShape, COURSE_MODULES_QUERY, COURSE_MODULES_QUERY_LOCAL} from '../../assignmentData'
 
-const I18n = useI18nScope('assignments_2')
+const I18n = createI18nScope('assignments_2')
 
 const AssignmentModulesPropTypes = {
   mode: oneOf(['edit', 'view']).isRequired,
@@ -43,13 +43,13 @@ const AssignmentModulesPropTypes = {
 }
 
 // eslint doesn't deal with the prop types being defined this way
-/* eslint-disable react/default-props-match-prop-types */
+ 
 const AssignmentModulesDefaultProps = {
   moduleList: [],
   selectedModules: [],
   readOnly: true,
 }
-/* eslint-enable react/default-props-match-prop-types */
+ 
 
 class AssignmentModulesUI extends React.Component {
   static propTypes = {

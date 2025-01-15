@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
 import SearchBreadcrumb from './shared/SearchBreadcrumb'
@@ -39,7 +39,7 @@ import {
   IMPORT_PENDING,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const FindOutcomesView = ({
   outcomesGroup,

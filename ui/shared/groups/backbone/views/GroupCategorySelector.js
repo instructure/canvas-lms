@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import {isEmpty, find, chain, includes} from 'lodash'
 import template from '../../jst/GroupCategorySelector.handlebars'
@@ -28,7 +28,7 @@ import awaitElement from '@canvas/await-element'
 import {renderCreateDialog} from '../../react/CreateOrEditSetModal'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
 
-const I18n = useI18nScope('assignment_group_category')
+const I18n = createI18nScope('assignment_group_category')
 
 extend(GroupCategorySelector, Backbone.View)
 

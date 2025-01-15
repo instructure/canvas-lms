@@ -20,11 +20,6 @@ admin_manage_access_tokens:
   display_name: Admin Manage Access Tokens
   description: Limit the ability to manage access tokens to admins only.
   applies_to: RootAccount
-oidc_rp_initiated_logout_params:
-  state: allowed
-  applies_to: RootAccount
-  display_name: OpenID Connect RP Initiated Logout Parameters
-  description: Enables sending additional parameters (client_id, post_logout_redirect_uri, and id_token_hint) to the `end_session_endpoint` when logging out of Canvas.
 oidc_full_token_validation:
   state: allowed
   applies_to: RootAccount

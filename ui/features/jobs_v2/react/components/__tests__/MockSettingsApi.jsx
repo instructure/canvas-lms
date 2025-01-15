@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {GET_SETTING_QUERY, SET_SETTING_MUTATION} from '../../../graphql/Queries'
 
 const settingsMocks = [

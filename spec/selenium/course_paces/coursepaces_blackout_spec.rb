@@ -173,7 +173,7 @@ describe "course pace page" do
       click_blackout_dates_add_button
       click_blackout_dates_save_button
 
-      expect(publish_status_button.text).to eq("2 unpublished changes")
+      expect(publish_status_button.text).to eq("2 unsaved changes")
       click_unpublished_changes_button
       expect(unpublished_changes_list[0].text).to include("Easter Break")
       expect(unpublished_changes_list[1].text).to include("Me Time Break")

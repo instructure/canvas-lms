@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-properties */
+ 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -84,7 +84,7 @@ import {
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from '@canvas/round'
 import {map, keyBy, values, find, includes, reject, some, isEqual, filter} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
 import * as tz from '@instructure/moment-utils'
@@ -159,6 +159,7 @@ import {SpeedGraderCheckpointsWrapper} from '../react/SpeedGraderCheckpoints/Spe
 import {SpeedGraderDiscussionsNavigation} from '../react/SpeedGraderDiscussionsNavigation'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import {containsHtmlTags, formatMessage} from '@canvas/util/TextHelper'
+import {createRoot} from 'react-dom/client'
 
 declare global {
   interface Window {
@@ -172,7 +173,7 @@ if (!('INST' in window)) window.INST = {}
 // Allow unchecked access to module-specific ENV variables
 declare const ENV: GlobalEnv & EnvGradebookSpeedGrader
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 const selectors = new JQuerySelectorCache()
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
@@ -204,7 +205,7 @@ let reassignAssignmentInProgress: boolean
 let vericiteAsset
 let turnitinAsset
 
-// eslint-disable-next-line no-undef
+ 
 let $window: JQuery<Window & typeof globalThis>
 let $full_width_container: JQuery
 let $vericiteScoreContainer: JQuery
@@ -473,7 +474,7 @@ function mergeStudentsAndSubmission() {
     ) {
       jsonData.studentsWithSubmissions = studentsInSection
     } else {
-      // eslint-disable-next-line no-alert
+       
       window.alert(
         I18n.t(
           'alerts.no_students_in_section',
@@ -637,7 +638,7 @@ function initDropdown() {
 
     if (sectionToShow) {
       const text = $.map(window.jsonData.context.active_course_sections, section => {
-        // eslint-disable-next-line eqeqeq
+         
         if (section.id == sectionToShow) {
           return section.name
         }
@@ -774,7 +775,7 @@ function setupHeader() {
         QuizzesNextSpeedGrading.postGradeByQuestionChangeMessage($iframe_holder, gradeByQuestion)
       }
 
-      // eslint-disable-next-line promise/catch-or-return
+       
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion,
       }).then(() => {
@@ -963,7 +964,7 @@ function initCommentBox() {
   }
 
   if (browserSupportsSpeech()) {
-    // eslint-disable-next-line new-cap
+     
     const recognition = new window.webkitSpeechRecognition()
     const messages = {
       begin: I18n.t('begin_record_prompt', 'Click the "Record" button to begin.'),
@@ -1394,7 +1395,7 @@ EG = {
 
     if (window.jsonData.GROUP_GRADING_MODE && !window.jsonData.studentsWithSubmissions.length) {
       if (SpeedgraderHelpers.getHistory().length === 1) {
-        // eslint-disable-next-line no-alert
+         
         window.alert(
           I18n.t(
             'alerts.no_students_in_groups_close',
@@ -1403,7 +1404,7 @@ EG = {
         )
         window.close()
       } else {
-        // eslint-disable-next-line no-alert
+         
         window.alert(
           I18n.t(
             'alerts.no_students_in_groups_back',
@@ -1419,7 +1420,7 @@ EG = {
       // execute the else clause below this one since we don't want to set up
       // the rest of SpeedGrader
       if (sectionToShow == null) {
-        // eslint-disable-next-line no-alert
+         
         window.alert(
           I18n.t(
             'alerts.no_active_students',
@@ -1479,9 +1480,9 @@ EG = {
   },
 
   setupGradeLoadingSpinner() {
-    ReactDOM.render(
-      <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />,
-      document.getElementById('grades-loading-spinner')
+    const root = createRoot(document.getElementById('grades-loading-spinner')!)
+    root.render(
+      <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />
     )
   },
 
@@ -3324,7 +3325,7 @@ EG = {
         const commentUpdateFailed = function (_jqXH: JQuery.jqXHR<any>, _textStatus: string) {
           $.flashError(I18n.t('Failed to submit draft comment'))
         }
-        // eslint-disable-next-line no-alert
+         
         const confirmed = window.confirm(I18n.t('Are you sure you want to submit this comment?'))
 
         if (confirmed) {
@@ -3362,7 +3363,7 @@ EG = {
 
     // Serialization seems to have changed... not sure if it's changed everywhere, though...
     if (comment.submission_comment) {
-      // eslint-disable-next-line no-console
+       
       console.warn('SubmissionComment serialization has changed')
       comment = commentData.submission_comment
     }
@@ -4595,7 +4596,7 @@ export default {
 
     commentSubmissionInProgress = false
 
-    // eslint-disable-next-line promise/catch-or-return
+     
     $.when(getGradingPeriods(), speedGraderJsonDfd).then(setupSpeedGrader)
 
     // run the stuff that just attaches event handlers and dom stuff, but does not need the jsonData

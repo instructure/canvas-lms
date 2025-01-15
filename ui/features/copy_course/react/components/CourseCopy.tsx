@@ -18,42 +18,77 @@
 
 import React from 'react'
 import {CopyCourseForm} from './form/CopyCourseForm'
-import {useQuery} from '@canvas/query'
+import {useQuery, useMutation} from '@canvas/query'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {coursesQuery} from '../queries/courseQuery'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {termsQuery} from '../queries/termsQuery'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useTermsQuery} from '../queries/termsQuery'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import {
+  type CopyCourseFormSubmitData,
+  courseCopyRootKey,
+  courseFetchKey,
+  createCourseAndMigrationKey,
+} from '../types'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {createCourseCopyMutation} from '../mutations/createCourseCopyMutation'
 // @ts-ignore
 import ErrorShip from '@canvas/images/ErrorShip.svg'
-import GenericErrorPage from '@canvas/generic-error-page/react'
 
-const I18n = useI18nScope('content_copy_redesign')
+const I18n = createI18nScope('content_copy_redesign')
+
+export const onSuccessCallback = (newCourseId: string) => {
+  window.location.href = `/courses/${newCourseId}/content_migrations`
+}
+
+export const onErrorCallback = () => {
+  showFlashError(
+    I18n.t('Something went wrong during copy course operation. Reload the page and try again.')
+  )()
+}
 
 export const CourseCopy = ({
   courseId,
   accountId,
-  timeZone,
+  userTimeZone,
+  courseTimeZone,
   canImportAsNewQuizzes,
 }: {
   courseId: string
   accountId: string
-  timeZone?: string
+  userTimeZone?: string
+  courseTimeZone?: string
   canImportAsNewQuizzes: boolean
 }) => {
   const courseQueryResult = useQuery({
-    queryKey: ['copy_course', 'course', courseId],
+    queryKey: [courseCopyRootKey, courseFetchKey, courseId],
     queryFn: coursesQuery,
     meta: {fetchAtLeastOnce: true},
   })
 
-  const termsQueryResult = useQuery({
-    queryKey: ['copy_course', 'enrollment_terms', accountId],
-    queryFn: termsQuery,
-    meta: {fetchAtLeastOnce: true},
+  const termsQueryResult = useTermsQuery(accountId)
+
+  const mutation = useMutation({
+    mutationKey: [courseCopyRootKey, createCourseAndMigrationKey, accountId],
+    mutationFn: createCourseCopyMutation,
+    onSuccess: onSuccessCallback,
+    onError: onErrorCallback,
   })
 
-  if (courseQueryResult.isLoading || termsQueryResult.isLoading) {
+  const handleCancel = () => {
+    window.location.href = `/courses/${courseId}/settings`
+  }
+
+  const handleSubmit = (formData: CopyCourseFormSubmitData) => {
+    mutation.mutate({accountId, formData, courseId})
+  }
+
+  if (
+    courseQueryResult.isLoading ||
+    termsQueryResult.isLoading ||
+    (!termsQueryResult.isError && termsQueryResult.hasNextPage !== false)
+  ) {
     return (
       <Flex height="80vh" justifyItems="center" padding="large">
         <Flex.Item textAlign="center">
@@ -84,7 +119,11 @@ export const CourseCopy = ({
       canImportAsNewQuizzes={canImportAsNewQuizzes}
       course={courseQueryResult.data}
       terms={termsQueryResult.data}
-      timeZone={timeZone}
+      userTimeZone={userTimeZone}
+      courseTimeZone={courseTimeZone}
+      isSubmitting={mutation.isLoading || mutation.isSuccess}
+      onCancel={handleCancel}
+      onSubmit={handleSubmit}
     />
   )
 }

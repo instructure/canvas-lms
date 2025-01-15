@@ -23,11 +23,11 @@ import {
 } from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from '@canvas/rails-flash-notifications'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 export const getSpeedGraderUrl = (authorId = null, entryId = null) => {
   let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE
@@ -340,6 +340,7 @@ export const getOptimisticResponse = ({
               __typename: 'AnonymousUser',
             }
           : null,
+        editedAt: null,
         editor: null,
         lastReply: null,
         permissions: {
@@ -455,30 +456,24 @@ export const showErrorWhenMessageTooLong = message => {
   return false
 }
 
-export const getTranslation = async (text, translateTargetLanguage, setter) => {
-  if (text === undefined || text == null) {
-    return // Do nothing, there is no text to translate
-  }
+export const getTranslation = async (text, translateTargetLanguage) => {
+  if (!text) return // Don't translate, if no content
 
   const apiPath = `/courses/${ENV.course_id}/translate`
 
-  try {
-    const {json} = await doFetchApi({
-      method: 'POST',
-      path: apiPath,
-      body: {
-        inputs: {
-          src_lang: 'en', // TODO: detect source language.
-          tgt_lang: translateTargetLanguage,
-          text,
-        },
+  const {json} = await doFetchApi({
+    method: 'POST',
+    path: apiPath,
+    body: {
+      inputs: {
+        src_lang: 'en', // TODO: detect source language.
+        tgt_lang: translateTargetLanguage,
+        text,
       },
-    })
-    // Join together all the text with a separator, so that the original text remains separate
-    setter([text, translationSeparator, json.translated_text].join(''))
-  } catch (e) {
-    // TODO: Do something with the error message.
-  }
+    },
+  })
+
+  return json.translated_text
 }
 
 export const translationSeparator = '\n\n----------\n\n\n'

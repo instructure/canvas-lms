@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {useForm, Controller} from 'react-hook-form'
 import * as z from 'zod'
 import {zodResolver} from '@hookform/resolvers/zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -29,9 +29,9 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {focusFiled, getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
+import {getFormErrorMessage} from '@canvas/forms/react/react-hook-form/utils'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 export enum Tab {
   EMAIL = 'email',
@@ -96,6 +96,7 @@ const RegisterCommunication = ({
     control,
     reset,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues,
     resolver: zodResolver(currentConfig.validationSchema),
@@ -117,7 +118,7 @@ const RegisterCommunication = ({
         selectedTab === Tab.EMAIL ? values.enableEmailLogin : undefined
       )
     } catch {
-      focusFiled(control, selectedTab)
+      setFocus(selectedTab)
     }
   }
 

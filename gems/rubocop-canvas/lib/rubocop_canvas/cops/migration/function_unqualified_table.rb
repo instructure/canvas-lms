@@ -20,7 +20,7 @@
 module RuboCop
   module Cop
     module Migration
-      class FunctionUnqualifiedTable < Cop
+      class FunctionUnqualifiedTable < Base
         include RuboCop::Canvas::CurrentDef
 
         MSG = <<~'TEXT'.tr("\n", " ")

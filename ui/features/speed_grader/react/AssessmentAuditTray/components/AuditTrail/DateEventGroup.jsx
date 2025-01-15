@@ -20,13 +20,13 @@ import React, {PureComponent} from 'react'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import * as timezone from '@instructure/moment-utils'
 
 import AuditEvent from './AuditEvent'
 import * as propTypes from './propTypes'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 function dateString(date) {
   const monthAndDay = timezone.format(date, '%B %-d')

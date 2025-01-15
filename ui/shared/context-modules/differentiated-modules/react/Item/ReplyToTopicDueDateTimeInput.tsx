@@ -17,12 +17,12 @@
  */
 
 import React, {useCallback, useMemo} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ClearableDateTimeInput from './ClearableDateTimeInput'
 import type {CustomDateTimeInputProps} from './types'
 import {generateMessages} from './utils'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 type ReplyToTopicDueDateTimeInputProps = CustomDateTimeInputProps & {
   replyToTopicDueDate: string | null

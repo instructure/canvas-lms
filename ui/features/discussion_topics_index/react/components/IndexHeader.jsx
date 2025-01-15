@@ -21,7 +21,7 @@ import {bindActionCreators} from 'redux'
 import {bool, func, string, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import propTypes from '../propTypes'
 import React, {Component} from 'react'
 import select from '@canvas/obj-select'
@@ -41,7 +41,7 @@ import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import {HeadingMenu} from '@canvas/discussions/react/components/HeadingMenu'
 import {SearchField} from '@canvas/discussions/react/components/SearchField'
 
-const I18n = useI18nScope('discussions_v2')
+const I18n = createI18nScope('discussions_v2')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 const SEARCH_DELAY = 750
@@ -158,7 +158,7 @@ export default class IndexHeader extends Component {
         window.location.reload()
       }
     }
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <ContentTypeExternalToolTray
         tool={tool}

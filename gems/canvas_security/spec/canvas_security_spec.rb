@@ -218,7 +218,7 @@ describe CanvasSecurity do
       config = "test:\n  another_key: true"
       expect(File).to receive(:read).with(Rails.root.join("config/security.yml").to_s).and_return(config)
       credentials = double(security_encryption_key: "secret")
-      expect(Rails).to receive(:application).and_return(instance_double("Rails::Application", credentials:))
+      expect(Rails).to receive(:application).and_return(instance_double(Rails::Application, credentials:))
       expect(CanvasSecurity.config).to eq("encryption_key" => "secret", "another_key" => true)
     end
   end

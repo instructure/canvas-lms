@@ -19,14 +19,14 @@
 import React, {useState, useEffect, useRef} from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Button} from '@instructure/ui-buttons'
 import {FocusRegionManager} from '@instructure/ui-a11y-utils'
 
-const I18n = useI18nScope('ImportConfirmBox')
+const I18n = createI18nScope('ImportConfirmBox')
 
 const ImportConfirmBox = ({count, onImportHandler, onCloseHandler}) => {
   const containerRef = useRef()
@@ -141,7 +141,7 @@ export const showImportConfirmBox = ({count, onImportHandler, onCloseHandler}) =
   parent.setAttribute('style', 'max-width:45em;margin:1rem auto;')
   parent.setAttribute('class', 'flashalert-message')
   getBoxContainer().appendChild(parent)
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <ImportConfirmBox
       count={count}

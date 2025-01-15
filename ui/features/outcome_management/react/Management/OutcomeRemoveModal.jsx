@@ -19,7 +19,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {outcomeShape} from './shapes'
 import {IconCheckMarkIndeterminateLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('OutcomeManagement')
+const I18n = createI18nScope('OutcomeManagement')
 
 const OutcomeRemoveModal = ({
   outcomes,

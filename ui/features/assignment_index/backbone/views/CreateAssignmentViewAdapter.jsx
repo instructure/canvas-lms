@@ -22,10 +22,10 @@ import CreateEditAssignmentModal from '@canvas/assignments/react/CreateEditAssig
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {encodeQueryString} from '@instructure/query-string-encoding'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('CreateEditAssignmentModalAdapter')
+const I18n = createI18nScope('CreateEditAssignmentModalAdapter')
 
 const CreateAssignmentViewAdapter = ({assignment, assignmentGroup, closeHandler}) => {
   const maxNameLength = ENV.MAX_NAME_LENGTH || 255
@@ -213,7 +213,7 @@ const getFrozenFields = assignment => {
   const fields = []
 
   // Check if assignment is a child of blueprint course
-  if (assignmentJSON.is_master_course_child_content) {
+  if (assignmentJSON.is_master_course_child_content && assignmentJSON.master_course_restrictions) {
     const restrictions = assignmentJSON.master_course_restrictions
     Object.keys(restrictions).forEach(r => {
       switch (r) {

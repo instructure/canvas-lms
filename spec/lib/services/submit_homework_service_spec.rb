@@ -36,7 +36,7 @@ module Services
     end
     let(:submit_assignment) { true }
     let(:failure_email) do
-      instance_double("Message",
+      instance_double(Message,
                       from_name: "notifications@instructure.com",
                       subject: "Submission upload failed: #{assignment.name}",
                       to: user.email,

@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import outcomeGrid from '@canvas/outcome-gradebook-grid'
 import {useQuery as useCanvasQuery} from '@canvas/query'
 import {Tabs} from '@instructure/ui-tabs'
@@ -49,7 +49,7 @@ import fetchOutcomeResult from './OutcomeResult/OutcomeResultQuery'
 import StudentInformation from './StudentInformation'
 import {useGradebookQuery} from '../hooks/useGradebookQuery'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 const STUDENT_SEARCH_PARAM = 'student'
 const OUTCOME_SEARCH_PARAM = 'outcome'

@@ -30,7 +30,7 @@ import React, {
 import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DateValidator from '@canvas/grading/DateValidator'
 import moment from 'moment'
 import AssigneeSelector from '../AssigneeSelector'
@@ -53,7 +53,7 @@ import {Text} from '@instructure/ui-text'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import type {ItemType} from '../types'
 
-const I18n = useI18nScope('differentiated_modules')
+const I18n = createI18nScope('differentiated_modules')
 
 export interface DateValidatorInputArgs {
   required_replies_due_at: string | null

@@ -17,7 +17,7 @@
  */
 
 import {executeQuery} from '@canvas/query/graphql'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 import type {
   AssignmentConnection,
   AssignmentGroupConnection,

@@ -132,7 +132,7 @@ describe "API Authentication", type: :request do
           expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
           json = JSON.parse(response.body)
           token = json["access_token"]
-          expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en" })
+          expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en", "fake_student" => false })
           reset!
 
           # try an api call
@@ -343,7 +343,7 @@ describe "API Authentication", type: :request do
             expect(response.header[content_type_key]).to eq "application/json; charset=utf-8"
             json = JSON.parse(response.body)
             @token = json["access_token"]
-            expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en" })
+            expect(json["user"]).to eq({ "id" => @user.id, "global_id" => @user.global_id.to_s, "name" => "test1@example.com", "effective_locale" => "en", "fake_student" => false })
             reset!
           end
 

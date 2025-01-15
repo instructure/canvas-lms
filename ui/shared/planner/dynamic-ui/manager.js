@@ -23,10 +23,10 @@ import {AnimationCollection} from './animation-collection'
 import {specialFallbackFocusId} from './util'
 import {daysToItems} from '../utilities/daysUtils'
 import {srAlert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {setNaiAboveScreen} from '../actions'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export class DynamicUiManager {
   static defaultOptions = {

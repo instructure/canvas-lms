@@ -18,7 +18,7 @@
 
 import React, {useContext} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
@@ -37,7 +37,7 @@ import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimized
 
 const k5ThemeVariables = getK5ThemeVars()
 
-const I18n = useI18nScope('k5_dashboard_card')
+const I18n = createI18nScope('k5_dashboard_card')
 
 export const CARD_SIZE_PX = 300
 

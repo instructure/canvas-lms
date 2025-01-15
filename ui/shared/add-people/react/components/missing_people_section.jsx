@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {missingsShape} from './shapes'
@@ -27,7 +27,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('add_people_missing_people_section')
+const I18n = createI18nScope('add_people_missing_people_section')
 
 const namePrompt = I18n.t('Click to add a name')
 const nameLabel = I18n.t("New user's name")

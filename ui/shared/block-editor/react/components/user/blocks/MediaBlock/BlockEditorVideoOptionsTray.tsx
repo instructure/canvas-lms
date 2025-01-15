@@ -24,9 +24,9 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {type MediaBlockProps} from './types'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 export default function BlockEditorVideoOptionsTray({
   open,

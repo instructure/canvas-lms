@@ -6,7 +6,7 @@
   "main": "./react/index.tsx",
   "dependencies": {
     "@craftjs/core": "^0.2.10",
-    "@instructure/ui-color-picker": "8.56.4",
+    "@instructure/ui-color-picker": "9.10.0",
     "html2canvas": "^1.4.1",
     "react-moveable": "0.56.0",
     "styled-components": ">= 4",

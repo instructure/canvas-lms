@@ -118,7 +118,7 @@ describe Course do
 
     it "properly converts timezones" do
       Time.zone = "Alaska"
-      default_due = DateTime.parse("01 Jan 2011 14:00 AKST")
+      default_due = Time.zone.parse("01 Jan 2011 14:00 AKST")
       @assignment4 = @test_course.assignments.create!(title: "some assignment", due_at: default_due, submission_types: ["online_text_entry"])
 
       edd = EffectiveDueDates.for_course(@test_course, @assignment4)

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Checkbox} from '@instructure/ui-checkbox'
 import {FormField} from '@instructure/ui-form-field'
@@ -27,7 +27,7 @@ declare const ENV: GlobalEnv & {
   SIS_NAME: string
 }
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 type Props = {
   postToSis: boolean

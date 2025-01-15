@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "โฟลเดอร์ที่ใช้ได้"
     },
+    "background_1bc88842": {
+        "message": "พื้นหลัง"
+    },
     "backslash_b2d5442d": {
         "message": "แบ็คสแลช"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "น้ำเงิน"
+    },
+    "border_5b08b06d": {
+        "message": "ขอบ"
     },
     "bottom_15a2a9be": {
         "message": "ล่างสุด"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "ย่อเพื่อซ่อน { types }"
     },
+    "color_a363e1b0": {
+        "message": "สี"
+    },
+    "color_contrast_4c418add": {
+        "message": "ความต่างสี"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "สัดส่วนความต่างสี"
+    },
     "color_picker_6b359edf": {
         "message": "ระบบเลือกสี "
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "ระบบเลือกสี ({ colorName } ที่เลือก)"
+    },
+    "color_popup_af39810f": {
+        "message": "ป๊อปอัพสี"
     },
     "column_e1ae5c64": {
         "message": "คอลัมน์"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (ฟังก์ชั่น)"
     },
+    "fail_544e5dde": {
+        "message": "ล้มเหลว"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "ไม่สามารถสืบค้นเนื้อหาของไฟล์"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "เกรด"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "ข้อความกราฟิก"
     },
     "greater_than_e98af662": {
         "message": "มากกว่า"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "อนันต์"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "ฟิลด์ป้อนข้อมูลสำหรับอัลฟ่า"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "ฟิลด์ป้อนข้อมูลสำหรับสีน้ำเงิน"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "ฟิลด์ป้อนข้อมูลสำหรับสีเขียว"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "ฟิลด์ป้อนข้อมูลสำหรับสีแดง"
+    },
     "insert_593145ef": {
         "message": "ใบกัด"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "ใหญ่"
+    },
+    "large_text_e7ba08cd": {
+        "message": "ข้อความขนาดใหญ่"
     },
     "latvian_2bbb6aab": {
         "message": "ลัทเวีย"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "ไม่ได้เลือกรายการใด"
     },
+    "normal_text_7b03da48": {
+        "message": "ข้อความปกติ"
+    },
     "norwegian_53f391ec": {
         "message": "นอร์เวย์"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "ขนาดเค้าโครง"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } ไม่ใช่โปรโตคอลที่ถูกต้อง โดยจะต้องเป็น ftp, http, https, mailto, skype, tel หรือสามารถเว้นว่าง"
-    },
     "page_50c4823d": {
         "message": "หน้า"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "บางส่วน (อนุพันธ์)"
     },
+    "pass_1c19a2b3": {
+        "message": "ผ่าน"
+    },
     "paste_5963d1c1": {
         "message": "วาง"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "เปอร์เซ็นต์จะต้องเป็นตัวเลข"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "เปอร์เซ็นต์อย่างน้อยจะต้องเท่ากับ { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "ไอคอนนาฏศิลป์"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "พาย (ตัวแปร)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "เลือกสี"
+    },
     "pink_68ad45cb": {
         "message": "ชมพู"
     },
     "pixels_52ece7d1": {
         "message": "พิกเซล"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "พิกเซลจะต้องอย่างน้อยเท่ากับ { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "เปิดเล่น"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "{ findText } ก่อนหน้า"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "สีที่เลือกไว้ก่อนหน้า"
     },
     "prime_917ea60e": {
         "message": "เฉพาะ"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "ยิดติช"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "คุณอยู่ที่จานสี เลื่อนจานสีขึ้น ไปทางซ้าย ลงหรือไปทางขวาโดยใช้ปุ่ม ''W'' ''A'' ''S'' และ ''D'' ตามลำดับ"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "คุณอยู่ที่แถบเลื่อนสี เลื่อนแถบเลื่อนไปทางซ้ายหรือขวาโดยใช้ปุ่ม ''A'' และ ''D'' ตามลำดับ"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "คุณอยู่ในแถบเลื่อนอัลฟ่า เลื่อนแถบเลื่อนไปทางซ้ายหรือขวาโดยใช้ปุ่ม ''A'' และ ''D'' ตามลำดับ"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "คุณสามารถแทนที่ได้โดยการอัพโหลดไฟล์คำบรรยายใหม่"

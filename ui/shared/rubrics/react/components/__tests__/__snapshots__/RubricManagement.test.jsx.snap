@@ -15,6 +15,7 @@ exports[`RubricManagement renders the RubricManagement component 1`] = `
     padding="small"
     renderTitle="Account Rubrics"
     textAlign="start"
+    unmountOnExit={true}
     variant="default"
   >
     <RubricPanel />
@@ -28,6 +29,7 @@ exports[`RubricManagement renders the RubricManagement component 1`] = `
     padding="small"
     renderTitle="Learning Mastery"
     textAlign="start"
+    unmountOnExit={true}
     variant="default"
   >
     <ProficiencyTable

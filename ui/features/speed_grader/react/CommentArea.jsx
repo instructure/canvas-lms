@@ -22,12 +22,12 @@ import PropTypes from 'prop-types'
 import {TextArea} from '@instructure/ui-text-area'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CommentLibrary from './CommentLibrary'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import ReactDOM from 'react-dom'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 
-const I18n = useI18nScope('speed_grader')
+const I18n = createI18nScope('speed_grader')
 
 function Portal({node, children}) {
   return ReactDOM.createPortal(children, node)

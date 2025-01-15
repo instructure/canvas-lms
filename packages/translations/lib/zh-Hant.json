@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "可用資料夾"
     },
+    "background_1bc88842": {
+        "message": "背景"
+    },
     "backslash_b2d5442d": {
         "message": "反斜线"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "藍色"
+    },
+    "border_5b08b06d": {
+        "message": "邊框"
     },
     "bottom_15a2a9be": {
         "message": "底部"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "收起以隱藏 { types }"
     },
+    "color_a363e1b0": {
+        "message": "顏色"
+    },
+    "color_contrast_4c418add": {
+        "message": "顏色對比度"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "顏色對比度比率"
+    },
     "color_picker_6b359edf": {
         "message": "顏色選擇器"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "顏色選擇器（已選擇 { colorName } 色）"
+    },
+    "color_popup_af39810f": {
+        "message": "顏色彈出視窗"
     },
     "column_e1ae5c64": {
         "message": "欄"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F（函數）"
     },
+    "fail_544e5dde": {
+        "message": "失敗"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "無法取得檔案內容"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "成績"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "圖形文字"
     },
     "greater_than_e98af662": {
         "message": ">"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "無限"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "α 系數的輸入欄位"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "藍色的輸入欄位"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "綠色的輸入欄位"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "紅色的輸入欄位"
+    },
     "insert_593145ef": {
         "message": "插入"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "大"
+    },
+    "large_text_e7ba08cd": {
+        "message": "大文字"
     },
     "latvian_2bbb6aab": {
         "message": "拉脫維亞語"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "未選擇任何項目"
     },
+    "normal_text_7b03da48": {
+        "message": "一般文字"
+    },
     "norwegian_53f391ec": {
         "message": "挪威語"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "輪廓大小"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p }並非有效協議，必須使用 ftp、http、https、mailto、skype、tel 或忽略此項"
-    },
     "page_50c4823d": {
         "message": "頁面"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "部份（導數）"
     },
+    "pass_1c19a2b3": {
+        "message": "合格"
+    },
     "paste_5963d1c1": {
         "message": "貼上"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "百分比必須是數字"
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "百分比必須至少為 { percentage }%"
     },
     "performing_arts_icon_f3497486": {
         "message": "表演藝術圖示"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "π（變量）"
     },
+    "pick_a_color_557abfb0": {
+        "message": "選擇一種顏色"
+    },
     "pink_68ad45cb": {
         "message": "粉紅色"
     },
     "pixels_52ece7d1": {
         "message": "像素"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "像素必須至少為 { width } x { height }px"
     },
     "play_1a47eaa7": {
         "message": "播放"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "上一個 { findText }"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "之前選擇的顏色"
     },
     "prime_917ea60e": {
         "message": "質數"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "意第緒語"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "您正在調色盤上。若要在調色盤上向上、向左、向下或向右導覽，請分別使用 ''W’、''A’、''S’ 和 ''D’ 按鈕"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "您正在顏色滑鈕上。若要使用滑鈕向左或向右導覽，請分別使用 ''A’ 和 ''D’ 按鈕"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "您正在 α 滑鈕上。若要使用滑鈕向左或向右導覽，請分別使用 ''A’ 和 ''D’ 按鈕"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "您可以透過上傳新的字幕檔來取代。"

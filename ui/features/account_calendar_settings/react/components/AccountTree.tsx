@@ -23,7 +23,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {addAccountsToTree} from '../utils'
@@ -38,7 +38,7 @@ import type {
   FetchAccountDataResponse,
 } from '../types'
 
-const I18n = useI18nScope('account_calendar_settings_account_tree')
+const I18n = createI18nScope('account_calendar_settings_account_tree')
 
 type ComponentProps = {
   readonly originAccountId: number

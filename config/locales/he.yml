@@ -1977,6 +1977,7 @@ he:
   add_new_group_7ac49f31: "הוספת קבוצה חדשה"
   add_new_set_of_due_dates_e8e240f: "הוספת סט של תאריכי יעד חדשים"
   add_new_term_d2217c0d: "הוספת תקופת לימודים חדשה"
+  add_page_7ea7ee39: "הוספת דף"
   add_people_7948b7da: "הוספת אנשים"
   add_people_7ee4b2ec: "הוספת אנשים"
   add_people_to_coursename_5ea234e1: "הוספת אנשים אל: %{courseName}"
@@ -3808,6 +3809,7 @@ he:
     edit: 
       confirm_delete_calendar_event: "בטוח/ה שרוצהלבטל את אירוע היומן הזה?"
       errors: 
+        greater_or_equal: "יש לאפשר לפחות למשתמש אחד להשתתף"
         title_required: "יש לספק כותרת"
       event_deleted: "%{event_title}  בוטל בהצלחה"
       event_saved: "האירוע נשמר בהצלחה"
@@ -4127,7 +4129,7 @@ he:
         stream_name_required: "נדרש שם לרצף התנועה"
   canvas_3962b702: קנבס
   canvas_account_id_97b0471f: canvas_account_id
-  canvas_alert_change_assignment_name_course_name_2fc63d9c: "התראת קנבס - יש לשנות:%{assignment_name}, %{course_name}"
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "התראת קנבס - חל שינוי: %{assignment_name} בקורס %{course_name} "
   canvas_alert_invited_course_as_role_type_9ed79ce3: "התראת קנבס - הוזמנת: %{course} כ %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "התראת קנבס - הוזמנת: קורס כ %{role_type}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "התראת קנבס - הגשה באיחור: %{user_name}, %{assignment_name}"
@@ -4761,6 +4763,7 @@ he:
     unexpected_error: "אירעה שגיאה בלתי צפויה, ויש ליצור קשר עם צוות התמיכה."
     unknown: "לא מוכר"
     upload_timeout_error: "הזמן המוקצה לתהליך ההעלאה עבר."
+  content_migration_1f14de27: "הגירת תוכן"
   content_migration_queued_46c27790: "תהליך הגירת התוכן נכנס לתור העבודות לביצוע"
   content_migration_running_percent_complete_4b00c024: "תהליך הגירת התוכן רץ, %{percent}% הושלמו"
   content_migrations: 
@@ -7828,7 +7831,7 @@ he:
     confirm_delete_page: "לבטל את הדף הזה על כל תוכנו?"
     confirm_delete_section: "למחוק את ההקבצה הזו ואת כל דפיה?"
     default_description: "זוהי הגשתי %{assignment} עבור  %{course}."
-    eportfolio_settings: "הגדרות  ePortfolio"
+    eportfolio_settings: "הגדרות  ePortfolio "
     errors: 
       compiling: "אירעה שגיאה בעת עיבוד ה eportfolio שלך. יש לנסות שוב מאוחר יותר"
       missing_file: "אנה בחר קובץ"
@@ -7863,7 +7866,7 @@ he:
     click_through: "יש להקליק כדי לצפות בתוכן הדף"
     default_content: "טרם התווסף תוכן כלשהו"
     default_name: "שם דף"
-  eportfolio_settings_75ba1f9a: "הגדרות  ePortfolio"
+  eportfolio_settings_75ba1f9a: "הגדרות  ePortfolio "
   eportfolios: 
     _page_section: 
       section_types: 
@@ -8575,6 +8578,7 @@ he:
     titles: 
       bookmark_search: "סימון מאפייני החיפוש %{service_name} לגישה ישירה"
   find_8d605019: חיפוש
+  find_a_course_94301b4d: "מציאת קורס"
   find_an_existing_grading_scheme_d836ea: "מציאת סכימת הערכה קיימת"
   find_an_outcome_919328e6: "מציאת השגי למידה"
   find_appointment_85d6922e: "איתור פגישה"
@@ -8613,6 +8617,8 @@ he:
   folder_705fd2d7: תיקיה
   folder_browsing_tree_1f00a3ae: "עץ דפדוף בתיקיות"
   folder_icon_29017021: "צלמית תיקיה"
+  folder_name_b28488c2: "שם תיקיה"
+  folder_was_successfully_created_8de6a282: "תיקיה נוצרה בהצלחה"
   folders: 
     event_updated: "אירוע עודכן בהצלחה"
     file_zip_in_process: "תהליך כווץ הקובץ עדיין בתהליך..."
@@ -11033,6 +11039,7 @@ he:
   m2c_name: "Moodle Importer"
   main_navigation_3f080c80: "ניווט ראשי"
   main_text_color_7d65ab1b: "צבע טקסט עיקרי"
+  make_it_public_71bf2a86: "הפיכה לציבורי "
   make_new_settings_for_sis_integrations_visible_and_875039ca: "סימון ביצוע הגדרות חדשות לאינטגרציה עם המערכת הבית ספרית כנצפה ופעיל"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "נא לוודא שנבחרה האפשרות הנכונה ביותר כיון שהדבר יכול להשפיע על ציוני התלמידים."
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "הפיכת קורס זה זמין לציבור (נתוני תלמידים עדיין ישארו פרטיים)"
@@ -11284,7 +11291,7 @@ he:
         unknown_user: "משתמש לא מוכר"
       twitter: 
         tweet: "התראת קנבס - התווספת לדיון ע\"י %{user_name}."
-        unknown_user: "משתמש לא מוכר"
+        unknown_user: "משתמש לא מוכר "
     alert: 
       email: 
         body: 
@@ -11649,8 +11656,8 @@ he:
         no_due_date: "תאריך יעד: לא נקבע תאריך "
       twitter: 
         assignment_change: "התראת קנבס - תאריך השתנה: %{assignment_name} בקורס %{course_name}"
-        due_at: "תאריך יעד: %{assignment_due_date_time}"
-        no_due_date: "תאריך יעד: אין תאריך"
+        due_at: "תאריך יעד: %{assignment_due_date_time} "
+        no_due_date: "תאריך יעד: לא נקבע תאריך "
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "תאריךיעד משימה השתנה: %{assignment_name}, בקורס %{course_name} (%{override})"
@@ -11673,8 +11680,8 @@ he:
         no_due_date: "תאריך יעד: אין תאריך"
       twitter: 
         assignment_change: "התראת קנבס - תאריך השתנה:: %{assignment_name}, %{course_name} (%{override})"
-        due_at: "תאריך יעד: %{assignment_due_date_time}"
-        no_due_date: "תאריך יעד: אין תאריך"
+        due_at: "תאריך יעד: %{assignment_due_date_time} "
+        no_due_date: "תאריך יעד: לא נקבע תאריך "
     assignment_graded: 
       email: 
         assignment_graded: "משימה הוערכה: %{assignment_name}, בקורס %{course_name}"
@@ -11927,7 +11934,7 @@ he:
         subject: "%{user_name}, שלחת הודעה בקנבס. "
         unknown_user: "משתמש לא מוכר "
       twitter: 
-        tweet: "התראת קנבס - הודעה מ %{user_name}."
+        tweet: "התראת קנבס - הודעה מ %{user_name}. "
     conversation_message: 
       email: 
         attached_files: "קבצים מצורפים:"
@@ -12680,7 +12687,7 @@ he:
         body: "%{author} זה עתה שלח/ה הודעה חדשה לגבי ההגשה של %{user} עבור %{assignment}"
         subject: "שליחת הערה: %{user}, %{assignment}, %{context} "
       twitter: 
-        tweet: "התראת קנבס - הערה: %{author} של %{assignment}, %{user}, %{context}."
+        tweet: "התראת קנבס - הערה: %{author} של %{assignment}, %{user}, %{context}. "
     submission_comment_for_teacher: 
       email: 
         body: "%{author} זה עתה שלח/ה הודעה חדשה לגבי ההגשה של %{user} עבור %{assignment}"
@@ -12741,7 +12748,7 @@ he:
         no_date_set: "לא נקבע תאריך "
         not_applicable: "N/A "
         score: "ניקוד: %{score} מתוך %{total}"
-        score_pending: "(ממתין לביקורת)"
+        score_pending: "(ממתין לביקורת) "
         tweet: "התראת קנבס - הערכה השתנתה: %{date}"
     submission_graded: 
       email: 
@@ -12780,9 +12787,9 @@ he:
         score_pending_review: "הציון ממתין לעיון המורה "
         subject: "משימה הוערכה: %{assignment}, %{context} "
       twitter: 
-        no_date_set: "תאריך לא נקבע "
+        no_date_set: "לא נקבע תאריך "
         not_applicable: "N/A "
-        score: "ניקוד: %{score} מתוך %{total} "
+        score: "ניקוד: %{score} מתוך %{total}"
         score_pending_review: "(ממתין לביקורת) "
         tweet: "התראת קנבס - בוצעה הערכה: %{assignment}, %{context}"
     submission_needs_grading: 
@@ -13221,6 +13228,7 @@ he:
     sure_you_want_to_mute: "בטוח/ה שרוצה להשתיק משימה זו? כאשר היא אינה פעילה, תלמידים לא יקבלו התראות ולא יוכלו לעיין בה"
   mute_unmute_assignment_62608e44: "השתקת/הפעלת מטלה"
   muted_283cfa0f: (מושתק/ת)
+  muted_3ff94739: מושתק/ת
   my_dashboard_8983c283: "לוח המחוונים שלי "
   my_dashboard_b724020: "לוח המחוונים שלי"
   my_files_2f621040: "הקבצים שלי"
@@ -14061,7 +14069,7 @@ he:
         date: תאריך
         participated: השתתף/ה
         time: "זמן "
-        url: "כתובת דף"
+        url: "כתובת דף אינטרנט"
         user_agent: "מאפייני סביבת המיחשוב של המשתמש"
   page_views_eb64cf53: "צפיות דף"
   page_views_only_312b7577: "צפיות דף בלבד"
@@ -14107,6 +14115,7 @@ he:
   parent_of_a_canvas_user_afba1624: "ההורה של משתמש קנבס?"
   parent_signup_b7c6bf0a: "הזדהות הורה"
   parents_sign_up_here_f0aa8f4f: "הרשמת הורים כאן"
+  participated_6279fba: השתתף/ה
   participation_af2598: השתתפות
   participations_1823832d: השתתפויות
   pass_2a8c4f07: עבר
@@ -14686,6 +14695,7 @@ he:
   points_possible_e57d5613: "ניקוד אפשרי"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "נקודות אפשריות חייבות להיות 0 או יותר עבור סוג ההערכה הנבחר"
   points_possible_points_fda3b111: "%{points_possible} נקודות"
+  points_possible_pts_aedb481e: "%{points_possible} נקודות אפשריות"
   points_pts_e5596bf7: "%{points} נקודות"
   points_total_pts_5b4cbd77: "%{points} / %{total} נקודות"
   pointspossible_points_possible_964c8592: "%{pointsPossible} נקודות אפשריות"
@@ -17363,8 +17373,10 @@ he:
   section_id_6f73f3d5: "מזהה הקבצה"
   section_id_8ec4f46f: "מזהה פרק"
   section_id_b5aad4a7: "מזהה הקבצה"
+  section_name_16ea8a4a: "שם הקבצה"
   section_name_b6d82574: "שם הקבצה"
   section_name_edb51b2: "שם הקבצה"
+  section_name_is_too_long_9cec2a30: "שם הקבצה ארוך מדי"
   section_section_names_98f172e6: "הקבצה: %{section_names}"
   section_sis_2a80d2fa: "הקבצה במערכת הבית ספרית SIS"
   section_sis_94511bcd: "הקבצה במערכת הבית ספרית SIS"
@@ -19858,6 +19870,7 @@ he:
   unpublished_courses_title: "קורסים שלא פורסמו"
   unpublished_dfd8801: "לא פורסם"
   unread_e9c1b19c: "לא נקראו"
+  unrecognized_browser_1fd80dfb: "דפדפן לא מזוהה"
   unregister_service_985238e9: "ביטול רישום שרות"
   unreserved_e86b7425: "לא שמור"
   unstar_b84daaef: "הסרת כוכבית"

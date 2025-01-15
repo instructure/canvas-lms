@@ -22,7 +22,7 @@ import {COURSE_NOTIFICATIONS_QUERY} from '../../graphql/Queries'
 import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from '../../graphql/Mutations'
 import {createCache} from '@canvas/apollo-v3'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import React from 'react'
 

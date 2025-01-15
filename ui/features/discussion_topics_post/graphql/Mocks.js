@@ -87,7 +87,9 @@ export const getDiscussionQueryMock = ({
           }
           if (sort === 'asc') {
             return Discussion.mock({
-              sortOrder: 'asc',
+              participant: {
+                sortOrder: 'asc',
+              },
               discussionEntriesConnection: {
                 nodes: [
                   DiscussionEntry.mock({

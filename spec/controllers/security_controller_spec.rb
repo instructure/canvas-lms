@@ -109,6 +109,7 @@ RSpec.describe SecurityController, type: :request do
       notice_types = SecurityController.notice_types_supported
 
       get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
       expect(response).to have_http_status :ok
       parsed_body = response.parsed_body
       expect(parsed_body["issuer"]).to eq "https://canvas.instructure.com"
@@ -122,6 +123,21 @@ RSpec.describe SecurityController, type: :request do
       expect(lti_platform_configuration["https://canvas.instructure.com/lti/account_name"]).to eq "Default Account"
       expect(lti_platform_configuration["messages_supported"]).to eq messages
       expect(lti_platform_configuration["notice_types_supported"]).to eq notice_types
+    end
+
+    it "contains the scopes based on available public scopes for that account (possibly feature-flag-gated)" do
+      sample_scope_urls_for_root_account =
+        TokenScopes::LTI_SCOPES.keys - [TokenScopes::LTI_ASSET_REPORT_SCOPE]
+
+      expect(TokenScopes).to receive(:public_lti_scopes_urls_for_account) do |acct|
+        expect(acct.id).to eq(Account.default.id)
+        sample_scope_urls_for_root_account
+      end
+
+      get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
+
+      expected_scopes = ["openid"] | sample_scope_urls_for_root_account
+      expect(response.parsed_body["scopes_supported"]).to match_array(expected_scopes)
     end
 
     context "when the platform_notification_service feature flag is off" do

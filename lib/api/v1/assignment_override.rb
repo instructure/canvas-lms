@@ -179,8 +179,8 @@ module Api::V1::AssignmentOverride
             s.global_id.to_s,
             ("sis_login_id:#{s.pseudonym.unique_id}" if s.pseudonym),
             ("hex:sis_login_id:#{s.pseudonym.unique_id.to_s.unpack("H*")}" if s.pseudonym),
-            ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),
-            ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack("H*")}" if s.pseudonym && s.pseudonym.sis_user_id)
+            ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym&.sis_user_id),
+            ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack("H*")}" if s.pseudonym&.sis_user_id)
           ]
         end.flatten.compact
         bad_ids = student_ids.map(&:to_s) - found_ids

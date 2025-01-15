@@ -20,10 +20,10 @@ import React from 'react'
 import {arrayOf, shape, string, bool, func} from 'prop-types'
 import {formatGradingPeriodTitleForDisplay} from '../../Gradebook.utils'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
-const I18n = useI18nScope(
+const I18n = createI18nScope(
   'gradebook_default_gradebook_components_content_filters_grading_period_filter'
 )
 

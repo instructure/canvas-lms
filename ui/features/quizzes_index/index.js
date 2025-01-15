@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {map} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -28,7 +28,7 @@ import QuizOverrideLoader from './backbone/models/QuizOverrideLoader'
 import vddTooltip from '@canvas/due-dates/jquery/vddTooltip'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('quizzes_index')
+const I18n = createI18nScope('quizzes_index')
 
 const QuizzesIndexRouter = Backbone.Router.extend({
   routes: {

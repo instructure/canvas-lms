@@ -17,12 +17,12 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
 import type {Assignment, StudentMap} from '../../../../api.d'
 
-const I18n = useI18nScope('gradebooksharedSetDefaultGradeDialogManager')
+const I18n = createI18nScope('gradebooksharedSetDefaultGradeDialogManager')
 
 class SetDefaultGradeDialogManager {
   assignment: Assignment

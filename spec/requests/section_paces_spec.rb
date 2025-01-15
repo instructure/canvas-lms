@@ -34,6 +34,8 @@ describe "Section Paces API" do
     2.times { multiple_student_enrollment(user_model, section_two, course:) }
     course.enroll_student(@user = user_factory, enrollment_state: "active")
     user_session(teacher)
+
+    stub_const("SELECTED_SKIP_DAYS", %w[fri sat])
   end
 
   def assert_grant_check
@@ -142,19 +144,68 @@ describe "Section Paces API" do
   describe "update" do
     let!(:pace) { section_pace_model(section:) }
 
-    it "updates the pace" do
-      expect do
+    context "when add_selected_days_to_skip_param is enabled" do
+      before do
+        @course.root_account.enable_feature!(:course_paces_skip_selected_days)
+      end
+
+      it "updates the pace" do
+        expect do
+          patch api_v1_patch_section_pace_path(course, section), params: {
+            format: :json,
+            pace: {
+              selected_days_to_skip: SELECTED_SKIP_DAYS
+            }
+          }
+        end.to change { pace.reload.selected_days_to_skip }
+          .to(SELECTED_SKIP_DAYS)
+          .and change { Progress.count }.by(1)
+        expect(Progress.last.queued?).to be_truthy
+        expect(response).to have_http_status :ok
+      end
+
+      it "handles invalid update parameters" do
+        allow_any_instance_of(CoursePace).to receive(:update).and_return(false)
         patch api_v1_patch_section_pace_path(course, section), params: {
           format: :json,
           pace: {
-            exclude_weekends: false
+            selected_days_to_skip: "foobar"
           }
         }
-      end.to change { pace.reload.exclude_weekends }
-        .to(false)
-        .and change { Progress.count }.by(1)
-      expect(Progress.last.queued?).to be_truthy
-      expect(response).to have_http_status :ok
+        expect(response).to have_http_status :unprocessable_entity
+      end
+    end
+
+    context "when add_selected_days_to_skip_param is disabled" do
+      before do
+        @course.root_account.disable_feature!(:course_paces_skip_selected_days)
+      end
+
+      it "updates the pace" do
+        expect do
+          patch api_v1_patch_section_pace_path(course, section), params: {
+            format: :json,
+            pace: {
+              exclude_weekends: false
+            }
+          }
+        end.to change { pace.reload.exclude_weekends }
+          .to(false)
+          .and change { Progress.count }.by(1)
+        expect(Progress.last.queued?).to be_truthy
+        expect(response).to have_http_status :ok
+      end
+
+      it "handles invalid update parameters" do
+        allow_any_instance_of(CoursePace).to receive(:update).and_return(false)
+        patch api_v1_patch_section_pace_path(course, section), params: {
+          format: :json,
+          pace: {
+            exclude_weekends: "foobar"
+          }
+        }
+        expect(response).to have_http_status :unprocessable_entity
+      end
     end
 
     it "returns a 401 if the user lacks permission" do
@@ -250,7 +301,7 @@ describe "Section Paces API" do
         patch api_v1_patch_section_pace_path(course, section), params: {
           format: :json,
           pace: {
-            exclude_weekends: false
+            exclude_weekends: true
           }
         }
         expect(response).to have_http_status :not_found

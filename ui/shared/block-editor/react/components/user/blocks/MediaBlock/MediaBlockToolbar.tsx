@@ -21,10 +21,10 @@ import {useNode, type Node} from '@craftjs/core'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {AddMediaButton} from './AddMediaButton'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import BlockEditorVideoOptionsTray from './BlockEditorVideoOptionsTray'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const MediaBlockToolbar = () => {
   const {

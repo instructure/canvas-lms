@@ -45,6 +45,11 @@ module CC
             course_pace_node.end_date CCHelper.ims_date(course_pace.end_date) if course_pace.end_date
             course_pace_node.published_at CCHelper.ims_datetime(course_pace.published_at) if course_pace.published_at
             course_pace_node.exclude_weekends course_pace.exclude_weekends
+            course_pace_node.selected_days_to_skip do |selected_days_to_skip_node|
+              course_pace.selected_days_to_skip.each do |day_of_week|
+                selected_days_to_skip_node.day_of_week day_of_week
+              end
+            end
             course_pace_node.hard_end_dates course_pace.hard_end_dates
             add_exported_asset(course_pace)
             course_pace_node.module_items do |module_items_node|

@@ -17,14 +17,14 @@
  */
 
 import {each, filter} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'
 import AssignmentCorrectionRow from './AssignmentCorrectionRow'
 import type PostGradesStore from './PostGradesStore'
 import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
-const I18n = useI18nScope('modules')
+const I18n = createI18nScope('modules')
 
 type Props = {
   store: ReturnType<typeof PostGradesStore>

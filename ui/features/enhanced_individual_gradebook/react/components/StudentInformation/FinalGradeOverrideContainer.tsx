@@ -18,14 +18,14 @@
 
 import {View} from '@instructure/ui-view'
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {DeprecatedGradingScheme, FinalGradeOverride} from '@canvas/grading/grading.d'
 import {updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import {ApiCallStatus} from '../../../types'
 import {FinalGradeOverrideTextBox} from '@canvas/final-grade-override'
 import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 type Props = {
   finalGradeOverride?: FinalGradeOverride
   gradingScheme?: DeprecatedGradingScheme | null

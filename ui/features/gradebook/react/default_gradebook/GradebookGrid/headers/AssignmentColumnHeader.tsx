@@ -23,7 +23,7 @@ import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-grid'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {Menu} from '@instructure/ui-menu'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import AsyncComponents from '../../AsyncComponents'
 import ColumnHeader from './ColumnHeader'
@@ -37,7 +37,7 @@ import useStore from '../../stores'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
 
-const I18n = useI18nScope('gradebook')
+const I18n = createI18nScope('gradebook')
 
 // @ts-expect-error
 function labelForPostGradesAction(postGradesAction) {
@@ -293,6 +293,9 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     })
   }
 
+  rubricAssessmentImportExportDisplayed = () =>
+    this.props.assignment.hasRubric && !this.props.assignment.anonymizeStudents && this.props.rubricAssessmentImportsExportsEnabled
+
   renderAssignmentLink() {
     const assignment = this.props.assignment
 
@@ -478,12 +481,13 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           </MenuItem>
         )}
 
-        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
+        {this.rubricAssessmentImportExportDisplayed() && (
           <MenuItem onSelect={() => this.selectBulkRubricExport()}>
             {I18n.t('Bulk Download Rubrics')}
           </MenuItem>
         )}
-        {this.props.assignment.hasRubric && this.props.rubricAssessmentImportsExportsEnabled && (
+
+        {this.rubricAssessmentImportExportDisplayed() && (
           <MenuItem
             onSelect={() => {
               const {toggleRubricAssessmentImportTray} = useStore.getState()

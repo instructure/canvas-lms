@@ -17,10 +17,10 @@
  */
 
 import React, {type SyntheticEvent, useState} from 'react'
-import {Select} from '@instructure/ui-select'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('content_copy_redesign')
+const I18n = createI18nScope('content_copy_redesign')
 
 type Option = {id: string; name: string}
 
@@ -38,72 +38,32 @@ export const ConfiguredSelectInput = ({
   disabled?: boolean
 }) => {
   const [inputValue, setInputValue] = useState<string>(defaultInputValue)
-  const [isShowingOptions, setIsShowingOptions] = useState<boolean>(false)
-  const [highlightedOptionId, setHighlightedOptionId] = useState<string | null>(null)
-  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null)
 
-  const getOptionById = (queryId: string) => {
-    return options.find(({id}) => id === queryId)
-  }
-
-  const getOptionLabelById = (queryId: string | null) => {
-    return queryId ? getOptionById(queryId)?.name || '' : ''
-  }
-
-  const handleShowOptions = () => {
-    setIsShowingOptions(true)
-  }
-
-  const handleBlur = () => {
-    setHighlightedOptionId(null)
-  }
-
-  const handleHighlightOption = (event: SyntheticEvent, {id}: {id?: string}) => {
+  const handleSelectOption = (
+    _: SyntheticEvent,
+    {id, value}: {id?: string; value?: string | number}
+  ) => {
     const convertedId = id === undefined ? null : id
-    event.persist()
-    setHighlightedOptionId(convertedId)
-    setInputValue(event.type === 'keydown' ? getOptionLabelById(convertedId) : inputValue)
-  }
-
-  const handleHideOptions = () => {
-    setIsShowingOptions(false)
-    setHighlightedOptionId(null)
-    setSelectedOptionId(getOptionLabelById(selectedOptionId))
-  }
-
-  const handleSelectOption = (_: SyntheticEvent, {id}: {id?: string}) => {
-    const convertedId = id === undefined ? null : id
-    setSelectedOptionId(convertedId)
-    setInputValue(getOptionLabelById(convertedId))
-    setIsShowingOptions(false)
+    setInputValue(value as string)
     onSelect(convertedId)
   }
 
   return (
-    <Select
+    <SimpleSelect
       renderLabel={label}
       assistiveText={I18n.t('Use arrow keys to navigate options.')}
-      inputValue={inputValue}
-      isShowingOptions={isShowingOptions}
-      onBlur={handleBlur}
-      onRequestShowOptions={handleShowOptions}
-      onRequestHideOptions={handleHideOptions}
-      onRequestHighlightOption={handleHighlightOption}
-      onRequestSelectOption={handleSelectOption}
-      disabled={disabled}
+      value={inputValue}
+      defaultValue={inputValue}
+      onChange={handleSelectOption}
+      interaction={disabled ? 'disabled' : 'enabled'}
     >
       {options.map(option => {
         return (
-          <Select.Option
-            id={option.id}
-            key={option.id}
-            isHighlighted={option.id === highlightedOptionId}
-            isSelected={option.id === selectedOptionId}
-          >
+          <SimpleSelect.Option key={option.id} id={option.id} value={option.name}>
             {option.name}
-          </Select.Option>
+          </SimpleSelect.Option>
         )
       })}
-    </Select>
+    </SimpleSelect>
   )
 }

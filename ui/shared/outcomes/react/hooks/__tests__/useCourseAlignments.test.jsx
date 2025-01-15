@@ -21,24 +21,34 @@ import useCourseAlignments from '../useCourseAlignments'
 import {createCache} from '@canvas/apollo-v3'
 import {renderHook, act} from '@testing-library/react-hooks'
 import {courseAlignmentMocks} from '../../../mocks/Management'
-import {MockedProvider} from '@apollo/react-testing'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import {MockedProvider} from '@apollo/client/testing'
 import OutcomesContext from '../../contexts/OutcomesContext'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-jest.mock('@canvas/alerts/react/FlashAlert')
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
+
+const flushAllTimersAndPromises = async () => {
+  while (jest.getTimerCount() > 0) {
+    // eslint-disable-next-line no-await-in-loop
+    await act(async () => {
+      jest.runAllTimers()
+    })
+  }
+}
 
 const outcomeTitles = result =>
   (result?.current?.rootGroup?.outcomes?.edges || []).map(edge => edge.node.title)
 
 describe('useCourseAlignments', () => {
-  let cache, mocks, searchMocks, showFlashAlertSpy
+  let cache, mocks, searchMocks
 
   beforeEach(() => {
     jest.useFakeTimers()
     cache = createCache()
     mocks = courseAlignmentMocks()
     searchMocks = [...courseAlignmentMocks(), ...courseAlignmentMocks({searchQuery: 'TEST'})]
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
   afterEach(() => {
@@ -71,14 +81,14 @@ describe('useCourseAlignments', () => {
     expect(result.current.loading).toBe(true)
     expect(result.current.rootGroup).toBe(null)
 
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.loading).toBe(false)
     expect(result.current.rootGroup._id).toBe('1')
     expect(outcomeTitles(result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
     expect(result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(true)
 
     act(() => result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(result)).toEqual([
       'Outcome 1 with alignments',
       'Outcome 2',
@@ -95,14 +105,14 @@ describe('useCourseAlignments', () => {
     })
 
     hook.result.current.onFilterChangeHandler('WITH_ALIGNMENTS')
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(hook.result.current.loading).toBe(false)
     expect(hook.result.current.rootGroup._id).toBe('1')
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments'])
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(true)
 
     act(() => hook.result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
       'Outcome 3 with alignments',
@@ -117,14 +127,14 @@ describe('useCourseAlignments', () => {
     })
 
     hook.result.current.onFilterChangeHandler('NO_ALIGNMENTS')
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(hook.result.current.loading).toBe(false)
     expect(hook.result.current.rootGroup._id).toBe('1')
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 2'])
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(true)
 
     act(() => hook.result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(hook.result)).toEqual(['Outcome 2', 'Outcome 4'])
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(false)
   })
@@ -137,7 +147,7 @@ describe('useCourseAlignments', () => {
       })
 
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'An error occurred while loading outcome alignments.',
         type: 'error',
       })
@@ -151,7 +161,7 @@ describe('useCourseAlignments', () => {
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Showing Search Results Below',
         type: 'info',
         srOnly: true,
@@ -163,10 +173,10 @@ describe('useCourseAlignments', () => {
       const hook = renderHook(() => useCourseAlignments(), {wrapper})
 
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
-      await act(async () => jest.runAllTimers())
+      await flushAllTimersAndPromises()
       act(() => hook.result.current.loadMore())
-      await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      await flushAllTimersAndPromises()
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'More Search Results Have Been Loaded',
         type: 'info',
         srOnly: true,
@@ -180,7 +190,7 @@ describe('useCourseAlignments', () => {
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
       await act(async () => jest.runAllTimers())
-      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+      expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'No Search Results Found',
         type: 'info',
         srOnly: true,
@@ -219,7 +229,7 @@ describe('useCourseAlignments', () => {
     const hook = renderHook(() => useCourseAlignments(), {wrapper})
 
     hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
       'Outcome 2 with alignments',
@@ -227,7 +237,7 @@ describe('useCourseAlignments', () => {
 
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(true)
     act(() => hook.result.current.loadMore())
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
       'Outcome 2 with alignments',

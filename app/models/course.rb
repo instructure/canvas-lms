@@ -164,6 +164,8 @@ class Course < ActiveRecord::Base
   has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :group_categories, -> { collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :all_group_categories, -> { collaborative }, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :combined_group_and_differentiation_tag_categories, class_name: "GroupCategory", as: :context, inverse_of: :context
+  has_many :active_combined_group_and_differentiation_tag_categories, -> { active }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :groups, -> { collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :active_groups, -> { active.collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :differentiation_tag_categories, -> { non_collaborative.where(deleted_at: nil) }, class_name: "GroupCategory", as: :context, inverse_of: :context
@@ -641,7 +643,9 @@ class Course < ActiveRecord::Base
   end
 
   def valid_course_image_url?(image_url)
-    URI.parse(image_url) rescue false
+    URI.parse(image_url)
+  rescue URI::InvalidURIError
+    false
   end
 
   def validate_default_view
@@ -1025,6 +1029,7 @@ class Course < ActiveRecord::Base
   scope :unpublished, -> { where(workflow_state: %w[created claimed]) }
 
   scope :deleted, -> { where(workflow_state: "deleted") }
+  scope :archived, -> { deleted.where.not(archived_at: nil) }
 
   scope :master_courses, -> { joins(:master_course_templates).where.not(MasterCourses::MasterTemplate.table_name => { workflow_state: "deleted" }) }
   scope :not_master_courses, -> { joins("LEFT OUTER JOIN #{MasterCourses::MasterTemplate.quoted_table_name} AS mct ON mct.course_id=courses.id AND mct.workflow_state<>'deleted'").where("mct IS NULL") } # rubocop:disable Rails/WhereEquals mct is a table, not a column
@@ -1285,7 +1290,7 @@ class Course < ActiveRecord::Base
       res = []
       split = self.name.split(/\s/)
       res << split[0]
-      res << split[1..].find { |txt| txt.match(/\d/) } rescue nil
+      res << split[1..].find { |txt| txt.match?(/\d/) }
       self.course_code = res.compact.join(" ")
     end
     @group_weighting_scheme_changed = group_weighting_scheme_changed?
@@ -1329,7 +1334,7 @@ class Course < ActiveRecord::Base
             Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "completed", completed_at: Time.now.utc)
 
             EnrollmentState.transaction do
-              locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
+              locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock("FOR NO KEY UPDATE").order(:enrollment_id).pluck(:enrollment_id)
               EnrollmentState.where(enrollment_id: locked_ids)
                              .update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "completed", true, false, Time.now.utc])
             end
@@ -1339,16 +1344,14 @@ class Course < ActiveRecord::Base
           appointment_participants.active.current.update_all(workflow_state: "deleted")
           appointment_groups.each(&:clear_cached_available_slots!)
         elsif deleted?
-          enroll_scope = Enrollment.where("course_id=? AND workflow_state<>'deleted'", self)
-
-          user_ids = enroll_scope.group(:user_id).pluck(:user_id).uniq
+          user_ids = enrollments.group(:user_id).pluck(:user_id).uniq
           if user_ids.any?
-            enrollment_info = enroll_scope.select(:id, :workflow_state).to_a
+            enrollment_info = enrollments.select(:id, :workflow_state).to_a
             if enrollment_info.any?
               data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: enrollment_info, updated_state: "deleted")
-              Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted")
+              Enrollment.where(id: enrollment_info.map(&:id)).update_all(workflow_state: "deleted", archived_at:)
               EnrollmentState.transaction do
-                locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock(:no_key_update).order(:enrollment_id).pluck(:enrollment_id)
+                locked_ids = EnrollmentState.where(enrollment_id: enrollment_info.map(&:id)).lock("FOR NO KEY UPDATE").order(:enrollment_id).pluck(:enrollment_id)
                 EnrollmentState.where(enrollment_id: locked_ids)
                                .update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
               end
@@ -1559,7 +1562,7 @@ class Course < ActiveRecord::Base
   end
 
   def do_complete
-    self.conclude_at ||= Time.now
+    self.conclude_at ||= Time.zone.now
   end
 
   def do_unconclude
@@ -1631,7 +1634,20 @@ class Course < ActiveRecord::Base
     save!
   end
 
-  def self.destroy_batch(courses, sis_batch: nil, batch_mode: false)
+  def archived?
+    deleted? && archived_at.present?
+  end
+
+  def archive!
+    return false if template?
+
+    self.workflow_state = "deleted"
+    self.deleted_at = self.archived_at = Time.now.utc
+    save!
+  end
+
+  def self.destroy_batch(courses, sis_batch: nil, batch_mode: false, archive: false)
+    archived_at = Time.now.utc if archive
     enroll_scope = Enrollment.active.where(course_id: courses)
     enroll_scope.find_in_batches do |e_batch|
       user_ids = e_batch.map(&:user_id).uniq.sort
@@ -1640,7 +1656,7 @@ class Course < ActiveRecord::Base
                                                        updated_state: "deleted",
                                                        batch_mode_delete: batch_mode)
       SisBatchRollBackData.bulk_insert_roll_back_data(data) if data
-      Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
+      Enrollment.where(id: e_batch.map(&:id)).update_all(workflow_state: "deleted", updated_at: Time.zone.now, archived_at:)
       EnrollmentState.where(enrollment_id: e_batch.map(&:id))
                      .update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", "deleted", true, Time.now.utc])
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
@@ -1648,7 +1664,7 @@ class Course < ActiveRecord::Base
     end
     c_data = SisBatchRollBackData.build_dependent_data(sis_batch:, contexts: courses, updated_state: "deleted", batch_mode_delete: batch_mode)
     SisBatchRollBackData.bulk_insert_roll_back_data(c_data) if c_data
-    Course.where(id: courses).update_all(workflow_state: "deleted", updated_at: Time.zone.now)
+    Course.where(id: courses).update_all(workflow_state: "deleted", updated_at: Time.zone.now, archived_at:)
     courses.count
   end
 
@@ -1672,7 +1688,7 @@ class Course < ActiveRecord::Base
     end.index_by(&:context_id)
     courses.each do |course|
       unless groups[course.id]
-        course.require_assignment_group rescue nil
+        course.require_assignment_group
       end
     end
   end
@@ -1727,7 +1743,7 @@ class Course < ActiveRecord::Base
 
   def storage_quota
     super ||
-      (account.default_storage_quota rescue nil) ||
+      account.default_storage_quota ||
       Setting.get("course_default_quota", 500.decimal_megabytes.to_s).to_i
   end
 
@@ -1889,14 +1905,6 @@ class Course < ActiveRecord::Base
     can :read, :read_grades, :read_outcomes, :read_as_member
 
     # Admin
-    #################### Begin legacy permission block #########################
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        grants_right?(user, :lti_add_edit)
-    end
-    can :create_tool_manually
-    ##################### End legacy permission block ##########################
-
     given { |user| account_membership_allows(user) }
     can :read_as_admin and can :view_unpublished_items
 
@@ -1964,7 +1972,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.filter_map { |c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }
+    ids = codes.filter_map { |c| c.match(/\Acourse_(\d+)\z/)&.[](1) }
     Course.where(id: ids).preload(:current_enrollments).to_a
   end
 
@@ -1991,7 +1999,7 @@ class Course < ActiveRecord::Base
   #
   # Returns boolean
   def soft_concluded?(enrollment_type = nil)
-    now = Time.now
+    now = Time.zone.now
     return end_at < now if end_at && restrict_enrollments_to_course_dates
 
     if enrollment_type
@@ -2003,7 +2011,7 @@ class Course < ActiveRecord::Base
   end
 
   def soft_conclude!
-    self.conclude_at = Time.now
+    self.conclude_at = Time.zone.now
     self.restrict_enrollments_to_course_dates = true
   end
 
@@ -2013,7 +2021,7 @@ class Course < ActiveRecord::Base
 
   def set_concluded_assignments_grading_standard
     ActiveRecord::Base.transaction do
-      assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.now)
+      assignments.where(grading_type: ["letter_grade", "gpa_scale"], grading_standard_id: nil).in_batches(of: 10_000).update_all(grading_standard_id: 0, updated_at: Time.zone.now)
     end
   end
 
@@ -3138,7 +3146,7 @@ class Course < ActiveRecord::Base
       return canvas_k6_tab_configuration.map(&:with_indifferent_access)
     end
 
-    super.compact.map(&:with_indifferent_access) rescue []
+    super&.compact&.map(&:with_indifferent_access) || []
   end
 
   TAB_HOME = 0
@@ -3558,12 +3566,10 @@ class Course < ActiveRecord::Base
     self["allow_wiki_comments"]
   end
 
-  def account_name
-    account.name rescue nil
-  end
+  delegate :name, to: :account, prefix: true
 
   def term_name
-    self.enrollment_term.name rescue nil
+    enrollment_term.name
   end
 
   def equella_settings

@@ -22,7 +22,7 @@ require "parser/current"
 module RuboCop
   module Cop
     module Migration
-      class PrimaryKey < Cop
+      class PrimaryKey < Base
         MSG = "Please always include a primary key"
 
         def on_send(node)

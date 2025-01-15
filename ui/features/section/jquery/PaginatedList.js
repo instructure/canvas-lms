@@ -32,12 +32,12 @@
 // passed to the constructor should be the <div>.
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Spinner from 'spin.js'
 import htmlEscape from '@instructure/html-escape'
 import parseLinkHeader from '@canvas/parse-link-header'
 
-const I18n = useI18nScope('paginated_list')
+const I18n = createI18nScope('paginated_list')
 
 export default class PaginatedList {
   // #

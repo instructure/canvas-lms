@@ -54,9 +54,9 @@ class NotificationFailureProcessor
   def process
     return nil unless self.class.enabled?
 
-    start_time = Time.now
+    start_time = Time.zone.now
     notification_failure_queue.before_request do |_stats|
-      throw :stop_polling if Time.now - start_time > config[:iteration_high_water]
+      throw :stop_polling if Time.zone.now - start_time > config[:iteration_high_water]
     end
 
     notification_failure_queue.poll(config.slice(*POLL_PARAMS)) do |failure_summary_json|

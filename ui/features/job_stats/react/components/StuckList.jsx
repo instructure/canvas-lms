@@ -19,13 +19,13 @@
 import React, {useState} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('jobs_v2')
+const I18n = createI18nScope('jobs_v2')
 
 export default function StuckList({shard, type}) {
   const [list, setList] = useState()

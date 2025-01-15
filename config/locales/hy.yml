@@ -146,6 +146,7 @@ hy:
     upload: Բեռնել
     uploading: "Բեռնում է..."
   _5a374287: "..."
+  _at_the_bottom__4360f2b4: "-- Ներքևում--"
   _section_not_synced_yet_cd07d0dd: "Բաժինը դեռևս չի սինխրոնացվել"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Հաշվարկվող մեծությունը չի օգտագործվում հաշվարկման սույն մեթոդում"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} անվանմամբ ֆայլը արդեն գոյություն ունի սույն թղթապանակում:"
@@ -1665,6 +1666,7 @@ hy:
     add_topic_to: "%{module}-ին ավելացնել քննարկման թեմաներ"
   add_new_group_7ac49f31: "Ավելացնել նոր խումբ"
   add_new_set_of_due_dates_e8e240f: "Ավելացնել կատարման ժամկետների նոր խմբեր"
+  add_page_7ea7ee39: "Ավելացնել էջ"
   add_people_7ee4b2ec: "Ավելացնել մարդկանց"
   add_prerequisite_6409bd9: "Ավելացնել նախնական պայման"
   add_quiz_cebfa28b: "Ավելացնել Թեստ"
@@ -3149,6 +3151,7 @@ hy:
     edit: 
       confirm_delete_calendar_event: "Դուք իսկապե՞ս ցանկանում եք ջնջել օրացուցային այս միջոցառումը:"
       errors: 
+        greater_or_equal: "Դուք պետք է թույլատրեք առնվազն մեկ օգտատիրոջ մասնակցությունը:"
         title_required: "Պետք է մուտքագրել վերնագիրը"
       event_deleted: "%{event_title} հաջողությամբ ջնջվել է"
       event_saved: "Միջոցառումը հաջողությամբ պահպանվել է"
@@ -3428,7 +3431,7 @@ hy:
         need_integer: "Վերարտադրելու ցանկի քեշի համար մուտքագրեք ամբողջ թիվ "
         stream_name_required: "Պահանջվում է նշել kinesis հոսքի անվանումը"
   canvas_3962b702: Canvas
-  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas համակարգի նախազգուշացում - Փոփոխություն: %{assignment_name}, %{course_name}"
+  canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas համակարգի նախազգուշացում. փոփոխություն՝ %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas համակարգի նախազգուշացում - Հրավիրված եք %{course} դասընթացին որպես %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas համակարգի նախազգուշացում - Հրավիրված եք դասընթացին որպես %{role_type}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas համակարգի նախազգուշացում. ուշացրած ուղարկում՝ %{user_name}, %{assignment_name}"
@@ -3503,6 +3506,7 @@ hy:
   click_here_to_review_the_submission_ae017c01: "Սեղմեք այստեղ ուղարկված նյութը դիտելու համար"
   click_here_to_see_the_file_79e2b366: "Սեղմեք այստեղ ֆայլը տեսնելու համար:"
   click_here_to_view_the_submission_24777a69: "Սեղմեք այստեղ ուղարկվածը դիտելու համար"
+  click_to_edit_drag_to_reorder_ab725681: "Սեղմել այստեղ՝ խմբագրելու համար: Վերադասավորելու համար քաշել աղեղի օգնությամբ "
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "Սեղմեք մեկնաբանությունները մուտքագրելու համար, եթե ունկնդիրը ընտրում է այս պատասխանը"
   click_to_modify_89fa26aa: "Սեղմել փոփոխելու համար"
   click_to_report_profile_picture_370f9625: "Սեղմել զեկուցելու պրոֆիլի նկարի մասին"
@@ -3901,6 +3905,7 @@ hy:
     unexpected_error: "Անսպասելի սխալ է տեղի ունեցել, կապվեք օժանդակող ծառայության հետ:"
     unknown: "Անհայտ է"
     upload_timeout_error: "Ֆայլի ներբեռնման գործընթացի ժամանակը սպառվել է:"
+  content_migration_1f14de27: "Բովանդակության տեղափոխում"
   content_migration_queued_46c27790: "Բովանդակության տեղափոխման հերթագրում"
   content_migration_running_percent_complete_4b00c024: "Բովանդակության տեղափոխում, %{percent}% ավարտված է"
   content_migrations: 
@@ -6538,13 +6543,13 @@ hy:
   enter_your_question_text_students_will_see_the_que_f19af9e9: "Մուտքագրեք Ձեր հարցը: Ուսանողները կտեսնեն հարցը եւ դրան կից դաշտում կլրացնեն իրենց պատասխանը:"
   eportfolio: 
     buttons: 
-      done_editing: "Խմբագրումը ավարտվել է"
+      done_editing: "Խմբագրումը կատարված  է"
       manage_sections: "Բաժինների կառավարում"
     confirm_delete_message: "Դուք իսկապե՞ս ցանկանում եք ջնջել այս հաղորդագրությունը:"
     confirm_delete_page: "Ջնջե՞լ այս էջը և նրա ամբողջ բովանդակությունը:"
     confirm_delete_section: "Ջնջե՞լ այս բաժինը և նրա ամբողջ էջերը:"
     default_description: "Սա %{course}-ի իմ %{assignment}-ի ներկայացումն է:"
-    eportfolio_settings: "Էլ. պորտֆոլիոյի կարգաբերումներ"
+    eportfolio_settings: "Էլ. պորտֆոլիոյի կարգաբերումները"
     errors: 
       compiling: "Ձեր Էլ. պորտֆոլիոն կազմելիս սխալ է տեղի ունեցել: Խնդրում ենք ավելի ուշ կրկին փորձեք:"
       missing_file: "Ընտրեք ֆայլը"
@@ -6579,7 +6584,7 @@ hy:
     click_through: "Սեղմեք էջի բովանդակությունը դիտելու համար"
     default_content: "Դեռևս ոչ մի բովանդակություն չի ավելացվել"
     default_name: "Էջի անվանում"
-  eportfolio_settings_75ba1f9a: "Էլ. պորտֆոլիոյի կարգաբերումներ"
+  eportfolio_settings_75ba1f9a: "Էլ. պորտֆոլիոյի կարգաբերումները"
   eportfolios: 
     _page_section: 
       section_types: 
@@ -6604,7 +6609,7 @@ hy:
       zipping: "Ֆայլի արխիվացումը ընթացքի մեջ է..."
     page_list: 
       buttons: 
-        done_editing: "Խմբագրումը ավարտվել է"
+        done_editing: "Խմբագրումը կատարված  է"
       default_page_name: "Էջի անվանում"
       edit_instructions: "Սեղմել էջի անվանման վրա՝ այն փոխելու, կամ սեղմել և քաշել վերադասավորելու համար:"
       headers: 
@@ -7196,6 +7201,7 @@ hy:
       searching: "Որոնումը ընթացքում է..."
     titles: 
       bookmark_search: "Էջանիշի որոնում՝ %{service_name}"
+  find_a_course_94301b4d: "Գտնել դասընթաց"
   find_an_existing_grading_scheme_d836ea: "Գտնել առկա գնահատման համակարգը"
   find_flickr_image_view: 
     find_cc_on_flickr: "Գտնել Creative Commons պատկերներ Flickr-ում"
@@ -7222,6 +7228,8 @@ hy:
       invalid_root_folder_name: "Արմատային թղթապանակի անունը հնարավոր չէ փոխել"
     folder_created: " \"%{name}\" թղթապանակը ստեղծված է"
   folder_705fd2d7: Թղթապանակ
+  folder_name_b28488c2: "Թղթապանակի անվանում"
+  folder_was_successfully_created_8de6a282: "Թղթապանակը հաջողությամբ ստեղծված է:"
   folders: 
     event_updated: "Միջոցառումը հաջողությամբ թարմացվել է"
     file_zip_in_process: "Ֆայլի արխիվացումը ընթացքի մեջ է..."
@@ -9098,6 +9106,7 @@ hy:
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: "Moodle ներմուծող"
   main_navigation_3f080c80: "Հիմնական նավարկում"
+  make_it_public_71bf2a86: "Դարձնել հանրությանը հասանելի"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Համոզվեք, որ ընտրել եք ամենահարմար տարբերակը, քանի որ դա ԿԱՐՈՂ Է ազդել ունկնդիրների գնահատականների վրա:"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Դարձրեք այս դասընթացը հանրության համար տեսանելի (ունկնդիրների տվյալները կմնան գաղտնի):"
   malformed_csv_aaa4b7f2: "Սխալ ձևավորված CSV ֆայլ"
@@ -9680,8 +9689,8 @@ hy:
         no_due_date: "Կատարման ժամկետ չկա"
       twitter: 
         assignment_change: "Canvas համակարգի նախազգուշացում.%{assignment_name}, %{course_name} կատարման ամսաթիվը փոխվել է:"
-        due_at: "կատարման ամսաթիվ՝ %{assignment_due_date_time}"
-        no_due_date: "Կատարման ժամկետ չկա"
+        due_at: "վերջնաժամկետ՝ %{assignment_due_date_time}"
+        no_due_date: "վերջնաժամկետ՝ վերջնաժամկետ չկա"
     assignment_due_date_override_changed: 
       email: 
         assignment_due_date_changed: "Հանձնարարության կատարման ամսաթիվը փոխվել է՝  %{assignment_name}, %{course_name} (%{override})"
@@ -9704,8 +9713,8 @@ hy:
         no_due_date: "Մինչև՝ կատարման ժամկետ չկա"
       twitter: 
         assignment_change: "Canvas համակարգի նախազգուշացում. %{course_name} (%{override})-ի   %{assignment_name} կատարման ժամկետի փոփոխություն "
-        due_at: "կատարման ամսաթիվ՝ %{assignment_due_date_time}"
-        no_due_date: "Կատարման ժամկետ չկա"
+        due_at: "վերջնաժամկետ՝ %{assignment_due_date_time}"
+        no_due_date: "վերջնաժամկետ՝ վերջնաժամկետ չկա"
     assignment_graded: 
       email: 
         assignment_graded: "Հանձնարարությունը գնահատված է՝ %{assignment_name}, %{course_name}"
@@ -10752,7 +10761,7 @@ hy:
         someone: "Ինչ-որ մեկը"
         subject: "Ուղարկված աշխատանքների մեկնաբանություն՝ %{user}, %{assignment}, %{context}"
       twitter: 
-        tweet: "Canvas համակարգի նախազգուշացում. մեկնաբանություն՝ %{author}, %{assignment}, %{user}, %{context}."
+        tweet: "Canvas համակարգի նախազգուշացում. մեկնաբանություն՝ %{author} for %{assignment}, %{user}, %{context}"
     submission_comment_for_teacher: 
       email: 
         body: "%{author}-ը նոր մեկնաբանություն է կատարել %{user}-ի կողմից ուղարկված %{assignment}-ի վերաբերյալ:"
@@ -10812,7 +10821,7 @@ hy:
         subject: "Գնահատականը փոխվել է՝ %{title}, %{context}"
       twitter: 
         no_date_set: "Ժամկետ սահմանված չէ"
-        not_applicable: "Չի կիրառվում"
+        not_applicable: Չկա
         score: "գնահատականը՝ %{total} -ից %{score} "
         score_pending: "(ենթակա է ստուգման)"
         tweet: "Canvas ծանուցում. գնահատականի փոփոխություն՝ %{date}"
@@ -11257,6 +11266,7 @@ hy:
     submission_comments: "Ուղարկված աշխատանքների մեկնաբանություններ"
     sure_you_want_to_mute: "Դուք իսկապե՞ս ցանկանում եք միացնել հանձնարարության \"համր\" ֆունկցիան: Քանի դեռ հանձնարարության \"համր\" ֆունկցիան միացված է, ունկնդիրները չեն կարող ստանալ նոր ծանուցումներ կամ չեն կարող տեսնել՝"
   muted_283cfa0f: "(\"համր\" ֆունկցիան միացված է)"
+  muted_3ff94739: "\"Համր\" ֆունկցիան միացված է"
   my_dashboard_8983c283: "Իմ տեղեկատվական վահանակը"
   my_dashboard_b724020: "Իմ տեղեկատվական վահանակը"
   my_files_2f621040: "Իմ ֆայլերը"
@@ -11918,6 +11928,7 @@ hy:
   page_comments: 
     errors: 
       create_failed: "Մեկնաբանության ստեղծումը չհաջողվեց"
+  page_name_21defa75: "Էջի անվանում"
   page_not_found_2b0d05f5: "Էջը չի գտնվել"
   page_title_d1a22bbf: "Էջի անվանում"
   page_views: 
@@ -11928,8 +11939,8 @@ hy:
       headers: 
         date: Ամսաթիվ
         participated: "Մասնակցել է"
-        time: Ժամ
-        url: "URL հասցե"
+        time: Ժամը
+        url: URL
         user_agent: "Օգտատիրոջ ներկայացուցիչ"
   page_views_eb64cf53: "Էջերի դիտումներ"
   pages: 
@@ -11968,6 +11979,7 @@ hy:
     loading_more_results: "Բեռնում է լրացուցիչ արդյունքներ"
   parent_signup_b7c6bf0a: "Ծնողների գրանցում"
   parents_sign_up_here_f0aa8f4f: "Ծնողներն այստեղ են գրանցվում"
+  participated_6279fba: "Մասնակցել է"
   participations_1823832d: Մասնակցություններ
   pass_fail_3d9461b0: Հանձնած/չհանձնած
   password_8a271b1c: Գաղտնաբառ
@@ -12064,6 +12076,7 @@ hy:
   please_enter_your_label_name_and_password_5c56be80: "Մուտքագրեք ձեր  %{label_name} և գաղտնաբառը՝"
   please_let_them_know_which_page_you_were_viewing_a_6039f59a: "Տեղեկացրեք նրանց, որ էջն եք դիտում և որ հղումով անցաք այդտեղ:"
   please_let_them_know_which_page_you_were_viewing_a_c9816406: "Թույլ տվեք նրանց տեսնել Ձեր կողմից տվյալ պահին դիտվող էջը եւ ձեր սեղմած հղումը"
+  please_upload_files_as_a_zip_5a2c799f: "Ներբեռնել ֆայլերը որպես zip ֆայլեր:"
   please_wait_e6355980: "Խնդրում ենք սպասել..."
   plugins: 
     academic_benchmark_importer: 
@@ -12407,7 +12420,7 @@ hy:
       description: "Twitter ծանուցումներ"
     twitter_settings: 
       labels: 
-        consumer_key: "Սպառողի բանալի"
+        consumer_key: "Օգտատիրոջ բանալի"
         consumer_secret: "Սպառողի գաղտնի բանալի"
     webct_scraper_settings: 
       description: "Եթե կազմակերպությունը չի օգտագործում WebCT-ի \"Ուսուցման մոդուլները\" (ներառյալ դպրոցները, որոնք ընդունել են WebCT՝ նախքան 4.0 տարբերակը, երբ մոդուլները հասանելի դարձան), դասընթացի տեղափոխությունները կարող են բարելավվել,  \"Ուսուցման մոդուլների\" փոխարեն որպես Canvas-ի մոդուլներ ներմուծելով \"Դասընթացի բովանդակությունը\": Այս էջը հնարավորություն է տալիս կարգաբերել WebCT-ի տեղափոխության գործիքի լռությամբ ընդունվող ռեժիմը  համաձայն բովանդակության մոդուլների: Անհրաժեշտ է հիշել, որ այն դեպքում, երբ դասընթացների առանձին տեղափոխությունները պահպանում են ընտրելու հնարավորությունը, զանգվածային տեղափոխության գործիքը միշտ օգտագործում է այստեղ կարգաբերված մեծությունը և չի կարող փոխվել առանձին տեղափոխության դեպքում:"
@@ -12447,6 +12460,7 @@ hy:
   points_points_b6b422e2: "Միավոր.  %{points}"
   points_possible_e57d5613: "Հնարավոր միավորներ"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "Գնահատման այս ընտրված տեսակի համար հնարավոր միավորները պետք է լինեն 0-ից ոչ պակաս"
+  points_possible_pts_aedb481e: "%{points_possible} միավոր"
   pointspossible_pts_624a6733: "%{pointsPossible} հնարավոր միավորներ"
   polling: 
     poll_sessions: 
@@ -14955,8 +14969,10 @@ hy:
   section_ends_at_bb9df3c0: "Բաժինն ավարտվում է "
   section_filter_cde54d0a: "Բաժնի ֆիլտր"
   section_id_8ec4f46f: "Բաժնի նույնականացուցիչը"
+  section_name_16ea8a4a: "Բաժնի անվանում"
   section_name_b6d82574: "Բաժնի անվանում"
   section_name_edb51b2: "բաժնի անվանում"
+  section_name_is_too_long_9cec2a30: "Բաժնի անվանումը չափազանց երկար է"
   section_sis_id_6f989834: "sis բաժնի id"
   section_starts_at_65eaed1: "Բաժինը սկսվում է "
   sections: 
@@ -17016,6 +17032,7 @@ hy:
   unpublished_courses_title: "Չհրապարակված դասընթացներ"
   unpublished_dfd8801: չհրապարակված
   unread_e9c1b19c: Չընթերցված
+  unrecognized_browser_1fd80dfb: "Չճանաչված բրաուզեր"
   unstar_b84daaef: "Հանել աստղիկը"
   unstarted_932f2990: "Չի սկսվել"
   unsubscribe_8be438ff: "Հանել բաժանորդագրությունը"

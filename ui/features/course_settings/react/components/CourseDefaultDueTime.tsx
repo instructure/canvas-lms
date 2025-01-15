@@ -20,9 +20,9 @@ import React, {useState} from 'react'
 import {TimeSelect} from '@instructure/ui-time-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('course_default_due_time')
+const I18n = createI18nScope('course_default_due_time')
 
 export default function CourseDefaultDueTime() {
   const FORM_IDS = {

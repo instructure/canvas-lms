@@ -25,11 +25,11 @@ import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useQuery} from '@canvas/query'
 import useDebouncedSearchTerm from '@canvas/search-item-selector/react/hooks/useDebouncedSearchTerm'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {type ResponseSection, fetchSections} from './api'
 
-const I18n = useScope('roster_section_input')
+const I18n = createI18nScope('roster_section_input')
 
 type SectionInputProps = {
   onSelect: (section: ResponseSection) => void

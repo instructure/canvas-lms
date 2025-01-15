@@ -19,13 +19,13 @@
 // TODO: consolidate this into DiscussionEntry
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {isArray, pick, some} from 'lodash'
 import Backbone from '@canvas/backbone'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 const stripTags = function (str) {
   const div = document.createElement('div')

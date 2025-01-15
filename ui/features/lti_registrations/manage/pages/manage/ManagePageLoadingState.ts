@@ -25,7 +25,7 @@ import type {
   DeleteRegistration,
   unbindGlobalLtiRegistration,
 } from '../../api/registrations'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {
   genericError,
   formatApiResultError,
@@ -35,7 +35,7 @@ import type {AccountId} from '../../model/AccountId'
 
 export const MANAGE_APPS_PAGE_LIMIT = 15
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const refreshRegistrations = () => {
   window.dispatchEvent(new Event(REFRESH_LTI_REGISTRATIONS_EVENT_TYPE))

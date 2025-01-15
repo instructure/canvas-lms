@@ -101,6 +101,94 @@ describe GroupPermissionHelper do
     end
   end
 
+  describe "#check_group_context_rights" do
+    before do
+      # Stub out `determine_rights_for_type` to ensure it returns known sets of permissions
+      # We rely on `determine_rights_for_type` tests to verify its correctness independently.
+      allow(self).to receive(:determine_rights_for_type).and_call_original
+    end
+
+    it "passes the correct rights for collaborative group add action and returns true if user has them" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_groups_add).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :add, non_collaborative: false)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for collaborative group add action and returns false if user doesn't have them" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_groups_add).and_return(false)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :add, non_collaborative: false)
+      expect(result).to be(false)
+    end
+
+    it "passes the correct rights for non_collaborative group add action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_tags_add).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :add, non_collaborative: true)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for collaborative group manage action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_groups_manage).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :manage, non_collaborative: false)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for non_collaborative group manage action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_tags_manage).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :manage, non_collaborative: true)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for collaborative group delete action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_groups_delete).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :delete, non_collaborative: false)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for non_collaborative group delete action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, :manage_tags_delete).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :delete, non_collaborative: true)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for collaborative group view action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :view, non_collaborative: false)
+      expect(result).to be(true)
+    end
+
+    it "passes the correct rights for non_collaborative group view action" do
+      expect(context).to receive(:grants_any_right?).with(teacher, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS).and_return(true)
+      result = check_group_context_rights(context:, current_user: teacher, action_category: :view, non_collaborative: true)
+      expect(result).to be(true)
+    end
+
+    context "when user does not have the required permissions" do
+      it "returns false for a collaborative action" do
+        expect(context).to receive(:grants_any_right?).with(teacher, :manage_groups_manage).and_return(false)
+        result = check_group_context_rights(context:, current_user: teacher, action_category: :manage, non_collaborative: false)
+        expect(result).to be(false)
+      end
+
+      it "returns false for a non_collaborative action" do
+        expect(context).to receive(:grants_any_right?).with(teacher, :manage_tags_add).and_return(false)
+        result = check_group_context_rights(context:, current_user: teacher, action_category: :add, non_collaborative: true)
+        expect(result).to be(false)
+      end
+    end
+
+    context "when non_collaborative is nil" do
+      it "treats non_collaborative as false" do
+        expect(context).to receive(:grants_any_right?).with(teacher, :manage_groups_add).and_return(true)
+        result = check_group_context_rights(context:, current_user: teacher, action_category: :add, non_collaborative: nil)
+        expect(result).to be(true)
+      end
+    end
+
+    it "raises an error when given an unsupported action_category" do
+      expect { check_group_context_rights(context:, current_user: teacher, action_category: :invalid, non_collaborative: false) }.to raise_error(ArgumentError)
+    end
+  end
+
   describe "#determine_rights_for_type" do
     it "returns collaborative group rights when non_collaborative is false" do
       expect(determine_rights_for_type(:add, false)).to eq([:manage_groups_add])

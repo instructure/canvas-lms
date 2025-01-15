@@ -252,7 +252,7 @@ class GradingStandard < ActiveRecord::Base
 
   def update_usage_count
     self.usage_count = assignments.active.count
-    self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
+    self.context_code = context_type && "#{context_type.underscore}_#{context_id}"
   end
 
   def prevent_deletion_of_used_schemes
@@ -284,8 +284,8 @@ class GradingStandard < ActiveRecord::Base
 
   def display_name
     res = ""
-    res += user.name + ", " rescue ""
-    res += context.name rescue ""
+    res += user.name + ", " if user
+    res += context.name
     res = t("unknown_grading_details", "Unknown Details") if res.empty?
     res
   end

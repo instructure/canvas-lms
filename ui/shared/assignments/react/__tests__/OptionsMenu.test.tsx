@@ -24,7 +24,7 @@ import {
   mockDeleteAssignmentFailure,
 } from './test-utils'
 import OptionsMenu from '../OptionsMenu'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 const setUp = (

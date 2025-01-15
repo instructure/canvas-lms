@@ -498,25 +498,6 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ]
       },
-      # lagacy role override
-      lti_add_edit: {
-        label: -> { I18n.t("LTI add and edit") },
-        label_v2: -> { I18n.t("LTI - add / edit / delete") },
-        available_to: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-          AccountMembership
-        ],
-        true_for: %w[
-          TeacherEnrollment
-          TaEnrollment
-          DesignerEnrollment
-          AccountAdmin
-        ],
-        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
-      },
       manage_lti_add: {
         label: -> { I18n.t("Add LTI") },
         label_v2: -> { I18n.t("LTI - add") },
@@ -534,8 +515,7 @@ Rails.application.config.to_prepare do
           TaEnrollment
           DesignerEnrollment
           AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
+        ]
       },
       manage_lti_edit: {
         label: -> { I18n.t("Edit LTI") },
@@ -554,8 +534,7 @@ Rails.application.config.to_prepare do
           TaEnrollment
           DesignerEnrollment
           AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
+        ]
       },
       manage_lti_delete: {
         label: -> { I18n.t("Delete LTI") },
@@ -574,8 +553,7 @@ Rails.application.config.to_prepare do
           TaEnrollment
           DesignerEnrollment
           AccountAdmin
-        ],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_lti) }
+        ]
       },
       allow_course_admin_actions: {
         label: -> { I18n.t("Allow administrative actions in courses") },

@@ -1020,7 +1020,7 @@ describe ContentMigration do
           .and_return(true)
       end
 
-      let(:importer) { instance_double("QuizzesNext::Importers::CourseContentImporter") }
+      let(:importer) { instance_double(QuizzesNext::Importers::CourseContentImporter) }
 
       it "should call QuizzesNext::Importers" do
         expect(Importers).not_to receive(:content_importer_for)
@@ -2191,7 +2191,7 @@ describe ContentMigration do
       @copy_from.wiki_pages.create! title: "wp1", body: "<iframe data-media-type=\"audio\" data-media-id=\"#{@att1.media_entry_id}\" src=\"/media_attachments_iframe/#{@att1.id}?type=audio\"></iframe>"
       @copy_from.wiki_pages.create! title: "wp2", body: "<iframe data-media-type=\"video\" data-media-id=\"#{@att2.media_entry_id}\" src=\"/media_attachments_iframe/#{@att2.id}?type=video\"></iframe>"
       @kaltura = double("CanvasKaltura::ClientV3")
-      @kaltura_media_handler = instance_double("KalturaMediaFileHandler")
+      @kaltura_media_handler = instance_double(KalturaMediaFileHandler)
       expect(@kaltura_media_handler).to receive(:add_media_files) do |_attachments, _wait_for_completion|
         att3 = @copy_to.attachments.where(migration_id: mig_id(@att1)).first.id
         att4 = @copy_to.attachments.where(migration_id: mig_id(@att2)).first.id
@@ -2254,7 +2254,7 @@ describe ContentMigration do
     end
 
     before do
-      @kaltura_media_handler = instance_double("KalturaMediaFileHandler")
+      @kaltura_media_handler = instance_double(KalturaMediaFileHandler)
       expect(@kaltura_media_handler).to receive(:add_media_files) do |attachments, _wait_for_completion|
         MediaObject.build_media_objects({
                                           entries: [

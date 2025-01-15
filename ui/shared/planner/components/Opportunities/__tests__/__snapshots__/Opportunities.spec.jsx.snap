@@ -93,6 +93,7 @@ exports[`renders nothing if no opportunities 1`] = `
           </AccessibleContent>
         }
         textAlign="start"
+        unmountOnExit={true}
         variant="default"
       >
         <div>
@@ -114,6 +115,7 @@ exports[`renders nothing if no opportunities 1`] = `
           </AccessibleContent>
         }
         textAlign="start"
+        unmountOnExit={true}
         variant="default"
       >
         <div>
@@ -218,6 +220,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
           </AccessibleContent>
         }
         textAlign="start"
+        unmountOnExit={true}
         variant="default"
       >
         <ol
@@ -255,6 +258,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
           </AccessibleContent>
         }
         textAlign="start"
+        unmountOnExit={true}
         variant="default"
       >
         <ol
@@ -375,6 +379,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           </AccessibleContent>
         }
         textAlign="start"
+        unmountOnExit={true}
         variant="default"
       >
         <ol
@@ -427,6 +432,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           </AccessibleContent>
         }
         textAlign="start"
+        unmountOnExit={true}
         variant="default"
       >
         <ol

@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import AssignmentModules from '../../Editables/AssignmentModules'
-import CanvasValidatedMockedProvider from '@canvas/validated-apollo-mocked-provider'
+import {MockedProvider} from '@apollo/client/testing'
 import {COURSE_MODULES_QUERY} from '../../../assignmentData'
 import {waitForNoElement} from '../../../test-utils'
 
@@ -113,7 +113,7 @@ const mocks = [
 describe('AssignmentModules', () => {
   it.skip('queries group list on edit', async () => {
     const {getByText} = render(
-      <CanvasValidatedMockedProvider mocks={mocks} addTypename={false}>
+      <MockedProvider mocks={mocks} addTypename={false}>
         <AssignmentModules
           courseId="55"
           mode="edit"
@@ -121,7 +121,7 @@ describe('AssignmentModules', () => {
           onChangeMode={() => {}}
           readOnly={false}
         />
-      </CanvasValidatedMockedProvider>
+      </MockedProvider>
     )
     // The modules are loded when Select removes its spinner
     await waitForNoElement(() => getByText('Loading...'))

@@ -23,10 +23,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconSearchLine} from '@instructure/ui-icons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('DiscussionToolbarView')
+const I18n = createI18nScope('DiscussionToolbarView')
 
 // #
 // requires a MaterializedDiscussionTopic model
@@ -66,7 +66,7 @@ export default class DiscussionToolbarView extends View {
 
   afterRender() {
     if (this.$el.find('#search_entries_container')[0]) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <TextInput
           onChange={e => {

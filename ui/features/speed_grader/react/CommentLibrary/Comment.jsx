@@ -25,11 +25,11 @@ import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CommentEditView from './CommentEditView'
 import shave from '@canvas/shave'
 
-const I18n = useI18nScope('CommentLibrary')
+const I18n = createI18nScope('CommentLibrary')
 
 const Comment = ({
   comment,
@@ -54,7 +54,7 @@ const Comment = ({
     // This uses window.confirm due to poor focus
     // behavior caused by using a Tray with a
     // Modal.
-    // eslint-disable-next-line no-alert
+     
     const confirmed = window.confirm(I18n.t('Are you sure you want to delete this comment?'))
     if (confirmed) {
       onDelete()

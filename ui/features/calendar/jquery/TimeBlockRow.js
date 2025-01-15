@@ -17,14 +17,14 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import timeBlockRowTemplate from '../jst/TimeBlockRow.handlebars'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import datePickerFormat from '@instructure/moment-utils/datePickerFormat'
 import '../fcMomentHandlebarsHelpers' // make sure fcMomentToString and fcMomentToDateString are available to TimeBlockRow.handlebars
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 export default class TimeBlockRow {
   constructor(TimeBlockList, data) {

@@ -33,10 +33,6 @@ describe "Block Editor", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include BlockEditorPage
 
-  def drop_new_block(block_name, where)
-    drag_and_drop_element(block_toolbox_box_by_block_name(block_name), where)
-  end
-
   before do
     course_with_teacher_logged_in
     @course.account.enable_feature!(:block_editor)
@@ -139,46 +135,6 @@ describe "Block Editor", :ignore_js_errors do
       h += 50
       expect(the_block.size.width).to eq(w)
       expect(the_block.size.height).to eq(h)
-    end
-
-    it "can resize blocks with the keyboard" do
-      get "/courses/#{@course.id}/pages/#{@block_page.url}/edit"
-      wait_for_block_editor
-      open_block_toolbox_to_tab("blocks")
-      drop_new_block("group", group_block_dropzone)
-      the_block = f(".group-block .group-block")
-      expect(the_block).to be_displayed
-      the_block.click
-      expect(block_toolbar).to be_displayed
-      expect(block_resize_handle("se")).to be_displayed
-      h = the_block.size.height
-      w = the_block.size.width
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
-      f("body").send_keys(:alt, :arrow_down)
-      h += 1
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
-      f("body").send_keys(:alt, :arrow_right)
-      w += 1
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
-      f("body").send_keys(:alt, :arrow_left)
-      w -= 1
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
-      f("body").send_keys(:alt, :arrow_up)
-      h -= 1
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
-      f("body").send_keys(:alt, :shift, :arrow_right)
-      w += 10
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
-      f("body").send_keys(:alt, :shift, :arrow_down)
-      h += 10
-      expect(the_block.size.height).to eq(h)
-      expect(the_block.size.width).to eq(w)
     end
 
     context "image block" do

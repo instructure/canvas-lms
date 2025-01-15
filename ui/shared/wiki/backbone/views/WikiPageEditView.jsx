@@ -24,7 +24,7 @@ import template from '../../jst/WikiPageEdit.handlebars'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView'
 import WikiPageDeleteDialog from './WikiPageDeleteDialog'
 import WikiPageReloadView from './WikiPageReloadView'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DueDateCalendarPicker from '@canvas/due-dates/react/DueDateCalendarPicker'
 import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
@@ -32,7 +32,7 @@ import renderWikiPageTitle from '../../react/renderWikiPageTitle'
 import {renderAssignToTray} from '../../react/renderAssignToTray'
 import {itemTypeToApiURL} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 
-const I18n = useI18nScope('pages')
+const I18n = createI18nScope('pages')
 
 RichContentEditor.preloadRemoteModule()
 
@@ -189,7 +189,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   renderStudentTodoAtDate() {
     const elt = this.$studentTodoAtContainer[0]
     if (elt) {
-      // eslint-disable-next-line react/no-render-return-value, no-restricted-properties
+      // eslint-disable-next-line react/no-render-return-value
       return ReactDOM.render(
         <DueDateCalendarPicker
           dateType="todo_date"
@@ -315,7 +315,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         RichContentEditor.destroyRCE(this.$wikiPageBody)
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
+       
       console.warn(e)
     } finally {
       this.$el.remove()
@@ -401,7 +401,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.checkUnsavedOnLeave = false
     if (this.reloadPending) {
       if (
-        // eslint-disable-next-line no-alert
+         
         !window.confirm(
           I18n.t(
             'warnings.overwrite_changes',
@@ -469,7 +469,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (event != null) {
       event.preventDefault()
     }
-    // eslint-disable-next-line no-alert
+     
     if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
       if (this.model.get('editor') !== 'block_editor') {

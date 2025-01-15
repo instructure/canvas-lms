@@ -29,17 +29,14 @@ class DeveloperKeysController < ApplicationController
     respond_to do |format|
       format.html do
         set_navigation
+
         js_env(
           accountEndpoint: api_v1_account_developer_keys_path(@context),
           enableTestClusterChecks: DeveloperKey.test_cluster_checks_enabled?,
-          validLtiScopes: (
-            if @domain_root_account.feature_enabled?(:platform_notification_service)
-              TokenScopes::LTI_SCOPES
-            else
-              TokenScopes::LTI_SCOPES.except(TokenScopes::LTI_PNS_SCOPE)
-            end
-          ),
-          validLtiPlacements: Lti::ResourcePlacement.public_placements(@domain_root_account)
+          validLtiScopes:
+            TokenScopes.public_lti_scopes_hash_for_account(@domain_root_account),
+          validLtiPlacements:
+            Lti::ResourcePlacement.public_placements(@domain_root_account)
         )
 
         render :index

@@ -23,12 +23,12 @@ import {Modal} from '@instructure/ui-modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {type GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import QuizSelect from './QuizSelect'
 import QuestionSelect from './QuestionSelect'
 import {type QuestionProps} from './types'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 declare const ENV: GlobalEnv
 
 type QuizModalProps = {

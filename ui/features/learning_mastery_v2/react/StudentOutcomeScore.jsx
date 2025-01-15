@@ -22,9 +22,9 @@ import {Flex} from '@instructure/ui-flex'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {svgUrl} from './icons'
 import {outcomeShape, outcomeRollupShape} from './shapes'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('learning_mastery_gradebook')
+const I18n = createI18nScope('learning_mastery_gradebook')
 
 const StudentOutcomeScore = ({outcome, rollup, visibleRatings}) => {
   let isVisible

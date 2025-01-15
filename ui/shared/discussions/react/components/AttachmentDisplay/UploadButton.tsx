@@ -22,9 +22,9 @@ import {CondensedButton} from '@instructure/ui-buttons'
 import {IconPaperclipLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_topics_post')
+const I18n = createI18nScope('discussion_topics_post')
 
 type Props = {
   onAttachmentUpload: (event: React.ChangeEvent<HTMLInputElement>) => void

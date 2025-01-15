@@ -147,8 +147,7 @@ module CC
           begin
             generate_quiz(quiz, false)
           rescue
-            title = quiz.title rescue I18n.t("unknown_quiz", "Unknown quiz")
-            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title:), $!)
+            add_error(I18n.t("course_exports.errors.quiz", "The quiz \"%{title}\" failed to export", title: quiz.title), $!)
           end
         end
 

@@ -220,10 +220,10 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def question_data=(data)
     data = if data.is_a?(String)
-             ActiveSupport::JSON.decode(data) rescue nil
+             JSON.parse(data)
            else
              # we may be modifying this data (translate_links), and only want to work on a copy
-             data.try(:dup)
+             data&.dup
            end
     super(data.to_hash.with_indifferent_access)
   end
@@ -370,7 +370,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
     question = Quizzes::QuizQuestion::QuestionData.generate(data)
 
-    question[:assessment_question_id] = assessment_question.id rescue nil
+    question[:assessment_question_id] = assessment_question&.id
     question
   end
 

@@ -45,6 +45,19 @@ course_paces:
     ci:
       state: allowed_on
 
+course_paces_skip_selected_days:
+  state: hidden
+  display_name: 'Course Pacing Skip Selected Days'
+  description: Course pacing removes support for exclude weekends field and add the 
+        ability to select specific days of the week.
+  applies_to: RootAccount
+  beta: true
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+
 create_course_subaccount_picker:
   state: hidden
   applies_to: RootAccount

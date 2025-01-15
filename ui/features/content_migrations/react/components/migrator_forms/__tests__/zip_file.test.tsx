@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import ZipFileImporter from '../zip_file'
 import fetchMock from 'fetch-mock'
@@ -146,15 +146,59 @@ describe('ZipFileImporter', () => {
     expect(onCancel).toHaveBeenCalled()
   })
 
-  it('renders folder select', async () => {
-    renderComponent()
+  describe('search folders', () => {
+    it('renders selected folder', async () => {
+      renderComponent()
 
-    await waitFor(() => {
-      expect(screen.getByText('Upload to')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(screen.getByText('Upload to')).toBeInTheDocument()
+      })
+      await userEvent.click(screen.getByText('course files'))
+      await waitFor(() => {
+        const {getByText} = within(screen.getByTestId('fileName'))
+        expect(getByText('course files')).toBeInTheDocument()
+      })
     })
-    await userEvent.click(screen.getByText('course files'))
-    await waitFor(() => {
-      expect(screen.getByText('course files')).toBeInTheDocument()
+
+    it('renders folder not selected message', async () => {
+      renderComponent()
+
+      await waitFor(() => {
+        expect(screen.getByText('Upload to')).toBeInTheDocument()
+      })
+
+      await waitFor(() => {
+        const {getByText} = within(screen.getByTestId('fileName'))
+        expect(getByText('No folder selected yet')).toBeInTheDocument()
+      })
+    })
+
+    it('clears selected folder', async () => {
+      renderComponent()
+
+      await waitFor(() => {
+        expect(screen.getByText('Upload to')).toBeInTheDocument()
+      })
+      await userEvent.click(screen.getByText('course files'))
+
+      await waitFor(() => {
+        const {getByText} = within(screen.getByTestId('fileName'))
+        expect(getByText('course files')).toBeInTheDocument()
+      })
+
+      await userEvent.click(screen.getByRole('button', {name: 'Remove folder'}))
+      await waitFor(() => {
+        const {getByText} = within(screen.getByTestId('fileName'))
+        expect(getByText('No folder selected yet')).toBeInTheDocument()
+      })
+    })
+
+    it('renders missing folder error', async () => {
+      renderComponent()
+
+      await userEvent.click(screen.getByRole('button', {name: 'Add to Import Queue'}))
+
+      expect(screen.getByText('Please select a folder')).toBeInTheDocument()
     })
   })
 

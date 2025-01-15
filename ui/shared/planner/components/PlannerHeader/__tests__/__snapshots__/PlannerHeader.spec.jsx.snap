@@ -163,6 +163,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     <Tray
       border={false}
       defaultFocusElement={null}
+      enableMask={false}
       insertAt="bottom"
       label="Add To Do"
       onDismiss={[Function]}
@@ -207,6 +208,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     <Tray
       border={false}
       defaultFocusElement={null}
+      enableMask={false}
       insertAt="bottom"
       label="My Grades"
       onDismiss={[Function]}
@@ -447,6 +449,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     <Tray
       border={false}
       defaultFocusElement={null}
+      enableMask={false}
       insertAt="bottom"
       label="Add To Do"
       onDismiss={[Function]}
@@ -491,6 +494,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     <Tray
       border={false}
       defaultFocusElement={null}
+      enableMask={false}
       insertAt="bottom"
       label="My Grades"
       onDismiss={[Function]}
@@ -731,6 +735,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     <Tray
       border={false}
       defaultFocusElement={null}
+      enableMask={false}
       insertAt="bottom"
       label="Add To Do"
       onDismiss={[Function]}
@@ -775,6 +780,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     <Tray
       border={false}
       defaultFocusElement={null}
+      enableMask={false}
       insertAt="bottom"
       label="My Grades"
       onDismiss={[Function]}

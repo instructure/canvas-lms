@@ -78,7 +78,9 @@ RSpec.describe Lti::Pns::NoticeBuilder, type: :model do
                                                                        id: "uuid",
                                                                        notice: "notice"
                                                                      },
-                                                                     user: nil
+                                                                     opts: nil,
+                                                                     user: nil,
+                                                                     expander: instance_of(Lti::VariableExpander)
                                                                    })
     end
   end

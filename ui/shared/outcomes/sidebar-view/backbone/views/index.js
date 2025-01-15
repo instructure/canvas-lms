@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {each, clone, indexOf, find, last} from 'lodash'
 import Backbone from '@canvas/backbone'
@@ -25,7 +25,7 @@ import OutcomeGroup from '../../../backbone/models/OutcomeGroup'
 import OutcomesDirectoryView from './OutcomesDirectoryView'
 import FindDirectoryView from './FindDirectoryView'
 
-const I18n = useI18nScope('outcomesSidebarView')
+const I18n = createI18nScope('outcomesSidebarView')
 
 let findDialog
 

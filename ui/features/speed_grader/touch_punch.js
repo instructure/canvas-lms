@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*!
  * jQuery UI Touch Punch 1.1.5 as modified by RWAP Software
  * based on original touchpunch v0.2.3 which has not been updated since 2014
@@ -21,7 +22,6 @@
     define(['jquery', 'jquery-ui'], factory)
   } else {
     // Browser globals
-    // eslint-disable-next-line no-undef
     factory(jQuery)
   }
 })(function ($) {
@@ -31,7 +31,6 @@
     'ontouchstart' in document ||
     'ontouchstart' in window ||
     window.TouchEvent ||
-    // eslint-disable-next-line no-undef
     (window.DocumentTouch && document instanceof DocumentTouch) ||
     navigator.maxTouchPoints > 0 ||
     navigator.msMaxTouchPoints > 0

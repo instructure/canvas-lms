@@ -19,10 +19,10 @@ import Backbone from '@canvas/backbone'
 
 import $ from 'jquery'
 import template from '../../jst/CourseSearchForm.handlebars'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('course_search')
+const I18n = createI18nScope('course_search')
 
 export default class CourseSearchFormView extends Backbone.View {
   static initClass() {

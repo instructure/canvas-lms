@@ -47,7 +47,7 @@ describe Quizzes::QuizExtensionSerializer do
     qs.extra_attempts = 2
     qs.extra_time = 20
     qs.manually_unlocked = true
-    qs.end_at = Time.now
+    qs.end_at = Time.zone.now
     Quizzes::QuizExtension.new(qs, {})
   end
 

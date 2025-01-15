@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {List} from '@instructure/ui-list'
 import {Link} from '@instructure/ui-link'
 import {useQuery} from '@canvas/query'
@@ -27,7 +27,7 @@ import HighContrastModeToggle from '../trays/HighContrastModeToggle'
 import {ActiveText} from './utils'
 import profileQuery from '../queries/profileQuery'
 
-const I18n = useI18nScope('CoursesTray')
+const I18n = createI18nScope('CoursesTray')
 
 export default function CoursesList() {
   const {data, isLoading, isSuccess} = useQuery({

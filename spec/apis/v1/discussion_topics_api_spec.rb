@@ -1795,8 +1795,7 @@ describe DiscussionTopicsController, type: :request do
         @user.time_zone = "Alaska"
         @user.save
 
-        user_tz = Time.use_zone(@user.time_zone) { Time.zone }
-        expected_time = user_tz.parse("Fri Aug 26, 2031 8:39AM")
+        expected_time = @user.time_zone.parse("Fri Aug 26, 2031 8:39AM")
 
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -1878,8 +1877,8 @@ describe DiscussionTopicsController, type: :request do
                    lock_at: 1.week.ago.as_json,
                    assignment: { unlock_at: 1.week.from_now.as_json, lock_at: 2.weeks.from_now.as_json } })
 
-        expect(@topic.reload.assignment.reload.unlock_at).to be > Time.now
-        expect(@topic.assignment.lock_at).to be > Time.now
+        expect(@topic.reload.assignment.reload.unlock_at).to be > Time.zone.now
+        expect(@topic.assignment.lock_at).to be > Time.zone.now
         expect(@topic).not_to be_locked
         expect(@topic.delayed_post_at).to be_nil
         expect(@topic.lock_at).to be_nil
@@ -2824,7 +2823,7 @@ describe DiscussionTopicsController, type: :request do
     it "paginates top-level entries" do
       # put in lots of entries
       entries = []
-      7.times { |i| entries << create_entry(@topic, message: i.to_s, created_at: Time.now + (i + 1).minutes) }
+      7.times { |i| entries << create_entry(@topic, message: i.to_s, created_at: Time.zone.now + (i + 1).minutes) }
 
       # first page
       json = api_call(
@@ -2869,7 +2868,7 @@ describe DiscussionTopicsController, type: :request do
     it "only includes the first 10 replies for each top-level entry" do
       # put in lots of replies
       replies = []
-      12.times { |i| replies << create_reply(@entry, message: i.to_s, created_at: Time.now + (i + 1).minutes) }
+      12.times { |i| replies << create_reply(@entry, message: i.to_s, created_at: Time.zone.now + (i + 1).minutes) }
 
       # get entry
       json = api_call(
@@ -2969,7 +2968,7 @@ describe DiscussionTopicsController, type: :request do
     it "paginates replies" do
       # put in lots of replies
       replies = []
-      7.times { |i| replies << create_reply(@entry, message: i.to_s, created_at: Time.now + (i + 1).minutes) }
+      7.times { |i| replies << create_reply(@entry, message: i.to_s, created_at: Time.zone.now + (i + 1).minutes) }
 
       # first page
       json = api_call(

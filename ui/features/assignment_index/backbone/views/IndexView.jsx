@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import {debounce} from 'lodash'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import keyboardNavTemplate from '@canvas/keyboard-nav-dialog/jst/KeyboardNavDialog.handlebars'
 import $ from 'jquery'
@@ -42,7 +42,7 @@ import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import IndexCreate from '../../react/IndexCreate'
 
-const I18n = useI18nScope('assignmentsIndexView')
+const I18n = createI18nScope('assignmentsIndexView')
 
 extend(IndexView, Backbone.View)
 
@@ -123,7 +123,7 @@ IndexView.prototype.afterRender = function () {
     const contextId = parseInt(contextInfo[1], 10)
     const requestBulkEditFn = (!ENV.COURSE_HOME && this.requestBulkEdit) || void 0
     if (this.$settingsMountPoint.length) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         React.createElement(IndexMenu, {
           store: this.indexMenuStore,
@@ -148,7 +148,7 @@ IndexView.prototype.afterRender = function () {
     }
   }
   if (this.$indexCreateMountPoint.length) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       React.createElement(IndexCreate, {
         newAssignmentUrl: ENV.URLS.new_assignment_url,
@@ -159,7 +159,7 @@ IndexView.prototype.afterRender = function () {
     )
   }
   if (this.bulkEditMode && this.$bulkEditRoot.length) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       React.createElement(BulkEditIndex, {
         courseId: ENV.COURSE_ID,
@@ -179,7 +179,7 @@ IndexView.prototype.afterRender = function () {
     )
     window.onkeydown = this.focusOnAssignments
   }
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <TextInput
       onChange={e => {

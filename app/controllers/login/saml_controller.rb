@@ -28,6 +28,8 @@ class Login::SamlController < ApplicationController
   before_action :fix_ms_office_redirects, only: :new
 
   def new
+    aac
+    increment_statsd(:attempts)
     redirect_to aac.generate_authn_request_redirect(host: request.host_with_port,
                                                     parent_registration: session[:parent_registration],
                                                     relay_state: Rails.env.development? && params[:RelayState])
@@ -50,6 +52,8 @@ class Login::SamlController < ApplicationController
                               .where(auth_type: "saml")
                               .where(idp_entity_id: issuer)
                               .first
+    tags = { idp_initiated: true } unless response.in_response_to
+    increment_statsd(:attempts, tags:)
     if aac.nil?
       logger.error "Attempted SAML login for #{issuer} on account without that IdP"
       flash[:delegated_message] = if @domain_root_account.auth_discovery_url
@@ -59,10 +63,11 @@ class Login::SamlController < ApplicationController
                                   else
                                     t("The institution you logged in from is not configured on this account.")
                                   end
+      increment_statsd(:failure, reason: :wrong_idp)
       return redirect_to login_url
     end
 
-    debugging = if aac.debugging? && response.is_a?(SAML2::Response)
+    debugging = if aac.debugging?
                   if response.in_response_to
                     aac.debug_get(:request_id) == response.in_response_to
                   else
@@ -111,6 +116,7 @@ class Login::SamlController < ApplicationController
       end
       logger.error "Failed to verify SAML signature: #{response.errors.join("\n")}"
       flash[:delegated_message] = login_error_message
+      increment_statsd(:failure, reason: :invalid)
       return redirect_to login_url
     end
 
@@ -169,9 +175,12 @@ class Login::SamlController < ApplicationController
           if uri.host
             # allow relay_state's to other (trusted) domains, by tacking on a session token
             target_account = Account.find_by_domain(uri.host)
-            if target_account &&
-               target_account != @domain_root_account &&
-               pseudonym.works_for_account?(target_account, true)
+            if uri.host == request.host_with_port
+              # full URLs on the same domain are okay
+              session[:return_to] = relay_state
+            elsif (target_account == @domain_root_account) ||
+                  (target_account && target_account != @domain_root_account &&
+                  pseudonym.works_for_account?(target_account, true))
               token = SessionToken.new(pseudonym.global_id,
                                        current_user_id: pseudonym.global_user_id).to_s
               uri.query&.concat("&")
@@ -188,13 +197,12 @@ class Login::SamlController < ApplicationController
       pseudonym.infer_auth_provider(aac)
       successful_login(user, pseudonym)
     else
-      unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-      message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
+      message = "Received SAML login request for unknown user: #{unique_id}"
       logger.warn message
       aac.debug_set(:canvas_login_fail_message, message) if debugging
-      flash[:delegated_message] = t("Canvas doesn't have an account for user: %{user}",
-                                    user: unique_id)
-      redirect_to unknown_user_url
+      redirect_to_unknown_user_url(t("Canvas doesn't have an account for user: %{user}",
+                                     user: unique_id))
+      increment_statsd(:failure, reason: :unknown_user)
     end
   end
 
@@ -222,14 +230,24 @@ class Login::SamlController < ApplicationController
     if request.post?
       message, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
       aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+      unless aac
+        increment_statsd(:attempts)
+        increment_statsd(:failure, reason: :wrong_sp)
+        return render status: :bad_request, plain: "Could not find SAML Entity"
+      end
 
       # only require signatures for LogoutRequests, and only if the provider has a certificate on file
       if message.is_a?(SAML2::LogoutRequest) && (certificates = aac.signing_certificates)
-        raise SAML2::UnsignedMessage unless message.signed?
+        unless message.signed?
+          increment_statsd(:attempts)
+          increment_statsd(:failure, reason: :unsigned_request)
+          raise SAML2::UnsignedMessage
+        end
 
         unless (signature_errors = message.validate_signature(cert: certificates)).empty?
           logger.debug("Failed to validate signature: #{signature_errors}")
+          increment_statsd(:attempts)
+          increment_statsd(:failure, reason: :invalid_signature)
           raise SAML2::InvalidSignature
         end
       end
@@ -237,7 +255,11 @@ class Login::SamlController < ApplicationController
       message, relay_state = SAML2::Bindings::HTTPRedirect.decode(request.url, public_key_used: log_key_used) do |m|
         message = m
         aac = @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-        return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+        unless aac
+          increment_statsd(:attempts)
+          increment_statsd(:failure, reason: :wrong_sp)
+          return render status: :bad_request, plain: "Could not find SAML Entity"
+        end
 
         # only require signatures for LogoutRequests, and only if the provider has a certificate on file
         next unless message.is_a?(SAML2::LogoutRequest)
@@ -252,11 +274,16 @@ class Login::SamlController < ApplicationController
       end
       # the above block may have been skipped in specs due to stubbing
       aac ||= @domain_root_account.authentication_providers.active.where(idp_entity_id: message.issuer.id).first
-      return render status: :bad_request, plain: "Could not find SAML Entity" unless aac
+      unless aac
+        increment_statsd(:attempts)
+        increment_statsd(:failure, reason: :wrong_sp)
+        return render status: :bad_request, plain: "Could not find SAML Entity"
+      end
     end
 
     case message
     when SAML2::LogoutResponse
+      increment_statsd(:attempts, action: :slo_response)
 
       if aac.debugging? && aac.debug_get(:logout_request_id) == message.in_response_to
         aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
@@ -269,6 +296,7 @@ class Login::SamlController < ApplicationController
       unless message.status.code == SAML2::Status::SUCCESS
         logger.error "Failed SAML LogoutResponse: #{message.status.code}: #{message.status.message}"
         flash[:delegated_message] = t("There was a failure logging out at your IdP")
+        increment_statsd(:failure, action: :slo_response)
         return redirect_to login_url
       end
 
@@ -308,7 +336,9 @@ class Login::SamlController < ApplicationController
       end
 
       redirect_to saml_login_url(id: aac.id)
+      increment_statsd(:success, action: :slo_response)
     when SAML2::LogoutRequest
+      increment_statsd(:attempts)
 
       if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
         aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
@@ -320,6 +350,7 @@ class Login::SamlController < ApplicationController
       end
       sso_idp = aac.idp_metadata.identity_providers.first
       if sso_idp.single_logout_services.empty?
+        increment_statsd(:failure, reason: :no_slo_service)
         return render status: :bad_request, plain: "IDP Metadata contains no destination to send a logout response"
       end
 
@@ -346,6 +377,7 @@ class Login::SamlController < ApplicationController
                                                          sig_alg: aac.sig_alg)
 
       redirect_to(forward_url)
+      increment_statsd(:success)
     else
       error = "Unexpected SAML message: #{message.class}"
       Canvas::Errors.capture_exception(:saml, error, :warn)
@@ -431,5 +463,9 @@ class Login::SamlController < ApplicationController
     notify_policy.dispatch!(user, pseudonym, cc)
 
     pseudonym
+  end
+
+  def auth_type
+    AuthenticationProvider::SAML.sti_name
   end
 end

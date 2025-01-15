@@ -48,7 +48,7 @@ describe "differentiated_assignments" do
   end
 
   def quiz_with_false_only_visible_to_overrides
-    make_quiz({ date: Time.now, ovto: false })
+    make_quiz({ date: Time.zone.now, ovto: false })
   end
 
   def student_in_course_with_adhoc_override(quiz, opts = {})

@@ -792,9 +792,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Dath Imlíne" },
   "outline_size_a6059a21": { "message": "Méid Imlíne" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "Ní prótacal bailí é { p } nach mór a bheith ftp, http, https, mailto, skype, teil nó is féidir é a fhágáil ar lár"
-  },
   "page_50c4823d": { "message": "Leathanach" },
   "pages_e5414c2c": { "message": "Leathanaigh" },
   "paragraph_5e5ad8eb": { "message": "Alt" },

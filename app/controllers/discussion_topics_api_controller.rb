@@ -731,7 +731,7 @@ class DiscussionTopicsApiController < ApplicationController
             end
 
     scope = scope.unread_for(@current_user)
-                 .where.not("unlock_at > ?", Time.now)
+                 .where.not("unlock_at > ?", Time.zone.now)
                  .or(scope.where(unlock_at: nil))
 
     scope.each do |announcement|

@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect, useState} from 'react'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -35,11 +35,11 @@ import {
 } from '../../../types'
 import {isExcused} from '@canvas/grading/GradeInputHelper'
 import {useDefaultGrade, type DefaultGradeSubmissionParams} from '../../hooks/useDefaultGrade'
-import {assignmentHasCheckpoints} from '../../../utils/gradebookUtils'
 import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../GradingResults'
+import {assignmentHasCheckpoints} from '../../../utils/gradeInputUtils'
 
 const {Header: ModalHeader, Body: ModalBody} = Modal as any
-const I18n = useI18nScope('enhanced_individual_gradebook')
+const I18n = createI18nScope('enhanced_individual_gradebook')
 
 type Props = {
   assignment: AssignmentConnection
@@ -72,12 +72,6 @@ export default function DefaultGradeModal({
   }
 
   const isCheckpointed = assignmentHasCheckpoints(assignment)
-
-  // @ts-expect-error
-  const getCheckpointSubmissions = submissions => {
-    // @ts-expect-error
-    return submissions.flatMap(submission => submission.subAssignmentSubmissions)
-  }
 
   const setGradeSuccessText = useCallback(
     (count: number): string => {

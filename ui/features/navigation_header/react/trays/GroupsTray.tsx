@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {View} from '@instructure/ui-view'
 import {List} from '@instructure/ui-list'
@@ -28,7 +28,7 @@ import {useQuery} from '@canvas/query'
 import groupsQuery from '../queries/groupsQuery'
 import type {AccessibleGroup} from '../../../../api.d'
 
-const I18n = useI18nScope('GroupsTray')
+const I18n = createI18nScope('GroupsTray')
 
 export default function GroupsTray() {
   const {data, isLoading, isSuccess} = useQuery<AccessibleGroup[], Error>({

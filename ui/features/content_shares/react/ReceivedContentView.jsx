@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect, useState, lazy} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
@@ -31,7 +31,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('content_share')
+const I18n = createI18nScope('content_share')
 
 const CourseImportPanel = lazy(() => import('./CourseImportPanel'))
 const NoContent = () => <Text size="large">{I18n.t('No content has been shared with you.')}</Text>
@@ -103,7 +103,7 @@ export default function ReceivedContentView() {
   }
 
   function onRemove(share) {
-    // eslint-disable-next-line no-alert
+     
     const shouldRemove = window.confirm(I18n.t('Are you sure you want to remove this item?'))
     if (shouldRemove) {
       doFetchApi({path: `${sharesUrl}/${share.id}`, method: 'DELETE'})

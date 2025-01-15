@@ -22,12 +22,12 @@ import $ from 'jquery'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import replaceTags from '@canvas/util/replaceTags'
 
-const I18n = useI18nScope('AccountGradingPeriod')
+const I18n = createI18nScope('AccountGradingPeriod')
 
 export default class AccountGradingPeriod extends React.Component {
   static propTypes = {

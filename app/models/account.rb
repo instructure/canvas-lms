@@ -52,6 +52,8 @@ class Account < ActiveRecord::Base
   has_many :differentiation_tags, -> { non_collaborative }, class_name: "Group", as: :context, inverse_of: :context
   has_many :all_differentiation_tags, -> { non_collaborative }, class_name: "Group", foreign_key: "root_account_id", inverse_of: :root_account
   has_many :all_differentiation_tag_memberships, source: "group_memberships", through: :all_differentiation_tags
+  has_many :combined_groups_and_differentiation_tags, class_name: "Group", as: :context, inverse_of: :context
+  has_many :active_combined_group_and_differentiation_tag_categories, -> { active }, class_name: "GroupCategory", as: :context, inverse_of: :context
   has_many :enrollment_terms, foreign_key: "root_account_id", inverse_of: :root_account
   has_many :active_enrollment_terms, -> { where("enrollment_terms.workflow_state<>'deleted'") }, class_name: "EnrollmentTerm", foreign_key: "root_account_id", inverse_of: false
   has_many :grading_period_groups, inverse_of: :root_account, dependent: :destroy
@@ -429,6 +431,7 @@ class Account < ActiveRecord::Base
                                                                         common_passwords_folder_id]
 
   add_setting :enable_limited_access_for_students, boolean: true, root_only: false, default: false, inheritable: false
+  add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: false
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -578,6 +581,12 @@ class Account < ActiveRecord::Base
     canvas_authentication_provider.try(:enable_captcha)
   end
 
+  def recaptcha_key
+    return nil unless root_account? && self_registration_captcha?
+
+    DynamicSettings.find(tree: "private")["recaptcha_client_key", failsafe: nil]
+  end
+
   def self_registration_allowed_for?(type)
     return false unless self_registration?
     return false if self_registration_type != "all" && type != self_registration_type
@@ -598,7 +607,7 @@ class Account < ActiveRecord::Base
     return false unless terms_required?
     return true if user.nil? || user.new_record?
 
-    soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
+    soc2_start_date = Setting.get("SOC2_start_date", Time.new(2015, 5, 16, 0, 0, 0).utc).to_time
     return false if user.created_at < soc2_start_date
 
     terms_changed_at = root_account.terms_of_service.terms_of_service_content&.terms_updated_at || settings[:terms_changed_at]
@@ -615,12 +624,14 @@ class Account < ActiveRecord::Base
       ips = []
       vals = str.split(",")
       vals.each do |val|
-        ip = IPAddr.new(val) rescue nil
+        IPAddr.new(val)
         # right now the ip_filter column on quizzes is just a string,
         # so it has a max length.  I figure whatever we set it to this
         # setter should at the very least limit stored values to that
         # length.
-        ips << val if ip && val.length <= 255
+        ips << val if val.length <= 255
+      rescue IPAddr::InvalidAddressError
+        # ignore
       end
       filters[key] = ips.join(",") unless ips.empty?
     end
@@ -698,7 +709,7 @@ class Account < ActiveRecord::Base
   def clear_downstream_caches(*keys_to_clear, xlog_location: nil, is_retry: false)
     shard.activate do
       if xlog_location && !self.class.wait_for_replication(start: xlog_location, timeout: 1.minute)
-        delay(run_at: Time.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
+        delay(run_at: Time.zone.now + timeout, singleton: "Account#clear_downstream_caches/#{global_id}:#{keys_to_clear.join("/")}")
           .clear_downstream_caches(*keys_to_clear, xlog_location:, is_retry: true)
         # we still clear, but only the first time; after that we just keep waiting
         return if is_retry
@@ -1449,14 +1460,6 @@ class Account < ActiveRecord::Base
   end
 
   set_policy do
-    #################### Begin legacy permission block #########################
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_lti) &&
-        grants_right?(user, :lti_add_edit)
-    end
-    can :create_tool_manually
-    ##################### End legacy permission block ##########################
-
     RoleOverride.permissions.each_key do |permission|
       given do |user|
         results = cached_account_users_for(user).map do |au|
@@ -2571,7 +2574,7 @@ class Account < ActiveRecord::Base
         new_grade = grading_standard.score_to_grade((score * 100).to_f)
         grade_has_changed = new_grade != submission.grade || new_grade != submission.published_grade
         if grade_has_changed
-          acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => Time.now)
+          acc << submission.attributes.merge("grade" => new_grade, "published_grade" => new_grade, "updated_at" => Time.zone.now)
         end
       end
 

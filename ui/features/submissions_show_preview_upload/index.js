@@ -16,12 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import swfobject from 'swfobject'
 import 'jqueryui/dialog'
 import {loadDocPreview} from '@instructure/canvas-rce/es/enhance-user-content/doc_previews'
 
-const I18n = useI18nScope('submissions.show_preview')
+const I18n = createI18nScope('submissions.show_preview')
 
 $(document).ready(() => {
   $('a.flash').click(function () {

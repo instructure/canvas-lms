@@ -167,6 +167,9 @@
     "available_folders_694d0436": {
         "message": "Carpetes disponibles"
     },
+    "background_1bc88842": {
+        "message": "Fons"
+    },
     "backslash_b2d5442d": {
         "message": "Barra invertida"
     },
@@ -199,6 +202,9 @@
     },
     "blue_daf8fea9": {
         "message": "Blau"
+    },
+    "border_5b08b06d": {
+        "message": "Vora"
     },
     "bottom_15a2a9be": {
         "message": "Fons"
@@ -341,11 +347,23 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Contrau per amagar { types }"
     },
+    "color_a363e1b0": {
+        "message": "Color"
+    },
+    "color_contrast_4c418add": {
+        "message": "Contrast de color"
+    },
+    "color_contrast_ratio_687782f0": {
+        "message": "Proporció de contrast de color"
+    },
     "color_picker_6b359edf": {
         "message": "Selector de color"
     },
     "color_picker_colorname_selected_ad4cf400": {
         "message": "Selector de color (s’ha seleccionat el color { colorName })"
+    },
+    "color_popup_af39810f": {
+        "message": "Finestra emergent de colors"
     },
     "column_e1ae5c64": {
         "message": "Columna"
@@ -779,6 +797,9 @@
     "f_function_fe422d65": {
         "message": "F (funció)"
     },
+    "fail_544e5dde": {
+        "message": "SUSPÈS"
+    },
     "failed_getting_file_contents_e9ea19f4": {
         "message": "No s''ha pogut obtenir el contingut del fitxer"
     },
@@ -895,6 +916,9 @@
     },
     "grades_a61eba0a": {
         "message": "Notes"
+    },
+    "graphics_text_bc9568bc": {
+        "message": "Text dels gràfics"
     },
     "greater_than_e98af662": {
         "message": "Més gran que"
@@ -1121,6 +1145,18 @@
     "infinity_7a10f206": {
         "message": "Infinitat"
     },
+    "input_field_for_alpha_678265fd": {
+        "message": "Camp d’entrada per a alfa"
+    },
+    "input_field_for_blue_561e020a": {
+        "message": "Camp d’entrada per a blau"
+    },
+    "input_field_for_green_67f8b2b6": {
+        "message": "Camp d’entrada per a verd"
+    },
+    "input_field_for_red_86a84615": {
+        "message": "Camp d’entrada per a vermell"
+    },
     "insert_593145ef": {
         "message": "Insereix"
     },
@@ -1189,6 +1225,9 @@
     },
     "large_9c5e80e7": {
         "message": "Gran"
+    },
+    "large_text_e7ba08cd": {
+        "message": "Text gran"
     },
     "latvian_2bbb6aab": {
         "message": "Letó"
@@ -1556,6 +1595,9 @@
     "none_selected_b93d56d2": {
         "message": "No se’n ha seleccionat cap"
     },
+    "normal_text_7b03da48": {
+        "message": "Text normal"
+    },
     "norwegian_53f391ec": {
         "message": "Noruec"
     },
@@ -1634,9 +1676,6 @@
     "outline_size_a6059a21": {
         "message": "Mida del contorn"
     },
-    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-        "message": "{ p } no és un protocol vàlid, que ha de ser ftp, http, https, mailto, skype, tel o es pot ometre."
-    },
     "page_50c4823d": {
         "message": "Pàgina"
     },
@@ -1655,6 +1694,9 @@
     "partial_derivative_4a9159df": {
         "message": "Parcial (derivat)"
     },
+    "pass_1c19a2b3": {
+        "message": "APROVAT"
+    },
     "paste_5963d1c1": {
         "message": "Enganxa"
     },
@@ -1672,6 +1714,9 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "El percentatge ha de ser un número."
+    },
+    "percentage_must_be_at_least_percentage_a98ca8fc": {
+        "message": "El percentatge ha de ser d’un { percentage }% com a mínim."
     },
     "performing_arts_icon_f3497486": {
         "message": "Icona d''arts interpretatives"
@@ -1697,11 +1742,17 @@
     "pi_variant_10f5f520": {
         "message": "Pi (variant)"
     },
+    "pick_a_color_557abfb0": {
+        "message": "Tria un color"
+    },
     "pink_68ad45cb": {
         "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Píxels"
+    },
+    "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+        "message": "Ha de ser de { width } × { height }píxels com a mínim"
     },
     "play_1a47eaa7": {
         "message": "Reprodueix"
@@ -1768,6 +1819,9 @@
     },
     "previous_findtext_8dfbfd30": {
         "message": "{ findText } anterior"
+    },
+    "previously_chosen_colors_f1338315": {
+        "message": "Colors que s''han triat anteriorment"
     },
     "prime_917ea60e": {
         "message": "Primer"
@@ -2668,6 +2722,15 @@
     },
     "yiddish_f96986df": {
         "message": "Jiddisch"
+    },
+    "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+        "message": "Sou en una paleta de colors. Per navegar per la paleta cap a amunt, a l’esquerra, a baix o a la dreta, utilitzeu els botons “W”, “A”, “S” i “D”, respectivament"
+    },
+    "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+        "message": "Sou en un control lliscant de colors. Per navegar pel control lliscant cap a l’esquerra o la dreta, utilitzeu els botons “A” i “D”, respectivament"
+    },
+    "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+        "message": "Sou en un control lliscant de colors alfa. Per navegar pel control lliscant cap a l’esquerra o la dreta, utilitzeu els botons “A” i “D”, respectivament"
     },
     "you_can_replace_by_uploading_a_new_caption_file_6c88ce00": {
         "message": "Ho podeu substituir carregant un nou fitxer de subtítols."

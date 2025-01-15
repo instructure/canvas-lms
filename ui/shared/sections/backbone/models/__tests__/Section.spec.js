@@ -17,9 +17,9 @@
  */
 
 import Section from '../Section'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('modelsSection')
+const I18n = createI18nScope('modelsSection')
 
 describe('Section', () => {
   test("initialize doesn't assign value for id if not given", () => {

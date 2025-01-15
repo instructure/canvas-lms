@@ -20,11 +20,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import K5Dashboard from './react/K5Dashboard'
-import {useK5Theme} from '@canvas/k5/react/k5-theme'
+import {registerK5Theme} from '@canvas/k5/react/k5-theme'
 import {QueryProvider} from '@canvas/query'
 import ready from '@instructure/ready'
 
-useK5Theme()
+registerK5Theme()
 
 ready(() => {
   const dashboardContainer = document.getElementById('dashboard-app-container')

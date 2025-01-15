@@ -410,7 +410,7 @@ describe('RubricAssessmentTray Tests', () => {
       })
 
       it('should not select a rating when user entered points do not match a rating points value', () => {
-        const {getByTestId, queryByTestId} = renderComponentModern('Horizontal')
+        const {getByTestId} = renderComponentModern('Horizontal')
         expect(getByTestId('rubric-assessment-instructor-score')).toHaveTextContent('0 pts')
         const input = getByTestId('criterion-score-2') as HTMLInputElement
         fireEvent.change(input, {target: {value: '20'}})
@@ -728,6 +728,14 @@ describe('RubricAssessmentTray Tests', () => {
         hidePoints: false,
       })
       expect(queryAllByTestId('modern-view-out-of-points')).toHaveLength(2)
+    })
+  })
+
+  describe('selfAssessment test', () => {
+    it('should display self assessment instructions and score', () => {
+      const {getByTestId} = renderComponent({isSelfAssessment: true})
+      expect(getByTestId('rubric-self-assessment-instructions')).toBeInTheDocument()
+      expect(getByTestId('rubric-self-assessment-instructor-score')).toBeInTheDocument()
     })
   })
 })

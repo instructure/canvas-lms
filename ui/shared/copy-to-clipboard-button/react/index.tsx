@@ -19,10 +19,10 @@
 import React, {useCallback, useState} from 'react'
 import {IconCheckDarkSolid, IconCopyLine, IconXSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('copy-to-clipboard-button')
+const I18n = createI18nScope('copy-to-clipboard-button')
 
 export type CopyToClipboardButtonProps = {
   value: string

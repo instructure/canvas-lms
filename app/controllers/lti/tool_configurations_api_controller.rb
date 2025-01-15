@@ -170,7 +170,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def require_manage_lti
-    head :unauthorized unless @context.grants_any_right?(@current_user, :lti_add_edit, *RoleOverride::GRANULAR_MANAGE_LTI_PERMISSIONS)
+    head :unauthorized unless @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_LTI_PERMISSIONS)
   end
 
   def manual_custom_fields

@@ -17,12 +17,13 @@
  */
 
 import React, {useContext, useState} from 'react'
+// @ts-expect-error
 import {UploadFile, type UploadFilePanelId} from '@instructure/canvas-rce'
 import {prepEmbedSrc} from '@instructure/canvas-rce/es/common/fileUrl'
 import {RCSPropsContext} from '../../../Contexts'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const handleImageSubmit = async (
   selectedPanel: UploadFilePanelId,

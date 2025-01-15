@@ -22,11 +22,11 @@
 // this function expects JSON input from /sections/:course_id/enrollments and
 // returns an array of enrollments meant for display on /courses/:course_id/sections/:id.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {map} from 'lodash'
 import {underscoreString} from '@canvas/convert-case'
 
-const I18n = useI18nScope('section')
+const I18n = createI18nScope('section')
 
 // declare all used i18n keys here to cluttering up the logic
 const keys = {

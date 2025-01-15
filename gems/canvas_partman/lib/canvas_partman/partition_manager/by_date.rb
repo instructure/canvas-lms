@@ -36,9 +36,9 @@ module CanvasPartman
       end
 
       def migrate_data_to_partitions(batch_size: 1000, timeout: nil)
-        start_time = Time.now
+        start_time = Time.zone.now
         loop do
-          return false if timeout && (start_time + timeout) < Time.now
+          return false if timeout && (start_time + timeout) < Time.zone.now
 
           id_dates = base_class.from("ONLY #{base_class.quoted_table_name}")
                                .order(base_class.partitioning_field)

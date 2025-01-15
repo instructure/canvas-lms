@@ -16,18 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
 import {extend as lodashExtend} from 'lodash'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import DialogFormView from '@canvas/forms/backbone/views/DialogFormView'
 import wrapper from '@canvas/forms/jst/EmptyDialogFormWrapper.handlebars'
 import assignmentSyncSettingsTemplate from '../../jst/AssignmentSyncSettings.handlebars'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('AssignmentSyncSettingsView')
+const I18n = createI18nScope('AssignmentSyncSettingsView')
 
 extend(AssignmentSyncSettingsView, DialogFormView)
 

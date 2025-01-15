@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import Modal from './InstuiModal'
@@ -59,12 +59,12 @@ export function alert(alertProps: AlertProps): Promise<void> {
       alertContainer.removeChild(container)
       resolve()
     }
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(<AlertModal {...alertProps} onOk={handleOk} />, container)
   })
 }
 
-const I18n = useI18nScope('modal')
+const I18n = createI18nScope('modal')
 
 type AlertModalProps = AlertProps & {
   onOk: () => void

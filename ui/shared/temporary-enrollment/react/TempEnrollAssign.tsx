@@ -18,7 +18,7 @@
 
 import React, {useEffect, useMemo, useState} from 'react'
 import type {ChangeEvent, Dispatch, SetStateAction, SyntheticEvent} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Grid} from '@instructure/ui-grid'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
@@ -73,7 +73,7 @@ import {captureException} from '@sentry/browser'
 
 declare const ENV: GlobalEnv & EnvCommon
 
-const I18n = useI18nScope('temporary_enrollment')
+const I18n = createI18nScope('temporary_enrollment')
 
 // initialize analytics props
 const analyticProps = createAnalyticPropsGenerator(MODULE_NAME)
@@ -293,7 +293,7 @@ export function TempEnrollAssign(props: Props) {
           }
         })
         .catch(error => {
-          // eslint-disable-next-line no-console
+           
           console.error('Error fetching temporary enrollment pairing:', error)
           captureException(error)
         })

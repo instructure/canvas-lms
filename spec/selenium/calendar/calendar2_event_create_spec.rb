@@ -550,7 +550,7 @@ describe "calendar2" do
       it "preserves correct time when editing an event in a different DST window" do
         @user.time_zone = "America/Denver"
         @user.save!
-        now = DateTime.current.noon
+        now = Time.zone.now.noon
         # by creating an event at t+3, t+6, and t+9 months, we guarantee that at least 1 of those
         # events will be in a different DST state than now
         [now + 3.months, now + 6.months, now + 9.months].each do |start_at|
@@ -567,7 +567,7 @@ describe "calendar2" do
       it "updates the event to the correct time when saving across DST window" do
         @user.time_zone = "America/Denver"
         @user.save!
-        start_at = DateTime.parse("2022-03-01 1:00pm -0600")
+        start_at = Time.zone.parse("2022-03-01 1:00pm -0600")
         event = CalendarEvent.create!(context: @course, start_at:)
         get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
         expect(f("#more_options_start_time").attribute(:value)).to eq("12:00pm")

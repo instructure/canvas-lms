@@ -23,9 +23,9 @@ import RruleHelper, {
   icalDateToISODate,
 } from './RRuleHelper'
 import type {RRULEDayValue, SelectedDaysArray} from './types'
-import {useScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useScope('calendar_custom_recurring_event_natural_language')
+const I18n = createI18nScope('calendar_custom_recurring_event_natural_language')
 
 const ORDINALS: readonly string[] = Object.freeze([
   '',

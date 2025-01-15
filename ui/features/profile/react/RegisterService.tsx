@@ -17,7 +17,7 @@
  */
 
 import React, {type ReactNode} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -31,7 +31,7 @@ import {zodResolver} from '@hookform/resolvers/zod'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('profile')
+const I18n = createI18nScope('profile')
 
 type ServiceName = 'skype' | 'google_drive' | 'diigo'
 

@@ -102,6 +102,7 @@ const locale = {
     "message": "Mae cynnwys sydd wedi’i gadw’n awtomatig yn bodoli. Hoffech chi lwytho’r cynnwys sydd wedi’i gadw’n awtomatig?"
   },
   "available_folders_694d0436": { "message": "Ffolderi sydd ar gael" },
+  "background_1bc88842": { "message": "Cefndir" },
   "backslash_b2d5442d": { "message": "Ôl-slaes" },
   "bar_ec63ed6": { "message": "Bar" },
   "basic_554cdc0a": { "message": "Sylfaenol" },
@@ -112,6 +113,7 @@ const locale = {
   "binomial_coefficient_ea5b9bb7": { "message": "Cyfernod Binomaidd" },
   "black_4cb01371": { "message": "Black" },
   "blue_daf8fea9": { "message": "Glas" },
+  "border_5b08b06d": { "message": "Bordor" },
   "bottom_15a2a9be": { "message": "Gwaelod" },
   "bottom_third_5f5fec1d": { "message": "Traean Isaf" },
   "bowtie_5f9629e4": { "message": "Tei bo" },
@@ -187,10 +189,14 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Crebachu i guddio { types }"
   },
+  "color_a363e1b0": { "message": "Lliw" },
+  "color_contrast_4c418add": { "message": "Cyferbyniad Lliw" },
+  "color_contrast_ratio_687782f0": { "message": "Cymhareb Cyferbyniad Lliw" },
   "color_picker_6b359edf": { "message": "Dewisydd Lliw" },
   "color_picker_colorname_selected_ad4cf400": {
     "message": "Dewisydd Lliw ({ colorName } wedi’i ddewis)"
   },
+  "color_popup_af39810f": { "message": "Naidlen lliwiau" },
   "column_e1ae5c64": { "message": "Colofn" },
   "column_group_1c062368": { "message": "Grŵp y golofn" },
   "complex_numbers_a543d004": { "message": "Rhifau Cymhleth" },
@@ -370,6 +376,7 @@ const locale = {
   "extra_small_9ae33252": { "message": "Bach Iawn" },
   "extracurricular_icon_67c8ca42": { "message": "Eicon Allgwricwlar" },
   "f_function_fe422d65": { "message": "F (nodwedd)" },
+  "fail_544e5dde": { "message": "WEDI METHU" },
   "failed_getting_file_contents_e9ea19f4": {
     "message": "Wedi methu cael cynnwys ffeil"
   },
@@ -427,6 +434,7 @@ const locale = {
     "message": "Ewch i far offer y golygydd"
   },
   "grades_a61eba0a": { "message": "Graddau" },
+  "graphics_text_bc9568bc": { "message": "Testun graffeg" },
   "greater_than_e98af662": { "message": "Yn fwy na" },
   "greater_than_or_equal_b911949a": { "message": "Yn fwy na neu’n hafal i" },
   "greek_65c5b3f7": { "message": "Groeg" },
@@ -528,6 +536,14 @@ const locale = {
   "indigo_2035fc55": { "message": "Indigo" },
   "inference_fed5c960": { "message": "Casgliad" },
   "infinity_7a10f206": { "message": "Anfeidredd" },
+  "input_field_for_alpha_678265fd": {
+    "message": "Maes mewnbwn ar gyfer alffa"
+  },
+  "input_field_for_blue_561e020a": { "message": "Maes mewnbwn ar gyfer glas" },
+  "input_field_for_green_67f8b2b6": {
+    "message": "Maes mewnbwn ar gyfer gwyrdd"
+  },
+  "input_field_for_red_86a84615": { "message": "Maes mewnbwn ar gyfer coch" },
   "insert_593145ef": { "message": "Mewnosod" },
   "insert_link_6dc23cae": { "message": "Mewnosod Dolen" },
   "insert_math_equation_57c6e767": {
@@ -551,6 +567,7 @@ const locale = {
   "language_arts_icon_a798b0f8": { "message": "Eicon Celfyddydau Iaith" },
   "languages_icon_9d20539": { "message": "Eicon Ieithoedd" },
   "large_9c5e80e7": { "message": "Mawr" },
+  "large_text_e7ba08cd": { "message": "Testun mawr" },
   "learn_more_about_adjacent_links_2cb9762c": {
     "message": "Dysgu mwy am ddolenni cyfagos"
   },
@@ -749,6 +766,7 @@ const locale = {
   "no_video_1ed00b26": { "message": "Dim Fideo" },
   "none_3b5e34d2": { "message": "Dim" },
   "none_selected_b93d56d2": { "message": "Dim un wedi’i ddewis" },
+  "normal_text_7b03da48": { "message": "Testun cyffredin" },
   "not_equal_6e2980e6": { "message": "Ddim yn Hafal" },
   "not_in_not_an_element_of_fb1ffb54": {
     "message": "Ddim yn (Ddim yn Elfen o)"
@@ -784,9 +802,6 @@ const locale = {
   },
   "outline_color_3ef2cea7": { "message": "Lliw Amlinell" },
   "outline_size_a6059a21": { "message": "Maint Amlinell" },
-  "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
-    "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
-  },
   "page_50c4823d": { "message": "Tudalen" },
   "pages_e5414c2c": { "message": "Tudalennau" },
   "paragraph_5e5ad8eb": { "message": "Paragraff" },
@@ -795,6 +810,7 @@ const locale = {
   },
   "parallel_d55d6e38": { "message": "Paralel" },
   "partial_derivative_4a9159df": { "message": "Rhannol (Deilliadol)" },
+  "pass_1c19a2b3": { "message": "PASIO" },
   "paste_5963d1c1": { "message": "Gludo" },
   "pause_12af3bb4": { "message": "Rhewi" },
   "pentagon_17d82ea3": { "message": "Pentagon" },
@@ -802,6 +818,9 @@ const locale = {
   "percentage_34ab7c2c": { "message": "Canran" },
   "percentage_must_be_a_number_8033c341": {
     "message": "Mae canran yn gorfod bod yn rhif"
+  },
+  "percentage_must_be_at_least_percentage_a98ca8fc": {
+    "message": "Rhaid i''r ganran fod o leiaf { percentage }%"
   },
   "performing_arts_icon_f3497486": {
     "message": "Eicon Celfyddydau Perfformio"
@@ -812,8 +831,12 @@ const locale = {
   "physical_education_icon_d7dffd3e": { "message": "Eicon Addysg Gorfforol" },
   "pi_dc4f0bd8": { "message": "Pi" },
   "pi_variant_10f5f520": { "message": "Pi (Amrywiad)" },
+  "pick_a_color_557abfb0": { "message": "Dewiswch liw" },
   "pink_68ad45cb": { "message": "Pinc" },
   "pixels_52ece7d1": { "message": "Picseli" },
+  "pixels_must_be_at_least_width_x_height_px_e965edd5": {
+    "message": "Rhaid i’r picseli fod o leiaf { width } x { height }px"
+  },
   "play_1a47eaa7": { "message": "Chwarae" },
   "play_media_comment_35257210": { "message": "Chwarae sylw ar gyfryngau." },
   "play_media_comment_by_name_from_createdat_c230123d": {
@@ -842,6 +865,9 @@ const locale = {
   "preview_inline_9787330": { "message": "Rhagolwg mewn llinell" },
   "previous_bd2ac015": { "message": "Blaenorol" },
   "previous_findtext_8dfbfd30": { "message": "Blaenorol { findText }" },
+  "previously_chosen_colors_f1338315": {
+    "message": "Lliwiau a ddewiswyd yn y gorffennol"
+  },
   "prime_917ea60e": { "message": "Cysefin" },
   "prime_numbers_13464f61": { "message": "Rhifau Cysefin" },
   "product_39cf144f": { "message": "Cynnyrch" },
@@ -1314,6 +1340,15 @@ const locale = {
   "writing_assistant_a30ac16a": { "message": "Cynorthwyydd Ysgrifennu" },
   "xi_149681d0": { "message": "Xi" },
   "yes_dde87d5": { "message": "Iawn" },
+  "you_are_on_a_color_palette_to_navigate_on_the_pale_227fc3a6": {
+    "message": "Rydych chi ar balet lliw. I grwydro’r palet i fyny, i’r chwith, i lawr neu i’r dde, defnyddiwch y botymau ''W'', ''A'', ''S'' a ''D'' yn eu tro"
+  },
+  "you_are_on_a_color_slider_to_navigate_the_slider_l_e800f68a": {
+    "message": "Rydych chi ar lithrydd lliw. I grwydro’r llithrydd i’r chwith neu i’r dde, defnyddiwch y botymau ''A’ a ''D'' yn eu tro"
+  },
+  "you_are_on_an_alpha_slider_to_navigate_the_slider__3a014dc5": {
+    "message": "Rydych chi ar lithrydd alffa. I grwydro’r llithrydd i’r chwith neu i’r dde, defnyddiwch y botymau ''A’ a ''D'' yn eu tro"
+  },
   "you_have_unsaved_changes_in_the_icon_maker_tray_do_e8cf5f1b": {
     "message": "Mae gennych chi newidiadau heb eu cadw yn yr ardal Gwneuthurwr Eiconau. Ydych chi am fwrw ymlaen heb gadw’r newidiadau hyn?"
   },

@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Popover} from '@instructure/ui-popover'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine, IconCheckLine} from '@instructure/ui-icons'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -31,7 +31,7 @@ import {getPeerReviewUrl} from '../helpers/PeerReviewHelpers'
 import type {AssignedAssessments} from 'api'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('assignments_2_student_header')
+const I18n = createI18nScope('assignments_2_student_header')
 
 type PeerReviewNavigationLinkProps = {
   assignedAssessments: AssignedAssessments[]

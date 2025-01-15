@@ -2895,7 +2895,7 @@ describe Enrollment do
     end
 
     it "follows chain of fallbacks in correct order if no enrollment_dates" do
-      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, Time.now]])
+      allow(@enrollment).to receive(:enrollment_dates).and_return([[nil, Time.zone.now]])
 
       # start peeling away things from most preferred to least preferred to
       # test fallback chain

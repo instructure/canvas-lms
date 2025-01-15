@@ -57,51 +57,82 @@
 // package is providing by using a free specifier like "*"
 //
 // see SEC-4437
-const fs = require('fs')
 const path = require('path')
-const glob = require('glob')
+const fg = require('fast-glob')
+
 const root = path.resolve(__dirname, '..')
+const pMap = require('p-map')
 
 async function main() {
   const workspaces = await parseWorkspacesFromStdin()
 
+  console.log('Workspaces parsed successfully')
+
   let errors = []
 
-  for (const pkgfile of scanPkgfiles(require.resolve('../package.json'))) {
-    errors = errors.concat( validate({ pkgfile, workspaces, errors }) )
+  const pkgfiles = scanPkgfiles(require.resolve('../package.json'))
+
+  console.log(`Found ${pkgfiles.length} package files to process`)
+
+  if (pkgfiles.length === 0) {
+    console.log('No package files found, exiting...')
+    return
   }
+
+  // Use concurrency for faster validation
+  errors = await pMap(
+    pkgfiles,
+    async (pkgfile, index) => {
+      const result = await validate({pkgfile, workspaces})
+      return result
+    },
+    {concurrency: 10}
+  ) // You can adjust the concurrency to fit your system
+
+  console.log('Validation complete')
+
+  // Flatten the array of errors
+  errors = errors.flat()
 
   if (errors.length) {
     process.exitCode = 1
-
     console.log('dependencies listed below must have a specifier of "*"')
     console.log('---')
 
     for (const error of errors) {
-      console.log("%s:%s", path.relative(root, error.pkgfile), error.dep)
+      console.log('%s:%s', path.relative(root, error.pkgfile), error.dep)
     }
 
     console.log('---')
+  } else {
+    console.log('No errors found.')
   }
 }
 
 function scanPkgfiles(rootpkgfile) {
-  let pkgfiles = [ rootpkgfile ]
+  console.log('Scanning package files...')
+  let pkgfiles = [rootpkgfile]
 
+  // eslint-disable-next-line import/no-dynamic-require
   for (const pattern of require(rootpkgfile).workspaces.packages || []) {
+    console.log(`Scanning pattern: ${pattern}`)
     pkgfiles = pkgfiles.concat(
-      glob.sync(`${pattern}/package.json`, {
+      fg.sync(`${pattern}/package.json`, {
         cwd: path.dirname(rootpkgfile),
-        absolute: true
+        absolute: true,
       })
     )
   }
 
+  console.log(`Found ${pkgfiles.length} package files`)
   return pkgfiles
 }
 
-function validate({ pkgfile, workspaces }) {
-  const { dependencies = {} } = require(pkgfile)
+async function validate({pkgfile, workspaces}) {
+  console.log(`Validating package: ${pkgfile}`)
+
+  // eslint-disable-next-line import/no-dynamic-require
+  const {dependencies = {}} = require(pkgfile)
   const errors = []
 
   let depcount = 0
@@ -111,22 +142,20 @@ function validate({ pkgfile, workspaces }) {
       depcount += 1
 
       if (version !== '*') {
-        errors.push({ pkgfile, dep })
+        errors.push({pkgfile, dep})
       }
     }
   }
 
   if (depcount > 0) {
-    console.error('found %d workspace package dependencies and %d errors -- "%s"',
+    console.error(
+      'found %d workspace package dependencies and %d errors -- "%s"',
       depcount,
       errors.length,
-      path.relative(root, pkgfile),
-    )
-  }
-  else {
-    console.error('found no workspace package dependencies -- "%s"',
       path.relative(root, pkgfile)
     )
+  } else {
+    console.error('found no workspace package dependencies -- "%s"', path.relative(root, pkgfile))
   }
 
   return errors
@@ -134,15 +163,16 @@ function validate({ pkgfile, workspaces }) {
 
 async function read(stream) {
   const chunks = []
-
   for await (const chunk of stream) {
     chunks.push(chunk)
   }
 
-  return Buffer.concat(chunks).toString('utf8')
+  const result = Buffer.concat(chunks).toString('utf8')
+  return result
 }
 
 async function parseWorkspacesFromStdin() {
+  console.log('Parsing workspaces from stdin...')
   const buffer = await read(process.stdin)
   const parsed = JSON.parse(buffer)
 
@@ -161,11 +191,13 @@ async function parseWorkspacesFromStdin() {
   //     }
   //
   if (parsed.type === 'log' && parsed.hasOwnProperty('data')) {
+    console.log('Detected yarn 1.19.1 log format')
     return JSON.parse(parsed.data)
-  }
-  else {
+  } else {
+    console.log('Detected yarn 1.22.1 or other log format')
     return parsed
   }
 }
 
+console.log('Validating workspace dependencies...')
 main()

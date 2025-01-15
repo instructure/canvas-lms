@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import EntryView from './backbone/views/EntryView'
 import DiscussionFilterState from './backbone/models/DiscussionFilterState'
 import DiscussionToolbarView from './backbone/views/DiscussionToolbarView'
@@ -37,7 +37,7 @@ import DiscussionTopicKeyboardShortcutModal from './react/DiscussionTopicKeyboar
 import ready from '@instructure/ready'
 import {captureException} from '@sentry/react'
 
-const I18n = useI18nScope('discussions')
+const I18n = createI18nScope('discussions')
 
 // Backbone routes
 $('body').on('click', '[data-pushstate]', function (event) {
@@ -84,7 +84,7 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, ENV.COURSE_ID)
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
+         
         console.error('Falied loading CoursePacingNotice', ex)
         captureException(new Error('Failed loading CoursePacingNotice: ' + ex.message))
       })
@@ -95,7 +95,7 @@ ready(() => {
   new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
   if (!window.ENV.disable_keyboard_shortcuts) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <DiscussionTopicKeyboardShortcutModal />,
       document.getElementById('keyboard-shortcut-modal')
@@ -113,7 +113,7 @@ ready(() => {
     !ENV.DISCUSSION.IS_ASSIGNMENT &&
     !ENV.DISCUSSION.IS_GROUP
   ) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <SectionsTooltip
         totalUserCount={ENV.TOTAL_USER_COUNT}

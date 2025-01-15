@@ -1,4 +1,4 @@
-/* eslint-disable eqeqeq */
+ 
 /*
  * Copyright (C) 2011 - present Instructure, Inc.
  *
@@ -17,7 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from '@instructure/html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -26,7 +26,7 @@ import replaceTags from '@canvas/util/replaceTags'
 import 'jquery-tinypubsub' // /\.publish/
 import 'jqueryui/button'
 
-const I18n = useI18nScope('alerts')
+const I18n = createI18nScope('alerts')
 
 $(function () {
   const $list = $('.alerts_list')

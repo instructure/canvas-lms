@@ -27,13 +27,13 @@ import {
   buildURL,
 } from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {itemsToDays} from '../utilities/daysUtils'
 import {processDashboardCards} from '@canvas/dashboard-card/util/dashboardUtils'
 import {queryClient} from '@canvas/query'
 import {fetchDashboardCardsAsync} from '@canvas/dashboard-card/dashboardCardQueries'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const {
   startLoadingItems,

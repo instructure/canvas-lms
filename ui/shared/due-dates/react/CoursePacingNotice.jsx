@@ -18,12 +18,12 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('shared_due_dates_react_due_dates_in_course_pacing')
+const I18n = createI18nScope('shared_due_dates_react_due_dates_in_course_pacing')
 
 const CoursePacingNotice = props => {
   return (
@@ -41,7 +41,7 @@ const CoursePacingNotice = props => {
 }
 
 export function renderCoursePacingNotice(mountPoint, courseId) {
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(<CoursePacingNotice courseId={courseId} />, mountPoint)
 }
 

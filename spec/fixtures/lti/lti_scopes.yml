@@ -5,9 +5,50 @@
 # ensure it is added to the correct places in TS, Ruby, and the docs (if
 # applicable)
 
+### 1EdTech Names and Role Provisioning Services (AGS) ###
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+  description: Can create and view assignment data in the gradebook associated with the tool
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly
+  description: Can view assignment data in the gradebook associated with the tool
+
+- scope: https://canvas.instructure.com/lti-ags/progress/scope/show
+  description: Can view Progress records associated with the context the tool is installed in
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
+  description: Can view submission data for assignments associated with the tool
+
+- scope: https://purl.imsglobal.org/spec/lti-ags/scope/score
+  description: Can create and update submission results for assignments associated with the tool
+
+### 1EdTech Names and Role Provisioning Services (NRPS) ###
+- scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+  description: Can retrieve user data associated with the context the tool is installed in
+
+### 1EdTech PNS, Asset Processor and associated services ###
+- scope: https://purl.imsglobal.org/spec/lti/scope/noticehandlers
+  description: Can register event notice handlers using the Platform Notification Service
+
+- scope: https://purl.imsglobal.org/spec/lti/scope/asset.readonly
+  description: Can fetch assets from the platform using the Asset Service
+
+- scope: https://purl.imsglobal.org/spec/lti/scope/report
+  description: Can create reports using the Asset Report Service
+
+- scope: https://purl.imsglobal.org/spec/lti/scope/eula
+  description: Can update or remove the tool's EULA accepted flag
+
+### Documented Canvas extensions ###
 - scope: https://canvas.instructure.com/lti/page_content/show
   description: Can view the content of a page the tool is launched from
 
+- scope: https://canvas.instructure.com/lti/account_lookup/scope/show
+  description: Can lookup Account information
+
+- scope: https://canvas.instructure.com/lti/public_jwk/scope/update
+  description: Can update public jwk for LTI services
+
+### Undocumented canvas extensions: account_external_tools management ###
 - scope: https://canvas.instructure.com/lti/account_external_tools/scope/create
   description: Can create external tools
   undocumented: true
@@ -28,24 +69,7 @@
   description: Can update external tools
   undocumented: true
 
-- scope: https://canvas.instructure.com/lti/account_lookup/scope/show
-  description: Can lookup Account information
-
-- scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
-  description: Can create and view assignment data in the gradebook associated with the tool
-
-- scope: https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly
-  description: Can view assignment data in the gradebook associated with the tool
-
-- scope: https://canvas.instructure.com/lti-ags/progress/scope/show
-  description: Can view Progress records associated with the context the tool is installed in
-
-- scope: https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
-  description: Can view submission data for assignments associated with the tool
-
-- scope: https://purl.imsglobal.org/spec/lti-ags/scope/score
-  description: Can create and update submission results for assignments associated with the tool
-
+### Undocumented Canvas extensions: Data Services (Live Events) ###
 - scope: https://canvas.instructure.com/lti/data_services/scope/create
   description: Can create subscription to data service data
   undocumented: true
@@ -70,18 +94,10 @@
   description: Can update subscription to data service data
   undocumented: true
 
+### Other undocumented Canvas extensions ###
 - scope: https://canvas.instructure.com/lti/feature_flags/scope/show
   description: Can view feature flags
   undocumented: true
-
-- scope: https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
-  description: Can retrieve user data associated with the context the tool is installed in
-
-- scope: https://purl.imsglobal.org/spec/lti/scope/noticehandlers
-  description: Can register event notice handlers using the Platform Notification Service
-
-- scope: https://canvas.instructure.com/lti/public_jwk/scope/update
-  description: Can update public jwk for LTI services
 
 - scope: https://canvas.instructure.com/lti/replace_editor_contents
   description: Can replace the entire contents of the RCE

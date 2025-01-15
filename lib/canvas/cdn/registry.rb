@@ -124,17 +124,19 @@ module Canvas
         @webpack_manifest = webpack
       end
 
-      def gulp(*, **kwargs)
+      def gulp(*, **)
         @gulp ||= Registry::Gulp.new(
           *,
-          **kwargs.merge(manifest: @gulp_manifest)
+          **,
+          manifest: @gulp_manifest
         )
       end
 
-      def webpack(*, **kwargs)
+      def webpack(*, **)
         @webpack ||= Registry::Webpack.new(
           *,
-          **kwargs.merge(manifest: @webpack_manifest)
+          **,
+          manifest: @webpack_manifest
         )
       end
     end

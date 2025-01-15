@@ -19,12 +19,11 @@
 import React, {useRef} from 'react'
 import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {zodResolver} from '@hookform/resolvers/zod'
 import {
-  focusFiled,
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
@@ -32,9 +31,11 @@ import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AutoCompleteSelect from './AutoCompleteSelect'
 import {TextInput} from '@instructure/ui-text-input'
-import {FormFieldGroup} from '@instructure/ui-form-field'
+import FieldGroup from '@canvas/forms/react/field-group/FieldGroup'
+import {Grid} from '@instructure/ui-grid'
+import {IconCoursesSolid, IconUserSolid} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('grade_change_logging_content')
+const I18n = createI18nScope('grade_change_logging_content')
 
 const defaultValues = {
   grader_id: '',
@@ -58,7 +59,7 @@ const validationSchema = z
     ({grader_id, student_id, course_id, assignment_id}) =>
       grader_id || student_id || course_id || assignment_id,
     {
-      message: 'One of Grader, Student, Course, or Assignment ID is required.',
+      message: 'Please enter at least one field.',
       path: ['grader_id'],
     }
   )
@@ -83,6 +84,12 @@ type User = {
   name: string
 }
 
+type Course = {
+  id: string
+  name: string
+  course_code: string
+}
+
 export interface GradeChangeActivityFormProps {
   accountId: string
   onSubmit: (data: FormValues) => void
@@ -93,19 +100,26 @@ const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormP
     control,
     formState: {errors},
     handleSubmit,
+    setFocus,
   } = useForm({defaultValues, resolver: zodResolver(validationSchema)})
   const startDateInputRef = useRef<DateTimeInput>(null)
   const endDateInputRef = useRef<DateTimeInput>(null)
-  const buttonText = I18n.t('Find')
+  const buttonText = I18n.t('Search Logs')
+  const searchCriteriaErrorMessage = getFormErrorMessage(errors, 'grader_id')
+  const searchCriteriaHintMessages = [
+    {text: I18n.t('Enter at least one.') as string, type: 'hint'} as const,
+  ]
+  const searchCriteriaMessages =
+    searchCriteriaErrorMessage.length > 0 ? searchCriteriaErrorMessage : searchCriteriaHintMessages
 
   const handleFormSubmit: SubmitHandler<FormValues> = async data => {
     if (isDateTimeInputInvalid(startDateInputRef)) {
-      focusFiled(control, 'start_time')
+      setFocus('start_time')
       return
     }
 
     if (isDateTimeInputInvalid(endDateInputRef)) {
-      focusFiled(control, 'end_time')
+      setFocus('end_time')
       return
     }
 
@@ -115,154 +129,203 @@ const GradeChangeActivityForm = ({accountId, onSubmit}: GradeChangeActivityFormP
   return (
     <form
       aria-label={I18n.t('Grade Change Activity Form')}
-      className="form-horizontal pad-box border border-trbl search-controls"
       noValidate={true}
       onSubmit={handleSubmit(handleFormSubmit)}
     >
-      <Flex direction="column" gap="small">
-        <FormFieldGroup
-          description={<ScreenReaderContent>{I18n.t('Search by')}</ScreenReaderContent>}
-          messages={getFormErrorMessage(errors, 'grader_id')}
-          rowSpacing="small"
+      <Flex direction="column" gap="large">
+        <FieldGroup
+          title={I18n.t('Search Criteria')}
+          isRequired={true}
+          messages={searchCriteriaMessages}
         >
-          <Controller
-            name="grader_id"
-            control={control}
-            rules={{deps: ['assignment_id', 'course_id', 'student_id']}}
-            render={({field: {ref, ...fieldWithoutRef}}) => (
-              <AutoCompleteSelect<User>
-                {...fieldWithoutRef}
-                maxLength={255}
-                inputRef={ref}
-                renderLabel={I18n.t('Grader ID')}
-                assistiveText={I18n.t('Type to search')}
-                url={`/api/v1/accounts/${accountId}/users`}
-                renderOptionLabel={option => option.name}
-                onInputChange={event => {
-                  fieldWithoutRef.onChange(event)
-                }}
-                onRequestSelectOption={(_, {id}) => {
-                  fieldWithoutRef.onChange(id)
-                }}
-              />
-            )}
-          />
-          <Controller
-            name="student_id"
-            control={control}
-            rules={{deps: ['assignment_id', 'course_id', 'grader_id']}}
-            render={({field: {ref, ...fieldWithoutRef}}) => (
-              <AutoCompleteSelect<User>
-                {...fieldWithoutRef}
-                maxLength={255}
-                inputRef={ref}
-                renderLabel={I18n.t('Student ID')}
-                assistiveText={I18n.t('Type to search')}
-                url={`/api/v1/accounts/${accountId}/users`}
-                renderOptionLabel={option => option.name}
-                messages={getFormErrorMessage(errors, 'student_id')}
-                onInputChange={event => {
-                  fieldWithoutRef.onChange(event)
-                }}
-                onRequestSelectOption={(_, {id}) => {
-                  fieldWithoutRef.onChange(id)
-                }}
-              />
-            )}
-          />
-          <Controller
-            name="course_id"
-            control={control}
-            rules={{deps: ['assignment_id', 'student_id', 'grader_id']}}
-            render={({field}) => (
-              <TextInput
-                {...field}
-                renderLabel={I18n.t('Course ID')}
-                messages={getFormErrorMessage(errors, 'course_id')}
-              />
-            )}
-          />
-          <Controller
-            name="assignment_id"
-            control={control}
-            rules={{deps: ['course_id', 'student_id', 'grader_id']}}
-            render={({field}) => (
-              <TextInput
-                {...field}
-                renderLabel={I18n.t('Assignment ID')}
-                messages={getFormErrorMessage(errors, 'assignment_id')}
-              />
-            )}
-          />
-        </FormFieldGroup>
-        <Controller
-          name="start_time"
-          control={control}
-          rules={{deps: ['end_time']}}
-          render={({field: {onChange, ref, ...rest}}) => (
-            <DateTimeInput
-              {...rest}
-              ref={startDateInputRef}
-              dateInputRef={dateInputRef => {
-                dateInputRef?.setAttribute('data-testid', 'start_time-date')
+          <Grid>
+            <Grid.Row>
+              <Grid.Col>
+                <Controller
+                  name="grader_id"
+                  control={control}
+                  rules={{deps: ['assignment_id', 'course_id', 'student_id']}}
+                  render={({field: {ref, ...fieldWithoutRef}}) => (
+                    <AutoCompleteSelect<User>
+                      {...fieldWithoutRef}
+                      maxLength={255}
+                      inputRef={ref}
+                      renderLabel={I18n.t('Grader')}
+                      placeholder={I18n.t('Search by name or ID')}
+                      assistiveText={I18n.t('Type to search')}
+                      url={`/api/v1/accounts/${accountId}/users`}
+                      renderOptionLabel={option => option.name}
+                      renderBeforeInput={<IconUserSolid inline={false} />}
+                      onInputChange={event => {
+                        fieldWithoutRef.onChange(event)
+                      }}
+                      onRequestSelectOption={(_, {id}) => {
+                        fieldWithoutRef.onChange(id)
+                      }}
+                      overrideSelectOptionProps={{
+                        renderBeforeLabel: <IconUserSolid inline={false} />,
+                      }}
+                    />
+                  )}
+                />
+              </Grid.Col>
+              <Grid.Col>
+                <Controller
+                  name="student_id"
+                  control={control}
+                  rules={{deps: ['assignment_id', 'course_id', 'grader_id']}}
+                  render={({field: {ref, ...fieldWithoutRef}}) => (
+                    <AutoCompleteSelect<User>
+                      {...fieldWithoutRef}
+                      maxLength={255}
+                      inputRef={ref}
+                      renderLabel={I18n.t('Student')}
+                      placeholder={I18n.t('Search by name or ID')}
+                      assistiveText={I18n.t('Type to search')}
+                      url={`/api/v1/accounts/${accountId}/users`}
+                      renderOptionLabel={option => option.name}
+                      renderBeforeInput={<IconUserSolid inline={false} />}
+                      messages={getFormErrorMessage(errors, 'student_id')}
+                      onInputChange={event => {
+                        fieldWithoutRef.onChange(event)
+                      }}
+                      onRequestSelectOption={(_, {id}) => {
+                        fieldWithoutRef.onChange(id)
+                      }}
+                      overrideSelectOptionProps={{
+                        renderBeforeLabel: <IconUserSolid inline={false} />,
+                      }}
+                    />
+                  )}
+                />
+              </Grid.Col>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Col>
+                <Controller
+                  name="course_id"
+                  control={control}
+                  rules={{deps: ['assignment_id', 'student_id', 'grader_id']}}
+                  render={({field: {ref, ...fieldWithoutRef}}) => (
+                    <AutoCompleteSelect<Course>
+                      {...fieldWithoutRef}
+                      maxLength={255}
+                      inputRef={ref}
+                      renderLabel={I18n.t('Course')}
+                      placeholder={I18n.t('Search by name or ID')}
+                      url={`/api/v1/accounts/${accountId}/courses`}
+                      renderOptionLabel={option =>
+                        `${option.id} - ${option.name} - ${option.course_code}`
+                      }
+                      renderBeforeInput={<IconCoursesSolid inline={false} />}
+                      messages={getFormErrorMessage(errors, 'course_id')}
+                      fetchParams={{'state[]': 'all'}}
+                      onInputChange={event => {
+                        fieldWithoutRef.onChange(event)
+                      }}
+                      onRequestSelectOption={(_, {id}) => {
+                        fieldWithoutRef.onChange(id)
+                      }}
+                      overrideSelectOptionProps={{
+                        renderBeforeLabel: <IconCoursesSolid inline={false} />,
+                      }}
+                    />
+                  )}
+                />
+              </Grid.Col>
+              <Grid.Col>
+                <Controller
+                  name="assignment_id"
+                  control={control}
+                  rules={{deps: ['course_id', 'student_id', 'grader_id']}}
+                  render={({field}) => (
+                    <TextInput
+                      {...field}
+                      renderLabel={I18n.t('Assignment ID')}
+                      placeholder={I18n.t('Enter assignment ID')}
+                      messages={getFormErrorMessage(errors, 'assignment_id')}
+                    />
+                  )}
+                />
+              </Grid.Col>
+            </Grid.Row>
+          </Grid>
+        </FieldGroup>
+        <FieldGroup
+          title={I18n.t('Time Range')}
+          messages={[{text: I18n.t('Optional.'), type: 'hint'}]}
+        >
+          <Flex direction="column" gap="medium">
+            <Controller
+              name="start_time"
+              control={control}
+              rules={{deps: ['end_time']}}
+              render={({field: {onChange, ref, ...rest}}) => (
+                <DateTimeInput
+                  {...rest}
+                  ref={startDateInputRef}
+                  dateInputRef={dateInputRef => {
+                    dateInputRef?.setAttribute('data-testid', 'start_time-date')
 
-                ref(dateInputRef)
-              }}
-              timeInputRef={timeInputRef =>
-                timeInputRef?.setAttribute('data-testid', 'start_time-time')
-              }
-              timezone={ENV.TIMEZONE}
-              locale={ENV.LOCALE}
-              description={
-                <ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>
-              }
-              invalidDateTimeMessage={I18n.t('Invalid date and time.')}
-              dateRenderLabel={I18n.t('From Date')}
-              timeRenderLabel={I18n.t('From Time')}
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              layout="columns"
-              allowNonStepInput={true}
-              onChange={(_, isoValue) => onChange(isoValue)}
-              messages={getFormErrorMessage(errors, 'start_time')}
+                    ref(dateInputRef)
+                  }}
+                  timeInputRef={timeInputRef =>
+                    timeInputRef?.setAttribute('data-testid', 'start_time-time')
+                  }
+                  timezone={ENV.TIMEZONE}
+                  locale={ENV.LOCALE}
+                  description={I18n.t('From')}
+                  invalidDateTimeMessage={I18n.t('Invalid date and time.')}
+                  datePlaceholder={I18n.t('Enter start date')}
+                  timePlaceholder={I18n.t('Enter start time')}
+                  dateRenderLabel={<ScreenReaderContent>{I18n.t('From Date')}</ScreenReaderContent>}
+                  timeRenderLabel={<ScreenReaderContent>{I18n.t('From Time')}</ScreenReaderContent>}
+                  prevMonthLabel={I18n.t('Previous month')}
+                  nextMonthLabel={I18n.t('Next month')}
+                  layout="columns"
+                  allowNonStepInput={true}
+                  onChange={(_, isoValue) => onChange(isoValue)}
+                  messages={getFormErrorMessage(errors, 'start_time')}
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          name="end_time"
-          control={control}
-          rules={{deps: ['start_time']}}
-          render={({field: {onChange, ref, ...rest}}) => (
-            <DateTimeInput
-              {...rest}
-              ref={endDateInputRef}
-              dateInputRef={dateInputRef => {
-                dateInputRef?.setAttribute('data-testid', 'end_time-date')
+            <Controller
+              name="end_time"
+              control={control}
+              rules={{deps: ['start_time']}}
+              render={({field: {onChange, ref, ...rest}}) => (
+                <DateTimeInput
+                  {...rest}
+                  ref={endDateInputRef}
+                  dateInputRef={dateInputRef => {
+                    dateInputRef?.setAttribute('data-testid', 'end_time-date')
 
-                ref(dateInputRef)
-              }}
-              timeInputRef={timeInputRef =>
-                timeInputRef?.setAttribute('data-testid', 'end_time-time')
-              }
-              timezone={ENV.TIMEZONE}
-              locale={ENV.LOCALE}
-              description={
-                <ScreenReaderContent>{I18n.t('Pick a date and time')}</ScreenReaderContent>
-              }
-              invalidDateTimeMessage={I18n.t('Invalid date and time.')}
-              dateRenderLabel={I18n.t('To Date')}
-              timeRenderLabel={I18n.t('To Time')}
-              prevMonthLabel={I18n.t('Previous month')}
-              nextMonthLabel={I18n.t('Next month')}
-              layout="columns"
-              allowNonStepInput={true}
-              onChange={(_, isoValue) => onChange(isoValue)}
-              messages={getFormErrorMessage(errors, 'end_time')}
+                    ref(dateInputRef)
+                  }}
+                  timeInputRef={timeInputRef =>
+                    timeInputRef?.setAttribute('data-testid', 'end_time-time')
+                  }
+                  timezone={ENV.TIMEZONE}
+                  locale={ENV.LOCALE}
+                  description={I18n.t('To')}
+                  invalidDateTimeMessage={I18n.t('Invalid date and time.')}
+                  datePlaceholder={I18n.t('Enter end date')}
+                  timePlaceholder={I18n.t('Enter end time')}
+                  dateRenderLabel={<ScreenReaderContent>{I18n.t('To Date')}</ScreenReaderContent>}
+                  timeRenderLabel={<ScreenReaderContent>{I18n.t('To Time')}</ScreenReaderContent>}
+                  prevMonthLabel={I18n.t('Previous month')}
+                  nextMonthLabel={I18n.t('Next month')}
+                  layout="columns"
+                  allowNonStepInput={true}
+                  onChange={(_, isoValue) => onChange(isoValue)}
+                  messages={getFormErrorMessage(errors, 'end_time')}
+                />
+              )}
             />
-          )}
-        />
-        <Flex justifyItems="end">
-          <Button type="submit" color="primary" margin="small 0 0 0" aria-label={buttonText}>
+          </Flex>
+        </FieldGroup>
+        <Flex justifyItems="start">
+          <Button type="submit" color="primary" aria-label={buttonText}>
             {buttonText}
           </Button>
         </Flex>

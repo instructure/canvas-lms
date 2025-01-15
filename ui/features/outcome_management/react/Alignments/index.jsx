@@ -20,13 +20,13 @@ import React, {useEffect, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import AlignmentSummaryHeader from './AlignmentSummaryHeader'
 import AlignmentOutcomeItemList from './AlignmentOutcomeItemList'
 import useCourseAlignmentStats from '@canvas/outcomes/react/hooks/useCourseAlignmentStats'
 import useCourseAlignments from '@canvas/outcomes/react/hooks/useCourseAlignments'
 
-const I18n = useI18nScope('AlignmentSummary')
+const I18n = createI18nScope('AlignmentSummary')
 
 const AlignmentSummary = () => {
   const [scrollContainer, setScrollContainer] = useState(null)

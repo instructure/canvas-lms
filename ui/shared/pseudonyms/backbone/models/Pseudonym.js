@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 
-const I18n = useI18nScope('pseudonym')
+const I18n = createI18nScope('pseudonym')
 
 extend(Pseudonym, Backbone.Model)
 
@@ -82,6 +82,10 @@ Pseudonym.prototype.errorMap = function (policy) {
       no_digits: I18n.t('errors.no_digits', 'Must include at least one number'),
       no_symbols: I18n.t('errors.no_symbols', 'Must include at least one symbol'),
       confirmation: I18n.t('errors.mismatch', "Doesn't match"),
+      unexpected: I18n.t(
+        'errors.unexpected',
+        'An unexpected error occurred. Please try again later.'
+      ),
     },
     password_confirmation: {
       confirmation: I18n.t('errors.mismatch', "Doesn't match"),

@@ -179,7 +179,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     course_with_teacher active_all: true
 
     @quiz = Quizzes::Quiz.create!(title: "quiz", context: @course)
-    @quiz.published_at = Time.now
+    @quiz.published_at = Time.zone.now
     @quiz.workflow_state = "available"
     @quiz.save!
   end
@@ -384,7 +384,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it "includes time spent" do
-        @quiz_submission.started_at = Time.now
+        @quiz_submission.started_at = Time.zone.now
         @quiz_submission.finished_at = @quiz_submission.started_at + 5.minutes
         @quiz_submission.save!
 

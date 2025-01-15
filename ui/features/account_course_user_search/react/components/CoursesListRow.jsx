@@ -37,11 +37,11 @@ import {Text} from '@instructure/ui-text'
 import axios from '@canvas/axios'
 import {uniqBy} from 'lodash'
 import $ from '@canvas/rails-flash-notifications'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import UserLink from './UserLink'
 import AddPeopleApp from '@canvas/add-people'
 
-const I18n = useI18nScope('account_course_user_search')
+const I18n = createI18nScope('account_course_user_search')
 
 export default class CoursesListRow extends React.Component {
   static propTypes = {
@@ -133,7 +133,7 @@ export default class CoursesListRow extends React.Component {
   }
 
   openAddUsersToCourseDialog = () => {
-    // eslint-disable-next-line promise/catch-or-return
+     
     this.getSections().then(sections => {
       this.addPeopleApp =
         this.addPeopleApp ||

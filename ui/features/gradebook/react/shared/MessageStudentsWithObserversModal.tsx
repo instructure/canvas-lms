@@ -20,8 +20,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AsyncComponents from '../default_gradebook/AsyncComponents'
-import {ApolloProvider} from '@apollo/react-common'
-import {createClient} from '@canvas/apollo'
+import {ApolloProvider} from '@apollo/client'
+import {createClient} from '@canvas/apollo-v3'
 
 export const showMessageStudentsWithObserversModal = async (props, focusAtEnd) => {
   const mountPoint = document.querySelector("[data-component='MessageStudentsWithObserversModal']")

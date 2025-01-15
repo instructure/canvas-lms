@@ -27,7 +27,14 @@
 
 import {useEffect, useRef} from 'react'
 import {isEqual} from 'lodash'
-import {shallowEqualArrays} from 'shallow-equal'
+
+function shallowEqualArrays(arrA, arrB) {
+  if (arrA === arrB) return true
+  if (!Array.isArray(arrA) || !Array.isArray(arrB)) return false
+  if (arrA.length !== arrB.length) return false
+
+  return arrA.every((value, index) => value === arrB[index])
+}
 
 function depsHaveChanged(priorDeps, newDeps, opts) {
   return (

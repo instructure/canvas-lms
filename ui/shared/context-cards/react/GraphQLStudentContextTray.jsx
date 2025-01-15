@@ -18,7 +18,7 @@
 
 import React from 'react'
 import StudentContextTray from './StudentContextTray'
-import {createClient, ApolloProvider, Query, gql} from '@canvas/apollo'
+import {createClient, ApolloProvider, Query, gql} from '@canvas/apollo-v3'
 
 const client = createClient()
 

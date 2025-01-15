@@ -20,11 +20,11 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {COURSES_QUERY} from '../../graphql/Queries'
 import CourseSelect, {ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {MailboxSelectionDropdown} from '../components/MailboxSelectionDropdown/MailboxSelectionDropdown'
 import {MessageActionButtons} from '../components/MessageActionButtons/MessageActionButtons'
 import PropTypes from 'prop-types'
-import {useQuery} from '@apollo/react-hooks'
+import {useQuery} from '@apollo/client'
 import React, {useContext, useEffect} from 'react'
 import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
@@ -32,7 +32,7 @@ import {AddressBookContainer} from './AddressBookContainer/AddressBookContainer'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../util/utils'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const MessageListActionContainer = props => {
   const LIMIT_TAG_COUNT = 1
@@ -96,13 +96,13 @@ const MessageListActionContainer = props => {
   useEffect(() => {
     if (
       !loading &&
-      !doesCourseFilterOptionExist(props.activeCourseFilter, courseSelectorOptions) &&
-      props.activeCourseFilter !== undefined
+      !doesCourseFilterOptionExist(props.activeCourseFilterID, courseSelectorOptions) &&
+      props.activeCourseFilterID !== undefined
     ) {
       props.onCourseFilterSelect(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.activeCourseFilter])
+  }, [props.activeCourseFilterID])
 
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
@@ -184,7 +184,7 @@ const MessageListActionContainer = props => {
               <CourseSelect
                 mainPage={true}
                 options={courseSelectorOptions}
-                activeCourseFilterID={props.activeCourseFilter}
+                activeCourseFilterID={props.activeCourseFilterID}
                 onCourseFilterSelect={contextObject => {
                   props.onCourseFilterSelect(contextObject.contextID)
                 }}
@@ -267,7 +267,7 @@ MessageListActionContainer.propTypes = {
   onStar: PropTypes.func,
   onDelete: PropTypes.func,
   onReadStateChange: PropTypes.func,
-  activeCourseFilter: PropTypes.string,
+  activeCourseFilterID: PropTypes.string,
   canReply: PropTypes.bool,
   showComposeButton: PropTypes.bool,
 }

@@ -22,11 +22,11 @@ import {shape, string} from 'prop-types'
 import update from 'immutability-helper'
 import DataRow from './dataRow'
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {chain, map, some} from 'lodash'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('gradinggradingStandard')
+const I18n = createI18nScope('gradinggradingStandard')
 
 class GradingStandard extends React.Component {
   static propTypes = {
@@ -211,7 +211,6 @@ class GradingStandard extends React.Component {
     return data.map(function (item, idx, array) {
       return (
         <DataRow
-          // eslint-disable-next-line react/no-array-index-key
           key={idx}
           uniqueId={idx}
           row={item}
@@ -419,6 +418,7 @@ class GradingStandard extends React.Component {
         <div
           className="grading_standard react_grading_standard pad-box-mini border border-trbl border-round"
           id={this.renderIdNames()}
+          data-testid={this.renderIdNames()}
         >
           {this.renderStandardAlert()}
           <div>

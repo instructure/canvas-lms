@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {useMutation} from '@tanstack/react-query'
 import {setRubricSelfAssessment} from '../queries'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('enhanced-rubrics-self-assessments')
+const I18n = createI18nScope('enhanced-rubrics-self-assessments')
 
 type RubricSelfAssessmentSettingsProps = {
   assignmentId: string

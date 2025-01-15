@@ -15,17 +15,17 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('broken_images')
+const I18n = createI18nScope('broken_images')
 
 export function attachErrorHandler(imgEl) {
   imgEl.addEventListener('error', e => {
     const img = e.currentTarget
     const broken = () => img.classList.add('broken-image')
     if (img.src) {
-      // eslint-disable-next-line promise/catch-or-return
+       
       fetch(img.src).then(res => {
         if (res.status === 403) {
           // if 403 Forbidden, replace the image with a lock image

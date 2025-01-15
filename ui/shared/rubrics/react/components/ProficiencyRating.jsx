@@ -26,7 +26,7 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
 import {RadioInput} from '@instructure/ui-radio-input'
@@ -34,7 +34,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import ColorPicker, {PREDEFINED_COLORS} from '@canvas/color-picker'
 
-const I18n = useI18nScope('ProficiencyRating')
+const I18n = createI18nScope('ProficiencyRating')
 
 function formatColor(color) {
   if (color[0] !== '#') {

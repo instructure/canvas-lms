@@ -22,7 +22,9 @@ require "redcarpet"
 
 module TextHelper
   def force_zone(time)
-    (time.in_time_zone(@time_zone || Time.zone) rescue nil) || time
+    time&.in_time_zone(@time_zone || Time.zone)
+  rescue ArgumentError
+    time
   end
 
   def self.date_string(start_date, *args)
@@ -52,23 +54,10 @@ module TextHelper
     presenter.as_string(display_as_range: end_time)
   end
 
-  def datetime_span(*args)
-    string = datetime_string(*args)
-    if string.present? && args[0]
-      "<span class='zone_cached_datetime' title='#{args[0].iso8601 rescue ""}'>#{string}</span>"
-    else
-      nil
-    end
-  end
-
   def datetime_string(start_datetime, datetime_type = :event, end_datetime = nil, shorten_midnight = false, zone = nil, with_weekday: false)
     zone ||= ::Time.zone
     presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone, with_weekday:)
     presenter.as_string(shorten_midnight:)
-  end
-
-  def time_ago_in_words_with_ago(time)
-    I18n.t("#time.with_ago", "%{time} ago", time: (time_ago_in_words time rescue ""))
   end
 
   # more precise than distance_of_time_in_words, and takes a number of seconds,
@@ -211,9 +200,9 @@ module TextHelper
     # now we grab the html and not the text.
     # we do first because nokogiri adds html and body tags
     # which we don't want
-    res = doc.at_css("body").inner_html rescue nil
-    res ||= doc.root.children.first.inner_html rescue ""
-    res&.html_safe
+    res = doc.at_css("body")&.inner_html
+    res ||= doc.root.children.first&.inner_html || ""
+    res.html_safe
   end
 
   def self.make_subject_reply_to(subject)

@@ -74,6 +74,7 @@ const NumberInputControlled: React.FC<NumberInputControlledProps> = ({
 
   return (
     <NumberInput
+      allowStringValue={true}
       min={minimum}
       max={maximum}
       renderLabel=""

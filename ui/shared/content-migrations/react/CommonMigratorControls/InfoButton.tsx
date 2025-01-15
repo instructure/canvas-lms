@@ -17,13 +17,13 @@
  */
 
 import React, {useState} from 'react'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, IconButton, CloseButton} from '@instructure/ui-buttons'
 import {IconQuestionLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('content_migrations_redesign')
+const I18n = createI18nScope('content_migrations_redesign')
 
 type InfoButtonProps = {
   heading: string

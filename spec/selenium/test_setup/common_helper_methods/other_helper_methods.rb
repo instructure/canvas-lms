@@ -56,7 +56,7 @@ module OtherHelperMethods
 
     page_view.summarized = summarized
     page_view.request_id = SecureRandom.hex(10)
-    page_view.created_at = opts[:created_at] || Time.now
+    page_view.created_at = opts[:created_at] || Time.zone.now
 
     if opts[:participated]
       page_view.participated = true

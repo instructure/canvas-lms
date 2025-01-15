@@ -35,9 +35,9 @@ import {FooterSection} from '../user/sections/FooterSection'
 import {getNodeIndex} from '../../utils'
 import {type AddSectionPlacement} from './types'
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 const nameToSection = (name: string) => {
   switch (name) {

@@ -25,11 +25,11 @@ import {
   type BlockEditorDataTypes,
   type BlockEditorData,
 } from './utils/transformations'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import './style.css'
 
-const I18n = useI18nScope('block-editor')
+const I18n = createI18nScope('block-editor')
 
 type BlockEditorViewProps = {
   content: BlockEditorDataTypes
@@ -49,7 +49,7 @@ const BlockEditorView = ({content, onRendered}: BlockEditorViewProps) => {
 
   useEffect(() => {
     if (data.version !== LATEST_BLOCK_DATA_VERSION) {
-      // eslint-disable-next-line no-alert
+       
       alert(I18n.t('Unknown block data version "%{v}", mayhem may ensue', {v: data.version}))
     }
   }, [data.version])

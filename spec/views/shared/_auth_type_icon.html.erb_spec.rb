@@ -50,8 +50,8 @@ describe "shared/_flash_notices" do
   end
 
   it "uses the button icon based on auth type" do
-    render partial: "shared/auth_type_icon", locals: local_options(auth_type: "twitter")
+    render partial: "shared/auth_type_icon", locals: local_options(auth_type: "google")
     doc = Nokogiri::HTML(response.body)
-    expect(doc.css("svg.ic-icon-svg--twitter")).to be_present
+    expect(doc.css("svg.ic-icon-svg--google")).to be_present
   end
 end

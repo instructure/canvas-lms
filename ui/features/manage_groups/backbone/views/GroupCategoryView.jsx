@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {View} from '@canvas/backbone'
 import {debounce} from 'lodash'
@@ -30,7 +30,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import GroupCategoryProgress from '../../react/GroupCategoryProgress'
 
-const I18n = useI18nScope('groups')
+const I18n = createI18nScope('groups')
 
 let _previousSearchTerm = ''
 export default class GroupCategoryView extends View {
@@ -149,7 +149,7 @@ export default class GroupCategoryView extends View {
   renderProgress() {
     const container = document.getElementById('group-category-progress')
     if (container != null) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
         container

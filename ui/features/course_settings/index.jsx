@@ -30,12 +30,12 @@ import initialState from './react/store/initialState'
 import './jquery/index'
 import '@canvas/grading-standards'
 import FeatureFlags from '@canvas/feature-flags'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 import QuantitativeDataOptions from './react/components/QuantitativeDataOptions'
 import CourseDefaultDueTime from './react/components/CourseDefaultDueTime'
 
-const I18n = useI18nScope('course_settings')
+const I18n = createI18nScope('course_settings')
 
 const BlueprintLockOptions = React.lazy(() => import('./react/components/BlueprintLockOptions'))
 const CourseTemplateDetails = React.lazy(() => import('./react/components/CourseTemplateDetails'))
@@ -55,7 +55,7 @@ const Error = () => (
 ready(() => {
   const blueprint = document.getElementById('blueprint_menu')
   if (blueprint) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
@@ -75,7 +75,7 @@ ready(() => {
   const courseTemplate = document.getElementById('course_template_details')
   if (courseTemplate) {
     const isEditable = courseTemplate.getAttribute('data-is-editable') === 'true'
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
@@ -89,7 +89,7 @@ ready(() => {
   const navView = new NavigationView({el: $('#tab-navigation')})
 
   if (document.getElementById('tab-features')) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <FeatureFlags disableDefaults={true} />,
       document.getElementById('tab-features')
@@ -98,7 +98,7 @@ ready(() => {
 
   $(() => navView.render())
 
-  // eslint-disable-next-line no-restricted-properties
+   
   ReactDOM.render(
     <CourseImageSelector
       store={configureStore(initialState)}
@@ -110,7 +110,7 @@ ready(() => {
 
   const bannerImageContainer = document.getElementById('course_banner_image_selector_container')
   if (bannerImageContainer) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <CourseImageSelector
         store={configureStore(initialState)}
@@ -124,7 +124,7 @@ ready(() => {
 
   const availabilityOptionsContainer = document.getElementById('availability_options_container')
   if (availabilityOptionsContainer) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
@@ -143,7 +143,7 @@ ready(() => {
     'restrict_quantitative_data_options_container'
   )
   if (restrictQuantitativeDataContainer) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <QuantitativeDataOptions canManage={ENV.CAN_EDIT_RESTRICT_QUANTITATIVE_DATA} />
@@ -154,7 +154,7 @@ ready(() => {
 
   const defaultDueTimeContainer = document.getElementById('default_due_time_container')
   if (defaultDueTimeContainer) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <CourseDefaultDueTime />
@@ -166,7 +166,7 @@ ready(() => {
   if (ENV.COURSE_COLORS_ENABLED) {
     const courseColorPickerContainer = document.getElementById('course_color_picker_container')
     if (courseColorPickerContainer) {
-      // eslint-disable-next-line no-restricted-properties
+       
       ReactDOM.render(
         <CourseColorSelector courseColor={ENV.COURSE_COLOR} />,
         courseColorPickerContainer
@@ -176,7 +176,7 @@ ready(() => {
 
   const integrationsContainer = document.getElementById('tab-integrations')
   if (integrationsContainer) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>
@@ -189,7 +189,7 @@ ready(() => {
 
   const appsMountpoint = document.getElementById('tab-apps')
   if (appsMountpoint) {
-    // eslint-disable-next-line no-restricted-properties
+     
     ReactDOM.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<Error />}>

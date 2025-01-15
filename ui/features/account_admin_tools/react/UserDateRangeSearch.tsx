@@ -19,7 +19,7 @@
 import React, {useRef} from 'react'
 import {zodResolver} from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -28,12 +28,11 @@ import {Controller, useForm, type SubmitHandler} from 'react-hook-form'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
-  focusFiled,
   getFormErrorMessage,
   isDateTimeInputInvalid,
 } from '@canvas/forms/react/react-hook-form/utils'
 
-const I18n = useI18nScope('user_date_range_search')
+const I18n = createI18nScope('user_date_range_search')
 
 const defaultValues = {
   from: undefined,
@@ -72,6 +71,7 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
     formState: {errors},
     control,
     handleSubmit,
+    setFocus,
   } = useForm({
     defaultValues,
     resolver: zodResolver(validationSchema),
@@ -83,12 +83,12 @@ const UserDateRangeSearch = ({userName, onSubmit, onClose}: UserDateRangeSearchP
 
   const handleFormSubmit: SubmitHandler<FormValues> = async data => {
     if (isDateTimeInputInvalid(fromInputRef)) {
-      focusFiled(control, 'from')
+      setFocus('from')
       return
     }
 
     if (isDateTimeInputInvalid(toInputRef)) {
-      focusFiled(control, 'to')
+      setFocus('to')
       return
     }
 

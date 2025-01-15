@@ -24,8 +24,8 @@ import MessageListActionContainer from './MessageListActionContainer'
 import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation, useQuery} from '@apollo/react-hooks'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {useMutation, useQuery} from '@apollo/client'
 import {
   CREATE_USER_INBOX_LABEL,
   DELETE_CONVERSATIONS,
@@ -56,7 +56,7 @@ import InboxSettingsModalContainer, {
 } from './InboxSettingsModalContainer/InboxSettingsModalContainer'
 import TopNavPortal from '@canvas/top-navigation/react/TopNavPortal'
 
-const I18n = useI18nScope('conversations_2')
+const I18n = createI18nScope('conversations_2')
 
 const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
 
@@ -301,7 +301,7 @@ const CanvasInbox = ({breakpoints}) => {
       {count: selectedConversations.length}
     )
 
-    const confirmResult = window.confirm(archiveConfirmMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(archiveConfirmMsg)  
     if (confirmResult) {
       archiveConversationParticipants({
         variables: {
@@ -324,7 +324,7 @@ const CanvasInbox = ({breakpoints}) => {
       {count: selectedConversations.length}
     )
 
-    const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(unarchiveConfirmMsg)  
     if (confirmResult) {
       unarchiveConversationParticipants({
         variables: {
@@ -451,7 +451,7 @@ const CanvasInbox = ({breakpoints}) => {
       },
       {count: conversationsToDeleteByID.length}
     )
-    const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
+    const confirmResult = window.confirm(delMsg)  
     if (confirmResult) {
       deleteConversations({variables: {ids: conversationsToDeleteByID}})
     } else {
@@ -744,13 +744,13 @@ const CanvasInbox = ({breakpoints}) => {
       buttonsDirection: breakpoints.mobileOnly ? 'column' : 'row',
       buttonsDisplay: breakpoints.mobileOnly ? 'block' : 'inline-block',
       headerMargin: breakpoints.ICEDesktop ? '0' : '0 0 medium 0',
-      containerWidth: breakpoints.ICEDesktop ? 'auto' : '100%'
+      containerWidth: breakpoints.ICEDesktop ? 'auto' : '100%',
     }
   }
 
   return (
     <>
-      <TopNavPortal/>
+      <TopNavPortal />
       <ConversationContext.Provider value={conversationContext}>
         {!inboxSettingsFeature && (
           <Heading level="h1">
@@ -771,7 +771,9 @@ const CanvasInbox = ({breakpoints}) => {
                 margin="small medium medium medium"
               >
                 <Flex.Item width={getResponsiveStyles().containerWidth} shouldShrink={true}>
-                  <Heading margin={getResponsiveStyles().headerMargin} level="h1">{I18n.t('Inbox')}</Heading>
+                  <Heading margin={getResponsiveStyles().headerMargin} level="h1">
+                    {I18n.t('Inbox')}
+                  </Heading>
                 </Flex.Item>
                 <Flex.Item width={getResponsiveStyles().buttonsWidth}>
                   <Flex
@@ -802,7 +804,7 @@ const CanvasInbox = ({breakpoints}) => {
             >
               <MessageListActionContainer
                 activeMailbox={scope}
-                activeCourseFilter={courseFilter}
+                activeCourseFilterID={courseFilter}
                 onSelectMailbox={newScope => {
                   setSelectedConversations([])
                   setScope(newScope)
@@ -944,7 +946,7 @@ const CanvasInbox = ({breakpoints}) => {
           selectedIds={selectedIds}
           contextIdFromUrl={urlContextId}
           maxGroupRecipientsMet={maxGroupRecipientsMet}
-          currentCourseFilter={courseFilter}
+          activeCourseFilterID={courseFilter}
           inboxSignatureBlock={inboxSignatureBlock}
         />
         <ManageUserLabels

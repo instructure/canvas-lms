@@ -2126,6 +2126,7 @@ fa:
   add_outcomes_to_course_88ba09be: "افزودن نتایج به درس"
   add_outcomes_to_groupname_8c33d118: "افزودن نتایج به \"%{groupName}\""
   add_override_da70f198: "اضافه کردن بازبینی"
+  add_page_7ea7ee39: "افزودن صفحه"
   add_people_7948b7da: "افزودن افراد"
   add_people_7ee4b2ec: "افزودن افراد"
   add_people_and_courses_to_canvas_5c4bfff9: "افراد و درس‌ها را به کانواس اضافه کنید"
@@ -3655,6 +3656,7 @@ fa:
     getting_file: "درحال بازیابی فایل..."
     grade_assignment: 
       buttons: 
+        choose_file: "انتخاب فایل"
         upload_files: "بارگذاری فایل ها"
       graded_count: "%{graded_count} *از*  %{total} مورد ارسالی نمره گذاری شده"
       links: 
@@ -4816,6 +4818,7 @@ fa:
     edit: 
       confirm_delete_calendar_event: "مطمئنید که می خواهید این رویداد تقویم حذف شود؟"
       errors: 
+        greater_or_equal: "باید حداقل به یک کاربر اجازه حضور بدهید"
         start_date_required: "باید یک تاریخ وارد کنید"
         title_required: "باید یک عنوان وارد کنید"
       event_deleted: "%{event_title} با موفقیت حذف شد"
@@ -6121,6 +6124,7 @@ fa:
     unexpected_error: "یک خطای پیش بینی نشده ای رخ داد، لطفا با پشتیبانی تماس بگیرید."
     unknown: ناشناس
     upload_timeout_error: "زمان مجاز برای بارگذاری فایل پایان یافته است."
+  content_migration_1f14de27: "انتقال محتوا"
   content_migration_queued_46c27790: "انتقال محتوا در صف قرار دارد"
   content_migration_running_percent_complete_4b00c024: "انتقال محتوا در حال اجراست, %{percent}% انجام شده است"
   content_migrations: 
@@ -10767,6 +10771,7 @@ fa:
     titles: 
       bookmark_search: "نشانه گذاری جستجو: %{service_name}"
   find_8d605019: یافتن
+  find_a_course_94301b4d: "یافتن یک درس"
   find_an_existing_grading_scheme_d836ea: "یافتن طرح نمره گذاری موجود"
   find_an_outcome_919328e6: "یافتن نتیجه"
   find_appointment_85d6922e: "یافتن قرار ملاقات"
@@ -10821,7 +10826,9 @@ fa:
   folder_705fd2d7: پوشه
   folder_browsing_tree_1f00a3ae: "درخت مرور پوشه"
   folder_icon_29017021: "نماد پوشه"
+  folder_name_b28488c2: "نام پوشه"
   folder_tree_fbab0726: "درخت پوشه"
+  folder_was_successfully_created_8de6a282: "پوشه با موفقیت ایجاد شد."
   folders: 
     event_updated: "رویداد با موفقیت بهنگام سازی شد"
     file_zip_in_process: "فشرده سازی فایل هنوز در حال انجام است..."
@@ -13746,6 +13753,7 @@ fa:
   magenta_4a65993c: ارغوانی
   main_navigation_3f080c80: "پیمایش اصلی"
   main_text_color_7d65ab1b: "رنگ متن اصلی"
+  make_it_public_71bf2a86: "عمومی کردن آن"
   make_key_developername_invisible_212ecf72: "کلید %{developerName} را نامرئی کن"
   make_key_developername_visible_97c404bf: "کلید %{developerName}را  قابل مشاهده کن"
   make_key_invisible_e66af89: "کلید را نامرئی کن"
@@ -14453,7 +14461,7 @@ fa:
         no_due_date: "مهلت: بدون تاریخ مهلت"
       twitter: 
         assignment_change: "هشدار کانواس - تغییر تاریخ: %{assignment_name}، %{course_name} (%{override})"
-        due_at: "مهلت: %{assignment_due_date_time}"
+        due_at: "due: %{assignment_due_date_time}"
         no_due_date: "مهلت: بدون تاریخ مهلت"
     assignment_graded: 
       email: 
@@ -15017,7 +15025,7 @@ fa:
       twitter: 
         email_body: "زمان رویداد %{event_title}، برای درس %{course_name} تغییر یافته است. اکنون بدین قرار است: %{new_time}"
         from_to_time: "از %{start_date_time} تا %{end_date_time}"
-        no_time_set: "هیچ زمانی تعیین نشده است"
+        no_time_set: "زمان تعیین نشده است"
     file_locked: "این فایل در حال حاضر قفل است."
     file_locked_at: "این فایل در %{at} قفل شد."
     file_locked_module: "این فایل بخشی از ماژول *%{module}* است و هنوز قفل گشایی نشده است."
@@ -15347,7 +15355,7 @@ fa:
         subject: "رویداد جدید - %{event_title}، %{course_name}"
       twitter: 
         from_to_time: "از %{start_date_time} تا %{end_date_time}"
-        no_time_set: "هیچ زمانی تعیین نشده است"
+        no_time_set: "زمان تعیین نشده است"
         subject: "هشدار کانواس - رویداد: %{event_title}، %{course_name}"
     new_file_added: 
       email: 
@@ -15582,7 +15590,7 @@ fa:
         someone: "یک شخص"
         subject: "نظر درباره مورد ارسالی: %{user}، %{assignment}، %{context}"
       twitter: 
-        tweet: "هشدار کانواس  -  نظر: %{author} برای %{assignment}، %{user}، %{context}."
+        tweet: "هشدار کانواس - نظر : %{author} برای %{assignment}، %{user}، %{context}."
     submission_comment_for_teacher: 
       email: 
         body: "%{author} یک نظر جدید درباره مورد ارسالی برای %{user} برای %{assignment} ایجاد کرد"
@@ -17441,6 +17449,7 @@ fa:
   partially_enabled_cd506819: "تا حدی فعال است"
   participantcount_less_8d258f6: "%{participantCount} کمتر"
   participantcount_more_50363e55: "%{participantCount} بیشتر"
+  participated_6279fba: "شرکت شده"
   participation_af2598: مشارکت
   participations_1823832d: "مشارکت ها"
   pass_2a8c4f07: قبول
@@ -18091,6 +18100,7 @@ fa:
   points_possible_e57d5613: "امتیازهای ممکن"
   points_possible_must_be_0_or_more_for_selected_gra_f96a04e3: "امتیازهای ممکن باید برای نوع نمره گذاری انتخابی 0 یا بیشتر باشد"
   points_possible_points_fda3b111: "%{points_possible} امتیاز"
+  points_possible_pts_aedb481e: "%{points_possible} امتیاز"
   points_pts_e5596bf7: "%{points} امتیاز"
   points_should_be_strictly_decreasing_l_r_18f26f87: "امتیازها باید اکیدا کاهش یابد:  %{l} <=%{r}"
   points_to_endofrangepoints_pts_aad207f0: "%{points} به >%{endOfRangePoints} امتیازها"
@@ -20198,6 +20208,7 @@ fa:
   re_upload_submissions_125e415d: "بارگذاری دوباره موردهای ارسالی"
   re_upload_submissions_form: 
     buttons: 
+      choose_file: "انتخاب فایل"
       upload: "بارگذاری فایل ها"
     reupload_submission_files: "بارگذاری دوباره فایل های ارسالی"
     upload_info: "اگر در فایل های ارسالی دانشجو که قبلا بارگیری کرده اید، تغییراتی ایجاد کردید، آنها را دوباره فشرده کنید و فایل فشرده را با استفاده از فرم زیر بارگذاری نمایید. دانشجویان فایل های تغییر یافته را در نظرهای مربوط به مورد ارسالی خود مشاهده خواهند کرد."
@@ -21124,8 +21135,10 @@ fa:
   section_id_6f73f3d5: "شناسه بخش"
   section_id_8ec4f46f: "شناسه بخش"
   section_id_b5aad4a7: "شناسه بخش"
+  section_name_16ea8a4a: "نام بخش"
   section_name_b6d82574: "نام بخش"
   section_name_edb51b2: "نام بخش"
+  section_name_is_too_long_9cec2a30: "نام بخش، طولانی است "
   section_removed_2ac72a79: "%{section} حذف شد."
   section_section_names_98f172e6: "بخش: %{section_names}"
   section_sis_2a80d2fa: "سامانه اطلاعات دانشجوی بخش"
@@ -24700,6 +24713,7 @@ fa:
   unread_e9c1b19c: "خوانده نشده"
   unread_post_47a1a06b: "پست خوانده نشده"
   unreadcount_unread_replies_509e167f: "%{unreadCount} پاسخ خوانده نشده"
+  unrecognized_browser_1fd80dfb: "مرورگر ناشناس"
   unregister_service_985238e9: "لغو ثبت سرویس"
   unreserved_e86b7425: "رزرو نشده"
   unsafe_file_link_8a18eceb: "پیوند فایل ناامن"

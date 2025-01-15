@@ -18,10 +18,10 @@
 
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
 
-const I18n = useI18nScope('theme_editor')
+const I18n = createI18nScope('theme_editor')
 
 export default class ThemeEditorFileUpload extends Component {
   static propTypes = {
@@ -66,7 +66,7 @@ export default class ThemeEditorFileUpload extends Component {
     this.props.handleThemeStateChange(this.props.name, null, {
       customFileUpload: true,
       resetValue: true,
-      useDefault: !this.hasUserInput() && this.props.currentValue,
+      useDefault: !this.hasUserInput() && !!this.props.currentValue,
     })
     this.props.onChange(!this.hasUserInput() ? '' : null)
   }
@@ -132,15 +132,15 @@ export default class ThemeEditorFileUpload extends Component {
           </button>
           <input
             type="hidden"
-            name={!this.props.userInput.val && this.props.name}
+            name={!this.props.userInput.val ? this.props.name : undefined}
             value={this.props.userInput.val === '' ? '' : this.props.currentValue}
           />
-          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
+          { }
           <label className="ThemeEditorFileUpload__file-chooser">
             <span className="screenreader-only">{this.props.label}</span>
             <input
               type="file"
-              name={this.props.userInput.val && this.props.name}
+              name={this.props.userInput.val ? this.props.name : undefined}
               accept={this.props.accept}
               onChange={this.handleFileChanged}
               ref={c => (this.fileInput = c)}

@@ -44,7 +44,9 @@ RSpec.describe Mutations::UpdateDiscussionSortOrder do
         }) {
           discussionTopic {
             _id
-            sortOrder
+            participant {
+              sortOrder
+             }
           }
           errors {
             message
@@ -71,11 +73,26 @@ RSpec.describe Mutations::UpdateDiscussionSortOrder do
     expect(discussion_type.resolve(:sortOrder)).to eq("desc")
 
     result = run_mutation(discussion_topic_id: @topic.id, sort: :asc)
-    expect(result[:data][:updateDiscussionSortOrder][:discussionTopic][:sortOrder]).to eq("asc")
-    expect(discussion_type.resolve(:sortOrder)).to eq("asc")
+    expect(result[:data][:updateDiscussionSortOrder][:discussionTopic][:participant][:sortOrder]).to eq("asc")
 
     result = run_mutation(discussion_topic_id: @topic.id, sort: :desc)
-    expect(result[:data][:updateDiscussionSortOrder][:discussionTopic][:sortOrder]).to eq("desc")
+    expect(result[:data][:updateDiscussionSortOrder][:discussionTopic][:participant][:sortOrder]).to eq("desc")
+  end
+
+  it "does not update when discussion topic default sort order locked is true" do
+    Account.site_admin.enable_feature!(:discussion_default_sort)
     expect(discussion_type.resolve(:sortOrder)).to eq("desc")
+    @topic.update!(sort_order_locked: true)
+    result = run_mutation(discussion_topic_id: @topic.id, sort: :asc)
+    # it did not update
+    expect(result[:data][:updateDiscussionSortOrder][:discussionTopic][:participant][:sortOrder]).to eq("desc")
+  end
+
+  it "does update when discussion_default_sort flag is off" do
+    Account.site_admin.disable_feature!(:discussion_default_sort)
+    expect(discussion_type.resolve(:sortOrder)).to eq("desc")
+    result = run_mutation(discussion_topic_id: @topic.id, sort: :asc)
+    # it did update
+    expect(result[:data][:updateDiscussionSortOrder][:discussionTopic][:participant][:sortOrder]).to eq("asc")
   end
 end

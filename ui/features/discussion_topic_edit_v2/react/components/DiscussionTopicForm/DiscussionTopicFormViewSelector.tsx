@@ -20,11 +20,11 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Tabs} from '@instructure/ui-tabs'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import type {ViewOwnProps} from '@instructure/ui-view'
 import type {Breakpoints} from '@canvas/with-breakpoints'
 
-const I18n = useI18nScope('discussion_create')
+const I18n = createI18nScope('discussion_create')
 
 export enum Views {
   Details = 0,

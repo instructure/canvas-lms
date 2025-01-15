@@ -99,3 +99,9 @@ prevent_deletion_outcomes_with_os_alignments:
   applies_to: SiteAdmin
   display_name: Prevent deletion of outcomes with alignments in OS
   description: This FF is for development purposes only and should not be adjusted without first consulting product and engineering. This flag will prevent deletion of outcomes that have alignments within the outcomes service, which is used for New Quizzes.
+improved_outcomes_report_generation:
+  state: hidden
+  display_name: Improved Outcomes Report Generation
+  description: Reduces execution time of Student Competency Report generation by reducing query complexity.
+  applies_to: SiteAdmin
+  shadow: true

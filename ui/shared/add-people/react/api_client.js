@@ -22,9 +22,9 @@
 // on the api input.
 //
 import axios from '@canvas/axios'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('add_people_api_client')
+const I18n = createI18nScope('add_people_api_client')
 
 export default {
   // @param courseId: id of current course
@@ -87,7 +87,7 @@ export default {
         return response
       })
     }
-    // eslint-disable-next-line prefer-promise-reject-errors
+     
     return Promise.reject({
       message: I18n.t('You do not have permission to invite users that do not already exist.'),
     })

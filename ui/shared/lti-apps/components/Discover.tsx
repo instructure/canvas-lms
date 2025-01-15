@@ -18,7 +18,7 @@
 
 import React, {useMemo, useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import LtiFilterTray from './apps/LtiFilterTray'
 import FilterTags from './apps/FilterTags'
 import {fetchLtiFilters, fetchProducts, fetchToolsByDisplayGroups} from '../queries/productsQuery'
@@ -29,7 +29,7 @@ import Disclaimer from './common/Disclaimer'
 import {Products} from './apps/Products'
 import {SearchAndFilter} from './apps/SearchAndFilter'
 
-const I18n = useI18nScope('lti_registrations')
+const I18n = createI18nScope('lti_registrations')
 
 export const Discover = () => {
   const accountId = ZAccountId.parse(window.location.pathname.split('/')[2])

@@ -119,7 +119,7 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
     end
 
     it "propagates unlock_at and lock_at changes to all checkpoints and the parent assignment" do
-      now = Time.now.change(usec: 0)
+      now = Time.zone.now.change(usec: 0)
       initial_unlock_at = 1.day.from_now(now)
       initial_lock_at = 5.days.from_now(now)
 
@@ -489,7 +489,7 @@ describe Checkpoints::DiscussionCheckpointUpdaterService do
       it "creates 2 checkpoints with 2 adhoc overrides each, and can update the correct sub_assignment assignment_overrides" do
         @students = create_users(2, return_type: :record)
         @students.each { |student| student_in_course(course: @topic.course, user: student, active_all: true) }
-        now = Time.now.change(usec: 0)
+        now = Time.zone.now.change(usec: 0)
         original_due_at_1 = 3.days.from_now(now)
         original_due_at_2 = 4.days.from_now(now)
         original_unlock_at_1 = 1.day.from_now(now)

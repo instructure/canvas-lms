@@ -125,7 +125,7 @@ class AnnouncementsController < ApplicationController
           channel.description = t(:podcast_feed_description_group, "Any media files linked from or embedded within announcements in the group \"%{group}\" will appear in this feed.", group: @context.name)
         end
         channel.link = polymorphic_url([@context, :announcements])
-        channel.pubDate = Time.now.strftime("%a, %d %b %Y %H:%M:%S %z")
+        channel.pubDate = Time.zone.now.strftime("%a, %d %b %Y %H:%M:%S %z")
         elements = Announcement.podcast_elements(announcements, @context)
         elements.each do |item|
           channel.items << item

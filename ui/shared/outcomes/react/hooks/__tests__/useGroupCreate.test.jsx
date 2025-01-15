@@ -20,7 +20,7 @@ import React from 'react'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useGroupCreate from '../useGroupCreate'
 import {createCache} from '@canvas/apollo-v3'
-import {MockedProvider} from '@apollo/react-testing'
+import {MockedProvider} from '@apollo/client/testing'
 import {createOutcomeGroupMocks} from '../../../mocks/Management'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 

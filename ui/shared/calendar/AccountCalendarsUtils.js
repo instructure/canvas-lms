@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_calendars')
+const I18n = createI18nScope('account_calendars')
 
 export const alertForMatchingAccounts = (results, showDefault) => {
   const polite = true

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable no-void */
+ 
 
 import {extend} from '@canvas/backbone/utils'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import * as tz from '@instructure/moment-utils'
 import fcUtil from '@canvas/calendar/jquery/fcUtil'
@@ -32,7 +32,7 @@ import '../../fcMomentHandlebarsHelpers' // make sure fcMomentToString is availa
 import 'jquery-tinypubsub'
 import userSettings from '@canvas/user-settings'
 
-const I18n = useI18nScope('calendar')
+const I18n = createI18nScope('calendar')
 
 extend(AgendaView, Backbone.View)
 
@@ -123,7 +123,7 @@ AgendaView.prototype.handleEvents = function (events) {
 AgendaView.prototype.appendEvents = function (events) {
   let ref
   this.nextPageDate = events.nextPageDate
-  // eslint-disable-next-line prefer-spread
+   
   this.collection.push.apply(
     this.collection,
     calendarEventFilter(

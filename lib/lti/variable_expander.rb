@@ -82,6 +82,7 @@ module Lti
     end
 
     CONTROLLER_GUARD = -> { !!@controller }
+    CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD = -> { use_controller_free_expansions? || !!@controller }
     COURSE_GUARD = -> { lti_helper.course }
     TERM_START_DATE_GUARD = -> { lti_helper.course&.enrollment_term&.start_at }
     TERM_END_DATE_GUARD = -> { lti_helper.course&.enrollment_term&.end_at }
@@ -159,6 +160,25 @@ module Lti
         else
           output
         end
+      end
+    end
+
+    def use_controller_free_expansions?
+      unless defined?(@use_controller_free_expansions)
+        @use_controller_free_expansions = @root_account.feature_enabled?(:refactor_custom_variables)
+      end
+      @use_controller_free_expansions
+    end
+
+    def url_helper_extra_params
+      @url_helper_extra_params ||= @controller ? {} : { host: @root_account.environment_specific_domain }
+    end
+
+    def url_helpers
+      if use_controller_free_expansions?
+        @controller || Rails.application.routes.url_helpers
+      else
+        @controller
       end
     end
 
@@ -632,8 +652,8 @@ module Lti
     #   ```
     register_expansion "Canvas.api.domain",
                        [],
-                       -> { HostUrl.context_host(@root_account, @request.host) },
-                       CONTROLLER_GUARD
+                       -> { HostUrl.context_host(@root_account, @request.nil? ? @root_account.environment_specific_domain : @request.host) },
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD
 
     # returns the api url for the members of the collaboration
     # @example
@@ -642,9 +662,10 @@ module Lti
     #  ```
     register_expansion "Canvas.api.collaborationMembers.url",
                        [],
-                       -> { @controller.api_v1_collaboration_members_url(@collaboration) },
-                       CONTROLLER_GUARD,
+                       -> { url_helpers.api_v1_collaboration_members_url(@collaboration, **url_helper_extra_params) },
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD,
                        COLLABORATION_GUARD
+
     # returns the base URL for the current context.
     # @example
     #   ```
@@ -652,8 +673,14 @@ module Lti
     #   ```
     register_expansion "Canvas.api.baseUrl",
                        [],
-                       -> { "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}" },
-                       CONTROLLER_GUARD
+                       lambda {
+                         if use_controller_free_expansions?
+                           url_helpers.root_url(**url_helper_extra_params).chomp("/")
+                         else
+                           "#{@request.scheme}://#{HostUrl.context_host(@root_account, @request.host)}"
+                         end
+                       },
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD
 
     # returns the URL for the membership service associated with the current context.
     #
@@ -664,8 +691,8 @@ module Lti
     #   ```
     register_expansion "ToolProxyBinding.memberships.url",
                        [],
-                       -> { @controller.polymorphic_url([@context, :membership_service]) },
-                       CONTROLLER_GUARD,
+                       -> { url_helpers.polymorphic_url([@context, :membership_service], **url_helper_extra_params) },
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD,
                        -> { @context.is_a?(Course) || @context.is_a?(Group) }
 
     # returns the account id for the current context.
@@ -721,7 +748,6 @@ module Lti
     register_expansion "Canvas.externalTool.global_id",
                        [],
                        -> { @tool.global_id },
-                       CONTROLLER_GUARD,
                        LTI1_GUARD
 
     # returns the URL for the external tool that was launched. Only available for LTI 1.
@@ -732,12 +758,28 @@ module Lti
     register_expansion "Canvas.externalTool.url",
                        [],
                        lambda {
-                         @controller.named_context_url(@tool.context,
-                                                       :api_v1_context_external_tools_update_url,
-                                                       @tool.id,
-                                                       include_host: true)
+                         if use_controller_free_expansions?
+                           if @tool.context.is_a?(Account)
+                             url_helpers.api_v1_account_external_tools_update_url(
+                               account_id: @tool.context_id,
+                               external_tool_id: @tool.id,
+                               **url_helper_extra_params
+                             )
+                           elsif @tool.context.is_a?(Course)
+                             url_helpers.api_v1_course_external_tools_update_url(
+                               course_id: @tool.context_id,
+                               external_tool_id: @tool.id,
+                               **url_helper_extra_params
+                             )
+                           end
+                         else
+                           @controller.named_context_url(@tool.context,
+                                                         :api_v1_context_external_tools_update_url,
+                                                         @tool.id,
+                                                         include_host: true)
+                         end
                        },
-                       CONTROLLER_GUARD,
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD,
                        LTI1_GUARD
 
     # returns the URL to retrieve the brand config JSON for the launching context.
@@ -1523,7 +1565,13 @@ module Lti
     #   ```
     register_expansion "Canvas.xapi.url",
                        [],
-                       -> { @controller.lti_xapi_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
+                       lambda {
+                         url_helpers.lti_xapi_url(
+                           Lti::AnalyticsService.create_token(@tool, @current_user, @context),
+                           **url_helper_extra_params
+                         )
+                       },
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD,
                        -> { @current_user && @context.is_a?(Course) && @tool }
 
     # Returns the caliper url for the user.
@@ -1533,8 +1581,13 @@ module Lti
     #   ```
     register_expansion "Caliper.url",
                        [],
-                       -> { @controller.lti_caliper_url(Lti::AnalyticsService.create_token(@tool, @current_user, @context)) },
-                       CONTROLLER_GUARD,
+                       lambda {
+                         url_helpers.lti_caliper_url(
+                           Lti::AnalyticsService.create_token(@tool, @current_user, @context),
+                           **url_helper_extra_params
+                         )
+                       },
+                       CONTROLLER_FREE_FF_OR_CONTROLLER_GUARD,
                        -> { @current_user && @context.is_a?(Course) && @tool }
 
     # Returns a comma separated list of section_id's that the user is enrolled in.
@@ -1994,7 +2047,8 @@ module Lti
                        lambda {
                          val = @request.parameters["com_instructure_course_accept_canvas_resource_types"]
                          val.is_a?(Array) ? val.join(",") : val
-                       }
+                       },
+                       CONTROLLER_GUARD
 
     # Returns the target resource type for the current page, forwarded from the request.
     # Value is the largest logical unit of the page. Possible values are: ["assignment", "assignment_group",
@@ -2012,7 +2066,8 @@ module Lti
     #   ```
     register_expansion "com.instructure.Course.canvas_resource_type",
                        [],
-                       -> { @request.parameters["com_instructure_course_canvas_resource_type"] }
+                       -> { @request.parameters["com_instructure_course_canvas_resource_type"] },
+                       CONTROLLER_GUARD
 
     # Returns the target resource id for the current page, forwarded from the request. Only functional when
     # `com_instructure_course_canvas_resource_type` is included as a query param. Currently, this is not
@@ -2024,7 +2079,8 @@ module Lti
     #   ```
     register_expansion "com.instructure.Course.canvas_resource_id",
                        [],
-                       -> { @request.parameters["com_instructure_course_canvas_resource_id"] }
+                       -> { @request.parameters["com_instructure_course_canvas_resource_id"] },
+                       CONTROLLER_GUARD
 
     # Returns whether a content can be imported into a specific group on the page, forwarded from the request.
     # True for Modules page and Assignment Groups page. False for other content index pages.
@@ -2038,7 +2094,8 @@ module Lti
     #   ```
     register_expansion "com.instructure.Course.allow_canvas_resource_selection",
                        [],
-                       -> { @request.parameters["com_instructure_course_allow_canvas_resource_selection"] }
+                       -> { @request.parameters["com_instructure_course_allow_canvas_resource_selection"] },
+                       CONTROLLER_GUARD
 
     # Returns a JSON-encoded list of content groups which can be selected, providing ID and name of each group,
     # forwarded from the request.
@@ -2068,7 +2125,8 @@ module Lti
                            end
                          end
                          val&.to_json
-                       }
+                       },
+                       CONTROLLER_GUARD
 
     register_expansion "com.instructure.Account.usage_metrics_enabled",
                        [],

@@ -23,14 +23,14 @@ import keycode from 'keycode'
 import {Tabs} from '@instructure/ui-tabs'
 import {CloseButton} from '@instructure/ui-buttons'
 import {array, bool, string, func, number, oneOfType} from 'prop-types'
-// eslint-disable-next-line import/no-named-as-default
+ 
 import Opportunity from '../Opportunity'
 import {specialFallbackFocusId} from '../../dynamic-ui/util'
 import {animatable} from '../../dynamic-ui'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import buildStyle from './style'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opportunity')
 

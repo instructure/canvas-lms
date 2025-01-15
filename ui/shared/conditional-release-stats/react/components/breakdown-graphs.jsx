@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {transformScore} from '@canvas/conditional-release-score'
 import BarGraph from './breakdown-graph-bar'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_graphs')
+const I18n = createI18nScope('cyoe_assignment_sidebar_breakdown_graphs')
 
 const {object, array, func, number, bool} = PropTypes
 
@@ -56,7 +56,7 @@ class BreakdownGraphs extends React.Component {
     const {ranges, assignment, enrolled, openSidebar, selectRange} = this.props
     return ranges.map(({size, scoring_range}, i) => (
       <BarGraph
-        // eslint-disable-next-line react/no-array-index-key
+         
         key={i}
         rangeIndex={i}
         rangeStudents={size}

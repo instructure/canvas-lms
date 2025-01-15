@@ -21,11 +21,11 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import PropTypes from 'prop-types'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {UpdateItemTray_ as UpdateItemForm} from '../UpdateItemTray'
 import {alert} from '../../utilities/alertUtils'
 
-const I18n = useI18nScope('planner')
+const I18n = createI18nScope('planner')
 
 export default function TodoEditorModal({
   locale,

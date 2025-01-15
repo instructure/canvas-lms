@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import glob from 'glob'
-import gql from 'graphql-tag'
+import {gql} from '@apollo/client'
 
 import {Assignment} from './student/Assignment'
 import {Submission} from './student/Submission'

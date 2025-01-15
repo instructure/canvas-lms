@@ -26,11 +26,11 @@ import ConfirmationModal from './ConfirmationModal'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {VisibilityChange} from '../types'
 
-const I18n = useI18nScope('account_calendar_settings_footer')
+const I18n = createI18nScope('account_calendar_settings_footer')
 
 type ComponentProps = {
   readonly originAccountId: number
@@ -52,10 +52,12 @@ export const Footer = ({
     number | undefined
   >(undefined)
 
-  // @ts-ignore - this hook isn't ts-ified
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/visible_calendars_count`,
-    success: useCallback(response => setInitialEnabledCalendarsCount(response.count), []),
+    success: useCallback(
+      (response: {count: number}) => setInitialEnabledCalendarsCount(response.count),
+      []
+    ),
     error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), []),
   })
 
